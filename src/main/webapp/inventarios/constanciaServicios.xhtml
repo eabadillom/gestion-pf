@@ -19,38 +19,29 @@
 				<div class="p-col-12">
 					<div class="card">
 						<p:outputLabel value="Por Rango de Fechas:" />
-							<p:datePicker id="fechaInicial" showIcon="true"
-								styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Inicio" />
-								<p:datePicker id="fechaFinal" showIcon="true"
-								styleClass="p-mr-4 p-mb-2" placeholder="Fecha Final" />
-<!-- 						</div> -->
-<!-- 						<div class="card"> -->
-							<p:outputLabel value="Por Folio:" />
-							<p:inputText />
-<!-- 						</div> -->
-<!-- 						<div class="card"> -->
-							<p:outputLabel for="cliente-som" value="Por Clientes:" />
-<!-- 						</div> -->
-<!-- 						<div class="card"> -->
-							<p:selectOneMenu id="cliente-som" autoWidth="false"
-								value="#{constanciaServicioBean.idCliente}" filter="true"
-								filterMatchMode="startsWith">
-								<f:selectItem itemLabel="Selecione Cliente" itemValue=""
-									noSelectionOption="true" />
-								<f:selectItems var="selectedCliente"
-									value="#{constanciaServicioBean.listaClientes}"
-									itemLabel="#{selectedCliente.cteNombre}"
-									itemValue="#{selectedCliente.cteCve}" />
-							</p:selectOneMenu>
-<!-- 						</div> -->
-<!-- 						<div class="card"> -->
-							<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2"
-								icon="pi pi-fw pi-search" process="@this"
-								oncomplete="PF('deleteEstadoDialog').show()">
-								<f:setPropertyActionListener value="#{estados}"
-									target="#{estadosBean.estadoSelect}" />
-							</p:commandButton>
-						</div>
+						<p:datePicker id="fechaInicial" showIcon="true"
+							styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Inicio"
+							value="#{constanciaServicioBean.fechaInicio}" />
+						<p:datePicker id="fechaFinal" showIcon="true"
+							styleClass="p-mr-4 p-mb-2" placeholder="Fecha Final"
+							value="#{constanciaServicioBean.fechaFinal}" />
+						<p:outputLabel for="folio" value="Por Folio:" />
+						<p:inputText id="folio" value="#{constanciaServicioBean.folio}" />
+						<p:outputLabel for="cliente-som" value="Por Clientes:" />
+						<p:selectOneMenu id="cliente-som" autoWidth="false"
+							value="#{constanciaServicioBean.idCliente}" filter="true"
+							filterMatchMode="startsWith">
+							<f:selectItem itemLabel="Selecione Cliente" itemValue=""
+								noSelectionOption="true" />
+							<f:selectItems var="selectedCliente"
+								value="#{constanciaServicioBean.listaClientes}"
+								itemLabel="#{selectedCliente.cteNombre}"
+								itemValue="#{selectedCliente.cteCve}" />
+						</p:selectOneMenu>
+						<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2"
+							icon="pi pi-fw pi-search"
+							actionListener="#{constanciaServicioBean.buscarConstancia}" update="@widgetVar(dtConstanciaServicios)"/>
+					</div>
 				</div>
 			</div>
 
@@ -58,187 +49,38 @@
 				<div class="p-col-12">
 					<div class="card">
 						<p:growl id="messages" showDetail="true" />
-						<p:dataTable id="dt-products" widgetVar="dtProducts" var="product"
-							value="#{crudDemoView.products}" reflow="true"
-							styleClass="products-table"
-							selection="#{crudDemoView.selectedProducts}"
-							rowKey="#{product.id}" paginator="true" rows="10"
+						<p:dataTable id="dt-constanciaServicios"
+							widgetVar="dtConstanciaServicios" var="constanciaServicios"
+							value="#{constanciaServicioBean.listaConstanciaServicios}"
+							reflow="true" rowKey="#{constanciaServicios.folio}" paginator="true" rows="10"
 							rowSelectMode="add" paginatorPosition="bottom">
 							<f:facet name="header">
-								<div class="products-table-header">
-									<span style="font-weight: bold">Manage Products</span> <span
-										class="filter-container ui-input-icon-left"> <i
+								<div class="customers-table-header">
+									<span style="font-weight: bold">Constancias de Servicio</span>
+									<span class="ui-input-icon-left filter-container"> <i
 										class="pi pi-search"></i> <p:inputText id="globalFilter"
-											onkeyup="PF('dtProducts').filter()" placeholder="Search" />
+											onkeyup="PF('dtConstanciaServicios').filter()"
+											placeholder="Búsqueda" />
 									</span>
 								</div>
 							</f:facet>
-
-							<p:ajax event="rowToggle" listener="#{crudDemoView.onRowToggle}" />
-
-							<p:column selectionMode="multiple" exportable="false"></p:column>
-							<p:column exportable="false">
-								<p:rowToggler />
+							<p:column selectionMode="multiple" />
+							<p:column headerText="Folio" sortBy="#{constanciaServicios.folio}"
+								filterBy="#{constanciaServicios.folio}">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem"
+									value="#{constanciaServicios.folio}" />
 							</p:column>
-							<p:column headerText="Code" sortBy="#{product.code}"
-								filterBy="#{product.code}">
-								<h:outputText value="#{product.code}" />
+							<p:column headerText="Cliente" sortBy="#{constanciaServicios.cteCve.cteNombre}"
+								filterBy="#{constanciaServicios.cteCve.cteNombre}">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem"
+									value="#{constanciaServicios.cteCve.cteNombre}" />
 							</p:column>
-							<p:column headerText="Name" sortBy="#{product.name}"
-								filterBy="#{product.name}">
-								<h:outputText value="#{product.name}" />
+							<p:column headerText="Fecha" sortBy="#{constanciaServicios.fecha}"
+								filterBy="#{constanciaServicios.fecha}">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem"
+									value="#{constanciaServicios.fecha}" />
 							</p:column>
-							<p:column headerText="Image" exportable="false">
-								<p:graphicImage name="images/product/#{product.image}"
-									library="demo" styleClass="product-image" />
-							</p:column>
-							<p:column headerText="Price" sortBy="#{product.price}">
-								<h:outputText value="#{product.price}" style="font-weight: 700">
-									<f:convertNumber currencySymbol="$" type="currency" />
-								</h:outputText>
-							</p:column>
-							<p:column headerText="Category" sortBy="#{product.category}"
-								filterBy="#{product.category}">
-								<h:outputText value="#{product.category}" />
-							</p:column>
-							<p:column headerText="Reviews" sortBy="#{product.rating}">
-								<p:rating value="#{product.rating}" readonly="true" />
-							</p:column>
-							<p:column headerText="Status" sortBy="#{product.inventoryStatus}"
-								filterBy="#{product.inventoryStatus}">
-								<h:outputText
-									styleClass="product-badge status-#{product.inventoryStatus.name().toLowerCase()}"
-									value="#{product.inventoryStatus.text}" />
-							</p:column>
-							<p:column exportable="false">
-								<p:commandButton icon="pi pi-pencil"
-									update=":form:manage-product-content"
-									oncomplete="PF('manageProductDialog').show()"
-									styleClass="edit-button rounded-button ui-button-success"
-									process="@this">
-									<f:setPropertyActionListener value="#{product}"
-										target="#{crudDemoView.selectedProduct}" />
-								</p:commandButton>
-								<p:commandButton class="ui-button-warning rounded-button"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('deleteProductDialog').show()">
-									<f:setPropertyActionListener value="#{product}"
-										target="#{crudDemoView.selectedProduct}" />
-								</p:commandButton>
-							</p:column>
-
-							<p:rowExpansion>
-								<div class="orders-subtable">
-									<h5>Orders for #{product.name}</h5>
-									<p:dataTable var="order" value="#{product.orders}"
-										reflow="true">
-										<p:column headerText="Id" sortBy="#{order.id}">
-											<h:outputText value="#{order.id}" />
-										</p:column>
-
-										<p:column headerText="Customer" sortBy="#{order.customer}">
-											<h:outputText value="#{order.customer}" />
-										</p:column>
-
-										<p:column headerText="Date" sortBy="#{order.date}">
-											<h:outputText value="#{order.date}" />
-										</p:column>
-
-										<p:column headerText="Amount" sortBy="#{order.amount}">
-											<h:outputText value="#{order.amount}">
-												<f:convertNumber currencySymbol="$" type="currency" />
-											</h:outputText>
-										</p:column>
-
-										<p:column headerText="Status" sortBy="#{order.status}">
-											<span
-												class="order-badge order-#{order.status.name().toLowerCase()}">#{order.status}</span>
-										</p:column>
-
-										<p:column style="width: 3.5rem">
-											<p:commandButton icon="pi pi-search" />
-										</p:column>
-									</p:dataTable>
-								</div>
-							</p:rowExpansion>
 						</p:dataTable>
-
-						<p:dialog header="Product Details" showEffect="fade" modal="true"
-							widgetVar="manageProductDialog" responsive="true">
-							<p:outputPanel id="manage-product-content" class="ui-fluid">
-								<p:outputPanel
-									rendered="#{not empty crudDemoView.selectedProduct}">
-									<p:graphicImage
-										name="images/product/#{crudDemoView.selectedProduct.image}"
-										library="demo" styleClass="product-image"
-										rendered="#{not empty crudDemoView.selectedProduct.image}" />
-									<div class="p-field">
-										<p:outputLabel for="name">Name</p:outputLabel>
-										<p:inputText id="name"
-											value="#{crudDemoView.selectedProduct.name}" required="true" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel for="description">Description</p:outputLabel>
-										<p:inputTextarea id="description"
-											value="#{crudDemoView.selectedProduct.description}" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel for="category">Category</p:outputLabel>
-										<p:selectOneRadio id="category"
-											value="#{crudDemoView.selectedProduct.category}"
-											layout="responsive" columns="2">
-											<f:selectItem itemLabel="Accessories" itemValue="Accessories" />
-											<f:selectItem itemLabel="Clothing" itemValue="Clothing" />
-											<f:selectItem itemLabel="Electronics" itemValue="Electronics" />
-											<f:selectItem itemLabel="Fitness" itemValue="Fitness" />
-										</p:selectOneRadio>
-									</div>
-									<div class="p-formgrid p-grid">
-										<div class="p-field p-col">
-											<p:outputLabel for="price">Price</p:outputLabel>
-											<p:inputNumber id="price"
-												value="#{crudDemoView.selectedProduct.price}" symbol=" USD"
-												symbolPosition="s" decimalSeparator="."
-												thousandSeparator="," />
-										</div>
-										<div class="p-field p-col">
-											<p:outputLabel for="quantity">Quantity</p:outputLabel>
-											<p:spinner id="quantity" min="0"
-												value="#{crudDemoView.selectedProduct.quantity}" />
-										</div>
-									</div>
-								</p:outputPanel>
-							</p:outputPanel>
-
-							<f:facet name="footer">
-								<p:commandButton value="Save" icon="pi pi-check"
-									actionListener="#{crudDemoView.saveProduct}"
-									update="manage-product-content"
-									process="manage-product-content @this" />
-								<p:commandButton value="Cancel" icon="pi pi-times"
-									onclick="PF('manageProductDialog').hide()"
-									class="ui-button-secondary" />
-							</f:facet>
-						</p:dialog>
-
-						<p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade"
-							width="300" message="Delete the product?" header="Confirm"
-							severity="warn">
-							<p:commandButton value="Yes" icon="pi pi-check"
-								actionListener="#{crudDemoView.deleteProduct}" process="@this"
-								oncomplete="PF('deleteProductDialog').hide()" />
-							<p:commandButton value="No" type="button"
-								styleClass="ui-button-secondary" icon="pi pi-times"
-								onclick="PF('deleteProductDialog').hide()" />
-						</p:confirmDialog>
-
-						<p:confirmDialog global="true" showEffect="fade" width="300">
-							<p:commandButton value="Yes" type="button"
-								styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-							<p:commandButton value="No" type="button"
-								styleClass="ui-confirmdialog-no ui-button-secondary"
-								icon="pi pi-times" />
-						</p:confirmDialog>
 					</div>
 				</div>
 			</div>
