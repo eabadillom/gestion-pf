@@ -184,8 +184,12 @@
 								<p:menuitem value="Mantenimiento" icon="pi pi-user-edit"
 									outcome="/protected/catalogos/facMantenimiento" />
 							</p:submenu>
+							<p:submenu id="frb_facturacion_ingresos" label="Ingresos" icon="pi pi-fw pi-wallet">
+<p:menuitem id="frb_facturacion_ingresos_alta" label="Alta" icon="pi pi-fw pi-plus"/>
+<p:menuitem id="frb_facturacion_ingresos_actualizar" label="Actualizar" icon="pi pi-fw pi-pencil"/>							</p:submenu>
 							<p:submenu id="frb_facturacion_sm1" label="Catálogos"
-								icon="pi pi-fw pi-th-large">
+				
+							icon="pi pi-fw pi-th-large">
 								<p:menuitem id="frb_facturacion_sm11" value="Banco"
 									icon="pi pi-fw pi-money-bill"
 									outcome="/protected/catalogos/bancos" />
