@@ -68,16 +68,13 @@
 									<div class="p-field p-col-12 p-md-6">
 										<p:commandButton id="limpiarFactura"
 											actionListener="#{ingresosCrudBean.limpiaFiltro()}"
-											icon="pi pi-undo"
-											process="@this soClientes soEstatus"
+											icon="pi pi-undo" process="@this soClientes soEstatus"
 											styleClass="edit-button ui-button-primary" value="Limpiar"
 											update="form:dt-facturas form:soClientes form:soEstatus form:dateSelected" />
 									</div>
 								</div>
 							</div>
 						</div>
-
-
 
 						<p:dataTable id="dt-facturas" widgetVar="dtFacturas"
 							var="pFactura" value="#{ingresosCrudBean.lstFacturaFiltered}"
@@ -141,8 +138,19 @@
 										paginatorPosition="bottom" lazy="true">
 										<f:facet name="header">
 											<div class="facturas-table-header">
-												<span style="font-weight: bold">Información de Pago</span> <span
-													class="filter-container ui-input-icon-left"> </span>
+												<p:toolbar styleClass="p-mb-5" >
+													<p:toolbarGroup align="left">
+														<h:outputText
+															value="#{ingresosCrudBean.clienteSelected.cteNombre}" />
+													</p:toolbarGroup>
+													<p:toolbarGroup align="right">
+														<h:outputText  
+															value="A pagar: #{ingresosCrudBean.montoPago}" />
+													</p:toolbarGroup>
+												</p:toolbar>
+												<span style="font-weight: bold"
+													title="Cliente: #{ingresosCrudBean.clienteSelected.cteNombre}" />
+												<span class="filter-container ui-input-icon-left"> </span>
 											</div>
 										</f:facet>
 										<p:column headerText="Factura">
@@ -157,13 +165,12 @@
 												<f:selectItems value="#{ingresosCrudBean.lstTipoPago}"
 													var="tipoPago" itemLabel="#{tipoPago.nombre}"
 													itemValue="#{tipoPago}" />
-												<p:ajax update="form:panel-pago" />
 											</p:selectOneMenu>
 										</p:column>
 										<p:column headerText="Cheque">
 											<p:inputText value="#{pPago.cheque}" />
 										</p:column>
-										<p:column headerText="Banco">											
+										<p:column headerText="Banco">
 											<p:selectOneMenu id="soBancos" converter="entityConverter"
 												value="#{ingresosCrudBean.bancosSelected}" filter="true"
 												filterMatchMode="contains"
@@ -172,20 +179,19 @@
 												<f:selectItems value="#{ingresosCrudBean.lstBancos}"
 													var="banco" itemLabel="#{banco.nombre}"
 													itemValue="#{banco}" />
-												<p:ajax
-													update="form:dt-facturas form:soClientes form:soEstatus form:dateSelected form:buscarFactura" />
-											</p:selectOneMenu>
+										</p:selectOneMenu>
 										</p:column>
 										<p:column headerText="A pagar">
-											<p:inputText value="#{pPago.monto}" />
+											<p:inputText value="#{pPago.monto}">
+												<p:ajax event="blur" update="@this"
+													listener="#{ingresosCrudBean.actualizaMontoPago()}" />
+											</p:inputText>
 										</p:column>
 										<p:column headerText="Saldo">
-											<h:outputText
-												value="#{pPago.factura.observacion}" />
+											<h:outputText value="#{pPago.factura.observacion}" />
 										</p:column>
 										<p:column headerText="Monto">
-											<h:outputText
-												value="#{pPago.factura.total}" />
+											<h:outputText value="#{pPago.factura.total}" />
 										</p:column>
 									</p:dataTable>
 
@@ -195,10 +201,11 @@
 							<f:facet name="footer">
 								<p:commandButton value="Registrar Pago" icon="pi pi-money-bill"
 									actionListener="#{ingresosCrudBean.procesaPago()}"
-									update="panel-pago" process="@this panel-pago" />
+									onclick="PF('informacionPagoDialog').hide()"
+									update="panel-pago dt-facturas" process="@this panel-pago" />
 								<p:commandButton value="Cancelar" icon="pi pi-times"
 									onclick="PF('informacionPagoDialog').hide()"
-									class="ui-button-secondary" update="panel-pago"
+									class="ui-button-secondary" update="panel-pago dt-facturas"
 									resetValues="true" />
 							</f:facet>
 						</p:dialog>

@@ -95,6 +95,7 @@ public class IngresosCrudBean implements Serializable {
 	private String startDate = "";
 	private String endDate = "";
 	private BigDecimal pagosTotales;
+	private BigDecimal montoPago;
 
 	/**
 	 * Objetos para Productos
@@ -133,7 +134,6 @@ public class IngresosCrudBean implements Serializable {
 		lstStatusFactura = statusFacturaDAO.buscarTodos();
 		lstPago = pagoDAO.buscarTodos();
 		lstTipoPago = tipoPagoDAO.buscarTodos();
-		// clienteSelected = new Cliente();
 	}
 
 	/**
@@ -207,6 +207,20 @@ public class IngresosCrudBean implements Serializable {
 			 */
 	}
 
+	public void filtraSaldos() {
+		for (int i = 0; i < lstFacturaFiltered.size(); i++) {
+			BigDecimal totalAux = lstFacturaFiltered.get(i).getTotal()
+					.subtract(calculaSaldoTotal(lstFacturaFiltered.get(i)));
+			if (totalAux.compareTo(BigDecimal.ZERO)==0) {
+				StatusFactura statusAux = new StatusFactura();
+				statusAux.setId(3);
+				lstFacturaFiltered.get(i).setStatus(statusAux);
+				facturaDAO.actualizaStatus(lstFacturaFiltered.get(i));
+			}
+		}
+		filtraFacturas();
+	}
+
 	public void filtraFacturas() {
 		filtraListadoClientes();
 		filtraListadoStatus();
@@ -220,6 +234,8 @@ public class IngresosCrudBean implements Serializable {
 		statusFacturaSelected = null;
 		customDate = null;
 		lstFacturaSelected = null;
+		PrimeFaces.current().ajax().update("form:dt-facturas");
+
 	}
 
 	public void calculaPago() {
@@ -227,6 +243,7 @@ public class IngresosCrudBean implements Serializable {
 		for (Factura f : lstFacturaFiltered) {
 			for (Pago p : f.getPagoList()) {
 				pagoTotAux = pagoTotAux.add(p.getMonto());
+
 			}
 		}
 		pagosTotales = pagoTotAux;
@@ -237,64 +254,92 @@ public class IngresosCrudBean implements Serializable {
 	 */
 	public void procesaPago() {
 		List<String> errores = new ArrayList<>();
-		for(Pago p : lstPago) {
-			//Se elimina dato de saldo de la factura
-			p.getFactura().setObservacion("");		
+		for (Pago p : lstPago) {
+			// Se elimina dato de saldo de la factura
+			p.getFactura().setObservacion("");
 			p.setFecha(new Date());
 			errores.add(pagoDAO.guardar(p));
 		}
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pago Procesado"));
-		for(String e : errores) {
-			if(e!=null) {
+		for (String e : errores) {
+			if (e != null) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error al guardar el Pago"));
 			}
 		}
-		PrimeFaces.current().ajax().update("form:messages");
+		filtraSaldos();
+		PrimeFaces.current().ajax().update("form:messages form:dt-facturas form:panel-pago");
 	}
-	
+
 	/**
 	 * Métodos de control
 	 */
 	public boolean hasFacturaSelected() {
 		return this.lstFacturaSelected != null && !this.lstFacturaSelected.isEmpty();
 	}
-	
+
 	public String getBotonPagoMessage() {
-		if(hasFacturaSelected()) {
+		if (hasFacturaSelected()) {
 			int size = this.lstFacturaSelected.size();
-			return size > 1 ? "Pagar " + size + " Facturas" :"Pagar 1 Factura";
+			return size > 1 ? "Pagar " + size + " Facturas" : "Pagar 1 Factura";
 		}
 		return "Pago";
 	}
+
 	public void actualizaBoton() {
 		lstPago = new ArrayList<>();
-		for(Factura f: lstFacturaSelected) {
+		for (Factura f : lstFacturaSelected) {
 			Pago pagoAux = new Pago();
-			this.calculaSaldo();	
-			pagoAux.setFactura(f);					
+			this.calculaSaldo();
+			pagoAux.setFactura(f);
+			BigDecimal saldoAux = calculaSaldoTotal(f);
+			if (saldoAux == new BigDecimal(0)) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error al guardar el Pago"));
+			}
 			lstPago.add(pagoAux);
-		}	
+		}
 		PrimeFaces.current().ajax().update("form:panel-pago");
+	}
 
+	/**
+	 * Método para calcular saldo Se utiliza un campo de Factura que no es enviado a
+	 * base de datos para poder mostrarlo en el campo de Saldo sin necesidad de
+	 * agregar campos al objeto Factura
+	 */
+	public void calculaSaldo() {
+		if (!lstFacturaSelected.isEmpty() && lstFacturaSelected != null) {
+			for (Factura f : lstFacturaSelected) {
+				BigDecimal saldo = calculaSaldoTotal(f);
+				// Se usa el campo Observación para mostrar el saldo
+				saldo = f.getTotal().subtract(saldo);
+				f.setObservacion(saldo.toString());
+			}
+		}
+	}
+
+	// List<Pago> pagoFactura = pagoDAO.buscaPorFactura(f);
+
+	private BigDecimal calculaSaldoTotal(Factura f) {
+		BigDecimal saldo = new BigDecimal(0);
+		List<Pago> pagoFactura = pagoDAO.buscaPorFactura(f);
+		for (Pago p : pagoFactura) {
+			saldo = saldo.add(p.getMonto());
+		}
+		return saldo;
 	}
 	
 	/**
-	 * Método para calcular saldo
-	 * Se utiliza un campo de Factura que no es enviado a base de datos
-	 * para poder mostrarlo en el campo de Saldo sin necesidad de agregar campos al objeto Factura
+	 * Método para actualizar monto a pagar total
 	 */
-	public void calculaSaldo() {
-		if(!lstFacturaSelected.isEmpty()&&lstFacturaSelected!=null) {
-			for(Factura f : lstFacturaSelected) {
-				BigDecimal saldo = new BigDecimal(0);
-				for(Pago p : f.getPagoList()) {
-					saldo = saldo.add(p.getMonto());
-				}
-				//Se usa el campo Observación para mostrar el saldo
-				saldo = f.getTotal().subtract(saldo);
-				f.setObservacion(Long.toString(saldo.longValue()));
+	
+	public void actualizaMontoPago() {
+		montoPago = new BigDecimal(0);
+		for(Pago p: lstPago) {
+			if(p.getMonto()!=null) {
+				montoPago = montoPago.add(p.getMonto());
 			}
 		}
+		PrimeFaces.current().ajax().update("form:montoPago");
+//		montoPago = new BigDecimal(0);
 	}
 
 	/**
@@ -516,5 +561,12 @@ public class IngresosCrudBean implements Serializable {
 		this.lstFacturaSelected = lstFacturaSelected;
 	}
 
-	
+	public BigDecimal getMontoPago() {
+		return montoPago;
+	}
+
+	public void setMontoPago(BigDecimal montoPago) {
+		this.montoPago = montoPago;
+	}
+
 }

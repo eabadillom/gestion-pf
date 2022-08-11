@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -60,6 +61,12 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 	public String eliminarListado(List<Pago> listado) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public List<Pago> buscaPorFactura(Factura f) {
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("Pago.findByFacturaId", Pago.class).setParameter("facturaId", f.getId())
+				.getResultList();
 	}
 
 }

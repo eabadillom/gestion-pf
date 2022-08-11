@@ -9,7 +9,7 @@ import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class FacturaDAO extends IBaseDAO<Factura, Integer>{
+public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 
 	@Override
 	public Factura buscarPorId(Integer id) {
@@ -31,7 +31,7 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer>{
 	}
 
 	@Override
-	public String actualizar(Factura e) {
+	public String actualizar(Factura f) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -51,6 +51,21 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer>{
 	@Override
 	public String eliminarListado(List<Factura> listado) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String actualizaStatus(Factura f) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.createNativeQuery("UPDATE factura SET status =:status WHERE id =:id")
+					.setParameter("status", f.getStatus()).setParameter("id", f.getId()).executeUpdate();
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
 		return null;
 	}
 
