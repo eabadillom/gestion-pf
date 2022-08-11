@@ -77,6 +77,8 @@ public class ConstanciaDeServicio implements Serializable {
     private EstadoConstancia status;
     @OneToMany(mappedBy = "folio")
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
+    @OneToMany(mappedBy = "constanciaDeServicio")
+    private List<ConstanciaFacturaDs> constanciaFacturaDsList;
 
     public ConstanciaDeServicio() {
     }
@@ -176,6 +178,14 @@ public class ConstanciaDeServicio implements Serializable {
 
     public void setConstanciaServicioDetalleList(List<ConstanciaServicioDetalle> constanciaServicioDetalleList) {
         this.constanciaServicioDetalleList = constanciaServicioDetalleList;
+    }
+    
+    public List<ConstanciaFacturaDs> getConstanciaFacturaDsList() {
+        return constanciaFacturaDsList;
+    }
+
+    public void setConstanciaFacturaDsList(List<ConstanciaFacturaDs> constanciaFacturaDsList) {
+        this.constanciaFacturaDsList = constanciaFacturaDsList;
     }
 
     @Override

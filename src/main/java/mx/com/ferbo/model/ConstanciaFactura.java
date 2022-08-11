@@ -7,7 +7,10 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +20,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -82,6 +86,8 @@ public class ConstanciaFactura implements Serializable {
     @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne
     private Factura factura;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "constancia")
+    private List<ServicioConstancia> servicioConstanciaList;
 
     public ConstanciaFactura() {
     }
@@ -189,6 +195,14 @@ public class ConstanciaFactura implements Serializable {
 
     public void setFactura(Factura factura) {
         this.factura = factura;
+    }
+    
+    public List<ServicioConstancia> getServicioConstanciaList() {
+        return servicioConstanciaList;
+    }
+
+    public void setServicioConstanciaList(List<ServicioConstancia> servicioConstanciaList) {
+        this.servicioConstanciaList = servicioConstanciaList;
     }
 
     @Override

@@ -66,6 +66,8 @@ public class Planta implements Serializable {
 	private List<Camara> camaraList;
 	@OneToMany(mappedBy = "plantaCve")
 	private List<Aviso> avisoList;
+	@OneToMany(mappedBy = "planta")
+    private List<Factura> facturaList;
 
 	public Planta() {
 
@@ -138,6 +140,14 @@ public class Planta implements Serializable {
 	public void setAvisoList(List<Aviso> avisoList) {
 		this.avisoList = avisoList;
 	}
+	
+	public List<Factura> getFacturaList() {
+        return facturaList;
+    }
+
+    public void setFacturaList(List<Factura> facturaList) {
+        this.facturaList = facturaList;
+    }
 
 	@Override
 	public int hashCode() {
