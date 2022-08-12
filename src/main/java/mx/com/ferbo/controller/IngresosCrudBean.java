@@ -64,6 +64,7 @@ public class IngresosCrudBean implements Serializable {
 	private List<Factura> lstFactura;
 	private List<Factura> lstFacturaFiltered;
 	private List<Factura> lstFacturaSelected;
+	private List<Factura> lstFacturaAux;
 	private Factura facturaSelected;
 	private FacturaDAO facturaDAO;
 
@@ -123,6 +124,7 @@ public class IngresosCrudBean implements Serializable {
 		lstPago = new ArrayList<>();
 		lstFacturaFiltered = new ArrayList<>();
 		lstFacturaSelected = new ArrayList<>();
+		lstFacturaAux = new ArrayList<>();
 		lstTipoPago = new ArrayList<>();
 
 	}
@@ -288,6 +290,7 @@ public class IngresosCrudBean implements Serializable {
 
 	public void actualizaBoton() {
 		lstPago = new ArrayList<>();
+		lstFacturaAux = lstFacturaSelected;
 		for (Factura f : lstFacturaSelected) {
 			Pago pagoAux = new Pago();
 			this.calculaSaldo();
@@ -301,6 +304,12 @@ public class IngresosCrudBean implements Serializable {
 		}
 		PrimeFaces.current().ajax().update("form:messages","form:panel-pago");
 	}
+	
+	public void refrescaTabla() {
+		lstFacturaSelected = lstFacturaAux;
+		PrimeFaces.current().ajax().update("form:messages","form:panel-pago", "form:dt-facturas", "form:botonPagar");
+	}
+	
 
 	/**
 	 * Método para calcular saldo Se utiliza un campo de Factura que no es enviado a
@@ -336,19 +345,21 @@ public class IngresosCrudBean implements Serializable {
 	public void actualizaMontoPago() {
 		disabledPagar = false;
 		montoPago = new BigDecimal(0);
-		for(Factura f : lstFacturaFiltered) {
+		//for(Factura f : lstFacturaAux) {
 		for (Pago p : lstPago) {
 			if (p.getMonto() != null) {
 				montoPago = montoPago.add(p.getMonto());
-				if (p.getMonto().compareTo(f.getTotal().subtract(calculaSaldoTotal(f))) > 0) {
+				if (p.getMonto().compareTo(p.getFactura().getTotal().subtract(calculaSaldoTotal(p.getFactura()))) > 0) {
 					disabledPagar = true;
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"Error", "El monto a pagar no debe ser mayor al Saldo"));
 				}
-			}
+			//}
 		}}
-		if(disabledPagar) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Error", "El monto a pagar no debe ser mayor al Saldo"));
-		}
+		//if(disabledPagar) {
+			//FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+		//			"Error", "El monto a pagar no debe ser mayor al Saldo"));
+		//}
 		PrimeFaces.current().ajax().update("form:montoPago", "form:panel-pago","form:botonProcesaPago","form:messages");
 		montoPago = new BigDecimal(0);
 	}
@@ -586,6 +597,14 @@ public class IngresosCrudBean implements Serializable {
 
 	public void setDisabledPagar(boolean disabledPagar) {
 		this.disabledPagar = disabledPagar;
+	}
+
+	public List<Factura> getLstFacturaAux() {
+		return lstFacturaAux;
+	}
+
+	public void setLstFacturaAux(List<Factura> lstFacturaAux) {
+		this.lstFacturaAux = lstFacturaAux;
 	}
 
 }

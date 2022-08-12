@@ -39,7 +39,7 @@
 											disabled="#{ingresosCrudBean.statusFacturaSelected eq null and ingresosCrudBean.statusFacturaSelected.id eq null}"
 											showIcon="true" value="#{ingresosCrudBean.customDate}">
 											<p:ajax
-												update="form:dt-facturas form:soClientes form:soEstatus form:dateSelected form:buscarFactura" />
+												update="form:dt-facturas form:soClientes form:soEstatus form:dateSelected form:buscarFactura form:panel-pago" />
 										</p:datePicker>
 									</div>
 									<div class="p-field p-col-12 p-md-6">
@@ -116,10 +116,10 @@
 								<p:commandButton id="botonPagar" style="width:300px;height:30px"
 									value="#{ingresosCrudBean.botonPagoMessage}"
 									icon="pi pi-money-bill"
-									actionListener="#{ingresosCrudBean.actualizaBoton}"
-									styleClass="edit-button ui-button-primary"
+									actionListener="#{ingresosCrudBean.actualizaBoton()}"
+									styleClass="edit-button ui-button-primary" process="@this"
 									disabled="#{!ingresosCrudBean.hasFacturaSelected()}"
-									update="@this" oncomplete="PF('informacionPagoDialog').show()">
+									update="@this form:panel-pago " oncomplete="PF('informacionPagoDialog').show()">
 									<f:setPropertyActionListener value="#{pInfoPago}"
 										target="#{ingresosCrudBean.lstFacturaSelected}" />
 								</p:commandButton>
@@ -209,8 +209,8 @@
 									onclick="PF('informacionPagoDialog').hide()" disabled="#{ingresosCrudBean.disabledPagar}"
 									update="panel-pago dt-facturas" process="@this panel-pago" />
 								<p:commandButton value="Cancelar" icon="pi pi-times"
-									onclick="PF('informacionPagoDialog').hide()"
-									class="ui-button-secondary" update="panel-pago dt-facturas"
+									onclick="PF('informacionPagoDialog').hide()" actionListener="#{ingresosCrudBean.refrescaTabla()}"
+									class="ui-button-secondary" update="panel-pago dt-facturas botonPagar"
 									resetValues="true" />
 							</f:facet>
 						</p:dialog>
