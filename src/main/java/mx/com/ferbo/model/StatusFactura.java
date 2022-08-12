@@ -27,10 +27,10 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "status_factura")
 @NamedQueries({
-    @NamedQuery(name = "StatusFactura.findAll", query = "SELECT s FROM StatusFactura s"),
-    @NamedQuery(name = "StatusFactura.findById", query = "SELECT s FROM StatusFactura s WHERE s.id = :id"),
-    @NamedQuery(name = "StatusFactura.findByNombre", query = "SELECT s FROM StatusFactura s WHERE s.nombre = :nombre"),
-    @NamedQuery(name = "StatusFactura.findByDescripcion", query = "SELECT s FROM StatusFactura s WHERE s.descripcion = :descripcion")})
+        @NamedQuery(name = "StatusFactura.findAll", query = "SELECT s FROM StatusFactura s"),
+        @NamedQuery(name = "StatusFactura.findById", query = "SELECT s FROM StatusFactura s WHERE s.id = :id"),
+        @NamedQuery(name = "StatusFactura.findByNombre", query = "SELECT s FROM StatusFactura s WHERE s.nombre = :nombre"),
+        @NamedQuery(name = "StatusFactura.findByDescripcion", query = "SELECT s FROM StatusFactura s WHERE s.descripcion = :descripcion") })
 public class StatusFactura implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -118,5 +118,5 @@ public class StatusFactura implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.StatusFactura[ id=" + id + " ]";
     }
-    
+
 }

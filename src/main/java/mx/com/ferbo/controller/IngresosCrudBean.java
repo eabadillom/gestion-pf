@@ -96,6 +96,7 @@ public class IngresosCrudBean implements Serializable {
 	private String endDate = "";
 	private BigDecimal pagosTotales;
 	private BigDecimal montoPago;
+	private boolean disabledPagar;
 
 	/**
 	 * Objetos para Productos
@@ -211,7 +212,7 @@ public class IngresosCrudBean implements Serializable {
 		for (int i = 0; i < lstFacturaFiltered.size(); i++) {
 			BigDecimal totalAux = lstFacturaFiltered.get(i).getTotal()
 					.subtract(calculaSaldoTotal(lstFacturaFiltered.get(i)));
-			if (totalAux.compareTo(BigDecimal.ZERO)==0) {
+			if (totalAux.compareTo(BigDecimal.ZERO) == 0) {
 				StatusFactura statusAux = new StatusFactura();
 				statusAux.setId(3);
 				lstFacturaFiltered.get(i).setStatus(statusAux);
@@ -293,11 +294,12 @@ public class IngresosCrudBean implements Serializable {
 			pagoAux.setFactura(f);
 			BigDecimal saldoAux = calculaSaldoTotal(f);
 			if (saldoAux == new BigDecimal(0)) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error al guardar el Pago"));
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"Error","Error al guardar el Pago"));
 			}
 			lstPago.add(pagoAux);
 		}
-		PrimeFaces.current().ajax().update("form:panel-pago");
+		PrimeFaces.current().ajax().update("form:messages","form:panel-pago");
 	}
 
 	/**
@@ -326,20 +328,29 @@ public class IngresosCrudBean implements Serializable {
 		}
 		return saldo;
 	}
-	
+
 	/**
 	 * Método para actualizar monto a pagar total
 	 */
-	
+
 	public void actualizaMontoPago() {
+		disabledPagar = false;
 		montoPago = new BigDecimal(0);
-		for(Pago p: lstPago) {
-			if(p.getMonto()!=null) {
+		for(Factura f : lstFacturaFiltered) {
+		for (Pago p : lstPago) {
+			if (p.getMonto() != null) {
 				montoPago = montoPago.add(p.getMonto());
+				if (p.getMonto().compareTo(f.getTotal().subtract(calculaSaldoTotal(f))) > 0) {
+					disabledPagar = true;
+				}
 			}
+		}}
+		if(disabledPagar) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"Error", "El monto a pagar no debe ser mayor al Saldo"));
 		}
-		PrimeFaces.current().ajax().update("form:montoPago");
-//		montoPago = new BigDecimal(0);
+		PrimeFaces.current().ajax().update("form:montoPago", "form:panel-pago","form:botonProcesaPago","form:messages");
+		montoPago = new BigDecimal(0);
 	}
 
 	/**
@@ -567,6 +578,14 @@ public class IngresosCrudBean implements Serializable {
 
 	public void setMontoPago(BigDecimal montoPago) {
 		this.montoPago = montoPago;
+	}
+
+	public boolean isDisabledPagar() {
+		return disabledPagar;
+	}
+
+	public void setDisabledPagar(boolean disabledPagar) {
+		this.disabledPagar = disabledPagar;
 	}
 
 }
