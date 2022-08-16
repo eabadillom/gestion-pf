@@ -79,6 +79,7 @@ public class IngresosCrudBean implements Serializable {
 	 * Objetos para Pagos
 	 */
 	private List<Pago> lstPago;
+	private List<Pago> lstPagoFiltered;
 	private Pago pagoSelected;
 	private PagoDAO pagoDAO;
 
@@ -93,8 +94,8 @@ public class IngresosCrudBean implements Serializable {
 	 * Objetos auxiliares
 	 */
 	private Date customDate;
-	private String startDate = "";
-	private String endDate = "";
+	private Date startDate;
+	private Date endDate;
 	private BigDecimal pagosTotales;
 	private BigDecimal montoPago;
 	private boolean disabledPagar;
@@ -126,6 +127,7 @@ public class IngresosCrudBean implements Serializable {
 		lstFacturaSelected = new ArrayList<>();
 		lstFacturaAux = new ArrayList<>();
 		lstTipoPago = new ArrayList<>();
+		pagoSelected = new Pago();
 
 	}
 
@@ -363,6 +365,55 @@ public class IngresosCrudBean implements Serializable {
 		PrimeFaces.current().ajax().update("form:montoPago", "form:panel-pago","form:botonProcesaPago","form:messages");
 		montoPago = new BigDecimal(0);
 	}
+	
+	/**
+	 * Métodos para actualización de Pago
+	 */
+	/**
+	 * Método para filtrado
+	 */
+public void filtraPagos() {
+	lstPagoFiltered = pagoDAO.buscaPorClienteFechas(clienteSelected, startDate, endDate);
+	PrimeFaces.current().ajax().update("form:dt-pagos");
+
+	
+	
+	
+}
+public void filtraListadoClientesPago() {
+	if (lstPagoFiltered.isEmpty() || lstPagoFiltered == null) {
+		lstPagoFiltered = lstPago;
+	}
+	lstPagoFiltered = lstPago.stream()
+			.filter(ps -> clienteSelected != null
+					? (ps.getFactura().getCliente().getCteCve().intValue() == clienteSelected.getCteCve().intValue())
+					: false)
+			.collect(Collectors.toList());
+	
+	
+}
+
+public void actualizaPago() {
+	if(pagoDAO.actualizar(pagoSelected)!=null) {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+				"Error", "Error al actualizar el pago"));
+	}else {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pago Actualizado"));
+	}
+	PrimeFaces.current().ajax().update("form:panel-actualizaPago", "form:dt-pagos");
+}
+
+public void eliminaPago() {
+	if(pagoDAO.eliminar(pagoSelected)!=null) {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+				"Error", "Error al eliminar el pago"));
+	}else {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pago Eliminado"));
+	}
+	filtraPagos();
+	PrimeFaces.current().ajax().update("form:panel-actualizaPago", "form:dt-pagos");
+}
+
 
 	/**
 	 * Getters y Setters
@@ -439,19 +490,19 @@ public class IngresosCrudBean implements Serializable {
 		this.facturaDAO = facturaDAO;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
-	public String getEndDate() {
+	public Date getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(String endDate) {
+	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
 
@@ -605,6 +656,14 @@ public class IngresosCrudBean implements Serializable {
 
 	public void setLstFacturaAux(List<Factura> lstFacturaAux) {
 		this.lstFacturaAux = lstFacturaAux;
+	}
+
+	public List<Pago> getLstPagoFiltered() {
+		return lstPagoFiltered;
+	}
+
+	public void setLstPagoFiltered(List<Pago> lstPagoFiltered) {
+		this.lstPagoFiltered = lstPagoFiltered;
 	}
 
 }

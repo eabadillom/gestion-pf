@@ -31,15 +31,15 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "pago")
 @NamedQueries({
-    @NamedQuery(name = "Pago.findAll", query = "SELECT p FROM Pago p"),
-    @NamedQuery(name = "Pago.findById", query = "SELECT p FROM Pago p WHERE p.id = :id"),
-    @NamedQuery(name = "Pago.findByMonto", query = "SELECT p FROM Pago p WHERE p.monto = :monto"),
-    @NamedQuery(name = "Pago.findByFecha", query = "SELECT p FROM Pago p WHERE p.fecha = :fecha"),
-    @NamedQuery(name = "Pago.findByReferencia", query = "SELECT p FROM Pago p WHERE p.referencia = :referencia"),
-    @NamedQuery(name = "Pago.findByCheque", query = "SELECT p FROM Pago p WHERE p.cheque = :cheque"),
-    @NamedQuery(name = "Pago.findByChequeDevuelto", query = "SELECT p FROM Pago p WHERE p.chequeDevuelto = :chequeDevuelto"),
-    @NamedQuery(name = "Pago.findByFacturaId", query = "SELECT p FROM Pago p WHERE p.factura.id = :facturaId") })
-
+        @NamedQuery(name = "Pago.findAll", query = "SELECT p FROM Pago p"),
+        @NamedQuery(name = "Pago.findById", query = "SELECT p FROM Pago p WHERE p.id = :id"),
+        @NamedQuery(name = "Pago.findByMonto", query = "SELECT p FROM Pago p WHERE p.monto = :monto"),
+        @NamedQuery(name = "Pago.findByFecha", query = "SELECT p FROM Pago p WHERE p.fecha = :fecha"),
+        @NamedQuery(name = "Pago.findByReferencia", query = "SELECT p FROM Pago p WHERE p.referencia = :referencia"),
+        @NamedQuery(name = "Pago.findByCheque", query = "SELECT p FROM Pago p WHERE p.cheque = :cheque"),
+        @NamedQuery(name = "Pago.findByChequeDevuelto", query = "SELECT p FROM Pago p WHERE p.chequeDevuelto = :chequeDevuelto"),
+        @NamedQuery(name = "Pago.findByFacturaId", query = "SELECT p FROM Pago p WHERE p.factura.id = :facturaId"),
+        @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE p.factura.cliente.cteCve = :cteCve AND p.fecha BETWEEN :startDate AND :endDate") })
 public class Pago implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -48,7 +48,8 @@ public class Pago implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+    // consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "monto")
@@ -185,5 +186,5 @@ public class Pago implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Pago[ id=" + id + " ]";
     }
-    
+
 }
