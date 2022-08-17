@@ -38,7 +38,6 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaSalida.findByFecha", query = "SELECT c FROM ConstanciaSalida c WHERE c.fecha = :fecha"),
     @NamedQuery(name = "ConstanciaSalida.findByNumero", query = "SELECT c FROM ConstanciaSalida c WHERE c.numero = :numero"),
     @NamedQuery(name = "ConstanciaSalida.findByNombreCte", query = "SELECT c FROM ConstanciaSalida c WHERE c.nombreCte = :nombreCte"),
-    @NamedQuery(name = "ConstanciaSalida.findByStatus", query = "SELECT c FROM ConstanciaSalida c WHERE c.status = :status"),
     @NamedQuery(name = "ConstanciaSalida.findByObservaciones", query = "SELECT c FROM ConstanciaSalida c WHERE c.observaciones = :observaciones")})
 public class ConstanciaSalida implements Serializable {
 
@@ -61,8 +60,9 @@ public class ConstanciaSalida implements Serializable {
     @Size(max = 150)
     @Column(name = "NOMBRE_CTE")
     private String nombreCte;
-    @Column(name = "STATUS")
-    private Integer status;
+    @JoinColumn(name = "STATUS", referencedColumnName = "ID")
+    @ManyToOne
+    private StatusConstanciaSalida status;
     @Size(max = 75)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
@@ -117,11 +117,11 @@ public class ConstanciaSalida implements Serializable {
         this.nombreCte = nombreCte;
     }
 
-    public Integer getStatus() {
+    public StatusConstanciaSalida getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(StatusConstanciaSalida status) {
         this.status = status;
     }
 
