@@ -81,7 +81,7 @@ public class DetalleConstanciaSalida implements Serializable {
         @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")})
     @ManyToOne(optional = false)
     private DetallePartida detallePartida;
-    @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")
+    @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Partida partidaCve;
 
