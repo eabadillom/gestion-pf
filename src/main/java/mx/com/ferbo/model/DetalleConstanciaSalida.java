@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -37,7 +38,6 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "DetalleConstanciaSalida.findByProducto", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.producto = :producto"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByFolioEntrada", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.folioEntrada = :folioEntrada"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByCamaraCadena", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.camaraCadena = :camaraCadena"),
-    @NamedQuery(name = "DetalleConstanciaSalida.findByDetPartCve", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.detPartCve = :detPartCve"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByTemperatura", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.temperatura = :temperatura")})
 public class DetalleConstanciaSalida implements Serializable {
 
@@ -70,14 +70,17 @@ public class DetalleConstanciaSalida implements Serializable {
     @Size(max = 50)
     @Column(name = "CAMARA_CADENA")
     private String camaraCadena;
-    @Column(name = "DET_PART_CVE")
-    private Integer detPartCve;
     @Size(max = 6)
     @Column(name = "TEMPERATURA")
     private String temperatura;
     @JoinColumn(name = "CONSTANCIA_CVE", referencedColumnName = "ID")
     @ManyToOne(optional = false)
     private ConstanciaSalida constanciaCve;
+    @JoinColumns({
+        @JoinColumn(name = "DET_PART_CVE", referencedColumnName = "DET_PART_CVE"),
+        @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")})
+    @ManyToOne(optional = false)
+    private DetallePartida detallePartida;
     @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")
     @ManyToOne(optional = false)
     private Partida partidaCve;
@@ -159,14 +162,6 @@ public class DetalleConstanciaSalida implements Serializable {
         this.camaraCadena = camaraCadena;
     }
 
-    public Integer getDetPartCve() {
-        return detPartCve;
-    }
-
-    public void setDetPartCve(Integer detPartCve) {
-        this.detPartCve = detPartCve;
-    }
-
     public String getTemperatura() {
         return temperatura;
     }
@@ -181,6 +176,14 @@ public class DetalleConstanciaSalida implements Serializable {
 
     public void setConstanciaCve(ConstanciaSalida constanciaCve) {
         this.constanciaCve = constanciaCve;
+    }
+
+    public DetallePartida getDetallePartida() {
+        return detallePartida;
+    }
+
+    public void setDetallePartida(DetallePartida detallePartida) {
+        this.detallePartida = detallePartida;
     }
 
     public Partida getPartidaCve() {
