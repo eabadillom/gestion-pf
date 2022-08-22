@@ -34,7 +34,6 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ServicioFactura.findByCantidad", query = "SELECT s FROM ServicioFactura s WHERE s.cantidad = :cantidad"),
     @NamedQuery(name = "ServicioFactura.findByUnidad", query = "SELECT s FROM ServicioFactura s WHERE s.unidad = :unidad"),
     @NamedQuery(name = "ServicioFactura.findByCosto", query = "SELECT s FROM ServicioFactura s WHERE s.costo = :costo"),
-    @NamedQuery(name = "ServicioFactura.findByTipoCobro", query = "SELECT s FROM ServicioFactura s WHERE s.tipoCobro = :tipoCobro"),
     @NamedQuery(name = "ServicioFactura.findByTarifa", query = "SELECT s FROM ServicioFactura s WHERE s.tarifa = :tarifa"),
     @NamedQuery(name = "ServicioFactura.findByUdCobro", query = "SELECT s FROM ServicioFactura s WHERE s.udCobro = :udCobro"),
     @NamedQuery(name = "ServicioFactura.findByCodigo", query = "SELECT s FROM ServicioFactura s WHERE s.codigo = :codigo")})
@@ -65,8 +64,6 @@ public class ServicioFactura implements Serializable {
     @NotNull
     @Column(name = "costo")
     private BigDecimal costo;
-    @Column(name = "tipo_cobro")
-    private Integer tipoCobro;
     @Column(name = "tarifa")
     private BigDecimal tarifa;
     @Size(max = 10)
@@ -78,6 +75,9 @@ public class ServicioFactura implements Serializable {
     @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Factura factura;
+    @JoinColumn(name = "tipo_cobro", referencedColumnName = "id")
+    @ManyToOne
+    private TipoCobro tipoCobro;
 
     public ServicioFactura() {
     }
@@ -134,11 +134,11 @@ public class ServicioFactura implements Serializable {
         this.costo = costo;
     }
 
-    public Integer getTipoCobro() {
+    public TipoCobro getTipoCobro() {
         return tipoCobro;
     }
 
-    public void setTipoCobro(Integer tipoCobro) {
+    public void setTipoCobro(TipoCobro tipoCobro) {
         this.tipoCobro = tipoCobro;
     }
 

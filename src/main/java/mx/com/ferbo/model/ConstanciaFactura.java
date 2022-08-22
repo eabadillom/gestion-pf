@@ -88,6 +88,8 @@ public class ConstanciaFactura implements Serializable {
     private Factura factura;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constancia")
     private List<ServicioConstancia> servicioConstanciaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaFactura")
+    private List<ProductoConstancia> productoConstanciaList;
 
     public ConstanciaFactura() {
     }
@@ -203,6 +205,14 @@ public class ConstanciaFactura implements Serializable {
 
     public void setServicioConstanciaList(List<ServicioConstancia> servicioConstanciaList) {
         this.servicioConstanciaList = servicioConstanciaList;
+    }
+    
+    public List<ProductoConstancia> getProductoConstanciaList() {
+        return productoConstanciaList;
+    }
+
+    public void setProductoConstanciaList(List<ProductoConstancia> productoConstanciaList) {
+        this.productoConstanciaList = productoConstanciaList;
     }
 
     @Override
