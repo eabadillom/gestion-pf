@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+	<ui:define name="title">Avisos</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Comercial" />
+				<p:menuitem value="Avisos"
+					outcome="/protected/catalogos/avisosComercial" />
+			</p:breadCrumb>
+
+			<div class="p-grid ingresosAlta">
+				<div class="p-col-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" />
+						<div class="p-col-12">
+							<div class="card">
+								<div class="ui-fluid p-formgrid p-grid">
+									<div class="p-field p-col-12 p-md-7">
+										<p:outputLabel for="soClientes" value="Clientes" />
+										<p:selectOneMenu id="soClientes" converter="entityConverter"
+											value="#{avisosComercialBean.clienteSelected}" filter="true"
+											filterMatchMode="contains">
+											<f:selectItem itemLabel="--Seleccione--" />
+											<f:selectItems value="#{avisosComercialBean.lstClientes}"
+												var="cliente" itemLabel="#{cliente.cteNombre}"
+												itemValue="#{cliente}" />
+											<p:ajax update="form:soClientes buscarAviso" />
+										</p:selectOneMenu>
+									</div>
+									<div class="p-field p-col-12 p-md-6">
+										<p:commandButton id="buscarAviso"
+											actionListener="#{avisosComercialBean.filtraAvisos()}"
+											icon="pi pi-search"
+											disabled="#{avisosComercialBean.clienteSelected eq null}"
+											process="@this soClientes"
+											styleClass="edit-button ui-button-primary" value="Buscar"
+											update="form:dt-avisos" />
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<p:dataTable id="dt-avisos" widgetVar="dtAvisos" var="pAviso"
+							value="#{avisosComercialBean.lstAvisos}" reflow="true"
+							styleClass="avisos-table" rowKey="#{pAviso.avisoCve}"
+							paginator="true" rows="10" rowSelectMode="add"
+							paginatorPosition="bottom" lazy="true">
+							<f:facet name="header">
+								<div class="p-field p-col-12 p-md-12">
+									<p:toolbar styleClass="p-mb-4">
+										<p:toolbarGroup align="left">
+											<div class="p-field p-col-12 p-md-6">
+												<h:outputText
+													value="#{avisosComercialBean.clienteSelected.cteNombre}" />
+											</div>
+											<div class="p-field p-col-12 p-md-6">
+												<h:outputText
+													value="R.F.C.: #{avisosComercialBean.clienteSelected.cteRfc}" />
+											</div>
+											<div class="p-field p-col-12 p-md-6">
+												<h:outputText
+													value="Domicilio: #{avisosComercialBean.clienteDomicilioSelected.domicilios.domicilioCalle.concat(' ')
+												.concat(avisosComercialBean.clienteDomicilioSelected.domicilios.domicilioNumExt).concat(', ')
+												.concat(avisosComercialBean.clienteDomicilioSelected.domicilios.domicilioColonia).concat(', ')
+												.concat(avisosComercialBean.clienteDomicilioSelected.domicilios.ciudades.municipios.municipioDs).concat(', ')
+												.concat(avisosComercialBean.clienteDomicilioSelected.domicilios.ciudades.municipios.estados.estadoDesc).concat(' ')} " />
+											</div>
+											<div class="p-field p-col-12 p-md-6">
+												<h:outputText
+													value="E-mail: #{avisosComercialBean.clienteSelected.cteMail}" />
+											</div>
+											<div class="p-field p-col-12 p-md-6">
+												<h:outputText value="Configuraciones Generales del Cliente"
+													for="@next" />
+												<p:toggleSwitch process="@this"
+													onchange="#{avisosComercialBean.cambiaCuotaMinima()}"
+													value="#{avisosComercialBean.hasCuotaMinima}"
+													update="Monto">
+													<p:ajax
+														listener="#{avisosComercialBean.cambiaCuotaMinima()}"
+														update="dt-avisos" />
+												</p:toggleSwitch>
+											</div>
+											<div class="p-field p-col-12 p-md-6">
+												<h:outputText value="Monto" for="@next" />
+												<p:inputText label="Monto"
+													disabled="#{avisosComercialBean.hasCuotaMinima}"
+													value="#{avisosComercialBean.cuotaMinimaSelected.cuotaValue}">
+													<p:ajax event="blur"
+														listener="#{avisosComercialBean.estableceCuotaMinima()}"
+														update="@this" />
+												</p:inputText>
+											</div>
+
+										</p:toolbarGroup>
+
+									</p:toolbar>
+								</div>
+								<div class="avisos-table-header">
+									<span style="font-weight: bold">Avisos</span> <span
+										class="filter-container ui-input-icon-left"> </span>
+								</div>
+							</f:facet>
+							<p:column width="15%" headerText="Pagar" selectionMode="multiple"
+								exportable="false" />
+						</p:dataTable>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
