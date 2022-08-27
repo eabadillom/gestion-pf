@@ -23,43 +23,34 @@ import javax.validation.constraints.Size;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "tipo_cobro")
+@Table(name = "TIPO_FACTURACION")
 @NamedQueries({
-    @NamedQuery(name = "TipoCobro.findAll", query = "SELECT t FROM TipoCobro t"),
-    @NamedQuery(name = "TipoCobro.findById", query = "SELECT t FROM TipoCobro t WHERE t.id = :id"),
-    @NamedQuery(name = "TipoCobro.findByNombre", query = "SELECT t FROM TipoCobro t WHERE t.nombre = :nombre"),
-    @NamedQuery(name = "TipoCobro.findByDescripcion", query = "SELECT t FROM TipoCobro t WHERE t.descripcion = :descripcion")})
-public class TipoCobro implements Serializable {
+    @NamedQuery(name = "TipoFacturacion.findAll", query = "SELECT t FROM TipoFacturacion t"),
+    @NamedQuery(name = "TipoFacturacion.findById", query = "SELECT t FROM TipoFacturacion t WHERE t.id = :id"),
+    @NamedQuery(name = "TipoFacturacion.findByNombre", query = "SELECT t FROM TipoFacturacion t WHERE t.nombre = :nombre"),
+    @NamedQuery(name = "TipoFacturacion.findByDescripcion", query = "SELECT t FROM TipoFacturacion t WHERE t.descripcion = :descripcion")})
+public class TipoFacturacion implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
     @NotNull
-    @Column(name = "id")
+    @Column(name = "ID")
     private Integer id;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 30)
-    @Column(name = "nombre")
+    @Size(max = 30)
+    @Column(name = "NOMBRE")
     private String nombre;
-    @Size(max = 255)
-    @Column(name = "descripcion")
+    @Size(max = 75)
+    @Column(name = "DESCRIPCION")
     private String descripcion;
-    @OneToMany(mappedBy = "cobro")
-    private List<Servicio> servicioList;
-    @OneToMany(mappedBy = "tipoCobro")
-    private List<ServicioFactura> servicioFacturaList;
+    @OneToMany(mappedBy = "tipoFacturacion")
+    private List<Factura> facturaList;
 
-    public TipoCobro() {
+    public TipoFacturacion() {
     }
 
-    public TipoCobro(Integer id) {
+    public TipoFacturacion(Integer id) {
         this.id = id;
-    }
-
-    public TipoCobro(Integer id, String nombre) {
-        this.id = id;
-        this.nombre = nombre;
     }
 
     public Integer getId() {
@@ -86,20 +77,12 @@ public class TipoCobro implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public List<Servicio> getServicioList() {
-        return servicioList;
+    public List<Factura> getFacturaList() {
+        return facturaList;
     }
 
-    public void setServicioList(List<Servicio> servicioList) {
-        this.servicioList = servicioList;
-    }
-    
-    public List<ServicioFactura> getServicioFacturaList() {
-        return servicioFacturaList;
-    }
-
-    public void setServicioFacturaList(List<ServicioFactura> servicioFacturaList) {
-        this.servicioFacturaList = servicioFacturaList;
+    public void setFacturaList(List<Factura> facturaList) {
+        this.facturaList = facturaList;
     }
 
     @Override
@@ -112,10 +95,10 @@ public class TipoCobro implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof TipoCobro)) {
+        if (!(object instanceof TipoFacturacion)) {
             return false;
         }
-        TipoCobro other = (TipoCobro) object;
+        TipoFacturacion other = (TipoFacturacion) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -124,7 +107,7 @@ public class TipoCobro implements Serializable {
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.TipoCobro[ id=" + id + " ]";
+        return "mx.com.ferbo.model.TipoFacturacion[ id=" + id + " ]";
     }
     
 }

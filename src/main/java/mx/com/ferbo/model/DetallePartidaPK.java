@@ -18,7 +18,9 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class DetallePartidaPK implements Serializable {
 
-    @Basic(optional = false)
+	private static final long serialVersionUID = -7593443111857351832L;
+	
+	@Basic(optional = false)
     @NotNull
     @Column(name = "DET_PART_CVE")
     private int detPartCve;

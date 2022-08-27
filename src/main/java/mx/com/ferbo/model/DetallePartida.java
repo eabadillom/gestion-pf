@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -83,6 +84,8 @@ public class DetallePartida implements Serializable {
     @Size(max = 15)
     @Column(name = "dtp_tarimas")
     private String dtpTarimas;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "detallePartida")
+    private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
     @OneToMany(mappedBy = "detallePartida")
     private List<DetallePartida> detallePartidaList;
     @JoinColumns({
@@ -216,6 +219,14 @@ public class DetallePartida implements Serializable {
 
     public void setDtpTarimas(String dtpTarimas) {
         this.dtpTarimas = dtpTarimas;
+    }
+
+    public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
+        return detalleConstanciaSalidaList;
+    }
+
+    public void setDetalleConstanciaSalidaList(List<DetalleConstanciaSalida> detalleConstanciaSalidaList) {
+        this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
     }
 
     public List<DetallePartida> getDetallePartidaList() {

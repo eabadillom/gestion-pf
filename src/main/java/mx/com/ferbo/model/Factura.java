@@ -62,8 +62,6 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Factura.findByInicioServicios", query = "SELECT f FROM Factura f WHERE f.inicioServicios = :inicioServicios"),
     @NamedQuery(name = "Factura.findByFinServicios", query = "SELECT f FROM Factura f WHERE f.finServicios = :finServicios"),
     @NamedQuery(name = "Factura.findByMontoLetra", query = "SELECT f FROM Factura f WHERE f.montoLetra = :montoLetra"),
-    @NamedQuery(name = "Factura.findByTipoFacturacion", query = "SELECT f FROM Factura f WHERE f.tipoFacturacion = :tipoFacturacion"),
-    @NamedQuery(name = "Factura.findByPlanta", query = "SELECT f FROM Factura f WHERE f.planta = :planta"),
     @NamedQuery(name = "Factura.findByPlazo", query = "SELECT f FROM Factura f WHERE f.plazo = :plazo"),
     @NamedQuery(name = "Factura.findByRetencion", query = "SELECT f FROM Factura f WHERE f.retencion = :retencion"),
     @NamedQuery(name = "Factura.findByNomSerie", query = "SELECT f FROM Factura f WHERE f.nomSerie = :nomSerie")})
@@ -188,10 +186,12 @@ public class Factura implements Serializable {
     @Size(max = 255)
     @Column(name = "monto_letra")
     private String montoLetra;
-    @Column(name = "tipo_facturacion")
-    private Integer tipoFacturacion;
-    @Column(name = "planta")
-    private Integer planta;
+    @JoinColumn(name = "tipo_facturacion", referencedColumnName = "ID")
+    @ManyToOne
+    private TipoFacturacion tipoFacturacion;
+    @JoinColumn(name = "planta", referencedColumnName = "PLANTA_CVE")
+    @ManyToOne
+    private Planta planta;
     @Basic(optional = false)
     @NotNull
     @Column(name = "plazo")
@@ -475,19 +475,19 @@ public class Factura implements Serializable {
         this.montoLetra = montoLetra;
     }
 
-    public Integer getTipoFacturacion() {
+    public TipoFacturacion getTipoFacturacion() {
         return tipoFacturacion;
     }
 
-    public void setTipoFacturacion(Integer tipoFacturacion) {
+    public void setTipoFacturacion(TipoFacturacion tipoFacturacion) {
         this.tipoFacturacion = tipoFacturacion;
     }
 
-    public Integer getPlanta() {
+    public Planta getPlanta() {
         return planta;
     }
 
-    public void setPlanta(Integer planta) {
+    public void setPlanta(Planta planta) {
         this.planta = planta;
     }
 
