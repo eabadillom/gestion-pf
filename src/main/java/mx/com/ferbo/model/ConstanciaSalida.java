@@ -33,12 +33,15 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "CONSTANCIA_SALIDA")
 @NamedQueries({
+
     @NamedQuery(name = "ConstanciaSalida.findAll", query = "SELECT c FROM ConstanciaSalida c"),
     @NamedQuery(name = "ConstanciaSalida.findById", query = "SELECT c FROM ConstanciaSalida c WHERE c.id = :id"),
     @NamedQuery(name = "ConstanciaSalida.findByFecha", query = "SELECT c FROM ConstanciaSalida c WHERE c.fecha = :fecha"),
     @NamedQuery(name = "ConstanciaSalida.findByNumero", query = "SELECT c FROM ConstanciaSalida c WHERE c.numero = :numero"),
     @NamedQuery(name = "ConstanciaSalida.findByNombreCte", query = "SELECT c FROM ConstanciaSalida c WHERE c.nombreCte = :nombreCte"),
+    @NamedQuery(name = "ConstanciaSalida.findByStatus", query = "SELECT c FROM ConstanciaSalida c WHERE c.status = :status"),
     @NamedQuery(name = "ConstanciaSalida.findByObservaciones", query = "SELECT c FROM ConstanciaSalida c WHERE c.observaciones = :observaciones")})
+
 public class ConstanciaSalida implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -173,5 +176,5 @@ public class ConstanciaSalida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.ConstanciaSalida[ id=" + id + " ]";
     }
-    
+
 }

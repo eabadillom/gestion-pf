@@ -14,13 +14,13 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.FacMantenimientoDAO;
+import mx.com.ferbo.dao.ModPlazosPagoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 
 @Named
 @ViewScoped
-public class FacMantenimentoBean implements Serializable {
+public class ModPlazosPagoBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,23 +29,25 @@ public class FacMantenimentoBean implements Serializable {
 	private Cliente clienteSelect;
 
 	private List<Factura> listFac;
-	private FacMantenimientoDAO daoFac;
-	private Factura seleccion;
+	private ModPlazosPagoDAO daoFac;
+	private List<Factura> facSelect;
+
+	private int modNumber;
 
 	private Date actual = GregorianCalendar.getInstance().getTime();
 	private Date de;
 	private Date hasta;
 
-	public FacMantenimentoBean() {
-		seleccion = new Factura();
+	public ModPlazosPagoBean() {
+		modNumber = 1;
 		daoCliente = new ClienteDAO();
-		daoFac = new FacMantenimientoDAO();
+		daoFac = new ModPlazosPagoDAO();
 		listClientes = daoCliente.buscarTodos();
-		listFac = new ArrayList<Factura>();
+		facSelect = new ArrayList<Factura>();
 		de = new Date();
 		hasta = new Date();
 	};
-
+	
 	public boolean hasClient() {
 		return this.clienteSelect != null;
 	};
@@ -54,22 +56,30 @@ public class FacMantenimentoBean implements Serializable {
 		listFac = daoFac.findDacturas(clienteSelect, de, hasta);
 	};
 
-	public void cancelFacture() {
-		PrimeFaces.current().executeScript("PF('dg-delete').hide()");
-		String message = daoFac.update(seleccion);
+	public boolean hasSelected() {
+		return this.facSelect != null && !this.facSelect.isEmpty();
+	};
+
+	public String getModBoton() {
+		int size = this.facSelect.size();
+		return "(" + size + ") Modificar";
+	};
+
+	public void update() {
+		String message = daoFac.update(facSelect, modNumber);
 
 		if (message == null) {
 			listFac.clear();
 			listFac = daoFac.findDacturas(clienteSelect, de, hasta);
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-					"Factura " + seleccion.getNumero() + " cancelada", null));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Se modificaron plazos de pago", null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
 		} else {
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al cancelar la factura", message));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al cmodificar plazos", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
-		seleccion = new Factura();
+		facSelect = new ArrayList<Factura>();
 	};
 
 	public List<Cliente> getListClientes() {
@@ -96,12 +106,20 @@ public class FacMantenimentoBean implements Serializable {
 		this.listFac = listFac;
 	};
 
-	public Factura getSeleccion() {
-		return seleccion;
+	public int getModNumber() {
+		return modNumber;
 	};
 
-	public void setSeleccion(Factura seleccion) {
-		this.seleccion = seleccion;
+	public void setModNumber(int modNumber) {
+		this.modNumber = modNumber;
+	};
+
+	public List<Factura> getFacSelect() {
+		return facSelect;
+	};
+
+	public void setFacSelect(List<Factura> facSelect) {
+		this.facSelect = facSelect;
 	};
 
 	public Date getActual() {

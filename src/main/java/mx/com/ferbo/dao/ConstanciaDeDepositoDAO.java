@@ -54,11 +54,11 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		return null;
 	}
 
-	public List<ConstanciaDeDeposito> buscarPorFolio(ConstanciaDeDeposito cons) {
+	public List<ConstanciaDeDeposito> buscarPorFolioCliente(ConstanciaDeDeposito cons) {
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		List<ConstanciaDeDeposito> lstAux = new ArrayList<>();
-		lstAux = em.createNamedQuery("ConstanciaDeDeposito.findByFolio",ConstanciaDeDeposito.class)
-				.setParameter("folio",cons.getFolio())
+		lstAux = em.createNamedQuery("ConstanciaDeDeposito.findByFolioCliente",ConstanciaDeDeposito.class)
+				.setParameter("folioCliente",cons.getFolioCliente())
 				.getResultList();	
 		System.out.println(lstAux);
 		return lstAux;

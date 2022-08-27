@@ -163,7 +163,7 @@
 									icon="pi pi-fw pi-search" url="#" />
 								<p:menuitem id="frb_inventarios_sm13" value="Modificar"
 									icon="pi pi-fw pi-desktop" url="#" />
-							</p:submenu>
+							</p:submenu>							
 							<p:submenu label="Catálogos" icon="pi pi-fw pi-book">
 								<p:menuitem value="Artículos"
 									outcome="/protected/catalogos/articulos" icon="pi pi-fw pi-box" />
@@ -177,14 +177,18 @@
 								<p:menuitem value="Productos por Cliente"
 									outcome="/protected/catalogos/prodCliente"
 									icon="pi pi-fw pi-shopping-bag" />
-
 							</p:submenu>
+							<p:menuitem id="frb_kardex" value="Kardex"
+								icon="pi pi-fw pi-shopping-bag"
+								outcome="/protected/catalogos/kardex" />
 						</p:submenu>
 						<p:submenu id="frb_facturacion" label="Facturación"
 							icon="pi pi-fw pi-wallet">
 							<p:submenu label="Facturación" icon="pi pi-file-o">
 								<p:menuitem value="Mantenimiento" icon="pi pi-user-edit"
 									outcome="/protected/catalogos/facMantenimiento" />
+								<p:menuitem value="Modificar Plazos de Pago" icon="pi pi-pencil"
+									outcome="/protected/catalogos/modPlazosPago" />
 							</p:submenu>
 							<p:submenu id="frb_facturacion_sm1" label="Catálogos"
 								icon="pi pi-fw pi-th-large">

@@ -90,7 +90,12 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(ciudades));
+//			em.remove(em.merge(ciudades));
+			em.createQuery("DELETE FROM Ciudades c WHERE c.ciudadesPK.paisCve =:paisCve and c.ciudadesPK.estadoCve =:estadoCve and c.ciudadesPK.municipioCve =:municipioCve and c.ciudadesPK.ciudadCve =:ciudadCve")
+			.setParameter("paisCve", ciudades.getCiudadesPK().getPaisCve())
+			.setParameter("estadoCve", ciudades.getCiudadesPK().getEstadoCve())
+			.setParameter("municipioCve", ciudades.getCiudadesPK().getMunicipioCve())
+			.setParameter("ciudadCve", ciudades.getCiudadesPK().getCiudadCve()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {

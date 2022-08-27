@@ -134,10 +134,10 @@
 								value="#{municipiosBean.idPais}">
 								<f:selectItem itemLabel="Selecione Pais" itemValue=""
 									noSelectionOption="true" />
-								<f:selectItems var="selectedtowns"
+								<f:selectItems var="selectedTowns"
 									value="#{municipiosBean.listaPaises}"
-									itemLabel="#{selectedtowns.paisDesc}"
-									itemValue="#{selectedtowns.paisCve}" />
+									itemLabel="#{selectedTowns.paisDesc}"
+									itemValue="#{selectedTowns.paisCve}" />
 								<p:ajax listener="#{municipiosBean.handleContrySelect}"
 									process="@this" update=":form:manage-town-content-new" />
 							</p:selectOneMenu>

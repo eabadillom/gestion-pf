@@ -86,7 +86,12 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(municipios));
+//			em.remove(em.merge(municipios));
+//			DELETE FROM `gestiondb`.`municipios` WHERE (`pais_cve` = '3') and (`estado_cve` = '9') and (`municipio_cve` = '18');
+			em.createQuery("DELETE FROM Municipios m WHERE m.municipiosPK.paisCve =:paisCve and m.municipiosPK.estadoCve =:estadoCve and m.municipiosPK.municipioCve =:municipioCve")
+			.setParameter("paisCve", municipios.getMunicipiosPK().getPaisCve())
+			.setParameter("estadoCve", municipios.getMunicipiosPK().getEstadoCve())
+			.setParameter("municipioCve", municipios.getMunicipiosPK().getMunicipioCve()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {

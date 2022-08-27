@@ -151,7 +151,7 @@
 						<p:selectOneMenu id="municipalities" autoWidth="false" value="#{ciudadesBean.idEstado}">
 							<f:selectItem itemLabel="Selecione Estado" itemValue="" noSelectionOption="true"/>
 							<f:selectItems var="selectedmunicipalities"  value="#{ciudadesBean.listaEstados}" itemLabel="#{selectedmunicipalities.estadoDesc}" itemValue="#{selectedmunicipalities.estadosPK.estadoCve}"/>
-							<p:ajax listener="#{ciudadesBean.handlemunicipalitieselect}" process="@this" update=":form:manage-city-content-new"/>
+							<p:ajax listener="#{ciudadesBean.handleStateSelect}" process="@this" update=":form:manage-city-content-new"/>
 						</p:selectOneMenu>
 						</div>
 						<div class="p-field">

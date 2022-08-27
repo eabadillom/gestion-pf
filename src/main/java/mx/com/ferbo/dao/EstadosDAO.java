@@ -29,7 +29,7 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	public List<Estados> buscarPorCriteriosEstados(Estados e) {
 		List<Estados> listado = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Estados.findByPaisCve", Estados.class).setParameter("paisCve", e.getPaises().getPaisCve()).getResultList();
+		listado = em.createNamedQuery("Estados.findByPaisCve", Estados.class).setParameter("paisCve", e.getEstadosPK().getPaisCve()).getResultList();
 		return listado;
 	}
 	
@@ -82,7 +82,9 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(estados));
+			em.createQuery("DELETE FROM Estados e WHERE e.estadosPK.paisCve =:paisCve and e.estadosPK.estadoCve =:estadoCve")
+			.setParameter("paisCve", estados.getEstadosPK().getPaisCve())
+			.setParameter("estadoCve", estados.getEstadosPK().getEstadoCve()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {

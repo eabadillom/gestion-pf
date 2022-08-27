@@ -2,7 +2,6 @@ package mx.com.ferbo.controller;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -13,9 +12,7 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Named
 @ViewScoped
@@ -23,53 +20,50 @@ public class PlantaBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private PlantaDAO result;
-	private List<Planta> principal;
-	private Planta nuevo;
+	private PlantaDAO daoPlanta;
+	private List<Planta> list;
+	private List<Usuario> usuarios;
+
+	private Planta planta;
 	private Planta seleccion;
 
-	private List<SelectItem> listaUsuario;
-
 	public PlantaBean() {
-		this.result = new PlantaDAO();
-		this.principal = result.findall();
-		this.nuevo = new Planta();
-		this.nuevo.setIdUsuario(new Usuario());
-		this.seleccion = new Planta();
-		this.seleccion.setIdUsuario(new Usuario());
+		daoPlanta = new PlantaDAO();
+		list = daoPlanta.findall();
+		usuarios = daoPlanta.getUsuarios();
+		planta = new Planta();
+		seleccion = new Planta();
 	};
 
 	public void openNew() {
-		this.nuevo = new Planta();
-		this.nuevo.setIdUsuario(new Usuario());
+		planta = new Planta();
 	};
 
 	public void save() {
 		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
-		String message = result.save(nuevo);
+		String message = daoPlanta.save(planta);
 
 		if (message == null) {
-			principal.clear();
-			principal = result.findall();
+			list.clear();
+			list = daoPlanta.findall();
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Agregada " + nuevo.getPlantaDs(), null));
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Agregada " + planta.getPlantaDs(), null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
 		} else {
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar " + nuevo.getPlantaDs(), message));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar " + planta.getPlantaDs(), message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
-		this.nuevo = new Planta();
-		this.nuevo.setIdUsuario(new Usuario());
+		this.planta = new Planta();
 	};
 
 	public void update() {
 		PrimeFaces.current().executeScript("PF('dg-modifica').hide()");
-		String message = result.update(seleccion);
+		String message = daoPlanta.update(seleccion);
 
 		if (message == null) {
-			principal.clear();
-			principal = result.findall();
+			list.clear();
+			list = daoPlanta.findall();
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Moficada  " + seleccion.getPlantaDs(), null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
@@ -79,15 +73,14 @@ public class PlantaBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 		this.seleccion = new Planta();
-		this.seleccion.setIdUsuario(new Usuario());
 	};
 
 	public void delete() {
 		PrimeFaces.current().executeScript("PF('dg-delete').hide()");
-		String message = result.delete(seleccion);
+		String message = daoPlanta.delete(seleccion);
 
 		if (message == null) {
-			principal.remove(this.seleccion);
+			list.remove(this.seleccion);
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Eliminado " + seleccion.getPlantaDs(), null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
@@ -96,43 +89,30 @@ public class PlantaBean implements Serializable {
 					"Error al eliminar " + seleccion.getPlantaDs(), message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
-		this.nuevo = new Planta();
-		this.nuevo.setIdUsuario(new Usuario());
 	};
 
-	public List<Planta> getPrincipal() {
-		return principal;
+	public List<Planta> getList() {
+		return list;
 	};
 
-	public void setPrincipal(List<Planta> principal) {
-		this.principal = principal;
+	public void setList(List<Planta> list) {
+		this.list = list;
 	};
 
-	public Planta getNuevo() {
-		return nuevo;
+	public List<Usuario> getUsuarios() {
+		return usuarios;
 	};
 
-	public void setNuevo(Planta nuevo) {
-		this.nuevo = nuevo;
+	public void setUsuarios(List<Usuario> usuarios) {
+		this.usuarios = usuarios;
 	};
 
-	public List<SelectItem> getListaUsuario() {
-		this.listaUsuario = new ArrayList<SelectItem>();
-		List<Usuario> u = result.getUsuarios();
-
-		listaUsuario.clear();
-
-		for (Usuario user : u) {
-			if (user.getPerfil() == 1 || user.getPerfil() == 4) {
-				SelectItem temp = new SelectItem(user.getId(), user.getUsuario());
-				this.listaUsuario.add(temp);
-			}
-		}
-		return listaUsuario;
+	public Planta getPlanta() {
+		return planta;
 	};
 
-	public void setListaUsuario(List<SelectItem> listaUsuario) {
-		this.listaUsuario = listaUsuario;
+	public void setPlanta(Planta planta) {
+		this.planta = planta;
 	};
 
 	public Planta getSeleccion() {
@@ -141,12 +121,6 @@ public class PlantaBean implements Serializable {
 
 	public void setSeleccion(Planta seleccion) {
 		this.seleccion = seleccion;
-
-		if (Objects.isNull(seleccion.getIdUsuario())) {
-			seleccion.setIdUsuario(new Usuario());
-		}
-
-		PrimeFaces.current().ajax().update("form:frm-modifica");
 	};
 
 }

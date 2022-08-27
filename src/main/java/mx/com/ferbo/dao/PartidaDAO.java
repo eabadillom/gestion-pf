@@ -58,7 +58,7 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		List<Partida> buscaPartidas = new ArrayList<>();
 		buscaPartidas=em.createNamedQuery("Partida.findByConstanciaDeDeposito",Partida.class)
-				.setParameter("folio", cons.getFolio()).getResultList();
+				.setParameter("folioCliente", cons.getFolioCliente()).getResultList();
 		return buscaPartidas;
 
 		

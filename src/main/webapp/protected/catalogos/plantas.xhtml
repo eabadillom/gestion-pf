@@ -25,40 +25,37 @@
 						<p:toolbar styleClass="p-mb-4">
 							<p:toolbarGroup>
 								<p:commandButton value="Agregar" icon="pi pi-plus"
-									styleClass="ui-button-success p-mr-2 p-mb-2"
+									styleClass="ui-button-info p-mr-2 p-mb-2"
 									oncomplete="PF('dg-agrega').show();" update="frm-agrega"
 									actionListener="#{plantaBean.openNew()}" process="@this" />
 							</p:toolbarGroup>
 						</p:toolbar>
 
 						<p:dataTable id="dt-planta" widgetVar="dtPlanta" var="planta"
-							value="#{plantaBean.principal}" rowKey="#{planta.plantaCve}"
+							value="#{plantaBean.list}" rowKey="#{planta.plantaCve}"
 							reflow="true" selection="#{plantaBean.seleccion}"
 							rowSelectMode="single" paginator="true" rows="5"
 							paginatorPosition="bottom">
 
-							<p:column headerText="Nombre Planta" sortBy="#{planta.plantaDs}">
+							<p:column headerText="Nombre Planta">
 								<h:outputText value="#{planta.plantaDs}" />
 							</p:column>
 
-							<p:column headerText="Número" sortBy="#{planta.plantaAbrev}">
+							<p:column headerText="Número">
 								<h:outputText value="#{planta.plantaAbrev}" />
 							</p:column>
 
-							<p:column headerText="Sufijo" sortBy="#{planta.plantaSufijo}">
+							<p:column headerText="Sufijo">
 								<h:outputText value="#{planta.plantaSufijo}" />
 							</p:column>
 
-							<p:column headerText="Responsable Planta"
-								sortBy="#{planta.idUsuario.nombre}">
-								<h:outputText value="#{planta.idUsuario.usuario}"
-									rendered="#{planta.idUsuario ne null}" />
+							<p:column headerText="Responsable Planta">
+								<h:outputText value="#{planta.idUsuario.usuario}" />
 							</p:column>
 
-							<p:column exportable="false" width="15%"
-								style="text-align:center">
+							<p:column>
 								<p:commandButton icon="pi pi-pencil" value="Modificar"
-									styleClass="edit-button ui-button-warning p-mr-2"
+									styleClass="edit-button ui-button-info p-mr-2"
 									oncomplete="PF('dg-modifica').show()"
 									update="form:frm-modifica" process="@this">
 									<f:setPropertyActionListener value="#{planta}"
@@ -82,32 +79,32 @@
 
 			<p:dialog header="Agregar Nueva Planta" widgetVar="dg-agrega"
 				modal="true" showEffect="fade" responsive="true">
-
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel for="@next">Nombre:</p:outputLabel>
-						<p:inputText value="#{plantaBean.nuevo.plantaDs}" required="true"></p:inputText>
+						<p:inputText value="#{plantaBean.planta.plantaDs}" required="true" />
 					</div>
 
 					<div class="p-field">
 						<p:outputLabel for="@next">Número:</p:outputLabel>
-						<p:inputText value="#{plantaBean.nuevo.plantaAbrev}"
-							required="true"></p:inputText>
+						<p:inputText value="#{plantaBean.planta.plantaAbrev}"
+							required="true" />
 					</div>
 
 					<div class="p-field">
 						<p:outputLabel for="@next">Súfijo:</p:outputLabel>
-						<p:inputText value="#{plantaBean.nuevo.plantaSufijo}"
-							required="true"></p:inputText>
+						<p:inputText value="#{plantaBean.planta.plantaSufijo}"
+							required="true" />
 					</div>
 
 					<div class="p-field">
 						<p:outputLabel for="@next">Responsable Planta:</p:outputLabel>
-						<p:selectOneMenu alwaysDisplayLabel="true"
-							value="#{plantaBean.nuevo.idUsuario.id}">
-							<f:selectItem itemLabel="---Seleccione---" itemValue=""></f:selectItem>
-							<f:selectItems itemLabel="#{plantaBean.listaUsuario}"
-								value="#{plantaBean.listaUsuario}" />
+						<p:selectOneMenu value="#{plantaBean.planta.idUsuario}"
+							converter="entityConverter" filter="true">
+							<f:selectItem itemLabel="---Seleccione---" />
+							<f:selectItems value="#{plantaBean.usuarios}" var="user"
+								itemLabel="#{user.usuario}" itemValue="#{user}" />
+							<p:ajax />
 						</p:selectOneMenu>
 					</div>
 				</p:outputPanel>
@@ -117,9 +114,8 @@
 						actionListener="#{plantaBean.save()}" update="frm-agrega"
 						process="frm-agrega @this" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-secondary" oncomplete="PF('dg-agrega').hide()" />
+						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()" />
 				</f:facet>
-
 			</p:dialog>
 
 			<p:dialog header="Editar Planta" widgetVar="dg-modifica" modal="true"
@@ -143,21 +139,21 @@
 
 					<div class="p-field">
 						<p:outputLabel for="@next">Responsable Planta:</p:outputLabel>
-						<p:selectOneMenu value="#{plantaBean.seleccion.idUsuario.id}"
-							required="true">
-							<f:selectItem itemLabel="---Seleccione---" itemValue="null"></f:selectItem>
-							<f:selectItems itemLabel="#{plantaBean.listaUsuario}"
-								value="#{plantaBean.listaUsuario}" />
+						<p:selectOneMenu value="#{plantaBean.seleccion.idUsuario}"
+							converter="entityConverter" required="true">
+							<f:selectItem itemLabel="---Seleccione---" />
+							<f:selectItems value="#{plantaBean.usuarios}" var="user"
+								itemLabel="#{user.usuario}" itemValue="#{user}" />
 						</p:selectOneMenu>
 					</div>
 				</p:outputPanel>
 
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-check"
-						actionListener="#{plantaBean.update()}"
-						process="frm-modifica @this" update="frm-modifica" />
+						actionListener="#{plantaBean.update()}" update="frm-modifica"
+						process="frm-modifica @this" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-secondary" oncomplete="PF('dg-modifica').hide()" />
+						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" />
 				</f:facet>
 
 			</p:dialog>
@@ -168,7 +164,7 @@
 				<p:commandButton value="Sí" icon="pi pi-check"
 					actionListener="#{plantaBean.delete()}" process="@this" />
 				<p:commandButton value="No" type="button"
-					styleClass="ui-button-secondary" icon="pi pi-times"
+					styleClass="ui-button-danger" icon="pi pi-times"
 					onclick="PF('dg-delete').hide()" />
 			</p:confirmDialog>
 

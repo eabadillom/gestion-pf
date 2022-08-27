@@ -99,7 +99,7 @@
 		<class>mx.com.ferbo.model.Estados</class>
 		<class>mx.com.ferbo.model.ConstanciaFacturaCmp</class>
 		<class>mx.com.ferbo.model.ClienteDomicilios</class>
-		<properties>
+		 <properties>
 			<property name="javax.persistence.jdbc.url"
 				value="jdbc:mysql://ferbo.dynalias.com:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
 			<property name="javax.persistence.jdbc.user" value="gestion" />
@@ -113,7 +113,14 @@
 			<!-- Estas dos lineas se comentan <property name="eclipselink.logging.level.sql" 
 				value="FINE" /> <property name="eclipselink.loggin.parameters" value="true" 
 				/> -->
-		</properties>
+	</properties>
+		
+		<!--	 <properties> <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"/> 
+			<property name="javax.persistence.jdbc.user" value="JuanZassu"/> <property 
+			name="javax.persistence.jdbc.password" value="123456789"/> <property name="javax.persistence.jdbc.driver" 
+			value="com.mysql.cj.jdbc.Driver"/> <property name="hibernate.show_sql" value="true"/> 
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/> 
+			</properties> -->
 
 	</persistence-unit>
 </persistence>

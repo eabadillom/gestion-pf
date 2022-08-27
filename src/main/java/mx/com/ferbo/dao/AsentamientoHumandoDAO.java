@@ -28,7 +28,12 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 	public List<AsentamientoHumano> buscarPorCriterios(AsentamientoHumano e) {		
 		List<AsentamientoHumano> listado = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("AsentamientoHumano.findByDomicilio", AsentamientoHumano.class).setParameter("paisCve", e.getAsentamientoHumanoPK().getPaisCve()).setParameter("estadoCve", e.getAsentamientoHumanoPK().getEstadoCve()).setParameter("municipioCve", e.getAsentamientoHumanoPK().getMunicipioCve()).setParameter("ciudadCve", e.getAsentamientoHumanoPK().getCiudadCve()).getResultList();
+		listado = em.createNamedQuery("AsentamientoHumano.findByDomicilio", AsentamientoHumano.class)
+				.setParameter("paisCve", e.getAsentamientoHumanoPK().getPaisCve())
+				.setParameter("estadoCve", e.getAsentamientoHumanoPK().getEstadoCve())
+				.setParameter("municipioCve", e.getAsentamientoHumanoPK().getMunicipioCve())
+				.setParameter("ciudadCve", e.getAsentamientoHumanoPK().getCiudadCve())
+				.getResultList();
 		return listado;
 	}
 
@@ -67,7 +72,15 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(asentamientoHumano));
+//			em.remove(em.merge(asentamientoHumano));
+			em.createQuery("DELETE FROM AsentamientoHumano ah WHERE ah.asentamientoHumanoPK.paisCve =:paisCve and ah.asentamientoHumanoPK.estadoCve =:estadoCve and ah.asentamientoHumanoPK.municipioCve =:municipioCve and ah.asentamientoHumanoPK.ciudadCve =:ciudadCve and ah.asentamientoHumanoPK.tipoasntmntoCve =:tipoasntmntoCve and ah.asentamientoHumanoPK.entidadpostalCve =:entidadpostalCve and ah.asentamientoHumanoPK.asentamientoCve =:asentamientoCve")
+			.setParameter("paisCve", asentamientoHumano.getAsentamientoHumanoPK().getPaisCve())
+			.setParameter("estadoCve", asentamientoHumano.getAsentamientoHumanoPK().getEstadoCve())
+			.setParameter("municipioCve", asentamientoHumano.getAsentamientoHumanoPK().getMunicipioCve())
+			.setParameter("ciudadCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudadCve())
+			.setParameter("tipoasntmntoCve", asentamientoHumano.getAsentamientoHumanoPK().getTipoasntmntoCve())
+			.setParameter("entidadpostalCve", asentamientoHumano.getAsentamientoHumanoPK().getEntidadpostalCve())
+			.setParameter("asentamientoCve", asentamientoHumano.getAsentamientoHumanoPK().getAsentamientoCve()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {

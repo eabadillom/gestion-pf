@@ -25,12 +25,17 @@
 					<p:toolbar styleClass="p-mb-4">
 						<p:toolbarGroup>
 							<p:outputLabel value="De:" styleClass="p-mr-2" />
-							<p:datePicker value="" monthNavigator="true" yearNavigator="true"
-								showWeek="true" required="true" />
-							<p:outputLabel value="A:" styleClass="p-ml-6 p-mr-2" />
-							<p:datePicker value="#{facMantenimentoBean.hasta}" locale="de"
+							<p:datePicker value="#{facMantenimentoBean.de}"
 								monthNavigator="true" yearNavigator="true" showWeek="true"
-								required="true" maxdate="#{facMantenimentoBean.hasta}" />
+								required="true" maxdate="#{facMantenimentoBean.actual}">
+								<p:ajax />
+							</p:datePicker>
+							<p:outputLabel value="A:" styleClass="p-ml-6 p-mr-2" />
+							<p:datePicker value="#{facMantenimentoBean.hasta}"
+								monthNavigator="true" yearNavigator="true" showWeek="true"
+								required="true" maxdate="#{facMantenimentoBean.actual}">
+								<p:ajax />
+							</p:datePicker>
 							<p:outputLabel for="@next" value="Clientes:"
 								styleClass="p-ml-6 p-mr-2" />
 							<p:selectOneMenu value="#{facMantenimentoBean.clienteSelect}"
@@ -40,12 +45,13 @@
 								<f:selectItems value="#{facMantenimentoBean.listClientes}"
 									var="client" itemLabel="#{client.cteNombre}"
 									itemValue="#{client}" />
-								<p:ajax />
+								<p:ajax update="form:bottomConsulta" />
 							</p:selectOneMenu>
-							<p:commandButton value="Consultar"
-								styleClass="ui-button-secondary p-ml-6" icon="pi pi-search"
+							<p:commandButton id="bottomConsulta" value="Consultar"
+								styleClass="ui-button-info p-ml-6" icon="pi pi-search"
 								actionListener="#{facMantenimentoBean.findFacture()}"
-								update="dtSerieFac" process="@this" />
+								update="dtSerieFac" process="@this"
+								disabled="#{!facMantenimentoBean.hasClient()}" />
 						</p:toolbarGroup>
 					</p:toolbar>
 
@@ -83,7 +89,6 @@
 								<f:setPropertyActionListener value="#{lista}"
 									target="#{facMantenimentoBean.seleccion}" />
 							</p:commandButton>
-
 						</p:column>
 					</p:dataTable>
 
@@ -106,7 +111,7 @@
 								actionListener="#{facMantenimentoBean.cancelFacture()}"
 								update="frm-cancel" process="frm-cancel @this" />
 							<p:commandButton value="No" type="button"
-								styleClass="ui-button-secondary" icon="pi pi-times"
+								styleClass="ui-button-danger" icon="pi pi-times"
 								onclick="PF('dg-delete').hide()" />
 						</f:facet>
 					</p:dialog>

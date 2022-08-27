@@ -25,23 +25,16 @@ public class PlantaDAO {
 	public List<Usuario> getUsuarios() {
 		EntityManager entity = getEntityManager();
 		List<Usuario> usuarios = null;
-		Query sql = entity.createNamedQuery("Usuario.findAll", Usuario.class);
+		Query sql = entity.createQuery("SELECT u FROM Usuario u WHERE u.perfil IN (1, 4)");
 		usuarios = sql.getResultList();
 		return usuarios;
 	}
 
 	public String save(Planta p) {
-		System.out.println(p.getIdUsuario());
 		try {
 			EntityManager entity = getEntityManager();
 			entity.getTransaction().begin();
-			Query sql = entity.createNativeQuery(
-					"insert into PLANTA (PLANTA_DS, planta_abrev, planta_sufijo, id_usuario) values(?,?,?,?)");
-			sql.setParameter(1, p.getPlantaDs());
-			sql.setParameter(2, p.getPlantaAbrev());
-			sql.setParameter(3, p.getPlantaSufijo());
-			sql.setParameter(4, p.getIdUsuario().getId());
-			sql.executeUpdate();
+			entity.persist(p);
 			entity.getTransaction().commit();
 			entity.close();
 		} catch (Exception e) {
@@ -54,14 +47,7 @@ public class PlantaDAO {
 		try {
 			EntityManager entity = getEntityManager();
 			entity.getTransaction().begin();
-			Query sql = entity.createNativeQuery(
-					"update PLANTA set PLANTA_DS=?, planta_abrev=?, planta_sufijo=?, id_usuario=? where PLANTA_CVE=?;");
-			sql.setParameter(1, p.getPlantaDs());
-			sql.setParameter(2, p.getPlantaAbrev());
-			sql.setParameter(3, p.getPlantaSufijo());
-			sql.setParameter(4, p.getIdUsuario().getId());
-			sql.setParameter(5, p.getPlantaCve());
-			sql.executeUpdate();
+			entity.merge(p);
 			entity.getTransaction().commit();
 			entity.close();
 		} catch (Exception e) {

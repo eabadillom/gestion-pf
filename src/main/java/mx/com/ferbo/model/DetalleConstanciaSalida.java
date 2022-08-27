@@ -38,7 +38,9 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "DetalleConstanciaSalida.findByProducto", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.producto = :producto"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByFolioEntrada", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.folioEntrada = :folioEntrada"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByCamaraCadena", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.camaraCadena = :camaraCadena"),
-    @NamedQuery(name = "DetalleConstanciaSalida.findByTemperatura", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.temperatura = :temperatura")})
+    @NamedQuery(name = "DetalleConstanciaSalida.findByDetPartCve", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.detPartCve = :detPartCve"),
+    @NamedQuery(name = "DetalleConstanciaSalida.findByTemperatura", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.temperatura = :temperatura"),
+    @NamedQuery(name = "DetalleConstanciaSalida.findByParams", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.partidaCve.partidaCve = :partidaCve AND d.folioEntrada =:folioEntrada AND d.producto = :producto") })
 public class DetalleConstanciaSalida implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -53,7 +55,8 @@ public class DetalleConstanciaSalida implements Serializable {
     private int camaraCve;
     @Column(name = "CANTIDAD")
     private Integer cantidad;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+    // consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "PESO")
@@ -218,5 +221,5 @@ public class DetalleConstanciaSalida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.DetalleConstanciaSalida[ id=" + id + " ]";
     }
-    
+
 }

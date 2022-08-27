@@ -19,105 +19,177 @@
 						<p:growl id="messages" showDetail="true" />
 						<div class="p-col-12">
 							<div class="card">
-								<span class="ui-float-label">								 
-								 <p:inputText id="folioSelected" value="#{kardexBean.folioClienteSelected}"/>
-								 <p:outputLabel for="@previous"	value="Folio" styleClass="ui-float-label p-mr-2 p-mb-2" /> 
-								 <p:commandButton id="buscarFolio" actionListener="#{kardexBean.buscaDatos()}"
+								<span class="ui-float-label"> <p:inputText
+										id="folioSelected" value="#{kardexBean.folioClienteSelected}" />
+									<p:outputLabel for="@previous" value="Folio"
+										styleClass="ui-float-label p-mr-2 p-mb-2" /> <p:commandButton
+										id="buscarFolio" actionListener="#{kardexBean.buscaDatos()}"
 										icon="pi pi-search" process="@this folioSelected"
 										styleClass="edit-button ui-button-primary" value="Buscar"
-										update="dt-entradasKardex" /> <p:commandButton
-										value="Limpiar" styleClass="edit-button ui-button-secondary" />
+
+										update="form:dt-entradasKardex form:numeroCliente form:nombreCliente form:button-traspasos" />
+									<p:commandButton value="Traspasos" id="button-traspasos"
+										styleClass="edit-button ui-botton-primary" process="@this"
+										oncomplete="PF('traspasosDialog').show()"
+										update="form:panel-traspasos form:dt-traspasos @this"
+										disabled="#{kardexBean.pintaTraspaso eq false}" />
+
 								</span>
 							</div>
-							
-							<p:dataTable var="pPartidas" id="dt-entradasKardex"
-								value="#{kardexBean.listPartida}" paginator="true"
-								rows="10" paginatorPosition="bottom" rowKey="#{partida.partidaCve}">
-								<p:headerRow field="partidaCve">
-									<p:column colspan="6">
-										<div class="p-d-inline-flex p-ai-center"
-											style="vertical-align: middle">
-											<h:outputText styleClass="p-ml-2" value="#{kardexBean.clienteSelected.cteCve}" />
-											<h:outputText styleClass="p-ml-2" value="#{kardexBean.clienteSelected.cteNombre}" />
-										</div>
-									</p:column>
-								</p:headerRow>
+
+							<div class="card">
+								<div class="p-d-inline-flex p-ai-center"
+									style="vertical-align: middle">
+									<h:outputText id="numeroCliente" styleClass="p-ml-2"
+										value="#{kardexBean.clienteSelected.numeroCte}" />
+									<h:outputText id="nombreCliente" styleClass="p-ml-2"
+										value="#{kardexBean.clienteSelected.cteNombre}" />
+								</div>
+							</div>
+
+
+							<p:dataTable id="dt-entradasKardex" widgetVar="dtEntradasKardex"
+								value="#{kardexBean.totalSalidaKardex}" var="pTotals"
+								rowKey="#{pTotals.partSelected.partidaCve}" paginator="true"
+								rows="10" paginatorPosition="bottom">
 								<p:column style="width:2rem" width="5">
 									<p:rowToggler />
 								</p:column>
-
 								<p:column headerText="Fecha de ingreso" width="40">
-									<h:outputText value="#{kardexBean.constanciaDepositoSelected.fechaIngreso}" />
+									<h:outputText
+										value="#{kardexBean.constanciaDepositoSelected.fechaIngreso}" />
 								</p:column>
 
 								<p:column headerText="Entrada" width="40">
-									<h:outputText value="#{kardexBean.constanciaDepositoSelected.folio}" />
+									<h:outputText
+										value="#{kardexBean.constanciaDepositoSelected.folioCliente}" />
 								</p:column>
 
 								<p:column headerText="Producto" width="120">
-									<h:outputText value="#{pPartidas.unidadDeProductoCve.productoCve.productoDs}" />
+									<h:outputText
+										value="#{pTotals.partSelected.unidadDeProductoCve.productoCve.productoDs}" />
 								</p:column>
 
 								<p:column headerText="Piezas Entrada" width="20">
-									<h:outputText value="#{pPartidas.cantidadTotal}"  />
+									<h:outputText value="#{pTotals.partSelected.cantidadTotal}" />
 								</p:column>
 
 								<p:column headerText="Unidad" width="30">
-									<h:outputText value="#{pPartida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
+									<h:outputText
+										value="#{pTotals.partSelected.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
 								</p:column>
 
 								<p:column headerText="Kilos Entrada" width="30">
-									<h:outputText value="#{pPartida.pesoTotal}" />
+									<h:outputText value="#{pTotals.partSelected.pesoTotal}" />
 								</p:column>
 
 								<p:column headerText="Planta" width="30">
-									<h:outputText value="#{pPartida.camaraCve.plantaCve.plantaDs}" />
+									<h:outputText
+										value="#{pTotals.partSelected.camaraCve.plantaCve.plantaDs}" />
 								</p:column>
 
 								<p:column headerText="Cámara" width="50">
-									<h:outputText value="#{pPartida.camaraCve.camaraDs}" />
+									<h:outputText
+										value="#{pTotals.partSelected.camaraCve.camaraDs}" />
 								</p:column>
 
 								<p:rowExpansion>
 									<div class="st-Salidas">
-										<p:dataTable var="dt-salidasKardex"
-											value="#{dataTableDemoView.products1}" paginator="true"
-											rows="10" paginatorPosition="bottom" rowKey="#{product.id}">
+										<p:dataTable id="dt-salidasKardex" lazy="true"
+											value="#{pTotals.listDetalleSalida}" paginator="true"
+											var="pSalidas" rows="5" paginatorPosition="bottom"
+											rowKey="#{pSalidas.id}">
 											<p:column headerText="Fecha" width="30">
-												<h:outputText value="22-06-2022" />
+												<h:outputText value="#{pSalidas.constanciaCve.fecha}" />
 											</p:column>
-											<p:column headerText="Entrada" width="40">
-												<h:outputText value="F-Entrada1" />
-											</p:column>
-
 											<p:column headerText="Salida" width="30">
-												<h:outputText value="F-Salida1" />
+												<h:outputText value="#{pSalidas.constanciaCve.numero}" />
 											</p:column>
 											<p:column headerText="Producto" width="150">
-												<h:outputText value="Harvest pride C Recto 7/16 13.610 KG" />
+												<h:outputText value="#{pSalidas.producto}" />
 											</p:column>
 											<p:column headerText="Piezas Salida" width="30">
-												<h:outputText value="10" />
+												<h:outputText value="#{pSalidas.cantidad}" />
 											</p:column>
 											<p:column headerText="Unidad" width="30">
-												<h:outputText value="Cajas" />
+												<h:outputText value="#{pTotals.partSelected.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
 											</p:column>
 											<p:column headerText="Kilos Salida" width="30">
-												<h:outputText value="10" />
+												<h:outputText value="#{pSalidas.peso}" />
+											</p:column>
+										</p:dataTable>
+										<p:dataTable var="dt-totalesKardex"
+											value="#{kardexBean.cantidadTotal}" paginator="false"
+											rows="2">
+											<p:column headerText="Totales">
+												<h:outputText value="" />
+											</p:column>
+											<p:column headerText="Total piezas Entrada">
+												<h:outputText value="#{pTotals.cantidadTotal}" />
+											</p:column>
+											<p:column headerText="Total piezas Salida">
+												<h:outputText value="#{pTotals.cantidadSalida}" />
+											</p:column>
+											<p:column headerText="Saldo Piezas">
+												<h:outputText
+													value="#{pTotals.cantidadTotal - pTotals.cantidadSalida}" />
+											</p:column>
+											<p:column headerText="Total Kilos Entrada">
+												<h:outputText value="#{pTotals.pesoTotal}" />
+											</p:column>
+											<p:column headerText="Total Kilos Salida">
+												<h:outputText value="#{pTotals.pesoSalida}" />
+											</p:column>
+											<p:column headerText="Saldo Kilos">
+												<h:outputText
+													value="#{pTotals.pesoTotal - pTotals.pesoSalida}" />
 											</p:column>
 										</p:dataTable>
 									</div>
-									<div class="card">
-										<div class="ui-fluid p-formgrid p-grid">
-											<div class="p-field p-col-12 p-md-6">
-												<p:outputLabel for="cdTotales" value="Totales" />
-												<h:outputText id="cdTotales" value="40" />
-											</div>
-										</div>
-									</div>
+
 								</p:rowExpansion>
 							</p:dataTable>
 
+							<p:dialog header="Traspasos" showEffect="fade" modal="true"
+								widgetVar="traspasosDialog" responsive="true">
+								<p:outputPanel id="panel-traspasos" class="ui-fluid">
+									<p:dataTable id="dt-traspasos" widgetVar="dtTraspasos"
+										value="#{kardexBean.listTraspasoPartida}" var="pTraspaso"
+										paginator="true" rows="10" paginatorPosition="bottom"
+										rowKey="#{pTraspaso.constancia}">
+										<p:headerRow field="id">
+											<p:column colspan="6">
+												<div class="p-d-inline-flex p-ai-center"
+													style="vertical-align: middle">
+													<h:outputText styleClass="p-ml-2"
+														value="#{pTraspaso.constancia}" />
+													<h:outputText styleClass="p-ml-2"
+														value="#{pTraspaso.traspaso.fecha}" />
+													<h:outputText styleClass="p-ml-2"
+														value="#{pTraspaso.traspaso.observacion}" />
+												</div>
+											</p:column>
+										</p:headerRow>
+										<p:column headerText="Producto">
+											<h:outputText
+												value="#{pTraspaso.partida.unidadDeProductoCve.productoCve.productoDs}" />
+										</p:column>
+										<p:column headerText="Cantidad">
+											<h:outputText value="#{pTraspaso.cantidad}" />
+										</p:column>
+										<p:column headerText="Unidad">
+											<h:outputText
+												value="#{pTraspaso.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
+										</p:column>
+										<p:column headerText="Origen">
+											<h:outputText value="#{pTraspaso.origen}" />
+										</p:column>
+										<p:column headerText="Destino">
+											<h:outputText value="#{pTraspaso.destino}" />
+										</p:column>
+									</p:dataTable>
+								</p:outputPanel>
+							</p:dialog>
 
 						</div>
 					</div>

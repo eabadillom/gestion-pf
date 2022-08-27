@@ -27,14 +27,14 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "traspaso_partida")
 @NamedQueries({
-    @NamedQuery(name = "TraspasoPartida.findAll", query = "SELECT t FROM TraspasoPartida t"),
-    @NamedQuery(name = "TraspasoPartida.findById", query = "SELECT t FROM TraspasoPartida t WHERE t.id = :id"),
-    @NamedQuery(name = "TraspasoPartida.findByConstancia", query = "SELECT t FROM TraspasoPartida t WHERE t.constancia = :constancia"),
-    @NamedQuery(name = "TraspasoPartida.findByPartida", query = "SELECT t FROM TraspasoPartida t WHERE t.partida = :partida"),
-    @NamedQuery(name = "TraspasoPartida.findByDescripcion", query = "SELECT t FROM TraspasoPartida t WHERE t.descripcion = :descripcion"),
-    @NamedQuery(name = "TraspasoPartida.findByCantidad", query = "SELECT t FROM TraspasoPartida t WHERE t.cantidad = :cantidad"),
-    @NamedQuery(name = "TraspasoPartida.findByOrigen", query = "SELECT t FROM TraspasoPartida t WHERE t.origen = :origen"),
-    @NamedQuery(name = "TraspasoPartida.findByDestino", query = "SELECT t FROM TraspasoPartida t WHERE t.destino = :destino")})
+        @NamedQuery(name = "TraspasoPartida.findAll", query = "SELECT t FROM TraspasoPartida t"),
+        @NamedQuery(name = "TraspasoPartida.findById", query = "SELECT t FROM TraspasoPartida t WHERE t.id = :id"),
+        @NamedQuery(name = "TraspasoPartida.findByConstancia", query = "SELECT t FROM TraspasoPartida t WHERE t.constancia = :constancia"),
+        @NamedQuery(name = "TraspasoPartida.findByPartida", query = "SELECT t FROM TraspasoPartida t WHERE t.partida.partidaCve = :partidaCve"),
+        @NamedQuery(name = "TraspasoPartida.findByDescripcion", query = "SELECT t FROM TraspasoPartida t WHERE t.descripcion = :descripcion"),
+        @NamedQuery(name = "TraspasoPartida.findByCantidad", query = "SELECT t FROM TraspasoPartida t WHERE t.cantidad = :cantidad"),
+        @NamedQuery(name = "TraspasoPartida.findByOrigen", query = "SELECT t FROM TraspasoPartida t WHERE t.origen = :origen"),
+        @NamedQuery(name = "TraspasoPartida.findByDestino", query = "SELECT t FROM TraspasoPartida t WHERE t.destino = :destino") })
 public class TraspasoPartida implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -48,10 +48,10 @@ public class TraspasoPartida implements Serializable {
     @Size(min = 1, max = 10)
     @Column(name = "constancia")
     private String constancia;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "partida")
-    private int partida;
+    // @Basic(optional = false)
+    // @NotNull
+    // @Column(name = "partida")
+    // private int partida;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
@@ -75,6 +75,10 @@ public class TraspasoPartida implements Serializable {
     @ManyToOne(optional = false)
     private ConstanciaTraspaso traspaso;
 
+    @JoinColumn(name = "partida", referencedColumnName = "PARTIDA_CVE")
+    @ManyToOne(optional = false)
+    private Partida partida;
+
     public TraspasoPartida() {
     }
 
@@ -82,7 +86,9 @@ public class TraspasoPartida implements Serializable {
         this.id = id;
     }
 
-    public TraspasoPartida(Integer id, String constancia, int partida, String descripcion, long cantidad, String origen, String destino) {
+    public TraspasoPartida(Integer id, String constancia, Partida partida, String descripcion, long cantidad,
+            String origen,
+            String destino) {
         this.id = id;
         this.constancia = constancia;
         this.partida = partida;
@@ -108,14 +114,15 @@ public class TraspasoPartida implements Serializable {
         this.constancia = constancia;
     }
 
-    public int getPartida() {
-        return partida;
-    }
-
-    public void setPartida(int partida) {
-        this.partida = partida;
-    }
-
+    /*
+     * public int getPartida() {
+     * return partida;
+     * }
+     * 
+     * public void setPartida(int partida) {
+     * this.partida = partida;
+     * }
+     */
     public String getDescripcion() {
         return descripcion;
     }
@@ -156,6 +163,14 @@ public class TraspasoPartida implements Serializable {
         this.traspaso = traspaso;
     }
 
+    public Partida getPartida() {
+        return partida;
+    }
+
+    public void setPartida(Partida partida) {
+        this.partida = partida;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -180,5 +195,5 @@ public class TraspasoPartida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.TraspasoPartida[ id=" + id + " ]";
     }
-    
+
 }
