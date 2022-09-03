@@ -182,6 +182,7 @@ public class ClientesBean implements Serializable {
 			}
 			PrimeFaces.current().executeScript("PF('dialogAddContacto').hide()");
 		} else {
+			clienteContactoSelected.setNbPassword(util.getSHA512(clienteContactoSelected.getNbPassword()));
 			if (clienteContactoDAO.actualizar(clienteContactoSelected) == null) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Contacto Actualizado"));
 			} else {
