@@ -29,9 +29,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "precio_servicio")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "PrecioServicio.findAll", query = "SELECT p FROM PrecioServicio p"),
-    @NamedQuery(name = "PrecioServicio.findById", query = "SELECT p FROM PrecioServicio p WHERE p.id = :id"),
-    @NamedQuery(name = "PrecioServicio.findByPrecio", query = "SELECT p FROM PrecioServicio p WHERE p.precio = :precio")})
+        @NamedQuery(name = "PrecioServicio.findAll", query = "SELECT p FROM PrecioServicio p"),
+        @NamedQuery(name = "PrecioServicio.findById", query = "SELECT p FROM PrecioServicio p WHERE p.id = :id"),
+        @NamedQuery(name = "PrecioServicio.findByPrecio", query = "SELECT p FROM PrecioServicio p WHERE p.precio = :precio"),
+        @NamedQuery(name = "PrecioServicio.findByCliente", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve"),
+        @NamedQuery(name = "PrecioServicio.findByClienteServicio", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.servicio.servicioCve = :servicioCve") })
 public class PrecioServicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,7 +42,8 @@ public class PrecioServicio implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+    // consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "precio")
@@ -142,5 +145,5 @@ public class PrecioServicio implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.PrecioServicio[ id=" + id + " ]";
     }
-    
+
 }

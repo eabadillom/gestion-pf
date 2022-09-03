@@ -34,7 +34,7 @@ public class AvisoDAO extends IBaseDAO<Aviso, Integer>{
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery(
-					"UPDATE aviso SET aviso_po = :avisoPo , aviso_pedimento = :avisoPedimento, aviso_sap = :avisoSap, aviso_lote = :avisoLote,aviso_caducidad = :avisoCaducidad,aviso_tarima = :avisoTarima,aviso_otro = :avisoOtro,planta_cve = :plantaCve,categoria_cve = :categoriaCve WHERE (cte_cve = :cteCve) and (aviso_cve = :avisoCve)") 
+					"UPDATE aviso SET aviso_po = :avisoPo , aviso_pedimento = :avisoPedimento, aviso_sap = :avisoSap, aviso_lote = :avisoLote,aviso_caducidad = :avisoCaducidad,aviso_tarima = :avisoTarima,aviso_otro = :avisoOtro,aviso_vigencia = :avisoVigencia,aviso_plazo = :avisoPlazo, aviso_val_seg = :avisoValSeg  WHERE (cte_cve = :cteCve) and (aviso_cve = :avisoCve)") 
 			.setParameter("avisoCve",e.getAvisoCve())
 			.setParameter("avisoPo",e.getAvisoPo())
 			.setParameter("avisoPedimento",e.getAvisoPedimento())
@@ -43,9 +43,10 @@ public class AvisoDAO extends IBaseDAO<Aviso, Integer>{
 			.setParameter("avisoCaducidad",e.getAvisoCaducidad())
 			.setParameter("avisoTarima",e.getAvisoTarima())
 			.setParameter("avisoOtro",e.getAvisoOtro())
-			.setParameter("plantaCve",e.getPlantaCve())
 			.setParameter("cteCve",e.getCteCve())
-			.setParameter("categoriaCve",e.getCategoriaCve())
+			.setParameter("avisoVigencia", e.getAvisoVigencia())
+			.setParameter("avisoPlazo", e.getAvisoPlazo())
+			.setParameter("avisoValSeg", e.getAvisoValSeg())
 					.executeUpdate();
 			em.getTransaction().commit();
 			em.close();
@@ -61,7 +62,7 @@ public class AvisoDAO extends IBaseDAO<Aviso, Integer>{
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createNativeQuery("INSERT INTO aviso (aviso_cve, aviso_po, aviso_pedimento, aviso_sap,aviso_lote,aviso_caducidad,aviso_tarima,aviso_otro,aviso_temp,aviso_fecha,planta_cve,aviso_observaciones,cte_cve,categoria_cve,aviso_vigencia,aviso_val_seg,aviso_plazo,aviso_tp_facturacion) VALUES (:avisoCve, b:avisoPo, :avisoPedimento, :avisoSap,:avisoLote,:avisoCaducidad,:avisoTarima,:avisoOtro,:avisoTemp,:avisoFecha,:plantaCve,:avisoObservaciones,:cteCve,:categoriaCve,:avisoVigencia,:avisoValSeg,:avisoPlazo,:avisoTpFacturacion)")
+			em.createNativeQuery("INSERT INTO aviso (aviso_cve, aviso_po, aviso_pedimento, aviso_sap,aviso_lote,aviso_caducidad,aviso_tarima,aviso_otro,aviso_temp,aviso_fecha,planta_cve,aviso_observaciones,cte_cve,categoria_cve,aviso_vigencia,aviso_val_seg,aviso_plazo,aviso_tp_facturacion) VALUES (:avisoCve, :avisoPo, :avisoPedimento, :avisoSap,:avisoLote,:avisoCaducidad,:avisoTarima,:avisoOtro,:avisoTemp,:avisoFecha,:plantaCve,:avisoObservaciones,:cteCve,:categoriaCve,:avisoVigencia,:avisoValSeg,:avisoPlazo,:avisoTpFacturacion)")
 			.setParameter("avisoCve",e.getAvisoCve())
 			.setParameter("avisoPo",e.getAvisoPo())
 			.setParameter("avisoPedimento",e.getAvisoPedimento())

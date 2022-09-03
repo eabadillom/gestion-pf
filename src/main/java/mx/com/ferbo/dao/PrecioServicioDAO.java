@@ -32,6 +32,14 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	@Override
 	public List<PrecioServicio> buscarPorCriterios(PrecioServicio e) {
 		// TODO Auto-generated method stub
+		if (e.getCliente().getCteCve() != null) {
+			if(e.getServicio()!=null) {
+				return this.buscarPorClienteServicio(e);
+			}
+			return this.buscarPorCliente(e);
+		}
+		
+
 		return null;
 	}
 
@@ -56,7 +64,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			em.getTransaction().begin();
 			em.persist(precioServicio);
 			em.getTransaction().commit();
-//			em.close();
+			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
@@ -71,7 +79,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			em.getTransaction().begin();
 			em.remove(em.merge(precioServicio));
 			em.getTransaction().commit();
-//			em.close();
+			// em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
@@ -85,4 +93,18 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		return null;
 	}
 
+	private List<PrecioServicio> buscarPorCliente(PrecioServicio e) {
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
+				.setParameter("cteCve", e.getCliente().getCteCve()).getResultList();
+	}
+	
+	private List<PrecioServicio> buscarPorClienteServicio(PrecioServicio e){
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("PrecioServicio.findByClienteServicio", PrecioServicio.class)
+				.setParameter("cteCve", e.getCliente().getCteCve())
+				.setParameter("servicioCve", e.getServicio())
+				.getResultList();
+	}
+	
 }
