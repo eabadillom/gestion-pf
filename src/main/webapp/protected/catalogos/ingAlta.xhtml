@@ -1,0 +1,225 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+	<ui:define name="title">Alta de Ingresos</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Inventarios" />
+				<p:menuitem value="Catálogos" />
+				<p:menuitem value="Ingresos" />
+				<p:menuitem value="Alta" outcome="/protected/catalogos/ingAlta" />
+			</p:breadCrumb>
+
+			<div class="p-grid ingresosAlta">
+				<div class="p-col-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" />
+						<div class="p-col-12">
+							<div class="card">
+								<div class="ui-fluid p-formgrid p-grid">
+									<div class="p-field p-col-12 p-md-6">
+										<p:outputLabel for="soClientes" value="Clientes" />
+										<p:selectOneMenu id="soClientes" converter="entityConverter"
+											value="#{ingresosCrudBean.clienteSelected}" filter="true"
+											filterMatchMode="contains">
+											<f:selectItem itemLabel="--Seleccione--" />
+											<f:selectItems value="#{ingresosCrudBean.lstClientes}"
+												var="cliente" itemLabel="#{cliente.cteNombre}"
+												itemValue="#{cliente}" />
+											<p:ajax
+												update="form:dt-facturas form:soClientes form:soEstatus form:dateSelected form:buscarFactura" />
+										</p:selectOneMenu>
+										<p:outputLabel for="dateSelected" value="Fecha" />
+										<p:datePicker id="dateSelected" for="@previous"
+											disabled="#{ingresosCrudBean.statusFacturaSelected eq null and ingresosCrudBean.statusFacturaSelected.id eq null}"
+											showIcon="true" value="#{ingresosCrudBean.customDate}">
+											<p:ajax
+												update="form:dt-facturas form:soClientes form:soEstatus form:dateSelected form:buscarFactura form:panel-pago" />
+										</p:datePicker>
+									</div>
+									<div class="p-field p-col-12 p-md-6">
+										<p:outputLabel for="soEstatus" value="Estatus de la factura" />
+										<p:selectOneMenu id="soEstatus" converter="entityConverter"
+											value="#{ingresosCrudBean.statusFacturaSelected}"
+											filter="true" filterMatchMode="contains"
+											disabled="#{ingresosCrudBean.clienteSelected eq null and ingresosCrudBean.clienteSelected.cteCve eq null}">
+											<f:selectItem itemLabel="--Seleccione--" />
+											<f:selectItems value="#{ingresosCrudBean.lstStatusFactura}"
+												var="status" itemLabel="#{status.nombre}"
+												itemValue="#{status}" />
+											<p:ajax
+												update="form:dt-facturas form:soClientes form:soEstatus form:dateSelected form:buscarFactura" />
+										</p:selectOneMenu>
+									</div>
+									<div class="p-field p-col-12 p-md-6">
+										<p:commandButton id="buscarFactura"
+											actionListener="#{ingresosCrudBean.filtraFacturas()}"
+											icon="pi pi-search"
+											disabled="#{ingresosCrudBean.customDate eq null}"
+											process="@this soClientes soEstatus dateSelected"
+											styleClass="edit-button ui-button-primary" value="Buscar"
+											update="form:dt-facturas" />
+									</div>
+									<div class="p-field p-col-12 p-md-6">
+										<p:commandButton id="limpiarFactura"
+											actionListener="#{ingresosCrudBean.limpiaFiltro()}"
+											icon="pi pi-undo" process="@this soClientes soEstatus"
+											styleClass="edit-button ui-button-primary" value="Limpiar"
+											update="form:dt-facturas form:soClientes form:soEstatus form:dateSelected" />
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<p:dataTable id="dt-facturas" widgetVar="dtFacturas"
+							var="pFactura" value="#{ingresosCrudBean.lstFacturaFiltered}"
+							reflow="true" styleClass="facturas-table"
+							selection="#{ingresosCrudBean.lstFacturaSelected}"
+							rowKey="#{pFactura.id}" paginator="true" rows="10"
+							rowSelectMode="add" paginatorPosition="bottom" lazy="true">
+							<f:facet name="header">
+								<div class="facturas-table-header">
+									<span style="font-weight: bold">Facturas</span> <span
+										class="filter-container ui-input-icon-left"> </span>
+								</div>
+							</f:facet>
+							<p:column headerText="Factura">
+								<h:outputText
+									value="#{pFactura.nomSerie.concat('-').concat(pFactura.numero)}" />
+							</p:column>
+							<p:column headerText="Fecha">
+								<h:outputText value="#{pFactura.fecha}" />
+							</p:column>
+							<p:column headerText="Moneda">
+								<h:outputText value="#{pFactura.moneda}">
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Monto total">
+								<h:outputText value="#{pFactura.total}">
+								</h:outputText>
+							</p:column>
+							<p:ajax event="rowSelect" update=":form:botonPagar" />
+							<p:ajax event="rowUnselect" update=":form:botonPagar" />
+							<p:ajax event="rowSelectCheckbox" update=":form:botonPagar" />
+							<p:ajax event="rowUnselectCheckbox" update=":form:botonPagar" />
+							<p:ajax event="toggleSelect" update=":form:botonPagar" />
+							<p:column width="15%" headerText="Pagar" selectionMode="multiple"
+								exportable="false" />
+						</p:dataTable>
+						<p:toolbar styleClass="p-mb-5">
+							<p:toolbarGroup align="right">
+								<p:commandButton id="botonPagar" style="width:300px;height:30px"
+									value="#{ingresosCrudBean.botonPagoMessage}"
+									icon="pi pi-money-bill"
+									actionListener="#{ingresosCrudBean.actualizaBoton()}"
+									styleClass="edit-button ui-button-primary" process="@this"
+									disabled="#{!ingresosCrudBean.hasFacturaSelected()}"
+									update="@this form:panel-pago " oncomplete="PF('informacionPagoDialog').show()">
+									<f:setPropertyActionListener value="#{pInfoPago}"
+										target="#{ingresosCrudBean.lstFacturaSelected}" />
+								</p:commandButton>
+							</p:toolbarGroup>
+						</p:toolbar>
+
+						<p:dialog header="Informacion de Pago" showEffect="fade"
+							modal="true" widgetVar="informacionPagoDialog" responsive="true">
+							<p:outputPanel id="panel-pago" class="ui-fluid">
+								<p:outputPanel>
+									<p:dataTable id="dt-pagos" widgetVar="dtPagos" var="pPago"
+										value="#{ingresosCrudBean.lstPago}" reflow="true"
+										styleClass="pagos-table"
+										selection="#{ingresosCrudBean.lstPago}" rowKey="#{pPago.id}"
+										paginator="true" rows="10" rowSelectMode="add"
+										paginatorPosition="bottom" lazy="true">
+										<f:facet name="header">
+											<div class="facturas-table-header">
+												<p:toolbar styleClass="p-mb-5">
+													<p:toolbarGroup align="left">
+														<h:outputText
+															value="#{ingresosCrudBean.clienteSelected.cteNombre}" />
+													</p:toolbarGroup>
+													<p:toolbarGroup align="right">
+														<h:outputText
+															value="A pagar: #{ingresosCrudBean.montoPago}" />
+													</p:toolbarGroup>
+												</p:toolbar>
+												<span style="font-weight: bold"
+													title="Cliente: #{ingresosCrudBean.clienteSelected.cteNombre}" />
+												<span class="filter-container ui-input-icon-left"> </span>
+											</div>
+										</f:facet>
+										<p:column headerText="Factura">
+											<h:outputText
+												value="#{pPago.factura.nomSerie.concat('-').concat(pPago.factura.numero)}" />
+										</p:column>
+										<p:column headerText="A pagar">
+											<p:inputText value="#{pPago.monto}">
+												<p:ajax event="blur" update="dt-pagos"
+													listener="#{ingresosCrudBean.actualizaMontoPago()}" />
+											</p:inputText>
+										</p:column>
+										<p:column headerText="Cheque">
+											<p:inputText value="#{pPago.cheque}">
+												<p:ajax event="blur" update="dt-pagos" />
+											</p:inputText>
+										</p:column>
+										<p:column headerText="Tipo de pago">
+											<p:selectOneMenu id="soTipoPago" converter="entityConverter"
+												value="#{pPago.tipo}" filter="true"
+												filterMatchMode="contains">
+												<f:selectItem itemLabel="--Seleccione--" />
+												<f:selectItems value="#{ingresosCrudBean.lstTipoPago}"
+													var="tipoPago" itemLabel="#{tipoPago.nombre}"
+													itemValue="#{tipoPago}" />
+												<p:ajax event="click" update="dt-pagos" />
+											</p:selectOneMenu>
+										</p:column>
+										<p:column headerText="Banco">
+											<p:selectOneMenu id="soBancos" converter="entityConverter"
+												value="#{ingresosCrudBean.bancosSelected}" filter="true"
+												filterMatchMode="contains"
+												disabled="#{ingresosCrudBean.clienteSelected eq null and ingresosCrudBean.clienteSelected.cteCve eq null}">
+												<f:selectItem itemLabel="--Seleccione--" />
+												<f:selectItems value="#{ingresosCrudBean.lstBancos}"
+													var="banco" itemLabel="#{banco.nombre}"
+													itemValue="#{banco}" />
+												<p:ajax event="click" update="dt-pagos" />
+											</p:selectOneMenu>
+										</p:column>
+
+										<p:column headerText="Saldo">
+											<h:outputText value="#{pPago.factura.observacion}" />
+										</p:column>
+										<p:column headerText="Monto">
+											<h:outputText value="#{pPago.factura.total}" />
+										</p:column>
+									</p:dataTable>
+
+								</p:outputPanel>
+							</p:outputPanel>
+
+							<f:facet name="footer">
+								<p:commandButton id="botonProcesaPago" value="Registrar Pago" icon="pi pi-money-bill"
+									actionListener="#{ingresosCrudBean.procesaPago()}"
+									onclick="PF('informacionPagoDialog').hide()" disabled="#{ingresosCrudBean.disabledPagar}"
+									update="panel-pago dt-facturas" process="@this panel-pago" />
+								<p:commandButton value="Cancelar" icon="pi pi-times"
+									onclick="PF('informacionPagoDialog').hide()" actionListener="#{ingresosCrudBean.refrescaTabla()}"
+									class="ui-button-secondary" update="panel-pago dt-facturas botonPagar"
+									resetValues="true" />
+							</f:facet>
+						</p:dialog>
+
+
+
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
