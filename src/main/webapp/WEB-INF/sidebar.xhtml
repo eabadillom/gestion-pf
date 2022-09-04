@@ -172,18 +172,18 @@
 									icon="pi pi-fw pi-search" outcome="/inventarios/constanciaServicios" />
 							</p:submenu>
 							<p:submenu label="Catálogos" icon="pi pi-fw pi-book">
-								<p:menuitem value="Artículos"
+								<p:menuitem value="Productos"
 									outcome="/protected/catalogos/articulos" icon="pi pi-fw pi-box" />
-								<p:menuitem value="Plantas"
-									outcome="/protected/catalogos/plantas" icon="pi pi-building" />
-								<p:menuitem value="Servicios"
-									outcome="/protected/catalogos/servicios"
-									icon="pi pi-fw pi-list" />
-								<p:menuitem value="Cámaras"
-									outcome="/protected/catalogos/camaras" icon="pi pi-fw pi-inbox" />
 								<p:menuitem value="Productos por Cliente"
 									outcome="/protected/catalogos/prodCliente"
 									icon="pi pi-fw pi-shopping-bag" />
+								<p:menuitem value="Plantas"
+									outcome="/protected/catalogos/plantas" icon="pi pi-building" />
+								<p:menuitem value="Cámaras"
+									outcome="/protected/catalogos/camaras" icon="pi pi-fw pi-inbox" />
+								<p:menuitem value="Posiciones en cámara"
+									outcome="/protected/catalogos/posicionesCamara"
+									icon="pi pi-fw pi-th-large" />
 							</p:submenu>
 							<p:menuitem id="frb_kardex" value="Kardex"
 								icon="pi pi-fw pi-shopping-bag"
@@ -255,6 +255,9 @@
 								<p:menuitem id="frb_facturacion_sm12" value="Ud de Medida"
 									icon="pi pi-fw pi-tags"
 									outcome="/protected/catalogos/unidadManejo" />
+								<p:menuitem value="Servicios"
+									outcome="/protected/catalogos/servicios"
+									icon="pi pi-fw pi-list" />
 								<p:menuitem value="Servicios por cliente"
 									outcome="/protected/catalogos/serviciosPorCliente"
 									icon="pi pi-fw pi-user-edit" />

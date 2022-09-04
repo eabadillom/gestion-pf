@@ -38,7 +38,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "DetalleConstanciaSalida.findByProducto", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.producto = :producto"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByFolioEntrada", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.folioEntrada = :folioEntrada"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByCamaraCadena", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.camaraCadena = :camaraCadena"),
-    @NamedQuery(name = "DetalleConstanciaSalida.findByDetPartCve", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.detPartCve = :detPartCve"),
+    //@NamedQuery(name = "DetalleConstanciaSalida.findByDetPartCve", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.detPartCve = :detPartCve"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByTemperatura", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.temperatura = :temperatura"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByParams", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.partidaCve.partidaCve = :partidaCve AND d.folioEntrada =:folioEntrada AND d.producto = :producto") })
 public class DetalleConstanciaSalida implements Serializable {
