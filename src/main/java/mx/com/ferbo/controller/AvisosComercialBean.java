@@ -34,6 +34,7 @@ import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoPagoDAO;
 import mx.com.ferbo.dao.UdCobroDAO;
+import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Categoria;
@@ -51,6 +52,7 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.model.UdCobro;
+import mx.com.ferbo.model.UnidadDeManejo;
 
 @Named
 @ViewScoped
@@ -102,6 +104,7 @@ public class AvisosComercialBean implements Serializable {
 	private Servicio servicioSelected;
 	private ServicioDAO servicioDAO;
 	private List<Servicio> lstServicios;
+	private List<Servicio> lstServiciosAviso;
 
 	/**
 	 * Objetos para Servicios por cliente
@@ -133,6 +136,13 @@ public class AvisosComercialBean implements Serializable {
 	private UdCobro udCobroSelected;
 	private List<UdCobro> lstUdCobro;
 	private UdCobroDAO udCobroDAO;
+	
+	/**
+	 * Objetos para unidad de Manejo
+	 */
+	private UnidadDeManejo unidadDeManejoSelected;
+	private List<UnidadDeManejo> lstUnidadDeManejo;
+	private UnidadDeManejoDAO unidadDeManejoDAO;
 
 	/**
 	 * Objetos auxiliares
@@ -175,6 +185,7 @@ public class AvisosComercialBean implements Serializable {
 		lstPrecioServicio = new ArrayList<>();
 		lstUdCobro = new ArrayList<>();
 		udCobroDAO = new UdCobroDAO();
+		unidadDeManejoDAO = new UnidadDeManejoDAO();
 		avisoPo=false;
 		avisoPed=false;
 		avisoSAP=false;
@@ -187,6 +198,9 @@ public class AvisosComercialBean implements Serializable {
 		avisoVigencia=0;
 		avisoValSeg=new BigDecimal(0);
 		avisoPlazo = 0;
+		lstPrecioServicioSelected = new ArrayList<>();
+		
+
 
 	}
 
@@ -197,6 +211,7 @@ public class AvisosComercialBean implements Serializable {
 		lstCategoria = categoriaDAO.buscarTodos();
 		lstPlanta = plantaDAO.findall();
 		lstUdCobro = udCobroDAO.buscarTodos();
+		lstUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 	}
 
 	/**
@@ -223,9 +238,30 @@ public class AvisosComercialBean implements Serializable {
 		for (PrecioServicio p : lstPrecioServicio) {
 			lstServAux.add(p.getServicio());
 		}
-		lstServAux = lstServAux.stream().distinct().collect(Collectors.toList());
 		lstServicios = lstServAux;
 
+	}
+	
+	public void buscaPrecioServicioAviso() {
+		Aviso avisoAux = new Aviso();
+		avisoAux.setAvisoCve(1);
+		PrecioServicio precioServicioAux = new PrecioServicio();
+		precioServicioAux = new PrecioServicio();
+		precioServicioAux.setCliente(clienteSelected);
+		precioServicioAux.setAvisoCve(avisoAux);
+		lstPrecioServicio = precioServicioDAO.buscarPorCriterios(precioServicioAux);
+		precioServicioAux = new PrecioServicio();
+		precioServicioAux.setCliente(clienteSelected);
+		precioServicioAux.setAvisoCve(avisoSelected);
+		lstPrecioServicioAviso = precioServicioDAO.buscarPorCriterios(precioServicioAux);
+	}
+
+	public List<Servicio> getLstServiciosAviso() {
+		return lstServiciosAviso;
+	}
+
+	public void setLstServiciosAviso(List<Servicio> lstServiciosAviso) {
+		this.lstServiciosAviso = lstServiciosAviso;
 	}
 
 	/**
@@ -312,8 +348,11 @@ public class AvisosComercialBean implements Serializable {
 		nPs.setCliente(clienteSelected);
 		nPs.setAvisoCve(avisoSelected);
 		nPs.setServicio(servicioSelected);
-		psLst = precioServicioDAO.buscarPorCriterios(nPs);		
-		avisoSelected.setPrecioServicioList(psLst);
+		for(PrecioServicio ps : lstPrecioServicioAviso) {
+			ps.setAvisoCve(avisoSelected);
+			precioServicioDAO.actualizar(ps);
+		}		
+		avisoSelected.setPrecioServicioList(lstPrecioServicioAviso);
 		Date fechaActual = new Date();
 		avisoSelected.setAvisoFecha(fechaActual);
 		avisoSelected.setAvisoTpFacturacion("");
@@ -330,10 +369,7 @@ public class AvisosComercialBean implements Serializable {
 		avisoSelected.setAvisoVigencia(avisoVigencia);
 		avisoSelected.setAvisoValSeg(avisoValSeg);
 		avisoSelected.setAvisoPlazo(avisoPlazo);
-		for(PrecioServicio ps : psLst) {
-			ps.setAvisoCve(avisoSelected);
-			precioServicioDAO.actualizar(ps);
-		}
+		
 		avisoDAO.actualizar(avisoSelected);		
 		PrimeFaces.current().ajax().update("form:dt-avisos");
 	}
@@ -343,11 +379,39 @@ public class AvisosComercialBean implements Serializable {
 		nPs.setCliente(clienteSelected);
 		nPs.setAvisoCve(avisoSelected);
 		nPs.setServicio(servicioSelected);
-		//precioServicioDAO.eliminar(nPs);
+		precioServicioDAO.eliminar(nPs);
 		avisoDAO.eliminar(avisoSelected);
 		lstAvisos.remove(avisoSelected);
 		PrimeFaces.current().ajax().update("form:dt-avisos");
 	}
+	
+	public void agregaAviso() {
+		for(PrecioServicio ps :lstPrecioServicioSelected) {
+			//int calcId = precioServicioDAO.obtenFinal();
+			//ps.setId(calcId+1);
+			ps.setId(null);
+			ps.setAvisoCve(avisoSelected);
+			precioServicioDAO.guardar(ps);
+		}
+		this.buscaPrecioServicioAviso();
+		List<PrecioServicio> lstPsAux = new ArrayList<>();
+		for(PrecioServicio pser :lstPrecioServicio) {
+			for(PrecioServicio pserAv : lstPrecioServicioAviso) {
+				if(pser.getServicio() == pserAv.getServicio()) {
+					lstPsAux.add(pser);
+				}
+			}
+		}
+		lstPrecioServicio.removeAll(lstPsAux);
+		PrimeFaces.current().ajax().update("form:dt-avisos", "form:panel-actAviso", "form:dt-servicioAviso", "form:dt-servicioSinAviso");
+	}
+	
+	public void remueveAviso() {		
+		precioServicioDAO.eliminarListado(lstPrecioServicioSelected);
+		PrimeFaces.current().ajax().update("form:dt-avisos", "form:panel-actAviso");
+
+	}
+	
 
 	/**
 	 * Getters & Setters
@@ -702,6 +766,30 @@ public class AvisosComercialBean implements Serializable {
 
 	public void setUdCobroDAO(UdCobroDAO udCobroDAO) {
 		this.udCobroDAO = udCobroDAO;
+	}
+
+	public UnidadDeManejo getUnidadDeManejoSelected() {
+		return unidadDeManejoSelected;
+	}
+
+	public void setUnidadDeManejoSelected(UnidadDeManejo unidadDeManejoSelected) {
+		this.unidadDeManejoSelected = unidadDeManejoSelected;
+	}
+
+	public List<UnidadDeManejo> getLstUnidadDeManejo() {
+		return lstUnidadDeManejo;
+	}
+
+	public void setLstUnidadDeManejo(List<UnidadDeManejo> lstUnidadDeManejo) {
+		this.lstUnidadDeManejo = lstUnidadDeManejo;
+	}
+
+	public UnidadDeManejoDAO getUnidadDeManejoDAO() {
+		return unidadDeManejoDAO;
+	}
+
+	public void setUnidadDeManejoDAO(UnidadDeManejoDAO unidadDeManejoDAO) {
+		this.unidadDeManejoDAO = unidadDeManejoDAO;
 	}
 
 }

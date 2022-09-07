@@ -34,7 +34,11 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		// TODO Auto-generated method stub
 		if (e.getCliente().getCteCve() != null) {
 			if(e.getServicio()!=null) {
+				
 				return this.buscarPorClienteServicio(e);
+			}
+			if(e.getAvisoCve()!=null) {
+				return this.buscarPorClienteAviso(e);
 			}
 			return this.buscarPorCliente(e);
 		}
@@ -66,7 +70,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+ 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}
 		return null;
@@ -79,7 +83,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			em.getTransaction().begin();
 			em.remove(em.merge(precioServicio));
 			em.getTransaction().commit();
-			// em.close();
+			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
@@ -90,7 +94,11 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	@Override
 	public String eliminarListado(List<PrecioServicio> listado) {
 		// TODO Auto-generated method stub
-		return null;
+		String val = "";
+		for(PrecioServicio ps:listado) {
+			val=this.eliminar(ps);
+		}
+		return val != null ? val:null;
 	}
 
 	private List<PrecioServicio> buscarPorCliente(PrecioServicio e) {
@@ -107,4 +115,27 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 				.getResultList();
 	}
 	
+	private List<PrecioServicio> buscarPorClienteAviso(PrecioServicio e){
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("PrecioServicio.findByClienteAviso", PrecioServicio.class)
+				.setParameter("cteCve", e.getCliente().getCteCve())
+				.setParameter("avisoCve", e.getAvisoCve().getAvisoCve())
+				.getResultList();
+	}	
+	
+	public int obtenFinal() {
+		int valorFinal=0;
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			valorFinal=(int) em.createNativeQuery("Select max(id) from precio_servicio").getSingleResult();
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception ex) {
+			System.out.println("ERROR" + ex.getMessage());
+			return 0;
+		}
+		return valorFinal;
+		
+	}
 }

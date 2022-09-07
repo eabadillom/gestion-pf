@@ -161,6 +161,7 @@
 							<p:column width="10%">
 								<p:commandButton icon="pi pi-pencil" process="@this"
 									styleClass="edit-button ui-button-primary"
+									actionListener="#{avisosComercialBean.buscaPrecioServicioAviso()}"
 									oncomplete="PF('actAvisoDialog').show()"
 									update="dt-avisos form:panel-actAviso">
 									<f:setPropertyActionListener value="#{pAviso}"
@@ -175,7 +176,8 @@
 						</p:dataTable>
 
 						<p:dialog header="Agregar Aviso" showEffect="fade" modal="true"
-							widgetVar="addAvisoDialog" responsive="true">
+							widgetVar="addAvisoDialog" responsive="true" height="350px"
+							width="700px">
 							<p:outputPanel id="panel-addAviso" class="ui-fluid">
 								<p:outputPanel>
 									<div class="aviso-add-header">
@@ -187,7 +189,7 @@
 										</p:toolbar>
 									</div>
 									<div class="p-formgrid p-grid">
-										<div class="p-field p-col-5 p-md-6">
+										<div class="p-field p-col-12 p-md-12">
 											<p:selectManyCheckbox layout="responsive" columns="7">
 												<f:selectItem itemLabel="P.O"
 													itemValue="#{avisosComercialBean.avisoPo}" />
@@ -204,6 +206,8 @@
 												<f:selectItem itemLabel="Otro"
 													itemValue="#{avisosComercialBean.avisoOtro}" />
 											</p:selectManyCheckbox>
+										</div>
+										<div class="p-field p-col-5 p-md-6">
 											<p:outputLabel for="@next" value="Valor del seguro" />
 											<p:inputText value="#{avisosComercialBean.avisoValSeg}" />
 											<p:outputLabel for="@next" value="Temperatura" />
@@ -217,11 +221,6 @@
 													var="planta" itemLabel="#{planta.plantaDs}"
 													itemValue="#{planta}" />
 											</p:selectOneMenu>
-										</div>
-										<div class="p-field p-col-5 p-md-6">
-											<p:outputLabel for="@next" value="Observaciones" />
-											<p:inputText
-												value="#{avisosComercialBean.avisoObservaciones}" />
 											<p:outputLabel for="@next" value="Categoria" />
 											<p:selectOneMenu id="soCategoria" converter="entityConverter"
 												value="#{avisosComercialBean.categoriaSelected}"
@@ -231,6 +230,11 @@
 													var="categoria" itemLabel="#{categoria.categoriaDs}"
 													itemValue="#{categoria}" />
 											</p:selectOneMenu>
+										</div>
+										<div class="p-field p-col-5 p-md-6">
+											<p:outputLabel for="@next" value="Observaciones" />
+											<p:inputText
+												value="#{avisosComercialBean.avisoObservaciones}" />
 											<p:outputLabel for="@next" value="Vigencia en días" />
 											<p:inputText value="#{avisosComercialBean.avisoVigencia}" />
 											<p:outputLabel for="@next" value="Plazo de pago en días" />
@@ -339,7 +343,7 @@
 												</p:column>
 											</p:dataTable>
 											<p:commandButton id="botonColocaAviso" value="Agregar avisos"
-												actionListener="#{avisosComercialBean.actualizaAviso()}"
+												actionListener="#{avisosComercialBean.agregaAviso()}"
 												update="panel-actAviso dt-avisos"
 												process="@this dt-servicioSinAviso" />
 										</div>
@@ -358,21 +362,24 @@
 													<p:inputText value="#{pServicioAviso.precio}" />
 												</p:column>
 												<p:column headerText="Unidad de Cobro">
-													<p:selectOneMenu id="soUnidadCobro"
+													<p:selectOneMenu id="soUnidadManejo"
 														converter="entityConverter"
-														value="#{avisosComercialBean.udCobroSelected}"
+														value="#{pServicioAviso.unidad}"
 														filter="true" filterMatchMode="contains">
 														<f:selectItem itemLabel="--Seleccione--" />
-														<f:selectItems value="#{avisosComercialBean.lstUdCobro}"
-															var="udCobro" itemLabel="#{udCobro.nbUnidad}"
-															itemValue="#{udCobro}" />
+														<f:selectItems value="#{avisosComercialBean.lstUnidadDeManejo}"
+															var="udManejo" itemLabel="#{udCobro.unidadDeManejoDs}"
+															itemValue="#{udManejo}" />
 													</p:selectOneMenu>
 												</p:column>
+												<p:column width="10%">
+													<p:commandButton id="botonQuitaAviso"
+														class="ui-button-danger" icon="pi pi-trash"
+														actionListener="#{avisosComercialBean.eliminaAviso()}"
+														update="form:panel-actAviso form:dt-avisos"
+														process="@this dt-servicioAviso" />
+												</p:column>
 											</p:dataTable>
-											<p:commandButton id="botonQuitaAviso" value="Eliminar avisos"
-												actionListener="#{avisosComercialBean.eliminaAviso()}"
-												update="panel-actAviso dt-avisos"
-												process="@this dt-servicioAviso" />
 										</div>
 									</div>
 								</p:outputPanel>
