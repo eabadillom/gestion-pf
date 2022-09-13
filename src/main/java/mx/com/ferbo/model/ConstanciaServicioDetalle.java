@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -27,6 +28,7 @@ import javax.validation.constraints.NotNull;
 @NamedQueries({
     @NamedQuery(name = "ConstanciaServicioDetalle.findAll", query = "SELECT c FROM ConstanciaServicioDetalle c"),
     @NamedQuery(name = "ConstanciaServicioDetalle.findByConstanciaServicioDetalleCve", query = "SELECT c FROM ConstanciaServicioDetalle c WHERE c.constanciaServicioDetalleCve = :constanciaServicioDetalleCve"),
+    @NamedQuery(name = "ConstanciaServicioDetalle.findByFolio", query = "SELECT c FROM ConstanciaServicioDetalle c WHERE c.folio = :folio"),
     @NamedQuery(name = "ConstanciaServicioDetalle.findByServicioCantidad", query = "SELECT c FROM ConstanciaServicioDetalle c WHERE c.servicioCantidad = :servicioCantidad")})
 public class ConstanciaServicioDetalle implements Serializable {
 
@@ -40,7 +42,7 @@ public class ConstanciaServicioDetalle implements Serializable {
     @Column(name = "SERVICIO_CANTIDAD")
     private BigDecimal servicioCantidad;
     @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private ConstanciaDeServicio folio;
     @JoinColumn(name = "SERVICIO_CVE", referencedColumnName = "SERVICIO_CVE")
     @ManyToOne(optional = false)
