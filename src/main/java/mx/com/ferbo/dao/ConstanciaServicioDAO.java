@@ -1,7 +1,5 @@
 package mx.com.ferbo.dao;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +18,15 @@ import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Integer> {
+	
+	public EntityManager em = null;
+	
+	public ConstanciaServicioDAO() {
+	}
+	
+	public ConstanciaServicioDAO(EntityManager em) {
+		this.em = em;
+	}
 
 	@Override
 	public ConstanciaDeServicio buscarPorId(Integer id) {
@@ -32,15 +40,14 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 		return null;
 	}
 
-	public List<ConstanciaDeServicio> buscarPorCriterio(int folio, Date fechaInico, Date fechaFin, int idCliente) {
+	@SuppressWarnings("unchecked")
+	public List<ConstanciaDeServicio> buscarPorCriterio(String folioCliente, Date fechaInico, Date fechaFin, int idCliente) {
 		Cliente cliente = new Cliente();
 		Map<String, Object> paramaterMap = new HashMap<String, Object>();
 		List<String> whereCause = new ArrayList<String>();
 		StringBuilder queryBuilder = new StringBuilder();
 		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
 			Query q = null;
 			queryBuilder.append("SELECT cds FROM ConstanciaDeServicio cds");
 
@@ -49,9 +56,9 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 				paramaterMap.put("fechaInicio", fechaInico);
 				paramaterMap.put("fechaFinal", fechaFin);
 			}
-			if (folio != 0) {
-				whereCause.add("cds.folio = :folio");
-				paramaterMap.put("folio", folio);
+			if (folioCliente != null && !"".equalsIgnoreCase(folioCliente.trim())) {
+				whereCause.add("cds.folioCliente = :folioCliente");
+				paramaterMap.put("folioCliente", folioCliente);
 			}
 			if (idCliente != 0) {
 				cliente.setCteCve(idCliente);
@@ -81,10 +88,22 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	@Override
 	public String actualizar(ConstanciaDeServicio e) {
-		// TODO Auto-generated method stub
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			entity.getTransaction().begin();
+			entity.merge(e);
+			entity.getTransaction().commit();
+		} catch(Exception ex) {
+			entity.getTransaction().rollback();
+			ex.printStackTrace();
+		}finally {
+			entity.close();
+		}
+	
 		return null;
 	}
 
@@ -106,4 +125,11 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 		return null;
 	}
 
+	public EntityManager getEntityManager() {
+		return em;
+	}
+
+	public void setEntityManager(EntityManager em) {
+		this.em = em;
+	}
 }

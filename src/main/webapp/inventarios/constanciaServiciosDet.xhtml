@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Constancia de Servicio DETALLE</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Inventarios" />
+				<p:menuitem value="Servicios" />
+				<p:menuitem value="Consultar"
+					outcome="/inventarios/constanciaServicios" />
+			</p:breadCrumb>
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						<p:outputLabel value="Por Rango de Fechas:" />
+						<p:datePicker id="fechaInicial" showIcon="true"
+							styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Inicio"
+							value="#{constanciaServicioBean.fechaInicio}" />
+						<p:datePicker id="fechaFinal" showIcon="true"
+							styleClass="p-mr-4 p-mb-2" placeholder="Fecha Final"
+							value="#{constanciaServicioBean.fechaFinal}" />
+						<p:outputLabel for="folio" value="Por Folio:" />
+						<p:inputText id="folio" value="#{constanciaServicioBean.folio}" />
+						<p:outputLabel for="cliente-som" value="Por Clientes:" />
+						<p:selectOneMenu id="cliente-som" autoWidth="false"
+							value="#{constanciaServicioBean.idCliente}" filter="true"
+							filterMatchMode="startsWith">
+							<f:selectItem itemLabel="Selecione Cliente" itemValue=""
+								noSelectionOption="true" />
+							<f:selectItems var="selectedCliente"
+								value="#{constanciaServicioBean.listaClientes}"
+								itemLabel="#{selectedCliente.cteNombre}"
+								itemValue="#{selectedCliente.cteCve}" />
+						</p:selectOneMenu>
+						<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2"
+							icon="pi pi-fw pi-search"
+							actionListener="#{constanciaServicioBean.buscarConstancia}" update="@widgetVar(dtConstanciaServicios)"/>
+					</div>
+				</div>
+			</div>
+
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" />
+						<p:dataTable id="dt-constanciaServicios"
+							widgetVar="dtConstanciaServicios" var="constanciaServicios"
+							value="#{constanciaServicioBean.listaConstanciaServicios}"
+							reflow="true" rowKey="#{constanciaServicios.folio}" paginator="true" rows="10"
+							rowSelectMode="add" paginatorPosition="bottom">
+							<f:facet name="header">
+								<div class="customers-table-header">
+									<span style="font-weight: bold">Constancias de Servicio DETALLE</span>
+									<span class="ui-input-icon-left filter-container"> <i
+										class="pi pi-search"></i> <p:inputText id="globalFilter"
+											onkeyup="PF('dtConstanciaServicios').filter()"
+											placeholder="Búsqueda" />
+									</span>
+								</div>
+							</f:facet>
+							<p:column selectionMode="multiple" />
+							<p:column headerText="Folio" sortBy="#{constanciaServicios.folio}"
+								filterBy="#{constanciaServicios.folio}">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem"
+									value="#{constanciaServicios.folio}" />
+							</p:column>
+							<p:column headerText="Cliente" sortBy="#{constanciaServicios.cteCve.cteNombre}"
+								filterBy="#{constanciaServicios.cteCve.cteNombre}">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem"
+									value="#{constanciaServicios.cteCve.cteNombre}" />
+							</p:column>
+							<p:column headerText="Fecha" sortBy="#{constanciaServicios.fecha}"
+								filterBy="#{constanciaServicios.fecha}">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem"
+									value="#{constanciaServicios.fecha}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</div>
+			</div>
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

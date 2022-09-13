@@ -99,6 +99,7 @@
 		<class>mx.com.ferbo.model.Estados</class>
 		<class>mx.com.ferbo.model.ConstanciaFacturaCmp</class>
 		<class>mx.com.ferbo.model.ClienteDomicilios</class>
+		<class>mx.com.ferbo.model.ControlFacturaConstanciaDS</class>
 		 <properties>
 			<property name="javax.persistence.jdbc.url"
 				value="jdbc:mysql://ferbo.dynalias.com:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
