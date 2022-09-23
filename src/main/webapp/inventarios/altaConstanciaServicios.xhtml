@@ -38,11 +38,11 @@
 			</p:toolbar>
 			<p:toolbar>
 				<p:toolbarGroup>
-					<p:inputNumber id="txtCantidadProd" value="#{altaConstanciaServicioBean.cantidadCobro}" placeholder="Cantidad" minValue="1" decimalPlaces="0"/>
+					<p:inputNumber id="txtCantidadProd" value="#{altaConstanciaServicioBean.cantidad}" placeholder="Cantidad" minValue="1" decimalPlaces="0"/>
 					<p:selectOneMenu id="selUnidad" autoWidth="true" filter="true"
 						value="#{altaConstanciaServicioBean.idUnidadManejo}"
 						filterMatchMode="startsWith">
-						<f:selectItem itemLabel="--Unidad--" itemValue="" noSelectionOption="true" />
+						<f:selectItem itemLabel="Seleccione Unidad" itemValue="" noSelectionOption="true" />
 						<f:selectItems var="selectedUnidadManejo"
 							value="#{altaConstanciaServicioBean.alUnidades}"
 							itemLabel="#{selectedUnidadManejo.unidadDeManejoDs}"
@@ -50,15 +50,15 @@
 					</p:selectOneMenu>
 				</p:toolbarGroup>
 				<p:toolbarGroup>
+					<p:inputNumber id="txtPesoProd" value="#{altaConstanciaServicioBean.peso}" placeholder="Peso (kg)" minValue="0" decimalPlaces="3" />
 					<p:selectOneMenu id="selProducto" autoWidth="true" filter="true"
 						value="#{altaConstanciaServicioBean.idProducto}" filterMatchMode="startsWith">
-						<f:selectItem itemLabel="--Producto--" itemValue="" noSelectionOption="true" />
+						<f:selectItem itemLabel="Seleccione Producto" itemValue="" noSelectionOption="true" />
 						<f:selectItems var="producto"
 							value="#{altaConstanciaServicioBean.alProductosFiltered}"
 							itemLabel="#{producto.productoCve.productoDs}"
 							itemValue="#{producto.productoCve.productoCve}" />
 					</p:selectOneMenu>
-					<p:inputNumber id="txtPesoProd" value="#{altaConstanciaServicioBean.peso}" placeholder="Peso (kg)" minValue="0" decimalPlaces="3" />
 				</p:toolbarGroup>
 				<p:toolbarGroup>
 					<p:commandButton value="Agregar" icon="pi pi-plus"
@@ -97,29 +97,26 @@
 			</p:dataTable>
 			<p:toolbar>
 				<p:toolbarGroup>
-					<div class="field col-12 md:col-4">
-						<p:selectOneMenu id="selServicio" autoWidth="true" filter="true"
-							value="#{altaConstanciaServicioBean.idPrecioServicio}"
-							filterMatchMode="startsWith">
-							<f:selectItem itemLabel="--Servicio--" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="selectedPrecioServicio"
-								value="#{altaConstanciaServicioBean.alServicios}"
-								itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})"
-								itemValue="#{selectedPrecioServicio.id}" />
-						</p:selectOneMenu>
-					</div>
-					<div class="field col-12 md:col-4">
-						<p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/>
-					</div>
+					
+					<p:selectOneMenu id="selServicio" autoWidth="true" filter="true"
+						value="#{altaConstanciaServicioBean.idPrecioServicio}"
+						filterMatchMode="startsWith">
+						<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
+						<f:selectItems var="selectedPrecioServicio"
+							value="#{altaConstanciaServicioBean.alServicios}"
+							itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})"
+							itemValue="#{selectedPrecioServicio.id}" />
+					</p:selectOneMenu>
+					<p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/>
 				</p:toolbarGroup>
 				<p:toolbarGroup>
-					<div>
+					
 						<p:commandButton value="Agregar" icon="pi pi-plus"
 							styleClass="ui-button-info p-mr-2 p-mb-2"
 							actionListener="#{altaConstanciaServicioBean.agregarServicio}"
 							update="dt-servicios"
 							/>
-					</div>
+					
 				</p:toolbarGroup>
 			</p:toolbar>
 			<p:dataTable id="dt-servicios"
@@ -143,6 +140,20 @@
 						update="dt-servicios"/>
 				</p:column>
 			</p:dataTable>
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:inputNumber id="txtValorDeclarado" value="#{altaConstanciaServicioBean.valorDeclarado}" placeholder="Valor declarado" minValue="1" decimalPlaces="2"/>
+					<p:inputText id="txtNombreTransportista" value="#{altaConstanciaServicioBean.nombreTransportista}" placeholder="Nombre del transportista." />
+					<p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." />
+					<p:inputText id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Indique aquí sus observaciones." style="width: 30em;"/>
+				</p:toolbarGroup>
+			</p:toolbar>
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton value="Guardar" icon="pi pi-save"
+						actionListener="#{altaConstanciaServicioBean.guardar}"/>
+				</p:toolbarGroup>
+			</p:toolbar>
 		</h:form>
 	</ui:define>
 </ui:composition>
