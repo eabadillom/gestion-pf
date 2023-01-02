@@ -88,8 +88,12 @@
                                         <p:inputText id="txtDescipcion" value="#{serviciosBean.selectedServicio.servicioDs}" required="true" requiredMessage="Campo requerido"/>
                                     </div>
                                     <div class="p-field">
-                                        <p:outputLabel for="txtCodigo">Código de servicio</p:outputLabel>
-                                        <p:inputTextarea id="txtCodigo" value="#{serviciosBean.selectedServicio.servicioCod}" />
+                                        <p:outputLabel for="txtCodigo">Codigo Producto o Servicio SAT </p:outputLabel>
+                                        <p:inputText id="txtCodigo" value="#{serviciosBean.selectedServicio.servicioCod}" />
+                                    </div>
+                                    <div class="p-field">
+                                    	<p:outputLabel for="txtUnidad">Codigo Unidad SAT</p:outputLabel>
+                                    	<p:inputText id="txtUnidad" value="#{serviciosBean.selectedServicio.cdUnidad}"/>
                                     </div>
                                     <div class="p-field">
                                         <p:outputLabel for="soTipoC">Tipo de cobro</p:outputLabel>

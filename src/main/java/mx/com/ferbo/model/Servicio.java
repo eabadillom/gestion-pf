@@ -32,7 +32,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Servicio.findAll", query = "SELECT s FROM Servicio s"),
     @NamedQuery(name = "Servicio.findByServicioCve", query = "SELECT s FROM Servicio s WHERE s.servicioCve = :servicioCve"),
     @NamedQuery(name = "Servicio.findByServicioDs", query = "SELECT s FROM Servicio s WHERE s.servicioDs = :servicioDs"),
-    @NamedQuery(name = "Servicio.findByServicioCod", query = "SELECT s FROM Servicio s WHERE s.servicioCod = :servicioCod")})
+    @NamedQuery(name = "Servicio.findByServicioCod", query = "SELECT s FROM Servicio s WHERE s.servicioCod = :servicioCod"),
+    @NamedQuery(name = "Servicio.findByCdUnidad", query = "SELECT s FROM Servicio s WHERE s.cdUnidad = :cdUnidad")})
 public class Servicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -47,6 +48,9 @@ public class Servicio implements Serializable {
     @Size(max = 20)
     @Column(name = "SERVICIO_COD")
     private String servicioCod;
+    @Size(max = 5)
+    @Column(name = "cd_unidad")
+    private String cdUnidad;
     @OneToMany(mappedBy = "servicioCve")
     private List<DetalleConstanciaServicios> detalleConstanciaServiciosList;
     @JoinColumn(name = "COBRO", referencedColumnName = "id")
@@ -92,7 +96,15 @@ public class Servicio implements Serializable {
         this.servicioCod = servicioCod;
     }
 
-    public List<DetalleConstanciaServicios> getDetalleConstanciaServiciosList() {
+    public String getCdUnidad() {
+		return cdUnidad;
+	}
+
+	public void setCdUnidad(String cdUnidad) {
+		this.cdUnidad = cdUnidad;
+	}
+
+	public List<DetalleConstanciaServicios> getDetalleConstanciaServiciosList() {
         return detalleConstanciaServiciosList;
     }
 
