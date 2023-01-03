@@ -101,7 +101,11 @@
                                             <f:selectItem itemLabel="--Selecciona--"/>
                                             <f:selectItems value="#{serviciosBean.listadoTipoCobro}" var="cobro" itemLabel="#{cobro.nombre}" itemValue="#{cobro}" />
                                         </p:selectOneMenu>
-                                    </div>                                    
+                                    </div>
+                                    <div class="p-field">
+                                    	<p:selectBooleanCheckbox value="true" itemLabel="Servicio registrado en facturama correctamente."></p:selectBooleanCheckbox>
+                                    </div>
+                                                                     
                                 </p:outputPanel>
                             </p:outputPanel>
 
