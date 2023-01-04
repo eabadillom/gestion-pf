@@ -35,6 +35,8 @@ public class UsuarioDAO extends IBaseDAO<Usuario, Integer>{
 		return usuario;
 	}
 
+
+
 	@Override
 	public List<Usuario> buscarPorCriterios(Usuario e) {
 		// TODO Auto-generated method stub

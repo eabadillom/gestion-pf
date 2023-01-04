@@ -25,15 +25,16 @@
 						<p:toolbar styleClass="p-mb-4">
 							<p:toolbarGroup>
 								<p:commandButton value="Agregar" icon="pi pi-plus"
-									styleClass="ui-button-info p-mr-2 p-mb-2"
-									oncomplete="PF('dg-agrega').show();" update="frm-agrega"
-									actionListener="#{plantaBean.openNew()}" process="@this" />
+									actionListener="#{plantaBean.openNew()}"
+									update="frm-agrega "
+									oncomplete="PF('dg-agregar').show();" 
+									styleClass="ui-button-info p-mr-2 p-mb-2" process="@this" />
 							</p:toolbarGroup>
 						</p:toolbar>
 
 						<p:dataTable id="dt-planta" widgetVar="dtPlanta" var="planta"
 							value="#{plantaBean.list}" rowKey="#{planta.plantaCve}"
-							reflow="true" selection="#{plantaBean.seleccion}"
+							reflow="true" selection="#{plantaBean.planta}"
 							rowSelectMode="single" paginator="true" rows="5"
 							paginatorPosition="bottom">
 
@@ -53,10 +54,12 @@
 								<h:outputText value="#{planta.idUsuario.usuario}" />
 							</p:column>
 
-							<p:column>
-								<p:commandButton icon="pi pi-pencil" value="Modificar" oncomplete="PF('dg-modifica').show()" 
-													styleClass="edit-button ui-button-info p-mr-2" update="form:frm-modifica" process="@this">
-									<f:setPropertyActionListener target="#{plantaBean.planta}" value="#{planta}"/>
+							<p:column headerText="Accion">
+								<p:commandButton icon="pi pi-pencil" value="Modificar"
+												actionListener="#{plantaBean.muestraplanta}" 
+												update="@widgetVar('dg-agrega')" 
+												oncomplete="PF(dg-agrega).show()" styleClass="edit-button ui-button-info p-mr-2" process="@this" >
+									<f:setPropertyActionListener value="#{planta}" target="#{plantaBean.planta}" />
 								</p:commandButton>
 
 								<p:commandButton class="ui-button-danger" icon="pi pi-trash"
@@ -71,8 +74,8 @@
 				</div>
 			</div>
 
-		<p:dialog header="Agregar Nueva Planta" widgetVar="dg-agrega"
-				modal="true" showEffect="fade" responsive="true">
+		<p:dialog header="Agregar Nueva Planta" showEffect="fade" 
+				modal="true" widgetVar="dg-agregar" responsive="true"  >
 
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 				<p:panel>
@@ -111,7 +114,7 @@
 							
         				<p:outputLabel for="states" value="Estado:"/>
 							<p:selectOneMenu id="states" value="#{plantaBean.idEstado}"  disable="#{plantaBean.idPais eq null or plantaBean.idPais eq 0}" >
-							<f:selectItem itemLabel="---Selecione---" itemValue="null"  />
+							<f:selectItem itemLabel="---Selecione---" itemValue="0"  />
 							<f:selectItems var="selectedStates" value="#{plantaBean.estadosList}" itemLabel="#{selectedStates.estadoDesc}" itemValue="#{selectedStates.estadosPK.estadoCve}"/>
 							<p:ajax listener="#{plantaBean.handleStateSelect}" process="@this" update="municipality"/>
 						</p:selectOneMenu>
@@ -127,7 +130,7 @@
 						<p:selectOneMenu id="cities"  autoWidth="false"  value="#{plantaBean.idCiudad}" disable="#{plantaBean.idMunicipio eq null or plantaBean.idMunicipio eq 0}" >
 							<f:selectItem itemLabel="---Selecione---" itemValue="0" />
 							<f:selectItems var="selectedCitiesOne" value="#{plantaBean.listaCiudades}" itemLabel="#{selectedCitiesOne.ciudadDs}" itemValue="#{selectedCitiesOne.ciudadesPK.ciudadCve}" />
-							<p:ajax process="@this"/>
+							<p:ajax listener="#{plantaBean.handleCitySelect}" process="@this" update="TipoAsen"/>
 						</p:selectOneMenu>
 							
         				<p:outputLabel for="TipoAsen" value="Tipo de Asentamiento:" />
@@ -145,7 +148,7 @@
 						<p:outputLabel for="@next">Num exterior:</p:outputLabel>
 						<p:inputText value="#{plantaBean.planta.numexterior}" required="true" />
 							
-							<p:outputLabel for="@next">Num interior:</p:outputLabel>
+						<p:outputLabel for="@next">Num interior:</p:outputLabel>
 						<p:inputText value="#{plantaBean.planta.numinterior}" required="true" />
 
     			</p:panelGrid>
@@ -156,17 +159,15 @@
 					<p:commandButton value="Guardar" icon="pi pi-check"
 						actionListener="#{plantaBean.save()}" update="frm-agrega"
 						process="frm-agrega @this" />
-					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dg-agregar').hide()" class="ui-button-danger" />
 				</f:facet>
 			</p:dialog>
 			 
 			 
-			<p:dialog header="Editar Planta" widgetVar="dg-modifica" modal="true"
+			<p:dialog header="Editar Planta" widgetVar="dg-agrega" modal="true"
 				showEffect="fade" responsive="true">
-				
 				<p:outputPanel id="frm-modifica" class="ui-fluid">
-				<p:panel>
+				<p:outputPanel rendered="#{not empty plantaBean.planta}">
 				<p:panelGrid columns="6" layout="flex" columnClasses="col-12 md:col-3 xl:col-2, 
 																	col-12 md:col-9 xl:col-4, 
 																	col-12 md:col-3 xl:col-2, 
@@ -175,90 +176,86 @@
 																	col-12 md:col-9 xl:col-4"
                  contentStyleClass="align-items-baseline ui-fluid">
 
-						<p:outputLabel for="@next">Nombre:</p:outputLabel>
-						<p:inputText value="#{plantaBean.planta.plantaDs}" />
+						<p:outputLabel for="Nombre-new" value="Nombre" />
+						<p:inputText widgetVar="txtplantaDs" id="Nombre-new" value="#{plantaBean.planta.plantaDs}" required="true" />
 
-						<p:outputLabel for="@next">Número:</p:outputLabel>
-						<p:inputText value="#{plantaBean.planta.plantaAbrev}" />
-				
-						<p:outputLabel for="@next">Súfijo:</p:outputLabel>
-						<p:inputText value="#{plantaBean.planta.plantaSufijo}" />
+						<p:outputLabel for="num-new" value="Numero" />
+						<p:inputText id="num-new" value="#{plantaBean.planta.plantaAbrev}" required="true" />
+	
+						<p:outputLabel for="sufijo-new" value="Sufijo" />
+						<p:inputText id="sufijo-new" value="#{plantaBean.planta.plantaSufijo}" required="true" />
 
-						<p:outputLabel for="@next">Responsable Planta:</p:outputLabel>
-						<p:selectOneMenu value="#{plantaBean.planta.idUsuario}" converter="entityConverter" >
-							<f:selectItem itemLabel="---Seleccione---" />
+						<p:outputLabel for="responsable" value="Responsable de Planta" />
+						<p:selectOneMenu id="responsable" value="#{plantaBean.planta.idUsuario}" converter="entityConverter" >
+							<f:selectItem itemLabel="---Selecione---" itemValue=""  />
 							<f:selectItems value="#{plantaBean.usuarios}" var="user" itemLabel="#{user.usuario}" itemValue="#{user}" />
-							<p:ajax istener="#{plantaBean.handleContrySelect}" process="@this" />
+							<p:ajax />
 						</p:selectOneMenu>
 						
-						<p:outputLabel for="town" value="Paises:" />
-							<p:selectOneMenu id="town" autoWidth="false" value="#{plantaBean.idPais}"  >
-								<f:selectItem itemLabel="---Selecione---" itemValue="0" />
-								<f:selectItems var="selectedTown" value="#{plantaBean.listaPaises}" itemLabel="#{selectedTown.paisDesc}" itemValue="#{selectedTown.paisCve}" />
-								<p:ajax listener="#{plantaBean.handleContrySelect}" process="@this" update = "states"/>
+						<p:outputLabel for="pais" value="Pais:" />
+							<p:selectOneMenu id="pais" autoWidth="false" value="#{plantaBean.idPais}" converter="entityConverter" filter="true">
+								<f:selectItem itemLabel="---Selecione---" itemValue=""  />
+								<f:selectItems value="#{plantaBean.listaPaises}" var="selectedTown" itemLabel="#{selectedTown.paisDesc}" itemValue="#{selectedTown.paisCve}" />
+								<p:ajax listener="#{plantaBean.handleContrySelect}" process="@this" update = "state"/>
 							</p:selectOneMenu>
 							
         				<p:outputLabel for="state" value="Estado:"/>
-							<p:selectOneMenu id="state" value="#{plantaBean.idEstado}">
-							<f:selectItem itemLabel="---Selecione---" itemValue="0"  />
+							<p:selectOneMenu id="state" value="#{plantaBean.idEstado}"  converter="entityConverter">
+							<f:selectItem itemLabel="---Selecione---" itemValue="0"/>
 							<f:selectItems var="selectedState" value="#{plantaBean.estadosList}" itemLabel="#{selectedState.estadoDesc}" itemValue="#{selectedState.estadosPK.estadoCve}"/>
-							<p:ajax listener="#{plantaBean.handleStateSelect}" process="@this" update="municipality"/>
+							<p:ajax listener="#{plantaBean.handleStateSelect}" process="@this" update="Municipality"/>
 						</p:selectOneMenu>
 						
 						<p:outputLabel for="Municipality" value="Municipio:"/>
-						<p:selectOneMenu id="Municipality" autoWidth="false" value="#{plantaBean.idMunicipio}" >
-							<f:selectItem itemLabel="---Selecione---" itemValue="0" />
+						<p:selectOneMenu id="Municipality" autoWidth="false" value="#{plantaBean.idMunicipio}"  converter="entityConverter">
+							<f:selectItem itemLabel="---Selecione---" itemValue="0"/>
 							<f:selectItems var="selectedMunicipality" value="#{plantaBean.listaMunicipios}" itemLabel="#{selectedMunicipality.municipioDs}" itemValue="#{selectedMunicipality.municipiosPK.municipioCve}"/>
-							<p:ajax listener="#{plantaBean.handleMunicipalitySelect}" process="@this" update="cities"/>
+							<p:ajax listener="#{plantaBean.handleMunicipalitySelect}" process="@this" update="city"/>
 						</p:selectOneMenu>
         					
         				<p:outputLabel for="city" value="Ciudades:" />
-						<p:selectOneMenu id="city"  autoWidth="false"  value="#{plantaBean.idCiudad}"  >
-							<f:selectItem itemLabel="---Selecione---" itemValue="0" />
+						<p:selectOneMenu id="city"  autoWidth="false" value="#{plantaBean.idCiudad}"  converter="entityConverter">
+							<f:selectItem itemLabel="---Selecione---" />
 							<f:selectItems var="selectedCity" value="#{plantaBean.listaCiudades}" itemLabel="#{selectedCity.ciudadDs}" itemValue="#{selectedCity.ciudadesPK.ciudadCve}" />
-							<p:ajax listener="#{plantaBean.handleCitySelect}" process="@this"/>
+							<p:ajax listener="#{plantaBean.handleCitySelect}" process="@this" update="TipoAs"/>
 						</p:selectOneMenu>
 							
         				<p:outputLabel for="TipoAs" value="Tipo de Asentamiento:" />
-						<p:selectOneMenu id="TipoAs" autoWidth="false" value="#{plantaBean.idTipoAsentamiento}" >
-							<f:selectItem itemLabel="---Seleccione---" itemValue="0" />
-							<f:selectItems var="selectedT" value="#{plantaBean.listaTipoAsentamiento}" itemLabel="#{selectedT.tipoasntmntoDs}" itemValue="#selectedT.tipoasntmntoCve}" />
+						<p:selectOneMenu id="TipoAs" autoWidth="false" value="#{plantaBean.idTipoAsentamiento}"  converter="entityConverter" >
+							
+							<f:selectItems var="selectedT" value="#{plantaBean.listaTipoAsentamiento}" itemLabel="#{selectedT.tipoasntmntoDs}" itemValue="#{selectedT.tipoasntmntoCve}" />
 						</p:selectOneMenu>
 
-        				<p:outputLabel for="@next">Codigo Postal:</p:outputLabel>
-						<p:inputText value="#{plantaBean.planta.codigopostal}"  />
+        				<p:outputLabel for="codigopostal-new" value="Codigo Postal" />
+						<p:inputText id="codigopostal-new" value="#{plantaBean.planta.codigopostal}" required="true" />
 
-						<p:outputLabel for="@next">Calle:</p:outputLabel>
-						<p:inputText value="#{plantaBean.planta.calle}" />
+						<p:outputLabel for="calle-new" value ="Calle"/>
+						<p:inputText id="calle-new" value="#{plantaBean.planta.calle}" required="true"/>
 
-						<p:outputLabel for="@next">Num exterior:</p:outputLabel>
-						<p:inputText value="#{plantaBean.planta.numexterior}" />
+						<p:outputLabel for="numext-new" value ="Num exterior"/>
+						<p:inputText id="numext-new" value="#{plantaBean.planta.numexterior}" required="true" />
 
-							<p:outputLabel for="@next">Num interior:</p:outputLabel>
-						<p:inputText value="#{plantaBean.planta.numinterior}" />
+						<p:outputLabel for="numint-new" value ="Num interior"/>
+						<p:inputText id="numint-new" value="#{plantaBean.planta.numinterior}" required="true"/>
     			</p:panelGrid>
-					</p:panel>
+					</p:outputPanel>
 						</p:outputPanel>
 
-				
 			<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-check"
-						actionListener="#{plantaBean.update()}" 
-						update="frm-modifica"
-						process="frm-modifica @this" />
-					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" />
+						actionListener="#{plantaBean.update()}" update="frm-modifica" process="frm-modifica @this" />
+					<p:commandButton value="Cancelar" update="@widgetVar(dg-agrega)"  
+									icon="pi pi-times" class="ui-button-danger" onclick="PF('dg-agrega').hide()" />
 				</f:facet>
 			</p:dialog>
 
-			<p:confirmDialog widgetVar="dg-delete" showEffect="fade" width="300"
-				message="¿Desea eliminar la planta?" header="Eliminar Planta"
+			<p:confirmDialog widgetVar="dg-delete" showEffect="fade" width="300" message="¿Desea eliminar la planta?" header="Eliminar Planta"
 				severity="warn">
 				<p:commandButton value="Sí" icon="pi pi-check"
 					actionListener="#{plantaBean.delete()}" process="@this" />
-				<p:commandButton value="No" type="button"
-					styleClass="ui-button-danger" icon="pi pi-times"
-					onclick="PF('dg-delete').hide()" />
+				<p:commandButton value="No" type="button" 
+									styleClass="ui-confirmdialog-no ui-button-secondary" 
+									icon="pi pi-times" oncomplete="PF('dg-delete').hide()" />
 			</p:confirmDialog>
 
 		</h:form>

@@ -15,6 +15,7 @@ import mx.com.ferbo.dao.MunicipiosDAO;
 import mx.com.ferbo.dao.PaisesDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.TipoAsentamientoDAO;
+import mx.com.ferbo.dao.UsuarioDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Ciudades;
@@ -99,7 +100,6 @@ public class PlantaBean implements Serializable {
 		listaMunicipios = daoMunicipios.findall();
 		listaCiudades = ciudadesDao.findall();
 		listaTipoAsentamiento = tipoAsentamientoDao.findall();
-		
 		planta = new Planta();
 		seleccion = new Planta();
 		
@@ -150,7 +150,14 @@ public class PlantaBean implements Serializable {
 		}
 	}
 	public void handleCitySelect() {
-		
+		if (this.idCiudad != -1) {
+			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
+			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
+			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
+			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
+			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
+			listaTipoAsentamiento = tipoAsentamientoDao.findall();
+		}
 	}	
 	
 	public void handleUsers () {
@@ -232,7 +239,13 @@ public class PlantaBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
-	
+	public void muestraplanta(){
+		System.out.println("Planta" + planta);
+		System.out.println("Planta" + seleccion);
+	}
+	public void limpiaPlanta() {
+		this.planta = new Planta();
+	}
 	public void setIdPais(int idPais) {
 		this.idPais = idPais;
 	}
