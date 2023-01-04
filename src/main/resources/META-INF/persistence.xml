@@ -105,7 +105,7 @@
 				value="jdbc:mysql://ferbo.dynalias.com:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
 			<property name="javax.persistence.jdbc.user" value="gestion" />
 			<property name="javax.persistence.jdbc.password"
-				value="d3vE1o0erferbO" />
+				value="D3s4rR0l1adoR315aQ" />
 			<property name="javax.persistence.jdbc.driver"
 				value="com.mysql.cj.jdbc.Driver" />
 			<property name="hibernate.show_sql" value="true" />

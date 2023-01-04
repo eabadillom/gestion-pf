@@ -1,15 +1,27 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.model.TipoAsentamiento;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoAsentamientoDAO extends IBaseDAO<TipoAsentamiento, Integer> {
 
+	@SuppressWarnings("unchecked")
+	public List<TipoAsentamiento> findall() {
+		EntityManager entity = getEntityManager();
+		List<TipoAsentamiento> TipoAs= null;
+		Query sql = entity.createNamedQuery("TipoAsentamiento.findAll", TipoAsentamiento.class);
+		TipoAs = sql.getResultList();
+		return TipoAs;
+	}
 	@Override
 	public TipoAsentamiento buscarPorId(Integer id) {
 		// TODO Auto-generated method stub

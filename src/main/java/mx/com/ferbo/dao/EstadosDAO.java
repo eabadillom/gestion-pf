@@ -1,17 +1,30 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Estados;
+import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class EstadosDAO extends IBaseDAO<Estados, Integer>{
-
+	
+	@SuppressWarnings("unchecked")
+	public List<Estados> findall() {
+		EntityManager entity = getEntityManager();
+		List<Estados> estados = null;
+		Query sql = entity.createNamedQuery("Estados.findAll", Estados.class);
+		estados = sql.getResultList();
+		entity.close();
+		return estados;
+	}
 	@Override
 	public Estados buscarPorId(Integer id) {
 		// TODO Auto-generated method stub

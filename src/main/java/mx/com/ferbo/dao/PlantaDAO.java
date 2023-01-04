@@ -29,7 +29,7 @@ public class PlantaDAO {
 		usuarios = sql.getResultList();
 		return usuarios;
 	}
-
+	
 	public String save(Planta p) {
 		try {
 			EntityManager entity = getEntityManager();
