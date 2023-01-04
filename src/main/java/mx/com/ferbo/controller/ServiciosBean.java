@@ -61,6 +61,8 @@ public class ServiciosBean implements Serializable{
 
 		} else {
 			if (servicioDAO.actualizar(selectedServicio) == null) {
+				//sentencia if 
+				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Actualizado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Ocurrió un error al intentar actualizar el Servicio"));
@@ -106,6 +108,19 @@ public class ServiciosBean implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Ocurrió un error al intentar eliminar los Servicios"));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
+	}
+	
+	
+	//método checkbox
+	public boolean getServicioCheck() {
+		boolean check;
+		if(this.selectedServicio.getUuId() != null) {
+			check = true;
+		}else {
+			check = false;
+		}
+		
+		return check;
 	}
 
 	public List<Servicio> getServicios() {
