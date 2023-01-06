@@ -8,6 +8,7 @@ import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
 import mx.com.ferbo.dao.EntidadPostalDAO;
 import mx.com.ferbo.dao.EstadosDAO;
@@ -31,6 +32,7 @@ import mx.com.ferbo.model.TipoAsentamiento;
 import mx.com.ferbo.model.Usuario;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Named
@@ -47,6 +49,8 @@ public class PlantaBean implements Serializable {
 	private EntidadPostalDAO entidadPostalDao;
 	private TipoAsentamiento tipoAsentamientoSelect; 
 	private TipoAsentamientoDAO tipoAsentamientoDao;
+	private AsentamientoHumandoDAO asentamientoHumandoDao;
+
 
 	private List<Planta> list;
 	private List<Usuario> usuarios;
@@ -56,6 +60,7 @@ public class PlantaBean implements Serializable {
 	private List<Ciudades> listaCiudades;
 	private List<EntidadPostal> listaEntidadPostal;
 	private List<TipoAsentamiento> listaTipoAsentamiento;
+	private List<AsentamientoHumano> listaAsentamientoHumano;
 
 	private Paises paisSelect;
 	private EstadosPK estadoPkSelect;
@@ -67,6 +72,7 @@ public class PlantaBean implements Serializable {
 	private Ciudades ciudadSelect;
 	private AsentamientoHumanoPK asentamientoHumanoPKSelect;
 	private AsentamientoHumano asentamientoHumanoSelect;
+
 
 	private int idMunicipio;
 	private int idPais;
@@ -92,14 +98,17 @@ public class PlantaBean implements Serializable {
 		ciudadesDao = new CiudadesDAO();
 		entidadPostalDao = new EntidadPostalDAO();
 		tipoAsentamientoDao = new TipoAsentamientoDAO();
+		asentamientoHumandoDao = new AsentamientoHumandoDAO();
+
 		
 		list = daoPlanta.findall();
 		usuarios = daoPlanta.getUsuarios();
 		listaPaises = daoPaises.findall();
-		estadosList = daoEstados.findall();
-		listaMunicipios = daoMunicipios.findall();
-		listaCiudades = ciudadesDao.findall();
-		listaTipoAsentamiento = tipoAsentamientoDao.findall();
+		//estadosList = daoEstados.findall();
+		//listaMunicipios = daoMunicipios.findall();
+		//listaCiudades = ciudadesDao.findall();
+		//listaTipoAsentamiento = tipoAsentamientoDao.findall();
+		//listaAsentamientoHumano = asentamientoHumandoDao.findall();
 		planta = new Planta();
 		seleccion = new Planta();
 		
@@ -108,8 +117,8 @@ public class PlantaBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		listaPaises = daoPaises.buscarTodos();
-		listaEntidadPostal = entidadPostalDao.buscarTodos();
 		listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
+		listaAsentamientoHumano = new ArrayList<>();
 
 		
 		this.paisSelect = new Paises();
@@ -159,6 +168,16 @@ public class PlantaBean implements Serializable {
 			listaTipoAsentamiento = tipoAsentamientoDao.findall();
 		}
 	}	
+	public void handleAsentH() {
+		if (this.idAsentamiento != -1) {
+			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
+			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
+			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
+			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
+			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
+			listaAsentamientoHumano = asentamientoHumandoDao.findall();
+		}
+	}	
 	
 	public void handleUsers () {
 		
@@ -180,7 +199,7 @@ public class PlantaBean implements Serializable {
 	}
 
 	public void openNew() {
-		planta = new Planta();
+		this.planta = new Planta();
 	};
 
 	public void save() {
@@ -246,6 +265,19 @@ public class PlantaBean implements Serializable {
 	public void limpiaPlanta() {
 		this.planta = new Planta();
 	}
+	
+	
+	
+	
+	
+	public List<AsentamientoHumano> getListaAsentamientoHumano() {
+		return listaAsentamientoHumano;
+	}
+
+	public void setListaAsentamientoHumano(List<AsentamientoHumano> listaAsentamientoHumano) {
+		this.listaAsentamientoHumano = listaAsentamientoHumano;
+	}
+
 	public void setIdPais(int idPais) {
 		this.idPais = idPais;
 	}
