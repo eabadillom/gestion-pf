@@ -68,8 +68,9 @@ public class Servicio implements Serializable {
     private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicioCve")
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
+    
 
-    public Servicio() {
+	public Servicio() {
     }
 
     public Servicio(Integer servicioCve) {

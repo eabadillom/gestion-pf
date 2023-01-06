@@ -7,15 +7,19 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.TipoCobroDAO;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.TipoCobro;
+import mx.com.ferbo.ui.ServicioUI;
+
 
 @Named
 @ViewScoped
@@ -23,16 +27,18 @@ public class ServiciosBean implements Serializable{
 
 	private static final long serialVersionUID = -4777843305394525276L;
 
-	private List<Servicio> servicios;
+	private List<ServicioUI> servicios;
 
-	private List<Servicio> selectedServicios;
+	private List<ServicioUI> selectedServicios;
 	
 	private List<TipoCobro> listadoTipoCobro;
 
-	private Servicio selectedServicio;
+	private ServicioUI selectedServicio;
 	
 	private ServicioDAO servicioDAO;
 	private TipoCobroDAO tipoCobroDAO;
+	
+	private boolean servicioCheck;
 	
 	public ServiciosBean() {
 		servicioDAO = new ServicioDAO();
@@ -42,17 +48,34 @@ public class ServiciosBean implements Serializable{
 	
 	@PostConstruct
 	public void init() {
-		servicios = servicioDAO.buscarTodos();
+		List<Servicio> servicios = servicioDAO.buscarTodos();
 		listadoTipoCobro = tipoCobroDAO.buscarTodos();
+		if(this.servicios == null) {
+			this.servicios = new ArrayList<>();
+		}
+		for(Servicio s:servicios){
+			ServicioUI servicioui = new ServicioUI(s);
+			this.servicios.add(servicioui);
+		}
 	}
 	
 	public void openNew() {
-		this.selectedServicio = new Servicio();
+		this.selectedServicio = new ServicioUI();
 	}
 
 	public void saveServicio() {
+		Servicio servicio = new Servicio();
+		
+		servicio.setCdUnidad(selectedServicio.getCdUnidad());
+		servicio.setServicioCod(selectedServicio.getServicioCod());
+		servicio.setServicioCve(selectedServicio.getServicioCve());
+		servicio.setServicioDs(selectedServicio.getServicioDs());
+		servicio.setUuId(selectedServicio.getUuId());
+		
 		if (this.selectedServicio.getServicioCve() == null) {
-			if (servicioDAO.guardar(selectedServicio) == null) {
+			
+			
+			if (servicioDAO.guardar(servicio) == null) {
 				this.servicios.add(this.selectedServicio);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Agregado"));
 			} else {
@@ -60,8 +83,8 @@ public class ServiciosBean implements Serializable{
 			}
 
 		} else {
-			if (servicioDAO.actualizar(selectedServicio) == null) {
-				//sentencia if 
+			if (servicioDAO.actualizar(servicio) == null) {
+				
 				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Actualizado"));
 			} else {
@@ -74,7 +97,15 @@ public class ServiciosBean implements Serializable{
 	}
 
 	public void deleteServicio() {
-		if (servicioDAO.eliminar(selectedServicio) == null) {
+		Servicio servicio = new Servicio();
+		
+		servicio.setCdUnidad(selectedServicio.getCdUnidad());
+		servicio.setServicioCod(selectedServicio.getServicioCod());
+		servicio.setServicioCve(selectedServicio.getServicioCve());
+		servicio.setServicioDs(selectedServicio.getServicioDs());
+		servicio.setUuId(selectedServicio.getUuId());
+		
+		if (servicioDAO.eliminar(servicio) == null) {
 			this.servicios.remove(this.selectedServicio);
 			this.selectedServicio = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Eliminado"));
@@ -99,7 +130,18 @@ public class ServiciosBean implements Serializable{
 	}
 
 	public void deleteSelectedServicios() {
-		if (servicioDAO.eliminarListado(selectedServicios) == null) {
+		List<Servicio> listaservicio = new ArrayList<>();
+		for(ServicioUI s:selectedServicios) {
+			Servicio servicio = new Servicio();
+			servicio.setCdUnidad(s.getCdUnidad());
+			servicio.setServicioCod(s.getServicioCod());
+			servicio.setServicioCve(s.getServicioCve());
+			servicio.setServicioDs(s.getServicioDs());
+			servicio.setUuId(s.getUuId());
+			
+		}
+		
+		if (servicioDAO.eliminarListado(listaservicio) == null) {
 			this.servicios.removeAll(this.selectedServicios);
 			this.selectedServicios = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicios Eliminados"));
@@ -110,40 +152,32 @@ public class ServiciosBean implements Serializable{
 		}
 	}
 	
-	
-	//método checkbox
-	public boolean getServicioCheck() {
-		boolean check;
-		if(this.selectedServicio.getUuId() != null) {
-			check = true;
-		}else {
-			check = false;
-		}
-		
-		return check;
+	public boolean getServicioCheck(){
+		servicioCheck = selectedServicio.isValor();
+		return servicioCheck;
 	}
 
-	public List<Servicio> getServicios() {
+	public List<ServicioUI> getServicios() {
 		return servicios;
 	}
 
-	public void setServicios(List<Servicio> servicios) {
+	public void setServicios(List<ServicioUI> servicios) {
 		this.servicios = servicios;
 	}
 
-	public Servicio getSelectedServicio() {
+	public ServicioUI getSelectedServicio() {
 		return selectedServicio;
 	}
 
-	public void setSelectedServicio(Servicio selectedServicio) {
+	public void setSelectedServicio(ServicioUI selectedServicio) {
 		this.selectedServicio = selectedServicio;
 	}
 
-	public List<Servicio> getSelectedServicios() {
+	public List<ServicioUI> getSelectedServicios() {
 		return selectedServicios;
 	}
 
-	public void setSelectedServicios(List<Servicio> selectedServicios) {
+	public void setSelectedServicios(List<ServicioUI> selectedServicios) {
 		this.selectedServicios = selectedServicios;
 	}
 
