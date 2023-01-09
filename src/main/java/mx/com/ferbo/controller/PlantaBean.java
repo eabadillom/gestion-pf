@@ -6,6 +6,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.jfree.util.Log;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
@@ -60,7 +61,7 @@ public class PlantaBean implements Serializable {
 	private List<Ciudades> listaCiudades;
 	private List<EntidadPostal> listaEntidadPostal;
 	private List<TipoAsentamiento> listaTipoAsentamiento;
-	private List<AsentamientoHumano> listaAsentamientoHumano;
+	private List<AsentamientoHumano> asentamientoHumanoList;
 
 	private Paises paisSelect;
 	private EstadosPK estadoPkSelect;
@@ -85,6 +86,8 @@ public class PlantaBean implements Serializable {
 	private String PlantaAbrev;
 	private String PlantaSufijo;
 	private int IdUsuario;
+	private String tipoAsentamientoSelected;
+	private String codigopostalSelected;
 	
 	private Planta planta;
 	private Planta seleccion;
@@ -118,7 +121,7 @@ public class PlantaBean implements Serializable {
 	public void init() {
 		listaPaises = daoPaises.buscarTodos();
 		listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
-		listaAsentamientoHumano = new ArrayList<>();
+		asentamientoHumanoList = new ArrayList<>();
 
 		
 		this.paisSelect = new Paises();
@@ -147,6 +150,7 @@ public class PlantaBean implements Serializable {
 			this.municipioPkSelect.setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);
 			listaMunicipios = daoMunicipios.buscarPorCriteriosMunicipios(municipioSelect);
+			Log.info("Lista Municipios" + listaMunicipios);
 		}
 	}
 	public void handleMunicipalitySelect() {
@@ -165,7 +169,7 @@ public class PlantaBean implements Serializable {
 			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
 			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
-			listaTipoAsentamiento = tipoAsentamientoDao.findall();
+			asentamientoHumanoList = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
 		}
 	}	
 	public void handleAsentH() {
@@ -174,8 +178,12 @@ public class PlantaBean implements Serializable {
 			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
 			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
 			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
+			this.asentamientoHumanoPKSelect.setAsentamientoCve(idAsentamiento);
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
-			listaAsentamientoHumano = asentamientoHumandoDao.findall();
+			AsentamientoHumano ah = asentamientoHumandoDao.buscar(asentamientoHumanoSelect);
+			this.tipoAsentamientoSelected = ah.getTipoAsentamiento().getTipoasntmntoDs();
+			this.idTipoAsentamiento = ah.getTipoAsentamiento().getTipoasntmntoCve();
+			this.codigopostalSelected = ah.getCp();
 		}
 	}	
 	
@@ -224,7 +232,8 @@ public class PlantaBean implements Serializable {
 	};
 
 	public void update() {
-		PrimeFaces.current().executeScript("PF('dg-modifica').hide()");
+		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
+		System.out.println(planta);
 		planta.setIdPais(this.idPais);
 		planta.setIdEstado(this.idEstado);
 		planta.setIdMunicipio(this.idMunicipio);
@@ -261,26 +270,38 @@ public class PlantaBean implements Serializable {
 	public void muestraplanta(){
 		System.out.println("Planta" + planta);
 		System.out.println("Planta" + seleccion);
+		
+		
 	}
 	public void limpiaPlanta() {
 		this.planta = new Planta();
 	}
 	
 	
-	
-	
-	
-	public List<AsentamientoHumano> getListaAsentamientoHumano() {
-		return listaAsentamientoHumano;
+	public String getCodigopostalSelected() {
+		return codigopostalSelected;
 	}
 
-	public void setListaAsentamientoHumano(List<AsentamientoHumano> listaAsentamientoHumano) {
-		this.listaAsentamientoHumano = listaAsentamientoHumano;
+	public void setCodigopostalSelected(String codigopostalSelected) {
+		this.codigopostalSelected = codigopostalSelected;
 	}
 
-	public void setIdPais(int idPais) {
-		this.idPais = idPais;
+	public String getTipoAsentamientoSelected() {
+		return tipoAsentamientoSelected;
 	}
+
+	public void setTipoAsentamientoSelected(String tipoAsentamientoSelected) {
+		this.tipoAsentamientoSelected = tipoAsentamientoSelected;
+	}
+
+	public List<AsentamientoHumano> getAsentamientoHumanoList() {
+		return asentamientoHumanoList;
+	}
+
+	public void setAsentamientoHumanoList(List<AsentamientoHumano> asentamientoHumanoList) {
+		this.asentamientoHumanoList = asentamientoHumanoList;
+	}
+
 
 	public int getIdAsentamiento() {
 		return idAsentamiento;

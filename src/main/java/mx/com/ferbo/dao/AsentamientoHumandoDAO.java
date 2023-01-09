@@ -48,7 +48,19 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 				.getResultList();
 		return listado;
 	}
-
+	
+	public AsentamientoHumano buscar(AsentamientoHumano e) {		
+		AsentamientoHumano listado = null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		listado = em.createNamedQuery("AsentamientoHumano.findAsentamiento", AsentamientoHumano.class)
+				.setParameter("paisCve", e.getAsentamientoHumanoPK().getPaisCve())
+				.setParameter("estadoCve", e.getAsentamientoHumanoPK().getEstadoCve())
+				.setParameter("municipioCve", e.getAsentamientoHumanoPK().getMunicipioCve())
+				.setParameter("ciudadCve", e.getAsentamientoHumanoPK().getCiudadCve())
+				.setParameter("asentamientoCve", e.getAsentamientoHumanoPK().getAsentamientoCve())
+				.getSingleResult();
+		return listado;
+	}
 	@Override
 	public String actualizar(AsentamientoHumano asentamientoHumano) {
 		try {
