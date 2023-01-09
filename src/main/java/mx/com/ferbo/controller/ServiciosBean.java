@@ -7,13 +7,11 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ValueChangeEvent;
+
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
-
 import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.TipoCobroDAO;
 import mx.com.ferbo.model.Servicio;
@@ -38,7 +36,7 @@ public class ServiciosBean implements Serializable{
 	private ServicioDAO servicioDAO;
 	private TipoCobroDAO tipoCobroDAO;
 	
-	private boolean servicioCheck;
+	//private boolean servicioCheck;
 	
 	public ServiciosBean() {
 		servicioDAO = new ServicioDAO();
@@ -71,6 +69,7 @@ public class ServiciosBean implements Serializable{
 		servicio.setServicioCve(selectedServicio.getServicioCve());
 		servicio.setServicioDs(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
+		servicio.setCobro(selectedServicio.getCobro());
 		
 		if (this.selectedServicio.getServicioCve() == null) {
 			
@@ -104,6 +103,7 @@ public class ServiciosBean implements Serializable{
 		servicio.setServicioCve(selectedServicio.getServicioCve());
 		servicio.setServicioDs(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
+		servicio.setCobro(selectedServicio.getCobro());
 		
 		if (servicioDAO.eliminar(servicio) == null) {
 			this.servicios.remove(this.selectedServicio);
@@ -138,7 +138,8 @@ public class ServiciosBean implements Serializable{
 			servicio.setServicioCve(s.getServicioCve());
 			servicio.setServicioDs(s.getServicioDs());
 			servicio.setUuId(s.getUuId());
-			
+			servicio.setCobro(s.getCobro());
+			listaservicio.add(servicio);
 		}
 		
 		if (servicioDAO.eliminarListado(listaservicio) == null) {
@@ -152,10 +153,6 @@ public class ServiciosBean implements Serializable{
 		}
 	}
 	
-	public boolean getServicioCheck(){
-		servicioCheck = selectedServicio.isValor();
-		return servicioCheck;
-	}
 
 	public List<ServicioUI> getServicios() {
 		return servicios;
@@ -174,6 +171,10 @@ public class ServiciosBean implements Serializable{
 	}
 
 	public List<ServicioUI> getSelectedServicios() {
+		/*if(selectedServicios==null || selectedServicios.isEmpty()) {
+			selectedServicios.add(selectedServicio);
+		}*/
+		
 		return selectedServicios;
 	}
 

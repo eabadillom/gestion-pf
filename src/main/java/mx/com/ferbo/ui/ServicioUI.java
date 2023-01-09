@@ -17,6 +17,7 @@ public class ServicioUI {
 	private String servicioCod;
 	private String cdUnidad;
 	private String uuId;
+	private boolean valor;
 	
 	private List<DetalleConstanciaServicios> detalleConstanciaServiciosList;
 	private TipoCobro cobro;
@@ -25,7 +26,7 @@ public class ServicioUI {
 	private List<PrecioServicio> precioServicioList;
 	private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
 	private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
-    private boolean valor;
+    
     
     public ServicioUI() {
     	
@@ -139,7 +140,6 @@ public class ServicioUI {
 	public void setConstanciaServicioDetalleList(List<ConstanciaServicioDetalle> constanciaServicioDetalleList) {
 		this.constanciaServicioDetalleList = constanciaServicioDetalleList;
 	}
-	
 	
 	public boolean isValor() {
 		return valor;

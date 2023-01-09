@@ -22,7 +22,7 @@
 
                         <p:toolbar styleClass="p-mb-4">
                             <p:toolbarGroup>
-                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{serviciosBean.openNew}" update="manage-servicio-content form:manage-servicio-content" oncomplete="PF('manageServicioDialog').show()" 
+                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{serviciosBean.openNew()}" update="manage-servicio-content form:manage-servicio-content" oncomplete="PF('manageServicioDialog').show()" 
                                     styleClass="ui-button-success" style="margin-right: .5rem" />
                                 <p:commandButton id="delete-servicios-button" value="#{serviciosBean.deleteButtonMessage}" icon="pi pi-trash" actionListener="#{serviciosBean.deleteSelectedServicios()}" 
                                     styleClass="ui-button-danger" disabled="#{!serviciosBean.hasSelectedServicios()}" update="@this">
@@ -102,7 +102,9 @@
                                             <f:selectItems value="#{serviciosBean.listadoTipoCobro}" var="cobro" itemLabel="#{cobro.nombre}" itemValue="#{cobro}" />
                                         </p:selectOneMenu>
                                     </div>
-                                    
+                                    <div>
+                                    	<p:selectBooleanCheckbox itemLabel="Registrado en Facturama" value="#{serviciosBean.selectedServicio.valor}" disabled="true"></p:selectBooleanCheckbox>
+                                    </div>
                                                
                                 </p:outputPanel>
                              
@@ -113,9 +115,6 @@
                                 <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageServicioDialog').hide()" class="ui-button-secondary" immediate="true"/>
                                 
                             </f:facet>
-                            
-                            
-                            
                             
                         </p:dialog> 
 
