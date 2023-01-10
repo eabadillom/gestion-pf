@@ -75,6 +75,7 @@ public class ServiciosBean implements Serializable{
 			
 			
 			if (servicioDAO.guardar(servicio) == null) {
+				selectedServicio = new ServicioUI(servicio);//usando datos de servicio a guardar
 				this.servicios.add(this.selectedServicio);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Agregado"));
 			} else {
