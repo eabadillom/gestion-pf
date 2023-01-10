@@ -172,10 +172,6 @@ public class ServiciosBean implements Serializable{
 	}
 
 	public List<ServicioUI> getSelectedServicios() {
-		/*if(selectedServicios==null || selectedServicios.isEmpty()) {
-			selectedServicios.add(selectedServicio);
-		}*/
-		
 		return selectedServicios;
 	}
 
