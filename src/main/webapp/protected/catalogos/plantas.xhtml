@@ -5,7 +5,6 @@
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
 	<ui:define name="title">Plantas</ui:define>
-
 	<ui:define name="content">
 		<h:form id="form">
 			<p:breadCrumb>
@@ -27,7 +26,6 @@
 							</p:toolbarGroup>
 						</p:toolbar>
 					 </div>
-					
 				</div>
 			</div>
 
@@ -35,15 +33,16 @@
 				<div class="p-col-12">
 					<div class="card">
 						<p:growl id="messages" showDetail="true" />
+						
 						<p:dataTable id="dt-planta" widgetVar="dtPlanta" var="planta"
 							value="#{plantaBean.list}" reflow="true"
 							rowKey="#{planta.plantaCve}" paginator="true" rows="5"
 							paginatorPosition="bottom" rowSelectMode="add">
-
+							
 							<p:column headerText="Nombre Planta">
 								<h:outputText value="#{planta.plantaDs}" />
 							</p:column>
-
+							
 							<p:column headerText="Número">
 								<h:outputText value="#{planta.plantaAbrev}" />
 							</p:column>
@@ -57,16 +56,19 @@
 							</p:column>
 
 							<p:column headerText="Acción" style="text-align:center">
+							
 								<p:commandButton icon="pi pi-pencil" update=":form:frm-agrega" value="Modificar"
 												oncomplete="PF('dg-agrega').show()" styleClass="p-mr-2 p-mb-2" process="@this">
 									<f:setPropertyActionListener value="#{planta}" target="#{plantaBean.planta}" />
 								</p:commandButton>
+								
 								<p:commandButton value="Eliminar" class="ui-button-danger"
 									icon="pi pi-trash" process="@this"
 									oncomplete="PF('dg-delete').show()">
 									<f:setPropertyActionListener value="#{planta}"
 										target="#{plantaBean.planta}" />
 								</p:commandButton>
+								
 							</p:column>
 						</p:dataTable>
 					</div>
@@ -78,7 +80,6 @@
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 				
 					<p:outputPanel rendered="#{not empty plantaBean.planta}">
-				
 				
 						<p:panelGrid columns="6" layout="flex" columnClasses="col-12 md:col-3 xl:col-2, 
 																	col-12 md:col-9 xl:col-4, 
@@ -162,8 +163,8 @@
 						actionListener="#{plantaBean.update()}" update="frm-agrega" styleClass="p-mr-2 p-mb-2" target="#{plantaBean.planta}" oncomplete="PF('dg-agrega').hide()"/>
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dg-agrega').hide()" class="ui-button-danger" />
 				</f:facet>
-				
 			</p:dialog>
+			
 			<p:confirmDialog widgetVar="dg-delete" showEffect="fade" width="400" message="Desea eliminar la planta?" header="Eliminar"
 				severity="warn">
 				<p:commandButton value="Sí" icon="pi pi-check"
@@ -173,6 +174,7 @@
 					styleClass="ui-button-secondary" icon="pi pi-times"
 					onclick="PF('dg-delete').hide()" />
 			</p:confirmDialog>
+			
 						<p:confirmDialog global="true" showEffect="fade" width="400"
 							header="Eliminar">
 							<p:commandButton value="Sí" type="button"

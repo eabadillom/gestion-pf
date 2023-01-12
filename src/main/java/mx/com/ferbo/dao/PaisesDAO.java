@@ -23,8 +23,13 @@ public class PaisesDAO extends IBaseDAO<Paises, Integer> {
 	}
 	@Override
 	public Paises buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager entity = getEntityManager();
+		Paises pais = null;
+		Query sql = entity.createNamedQuery("Paises.findByPaisCve",Paises.class)
+				.setParameter("paisCve", id);
+		pais = (Paises) sql.getSingleResult();
+		
+		return pais;
 	}
 
 	@Override

@@ -2,15 +2,23 @@ package mx.com.ferbo.dao;
 
 import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+
+import mx.com.ferbo.facturacion.facturama.FacturamaBL;
+import mx.com.ferbo.facturacion.facturama.Product;
+
+import mx.com.ferbo.facturacion.facturama.response.BranchOfficeViewModel;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
 
 public class PlantaDAO {
+	private static Logger log = Logger.getLogger(PlantaDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Planta> findall() {
@@ -29,6 +37,8 @@ public class PlantaDAO {
 		usuarios = sql.getResultList();
 		return usuarios;
 	}
+
+	
 	
 	public String save(Planta p) {
 		try {
@@ -42,15 +52,17 @@ public class PlantaDAO {
 		}
 		return null;
 	}
+	
 
 	public String update(Planta p) {
+		
 		try {
 			EntityManager entity = getEntityManager();
 			entity.getTransaction().begin();
 			entity.merge(p);
 			entity.getTransaction().commit();
 			entity.close();
-		} catch (Exception e) {
+		   } catch (Exception e) {
 			return "Failed!! " + e.getMessage();
 		}
 		return null;
@@ -68,4 +80,6 @@ public class PlantaDAO {
 		}
 		return null;
 	}
+	
+	
 }

@@ -24,8 +24,12 @@ public class TipoAsentamientoDAO extends IBaseDAO<TipoAsentamiento, Integer> {
 	}
 	@Override
 	public TipoAsentamiento buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager entity = getEntityManager();
+		TipoAsentamiento Tasn = null;
+		Query sql = entity.createNamedQuery("TipoAsentamiento.findByTipoasntmntoCve",TipoAsentamiento.class)
+				.setParameter("tipoasntmntoCve",id.shortValue());
+		Tasn = (TipoAsentamiento) sql.getSingleResult();
+		return Tasn;
 	}
 
 	@Override
