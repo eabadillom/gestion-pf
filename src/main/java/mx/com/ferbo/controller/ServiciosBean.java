@@ -1,6 +1,8 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +13,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.jfree.util.Log;
 import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.TipoCobroDAO;
+import mx.com.ferbo.facturacion.facturama.FacturamaBL;
+import mx.com.ferbo.facturacion.facturama.Product;
+import mx.com.ferbo.facturacion.facturama.ProductTax;
+import mx.com.ferbo.facturacion.facturama.response.ProductRsp;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.TipoCobro;
 import mx.com.ferbo.ui.ServicioUI;
@@ -36,7 +43,8 @@ public class ServiciosBean implements Serializable{
 	private ServicioDAO servicioDAO;
 	private TipoCobroDAO tipoCobroDAO;
 	
-	//private boolean servicioCheck;
+	String unitCode,identificador,name,cdProducto;
+	
 	
 	public ServiciosBean() {
 		servicioDAO = new ServicioDAO();
@@ -75,6 +83,40 @@ public class ServiciosBean implements Serializable{
 			
 			
 			if (servicioDAO.guardar(servicio) == null) {
+				
+				//INICIA FACTURAMA 
+				
+				List<ProductTax> listaTaxes = new ArrayList<>();//Taxes
+				ProductTax Ptaxe = new ProductTax();//Producto facturama
+				//ProductRsp productRsp = new ProductRsp();//Producto registrado
+				
+				//name
+				Ptaxe.setName("IVA");
+				//rate
+				Ptaxe.setRate(new BigDecimal("0.16").setScale(2));
+				//Isretentin
+				Ptaxe.setIsRetention(false);
+				//IsfederalTax
+				Ptaxe.setIsFederalTax(true);
+				listaTaxes.add(Ptaxe);
+				
+				Product producto = new Product();
+				producto.setUnit("");//UNIT (clave unidad-nombre pendiente)
+				producto.setUnitCode(servicio.getCdUnidad());//uni_code (cdUnidad)
+				producto.setIdentificationNumber("");//identificador
+				producto.setName(servicio.getServicioDs());//Nombre (servicioDS)
+				producto.setDescription(servicio.getServicioDs());//Descripcion (servicioDS)
+				producto.setPrice(null);//(pendiente)
+				producto.setCodeProdServ(servicio.getServicioCod());//Codigo Producto (servicioCod)
+				producto.setCuentaPredial(null);//(pendiente)
+				producto.setTaxes(listaTaxes);
+				
+				/*FacturamaBL facturama = new FacturamaBL();
+				productRsp = facturama.registra(producto);
+				Log.debug("el producto registrado es:" + productRsp);*/
+				
+				//TERMINA FACTURAMA
+				
 				selectedServicio = new ServicioUI(servicio);
 				this.servicios.add(this.selectedServicio);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Agregado"));

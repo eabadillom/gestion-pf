@@ -301,7 +301,7 @@ public class FacturamaBL {
         ProductRsp respuesta = null;
         //Product sf = null;
         //List<ProductTax> alTaxes = null;
-        ProductTax tax = null;
+        //ProductTax tax = null;
         
         Gson prettyGson   = null;
         String json = null;
