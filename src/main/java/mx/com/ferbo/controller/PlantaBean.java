@@ -13,7 +13,7 @@ import org.primefaces.PrimeFaces;
 import com.google.gson.Gson;
 
 import mx.com.ferbo.facturacion.facturama.Product;
-
+import mx.com.ferbo.facturacion.facturama.TaxAddress;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
 import mx.com.ferbo.dao.EstadosDAO;
@@ -310,17 +310,33 @@ public class PlantaBean implements Serializable {
 		buscatipoAsn.setAsentamientoHumanoList(buscarAsent);
 		TipoAsentamiento buscarIdT = tipoAsentamientoDao.buscarPorId(this.idTipoAsentamiento);
 		BranchOffice sucursal = new BranchOffice();
-		Address direccion = new Address();
+		TaxAddress direccion = new TaxAddress();
 		direccion.setCountry(buscaPais.getPaisDesc());
 		direccion.setState(estadoB.getEstadoDesc());
+		//direccion.setState(estado.getEstadoDesc());
 		direccion.setMunicipality(buscaMunicipiofor.getMunicipioDs());
+		//direccion.setMunicipality(buscaMunicipio.getMunicipioDs());
 		direccion.setLocality(buscaCiudadfor.getCiudadDs());
+		//direccion.setLocality(buscaCiudad.getCiudadDs());
 		direccion.setZipCode(this.planta.getPlantaCod());
-		direccion.setNeighborhood(this.planta.getCalle());
+		direccion.setNeighborhood(buscaAsentamientofor.getAsentamientoDs());
 		direccion.setInteriorNumber(this.planta.getNuminterior());
 		direccion.setExteriorNumber(this.planta.getNumexterior());
-		sucursal.setName(this.PlantaDs);
-		sucursal.setName(this.PlantaDs);
+		direccion.setStreet(this.planta.getCalle());
+		sucursal.setName(this.planta.getPlantaDs());
+		sucursal.setDescription(this.planta.getPlantaDs());
+		sucursal.setAddress(direccion);
+ 		FacturamaBL solicitud = new FacturamaBL();
+		BranchOfficeViewModel registra = solicitud.registra(sucursal);
+        //BranchOfficeViewModel registrar = null;
+		List<BranchOfficeViewModel> sucursales= null;
+
+		try {
+			registra = (BranchOfficeViewModel) solicitud.getSucursales();
+			log.info("sucursales: " + registra);
+		} catch (IOException ex) {
+			log.error("Problema en la consulta con Facturama...", ex);
+		}
 		
 		//Gson gson = new Gson();
 		//String json = gson.toJson(buscaPais, estado, buscaMunicipio, buscaCiudad, buscaAsentamiento,buscatipoAsn);
