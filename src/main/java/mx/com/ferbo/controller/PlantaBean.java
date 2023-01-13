@@ -16,6 +16,7 @@ import mx.com.ferbo.facturacion.facturama.Product;
 import mx.com.ferbo.facturacion.facturama.TaxAddress;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
+import mx.com.ferbo.dao.EntidadPostalDAO;
 import mx.com.ferbo.dao.EstadosDAO;
 import mx.com.ferbo.dao.MunicipiosDAO;
 import mx.com.ferbo.dao.PaisesDAO;
@@ -85,6 +86,7 @@ public class PlantaBean implements Serializable {
 	private int idCiudad;
 	private int idTipoAsentamiento;
 	private int idAsentamiento;
+	private int CodigoPostal;
 	private String PlantaDs;
 	private String PlantaAbrev;
 	private String PlantaSufijo;
@@ -314,12 +316,13 @@ public class PlantaBean implements Serializable {
 		direccion.setCountry(buscaPais.getPaisDesc());
 		direccion.setState(estadoB.getEstadoDesc());
 		//direccion.setState(estado.getEstadoDesc());
-		direccion.setMunicipality(buscaMunicipiofor.getMunicipioDs());
 		//direccion.setMunicipality(buscaMunicipio.getMunicipioDs());
+		direccion.setMunicipality(buscaMunicipiofor.getMunicipioDs());
 		direccion.setLocality(buscaCiudadfor.getCiudadDs());
 		//direccion.setLocality(buscaCiudad.getCiudadDs());
-		direccion.setZipCode(this.planta.getPlantaCod());
+		direccion.setZipCode(this.getCodigopostalSelected());
 		direccion.setNeighborhood(buscaAsentamientofor.getAsentamientoDs());
+		//direccion.setNeighborhood(buscaAsentamiento.getAsentamientoDs());
 		direccion.setInteriorNumber(this.planta.getNuminterior());
 		direccion.setExteriorNumber(this.planta.getNumexterior());
 		direccion.setStreet(this.planta.getCalle());
@@ -329,18 +332,8 @@ public class PlantaBean implements Serializable {
  		FacturamaBL solicitud = new FacturamaBL();
 		BranchOfficeViewModel registra = solicitud.registra(sucursal);
         //BranchOfficeViewModel registrar = null;
-		List<BranchOfficeViewModel> sucursales= null;
 
-		try {
-			registra = (BranchOfficeViewModel) solicitud.getSucursales();
-			log.info("sucursales: " + registra);
-		} catch (IOException ex) {
-			log.error("Problema en la consulta con Facturama...", ex);
-		}
 		
-		//Gson gson = new Gson();
-		//String json = gson.toJson(buscaPais, estado, buscaMunicipio, buscaCiudad, buscaAsentamiento,buscatipoAsn);
-		//System.out.println(json);
 		//Termina llenado de facturama
 		if (message == null) {
 			list.clear();
@@ -637,6 +630,8 @@ public class PlantaBean implements Serializable {
 
 	public void setSeleccion(Planta seleccion) {
 		this.seleccion = seleccion;
-	};
+	}
+
+
 
 }
