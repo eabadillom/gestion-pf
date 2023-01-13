@@ -96,7 +96,7 @@ public class PlantaBean implements Serializable {
 	private Planta planta;
 	private Planta seleccion;
 	private FacturamaBL facturamabl;
-	
+	private String uuid;
 
 	public PlantaBean() {
 		
@@ -311,18 +311,15 @@ public class PlantaBean implements Serializable {
 		buscaTipoAsentamientoHumanoPK.setAsentamientoCve(idAsentamiento);
 		buscatipoAsn.setAsentamientoHumanoList(buscarAsent);
 		TipoAsentamiento buscarIdT = tipoAsentamientoDao.buscarPorId(this.idTipoAsentamiento);
+		
 		BranchOffice sucursal = new BranchOffice();
 		TaxAddress direccion = new TaxAddress();
 		direccion.setCountry(buscaPais.getPaisDesc());
 		direccion.setState(estadoB.getEstadoDesc());
-		//direccion.setState(estado.getEstadoDesc());
-		//direccion.setMunicipality(buscaMunicipio.getMunicipioDs());
 		direccion.setMunicipality(buscaMunicipiofor.getMunicipioDs());
 		direccion.setLocality(buscaCiudadfor.getCiudadDs());
-		//direccion.setLocality(buscaCiudad.getCiudadDs());
 		direccion.setZipCode(this.getCodigopostalSelected());
 		direccion.setNeighborhood(buscaAsentamientofor.getAsentamientoDs());
-		//direccion.setNeighborhood(buscaAsentamiento.getAsentamientoDs());
 		direccion.setInteriorNumber(this.planta.getNuminterior());
 		direccion.setExteriorNumber(this.planta.getNumexterior());
 		direccion.setStreet(this.planta.getCalle());
@@ -331,8 +328,7 @@ public class PlantaBean implements Serializable {
 		sucursal.setAddress(direccion);
  		FacturamaBL solicitud = new FacturamaBL();
 		BranchOfficeViewModel registra = solicitud.registra(sucursal);
-        //BranchOfficeViewModel registrar = null;
-
+		this.planta.setUuid(registra.getId());
 		
 		//Termina llenado de facturama
 		if (message == null) {
@@ -383,6 +379,14 @@ public class PlantaBean implements Serializable {
 	}
 	
 	
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
 	public String getCodigopostalSelected() {
 		return codigopostalSelected;
 	}

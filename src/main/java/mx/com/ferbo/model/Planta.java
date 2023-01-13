@@ -35,7 +35,6 @@ import javax.validation.constraints.Size;
 		@NamedQuery(name = "Planta.findByPlantaAbrev", query = "SELECT p FROM Planta p WHERE p.plantaAbrev = :plantaAbrev"),
 		@NamedQuery(name = "Planta.findByPlantaSufijo", query = "SELECT p FROM Planta p WHERE p.plantaSufijo = :plantaSufijo"),
 		@NamedQuery(name = "Planta.findByPlantaCod", query = "SELECT p FROM Planta p WHERE p.plantaCod = :plantaCod") })
-		
 public class Planta implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -72,6 +71,9 @@ public class Planta implements Serializable {
 	@Column(name = " id_pais")
 	private Integer idPais;
 	
+	@Column(name = "uuid")
+	private String uuid;
+	
 	@Column (name = "id_estado")
 	private Integer idEstado;
 	
@@ -104,6 +106,14 @@ public class Planta implements Serializable {
 	
 	public Planta() {
 
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public Integer getIdCiudad() {
