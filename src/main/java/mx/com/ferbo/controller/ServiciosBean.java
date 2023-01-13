@@ -78,6 +78,7 @@ public class ServiciosBean implements Serializable{
 		servicio.setServicioDs(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
 		servicio.setCobro(selectedServicio.getCobro());
+		//servicio.setClaveUnit(selectedServicio.getClaveUnit());
 		
 		if (this.selectedServicio.getServicioCve() == null) {
 			
@@ -85,35 +86,30 @@ public class ServiciosBean implements Serializable{
 			if (servicioDAO.guardar(servicio) == null) {
 				
 				//INICIA FACTURAMA 
-				
+				/*
 				List<ProductTax> listaTaxes = new ArrayList<>();//Taxes
 				ProductTax Ptaxe = new ProductTax();//Producto facturama
 				//ProductRsp productRsp = new ProductRsp();//Producto registrado
 				
-				//name
-				Ptaxe.setName("IVA");
-				//rate
-				Ptaxe.setRate(new BigDecimal("0.16").setScale(2));
-				//Isretentin
-				Ptaxe.setIsRetention(false);
-				//IsfederalTax
-				Ptaxe.setIsFederalTax(true);
+				Ptaxe.setName("IVA");//name
+				Ptaxe.setRate(new BigDecimal("0.16").setScale(2));//rate
+				Ptaxe.setIsRetention(false);//Isretentin
+				Ptaxe.setIsFederalTax(true);//IsfederalTax
 				listaTaxes.add(Ptaxe);
 				
 				Product producto = new Product();
-				producto.setUnit("");//UNIT (clave unidad-nombre pendiente)
+				producto.setUnit(servicio.getClaveUnit().getNbUnidad());//UNIT (clave unidad-nombre pendiente)
 				producto.setUnitCode(servicio.getCdUnidad());//uni_code (cdUnidad)
 				producto.setIdentificationNumber("");//identificador
 				producto.setName(servicio.getServicioDs());//Nombre (servicioDS)
 				producto.setDescription(servicio.getServicioDs());//Descripcion (servicioDS)
-				producto.setPrice(null);//(pendiente)
+				producto.setPrice(new BigDecimal("1").setScale(2));//(pendiente)
 				producto.setCodeProdServ(servicio.getServicioCod());//Codigo Producto (servicioCod)
-				producto.setCuentaPredial(null);//(pendiente)
 				producto.setTaxes(listaTaxes);
 				
 				/*FacturamaBL facturama = new FacturamaBL();
 				productRsp = facturama.registra(producto);
-				Log.debug("el producto registrado es:" + productRsp);*/
+				Log.debug("El producto registrado es:" + productRsp);*/
 				
 				//TERMINA FACTURAMA
 				
@@ -147,6 +143,7 @@ public class ServiciosBean implements Serializable{
 		servicio.setServicioDs(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
 		servicio.setCobro(selectedServicio.getCobro());
+		//servicio.setClaveUnit(selectedServicio.getClaveUnit());
 		
 		if (servicioDAO.eliminar(servicio) == null) {
 			this.servicios.remove(this.selectedServicio);
@@ -182,6 +179,7 @@ public class ServiciosBean implements Serializable{
 			servicio.setServicioDs(s.getServicioDs());
 			servicio.setUuId(s.getUuId());
 			servicio.setCobro(s.getCobro());
+			//servicio.setClaveUnit(s.getClaveUnit());
 			listaservicio.add(servicio);
 		}
 		

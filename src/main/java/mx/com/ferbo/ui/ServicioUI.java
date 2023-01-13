@@ -2,6 +2,7 @@ package mx.com.ferbo.ui;
 
 import java.util.List;
 
+import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.CuotaMensualServicio;
@@ -20,7 +21,9 @@ public class ServicioUI {
 	private boolean valor;
 	
 	private List<DetalleConstanciaServicios> detalleConstanciaServiciosList;
+
 	private TipoCobro cobro;
+	private ClaveUnidad claveUnit;
 	
 	private List<CuotaMensualServicio> cuotaMensualServicioList;
 	private List<PrecioServicio> precioServicioList;
@@ -39,6 +42,7 @@ public class ServicioUI {
 		this.setCdUnidad(servicio.getCdUnidad());
 		this.setUuId(servicio.getUuId());
 		this.cobro = servicio.getCobro();
+		//this.claveUnit = servicio.getClaveUnit();
 		this.cuotaMensualServicioList = servicio.getCuotaMensualServicioList();
 		this.precioServicioList = servicio.getPrecioServicioList();
 		this.constanciaDepositoDetalleList = servicio.getConstanciaDepositoDetalleList();
@@ -109,6 +113,15 @@ public class ServicioUI {
 		this.cobro = cobro;
 	}
 	
+	
+	public ClaveUnidad getClaveUnit() {
+		return claveUnit;
+	}
+
+	public void setClaveUnit(ClaveUnidad claveUnit) {
+		this.claveUnit = claveUnit;
+	}
+
 	
 	public List<CuotaMensualServicio> getCuotaMensualServicioList() {
 		return cuotaMensualServicioList;

@@ -59,9 +59,16 @@ public class Servicio implements Serializable {
     private String uuId;
     @OneToMany(mappedBy = "servicioCve")
     private List<DetalleConstanciaServicios> detalleConstanciaServiciosList;
+    
     @JoinColumn(name = "COBRO", referencedColumnName = "id")
     @ManyToOne
     private TipoCobro cobro;
+    
+    /*@JoinColumn(name = "cd_unidad", referencedColumnName = "cd_unidad")
+    @Size(max = 5)
+    @ManyToOne
+    private ClaveUnidad claveUnit;*/
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicioCve")
     private List<CuotaMensualServicio> cuotaMensualServicioList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicio")
@@ -135,7 +142,15 @@ public class Servicio implements Serializable {
         this.cobro = cobro;
     }
 
-    public List<CuotaMensualServicio> getCuotaMensualServicioList() {
+    /*public ClaveUnidad getClaveUnit() {
+		return claveUnit;
+	}
+
+	public void setClaveUnit(ClaveUnidad claveunit) {
+		this.claveUnit = claveunit;
+	}*/
+
+	public List<CuotaMensualServicio> getCuotaMensualServicioList() {
         return cuotaMensualServicioList;
     }
 
