@@ -15,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -35,7 +36,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Servicio.findByServicioCve", query = "SELECT s FROM Servicio s WHERE s.servicioCve = :servicioCve"),
     @NamedQuery(name = "Servicio.findByServicioDs", query = "SELECT s FROM Servicio s WHERE s.servicioDs = :servicioDs"),
     @NamedQuery(name = "Servicio.findByServicioCod", query = "SELECT s FROM Servicio s WHERE s.servicioCod = :servicioCod"),
-    @NamedQuery(name = "Servicio.findByCdUnidad", query = "SELECT s FROM Servicio s WHERE s.cdUnidad = :cdUnidad"),
+    @NamedQuery(name = "Servicio.findByCdUnidad", query = "SELECT s FROM Servicio s WHERE s.cdUnidad = :cdUnidad"),//cd unidad paso a ser clave foranea
     @NamedQuery(name = "Servicio.findByUuId", query = "SELECT s FROM Servicio s WHERE s.uuId = :uuId")})
 public class Servicio implements Serializable {
 
@@ -64,10 +65,9 @@ public class Servicio implements Serializable {
     @ManyToOne
     private TipoCobro cobro;
     
-    /*@JoinColumn(name = "cd_unidad", referencedColumnName = "cd_unidad")
-    @Size(max = 5)
+    @JoinColumn(name = "cd_unidad", referencedColumnName = "cd_unidad", insertable=false,updatable=false)
     @ManyToOne
-    private ClaveUnidad claveUnit;*/
+    private ClaveUnidad claveUnit; //(AQUI HAY UN ERROR) 
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicioCve")
     private List<CuotaMensualServicio> cuotaMensualServicioList;
@@ -142,13 +142,13 @@ public class Servicio implements Serializable {
         this.cobro = cobro;
     }
 
-    /*public ClaveUnidad getClaveUnit() {
+	public ClaveUnidad getClaveUnit() {
 		return claveUnit;
 	}
 
-	public void setClaveUnit(ClaveUnidad claveunit) {
-		this.claveUnit = claveunit;
-	}*/
+	public void setClaveUnit(ClaveUnidad claveUnit) {
+		this.claveUnit = claveUnit;
+	}
 
 	public List<CuotaMensualServicio> getCuotaMensualServicioList() {
         return cuotaMensualServicioList;

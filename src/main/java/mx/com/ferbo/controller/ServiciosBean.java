@@ -15,12 +15,15 @@ import javax.inject.Named;
 
 import org.jfree.util.Log;
 import org.primefaces.PrimeFaces;
+
+import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.TipoCobroDAO;
 import mx.com.ferbo.facturacion.facturama.FacturamaBL;
 import mx.com.ferbo.facturacion.facturama.Product;
 import mx.com.ferbo.facturacion.facturama.ProductTax;
 import mx.com.ferbo.facturacion.facturama.response.ProductRsp;
+import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.TipoCobro;
 import mx.com.ferbo.ui.ServicioUI;
@@ -37,11 +40,13 @@ public class ServiciosBean implements Serializable{
 	private List<ServicioUI> selectedServicios;
 	
 	private List<TipoCobro> listadoTipoCobro;
+	private List<ClaveUnidad> listadoUnidades;
 
 	private ServicioUI selectedServicio;
 	
 	private ServicioDAO servicioDAO;
 	private TipoCobroDAO tipoCobroDAO;
+	private ClaveUnidadDAO claveUnidadDAO;
 	
 	String unitCode,identificador,name,cdProducto;
 	
@@ -49,6 +54,7 @@ public class ServiciosBean implements Serializable{
 	public ServiciosBean() {
 		servicioDAO = new ServicioDAO();
 		tipoCobroDAO = new TipoCobroDAO();
+		claveUnidadDAO = new ClaveUnidadDAO();
 		selectedServicios = new ArrayList<>();
 	}
 	
@@ -56,6 +62,8 @@ public class ServiciosBean implements Serializable{
 	public void init() {
 		List<Servicio> servicios = servicioDAO.buscarTodos();
 		listadoTipoCobro = tipoCobroDAO.buscarTodos();
+		listadoUnidades = claveUnidadDAO.buscarTodos();
+		
 		if(this.servicios == null) {
 			this.servicios = new ArrayList<>();
 		}
@@ -69,35 +77,33 @@ public class ServiciosBean implements Serializable{
 		this.selectedServicio = new ServicioUI();
 	}
 
-	public void saveServicio() {
+	public void saveServicio(){
 		Servicio servicio = new Servicio();
 		
 		servicio.setCdUnidad(selectedServicio.getCdUnidad());
-		servicio.setServicioCod(selectedServicio.getServicioCod());
+		servicio.setServicioCod(selectedServicio.getServicioCod());//colocar en codigo producto directamente en el dialogo el dato: 26121661 para permitir el ingreso del json a facturama
 		servicio.setServicioCve(selectedServicio.getServicioCve());
 		servicio.setServicioDs(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
 		servicio.setCobro(selectedServicio.getCobro());
-		//servicio.setClaveUnit(selectedServicio.getClaveUnit());
+		
+		for(ClaveUnidad cn: listadoUnidades) {
+			if(cn.getcdUnidad().equals(selectedServicio.getCdUnidad())) {
+				servicio.setClaveUnit(cn);
+			}
+		}
+		
 		
 		if (this.selectedServicio.getServicioCve() == null) {
-			
 			
 			if (servicioDAO.guardar(servicio) == null) {
 				
 				//INICIA FACTURAMA 
-				/*
-				List<ProductTax> listaTaxes = new ArrayList<>();//Taxes
+				
 				ProductTax Ptaxe = new ProductTax();//Producto facturama
-				//ProductRsp productRsp = new ProductRsp();//Producto registrado
-				
-				Ptaxe.setName("IVA");//name
-				Ptaxe.setRate(new BigDecimal("0.16").setScale(2));//rate
-				Ptaxe.setIsRetention(false);//Isretentin
-				Ptaxe.setIsFederalTax(true);//IsfederalTax
-				listaTaxes.add(Ptaxe);
-				
+				ProductRsp productRsp = new ProductRsp();//Producto registrado
 				Product producto = new Product();
+				
 				producto.setUnit(servicio.getClaveUnit().getNbUnidad());//UNIT (clave unidad-nombre pendiente)
 				producto.setUnitCode(servicio.getCdUnidad());//uni_code (cdUnidad)
 				producto.setIdentificationNumber("");//identificador
@@ -105,11 +111,19 @@ public class ServiciosBean implements Serializable{
 				producto.setDescription(servicio.getServicioDs());//Descripcion (servicioDS)
 				producto.setPrice(new BigDecimal("1").setScale(2));//(pendiente)
 				producto.setCodeProdServ(servicio.getServicioCod());//Codigo Producto (servicioCod)
+				
+				List<ProductTax> listaTaxes = new ArrayList<>();//Taxes
+				Ptaxe.setName("IVA");//name
+				Ptaxe.setRate(new BigDecimal("0.16").setScale(2));//rate
+				Ptaxe.setIsRetention(false);//Isretentin
+				Ptaxe.setIsFederalTax(true);//IsfederalTax
+				listaTaxes.add(Ptaxe);
+				
 				producto.setTaxes(listaTaxes);
 				
-				/*FacturamaBL facturama = new FacturamaBL();
-				productRsp = facturama.registra(producto);
-				Log.debug("El producto registrado es:" + productRsp);*/
+				FacturamaBL facturama = new FacturamaBL();
+				productRsp = facturama.registra(producto);//ERROR
+				Log.debug("El producto registrado es:" + productRsp);
 				
 				//TERMINA FACTURAMA
 				

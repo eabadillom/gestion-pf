@@ -67,7 +67,7 @@
 
 							<p:column headerText="Tipo de cobro" sortBy="#{servicio.cobro.nombre}" filterBy="#{servicio.cobro.nombre}">
 								<h:outputText value="#{servicio.cobro.nombre}" />
-							</p:column>
+							</p:column>												
 							<p:column exportable="false" width="20%" style="text-align:center">
                                 <p:commandButton icon="pi pi-pencil" update=":form:manage-servicio-content" value="Modificar" oncomplete="PF('manageServicioDialog').show()" 
                                     styleClass="edit-button ui-button-success" process="@this">
@@ -104,10 +104,9 @@
                                     </div>
                                     <div>
                                     	<p:selectBooleanCheckbox itemLabel="Registrado en Facturama" value="#{serviciosBean.selectedServicio.valor}" disabled="true"></p:selectBooleanCheckbox>
-                                    </div> 
-                                    <!--  <div class="p-field">
-                                    	<p:outputLabel for="txtCodigo">Codigo de Unidad</p:outputLabel>
-                                    	<p:inputText value="#{serviciosBean.selectedServicio.claveUnit.nbUnidad}" />
+                                    </div>                              
+                                    <!-- <div class="p-field">                                    	
+                                    	<p:outputLabel value="#{serviciosBean.selectedServicio.claveUnit.nbUnidad}"/>
                                     </div> -->
                                 </p:outputPanel>
                             </p:outputPanel>

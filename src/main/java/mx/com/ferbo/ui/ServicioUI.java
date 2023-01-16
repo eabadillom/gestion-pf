@@ -42,7 +42,7 @@ public class ServicioUI {
 		this.setCdUnidad(servicio.getCdUnidad());
 		this.setUuId(servicio.getUuId());
 		this.cobro = servicio.getCobro();
-		//this.claveUnit = servicio.getClaveUnit();
+		this.claveUnit = servicio.getClaveUnit();//
 		this.cuotaMensualServicioList = servicio.getCuotaMensualServicioList();
 		this.precioServicioList = servicio.getPrecioServicioList();
 		this.constanciaDepositoDetalleList = servicio.getConstanciaDepositoDetalleList();

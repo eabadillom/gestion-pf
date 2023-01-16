@@ -297,11 +297,8 @@ public class FacturamaBL {
         return bean;
     }
     
-    public ProductRsp registra(Product servicio) {
+    public ProductRsp registra(Product servicio){
         ProductRsp respuesta = null;
-        //Product sf = null;
-        //List<ProductTax> alTaxes = null;
-        //ProductTax tax = null;
         
         Gson prettyGson   = null;
         String json = null;
@@ -332,31 +329,8 @@ public class FacturamaBL {
             password = DataSourceManager.getJndiParameter("facturama/password");
             sURL = basePath + "/api/Product";
             
-            jndiName = DataSourceManager.getJniName("");
-            conn = DataSourceManager.getConnection(jndiName);
-            
-            /*sf = new Product();
-            
-            sf.setUnit("Unidad de servicio.");
-            sf.setUnitCode("E48");
-            sf.setIdentificationNumber("");//En este caso, se deja vacío el id number, debido a que no se cuenta con un SKU para los servicios.
-            sf.setName("MANIOBRAS");
-            sf.setDescription("MANIOBRAS");
-            sf.setPrice(new BigDecimal("0.34"));
-            sf.setCodeProdServ("78121600");
-            sf.setCodeProdServName("MANIOBRAS");
-            
-            alTaxes = new ArrayList<ProductTax>();
-            tax = new ProductTax();
-            tax.setName("IVA");
-            tax.setRate(new BigDecimal("0.16").setScale(2));
-            tax.setIsRetention(false);
-            tax.setIsFederalTax(true);
-            
-            alTaxes.add(tax);
-            
-            sf.setTaxes(alTaxes);*/
-            
+            //jndiName = DataSourceManager.getJniName("");//ERROR
+            //conn = DataSourceManager.getConnection(jndiName);
             
             /*--------------------------------------------------*/
             
@@ -367,7 +341,7 @@ public class FacturamaBL {
             
             
             log.info("JSON Producto / Servicio Facturama: " + json);
-            
+            System.out.println(json);
             
             auth = String.format("%s:%s", user, password);
             encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
@@ -378,7 +352,7 @@ public class FacturamaBL {
             httpConn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             httpConn.setRequestProperty("Accept", "application/json");
             httpConn.setRequestProperty("Authorization", authHeaderValue);
-            httpConn.setRequestMethod("POST");
+            httpConn.setRequestMethod("POST");            
             httpConn.setDoOutput(true);
             httpConn.setDoInput(true);
             bytes = json.getBytes("utf-8");
@@ -386,7 +360,7 @@ public class FacturamaBL {
             output.write(bytes);
             output.close();
             
-            input = new BufferedInputStream(httpConn.getInputStream());
+            input = new BufferedInputStream(httpConn.getInputStream());//error
             String result = IOUtils.toString(input, "UTF-8");
             log.info("Respuesta de la API Facturama:\n" + result);
             Gson gson = new Gson();
@@ -398,7 +372,7 @@ public class FacturamaBL {
         } catch(Exception ex) {
             log.error("Problema para registrar producto o servicio en Facturama...", ex);
         } finally {
-            DataSourceManager.close(conn);
+            //DataSourceManager.close(conn);
             IOUtil.close(input);
             IOUtil.close(output);
             httpConn.disconnect();

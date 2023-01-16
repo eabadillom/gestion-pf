@@ -1,16 +1,21 @@
 package mx.com.ferbo.model;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity //refiere a que la clase sera mapeada a una tabla 
@@ -25,10 +30,12 @@ import javax.validation.constraints.Size;
 	@NamedQuery(name = "ClaveUnidad.findByFechaFinal", query = "SELECT c FROM ClaveUnidad c WHERE c.fechFinal = :fechFinal"),
 	@NamedQuery(name = "ClaveUnidad.findByNbSimbolo", query = "SELECT c FROM ClaveUnidad c WHERE c.nbSimbolo = :nbSimbolo")})
 
-public class ClaveUnidad {
+public class ClaveUnidad implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
 	@Id//identifica el campo como id 
-	@Basic(optional = true)//indica que el campo no acepta valores NULL
+	@Basic(optional = false)//indica que el campo no acepta valores NULL¿
+	@NotNull
 	@Size(max = 5)
 	@Column(name = "cd_unidad")//relaciona la columna de bd a la variable declarada debajo
 	private String cdUnidad;
@@ -59,10 +66,10 @@ public class ClaveUnidad {
 	private String nbSimbolo;
 	
 	
-	public String getCdUnidad() {
+	public String getcdUnidad() {
 		return cdUnidad;
 	}
-	public void setCdUnidad(String cdUnidad) {
+	public void setcdUnidad(String cdUnidad) {
 		this.cdUnidad = cdUnidad;
 	}
 	public String getNbUnidad() {
@@ -101,7 +108,6 @@ public class ClaveUnidad {
 	public void setNbSimbolo(String nbSimbolo) {
 		this.nbSimbolo = nbSimbolo;
 	}
-	
 	
 	
 
