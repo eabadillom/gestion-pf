@@ -206,26 +206,31 @@ public class PlantaBean implements Serializable {
 	public void openNew() {
 		this.planta = new Planta();
 	};
-	//public void save() {
-	//	PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
-	//	planta.setIdPais(this.idPais);
-	//	planta.setIdEstado(this.idEstado);
-	//	planta.setIdMunicipio(this.idMunicipio);
-	//	planta.setIdCiudad(this.idCiudad);
-	//	planta.setIdAsentamiento(this.idAsentamiento);
-	//	planta.setTipoasentamiento(this.idTipoAsentamiento);
-	//	String message = daoPlanta.save(planta);
-	//	if (message == null) {
-	//		list.clear();
-	//		list = daoPlanta.findall();
-	//		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Agregada" + planta.getPlantaDs(), null));
-	//		PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
-	//	} else {
-	//		FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar " + planta.getPlantaDs(), message));
-	//		PrimeFaces.current().ajax().update("form:messages");
-	//	}
-	//	this.planta = new Planta();
-	//};
+	public void save() {
+		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
+		System.out.println(planta);
+		planta.setIdPais(this.idPais);
+		planta.setIdEstado(this.idEstado);
+		planta.setIdMunicipio(this.idMunicipio);
+		planta.setIdCiudad(this.idCiudad);
+		planta.setIdAsentamiento(this.idAsentamiento);
+		planta.setTipoasentamiento(this.idTipoAsentamiento);
+		String message = daoPlanta.save(planta);
+
+		if (message == null) {
+			list.clear();
+			list = daoPlanta.findall();
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Modificada" + planta.getPlantaDs(), null));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR, "Planta Modificada" + planta.getPlantaDs(), message));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		this.planta = new Planta();
+
+	
+	
+};
 
 	public void update() {
 		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
@@ -236,15 +241,16 @@ public class PlantaBean implements Serializable {
 		planta.setIdCiudad(this.idCiudad);
 		planta.setIdAsentamiento(this.idAsentamiento);
 		planta.setTipoasentamiento(this.idTipoAsentamiento);
-		String message = daoPlanta.update(planta);
-
+		//String message = daoPlanta.update(planta);
+		String message = null;
+		//boolean bandera = false;
+		if(planta.getPlantaCve() == null) {
+			
 		//Empieza el llenado de facturama
 		Paises buscaPais = daoPaises.buscarPorId(this.idPais);
-		
 		Estados estado = new Estados();
 		estado.setPaises(buscaPais);
 		List<Estados> buscarPorCriterios = daoEstados.buscarPorCriterios(estado);
-		
 		Estados estadoB = null;
 		for(Estados e : buscarPorCriterios) {
 			EstadosPK pkestado= e.getEstadosPK();
@@ -316,7 +322,9 @@ public class PlantaBean implements Serializable {
 		TaxAddress direccion = new TaxAddress();
 		direccion.setCountry(buscaPais.getPaisDesc());
 		direccion.setState(estadoB.getEstadoDesc());
+		//direccion.setState(estado.getEstadoDesc());
 		direccion.setMunicipality(buscaMunicipiofor.getMunicipioDs());
+		//direccion.setMunicipality(buscaMunicipio.getMunicipioDs());
 		direccion.setLocality(buscaCiudadfor.getCiudadDs());
 		direccion.setZipCode(this.getCodigopostalSelected());
 		direccion.setNeighborhood(buscaAsentamientofor.getAsentamientoDs());
@@ -329,20 +337,22 @@ public class PlantaBean implements Serializable {
  		FacturamaBL solicitud = new FacturamaBL();
 		BranchOfficeViewModel registra = solicitud.registra(sucursal);
 		this.planta.setUuid(registra.getId());
-		
+		String registro =  daoPlanta.update(planta);
 		//Termina llenado de facturama
+		}else {
+		
 		if (message == null) {
 			list.clear();
 			list = daoPlanta.findall();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Modificada" +  planta.getPlantaDs() , null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Agregada" +  planta.getPlantaDs() , null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al modificar " + planta.getPlantaDs(), message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar planta " + planta.getPlantaDs(), message));
 			PrimeFaces.current().ajax().update("form:messages");
-		}	
+		}
+		}
 		this.planta = new Planta();
 	};
-	
 
 	public void CJSON() {
 

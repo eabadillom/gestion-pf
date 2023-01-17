@@ -55,7 +55,8 @@ public class PlantaDAO {
 	
 
 	public String update(Planta p) {
-		
+		//String consulta = "SELECT * FROM PLANTA WHERE planta_ds = ?";
+		//Planta planta;
 		try {
 			EntityManager entity = getEntityManager();
 			entity.getTransaction().begin();
@@ -63,7 +64,7 @@ public class PlantaDAO {
 			entity.getTransaction().commit();
 			entity.close();
 		   } catch (Exception e) {
-			return "Failed!! " + e.getMessage();
+			return "Failed!!" + e.getMessage();
 		}
 		return null;
 	}

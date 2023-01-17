@@ -160,10 +160,11 @@
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-check" onclick="PF('dg-agrega').hide()"
-						actionListener="#{plantaBean.update()}" update="frm-agrega" styleClass="p-mr-2 p-mb-2" target="#{plantaBean.planta}" oncomplete="PF('dg-agrega').hide()"/>
+						actionListener="#{plantaBean.update()}"  update="frm-agrega" styleClass="p-mr-2 p-mb-2" target="#{plantaBean.planta}" oncomplete="PF('dg-agrega').hide()"/>
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dg-agrega').hide()" class="ui-button-danger" />
 				</f:facet>
 			</p:dialog>
+			
 			
 			<p:confirmDialog widgetVar="dg-delete" showEffect="fade" width="400" message="Desea eliminar la planta?" header="Eliminar"
 				severity="warn">
