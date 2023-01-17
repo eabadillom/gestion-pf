@@ -1,17 +1,15 @@
 package mx.com.ferbo.facturacion.facturama;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -132,7 +130,6 @@ public class FacturamaBL {
             basePath = DataSourceManager.getJndiParameter("facturama/api");
             user = DataSourceManager.getJndiParameter("facturama/user");
             password = DataSourceManager.getJndiParameter("facturama/password");
-            
             
             auth = String.format("%s:%s", user, password);
             encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
@@ -317,10 +314,6 @@ public class FacturamaBL {
         byte[] bytes = null;
         
         InputStream input = null;
-        
-        Connection conn = null;
-        String jndiName = null;
-        
         try {
             this.infoTrustStorePath();
             log.info("Solicitando información a Facturama...");
@@ -328,9 +321,6 @@ public class FacturamaBL {
             user = DataSourceManager.getJndiParameter("facturama/user");
             password = DataSourceManager.getJndiParameter("facturama/password");
             sURL = basePath + "/api/Product";
-            
-            //jndiName = DataSourceManager.getJniName("");//ERROR
-            //conn = DataSourceManager.getConnection(jndiName);
             
             /*--------------------------------------------------*/
             
@@ -372,11 +362,80 @@ public class FacturamaBL {
         } catch(Exception ex) {
             log.error("Problema para registrar producto o servicio en Facturama...", ex);
         } finally {
-            //DataSourceManager.close(conn);
             IOUtil.close(input);
             IOUtil.close(output);
             httpConn.disconnect();
+        }
+        
+        return respuesta;
+    }
+    
+    public Boolean updateProducto(ProductRsp servicio, String Uuid){
+        boolean respuesta = true;
+        Gson prettyGson   = null;
+        String json = null;
+        
+        String user = null;
+        String password = null;
+        String basePath = null;
+        String sURL = null;
+        String auth = null;
+        byte[] encodedAuth = null;
+        String authHeaderValue = null;
+        
+        URL url = null;
+        HttpURLConnection httpConn = null;
+        OutputStream output = null;
+        byte[] bytes = null;
+        
+        InputStream input = null;
+        try {
+            this.infoTrustStorePath();
+            log.info("Solicitando información a Facturama...");
+            basePath = DataSourceManager.getJndiParameter("facturama/api");
+            user = DataSourceManager.getJndiParameter("facturama/user");
+            password = DataSourceManager.getJndiParameter("facturama/password");
+            sURL = basePath + "/api/Product/" + Uuid;
             
+            /*--------------------------------------------------*/
+            
+            prettyGson = new GsonBuilder()
+                    .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                    .setPrettyPrinting().create();
+            json = prettyGson.toJson(servicio);
+            
+            
+            //log.info("JSON Producto / Servicio Facturama: " + json);
+            System.out.println(json);
+            
+            auth = String.format("%s:%s", user, password);
+            encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
+            authHeaderValue = "Basic " + new String(encodedAuth);
+            
+            url = new URL(sURL);
+            httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            httpConn.setRequestProperty("Accept", "application/json");
+            httpConn.setRequestProperty("Authorization", authHeaderValue);
+            httpConn.setRequestMethod("PUT");   
+            httpConn.setDoOutput(true);
+            httpConn.setDoInput(false);
+            bytes = json.getBytes("utf-8");
+            output = httpConn.getOutputStream();
+            output.write(bytes);
+            output.close();                    
+                        
+            
+            /*--------------------------------------------------*/
+            
+            respuesta = true;
+        } catch(Exception ex) {
+            log.error("Problema para actualizar producto o servicio en Facturama...", ex);
+            respuesta = false;
+        } finally {
+            IOUtil.close(input);
+            IOUtil.close(output);
+            httpConn.disconnect();
         }
         
         return respuesta;

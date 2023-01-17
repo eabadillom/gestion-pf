@@ -1,6 +1,5 @@
 package mx.com.ferbo.controller;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ import mx.com.ferbo.facturacion.facturama.FacturamaBL;
 import mx.com.ferbo.facturacion.facturama.Product;
 import mx.com.ferbo.facturacion.facturama.ProductTax;
 import mx.com.ferbo.facturacion.facturama.response.ProductRsp;
+import mx.com.ferbo.facturacion.facturama.response.ProductTaxRsp;
 import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.TipoCobro;
@@ -78,13 +78,14 @@ public class ServiciosBean implements Serializable{
 	}
 
 	public void saveServicio(){
+		
 		Servicio servicio = new Servicio();
 		
 		servicio.setCdUnidad(selectedServicio.getCdUnidad());
 		servicio.setServicioCod(selectedServicio.getServicioCod());//colocar en codigo producto directamente en el dialogo el dato: 26121661 para permitir el ingreso del json a facturama
 		servicio.setServicioCve(selectedServicio.getServicioCve());
 		servicio.setServicioDs(selectedServicio.getServicioDs());
-		servicio.setUuId(selectedServicio.getUuId());
+		servicio.setUuId(selectedServicio.getUuId());//Al registrar no contiene el Uuid
 		servicio.setCobro(selectedServicio.getCobro());
 		
 		for(ClaveUnidad cn: listadoUnidades) {
@@ -93,13 +94,11 @@ public class ServiciosBean implements Serializable{
 			}
 		}
 		
-		
 		if (this.selectedServicio.getServicioCve() == null) {
 			
 			if (servicioDAO.guardar(servicio) == null) {
 				
 				//INICIA FACTURAMA 
-				
 				ProductTax Ptaxe = new ProductTax();//Producto facturama
 				ProductRsp productRsp = new ProductRsp();//Producto registrado
 				Product producto = new Product();
@@ -123,6 +122,7 @@ public class ServiciosBean implements Serializable{
 				
 				FacturamaBL facturama = new FacturamaBL();
 				productRsp = facturama.registra(producto);//ERROR
+				//idproducto = productRsp.getId();
 				Log.debug("El producto registrado es:" + productRsp);
 				
 				//TERMINA FACTURAMA
@@ -133,17 +133,45 @@ public class ServiciosBean implements Serializable{
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Ocurrió un error al intentar guardar el Servicio"));
 			}
-
 		} else {
 			if (servicioDAO.actualizar(servicio) == null) {
 				
+				//Inicia Facturama -------------------
+				
+				ProductTaxRsp Ptaxe = new ProductTaxRsp();//Producto facturama
+				boolean productRsp;//Producto registrado
+				ProductRsp producto = new ProductRsp();
+				
+				producto.setId(servicio.getUuId());
+				producto.setUnit(servicio.getClaveUnit().getNbUnidad());//UNIT (clave unidad-nombre pendiente)
+				producto.setUnitCode(servicio.getCdUnidad());//uni_code (cdUnidad)
+				producto.setIdentificationNumber("");//identificador
+				producto.setName(servicio.getServicioDs());//Nombre (servicioDS)
+				producto.setDescription(servicio.getServicioDs());//Descripcion (servicioDS)
+				producto.setPrice(new BigDecimal("1").setScale(2));//(pendiente)
+				producto.setCodeProdServ(servicio.getServicioCod());//Codigo Producto (servicioCod)
+				
+				List<ProductTaxRsp> listaTaxes = new ArrayList<>();//Taxes
+				Ptaxe.setName("IVA");//name
+				Ptaxe.setRate(new BigDecimal("0.16").setScale(2));//rate
+				Ptaxe.setIsRetention(false);//Isretentin
+				Ptaxe.setIsFederalTax(true);//IsfederalTax
+				listaTaxes.add(Ptaxe);
+				
+				producto.setTaxes(listaTaxes);
+				producto.setCuentaPredial(null);
+				FacturamaBL facturama = new FacturamaBL();
+				productRsp = facturama.updateProducto(producto, servicio.getUuId());//ERROR
+				
+				System.out.println("El producto modificado es:\n" + productRsp);
+				
+				//Termina Facturama
 				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Actualizado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Ocurrió un error al intentar actualizar el Servicio"));
 			}
 		}
-
 		PrimeFaces.current().executeScript("PF('manageServicioDialog').hide()");
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-servicios");
 	}
@@ -157,7 +185,6 @@ public class ServiciosBean implements Serializable{
 		servicio.setServicioDs(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
 		servicio.setCobro(selectedServicio.getCobro());
-		//servicio.setClaveUnit(selectedServicio.getClaveUnit());
 		
 		if (servicioDAO.eliminar(servicio) == null) {
 			this.servicios.remove(this.selectedServicio);
