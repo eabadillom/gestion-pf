@@ -88,15 +88,9 @@ public abstract class DataSourceManager {
 		if("facturama/api".equals(name)) {
 			parameter = "https://apisandbox.facturama.mx";
 		} else if( ("facturama/user").equals(name) ) {
-<<<<<<< HEAD
-			parameter = "ebadillom";//ebadillom
-		} else if ( "facturama/password".equals(name) ) {
-			parameter = "xpafBdmFrb01";//xpafBdmFrb01
-=======
 			parameter = "ebadillom";
 		} else if ( "facturama/password".equals(name) ) {
 			parameter = "xpafBdmFrb01";
->>>>>>> develop
 		}
 		
 		return parameter;
