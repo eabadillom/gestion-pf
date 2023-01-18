@@ -1,15 +1,28 @@
 package mx.com.ferbo.facturacion.facturama;
 
 import java.io.BufferedInputStream;
+<<<<<<< HEAD
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
+=======
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+>>>>>>> develop
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+<<<<<<< HEAD
+=======
+import java.sql.Connection;
+>>>>>>> develop
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -18,16 +31,27 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+<<<<<<< HEAD
+=======
+import mx.com.ferbo.utils.IOUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+>>>>>>> develop
 import mx.com.ferbo.db.DataSourceManager;
 import mx.com.ferbo.facturacion.facturama.response.BranchOfficeViewModel;
 import mx.com.ferbo.facturacion.facturama.response.CfdiInfoModel;
 import mx.com.ferbo.facturacion.facturama.response.ClientModelRsp;
 import mx.com.ferbo.facturacion.facturama.response.FileViewModel;
 import mx.com.ferbo.facturacion.facturama.response.ProductRsp;
+<<<<<<< HEAD
 import mx.com.ferbo.utils.IOUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+=======
+>>>>>>> develop
 
 public class FacturamaBL {
     private static Logger log = Logger.getLogger(FacturamaBL.class);
@@ -131,6 +155,10 @@ public class FacturamaBL {
             user = DataSourceManager.getJndiParameter("facturama/user");
             password = DataSourceManager.getJndiParameter("facturama/password");
             
+<<<<<<< HEAD
+=======
+            
+>>>>>>> develop
             auth = String.format("%s:%s", user, password);
             encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
             authHeaderValue = "Basic " + new String(encodedAuth);
@@ -314,6 +342,13 @@ public class FacturamaBL {
         byte[] bytes = null;
         
         InputStream input = null;
+<<<<<<< HEAD
+=======
+        
+        Connection conn = null;
+        String jndiName = null;
+        
+>>>>>>> develop
         try {
             this.infoTrustStorePath();
             log.info("Solicitando información a Facturama...");
@@ -322,16 +357,53 @@ public class FacturamaBL {
             password = DataSourceManager.getJndiParameter("facturama/password");
             sURL = basePath + "/api/Product";
             
+<<<<<<< HEAD
+=======
+            jndiName = DataSourceManager.getJniName("");
+            conn = DataSourceManager.getConnection(jndiName);
+            
+            sf = new Product();
+            
+            sf.setUnit("Unidad de servicio.");
+            sf.setUnitCode("E48");
+            sf.setIdentificationNumber("");//En este caso, se deja vacío el id number, debido a que no se cuenta con un SKU para los servicios.
+            sf.setName("MANIOBRAS");
+            sf.setDescription("MANIOBRAS");
+            sf.setPrice(new BigDecimal("0.34"));
+            sf.setCodeProdServ("78121600");
+            sf.setCodeProdServName("MANIOBRAS");
+            
+            alTaxes = new ArrayList<ProductTax>();
+            tax = new ProductTax();
+            tax.setName("IVA");
+            tax.setRate(new BigDecimal("0.16").setScale(2));
+            tax.setIsRetention(false);
+            tax.setIsFederalTax(true);
+            
+            alTaxes.add(tax);
+            
+            sf.setTaxes(alTaxes);
+            
+            
+>>>>>>> develop
             /*--------------------------------------------------*/
             
             prettyGson = new GsonBuilder()
                     .setDateFormat("yyyy-MM-dd HH:mm:ss")
                     .setPrettyPrinting().create();
+<<<<<<< HEAD
             json = prettyGson.toJson(servicio);
             
             
             log.info("JSON Producto / Servicio Facturama: " + json);
             System.out.println(json);
+=======
+            json = prettyGson.toJson(sf);
+            
+            
+            log.info("JSON Producto / Servicio Facturama: " + json);
+            
+>>>>>>> develop
             
             auth = String.format("%s:%s", user, password);
             encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
@@ -342,7 +414,11 @@ public class FacturamaBL {
             httpConn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             httpConn.setRequestProperty("Accept", "application/json");
             httpConn.setRequestProperty("Authorization", authHeaderValue);
+<<<<<<< HEAD
             httpConn.setRequestMethod("POST");            
+=======
+            httpConn.setRequestMethod("POST");
+>>>>>>> develop
             httpConn.setDoOutput(true);
             httpConn.setDoInput(true);
             bytes = json.getBytes("utf-8");
@@ -350,7 +426,11 @@ public class FacturamaBL {
             output.write(bytes);
             output.close();
             
+<<<<<<< HEAD
             input = new BufferedInputStream(httpConn.getInputStream());//error
+=======
+            input = new BufferedInputStream(httpConn.getInputStream());
+>>>>>>> develop
             String result = IOUtils.toString(input, "UTF-8");
             log.info("Respuesta de la API Facturama:\n" + result);
             Gson gson = new Gson();
@@ -362,6 +442,7 @@ public class FacturamaBL {
         } catch(Exception ex) {
             log.error("Problema para registrar producto o servicio en Facturama...", ex);
         } finally {
+<<<<<<< HEAD
             IOUtil.close(input);
             IOUtil.close(output);
             httpConn.disconnect();
@@ -436,6 +517,13 @@ public class FacturamaBL {
             IOUtil.close(input);
             IOUtil.close(output);
             httpConn.disconnect();
+=======
+            DataSourceManager.close(conn);
+            IOUtil.close(input);
+            IOUtil.close(output);
+            httpConn.disconnect();
+            
+>>>>>>> develop
         }
         
         return respuesta;

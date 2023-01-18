@@ -125,6 +125,7 @@
 			</div>
 			<p:dialog header="Agregar/Editar un Municipio" showEffect="fade"
 				modal="true" widgetVar="nuevoMunicipioDialog" responsive="true">
+				
 				<p:outputPanel id="manage-town-content-new" class="ui-fluid">
 					<p:outputPanel
 						rendered="#{not empty municipiosBean.municipioSelect}">
@@ -164,6 +165,7 @@
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
+				
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-plus"
 						actionListener="#{municipiosBean.guardarMunicipio()}"

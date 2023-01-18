@@ -1,0 +1,32 @@
+[
+ {
+ "Id":"jqmTIUTqKIYAuF_P2mApKg2",
+"Name":"P1 CENTRAL DE ABASTOS",
+"Description":"P1 CENTRAL DE ABASTOS",
+"Address":
+   {
+	"Street":"Calle 2",
+	"ExteriorNumber":"34",
+	"Neighborhood":"Central de Abasto",
+	"ZipCode":"09040",
+	"Municipality":"Iztapalapa",
+	"State":"Ciudad de México",
+	"Country":"MEXICO"
+  }
+ },
+ {
+"Id":"xdV0hlHZMsfFG_cAuRgWmw2",
+"Name":"Planta 2",
+"Description":"Planta",
+"Address":
+  {
+  "Street":"FRAY JESUS ALMANZA",
+  "ExteriorNumber":"10",
+  "Neighborhood":"TEPALCATES",
+  "ZipCode":"09210",
+  "Municipality":"IZTAPALAPA",
+  "State":"Ciudad de México",
+  "Country":"MEXICO"
+  }
+ }
+]

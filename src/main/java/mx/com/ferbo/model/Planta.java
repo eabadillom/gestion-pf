@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -66,9 +67,133 @@ public class Planta implements Serializable {
 	private List<Aviso> avisoList;
 	@OneToMany(mappedBy = "planta")
     private List<Factura> facturaList;
-
+	
+	@Column(name = " id_pais")
+	private Integer idPais;
+	
+	@Column(name = "uuid")
+	private String uuid;
+	
+	@Column (name = "id_estado")
+	private Integer idEstado;
+	
+	@Column(name ="id_municipio")
+	private Integer idMunicipio;
+	
+	@Column(name ="id_ciudad")
+	private Integer idCiudad;
+	
+	@Column(name ="id_asentamiento")
+	private Integer idAsentamiento;
+	
+	@Column(name ="tp_asentamiento")
+	private Integer tipoasentamiento;
+	
+	@Column(name ="nb_cp")
+	private Integer codigopostal;
+	
+	@Size (max = 20)
+	@Column(name ="nb_calle")
+	private String calle;
+	
+	@Column(name ="nu_exterior")
+	private String numexterior;
+	
+	@Column(name ="nu_interior")
+	private String numinterior;
+	
+	
+	
 	public Planta() {
 
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public Integer getIdCiudad() {
+		return idCiudad;
+	} 
+
+	public void setIdCiudad(Integer idCiudad) {
+		this.idCiudad = idCiudad;
+	}
+
+	public Integer getIdMunicipio() {
+		return idMunicipio;
+	}
+
+	public void setIdMunicipio(Integer idMunicipio) {
+		this.idMunicipio = idMunicipio;
+	}
+
+	public Integer getIdPais() {
+		return idPais;
+	}
+
+	public void setIdPais(Integer idPais) {
+		this.idPais = idPais;
+	}
+
+	public Integer getIdEstado() {
+		return idEstado;
+	}
+
+	public void setIdEstado(Integer idEstado) {
+		this.idEstado = idEstado;
+	}
+
+	public String getNumexterior() {
+		return numexterior;
+	}
+
+	public void setNumexterior(String numexterior) {
+		this.numexterior = numexterior;
+	}
+
+	public String getNuminterior() {
+		return numinterior;
+	}
+
+	public void setNuminterior(String numinterior) {
+		this.numinterior = numinterior;
+	}
+
+	public String getCalle() {
+		return calle;
+	}
+
+	public void setCalle(String calle) {
+		this.calle = calle;
+	}
+
+	public Integer getCodigopostal() {
+		return codigopostal;
+	}
+
+	public void setCodigopostal(Integer codigopostal) {
+		this.codigopostal = codigopostal;
+	}
+
+	public Integer getIdAsentamiento() {
+		return idAsentamiento;
+	}
+
+	public void setIdAsentamiento(Integer idAsentamiento) {
+		this.idAsentamiento = idAsentamiento;
+	}
+
+	public Integer getTipoasentamiento() {
+		return tipoasentamiento;
+	}
+
+	public void setTipoasentamiento(Integer tipoasentamiento) {
+		this.tipoasentamiento = tipoasentamiento;
 	}
 
 	public Planta(Integer plantaCve) {
@@ -115,6 +240,7 @@ public class Planta implements Serializable {
 		this.plantaCod = plantaCod;
 	}
 
+	
 	public Usuario getIdUsuario() {
 		return idUsuario;
 	}
@@ -167,6 +293,7 @@ public class Planta implements Serializable {
 		}
 		return true;
 	}
+	
 
 	@Override
 	public String toString() {
