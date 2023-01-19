@@ -115,10 +115,10 @@ public class ServiciosBean implements Serializable{
 				
 				// -----------------------    INICIA FACTURAMA    ------------------- 
 				
-				ProductTax Ptaxe = new ProductTax();//Producto facturama
-				ProductRsp productRsp = new ProductRsp();//Producto registrado
+				ProductTax Ptaxe = new ProductTax();
+				ProductRsp productRsp = new ProductRsp();
 				Product producto = new Product();
-				List<ProductTax> listaTaxes = new ArrayList<>();//Taxes
+				List<ProductTax> listaTaxes = new ArrayList<>();
 				
 				producto.setUnit(servicio.getClaveUnit().getNbUnidad());//UNIT (clave unidad-nombre pendiente)
 				producto.setUnitCode(servicio.getCdUnidad());//uni_code (cdUnidad)
