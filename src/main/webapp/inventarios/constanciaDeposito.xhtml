@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Constancia de Deposito</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Inventarios" />
+				<p:menuitem value="Entradas" />
+				<p:menuitem value="Alta" outcome="/inventarios/constanciaDeposito" />
+			</p:breadCrumb>
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+					
+						<div style="text-align: center" class="p-field">
+							<p:outputLabel value="Cliente:"/>
+							<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{constanciaDeDepositoBean.constancia.cteCve}"  converter="entityConverter" required="true" requiredMessage="Campo requerido">
+								<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>				
+							</p:selectOneMenu>							
+						</div>
+						
+						<div class="p-field">
+							<p:outputLabel value="Aviso:"/>
+							<p:selectOneMenu autoWidth="false">
+								<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoAviso}" var="aviso" itemLabel="#{aviso.avisoObservaciones}" itemValue="#{aviso}"/>					
+							</p:selectOneMenu>
+							
+							<p:outputLabel value="Planta:" styleClass="ui-button-secondary"/>
+							<p:selectOneMenu id="planta" autoWidth="false">
+								<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
+								<f:ajax execute="planta" render="camara"/>					
+							</p:selectOneMenu>
+							
+							<p:outputLabel value="Camara:"/>
+							<p:selectOneMenu id="camara" autoWidth="false">
+								<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoCamara}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}"/>					
+							</p:selectOneMenu>
+							
+							<p:outputLabel value="Fecha:"/>
+							<p:datePicker id="fechaInicial" showIcon="true"
+							styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Inicio"
+							value="#{constanciaServicioBean.fechaInicio}" />
+							<p:outputLabel value="No. Constancia"/>
+							<p:inputText placeholder="No asignado"/>
+							<p:commandButton value="Cambiar" icon="pi pi-pencil" styleClass="edit-button ui-button-success"/>										
+						</div>
+						
+					</div>
+				</div>
+			</div>
+			
+			
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>
