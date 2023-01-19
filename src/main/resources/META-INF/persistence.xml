@@ -100,6 +100,7 @@
 		<class>mx.com.ferbo.model.ConstanciaFacturaCmp</class>
 		<class>mx.com.ferbo.model.ClienteDomicilios</class>
 		<class>mx.com.ferbo.model.ControlFacturaConstanciaDS</class>
+		<class>mx.com.ferbo.model.ClaveUnidad</class>
 		 <properties>
 			<property name="javax.persistence.jdbc.url"
 				value="jdbc:mysql://192.168.1.15:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />

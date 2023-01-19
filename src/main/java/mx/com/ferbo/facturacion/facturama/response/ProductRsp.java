@@ -54,9 +54,9 @@ public class ProductRsp {
                 + "\", \"identificationNumber\":\"" + identificationNumber + "\", \"name\":\"" + name
                 + "\", \"description\":\"" + description + "\", \"category\":\"" + category + "\", \"code\":\"" + code
                 + "\", \"price\":\"" + price + "\", \"codeProdServ\":\"" + codeProdServ + "\", \"nameCodeProdServ\":\""
-                + nameCodeProdServ + "\", \"cuentaPredial\":\"" + cuentaPredial + "\", \"objetoImp\":\"" + objetoImp
+                + nameCodeProdServ + "\", \"objetoImp\":\"" + objetoImp
                 + "\", \"taxes\":\"" + taxes + "\"}";
-    }
+    }//"\", \"cuentaPredial\":\"" + cuentaPredial +
 
     public String getId() {
         return id;
