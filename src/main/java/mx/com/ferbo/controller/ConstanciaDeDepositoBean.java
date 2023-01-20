@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
@@ -32,21 +34,26 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	
 	private List<Cliente> listadoCliente;
 	private List<Planta> listadoPlanta;
-	private List<Camara> listadoCamara;
+	private List<Camara> camaras;
+	private List<Camara> camaraPorPlanta;
 	private List<Aviso> listadoAviso;
+	
+	private Planta plantaSelect;
 	
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
 		avisoDAO = new AvisoDAO();
+		listadoPlanta = new ArrayList<>();
+		camaraPorPlanta = new ArrayList<Camara>();
 	}
 	
 	@PostConstruct
 	public void init(){
 		listadoCliente = clienteDAO.buscarTodos();		
 		listadoPlanta = plantaDAO.findall();
-		listadoCamara = camaraDAO.buscarTodos();
+		camaras = camaraDAO.buscarTodos();
 		listadoAviso = avisoDAO.buscarTodos();
 	}
 
@@ -68,13 +75,6 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.listadoPlanta = listadoPlanta;
 	}
 	
-	public List<Camara> getListadoCamara() {
-		return listadoCamara;
-	}
-
-	public void setListadoCamara(List<Camara> listadoCamara) {
-		this.listadoCamara = listadoCamara;
-	}
 	
 	public List<Aviso> getListadoAviso() {
 		return listadoAviso;
@@ -82,6 +82,22 @@ public class ConstanciaDeDepositoBean implements Serializable{
 
 	public void setListadoAviso(List<Aviso> listadoAviso) {
 		this.listadoAviso = listadoAviso;
+	}
+	
+	public List<Camara> getCamaras() {
+		return camaras;
+	}
+
+	public void setCamaras(List<Camara> camaras) {
+		this.camaras = camaras;
+	}
+
+	public List<Camara> getCamaraPorPlanta() {
+		return camaraPorPlanta;
+	}
+
+	public void setCamaraPorPlanta(List<Camara> camaraPorPlanta) {
+		this.camaraPorPlanta = camaraPorPlanta;
 	}
 	
 	// ------------ Metodos DAO ------------------
@@ -128,8 +144,32 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	public void setConstancia(ConstanciaDeDeposito selectedConstancia) {
 		this.constancia = selectedConstancia;
 	}
-	
 
+	public Planta getPlantaSelect() {
+		return plantaSelect;
+	}
+
+	public void setPlantaSelect(Planta plantaSelect) {
+		this.plantaSelect = plantaSelect;
+	}
+
+	
+	
+	// ----------- Otros Metodos ------------------
+
+	public void filtraListado() {
+		camaraPorPlanta.clear();//limpia la lista
+		camaraPorPlanta = camaras.stream()
+				.filter(ps -> plantaSelect != null
+						? (ps.getPlantaCve().getPlantaCve().intValue() == plantaSelect.getPlantaCve().intValue())
+						: false)
+				.collect(Collectors.toList());
+		System.out.println("Productos Cliente Filtrados:" + camaraPorPlanta.toString() + "---------------------------------------------------------------------------------------");
+	}
+	
+	
+	
+	
 	
 	
 	

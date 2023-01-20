@@ -34,17 +34,17 @@
 								<f:selectItems value="#{constanciaDeDepositoBean.listadoAviso}" var="aviso" itemLabel="#{aviso.avisoObservaciones}" itemValue="#{aviso}"/>					
 							</p:selectOneMenu>
 							
-							<p:outputLabel value="Planta:" styleClass="ui-button-secondary"/>
-							<p:selectOneMenu id="planta" autoWidth="false">
+							<p:outputLabel for="planta" value="Planta:" styleClass="ui-button-secondary"/>
+							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.plantaSelect}">
 								<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{constanciaDeDepositoBean.listadoPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
-								<f:ajax execute="planta" render="camara"/>					
+								<p:ajax listener="#{constanciaDeDepositoBean.filtraListado()}" update="camara" />	
 							</p:selectOneMenu>
 							
-							<p:outputLabel value="Camara:"/>
-							<p:selectOneMenu id="camara" autoWidth="false">
+							<p:outputLabel for="camara" value="Camara:"/>
+							<p:selectOneMenu id="camara" autoWidth="false" >
 								<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
-								<f:selectItems value="#{constanciaDeDepositoBean.listadoCamara}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}"/>					
+								<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />					
 							</p:selectOneMenu>
 							
 							<p:outputLabel value="Fecha:"/>
