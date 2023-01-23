@@ -19,42 +19,109 @@
 				<div class="p-col-12">
 					<div class="card">
 					
+						<p:growl id="messages" showDetail="true" />
+						
 						<div style="text-align: center" class="p-field">
-							<p:outputLabel value="Cliente:"/>
-							<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{constanciaDeDepositoBean.constancia.cteCve}"  converter="entityConverter" required="true" requiredMessage="Campo requerido">
+							<p:outputLabel styleClass="p-mr-2" value="Cliente:"/>
+							<p:selectOneMenu id="cliente-som" autoWidth="false"  converter="entityConverter" required="true" requiredMessage="Campo requerido">
 								<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>				
 							</p:selectOneMenu>							
 						</div>
 						
-						<div class="p-field">
-							<p:outputLabel value="Aviso:"/>
-							<p:selectOneMenu autoWidth="false">
+						<div style="text-align: center">
+							<p:outputLabel value="Aviso:" styleClass="p-mr-2"/>
+							<p:selectOneMenu id="aviso" autoWidth="false">
 								<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
-								<f:selectItems value="#{constanciaDeDepositoBean.listadoAviso}" var="aviso" itemLabel="#{aviso.avisoObservaciones}" itemValue="#{aviso}"/>					
+								<f:selectItems value="#{constanciaDeDepositoBean.avisoC}" var="aviso" itemLabel="#{aviso}" itemValue="#{aviso}"/>					
 							</p:selectOneMenu>
-							
-							<p:outputLabel for="planta" value="Planta:" styleClass="ui-button-secondary"/>
+													
+							<p:outputLabel for="planta" value="Planta:" styleClass="p-ml-6 p-mr-2"/>
 							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.plantaSelect}">
 								<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{constanciaDeDepositoBean.listadoPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
 								<p:ajax listener="#{constanciaDeDepositoBean.filtraListado()}" update="camara" />	
-							</p:selectOneMenu>
+							</p:selectOneMenu>	
 							
-							<p:outputLabel for="camara" value="Camara:"/>
+							<p:outputLabel for="camara" value="Camara:" styleClass="p-ml-6 p-mr-2"/>
 							<p:selectOneMenu id="camara" autoWidth="false" >
 								<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />					
 							</p:selectOneMenu>
 							
-							<p:outputLabel value="Fecha:"/>
-							<p:datePicker id="fechaInicial" showIcon="true"
-							styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Inicio"
-							value="#{constanciaServicioBean.fechaInicio}" />
-							<p:outputLabel value="No. Constancia"/>
-							<p:inputText placeholder="No asignado"/>
-							<p:commandButton value="Cambiar" icon="pi pi-pencil" styleClass="edit-button ui-button-success"/>										
+							<p:outputLabel value="Fecha:" styleClass="p-ml-6 p-mr-2"/>
+							<p:datePicker id="fechaInicial" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Inicio" value="#{null}" />
+							
+							<p:outputLabel styleClass="p-mr-2" value="No. Constancia:"/>
+							<p:inputText placeholder="No asignado" disabled="true" />
+							<p:commandButton value="Cambiar" icon="pi pi-pencil" styleClass="edit-button ui-button-success" oncomplete="PF('NoCambiarDialog').show()"/>										
 						</div>
+						
+						<div class="" style="text-align: center">
+							<span style="font-weight: bold;color: gray">SELECCIONE LA MERCANCIA</span>
+						</div>
+						
+						<p:toolbar>
+							<div class="card">
+								<div class="">								
+									<p:toolbarGroup>
+										<div>
+											<p:outputLabel value="Clave|Producto:" styleClass="p-ml-6 p-mr-2"/>
+											<p:selectOneMenu>
+												<f:selectItem itemLabel="----SELECCIONA P-----"></f:selectItem>
+											</p:selectOneMenu>
+											
+											<p:outputLabel value="Unidad de Manejo:" styleClass="p-ml-6 p-mr-2"/>
+											<p:selectOneMenu>
+												<f:selectItem itemLabel="----SELECCIONA Unidad-----"></f:selectItem>
+											</p:selectOneMenu>
+											
+											<p:outputLabel value="Ubicación:" styleClass="p-ml-6 p-mr-2"/>
+											<p:selectOneMenu>
+												<f:selectItem itemLabel="----SELECCIONA Ubicacion-----"></f:selectItem>
+											</p:selectOneMenu>
+											
+											<p:outputLabel value="Cantidad:" styleClass="p-ml-6 p-mr-2"></p:outputLabel>
+											<p:selectOneMenu>
+												<f:selectItem itemLabel="----SELECCIONA Cantidad-----"></f:selectItem>
+											</p:selectOneMenu>
+										</div>
+										
+										<div style="margin-top: 5px">
+											<p:outputLabel value="Peso Total:" styleClass="p-ml-6 p-mr-2" />								
+											<p:inputText/>
+											
+											<p:outputLabel value="# Tarimas:" styleClass="p-ml-6 p-mr-2" />								
+											<p:inputText/>
+											
+											<p:outputLabel value="Unidades por tarima:" styleClass="p-ml-6 p-mr-2" />								
+											<p:inputText/>
+											
+											<p:outputLabel value="Valor($) Mercancia:" styleClass="p-ml-6 p-mr-2" />								
+											<p:inputText/>
+										</div>
+									</p:toolbarGroup>
+								</div>
+							</div>
+						</p:toolbar>
+						
+			<!-- Dialogo cambiar No. Constancia -->
+						<p:dialog header="No. Constancia" showEffect="hide" modal="true" widgetVar="NoCambiarDialog" responsive="true" style="text-align:center">
+							<p:outputPanel id="NoConstancia">
+								<p:outputPanel>
+									<div>
+										<p:outputLabel styleClass="p-mr-2" value="No. Constancia:" />
+										<p:inputText value="#{constanciaDeDepositoBean.noConstanciaSelect}"/>
+									</div>		
+								</p:outputPanel>
+							</p:outputPanel>
+							<f:facet name="footer">
+									<p:commandButton value="Validar" actionListener="#{constanciaDeDepositoBean.validar()}" oncomplete="PF('NoCambiarDialog').hide()" update="@this" process="NoConstancia @this"/>
+									<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('NoCambiarDialog').hide()" class="ui-button-secondary"/>
+							</f:facet>													
+						</p:dialog>
+						
+						
 						
 					</div>
 				</div>
