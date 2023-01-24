@@ -31,7 +31,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 
 	@Override
 	public List<Cliente> buscarPorCriterios(Cliente e) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

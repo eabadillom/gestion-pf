@@ -23,17 +23,18 @@
 						
 						<div style="text-align: center" class="p-field">
 							<p:outputLabel styleClass="p-mr-2" value="Cliente:"/>
-							<p:selectOneMenu id="cliente-som" autoWidth="false"  converter="entityConverter" required="true" requiredMessage="Campo requerido">
+							<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{constanciaDeDepositoBean.clienteSelect}" converter="entityConverter">
 								<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true"/>
-								<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>				
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
+								<p:ajax listener="#{constanciaDeDepositoBean.productoPorCliente()}" update="claveProducto" />				
 							</p:selectOneMenu>							
 						</div>
 						
 						<div style="text-align: center">
 							<p:outputLabel value="Aviso:" styleClass="p-mr-2"/>
-							<p:selectOneMenu id="aviso" autoWidth="false">
+							<p:selectOneMenu id="aviso" autoWidth="false" converter="entityConverter">
 								<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
-								<f:selectItems value="#{constanciaDeDepositoBean.avisoC}" var="aviso" itemLabel="#{aviso}" itemValue="#{aviso}"/>					
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoAviso}" var="aviso" itemLabel="#{aviso.avisoObservaciones}" itemValue="#{aviso}"/>					
 							</p:selectOneMenu>
 													
 							<p:outputLabel for="planta" value="Planta:" styleClass="p-ml-6 p-mr-2"/>
@@ -44,9 +45,10 @@
 							</p:selectOneMenu>	
 							
 							<p:outputLabel for="camara" value="Camara:" styleClass="p-ml-6 p-mr-2"/>
-							<p:selectOneMenu id="camara" autoWidth="false" >
+							<p:selectOneMenu id="camara" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.camaraSelect}">
 								<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
-								<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />					
+								<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />	
+								<p:ajax listener="#{constanciaDeDepositoBean.filtrarP()}" ></p:ajax>		
 							</p:selectOneMenu>
 							
 							<p:outputLabel value="Fecha:" styleClass="p-ml-6 p-mr-2"/>
@@ -66,39 +68,40 @@
 								<div class="">								
 									<p:toolbarGroup>
 										<div>
-											<p:outputLabel value="Clave|Producto:" styleClass="p-ml-6 p-mr-2"/>
-											<p:selectOneMenu>
-												<f:selectItem itemLabel="----SELECCIONA P-----"></f:selectItem>
+											<p:outputLabel for="claveProducto" value="Clave|Producto:" styleClass="p-ml-6 p-mr-2"/>
+											<p:selectOneMenu id="claveProducto" autoWidth="false" converter="entityConverter">
+												<f:selectItem itemLabel="---Selecciona Producto---"></f:selectItem>
+												<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto}"/>
 											</p:selectOneMenu>
 											
 											<p:outputLabel value="Unidad de Manejo:" styleClass="p-ml-6 p-mr-2"/>
-											<p:selectOneMenu>
-												<f:selectItem itemLabel="----SELECCIONA Unidad-----"></f:selectItem>
+											<p:selectOneMenu autoWidth="false" converter="entityConverter">
+												<f:selectItem itemLabel="---Selecciona Unidad---"></f:selectItem>
+												<f:selectItems value="#{constanciaDeDepositoBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}"  />
 											</p:selectOneMenu>
 											
 											<p:outputLabel value="Ubicación:" styleClass="p-ml-6 p-mr-2"/>
-											<p:selectOneMenu>
-												<f:selectItem itemLabel="----SELECCIONA Ubicacion-----"></f:selectItem>
+											<p:selectOneMenu id="posiciones" autoWidth="false" converter="entityConverter">
+												<f:selectItem itemLabel="---Selecciona Ubicacion---"></f:selectItem>
+												<f:selectItems value="#{constanciaDeDepositoBean.posiciones}" var="posicion" itemLabel="#{posicion.descPosicion}" itemValue="#{posicion}" />
 											</p:selectOneMenu>
 											
 											<p:outputLabel value="Cantidad:" styleClass="p-ml-6 p-mr-2"></p:outputLabel>
-											<p:selectOneMenu>
-												<f:selectItem itemLabel="----SELECCIONA Cantidad-----"></f:selectItem>
-											</p:selectOneMenu>
+											<p:inputNumber/>
 										</div>
 										
 										<div style="margin-top: 5px">
 											<p:outputLabel value="Peso Total:" styleClass="p-ml-6 p-mr-2" />								
-											<p:inputText/>
+											<p:inputNumber/>
 											
 											<p:outputLabel value="# Tarimas:" styleClass="p-ml-6 p-mr-2" />								
-											<p:inputText/>
+											<p:inputNumber/>
 											
 											<p:outputLabel value="Unidades por tarima:" styleClass="p-ml-6 p-mr-2" />								
 											<p:inputText/>
 											
 											<p:outputLabel value="Valor($) Mercancia:" styleClass="p-ml-6 p-mr-2" />								
-											<p:inputText/>
+											<p:inputNumber/>
 										</div>
 									</p:toolbarGroup>
 								</div>
@@ -120,8 +123,6 @@
 									<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('NoCambiarDialog').hide()" class="ui-button-secondary"/>
 							</f:facet>													
 						</p:dialog>
-						
-						
 						
 					</div>
 				</div>

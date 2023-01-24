@@ -18,11 +18,19 @@ import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.PlantaDAO;
+import mx.com.ferbo.dao.PosicionCamaraDAO;
+import mx.com.ferbo.dao.ProductoClienteDAO;
+import mx.com.ferbo.dao.ProductoDAO;
+import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.Posicion;
+import mx.com.ferbo.model.Producto;
+import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.model.UnidadDeManejo;
 
 @Named
 @ViewScoped
@@ -35,18 +43,28 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private AvisoDAO avisoDAO;
 	private CamaraDAO camaraDAO;
 	private ConstanciaDeDepositoDAO constanciaDAO;
-	
-	//private ConstanciaDeDeposito constancia;
+	private ProductoClienteDAO productoClienteDAO;
+	private ProductoDAO productoDAO;
+	private UnidadDeManejoDAO unidadManejoDAO;
+	private PosicionCamaraDAO posicionCamaraDAO;
 	
 	private List<Cliente> listadoCliente;
 	private List<Planta> listadoPlanta;
 	private List<Camara> camaras;
 	private List<Camara> camaraPorPlanta;
 	private List<Aviso> listadoAviso;
-	private List <String> avisoC;
 	private List<ConstanciaDeDeposito> listadoConstancia;
+	private List<ProductoPorCliente> productoCliente;
+	private List<Producto> listadoProducto;//nueva
+	private List<Producto> productoC;
+	private List<UnidadDeManejo> listadoUnidadDeManejo;
+	private List<Posicion> listaPosiciones;
+	private List<Posicion> posiciones;
 	
 	private Planta plantaSelect;
+	private Cliente clienteSelect;
+	private ProductoPorCliente productoPorCliente;//nueva
+	private Camara camaraSelect;
 
 	private String noConstanciaSelect;
 	
@@ -56,10 +74,16 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		camaraDAO = new CamaraDAO();
 		avisoDAO = new AvisoDAO();
 		constanciaDAO = new ConstanciaDeDepositoDAO();
+		productoClienteDAO = new ProductoClienteDAO();//nueva
+		productoDAO = new ProductoDAO();
+		unidadManejoDAO = new UnidadDeManejoDAO();
+		posicionCamaraDAO = new PosicionCamaraDAO();
 		
 		listadoPlanta = new ArrayList<>();
 		camaraPorPlanta = new ArrayList<Camara>();
-		avisoC = new ArrayList<>();
+		productoC = new ArrayList<Producto>();
+		posiciones = new ArrayList<Posicion>();
+		
 	}
 	
 	@PostConstruct
@@ -67,8 +91,11 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoCliente = clienteDAO.buscarTodos();		
 		listadoPlanta = plantaDAO.findall();
 		camaras = camaraDAO.buscarTodos();
+		listadoProducto = productoDAO.buscarTodos();//nueva
 		listadoAviso = avisoDAO.buscarTodos();
 		listadoConstancia = constanciaDAO.buscarTodos();
+		listadoUnidadDeManejo = unidadManejoDAO.buscarTodos();
+		listaPosiciones = posicionCamaraDAO.findAll();
 	}
 
 	//---------- Metodos de listas --------------
@@ -114,27 +141,52 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.camaraPorPlanta = camaraPorPlanta;
 	}
 	
-	public List<String> getAvisoC() {
-		
-		String concatenado;
-		for(Aviso a: listadoAviso) {
-			concatenado = String.valueOf(a.getAvisoCve())+a.getAvisoVigencia()+a.getAvisoTpFacturacion();
-			avisoC.add(concatenado);
-		}
-		
-		return avisoC;
-	}
-
-	public void setAvisoC(List<String> avisoC) {
-		this.avisoC = avisoC;
-	}
-	
 	public List<ConstanciaDeDeposito> getListadoConstancia() {
 		return listadoConstancia;
 	}
 
 	public void setListadoConstancia(List<ConstanciaDeDeposito> listadoConstancia) {
 		this.listadoConstancia = listadoConstancia;
+	}
+	
+	public List<ProductoPorCliente> getProductoCliente() {
+		return productoCliente;
+	}
+
+	public void setProductoCliente(List<ProductoPorCliente> productoCliente) {
+		this.productoCliente = productoCliente;
+	}
+	
+	public List<Producto> getListadoProducto() {
+		return listadoProducto;
+	}
+
+	public void setListadoProducto(List<Producto> listadoProducto) {
+		this.listadoProducto = listadoProducto;
+	}
+	
+	public List<UnidadDeManejo> getListadoUnidadDeManejo() {
+		return listadoUnidadDeManejo;
+	}
+
+	public void setListadoUnidadDeManejo(List<UnidadDeManejo> listadoUnidadDeManejo) {
+		this.listadoUnidadDeManejo = listadoUnidadDeManejo;
+	}
+	
+	public List<Posicion> getListaPosiciones() {
+		return listaPosiciones;
+	}
+
+	public void setListaPosiciones(List<Posicion> listaPosiciones) {
+		this.listaPosiciones = listaPosiciones;
+	}
+	
+	public List<Posicion> getPosiciones() {
+		return posiciones;
+	}
+
+	public void setPosiciones(List<Posicion> posiciones) {
+		this.posiciones = posiciones;
 	}
 	
 	// ------------ Metodos DAO ------------------
@@ -179,11 +231,31 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.constanciaDAO = constanciaDAO;
 	}
 	
-	// ------------ Metodos de Modelo --------------
+	public ProductoClienteDAO getProductoClienteDAO() {
+		return productoClienteDAO;
+	}
 
-	/*public ConstanciaDeDeposito getConstancia() {
-		return constancia;
-	}*/
+	public void setProductoClienteDAO(ProductoClienteDAO productoClienteDAO) {
+		this.productoClienteDAO = productoClienteDAO;
+	}
+	
+	public UnidadDeManejoDAO getUnidadManejoDAO() {
+		return unidadManejoDAO;
+	}
+
+	public void setUnidadManejoDAO(UnidadDeManejoDAO unidadManejoDAO) {
+		this.unidadManejoDAO = unidadManejoDAO;
+	}
+	
+	public PosicionCamaraDAO getPosicionCamaraDAO() {
+		return posicionCamaraDAO;
+	}
+
+	public void setPosicionCamaraDAO(PosicionCamaraDAO posicionCamaraDAO) {
+		this.posicionCamaraDAO = posicionCamaraDAO;
+	}
+	
+	// ------------ Metodos de Modelo --------------
 
 	public String getNoConstanciaSelect() {
 		return noConstanciaSelect;
@@ -193,10 +265,6 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.noConstanciaSelect = noConstanciaSelect;
 	}
 
-	/*public void setConstancia(ConstanciaDeDeposito selectedConstancia) {
-		this.constancia = selectedConstancia;
-	}*/
-
 	public Planta getPlantaSelect() {
 		return plantaSelect;
 	}
@@ -205,9 +273,47 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.plantaSelect = plantaSelect;
 	}
 
+	public Cliente getClienteSelect() {
+		return clienteSelect;
+	}
+
+	public void setClienteSelect(Cliente clienteSelect) {
+		this.clienteSelect = clienteSelect;
+	}
+	
+	public ProductoPorCliente getProductoPorCliente() {
+		return productoPorCliente;
+	}
+
+	public void setProductoPorCliente(ProductoPorCliente productoPorCliente) {
+		this.productoPorCliente = productoPorCliente;
+	}
+	
+	public ProductoDAO getProductoDAO() {
+		return productoDAO;
+	}
+
+	public void setProductoDAO(ProductoDAO productoDAO) {
+		this.productoDAO = productoDAO;
+	}
+	
+	public List<Producto> getProductoC() {
+		return productoC;
+	}
+
+	public void setProductoC(List<Producto> productoC) {
+		this.productoC = productoC;
+	}
+	
+	public Camara getCamaraSelect() {
+		return camaraSelect;
+	}
+
+	public void setCamaraSelect(Camara camaraSelect) {
+		this.camaraSelect = camaraSelect;
+	}
 	
 	// ----------- Otros Metodos ------------------
-
 
 	public void filtraListado() {
 		camaraPorPlanta.clear();//limpia la lista
@@ -230,7 +336,45 @@ public class ConstanciaDeDepositoBean implements Serializable{
 				PrimeFaces.current().ajax().update("form:messages");
 			}
 		}
-		
 	}
+	
+	public void productoPorCliente() {//nuevo
+		
+		productoC.clear();
+		productoPorCliente = new ProductoPorCliente(clienteSelect); //seteo el cliente seleccionado del componente
+		productoCliente = productoClienteDAO.buscarPorCriterios(productoPorCliente);//retorno la lista de objeto productoporcliente (lo busco por cteCve)
+		for(ProductoPorCliente pc: productoCliente) {//recorro la lista de productocliente para tomar para tomar el valor de productoCve
+			for(Producto p: listadoProducto) {//anido el recorrido de la lista de mis productos
+				if(pc.getProductoCve().getProductoCve().intValue()==p.getProductoCve().intValue()) {//comparo que si el id recuperado es igual al id de algun registro de producto
+					productoC.add(p);//añado dicho registro a la lista 
+				}
+			}
+		}
+		//System.out.println("Productos de cliente:" + productoC);
+	}
+	
+	public void filtrarP() {
+		//posiciones.clear();
+		System.out.println("--------------------------------------------"+listaPosiciones);
+		Posicion posicion = new Posicion();
+		posicion.setPlanta(plantaSelect);
+		posicion.setCamara(camaraSelect);
+		posiciones = posicionCamaraDAO.buscarPorCriterios(posicion);
+		posiciones = listaPosiciones.stream()
+				.filter(pc -> plantaSelect != null
+						? (pc.getPlanta().getPlantaCve() == camaraSelect.getPlantaCve().getPlantaCve())
+						: false)
+				.collect(Collectors.toList());
+		System.out.println("posicion planta -----------------------------------------------------" + posiciones);
+		posiciones = listaPosiciones.stream()
+				.filter(cs -> camaraSelect != null
+						? (cs.getCamara().getCamaraCve() == camaraSelect.getCamaraCve().intValue())
+						: false)
+				.collect(Collectors.toList());
+
+		System.out.println("camaras-----------------------------------------------------------" + posiciones);
+//		PrimeFaces.current().ajax().update("form:dt-posiciones");
+	}
+	
 
 }

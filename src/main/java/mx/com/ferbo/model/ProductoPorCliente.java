@@ -28,6 +28,7 @@ import javax.validation.constraints.NotNull;
 @NamedQueries({
     @NamedQuery(name = "ProductoPorCliente.findAll", query = "SELECT p FROM ProductoPorCliente p"),
     @NamedQuery(name = "ProductoPorCliente.findByProdXCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.prodXCteCve = :prodXCteCve"),
+    @NamedQuery(name = "ProductoPorCliente.findByCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve.cteCve = :cteCve"),//nuevo
     @NamedQuery(name = "ProductoPorCliente.findByProductoCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.productoCve = :productoCve")})
 public class ProductoPorCliente implements Serializable {
 
@@ -43,14 +44,16 @@ public class ProductoPorCliente implements Serializable {
     @JoinColumn(name = "PRODUCTO_CVE", referencedColumnName = "PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private Producto productoCve;
-    
-    
 
     public ProductoPorCliente() {
     }
 
     public ProductoPorCliente(Integer prodXCteCve) {
         this.prodXCteCve = prodXCteCve;
+    }
+    
+    public ProductoPorCliente(Cliente cliente) {//nuevo
+    	this.cteCve = cliente;
     }
 
     public Integer getProdXCteCve() {
