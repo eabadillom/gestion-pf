@@ -23,10 +23,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "PLANTA")
 @NamedQueries({ @NamedQuery(name = "Planta.findAll", query = "SELECT p FROM Planta p"),

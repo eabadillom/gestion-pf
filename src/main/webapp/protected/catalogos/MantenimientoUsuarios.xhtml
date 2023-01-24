@@ -1,0 +1,220 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="title">Usuarios</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Usuarios" />
+				<p:menuitem value="Mantenimiento de usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" />
+			</p:breadCrumb>
+
+					
+			<p:toolbar styleClass="p-mb-4">
+				<p:toolbarGroup>
+					<p:commandButton value="Agregar" icon="pi pi-plus" 
+						actionListener="#{usuariosBean.openNew()}" update="dialogCliente" 
+						oncomplete="PF('dialogCliente').show();" styleClass="ui-button-info p-mr-2 p-mb-2"
+						 style="margin-right: .5rem" process="@this" />
+				</p:toolbarGroup>
+			</p:toolbar>
+				<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" />
+						
+						<p:dataTable id="dt-usuario" lazy="true" widgetVar="dtUser" var="userdt"
+							value="#{usuariosBean.usuarios}" reflow="true"
+							rowKey="#{userdt.id}" paginator="true" rows="10"
+							paginatorPosition="bottom" rowSelectMode="add">
+							
+							<p:column headerText="Nombre">
+								<h:outputText value="#{userdt.nombre}" />
+							</p:column>
+
+							<p:column headerText="Apellido Paterno">
+								<h:outputText value="#{userdt.apellido1}" />
+							</p:column>
+
+							<p:column headerText="Apellido Materno">
+								<h:outputText value="#{userdt.apellido2}" />
+							</p:column>
+
+							<p:column headerText="Perfil">
+								<h:outputText value="#{userdt.perfil}" />
+							</p:column>
+
+					<p:column headerText="Acción" style="text-align:center">
+					
+					<p:commandButton icon="pi pi-pencil" update=":form:dialogCliente" value="Modificar" 
+									oncomplete="PF('dialogCliente').show();" styleClass="edit-button" process="@this" >
+					<f:setPropertyActionListener value="#{userdt}" target="#{UsuariosBean.userdt}" />
+					</p:commandButton>
+					<p:commandButton value="Eliminar" class="ui-button-danger" 
+										icon="pi pi-trash" process="@this" 
+										oncomplete="PF('deleteClienteDialog').show()">
+				    <f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.userdt}" />
+					</p:commandButton>
+					</p:column>
+					</p:dataTable>
+					</div>
+				</div>
+			</div>
+	
+			<p:dialog header="Agregar usuario" id="dialogCliente" showEffect="fade"
+				modal="true" widgetVar="dialogCliente" responsive="true">
+			<p:outputPanel id="pnlCliente" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty usuariosBean.usuarios}">
+			    <div class="card" style="width: 100%">
+			    <h:form>
+			        <div class="grid ui-fluid mt-3 floatlabel-demo">
+			            <div class="col-12 md:col-6">
+			            
+			            <p:panel id="Nombre">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="nombre-new" id="nombre-new" value="#{usuariosBean.usuario.nombre}" required="true"/>
+			                        <p:outputLabel for="nombre-new" value="Nombre" styleClass="ml-4" />
+			                        <i class="pi pi-user" />
+			                    </span>
+			                </div>
+			            </p:panel>
+			            
+            <p:panel id="apa">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="apellidop-new" id="apellidop-new" value="#{usuariosBean.usuario.apellido1}" required="true"/>
+                        <p:outputLabel for="apellidop-new" value="Apellido Paterno" styleClass="ml-4" />
+                       <i class="pi pi-user-plus" />
+                    </span>
+                </div>
+                </p:panel>
+                
+                <p:panel id="ama">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="apellidom-new" id="apellidom-new" value="#{usuariosBean.usuario.apellido2}" required="true"/>
+                        <p:outputLabel for="apellidom-new" value="Apellido Materno" styleClass="ml-4" />
+                        <i class="pi pi-user-minus" />
+                    </span>
+                </div>
+                </p:panel>
+                
+                 <p:panel id="email">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="email-new" id="email-new" value="#{usuariosBean.usuario.mail}" required="true"/>
+                        <p:outputLabel for="email-new" value="E-mail" styleClass="ml-4" />
+                           <i class="pi pi-envelope" />
+                   </span>
+                </div>
+                </p:panel>
+                
+                <p:panel id="login">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="login-new" id="login-new" value="#{usuariosBean.usuario.usuario}" required="true"/>
+                        <p:outputLabel for="login-new" value="Login" />
+                        <i class="pi pi-id-card" />
+                    </span>
+                </div>
+                </p:panel>
+                  
+                <p:panel id="planta">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                       <p:selectOneMenu id="user" value="#{usuariosBean.usuario.idPlanta}" converter="entityConverter">
+                            <f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems var="user" value="#{usuariosBean.lstPlanta}" itemLabel="#{user.plantaDs}" itemValue="#{user.plantaCve}" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="user" value="Planta asignada" />
+                    </span>
+                </div>
+                </p:panel>
+                
+                <p:panel id="status">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                       <p:selectOneMenu id="statusUsuario" value="#{usuariosBean.usuario.stUsuario}" converter="entityConverter">
+                            <f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems value="#{usuariosBean.usuarios}" var="user" itemLabel="#{user.stUsuario}" itemValue="#{user}" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="status" value="Status" />                       
+                    </span>
+                </div>
+                </p:panel>
+                
+                <p:panel id="puser">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                       <p:selectOneMenu id="perfiluser" value="#{usuariosBean.usuario.perfil}" converter="entityConverter" >
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItems value="#{usuariosBean.lstPerfil}" var="perfiluser" itemLabel="#{perfiluser.nombre}" itemValue="#{perfiluser}" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="perfiluser" value="Perfil" />
+                    </span>
+                </div>
+                </p:panel>
+                
+                <p:panel id="descripcion">
+                <div class="field">
+                    <span class="ui-float-label">
+                       <p:inputTextarea rows="3" cols="30" widgetVar="descripcion-new" id="descripcion-new" value="#{usuariosBean.usuario.descripcion}"/>
+                       <p:outputLabel for="descripcion" value="Descripcion" required="true"/>
+                    </span>
+                </div>
+                </p:panel>
+            </div>
+        </div>
+    </h:form>
+</div>
+							</p:outputPanel>
+							</p:outputPanel>
+						<f:facet name="footer">
+							<p:commandButton value="Resetear password" icon="pi pi-key" process="@this pnlCliente" />
+							
+								<p:commandButton value="Guardar" icon="pi pi-check" onclick="PF('dialogCliente').hide()" 
+													actionListener="#{usuariosBean.guardar()}" update="dt-usuario"   
+										target="#{usuariosBean.usuario}" oncomplete="PF('dialogCliente').hide()" required="true"/>
+								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" resetValues="pnlCliente" process=" @this pnlCliente">
+								</p:commandButton>
+							</f:facet>
+						</p:dialog>
+
+						<p:confirmDialog widgetVar="deleteClienteDialog" showEffect="fade" width="400" message="Desea eliminar el cliente?" header="Eliminar" severity="warn">
+							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarCliente()}" oncomplete="PF('deleteClienteDialog').hide()" />
+							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteClienteDialog').hide()" />
+						</p:confirmDialog>
+
+						<p:confirmDialog global="true" showEffect="fade" width="400" header="Eliminar">
+							<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+							<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
+						</p:confirmDialog>
+
+		
+			  
+        
+        
+			<style>
+body .ui-panelgrid .ui-panelgrid-cell {
+	border: none !important;
+	padding: 0px;
+}
+
+.ui-fluid .ui-password {
+	width: 90% !important;
+	display: inline-block !important;
+}
+
+body .ui-input-icon-right>i:last-of-type {
+	right: 1rem;
+}
+
+body .ui-input-icon-right>.ui-inputfield {
+	width: 100%;
+}
+</style>
+		</h:form>
+	</ui:define>
+</ui:composition>
