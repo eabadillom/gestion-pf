@@ -72,8 +72,8 @@ public class UsuariosBean implements Serializable {
 		System.out.println(usuario);
 		usuario.setIdPlanta(this.idplanta);
 		usuario.setStUsuario(this.idstatus);
-		usuario.setPerfil(this.idperfil);
-		String user = usuarioDAO.guardar(usuario);
+		usuario.setPerfil(this.perfil.getId());
+		String user = usuarioDAO.actualizar(usuario);
 		if (user == null) {
 			usuarios.clear();
 			usuarios = usuarioDAO.findall();
@@ -85,9 +85,31 @@ public class UsuariosBean implements Serializable {
 		}
 		this.usuario = new Usuario();
 	}
-
-	public void eliminarUsuario() {
-		
+public void resetpassword() {
+	usuario.setPassword("");
+	String user = usuarioDAO.actualizar(usuario);
+	if (user == null) {
+		usuarios.clear();
+		usuarios = usuarioDAO.findall();
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Contraseña reestablecida para el usuario " + usuario.getUsuario(), null));
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-usuario");
+	} else {
+		FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR, "Contraseña no reestablecida para el usuario " + usuario.getUsuario(), user));
+		PrimeFaces.current().ajax().update("form:messages");
+	}
+	this.usuario = new Usuario();
+}
+	public void eliminar() {
+		PrimeFaces.current().executeScript("PF('deleteClienteDialog').hide()");
+		String user= usuarioDAO.eliminar(usuario);
+		if (user == null) {
+			usuarios.remove(this.usuario);
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario Eliminado " + usuario.getUsuario(), null));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-usuario");
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al eliminar " + usuario.getUsuario(), user));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
 	}
 	
 	public List<TipoMail> getLstTipoMail() {

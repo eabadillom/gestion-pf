@@ -104,16 +104,17 @@ public class UsuarioDAO extends IBaseDAO<Usuario, Integer>{
 			return null;
 	}
 	@Override
-	public String eliminar(Usuario e) {
+	public String eliminar(Usuario u) {
 		try {
 			EntityManager entity = getEntityManager();
 			entity.getTransaction().begin();
-			entity.remove(entity.merge(e));
+			entity.remove(entity.merge(u));
 			entity.getTransaction().commit();
 			entity.close();
-		} catch (Exception e1) {
-			return "Failed!! " + e1.getMessage();
-		}return null;
+		} catch (Exception e) {
+			return "Failed!! " + e.getMessage();
+		}
+		return null;
 	}
 
 	@Override

@@ -14,7 +14,7 @@
 			<p:toolbar styleClass="p-mb-4">
 				<p:toolbarGroup>
 					<p:commandButton value="Agregar" icon="pi pi-plus" 
-						actionListener="#{usuariosBean.openNew()}" update="dialogCliente" 
+						actionListener="#{usuariosBean.openNew()}" update="pnlCliente" 
 						oncomplete="PF('dialogCliente').show();" styleClass="ui-button-info p-mr-2 p-mb-2"
 						 style="margin-right: .5rem" process="@this" />
 				</p:toolbarGroup>
@@ -47,14 +47,12 @@
 
 					<p:column headerText="Acción" style="text-align:center">
 					
-					<p:commandButton icon="pi pi-pencil" update=":form:dialogCliente" value="Modificar" 
+					<p:commandButton icon="pi pi-pencil" update=":form:pnlCliente" value="Modificar" 
 									oncomplete="PF('dialogCliente').show();" styleClass="edit-button" process="@this" >
-					<f:setPropertyActionListener value="#{userdt}" target="#{UsuariosBean.userdt}" />
+					<f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.usuario}" />
 					</p:commandButton>
-					<p:commandButton value="Eliminar" class="ui-button-danger" 
-										icon="pi pi-trash" process="@this" 
-										oncomplete="PF('deleteClienteDialog').show()">
-				    <f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.userdt}" />
+					<p:commandButton value="Eliminar" class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteClienteDialog').show()">
+				    <f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.usuario}" />
 					</p:commandButton>
 					</p:column>
 					</p:dataTable>
@@ -62,15 +60,16 @@
 				</div>
 			</div>
 	
-			<p:dialog header="Agregar usuario" id="dialogCliente" showEffect="fade"
+			<p:dialog header="Agregar usuario" showEffect="fade"
 				modal="true" widgetVar="dialogCliente" responsive="true">
+				
 			<p:outputPanel id="pnlCliente" class="ui-fluid">
 					<p:outputPanel rendered="#{not empty usuariosBean.usuarios}">
-			    <div class="card" style="width: 100%">
-			    <h:form>
+                  
+                 <div class="card" style="width: 100%">
 			        <div class="grid ui-fluid mt-3 floatlabel-demo">
 			            <div class="col-12 md:col-6">
-			            
+			             <p:panelGrid columns="3" >
 			            <p:panel id="Nombre">
 			                <div class="field">
 			                    <span class="ui-float-label ui-input-icon-right">
@@ -124,8 +123,7 @@
                 <p:panel id="planta">
                 <div class="field">
                     <span class="ui-float-label ui-input-icon-right">
-                       <p:selectOneMenu id="user" value="#{usuariosBean.usuario.idPlanta}" converter="entityConverter">
-                            <f:selectItem itemLabel="" itemValue="" />
+                       <p:selectOneMenu id="user" value="#{usuariosBean.idplanta}" converter="entityConverter">
 							<f:selectItems var="user" value="#{usuariosBean.lstPlanta}" itemLabel="#{user.plantaDs}" itemValue="#{user.plantaCve}" />
                         </p:selectOneMenu>
                         <p:outputLabel for="user" value="Planta asignada" />
@@ -136,9 +134,10 @@
                 <p:panel id="status">
                 <div class="field">
                     <span class="ui-float-label ui-input-icon-right">
-                       <p:selectOneMenu id="statusUsuario" value="#{usuariosBean.usuario.stUsuario}" converter="entityConverter">
-                            <f:selectItem itemLabel="" itemValue="" />
-							<f:selectItems value="#{usuariosBean.usuarios}" var="user" itemLabel="#{user.stUsuario}" itemValue="#{user}" />
+                       <p:selectOneMenu id="statusUsuario" value="#{usuariosBean.idstatus}" converter="entityConverter">
+                            <f:selectItem itemLabel="Activo" itemValue="A" />
+                           <f:selectItem itemLabel="Baja" itemValue="B" />
+                           <f:selectItem itemLabel="Bloqueado" itemValue="L" />
                         </p:selectOneMenu>
                         <p:outputLabel for="status" value="Status" />                       
                     </span>
@@ -148,8 +147,7 @@
                 <p:panel id="puser">
                 <div class="field">
                     <span class="ui-float-label ui-input-icon-right">
-                       <p:selectOneMenu id="perfiluser" value="#{usuariosBean.usuario.perfil}" converter="entityConverter" >
-                            <f:selectItem itemLabel="" itemValue="" />
+                       <p:selectOneMenu id="perfiluser" value="#{usuariosBean.perfil}" converter="entityConverter" >
                             <f:selectItems value="#{usuariosBean.lstPerfil}" var="perfiluser" itemLabel="#{perfiluser.nombre}" itemValue="#{perfiluser}" />
                         </p:selectOneMenu>
                         <p:outputLabel for="perfiluser" value="Perfil" />
@@ -165,25 +163,31 @@
                     </span>
                 </div>
                 </p:panel>
-            </div>
-        </div>
-    </h:form>
-</div>
+                <p:row>
+		           <p:column styleClass="ui-grid-col-12">   
+		       <p:outputLabel for="checkbox" value=" ¿RECIBIR NOTIFICACIONES DE ALMACEN? "/>
+		       <p:selectBooleanCheckbox id="checkbox" itemLabel="No"/>
+		           </p:column>
+        		</p:row>
+                					</p:panelGrid>
+						            </div>
+						        </div>
+							</div>
 							</p:outputPanel>
 							</p:outputPanel>
 						<f:facet name="footer">
-							<p:commandButton value="Resetear password" icon="pi pi-key" process="@this pnlCliente" />
+							<p:commandButton value="Resetear password" icon="pi pi-key" process="@this pnlCliente" actionListener="#{usuariosBean.resetpassword()}" />
 							
 								<p:commandButton value="Guardar" icon="pi pi-check" onclick="PF('dialogCliente').hide()" 
-													actionListener="#{usuariosBean.guardar()}" update="dt-usuario"   
-										target="#{usuariosBean.usuario}" oncomplete="PF('dialogCliente').hide()" required="true"/>
-								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" resetValues="pnlCliente" process=" @this pnlCliente">
+										actionListener="#{usuariosBean.guardar()}" process="pnlCliente @this" update="pnlCliente" target="#{usuariosBean.usuario}" 
+										oncomplete="PF('dialogCliente').hide()"/>
+								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" >
 								</p:commandButton>
 							</f:facet>
 						</p:dialog>
 
-						<p:confirmDialog widgetVar="deleteClienteDialog" showEffect="fade" width="400" message="Desea eliminar el cliente?" header="Eliminar" severity="warn">
-							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarCliente()}" oncomplete="PF('deleteClienteDialog').hide()" />
+						<p:confirmDialog widgetVar="deleteClienteDialog" showEffect="fade" width="400" message="Desea eliminar el usuario?" header="Eliminar" severity="warn">
+							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{usuariosBean.eliminar()}" oncomplete="PF('deleteClienteDialog').hide()" />
 							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteClienteDialog').hide()" />
 						</p:confirmDialog>
 
@@ -191,10 +195,6 @@
 							<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
 							<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
 						</p:confirmDialog>
-
-		
-			  
-        
         
 			<style>
 body .ui-panelgrid .ui-panelgrid-cell {
