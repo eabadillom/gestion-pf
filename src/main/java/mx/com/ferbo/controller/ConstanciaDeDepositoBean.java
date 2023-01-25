@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,11 +63,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private List<Posicion> posiciones;
 	
 	private Planta plantaSelect;
-	private Cliente clienteSelect;
+	private Cliente clienteSelect;//cambiar por int 
 	private ProductoPorCliente productoPorCliente;//nueva
 	private Camara camaraSelect;
 
 	private String noConstanciaSelect;
+	private BigDecimal unidadesPorTarima;
+	private BigDecimal numTarimas;
+	private int cantidadTotal;
 	
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
@@ -78,7 +82,6 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		productoDAO = new ProductoDAO();
 		unidadManejoDAO = new UnidadDeManejoDAO();
 		posicionCamaraDAO = new PosicionCamaraDAO();
-		
 		listadoPlanta = new ArrayList<>();
 		camaraPorPlanta = new ArrayList<Camara>();
 		productoC = new ArrayList<Producto>();
@@ -95,7 +98,8 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoAviso = avisoDAO.buscarTodos();
 		listadoConstancia = constanciaDAO.buscarTodos();
 		listadoUnidadDeManejo = unidadManejoDAO.buscarTodos();
-		listaPosiciones = posicionCamaraDAO.findAll();
+		this.listaPosiciones = posicionCamaraDAO.findAll();
+		
 	}
 
 	//---------- Metodos de listas --------------
@@ -189,6 +193,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.posiciones = posiciones;
 	}
 	
+	public Cliente getClienteSelect() {
+		return clienteSelect;
+	}
+
+	public void setClienteSelect(Cliente clienteSelect) {
+		this.clienteSelect = clienteSelect;
+	}
+	
 	// ------------ Metodos DAO ------------------
 
 	public ClienteDAO getClienteDAO() {
@@ -272,14 +284,6 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	public void setPlantaSelect(Planta plantaSelect) {
 		this.plantaSelect = plantaSelect;
 	}
-
-	public Cliente getClienteSelect() {
-		return clienteSelect;
-	}
-
-	public void setClienteSelect(Cliente clienteSelect) {
-		this.clienteSelect = clienteSelect;
-	}
 	
 	public ProductoPorCliente getProductoPorCliente() {
 		return productoPorCliente;
@@ -313,6 +317,22 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.camaraSelect = camaraSelect;
 	}
 	
+	public BigDecimal getNumTarimas() {
+		return numTarimas;
+	}
+
+	public void setNumTarimas(BigDecimal numTarimas) {
+		this.numTarimas = numTarimas;
+	}
+	
+	public int getCantidadTotal() {
+		return cantidadTotal;
+	}
+
+	public void setCantidadTotal(int cantidadTotal) {
+		this.cantidadTotal = cantidadTotal;
+	}
+	
 	// ----------- Otros Metodos ------------------
 
 	public void filtraListado() {
@@ -336,6 +356,9 @@ public class ConstanciaDeDepositoBean implements Serializable{
 				PrimeFaces.current().ajax().update("form:messages");
 			}
 		}
+		
+		this.noConstanciaSelect = constanciaE;
+		
 	}
 	
 	public void productoPorCliente() {//nuevo
@@ -365,16 +388,30 @@ public class ConstanciaDeDepositoBean implements Serializable{
 						? (pc.getPlanta().getPlantaCve() == camaraSelect.getPlantaCve().getPlantaCve())
 						: false)
 				.collect(Collectors.toList());
-		System.out.println("posicion planta -----------------------------------------------------" + posiciones);
+		//System.out.println("posicion planta -----------------------------------------------------" + posiciones);
 		posiciones = listaPosiciones.stream()
 				.filter(cs -> camaraSelect != null
 						? (cs.getCamara().getCamaraCve() == camaraSelect.getCamaraCve().intValue())
 						: false)
 				.collect(Collectors.toList());
+		
+		//System.out.println("camaras-----------------------------------------------------------" + posiciones);
 
-		System.out.println("camaras-----------------------------------------------------------" + posiciones);
-//		PrimeFaces.current().ajax().update("form:dt-posiciones");
 	}
+
+	public BigDecimal getUnidadesPorTarima() {
+		return unidadesPorTarima;
+	}
+
+	public void setUnidadesPorTarima(BigDecimal unidadesPorTarima) {
+		this.unidadesPorTarima = unidadesPorTarima;
+	}
+
+	public void calculo() {
+		this.unidadesPorTarima = new BigDecimal("56");//falta calculo 
+	}
+	
+	
 	
 
 }
