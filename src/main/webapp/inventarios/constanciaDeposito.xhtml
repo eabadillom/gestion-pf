@@ -18,8 +18,7 @@
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-						<p:growl id="messages" showDetail="true" />
-					
+						<p:growl id="messages" showDetail="true" life="2000"/>					
 						
 						<div style="text-align: center" class="p-field">
 							<p:outputLabel styleClass="p-mr-2" value="Cliente:"/>
@@ -49,7 +48,7 @@
 							<p:selectOneMenu id="camara" autoWidth="false" value="#{constanciaDeDepositoBean.camaraSelect}" converter="entityConverter">
 								<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />	
-								<p:ajax listener="#{constanciaDeDepositoBean.filtrarP()}" update="posiciones" ></p:ajax>		
+								<p:ajax listener="#{constanciaDeDepositoBean.filtrarPosicion()}" update="posiciones" ></p:ajax>		
 							</p:selectOneMenu>
 							
 							<p:outputLabel value="Fecha:" styleClass="p-ml-6 p-mr-2"/>
@@ -71,34 +70,37 @@
 							<div class="card">
 								<div class="">								
 									<p:toolbarGroup>
+									
 										<div>
-											<p:outputLabel for="claveProducto" value="Clave|Producto:" styleClass="p-ml-6 p-mr-2"/>
-											<p:selectOneMenu id="claveProducto" autoWidth="false" value="#{null}">
+											<p:outputLabel value="Clave|Producto:" styleClass="p-ml-6 p-mr-2"/>
+											<p:selectOneMenu id="claveProducto" autoWidth="false" value="#{constanciaDeDepositoBean.productoSelect}" converter="entityConverter">
 												<f:selectItem itemLabel="Selecciona Producto" itemValue="" noSelectionOption="true"></f:selectItem>
-												<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.productoDs}"/>
+												<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto}"/>										
 											</p:selectOneMenu>
 											
 											<p:outputLabel value="Unidad de Manejo:" styleClass="p-ml-6 p-mr-2"/>
-											<p:selectOneMenu autoWidth="false" value="#{null}" >
+											<p:selectOneMenu autoWidth="false" converter="entityConverter" value="#{constanciaDeDeposito.unidadManejoSelect}" >
 												<f:selectItem itemLabel="Selecciona Unidad" itemValue="" noSelectionOption="true"></f:selectItem>
-												<f:selectItems value="#{constanciaDeDepositoBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" />
+												<f:selectItems value="#{constanciaDeDepositoBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
 											</p:selectOneMenu>
 											
 											<p:outputLabel value="Ubicación:" styleClass="p-ml-6 p-mr-2"/>
-											<p:selectOneMenu id="posiciones" autoWidth="false" value="#{null}">
+											<p:selectOneMenu id="posiciones" autoWidth="false" value="#{constanciaDeDepositoBean.posicionSelect}">
 												<f:selectItem itemLabel="Selecciona Ubicacion" itemValue="" noSelectionOption="true"></f:selectItem>
-												<f:selectItems value="#{constanciaDeDepositoBean.posiciones}" var="posicion" itemLabel="#{posicion.descPosicion}"/>
+												<f:selectItems value="#{constanciaDeDepositoBean.posiciones}" var="posicion" itemLabel="#{posicion.descPosicion}" itemValue="#{posicion}"/>
 											</p:selectOneMenu>
 											
 											<p:outputLabel value="Cantidad:" styleClass="p-ml-6 p-mr-2"></p:outputLabel> 
 											<p:inputNumber value="#{constanciaDeDepositoBean.cantidadTotal}">
-												
+												<p:ajax update="@this" />
 											</p:inputNumber>
 										</div>
 										
 										<div style="margin-top: 5px">
-											<p:outputLabel value="Peso Total:" styleClass="p-ml-6 p-mr-2" />								
-											<p:inputNumber/>
+											<p:outputLabel value="Peso Total:" styleClass="p-ml-6 p-mr-2"/>								
+											<p:inputNumber id="pesoTotal" value="#{constanciaDeDepositoBean.pesoTotal}" >
+												<p:ajax update="@this"/>
+											</p:inputNumber>
 											
 											<p:outputLabel value="# Tarimas:" styleClass="p-ml-6 p-mr-2" />								
 											<p:inputNumber value="#{constanciaDeDepositoBean.numTarimas}">
@@ -111,7 +113,9 @@
 											</p:inputText>
 											
 											<p:outputLabel value="Valor($) Mercancia:" styleClass="p-ml-6 p-mr-2" />								
-											<p:inputNumber/>
+											<p:inputNumber value="#{constanciaDeDepositoBean.valorMercancia}">
+												<p:ajax update="@this" />
+											</p:inputNumber>
 										</div>
 										
 										<div style="margin-top: 5px">
@@ -130,14 +134,44 @@
 											<p:outputLabel value="Otro:" styleClass="p-ml-6 p-mr-2" />
 											<p:inputText maxlength="12" />
 										</div>
+										
 									</p:toolbarGroup>
 								</div>
 							</div>
 							<p:toolbarGroup>
-										<p:commandButton value="Añadir" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus"/>
+										<p:commandButton value="Añadir" actionListener="#{constanciaDeDepositoBean.savePartida()}" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="datosPartida form:dt-partidas "/>											
 										<p:commandButton value="Borrar" styleClass="ui-button-danger" icon="pi pi-trash"/>
 							</p:toolbarGroup>
 						</p:toolbar> 
+						
+						<p:dataTable  id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="true" paginatorPosition="bottom">
+							<p:column headerText="ID">
+								<h:outputText value="#{partida.partidaCve}"/> <!-- No se muestra porque no se esta registrando en la BD y por tanto no le asigna ningun ID -->
+							</p:column>
+							<p:column headerText="Id Camara">
+								<h:outputText value="#{partida.camaraCve.camaraCve}"/>
+							</p:column>
+							<p:column headerText="Folio">
+								<h:outputText value="#{partida.folio.folioCliente}"/>
+							</p:column>
+							<p:column headerText="Peso Total">
+								<h:outputText value="#{partida.pesoTotal}"/>
+							</p:column>
+							<p:column headerText="Cantidad Total">
+								<h:outputText value="#{partida.cantidadTotal}"/>
+							</p:column>
+							<p:column headerText="Unidad De Producto (Producto)">
+								<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
+							</p:column>
+							<p:column headerText="Valor de Mercancia">
+								<h:outputText value="#{partida.valorMercancia}"/>
+							</p:column>
+							<p:column headerText="# de Tarimas">
+								<h:outputText value="#{partida.noTarimas}"/>
+							</p:column>
+						</p:dataTable>
+						
+					
 						
 			<!-- Dialogo cambiar No. Constancia -->
 						<p:dialog header="No. Constancia" showEffect="hide" modal="true" widgetVar="NoCambiarDialog" responsive="true" style="text-align:center">

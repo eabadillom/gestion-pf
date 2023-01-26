@@ -2,6 +2,7 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,11 +28,13 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Posicion;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.model.UnidadDeProducto;
 
 @Named
 @ViewScoped
@@ -61,16 +64,22 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private List<UnidadDeManejo> listadoUnidadDeManejo;
 	private List<Posicion> listaPosiciones;
 	private List<Posicion> posiciones;
+	private List<Partida> listadoPartida;
 	
 	private Planta plantaSelect;
-	private Cliente clienteSelect;//cambiar por int 
+	private Cliente clienteSelect;
 	private ProductoPorCliente productoPorCliente;//nueva
 	private Camara camaraSelect;
+	private Producto productoSelect;
+	private UnidadDeManejo unidadManejoSelect;
+	private Posicion posicionSelect;
 
 	private String noConstanciaSelect;
 	private BigDecimal unidadesPorTarima;
 	private BigDecimal numTarimas;
 	private int cantidadTotal;
+	private BigDecimal pesoTotal;
+	private BigDecimal valorMercancia;
 	
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
@@ -86,6 +95,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		camaraPorPlanta = new ArrayList<Camara>();
 		productoC = new ArrayList<Producto>();
 		posiciones = new ArrayList<Posicion>();
+		listadoPartida = new ArrayList<Partida>();
 		
 	}
 	
@@ -199,6 +209,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 
 	public void setClienteSelect(Cliente clienteSelect) {
 		this.clienteSelect = clienteSelect;
+	}
+	
+	public List<Partida> getListadoPartida() {
+		return listadoPartida;
+	}
+
+	public void setListadoPartida(List<Partida> listadoPartida) {
+		this.listadoPartida = listadoPartida;
 	}
 	
 	// ------------ Metodos DAO ------------------
@@ -333,6 +351,30 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.cantidadTotal = cantidadTotal;
 	}
 	
+	public Producto getProductoSelect() {
+		return productoSelect;
+	}
+
+	public void setProductoSelect(Producto productoSelect) {
+		this.productoSelect = productoSelect;
+	}
+	
+	public UnidadDeManejo getUnidadManejoSelect() {
+		return unidadManejoSelect;
+	}
+
+	public void setUnidadManejoSelect(UnidadDeManejo unidadManejoSelect) {
+		this.unidadManejoSelect = unidadManejoSelect;
+	}
+	
+	public Posicion getPosicionSelect() {
+		return posicionSelect;
+	}
+
+	public void setPosicionSelect(Posicion posicionSelect) {
+		this.posicionSelect = posicionSelect;
+	}
+	
 	// ----------- Otros Metodos ------------------
 
 	public void filtraListado() {
@@ -357,6 +399,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 			}
 		}
 		
+		
 		this.noConstanciaSelect = constanciaE;
 		
 	}
@@ -373,12 +416,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 				}
 			}
 		}
-		//System.out.println("Productos de cliente:" + productoC);
+		
+		System.out.println("Productos de cliente:" + productoC);
+		
 	}
 	
-	public void filtrarP() {
+	public void filtrarPosicion() {
 		//posiciones.clear();
-		System.out.println("--------------------------------------------"+listaPosiciones);
+		//System.out.println("--------------------------------------------"+listaPosiciones);
 		Posicion posicion = new Posicion();
 		posicion.setPlanta(plantaSelect);
 		posicion.setCamara(camaraSelect);
@@ -395,7 +440,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 						: false)
 				.collect(Collectors.toList());
 		
-		//System.out.println("camaras-----------------------------------------------------------" + posiciones);
+		System.out.println("camaras-----------------------------------------------------------" + posiciones);
 
 	}
 
@@ -407,11 +452,49 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.unidadesPorTarima = unidadesPorTarima;
 	}
 
+	public BigDecimal getPesoTotal() {
+		return pesoTotal;
+	}
+
+	public void setPesoTotal(BigDecimal pesoTotal) {
+		this.pesoTotal = pesoTotal;
+	}
+
+	public BigDecimal getValorMercancia() {
+		return valorMercancia;
+	}
+
+	public void setValorMercancia(BigDecimal valorMercancia) {
+		this.valorMercancia = valorMercancia;
+	}
+
 	public void calculo() {
-		this.unidadesPorTarima = new BigDecimal("56");//falta calculo 
+		BigDecimal unidadT = new BigDecimal(cantidadTotal).setScale(2);
+		BigDecimal tarimas = unidadT.divide(numTarimas,2,RoundingMode.HALF_UP);		
+		this.unidadesPorTarima = new BigDecimal(tarimas.intValue()).setScale(2);
 	}
 	
-	
+	public void savePartida() {
+		
+		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
+		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
+		
+		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
+		unidadDeProducto.setProductoCve(productoSelect);
+		unidadDeProducto.setUnidadDeManejoCve(unidadManejoSelect);
+		
+		Partida partida = new Partida();
+		partida.setCamaraCve(camaraSelect);//revisar se le pasaba camaraSelect
+		partida.setFolio(constanciaDeDeposito);
+		partida.setPesoTotal(pesoTotal);
+		partida.setCantidadTotal(cantidadTotal);
+		partida.setUnidadDeProductoCve(unidadDeProducto);
+		partida.setValorMercancia(valorMercancia);
+		partida.setNoTarimas(numTarimas);
+		
+		this.listadoPartida.add(partida);
+		
+	}
 	
 
 }
