@@ -22,7 +22,7 @@
 
                         <p:toolbar styleClass="p-mb-4">
                             <p:toolbarGroup>
-                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{serviciosBean.openNew}" update="manage-servicio-content form:manage-servicio-content" oncomplete="PF('manageServicioDialog').show()" 
+                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{serviciosBean.openNew()}" update="manage-servicio-content form:manage-servicio-content" oncomplete="PF('manageServicioDialog').show()" 
                                     styleClass="ui-button-success" style="margin-right: .5rem" />
                                 <p:commandButton id="delete-servicios-button" value="#{serviciosBean.deleteButtonMessage}" icon="pi pi-trash" actionListener="#{serviciosBean.deleteSelectedServicios()}" 
                                     styleClass="ui-button-danger" disabled="#{!serviciosBean.hasSelectedServicios()}" update="@this">
@@ -67,7 +67,7 @@
 
 							<p:column headerText="Tipo de cobro" sortBy="#{servicio.cobro.nombre}" filterBy="#{servicio.cobro.nombre}">
 								<h:outputText value="#{servicio.cobro.nombre}" />
-							</p:column>
+							</p:column>												
 							<p:column exportable="false" width="20%" style="text-align:center">
                                 <p:commandButton icon="pi pi-pencil" update=":form:manage-servicio-content" value="Modificar" oncomplete="PF('manageServicioDialog').show()" 
                                     styleClass="edit-button ui-button-success" process="@this">
@@ -88,8 +88,12 @@
                                         <p:inputText id="txtDescipcion" value="#{serviciosBean.selectedServicio.servicioDs}" required="true" requiredMessage="Campo requerido"/>
                                     </div>
                                     <div class="p-field">
-                                        <p:outputLabel for="txtCodigo">Código de servicio</p:outputLabel>
-                                        <p:inputTextarea id="txtCodigo" value="#{serviciosBean.selectedServicio.servicioCod}" />
+                                        <p:outputLabel for="txtCodigo">Codigo Producto o Servicio SAT </p:outputLabel>
+                                        <p:inputText id="txtCodigo" value="#{serviciosBean.selectedServicio.servicioCod}"/>
+                                    </div>
+                                    <div class="p-field">
+                                    	<p:outputLabel for="txtUnidad">Codigo Unidad SAT</p:outputLabel>
+                                    	<p:inputText id="txtUnidad" value="#{serviciosBean.selectedServicio.cdUnidad}"/>
                                     </div>
                                     <div class="p-field">
                                         <p:outputLabel for="soTipoC">Tipo de cobro</p:outputLabel>
@@ -97,14 +101,19 @@
                                             <f:selectItem itemLabel="--Selecciona--"/>
                                             <f:selectItems value="#{serviciosBean.listadoTipoCobro}" var="cobro" itemLabel="#{cobro.nombre}" itemValue="#{cobro}" />
                                         </p:selectOneMenu>
-                                    </div>                                    
+                                    </div>
+                                    <div>
+                                    	<p:selectBooleanCheckbox itemLabel="Registrado en Facturama" value="#{serviciosBean.selectedServicio.valor}" disabled="true"></p:selectBooleanCheckbox>
+                                    </div>                                                                  
                                 </p:outputPanel>
                             </p:outputPanel>
 
                             <f:facet name="footer">
-                                <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{serviciosBean.saveServicio()}" update="manage-servicio-content" process="manage-servicio-content @this" />
-                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageServicioDialog').hide()" class="ui-button-secondary" />
+                                <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{serviciosBean.saveServicio()}" update="manage-servicio-content" process="manage-servicio-content @this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageServicioDialog').hide()" class="ui-button-secondary" immediate="true"/>
+                                
                             </f:facet>
+                            
                         </p:dialog> 
 
                         <p:confirmDialog widgetVar="deleteServicioDialog" showEffect="fade" width="400" message="Desea eliminar el servicio?" header="Eliminar" severity="warn">
@@ -116,6 +125,9 @@
                             <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                             <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
                         </p:confirmDialog>
+                        
+                      
+                        
                     </div>
                 </div>
             </div>

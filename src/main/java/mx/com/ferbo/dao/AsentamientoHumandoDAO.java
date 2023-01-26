@@ -1,15 +1,27 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.TipoAsentamiento;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer> {
 
+	@SuppressWarnings("unchecked")
+	public List<AsentamientoHumano> findall() {
+		EntityManager entity = getEntityManager();
+		List<AsentamientoHumano> AsH= null;
+		Query sql = entity.createNamedQuery("AsentamientoHumano.findAll", AsentamientoHumano.class);
+		AsH = sql.getResultList();
+		return AsH;
+	}
 	@Override
 	public AsentamientoHumano buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -36,7 +48,19 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 				.getResultList();
 		return listado;
 	}
-
+	
+	public AsentamientoHumano buscar(AsentamientoHumano e) {		
+		AsentamientoHumano listado = null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		listado = em.createNamedQuery("AsentamientoHumano.findAsentamiento", AsentamientoHumano.class)
+				.setParameter("paisCve", e.getAsentamientoHumanoPK().getPaisCve())
+				.setParameter("estadoCve", e.getAsentamientoHumanoPK().getEstadoCve())
+				.setParameter("municipioCve", e.getAsentamientoHumanoPK().getMunicipioCve())
+				.setParameter("ciudadCve", e.getAsentamientoHumanoPK().getCiudadCve())
+				.setParameter("asentamientoCve", e.getAsentamientoHumanoPK().getAsentamientoCve())
+				.getSingleResult();
+		return listado;
+	}
 	@Override
 	public String actualizar(AsentamientoHumano asentamientoHumano) {
 		try {
