@@ -3,7 +3,10 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,6 +15,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.validation.constraints.Future;
 
 import org.primefaces.PrimeFaces;
 
@@ -28,6 +32,7 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Posicion;
@@ -49,7 +54,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private ConstanciaDeDepositoDAO constanciaDAO;
 	private ProductoClienteDAO productoClienteDAO;
 	private ProductoDAO productoDAO;
-	private UnidadDeManejoDAO unidadManejoDAO;
+	private UnidadDeManejoDAO unidadDeManejoDAO;
 	private PosicionCamaraDAO posicionCamaraDAO;
 	
 	private List<Cliente> listadoCliente;
@@ -64,15 +69,19 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private List<UnidadDeManejo> listadoUnidadDeManejo;
 	private List<Posicion> listaPosiciones;
 	private List<Posicion> posiciones;
-	private List<Partida> listadoPartida;
+	private List<Aviso> avisoPorCliente;
+	private List<Partida> listadoPartida;//lista donde se guardan los objetos pero no se guardan en BD
+	private List<DetallePartida> listadoDetallePartida;
+	
 	
 	private Planta plantaSelect;
 	private Cliente clienteSelect;
 	private ProductoPorCliente productoPorCliente;//nueva
 	private Camara camaraSelect;
 	private Producto productoSelect;
-	private UnidadDeManejo unidadManejoSelect;
-	private Posicion posicionSelect;
+	private UnidadDeManejo unidadDeManejoSelect;
+	private Posicion posicionCamaraSelect;
+	private Aviso avisoSelect;
 
 	private String noConstanciaSelect;
 	private BigDecimal unidadesPorTarima;
@@ -80,6 +89,9 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private int cantidadTotal;
 	private BigDecimal pesoTotal;
 	private BigDecimal valorMercancia;
+	private String pedimento,contenedor,lote,otro;
+	@Future
+	private Date fechaCaducidad;
 	
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
@@ -89,13 +101,16 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		constanciaDAO = new ConstanciaDeDepositoDAO();
 		productoClienteDAO = new ProductoClienteDAO();//nueva
 		productoDAO = new ProductoDAO();
-		unidadManejoDAO = new UnidadDeManejoDAO();
+		unidadDeManejoDAO = new UnidadDeManejoDAO();
 		posicionCamaraDAO = new PosicionCamaraDAO();
 		listadoPlanta = new ArrayList<>();
 		camaraPorPlanta = new ArrayList<Camara>();
 		productoC = new ArrayList<Producto>();
 		posiciones = new ArrayList<Posicion>();
 		listadoPartida = new ArrayList<Partida>();
+		listadoUnidadDeManejo = new ArrayList<>();
+		avisoPorCliente = new ArrayList<Aviso>();
+		listadoDetallePartida = new ArrayList<>();
 		
 	}
 	
@@ -105,10 +120,12 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoPlanta = plantaDAO.findall();
 		camaras = camaraDAO.buscarTodos();
 		listadoProducto = productoDAO.buscarTodos();//nueva
-		listadoAviso = avisoDAO.buscarTodos();
+		this.listadoAviso = avisoDAO.buscarTodos();
 		listadoConstancia = constanciaDAO.buscarTodos();
-		listadoUnidadDeManejo = unidadManejoDAO.buscarTodos();
+		this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 		this.listaPosiciones = posicionCamaraDAO.findAll();
+		
+		this.fechaCaducidad = new Date();
 		
 	}
 
@@ -219,6 +236,22 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.listadoPartida = listadoPartida;
 	}
 	
+	public List<Aviso> getAvisoPorCliente() {
+		return avisoPorCliente;
+	}
+
+	public void setAvisoPorCliente(List<Aviso> avisoPorCliente) {
+		this.avisoPorCliente = avisoPorCliente;
+	}
+	
+	public List<DetallePartida> getListadoDetallePartida() {
+		return listadoDetallePartida;
+	}
+
+	public void setListadoDetallePartida(List<DetallePartida> listadoDetallePartida) {
+		this.listadoDetallePartida = listadoDetallePartida;
+	}
+	
 	// ------------ Metodos DAO ------------------
 
 	public ClienteDAO getClienteDAO() {
@@ -269,14 +302,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.productoClienteDAO = productoClienteDAO;
 	}
 	
-	public UnidadDeManejoDAO getUnidadManejoDAO() {
-		return unidadManejoDAO;
+	public UnidadDeManejoDAO getUnidadDeManejoDAO() {
+		return unidadDeManejoDAO;
 	}
 
-	public void setUnidadManejoDAO(UnidadDeManejoDAO unidadManejoDAO) {
-		this.unidadManejoDAO = unidadManejoDAO;
+	public void setUnidadDeManejoDAO(UnidadDeManejoDAO unidadDeManejoDAO) {
+		this.unidadDeManejoDAO = unidadDeManejoDAO;
 	}
-	
+
 	public PosicionCamaraDAO getPosicionCamaraDAO() {
 		return posicionCamaraDAO;
 	}
@@ -358,21 +391,69 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	public void setProductoSelect(Producto productoSelect) {
 		this.productoSelect = productoSelect;
 	}
-	
-	public UnidadDeManejo getUnidadManejoSelect() {
-		return unidadManejoSelect;
+
+	public UnidadDeManejo getUnidadDeManejoSelect() {
+		return unidadDeManejoSelect;
 	}
 
-	public void setUnidadManejoSelect(UnidadDeManejo unidadManejoSelect) {
-		this.unidadManejoSelect = unidadManejoSelect;
+	public void setUnidadDeManejoSelect(UnidadDeManejo unidadDeManejoSelect) {
+		this.unidadDeManejoSelect = unidadDeManejoSelect;
 	}
 	
-	public Posicion getPosicionSelect() {
-		return posicionSelect;
+	public Posicion getPosicionCamaraSelect() {
+		return posicionCamaraSelect;
 	}
 
-	public void setPosicionSelect(Posicion posicionSelect) {
-		this.posicionSelect = posicionSelect;
+	public void setPosicionCamaraSelect(Posicion posicionCamaraSelect) {
+		this.posicionCamaraSelect = posicionCamaraSelect;
+	}
+	
+	public Aviso getAvisoSelect() {
+		return avisoSelect;
+	}
+
+	public void setAvisoSelect(Aviso avisoSelect) {
+		this.avisoSelect = avisoSelect;
+	}
+	
+	public String getPedimento() {
+		return pedimento;
+	}
+
+	public void setPedimento(String pedimento) {
+		this.pedimento = pedimento;
+	}
+	
+	public String getContenedor() {
+		return contenedor;
+	}
+
+	public void setContenedor(String contenedor) {
+		this.contenedor = contenedor;
+	}
+
+	public String getLote() {
+		return lote;
+	}
+
+	public void setLote(String lote) {
+		this.lote = lote;
+	}
+
+	public String getOtro() {
+		return otro;
+	}
+
+	public void setOtro(String otro) {
+		this.otro = otro;
+	}
+	
+	public Date getFechaCaducidad() {
+		return fechaCaducidad;
+	}
+
+	public void setFechaCaducidad(Date fechaCaducidad) {
+		this.fechaCaducidad = fechaCaducidad;
 	}
 	
 	// ----------- Otros Metodos ------------------
@@ -417,8 +498,16 @@ public class ConstanciaDeDepositoBean implements Serializable{
 			}
 		}
 		
-		System.out.println("Productos de cliente:" + productoC);
+		//System.out.println("Productos de cliente:" + productoC);
 		
+		//codigo para avisos de cliente
+		avisoPorCliente.clear();
+		avisoPorCliente = listadoAviso.stream()
+				.filter(av -> clienteSelect != null
+				?(av.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())//compara el id del cliente que esta en la lista con el de clienteSelect si son iguales se trae el dato
+				:false).collect(Collectors.toList());
+				
+		System.out.println("Avisos por cliente: " + avisoPorCliente);
 	}
 	
 	public void filtrarPosicion() {
@@ -476,15 +565,16 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	
 	public void savePartida() {
 		
+		
 		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
 		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
 		
 		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
 		unidadDeProducto.setProductoCve(productoSelect);
-		unidadDeProducto.setUnidadDeManejoCve(unidadManejoSelect);
+		unidadDeProducto.setUnidadDeManejoCve(unidadDeManejoSelect);
 		
 		Partida partida = new Partida();
-		partida.setCamaraCve(camaraSelect);//revisar se le pasaba camaraSelect
+		partida.setCamaraCve(posicionCamaraSelect.getCamara());
 		partida.setFolio(constanciaDeDeposito);
 		partida.setPesoTotal(pesoTotal);
 		partida.setCantidadTotal(cantidadTotal);
@@ -492,8 +582,17 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		partida.setValorMercancia(valorMercancia);
 		partida.setNoTarimas(numTarimas);
 		
-		this.listadoPartida.add(partida);
+		DetallePartida detallePartida = new DetallePartida();
+		detallePartida.setDtpPedimento(pedimento);
+		detallePartida.setDtpSAP(contenedor);
+		detallePartida.setDtpLote(lote);
+		detallePartida.setDtpPO(otro);
 		
+		this.listadoPartida.add(partida);
+		this.listadoDetallePartida.add(detallePartida);
+		
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro exitosamente"));
+		PrimeFaces.current().ajax().update("form:messages");
 	}
 	
 
