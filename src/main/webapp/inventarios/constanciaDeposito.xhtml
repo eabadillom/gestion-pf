@@ -25,7 +25,7 @@
 							<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{constanciaDeDepositoBean.clienteSelect}" converter="entityConverter" >
 								<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
-								<p:ajax listener="#{constanciaDeDepositoBean.productoPorCliente()}" update="claveProducto aviso" />		
+								<p:ajax listener="#{constanciaDeDepositoBean.productoPorCliente()}" update="claveProducto aviso servicio" />		
 							</p:selectOneMenu>							
 						</div> 
 						
@@ -61,8 +61,8 @@
 							<p:commandButton value="Cambiar" icon="pi pi-pencil" styleClass="edit-button ui-button-success" oncomplete="PF('NoCambiarDialog').show()"/>										
 						</div> 
 						
-						<div class="" style="text-align: center">
-							<span style="font-weight: bold;color: gray">SELECCIONE LA MERCANCIA</span>
+						<div class="" style="text-align: center;background-color: gray;">
+							<span style="font-weight: bold;color: white">SELECCIONE LA MERCANCIA</span>
 						</div>  
 						
 						
@@ -114,7 +114,7 @@
 											
 											<p:outputLabel value="Unidades por tarima:" styleClass="p-ml-6 p-mr-2" />								
 											<p:inputText id="unidadesTarima" value="#{constanciaDeDepositoBean.unidadesPorTarima}">
-												
+												<p:ajax update="@this" />
 											</p:inputText>
 											
 											<p:outputLabel value="Valor($) Mercancia:" styleClass="p-ml-6 p-mr-2" />								
@@ -142,7 +142,8 @@
 											</p:inputText>
 											
 											<p:outputLabel value="Caducidad:" styleClass="p-ml-6 p-mr-2"/>
-											<p:datePicker id="fechaCaducidad" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Caducidad" value="#{constanciaDeDepositoBean.fechaCaducidad}" locale="es">
+											<p:datePicker id="fechaCaducidad" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Caducidad" value="#{constanciaDeDepositoBean.fechaCaducidad}" 
+														  pattern="yyyy-MM-dd" >
 												<p:ajax event="dateSelect" update="fechaCaducidad" />
 											</p:datePicker>
 											
@@ -177,7 +178,7 @@
 								<h:outputText value="#{partida.partidaCve}"/> <!-- No se muestra porque no se esta registrando en la BD y por tanto no le asigna ningun ID -->
 							</p:column>
 							<p:column headerText="Id Camara">
-								<h:outputText value="#{partida.camaraCve.camaraCve}"/>
+								<h:outputText value="#{partida.camaraCve.camaraAbrev}"/>
 							</p:column>
 							<p:column headerText="Folio">
 								<h:outputText value="#{partida.folio.folioCliente}"/>
@@ -201,7 +202,7 @@
 							
 							<p:rowExpansion>
 								<div class="orders-subtable">
-									<p:dataTable id="dtDetallePartida" value="#{constanciaDeDepositoBean.listadoDetallePartida}" var="detallePartida" reflow="true">
+									<p:dataTable id="dtDetallePartida" value="#{partida.detallePartidaList}" var="detallePartida" reflow="true">
 										
 										<f:facet name="header">
 											<div class="products-table-header">
@@ -232,7 +233,19 @@
 							
 						</p:dataTable>
 						
-					
+						<div style="text-align: center;margin-top: 10px;background-color: gray">
+							<span style="font-weight: bold;color: white;">PARA LOS SERVICIOS DE</span>
+						</div>
+						
+						<div style="margin-top: 5px">
+						
+							<p:outputLabel value="Servicios:" styleClass="p-mr-2"/>
+							<p:selectOneMenu id="servicio" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.servicioSelect}" >
+								<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoServicio}" var="servicio" itemLabel="#{servicio.servicioDs}" itemValue="#{servicio}" />
+								<p:ajax update="servicio" />
+							</p:selectOneMenu>
+						</div>
 						
 			<!-- Dialogo cambiar No. Constancia -->
 						<p:dialog header="No. Constancia" showEffect="hide" modal="true" widgetVar="NoCambiarDialog" responsive="true" style="text-align:center">

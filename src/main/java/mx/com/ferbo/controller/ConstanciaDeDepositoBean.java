@@ -3,10 +3,8 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +25,7 @@ import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PosicionCamaraDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.ProductoDAO;
+import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
@@ -38,8 +37,10 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Posicion;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
+
 
 @Named
 @ViewScoped
@@ -56,6 +57,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private ProductoDAO productoDAO;
 	private UnidadDeManejoDAO unidadDeManejoDAO;
 	private PosicionCamaraDAO posicionCamaraDAO;
+	private ServicioDAO servicioDAO;	
 	
 	private List<Cliente> listadoCliente;
 	private List<Planta> listadoPlanta;
@@ -72,8 +74,8 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private List<Aviso> avisoPorCliente;
 	private List<Partida> listadoPartida;//lista donde se guardan los objetos pero no se guardan en BD
 	private List<DetallePartida> listadoDetallePartida;
-	
-	
+	private List<Servicio> listadoServicio;
+
 	private Planta plantaSelect;
 	private Cliente clienteSelect;
 	private ProductoPorCliente productoPorCliente;//nueva
@@ -82,6 +84,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private UnidadDeManejo unidadDeManejoSelect;
 	private Posicion posicionCamaraSelect;
 	private Aviso avisoSelect;
+	private Servicio servicioSelect;
 
 	private String noConstanciaSelect;
 	private BigDecimal unidadesPorTarima;
@@ -103,6 +106,8 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		productoDAO = new ProductoDAO();
 		unidadDeManejoDAO = new UnidadDeManejoDAO();
 		posicionCamaraDAO = new PosicionCamaraDAO();
+		servicioDAO = new ServicioDAO();
+		
 		listadoPlanta = new ArrayList<>();
 		camaraPorPlanta = new ArrayList<Camara>();
 		productoC = new ArrayList<Producto>();
@@ -124,8 +129,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoConstancia = constanciaDAO.buscarTodos();
 		this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 		this.listaPosiciones = posicionCamaraDAO.findAll();
-		
-		this.fechaCaducidad = new Date();
+		listadoServicio = servicioDAO.buscarTodos();
 		
 	}
 
@@ -252,6 +256,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.listadoDetallePartida = listadoDetallePartida;
 	}
 	
+	public List<Servicio> getListadoServicio() {
+		return listadoServicio;
+	}
+
+	public void setListadoServicio(List<Servicio> listadoServicio) {
+		this.listadoServicio = listadoServicio;
+	}
+	
 	// ------------ Metodos DAO ------------------
 
 	public ClienteDAO getClienteDAO() {
@@ -316,6 +328,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 
 	public void setPosicionCamaraDAO(PosicionCamaraDAO posicionCamaraDAO) {
 		this.posicionCamaraDAO = posicionCamaraDAO;
+	}
+	
+	public ServicioDAO getServicioDAO() {
+		return servicioDAO;
+	}
+
+	public void setServicioDAO(ServicioDAO servicioDAO) {
+		this.servicioDAO = servicioDAO;
 	}
 	
 	// ------------ Metodos de Modelo --------------
@@ -456,7 +476,17 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.fechaCaducidad = fechaCaducidad;
 	}
 	
+	public Servicio getServicioSelect() {
+		return servicioSelect;
+	}
+
+	public void setServicioSelect(Servicio servicioSelect) {
+		this.servicioSelect = servicioSelect;
+	}
+
+	
 	// ----------- Otros Metodos ------------------
+
 
 	public void filtraListado() {
 		camaraPorPlanta.clear();//limpia la lista
@@ -507,7 +537,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 				?(av.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())//compara el id del cliente que esta en la lista con el de clienteSelect si son iguales se trae el dato
 				:false).collect(Collectors.toList());
 				
-		System.out.println("Avisos por cliente: " + avisoPorCliente);
+		//System.out.println("Avisos por cliente: " + avisoPorCliente);
 	}
 	
 	public void filtrarPosicion() {
@@ -529,7 +559,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 						: false)
 				.collect(Collectors.toList());
 		
-		System.out.println("camaras-----------------------------------------------------------" + posiciones);
+		//System.out.println("camaras-----------------------------------------------------------" + posiciones);
 
 	}
 
@@ -563,9 +593,11 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.unidadesPorTarima = new BigDecimal(tarimas.intValue()).setScale(2);
 	}
 	
-	public void savePartida() {
+	public void savePartida(){
+		//partidaSelect.getDetallePartidaList();
 		
-		
+		//listadoDetallePartida.clear();
+		listadoDetallePartida = new ArrayList<>();
 		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
 		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
 		
@@ -581,15 +613,17 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		partida.setUnidadDeProductoCve(unidadDeProducto);
 		partida.setValorMercancia(valorMercancia);
 		partida.setNoTarimas(numTarimas);
+		partida.setDetallePartidaList(new ArrayList<DetallePartida>());
 		
 		DetallePartida detallePartida = new DetallePartida();
 		detallePartida.setDtpPedimento(pedimento);
 		detallePartida.setDtpSAP(contenedor);
 		detallePartida.setDtpLote(lote);
-		detallePartida.setDtpPO(otro);
+		detallePartida.setDtpPO(otro);      
+		detallePartida.setDtpCaducidad(fechaCaducidad);
 		
+		partida.getDetallePartidaList().add(detallePartida);
 		this.listadoPartida.add(partida);
-		this.listadoDetallePartida.add(detallePartida);
 		
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro exitosamente"));
 		PrimeFaces.current().ajax().update("form:messages");
