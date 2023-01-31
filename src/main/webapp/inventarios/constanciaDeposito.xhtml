@@ -25,7 +25,7 @@
 							<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{constanciaDeDepositoBean.clienteSelect}" converter="entityConverter" >
 								<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
-								<p:ajax listener="#{constanciaDeDepositoBean.productoPorCliente()}" update="claveProducto aviso servicio" />		
+								<p:ajax listener="#{constanciaDeDepositoBean.productoPorCliente()}" update="claveProducto aviso precioServicio congelacion conservacion refrigeracion maniobras"/>		
 							</p:selectOneMenu>							
 						</div> 
 						
@@ -83,7 +83,7 @@
 											<p:selectOneMenu autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.unidadDeManejoSelect}" >
 												<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
 												<f:selectItems value="#{constanciaDeDepositoBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
-												<p:ajax update="@this" /> 
+												<p:ajax update="@this"/> 
 											</p:selectOneMenu>	
 											
 											<p:outputLabel value="Ubicación:" styleClass="p-ml-6 p-mr-2"/>
@@ -237,14 +237,37 @@
 							<span style="font-weight: bold;color: white;">PARA LOS SERVICIOS DE</span>
 						</div>
 						
+						<div style="text-align: center;margin-top: 5px">
+						
+							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{constanciaDeDepositoBean.isCongelacion}"/>
+							<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{constanciaDeDepositoBean.isConservacion}">
+								<p:ajax update="@this" resetValues="true"/>
+							</p:selectBooleanCheckbox>
+							<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{constanciaDeDepositoBean.isRefrigeracion}">
+								<p:ajax update="@this" resetValues="true"/>
+							</p:selectBooleanCheckbox>
+							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{constanciaDeDepositoBean.isManiobras}"/>
+				
+						
+						</div>
+						
 						<div style="margin-top: 5px">
 						
 							<p:outputLabel value="Servicios:" styleClass="p-mr-2"/>
-							<p:selectOneMenu id="servicio" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.servicioSelect}" >
+							<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.precioServicioSelect}" >
 								<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
-								<f:selectItems value="#{constanciaDeDepositoBean.listadoServicio}" var="servicio" itemLabel="#{servicio.servicioDs}" itemValue="#{servicio}" />
-								<p:ajax update="servicio" />
+								<f:selectItems value="#{constanciaDeDepositoBean.listaServicioUnidad}" var="precioServicio" itemLabel="#{precioServicio.servicio.servicioDs} (Cobro por #{precioServicio.unidad.unidadDeManejoDs})" itemValue="#{precioServicio}" />	
+																
 							</p:selectOneMenu>
+							
+							<p:outputLabel value="Cantidad:" styleClass="p-ml-6 p-mr-2"/>
+							<p:spinner min="1" />
+						
+							
+							<div style="text-align: right;">
+							<p:commandButton value="Añadir" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus"/>
+							<p:commandButton value="Borrar" styleClass="ui-button-danger" icon="pi pi-trash" />
+							</div>
 						</div>
 						
 			<!-- Dialogo cambiar No. Constancia -->

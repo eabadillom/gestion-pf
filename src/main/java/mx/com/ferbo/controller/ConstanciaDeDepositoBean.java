@@ -23,6 +23,7 @@ import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PosicionCamaraDAO;
+import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.ServicioDAO;
@@ -35,6 +36,7 @@ import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Posicion;
+import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
@@ -58,6 +60,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private UnidadDeManejoDAO unidadDeManejoDAO;
 	private PosicionCamaraDAO posicionCamaraDAO;
 	private ServicioDAO servicioDAO;	
+	private PrecioServicioDAO precioServicioDAO;
 	
 	private List<Cliente> listadoCliente;
 	private List<Planta> listadoPlanta;
@@ -75,7 +78,9 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private List<Partida> listadoPartida;//lista donde se guardan los objetos pero no se guardan en BD
 	private List<DetallePartida> listadoDetallePartida;
 	private List<Servicio> listadoServicio;
-
+	private List<PrecioServicio> listadoPrecioServicio;//
+	private List<PrecioServicio> listaServicioUnidad;
+	
 	private Planta plantaSelect;
 	private Cliente clienteSelect;
 	private ProductoPorCliente productoPorCliente;//nueva
@@ -84,7 +89,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private UnidadDeManejo unidadDeManejoSelect;
 	private Posicion posicionCamaraSelect;
 	private Aviso avisoSelect;
-	private Servicio servicioSelect;
+	private PrecioServicio precioServicioSelect;
 
 	private String noConstanciaSelect;
 	private BigDecimal unidadesPorTarima;
@@ -93,8 +98,11 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private BigDecimal pesoTotal;
 	private BigDecimal valorMercancia;
 	private String pedimento,contenedor,lote,otro;
+	private Boolean isCongelacion,isConservacion,isRefrigeracion,isManiobras;
+	private int congelacion=2,conservacion=32,refrigeracion=33,maniobras=34;
 	@Future
 	private Date fechaCaducidad;
+	
 	
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
@@ -107,8 +115,10 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		unidadDeManejoDAO = new UnidadDeManejoDAO();
 		posicionCamaraDAO = new PosicionCamaraDAO();
 		servicioDAO = new ServicioDAO();
+		precioServicioDAO = new PrecioServicioDAO();//
 		
 		listadoPlanta = new ArrayList<>();
+		listadoCliente = new ArrayList<>();
 		camaraPorPlanta = new ArrayList<Camara>();
 		productoC = new ArrayList<Producto>();
 		posiciones = new ArrayList<Posicion>();
@@ -116,6 +126,8 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoUnidadDeManejo = new ArrayList<>();
 		avisoPorCliente = new ArrayList<Aviso>();
 		listadoDetallePartida = new ArrayList<>();
+		listadoPrecioServicio = new ArrayList<>();//
+		listaServicioUnidad = new ArrayList<PrecioServicio>();//
 		
 	}
 	
@@ -130,7 +142,12 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 		this.listaPosiciones = posicionCamaraDAO.findAll();
 		listadoServicio = servicioDAO.buscarTodos();
+		listadoPrecioServicio = precioServicioDAO.buscarTodos();
 		
+		isCongelacion=false;
+		isConservacion=false;
+		isRefrigeracion=false;
+		isManiobras=false;
 	}
 
 	//---------- Metodos de listas --------------
@@ -264,6 +281,22 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.listadoServicio = listadoServicio;
 	}
 	
+	public List<PrecioServicio> getListadoPrecioServicio() {
+		return listadoPrecioServicio;
+	}
+
+	public void setListadoPrecioServicio(List<PrecioServicio> listadoPrecioServicio) {
+		this.listadoPrecioServicio = listadoPrecioServicio;
+	}
+
+	public List<PrecioServicio> getListaServicioUnidad() {
+		return listaServicioUnidad;
+	}
+
+	public void setListaServicioUnidad(List<PrecioServicio> listaServicioUnidad) {
+		this.listaServicioUnidad = listaServicioUnidad;
+	}
+	
 	// ------------ Metodos DAO ------------------
 
 	public ClienteDAO getClienteDAO() {
@@ -336,6 +369,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 
 	public void setServicioDAO(ServicioDAO servicioDAO) {
 		this.servicioDAO = servicioDAO;
+	}
+	
+	public PrecioServicioDAO getPrecioServicioDAO() {
+		return precioServicioDAO;
+	}
+
+	public void setPrecioServicioDAO(PrecioServicioDAO precioServicioDAO) {
+		this.precioServicioDAO = precioServicioDAO;
 	}
 	
 	// ------------ Metodos de Modelo --------------
@@ -476,17 +517,47 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.fechaCaducidad = fechaCaducidad;
 	}
 	
-	public Servicio getServicioSelect() {
-		return servicioSelect;
+	public PrecioServicio getPrecioServicioSelect() {
+		return precioServicioSelect;
 	}
 
-	public void setServicioSelect(Servicio servicioSelect) {
-		this.servicioSelect = servicioSelect;
+	public void setPrecioServicioSelect(PrecioServicio precioServicioSelect) {
+		this.precioServicioSelect = precioServicioSelect;
+	}
+	
+	public Boolean getIsCongelacion() {
+		return isCongelacion;
 	}
 
+	public void setIsCongelacion(Boolean isCongelacion) {
+		this.isCongelacion = isCongelacion;
+	}
+
+	public Boolean getIsConservacion() {
+		return isConservacion;
+	}
+
+	public void setIsConservacion(Boolean isConservacion) {
+		this.isConservacion = isConservacion;
+	}
+	
+	public Boolean getIsRefrigeracion() {
+		return isRefrigeracion;
+	}
+
+	public void setIsRefrigeracion(Boolean isRefrigeracion) {
+		this.isRefrigeracion = isRefrigeracion;
+	}
+	
+	public Boolean getIsManiobras() {
+		return isManiobras;
+	}
+
+	public void setIsManiobras(Boolean isManiobras) {
+		this.isManiobras = isManiobras;
+	}
 	
 	// ----------- Otros Metodos ------------------
-
 
 	public void filtraListado() {
 		camaraPorPlanta.clear();//limpia la lista
@@ -517,6 +588,8 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	
 	public void productoPorCliente() {//nuevo
 		
+		//--------------- PRODUCTO POR CLIENTE ------------
+		
 		productoC.clear();
 		productoPorCliente = new ProductoPorCliente(clienteSelect); //seteo el cliente seleccionado del componente
 		productoCliente = productoClienteDAO.buscarPorCriterios(productoPorCliente);//retorno la lista de objeto productoporcliente (lo busco por cteCve)
@@ -530,7 +603,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		
 		//System.out.println("Productos de cliente:" + productoC);
 		
-		//codigo para avisos de cliente
+		//------------ AVISOS CLIENTE -------------
 		avisoPorCliente.clear();
 		avisoPorCliente = listadoAviso.stream()
 				.filter(av -> clienteSelect != null
@@ -538,6 +611,38 @@ public class ConstanciaDeDepositoBean implements Serializable{
 				:false).collect(Collectors.toList());
 				
 		//System.out.println("Avisos por cliente: " + avisoPorCliente);
+		
+		//-------------- PRECIO SERVICIO -----------------
+		listaServicioUnidad.clear();
+		PrecioServicio precioServicio = new PrecioServicio();
+		precioServicio.setCliente(clienteSelect);
+		listaServicioUnidad = listadoPrecioServicio.stream()
+								.filter(ps -> clienteSelect != null
+								?(ps.getCliente().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
+								:false)
+								.collect(Collectors.toList());
+		//Remover servicios (*)
+		List<PrecioServicio> precioServicioTemp = new ArrayList<PrecioServicio>();
+		precioServicioTemp.clear();
+		for(PrecioServicio ps: listaServicioUnidad) {
+			/*if(((isCongelacion == true) && (ps.getServicio().getServicioCve()==congelacion)) 
+					|| ((isConservacion == true) && (ps.getServicio().getServicioCve()==conservacion)) 
+					|| ((isRefrigeracion == true) && (ps.getServicio().getServicioCve()==refrigeracion))
+					|| ((isManiobras == true) && (ps.getServicio().getServicioCve()==maniobras))) {
+				precioServicioTemp.add(ps);
+			}*/
+			if(ps.getServicio().getServicioCve()==refrigeracion) {
+				isRefrigeracion=true;
+				precioServicioTemp.add(ps);
+			}else if(ps.getServicio().getServicioCve()==conservacion) {
+				isConservacion = true;
+				precioServicioTemp.add(ps);
+			}
+		}
+		
+		listaServicioUnidad.removeAll(precioServicioTemp);
+		
+		
 	}
 	
 	public void filtrarPosicion() {
