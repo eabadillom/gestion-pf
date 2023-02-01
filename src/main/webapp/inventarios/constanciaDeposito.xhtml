@@ -34,7 +34,8 @@
 							<p:outputLabel value="Aviso:" styleClass="p-mr-2"/>
 							<p:selectOneMenu id="aviso" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.avisoSelect}">
 								<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
-								<f:selectItems value="#{constanciaDeDepositoBean.avisoPorCliente}" var="aviso" itemLabel="#{aviso.avisoObservaciones}" itemValue="#{aviso}"/>					
+								<f:selectItems value="#{constanciaDeDepositoBean.avisoPorCliente}" var="aviso" itemLabel="#{aviso.avisoObservaciones}" itemValue="#{aviso}"/>
+								<f:ajax render="cont-fecha" listener="#{constanciaDeDepositoBean.renderConstanciaDeDeposito()}"/>				
 							</p:selectOneMenu>
 													
 							<p:outputLabel for="planta" value="Planta:" styleClass="p-ml-6 p-mr-2"/>
@@ -52,13 +53,15 @@
 							</p:selectOneMenu>
 							
 							<p:outputLabel value="Fecha:" styleClass="p-ml-6 p-mr-2"/>
-							<p:datePicker id="fechaInicial" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Inicio" />
+							<p:datePicker id="fechaIngreso" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Ingreso" value="#{constanciaDeDepositoBean.fechaIngreso}" >
+								<p:ajax update="@this" />
+							</p:datePicker>
 							
 							<p:outputLabel styleClass="p-mr-2" value="No. Constancia:"/> 
 							<p:inputText id="numeroC" placeholder="No Asignado" disabled="true" value="#{constanciaDeDepositoBean.noConstanciaSelect}"/>
 							
 							
-							<p:commandButton value="Cambiar" icon="pi pi-pencil" styleClass="edit-button ui-button-success" oncomplete="PF('NoCambiarDialog').show()"/>										
+							<p:commandButton value="Cambiar" icon="pi pi-pencil" style="margin-left: .5rem" styleClass="edit-button ui-button-success" oncomplete="PF('NoCambiarDialog').show()"/>										
 						</div> 
 						
 						<div class="" style="text-align: center;background-color: gray;">
@@ -76,7 +79,7 @@
 											<p:selectOneMenu id="claveProducto" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.productoSelect}">
 												<f:selectItem itemLabel="Selecciona Producto" itemValue="" noSelectionOption="true"></f:selectItem>
 												<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto}" />
-												<p:ajax update="@this" />									
+												<p:ajax update="@this"/>									
 											</p:selectOneMenu>
 											
 											<p:outputLabel value="Unidad de Manejo:" styleClass="p-ml-6 p-mr-2"/>
@@ -124,7 +127,7 @@
 										</div>
 										
 										<div id="dat" style="margin-top: 5px">
-										<p:outputPanel id="datosAdicionales">
+									
 											<p:outputLabel value="Pedimento:" styleClass="p-mr-2"/>
 											<p:inputText maxlength="13" value="#{constanciaDeDepositoBean.pedimento}" >
 												<p:ajax update="@this" />
@@ -141,18 +144,18 @@
 												<p:ajax update="@this" />
 											</p:inputText>
 											
-											<p:outputLabel value="Caducidad:" styleClass="p-ml-6 p-mr-2"/>
-											<p:datePicker id="fechaCaducidad" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Caducidad" value="#{constanciaDeDepositoBean.fechaCaducidad}" 
-														  pattern="yyyy-MM-dd" >
-												<p:ajax event="dateSelect" update="fechaCaducidad" />
-											</p:datePicker>
-											
+											<p:outputPanel id="cont-fecha">
+											<p:outputLabel value="Caducidad:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+												<p:datePicker id="fechaCaducidad" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Caducidad" value="#{constanciaDeDepositoBean.fechaCaducidad}" >
+													<p:ajax update="@this cont-fecha" />
+												</p:datePicker>									
+											</p:outputLabel>
+											</p:outputPanel>
 											<p:outputLabel value="Otro:" styleClass="p-ml-6 p-mr-2" />
 											<p:inputText maxlength="12" value="#{constanciaDeDepositoBean.otro}">
 												<p:ajax update="@this" />
 											</p:inputText>
 											
-										</p:outputPanel>
 										</div>
 										
 									</p:toolbarGroup>
@@ -165,7 +168,7 @@
 						</p:toolbar> 
 						
 						<p:dataTable  id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="true" paginatorPosition="bottom"
-									  rowSelectMode="add" rows="10" rowKey="#{partida.partidaCve}">
+									  rowSelectMode="add" rows="10" rowKey="#{partida.partidaCve}" reflow="true">
 							<f:facet name="header">
 								<div class="products-table-header">
 									<span style="font-weight: bold;">Sus Productos</span>
@@ -175,7 +178,7 @@
 								<p:rowToggler />
 							</p:column>
 							<p:column headerText="ID">
-								<h:outputText value="#{partida.partidaCve}"/> <!-- No se muestra porque no se esta registrando en la BD y por tanto no le asigna ningun ID -->
+								<h:outputText value="#{partida.partidaCve}"/>
 							</p:column>
 							<p:column headerText="Id Camara">
 								<h:outputText value="#{partida.camaraCve.camaraAbrev}"/>
@@ -219,12 +222,13 @@
 										<p:column headerText="Lote">
 											<h:outputText value="#{detallePartida.dtpLote}" />
 										</p:column>
+										<p:column headerText="Otro">
+											<h:outputText value="#{detallePartida.dtpPO}" />
+										</p:column>
 										<p:column headerText="Fecha Caducidad">
 											<h:outputText value="#{detallePartida.dtpCaducidad}" />
 										</p:column>
-										<p:column headerText="Lote">
-											<h:outputText value="#{detallePartida.dtpPO}" />
-										</p:column>
+										
 									</p:dataTable>
 								</div>
 										
@@ -239,14 +243,18 @@
 						
 						<div style="text-align: center;margin-top: 5px">
 						
-							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{constanciaDeDepositoBean.isCongelacion}"/>
+							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{constanciaDeDepositoBean.isCongelacion}">
+								<p:ajax update="@this" />
+							</p:selectBooleanCheckbox>
 							<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{constanciaDeDepositoBean.isConservacion}">
-								<p:ajax update="@this" resetValues="true"/>
+								<p:ajax update="@this"/>
 							</p:selectBooleanCheckbox>
 							<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{constanciaDeDepositoBean.isRefrigeracion}">
-								<p:ajax update="@this" resetValues="true"/>
+								<p:ajax update="@this"/>
 							</p:selectBooleanCheckbox>
-							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{constanciaDeDepositoBean.isManiobras}"/>
+							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{constanciaDeDepositoBean.isManiobras}">
+								<p:ajax update="@this"/>
+							</p:selectBooleanCheckbox>
 				
 						
 						</div>
@@ -257,18 +265,43 @@
 							<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.precioServicioSelect}" >
 								<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
 								<f:selectItems value="#{constanciaDeDepositoBean.listaServicioUnidad}" var="precioServicio" itemLabel="#{precioServicio.servicio.servicioDs} (Cobro por #{precioServicio.unidad.unidadDeManejoDs})" itemValue="#{precioServicio}" />	
-																
+								<p:ajax update="@this" />																	
 							</p:selectOneMenu>
 							
+							
 							<p:outputLabel value="Cantidad:" styleClass="p-ml-6 p-mr-2"/>
-							<p:spinner min="1" />
+							<p:spinner id="cantidadServicio" min="1" value="#{constanciaDeDepositoBean.cantidadServicio}">
+								<p:ajax update="@this" />
+							</p:spinner>
 						
 							
 							<div style="text-align: right;">
-							<p:commandButton value="Añadir" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus"/>
+							<p:commandButton value="Añadir" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" style="margin-right: .5rem" icon="pi pi-plus" update="@this dt-constanciaDD"/>
 							<p:commandButton value="Borrar" styleClass="ui-button-danger" icon="pi pi-trash" />
 							</div>
 						</div>
+						
+						<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" rows="10" value="#{constanciaDeDepositoBean.listadoConstanciaDepositoDetalle}" 
+									rowSelectMode="add"	var="constanciaDD" paginator="true" paginatorPosition="bottom" reflow="true">
+						
+							<f:facet name="header">
+								<div class="products-table-header">
+									<span style="font-weight: bold;">Sus Servicios</span>
+								</div>
+							</f:facet>
+						
+							<p:column headerText="Servicio">
+								<h:outputText value="#{constanciaDD.servicioCve.servicioDs}" />
+							</p:column>
+							
+							<p:column headerText="Constancia De Deposito">
+								<h:outputText value="#{constanciaDD.folio.fechaIngreso}" />
+							</p:column>
+						
+							<p:column headerText="Cantidad">
+								<h:outputText value="#{constanciaDD.servicioCantidad}" />
+							</p:column>
+						</p:dataTable>
 						
 			<!-- Dialogo cambiar No. Constancia -->
 						<p:dialog header="No. Constancia" showEffect="hide" modal="true" widgetVar="NoCambiarDialog" responsive="true" style="text-align:center">
@@ -277,7 +310,7 @@
 									<div>
 										<p:outputLabel styleClass="p-mr-2" value="No. Constancia:" />
 										<p:inputText value="#{constanciaDeDepositoBean.noConstanciaSelect}">
-											<p:ajax event="blur" update="numeroC"/>
+											<p:ajax event="blur" update="numeroC"/> 
 										</p:inputText>
 									</div>		
 								</p:outputPanel>

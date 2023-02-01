@@ -13,7 +13,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.validation.constraints.Future;
 
 import org.primefaces.PrimeFaces;
 
@@ -32,6 +31,7 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
@@ -80,6 +80,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private List<Servicio> listadoServicio;
 	private List<PrecioServicio> listadoPrecioServicio;//
 	private List<PrecioServicio> listaServicioUnidad;
+	private List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle;//se van agregar constanciadepositodetalle al dar añadir
 	
 	private Planta plantaSelect;
 	private Cliente clienteSelect;
@@ -100,8 +101,11 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private String pedimento,contenedor,lote,otro;
 	private Boolean isCongelacion,isConservacion,isRefrigeracion,isManiobras;
 	private int congelacion=2,conservacion=32,refrigeracion=33,maniobras=34;
-	@Future
+	private BigDecimal cantidadServicio;
+	private Boolean respuesta;
+	
 	private Date fechaCaducidad;
+	private Date fechaIngreso;
 	
 	
 	public ConstanciaDeDepositoBean() {
@@ -128,6 +132,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoDetallePartida = new ArrayList<>();
 		listadoPrecioServicio = new ArrayList<>();//
 		listaServicioUnidad = new ArrayList<PrecioServicio>();//
+		listadoConstanciaDepositoDetalle = new ArrayList<>();
 		
 	}
 	
@@ -144,10 +149,10 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoServicio = servicioDAO.buscarTodos();
 		listadoPrecioServicio = precioServicioDAO.buscarTodos();
 		
-		isCongelacion=false;
-		isConservacion=false;
-		isRefrigeracion=false;
-		isManiobras=false;
+		isCongelacion=true;
+		isConservacion=true;
+		isRefrigeracion=true;
+		isManiobras=true;
 	}
 
 	//---------- Metodos de listas --------------
@@ -295,6 +300,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 
 	public void setListaServicioUnidad(List<PrecioServicio> listaServicioUnidad) {
 		this.listaServicioUnidad = listaServicioUnidad;
+	}
+	
+	public List<ConstanciaDepositoDetalle> getListadoConstanciaDepositoDetalle() {
+		return listadoConstanciaDepositoDetalle;
+	}
+
+	public void setListadoConstanciaDepositoDetalle(List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle) {
+		this.listadoConstanciaDepositoDetalle = listadoConstanciaDepositoDetalle;
 	}
 	
 	// ------------ Metodos DAO ------------------
@@ -517,6 +530,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.fechaCaducidad = fechaCaducidad;
 	}
 	
+	public Date getFechaIngreso() {
+		return fechaIngreso;
+	}
+
+	public void setFechaIngreso(Date fechaIngreso) {
+		this.fechaIngreso = fechaIngreso;
+	}
+
 	public PrecioServicio getPrecioServicioSelect() {
 		return precioServicioSelect;
 	}
@@ -557,6 +578,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.isManiobras = isManiobras;
 	}
 	
+	public BigDecimal getCantidadServicio() {
+		return cantidadServicio;
+	}
+
+	public void setCantidadServicio(BigDecimal cantidadServicio) {
+		this.cantidadServicio = cantidadServicio;
+	}
+	
 	// ----------- Otros Metodos ------------------
 
 	public void filtraListado() {
@@ -577,12 +606,19 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		for(ConstanciaDeDeposito cd: listadoConstancia) {
 			if(constanciaE.equals(cd.getFolioCliente())) {				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Folio Existente" ,"Digite un nuevo folio"));
-				PrimeFaces.current().ajax().update("form:messages");
+				this.noConstanciaSelect = null;
+				PrimeFaces.current().ajax().update("form:messages","form:numeroC");
+				break;
 			}
+			
 		}
 		
+		/*if(!constanciaE.isEmpty()){
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Folio Disponible" ,"Digite un nuevo folio"));
+			PrimeFaces.current().ajax().update("form:messages");
+		}*/
 		
-		this.noConstanciaSelect = constanciaE;
+		//this.noConstanciaSelect = constanciaE;
 		
 	}
 	
@@ -622,22 +658,29 @@ public class ConstanciaDeDepositoBean implements Serializable{
 								:false)
 								.collect(Collectors.toList());
 		//Remover servicios (*)
+		
 		List<PrecioServicio> precioServicioTemp = new ArrayList<PrecioServicio>();
 		precioServicioTemp.clear();
 		for(PrecioServicio ps: listaServicioUnidad) {
-			/*if(((isCongelacion == true) && (ps.getServicio().getServicioCve()==congelacion)) 
+			if(((isCongelacion == true) && (ps.getServicio().getServicioCve()==congelacion)) 
 					|| ((isConservacion == true) && (ps.getServicio().getServicioCve()==conservacion)) 
 					|| ((isRefrigeracion == true) && (ps.getServicio().getServicioCve()==refrigeracion))
 					|| ((isManiobras == true) && (ps.getServicio().getServicioCve()==maniobras))) {
 				precioServicioTemp.add(ps);
-			}*/
-			if(ps.getServicio().getServicioCve()==refrigeracion) {
+			}
+			/*if(ps.getServicio().getServicioCve()==refrigeracion) {
 				isRefrigeracion=true;
 				precioServicioTemp.add(ps);
 			}else if(ps.getServicio().getServicioCve()==conservacion) {
 				isConservacion = true;
 				precioServicioTemp.add(ps);
-			}
+			}else if(ps.getServicio().getServicioCve()==congelacion) {
+				isCongelacion = true;
+				precioServicioTemp.add(ps);
+			}else if(ps.getServicio().getServicioCve()==maniobras) {
+				isManiobras = true;
+				precioServicioTemp.add(ps);
+			}*/
 		}
 		
 		listaServicioUnidad.removeAll(precioServicioTemp);
@@ -691,6 +734,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	public void setValorMercancia(BigDecimal valorMercancia) {
 		this.valorMercancia = valorMercancia;
 	}
+	
+	public Boolean getRespuesta() {
+		return respuesta;
+	}
+
+	public void setRespuesta(Boolean respuesta) {
+		this.respuesta = respuesta;
+	}
 
 	public void calculo() {
 		BigDecimal unidadT = new BigDecimal(cantidadTotal).setScale(2);
@@ -704,6 +755,8 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		//listadoDetallePartida.clear();
 		listadoDetallePartida = new ArrayList<>();
 		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
+		constanciaDeDeposito.setCteCve(clienteSelect);
+		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
 		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
 		
 		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
@@ -730,9 +783,41 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		partida.getDetallePartidaList().add(detallePartida);
 		this.listadoPartida.add(partida);
 		
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro exitosamente"));
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages");
 	}
 	
+	public void saveConstanciaDepositoDetalle(){
+		
+		//---------------- FOLIO ----------------
+		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
+		constanciaDeDeposito.setCteCve(clienteSelect);
+		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
+		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
+		
+		ConstanciaDepositoDetalle constanciaDD = new ConstanciaDepositoDetalle();
+		constanciaDD.setServicioCve(precioServicioSelect.getServicio());
+		constanciaDD.setFolio(constanciaDeDeposito);
+		constanciaDD.setServicioCantidad(cantidadServicio);
+		
+		listadoConstanciaDepositoDetalle.add(constanciaDD);
+		
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Se agrego el registro correctamente"));
+		PrimeFaces.current().ajax().update("form:messages");
+		
+	}
+	
+	public void renderConstanciaDeDeposito(){
+		
+		if(avisoSelect != null ) {
+			if(avisoSelect.getAvisoCaducidad() == false ) {
+				respuesta = false; 
+			}else {
+				respuesta = true;
+			}
+			
+		}
+		
+	}
 
 }
