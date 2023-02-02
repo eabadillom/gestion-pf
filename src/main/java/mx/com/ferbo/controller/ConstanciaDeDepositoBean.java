@@ -103,6 +103,11 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private int congelacion=2,conservacion=32,refrigeracion=33,maniobras=34;
 	private BigDecimal cantidadServicio;
 	private Boolean respuesta;
+	private String temperatura;
+	private BigDecimal metroCamara;
+	private String nombreTransportista;
+	private String placas;
+	private String observacion;
 	
 	private Date fechaCaducidad;
 	private Date fechaIngreso;
@@ -149,10 +154,10 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoServicio = servicioDAO.buscarTodos();
 		listadoPrecioServicio = precioServicioDAO.buscarTodos();
 		
-		isCongelacion=true;
-		isConservacion=true;
-		isRefrigeracion=true;
-		isManiobras=true;
+		isCongelacion=false;
+		isConservacion=false;
+		isRefrigeracion=false;
+		isManiobras=false;
 	}
 
 	//---------- Metodos de listas --------------
@@ -658,33 +663,38 @@ public class ConstanciaDeDepositoBean implements Serializable{
 								:false)
 								.collect(Collectors.toList());
 		//Remover servicios (*)
-		
+		isCongelacion=false;isRefrigeracion=false;isConservacion=false;isManiobras=false;
+		//isRefrigeracion = false;
 		List<PrecioServicio> precioServicioTemp = new ArrayList<PrecioServicio>();
 		precioServicioTemp.clear();
 		for(PrecioServicio ps: listaServicioUnidad) {
-			if(((isCongelacion == true) && (ps.getServicio().getServicioCve()==congelacion)) 
-					|| ((isConservacion == true) && (ps.getServicio().getServicioCve()==conservacion)) 
-					|| ((isRefrigeracion == true) && (ps.getServicio().getServicioCve()==refrigeracion))
-					|| ((isManiobras == true) && (ps.getServicio().getServicioCve()==maniobras))) {
+			if(((ps.getServicio().getServicioCve()==congelacion)) 
+					|| ((ps.getServicio().getServicioCve()==conservacion)) 
+					|| ((ps.getServicio().getServicioCve()==refrigeracion))
+					|| ((ps.getServicio().getServicioCve()==maniobras))) {
+				//isRefrigeracion = true;
 				precioServicioTemp.add(ps);
+				
 			}
-			/*if(ps.getServicio().getServicioCve()==refrigeracion) {
-				isRefrigeracion=true;
-				precioServicioTemp.add(ps);
-			}else if(ps.getServicio().getServicioCve()==conservacion) {
-				isConservacion = true;
-				precioServicioTemp.add(ps);
-			}else if(ps.getServicio().getServicioCve()==congelacion) {
-				isCongelacion = true;
-				precioServicioTemp.add(ps);
-			}else if(ps.getServicio().getServicioCve()==maniobras) {
-				isManiobras = true;
-				precioServicioTemp.add(ps);
-			}*/
+			
 		}
 		
-		listaServicioUnidad.removeAll(precioServicioTemp);
+		if(!(precioServicioTemp.isEmpty())) {
+			for(PrecioServicio pt: precioServicioTemp) {
+				if(pt.getServicio().getServicioCve()==conservacion) {
+					isConservacion=true;
+				}else if(pt.getServicio().getServicioCve()==refrigeracion) {
+					isRefrigeracion=true;
+				}else if(pt.getServicio().getServicioCve()==maniobras) {
+					isManiobras = true;
+				}else if(pt.getServicio().getServicioCve()==congelacion) {
+					isCongelacion = true;
+				}
+			}
+		}
+		//System.out.println("lista de objetos a remover: "+precioServicioTemp);
 		
+		listaServicioUnidad.removeAll(precioServicioTemp);
 		
 	}
 	
@@ -743,6 +753,46 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.respuesta = respuesta;
 	}
 
+	public String getTemperatura() {
+		return temperatura;
+	}
+
+	public void setTemperatura(String temperatura) {
+		this.temperatura = temperatura;
+	}
+
+	public BigDecimal getMetroCamara() {
+		return metroCamara;
+	}
+
+	public void setMetroCamara(BigDecimal metroCamara) {
+		this.metroCamara = metroCamara;
+	}
+	
+	public String getNombreTransportista() {
+		return nombreTransportista;
+	}
+
+	public void setNombreTransportista(String nombreTransportista) {
+		this.nombreTransportista = nombreTransportista;
+	}
+
+	public String getPlacas() {
+		return placas;
+	}
+
+	public void setPlacas(String placas) {
+		this.placas = placas;
+	}
+	
+	public String getObservacion() {
+		return observacion;
+	}
+
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+
 	public void calculo() {
 		BigDecimal unidadT = new BigDecimal(cantidadTotal).setScale(2);
 		BigDecimal tarimas = unidadT.divide(numTarimas,2,RoundingMode.HALF_UP);		
@@ -750,9 +800,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	}
 	
 	public void savePartida(){
-		//partidaSelect.getDetallePartidaList();
 		
-		//listadoDetallePartida.clear();
 		listadoDetallePartida = new ArrayList<>();
 		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
 		constanciaDeDeposito.setCteCve(clienteSelect);
@@ -811,12 +859,44 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		
 		if(avisoSelect != null ) {
 			if(avisoSelect.getAvisoCaducidad() == false ) {
-				respuesta = false; 
+				respuesta = false;
+				this.fechaCaducidad= null;
+				this.pedimento = null;
+				this.contenedor = null;
+				this.otro = null;
+				this.lote = null;
 			}else {
 				respuesta = true;
 			}
 			
 		}
+		
+	}
+	
+	public void limpiar() {
+		productoSelect = new Producto();
+		unidadDeManejoSelect = new UnidadDeManejo();
+		posicionCamaraSelect = new Posicion() ;
+		posicionCamaraSelect = new Posicion();
+		
+		cantidadTotal = 0;
+		pesoTotal = new BigDecimal("0.00").setScale(2);
+		numTarimas = new BigDecimal("0.00").setScale(2);
+		unidadesPorTarima = new BigDecimal("0.00").setScale(2);
+		valorMercancia = new BigDecimal("0.00").setScale(2);
+		pedimento = "";
+		contenedor = "";
+		lote = "";
+		fechaCaducidad = new Date();
+		otro = "";
+		
+		precioServicioSelect = new PrecioServicio();
+		cantidadServicio = new BigDecimal("0.00").setScale(2);
+		temperatura = "";
+		metroCamara = new BigDecimal("0.00").setScale(2);
+		nombreTransportista = "";
+		placas = "";
+		observacion = "";
 		
 	}
 

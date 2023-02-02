@@ -35,7 +35,7 @@
 							<p:selectOneMenu id="aviso" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.avisoSelect}">
 								<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{constanciaDeDepositoBean.avisoPorCliente}" var="aviso" itemLabel="#{aviso.avisoObservaciones}" itemValue="#{aviso}"/>
-								<f:ajax render="cont-fecha" listener="#{constanciaDeDepositoBean.renderConstanciaDeDeposito()}"/>				
+								<f:ajax render="cont-fecha cont-pedimento cont-contenedor cont-otro cont-lote" listener="#{constanciaDeDepositoBean.renderConstanciaDeDeposito()}"/>				
 							</p:selectOneMenu>
 													
 							<p:outputLabel for="planta" value="Planta:" styleClass="p-ml-6 p-mr-2"/>
@@ -69,13 +69,12 @@
 						</div>  
 						
 						
-						<p:toolbar styleClass="p-mb-4">
+						<p:toolbar styleClass="p-mb-4" id="seleccion-mercancia">
 							<div class="card">
 								<div class="">								
 									<p:toolbarGroup>
-										<div>
-										
-											<p:outputLabel value="Clave|Producto:" styleClass="p-ml-6 p-mr-2"/>
+									
+											<p:outputLabel value="Clave|Producto:" styleClass="p-mr-2"/>
 											<p:selectOneMenu id="claveProducto" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.productoSelect}">
 												<f:selectItem itemLabel="Selecciona Producto" itemValue="" noSelectionOption="true"></f:selectItem>
 												<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto}" />
@@ -101,11 +100,10 @@
 												<p:ajax update="@this" />
 											</p:inputNumber>
 										
-										</div>
 										
 										<div style="margin-top: 5px;" >
 											
-											<p:outputLabel value="Peso Total:" styleClass="p-ml-6 p-mr-2"/>								
+											<p:outputLabel value="Peso Total:" styleClass="p-mr-2"/>								
 											<p:inputNumber id="pesoTotal" value="#{constanciaDeDepositoBean.pesoTotal}" >
 												<p:ajax update="@this"/>
 											</p:inputNumber>
@@ -126,44 +124,53 @@
 											</p:inputNumber>
 										</div>
 										
-										<div id="dat" style="margin-top: 5px">
-									
-											<p:outputLabel value="Pedimento:" styleClass="p-mr-2"/>
-											<p:inputText maxlength="13" value="#{constanciaDeDepositoBean.pedimento}" >
-												<p:ajax update="@this" />
-											</p:inputText>
-											
-											<p:outputLabel value="Contenedor:" styleClass="p-ml-6 p-mr-2" />
-											<p:inputText maxlength="20" value="#{constanciaDeDepositoBean.contenedor}">
-												<p:ajax update="@this" />
-											</p:inputText>
-											
-											
-											<p:outputLabel value="Lote:" styleClass="p-ml-6 p-mr-2" />
-											<p:inputText maxlength="20" value="#{constanciaDeDepositoBean.lote}">
-												<p:ajax update="@this" />
-											</p:inputText>
-											
-											<p:outputPanel id="cont-fecha">
-											<p:outputLabel value="Caducidad:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
-												<p:datePicker id="fechaCaducidad" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Caducidad" value="#{constanciaDeDepositoBean.fechaCaducidad}" >
-													<p:ajax update="@this cont-fecha" />
-												</p:datePicker>									
-											</p:outputLabel>
-											</p:outputPanel>
-											<p:outputLabel value="Otro:" styleClass="p-ml-6 p-mr-2" />
-											<p:inputText maxlength="12" value="#{constanciaDeDepositoBean.otro}">
-												<p:ajax update="@this" />
-											</p:inputText>
-											
-										</div>
 										
+											<p:outputPanel id="cont-pedimento" styleClass="p-mt-2">
+												<p:outputLabel value="Pedimento:" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+												<p:inputText maxlength="13" value="#{constanciaDeDepositoBean.pedimento}" styleClass="p-ml-2">
+													<p:ajax update="@this" />
+												</p:inputText>
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<p:outputPanel id="cont-contenedor" styleClass="p-mt-2">
+												<p:outputLabel value="Contenedor:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+													<p:inputText maxlength="20" value="#{constanciaDeDepositoBean.contenedor}" styleClass="p-ml-2">
+														<p:ajax update="@this" />
+													</p:inputText>
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<p:outputPanel id="cont-lote" styleClass="p-mt-2">
+												<p:outputLabel value="Lote:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+													<p:inputText maxlength="20" value="#{constanciaDeDepositoBean.lote}" styleClass="p-ml-2">
+														<p:ajax update="@this" />
+													</p:inputText>
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<p:outputPanel id="cont-fecha" styleClass="p-mt-2">
+												<p:outputLabel value="Caducidad:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+													<p:datePicker id="fechaCaducidad" showIcon="true" placeholder="Fecha de Caducidad" value="#{constanciaDeDepositoBean.fechaCaducidad}" styleClass="p-ml-2">
+														<p:ajax update="@this" />
+													</p:datePicker>									
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<p:outputPanel id="cont-otro" styleClass="p-mt-2">
+												<p:outputLabel value="Otro:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+													<p:inputText maxlength="12" value="#{constanciaDeDepositoBean.otro}" styleClass="p-ml-2">
+														<p:ajax update="@this" />
+													</p:inputText>
+												</p:outputLabel>
+											</p:outputPanel>
+											
 									</p:toolbarGroup>
 								</div>
 							</div>
-							<p:toolbarGroup>
-										<p:commandButton value="Añadir" actionListener="#{constanciaDeDepositoBean.savePartida()}" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="form:dt-partidas"/>
-										<p:commandButton value="Borrar" styleClass="ui-button-danger" icon="pi pi-trash"/>
+							<p:toolbarGroup styleClass="p-mt-4">
+										<p:commandButton value="Agregar" actionListener="#{constanciaDeDepositoBean.savePartida()}" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="form:dt-partidas"/>
+										<p:commandButton value="Eliminar" styleClass="ui-button-danger" icon="pi pi-trash"/>
 							</p:toolbarGroup>
 						</p:toolbar> 
 						
@@ -242,7 +249,6 @@
 						</div>
 						
 						<div style="text-align: center;margin-top: 5px">
-						
 							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{constanciaDeDepositoBean.isCongelacion}">
 								<p:ajax update="@this" />
 							</p:selectBooleanCheckbox>
@@ -255,12 +261,9 @@
 							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{constanciaDeDepositoBean.isManiobras}">
 								<p:ajax update="@this"/>
 							</p:selectBooleanCheckbox>
-				
-						
 						</div>
 						
-						<div style="margin-top: 5px">
-						
+						<p:outputPanel  styleClass="p-mt-2" id="seleccion-producto">
 							<p:outputLabel value="Servicios:" styleClass="p-mr-2"/>
 							<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.precioServicioSelect}" >
 								<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
@@ -276,10 +279,10 @@
 						
 							
 							<div style="text-align: right;">
-							<p:commandButton value="Añadir" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" style="margin-right: .5rem" icon="pi pi-plus" update="@this dt-constanciaDD"/>
-							<p:commandButton value="Borrar" styleClass="ui-button-danger" icon="pi pi-trash" />
+							<p:commandButton value="Agregar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" style="margin-right: .5rem" icon="pi pi-plus" update="@this dt-constanciaDD"/>
+							<p:commandButton value="Eliminar" styleClass="ui-button-danger" icon="pi pi-trash" />
 							</div>
-						</div>
+						</p:outputPanel>
 						
 						<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" rows="10" value="#{constanciaDeDepositoBean.listadoConstanciaDepositoDetalle}" 
 									rowSelectMode="add"	var="constanciaDD" paginator="true" paginatorPosition="bottom" reflow="true">
@@ -302,6 +305,43 @@
 								<h:outputText value="#{constanciaDD.servicioCantidad}" />
 							</p:column>
 						</p:dataTable>
+						
+						
+						<p:outputPanel styleClass="p-mt-4" id="datos-adicionales">
+							<p:outputLabel value="Temperatura De La Mercancia:" styleClass="p-mr-2" />
+							<p:spinner stepFactor=".01" value="#{constanciaDeDepositoBean.temperatura}" >
+								<p:ajax update="@this" />
+							</p:spinner>
+							
+							
+							<p:outputLabel styleClass="p-ml-6 p-mr-2" >m<sup>2</sup> Por Camara:</p:outputLabel>	
+							<p:inputNumber value="#{constanciaDeDepositoBean.metroCamara}" >
+								<p:ajax update="@this" />
+							</p:inputNumber>
+							
+							<p:outputLabel styleClass="p-ml-6 p-mr-2" value="Nombre Transportista:"/>
+							<p:inputText value="#{constanciaDeDepositoBean.nombreTransportista}" >
+								<p:ajax update="@this" />
+							</p:inputText>
+							
+							<p:outputLabel styleClass="p-ml-6 p-mr-2" value="Placas Del Vehiculo:"/>
+							<p:inputText value="#{constanciaDeDepositoBean.placas}" >
+								<p:ajax update="@this" />
+							</p:inputText>
+							
+							<div style="margin-top: 5px;text-align: center;">
+							<p:outputLabel styleClass="p-ml-6 p-mr-2 p-mt-2" value="Observaciones:" />
+							<p:inputTextarea value="#{constanciaDeDepositoBean.observacion}" autoResize="true">
+								<p:ajax update="@this" />
+							</p:inputTextarea>
+							</div>
+							<div style="margin-top: 5px">
+								<p:commandButton value="Guardar" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-save"/>
+								<p:commandButton value="Limpiar" class="ui-button-warning" actionListener="#{constanciaDeDepositoBean.limpiar()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales"/>
+								<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary"/>
+							</div>
+													
+						</p:outputPanel>
 						
 			<!-- Dialogo cambiar No. Constancia -->
 						<p:dialog header="No. Constancia" showEffect="hide" modal="true" widgetVar="NoCambiarDialog" responsive="true" style="text-align:center">
