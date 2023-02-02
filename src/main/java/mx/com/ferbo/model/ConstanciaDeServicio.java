@@ -43,6 +43,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaDeServicio.findByObservaciones", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.observaciones = :observaciones"),
     @NamedQuery(name = "ConstanciaDeServicio.findByFolioCliente", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.folioCliente = :folioCliente"),
     @NamedQuery(name = "ConstanciaDeServicio.findByValorDeclarado", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.valorDeclarado = :valorDeclarado")})
+
 public class ConstanciaDeServicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -96,6 +97,8 @@ public class ConstanciaDeServicio implements Serializable {
     @OneToMany(mappedBy = "constanciaDeServicio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
 
+    
+    
     public ConstanciaDeServicio() {
     }
 

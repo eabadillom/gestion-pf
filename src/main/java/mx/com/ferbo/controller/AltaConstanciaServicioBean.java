@@ -1,7 +1,12 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
@@ -16,6 +22,11 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonActionListener;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
@@ -35,23 +46,33 @@ import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
+import net.bytebuddy.implementation.Implementation.Context.Disabled;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Named
+@ManagedBean(value = "ejemplo1")
 @ViewScoped
 public class AltaConstanciaServicioBean implements Serializable {
 
 	private static final long serialVersionUID = -3109002730694247052L;
-	
+
 	private static Logger log = Logger.getLogger(AltaConstanciaServicioBean.class);
-	
+
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;
 	private List<ConstanciaServicioDetalle> alServiciosDetalle;
 	private List<PrecioServicio> alServicios;
-	
+
 	private List<ProductoPorCliente> alProductosFiltered;
 	private List<UnidadDeManejo> alUnidades;
-	
+
 	private Date fecha;
 	private String folio;
 	private Integer cantidad;
@@ -64,22 +85,20 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private String placasVehiculo;
 	private Cliente selCliente;
 	private Integer idCliente;
+	private String folioCliente;
+	private String unidadcobro;
 	private UnidadDeManejo selUnidadManejo;
 	private Integer idPrecioServicio;
 	private BigDecimal cantidadServicio;
-	
 	private ClienteDAO clienteDAO;
 	private UnidadDeManejoDAO udmDAO;
 	private ConstanciaServicioDAO csDAO;
 	private EstadoConstanciaDAO edoDAO;
-	
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
 	private boolean isSaved = false;
 	private List<EstadoConstancia> estados = null;
-	
-	
-	
+
 	public AltaConstanciaServicioBean() {
 		log.info("Entrando al constructor del controller...");
 		clientes = new ArrayList<Cliente>();
@@ -94,20 +113,20 @@ public class AltaConstanciaServicioBean implements Serializable {
 		edoDAO = new EstadoConstanciaDAO();
 		selCliente = new Cliente();
 	}
-	
+
 	@PostConstruct
 	public void init() {
 		log.info("Entrando a Init...");
 		clientes = clienteDAO.buscarTodos();
 		fecha = new Date();
 		alUnidades = udmDAO.buscarTodos();
-		if(alProductosFiltered == null)
+		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		estados = edoDAO.buscarTodos();
 	}
-	
+
 	public void filtrarCliente() {
-		
+
 		String message = null;
 		Severity severity = null;
 		EntityManager manager = null;
@@ -117,137 +136,143 @@ public class AltaConstanciaServicioBean implements Serializable {
 		selCliente.setCteCve(this.idCliente);
 		try {
 			log.info("Entrando a filtrar cliente...");
-			//selCliente = clientes.stream()
+			// selCliente = clientes.stream()
 			manager = EntityManagerUtil.getEntityManager();
-			cliente = manager.createNamedQuery("Cliente.findByCteCve", Cliente.class).setParameter("cteCve", this.idCliente).getSingleResult();
-			log.info("Productos cargados: "+ cliente.getProductoPorClienteList().size());
+			cliente = manager.createNamedQuery("Cliente.findByCteCve", Cliente.class)
+					.setParameter("cteCve", this.idCliente).getSingleResult();
+			log.info("Productos cargados: " + cliente.getProductoPorClienteList().size());
 			alProductosFiltered.clear();
 			alProductosFiltered.addAll(cliente.getProductoPorClienteList());
-			for(ProductoPorCliente ppc : alProductosFiltered) {
-				log.info("Producto: "+ ppc.getProductoCve()); 
+			for (ProductoPorCliente ppc : alProductosFiltered) {
+				log.info("Producto: " + ppc.getProductoCve());
 			}
 			precioServicioList = cliente.getPrecioServicioList();
 			Integer idAviso = new Integer(-1);
-			for(PrecioServicio ps : precioServicioList) {
+			for (PrecioServicio ps : precioServicioList) {
 				Integer avisoCve = ps.getAvisoCve().getAvisoCve();
-				if(avisoCve > idAviso)
+				if (avisoCve > idAviso)
 					idAviso = new Integer(avisoCve);
 				List<PrecioServicio> list = mpPrecioServicio.get(avisoCve);
-				if(list == null) {
+				if (list == null) {
 					list = new ArrayList<PrecioServicio>();
 					mpPrecioServicio.put(avisoCve, list);
-				}list.add(ps);
+				}
+				list.add(ps);
 			}
-			mpPrecioServicio.get(idAviso);			
+			mpPrecioServicio.get(idAviso);
 			alServicios.clear();
 			alServicios = mpPrecioServicio.get(idAviso);
-			for(PrecioServicio ps : alServicios) {
+			for (PrecioServicio ps : alServicios) {
 				log.info(ps.getServicio().getServicioDs());
 				log.info(ps.getUnidad().getUnidadDeManejoDs());
 			}
 			message = "Agregue sus productos y servicios.";
 			severity = FacesMessage.SEVERITY_INFO;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			if(manager != null)
+			if (manager != null)
 				manager.close();
-			FacesContext.getCurrentInstance().addMessage(null,  new FacesMessage(severity, "Cliente", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-partidas");
 		}
 		log.info("Productos y/o servicios del cliente filtrados.");
 	}
-	
+
 	public void agregarProducto() {
 		String message = null;
 		Severity severity = null;
 		try {
 			log.info("AGREGANDO PRODUCTO...");
-			
-			if(this.idCliente == null || this.idCliente == 0)
+
+			if (this.idCliente == null || this.idCliente == 0)
 				throw new InventarioException("Debe seleccionar el cliente");
-			
-			if(this.cantidad == null || this.cantidad <= 0)
+
+			if (this.cantidad == null || this.cantidad <= 0)
 				throw new InventarioException("Debe indicar la cantidad de piezas");
-			
-			if(this.peso == null || this.peso.compareTo(BigDecimal.ZERO) <= 0)
+
+			if (this.peso == null || this.peso.compareTo(BigDecimal.ZERO) <= 0)
 				throw new InventarioException("Debe indicar el peso del producto.");
-			
-			if(this.idUnidadManejo == null)
+
+			if (this.idUnidadManejo == null)
 				throw new InventarioException("Debe seleccionar una unidad de manejo");
-			
-			if(this.idProducto == null)
+
+			if (this.idProducto == null)
 				throw new InventarioException("Debe seleccionar un producto");
-			
-			if(alPartidas == null)
-				alPartidas = new ArrayList<PartidaServicio>();	
-				
-				UnidadDeManejo udm = alUnidades.stream().filter(u -> this.idUnidadManejo == u.getUnidadDeManejoCve()).collect(Collectors.toList()).get(0);
-			
-			if(udm == null)
+
+			if (alPartidas == null)
+				alPartidas = new ArrayList<PartidaServicio>();
+
+			UnidadDeManejo udm = alUnidades.stream().filter(u -> this.idUnidadManejo == u.getUnidadDeManejoCve())
+					.collect(Collectors.toList()).get(0);
+
+			if (udm == null)
 				throw new InventarioException("Debe seleccionar una unidad de producto.");
-				ProductoPorCliente prd = alProductosFiltered.stream().filter(p -> this.idProducto.equals(p.getProductoCve().getProductoCve())).collect(Collectors.toList()).get(0);
-				
-			if(prd == null)
+			ProductoPorCliente prd = alProductosFiltered.stream()
+					.filter(p -> this.idProducto.equals(p.getProductoCve().getProductoCve()))
+					.collect(Collectors.toList()).get(0);
+
+			if (prd == null)
 				throw new InventarioException("Debe seleccionar un producto.");
-				Producto p = prd.getProductoCve();
-				PartidaServicio partida = new PartidaServicio();
-				partida.setCantidadDeCobro(this.peso);
-				partida.setCantidadTotal(this.cantidad);
-				partida.setUnidadDeCobro(udm);
-				partida.setUnidadDeManejoCve(udm);
-				partida.setProductoCve(p);
-				alPartidas.add(partida);
-				message = "Producto agregado correctamente.";
-				severity = FacesMessage.SEVERITY_INFO;
-		} catch(InventarioException ex) {
+			Producto p = prd.getProductoCve();
+			PartidaServicio partida = new PartidaServicio();
+			partida.setCantidadDeCobro(this.peso);
+			partida.setCantidadTotal(this.cantidad);
+			partida.setUnidadDeCobro(udm);
+			partida.setUnidadDeManejoCve(udm);
+			partida.setProductoCve(p);
+			alPartidas.add(partida);
+			message = "Producto agregado correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener la informaciòn de los productos...", ex);
 			message = "Problema al agregar sus productos.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar producto", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:form:dt-partidas");
-		}	
+		}
 		log.info("Id Producto: " + this.idProducto);
 	}
-	
+
 	public void agregarServicio() {
 		String message = null;
-		Severity severity = null;		
+		Severity severity = null;
 		PrecioServicio precioServicio = null;
 		ConstanciaServicioDetalle servicio = null;
-		
+
 		try {
-			if(this.idCliente == null || this.idCliente == 0)
+			if (this.idCliente == null || this.idCliente == 0)
 				throw new InventarioException("Debe seleccionar el cliente");
-			
-			if(this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0 )
+
+			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
 				throw new InventarioException("Debe indicar la cantidad de servicios.");
-			
-			if(this.idPrecioServicio == null)
+
+			if (this.idPrecioServicio == null)
 				throw new InventarioException("Debe seleccionar un servicio.");
-			
-			precioServicio = this.alServicios.stream().filter(ps -> this.idPrecioServicio.equals(ps.getId())).collect(Collectors.toList()).get(0);
-			if(alServiciosDetalle == null)
-				alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();	
-			
+
+			precioServicio = this.alServicios.stream().filter(ps -> this.idPrecioServicio.equals(ps.getId()))
+					.collect(Collectors.toList()).get(0);
+			if (alServiciosDetalle == null)
+				alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
+
 			servicio = new ConstanciaServicioDetalle();
 			servicio.setServicioCantidad(this.cantidadServicio);
 			servicio.setServicioCve(precioServicio.getServicio());
 			alServiciosDetalle.add(servicio);
 			message = "Producto agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-		} catch(InventarioException ex) {
+		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de servicios del cliente.", ex);
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
@@ -256,64 +281,62 @@ public class AltaConstanciaServicioBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		}
 	}
-	
+
 	public synchronized void guardar() {
 		String message = null;
-		Severity severity = null;
-		
+		Severity severity = null;		
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
 		EstadoConstancia estado = null;
-		
+
 		try {
-			if(this.isSaved)
+			if (this.isSaved)
 				throw new InventarioException("La constancia ya se encuentra registrada.");
-			
-			if(this.folio == null || "".equalsIgnoreCase(this.folio.trim()))
+
+			if (this.folio == null || "".equalsIgnoreCase(this.folio.trim()))
 				throw new InventarioException("Debe indicar el folio de la constancia.");
-			
-			if(this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
+
+			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
 				throw new InventarioException("Debe seleccionar al menos un servicio");
-			
+
 			alConstancias = csDAO.buscarPorFolioCliente(this.folio);
-			
-			if(alConstancias != null && alConstancias.size() > 0)
+
+			if (alConstancias != null && alConstancias.size() > 0)
 				throw new InventarioException(String.format("El folio %s ya se encuentra registrado.", this.folio));
-			
+
 			estado = estados.stream().filter(e -> e.getEdoCve() == 1).collect(Collectors.toList()).get(0);
-			
 			constancia = new ConstanciaDeServicio();
+			constancia.setFecha(this.fecha);
 			constancia.setFolioCliente(this.folio);
 			constancia.setCteCve(this.selCliente);
-			constancia.setFecha(this.fecha);
 			constancia.setObservaciones(this.observaciones);
+			constancia.setValorDeclarado(this.valorDeclarado);
 			constancia.setNombreTransportista(this.nombreTransportista);
 			constancia.setPlacasTransporte(this.placasVehiculo);
 			constancia.setPartidaServicioList(this.alPartidas);
 			constancia.setConstanciaServicioDetalleList(this.alServiciosDetalle);
 			constancia.setStatus(estado);
-			
-			for(PartidaServicio partida : this.alPartidas) {
+			for (PartidaServicio partida : this.alPartidas) {
 				partida.setFolio(constancia);
 			}
-			
-			for(ConstanciaServicioDetalle servicio : this.alServiciosDetalle) {
+
+			for (ConstanciaServicioDetalle servicio : this.alServiciosDetalle) {
 				servicio.setFolio(constancia);
 			}
-			
+
 			csDAO.actualizar(constancia);
-			
 			this.isSaved = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
-		} catch(InventarioException ex) {
+			
+			
+		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de servicios del cliente.", ex);
 			ex.printStackTrace();
-
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
@@ -321,54 +344,124 @@ public class AltaConstanciaServicioBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		}
 	}
-	
+
+	public void jasper() throws JRException, IOException, SQLException {
+		
+		String jasperPath = "/jasper/ejemplo1.jasper";
+		String filename = "Constancia_de_servicio.pdf";
+		//String jasperPath ="/resources/ejemplo1.jrxml";
+		ConstanciaDeServicio constancia = null;
+		List<ConstanciaDeServicio> alConstancias = null;
+		alConstancias = csDAO.buscarPorFolioCliente(this.folio);
+		 File reportFile = new File(jasperPath);
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		ConstanciaDeServicio cds = new ConstanciaDeServicio();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		
+		try {
+			if (this.folio == null || "".equalsIgnoreCase(this.folio.trim()))
+				throw new InventarioException("Debe indicar el folio de la constancia.");
+
+			URL resource = getClass().getResource(jasperPath);
+			String file = resource.getFile();
+			reportFile = new File(file);
+			log.info(reportFile.getPath());
+			constancia = new ConstanciaDeServicio();
+			constancia.setFolioCliente(this.folio);
+			folio = String.valueOf(getFolioCliente());
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("FOLIO", folio);
+			log.info("Parametros: " + parameters.toString());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			
+		} catch (Exception ex) {
+			ex.fillInStackTrace();
+			log.error("Problema general...", ex);
+		} finally {
+			conexion.close((Connection) connection);
+		}
+	}
+
+
+	public String getFolioCliente() {
+		return folioCliente;
+	}
+
+	public void setFolioCliente(String folioCliente) {
+		this.folioCliente = folioCliente;
+	}
+
+	public String getUnidadcobro() {
+		return unidadcobro;
+	}
+
+	public void setUnidadcobro(String unidadcobro) {
+		this.unidadcobro = unidadcobro;
+	}
+
 	public void deletePartida(PartidaServicio partida) {
 		this.alPartidas.remove(partida);
 	}
-	
+
 	public void deleteServicio(ConstanciaServicioDetalle servicio) {
 		this.alServiciosDetalle.remove(servicio);
 	}
-	
+
 	public Cliente getSelCliente() {
 		return selCliente;
 	}
+
 	public void setSelCliente(Cliente selCliente) {
 		this.selCliente = selCliente;
 	}
+
 	public Date getFecha() {
 		return fecha;
 	}
+
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
+
 	public String getFolio() {
 		return folio;
 	}
+
 	public void setFolio(String folio) {
 		this.folio = folio;
 	}
+
 	public BigDecimal getValorDeclarado() {
 		return valorDeclarado;
 	}
+
 	public void setValorDeclarado(BigDecimal valorDeclarado) {
 		this.valorDeclarado = valorDeclarado;
 	}
+
 	public String getObservaciones() {
 		return observaciones;
 	}
+
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
 	}
+
 	public String getNombreTransportista() {
 		return nombreTransportista;
 	}
+
 	public void setNombreTransportista(String nombreTransportista) {
 		this.nombreTransportista = nombreTransportista;
 	}
+
 	public String getPlacasVehiculo() {
 		return placasVehiculo;
 	}
+
 	public void setPlacasVehiculo(String placasVehiculo) {
 		this.placasVehiculo = placasVehiculo;
 	}
@@ -500,4 +593,5 @@ public class AltaConstanciaServicioBean implements Serializable {
 	public void setCantidadServicio(BigDecimal cantidadServicio) {
 		this.cantidadServicio = cantidadServicio;
 	}
+
 }

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ejemplo1" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fcaa7500-ce1f-4ca0-9768-460b64cc8f6d">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.jrdax"/>
+	<property name="com.jaspersoft.studio.data.sql.tables">
+		<![CDATA[Z2VzdGlvbmRiLmBQUk9EVUNUT2AgLDc5NiwzNDYsNjI4ZjRmY2UtZWYwOS00MWVhLTg3ZWYtMzFl
+NmE3Y2IwMmQyO2dlc3Rpb25kYi5gQ0xJRU5URWAgLDI2Miw0MyxhODBmNmIzOC0zMDNiLTRlMTAt
+OWJjOS0yODgzOGUxODNlY2I7Z2VzdGlvbmRiLmBVTklEQURfREVfTUFORUpPYCAsNTI5LDMwMyw2
+MjBhOWQ1Zi1hOGQzLTRiMTctYjZjZi01MTJiNzBkYWUwODE7Z2VzdGlvbmRiLmBDT05TVEFOQ0lB
+X0RFX1NFUlZJQ0lPYCAsMTUsMTUsMjExMjhjYWItMzU0Yy00NjU4LThmOTYtYmI5M2RmYmEwNzJj
+O2dlc3Rpb25kYi5gUEFSVElEQV9TRVJWSUNJT2AgLDI2MiwzMDQsNjk4ZGZkM2EtZGVhMC00ODQ0
+LWE2MTYtODA2M2YyZmRkMzYwOw==]]>
+	</property>
+	<parameter name="FOLIO" class="java.lang.String">
+		<parameterDescription><![CDATA[FOLIO DE LA CONSTANCIA DE SERVICIO]]></parameterDescription>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT cs.`FOLIO_CLIENTE`,
+	cs.`FECHA`,
+	cs.`PLACAS_TRANSPORTE`,
+	cs.`NOMBRE_TRANSPORTISTA`,
+	ps.`CANTIDAD_DE_COBRO`,
+	cs.`OBSERVACIONES`,
+	cs.`VALOR_DECLARADO`,
+	ps.`CANTIDAD_TOTAL`,
+	gestiondb.`CLIENTE`.`CTE_NOMBRE`,
+	gestiondb.`UNIDAD_DE_MANEJO`.`UNIDAD_DE_MANEJO_DS`,
+	gestiondb.`PRODUCTO`.`PRODUCTO_DS`
+FROM gestiondb.`CONSTANCIA_DE_SERVICIO` cs
+	left outer join gestiondb.`PARTIDA_SERVICIO` ps ON 
+	 cs.`FOLIO` = ps.`FOLIO` 
+	INNER JOIN gestiondb.`CLIENTE` ON 
+	 cs.`CTE_CVE` = gestiondb.`CLIENTE`.`CTE_CVE` 
+	 AND cs.`CTE_CVE` = gestiondb.`CLIENTE`.`CTE_CVE` 
+	INNER JOIN gestiondb.`UNIDAD_DE_MANEJO` ON 
+	 ps.`UNIDAD_DE_COBRO` = gestiondb.`UNIDAD_DE_MANEJO`.`UNIDAD_DE_MANEJO_CVE` 
+	 AND ps.`UNIDAD_DE_MANEJO_CVE` = gestiondb.`UNIDAD_DE_MANEJO`.`UNIDAD_DE_MANEJO_CVE` 
+	 AND ps.`UNIDAD_DE_COBRO` = gestiondb.`UNIDAD_DE_MANEJO`.`UNIDAD_DE_MANEJO_CVE` 
+	 AND ps.`UNIDAD_DE_MANEJO_CVE` = gestiondb.`UNIDAD_DE_MANEJO`.`UNIDAD_DE_MANEJO_CVE` 
+	INNER JOIN gestiondb.`PRODUCTO` ON 
+	 ps.`PRODUCTO_CVE` = gestiondb.`PRODUCTO`.`PRODUCTO_CVE` 
+	 AND ps.`PRODUCTO_CVE` = gestiondb.`PRODUCTO`.`PRODUCTO_CVE` 
+WHERE 
+	 cs.`FOLIO_CLIENTE` = $P{FOLIO}]]>
+	</queryString>
+	<field name="FOLIO_CLIENTE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FOLIO_CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.label" value="FOLIO_CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+	</field>
+	<field name="FECHA" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="FECHA"/>
+		<property name="com.jaspersoft.studio.field.label" value="FECHA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+	</field>
+	<field name="PLACAS_TRANSPORTE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PLACAS_TRANSPORTE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PLACAS_TRANSPORTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+	</field>
+	<field name="NOMBRE_TRANSPORTISTA" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NOMBRE_TRANSPORTISTA"/>
+		<property name="com.jaspersoft.studio.field.label" value="NOMBRE_TRANSPORTISTA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+	</field>
+	<field name="CANTIDAD_DE_COBRO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD_DE_COBRO"/>
+		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD_DE_COBRO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA_SERVICIO"/>
+	</field>
+	<field name="OBSERVACIONES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OBSERVACIONES"/>
+		<property name="com.jaspersoft.studio.field.label" value="OBSERVACIONES"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+	</field>
+	<field name="VALOR_DECLARADO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="VALOR_DECLARADO"/>
+		<property name="com.jaspersoft.studio.field.label" value="VALOR_DECLARADO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+	</field>
+	<field name="CANTIDAD_TOTAL" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD_TOTAL"/>
+		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD_TOTAL"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA_SERVICIO"/>
+	</field>
+	<field name="CTE_NOMBRE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CTE_NOMBRE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+	</field>
+	<field name="UNIDAD_DE_MANEJO_DS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UNIDAD_DE_MANEJO_DS"/>
+		<property name="com.jaspersoft.studio.field.label" value="UNIDAD_DE_MANEJO_DS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
+	</field>
+	<field name="PRODUCTO_DS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PRODUCTO_DS"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRODUCTO_DS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PRODUCTO"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="95" splitType="Stretch">
+			<textField>
+				<reportElement x="71" y="42" width="100" height="30" uuid="8d084936-6e2f-44bf-acc2-28254f95736e"/>
+				<textFieldExpression><![CDATA[$F{FECHA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="40" width="100" height="30" uuid="6f61e3ea-ef2e-4325-bad0-f9b1bf2d9dcb"/>
+				<textFieldExpression><![CDATA[$F{FOLIO_CLIENTE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="50" height="30" uuid="c023f513-c234-4846-837c-52b2090240c3"/>
+				<textFieldExpression><![CDATA[$F{CTE_NOMBRE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="50" height="30" uuid="c9b427d7-4718-40f1-bf30-8c61d04c72f6"/>
+				<textFieldExpression><![CDATA[$F{PRODUCTO_DS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="3" width="100" height="30" uuid="4c1fc0d9-4b3e-49dc-b6fd-fc1a26765ea4"/>
+				<textFieldExpression><![CDATA[$F{CANTIDAD_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="2" width="100" height="30" uuid="99ac77f9-05ce-45e8-bec3-dbc638d7de28"/>
+				<textFieldExpression><![CDATA[$F{CANTIDAD_DE_COBRO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="44" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="55" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="30" uuid="185a9087-ac4c-4158-9127-cf40c7b2447c"/>
+				<textFieldExpression><![CDATA[$F{VALOR_DECLARADO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="25" width="100" height="30" uuid="2dc28017-4dc1-4c4a-b147-07bf7096671f"/>
+				<textFieldExpression><![CDATA[$F{NOMBRE_TRANSPORTISTA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="75" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="10" width="100" height="30" uuid="84dd7aac-1f54-4fbf-a296-8abfdcc2b4c1"/>
+				<textFieldExpression><![CDATA[$F{PLACAS_TRANSPORTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="40" width="100" height="30" uuid="2c9bb1b1-e730-44ea-8a1b-210d71343653"/>
+				<textFieldExpression><![CDATA[$F{OBSERVACIONES}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="50" splitType="Stretch"/>
+	</summary>
+</jasperReport>

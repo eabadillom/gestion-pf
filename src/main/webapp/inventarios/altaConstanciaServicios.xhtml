@@ -5,7 +5,6 @@
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
 	<ui:define name="title">Alta Constancia de Servicio</ui:define>
-
 	<ui:define name="content">
 		<h:form id="form">
 			<p:breadCrumb>
@@ -61,26 +60,25 @@
 	 <h5></h5>
 	 
         <p:fieldset legend="Servicios">
-        	<p:toolbar>
-				<p:toolbarGroup>	
-					<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaConstanciaServicioBean.idPrecioServicio}" filterMatchMode="startsWith">
-						<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
-						<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}"
-							itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
-					</p:selectOneMenu>
-					<p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/>
-				</p:toolbarGroup>
-				
-				<p:toolbarGroup>	
-						<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.agregarServicio}" update="dt-servicios"/>
-				</p:toolbarGroup>
-			</p:toolbar>
 
+			<p:panel>	
+				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaConstanciaServicioBean.idPrecioServicio}" filterMatchMode="startsWith">
+					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
+					<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}"
+						itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
+				</p:selectOneMenu>
+				<p:column><p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/></p:column>
+				<p:column>
+				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.agregarServicio}" update="dt-servicios"/>
+				</p:column>
+				</p:panel>
+
+			
+			
 			<p:dataTable id="dt-servicios"	var="servicio" selection="#{altaConstanciaServicioBean.selServicio}" value="#{altaConstanciaServicioBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" 
 							scrollRows="2" reflow="true">	
 				<p:column headerText="Servicio seleccionado" width="8em"><h:outputText value="#{servicio.servicioCve.servicioDs}" /></p:column>
 				<p:column headerText="Cantidad" width="10em"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
-				
 				<p:column width="8em">
 					<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.deleteServicio(servicio)}" update="dt-servicios"/>
 				</p:column>
@@ -94,10 +92,13 @@
 				   	<p:panel><p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." /></p:panel>
 					<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." style="width: 30em;"/>
 				</p:fieldset>
+
+				<p:panel>
+				<p:commandButton id="guardacon" value="Guardar" icon="pi pi-save" actionListener="#{altaConstanciaServicioBean.guardar}" />
+				<h5></h5>
+				<p:commandButton id="generarep" value="Generar reporte" icon="pi pi-file-pdf" disabled="true" actionListener="#{altaConstanciaServicioBean.jasper}" ajax="false" process="@this"/>
+				</p:panel>
 				
-				<p:toolbar>
-				<p:toolbarGroup><p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{altaConstanciaServicioBean.guardar}"/></p:toolbarGroup>
-			</p:toolbar>
 		</h:form>
 	</ui:define>
 </ui:composition>
