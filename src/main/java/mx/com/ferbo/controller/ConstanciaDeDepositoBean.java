@@ -20,6 +20,8 @@ import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
+import mx.com.ferbo.dao.ConstanciaDepositoDetalleDAO;
+import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PosicionCamaraDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
@@ -27,12 +29,14 @@ import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
+import mx.com.ferbo.dao.UnidadDeProductoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
+import mx.com.ferbo.model.DetallePartidaPK;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Posicion;
@@ -61,6 +65,9 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private PosicionCamaraDAO posicionCamaraDAO;
 	private ServicioDAO servicioDAO;	
 	private PrecioServicioDAO precioServicioDAO;
+	private PartidaDAO partidaDAO;
+	private UnidadDeProductoDAO unidadDeProductoDAO;
+	private ConstanciaDepositoDetalleDAO constanciaDepositoDAO;
 	
 	private List<Cliente> listadoCliente;
 	private List<Planta> listadoPlanta;
@@ -125,6 +132,9 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		posicionCamaraDAO = new PosicionCamaraDAO();
 		servicioDAO = new ServicioDAO();
 		precioServicioDAO = new PrecioServicioDAO();//
+		partidaDAO = new PartidaDAO();
+		unidadDeProductoDAO = new UnidadDeProductoDAO();
+		constanciaDepositoDAO = new ConstanciaDepositoDetalleDAO();
 		
 		listadoPlanta = new ArrayList<>();
 		listadoCliente = new ArrayList<>();
@@ -137,7 +147,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoDetallePartida = new ArrayList<>();
 		listadoPrecioServicio = new ArrayList<>();//
 		listaServicioUnidad = new ArrayList<PrecioServicio>();//
-		listadoConstanciaDepositoDetalle = new ArrayList<>();
+		listadoConstanciaDepositoDetalle = new ArrayList<ConstanciaDepositoDetalle>();
 		
 	}
 	
@@ -801,11 +811,21 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	
 	public void savePartida(){
 		
-		listadoDetallePartida = new ArrayList<>();
+
 		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
 		constanciaDeDeposito.setCteCve(clienteSelect);
 		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
+		constanciaDeDeposito.setNombreTransportista(nombreTransportista);
+		constanciaDeDeposito.setPlacasTransporte(placas);
+		constanciaDeDeposito.setObservaciones(observacion);
 		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
+		//constanciaDeDeposito.setValorDeclarado(metroCamara);
+		//constanciaDeDeposito.setStatus(null);
+		constanciaDeDeposito.setAvisoCve(avisoSelect);
+		constanciaDeDeposito.setTemperatura(temperatura);
+		
+		//constanciaDAO.guardar(constanciaDeDeposito);
+		
 		
 		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
 		unidadDeProducto.setProductoCve(productoSelect);
@@ -813,15 +833,20 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		
 		Partida partida = new Partida();
 		partida.setCamaraCve(posicionCamaraSelect.getCamara());
-		partida.setFolio(constanciaDeDeposito);
+		partida.setFolio(constanciaDeDeposito);//falta status
 		partida.setPesoTotal(pesoTotal);
 		partida.setCantidadTotal(cantidadTotal);
-		partida.setUnidadDeProductoCve(unidadDeProducto);
+		partida.setUnidadDeProductoCve(unidadDeProducto);		
+		//partida.setCantidadDeCobro(null);
+		partida.setUnidadDeCobro(unidadDeManejoSelect);
+		//partida.setPartidaSeq(null);
 		partida.setValorMercancia(valorMercancia);
+		partida.setRendimiento(metroCamara);
 		partida.setNoTarimas(numTarimas);
-		partida.setDetallePartidaList(new ArrayList<DetallePartida>());
 		
+		partida.setDetallePartidaList(new ArrayList<DetallePartida>());
 		DetallePartida detallePartida = new DetallePartida();
+		
 		detallePartida.setDtpPedimento(pedimento);
 		detallePartida.setDtpSAP(contenedor);
 		detallePartida.setDtpLote(lote);
@@ -829,13 +854,19 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		detallePartida.setDtpCaducidad(fechaCaducidad);
 		
 		partida.getDetallePartidaList().add(detallePartida);
+		//constanciaDeDeposito.getPartidaList().add(partida);
 		this.listadoPartida.add(partida);
 		
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro correctamente"));
-		PrimeFaces.current().ajax().update("form:messages");
+		
+			
+		
+		//FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro correctamente"));
+		//PrimeFaces.current().ajax().update("form:messages");
 	}
 	
 	public void saveConstanciaDepositoDetalle(){
+		
+		listadoConstanciaDepositoDetalle.clear();
 		
 		//---------------- FOLIO ----------------
 		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
@@ -844,11 +875,19 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
 		
 		ConstanciaDepositoDetalle constanciaDD = new ConstanciaDepositoDetalle();
+		
 		constanciaDD.setServicioCve(precioServicioSelect.getServicio());
-		constanciaDD.setFolio(constanciaDeDeposito);
+		//constanciaDD.setFolio(constanciaDeDeposito);
 		constanciaDD.setServicioCantidad(cantidadServicio);
+		constanciaDD.setConstanciaDepositoDetalleCve(12);
 		
 		listadoConstanciaDepositoDetalle.add(constanciaDD);
+		
+		
+		constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);//mappedBy
+		
+		constanciaDAO.guardar(constanciaDeDeposito);
+		constanciaDepositoDAO.guardar(constanciaDD);
 		
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Se agrego el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages");
@@ -897,6 +936,95 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		nombreTransportista = "";
 		placas = "";
 		observacion = "";
+		
+	}
+	
+	public void saveConstanciaDeDeposito() {
+		
+		
+		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
+		constanciaDeDeposito.setCteCve(clienteSelect);
+		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
+		constanciaDeDeposito.setNombreTransportista(nombreTransportista);
+		constanciaDeDeposito.setPlacasTransporte(placas);
+		constanciaDeDeposito.setObservaciones(observacion);
+		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
+		//constanciaDeDeposito.setStatus(null);
+		constanciaDeDeposito.setAvisoCve(avisoSelect);
+		constanciaDeDeposito.setTemperatura(temperatura);
+		constanciaDeDeposito.setPartidaList(listadoPartida);//mappedBy 
+		constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);//mappedBy
+		
+//		ConstanciaDepositoDetalle constanciaDD = new ConstanciaDepositoDetalle();
+//		constanciaDD.setServicioCve(precioServicioSelect.getServicio());
+//		constanciaDD.setFolio(constanciaDeDeposito);//se hace en metodo constanciadetalle constanciadepositodetallelist
+//		constanciaDD.setServicioCantidad(cantidadServicio);
+		
+//		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
+//		unidadDeProducto.setProductoCve(productoSelect);
+//		unidadDeProducto.setUnidadDeManejoCve(unidadDeManejoSelect);
+//		
+//		Partida partida = new Partida();
+//		partida.setCamaraCve(posicionCamaraSelect.getCamara());
+//		partida.setFolio(constanciaDeDeposito);//falta status serealiza en el metodo partidalist
+//		partida.setPesoTotal(pesoTotal);
+//		partida.setCantidadTotal(cantidadTotal);
+//		partida.setUnidadDeProductoCve(unidadDeProducto);
+//		partida.setRendimiento(metroCamara);
+//		partida.setValorMercancia(valorMercancia);
+//		partida.setNoTarimas(numTarimas);
+//		
+//		partida.setDetallePartidaList(new ArrayList<DetallePartida>());
+//		
+//		DetallePartida detallePartida = new DetallePartida();
+//		DetallePartidaPK detallePartidaPK = new DetallePartidaPK();
+//		detallePartidaPK.setDetPartCve(1);
+//		//detallePartidaPK.setPartidaCve(partida.getPartidaCve());//error null POSIBLE
+//		
+//		detallePartida.setDetallePartidaPK(detallePartidaPK);
+//		detallePartida.setDtpPedimento(pedimento);
+//		detallePartida.setDtpSAP(contenedor);
+//		detallePartida.setDtpLote(lote);
+//		detallePartida.setDtpPO(otro);      
+//		detallePartida.setDtpCaducidad(fechaCaducidad);
+//		
+//		partida.getDetallePartidaList().add(detallePartida);
+		//constanciaDeDeposito.getPartidaList().add(partida);
+		//constanciaDeDeposito.setPartidaList(listadoPartida);
+		
+		//constanciaDeDeposito.getPartidaList().add(partida);
+		
+		//Guardado de constanciaDeDeposito, partida y detallePartida
+		constanciaDAO.guardar(constanciaDeDeposito);
+		
+//		if(constanciaDeDeposito.getFolio()==null) {
+//			if(constanciaDAO.guardar(constanciaDeDeposito)==null) {
+//				if(constanciaDD.getConstanciaDepositoDetalleCve()==null) {
+//					if(constanciaDepositoDAO.guardar(constanciaDD)==null) {
+//						if(unidadDeProducto.getUnidadDeProductoCve()==null) {
+//							if(unidadDeProductoDAO.guardar(unidadDeProducto)==null) {	
+//								if(partida.getPartidaCve()==null) {
+//									if(partidaDAO.guardar(partida)==null) {//error
+//										
+//										detallePartidaPK.setPartidaCve(partida.getPartidaCve());
+//								
+//									}
+//								}
+//							}
+//						}
+//					}		
+//				}
+//			}
+//		}
+		
+		
+		if(constanciaDAO.guardar(constanciaDeDeposito)==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Agregado"));
+		}else {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Ocurrió un error al intentar guardar el Servicio"));
+		}
+		
+		PrimeFaces.current().ajax().update("form:messages");
 		
 	}
 

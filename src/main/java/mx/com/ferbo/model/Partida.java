@@ -174,6 +174,9 @@ public class Partida implements Serializable {
 
     public void setDetallePartidaList(List<DetallePartida> detallePartidaList) {
         this.detallePartidaList = detallePartidaList;
+        for(DetallePartida dp : detallePartidaList) {
+        	dp.setPartida(this);
+        }
     }
 
     public Camara getCamaraCve() {

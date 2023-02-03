@@ -336,7 +336,7 @@
 							</p:inputTextarea>
 							</div>
 							<div style="margin-top: 5px">
-								<p:commandButton value="Guardar" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-save"/>
+								<p:commandButton value="Guardar" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-save" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" update="@this" process="@form"/>
 								<p:commandButton value="Limpiar" class="ui-button-warning" actionListener="#{constanciaDeDepositoBean.limpiar()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales"/>
 								<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary"/>
 							</div>
