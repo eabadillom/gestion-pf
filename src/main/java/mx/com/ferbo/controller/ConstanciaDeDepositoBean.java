@@ -115,6 +115,10 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private String nombreTransportista;
 	private String placas;
 	private String observacion;
+	private ConstanciaDeDeposito constanciaDeDeposito;
+	private ConstanciaDepositoDetalle constanciaDD;
+	//private Partida partida;
+	private DetallePartida detallePartida;
 	
 	private Date fechaCaducidad;
 	private Date fechaIngreso;
@@ -163,6 +167,11 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.listaPosiciones = posicionCamaraDAO.findAll();
 		listadoServicio = servicioDAO.buscarTodos();
 		listadoPrecioServicio = precioServicioDAO.buscarTodos();
+		
+		constanciaDeDeposito = new ConstanciaDeDeposito();
+		constanciaDD = new ConstanciaDepositoDetalle();
+		//partida = new Partida();
+		detallePartida = new DetallePartida();
 		
 		isCongelacion=false;
 		isConservacion=false;
@@ -811,29 +820,16 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	
 	public void savePartida(){
 		
-
-		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
-		constanciaDeDeposito.setCteCve(clienteSelect);
-		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
-		constanciaDeDeposito.setNombreTransportista(nombreTransportista);
-		constanciaDeDeposito.setPlacasTransporte(placas);
-		constanciaDeDeposito.setObservaciones(observacion);
-		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
-		//constanciaDeDeposito.setValorDeclarado(metroCamara);
-		//constanciaDeDeposito.setStatus(null);
-		constanciaDeDeposito.setAvisoCve(avisoSelect);
-		constanciaDeDeposito.setTemperatura(temperatura);
-		
-		//constanciaDAO.guardar(constanciaDeDeposito);
-		
+		//listadoPartida.clear();
 		
 		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
 		unidadDeProducto.setProductoCve(productoSelect);
 		unidadDeProducto.setUnidadDeManejoCve(unidadDeManejoSelect);
 		
+		unidadDeProductoDAO.guardar(unidadDeProducto);//guardo el registro
 		Partida partida = new Partida();
 		partida.setCamaraCve(posicionCamaraSelect.getCamara());
-		partida.setFolio(constanciaDeDeposito);//falta status
+		//partida.setFolio(constanciaDeDeposito);
 		partida.setPesoTotal(pesoTotal);
 		partida.setCantidadTotal(cantidadTotal);
 		partida.setUnidadDeProductoCve(unidadDeProducto);		
@@ -845,18 +841,25 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		partida.setNoTarimas(numTarimas);
 		
 		partida.setDetallePartidaList(new ArrayList<DetallePartida>());
-		DetallePartida detallePartida = new DetallePartida();
 		
+		DetallePartidaPK detallePk = new DetallePartidaPK();
+		detallePk.setDetPartCve(1);
+		detallePk.setPartidaCve(partida);
+		
+		detallePartida.setDetallePartidaPK(detallePk);
 		detallePartida.setDtpPedimento(pedimento);
 		detallePartida.setDtpSAP(contenedor);
 		detallePartida.setDtpLote(lote);
 		detallePartida.setDtpPO(otro);      
 		detallePartida.setDtpCaducidad(fechaCaducidad);
+		detallePartida.setPartida(partida);
 		
+		//listadoDetallePartida.add(detallePartida);
+		//partida.setDetallePartidaList(listadoDetallePartida);
 		partida.getDetallePartidaList().add(detallePartida);
-		//constanciaDeDeposito.getPartidaList().add(partida);
-		this.listadoPartida.add(partida);
 		
+		
+		this.listadoPartida.add(partida);
 		
 			
 		
@@ -869,25 +872,18 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		listadoConstanciaDepositoDetalle.clear();
 		
 		//---------------- FOLIO ----------------
-		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
+		//ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
 		constanciaDeDeposito.setCteCve(clienteSelect);
 		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
 		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
-		
-		ConstanciaDepositoDetalle constanciaDD = new ConstanciaDepositoDetalle();
+		constanciaDeDeposito.setAvisoCve(avisoSelect);
 		
 		constanciaDD.setServicioCve(precioServicioSelect.getServicio());
 		//constanciaDD.setFolio(constanciaDeDeposito);
 		constanciaDD.setServicioCantidad(cantidadServicio);
-		constanciaDD.setConstanciaDepositoDetalleCve(12);
-		
 		listadoConstanciaDepositoDetalle.add(constanciaDD);
+		//constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);//mappedBy
 		
-		
-		constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);//mappedBy
-		
-		constanciaDAO.guardar(constanciaDeDeposito);
-		constanciaDepositoDAO.guardar(constanciaDD);
 		
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Se agrego el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages");
@@ -942,89 +938,17 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	public void saveConstanciaDeDeposito() {
 		
 		
-		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
-		constanciaDeDeposito.setCteCve(clienteSelect);
-		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
+	
 		constanciaDeDeposito.setNombreTransportista(nombreTransportista);
 		constanciaDeDeposito.setPlacasTransporte(placas);
 		constanciaDeDeposito.setObservaciones(observacion);
-		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
-		//constanciaDeDeposito.setStatus(null);
-		constanciaDeDeposito.setAvisoCve(avisoSelect);
 		constanciaDeDeposito.setTemperatura(temperatura);
-		constanciaDeDeposito.setPartidaList(listadoPartida);//mappedBy 
-		constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);//mappedBy
+		constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
+		constanciaDeDeposito.setPartidaList(listadoPartida);
 		
-//		ConstanciaDepositoDetalle constanciaDD = new ConstanciaDepositoDetalle();
-//		constanciaDD.setServicioCve(precioServicioSelect.getServicio());
-//		constanciaDD.setFolio(constanciaDeDeposito);//se hace en metodo constanciadetalle constanciadepositodetallelist
-//		constanciaDD.setServicioCantidad(cantidadServicio);
-		
-//		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
-//		unidadDeProducto.setProductoCve(productoSelect);
-//		unidadDeProducto.setUnidadDeManejoCve(unidadDeManejoSelect);
-//		
-//		Partida partida = new Partida();
-//		partida.setCamaraCve(posicionCamaraSelect.getCamara());
-//		partida.setFolio(constanciaDeDeposito);//falta status serealiza en el metodo partidalist
-//		partida.setPesoTotal(pesoTotal);
-//		partida.setCantidadTotal(cantidadTotal);
-//		partida.setUnidadDeProductoCve(unidadDeProducto);
-//		partida.setRendimiento(metroCamara);
-//		partida.setValorMercancia(valorMercancia);
-//		partida.setNoTarimas(numTarimas);
-//		
-//		partida.setDetallePartidaList(new ArrayList<DetallePartida>());
-//		
-//		DetallePartida detallePartida = new DetallePartida();
-//		DetallePartidaPK detallePartidaPK = new DetallePartidaPK();
-//		detallePartidaPK.setDetPartCve(1);
-//		//detallePartidaPK.setPartidaCve(partida.getPartidaCve());//error null POSIBLE
-//		
-//		detallePartida.setDetallePartidaPK(detallePartidaPK);
-//		detallePartida.setDtpPedimento(pedimento);
-//		detallePartida.setDtpSAP(contenedor);
-//		detallePartida.setDtpLote(lote);
-//		detallePartida.setDtpPO(otro);      
-//		detallePartida.setDtpCaducidad(fechaCaducidad);
-//		
-//		partida.getDetallePartidaList().add(detallePartida);
-		//constanciaDeDeposito.getPartidaList().add(partida);
-		//constanciaDeDeposito.setPartidaList(listadoPartida);
-		
-		//constanciaDeDeposito.getPartidaList().add(partida);
-		
-		//Guardado de constanciaDeDeposito, partida y detallePartida
 		constanciaDAO.guardar(constanciaDeDeposito);
 		
-//		if(constanciaDeDeposito.getFolio()==null) {
-//			if(constanciaDAO.guardar(constanciaDeDeposito)==null) {
-//				if(constanciaDD.getConstanciaDepositoDetalleCve()==null) {
-//					if(constanciaDepositoDAO.guardar(constanciaDD)==null) {
-//						if(unidadDeProducto.getUnidadDeProductoCve()==null) {
-//							if(unidadDeProductoDAO.guardar(unidadDeProducto)==null) {	
-//								if(partida.getPartidaCve()==null) {
-//									if(partidaDAO.guardar(partida)==null) {//error
-//										
-//										detallePartidaPK.setPartidaCve(partida.getPartidaCve());
-//								
-//									}
-//								}
-//							}
-//						}
-//					}		
-//				}
-//			}
-//		}
 		
-		
-		if(constanciaDAO.guardar(constanciaDeDeposito)==null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Agregado"));
-		}else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Ocurrió un error al intentar guardar el Servicio"));
-		}
-		
-		PrimeFaces.current().ajax().update("form:messages");
 		
 	}
 

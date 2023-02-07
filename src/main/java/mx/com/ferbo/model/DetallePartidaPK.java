@@ -9,6 +9,8 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -24,15 +26,19 @@ public class DetallePartidaPK implements Serializable {
     @NotNull
     @Column(name = "DET_PART_CVE")
     private int detPartCve;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "PARTIDA_CVE")
-    private int partidaCve;
+    //@Basic(optional = false)
+    //@NotNull
+    //@Column(name = "PARTIDA_CVE")
+    @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")
+    @ManyToOne(optional = false)
+    //@JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
+    //@ManyToOne(optional = false)
+    private Partida partidaCve;
 
     public DetallePartidaPK() {
     }
 
-    public DetallePartidaPK(int detPartCve, int partidaCve) {
+    public DetallePartidaPK(int detPartCve, Partida partidaCve) {
         this.detPartCve = detPartCve;
         this.partidaCve = partidaCve;
     }
@@ -45,11 +51,11 @@ public class DetallePartidaPK implements Serializable {
         this.detPartCve = detPartCve;
     }
 
-    public int getPartidaCve() {
+    public Partida getPartidaCve() {
         return partidaCve;
     }
 
-    public void setPartidaCve(int partidaCve) {
+    public void setPartidaCve(Partida partidaCve) {
         this.partidaCve = partidaCve;
     }
 
@@ -57,7 +63,7 @@ public class DetallePartidaPK implements Serializable {
     public int hashCode() {
         int hash = 0;
         hash += (int) detPartCve;
-        hash += (int) partidaCve;
+        hash += (int) partidaCve.getPartidaCve();
         return hash;
     }
 
