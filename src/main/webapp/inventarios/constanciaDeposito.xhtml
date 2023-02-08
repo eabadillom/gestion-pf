@@ -88,7 +88,7 @@
 												<p:ajax update="@this"/> 
 											</p:selectOneMenu>	
 											
-											<p:outputLabel value="Ubicación:" styleClass="p-ml-6 p-mr-2"/>
+											<p:outputLabel value="Ubicación*:" styleClass="p-ml-6 p-mr-2"/>
 											<p:selectOneMenu id="posiciones" autoWidth="false" value="#{constanciaDeDepositoBean.posicionCamaraSelect}" converter="entityConverter">
 												<f:selectItem itemLabel="Selecciona Ubicacion" itemValue="" noSelectionOption="true"></f:selectItem>
 												<f:selectItems value="#{constanciaDeDepositoBean.posiciones}" var="posicion" itemLabel="#{posicion.descPosicion}" itemValue="#{posicion}"/>
@@ -170,23 +170,30 @@
 							</div>
 							<p:toolbarGroup styleClass="p-mt-4">
 										<p:commandButton value="Agregar" actionListener="#{constanciaDeDepositoBean.savePartida()}" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="form:dt-partidas"/>
-										<p:commandButton value="Eliminar" styleClass="ui-button-danger" icon="pi pi-trash"/>
+										<p:commandButton id="button-delete-partidas" value="Eliminar" styleClass="ui-button-danger" icon="pi pi-trash" actionListener="#{constanciaDeDepositoBean.deleteSelectedPartidas()}" 
+														 update="@this"/>
 							</p:toolbarGroup>
 						</p:toolbar> 
 						
-						<p:dataTable  id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="true" paginatorPosition="bottom"
-									  rowSelectMode="add" rows="10" rowKey="#{partida.partidaCve}" reflow="true">
+						<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="true" paginatorPosition="bottom"
+									  rowSelectMode="add" rows="10" rowKey="#{partida.pesoTotal}" reflow="true" selection="#{constanciaDeDepositoBean.selectedPartidas}" >
 							<f:facet name="header">
 								<div class="products-table-header">
 									<span style="font-weight: bold;">Sus Productos</span>
 								</div>
 							</f:facet>
+							
+							<p:ajax event="rowSelect" />
+                            <p:ajax event="rowUnselect" />
+                            <p:ajax event="rowSelectCheckbox"/>
+                            <p:ajax event="rowUnselectCheckbox" />
+                            <p:ajax event="toggleSelect" />
+
+                            <p:column selectionMode="multiple" exportable="false"></p:column>
+							
 							<p:column exportable="false" width="3%">
 								<p:rowToggler />
-							</p:column>
-							<p:column headerText="ID">
-								<h:outputText value="#{partida.partidaCve}"/>
-							</p:column>
+							</p:column>							
 							<p:column headerText="Id Camara">
 								<h:outputText value="#{partida.camaraCve.camaraAbrev}"/>
 							</p:column>
@@ -212,7 +219,7 @@
 							
 							<p:rowExpansion>
 								<div class="orders-subtable">
-									<p:dataTable id="dtDetallePartida" value="#{partida.detallePartidaList}" var="detallePartida" reflow="true">
+									<p:dataTable id="dtDetallePartida" value="#{partida.detallePartidaList}" var="detallePartida" reflow="true" >
 										
 										<f:facet name="header">
 											<div class="products-table-header">
@@ -240,7 +247,6 @@
 								</div>
 										
 							</p:rowExpansion>
-							
 							
 						</p:dataTable>
 						
@@ -279,20 +285,28 @@
 						
 							
 							<div style="text-align: right;">
-							<p:commandButton value="Agregar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" style="margin-right: .5rem" icon="pi pi-plus" update="@this dt-constanciaDD"/>
-							<p:commandButton value="Eliminar" styleClass="ui-button-danger" icon="pi pi-trash" />
+							<p:commandButton value="Agregar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" style="margin-right: .5rem" icon="pi pi-plus" update="form:dt-constanciaDD"/>
+							<p:commandButton id="eliminar" value="Eliminar" styleClass="ui-button-danger" icon="pi pi-trash" actionListener="#{constanciaDeDepositoBean.deleteConstanciaDD()}" update="@this"/>
 							</div>
 						</p:outputPanel>
 						
-						<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" rows="10" value="#{constanciaDeDepositoBean.listadoConstanciaDepositoDetalle}" 
-									rowSelectMode="add"	var="constanciaDD" paginator="true" paginatorPosition="bottom" reflow="true">
+						<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" rows="10" value="#{constanciaDeDepositoBean.listadoConstanciaDepositoDetalle}"
+									rowSelectMode="add"	rowKey="#{constanciaDD.servicioCantidad}" var="constanciaDD" paginator="true" paginatorPosition="bottom" reflow="true" selection="#{constanciaDeDepositoBean.selectedConstanciaDD}">
 						
 							<f:facet name="header">
 								<div class="products-table-header">
 									<span style="font-weight: bold;">Sus Servicios</span>
 								</div>
 							</f:facet>
-						
+							
+							<p:ajax event="rowSelect"/>
+                            <p:ajax event="rowUnselect"/>
+                            <p:ajax event="rowSelectCheckbox"/>
+                            <p:ajax event="rowUnselectCheckbox"/>
+                            <p:ajax event="toggleSelect"/>
+
+							<p:column selectionMode="multiple" exportable="false"></p:column>
+							
 							<p:column headerText="Servicio">
 								<h:outputText value="#{constanciaDD.servicioCve.servicioDs}" />
 							</p:column>
@@ -337,7 +351,7 @@
 							</div>
 							<div style="margin-top: 5px">
 								<p:commandButton value="Guardar" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-save" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" update="@this" process="@form"/>
-								<p:commandButton value="Limpiar" class="ui-button-warning" actionListener="#{constanciaDeDepositoBean.limpiar()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales"/>
+								<p:commandButton value="Limpiar" class="ui-button-warning" actionListener="#{constanciaDeDepositoBean.limpiar()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales dt-constanciaDD dt-partidas"/>
 								<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary"/>
 							</div>
 													
