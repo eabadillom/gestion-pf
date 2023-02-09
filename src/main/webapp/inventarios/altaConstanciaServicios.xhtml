@@ -36,10 +36,8 @@
 						<f:selectItems var="selectedUnidadManejo" value="#{altaConstanciaServicioBean.alUnidades}" itemLabel="#{selectedUnidadManejo.unidadDeManejoDs}"
 							itemValue="#{selectedUnidadManejo.unidadDeManejoCve}" />
 					</p:selectOneMenu>
-					</p:panel>
-					
-				 <p:panel>
-					<p:inputNumber id="txtPesoProd" value="#{altaConstanciaServicioBean.peso}" placeholder="Peso (kg)" minValue="0" decimalPlaces="3" />
+
+					<panel><p:inputNumber id="txtPesoProd" value="#{altaConstanciaServicioBean.peso}" placeholder="Peso (kg)" minValue="0" decimalPlaces="3" /></panel>
 					<p:selectOneMenu id="selProducto" autoWidth="true" value="#{altaConstanciaServicioBean.idProducto}" filterMatchMode="startsWith">
 						<f:selectItem itemLabel="Seleccione Producto" itemValue="" noSelectionOption="true" />
 						<f:selectItems var="producto" value="#{altaConstanciaServicioBean.alProductosFiltered}" itemLabel="#{producto.productoCve.productoDs}" itemValue="#{producto.productoCve.productoCve}" />
@@ -87,18 +85,21 @@
 	            
 	   <h5></h5>
 				<p:fieldset legend="Valor declarado">
-					<p:panel><p:inputNumber id="txtValorDeclarado" value="#{altaConstanciaServicioBean.valorDeclarado}" placeholder="Valor declarado" minValue="1" decimalPlaces="2"/></p:panel>
-					<p:panel><p:inputText id="txtNombreTransportista" value="#{altaConstanciaServicioBean.nombreTransportista}" placeholder="Nombre del transportista." /></p:panel>
-				   	<p:panel><p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." /></p:panel>
-					<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." style="width: 30em;"/>
+				<div class="field col-12 md:col-4">
+					<p:inputNumber id="txtValorDeclarado" value="#{altaConstanciaServicioBean.valorDeclarado}" placeholder="Valor declarado" minValue="1" decimalPlaces="2"/>
+					<p:inputText id="txtNombreTransportista" value="#{altaConstanciaServicioBean.nombreTransportista}" placeholder="Nombre del transportista." />
+				   	<p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." />
+					<p:panel><p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." style="width: 30em;"/></p:panel>
+				</div>
+				
+<div>
+        <p:splitButton value="Guardar" actionListener="#{altaConstanciaServicioBean.guardar}" icon="pi pi-save">
+            <p:menuitem value="Generar reporte" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+            <p:menuitem value="Limpiar" action="#{altaConstanciaServicioBean.reload}" update="messages" icon="pi pi-times"/>
+        </p:splitButton>
+</div>
 				</p:fieldset>
 
-				<p:panel>
-				<p:commandButton id="guardacon" value="Guardar" icon="pi pi-save" actionListener="#{altaConstanciaServicioBean.guardar}" />
-				<h5></h5>
-				<p:commandButton id="generarep" value="Generar reporte" icon="pi pi-file-pdf" disabled="true" actionListener="#{altaConstanciaServicioBean.jasper}" ajax="false" process="@this"/>
-				</p:panel>
-				
 		</h:form>
 	</ui:define>
 </ui:composition>

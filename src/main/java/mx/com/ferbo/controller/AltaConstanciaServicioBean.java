@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,18 +19,20 @@ import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.application.ViewHandler;
+import javax.faces.component.UIViewRoot;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonActionListener;
+import javax.ws.rs.core.Application;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
+
+import com.lowagie.text.Document;
 
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
@@ -48,13 +51,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
-import net.bytebuddy.implementation.Implementation.Context.Disabled;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Named
 @ManagedBean(value = "ejemplo1")
@@ -69,7 +66,6 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private List<PartidaServicio> alPartidas;
 	private List<ConstanciaServicioDetalle> alServiciosDetalle;
 	private List<PrecioServicio> alServicios;
-
 	private List<ProductoPorCliente> alProductosFiltered;
 	private List<UnidadDeManejo> alUnidades;
 
@@ -85,7 +81,6 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private String placasVehiculo;
 	private Cliente selCliente;
 	private Integer idCliente;
-	private String folioCliente;
 	private String unidadcobro;
 	private UnidadDeManejo selUnidadManejo;
 	private Integer idPrecioServicio;
@@ -97,6 +92,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
 	private boolean isSaved = false;
+	private boolean habilitareporte = false;
 	private List<EstadoConstancia> estados = null;
 
 	public AltaConstanciaServicioBean() {
@@ -319,16 +315,14 @@ public class AltaConstanciaServicioBean implements Serializable {
 			for (PartidaServicio partida : this.alPartidas) {
 				partida.setFolio(constancia);
 			}
-
 			for (ConstanciaServicioDetalle servicio : this.alServiciosDetalle) {
 				servicio.setFolio(constancia);
 			}
-
 			csDAO.actualizar(constancia);
 			this.isSaved = true;
+			this.habilitareporte = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
-			
 			
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
@@ -345,55 +339,60 @@ public class AltaConstanciaServicioBean implements Serializable {
 		}
 	}
 
+
 	public void jasper() throws JRException, IOException, SQLException {
-		
-		String jasperPath = "/jasper/ejemplo1.jasper";
+		String jasperPath = "/jasper/ejemplo1.jrxml";
 		String filename = "Constancia_de_servicio.pdf";
-		//String jasperPath ="/resources/ejemplo1.jrxml";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
 		alConstancias = csDAO.buscarPorFolioCliente(this.folio);
 		 File reportFile = new File(jasperPath);
+		 File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
 		ConstanciaDeServicio cds = new ConstanciaDeServicio();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
-		
 		try {
-			if (this.folio == null || "".equalsIgnoreCase(this.folio.trim()))
-				throw new InventarioException("Debe indicar el folio de la constancia.");
-
+			if(habilitareporte == false ) {
+				throw new Exception("Favor de guardar constancia");
+			}
 			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
+			String img = resourceimg.getFile();
 			reportFile = new File(file);
+			imgfile = new File(img);
 			log.info(reportFile.getPath());
 			constancia = new ConstanciaDeServicio();
 			constancia.setFolioCliente(this.folio);
-			folio = String.valueOf(getFolioCliente());
+			folio = String.valueOf(getFolio());
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", folio);
+			parameters.put("LogoPath",imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			
+			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());			
 		} catch (Exception ex) {
 			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
+			message = String.format("No se pudo imprimir el folio %s", this.folio);
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		} finally {
 			conexion.close((Connection) connection);
 		}
 	}
-
-
-	public String getFolioCliente() {
-		return folioCliente;
+	
+	public void reload() throws IOException {
+	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
-
-	public void setFolioCliente(String folioCliente) {
-		this.folioCliente = folioCliente;
-	}
-
+	
 	public String getUnidadcobro() {
 		return unidadcobro;
 	}
@@ -592,6 +591,22 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 	public void setCantidadServicio(BigDecimal cantidadServicio) {
 		this.cantidadServicio = cantidadServicio;
+	}
+
+	public boolean isHabilitareporte() {
+		return habilitareporte;
+	}
+
+	public void setHabilitareporte(boolean habilitareporte) {
+		this.habilitareporte = habilitareporte;
+	}
+
+	public List<EstadoConstancia> getEstados() {
+		return estados;
+	}
+
+	public void setEstados(List<EstadoConstancia> estados) {
+		this.estados = estados;
 	}
 
 }
