@@ -99,6 +99,8 @@
 											<p:inputNumber value="#{constanciaDeDepositoBean.cantidadTotal}">
 												<p:ajax update="@this" />
 											</p:inputNumber>
+											
+											
 										
 										
 										<div style="margin-top: 5px;" >
@@ -165,13 +167,19 @@
 												</p:outputLabel>
 											</p:outputPanel>
 											
+											<div  style="margin-top: 5px;">
+												<p:outputLabel styleClass="p-mr-2" >m<sup>2</sup> Por Camara:</p:outputLabel>	
+												<p:inputNumber value="#{constanciaDeDepositoBean.metroCamara}" >
+													<p:ajax update="@this" />
+												</p:inputNumber>
+											</div>
 									</p:toolbarGroup>
 								</div>
 							</div>
 							<p:toolbarGroup styleClass="p-mt-4">
+							
 										<p:commandButton value="Agregar" actionListener="#{constanciaDeDepositoBean.savePartida()}" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="form:dt-partidas"/>
-										<p:commandButton id="button-delete-partidas" value="Eliminar" styleClass="ui-button-danger" icon="pi pi-trash" actionListener="#{constanciaDeDepositoBean.deleteSelectedPartidas()}" 
-														 update="@this"/>
+										
 							</p:toolbarGroup>
 						</p:toolbar> 
 						
@@ -248,6 +256,12 @@
 										
 							</p:rowExpansion>
 							
+							<p:column exportable="false" width="15%" style="text-align:center">
+                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" action="#{constanciaDeDepositoBean.deleteSelectedPartidas}"  width="45%">
+                                    <f:setPropertyActionListener value="#{partida}" target="#{constanciaDeDepositoBean.selectedPartida}" />
+                                </p:commandButton>
+                            </p:column>
+							
 						</p:dataTable>
 						
 						<div style="text-align: center;margin-top: 10px;background-color: gray">
@@ -286,12 +300,11 @@
 							
 							<div style="text-align: right;">
 							<p:commandButton value="Agregar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" style="margin-right: .5rem" icon="pi pi-plus" update="form:dt-constanciaDD"/>
-							<p:commandButton id="eliminar" value="Eliminar" styleClass="ui-button-danger" icon="pi pi-trash" actionListener="#{constanciaDeDepositoBean.deleteConstanciaDD()}" update="@this"/>
 							</div>
 						</p:outputPanel>
 						
 						<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" rows="10" value="#{constanciaDeDepositoBean.listadoConstanciaDepositoDetalle}"
-									rowSelectMode="add"	rowKey="#{constanciaDD.servicioCantidad}" var="constanciaDD" paginator="true" paginatorPosition="bottom" reflow="true" selection="#{constanciaDeDepositoBean.selectedConstanciaDD}">
+									rowSelectMode="add"	rowKey="#{constanciaDD}" var="constanciaDD" paginator="true" paginatorPosition="bottom" reflow="true" selection="#{constanciaDeDepositoBean.selectedConstanciaDD}">
 						
 							<f:facet name="header">
 								<div class="products-table-header">
@@ -318,6 +331,13 @@
 							<p:column headerText="Cantidad">
 								<h:outputText value="#{constanciaDD.servicioCantidad}" />
 							</p:column>
+							
+							 <p:column exportable="false" width="15%" style="text-align:center">
+                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" action="#{constanciaDeDepositoBean.deleteConstanciaDD}"  width="45%">
+                                    <f:setPropertyActionListener value="#{constanciaDD}" target="#{constanciaDeDepositoBean.selectedConstanciasDD}" />
+                                </p:commandButton>
+                            </p:column>
+							
 						</p:dataTable>
 						
 						
@@ -327,11 +347,6 @@
 								<p:ajax update="@this" />
 							</p:spinner>
 							
-							
-							<p:outputLabel styleClass="p-ml-6 p-mr-2" >m<sup>2</sup> Por Camara:</p:outputLabel>	
-							<p:inputNumber value="#{constanciaDeDepositoBean.metroCamara}" >
-								<p:ajax update="@this" />
-							</p:inputNumber>
 							
 							<p:outputLabel styleClass="p-ml-6 p-mr-2" value="Nombre Transportista:"/>
 							<p:inputText value="#{constanciaDeDepositoBean.nombreTransportista}" >
@@ -374,6 +389,11 @@
 									<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('NoCambiarDialog').hide()" class="ui-button-secondary"/>
 							</f:facet>													
 						</p:dialog>
+			<!-- Dialogo de confirmacion a eliminar -->
+						<p:confirmDialog widgetVar="deleteConstanciaDialog" showEffect="fade" width="400" message="Desea eliminar la constancia?" header="Eliminar" severity="warn">
+                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{constanciaDeDepositoBean.deleteConstanciaDD}" process="@this" oncomplete="PF('deleteConstanciaDialog').hide()"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteConstanciaDialog').hide()" />
+                        </p:confirmDialog>
 						
 					</div>
 				</div>

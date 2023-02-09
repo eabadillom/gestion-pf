@@ -98,6 +98,8 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private Posicion posicionCamaraSelect;
 	private Aviso avisoSelect;
 	private PrecioServicio precioServicioSelect;
+	private ConstanciaDepositoDetalle selectedConstanciasDD;
+	private Partida selectedPartida;
 
 	private String noConstanciaSelect;
 	private BigDecimal unidadesPorTarima;
@@ -623,7 +625,24 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.cantidadServicio = cantidadServicio;
 	}
 	
+	public ConstanciaDepositoDetalle getSelectedConstanciasDD() {
+		return selectedConstanciasDD;
+	}
+
+	public void setSelectedConstanciasDD(ConstanciaDepositoDetalle selectedConstanciasDD) {
+		this.selectedConstanciasDD = selectedConstanciasDD;
+	}
+	
+	public Partida getSelectedPartida() {
+		return selectedPartida;
+	}
+
+	public void setSelectedPartida(Partida selectedPartida) {
+		this.selectedPartida = selectedPartida;
+	}
+	
 	// ----------- Otros Metodos ------------------
+
 
 	public void filtraListado() {
 		camaraPorPlanta.clear();
@@ -947,7 +966,6 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	
 	public void saveConstanciaDeDeposito() {
 		
-		
 	
 		constanciaDeDeposito.setNombreTransportista(nombreTransportista);
 		constanciaDeDeposito.setPlacasTransporte(placas);
@@ -964,7 +982,17 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	}
 	
 	public void deleteSelectedPartidas() {
-		this.listadoPartida.removeAll(this.selectedPartidas);//remueve todos los elementos de listadoPartida ERROR
+		
+		for(Partida p: listadoPartida) {
+			if(p==selectedPartida) {
+				p.setPartidaCve(1);
+				selectedPartida.setPartidaCve(1);
+				System.out.println(p);
+				System.out.println(selectedPartida);
+			}
+		}
+		
+		listadoPartida.remove(this.selectedPartida);//remueve todos los elementos de listadoPartida ERROR
 		this.selectedPartidas = null;
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Eliminado","Se elimino el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages","form:dt-partidas");
@@ -972,21 +1000,21 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	
 	public void deleteConstanciaDD() {
 		
-		//List<ConstanciaDepositoDetalle> temp = new ArrayList<>();
-		/*for(ConstanciaDepositoDetalle cdd:selectedConstanciaDD) {
-			for(ConstanciaDepositoDetalle cd: listadoConstanciaDepositoDetalle) {
-				if(cdd==cd) { 
-					temp.add(cdd);
-				}
+		for(ConstanciaDepositoDetalle cdd: listadoConstanciaDepositoDetalle) {
+			if(cdd==selectedConstanciasDD) {
+				cdd.setConstanciaDepositoDetalleCve(1);
+				selectedConstanciasDD.setConstanciaDepositoDetalleCve(1);
+				System.out.println(cdd);
+				System.out.println(selectedConstanciaDD);
 			}
-		}*/
+		}
 		
-		
-		this.listadoConstanciaDepositoDetalle.removeAll(this.selectedConstanciaDD);//lo remueve cuando la constanciadepositodetallecve tiene un Id, mientras no lo hace 
-		this.selectedConstanciaDD = null;
+		listadoConstanciaDepositoDetalle.remove(this.selectedConstanciasDD);//lo remueve cuando la constanciadepositodetallecve tiene un Id, mientras no lo hace 
+		this.selectedConstanciasDD = null;
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Eliminado","Se elimino el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages","form:dt-constanciaDD");
 	}
+	
 	
 
 }
