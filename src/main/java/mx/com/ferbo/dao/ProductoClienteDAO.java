@@ -6,11 +6,11 @@ import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
+	private EntityManager manager = null;
 
 	@Override
 	public ProductoPorCliente buscarPorId(Integer id) {
@@ -34,6 +34,27 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 		listado = em.createNamedQuery("ProductoPorCliente.findByCteCve",ProductoPorCliente.class).setParameter("cteCve", e.getCteCve().getCteCve()).getResultList();
 		
 		return listado;
+	}
+	
+	public List<ProductoPorCliente> buscarPorCteCve(Cliente cliente) {
+		List<ProductoPorCliente> alProductos = null;
+		boolean entityManagerInternal = false;
+		EntityManager em = null;
+		try {
+			if(em == null) {
+				entityManagerInternal = true;
+				em = EntityManagerUtil.getEntityManager();
+			}
+			alProductos = em.createNamedQuery("ProductoPorCliente.findByCteCve", ProductoPorCliente.class)
+					.setParameter("cteCve", cliente)
+					.getResultList();
+		} finally {
+			if(entityManagerInternal) {
+				em.close();
+			}
+		}
+		
+		return alProductos;
 	}
 
 	@Override
@@ -96,6 +117,14 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 	public String eliminarListado(List<ProductoPorCliente> listado) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public EntityManager getEntityManager() {
+		return manager;
+	}
+
+	public void setEntityManager(EntityManager manager) {
+		this.manager = manager;
 	}
 
 }

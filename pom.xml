@@ -22,7 +22,7 @@
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
 			<version>8.0</version>
-			<!--<scope>provided</scope>-->
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.primefaces</groupId>
@@ -277,10 +277,9 @@
 
 	<build>
 		<resources>
-			<!--                        <resource> 
-                 <directory>src/main/resources</directory> 
-                 <filtering>true</filtering> 
-             </resource> -->
+			   <resource> 
+                 <directory>src/main/resources</directory>  
+             </resource> 
 			<resource>
 				<directory>${basedir}/src/main/webapp/WEB-INF</directory>
 				<includes>
@@ -289,10 +288,10 @@
 				<filtering>true</filtering>
 				<targetPath>${project.build.directory}</targetPath>
 			</resource>
-			<!--            <resource>
-                <directory>src/main/recursos</directory>
+            <resource>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-            </resource>-->
+            </resource>
 			<!-- Brutal force to fix -->
 			<resource>
 				<directory>src/main/resources/META-INF</directory>
@@ -528,12 +527,12 @@
 									</includes>
 								</resource>
 							</webResources>
-							<!--                            <webResources>
+                            <webResources>
                                 <resource>
                                     <filtering>true</filtering>
-                                    <directory>src/main/recursos</directory>
+                                    <directory>src/main/resources</directory>
                                 </resource>
-                            </webResources>-->
+                            </webResources>
 							<warSourceDirectory>src/main/webapp</warSourceDirectory>
 							<webXml>${project.build.directory}/web.xml</webXml>
 						</configuration>

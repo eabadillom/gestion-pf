@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @Table(name = "status_serie")
 @NamedQueries({
     @NamedQuery(name = "StatusSerie.findAll", query = "SELECT s FROM StatusSerie s"),
-    @NamedQuery(name = "StatusSerie.find", query = "SELECT s FROM StatusSerie s WHERE s.id != 3"),
+//    @NamedQuery(name = "StatusSerie.find", query = "SELECT s FROM StatusSerie s WHERE s.id != 3"),
     @NamedQuery(name = "StatusSerie.findById", query = "SELECT s FROM StatusSerie s WHERE s.id = :id"),
     @NamedQuery(name = "StatusSerie.findByDescripcion", query = "SELECT s FROM StatusSerie s WHERE s.descripcion = :descripcion")})
 public class StatusSerie implements Serializable {

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +31,28 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 	public ConstanciaDeServicio buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public List<ConstanciaDeServicio> buscarPorFolioCliente(String folioCliente) {
+		List<ConstanciaDeServicio> alConstancias = null;
+		EntityManager manager = null;
+		
+		try {
+			manager = EntityManagerUtil.getEntityManager();
+			manager.getTransaction().begin();
+			alConstancias = manager.createNamedQuery("ConstanciaDeServicio.findByFolioCliente", ConstanciaDeServicio.class)
+					.setParameter("folioCliente", folioCliente)
+					.getResultList();
+			
+			manager.getTransaction().commit();
+		} catch(Exception ex) {
+			manager.getTransaction().rollback();
+		} finally {
+			if(manager != null)
+				manager.close();
+		}
+		
+		return alConstancias;
 	}
 
 	@Override
@@ -109,7 +130,19 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 
 	@Override
 	public String guardar(ConstanciaDeServicio e) {
-		// TODO Auto-generated method stub
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			entity.getTransaction().begin();
+			entity.persist(e);
+			entity.getTransaction().commit();
+		} catch(Exception ex) {
+			entity.getTransaction().rollback();
+			ex.printStackTrace();
+		} finally {
+			if(entity != null)
+				entity.close();
+		}
 		return null;
 	}
 

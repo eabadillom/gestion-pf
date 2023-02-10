@@ -9,7 +9,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-@Entity
+//@Entity
 
 @Table(name="CONTROL_FACTURA_CONSTANCIA_DS")
 @NamedQueries({

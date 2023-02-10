@@ -167,10 +167,11 @@
 							<p:submenu id="frb_inventarios_sm2" label="Servicios"
 								icon="fa fa-fw fa-edit">
 								<p:menuitem id="frb_inventarios_sm21" value="Alta"
-									icon="pi pi-fw pi-check" url="#" />
+									icon="pi pi-fw pi-check" outcome="/inventarios/altaConstanciaServicios" />
 								<p:menuitem id="frb_inventarios_sm22" value="Consultar"
 									icon="pi pi-fw pi-search" outcome="/inventarios/constanciaServicios" />
 							</p:submenu>
+							
 							<p:submenu label="Catálogos" icon="pi pi-fw pi-book">
 								<p:menuitem value="Productos"
 									outcome="/protected/catalogos/articulos" icon="pi pi-fw pi-box" />
@@ -189,6 +190,7 @@
 								icon="pi pi-fw pi-shopping-bag"
 								outcome="/protected/catalogos/kardex" />
 						</p:submenu>
+						
 						<p:submenu id="frb_facturacion" label="Facturación"
 							icon="pi pi-fw pi-wallet">
 							<p:submenu label="Facturación" icon="pi pi-file-o">
@@ -276,6 +278,12 @@
 									outcome="/protected/catalogos/candadoSalida" icon="pi pi-lock" />
 							</p:submenu>
 						</p:submenu>
+						
+						<p:submenu label="Usuarios" icon="pi pi-fw pi-book">
+								<p:menuitem value="Mantenimiento de usuarios"
+									outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit"  />
+							</p:submenu>
+							
 					</po:menu>
 				</div>
 			</div>
