@@ -1,16 +1,24 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -35,6 +43,7 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.DetallePartidaPK;
@@ -47,6 +56,10 @@ import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
+import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
+import net.sf.jasperreports.engine.JRException;
 
 
 @Named
@@ -120,6 +133,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	private ConstanciaDeDeposito constanciaDeDeposito;
 	private ConstanciaDepositoDetalle constanciaDD;
 	private List<ConstanciaDepositoDetalle> selectedConstanciaDD;
+	private Boolean impresion = false;
 	
 	private Date fechaCaducidad;
 	private Date fechaIngreso;
@@ -975,7 +989,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		constanciaDeDeposito.setPartidaList(listadoPartida);
 		
 		constanciaDAO.guardar(constanciaDeDeposito);
-		
+		impresion = true;
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages");
 		
@@ -1013,6 +1027,52 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		this.selectedConstanciasDD = null;
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Eliminado","Se elimino el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages","form:dt-constanciaDD");
+	}
+	
+	public void imprimir() {
+		String jasperPath = "/jasper/GestionReport.jrxml";
+		String filename = "ticket.pdf";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
+		ConstanciaDeDeposito constancia = null;
+		 File reportFile = new File(jasperPath);
+		 File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			/*if(impresion == false ) {
+				throw new Exception("Favor de guardar constancia");
+			}*/
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			//log.info(reportFile.getPath());
+			constancia = new ConstanciaDeDeposito();
+			constancia.setFolioCliente(this.noConstanciaSelect);
+			noConstanciaSelect = String.valueOf("C 233");
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("Folio", noConstanciaSelect);
+			//parameters.put("LogoPath",imgfile.getPath());
+			//log.info("Parametros: " + parameters.toString());
+			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());		
+		} catch (Exception ex) {
+			ex.fillInStackTrace();
+			//log.error("Problema general...", ex);
+			message = String.format("No se pudo imprimir el folio %s", this.noConstanciaSelect);
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		} finally {
+			conexion.close((Connection) connection);
+		}
+		
 	}
 	
 	

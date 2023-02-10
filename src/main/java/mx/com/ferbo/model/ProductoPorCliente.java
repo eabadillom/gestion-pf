@@ -29,6 +29,7 @@ import javax.persistence.Table;
     @NamedQuery(name = "ProductoPorCliente.findAll", query = "SELECT p FROM ProductoPorCliente p"),
     @NamedQuery(name = "ProductoPorCliente.findByProdXCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.prodXCteCve = :prodXCteCve"),
     @NamedQuery(name = "ProductoPorCliente.findByProductoCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.productoCve = :productoCve"),
+    @NamedQuery(name = "ProductoPorCliente.findByCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve.cteCve = :cteCve"),
     @NamedQuery(name = "ProductoPorCliente.findByCliente", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve = :cteCve")})
 
 public class ProductoPorCliente implements Serializable {
