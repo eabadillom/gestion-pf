@@ -167,7 +167,7 @@
 												</p:outputLabel>
 											</p:outputPanel>
 											
-											<div  style="margin-top: 5px;">
+											<div  style="margin: 5px auto">
 												<p:outputLabel styleClass="p-mr-2" >m<sup>2</sup> Por Camara:</p:outputLabel>	
 												<p:inputNumber value="#{constanciaDeDepositoBean.metroCamara}" >
 													<p:ajax update="@this" />
@@ -176,10 +176,8 @@
 									</p:toolbarGroup>
 								</div>
 							</div>
-							<p:toolbarGroup styleClass="p-mt-4">
-							
+							<p:toolbarGroup styleClass="p-mt-2">
 										<p:commandButton value="Agregar" actionListener="#{constanciaDeDepositoBean.savePartida()}" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="form:dt-partidas"/>
-										
 							</p:toolbarGroup>
 						</p:toolbar> 
 						
