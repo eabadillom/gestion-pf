@@ -36,8 +36,7 @@ FROM
 	LEFT OUTER JOIN SERVICIO s ON det.SERVICIO_CVE =s.SERVICIO_CVE 
 	
 	WHERE 
-	folio_cliente = $P{Folio}
-]]>
+	folio_cliente = $P{Folio}]]>
 	</queryString>
 	<field name="FOLIO" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="FOLIO"/>

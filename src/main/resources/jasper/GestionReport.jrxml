@@ -10,10 +10,171 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<parameter name="Folio" class="java.lang.String">
-		<defaultValueExpression><![CDATA[$P{Folio}]]></defaultValueExpression>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.concurrent.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FCFCFC"/>
+			<bottomPen lineWidth="0.5" lineColor="#FCFCFC"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FCFCFC"/>
+			<bottomPen lineWidth="0.5" lineColor="#FCFCFC"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FCFCFC"/>
+			<bottomPen lineWidth="0.5" lineColor="#FCFCFC"/>
+		</box>
+	</style>
+	<subDataset name="Dataset2" uuid="d2e68ed7-5a98-4ade-9eb4-8331cad12bc6">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDB"/>
+		<parameter name="Folio" class="java.lang.String">
+			<defaultValueExpression><![CDATA[$P{Folio}]]></defaultValueExpression>
+		</parameter>
+		<queryString language="SQL">
+			<![CDATA[SELECT
+	cdd.FOLIO,
+	cdd.CTE_CVE,
+	cdd.FECHA_INGRESO,
+	cdd.NOMBRE_TRANSPORTISTA,
+	cdd.PLACAS_TRANSPORTE,
+	cdd.OBSERVACIONES,
+	cdd.folio_cliente,
+	cdd.valor_declarado,
+	cdd.status,
+	cdd.aviso_cve,
+	cdd.temperatura,
+	det.*,
+	s.*
+FROM
+	CONSTANCIA_DE_DEPOSITO cdd
+	LEFT OUTER JOIN CONSTANCIA_DEPOSITO_DETALLE det ON cdd.FOLIO = det.FOLIO 
+	LEFT OUTER JOIN SERVICIO s ON det.SERVICIO_CVE =s.SERVICIO_CVE 
+	
+	WHERE 
+	folio_cliente = $P{Folio}]]>
+		</queryString>
+		<field name="FOLIO" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="FOLIO"/>
+			<property name="com.jaspersoft.studio.field.label" value="FOLIO"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="CTE_CVE" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="CTE_CVE"/>
+			<property name="com.jaspersoft.studio.field.label" value="CTE_CVE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="FECHA_INGRESO" class="java.sql.Date">
+			<property name="com.jaspersoft.studio.field.name" value="FECHA_INGRESO"/>
+			<property name="com.jaspersoft.studio.field.label" value="FECHA_INGRESO"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="NOMBRE_TRANSPORTISTA" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="NOMBRE_TRANSPORTISTA"/>
+			<property name="com.jaspersoft.studio.field.label" value="NOMBRE_TRANSPORTISTA"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="PLACAS_TRANSPORTE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="PLACAS_TRANSPORTE"/>
+			<property name="com.jaspersoft.studio.field.label" value="PLACAS_TRANSPORTE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="OBSERVACIONES" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="OBSERVACIONES"/>
+			<property name="com.jaspersoft.studio.field.label" value="OBSERVACIONES"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="folio_cliente" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="folio_cliente"/>
+			<property name="com.jaspersoft.studio.field.label" value="folio_cliente"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="valor_declarado" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="valor_declarado"/>
+			<property name="com.jaspersoft.studio.field.label" value="valor_declarado"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="status" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="status"/>
+			<property name="com.jaspersoft.studio.field.label" value="status"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="aviso_cve" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="aviso_cve"/>
+			<property name="com.jaspersoft.studio.field.label" value="aviso_cve"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="temperatura" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="temperatura"/>
+			<property name="com.jaspersoft.studio.field.label" value="temperatura"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		</field>
+		<field name="CONSTANCIA_DEPOSITO_DETALLE_CVE" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="CONSTANCIA_DEPOSITO_DETALLE_CVE"/>
+			<property name="com.jaspersoft.studio.field.label" value="CONSTANCIA_DEPOSITO_DETALLE_CVE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DEPOSITO_DETALLE"/>
+		</field>
+		<field name="SERVICIO_CVE" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="SERVICIO_CVE"/>
+			<property name="com.jaspersoft.studio.field.label" value="SERVICIO_CVE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DEPOSITO_DETALLE"/>
+		</field>
+		<field name="COLUMN_14" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="FOLIO"/>
+			<property name="com.jaspersoft.studio.field.label" value="FOLIO"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DEPOSITO_DETALLE"/>
+		</field>
+		<field name="servicio_cantidad" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="servicio_cantidad"/>
+			<property name="com.jaspersoft.studio.field.label" value="servicio_cantidad"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DEPOSITO_DETALLE"/>
+		</field>
+		<field name="COLUMN_16" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="SERVICIO_CVE"/>
+			<property name="com.jaspersoft.studio.field.label" value="SERVICIO_CVE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+		</field>
+		<field name="SERVICIO_DS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SERVICIO_DS"/>
+			<property name="com.jaspersoft.studio.field.label" value="SERVICIO_DS"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+		</field>
+		<field name="COBRO" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="COBRO"/>
+			<property name="com.jaspersoft.studio.field.label" value="COBRO"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+		</field>
+		<field name="SERVICIO_COD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SERVICIO_COD"/>
+			<property name="com.jaspersoft.studio.field.label" value="SERVICIO_COD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+		</field>
+		<field name="cd_unidad" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="cd_unidad"/>
+			<property name="com.jaspersoft.studio.field.label" value="cd_unidad"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+		</field>
+		<field name="SERVICIO_NOM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SERVICIO_NOM"/>
+			<property name="com.jaspersoft.studio.field.label" value="SERVICIO_NOM"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+		</field>
+		<field name="uuid" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="uuid"/>
+			<property name="com.jaspersoft.studio.field.label" value="uuid"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+		</field>
+	</subDataset>
+	<parameter name="FOLIO" class="java.lang.String">
+		<defaultValueExpression><![CDATA["C 233"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="SUBREPORT_CONNECTION" class="java.sql.Connection"/>
+	<parameter name="LogoPath" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT
 	
@@ -41,7 +202,7 @@ FROM
 	INNER JOIN UNIDAD_DE_MANEJO udm ON udp.UNIDAD_DE_MANEJO_CVE = udm.UNIDAD_DE_MANEJO_CVE 
 	
 	WHERE
-	folio_cliente = $P{Folio}]]>
+	folio_cliente = $P{FOLIO}]]>
 	</queryString>
 	<field name="folio_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="folio_cliente"/>
@@ -104,8 +265,12 @@ FROM
 		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
 	</field>
 	<title>
-		<band height="69" splitType="Stretch">
+		<band height="77" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image>
+				<reportElement x="21" y="0" width="170" height="77" uuid="64d07356-2507-40c8-a6c4-e9a5a0dbea68"/>
+				<imageExpression><![CDATA[$P{LogoPath}]]></imageExpression>
+			</image>
 		</band>
 	</title>
 	<pageHeader>
@@ -187,7 +352,7 @@ KELANGAN S.A. DE C.V.]]></text>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="163" splitType="Stretch">
+		<band height="290" splitType="Stretch">
 			<line>
 				<reportElement x="2" y="0" width="208" height="1" uuid="196c9cff-72b5-4463-b565-4ecbb2302621"/>
 				<graphicElement>
@@ -252,6 +417,56 @@ KELANGAN S.A. DE C.V.]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PESO_TOTAL}]]></textFieldExpression>
 			</textField>
+			<componentElement>
+				<reportElement x="5" y="80" width="200" height="110" uuid="bd380806-e570-45f4-970e-9d8bc25252c3">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset2" uuid="6d876f17-f682-4683-813f-0fb8f41d64b7">
+						<datasetParameter name="Folio">
+							<datasetParameterExpression><![CDATA[$P{FOLIO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="100" uuid="f2a2db10-a69d-401e-87ec-830866c6c9c9">
+						<jr:tableHeader style="Table_TH" height="30"/>
+						<jr:tableFooter style="Table_TH" height="30"/>
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="100" height="30" uuid="6cf7534c-7d95-400e-baf3-e5e4d3739aaf"/>
+								<text><![CDATA[SERVICIO_DS]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="100" height="30" uuid="bd4588c9-26ef-4b52-b4e2-56310114dcb3"/>
+								<textFieldExpression><![CDATA[$F{SERVICIO_DS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="100" uuid="7e8e14e7-13e4-4ffd-a3de-ff6685067f59">
+						<jr:tableHeader style="Table_TH" height="30"/>
+						<jr:tableFooter style="Table_TH" height="30"/>
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="100" height="30" uuid="070d6b36-6b08-473b-888a-61d311af9f51"/>
+								<text><![CDATA[servicio_cantidad]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="100" height="30" uuid="93022f96-db49-4f6c-b2d6-21458d6986cf"/>
+								<textFieldExpression><![CDATA[$F{servicio_cantidad}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
 		</band>
 	</detail>
 	<columnFooter>
