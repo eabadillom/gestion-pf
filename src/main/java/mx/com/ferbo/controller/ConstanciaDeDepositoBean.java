@@ -928,6 +928,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		constanciaDD.setServicioCantidad(cantidadServicio);
 		listadoConstanciaDepositoDetalle.add(constanciaDD);
 		
+		
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Se agrego el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages","form:dt.constanciaDD");
 		
@@ -975,19 +976,28 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		nombreTransportista = "";
 		placas = "";
 		observacion = "";
-		listadoPartida = new ArrayList<Partida>();
-		listadoConstanciaDepositoDetalle = new ArrayList<ConstanciaDepositoDetalle>();
+		listadoPartida.clear();
+		listadoConstanciaDepositoDetalle.clear();
 		
 	}
 	
 	public void saveConstanciaDeDeposito() {
 		
-	
 		constanciaDeDeposito.setNombreTransportista(nombreTransportista);
 		constanciaDeDeposito.setPlacasTransporte(placas);
 		constanciaDeDeposito.setObservaciones(observacion);
 		constanciaDeDeposito.setTemperatura(temperatura);
-		constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
+		if(!(listadoConstanciaDepositoDetalle.isEmpty())) {
+			constanciaDeDeposito.setConstanciaDepositoDetalleList(new ArrayList<ConstanciaDepositoDetalle>());
+			constanciaDeDeposito.setPartidaList(new ArrayList<Partida>());
+			constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);	
+		}else {
+			constanciaDeDeposito.setCteCve(clienteSelect);
+			constanciaDeDeposito.setFechaIngreso(fechaIngreso);
+			constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
+			constanciaDeDeposito.setAvisoCve(avisoSelect);
+		}
+		
 		constanciaDeDeposito.setPartidaList(listadoPartida);
 		
 		constanciaDAO.guardar(constanciaDeDeposito);
@@ -1033,14 +1043,12 @@ public class ConstanciaDeDepositoBean implements Serializable{
 	
 	public void imprimir() {
 		String jasperPath = "/jasper/GestionReport.jrxml";
-		//String subReport = "/jasper";
 		String filename = "ticket.pdf";
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
 		ConstanciaDeDeposito constancia = null;
 		 File reportFile = new File(jasperPath);
-		 //File subReportFile = new File(subReport);
 		 File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
 		Map<String, Object> parameters = new HashMap<String, Object>();
@@ -1051,12 +1059,8 @@ public class ConstanciaDeDepositoBean implements Serializable{
 				throw new Exception("Favor de guardar constancia");
 			}*/
 			URL resource = getClass().getResource(jasperPath);
-			//URL resourceSub = getClass().getResource(subReport);
-			//System.out.println(resource);
-			//System.out.println(resourceSub);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
-			//String fileSub = resourceSub.getFile();
 			String img = resourceimg.getFile();
 			reportFile = new File(file);
 			//subReportFile = new File(fileSub);
@@ -1065,19 +1069,14 @@ public class ConstanciaDeDepositoBean implements Serializable{
 			//log.info(reportFile.getPath());
 			constancia = new ConstanciaDeDeposito();
 			constancia.setFolioCliente(this.noConstanciaSelect);
-			noConstanciaSelect = String.valueOf("C 233");
+			noConstanciaSelect = String.valueOf("C 218");
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", noConstanciaSelect);
 			parameters.put("LogoPath",imgfile.getPath());
-			//System.out.println(subReportFile+File.separator);
-			//parameters.put("SubReport",subReportFile+File.separator);
-			//System.out.println(parameters.toString());
-			//log.info("Parametros: " + parameters.toString());
 			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());		
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			//log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.noConstanciaSelect);
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));

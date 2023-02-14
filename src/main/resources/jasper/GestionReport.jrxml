@@ -15,20 +15,20 @@
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
 		<box>
-			<topPen lineWidth="0.5" lineColor="#FCFCFC"/>
-			<bottomPen lineWidth="0.5" lineColor="#FCFCFC"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
 		</box>
 	</style>
 	<style name="Table_CH" mode="Opaque" backcolor="#FFFFFF">
 		<box>
-			<topPen lineWidth="0.5" lineColor="#FCFCFC"/>
-			<bottomPen lineWidth="0.5" lineColor="#FCFCFC"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
 		</box>
 	</style>
 	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
 		<box>
-			<topPen lineWidth="0.5" lineColor="#FCFCFC"/>
-			<bottomPen lineWidth="0.5" lineColor="#FCFCFC"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
 		</box>
 	</style>
 	<subDataset name="Dataset2" uuid="d2e68ed7-5a98-4ade-9eb4-8331cad12bc6">
@@ -264,6 +264,15 @@ FROM
 		<property name="com.jaspersoft.studio.field.label" value="UNIDAD_DE_MANEJO_DS"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
 	</field>
+	<variable name="pesoUnitario" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$F{PESO_TOTAL}.divide( new BigDecimal($F{CANTIDAD_TOTAL}) ,2,RoundingMode.HALF_UP)]]></variableExpression>
+	</variable>
+	<variable name="CantidadTotal" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{CANTIDAD_TOTAL}]]></variableExpression>
+	</variable>
+	<variable name="PesoTotal" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PESO_TOTAL}]]></variableExpression>
+	</variable>
 	<title>
 		<band height="77" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -274,9 +283,11 @@ FROM
 		</band>
 	</title>
 	<pageHeader>
-		<band height="35" splitType="Stretch">
+		<band height="29" splitType="Stretch">
 			<staticText>
-				<reportElement x="16" y="0" width="174" height="30" uuid="b56049e7-44be-476d-a458-3146bb78b255"/>
+				<reportElement x="16" y="0" width="174" height="24" uuid="b56049e7-44be-476d-a458-3146bb78b255">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textElement textAlignment="Center"/>
 				<text><![CDATA[INDUSTRIAS DE REFRIGERACIÓN
 KELANGAN S.A. DE C.V.]]></text>
@@ -284,7 +295,7 @@ KELANGAN S.A. DE C.V.]]></text>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="82" splitType="Stretch">
+		<band height="88" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="10" width="139" height="12" uuid="54c46c0c-f65f-4f9d-ac05-c1f8a31ccb2f">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -349,16 +360,16 @@ KELANGAN S.A. DE C.V.]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{FECHA_INGRESO}]]></textFieldExpression>
 			</textField>
-		</band>
-	</columnHeader>
-	<detail>
-		<band height="290" splitType="Stretch">
 			<line>
-				<reportElement x="2" y="0" width="208" height="1" uuid="196c9cff-72b5-4463-b565-4ecbb2302621"/>
+				<reportElement x="3" y="87" width="208" height="1" uuid="196c9cff-72b5-4463-b565-4ecbb2302621"/>
 				<graphicElement>
 					<pen lineWidth="1.5" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="68" splitType="Stretch">
 			<textField>
 				<reportElement x="0" y="10" width="148" height="12" uuid="6b42b6b6-59c2-47df-9060-2ff2c453b8c3">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -402,13 +413,13 @@ KELANGAN S.A. DE C.V.]]></text>
 				<text><![CDATA[PesoU]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="90" y="50" width="50" height="12" uuid="72d20165-0489-486d-bbaf-9d7466e9456d">
+				<reportElement x="100" y="50" width="50" height="12" uuid="72d20165-0489-486d-bbaf-9d7466e9456d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<text><![CDATA[Peso]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="150" y="50" width="59" height="12" forecolor="#000000" uuid="75cbba95-9527-44c3-8e43-f9a97794461c">
+				<reportElement x="150" y="50" width="41" height="12" forecolor="#000000" uuid="75cbba95-9527-44c3-8e43-f9a97794461c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
@@ -417,56 +428,27 @@ KELANGAN S.A. DE C.V.]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PESO_TOTAL}]]></textFieldExpression>
 			</textField>
-			<componentElement>
-				<reportElement x="5" y="80" width="200" height="110" uuid="bd380806-e570-45f4-970e-9d8bc25252c3">
-					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
-					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
-					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
-					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+			<textField>
+				<reportElement x="51" y="50" width="26" height="12" forecolor="#000000" uuid="3e31ce54-428f-4725-8d83-184c0a5611ee">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="Dataset2" uuid="6d876f17-f682-4683-813f-0fb8f41d64b7">
-						<datasetParameter name="Folio">
-							<datasetParameterExpression><![CDATA[$P{FOLIO}]]></datasetParameterExpression>
-						</datasetParameter>
-						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-					</datasetRun>
-					<jr:column width="100" uuid="f2a2db10-a69d-401e-87ec-830866c6c9c9">
-						<jr:tableHeader style="Table_TH" height="30"/>
-						<jr:tableFooter style="Table_TH" height="30"/>
-						<jr:columnHeader style="Table_CH" height="30">
-							<staticText>
-								<reportElement x="0" y="0" width="100" height="30" uuid="6cf7534c-7d95-400e-baf3-e5e4d3739aaf"/>
-								<text><![CDATA[SERVICIO_DS]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
-						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement x="0" y="0" width="100" height="30" uuid="bd4588c9-26ef-4b52-b4e2-56310114dcb3"/>
-								<textFieldExpression><![CDATA[$F{SERVICIO_DS}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="100" uuid="7e8e14e7-13e4-4ffd-a3de-ff6685067f59">
-						<jr:tableHeader style="Table_TH" height="30"/>
-						<jr:tableFooter style="Table_TH" height="30"/>
-						<jr:columnHeader style="Table_CH" height="30">
-							<staticText>
-								<reportElement x="0" y="0" width="100" height="30" uuid="070d6b36-6b08-473b-888a-61d311af9f51"/>
-								<text><![CDATA[servicio_cantidad]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
-						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement x="0" y="0" width="100" height="30" uuid="93022f96-db49-4f6c-b2d6-21458d6986cf"/>
-								<textFieldExpression><![CDATA[$F{servicio_cantidad}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-				</jr:table>
-			</componentElement>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{pesoUnitario}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="190" y="50" width="19" height="12" uuid="3c5428c3-84bd-4fc1-96a6-9a30d7dcfd02"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[kg]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="77" y="50" width="19" height="12" uuid="eaa8f29f-fb11-48b0-a363-a96e762ef5f8"/>
+				<text><![CDATA[kg]]></text>
+			</staticText>
 		</band>
 	</detail>
 	<columnFooter>
@@ -481,18 +463,27 @@ KELANGAN S.A. DE C.V.]]></text>
 				<reportElement x="0" y="1" width="50" height="12" uuid="d86be0e3-77d4-4c77-9455-86a02b0c77f4">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
 				<text><![CDATA[Cantidad]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="20" width="59" height="12" uuid="b2d36993-1d54-489b-9600-4086f33ed223">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
 				<text><![CDATA[Peso Total]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="38" width="90" height="12" uuid="9e962e6c-d087-41ef-9463-ef4b74788160">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
 				<text><![CDATA[Temperatura De]]></text>
 			</staticText>
 			<textField>
@@ -503,12 +494,26 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{temperatura}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{temperatura}+ "°C"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="0" width="60" height="14" uuid="aa391e63-4364-4be1-a0ea-55cfeb7fb18b"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CantidadTotal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="19" width="60" height="14" uuid="5a2bf181-7352-4e85-b0ad-b4b77fdd40b2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PesoTotal}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>
 	<pageFooter>
-		<band height="62" splitType="Stretch">
+		<band height="43" splitType="Stretch">
 			<line>
 				<reportElement x="-1" y="0" width="208" height="1" uuid="0009efeb-f2d3-440d-a897-e9c116be6dc7"/>
 				<graphicElement>
@@ -525,7 +530,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<reportElement x="70" y="0" width="70" height="12" uuid="0e9bd40a-9364-412f-a1dd-bbe6d8b2c32a">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<text><![CDATA[Transportista]]></text>
+				<text><![CDATA[Transportista:]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="130" y="30" width="59" height="12" forecolor="#000000" uuid="1af28da6-973b-4306-8d9e-ec959f2c17c7">
@@ -533,7 +538,7 @@ KELANGAN S.A. DE C.V.]]></text>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement>
-					<font isBold="true"/>
+					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PLACAS_TRANSPORTE}]]></textFieldExpression>
 			</textField>
@@ -543,12 +548,12 @@ KELANGAN S.A. DE C.V.]]></text>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement>
-					<font isBold="true"/>
+					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{NOMBRE_TRANSPORTISTA}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="0" y="61" width="208" height="1" uuid="e66f6137-74ab-4cca-a0e5-f85cfb67f8ea"/>
+				<reportElement x="4" y="42" width="208" height="1" uuid="fdb3197b-cfe1-4eb2-834c-cb0aa6e60906"/>
 				<graphicElement>
 					<pen lineWidth="1.5" lineStyle="Solid"/>
 				</graphicElement>
@@ -556,23 +561,74 @@ KELANGAN S.A. DE C.V.]]></text>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="29" splitType="Stretch">
+		<band height="125" splitType="Stretch">
 			<staticText>
-				<reportElement x="2" y="0" width="71" height="12" uuid="0757078c-a55d-49b3-8ab3-7650aa849795">
+				<reportElement x="2" y="110" width="71" height="12" uuid="0757078c-a55d-49b3-8ab3-7650aa849795">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<text><![CDATA[Observaciones]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="6" y="15" width="59" height="12" forecolor="#000000" uuid="50b1da22-af6b-4475-851d-84ed176bb092">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
+				<text><![CDATA[Observaciones]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="90" y="110" width="59" height="12" forecolor="#000000" uuid="50b1da22-af6b-4475-851d-84ed176bb092">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{OBSERVACIONES}]]></textFieldExpression>
 			</textField>
+			<componentElement>
+				<reportElement isPrintRepeatedValues="false" x="2" y="16" width="209" height="43" forecolor="#000000" uuid="bb07ed43-766f-4471-91c8-55de1272825e">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset2" uuid="8929f696-0118-43fb-a85a-2af6d644d185">
+						<datasetParameter name="Folio">
+							<datasetParameterExpression><![CDATA[$P{FOLIO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="140" uuid="fe083b1c-cce9-4023-9513-c4d5f2668c0c">
+						<jr:detailCell style="Table_TD" height="40">
+							<textField>
+								<reportElement x="0" y="0" width="140" height="40" uuid="d7308b4f-f65f-431a-a007-7035b05708dd"/>
+								<textElement>
+									<font isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{SERVICIO_DS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="72" uuid="dc311ee4-5cd0-450d-a953-7d73e4e7fd1c">
+						<jr:detailCell style="Table_TD" height="40">
+							<textField>
+								<reportElement x="0" y="0" width="72" height="40" uuid="97137650-5d8e-43c3-a4c8-ddd2222e955d"/>
+								<textElement>
+									<font isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{servicio_cantidad}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement x="2" y="0" width="60" height="12" uuid="c1d2e90a-0393-4492-98f0-9c5e07991c58">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Servicios]]></text>
+			</staticText>
 		</band>
 	</summary>
 </jasperReport>
