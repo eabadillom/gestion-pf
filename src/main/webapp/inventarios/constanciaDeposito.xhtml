@@ -363,9 +363,9 @@
 							</p:inputTextarea>
 							</div>
 							<div style="margin-top: 5px">
-								<p:commandButton value="Guardar" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-save" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" update="@this" process="@form"/>
+								
 								<p:commandButton value="Limpiar" class="ui-button-warning" actionListener="#{constanciaDeDepositoBean.limpiar()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales dt-constanciaDD dt-partidas"/>
-								<p:splitButton value="Guardar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" icon="pi pi-save" update="@this @form" process="@form">
+								<p:splitButton value="Guardar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" icon="pi pi-save" update="@this">
 						            <p:menuitem value="Imprimir" actionListener="#{constanciaDeDepositoBean.imprimir()}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
 						            <p:menuitem value="Cancelar" icon="pi pi-times"/>
 						        </p:splitButton>

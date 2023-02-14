@@ -914,10 +914,10 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		
 		
 		//---------------- FOLIO ----------------
-		constanciaDeDeposito.setCteCve(clienteSelect);
+		/*constanciaDeDeposito.setCteCve(clienteSelect);
 		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
 		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
-		constanciaDeDeposito.setAvisoCve(avisoSelect);
+		constanciaDeDeposito.setAvisoCve(avisoSelect);*/
 		
 		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
 		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
@@ -930,7 +930,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		
 		
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Se agrego el registro correctamente"));
-		PrimeFaces.current().ajax().update("form:messages","form:dt.constanciaDD");
+		PrimeFaces.current().ajax().update("form:messages","form:dt-constanciaDD");
 		
 	}
 	
@@ -976,9 +976,9 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		nombreTransportista = "";
 		placas = "";
 		observacion = "";
-		listadoPartida.clear();
-		listadoConstanciaDepositoDetalle.clear();
-		
+		listadoPartida = new ArrayList<Partida>();
+		listadoConstanciaDepositoDetalle = new ArrayList<ConstanciaDepositoDetalle>();
+		constanciaDeDeposito = new ConstanciaDeDeposito();
 	}
 	
 	public void saveConstanciaDeDeposito() {
@@ -991,15 +991,17 @@ public class ConstanciaDeDepositoBean implements Serializable{
 			constanciaDeDeposito.setConstanciaDepositoDetalleList(new ArrayList<ConstanciaDepositoDetalle>());
 			constanciaDeDeposito.setPartidaList(new ArrayList<Partida>());
 			constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);	
-		}else {
-			constanciaDeDeposito.setCteCve(clienteSelect);
-			constanciaDeDeposito.setFechaIngreso(fechaIngreso);
-			constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
-			constanciaDeDeposito.setAvisoCve(avisoSelect);
 		}
+		constanciaDeDeposito.setCteCve(clienteSelect);
+		constanciaDeDeposito.setFechaIngreso(fechaIngreso);
+		constanciaDeDeposito.setFolioCliente(noConstanciaSelect);
+		constanciaDeDeposito.setAvisoCve(avisoSelect);
 		
+		constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
 		constanciaDeDeposito.setPartidaList(listadoPartida);
-		
+		/*if(constanciaDeDeposito.getFolio()!=null) {
+			constanciaDeDeposito.setFolio(null);
+		}*/
 		constanciaDAO.guardar(constanciaDeDeposito);
 		impresion = true;
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro correctamente"));
@@ -1063,13 +1065,10 @@ public class ConstanciaDeDepositoBean implements Serializable{
 			String file = resource.getFile();
 			String img = resourceimg.getFile();
 			reportFile = new File(file);
-			//subReportFile = new File(fileSub);
-			//System.out.println(subReportFile.getPath());
 			imgfile = new File(img);
-			//log.info(reportFile.getPath());
 			constancia = new ConstanciaDeDeposito();
 			constancia.setFolioCliente(this.noConstanciaSelect);
-			noConstanciaSelect = String.valueOf("C 218");
+			noConstanciaSelect = String.valueOf(getNoConstanciaSelect());
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", noConstanciaSelect);

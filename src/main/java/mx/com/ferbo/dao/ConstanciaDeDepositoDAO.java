@@ -47,6 +47,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		}catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			e.printStackTrace();
+			e.getCause();
 			return "ERROR";
 		}
 		
