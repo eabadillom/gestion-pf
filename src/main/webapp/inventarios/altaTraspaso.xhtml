@@ -1,0 +1,250 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Alta Constancia de Servicio</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Traspasos" />
+				<p:menuitem value="Alta" />
+				<p:menuitem value="Alta" outcome="/inventarios/altaTraspaso" />
+			</p:breadCrumb>
+			<p:growl id="messages" showDetail="true" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altatraspaso.fecha}" />
+							<p:inputText id="txtFolio" value="#{altatraspaso.folio}" placeholder="Folio" />
+			<p:toolbar>
+				<p:toolbarGroup>
+						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altaTraspasoBean.idCliente}" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="Seleccione Cliente" itemValue="" noSelectionOption="true" />
+							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
+							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:selProducto  "/>
+						</p:selectOneMenu>
+						
+						<p:selectOneMenu id="selProducto" autoWidth="true" value="#{altaTraspasoBean.idProducto}" filterMatchMode="startsWith">
+						<f:selectItem itemLabel="Seleccione Producto" itemValue="" noSelectionOption="true" />
+						<f:selectItems var="producto" value="#{altaTraspasoBean.alProductosFiltered}" itemLabel="#{producto.productoCve.productoDs}" itemValue="#{producto.productoCve.productoCve}" />
+					</p:selectOneMenu>
+				</p:toolbarGroup>
+			</p:toolbar>
+	<h5></h5>
+<div class="card crud-demo">
+    <h:form id="form">
+        <p:growl id="messages" showDetail="true" />
+
+        <p:toolbar>
+            <p:toolbarGroup>
+             <!--  
+                <p:commandButton value="Añadir" icon="pi pi-plus" actionListener="#{crudView.openNew}" update="" oncomplete=""
+                    styleClass="ui-button-info p-mr-2 p-mb-2" style="margin-right: .5rem">
+                   <p:resetInput target=":dialogs:manage-product-content" />
+                   </p:commandButton>-->
+        <div class="card">
+    		<h5>Basic</h5>
+    		<p:commandButton value="Confirmar Traspaso" actionListener="#{altaConstanciaServicioBean.agregarProducto}" type="button" icon="pi pi-plus-circle" onclick="PF('dlg1').show()"/>
+		</div>
+
+                <p:commandButton id="delete-products-button" value="#{crudView.deleteButtonMessage}" icon="pi pi-trash" 
+                actionListener="#{crudView.deleteSelectedProducts}" styleClass="ui-button-danger" disabled="#{!crudView.hasSelectedProducts()}" update="@this">
+                    <p:confirm header="Confirmation" message="Delete the selected products?" icon="pi pi-exclamation-triangle" />
+                </p:commandButton>
+            </p:toolbarGroup>
+</p:toolbar>
+            
+         <div class="card">
+    <h:form>
+<p:dataTable id="dt-traspaso" widgetVar="dttraspaso" lazy="true" var="altatraspaso" value="#{altaTraspasoBean.alPartidas}" reflow="true" 
+        styleClass="products-table" selection="#{altaTraspasoBean.alPartidas}" rowKey="#{altatraspaso.folio}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">           
+             <f:facet name="header">
+                Expand rows to see detailed information
+            </f:facet>
+            <p:column style="width:2rem">
+                <p:rowToggler/>
+            </p:column>
+
+            <p:column headerText="Folio" sortBy="#{altatraspaso.folio.folio}" filterBy="#{altatraspaso.folio.folio}"><h:outputText value="#{altatraspaso.folio.folio}" />
+            </p:column>
+
+            <p:column headerText="Producto" sortBy="#{altatraspaso.productoCve.productoDs}" filterBy="#{altatraspaso.productoCve.productoDs}">
+                <h:outputText value="#{altatraspaso.productoCve.productoDs}"  />
+            </p:column>
+			
+            <p:column headerText="Cantidad" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}">
+                <h:outputText value="#{altatraspaso.cantidadTotal}" />
+            </p:column>
+            
+            <p:column headerText="Posicion" sortBy="#{datosT.inventoryStatus}" filterBy="#{product.inventoryStatus}">
+                <h:outputText styleClass="product-badge status-#{product.inventoryStatus.name().toLowerCase()}" value="#{product.inventoryStatus.text}" />
+            </p:column>
+
+            <p:column headerText="Category">
+                <h:outputText value="#{product.category}"/>
+            </p:column>
+
+            <p:column headerText="Reviews">
+            <h:outputText value="#{product.name}"/>
+            </p:column>
+
+            <p:column headerText="Status">
+                <h:outputText value="#{product.inventoryStatus}"/>
+            </p:column>
+
+            <p:rowExpansion>
+                <div class="altatraspaso">
+                    <div class="altatraspaso-list-item">
+                       <div class="product-name"> XXXXXXX </div>
+                                                    <div class="product-dscrp"> XXXXXXX </div>
+                        <div class="altatraspaso-list-action">
+                                                    <div class="product-name"> XXXXXXX </div>
+                                                    <div class="product-dscrp"> XXXXXXX </div>
+
+                            <h:outputText value="#{altatraspaso.cantidad}" styleClass="altatraspaso-cantidad">
+                                <f:convertNumber currencySymbol="$" type="currency"/>
+                            </h:outputText>
+                            <p:commandButton value="Add To Cart" icon="pi pi-shopping-cart" type="button" disabled="#{altatraspaso.inventoryStatus == 'OUTOFSTOCK'}">
+                            </p:commandButton>
+                            <span class="product-badge status-#{product.inventoryStatus.name().toLowerCase()}">#{altatraspaso.inventoryStatus.text}</span>
+                        </div>
+                    </div>
+                </div>
+            </p:rowExpansion>
+        </p:dataTable>
+         </h:form>
+         </div>
+			<p:dialog header="Header" widgetVar="dlg1"  showEffect="fade">
+          	<div class="card ui-fluid ">
+    <h:form>
+        <p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
+        <h5 class="mt-0">Single</h5>
+        <div class="formgrid grid">
+        
+            <div class="field col-12 md:col-4">
+            <p:panel id="Folio">
+	             <div class="field">
+	                 <span class="ui-float-label ui-input-icon-right">
+	                  <p:inputText widgetVar="Folio-new" id="Folio-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+	                  <p:outputLabel for="Folio-new" value="Folio" styleClass="ml-4" />
+	                <!--    <i class="pi pi-user" />-->
+			</span></div></p:panel></div>
+			                
+            <div class="field col-12 md:col-4">
+            <p:panel id="Producto">
+                <div class="field">
+	               <span class="ui-float-label ui-input-icon-right">
+	               <p:inputText widgetVar="producto-new" id="producto-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+	               <p:outputLabel for="producto-new" value="Producto" styleClass="ml-4" />
+                        <!--  <i class="pi pi-user" />-->
+			 </span></div></p:panel></div>
+
+            <div class="field col-12 md:col-4">
+            		<p:panel id="Existencia">
+			  		<div class="field">
+               		<span class="ui-float-label ui-input-icon-right">
+                    <p:inputText widgetVar="Existencia-new" id="Existencia-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+                    <p:outputLabel for="Existencia-new" value="En existencia" styleClass="ml-4" /><!--  <i class="pi pi-user" />-->
+		    </span></div></p:panel></div>
+
+			  <div class="field col-12 md:col-4">
+		            <p:panel id="Unidadmanejo">
+				    <div class="field">
+			        <span class="ui-float-label ui-input-icon-right">
+                    <p:inputText widgetVar="unidadm-new" id="unidadm-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+                    <p:outputLabel for="unidadm-new" value="Unidad de Manejo" styleClass="ml-4" /> <!--  <i class="pi pi-user" />-->
+	           </span></div></p:panel></div>
+			                
+<div class="field col-12 md:col-4">
+           <p:panel id="Kilos">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="kilos-new" id="kilos-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+			                        <p:outputLabel for="kilos-new" value="Kilos" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                </span></div></p:panel></div>
+
+<div class="field col-12 md:col-4">
+           <p:panel id="Productos">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="Productos-new" id="Productos-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+			                        <p:outputLabel for="Productos-new" value="Productos" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                </span></div></p:panel></div>
+
+<div class="field col-12 md:col-4">
+           <p:panel id="Camara">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="camara-new" id="camara-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+			                        <p:outputLabel for="camara-new" value="Camara" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                </span></div></p:panel></div>
+
+<div class="field col-12 md:col-4">
+           <p:panel id="Planta">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="planta-new" id="planta-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+			                        <p:outputLabel for="planta-new" value="planta" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                </span></div></p:panel></div>
+
+<div class="field col-12 md:col-4">
+           <p:panel id="Posicion">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="posicion-new" id="posicion-new" value="#{altatraspaso.cantidadTotal}" disabled="true" required="true"/>
+			                        <p:outputLabel for="posicion-new" value="Posicion" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                	</span></div></p:panel></div>
+			                
+<div class="field col-12 md:col-4">
+           <p:panel id="Plantadestino">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="plantadestino-new" id="plantadestino-new" value="#{altatraspaso.cantidadTotal}" required="true"/>
+			                        <p:outputLabel for="plantadestino-new" value="plantadestino" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                </span></div></p:panel></div>
+ 
+ <div class="field col-12 md:col-4">
+           <p:panel id="Camaradestino">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="camaradestino-new" id="camaradestino-new" value="#{altatraspaso.cantidadTotal}" required="true"/>
+			                        <p:outputLabel for="camaradestino-new" value="camaradestino" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                </span></div></p:panel></div>
+
+<div class="field col-12 md:col-4">
+           <p:panel id="Servicio">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="Servicio-new" id="Servicio-new" value="#{altatraspaso.cantidadTotal}" required="true"/>
+			                        <p:outputLabel for="Servicio-new" value="Servicio" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                </span></div></p:panel></div>
+			                
+<div class="field col-12 md:col-4">
+           <p:panel id="Cantidad">
+			                <div class="field">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="cantidad-new" id="cantidad-new" value="#{altatraspaso.cantidadTotal}" required="true"/>
+			                        <p:outputLabel for="cantidad-new" value="cantidad" styleClass="ml-4" />
+			                        <!--  <i class="pi pi-user" />-->
+			                </span></div></p:panel></div>
+
+		</div>
+    </h:form>
+</div>
+          	
+          	
+		</p:dialog>
+    </h:form>
+</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
