@@ -25,13 +25,13 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 	public List<Cliente> buscarTodos() {
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		List<Cliente> listado = null;
-		listado = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();
+		listado = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();		
 		return listado;
 	}
 
 	@Override
 	public List<Cliente> buscarPorCriterios(Cliente e) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

@@ -29,7 +29,11 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 	@Override
 	public List<ProductoPorCliente> buscarPorCriterios(ProductoPorCliente e) {
 		// TODO Auto-generated method stub
-		return null;
+		List<ProductoPorCliente> listado;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		listado = em.createNamedQuery("ProductoPorCliente.findByCteCve",ProductoPorCliente.class).setParameter("cteCve", e.getCteCve().getCteCve()).getResultList();
+		
+		return listado;
 	}
 	
 	public List<ProductoPorCliente> buscarPorCteCve(Cliente cliente) {

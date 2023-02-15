@@ -26,7 +26,7 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 
 	@Override
 	public List<Camara> buscarPorCriterios(Camara e) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
