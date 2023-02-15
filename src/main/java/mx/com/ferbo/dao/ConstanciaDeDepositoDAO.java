@@ -37,8 +37,20 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	}
 
 	@Override
-	public String guardar(ConstanciaDeDeposito e) {
-		// TODO Auto-generated method stub
+	public String guardar(ConstanciaDeDeposito constanciaDeDeposito) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(constanciaDeDeposito);
+			em.getTransaction().commit();
+			em.close();
+		}catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			e.printStackTrace();
+			e.getCause();
+			return "ERROR";
+		}
+		
 		return null;
 	}
 

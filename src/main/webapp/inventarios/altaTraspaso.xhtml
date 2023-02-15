@@ -76,42 +76,28 @@
                 <h:outputText value="#{altatraspaso.cantidadTotal}" />
             </p:column>
             
-            <p:column headerText="Posicion" sortBy="#{datosT.inventoryStatus}" filterBy="#{product.inventoryStatus}">
-                <h:outputText styleClass="product-badge status-#{product.inventoryStatus.name().toLowerCase()}" value="#{product.inventoryStatus.text}" />
-            </p:column>
-
-            <p:column headerText="Category">
-                <h:outputText value="#{product.category}"/>
-            </p:column>
-
-            <p:column headerText="Reviews">
-            <h:outputText value="#{product.name}"/>
-            </p:column>
-
-            <p:column headerText="Status">
-                <h:outputText value="#{product.inventoryStatus}"/>
-            </p:column>
 
             <p:rowExpansion>
-                <div class="altatraspaso">
-                    <div class="altatraspaso-list-item">
-                       <div class="product-name"> XXXXXXX </div>
-                                                    <div class="product-dscrp"> XXXXXXX </div>
-                        <div class="altatraspaso-list-action">
-                                                    <div class="product-name"> XXXXXXX </div>
-                                                    <div class="product-dscrp"> XXXXXXX </div>
-
-                            <h:outputText value="#{altatraspaso.cantidad}" styleClass="altatraspaso-cantidad">
-                                <f:convertNumber currencySymbol="$" type="currency"/>
-                            </h:outputText>
-                            <p:commandButton value="Add To Cart" icon="pi pi-shopping-cart" type="button" disabled="#{altatraspaso.inventoryStatus == 'OUTOFSTOCK'}">
-                            </p:commandButton>
-                            <span class="product-badge status-#{product.inventoryStatus.name().toLowerCase()}">#{altatraspaso.inventoryStatus.text}</span>
-                        </div>
-                    </div>
-                </div>
-            </p:rowExpansion>
-        </p:dataTable>
+											<div class="p-grid ui-fluid">
+												<div class="p-field p-col-2 p-md-2">
+													<p:outputLabel for="@next" value="Código" />
+													<p:inputText value="altatraspaso.folio" readonly="true" />
+												</div>
+												<div class="p-field p-col-2 p-md-2">
+													<p:outputLabel for="@next" value="Caducidad"/>
+													<p:datePicker value="altatraspaso.folio" readonly="true"/>
+												</div>
+												<div class="p-field p-col-2 p-md-2">
+													<p:outputLabel for="@next" value="Lote"/>
+													<p:inputText value="altatraspaso.folio" readonly="true" />
+												</div>
+												<div class="p-field p-col-2 p-md-2">
+													<p:outputLabel for="@next" value="Contenedor"/>
+													<p:inputText value="altatraspaso.folio" readonly="true" />
+												</div>
+											</div>
+										</p:rowExpansion>
+                    </p:dataTable>
          </h:form>
          </div>
 			<p:dialog header="Header" widgetVar="dlg1"  showEffect="fade">

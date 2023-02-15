@@ -164,8 +164,11 @@ public class ConstanciaDeDeposito implements Serializable {
         return partidaList;
     }
 
-    public void setPartidaList(List<Partida> partidaList) {
+    public void setPartidaList(List<Partida> partidaList) {//modificar para mappedby 
         this.partidaList = partidaList;
+        for(Partida p:partidaList) {
+        	p.setFolio(this);
+        }
     }
 
     public List<ConstanciaDepositoDetalle> getConstanciaDepositoDetalleList() {
@@ -174,6 +177,9 @@ public class ConstanciaDeDeposito implements Serializable {
 
     public void setConstanciaDepositoDetalleList(List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList) {
         this.constanciaDepositoDetalleList = constanciaDepositoDetalleList;
+        for(ConstanciaDepositoDetalle c: constanciaDepositoDetalleList) {
+        	c.setFolio(this);
+        }
     }
 
     public Cliente getCteCve() {

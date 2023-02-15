@@ -31,14 +31,32 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 	}
 
 	@Override
-	public String actualizar(Partida e) {
-		// TODO Auto-generated method stub
+	public String actualizar(Partida partida) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(partida);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
 		return null;
 	}
 
 	@Override
-	public String guardar(Partida e) {
-		// TODO Auto-generated method stub
+	public String guardar(Partida partida) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(partida);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
 		return null;
 	}
 

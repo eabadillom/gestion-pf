@@ -113,7 +113,7 @@ public class DetallePartida implements Serializable {
         this.detallePartidaPK = detallePartidaPK;
     }
 
-    public DetallePartida(int detPartCve, int partidaCve) {
+    public DetallePartida(int detPartCve, Partida partidaCve) {
         this.detallePartidaPK = new DetallePartidaPK(detPartCve, partidaCve);
     }
 

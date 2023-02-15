@@ -5,41 +5,41 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.UnidadDeProducto;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
+public class ConstanciaDepositoDetalleDAO extends IBaseDAO<ConstanciaDepositoDetalle,Integer>{
 
 	@Override
-	public UnidadDeProducto buscarPorId(Integer id) {
+	public ConstanciaDepositoDetalle buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<UnidadDeProducto> buscarTodos() {
+	public List<ConstanciaDepositoDetalle> buscarTodos() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<UnidadDeProducto> buscarPorCriterios(UnidadDeProducto e) {
+	public List<ConstanciaDepositoDetalle> buscarPorCriterios(ConstanciaDepositoDetalle e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String actualizar(UnidadDeProducto e) {
+	public String actualizar(ConstanciaDepositoDetalle e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String guardar(UnidadDeProducto unidadDeProducto) {
+	public String guardar(ConstanciaDepositoDetalle constanciaDD) {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.persist(unidadDeProducto);
+			em.persist(constanciaDD);
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
@@ -50,13 +50,13 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 	}
 
 	@Override
-	public String eliminar(UnidadDeProducto e) {
+	public String eliminar(ConstanciaDepositoDetalle e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String eliminarListado(List<UnidadDeProducto> listado) {
+	public String eliminarListado(List<ConstanciaDepositoDetalle> listado) {
 		// TODO Auto-generated method stub
 		return null;
 	}
