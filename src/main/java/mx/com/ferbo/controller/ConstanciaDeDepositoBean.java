@@ -1003,7 +1003,7 @@ public class ConstanciaDeDepositoBean implements Serializable{
 			constanciaDeDeposito.setFolio(null);
 		}*/
 		constanciaDAO.guardar(constanciaDeDeposito);
-		impresion = true;
+		this.impresion = true;
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Agregado","Se agrego el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages");
 		
@@ -1057,9 +1057,6 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
 		try {
-			/*if(impresion == false ) {
-				throw new Exception("Favor de guardar constancia");
-			}*/
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();

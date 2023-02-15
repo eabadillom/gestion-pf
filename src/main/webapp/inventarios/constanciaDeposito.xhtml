@@ -58,7 +58,7 @@
 							</p:datePicker>
 							
 							<p:outputLabel styleClass="p-mr-2" value="No. Constancia:"/> 
-							<p:inputText id="numeroC" placeholder="No Asignado" disabled="true" value="#{constanciaDeDepositoBean.noConstanciaSelect}"/>
+							<p:inputText id="numeroC" placeholder="No Asignado" disabled="true" value="#{constanciaDeDepositoBean.noConstanciaSelect}" required="true" requiredMessage="ingresa folio"/>
 							
 							
 							<p:commandButton value="Cambiar" icon="pi pi-pencil" style="margin-left: .5rem" styleClass="edit-button ui-button-success" oncomplete="PF('NoCambiarDialog').show()"/>										

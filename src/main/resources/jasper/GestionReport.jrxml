@@ -369,7 +369,8 @@ KELANGAN S.A. DE C.V.]]></text>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="68" splitType="Stretch">
+		<band height="64" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
 				<reportElement x="0" y="10" width="148" height="12" uuid="6b42b6b6-59c2-47df-9060-2ff2c453b8c3">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -561,9 +562,9 @@ KELANGAN S.A. DE C.V.]]></text>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="125" splitType="Stretch">
+		<band height="291" splitType="Stretch">
 			<staticText>
-				<reportElement x="2" y="110" width="71" height="12" uuid="0757078c-a55d-49b3-8ab3-7650aa849795">
+				<reportElement x="0" y="187" width="71" height="12" uuid="0757078c-a55d-49b3-8ab3-7650aa849795">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -572,17 +573,17 @@ KELANGAN S.A. DE C.V.]]></text>
 				<text><![CDATA[Observaciones]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="90" y="110" width="59" height="12" forecolor="#000000" uuid="50b1da22-af6b-4475-851d-84ed176bb092">
+				<reportElement x="0" y="200" width="210" height="78" forecolor="#000000" uuid="50b1da22-af6b-4475-851d-84ed176bb092">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<textElement>
+				<textElement textAlignment="Justified">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{OBSERVACIONES}]]></textFieldExpression>
 			</textField>
 			<componentElement>
-				<reportElement isPrintRepeatedValues="false" x="2" y="16" width="209" height="43" forecolor="#000000" uuid="bb07ed43-766f-4471-91c8-55de1272825e">
+				<reportElement isPrintRepeatedValues="false" x="0" y="12" width="212" height="20" forecolor="#000000" uuid="bb07ed43-766f-4471-91c8-55de1272825e">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
@@ -595,21 +596,22 @@ KELANGAN S.A. DE C.V.]]></text>
 						</datasetParameter>
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					</datasetRun>
-					<jr:column width="140" uuid="fe083b1c-cce9-4023-9513-c4d5f2668c0c">
-						<jr:detailCell style="Table_TD" height="40">
-							<textField>
-								<reportElement x="0" y="0" width="140" height="40" uuid="d7308b4f-f65f-431a-a007-7035b05708dd"/>
+					<jr:column width="160" uuid="fe083b1c-cce9-4023-9513-c4d5f2668c0c">
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="160" height="20" uuid="d7308b4f-f65f-431a-a007-7035b05708dd"/>
 								<textElement>
 									<font isBold="false"/>
+									<paragraph lineSpacing="Single"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{SERVICIO_DS}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="72" uuid="dc311ee4-5cd0-450d-a953-7d73e4e7fd1c">
-						<jr:detailCell style="Table_TD" height="40">
-							<textField>
-								<reportElement x="0" y="0" width="72" height="40" uuid="97137650-5d8e-43c3-a4c8-ddd2222e955d"/>
+					<jr:column width="52" uuid="dc311ee4-5cd0-450d-a953-7d73e4e7fd1c">
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="52" height="20" uuid="97137650-5d8e-43c3-a4c8-ddd2222e955d"/>
 								<textElement>
 									<font isBold="false"/>
 								</textElement>
@@ -620,7 +622,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				</jr:table>
 			</componentElement>
 			<staticText>
-				<reportElement x="2" y="0" width="60" height="12" uuid="c1d2e90a-0393-4492-98f0-9c5e07991c58">
+				<reportElement x="0" y="0" width="60" height="12" uuid="c1d2e90a-0393-4492-98f0-9c5e07991c58">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
