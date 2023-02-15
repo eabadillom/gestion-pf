@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Detalle Constancia Salida</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Inventarios" />
+				<p:menuitem value="Salidas" />
+				<p:menuitem value="Alta" outcome="/inventarios/altaDetalleConstanciaSalida" />
+			</p:breadCrumb>
+						<p:growl id="messages" showDetail="true" life="2000"/>
+						<p:toolbar>
+							<p:toolbarGroup id="datos-generales" >
+							
+								<p:outputLabel value="Cliente:" />
+									<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.clienteSelect}">
+										<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
+										<f:selectItems value="#{altaDetalleConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+										<p:ajax update="datos-generales" />
+									</p:selectOneMenu>
+								<p:outputLabel value="Planta:" styleClass="p-ml-4 p-mr-2"/>
+									<p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.plantaSelect}">
+										<f:selectItem itemLabel="Seleccione Planta" itemValue="" noSelectionOption="true" />
+										<f:selectItems value="#{altaDetalleConstanciaSalidaBean.listadoPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+										<p:ajax update="datos-generales" />
+									</p:selectOneMenu>
+								<p:outputLabel value="Fecha:" styleClass="p-ml-4 p-mr-2" />
+									<p:datePicker id="fechaSalida" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Salida" value="#{altaDetalleConstanciaSalidaBean.fechaSalida}">
+										<p:ajax update="datos-generales"/>
+									</p:datePicker>
+								<p:outputLabel value="Folio:" styleClass="p-ml-4 p-mr-2"/>
+									<p:inputText id="folio" placeholder="Ingresa Folio" value="#{altaDetalleConstanciaSalidaBean.numFolio}">
+										<p:ajax update="datos-generales" />
+									</p:inputText>
+								
+							 	<div style="margin-left: 4px">
+									<p:commandButton value="Asignar" actionListener="#{altaDetalleConstanciaSalidaBean.validar()}"/>
+								</div>
+						
+							</p:toolbarGroup>
+						</p:toolbar>
+						
+						
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						
+						<p:dataTable id="dt-constanciaDD" value="#{altaDetalleConstanciaSalidaBean.listadoConstanciaDD}" var="constanciaDD" 
+									rowKey="#{constanciaDD.folio}" reflow="true" paginator="true" paginatorPosition="bottom" rows="10">
+						
+						<p:column exportable="false" width="3%">
+							<p:rowToggler/>
+						</p:column>
+						
+						<p:column headerText="Folio CDD">
+						<h:outputText value="#{constanciaDD.folio}" />
+						</p:column>
+						
+						<p:column headerText="Fecha">
+							<h:outputText value="#{constanciaDD.fechaIngreso}" />
+						</p:column>
+						
+						<p:rowExpansion>
+							<p:dataTable value="#{constanciaDD.partidaList}" var="partida">
+							
+								<p:column headerText="Folio">
+									<h:outputText value="#{partida.folio.folio}" />
+								</p:column>
+								
+								<p:column headerText="Numero">
+									<h:outputText value="#{partida.unidadDeProductoCve.productoCve.numeroProd}" />
+								</p:column>
+							
+							</p:dataTable>
+						</p:rowExpansion>
+						
+						</p:dataTable>
+						
+						
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

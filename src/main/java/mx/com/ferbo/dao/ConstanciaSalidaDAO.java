@@ -2,8 +2,11 @@ package mx.com.ferbo.dao;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaSalida;
+import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
@@ -15,8 +18,11 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
 	@Override
 	public List<ConstanciaSalida> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<ConstanciaSalida> lista = null;
+		lista = em.createNamedQuery("ConstanciaSalida.findAll",ConstanciaSalida.class).getResultList();
+		
+		return lista;
 	}
 
 	@Override
