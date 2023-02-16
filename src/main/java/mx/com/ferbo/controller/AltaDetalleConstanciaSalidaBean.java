@@ -1,9 +1,11 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -17,10 +19,15 @@ import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.PlantaDAO;
+import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaSalida;
+import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.PrecioServicio;
 
 @Named
 @ViewScoped
@@ -43,8 +50,18 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	private List<ConstanciaDeDeposito> listadoConstanciaDD;
 	private ConstanciaDeDepositoDAO constanciaDDDAO;
 	
+	private List<PrecioServicio> listadoPrecioServicios;
+	private PrecioServicioDAO preciosServicioDAO;
+	private List<PrecioServicio> serviciosCliente;
+	private PrecioServicio servicioClienteSelect;
 	
-	private String numFolio;
+	private List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle;
+	
+	private Partida partidaSelect;
+	private List<Partida> listadoPartida;
+	
+	private String numFolio,nombreTransportista,placas,observaciones;
+	private BigDecimal cantidadServicio;
 	private Date fechaSalida;
 	
 	public AltaDetalleConstanciaSalidaBean() {
@@ -60,6 +77,14 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		listadoConstanciaDD = new ArrayList<>();
 		constanciaDDDAO = new ConstanciaDeDepositoDAO();
 		
+		listadoPrecioServicios = new ArrayList<>();
+		serviciosCliente = new ArrayList<>();
+		preciosServicioDAO = new PrecioServicioDAO();
+		
+		listadoConstanciaDepositoDetalle = new ArrayList<>();
+		
+		listadoPartida = new ArrayList<Partida>();
+		
 	}
 	
 	@PostConstruct
@@ -69,6 +94,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		listadoPlantas = plantaDAO.findall();
 		listadoConstanciasSalidas = constanciaSalidaDAO.buscarTodos();
 		listadoConstanciaDD = constanciaDDDAO.buscarTodos();
+		listadoPrecioServicios = preciosServicioDAO.buscarTodos();
 	}
 
 	public List<Cliente> getListadoClientes() {
@@ -167,6 +193,95 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		this.constanciaDDDAO = constanciaDDDAO;
 	}
 
+	public List<PrecioServicio> getListadoPrecioServicios() {
+		return listadoPrecioServicios;
+	}
+
+	public void setListadoPrecioServicios(List<PrecioServicio> listadoPrecioServicios) {
+		this.listadoPrecioServicios = listadoPrecioServicios;
+	}
+
+	public PrecioServicioDAO getPreciosServicioDAO() {
+		return preciosServicioDAO;
+	}
+
+	public void setPreciosServicioDAO(PrecioServicioDAO preciosServicioDAO) {
+		this.preciosServicioDAO = preciosServicioDAO;
+	}
+
+	public List<PrecioServicio> getServiciosCliente() {
+		return serviciosCliente;
+	}
+
+	public void setServiciosCliente(List<PrecioServicio> serviciosCliente) {
+		this.serviciosCliente = serviciosCliente;
+	}
+
+	public PrecioServicio getServicioClienteSelect() {
+		return servicioClienteSelect;
+	}
+
+	public void setServicioClienteSelect(PrecioServicio servicioClienteSelect) {
+		this.servicioClienteSelect = servicioClienteSelect;
+	}
+	
+
+	public List<ConstanciaDepositoDetalle> getListadoConstanciaDepositoDetalle() {
+		return listadoConstanciaDepositoDetalle;
+	}
+
+	public void setListadoConstanciaDepositoDetalle(List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle) {
+		this.listadoConstanciaDepositoDetalle = listadoConstanciaDepositoDetalle;
+	}
+
+	public BigDecimal getCantidadServicio() {
+		return cantidadServicio;
+	}
+
+	public void setCantidadServicio(BigDecimal cantidadServicio) {
+		this.cantidadServicio = cantidadServicio;
+	}
+
+	public Partida getPartidaSelect() {
+		return partidaSelect;
+	}
+
+	public void setPartidaSelect(Partida partidaSelect) {
+		this.partidaSelect = partidaSelect;
+	}
+
+	public List<Partida> getListadoPartida() {
+		return listadoPartida;
+	}
+
+	public void setListadoPartida(List<Partida> listadoPartida) {
+		this.listadoPartida = listadoPartida;
+	}
+
+	public String getNombreTransportista() {
+		return nombreTransportista;
+	}
+
+	public void setNombreTransportista(String nombreTransportista) {
+		this.nombreTransportista = nombreTransportista;
+	}
+
+	public String getPlacas() {
+		return placas;
+	}
+
+	public void setPlacas(String placas) {
+		this.placas = placas;
+	}
+
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+
 	public void validar() {
 		
 		//System.out.println(listadoConstanciasSalidas);
@@ -184,6 +299,60 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 			}
 		}
 		PrimeFaces.current().ajax().update("form:messages");
+		
+	}
+	
+	public void servicioCliente() {
+		
+		serviciosCliente.clear();
+		serviciosCliente = listadoPrecioServicios.stream()
+								.filter(s -> clienteSelect != null
+								?(s.getCliente().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
+								:false)
+								.collect(Collectors.toList());
+		
+	}
+	
+	public void saveServicio() {
+		
+		//CONSTANCIA_DEPOSITO_DETALLE (alli se guardan constancias entrada/ salida)??? require constanciadedeposito
+		ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
+		constanciaDeDeposito.setFolioCliente(numFolio);
+		
+		ConstanciaDepositoDetalle constanciaDD = new ConstanciaDepositoDetalle();
+		
+		
+		constanciaDD.setServicioCve(servicioClienteSelect.getServicio());
+		constanciaDD.setFolio(constanciaDeDeposito);
+		constanciaDD.setServicioCantidad(cantidadServicio);
+		
+		listadoConstanciaDepositoDetalle.add(constanciaDD);
+		System.out.println(listadoConstanciaDepositoDetalle);
+	}
+	
+	public void saveDetalleConstanciaSalida() {
+		
+		//GENERAMOS DETALLECONSTANCIASALIDA
+		DetalleConstanciaSalida detalleConstanciaS = new DetalleConstanciaSalida();
+		
+		detalleConstanciaS.setCantidad(partidaSelect.getCantidadTotal());
+		detalleConstanciaS.setPeso(partidaSelect.getPesoTotal());
+		
+	}
+	
+	//boton continuar es para guardar la constancia salida????
+	public void saveConstanciaSalida() {
+		
+		//GUARDO CONSTANCIA SALIDA
+		ConstanciaSalida constanciaSalida = new ConstanciaSalida();
+		
+		constanciaSalida.setFecha(fechaSalida);
+		constanciaSalida.setNumero(numFolio);
+		constanciaSalida.setClienteCve(clienteSelect);
+		constanciaSalida.setNombreCte(clienteSelect.getCteNombre());
+		//constanciaSalida.setStatus();
+		//constanciaSalida.setObservaciones();
+		//pendiente agregar al model los campos de nombre y placas transporte
 		
 	}
 	

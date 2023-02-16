@@ -23,7 +23,7 @@
 									<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.clienteSelect}">
 										<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
 										<f:selectItems value="#{altaDetalleConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-										<p:ajax update="datos-generales" />
+										<p:ajax listener="#{altaDetalleConstanciaSalidaBean.servicioCliente}" update="datos-generales s-servicio" />
 									</p:selectOneMenu>
 								<p:outputLabel value="Planta:" styleClass="p-ml-4 p-mr-2"/>
 									<p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.plantaSelect}">
@@ -41,7 +41,7 @@
 									</p:inputText>
 								
 							 	<div style="margin-left: 4px">
-									<p:commandButton value="Asignar" actionListener="#{altaDetalleConstanciaSalidaBean.validar()}"/>
+									<p:commandButton value="Asignar" actionListener="#{altaDetalleConstanciaSalidaBean.validar()}" styleClass="ui-button-success" icon="pi pi-plus"/>
 								</div>
 						
 							</p:toolbarGroup>
@@ -55,12 +55,18 @@
 						<p:dataTable id="dt-constanciaDD" value="#{altaDetalleConstanciaSalidaBean.listadoConstanciaDD}" var="constanciaDD" 
 									rowKey="#{constanciaDD.folio}" reflow="true" paginator="true" paginatorPosition="bottom" rows="10">
 						
+						<f:facet name="header">
+								<div>
+									<span>CONSTANCIAS DE DEPOSITO</span>
+								</div>
+						</f:facet>
+						
 						<p:column exportable="false" width="3%">
 							<p:rowToggler/>
 						</p:column>
 						
-						<p:column headerText="Folio CDD">
-						<h:outputText value="#{constanciaDD.folio}" />
+						<p:column headerText="Folio Constancia De Deposito">
+							<h:outputText value="#{constanciaDD.folio}" />
 						</p:column>
 						
 						<p:column headerText="Fecha">
@@ -68,8 +74,18 @@
 						</p:column>
 						
 						<p:rowExpansion>
-							<p:dataTable value="#{constanciaDD.partidaList}" var="partida">
-							
+							<p:dataTable value="#{constanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}">
+								
+								<f:facet name="header">
+									<div style="text-align: center;">
+										<span>PARTIDAS</span>
+									</div>
+								</f:facet>
+								
+								<p:column>
+									<p:rowToggler/>
+								</p:column>
+								
 								<p:column headerText="Folio">
 									<h:outputText value="#{partida.folio.folio}" />
 								</p:column>
@@ -77,12 +93,147 @@
 								<p:column headerText="Numero">
 									<h:outputText value="#{partida.unidadDeProductoCve.productoCve.numeroProd}" />
 								</p:column>
-							
+								
+								<p:column headerText="Producto">
+									<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}" />
+								</p:column>
+								
+								<p:column headerText="Tarimas">
+									<h:outputText value="#{partida.noTarimas}" />
+								</p:column>
+								
+								<p:column headerText="Piezas">
+									<h:outputText value="#{partida.cantidadTotal}" />
+								</p:column>
+								
+								<p:column headerText="Kilos">
+									<h:outputText value="#{partida.pesoTotal}" />
+								</p:column>
+								
+								<p:column headerText="Posicion">
+									<h:outputText value="#{partida.camaraCve.camaraDs}" />
+								</p:column>
+								
+								<p:column>
+									<p:commandButton value="Agregar" process="@this" icon="pi pi-plus" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaSalida()}" update="@this form:piezas form:kilos">
+										<f:setPropertyActionListener value="#{partida}" target="#{altaDetalleConstanciaSalidaBean.partidaSelect}"/>
+									</p:commandButton>
+								</p:column>
+								
+								<p:rowExpansion>
+									<p:dataTable value="#{partida.detallePartidaList}" var="detalle">
+										<f:facet name="header">
+											<div style="text-align: center;">
+												<span>DETALLE PARTIDA</span>
+											</div>
+										</f:facet>
+									
+										<p:column headerText="Codigo">
+											<h:outputText value="#{detalle.dtpCodigo}" />
+										</p:column>
+										
+										<p:column headerText="Lote">
+											<h:outputText value="#{detalle.dtpLote}" />
+										</p:column>
+								
+										<p:column headerText="Contenedor">
+											<h:outputText value="#{detalle.dtpSAP}" />
+										</p:column>
+										
+										<p:column headerText="Caducidad">
+											<h:outputText value="#{detalle.dtpCaducidad}" />
+										</p:column>
+										
+										<p:column headerText="PO">
+											<h:outputText value="#{detalle.dtpPO}" />
+										</p:column>
+										
+										<p:column headerText="MP">
+											<h:outputText value="#{detalle.dtpMP}" />
+										</p:column>
+										
+										<p:column headerText="Pedimento">
+											<h:outputText value="#{detalle.dtpPedimento}" />
+										</p:column>
+									</p:dataTable>
+								</p:rowExpansion>
 							</p:dataTable>
 						</p:rowExpansion>
+						</p:dataTable>
+						
+						
+						<!-- Espacio para el anterior datatable -->
+						<p:fieldset legend="Productos">
+							<p:panel>
+								<p:outputLabel value="Piezas:" styleClass="p-mr-2" />
+								<p:inputNumber id="piezas" styleClass="p-mr-4" value="#{altaDetalleConstanciaSalidaBean.partidaSelect.cantidadTotal}">
+								<p:ajax update="@this" />
+								</p:inputNumber>
+								
+								<p:outputLabel value="Kilos:" styleClass="p-mr-2"/>
+								<p:inputNumber id="kilos" styleClass="p-mr-4" value="#{altaDetalleConstanciaSalidaBean.partidaSelect.pesoTotal}">
+								<p:ajax update="@this" />
+								</p:inputNumber>
+								
+								<p:outputLabel value="Temperatura:" styleClass="p-mr-2"/>
+								<p:inputNumber styleClass="p-mr-4" value="#{altaDetalleConstanciaSalidaBean.temperatura}">
+								</p:inputNumber>
+							</p:panel>
+						</p:fieldset>
+						
+						<!-- Servicios -->
+						<div style="margin-top: 10px;">
+						
+							<p:outputLabel value="Servicio:" styleClass="p-mr-2"/>
+							<p:selectOneMenu id="s-servicio" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.servicioClienteSelect}">
+								<f:selectItem itemLabel="Selecciona Servicio" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{altaDetalleConstanciaSalidaBean.serviciosCliente}" var="servicioC" itemLabel="#{servicioC.servicio.servicioDs}" itemValue="#{servicioC}"/>
+								<p:ajax update="@this" />
+							</p:selectOneMenu>
+							
+							<p:inputNumber styleClass="p-ml-4" value="#{altaDetalleConstanciaSalidaBean.cantidadServicio}">
+								<p:ajax update="@this" />
+							</p:inputNumber>
+							
+							<p:commandButton value="Agregar Servicio" icon="pi pi-plus" styleClass="p-ml-4 ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveServicio()}" update="dt-servicio"></p:commandButton>
+							
+						</div>
+						
+						<p:dataTable id="dt-servicio" value="#{altaDetalleConstanciaSalidaBean.listadoConstanciaDepositoDetalle}" var="constanciaDD" >
+						
+							<f:facet name="header">
+								<div style="text-align: center;">
+									<span>SERVICIOS</span>
+								</div>
+							</f:facet>
+						
+							<p:column headerText="Servicio" >
+								<h:outputText value="#{constanciaDD.servicioCve.servicioDs}" />
+							</p:column>
+						
+							<p:column headerText="Cantidad Servicio">
+							<h:outputText value="#{constanciaDD.servicioCantidad}" />
+							</p:column>
 						
 						</p:dataTable>
 						
+						
+						<div style="margin-top: 5px">
+							<p:outputLabel value="Nombre del Transportista:" styleClass="p-mr-2" />
+							<p:inputText value="#{altaDetalleConstanciaSalidaBean.nombreTransportista}"/>
+							
+							<p:outputLabel value="Placas del Transporte:" styleClass="p-ml-4" />
+							<p:inputText styleClass="p-ml-2" value="#{altaDetalleConstanciaSalidaBean.placas}"/>
+							
+							<p:outputLabel value="Observaciones:" styleClass="p-mr-2 p-ml-4" />
+							<p:inputTextarea autoResize="true" value="#{altaDetalleConstanciaSalidaBean.observaciones}"></p:inputTextarea>
+						</div>
+						
+						<p:toolbar styleClass="p-mt-3">
+							<p:toolbarGroup>
+								<p:commandButton value="Continuar" />
+							</p:toolbarGroup>
+						</p:toolbar>
 						
 					</div>
 				</div>
