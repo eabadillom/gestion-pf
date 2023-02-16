@@ -38,7 +38,9 @@ import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
+import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.EstadoConstancia;
@@ -91,6 +93,8 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private EstadoConstanciaDAO edoDAO;
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
+	private ConstanciaDeDeposito constanciadep;
+	private Aviso aviso;
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 	private List<EstadoConstancia> estados = null;
@@ -108,6 +112,8 @@ public class AltaConstanciaServicioBean implements Serializable {
 		alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		edoDAO = new EstadoConstanciaDAO();
 		selCliente = new Cliente();
+		constanciadep = new ConstanciaDeDeposito();
+		aviso = new Aviso();
 	}
 
 	@PostConstruct

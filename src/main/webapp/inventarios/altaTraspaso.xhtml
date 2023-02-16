@@ -21,7 +21,7 @@
 						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altaTraspasoBean.idCliente}" filterMatchMode="startsWith">
 							<f:selectItem itemLabel="Seleccione Cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
-							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:selProducto  "/>
+							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:selProducto "/>
 						</p:selectOneMenu>
 						
 						<p:selectOneMenu id="selProducto" autoWidth="true" value="#{altaTraspasoBean.idProducto}" filterMatchMode="startsWith">
@@ -37,14 +37,9 @@
 
         <p:toolbar>
             <p:toolbarGroup>
-             <!--  
-                <p:commandButton value="Añadir" icon="pi pi-plus" actionListener="#{crudView.openNew}" update="" oncomplete=""
-                    styleClass="ui-button-info p-mr-2 p-mb-2" style="margin-right: .5rem">
-                   <p:resetInput target=":dialogs:manage-product-content" />
-                   </p:commandButton>-->
         <div class="card">
     		<h5>Basic</h5>
-    		<p:commandButton value="Confirmar Traspaso" actionListener="#{altaConstanciaServicioBean.agregarProducto}" type="button" icon="pi pi-plus-circle" onclick="PF('dlg1').show()"/>
+    		<p:commandButton value="Confirmar Traspaso" actionListener="#{altaConstanciaServicioBean.agregarProducto}" type="button" icon="pi pi-check" onclick="PF('dlg1').show()"/>
 		</div>
 
                 <p:commandButton id="delete-products-button" value="#{crudView.deleteButtonMessage}" icon="pi pi-trash" 
@@ -56,7 +51,7 @@
             
          <div class="card">
     <h:form>
-<p:dataTable id="dt-traspaso" widgetVar="dttraspaso" lazy="true" var="altatraspaso" value="#{altaTraspasoBean.alPartidas}" reflow="true" 
+<p:dataTable id="dt-traspaso" widgetVar="dttraspaso"  var="altatraspaso" value="#{altaTraspasoBean.alPartidas}" reflow="true" 
         styleClass="products-table" selection="#{altaTraspasoBean.alPartidas}" rowKey="#{altatraspaso.folio}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">           
              <f:facet name="header">
                 Expand rows to see detailed information
@@ -75,29 +70,82 @@
             <p:column headerText="Cantidad" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}">
                 <h:outputText value="#{altatraspaso.cantidadTotal}" />
             </p:column>
-            
 
+            <p:column headerText="Cantidad" sortBy="#{altatraspaso.folio.cteCve.aviso_caducidad}" filterBy="#{altatraspaso.folio.cteCve.aviso_caducidad}">
+                <h:outputText value="#{altatraspaso.cantidadTotal}" />
+            </p:column>
+
+            <p:column headerText="Unidad de Manejo" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}">
+                <h:outputText value="#{altatraspaso.cantidadTotal}" />
+            </p:column>
+
+            <p:column headerText="Posicion" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}">
+                <h:outputText value="#{altatraspaso.cantidadTotal}" />
+            </p:column>
+
+            <p:column headerText="Planta origen" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}">
+                <h:outputText value="#{altatraspaso.cantidadTotal}" />
+            </p:column>
+            
+            <p:column headerText="Posicion Origen" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}">
+                <h:outputText value="#{altatraspaso.cantidadTotal}" />
+            </p:column>
+            
+						   <p:column headerText="Acción" style="text-align:center">
+                           <p:commandButton value="Traspasar" styleClass="ui-button-raised" icon="pi pi-plus" disabled="#{product.inventoryStatus == 'OUTOFSTOCK'}"></p:commandButton>
+                           <span class="product-badge status-#{product.inventoryStatus.name().toLowerCase()}">#{product.inventoryStatus.text}</span>
+	</p:column>
+	<!-- Comienza lista desplegable -->
             <p:rowExpansion>
-											<div class="p-grid ui-fluid">
-												<div class="p-field p-col-2 p-md-2">
-													<p:outputLabel for="@next" value="Código" />
-													<p:inputText value="altatraspaso.folio" readonly="true" />
-												</div>
-												<div class="p-field p-col-2 p-md-2">
-													<p:outputLabel for="@next" value="Caducidad"/>
-													<p:datePicker value="altatraspaso.folio" readonly="true"/>
-												</div>
-												<div class="p-field p-col-2 p-md-2">
-													<p:outputLabel for="@next" value="Lote"/>
-													<p:inputText value="altatraspaso.folio" readonly="true" />
-												</div>
-												<div class="p-field p-col-2 p-md-2">
-													<p:outputLabel for="@next" value="Contenedor"/>
-													<p:inputText value="altatraspaso.folio" readonly="true" />
-												</div>
-											</div>
-										</p:rowExpansion>
-                    </p:dataTable>
+            <div class="p-grid ui-fluid">
+					<div class="p-field p-col-2 p-md-2">
+					<p:outputLabel for="caducidad" value="Caducidad" />
+					<p:inputText id="caducidad" value="#{altatraspaso.productoCve.productoDs}" readonly="true" />
+					</div>
+	
+					<div class="p-field p-col-2 p-md-2">
+					<p:outputLabel for="txtCodigo" value="Codigo" />
+					<p:inputText id="txtCodigo" value="#{altatraspaso.productoCve.productoDs}" readonly="true" />
+					</div>
+
+					<div class="p-field p-col-2 p-md-2">
+					<p:outputLabel for="txtLote" value="Lote" />
+					<p:inputText id="txtLote" value="#{altatraspaso.productoCve.productoDs}" readonly="true" />
+					</div>
+					</div>
+					
+					<div class="p-grid ui-fluid">
+					<div class="p-field p-col-2 p-md-2" align="center">
+					<p:outputLabel for="txtSAP" value="SAP" />
+					<p:inputText id="txtSAP" value="#{altatraspaso.productoCve.productoDs}" readonly="true" />
+					</div>
+
+					<div class="p-field p-col-2 p-md-2">
+					<p:outputLabel for="txtplantadestino" value="Planta destino:" />
+					<p:selectOneMenu id="txtplantadestino" value="#{altatraspaso.productoCve.productoDs}" converter="entityConverter" >
+					<f:selectItem itemLabel="---Seleccione---" itemValue=""  />
+					<f:selectItems value="" var="user" itemLabel="#{user}" itemValue="#{user}" />
+					<p:ajax />
+					</p:selectOneMenu></div>
+					
+					<div class="p-field p-col-2 p-md-2">
+					<p:outputLabel for="camarad" value="Camara Destino:" />
+					<p:selectOneMenu id="camarad" value="#{altatraspaso.productoCve.productoDs}" converter="entityConverter" >
+					<f:selectItem itemLabel="---Seleccione---" itemValue=""  />
+					<f:selectItems value="" var="user" itemLabel="#{user}" itemValue="#{user}" />
+					<p:ajax />
+					</p:selectOneMenu></div>
+
+					<div class="p-field p-col-2 p-md-2">
+					<p:outputLabel for="posiciond" value="Posicion Destino:" />
+					<p:selectOneMenu id="posiciond" value="#{altatraspaso.productoCve.productoDs}" converter="entityConverter" >
+					<f:selectItem itemLabel="---Seleccione---" itemValue=""  />
+					<f:selectItems value="" var="user" itemLabel="#{user}" itemValue="#{user}" />
+					<p:ajax />
+					</p:selectOneMenu></div>
+</div>
+			</p:rowExpansion>
+         </p:dataTable>
          </h:form>
          </div>
 			<p:dialog header="Header" widgetVar="dlg1"  showEffect="fade">

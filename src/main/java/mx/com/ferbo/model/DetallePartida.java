@@ -49,7 +49,7 @@ import javax.validation.constraints.Size;
 public class DetallePartida implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
+    //@EmbeddedId
     protected DetallePartidaPK detallePartidaPK;
     @Column(name = "det_padre")
     private Integer detPadre;
