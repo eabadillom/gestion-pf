@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
@@ -37,6 +38,7 @@ import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.PartidaServicioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
+import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
@@ -68,8 +70,8 @@ public class AltaTraspasoBean implements Serializable {
 	private List<ProductoPorCliente> alProductosFiltered;
 	private List<UnidadDeManejo> alUnidades;
 	private List<EstadoConstancia> estados = null;
-	private List<Planta> plantas;
 	private List<ConstanciaDeDeposito> listaconstanciadepo;
+	private List<Aviso> listaaviso;
 	private Date fecha;
 	private String folio;
 	private Integer cantidad;
@@ -96,30 +98,31 @@ public class AltaTraspasoBean implements Serializable {
 	private ConstanciaServicioDAO csDAO;
 	private EstadoConstanciaDAO edoDAO;
 	private ClienteDAO clienteDAO;
-	private PlantaDAO plantasDAO;
 	private PartidaServicioDAO partidaservicioDAO;
 	private ConstanciaDeDepositoDAO constanciadepDAO;
+	private AvisoDAO avisoDAO;
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
 	public AltaTraspasoBean() {
 		log.info("Entrando al constructor del controller...");
-		plantasDAO = new PlantaDAO();
-		partidaservicioDAO= new PartidaServicioDAO();
 		clientes = new ArrayList<Cliente>();
 		//alPartidas = new ArrayList<PartidaServicio>();
 		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
 		alServicios = new ArrayList<PrecioServicio>();
 		alUnidades = new ArrayList<UnidadDeManejo>();
+		alProductosFiltered = new ArrayList<ProductoPorCliente>();
+		listaconstanciadepo = new ArrayList<ConstanciaDeDeposito>();
+		selCliente = new Cliente();
+		alPartidas = partidaservicioDAO.findall();
+		clientes = clienteDAO.findall();
+		listaaviso = avisoDAO.findall();
+		partidaservicioDAO= new PartidaServicioDAO();
 		clienteDAO = new ClienteDAO();
 		udmDAO = new UnidadDeManejoDAO();
 		csDAO = new ConstanciaServicioDAO();
-		alProductosFiltered = new ArrayList<ProductoPorCliente>();
-		listaconstanciadepo = new ArrayList<ConstanciaDeDeposito>();
 		edoDAO = new EstadoConstanciaDAO();
-		selCliente = new Cliente();
-		plantas = plantasDAO.findall();
-		alPartidas = partidaservicioDAO.findall();
+
 	}
 
 	@PostConstruct
@@ -628,14 +631,6 @@ public class AltaTraspasoBean implements Serializable {
 		this.estados = estados;
 	}
 
-	public List<Planta> getPlantas() {
-		return plantas;
-	}
-
-	public void setPlantas(List<Planta> plantas) {
-		this.plantas = plantas;
-	}
-
 	public List<ConstanciaDeDeposito> getListaconstanciadepo() {
 		return listaconstanciadepo;
 	}
@@ -660,5 +655,14 @@ public class AltaTraspasoBean implements Serializable {
 		this.idclavectedeposito = idclavectedeposito;
 	}
 
+	public List<Aviso> getListaaviso() {
+		return listaaviso;
+	}
+
+	public void setListaaviso(List<Aviso> listaaviso) {
+		this.listaaviso = listaaviso;
+	}
+
+	
 }
 	  

@@ -6,6 +6,8 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -29,8 +31,8 @@ public class DetallePartidaPK implements Serializable {
     //@Basic(optional = false)
     //@NotNull
     //@Column(name = "PARTIDA_CVE")
-    @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")
-    @ManyToOne(optional = false)
+	@ManyToOne(optional = false)
+    @JoinColumn(name = "PARTIDA_CVE")
     //@JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
     //@ManyToOne(optional = false)
     private Partida partidaCve;
@@ -38,54 +40,52 @@ public class DetallePartidaPK implements Serializable {
     public DetallePartidaPK() {
     }
 
-    public DetallePartidaPK(int detPartCve, Partida partidaCve) {
-        this.detPartCve = detPartCve;
-        this.partidaCve = partidaCve;
-    }
+	public DetallePartidaPK(@NotNull int detPartCve, Partida partidaCve) {
+		super();
+		this.detPartCve = detPartCve;
+		this.partidaCve = partidaCve;
+	}
+	
+	public int getDetPartCve() {
+		return detPartCve;
+	}
 
-    public int getDetPartCve() {
-        return detPartCve;
-    }
+	public void setDetPartCve(int detPartCve) {
+		this.detPartCve = detPartCve;
+	}
 
-    public void setDetPartCve(int detPartCve) {
-        this.detPartCve = detPartCve;
-    }
+	public Partida getPartidaCve() {
+		return partidaCve;
+	}
 
-    public Partida getPartidaCve() {
-        return partidaCve;
-    }
+	public void setPartidaCve(Partida partidaCve) {
+		this.partidaCve = partidaCve;
+	}
 
-    public void setPartidaCve(Partida partidaCve) {
-        this.partidaCve = partidaCve;
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(detPartCve, partidaCve);
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (int) detPartCve;
-        hash += (int) partidaCve.getPartidaCve();
-        return hash;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetallePartidaPK other = (DetallePartidaPK) obj;
+		return detPartCve == other.detPartCve && Objects.equals(partidaCve, other.partidaCve);
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof DetallePartidaPK)) {
-            return false;
-        }
-        DetallePartidaPK other = (DetallePartidaPK) object;
-        if (this.detPartCve != other.detPartCve) {
-            return false;
-        }
-        if (this.partidaCve != other.partidaCve) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public String toString() {
+		return "DetallePartidaPK [detPartCve=" + detPartCve + ", partidaCve=" + partidaCve + "]";
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.DetallePartidaPK[ detPartCve=" + detPartCve + ", partidaCve=" + partidaCve + " ]";
-    }
+    
+
+	
     
 }

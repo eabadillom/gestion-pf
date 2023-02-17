@@ -44,15 +44,13 @@
 					</p:selectOneMenu>
 					<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.agregarProducto}" update="dt-partidas"/>
         		</p:panel>
-        	<p:dataTable id="dt-partidas" var="partida" selection="#{altaConstanciaServicioBean.selPartida}" value="#{altaConstanciaServicioBean.alPartidas}" scrollable="true" scrollHeight="9em" 
-        				scrollRows="4" reflow="true">
+        	<p:dataTable id="dt-partidas" var="partida" selection="#{altaConstanciaServicioBean.selPartida}" value="#{altaConstanciaServicioBean.alPartidas}" scrollable="true" scrollHeight="9em" scrollRows="4" reflow="true">
 				<p:column headerText="Cantidad" width="8em"><h:outputText value="#{partida.cantidadTotal}"/></p:column>
 				<p:column headerText="Unidad(es)" width="10em"><h:outputText value="#{partida.unidadDeManejoCve.unidadDeManejoDs}" /></p:column>
 				<p:column headerText="Producto(s)" width="8em"><h:outputText value="#{partida.productoCve.productoDs}"/></p:column>
 				<p:column headerText="Peso" width="10em"><h:outputText value="#{partida.cantidadDeCobro} kg"/></p:column>
-				<p:column width="8em">
-					<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.deletePartida(partida)}" update="dt-partidas"/>
-				</p:column>
+				<p:column width="8em"><p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.deletePartida(partida)}" 
+						  update="dt-partidas"/></p:column>
 			</p:dataTable>
 	  </p:fieldset>
 	 <h5></h5>
