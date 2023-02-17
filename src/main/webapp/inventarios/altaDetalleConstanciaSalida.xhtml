@@ -74,13 +74,17 @@
 						</p:column>
 						
 						<p:rowExpansion>
-							<p:dataTable value="#{constanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}">
+							<p:dataTable value="#{constanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}" rowSelectMode="add" 
+											selection="#{altaDetalleConstanciaSalidaBean.partidaSelect}" selectionMode="single">
 								
 								<f:facet name="header">
 									<div style="text-align: center;">
 										<span>PARTIDAS</span>
 									</div>
 								</f:facet>
+								
+								<p:ajax event="rowSelect" />
+								<p:ajax event="rowUnselect" />
 								
 								<p:column>
 									<p:rowToggler/>
@@ -115,10 +119,9 @@
 								</p:column>
 								
 								<p:column>
-									<p:commandButton value="Agregar" process="@this" icon="pi pi-plus" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaSalida()}" update="@this form:piezas form:kilos">
-										<f:setPropertyActionListener value="#{partida}" target="#{altaDetalleConstanciaSalidaBean.partidaSelect}"/>
+									<p:commandButton value="Agregar" process="@this" icon="pi pi-plus" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaSalida()}" update="@this form:dt-detalleConstanciaSalida">
 									</p:commandButton>
-								</p:column>
+								</p:column> 
 								
 								<p:rowExpansion>
 									<p:dataTable value="#{partida.detallePartidaList}" var="detalle">
@@ -161,8 +164,53 @@
 						</p:rowExpansion>
 						</p:dataTable>
 						
+						<!-- Espacio detalleconstanciasalida -->
 						
-						<!-- Espacio para el anterior datatable -->
+						<p:dataTable id="dt-detalleConstanciaSalida" value="#{altaDetalleConstanciaSalidaBean.listadoDetalleConstanciaSalida}" var="detalleCS"
+									editable="true" editMode="cell">
+						<!-- <p:ajax event="cellEdit" listener="#{altaDetalleConstanciaSalidaBean.onCellEdit}" update=":form:messages"/> -->
+					
+						<p:column headerText="Piezas" >
+							<p:cellEditor>
+			                    <f:facet name="output">
+			                        <h:outputText value="#{detalleCS.partidaCve.cantidadTotal}"/>
+			                    </f:facet>
+			                    <f:facet name="input">
+			                        <p:inputText id="cantidadTotal" value="#{detalleCS.cantidad}" style="width:100%">
+			                        	<p:ajax update="cantidad pesoT" event="blur" listener="#{altaDetalleConstanciaSalidaBean.calculoPesoSalida()}"/>
+			                        </p:inputText>
+			                    </f:facet>
+			                </p:cellEditor>
+						</p:column>
+						
+						<p:column headerText="Peso" >
+							<p:cellEditor>
+			                    <f:facet name="output">
+			                        <h:outputText value="#{detalleCS.partidaCve.pesoTotal}"/>
+			                    </f:facet>
+			                    <f:facet name="input">
+			                        <p:inputText id="pesoTotal" value="#{detalleCS.peso}" style="width:100%">
+			                        </p:inputText>
+			                    </f:facet>
+			                </p:cellEditor>
+						</p:column>
+						
+						<p:column headerText="Piezas a salir">
+								<h:outputText id="cantidad" value="#{detalleCS.cantidad}" />
+						</p:column>
+						
+						<p:column headerText="peso de piezas a salir">
+							<h:outputText id="pesoT" value="#{detalleCS.peso}" />
+						</p:column>
+						
+						</p:dataTable>
+						
+						
+						<!-- Espacio para el anterior datatable
+						
+						
+						
+						
 						<p:fieldset legend="Productos">
 							<p:panel>
 								<p:outputLabel value="Piezas:" styleClass="p-mr-2" />
@@ -179,7 +227,7 @@
 								<p:inputNumber styleClass="p-mr-4" value="#{altaDetalleConstanciaSalidaBean.temperatura}">
 								</p:inputNumber>
 							</p:panel>
-						</p:fieldset>
+						</p:fieldset> -->
 						
 						<!-- Servicios -->
 						<div style="margin-top: 10px;">
@@ -199,7 +247,7 @@
 							
 						</div>
 						
-						<p:dataTable id="dt-servicio" value="#{altaDetalleConstanciaSalidaBean.listadoConstanciaDepositoDetalle}" var="constanciaDD" >
+						<p:dataTable id="dt-servicio" value="#{altaDetalleConstanciaSalidaBean.listadoConstanciaSalidaServicios}" var="constanciaServicios" >
 						
 							<f:facet name="header">
 								<div style="text-align: center;">
@@ -208,11 +256,11 @@
 							</f:facet>
 						
 							<p:column headerText="Servicio" >
-								<h:outputText value="#{constanciaDD.servicioCve.servicioDs}" />
+								<h:outputText value="#{constanciaServicios.servicioCve.servicioDs}" />
 							</p:column>
 						
 							<p:column headerText="Cantidad Servicio">
-							<h:outputText value="#{constanciaDD.servicioCantidad}" />
+							<h:outputText value="#{constanciaServicios.servicioCantidad}" />
 							</p:column>
 						
 						</p:dataTable>
