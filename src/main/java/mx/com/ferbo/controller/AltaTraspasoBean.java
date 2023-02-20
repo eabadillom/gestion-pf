@@ -35,6 +35,7 @@ import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
+import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PartidaServicioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
@@ -44,6 +45,7 @@ import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.EstadoConstancia;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
@@ -56,7 +58,6 @@ import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 import net.sf.jasperreports.engine.JRException;
 @Named
-@ManagedBean(value = "ejemplo1")
 @ViewScoped
 public class AltaTraspasoBean implements Serializable {
 
@@ -71,7 +72,7 @@ public class AltaTraspasoBean implements Serializable {
 	private List<UnidadDeManejo> alUnidades;
 	private List<EstadoConstancia> estados = null;
 	private List<ConstanciaDeDeposito> listaconstanciadepo;
-	private List<Aviso> listaaviso;
+	private List<Partida> partida;
 	private Date fecha;
 	private String folio;
 	private Integer cantidad;
@@ -100,13 +101,20 @@ public class AltaTraspasoBean implements Serializable {
 	private ClienteDAO clienteDAO;
 	private PartidaServicioDAO partidaservicioDAO;
 	private ConstanciaDeDepositoDAO constanciadepDAO;
-	private AvisoDAO avisoDAO;
+	private PartidaDAO partidaDAO;
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
 	public AltaTraspasoBean() {
 		log.info("Entrando al constructor del controller...");
+		partidaservicioDAO = new PartidaServicioDAO();
+		clienteDAO = new ClienteDAO();
+		udmDAO = new UnidadDeManejoDAO();
+		csDAO = new ConstanciaServicioDAO();
+		edoDAO = new EstadoConstanciaDAO();
+		partidaDAO = new PartidaDAO();
 		clientes = new ArrayList<Cliente>();
+		partida = new ArrayList<Partida>();
 		//alPartidas = new ArrayList<PartidaServicio>();
 		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
 		alServicios = new ArrayList<PrecioServicio>();
@@ -116,12 +124,8 @@ public class AltaTraspasoBean implements Serializable {
 		selCliente = new Cliente();
 		alPartidas = partidaservicioDAO.findall();
 		clientes = clienteDAO.findall();
-		listaaviso = avisoDAO.findall();
-		partidaservicioDAO= new PartidaServicioDAO();
-		clienteDAO = new ClienteDAO();
-		udmDAO = new UnidadDeManejoDAO();
-		csDAO = new ConstanciaServicioDAO();
-		edoDAO = new EstadoConstanciaDAO();
+		partida = partidaDAO.findall();
+
 
 	}
 
@@ -136,11 +140,6 @@ public class AltaTraspasoBean implements Serializable {
 		estados = edoDAO.buscarTodos();
 	}
 
-	public static String fecha() {
-		Date fecha = new Date();
-		SimpleDateFormat formatofecha = new SimpleDateFormat("dd/MM/YYYY");
-		return formatofecha.format(fecha);
-	}
 	public void filtrarCliente() {
 		String message = null;
 		Severity severity = null;
@@ -415,6 +414,7 @@ public class AltaTraspasoBean implements Serializable {
 	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
 	
+	
 	public String getUnidadcobro() {
 		return unidadcobro;
 	}
@@ -655,14 +655,13 @@ public class AltaTraspasoBean implements Serializable {
 		this.idclavectedeposito = idclavectedeposito;
 	}
 
-	public List<Aviso> getListaaviso() {
-		return listaaviso;
+	public List<Partida> getPartida() {
+		return partida;
 	}
 
-	public void setListaaviso(List<Aviso> listaaviso) {
-		this.listaaviso = listaaviso;
+	public void setPartida(List<Partida> partida) {
+		this.partida = partida;
 	}
-
 	
 }
 	  

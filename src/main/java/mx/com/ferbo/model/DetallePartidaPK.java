@@ -3,6 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
@@ -83,9 +88,5 @@ public class DetallePartidaPK implements Serializable {
 	public String toString() {
 		return "DetallePartidaPK [detPartCve=" + detPartCve + ", partidaCve=" + partidaCve + "]";
 	}
-
-    
-
-	
     
 }

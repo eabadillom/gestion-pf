@@ -14,19 +14,19 @@
 				<p:menuitem value="Alta" outcome="/inventarios/altaTraspaso" />
 			</p:breadCrumb>
 			<p:growl id="messages" showDetail="true" />
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altatraspaso.fecha}" />
-							<p:inputText id="txtFolio" value="#{altatraspaso.folio}" placeholder="Folio" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altaTraspasoBean.fecha}" />
+							<p:inputText id="txtFolio" value="#{altaTraspasoBean.folio}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>
-						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altatraspasoBean.selCliente.cteNombre}" filterMatchMode="startsWith">
+						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altaTraspasoBean.selCliente.cteNombre}" filterMatchMode="startsWith">
 							<f:selectItem itemLabel="Seleccione Cliente" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="cte" value="#{altatraspasoBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
+							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
 							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:selProducto "/>
 						</p:selectOneMenu>
 						
-						<p:selectOneMenu id="selProducto" autoWidth="true" value="#{altatraspasoBean.idProducto}" filterMatchMode="startsWith">
+						<p:selectOneMenu id="selProducto" autoWidth="true" value="#{altaTraspasoBean.idProducto}" filterMatchMode="startsWith">
 						<f:selectItem itemLabel="Seleccione Producto" itemValue="" noSelectionOption="true" />
-						<f:selectItems var="producto" value="#{altatraspasoBean.alProductosFiltered}" itemLabel="#{producto.productoCve.productoDs}" itemValue="#{producto.productoCve.productoCve}" />
+						<f:selectItems var="producto" value="#{altaTraspasoBean.alProductosFiltered}" itemLabel="#{producto.productoCve.productoDs}" itemValue="#{producto.productoCve.productoCve}" />
 					</p:selectOneMenu>
 				</p:toolbarGroup>
 			</p:toolbar>
@@ -44,10 +44,9 @@
             </p:toolbarGroup>
 </p:toolbar>
             
-         <div class="card">
-   		 <h:form>
-		<p:dataTable id="traspaso" widgetVar="dttraspaso"  var="altatraspaso" value="#{altatraspasoBean.alPartidas}" reflow="true" 
-        styleClass="products-table" rowKey="#{altatraspaso.folio}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">           
+         <div class="card"><h:form>
+		<p:dataTable id="traspaso" widgetVar="dttraspaso" var="altatraspaso" value="#{altaTraspasoBean.alPartidas}" reflow="true" styleClass="products-table" rowKey="#{altaTraspaso.folio}" 
+			paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">           
             <p:column style="width:2rem"><p:rowToggler/></p:column>
             <p:column headerText="Folio" sortBy="#{altatraspaso.folio.folio}" filterBy="#{altatraspaso.folio.folio}"><h:outputText value="#{altatraspaso.folio.folio}" /></p:column>
             <p:column headerText="Producto" sortBy="#{altatraspaso.productoCve.productoDs}" filterBy="#{altatraspaso.productoCve.productoDs}">
@@ -56,16 +55,13 @@
             <p:column headerText="Cantidad" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}"><h:outputText value="#{altatraspaso.cantidadTotal}" /></p:column>
             <p:column headerText="Unidad de Manejo" sortBy="#{altatraspaso.unidadDeManejoCve.unidadDeManejoDs}" filterBy="#{altatraspaso.unidadDeManejoCve.unidadDeManejoDs}">
             	<h:outputText value="#{altatraspaso.unidadDeManejoCve.unidadDeManejoDs}" /></p:column>
-            <p:column headerText="Planta origen" sortBy="#{altatraspaso.plantaCve.plantaDs}" filterBy="#{altatraspaso.plantaCve.plantaDs}"><h:outputText value="#{altatraspaso.plantaCve.plantaDs}" /></p:column>
+            <p:column headerText="Planta origen" sortBy="" filterBy=""><h:outputText value="" /></p:column>
             <p:column headerText="Posicion Origen" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}"><h:outputText value="#{altatraspaso.cantidadTotal}" /></p:column>
 						   
 	<!-- Comienza lista desplegable -->
             <p:rowExpansion>
-            
-            <p:dataTable id="row-constancia" widgetVar="dt-constancia" var="rconstancia" value="altatraspasoBean.listaaviso" reflow="true" rowKey="" rows="5" paginatorPosition="bottom" 
-            		rowSelectMode="add">
-							
-							<p:column headerText="Caducidad"><h:outputText value="#{altatraspaso.productoCve.productoDs}" /></p:column>
+            <p:dataTable id="row-constancia" widgetVar="dt-constancia" var="rconstancia" value="#{altaTraspasoBean.partida}" reflow="true" rowKey="" rows="5" paginatorPosition="bottom" rowSelectMode="add">
+							<p:column headerText="Caducidad"><h:outputText value="#{rconstancia.productoCve.productoDs}" /></p:column>
 							<p:column headerText="Codigo"><h:outputText value="#{altatraspaso.productoCve.productoDs}" /></p:column>
 							<p:column headerText="Lote"><h:outputText value="#{altatraspaso.productoCve.productoDs}" /></p:column>
 							<p:column headerText="SAP"><h:outputText value="#{altatraspaso.productoCve.productoDs}" /></p:column>
@@ -98,39 +94,27 @@
 			        </div>
 			    </p:divider>
 								<b>Tipo de servicio</b>
-								<p:selectOneMenu id="servicio" value="#{altatraspasoBean.idPrecioServicio}" converter="entityConverter" >
-								<f:selectItem itemLabel="---Seleccione---" itemValue="#{altatraspasoBean.alServicios}"  />
-								<f:selectItems value="#{altatraspasoBean.alServicios} #{selectedPrecioServicio.unidad.unidadDeManejoDs})" var="selectedPrecioServicio" itemLabel="#{selectedPrecioServicio.servicio.servicioDs}" itemValue="#{selectedPrecioServicio.id}" />
+								<p:selectOneMenu id="servicio" value="#{altaTraspasoBean.idPrecioServicio}" converter="entityConverter" >
+								<f:selectItem itemLabel="---Seleccione---" itemValue="#{altaTraspasoBean.alServicios}"  />
+								<f:selectItems value="#{altaTraspasoBean.alServicios} #{selectedPrecioServicio.unidad.unidadDeManejoDs})" var="selectedPrecioServicio" itemLabel="#{selectedPrecioServicio.servicio.servicioDs}" itemValue="#{selectedPrecioServicio.id}" />
 								<p:ajax />
 								</p:selectOneMenu>
 							
 							<b>    </b>
-							<p:column headerText="cantidadservicio">
-								<p:inputText id="cantidad" value="" placeholder="Cantidad." />
-							</p:column>
-							
+							<p:column headerText="cantidadservicio"><p:inputText id="cantidad" value="" placeholder="Cantidad." /></p:column>
 							<div class="p-grid ui-fluid">
 						 		<div class="p-field p-col-2 p-md-2">
                            <p:commandButton value="Traspasar" styleClass="ui-button-raised" icon="pi pi-plus" disabled="#{product.inventoryStatus == 'OUTOFSTOCK'}"/>
                            <span class="product-badge status-#{product.inventoryStatus.name().toLowerCase()}">#{product.inventoryStatus.text}</span>
 								</div>
 							</div>
-				 
 			</p:rowExpansion>
          </p:dataTable>
          </h:form>
          </div>
 			<p:dialog header="Header" widgetVar="dlg1"  showEffect="fade">
-          	<div class="card ui-fluid ">
-    <h:form>
-				<p:panel widgetVar="testPanel">
-				<p:dataTable id="dt-servicio" widgetVar="dtServicio" var="serviciosExtras" lazy="false" rowKey="#{altatraspaso.folio}" value="altatraspasoBean.listaaviso" reflow="true" styleClass="servicio-table" 
-							rowSelectMode="add" tableStyle="width:auto">
-					<p:ajax event="toggleSelect"  process="@this" update="dt-servicio" />
-										<p:ajax event="rowSelectCheckbox" process="@this" update="dt-servicio" />
-										<p:ajax event="rowSelect" process="@this" update="dt-servicio" />
-										<p:ajax event="rowUnselect" update="dt-servicio" />
-										<p:ajax event="rowUnselectCheckbox" update="dt-servicio" />
+				<p:panelGrid columns="9" layout="grid" styleClass="showcase-text-align-center">
+				<p:dataTable id="dt-servicio" widgetVar="dtServicio" var="serviciosExtras" rowKey="#{serviciosExtras.folio}" value="#{altaTraspasoBean.partida}" reflow="true"	 tableStyle="width:auto">
 		           	<p:column headerText="Descripcion" ><h:outputText value="" /></p:column>
 					<p:column headerText="Cantidad" sortBy=""><h:outputText value=""/></p:column>
 					<p:column headerText="Origen"><h:outputText value=""/></p:column>
@@ -139,24 +123,22 @@
 					<p:column headerText="Precio"	sortBy=""><h:outputText value=""/></p:column>
 					<p:column headerText="Subtotal"	sortBy=""><h:outputText value=""/></p:column>
 				</p:dataTable>
+				</p:panelGrid>
 				<p:fieldset legend="Valor declarado">
-				<div class="field col-12 md:col-4">
-					<p:panel><p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="" placeholder="Observaciones." style="width: 30em;"/></p:panel>
-				</div>
+					<div class="field col-12 md:col-4">
+						<p:panel><p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="" placeholder="Observaciones." style="width: 30em;"/></p:panel>
+					</div>
 				</p:fieldset>
 				
 				<div class="p-grid ui-fluid">
-				<div class="p-field p-col-6 p-md-6">
-			    <p:commandButton type="button" value="Generar constancia de traspaso " icon="pi pi-check" />
-			    </div>
-				
-				<div class="p-field p-col-6 p-md-6">
-			    <p:commandButton type="button" value="Cancelar"  icon="pi pi-times" />			
-			    </div>
+					<div class="p-field p-col-6 p-md-6">
+				    <p:commandButton type="button" value="Generar constancia de traspaso " icon="pi pi-check" />
+				    </div>
+					<div class="p-field p-col-6 p-md-6">
+				    <p:commandButton type="button" value="Cancelar"  icon="pi pi-times" />			
+				    </div>
 			    </div>	
-			</p:panel>
-    </h:form>
-			</div>
+			
 		</p:dialog>
     </h:form>
 </div>

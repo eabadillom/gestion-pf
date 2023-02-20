@@ -4,14 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PartidaDAO extends IBaseDAO<Partida, Integer>{
-
+	@SuppressWarnings("unchecked")
+	public List<Partida> findall() {
+		EntityManager entity = EntityManagerUtil.getEntityManager();
+		List<Partida> partida= null;
+		Query sql = entity.createNamedQuery("Partida.findAll", Partida.class);
+		partida = sql.getResultList();
+		return partida;
+	}
+	
 	@Override
 	public Partida buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
