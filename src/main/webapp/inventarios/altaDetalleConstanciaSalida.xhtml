@@ -75,7 +75,7 @@
 						
 						<p:rowExpansion>
 							<p:dataTable value="#{constanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}" rowSelectMode="add" 
-											selection="#{altaDetalleConstanciaSalidaBean.partidaSelect}" selectionMode="single" disabledSelection="#{not empty altaDetalleConstanciaSalidaBean.partidaSelect}">
+											selection="#{altaDetalleConstanciaSalidaBean.partidaSelect}" selectionMode="single">
 								
 								<f:facet name="header">
 									<div style="text-align: center;">
@@ -163,6 +163,8 @@
 							</p:dataTable>
 						</p:rowExpansion>
 						</p:dataTable>
+						<!-- Espoacio para modificar salida -->
+						
 						
 						<!-- Espacio detalleconstanciasalida -->
 						
@@ -177,22 +179,16 @@
 			                    </f:facet>
 			                    <f:facet name="input">
 			                        <p:inputText id="cantidadTotal" value="#{detalleCS.cantidad}" style="width:100%">
-			                        	<p:ajax update="cantidad pesoT cantidadTotal" event="blur" listener="#{altaDetalleConstanciaSalidaBean.calculoPesoSalida()}"/>
+			                        	<p:ajax update="cantidad pesoT cantidadTotal form:dt-salidas " event="blur" listener="#{altaDetalleConstanciaSalidaBean.calculoPesoSalida()}"/>
 			                        </p:inputText>
 			                    </f:facet>
 			                </p:cellEditor>
 						</p:column>
 						
 						<p:column headerText="Peso" >
-							<p:cellEditor>
-			                    <f:facet name="output">
-			                        <h:outputText value="#{detalleCS.partidaCve.pesoTotal}"/>
-			                    </f:facet>
-			                    <f:facet name="input">
-			                        <p:inputText id="pesoTotal" value="#{detalleCS.peso}" style="width:100%">
-			                        </p:inputText>
-			                    </f:facet>
-			                </p:cellEditor>
+							
+		                        <h:outputText value="#{detalleCS.partidaCve.pesoTotal}"/>
+			        
 						</p:column>
 						
 						<p:column headerText="Piezas a salir">
@@ -205,13 +201,35 @@
 						
 						</p:dataTable>
 						
+						<p:dataTable id="dt-salidas" value="#{altaDetalleConstanciaSalidaBean.listadoTemp}" var="salida">
 						
-						<!-- Espacio para el anterior datatable
+						<f:facet name="header">
+							<div style="text-align: center;">
+								<span>Detalle Constancia Salida</span>
+							</div>
+						</f:facet>
+						
+						<p:column headerText="Cantidad Total">
+							<h:outputText value="#{salida.partidaCve.cantidadTotal}" />
+						</p:column>
+						
+						<p:column headerText="Piezas a salir">
+							<h:outputText value="#{salida.cantidad}" />
+						</p:column>
+						
+						<p:column headerText="Peso de piezas a salir">
+							<h:outputText value="#{salida.peso}" />
+						</p:column>
+						
+						</p:dataTable>
+						
+						
+						<!-- Espacio para el anterior datatable-->
 						
 						
 						
 						
-						<p:fieldset legend="Productos">
+						<!-- <p:fieldset legend="Productos">
 							<p:panel>
 								<p:outputLabel value="Piezas:" styleClass="p-mr-2" />
 								<p:inputNumber id="piezas" styleClass="p-mr-4" value="#{altaDetalleConstanciaSalidaBean.partidaSelect.cantidadTotal}">
@@ -227,7 +245,7 @@
 								<p:inputNumber styleClass="p-mr-4" value="#{altaDetalleConstanciaSalidaBean.temperatura}">
 								</p:inputNumber>
 							</p:panel>
-						</p:fieldset> -->
+						</p:fieldset>  --> 
 						
 						<!-- Servicios -->
 						<div style="margin-top: 10px;">

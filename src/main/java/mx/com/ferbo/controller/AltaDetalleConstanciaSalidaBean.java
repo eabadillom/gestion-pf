@@ -322,6 +322,14 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		this.pesoTotal = pesoTotal;
 	}
 
+	public List<DetalleConstanciaSalida> getListadoTemp() {
+		return listadoTemp;
+	}
+
+	public void setListadoTemp(List<DetalleConstanciaSalida> listadoTemp) {
+		this.listadoTemp = listadoTemp;
+	}
+
 	public void validar() {
 		
 		//System.out.println(listadoConstanciasSalidas);
@@ -415,6 +423,15 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	public void calculoPesoSalida() {
 		BigDecimal totalP = null,cantidad = null,peso = null,calculo = null,mul = null;
 		
+		/*for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
+			totalP = new BigDecimal(d.getPartidaCve().getCantidadTotal());
+			peso = d.getPartidaCve().getPesoTotal();
+			cantidad = new BigDecimal(d.getCantidad());
+			mul = cantidad.multiply(peso);
+			calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);
+			d.setPeso(calculo);
+			metodo para probra mañana como lo tenia en una sola dataTable 
+		}*/
 		
 		/*for(Partida p: listadoPartida) {
 			for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
@@ -433,22 +450,34 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 			}
 		}*/
 		
+		DetalleConstanciaSalida detalleT = new DetalleConstanciaSalida();
 		
 		for(Partida p: listadoPartida) {
+			
 			totalP = new BigDecimal(p.getCantidadTotal());//piezas totales
 			peso = p.getPesoTotal();//peso total de todas las piezas 
+			//List<DetalleConstanciaSalida> detalleConstanciaSalidas = new ArrayList<DetalleConstanciaSalida>();
+			
 			for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
 				cantidad = new BigDecimal(d.getCantidad());//numero de piezas a salir
 				
 				mul = cantidad.multiply(peso);
 				calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);
 				d.setPeso(calculo);
+				//detalleConstanciaSalidas.add(d);
 				listadoTemp.add(d);
+				detalleT = d;
+				//PrimeFaces.current().ajax().update("form:dt-detalleConstanciaSalida");
 			}
 			
 		}
 		
+		listadoDetalleConstanciaSalida.remove(detalleT);
+		
 		System.out.println(listadoDetalleConstanciaSalida);
+		PrimeFaces.current().ajax().update("form:dt-detalleConstanciaSalida","form:dt-salidas");
+		//estoy recorriendo ambas partidas y en la ultima partida recorro ambas detalleconstanciasalida y ppor ellos 
+		//los resultados finales son respecto a la ultima partida dejando a un lado los resultados de la primera partida
 		
 		/*DetalleConstanciaSalida detalleConstanciaS = new DetalleConstanciaSalida();
 		detalleConstanciaS.setPeso(totalP.divide(cantidad.multiply(peso),2,RoundingMode.HALF_UP));*/
