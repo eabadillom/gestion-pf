@@ -15,7 +15,7 @@
 				<p:menuitem value="Salidas" />
 				<p:menuitem value="Alta" outcome="/inventarios/altaDetalleConstanciaSalida" />
 			</p:breadCrumb>
-						<p:growl id="messages" showDetail="true" life="2000"/>
+						<p:growl id="messages" showDetail="true" life="4000"/>
 						<p:toolbar>
 							<p:toolbarGroup id="datos-generales" >
 							
@@ -75,7 +75,7 @@
 						
 						<p:rowExpansion>
 							<p:dataTable value="#{constanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}" rowSelectMode="add" 
-											selection="#{altaDetalleConstanciaSalidaBean.partidaSelect}" selectionMode="single">
+											selection="#{altaDetalleConstanciaSalidaBean.partidaSelect}" selectionMode="single" disabledSelection="#{not empty altaDetalleConstanciaSalidaBean.partidaSelect}">
 								
 								<f:facet name="header">
 									<div style="text-align: center;">
@@ -119,7 +119,7 @@
 								</p:column>
 								
 								<p:column>
-									<p:commandButton value="Agregar" process="@this" icon="pi pi-plus" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaSalida()}" update="@this form:dt-detalleConstanciaSalida">
+									<p:commandButton value="Agregar" process="@this" icon="pi pi-plus" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaSalida()}" update="@this">
 									</p:commandButton>
 								</p:column> 
 								
@@ -177,7 +177,7 @@
 			                    </f:facet>
 			                    <f:facet name="input">
 			                        <p:inputText id="cantidadTotal" value="#{detalleCS.cantidad}" style="width:100%">
-			                        	<p:ajax update="cantidad pesoT" event="blur" listener="#{altaDetalleConstanciaSalidaBean.calculoPesoSalida()}"/>
+			                        	<p:ajax update="cantidad pesoT cantidadTotal" event="blur" listener="#{altaDetalleConstanciaSalidaBean.calculoPesoSalida()}"/>
 			                        </p:inputText>
 			                    </f:facet>
 			                </p:cellEditor>
@@ -256,11 +256,11 @@
 							</f:facet>
 						
 							<p:column headerText="Servicio" >
-								<h:outputText value="#{constanciaServicios.servicioCve.servicioDs}" />
+								<h:outputText value="#{constanciaServicios.constanciaSalidaServiciosPK.servicioCve.servicioDs}" />
 							</p:column>
 						
 							<p:column headerText="Cantidad Servicio">
-							<h:outputText value="#{constanciaServicios.servicioCantidad}" />
+							<h:outputText value="#{constanciaServicios.numCantidad}" />
 							</p:column>
 						
 						</p:dataTable>

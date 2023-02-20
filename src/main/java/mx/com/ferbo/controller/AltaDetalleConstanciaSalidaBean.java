@@ -64,6 +64,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	private List<Partida> listadoPartida;
 	
 	private List<DetalleConstanciaSalida> listadoDetalleConstanciaSalida;
+	private List<DetalleConstanciaSalida> listadoTemp;
 	
 	private String numFolio,nombreTransportista,placas,observaciones,temperatura;
 	private BigDecimal cantidadServicio;
@@ -92,6 +93,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		
 		listadoPartida = new ArrayList<Partida>();
 		listadoDetalleConstanciaSalida = new ArrayList<>();
+		listadoTemp = new ArrayList<>();
 	}
 	
 	@PostConstruct
@@ -385,6 +387,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 			
 		}
 		else{
+			listadoPartida.clear();
 			DetalleConstanciaSalida detalleConstanciaSalida = new DetalleConstanciaSalida();
 			
 			detalleConstanciaSalida.setPartidaCve(partidaSelect);
@@ -392,9 +395,10 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 			listadoDetalleConstanciaSalida.add(detalleConstanciaSalida);
 			listadoPartida.add(partidaSelect);
 			this.partidaSelect = null;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,"Modificar registro agregado","Modifica piezas a salir antes de agregar otro producto"));
 		}
 		
-		PrimeFaces.current().ajax().update("form:messages");
+		PrimeFaces.current().ajax().update("form:messages","form:dt-detalleConstanciaSalida");
 		
 	}
 	
@@ -409,10 +413,12 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
     }*/
 	
 	public void calculoPesoSalida() {
-		BigDecimal totalP,cantidad,peso,calculo,mul;
+		BigDecimal totalP = null,cantidad = null,peso = null,calculo = null,mul = null;
 		
-		for(Partida p: listadoPartida) {
+		
+		/*for(Partida p: listadoPartida) {
 			for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
+				
 				cantidad = new BigDecimal(d.getCantidad());
 				peso = p.getPesoTotal();
 				//DetalleConstanciaSalida detalleConstanciaSalida = new DetalleConstanciaSalida();
@@ -420,10 +426,29 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 				totalP = new BigDecimal(p.getCantidadTotal());
 				calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);//MOSTRAR DECIMALES?
 				//detalleConstanciaSalida.setPeso(calculo.setScale(2));
+				d.setPeso(null);
 				d.setPeso(calculo);
 				System.out.println("");
+				
 			}
+		}*/
+		
+		
+		for(Partida p: listadoPartida) {
+			totalP = new BigDecimal(p.getCantidadTotal());//piezas totales
+			peso = p.getPesoTotal();//peso total de todas las piezas 
+			for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
+				cantidad = new BigDecimal(d.getCantidad());//numero de piezas a salir
+				
+				mul = cantidad.multiply(peso);
+				calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);
+				d.setPeso(calculo);
+				listadoTemp.add(d);
+			}
+			
 		}
+		
+		System.out.println(listadoDetalleConstanciaSalida);
 		
 		/*DetalleConstanciaSalida detalleConstanciaS = new DetalleConstanciaSalida();
 		detalleConstanciaS.setPeso(totalP.divide(cantidad.multiply(peso),2,RoundingMode.HALF_UP));*/
