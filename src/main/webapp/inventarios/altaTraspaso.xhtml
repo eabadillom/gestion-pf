@@ -18,7 +18,7 @@
 							<p:inputText id="txtFolio" value="#{altaTraspasoBean.folio}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>
-						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altaTraspasoBean.selCliente.cteNombre}" filterMatchMode="startsWith">
+						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altaTraspasoBean.idCliente}" filterMatchMode="startsWith">
 							<f:selectItem itemLabel="Seleccione Cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
 							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:selProducto "/>
@@ -60,13 +60,13 @@
 						   
 	<!-- Comienza lista desplegable -->
             <p:rowExpansion>
-            <p:dataTable id="row-constancia" widgetVar="dt-constancia" var="rconstancia" value="#{altaTraspasoBean.partida}" reflow="true" rowKey="" rows="5" paginatorPosition="bottom" rowSelectMode="add">
-							<p:column headerText="Caducidad"><h:outputText value="#{rconstancia.productoCve.productoDs}" /></p:column>
-							<p:column headerText="Codigo"><h:outputText value="#{altatraspaso.productoCve.productoDs}" /></p:column>
-							<p:column headerText="Lote"><h:outputText value="#{altatraspaso.productoCve.productoDs}" /></p:column>
-							<p:column headerText="SAP"><h:outputText value="#{altatraspaso.productoCve.productoDs}" /></p:column>
+            <p:dataTable id="row-constancia" widgetVar="dt-constancia" var="rconstancia" value="#{altaTraspasoBean.ldpartida}" reflow="true" rowKey="" rows="5" paginatorPosition="bottom" rowSelectMode="add">
+							<p:column headerText="Caducidad"><h:outputText value="#{rconstancia.dtpCaducidad}" /></p:column>
+							<p:column headerText="Codigo"><h:outputText value="#{rconstancia.dtpCodigo}" /></p:column>
+							<p:column headerText="Lote"><h:outputText value="#{rconstancia.dtpLote}" /></p:column>
+							<p:column headerText="SAP"><h:outputText value="#{rconstancia.dtpSAP}" /></p:column>
 							<p:column headerText="Planta destino">
-								<p:selectOneMenu id="txtplantadestino" value="#{altatraspaso.productoCve.productoDs}" converter="entityConverter" >
+								<p:selectOneMenu id="txtplantadestino" value="" converter="entityConverter" >
 								<f:selectItem itemLabel="---Seleccione---" itemValue=""  />
 								<f:selectItems value="" var="user" itemLabel="#{user}" itemValue="#{user}" />
 								<p:ajax />

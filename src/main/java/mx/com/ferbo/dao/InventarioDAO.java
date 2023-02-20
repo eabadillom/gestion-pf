@@ -2,13 +2,24 @@ package mx.com.ferbo.dao;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{	
+	@SuppressWarnings("unchecked")
+	public List<ConstanciaDeDeposito> findall() {
+		EntityManager entity = EntityManagerUtil.getEntityManager();
+		List<ConstanciaDeDeposito> cdd= null;
+		Query sql = entity.createNamedQuery("ConstanciaDeDeposito.findAll", ConstanciaDeDeposito.class);
+		cdd = sql.getResultList();
+		return cdd;
+	}
 	
 	@Override
 	public ConstanciaDeDeposito buscarPorId(Integer id) {
@@ -28,11 +39,11 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{
 	return null;
 	}
 
-	public List<ConstanciaDeDeposito> buscarPorCliente(ConstanciaDeDeposito cteCve) {
+	public List<ConstanciaDeDeposito> buscarPorCliente(Cliente cliente) {
 	EntityManager entity = EntityManagerUtil.getEntityManager();
 	List<ConstanciaDeDeposito> constancia = new ArrayList<>();
 	constancia = entity.createNamedQuery("ConstanciaDeDeposito.findByCteCve", ConstanciaDeDeposito.class)
-	.setParameter("ctecve", cteCve.getCteCve())
+	.setParameter("cteCve", cliente.getCteCve())
 	.getResultList();
 
 	for(ConstanciaDeDeposito c: constancia) {

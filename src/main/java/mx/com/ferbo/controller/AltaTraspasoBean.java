@@ -35,6 +35,7 @@ import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
+import mx.com.ferbo.dao.InventarioDAO;
 import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PartidaServicioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
@@ -44,7 +45,9 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.EstadoConstancia;
+import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
@@ -57,6 +60,7 @@ import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 import net.sf.jasperreports.engine.JRException;
+
 @Named
 @ViewScoped
 public class AltaTraspasoBean implements Serializable {
@@ -73,6 +77,8 @@ public class AltaTraspasoBean implements Serializable {
 	private List<EstadoConstancia> estados = null;
 	private List<ConstanciaDeDeposito> listaconstanciadepo;
 	private List<Partida> partida;
+	private List<DetallePartida> ldpartida;
+	private List<Inventario> inventario;
 	private Date fecha;
 	private String folio;
 	private Integer cantidad;
@@ -89,12 +95,12 @@ public class AltaTraspasoBean implements Serializable {
 	private BigDecimal cantidadServicio;
 	private Integer idCliente;
 	private Integer idclavectedeposito;
-	
-	private Cliente selCliente;	
+
+	private Cliente selCliente;
 	private ConstanciaDeDeposito ctecve;
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
-	
+
 	private UnidadDeManejoDAO udmDAO;
 	private ConstanciaServicioDAO csDAO;
 	private EstadoConstanciaDAO edoDAO;
@@ -102,6 +108,7 @@ public class AltaTraspasoBean implements Serializable {
 	private PartidaServicioDAO partidaservicioDAO;
 	private ConstanciaDeDepositoDAO constanciadepDAO;
 	private PartidaDAO partidaDAO;
+	private InventarioDAO inventarioDAO;
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
@@ -113,9 +120,13 @@ public class AltaTraspasoBean implements Serializable {
 		csDAO = new ConstanciaServicioDAO();
 		edoDAO = new EstadoConstanciaDAO();
 		partidaDAO = new PartidaDAO();
+		inventarioDAO = new InventarioDAO();
+		constanciadepDAO = new ConstanciaDeDepositoDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
-		//alPartidas = new ArrayList<PartidaServicio>();
+		ldpartida = new ArrayList<DetallePartida>();
+		inventario = new ArrayList<Inventario>();
+		// alPartidas = new ArrayList<PartidaServicio>();
 		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
 		alServicios = new ArrayList<PrecioServicio>();
 		alUnidades = new ArrayList<UnidadDeManejo>();
@@ -125,8 +136,7 @@ public class AltaTraspasoBean implements Serializable {
 		alPartidas = partidaservicioDAO.findall();
 		clientes = clienteDAO.findall();
 		partida = partidaDAO.findall();
-
-
+		
 	}
 
 	@PostConstruct
@@ -138,6 +148,7 @@ public class AltaTraspasoBean implements Serializable {
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		estados = edoDAO.buscarTodos();
+		
 	}
 
 	public void filtrarCliente() {
@@ -147,8 +158,8 @@ public class AltaTraspasoBean implements Serializable {
 		Cliente cliente = null;
 		Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
 		List<PrecioServicio> precioServicioList = null;
-		selCliente.setCteCve(this.idCliente);
-		
+		selCliente = clienteDAO.buscarPorId(idCliente);
+		listaconstanciadepo = inventarioDAO.buscarPorCliente(selCliente);
 		try {
 			log.info("Entrando a filtrar cliente...");
 			// selCliente = clientes.stream()
@@ -228,8 +239,12 @@ public class AltaTraspasoBean implements Serializable {
 
 			if (udm == null)
 				throw new InventarioException("Debe seleccionar una unidad de producto.");
-			ProductoPorCliente prd = alProductosFiltered.stream().filter(p -> this.idProducto.equals(p.getProductoCve().getProductoCve())).collect(Collectors.toList()).get(0);
-			ConstanciaDeDeposito cdd= listaconstanciadepo.stream().filter(p -> this.idclavectedeposito.equals(p.getCteCve().getCteCve())).collect(Collectors.toList()).get(0);
+			ProductoPorCliente prd = alProductosFiltered.stream()
+					.filter(p -> this.idProducto.equals(p.getProductoCve().getProductoCve()))
+					.collect(Collectors.toList()).get(0);
+			ConstanciaDeDeposito cdd = listaconstanciadepo.stream()
+					.filter(p -> this.idclavectedeposito.equals(p.getCteCve().getCteCve())).collect(Collectors.toList())
+					.get(0);
 
 			if (prd == null)
 				throw new InventarioException("Debe seleccionar un producto.");
@@ -301,7 +316,7 @@ public class AltaTraspasoBean implements Serializable {
 
 	public synchronized void guardar() {
 		String message = null;
-		Severity severity = null;		
+		Severity severity = null;
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
 		EstadoConstancia estado = null;
@@ -344,7 +359,7 @@ public class AltaTraspasoBean implements Serializable {
 			this.habilitareporte = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
-			
+
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -360,7 +375,6 @@ public class AltaTraspasoBean implements Serializable {
 		}
 	}
 
-
 	public void jasper() throws JRException, IOException, SQLException {
 		String jasperPath = "/jasper/ejemplo1.jrxml";
 		String filename = "Constancia_de_servicio.pdf";
@@ -370,15 +384,15 @@ public class AltaTraspasoBean implements Serializable {
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
 		alConstancias = csDAO.buscarPorFolioCliente(this.folio);
-		 File reportFile = new File(jasperPath);
-		 File imgfile = null;
+		File reportFile = new File(jasperPath);
+		File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
 		ConstanciaDeServicio cds = new ConstanciaDeServicio();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
 		try {
-			if(habilitareporte == false ) {
+			if (habilitareporte == false) {
 				throw new Exception("Favor de guardar constancia");
 			}
 			URL resource = getClass().getResource(jasperPath);
@@ -394,27 +408,27 @@ public class AltaTraspasoBean implements Serializable {
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", folio);
-			parameters.put("LogoPath",imgfile.getPath());
+			parameters.put("LogoPath", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());			
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 		} catch (Exception ex) {
 			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		} finally {
 			conexion.close((Connection) connection);
 		}
 	}
-	
+
 	public void reload() throws IOException {
-	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
-	
-	
+
 	public String getUnidadcobro() {
 		return unidadcobro;
 	}
@@ -662,6 +676,13 @@ public class AltaTraspasoBean implements Serializable {
 	public void setPartida(List<Partida> partida) {
 		this.partida = partida;
 	}
-	
+
+	public List<DetallePartida> getLdpartida() {
+		return ldpartida;
+	}
+
+	public void setLdpartida(List<DetallePartida> ldpartida) {
+		this.ldpartida = ldpartida;
+	}
+
 }
-	  
