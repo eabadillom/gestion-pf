@@ -421,7 +421,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
     }*/
 	
 	public void calculoPesoSalida() {
-		BigDecimal totalP = null,cantidad = null,peso = null,calculo = null,mul = null;
+		BigDecimal totalP,cantidad,peso,calculo,mul;
 		
 		/*for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
 			totalP = new BigDecimal(d.getPartidaCve().getCantidadTotal());
@@ -478,17 +478,6 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		PrimeFaces.current().ajax().update("form:dt-detalleConstanciaSalida","form:dt-salidas");
 		//estoy recorriendo ambas partidas y en la ultima partida recorro ambas detalleconstanciasalida y ppor ellos 
 		//los resultados finales son respecto a la ultima partida dejando a un lado los resultados de la primera partida
-		
-		/*DetalleConstanciaSalida detalleConstanciaS = new DetalleConstanciaSalida();
-		detalleConstanciaS.setPeso(totalP.divide(cantidad.multiply(peso),2,RoundingMode.HALF_UP));*/
-		
-		
-		/*for(DetalleConstanciaSalida dcs: listadoDetalleConstanciaSalida) {
-			cantidad = new BigDecimal(dcs.getCantidad()).setScale(2);
-			peso = dcs.getPeso().setScale(2);
-			dcs.setPeso(totalP.divide(cantidad.multiply(peso)));
-		}*/
-		
 		
 	}
 	

@@ -167,10 +167,25 @@
 						
 						
 						<!-- Espacio detalleconstanciasalida -->
-						
+						<p:fieldset legend="Producto a Salir" styleClass="p-mt-4">
 						<p:dataTable id="dt-detalleConstanciaSalida" value="#{altaDetalleConstanciaSalidaBean.listadoDetalleConstanciaSalida}" var="detalleCS"
 									editable="true" editMode="cell">
 						<!-- <p:ajax event="cellEdit" listener="#{altaDetalleConstanciaSalidaBean.onCellEdit}" update=":form:messages"/> -->
+						
+						
+						
+						<p:column headerText="Temperatura">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{detalleCS.temperatura}" />
+								</f:facet>								
+								<f:facet name="input">
+									<p:inputText id="temperatura" value="#{detalleCS.temperatura}" required="true" requiredMessage="Ingresa Temperatura">
+										<p:ajax update="form:messages temperatura" event="blur" />
+									</p:inputText>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
 					
 						<p:column headerText="Piezas" >
 							<p:cellEditor>
@@ -178,34 +193,25 @@
 			                        <h:outputText value="#{detalleCS.partidaCve.cantidadTotal}"/>
 			                    </f:facet>
 			                    <f:facet name="input">
-			                        <p:inputText id="cantidadTotal" value="#{detalleCS.cantidad}" style="width:100%">
-			                        	<p:ajax update="cantidad pesoT cantidadTotal form:dt-salidas " event="blur" listener="#{altaDetalleConstanciaSalidaBean.calculoPesoSalida()}"/>
+			                        <p:inputText id="cantidadTotal" value="#{detalleCS.cantidad}" style="width:100%" required="true" requiredMessage="Ingresa piezas a salir">
+			                        	<p:ajax update="form:messages cantidadTotal form:dt-salidas temperatura" event="blur" listener="#{altaDetalleConstanciaSalidaBean.calculoPesoSalida()}"/>
 			                        </p:inputText>
 			                    </f:facet>
 			                </p:cellEditor>
 						</p:column>
 						
 						<p:column headerText="Peso" >
-							
 		                        <h:outputText value="#{detalleCS.partidaCve.pesoTotal}"/>
-			        
-						</p:column>
-						
-						<p:column headerText="Piezas a salir">
-								<h:outputText id="cantidad" value="#{detalleCS.cantidad}" />
-						</p:column>
-						
-						<p:column headerText="peso de piezas a salir">
-							<h:outputText id="pesoT" value="#{detalleCS.peso}" />
 						</p:column>
 						
 						</p:dataTable>
+						</p:fieldset>
 						
 						<p:dataTable id="dt-salidas" value="#{altaDetalleConstanciaSalidaBean.listadoTemp}" var="salida">
 						
 						<f:facet name="header">
 							<div style="text-align: center;">
-								<span>Detalle Constancia Salida</span>
+								<span>DETALLE CONSTANCIA SALIDA</span>
 							</div>
 						</f:facet>
 						
@@ -219,6 +225,10 @@
 						
 						<p:column headerText="Peso de piezas a salir">
 							<h:outputText value="#{salida.peso}" />
+						</p:column>
+						
+						<p:column headerText="Temperatura">
+							<h:outputText value="#{salida.temperatura}" />
 						</p:column>
 						
 						</p:dataTable>
