@@ -31,6 +31,8 @@ import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.Servicio;
+import mx.com.ferbo.model.StatusConstanciaSalida;
 
 @Named
 @ViewScoped
@@ -102,7 +104,6 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		listadoClientes = clienteDAO.buscarTodos();
 		listadoPlantas = plantaDAO.findall();
 		listadoConstanciasSalidas = constanciaSalidaDAO.buscarTodos();
-		listadoConstanciaDD = constanciaDDDAO.buscarTodos();
 		listadoPrecioServicios = preciosServicioDAO.buscarTodos();
 	}
 
@@ -359,6 +360,8 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 								:false)
 								.collect(Collectors.toList());
 		
+		listadoConstanciaDD = constanciaDDDAO.buscarPorCliente(clienteSelect.getCteCve());
+		
 	}
 	
 	public void saveServicio() {
@@ -377,17 +380,9 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		System.out.println(listadoConstanciaSalidaServicios);
 		
 		
-		
-		/*ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
-		constanciaDeDeposito.setFolioCliente(numFolio);
-		ConstanciaDepositoDetalle constanciaDD = new ConstanciaDepositoDetalle();
-		constanciaDD.setServicioCve(servicioClienteSelect.getServicio());
-		constanciaDD.setFolio(constanciaDeDeposito);
-		constanciaDD.setServicioCantidad(cantidadServicio);*/
-		
 	}
 	
-	public void saveDetalleConstanciaSalida(){
+	public void saveDetalleConstanciaS(){
 		
 		if(partidaSelect==null) {
 			
@@ -410,15 +405,6 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		
 	}
 	
-	/*public void onCellEdit(CellEditEvent event) {
-        Object oldValue = event.getOldValue();
-        Object newValue = event.getNewValue();
-
-        if (newValue != null && !newValue.equals(oldValue)) {
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-        }
-    }*/
 	
 	public void calculoPesoSalida() {
 		BigDecimal totalP,cantidad,peso,calculo,mul;
@@ -431,23 +417,6 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 			calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);
 			d.setPeso(calculo);
 			metodo para probra mañana como lo tenia en una sola dataTable 
-		}*/
-		
-		/*for(Partida p: listadoPartida) {
-			for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
-				
-				cantidad = new BigDecimal(d.getCantidad());
-				peso = p.getPesoTotal();
-				//DetalleConstanciaSalida detalleConstanciaSalida = new DetalleConstanciaSalida();
-				mul = cantidad.multiply(peso);
-				totalP = new BigDecimal(p.getCantidadTotal());
-				calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);//MOSTRAR DECIMALES?
-				//detalleConstanciaSalida.setPeso(calculo.setScale(2));
-				d.setPeso(null);
-				d.setPeso(calculo);
-				System.out.println("");
-				
-			}
 		}*/
 		
 		DetalleConstanciaSalida detalleT = new DetalleConstanciaSalida();
@@ -476,13 +445,12 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		
 		System.out.println(listadoDetalleConstanciaSalida);
 		PrimeFaces.current().ajax().update("form:dt-detalleConstanciaSalida","form:dt-salidas");
-		//estoy recorriendo ambas partidas y en la ultima partida recorro ambas detalleconstanciasalida y ppor ellos 
-		//los resultados finales son respecto a la ultima partida dejando a un lado los resultados de la primera partida
+		
 		
 	}
 	
 	
-	//boton continuar es para guardar la constancia salida????
+	
 	public void saveConstanciaSalida() {
 		
 		//GUARDO CONSTANCIA SALIDA
@@ -495,6 +463,39 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		//constanciaSalida.setStatus();
 		//constanciaSalida.setObservaciones();
 		//pendiente agregar al model los campos de nombre y placas transporte
+		
+	}
+	
+	public void saveDetalleConstanciaSalida() {
+		//METODO PARA GUARDAR INFORMACION EN LA BASE DE DATOS
+		
+		
+		ConstanciaSalida cs = new ConstanciaSalida();
+		
+		//StatusConstanciaSalida status = new StatusConstanciaSalida();
+		
+		cs.setFecha(fechaSalida);
+		cs.setNumero(numFolio);
+		cs.setClienteCve(clienteSelect);
+		cs.setNombreCte(clienteSelect.getCteNombre());
+		cs.setStatus(null);
+		cs.setObservaciones(observaciones);
+		cs.setNombreTransportista(nombreTransportista);
+		cs.setPlacasTransporte(placas);
+		
+		ConstanciaSalidaServiciosPK cssPK = new ConstanciaSalidaServiciosPK();
+		cssPK.setConstanciaSalidaCve(cs);
+		//cssPK.setServicioCve(); como guardar la lista de servicios
+				
+		
+		//cssPK.setServicioCve();
+		
+		ConstanciaSalidaServicios css = new ConstanciaSalidaServicios();
+		
+		DetalleConstanciaSalida dcs = new DetalleConstanciaSalida();
+		
+		
+		
 		
 	}
 	

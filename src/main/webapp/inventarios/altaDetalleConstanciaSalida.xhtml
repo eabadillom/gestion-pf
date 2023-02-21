@@ -23,7 +23,7 @@
 									<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.clienteSelect}">
 										<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
 										<f:selectItems value="#{altaDetalleConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-										<p:ajax listener="#{altaDetalleConstanciaSalidaBean.servicioCliente}" update="datos-generales s-servicio" />
+										<p:ajax listener="#{altaDetalleConstanciaSalidaBean.servicioCliente}" update="datos-generales s-servicio dt-constanciaDD" />
 									</p:selectOneMenu>
 								<p:outputLabel value="Planta:" styleClass="p-ml-4 p-mr-2"/>
 									<p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.plantaSelect}">
@@ -119,7 +119,7 @@
 								</p:column>
 								
 								<p:column>
-									<p:commandButton value="Agregar" process="@this" icon="pi pi-plus" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaSalida()}" update="@this">
+									<p:commandButton value="Agregar" process="@this" icon="pi pi-plus" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaS()}" update="@this">
 									</p:commandButton>
 								</p:column> 
 								
@@ -307,7 +307,10 @@
 						
 						<p:toolbar styleClass="p-mt-3">
 							<p:toolbarGroup>
-								<p:commandButton value="Continuar" />
+								<p:splitButton value="Guardar" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaSalida()}" icon="pi pi-save" update="@this">
+									<p:menuitem value="Ticket" icon="pi pi-print"/>
+									<p:menuitem value="Nuevo" icon="pi pi-refresh"/>
+								</p:splitButton>
 							</p:toolbarGroup>
 						</p:toolbar>
 						
