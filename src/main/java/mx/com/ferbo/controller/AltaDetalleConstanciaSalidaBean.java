@@ -28,6 +28,8 @@ import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.ConstanciaSalidaServiciosPK;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.DetallePartida;
+import mx.com.ferbo.model.DetallePartidaPK;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
@@ -64,9 +66,13 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	
 	private Partida partidaSelect;
 	private List<Partida> listadoPartida;
+	private List<Partida> listaAuxPartida;
 	
 	private List<DetalleConstanciaSalida> listadoDetalleConstanciaSalida;
 	private List<DetalleConstanciaSalida> listadoTemp;
+	
+	private DetallePartida detallePartida;
+	private List<DetallePartida> detallePartidaLista;
 	
 	private String numFolio,nombreTransportista,placas,observaciones,temperatura;
 	private BigDecimal cantidadServicio;
@@ -96,6 +102,8 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		listadoPartida = new ArrayList<Partida>();
 		listadoDetalleConstanciaSalida = new ArrayList<>();
 		listadoTemp = new ArrayList<>();
+		detallePartidaLista = new ArrayList<>();
+		listaAuxPartida = new ArrayList<>();
 	}
 	
 	@PostConstruct
@@ -330,6 +338,22 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	public void setListadoTemp(List<DetalleConstanciaSalida> listadoTemp) {
 		this.listadoTemp = listadoTemp;
 	}
+	
+	public DetallePartida getDetallePartida() {
+		return detallePartida;
+	}
+
+	public void setDetallePartida(DetallePartida detallePartida) {
+		this.detallePartida = detallePartida;
+	}
+
+	public List<DetallePartida> getDetallePartidaLista() {
+		return detallePartidaLista;
+	}
+
+	public void setDetallePartidaLista(List<DetallePartida> detallePartidaLista) {
+		this.detallePartidaLista = detallePartidaLista;
+	}
 
 	public void validar() {
 		
@@ -397,6 +421,9 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 			
 			listadoDetalleConstanciaSalida.add(detalleConstanciaSalida);
 			listadoPartida.add(partidaSelect);
+			listaAuxPartida.add(partidaSelect);
+			detallePartida = partidaSelect.getDetallePartidaList().get(0);
+			detallePartidaLista.add(detallePartida);//detallepartida de cada partidaSelect
 			this.partidaSelect = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,"Modificar registro agregado","Modifica piezas a salir antes de agregar otro producto"));
 		}
@@ -469,11 +496,9 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	public void saveDetalleConstanciaSalida() {
 		//METODO PARA GUARDAR INFORMACION EN LA BASE DE DATOS
 		
-		
 		ConstanciaSalida cs = new ConstanciaSalida();
 		
 		//StatusConstanciaSalida status = new StatusConstanciaSalida();
-		
 		cs.setFecha(fechaSalida);
 		cs.setNumero(numFolio);
 		cs.setClienteCve(clienteSelect);
@@ -482,17 +507,95 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		cs.setObservaciones(observaciones);
 		cs.setNombreTransportista(nombreTransportista);
 		cs.setPlacasTransporte(placas);
+		//cs.setConstanciaSalidaServiciosList(new ArrayList<>());
+		//cs.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
+		cs.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
+		cs.setDetalleConstanciaSalidaList(listadoDetalleConstanciaSalida);
 		
-		ConstanciaSalidaServiciosPK cssPK = new ConstanciaSalidaServiciosPK();
-		cssPK.setConstanciaSalidaCve(cs);
+ 		for(ConstanciaSalidaServicios c: listadoConstanciaSalidaServicios) {
+ 			c.getConstanciaSalidaServiciosPK().setConstanciaSalidaCve(cs);
+			
+ 			c.setIdConstancia(cs);
+ 			c.setServicioCve(c.getConstanciaSalidaServiciosPK().getServicioCve());
+			
+		}
+ 		
+ 		for(DetalleConstanciaSalida d: listadoTemp) {
+ 			for(Partida p: listaAuxPartida) {
+ 				
+ 				if(d.getPartidaCve().equals(p)) {
+		 			d.setConstanciaCve(cs);
+		 			d.setPartidaCve(p);
+		 			d.setCamaraCve(p.getCamaraCve().getCamaraCve());
+		 			d.setUnidad(p.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoDs());
+		 			d.setProducto(p.getUnidadDeProductoCve().getProductoCve().getProductoDs());
+		 			d.setFolioEntrada(p.getFolio().toString());//es el folio de constancia de deposito????
+		 			d.setCamaraCadena(p.getCamaraCve().getCamaraDs());
+		 			d.setDetallePartida(p.getDetallePartidaList().get(0));
+		 			//d.setTemperatura();
+ 				}
+ 			}
+ 			
+ 			/*int detalleNuevo = detallePartida.getDetallePartidaPK().getDetPartCve() + 1;
+ 			
+ 			DetallePartidaPK detallePartidaPK = new DetallePartidaPK();
+ 			detallePartidaPK.setDetPartCve(detalleNuevo);
+ 			detallePartidaPK.setPartidaCve(partidaSelect);
+ 			
+ 			DetallePartida detallePartida = new DetallePartida();
+ 			
+ 			detallePartida = this.detallePartida;
+ 			
+ 			detallePartida.setDetallePartidaPK(detallePartidaPK);
+ 			detallePartida.setDetallePartida(this.detallePartida);
+ 			
+ 			//guardando detalle constancia salida en la BD
+ 			
+ 			DetalleConstanciaSalida detalleConstanciaSalida = new DetalleConstanciaSalida();
+ 			detalleConstanciaSalida.setConstanciaCve(cs);
+ 			detalleConstanciaSalida.setPartidaCve(partidaSelect);
+ 			detalleConstanciaSalida.setCamaraCve(partidaSelect.getCamaraCve().getCamaraCve()); 
+ 			detalleConstanciaSalida.setCantidad(d.getCantidad());
+ 			detalleConstanciaSalida.setPeso(d.getPeso());
+ 			detalleConstanciaSalida.setUnidad(d.getPartidaCve().getUnidadDeCobro().getUnidadDeManejoDs());
+ 			detalleConstanciaSalida.setProducto(d.getPartidaCve().getUnidadDeProductoCve().getProductoCve().getProductoDs());
+ 			detalleConstanciaSalida.setFolioEntrada(String.valueOf(this.detallePartida.getDetallePartidaPK().getDetPartCve())); //coresponde el dato al numero de id de la tabla detallePartida???
+ 			detalleConstanciaSalida.setCamaraCadena(partidaSelect.getCamaraCve().getCamaraDs()); 
+ 			detalleConstanciaSalida.setTemperatura(d.getTemperatura());*/
+ 			
+ 			
+ 		}
+ 		
+		
+ 		//constanciaSalidaDAO.guardar(cs);
+		
+		
+		
+		//guardando detalle constancia salida en la BD
+		/*
+		DetalleConstanciaSalida detalleConstanciaSalida = new DetalleConstanciaSalida();
+		detalleConstanciaSalida.setConstanciaCve(cs);
+		//detalleConstanciaSalida.setPartidaCve(partidaSelect);
+		//detalleConstanciaSalida.setCamaraCve(); es un int, deberia de ser de tipo CAMARA?
+		//detalleConstanciaSalida.setCantidad(null);
+		//detalleConstanciaSalida.setPeso(null);
+		//detalleConstanciaSalida.setUnidad();
+		//detalleConstanciaSalida.setProducto(null);
+		//detalleConstanciaSalida.setFolioEntrada(); trae el dato mi listadoConstanciaDD
+		//detalleConstanciaSalida.setCamaraCadena(); 
+		detalleConstanciaSalida.setTemperatura(temperatura);*/
+		
+		
+		
+		//cssPK.setServicioCve(servicioClienteSelect.getServicio());///checar este seteo para seguir con los demas
 		//cssPK.setServicioCve(); como guardar la lista de servicios
-				
+		
 		
 		//cssPK.setServicioCve();
 		
-		ConstanciaSalidaServicios css = new ConstanciaSalidaServicios();
+		//ConstanciaSalidaServicios css = new ConstanciaSalidaServicios();
 		
-		DetalleConstanciaSalida dcs = new DetalleConstanciaSalida();
+		//DetalleConstanciaSalida dcs = new DetalleConstanciaSalida();
 		
 		
 		

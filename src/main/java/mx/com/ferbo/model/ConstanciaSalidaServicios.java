@@ -2,12 +2,17 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -24,6 +29,14 @@ public class ConstanciaSalidaServicios implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@EmbeddedId
 	protected ConstanciaSalidaServiciosPK constanciaSalidaServiciosPK;
+	
+	@JoinColumn(name = "id_constancia", referencedColumnName = "ID",  insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+	private ConstanciaSalida idConstancia;
+	
+	@JoinColumn(name = "id_servicio", referencedColumnName = "SERVICIO_CVE",  insertable = false, updatable = false)
+	@ManyToOne(optional = false)
+    private Servicio servicioCve;//crear en model SERVICIO una variable constanciaSalida?
 	
 	@Column(name = "nu_cantidad")
 	private BigDecimal numCantidad;
@@ -53,6 +66,22 @@ public class ConstanciaSalidaServicios implements Serializable{
 
 	public void setNumCantidad(BigDecimal numCantidad) {
 		this.numCantidad = numCantidad;
+	}
+
+	public ConstanciaSalida getIdConstancia() {
+		return idConstancia;
+	}
+
+	public void setIdConstancia(ConstanciaSalida idConstancia) {
+		this.idConstancia = idConstancia;
+	}
+
+	public Servicio getServicioCve() {
+		return servicioCve;
+	}
+
+	public void setServicioCve(Servicio servicioCve) {
+		this.servicioCve = servicioCve;
 	}
 
 	@Override

@@ -79,6 +79,8 @@ public class ConstanciaSalida implements Serializable {
     private  String placasTransporte;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaCve")
     private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idConstancia")
+    private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
     @JoinColumn(name = "CLIENTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente clienteCve;
@@ -168,7 +170,15 @@ public class ConstanciaSalida implements Serializable {
         this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
     }
 
-    public Cliente getClienteCve() {
+    public List<ConstanciaSalidaServicios> getConstanciaSalidaServiciosList() {
+		return constanciaSalidaServiciosList;
+	}
+
+	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
+		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
+	}
+
+	public Cliente getClienteCve() {
         return clienteCve;
     }
 

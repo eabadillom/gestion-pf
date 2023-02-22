@@ -38,8 +38,19 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	}
 
 	@Override
-	public String guardar(ConstanciaSalida e) {
+	public String guardar(ConstanciaSalida constanciaSalida) {
 		// TODO Auto-generated method stub
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(constanciaSalida);//guarda el servicio dado (NO es gestionado)
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
+		
 		return null;
 	}
 
