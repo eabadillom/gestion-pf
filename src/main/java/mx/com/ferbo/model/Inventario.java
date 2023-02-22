@@ -1,80 +1,106 @@
 package mx.com.ferbo.model;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 public class Inventario {
-	String folio;
-	String Producto;
-	String Cantidad;
-	String Unidad_Manejo;
-	String Planta_Origen;
-	String Posicion_Origen;
-	String Caducidad;
+	Integer folio;
+	Producto Producto;
+	Integer Cantidad;
+	UnidadDeManejo Unidad_Manejo;
+	Integer Planta;
+	Date Caducidad;
 	String codigo;
 	String lote;
 	String SAP;
-	String Planta;
-	String Camara;
+	Integer Camara;
 	String posicion;
+	Integer partidaCve;
+	BigDecimal peso;
+	String inventarioCve;
+	String detalle_ant;
+	Integer detallePartidaAnterior;
+	Integer detallePadre;
+	Integer detallePartidaPadre;
+	String PO;
+	String MP;
+	String pedimento;
+	String tarimas;
+	
 	
 	public Inventario() {
 		
 	}
-	public Inventario(String folio, String producto, String cantidad, String unidad_Manejo, String planta_Origen,
-			String posicion_Origen, String caducidad, String codigo, String lote, String sAP, String planta,
-			String camara, String posicion) {
+	
+	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidad_Manejo, Integer planta_Origen,
+			Date caducidad, String codigo, String lote, String sAP, String planta,
+			Integer camara, String posicion, Integer partidaCve, BigDecimal peso, String inventarioCve,
+			String detalle_ant, Integer detallePartidaAnterior, Integer detallePadre, Integer detallePartidaPadre,
+			String pO, String mP, String pedimento, String tarimas) {
+		super();
 		this.folio = folio;
 		this.Producto = producto;
 		this.Cantidad = cantidad;
 		this.Unidad_Manejo = unidad_Manejo;
-		this.Planta_Origen = planta_Origen;
-		this.Posicion_Origen = posicion_Origen;
+		this.Planta = planta_Origen;
 		this.Caducidad = caducidad;
 		this.codigo = codigo;
 		this.lote = lote;
 		this.SAP = sAP;
-		this.Planta = planta;
 		this.Camara = camara;
 		this.posicion = posicion;
+		this.partidaCve = partidaCve;
+		this.peso = peso;
+		this.inventarioCve = inventarioCve;
+		this.detalle_ant = detalle_ant;
+		this.detallePartidaAnterior = detallePartidaAnterior;
+		this.detallePadre = detallePadre;
+		this.detallePartidaPadre = detallePartidaPadre;
+		this.PO = pO;
+		this.MP = mP;
+		this.pedimento = pedimento;
+		this.tarimas = tarimas;
 	}
-	public String getFolio() {
+	public Integer getPartidaCve() {
+		return partidaCve;
+	}
+	public void setPartidaCve(Integer partidaCve) {
+		this.partidaCve = partidaCve;
+	}
+	public Integer getFolio() {
 		return folio;
 	}
-	public void setFolio(String folio) {
+	public void setFolio(Integer folio) {
 		this.folio = folio;
 	}
-	public String getProducto() {
+	public Producto getProducto() {
 		return Producto;
 	}
-	public void setProducto(String producto) {
+	public void setProducto(Producto producto) {
 		Producto = producto;
 	}
-	public String getCantidad() {
+	public Integer getCantidad() {
 		return Cantidad;
 	}
-	public void setCantidad(String cantidad) {
+	public void setCantidad(Integer cantidad) {
 		Cantidad = cantidad;
 	}
-	public String getUnidad_Manejo() {
+	public UnidadDeManejo getUnidad_Manejo() {
 		return Unidad_Manejo;
 	}
-	public void setUnidad_Manejo(String unidad_Manejo) {
+	public void setUnidad_Manejo(UnidadDeManejo unidad_Manejo) {
 		Unidad_Manejo = unidad_Manejo;
 	}
-	public String getPlanta_Origen() {
-		return Planta_Origen;
+	public Integer getPlanta_Origen() {
+		return Planta;
 	}
-	public void setPlanta_Origen(String planta_Origen) {
-		Planta_Origen = planta_Origen;
+	public void setPlanta(Integer planta_Origen) {
+		Planta = planta_Origen;
 	}
-	public String getPosicion_Origen() {
-		return Posicion_Origen;
-	}
-	public void setPosicion_Origen(String posicion_Origen) {
-		Posicion_Origen = posicion_Origen;
-	}
-	public String getCaducidad() {
+	public Date getCaducidad() {
 		return Caducidad;
 	}
-	public void setCaducidad(String caducidad) {
+	public void setCaducidad(Date caducidad) {
 		Caducidad = caducidad;
 	}
 	public String getCodigo() {
@@ -95,16 +121,10 @@ public class Inventario {
 	public void setSAP(String sAP) {
 		SAP = sAP;
 	}
-	public String getPlanta() {
-		return Planta;
-	}
-	public void setPlanta(String planta) {
-		Planta = planta;
-	}
-	public String getCamara() {
+	public Integer getCamara() {
 		return Camara;
 	}
-	public void setCamara(String camara) {
+	public void setCamara(Integer camara) {
 		Camara = camara;
 	}
 	public String getPosicion() {
@@ -113,12 +133,67 @@ public class Inventario {
 	public void setPosicion(String posicion) {
 		this.posicion = posicion;
 	}
-	@Override
-	public String toString() {
-		return "Inventario [folio=" + folio + ", Producto=" + Producto + ", Cantidad=" + Cantidad + ", Unidad_Manejo="
-				+ Unidad_Manejo + ", Planta_Origen=" + Planta_Origen + ", Posicion_Origen=" + Posicion_Origen
-				+ ", Caducidad=" + Caducidad + ", codigo=" + codigo + ", lote=" + lote + ", SAP=" + SAP + ", Planta="
-				+ Planta + ", Camara=" + Camara + ", posicion=" + posicion + "]";
+	public BigDecimal getPeso() {
+		return peso;
 	}
+	public void setPeso(BigDecimal peso) {
+		this.peso = peso;
+	}
+	public String getInventarioCve() {
+		return inventarioCve;
+	}
+	public void setInventarioCve(String inventarioCve) {
+		this.inventarioCve = inventarioCve;
+	}
+	public String getDetalle_ant() {
+		return detalle_ant;
+	}
+	public void setDetalle_ant(String detalle_ant) {
+		this.detalle_ant = detalle_ant;
+	}
+	public Integer getDetallePartidaAnterior() {
+		return detallePartidaAnterior;
+	}
+	public void setDetallePartidaAnterior(Integer detallePartidaAnterior) {
+		this.detallePartidaAnterior = detallePartidaAnterior;
+	}
+	public Integer getDetallePadre() {
+		return detallePadre;
+	}
+	public void setDetallePadre(Integer detallePadre) {
+		this.detallePadre = detallePadre;
+	}
+	public Integer getDetallePartidaPadre() {
+		return detallePartidaPadre;
+	}
+	public void setDetallePartidaPadre(Integer detallePartidaPadre) {
+		this.detallePartidaPadre = detallePartidaPadre;
+	}
+	public String getPO() {
+		return PO;
+	}
+	public void setPO(String pO) {
+		PO = pO;
+	}
+	public String getMP() {
+		return MP;
+	}
+	public void setMP(String mP) {
+		MP = mP;
+	}
+	public String getPedimento() {
+		return pedimento;
+	}
+	public void setPedimento(String pedimento) {
+		this.pedimento = pedimento;
+	}
+	public String getTarimas() {
+		return tarimas;
+	}
+	public void setTarimas(String tarimas) {
+		this.tarimas = tarimas;
+	}
+	
+
 
 }

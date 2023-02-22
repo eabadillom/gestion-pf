@@ -15,37 +15,24 @@
 			</p:breadCrumb>
 			<p:growl id="messages" showDetail="true" />
 						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altaTraspasoBean.fecha}" />
-							<p:inputText id="txtFolio" value="#{altaTraspasoBean.folio}" placeholder="Folio" />
+							<p:inputText id="txtFolio" value="#{altaTraspasoBean.numero}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>
 						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altaTraspasoBean.idCliente}" filterMatchMode="startsWith">
 							<f:selectItem itemLabel="Seleccione Cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
-							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:selProducto "/>
+							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:traspaso "/>
 						</p:selectOneMenu>
 						
-						<p:selectOneMenu id="selProducto" autoWidth="true" value="#{altaTraspasoBean.idProducto}" filterMatchMode="startsWith">
-						<f:selectItem itemLabel="Seleccione Producto" itemValue="" noSelectionOption="true" />
-						<f:selectItems var="producto" value="#{altaTraspasoBean.alProductosFiltered}" itemLabel="#{producto.productoCve.productoDs}" itemValue="#{producto.productoCve.productoCve}" />
-					</p:selectOneMenu>
 				</p:toolbarGroup>
 			</p:toolbar>
 	<h5></h5>
 <div class="card crud-demo">
     <h:form id="form">
         <p:growl id="messages" showDetail="true" />
-
-        <p:toolbar>
-            <p:toolbarGroup>
-        <div class="card">
-    		<h5>Basic</h5>
-    		<p:commandButton value="Confirmar Traslado" actionListener="#{altaConstanciaServicioBean.agregarProducto}" type="button" icon="pi pi-check" onclick="PF('dlg1').show()"/>
-		</div>
-            </p:toolbarGroup>
-</p:toolbar>
             
          <div class="card"><h:form>
-		<p:dataTable id="traspaso" widgetVar="dttraspaso" var="altatraspaso" value="#{altaTraspasoBean.alPartidas}" reflow="true" styleClass="products-table" rowKey="#{altaTraspaso.folio}" 
+		<p:dataTable id="traspaso" var="altatraspaso" value="#{altaTraspasoBean.inventario}" reflow="true" rowKey="#{altatraspaso.folio}" styleClass="products-table"
 			paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">           
             <p:column style="width:2rem"><p:rowToggler/></p:column>
             <p:column headerText="Folio" sortBy="#{altatraspaso.folio.folio}" filterBy="#{altatraspaso.folio.folio}"><h:outputText value="#{altatraspaso.folio.folio}" /></p:column>
@@ -53,19 +40,19 @@
                 <h:outputText value="#{altatraspaso.productoCve.productoDs}"  />
             </p:column>
             <p:column headerText="Cantidad" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}"><h:outputText value="#{altatraspaso.cantidadTotal}" /></p:column>
-            <p:column headerText="Unidad de Manejo" sortBy="#{altatraspaso.unidadDeManejoCve.unidadDeManejoDs}" filterBy="#{altatraspaso.unidadDeManejoCve.unidadDeManejoDs}">
-            	<h:outputText value="#{altatraspaso.unidadDeManejoCve.unidadDeManejoDs}" /></p:column>
-            <p:column headerText="Planta origen" sortBy="" filterBy=""><h:outputText value="" /></p:column>
-            <p:column headerText="Posicion Origen" sortBy="#{altatraspaso.cantidadTotal}" filterBy="#{altatraspaso.cantidadTotal}"><h:outputText value="#{altatraspaso.cantidadTotal}" /></p:column>
+            <p:column headerText="Unidad de Manejo" ><h:outputText value="#{altatraspaso.unidadDeManejoCve.unidadDeManejoDs}" /></p:column>
+            <p:column headerText="Planta origen" ><h:outputText value="" /></p:column>
+            <p:column headerText="Posicion Origen" ><h:outputText value="#{altatraspaso.cantidadTotal}" /></p:column>
 						   
 	<!-- Comienza lista desplegable -->
             <p:rowExpansion>
-            <p:dataTable id="row-constancia" widgetVar="dt-constancia" var="rconstancia" value="#{altaTraspasoBean.ldpartida}" reflow="true" rowKey="" rows="5" paginatorPosition="bottom" rowSelectMode="add">
+            <p:dataTable id="row-constancia" widgetVar="dt-constancia" var="rconstancia" value="#{altaTraspasoBean.ldpartida}" reflow="true" rowKey="#{rconstancia.partidaCve}" 
+            		styleClass="products-table" rows="5" paginatorPosition="bottom" >
 							<p:column headerText="Caducidad"><h:outputText value="#{rconstancia.dtpCaducidad}" /></p:column>
 							<p:column headerText="Codigo"><h:outputText value="#{rconstancia.dtpCodigo}" /></p:column>
 							<p:column headerText="Lote"><h:outputText value="#{rconstancia.dtpLote}" /></p:column>
-							<p:column headerText="SAP"><h:outputText value="#{rconstancia.dtpSAP}" /></p:column>
-							<p:column headerText="Planta destino">
+							<p:column headerText="SAP"><h:outputText value="#{rconstancia.cantidadTotal}" /></p:column>
+							<p:column headerText="Planta destino"><h:outputText value="#{rconstancia.cantidadTotal}" />
 								<p:selectOneMenu id="txtplantadestino" value="" converter="entityConverter" >
 								<f:selectItem itemLabel="---Seleccione---" itemValue=""  />
 								<f:selectItems value="" var="user" itemLabel="#{user}" itemValue="#{user}" />
@@ -94,12 +81,11 @@
 			        </div>
 			    </p:divider>
 								<b>Tipo de servicio</b>
-								<p:selectOneMenu id="servicio" value="#{altaTraspasoBean.idPrecioServicio}" converter="entityConverter" >
-								<f:selectItem itemLabel="---Seleccione---" itemValue="#{altaTraspasoBean.alServicios}"  />
-								<f:selectItems value="#{altaTraspasoBean.alServicios} #{selectedPrecioServicio.unidad.unidadDeManejoDs})" var="selectedPrecioServicio" itemLabel="#{selectedPrecioServicio.servicio.servicioDs}" itemValue="#{selectedPrecioServicio.id}" />
-								<p:ajax />
-								</p:selectOneMenu>
-							
+				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaTraspasoBean.idPrecioServicio}" filterMatchMode="startsWith">
+					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
+					<f:selectItems var="selectedPrecioServicio" value="#{altaTraspasoBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} 
+									(#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
+				</p:selectOneMenu>
 							<b>    </b>
 							<p:column headerText="cantidadservicio"><p:inputText id="cantidad" value="" placeholder="Cantidad." /></p:column>
 							<div class="p-grid ui-fluid">
@@ -112,34 +98,35 @@
          </p:dataTable>
          </h:form>
          </div>
-			<p:dialog header="Header" widgetVar="dlg1"  showEffect="fade">
-				<p:panelGrid columns="9" layout="grid" styleClass="showcase-text-align-center">
-				<p:dataTable id="dt-servicio" widgetVar="dtServicio" var="serviciosExtras" rowKey="#{serviciosExtras.folio}" value="#{altaTraspasoBean.partida}" reflow="true"	 tableStyle="width:auto">
-		           	<p:column headerText="Descripcion" ><h:outputText value="" /></p:column>
-					<p:column headerText="Cantidad" sortBy=""><h:outputText value=""/></p:column>
-					<p:column headerText="Origen"><h:outputText value=""/></p:column>
-					<p:column headerText="Destino"	sortBy=""><h:outputText value=""/></p:column>
-					<p:column headerText="Cantidad" sortBy=""><h:outputText value=""/></p:column>
-					<p:column headerText="Precio"	sortBy=""><h:outputText value=""/></p:column>
-					<p:column headerText="Subtotal"	sortBy=""><h:outputText value=""/></p:column>
-				</p:dataTable>
-				</p:panelGrid>
-				<p:fieldset legend="Valor declarado">
+         
+         
+        <p:toolbar>
+            <p:toolbarGroup>
+            <p:dataTable id="dt-servicio" var="serviciosExtras" selection="#{altaConstanciaServicioBean.selPartida}" value="#{altaTraspasoBean.partida}" scrollable="true" scrollHeight="9em" scrollRows="4" reflow="true">
+				<p:column headerText="Descripcion" width="8em"><h:outputText value="#{partida.cantidadTotal}"/></p:column>
+				<p:column headerText="Cantidad" width="10em"><h:outputText value="#{partida.unidadDeManejoCve.unidadDeManejoDs}" /></p:column>
+				<p:column headerText="Origen" width="8em"><h:outputText value="#{partida.productoCve.productoDs}"/></p:column>
+				<p:column headerText="Destino" width="10em"><h:outputText value="#{partida.cantidadDeCobro}"/></p:column>
+				<p:column headerText="Cantidad" width="10em"><h:outputText value="#{partida.cantidadDeCobro}"/></p:column>
+				<p:column headerText="Precio" width="10em"><h:outputText value="#{partida.cantidadDeCobro}"/></p:column>
+				<p:column headerText="Subtotal" width="10em"><h:outputText value="#{partida.cantidadDeCobro}"/></p:column>
+				<p:column width="8em">
+				<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altatraspasoBean.deletePartida(partida)}" update="dt-servicio"/>
+				</p:column>
+			</p:dataTable>
+            </p:toolbarGroup>
+		</p:toolbar>
+					<p:fieldset legend="Valor declarado">
 					<div class="field col-12 md:col-4">
-						<p:panel><p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="" placeholder="Observaciones." style="width: 30em;"/></p:panel>
-					</div>
-				</p:fieldset>
-				
-				<div class="p-grid ui-fluid">
-					<div class="p-field p-col-6 p-md-6">
-				    <p:commandButton type="button" value="Generar constancia de traspaso " icon="pi pi-check" />
-				    </div>
-					<div class="p-field p-col-6 p-md-6">
-				    <p:commandButton type="button" value="Cancelar"  icon="pi pi-times" />			
-				    </div>
-			    </div>	
-			
-		</p:dialog>
+					<p:panel><p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." style="width: 30em;"/></p:panel>
+				</div>			
+			<div>
+        <p:splitButton value="Confirmar Traspaso" actionListener="#{altaConstanciaServicioBean.guardar}" icon="pi pi-save">
+            <p:menuitem value="Generar reporte" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+            <p:menuitem value="Limpiar" action="#{altaConstanciaServicioBean.reload}" update="messages" icon="pi pi-times"/>
+        </p:splitButton>
+		</div>
+		</p:fieldset>
     </h:form>
 </div>
 		</h:form>

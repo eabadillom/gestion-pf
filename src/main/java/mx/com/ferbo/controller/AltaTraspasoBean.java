@@ -79,8 +79,9 @@ public class AltaTraspasoBean implements Serializable {
 	private List<Partida> partida;
 	private List<DetallePartida> ldpartida;
 	private List<Inventario> inventario;
+	
 	private Date fecha;
-	private String folio;
+	private String numero;
 	private Integer cantidad;
 	private Integer idUnidadManejo;
 	private Integer idProducto;
@@ -159,7 +160,7 @@ public class AltaTraspasoBean implements Serializable {
 		Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
 		List<PrecioServicio> precioServicioList = null;
 		selCliente = clienteDAO.buscarPorId(idCliente);
-		listaconstanciadepo = inventarioDAO.buscarPorCliente(selCliente);
+		inventario = inventarioDAO.buscarPorCliente(selCliente);
 		try {
 			log.info("Entrando a filtrar cliente...");
 			// selCliente = clientes.stream()
@@ -325,21 +326,21 @@ public class AltaTraspasoBean implements Serializable {
 			if (this.isSaved)
 				throw new InventarioException("La constancia ya se encuentra registrada.");
 
-			if (this.folio == null || "".equalsIgnoreCase(this.folio.trim()))
+			if (this.numero == null || "".equalsIgnoreCase(this.numero.trim()))
 				throw new InventarioException("Debe indicar el folio de la constancia.");
 
 			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
 				throw new InventarioException("Debe seleccionar al menos un servicio");
 
-			alConstancias = csDAO.buscarPorFolioCliente(this.folio);
+			alConstancias = csDAO.buscarPorFolioCliente(this.numero);
 
 			if (alConstancias != null && alConstancias.size() > 0)
-				throw new InventarioException(String.format("El folio %s ya se encuentra registrado.", this.folio));
+				throw new InventarioException(String.format("El folio %s ya se encuentra registrado.", this.numero));
 
 			estado = estados.stream().filter(e -> e.getEdoCve() == 1).collect(Collectors.toList()).get(0);
 			constancia = new ConstanciaDeServicio();
 			constancia.setFecha(this.fecha);
-			constancia.setFolioCliente(this.folio);
+			constancia.setFolioCliente(this.numero);
 			constancia.setCteCve(this.selCliente);
 			constancia.setObservaciones(this.observaciones);
 			constancia.setValorDeclarado(this.valorDeclarado);
@@ -357,7 +358,7 @@ public class AltaTraspasoBean implements Serializable {
 			csDAO.actualizar(constancia);
 			this.isSaved = true;
 			this.habilitareporte = true;
-			message = String.format("Constancia guardada correctamente con el folio %s", this.folio);
+			message = String.format("Constancia guardada correctamente con el folio %s", this.numero);
 			severity = FacesMessage.SEVERITY_INFO;
 
 		} catch (InventarioException ex) {
@@ -383,7 +384,7 @@ public class AltaTraspasoBean implements Serializable {
 		Severity severity = null;
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
-		alConstancias = csDAO.buscarPorFolioCliente(this.folio);
+		alConstancias = csDAO.buscarPorFolioCliente(this.numero);
 		File reportFile = new File(jasperPath);
 		File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
@@ -403,18 +404,18 @@ public class AltaTraspasoBean implements Serializable {
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
 			constancia = new ConstanciaDeServicio();
-			constancia.setFolioCliente(this.folio);
-			folio = String.valueOf(getFolio());
+			constancia.setFolioCliente(this.numero);
+			numero = String.valueOf(getNumero());
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("FOLIO", folio);
+			parameters.put("FOLIO", numero);
 			parameters.put("LogoPath", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 		} catch (Exception ex) {
 			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
-			message = String.format("No se pudo imprimir el folio %s", this.folio);
+			message = String.format("No se pudo imprimir el folio %s", this.numero);
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(severity, "Error en impresion", message));
@@ -461,12 +462,12 @@ public class AltaTraspasoBean implements Serializable {
 		this.fecha = fecha;
 	}
 
-	public String getFolio() {
-		return folio;
+	public String getNumero() {
+		return numero;
 	}
 
-	public void setFolio(String folio) {
-		this.folio = folio;
+	public void setNumero(String numero) {
+		this.numero = numero;
 	}
 
 	public BigDecimal getValorDeclarado() {
@@ -683,6 +684,14 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void setLdpartida(List<DetallePartida> ldpartida) {
 		this.ldpartida = ldpartida;
+	}
+
+	public List<Inventario> getInventario() {
+		return inventario;
+	}
+
+	public void setInventario(List<Inventario> inventario) {
+		this.inventario = inventario;
 	}
 
 }
