@@ -40,6 +40,7 @@ import mx.com.ferbo.dao.InventarioDAO;
 import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PartidaServicioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
+import mx.com.ferbo.dao.PosicionCamaraDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
@@ -53,9 +54,12 @@ import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.Posicion;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.model.TraspasoPartida;
+import mx.com.ferbo.model.TraspasoServicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -83,6 +87,7 @@ public class AltaTraspasoBean implements Serializable {
 	private List<Inventario> inventario;
 	private List<Planta> listaplanta;
 	private List<Camara> listacamara;
+	private List<Posicion> listaposicion;
 	
 	private Date fecha;
 	private String numero;
@@ -100,6 +105,7 @@ public class AltaTraspasoBean implements Serializable {
 	private BigDecimal cantidadServicio;
 	private Integer idCliente;
 	private Integer idclavectedeposito;
+	private Inventario selectedInventario;
 
 	private Cliente selCliente;
 	private ConstanciaDeDeposito ctecve;
@@ -115,6 +121,7 @@ public class AltaTraspasoBean implements Serializable {
 	private InventarioDAO inventarioDAO;
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
+	private PosicionCamaraDAO posicionDAO;
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
@@ -129,6 +136,7 @@ public class AltaTraspasoBean implements Serializable {
 		inventarioDAO = new InventarioDAO();
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
+		posicionDAO = new PosicionCamaraDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
@@ -144,7 +152,7 @@ public class AltaTraspasoBean implements Serializable {
 		partida = partidaDAO.findall();
 		listaplanta = plantaDAO.findall();
 		listacamara = camaraDAO.findall();
-		
+		listaposicion = posicionDAO.findAll();
 	}
 
 	@PostConstruct
@@ -219,64 +227,21 @@ public class AltaTraspasoBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		try {
-			log.info("AGREGANDO PRODUCTO...");
-
-			if (this.idCliente == null || this.idCliente == 0)
-				throw new InventarioException("Debe seleccionar el cliente");
-
-			if (this.cantidad == null || this.cantidad <= 0)
-				throw new InventarioException("Debe indicar la cantidad de piezas");
-
-			if (this.peso == null || this.peso.compareTo(BigDecimal.ZERO) <= 0)
-				throw new InventarioException("Debe indicar el peso del producto.");
-
-			if (this.idUnidadManejo == null)
-				throw new InventarioException("Debe seleccionar una unidad de manejo");
-
-			if (this.idProducto == null)
-				throw new InventarioException("Debe seleccionar un producto");
-
-			if (this.idclavectedeposito == null)
-				throw new InventarioException("Debe seleccionar algo");
-
-			if (alPartidas == null)
-				alPartidas = new ArrayList<PartidaServicio>();
-
-			UnidadDeManejo udm = alUnidades.stream().filter(u -> this.idUnidadManejo == u.getUnidadDeManejoCve())
-					.collect(Collectors.toList()).get(0);
-
-			if (udm == null)
-				throw new InventarioException("Debe seleccionar una unidad de producto.");
-			ProductoPorCliente prd = alProductosFiltered.stream()
-					.filter(p -> this.idProducto.equals(p.getProductoCve().getProductoCve()))
-					.collect(Collectors.toList()).get(0);
-			ConstanciaDeDeposito cdd = listaconstanciadepo.stream()
-					.filter(p -> this.idclavectedeposito.equals(p.getCteCve().getCteCve())).collect(Collectors.toList())
-					.get(0);
-
-			if (prd == null)
-				throw new InventarioException("Debe seleccionar un producto.");
-			Producto p = prd.getProductoCve();
-			PartidaServicio partida = new PartidaServicio();
-			partida.setCantidadDeCobro(this.peso);
-			partida.setCantidadTotal(this.cantidad);
-			partida.setUnidadDeCobro(udm);
-			partida.setUnidadDeManejoCve(udm);
-			partida.setProductoCve(p);
-			alPartidas.add(partida);
+			
+			System.out.println(this.selectedInventario);
 			message = "Producto agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-		} catch (InventarioException ex) {
-			log.error("Problema para obtener la información de los productos...", ex);
-			message = ex.getMessage();
-			severity = FacesMessage.SEVERITY_ERROR;
+		//} catch (InventarioException ex) {
+			//	log.error("Problema para obtener la información de los productos...", ex);
+			//	message = ex.getMessage();
+			//	severity = FacesMessage.SEVERITY_ERROR;
 		} catch (Exception ex) {
 			log.error("Problema para obtener la informaciòn de los productos...", ex);
 			message = "Problema al agregar sus productos.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar producto", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:form:dt-partidas");
+			PrimeFaces.current().ajax().update("form:messages", "form:form:destino");
 		}
 		log.info("Id Producto: " + this.idProducto);
 	}
@@ -286,41 +251,8 @@ public class AltaTraspasoBean implements Serializable {
 		Severity severity = null;
 		PrecioServicio precioServicio = null;
 		ConstanciaServicioDetalle servicio = null;
-
-		try {
-			if (this.idCliente == null || this.idCliente == 0)
-				throw new InventarioException("Debe seleccionar el cliente");
-
-			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
-				throw new InventarioException("Debe indicar la cantidad de servicios.");
-
-			if (this.idPrecioServicio == null)
-				throw new InventarioException("Debe seleccionar un servicio.");
-
-			precioServicio = this.alServicios.stream().filter(ps -> this.idPrecioServicio.equals(ps.getId()))
-					.collect(Collectors.toList()).get(0);
-			if (alServiciosDetalle == null)
-				alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
-
-			servicio = new ConstanciaServicioDetalle();
-			servicio.setServicioCantidad(this.cantidadServicio);
-			servicio.setServicioCve(precioServicio.getServicio());
-			alServiciosDetalle.add(servicio);
-			message = "Producto agregado correctamente.";
-			severity = FacesMessage.SEVERITY_INFO;
-		} catch (InventarioException ex) {
-			log.error("Problema para obtener la información de los productos...", ex);
-			message = ex.getMessage();
-			severity = FacesMessage.SEVERITY_ERROR;
-		} catch (Exception ex) {
-			log.error("Problema para obtener el listado de servicios del cliente.", ex);
-			message = "Problema con la información de servicios.";
-			severity = FacesMessage.SEVERITY_ERROR;
-		} finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar servicio", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
-		}
-	}
+				
+		} 
 
 	public synchronized void guardar() {
 		String message = null;
@@ -717,6 +649,22 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void setListacamara(List<Camara> listacamara) {
 		this.listacamara = listacamara;
+	}
+
+	public List<Posicion> getListaposicion() {
+		return listaposicion;
+	}
+
+	public void setListaposicion(List<Posicion> listaposicion) {
+		this.listaposicion = listaposicion;
+	}
+
+	public Inventario getSelectedInventario() {
+		return selectedInventario;
+	}
+
+	public void setSelectedInventario(Inventario selectedInventario) {
+		this.selectedInventario = selectedInventario;
 	}
 
 }

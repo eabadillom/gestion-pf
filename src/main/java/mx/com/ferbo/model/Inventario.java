@@ -2,8 +2,12 @@ package mx.com.ferbo.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Inventario {
+import javax.faces.application.FacesMessage.Severity;
+
+public class Inventario{
 	Integer folio;
 	Producto producto;
 	Integer cantidad;
@@ -27,18 +31,17 @@ public class Inventario {
 	String pedimento;
 	String tarimas;
 	String folioCliente;
-	Servicio srv;
 	
 	
 	public Inventario() {
 		
 	}
-
-
+public void listas() {
+}
 	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidadManejo, Planta planta,
 			Date caducidad, String codigo, String lote, String sap, Camara camara, String posicion, Integer partidaCve,
 			BigDecimal peso, String inventarioCve, String detalleAnt, Integer detallePartidaAnterior,
-			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas,Servicio srv) {
+			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas) {
 		this.folio = folio;
 		this.producto = producto;
 		this.cantidad = cantidad;
@@ -61,19 +64,7 @@ public class Inventario {
 		this.mp = mp;
 		this.pedimento = pedimento;
 		this.tarimas = tarimas;
-		this.srv = srv;
 	}
-
-
-	public Servicio getSrv() {
-		return srv;
-	}
-
-
-	public void setSrv(Servicio srv) {
-		this.srv = srv;
-	}
-
 
 	public Integer getFolio() {
 		return folio;
