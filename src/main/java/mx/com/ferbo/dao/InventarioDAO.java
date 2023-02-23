@@ -57,12 +57,13 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{
 			
 			for (Partida p : partidaList) {
 				Inventario inventario = new Inventario(); //Inicializamos Inventario
+				inventario.setFolioCliente(c.getFolioCliente());
 				p.getUnidadDeProductoCve();
 				inventario.setProducto(p.getUnidadDeProductoCve().getProductoCve());
-				inventario.setUnidad_Manejo(p.getUnidadDeProductoCve().getUnidadDeManejoCve());
+				inventario.setUnidadManejo(p.getUnidadDeProductoCve().getUnidadDeManejoCve());
 				inventario.setPartidaCve(p.getPartidaCve());
-				inventario.setPlanta(p.getCamaraCve().getPlantaCve().getPlantaCve());
-				inventario.setCamara(p.getCamaraCve().getCamaraCve());
+				inventario.setPlanta(p.getCamaraCve().getPlantaCve());
+				inventario.setCamara(p.getCamaraCve());
 				inventario.setPosicion(null);
 				Integer cantidadInicial = p.getCantidadTotal(); //Obtenemos la cantidad inicial de la partida
 				BigDecimal pesoInicial = p.getPesoTotal(); 
@@ -88,16 +89,16 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{
 //				inventario.setSAP(dp.getDtpSAP());
 				for(DetallePartida dp : detallePartidaList) {
 					inventario.setCaducidad(dp.getDtpCaducidad());
-					inventario.setSAP(dp.getDtpSAP());		
+					inventario.setSap(dp.getDtpSAP());		
 					//inventario.setCantidad(null);
 					inventario.setCodigo(dp.getDtpCodigo());
 					//inventario.setDetalle_ant(null);
 					inventario.setFolio(null);
 					//inventario.setInventarioCve(null);
 					inventario.setLote(dp.getDtpLote());
-					inventario.setMP(dp.getDtpMP());
+					inventario.setMp(dp.getDtpMP());
 					inventario.setPedimento(dp.getDtpPedimento());
-					inventario.setPO(dp.getDtpPO());
+					inventario.setPo(dp.getDtpPO());
 					//inventario.setProducto(null);
 					//inventario.setUnidad_Manejo(null);
 					break;

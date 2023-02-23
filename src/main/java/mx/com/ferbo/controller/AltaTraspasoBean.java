@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AvisoDAO;
+import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
@@ -41,6 +42,7 @@ import mx.com.ferbo.dao.PartidaServicioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
@@ -79,6 +81,8 @@ public class AltaTraspasoBean implements Serializable {
 	private List<Partida> partida;
 	private List<DetallePartida> ldpartida;
 	private List<Inventario> inventario;
+	private List<Planta> listaplanta;
+	private List<Camara> listacamara;
 	
 	private Date fecha;
 	private String numero;
@@ -107,9 +111,10 @@ public class AltaTraspasoBean implements Serializable {
 	private EstadoConstanciaDAO edoDAO;
 	private ClienteDAO clienteDAO;
 	private PartidaServicioDAO partidaservicioDAO;
-	private ConstanciaDeDepositoDAO constanciadepDAO;
 	private PartidaDAO partidaDAO;
 	private InventarioDAO inventarioDAO;
+	private PlantaDAO plantaDAO;
+	private CamaraDAO camaraDAO;
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
@@ -122,12 +127,12 @@ public class AltaTraspasoBean implements Serializable {
 		edoDAO = new EstadoConstanciaDAO();
 		partidaDAO = new PartidaDAO();
 		inventarioDAO = new InventarioDAO();
-		constanciadepDAO = new ConstanciaDeDepositoDAO();
+		plantaDAO = new PlantaDAO();
+		camaraDAO = new CamaraDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
 		inventario = new ArrayList<Inventario>();
-		// alPartidas = new ArrayList<PartidaServicio>();
 		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
 		alServicios = new ArrayList<PrecioServicio>();
 		alUnidades = new ArrayList<UnidadDeManejo>();
@@ -137,6 +142,8 @@ public class AltaTraspasoBean implements Serializable {
 		alPartidas = partidaservicioDAO.findall();
 		clientes = clienteDAO.findall();
 		partida = partidaDAO.findall();
+		listaplanta = plantaDAO.findall();
+		listacamara = camaraDAO.findall();
 		
 	}
 
@@ -321,7 +328,9 @@ public class AltaTraspasoBean implements Serializable {
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
 		EstadoConstancia estado = null;
-
+		
+		
+		
 		try {
 			if (this.isSaved)
 				throw new InventarioException("La constancia ya se encuentra registrada.");
@@ -692,6 +701,22 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void setInventario(List<Inventario> inventario) {
 		this.inventario = inventario;
+	}
+
+	public List<Planta> getListaplanta() {
+		return listaplanta;
+	}
+
+	public void setListaplanta(List<Planta> listaplanta) {
+		this.listaplanta = listaplanta;
+	}
+
+	public List<Camara> getListacamara() {
+		return listacamara;
+	}
+
+	public void setListacamara(List<Camara> listacamara) {
+		this.listacamara = listacamara;
 	}
 
 }

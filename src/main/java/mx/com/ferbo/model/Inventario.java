@@ -5,193 +5,315 @@ import java.util.Date;
 
 public class Inventario {
 	Integer folio;
-	Producto Producto;
-	Integer Cantidad;
-	UnidadDeManejo Unidad_Manejo;
-	Integer Planta;
-	Date Caducidad;
+	Producto producto;
+	Integer cantidad;
+	UnidadDeManejo unidadManejo;
+	Planta planta;
+	Date caducidad;
 	String codigo;
 	String lote;
-	String SAP;
-	Integer Camara;
+	String sap;
+	Camara camara;
 	String posicion;
 	Integer partidaCve;
 	BigDecimal peso;
 	String inventarioCve;
-	String detalle_ant;
+	String detalleAnt;
 	Integer detallePartidaAnterior;
 	Integer detallePadre;
 	Integer detallePartidaPadre;
-	String PO;
-	String MP;
+	String po;
+	String mp;
 	String pedimento;
 	String tarimas;
+	String folioCliente;
+	Servicio srv;
 	
 	
 	public Inventario() {
 		
 	}
-	
-	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidad_Manejo, Integer planta_Origen,
-			Date caducidad, String codigo, String lote, String sAP, String planta,
-			Integer camara, String posicion, Integer partidaCve, BigDecimal peso, String inventarioCve,
-			String detalle_ant, Integer detallePartidaAnterior, Integer detallePadre, Integer detallePartidaPadre,
-			String pO, String mP, String pedimento, String tarimas) {
-		super();
+
+
+	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidadManejo, Planta planta,
+			Date caducidad, String codigo, String lote, String sap, Camara camara, String posicion, Integer partidaCve,
+			BigDecimal peso, String inventarioCve, String detalleAnt, Integer detallePartidaAnterior,
+			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas,Servicio srv) {
 		this.folio = folio;
-		this.Producto = producto;
-		this.Cantidad = cantidad;
-		this.Unidad_Manejo = unidad_Manejo;
-		this.Planta = planta_Origen;
-		this.Caducidad = caducidad;
+		this.producto = producto;
+		this.cantidad = cantidad;
+		this.unidadManejo = unidadManejo;
+		this.planta = planta;
+		this.caducidad = caducidad;
 		this.codigo = codigo;
 		this.lote = lote;
-		this.SAP = sAP;
-		this.Camara = camara;
+		this.sap = sap;
+		this.camara = camara;
 		this.posicion = posicion;
 		this.partidaCve = partidaCve;
 		this.peso = peso;
 		this.inventarioCve = inventarioCve;
-		this.detalle_ant = detalle_ant;
+		this.detalleAnt = detalleAnt;
 		this.detallePartidaAnterior = detallePartidaAnterior;
 		this.detallePadre = detallePadre;
 		this.detallePartidaPadre = detallePartidaPadre;
-		this.PO = pO;
-		this.MP = mP;
+		this.po = po;
+		this.mp = mp;
 		this.pedimento = pedimento;
 		this.tarimas = tarimas;
+		this.srv = srv;
 	}
-	public Integer getPartidaCve() {
-		return partidaCve;
+
+
+	public Servicio getSrv() {
+		return srv;
 	}
-	public void setPartidaCve(Integer partidaCve) {
-		this.partidaCve = partidaCve;
+
+
+	public void setSrv(Servicio srv) {
+		this.srv = srv;
 	}
+
+
 	public Integer getFolio() {
 		return folio;
 	}
+
+
 	public void setFolio(Integer folio) {
 		this.folio = folio;
 	}
+
+
 	public Producto getProducto() {
-		return Producto;
+		return producto;
 	}
+
+
 	public void setProducto(Producto producto) {
-		Producto = producto;
+		this.producto = producto;
 	}
+
+
 	public Integer getCantidad() {
-		return Cantidad;
+		return cantidad;
 	}
+
+
 	public void setCantidad(Integer cantidad) {
-		Cantidad = cantidad;
+		this.cantidad = cantidad;
 	}
-	public UnidadDeManejo getUnidad_Manejo() {
-		return Unidad_Manejo;
+
+
+	public UnidadDeManejo getUnidadManejo() {
+		return unidadManejo;
 	}
-	public void setUnidad_Manejo(UnidadDeManejo unidad_Manejo) {
-		Unidad_Manejo = unidad_Manejo;
+
+
+	public void setUnidadManejo(UnidadDeManejo unidadManejo) {
+		this.unidadManejo = unidadManejo;
 	}
-	public Integer getPlanta_Origen() {
-		return Planta;
+
+
+	public Planta getPlanta() {
+		return planta;
 	}
-	public void setPlanta(Integer planta_Origen) {
-		Planta = planta_Origen;
+
+
+	public void setPlanta(Planta planta) {
+		this.planta = planta;
 	}
+
+
 	public Date getCaducidad() {
-		return Caducidad;
+		return caducidad;
 	}
+
+
 	public void setCaducidad(Date caducidad) {
-		Caducidad = caducidad;
+		this.caducidad = caducidad;
 	}
+
+
 	public String getCodigo() {
 		return codigo;
 	}
+
+
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
 	}
+
+
 	public String getLote() {
 		return lote;
 	}
+
+
 	public void setLote(String lote) {
 		this.lote = lote;
 	}
-	public String getSAP() {
-		return SAP;
+
+
+	public String getSap() {
+		return sap;
 	}
-	public void setSAP(String sAP) {
-		SAP = sAP;
+
+
+	public void setSap(String sap) {
+		this.sap = sap;
 	}
-	public Integer getCamara() {
-		return Camara;
+
+
+	public Camara getCamara() {
+		return camara;
 	}
-	public void setCamara(Integer camara) {
-		Camara = camara;
+
+
+	public void setCamara(Camara camara) {
+		this.camara = camara;
 	}
+
+
 	public String getPosicion() {
 		return posicion;
 	}
+
+
 	public void setPosicion(String posicion) {
 		this.posicion = posicion;
 	}
+
+
+	public Integer getPartidaCve() {
+		return partidaCve;
+	}
+
+
+	public void setPartidaCve(Integer partidaCve) {
+		this.partidaCve = partidaCve;
+	}
+
+
 	public BigDecimal getPeso() {
 		return peso;
 	}
+
+
 	public void setPeso(BigDecimal peso) {
 		this.peso = peso;
 	}
+
+
 	public String getInventarioCve() {
 		return inventarioCve;
 	}
+
+
 	public void setInventarioCve(String inventarioCve) {
 		this.inventarioCve = inventarioCve;
 	}
-	public String getDetalle_ant() {
-		return detalle_ant;
+
+
+	public String getDetalleAnt() {
+		return detalleAnt;
 	}
-	public void setDetalle_ant(String detalle_ant) {
-		this.detalle_ant = detalle_ant;
+
+
+	public void setDetalleAnt(String detalleAnt) {
+		this.detalleAnt = detalleAnt;
 	}
+
+
 	public Integer getDetallePartidaAnterior() {
 		return detallePartidaAnterior;
 	}
+
+
 	public void setDetallePartidaAnterior(Integer detallePartidaAnterior) {
 		this.detallePartidaAnterior = detallePartidaAnterior;
 	}
+
+
 	public Integer getDetallePadre() {
 		return detallePadre;
 	}
+
+
 	public void setDetallePadre(Integer detallePadre) {
 		this.detallePadre = detallePadre;
 	}
+
+
 	public Integer getDetallePartidaPadre() {
 		return detallePartidaPadre;
 	}
+
+
 	public void setDetallePartidaPadre(Integer detallePartidaPadre) {
 		this.detallePartidaPadre = detallePartidaPadre;
 	}
-	public String getPO() {
-		return PO;
+
+
+	public String getPo() {
+		return po;
 	}
-	public void setPO(String pO) {
-		PO = pO;
+
+
+	public void setPo(String po) {
+		this.po = po;
 	}
-	public String getMP() {
-		return MP;
+
+
+	public String getMp() {
+		return mp;
 	}
-	public void setMP(String mP) {
-		MP = mP;
+
+
+	public void setMp(String mp) {
+		this.mp = mp;
 	}
+
+
 	public String getPedimento() {
 		return pedimento;
 	}
+
+
 	public void setPedimento(String pedimento) {
 		this.pedimento = pedimento;
 	}
+
+
 	public String getTarimas() {
 		return tarimas;
 	}
+
+
 	public void setTarimas(String tarimas) {
 		this.tarimas = tarimas;
+	}
+
+
+	public String getFolioCliente() {
+		return folioCliente;
+	}
+
+
+	public void setFolioCliente(String folioCliente) {
+		this.folioCliente = folioCliente;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Inventario [folio=" + folio + ", producto=" + producto + ", cantidad=" + cantidad + ", unidadManejo="
+				+ unidadManejo + ", planta=" + planta + ", caducidad=" + caducidad + ", codigo=" + codigo + ", lote="
+				+ lote + ", sap=" + sap + ", camara=" + camara + ", posicion=" + posicion + ", partidaCve=" + partidaCve
+				+ ", peso=" + peso + ", inventarioCve=" + inventarioCve + ", detalleAnt=" + detalleAnt
+				+ ", detallePartidaAnterior=" + detallePartidaAnterior + ", detallePadre=" + detallePadre
+				+ ", detallePartidaPadre=" + detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento="
+				+ pedimento + ", tarimas=" + tarimas + "]";
 	}
 	
 

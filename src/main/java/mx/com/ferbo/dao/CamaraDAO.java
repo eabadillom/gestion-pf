@@ -1,15 +1,28 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 
+	
+	@SuppressWarnings("unchecked")
+	public List<Camara> findall() {
+		EntityManager entity = getEntityManager();
+		List<Camara> camara = null;
+		Query sql = entity.createNamedQuery("Camara.findAll", Camara.class);
+		camara = sql.getResultList();
+		return camara;
+	}
 	@Override
 	public Camara buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
