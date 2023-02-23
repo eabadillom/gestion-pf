@@ -23,7 +23,7 @@
 									<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.clienteSelect}">
 										<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
 										<f:selectItems value="#{altaDetalleConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-										<p:ajax listener="#{altaDetalleConstanciaSalidaBean.servicioCliente}" update="datos-generales s-servicio dt-constanciaDD" />
+										<p:ajax listener="#{altaDetalleConstanciaSalidaBean.servicioCliente}" update="datos-generales s-servicio  dt-inventario" />
 									</p:selectOneMenu>
 								<p:outputLabel value="Planta:" styleClass="p-ml-4 p-mr-2"/>
 									<p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{altaDetalleConstanciaSalidaBean.plantaSelect}">
@@ -52,6 +52,114 @@
 				<div class="p-col-12">
 					<div class="card">
 						
+						<p:dataTable id="dt-inventario" value="#{altaDetalleConstanciaSalidaBean.listaInventario}" var="inventario" rows="10"
+									 rowKey="#{inventario.constanciaDeDeposito.folio}" paginator="true" paginatorPosition="bottom">
+									 
+							<p:column exportable="false" width="3%">
+								<p:rowToggler/>
+							</p:column>
+							
+							<p:column headerText="Folio Constancia De Deposito">
+								<h:outputText value="#{inventario.constanciaDeDeposito.folio}" />
+							</p:column>
+							
+							<p:column headerText="Fecha">
+								<h:outputText value="#{inventario.constanciaDeDeposito.fechaIngreso}" />
+							</p:column>
+							
+							<p:rowExpansion>
+							<p:dataTable value="#{inventario.constanciaDeDeposito.partidaList}" var="partida" rowKey="#{partida.partidaCve}" rowSelectMode="add" 
+											selection="#{altaDetalleConstanciaSalidaBean.partidaSelect}" selectionMode="single">
+								
+								<f:facet name="header">
+									<div style="text-align: center;">
+										<span>PARTIDAS</span>
+									</div>
+								</f:facet>
+								
+								<p:ajax event="rowSelect" />
+								<p:ajax event="rowUnselect" />
+								
+								<p:column>
+									<p:rowToggler/>
+								</p:column>
+								
+								<p:column headerText="Folio">
+									<h:outputText value="#{partida.folio.folio}" />
+								</p:column>
+								
+								<p:column headerText="Numero">
+									<h:outputText value="#{partida.unidadDeProductoCve.productoCve.numeroProd}" />
+								</p:column>
+								
+								<p:column headerText="Producto">
+									<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}" />
+								</p:column>
+								
+								<p:column headerText="Tarimas">
+									<h:outputText value="#{partida.noTarimas}" />
+								</p:column>
+								
+								<p:column headerText="Piezas">
+									<h:outputText value="#{partida.cantidadTotal}" />
+								</p:column>
+								
+								<p:column headerText="Kilos">
+									<h:outputText value="#{partida.pesoTotal}" />
+								</p:column>
+								
+								<p:column headerText="Posicion">
+									<h:outputText value="#{partida.camaraCve.camaraDs}" />
+								</p:column>
+								
+								<p:column>
+									<p:commandButton value="Agregar" process="@this" icon="pi pi-plus" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaS()}" update="@this">
+									</p:commandButton>
+								</p:column> 
+								
+								<p:rowExpansion>
+									<p:dataTable value="#{partida.detallePartidaList}" var="detalle">
+										<f:facet name="header">
+											<div style="text-align: center;">
+												<span>DETALLE PARTIDA</span>
+											</div>
+										</f:facet>
+									
+										<p:column headerText="Codigo">
+											<h:outputText value="#{detalle.dtpCodigo}" />
+										</p:column>
+										
+										<p:column headerText="Lote">
+											<h:outputText value="#{detalle.dtpLote}" />
+										</p:column>
+								
+										<p:column headerText="Contenedor">
+											<h:outputText value="#{detalle.dtpSAP}" />
+										</p:column>
+										
+										<p:column headerText="Caducidad">
+											<h:outputText value="#{detalle.dtpCaducidad}" />
+										</p:column>
+										
+										<p:column headerText="PO">
+											<h:outputText value="#{detalle.dtpPO}" />
+										</p:column>
+										
+										<p:column headerText="MP">
+											<h:outputText value="#{detalle.dtpMP}" />
+										</p:column>
+										
+										<p:column headerText="Pedimento">
+											<h:outputText value="#{detalle.dtpPedimento}" />
+										</p:column>
+									</p:dataTable>
+								</p:rowExpansion>
+							</p:dataTable>
+						</p:rowExpansion>
+						
+						</p:dataTable>
+						
+						<!-- 
 						<p:dataTable id="dt-constanciaDD" value="#{altaDetalleConstanciaSalidaBean.listadoConstanciaDD}" var="constanciaDD" 
 									rowKey="#{constanciaDD.folio}" reflow="true" paginator="true" paginatorPosition="bottom" rows="10">
 						
@@ -162,7 +270,7 @@
 								</p:rowExpansion>
 							</p:dataTable>
 						</p:rowExpansion>
-						</p:dataTable>
+						</p:dataTable>  -->
 						<!-- Espoacio para modificar salida -->
 						
 						

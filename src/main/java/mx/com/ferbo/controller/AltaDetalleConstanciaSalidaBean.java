@@ -15,11 +15,12 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
-import org.primefaces.event.CellEditEvent;
 
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
+import mx.com.ferbo.dao.DetallePartidaDAO;
+import mx.com.ferbo.dao.InventarioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.Cliente;
@@ -30,11 +31,10 @@ import mx.com.ferbo.model.ConstanciaSalidaServiciosPK;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.DetallePartidaPK;
+import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.model.Servicio;
-import mx.com.ferbo.model.StatusConstanciaSalida;
 
 @Named
 @ViewScoped
@@ -74,6 +74,11 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	private DetallePartida detallePartida;
 	private List<DetallePartida> detallePartidaLista;
 	
+	private DetallePartidaDAO detallePartidaDAO;
+	
+	private List<Inventario> listaInventario;
+	private InventarioDAO inventarioDAO;
+	
 	private String numFolio,nombreTransportista,placas,observaciones,temperatura;
 	private BigDecimal cantidadServicio;
 	private Date fechaSalida;
@@ -96,6 +101,11 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		listadoPrecioServicios = new ArrayList<>();
 		serviciosCliente = new ArrayList<>();
 		preciosServicioDAO = new PrecioServicioDAO();
+		
+		inventarioDAO = new InventarioDAO();
+		listaInventario = new ArrayList<Inventario>();
+		
+		detallePartidaDAO = new DetallePartidaDAO();
 		
 		listadoConstanciaSalidaServicios = new ArrayList<>();
 		
@@ -354,6 +364,22 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	public void setDetallePartidaLista(List<DetallePartida> detallePartidaLista) {
 		this.detallePartidaLista = detallePartidaLista;
 	}
+	
+	public List<Inventario> getListaInventario() {
+		return listaInventario;
+	}
+
+	public void setListaInventario(List<Inventario> listaInventario) {
+		this.listaInventario = listaInventario;
+	}
+
+	public InventarioDAO getInventarioDAO() {
+		return inventarioDAO;
+	}
+
+	public void setInventarioDAO(InventarioDAO inventarioDAO) {
+		this.inventarioDAO = inventarioDAO;
+	}
 
 	public void validar() {
 		
@@ -384,7 +410,12 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 								:false)
 								.collect(Collectors.toList());
 		
-		listadoConstanciaDD = constanciaDDDAO.buscarPorCliente(clienteSelect.getCteCve());
+		//listadoConstanciaDD = constanciaDDDAO.buscarPorCliente(clienteSelect.getCteCve());
+		listaInventario = inventarioDAO.buscarPorCliente(getClienteSelect());
+		/*for(Inventario i: listaInventario) {
+			System.out.println(i.getConstanciaDeDeposito());
+		}*/
+		
 		
 	}
 	
@@ -514,8 +545,6 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		cs.setObservaciones(observaciones);
 		cs.setNombreTransportista(nombreTransportista);
 		cs.setPlacasTransporte(placas);
-		//cs.setConstanciaSalidaServiciosList(new ArrayList<>());
-		//cs.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
 		cs.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
 		cs.setDetalleConstanciaSalidaList(listadoTemp);
 		
@@ -536,42 +565,51 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		 			d.setCamaraCve(p.getCamaraCve().getCamaraCve());
 		 			d.setUnidad(p.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoDs());
 		 			d.setProducto(p.getUnidadDeProductoCve().getProductoCve().getProductoDs());
-		 			d.setFolioEntrada(p.getFolio().toString());//es el folio de constancia de deposito????
+		 			d.setFolioEntrada(p.getFolio().getFolio().toString());//es el folio de constancia de deposito????
 		 			d.setCamaraCadena(p.getCamaraCve().getCamaraDs());
+		 			
 		 			
 		 			int size = p.getDetallePartidaList().size();
 		 			System.out.println(size);
 	 				d.setDetallePartida(p.getDetallePartidaList().get(size-1));
-		 			//System.out.println(size);
-		 			
-		 			//d.setDetallePartida();
-		 			//d.setDetallePartida(p.getDetallePartidaList().get(0));
 		 			
 		 			for(DetallePartida dp: detallePartidaLista) {
 		 				
 		 				if(d.getDetallePartida().equals(dp)) {
 		 					int detalleNuevo = dp.getDetallePartidaPK().getDetPartCve() + 1;
-		 					d.getDetallePartida().getDetallePartidaPK().setDetPartCve(detalleNuevo);
+		 					//d.getDetallePartida().getDetallePartidaPK().setDetPartCve(detalleNuevo);//ERROR
+		 					//d.getDetallePartida().getDetallePartidaPK().setDetPartCve(detalleNuevo);
 		 					
-		 					//d.setDetallePartida(d.getDetallePartida());
+		 					DetallePartidaPK detallePartidaPK = new DetallePartidaPK();
+		 					detallePartidaPK.setDetPartCve(detalleNuevo);
+		 					detallePartidaPK.setPartidaCve(p);
+		 					
+		 					DetallePartida detalle = new DetallePartida();
+		 					detalle.setDetallePartidaPK(detallePartidaPK);
+		 					detalle.setDtpPedimento(dp.getDtpPedimento());
+		 					detalle.setDtpSAP(dp.getDtpSAP());
+		 					detalle.setDtpLote(dp.getDtpLote());
+		 					detalle.setDtpMP(dp.getDtpMP());
+		 					detalle.setDtpPO(dp.getDtpPO());      
+		 					detalle.setDtpCaducidad(dp.getDtpCaducidad());
+		 					detalle.setPartida(p);		 
+		 					
+		 					d.setDetallePartida(detalle);
+		 					
+		 					if(detallePartidaDAO.guardar(d.getDetallePartida())==null) {
+			 					System.out.println("registro correcto detalle partida");
+			 				}
 		 				}
-		 				
-		 				dp.setDetalleConstanciaSalidaList(listadoTemp);
-		 				dp.setDetallePartidaList(detallePartidaLista);
-		 				d.setDetallePartida(dp);
 		 			}
-		 			
-		 			
-		 			
 		 			break;
  				}
  			}
- 			
  		}
- 		
 		
  		constanciaSalidaDAO.guardar(cs);
 		
+ 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"CONSTANCIA DE SALIDA", "Se registro de forma correcta"));
+ 		PrimeFaces.current().ajax().update("form:messages");
 		
 	}
 	

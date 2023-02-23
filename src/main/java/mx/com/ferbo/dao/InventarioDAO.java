@@ -51,12 +51,14 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 		List<Inventario> listaInventario = new ArrayList<>();
 		constancia = entity.createNamedQuery("ConstanciaDeDeposito.findByCteCve", ConstanciaDeDeposito.class)
 				.setParameter("cteCve", cliente.getCteCve()).getResultList();
-
+		//System.out.println(constancia);//imprimo para verificar
 		for (ConstanciaDeDeposito c : constancia) {
+			Inventario inventario = new Inventario(); // Inicializamos Inventario
 			List<Partida> partidaList = c.getPartidaList();
 
 			for (Partida p : partidaList) {
-				Inventario inventario = new Inventario(); // Inicializamos Inventario
+				//Inventario inventario = new Inventario(); // Inicializamos Inventario
+				//inventario.setConstanciaDeDeposito(c);//agregue constanciadedeposito
 				inventario.setFolioCliente(c.getFolioCliente());
 				p.getUnidadDeProductoCve();
 				inventario.setProducto(p.getUnidadDeProductoCve().getProductoCve());
@@ -96,8 +98,11 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					inventario.setPo(dp.getDtpPO());
 					break;
 				}
-				listaInventario.add(inventario);
+				//listaInventario.add(inventario);
 			}
+			inventario.setConstanciaDeDeposito(c);
+			listaInventario.add(inventario);
+			
 		}
 		entity.close();
 		return listaInventario;

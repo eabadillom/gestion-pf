@@ -28,6 +28,7 @@ public class Inventario {
 	String tarimas;
 	String folioCliente;
 	Servicio srv;
+	ConstanciaDeDeposito constanciaDeDeposito;
 
 	public Inventario() {
 
@@ -37,7 +38,7 @@ public class Inventario {
 			Date caducidad, String codigo, String lote, String sap, Camara camara, String posicion, Integer partidaCve,
 			BigDecimal peso, String inventarioCve, String detalleAnt, Integer detallePartidaAnterior,
 			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas,
-			Servicio srv) {
+			Servicio srv, ConstanciaDeDeposito constanciaDeDeposito) {
 		this.folio = folio;
 		this.producto = producto;
 		this.cantidad = cantidad;
@@ -61,6 +62,15 @@ public class Inventario {
 		this.pedimento = pedimento;
 		this.tarimas = tarimas;
 		this.srv = srv;
+		this.constanciaDeDeposito = constanciaDeDeposito;
+	}
+	
+	public ConstanciaDeDeposito getConstanciaDeDeposito() {
+		return constanciaDeDeposito;
+	}
+
+	public void setConstanciaDeDeposito(ConstanciaDeDeposito constanciaDeDeposito) {
+		this.constanciaDeDeposito = constanciaDeDeposito;
 	}
 
 	public Servicio getSrv() {
