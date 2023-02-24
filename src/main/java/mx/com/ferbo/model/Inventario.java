@@ -10,6 +10,7 @@ import javax.faces.application.FacesMessage.Severity;
 public class Inventario{
 	Integer folio;
 	Producto producto;
+	Cliente cliente;
 	Integer cantidad;
 	UnidadDeManejo unidadManejo;
 	Planta planta;
@@ -18,7 +19,7 @@ public class Inventario{
 	String lote;
 	String sap;
 	Camara camara;
-	String posicion;
+	Posicion posicion;
 	Integer partidaCve;
 	BigDecimal peso;
 	String inventarioCve;
@@ -39,9 +40,9 @@ public class Inventario{
 public void listas() {
 }
 	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidadManejo, Planta planta,
-			Date caducidad, String codigo, String lote, String sap, Camara camara, String posicion, Integer partidaCve,
+			Date caducidad, String codigo, String lote, String sap, Camara camara, Posicion posicion, Integer partidaCve,
 			BigDecimal peso, String inventarioCve, String detalleAnt, Integer detallePartidaAnterior,
-			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas) {
+			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas, Cliente cliente) {
 		this.folio = folio;
 		this.producto = producto;
 		this.cantidad = cantidad;
@@ -64,6 +65,7 @@ public void listas() {
 		this.mp = mp;
 		this.pedimento = pedimento;
 		this.tarimas = tarimas;
+		this.cliente = cliente;
 	}
 
 	public Integer getFolio() {
@@ -166,12 +168,12 @@ public void listas() {
 	}
 
 
-	public String getPosicion() {
+	public Posicion getPosicion() {
 		return posicion;
 	}
 
 
-	public void setPosicion(String posicion) {
+	public void setPosicion(Posicion posicion) {
 		this.posicion = posicion;
 	}
 
@@ -296,16 +298,25 @@ public void listas() {
 	}
 
 
+	public Cliente getCliente() {
+		return cliente;
+	}
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
 	@Override
 	public String toString() {
-		return "Inventario [folio=" + folio + ", producto=" + producto + ", cantidad=" + cantidad + ", unidadManejo="
-				+ unidadManejo + ", planta=" + planta + ", caducidad=" + caducidad + ", codigo=" + codigo + ", lote="
-				+ lote + ", sap=" + sap + ", camara=" + camara + ", posicion=" + posicion + ", partidaCve=" + partidaCve
-				+ ", peso=" + peso + ", inventarioCve=" + inventarioCve + ", detalleAnt=" + detalleAnt
-				+ ", detallePartidaAnterior=" + detallePartidaAnterior + ", detallePadre=" + detallePadre
-				+ ", detallePartidaPadre=" + detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento="
-				+ pedimento + ", tarimas=" + tarimas + "]";
+		return "Inventario [folio=" + folio + ", producto=" + producto + ", cliente=" + cliente + ", cantidad="
+				+ cantidad + ", unidadManejo=" + unidadManejo + ", planta=" + planta + ", caducidad=" + caducidad
+				+ ", codigo=" + codigo + ", lote=" + lote + ", sap=" + sap + ", camara=" + camara + ", posicion="
+				+ posicion + ", partidaCve=" + partidaCve + ", peso=" + peso + ", inventarioCve=" + inventarioCve
+				+ ", detalleAnt=" + detalleAnt + ", detallePartidaAnterior=" + detallePartidaAnterior
+				+ ", detallePadre=" + detallePadre + ", detallePartidaPadre=" + detallePartidaPadre + ", po=" + po
+				+ ", mp=" + mp + ", pedimento=" + pedimento + ", tarimas=" + tarimas + ", folioCliente=" + folioCliente
+				+ "]";
 	}
+	
+	
 	
 
 

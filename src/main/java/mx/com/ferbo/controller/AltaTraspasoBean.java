@@ -106,7 +106,9 @@ public class AltaTraspasoBean implements Serializable {
 	private Integer idCliente;
 	private Integer idclavectedeposito;
 	private Inventario selectedInventario;
-
+	private Integer planta;
+	private Integer camara;
+	private Integer posicion;
 	private Cliente selCliente;
 	private ConstanciaDeDeposito ctecve;
 	private PartidaServicio selPartida;
@@ -222,28 +224,65 @@ public class AltaTraspasoBean implements Serializable {
 		}
 		log.info("Productos y/o servicios del cliente filtrados.");
 	}
-
+		public void guardaDatosDialog() {
+		PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
+		System.out.println(selectedInventario);
+		selectedInventario.setCantidad(cantidad);
+		selectedInventario.setUnidadManejo(selUnidadManejo);
+		selectedInventario.setPeso(peso);
+		String dialog = inventarioDAO.actualizar(selectedInventario);
+		if( dialog == null) {
+		listaconstanciadepo.clear();			
+		listaconstanciadepo = inventarioDAO.findall();
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Datos guardados" + selectedInventario.getInventarioCve(), null));
+		PrimeFaces.current().ajax().update("form:messages", "form:destino");
+		}else {
+			FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR, "Datos guardados" + selectedInventario.getInventarioCve(), null));
+			PrimeFaces.current().ajax().update("form:messages", "form:altaTraspaso");
+		}
+		this.selectedInventario = new Inventario();
+		}
 	public void agregarProducto() {
 		String message = null;
 		Severity severity = null;
 		try {
-			
-			System.out.println(this.selectedInventario);
-			message = "Producto agregado correctamente.";
-			severity = FacesMessage.SEVERITY_INFO;
-		//} catch (InventarioException ex) {
-			//	log.error("Problema para obtener la información de los productos...", ex);
-			//	message = ex.getMessage();
-			//	severity = FacesMessage.SEVERITY_ERROR;
-		} catch (Exception ex) {
-			log.error("Problema para obtener la informaciòn de los productos...", ex);
-			message = "Problema al agregar sus productos.";
-			severity = FacesMessage.SEVERITY_ERROR;
-		} finally {
+			if(this.listaplanta == null)
+				throw new InventarioException("Debe seleccionar almenos una planta");
+				
+				if(this.listacamara == null)
+					throw new InventarioException("Debe seleccionar almenos una planta");
+					
+				if(this.listaposicion == null)					
+					throw new InventarioException("Debe seleccionar almenos una posicion");
+
+					UnidadDeManejo udm = alUnidades.stream().filter(u -> this.idUnidadManejo == u.getUnidadDeManejoCve()).collect(Collectors.toList()).get(0);
+					if (udm == null)
+						throw new InventarioException("Debe seleccionar una unidad de producto.");
+					ProductoPorCliente prd = alProductosFiltered.stream()
+							.filter(p -> this.idProducto.equals(p.getProductoCve().getProductoCve()))
+							.collect(Collectors.toList()).get(0);
+					Producto p = prd.getProductoCve();
+					PartidaServicio prt = new PartidaServicio();
+					Inventario inventario = new Inventario();
+					prt.setCantidadDeCobro(peso);
+					prt.setCantidadTotal(cantidad);
+					prt.setUnidadDeCobro(udm);
+					prt.setProductoCve(p);
+
+		}catch(InventarioException ex) {
+			log.error("Problema para obtener la informacion requerida",ex);
+			message = ex.getMessage();
+			severity	= FacesMessage.SEVERITY_ERROR;
+		}catch(Exception ex){
+			log.error("Problema para obtener la informacion requerida",ex);
+			message = ex.getMessage();
+			severity	= FacesMessage.SEVERITY_ERROR;
+		}finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar producto", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:form:destino");
+		
 		}
-		log.info("Id Producto: " + this.idProducto);
+		log.info("Id Producto " + this.idProducto);
 	}
 
 	public void agregarServicio() {
@@ -251,8 +290,41 @@ public class AltaTraspasoBean implements Serializable {
 		Severity severity = null;
 		PrecioServicio precioServicio = null;
 		ConstanciaServicioDetalle servicio = null;
-				
-		} 
+
+		try {
+			if (this.idCliente == null || this.idCliente == 0)
+				throw new InventarioException("Debe seleccionar el cliente");
+
+			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
+				throw new InventarioException("Debe indicar la cantidad de servicios.");
+
+			if (this.idPrecioServicio == null)
+				throw new InventarioException("Debe seleccionar un servicio.");
+
+			precioServicio = this.alServicios.stream().filter(ps -> this.idPrecioServicio.equals(ps.getId()))
+					.collect(Collectors.toList()).get(0);
+			if (alServiciosDetalle == null)
+				alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
+
+			servicio = new ConstanciaServicioDetalle();
+			servicio.setServicioCantidad(this.cantidadServicio);
+			servicio.setServicioCve(precioServicio.getServicio());
+			alServiciosDetalle.add(servicio);
+			message = "Producto agregado correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			log.error("Problema para obtener la información de los productos...", ex);
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de servicios del cliente.", ex);
+			message = "Problema con la información de servicios.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar servicio", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
+		}
+	}
 
 	public synchronized void guardar() {
 		String message = null;
@@ -260,8 +332,6 @@ public class AltaTraspasoBean implements Serializable {
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
 		EstadoConstancia estado = null;
-		
-		
 		
 		try {
 			if (this.isSaved)
@@ -665,6 +735,22 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void setSelectedInventario(Inventario selectedInventario) {
 		this.selectedInventario = selectedInventario;
+	}
+
+	public Integer getPlanta() {
+		return planta;
+	}
+
+	public void setPlanta(Integer planta) {
+		this.planta = planta;
+	}
+
+	public Integer getCamara() {
+		return camara;
+	}
+
+	public void setCamara(Integer camara) {
+		this.camara = camara;
 	}
 
 }

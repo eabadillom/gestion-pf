@@ -16,8 +16,11 @@ import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.EntityConverter;
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
 
 public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{	
+	
 	@SuppressWarnings("unchecked")
 	public List<ConstanciaDeDeposito> findall() {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
@@ -111,10 +114,17 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{
 	}
 
 	@Override
-	public String actualizar(ConstanciaDeDeposito e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public String actualizar(Inventario e) {
+		try {
+			EntityManager entity = getEntityManager();
+			entity.getTransaction().begin();
+			entity.merge(e);
+			entity.getTransaction().commit();
+			entity.close();
+			}catch(Exception a) {
+		return "Filed!" + a.getMessage();
+		}return null;
+}
 
 	@Override
 	public String guardar(ConstanciaDeDeposito e) {
@@ -130,6 +140,12 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{
 
 	@Override
 	public String eliminarListado(List<ConstanciaDeDeposito> listado) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String actualizar(ConstanciaDeDeposito e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
