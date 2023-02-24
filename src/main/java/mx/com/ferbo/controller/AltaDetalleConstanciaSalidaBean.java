@@ -19,6 +19,7 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
+import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
 import mx.com.ferbo.dao.InventarioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
@@ -75,6 +76,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	private List<DetallePartida> detallePartidaLista;
 	
 	private DetallePartidaDAO detallePartidaDAO;
+	private DetalleConstanciaSalidaDAO detalleConstanciaSDAO;
 	
 	private List<Inventario> listaInventario;
 	private InventarioDAO inventarioDAO;
@@ -106,6 +108,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		listaInventario = new ArrayList<Inventario>();
 		
 		detallePartidaDAO = new DetallePartidaDAO();
+		detalleConstanciaSDAO = new DetalleConstanciaSalidaDAO();
 		
 		listadoConstanciaSalidaServicios = new ArrayList<>();
 		
@@ -410,12 +413,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 								:false)
 								.collect(Collectors.toList());
 		
-		//listadoConstanciaDD = constanciaDDDAO.buscarPorCliente(clienteSelect.getCteCve());
 		listaInventario = inventarioDAO.buscarPorCliente(getClienteSelect());
-		/*for(Inventario i: listaInventario) {
-			System.out.println(i.getConstanciaDeDeposito());
-		}*/
-		
 		
 	}
 	
@@ -501,7 +499,6 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 				//detalleConstanciaSalidas.add(d);
 				listadoTemp.add(d);
 				detalleT = d;
-				//PrimeFaces.current().ajax().update("form:dt-detalleConstanciaSalida");
 			}
 			
 		}
@@ -524,11 +521,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		constanciaSalida.setFecha(fechaSalida);
 		constanciaSalida.setNumero(numFolio);
 		constanciaSalida.setClienteCve(clienteSelect);
-		constanciaSalida.setNombreCte(clienteSelect.getCteNombre());
-		//constanciaSalida.setStatus();
-		//constanciaSalida.setObservaciones();
-		//pendiente agregar al model los campos de nombre y placas transporte
-		
+		constanciaSalida.setNombreCte(clienteSelect.getCteNombre());		
 	}
 	
 	public void saveDetalleConstanciaSalida() {
@@ -565,7 +558,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		 			d.setCamaraCve(p.getCamaraCve().getCamaraCve());
 		 			d.setUnidad(p.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoDs());
 		 			d.setProducto(p.getUnidadDeProductoCve().getProductoCve().getProductoDs());
-		 			d.setFolioEntrada(p.getFolio().getFolio().toString());//es el folio de constancia de deposito????
+		 			d.setFolioEntrada(p.getFolio().getFolioCliente());
 		 			d.setCamaraCadena(p.getCamaraCve().getCamaraDs());
 		 			
 		 			
@@ -577,8 +570,11 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		 				
 		 				if(d.getDetallePartida().equals(dp)) {
 		 					int detalleNuevo = dp.getDetallePartidaPK().getDetPartCve() + 1;
-		 					//d.getDetallePartida().getDetallePartidaPK().setDetPartCve(detalleNuevo);//ERROR
-		 					//d.getDetallePartida().getDetallePartidaPK().setDetPartCve(detalleNuevo);
+		 					int cantidadRestante;
+		 					BigDecimal pesoRestante;
+		 					
+		 					cantidadRestante = dp.getCantidadUManejo() - d.getCantidad();
+		 					pesoRestante = dp.getCantidadUMedida().subtract(d.getPeso());
 		 					
 		 					DetallePartidaPK detallePartidaPK = new DetallePartidaPK();
 		 					detallePartidaPK.setDetPartCve(detalleNuevo);
@@ -586,11 +582,15 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		 					
 		 					DetallePartida detalle = new DetallePartida();
 		 					detalle.setDetallePartidaPK(detallePartidaPK);
+		 					detalle.setDetallePartida(dp);
 		 					detalle.setDtpPedimento(dp.getDtpPedimento());
 		 					detalle.setDtpSAP(dp.getDtpSAP());
 		 					detalle.setDtpLote(dp.getDtpLote());
 		 					detalle.setDtpMP(dp.getDtpMP());
 		 					detalle.setDtpPO(dp.getDtpPO());      
+		 					detalle.setCantidadUManejo(cantidadRestante);
+		 					detalle.setUMedidaCve(dp.getUMedidaCve());
+		 					detalle.setCantidadUMedida(pesoRestante);
 		 					detalle.setDtpCaducidad(dp.getDtpCaducidad());
 		 					detalle.setPartida(p);		 
 		 					
@@ -603,13 +603,37 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		 			}
 		 			break;
  				}
+ 				
  			}
  		}
 		
- 		constanciaSalidaDAO.guardar(cs);
+ 		constanciaSalidaDAO.guardar(cs); //REGISTRO LA CONTSANCIA SALIDA
 		
  		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"CONSTANCIA DE SALIDA", "Se registro de forma correcta"));
  		PrimeFaces.current().ajax().update("form:messages");
+		
+	}
+	
+	public void nuevoRegistro() {
+		
+		clienteSelect = new Cliente();
+		plantaSelect = new Planta();
+		fechaSalida = new Date();
+		numFolio = "";
+		
+		
+		listaInventario = new ArrayList<>();
+		listadoTemp = new ArrayList<>();
+		listadoConstanciaSalidaServicios = new ArrayList<>();
+		
+		servicioClienteSelect = new PrecioServicio();
+		cantidadServicio = new BigDecimal(0);
+		nombreTransportista = "";
+		placas = "";
+		observaciones = "";
+		
+		
+		PrimeFaces.current().ajax().update("form:dt-inventario","form:dt-servicio");
 		
 	}
 	
