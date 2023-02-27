@@ -1,15 +1,21 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -36,6 +42,9 @@ import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
@@ -407,6 +416,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	public void servicioCliente() {
 		
 		serviciosCliente.clear();
+		listaInventario.clear();
 		serviciosCliente = listadoPrecioServicios.stream()
 								.filter(s -> clienteSelect != null
 								?(s.getCliente().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
@@ -568,7 +578,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		 			
 		 			for(DetallePartida dp: detallePartidaLista) {
 		 				
-		 				if(d.getDetallePartida().equals(dp)) {
+		 				if(d.getDetallePartida().equals(dp)) {//NO ACTUALIZA AL D EN DETALLEPARTIDA AL REGISTRAR UNO NUEVO DESPUES DE OTRO YA ANTERIORMENTE REGISTRADO
 		 					int detalleNuevo = dp.getDetallePartidaPK().getDetPartCve() + 1;
 		 					int cantidadRestante;
 		 					BigDecimal pesoRestante;
@@ -599,6 +609,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		 					if(detallePartidaDAO.guardar(d.getDetallePartida())==null) {
 			 					System.out.println("registro correcto detalle partida");
 			 				}
+		 					
 		 				}
 		 			}
 		 			break;
@@ -618,13 +629,18 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		
 		clienteSelect = new Cliente();
 		plantaSelect = new Planta();
+		partidaSelect = new Partida();
 		fechaSalida = new Date();
 		numFolio = "";
-		
+		detallePartida = new DetallePartida();
+		listadoDetalleConstanciaSalida = new ArrayList<DetalleConstanciaSalida>();
+		detallePartidaLista = new ArrayList<DetallePartida>();
 		
 		listaInventario = new ArrayList<>();
 		listadoTemp = new ArrayList<>();
+		listadoPartida = new ArrayList<>();
 		listadoConstanciaSalidaServicios = new ArrayList<>();
+		listaAuxPartida = new ArrayList<Partida>();
 		
 		servicioClienteSelect = new PrecioServicio();
 		cantidadServicio = new BigDecimal(0);
@@ -637,6 +653,47 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		
 	}
 	
+	public void imprimirTicket(){
+		
+		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
+		String filename = "ticket.pdf";
+		String images = "/images/logoF.png";
+		String message = null;
+		Severity severity = null;
+		ConstanciaSalida constancia = null;
+		File reportFile = new File(jasperPath);
+		File imgFile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
+			URL resourceimg = getClass().getResource(images); 
+			String file = resource.getFile();//retorna la ubicacion del archivo
+			String img = resourceimg.getFile();
+			reportFile = new File(file);//crea un archivo
+			imgFile = new File(img);
+			constancia = new ConstanciaSalida();
+			constancia.setNumero(this.numFolio);
+			numFolio = String.valueOf(getNumFolio());
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("NUMERO", numFolio);
+			parameters.put("LogoPath", imgFile.getPath());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+		} catch (Exception e) {
+			e.printStackTrace();
+			message = String.format("No se pudo imprimir el folio %s", this.numFolio);
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
+			PrimeFaces.current().ajax().update("form:messages");
+			
+		}finally {
+			conexion.close((Connection) connection);
+		}
+		
+		
+	}
 	
-
 }

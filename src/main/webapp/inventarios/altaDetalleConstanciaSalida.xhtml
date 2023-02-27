@@ -288,7 +288,7 @@
 						<p:toolbar styleClass="p-mt-3">
 							<p:toolbarGroup>
 								<p:splitButton value="Guardar" styleClass="ui-button-success" actionListener="#{altaDetalleConstanciaSalidaBean.saveDetalleConstanciaSalida()}" icon="pi pi-save" update="@this">
-									<p:menuitem value="Ticket" icon="pi pi-print"/>
+									<p:menuitem value="Ticket" icon="pi pi-print" actionListener="#{altaDetalleConstanciaSalidaBean.imprimirTicket()}" ajax="false"/>
 									<p:menuitem value="Nuevo" icon="pi pi-refresh" actionListener="#{altaDetalleConstanciaSalidaBean.nuevoRegistro()}" update="@form"/>
 								</p:splitButton>
 							</p:toolbarGroup>
