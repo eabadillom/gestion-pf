@@ -4,7 +4,7 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
-	<ui:define name="title">Alta Constancia de Servicio</ui:define>
+	<ui:define name="title">Alta Traspaso de Servicio</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
 			<p:breadCrumb>
@@ -21,7 +21,7 @@
 						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altaTraspasoBean.idCliente}" filterMatchMode="startsWith">
 							<f:selectItem itemLabel="Seleccione Cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
-							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:traspaso :form:selServicio"/>
+							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:traspaso :form:selServicio :form:txtplantadestino :form:camaradestino :form:posiciondestino"/>
 						</p:selectOneMenu>
 				</p:toolbarGroup>
 			</p:toolbar>
@@ -30,7 +30,7 @@
 		<p:dataTable id="traspaso" var="inventario" value="#{altaTraspasoBean.inventario}" reflow="true" rowKey="#{inventario.folioCliente}"
 			paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">           
             <p:column style="width:2rem"><p:rowToggler/></p:column>
-            <p:column headerText="Folio" sortBy="#{inventario.folioCliente}" ><h:outputText value="#{inventario.folioCliente}" /></p:column>
+            <p:column headerText="Folio" sortBy="#{inventario.constanciaDepo.folio}" ><h:outputText value="#{inventario.folioCliente}" /></p:column>
 
             <p:column headerText="Producto" sortBy="#{inventario.producto.productoDs}" >
                 <h:outputText value="#{inventario.producto.productoDs}"  />
@@ -40,6 +40,7 @@
             <p:column headerText="Unidad de Manejo" ><h:outputText value="#{inventario.unidadManejo.unidadDeManejoDs}" /></p:column>
             <p:column headerText="Planta origen" ><h:outputText value="#{inventario.planta.plantaDs}" /></p:column>						   
 	<!-- Comienza lista desplegable -->
+	
             <p:rowExpansion>
             <div class="p-grid ui-fluid">
 				<div class="p-field p-col-2 p-md-2">
@@ -83,7 +84,7 @@
 			             <p:panel id="Nombre">
 			                <div class="field">              
 			                    <p:outputLabel for="@next" value="Cliente" />
-			                    <p:inputText value="#{altaTraspasoBean.selCliente.cteNombre}" readonly="true" />
+			                    <p:inputText value="#{altaTraspasoBean.selectedInventario.cliente.cteNombre}" readonly="true" />
 			                </div>
 			            </p:panel>
 			            
@@ -111,29 +112,31 @@
                 <p:panel id="planta">
                 <div class="field">
                         <p:outputLabel for="planta" value="Planta destino" />
-                       <p:selectOneMenu id="txtplantadestino" value="#{altaTraspasoBean.selectedInventario.planta}" converter="entityConverter" >
+                       <p:selectOneMenu id="txtplantadestino" value="#{altaTraspasoBean.selectedInventario.plantaDestino}" converter="entityConverter" >
 						<f:selectItem itemLabel="--Planta--" itemValue=""  />
-						<f:selectItems value="#{altaTraspasoBean.listaplanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" update=":form:camaradestino :form:posiciondestino"/>
-						<p:ajax /></p:selectOneMenu>
+						<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaplanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						<p:ajax listener="#{altaTraspasoBean.plantaselect}" process="@this" update=":form:camaradestino"/>						
+						</p:selectOneMenu>
                 </div>
                 </p:panel>
                 
                 <p:panel id="Camara">
                 <div class="field">
                         <p:outputLabel for="camaradestino" value="Camara destino" />
-				<p:selectOneMenu id="camaradestino" value="#{altaTraspasoBean.selectedInventario.camara}" converter="entityConverter" >
+				<p:selectOneMenu id="camaradestino" value="#{altaTraspasoBean.selectedInventario.camaraDestino}" converter="entityConverter" >
 				<f:selectItem itemLabel="--Camara--" itemValue=""  />
-				<f:selectItems var="camaradestino" value="#{altaTraspasoBean.listacamara}" itemLabel="#{camaradestino.camaraDs}" itemValue="#{camaradestino}" />
-				<p:ajax /></p:selectOneMenu>
+				<f:selectItems value="#{altaTraspasoBean.selectedInventario.listacamara}" var="camaradestino" itemLabel="#{camaradestino.camaraDs}" itemValue="#{camaradestino}" />
+				<p:ajax listener="#{altaTraspasoBean.camaraselect}" process="@this" update=":form:posiciondestino"/>						
+				</p:selectOneMenu>
                 </div>
                 </p:panel>
                 
                 <p:panel id="Posicion">
                 <div class="field">
                 <p:outputLabel for="posiciondestino" value="Posicion destino" />
-                <p:selectOneMenu id="posiciondestino" value="#{altaTraspasoBean.selectedInventario.posicion}" converter="entityConverter" >
+                <p:selectOneMenu id="posiciondestino" value="#{altaTraspasoBean.selectedInventario.posicionDestPosicion}" converter="entityConverter" >
 				<f:selectItem itemLabel="--Posicion--" itemValue=""  />
-				<f:selectItems var="posiciondestino" value="#{altaTraspasoBean.listaposicion}" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
+				<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaposicion}" var="posiciondestino" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
 				<p:ajax /></p:selectOneMenu>
                 </div>
                 </p:panel>
@@ -144,7 +147,7 @@
 							</p:outputPanel>
 							</p:outputPanel>
 						<f:facet name="footer">
-				<p:commandButton value="Añadir" icon="pi pi-check" actionListener="#{altaTraspasoBean.agregarProducto()}" update="destino" oncomplete="PF('dialogCliente').hide()"/>
+				<p:commandButton value="Añadir" icon="pi pi-check" actionListener="#{altaTraspasoBean.agrega()}" update="destino" oncomplete="PF('dialogCliente').hide()"/>
 				<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" ></p:commandButton>
 					</f:facet>
 						</p:dialog>
@@ -153,6 +156,7 @@
 		 </div></p:divider>
         <p:toolbar>
             <p:toolbarGroup>
+
 			
             <p:dataTable id="destino" var="partida" value="#{altaTraspasoBean.inventario}" reflow="true" rowKey="#{altaTraspasoBean.selectedInventario}"  scrollable="true" scrollHeight="9em" scrollRows="4" >
 				<p:column headerText="Folio" width="8em"><h:outputText value="#{partida.folioCliente}"/></p:column>
@@ -168,7 +172,7 @@
 				<p:column headerText="Posicion destinada" width="10em"><h:outputText value="#{partida.posicion.idPosicion}"/></p:column>
 				
 				<p:column width="8em">
-				<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altatraspasoBean.deletePartida(partida)}" />
+				<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altatraspasoBean.deletePartida(partida)}" update="destino" />
 				</p:column>
 			</p:dataTable>
             </p:toolbarGroup>
@@ -200,12 +204,12 @@
 		</div>
 		<div>
 			
-        <p:splitButton value="Confirmar Traspaso" actionListener="#{altatraspasoBean.guardar}" icon="pi pi-save">
-            <p:menuitem value="Generar reporte" actionListener="#{altatraspasoBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+        <p:splitButton value="Confirmar Traspaso" actionListener="#{altaTraspasoBean.guardar}" icon="pi pi-save">
+            <p:menuitem value="Generar reporte" actionListener="#{altaTraspasoBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
             <p:menuitem value="Limpiar" action="#{altatraspasoBean.reload}" update="messages" icon="pi pi-times"/>
         </p:splitButton>
 		</div>
-
+ 
 
 		</h:form>
 	</ui:define>

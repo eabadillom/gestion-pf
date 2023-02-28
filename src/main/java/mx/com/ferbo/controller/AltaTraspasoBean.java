@@ -41,6 +41,7 @@ import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PartidaServicioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PosicionCamaraDAO;
+import mx.com.ferbo.dao.TraspasoPartidaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
@@ -51,6 +52,8 @@ import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.Inventario;
+import mx.com.ferbo.model.InventarioDetalle;
+import mx.com.ferbo.model.InventarioDetalle;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
@@ -84,10 +87,12 @@ public class AltaTraspasoBean implements Serializable {
 	private List<ConstanciaDeDeposito> listaconstanciadepo;
 	private List<Partida> partida;
 	private List<DetallePartida> ldpartida;
-	private List<Inventario> inventario;
+	private List<InventarioDetalle> inventario;
+	//private List<Inventario> inventario;
 	private List<Planta> listaplanta;
 	private List<Camara> listacamara;
 	private List<Posicion> listaposicion;
+	private List<TraspasoPartida> listaTraspasoPartida;
 	
 	private Date fecha;
 	private String numero;
@@ -97,23 +102,23 @@ public class AltaTraspasoBean implements Serializable {
 	private BigDecimal peso;
 	private BigDecimal valorDeclarado;
 	private String observaciones;
-	private String nombreTransportista;
-	private String placasVehiculo;
 	private String unidadcobro;
 	private UnidadDeManejo selUnidadManejo;
 	private Integer idPrecioServicio;
 	private BigDecimal cantidadServicio;
 	private Integer idCliente;
 	private Integer idclavectedeposito;
-	private Inventario selectedInventario;
+	private InventarioDetalle selectedInventario;
 	private Integer planta;
 	private Integer camara;
-	private Integer posicion;
+	private String camarad;
+	private String posicion;
 	private Cliente selCliente;
+	private Posicion posicionSelect;
 	private ConstanciaDeDeposito ctecve;
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
-
+	private TraspasoPartida tp;
 	private UnidadDeManejoDAO udmDAO;
 	private ConstanciaServicioDAO csDAO;
 	private EstadoConstanciaDAO edoDAO;
@@ -124,6 +129,7 @@ public class AltaTraspasoBean implements Serializable {
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
 	private PosicionCamaraDAO posicionDAO;
+	private TraspasoPartidaDAO tpDAO;
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
@@ -139,15 +145,18 @@ public class AltaTraspasoBean implements Serializable {
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
 		posicionDAO = new PosicionCamaraDAO();
+		tpDAO = new TraspasoPartidaDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
-		inventario = new ArrayList<Inventario>();
+		inventario = new ArrayList<InventarioDetalle>();
+		//inventario = new ArrayList<Inventario>();
 		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
 		alServicios = new ArrayList<PrecioServicio>();
 		alUnidades = new ArrayList<UnidadDeManejo>();
 		alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		listaconstanciadepo = new ArrayList<ConstanciaDeDeposito>();
+		listaTraspasoPartida = new ArrayList<TraspasoPartida>();
 		selCliente = new Cliente();
 		alPartidas = partidaservicioDAO.findall();
 		clientes = clienteDAO.findall();
@@ -155,6 +164,7 @@ public class AltaTraspasoBean implements Serializable {
 		listaplanta = plantaDAO.findall();
 		listacamara = camaraDAO.findall();
 		listaposicion = posicionDAO.findAll();
+		listaTraspasoPartida = tpDAO.findall();
 	}
 
 	@PostConstruct
@@ -166,6 +176,7 @@ public class AltaTraspasoBean implements Serializable {
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		estados = edoDAO.buscarTodos();
+		tp = new TraspasoPartida();
 		
 	}
 
@@ -174,11 +185,21 @@ public class AltaTraspasoBean implements Serializable {
 		Severity severity = null;
 		EntityManager manager = null;
 		Cliente cliente = null;
+		
 		Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
 		List<PrecioServicio> precioServicioList = null;
-		selCliente = clienteDAO.buscarPorId(idCliente);
-		inventario = inventarioDAO.buscarPorCliente(selCliente);
-		try {
+		//selCliente = clienteDAO.buscarPorId(idCliente);
+		Cliente buscarPorId = clienteDAO.buscarPorId(idCliente);
+		//inventario = inventarioDAO.buscarPorCliente(selCliente);
+		List<Inventario> inventario_antes = inventarioDAO.buscarPorCliente(buscarPorId);
+	try {
+			for( Inventario i : inventario_antes) {
+				InventarioDetalle invdet = new InventarioDetalle(i);
+				invdet.setListaplanta(listaplanta);
+				invdet.setListacamara(listacamara);
+				invdet.setListaposicion(listaposicion);
+				inventario.add(invdet);
+			}
 			log.info("Entrando a filtrar cliente...");
 			// selCliente = clientes.stream()
 			manager = EntityManagerUtil.getEntityManager();
@@ -210,7 +231,7 @@ public class AltaTraspasoBean implements Serializable {
 				log.info(ps.getServicio().getServicioDs());
 				log.info(ps.getUnidad().getUnidadDeManejoDs());
 			}
-			message = "Agregue sus productos y servicios.";
+			message = "Agregue los servicios requeridos.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
@@ -220,70 +241,37 @@ public class AltaTraspasoBean implements Serializable {
 			if (manager != null)
 				manager.close();
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-partidas");
+			PrimeFaces.current().ajax().update("form:messages", "form:destino");
 		}
-		log.info("Productos y/o servicios del cliente filtrados.");
+		log.info("Servicios del cliente filtrados.");
 	}
-		public void guardaDatosDialog() {
-		PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
-		System.out.println(selectedInventario);
-		selectedInventario.setCantidad(cantidad);
-		selectedInventario.setUnidadManejo(selUnidadManejo);
-		selectedInventario.setPeso(peso);
-		String dialog = inventarioDAO.actualizar(selectedInventario);
-		if( dialog == null) {
-		listaconstanciadepo.clear();			
-		listaconstanciadepo = inventarioDAO.findall();
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Datos guardados" + selectedInventario.getInventarioCve(), null));
-		PrimeFaces.current().ajax().update("form:messages", "form:destino");
-		}else {
-			FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR, "Datos guardados" + selectedInventario.getInventarioCve(), null));
-			PrimeFaces.current().ajax().update("form:messages", "form:altaTraspaso");
-		}
-		this.selectedInventario = new Inventario();
-		}
-	public void agregarProducto() {
-		String message = null;
-		Severity severity = null;
-		try {
-			if(this.listaplanta == null)
-				throw new InventarioException("Debe seleccionar almenos una planta");
-				
-				if(this.listacamara == null)
-					throw new InventarioException("Debe seleccionar almenos una planta");
-					
-				if(this.listaposicion == null)					
-					throw new InventarioException("Debe seleccionar almenos una posicion");
-
-					UnidadDeManejo udm = alUnidades.stream().filter(u -> this.idUnidadManejo == u.getUnidadDeManejoCve()).collect(Collectors.toList()).get(0);
-					if (udm == null)
-						throw new InventarioException("Debe seleccionar una unidad de producto.");
-					ProductoPorCliente prd = alProductosFiltered.stream()
-							.filter(p -> this.idProducto.equals(p.getProductoCve().getProductoCve()))
-							.collect(Collectors.toList()).get(0);
-					Producto p = prd.getProductoCve();
-					PartidaServicio prt = new PartidaServicio();
-					Inventario inventario = new Inventario();
-					prt.setCantidadDeCobro(peso);
-					prt.setCantidadTotal(cantidad);
-					prt.setUnidadDeCobro(udm);
-					prt.setProductoCve(p);
-
-		}catch(InventarioException ex) {
-			log.error("Problema para obtener la informacion requerida",ex);
-			message = ex.getMessage();
-			severity	= FacesMessage.SEVERITY_ERROR;
-		}catch(Exception ex){
-			log.error("Problema para obtener la informacion requerida",ex);
-			message = ex.getMessage();
-			severity	= FacesMessage.SEVERITY_ERROR;
-		}finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar producto", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:form:destino");
 		
+		public void agrega() {
+			System.out.println(this.selectedInventario);
+			TraspasoPartida traspasoP = new TraspasoPartida();
+			Inventario inventario = new Inventario();
+			if(tp != null) {
+				traspasoP.setCantidad(cantidad);
+				traspasoP.setDescripcion(this.selectedInventario.getProducto().getProductoDs());
+				traspasoP.setOrigen(this.selectedInventario.getPlanta().getPlantaDs() + " " + this.selectedInventario.getCamara().getCamaraDs());
+				traspasoP.setDestino(camarad);
+				inventario.setFolioCliente(this.selectedInventario.getFolioCliente());
+				inventario.setPeso(peso);
+				inventario.setProducto(this.selectedInventario.getProducto());
+				//inventario.setCamara(this.selectedInventario.getCamara().getCamaraDs());
+				inventario.setCamarad(this.selectedInventario.getCamarad());
+				inventario.setPosicion(this.selectedInventario.getPosicion());
+				inventario.setPosiciond(this.selectedInventario.getPosiciond());
+				
+				
+				
+				
+				listaTraspasoPartida.add(tp);
+				tp = new TraspasoPartida();
+			}
+				
 		}
-		log.info("Id Producto " + this.idProducto);
-	}
+		
 
 	public void agregarServicio() {
 		String message = null;
@@ -322,10 +310,24 @@ public class AltaTraspasoBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar servicio", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-altaTraspaso");
 		}
 	}
-
+	
+	public void plantaselect() {
+		Planta plantaDestino = this.selectedInventario.getPlantaDestino();
+		List<Camara> listaCamarasDestino = camaraDAO.buscarPorPlanta(plantaDestino);
+		selectedInventario.setListacamara(listaCamarasDestino);
+	}
+	public void camaraselect() {
+			Camara camD = this.selectedInventario.getCamaraDestino();
+			List<Posicion> listaposD = posicionDAO.buscarPorCamara(camD);
+			selectedInventario.setListaposicion(listaposD);
+		}
+	public void posicionselect() {
+//		Posicion pos = this.selectedInventario.getPosicionDestPosicion();
+		
+	}
 	public synchronized void guardar() {
 		String message = null;
 		Severity severity = null;
@@ -355,8 +357,6 @@ public class AltaTraspasoBean implements Serializable {
 			constancia.setCteCve(this.selCliente);
 			constancia.setObservaciones(this.observaciones);
 			constancia.setValorDeclarado(this.valorDeclarado);
-			constancia.setNombreTransportista(this.nombreTransportista);
-			constancia.setPlacasTransporte(this.placasVehiculo);
 			constancia.setPartidaServicioList(this.alPartidas);
 			constancia.setConstanciaServicioDetalleList(this.alServiciosDetalle);
 			constancia.setStatus(estado);
@@ -495,22 +495,6 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
-	}
-
-	public String getNombreTransportista() {
-		return nombreTransportista;
-	}
-
-	public void setNombreTransportista(String nombreTransportista) {
-		this.nombreTransportista = nombreTransportista;
-	}
-
-	public String getPlacasVehiculo() {
-		return placasVehiculo;
-	}
-
-	public void setPlacasVehiculo(String placasVehiculo) {
-		this.placasVehiculo = placasVehiculo;
 	}
 
 	public List<Cliente> getClientes() {
@@ -697,11 +681,11 @@ public class AltaTraspasoBean implements Serializable {
 		this.ldpartida = ldpartida;
 	}
 
-	public List<Inventario> getInventario() {
+	public List<InventarioDetalle> getInventario() {
 		return inventario;
 	}
 
-	public void setInventario(List<Inventario> inventario) {
+	public void setInventario(List<InventarioDetalle> inventario) {
 		this.inventario = inventario;
 	}
 
@@ -729,11 +713,11 @@ public class AltaTraspasoBean implements Serializable {
 		this.listaposicion = listaposicion;
 	}
 
-	public Inventario getSelectedInventario() {
+	public InventarioDetalle getSelectedInventario() {
 		return selectedInventario;
 	}
 
-	public void setSelectedInventario(Inventario selectedInventario) {
+	public void setSelectedInventario(InventarioDetalle selectedInventario) {
 		this.selectedInventario = selectedInventario;
 	}
 
@@ -752,5 +736,32 @@ public class AltaTraspasoBean implements Serializable {
 	public void setCamara(Integer camara) {
 		this.camara = camara;
 	}
+
+	public String getPosicion() {
+		return posicion;
+	}
+
+	public void setPosicion(String posicion) {
+		this.posicion = posicion;
+	}
+
+	public String getCamarad() {
+		return camarad;
+	}
+
+	public void setCamarad(String camarad) {
+		this.camarad = camarad;
+	}
+
+	public TraspasoPartida getTp() {
+		return tp;
+	}
+
+	public void setTp(TraspasoPartida tp) {
+		this.tp = tp;
+	}
+
+	
+
 
 }

@@ -39,8 +39,19 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 
 	@Override
 	public List<Camara> buscarPorCriterios(Camara e) {
-		
-		return null;
+		List<Camara> listaC = null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		listaC = em.createNamedQuery("Camara.findByplantaCve", Camara.class).setParameter("plantaCve",e.getPlantaCve()).getResultList();
+		return listaC;
+	}
+	
+	public List<Camara> buscarPorPlanta(Planta p) {
+		List<Camara> listaC = null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		listaC = em.createNamedQuery("Camara.findByPlantaCve", Camara.class)
+				.setParameter("plantaCve", p.getPlantaCve())
+				.getResultList();
+		return listaC;
 	}
 
 	@Override

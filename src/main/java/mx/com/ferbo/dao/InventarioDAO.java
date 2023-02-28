@@ -57,7 +57,6 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{
 
 		for (ConstanciaDeDeposito c : constancia) {
 			List<Partida> partidaList = c.getPartidaList();
-			
 			for (Partida p : partidaList) {
 				Inventario inventario = new Inventario(); //Inicializamos Inventario
 				inventario.setFolioCliente(c.getFolioCliente());
@@ -106,6 +105,7 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer>{
 					//inventario.setUnidad_Manejo(null);
 					break;
 				}
+				inventario.setCliente(c.getCteCve());
 				listaInventario.add(inventario);
 			}
 		}

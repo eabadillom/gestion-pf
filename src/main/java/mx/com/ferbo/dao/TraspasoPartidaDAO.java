@@ -1,15 +1,29 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Camara;
+import mx.com.ferbo.model.Posicion;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TraspasoPartidaDAO extends IBaseDAO<TraspasoPartida, Integer>{
-
+	
+	@SuppressWarnings("unchecked")
+	public List<TraspasoPartida> findall() {
+		EntityManager entity = getEntityManager();
+		List<TraspasoPartida> tp = null;
+		Query sql = entity.createNamedQuery("TraspasoPartida.findAll", TraspasoPartida.class);
+		tp = sql.getResultList();
+		return tp;
+	}
+	
 	@Override
 	public TraspasoPartida buscarPorId(Integer id) {
 		// TODO Auto-generated method stub

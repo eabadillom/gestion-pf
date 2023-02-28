@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "Camara.findAll", query = "SELECT c FROM Camara c"),
     @NamedQuery(name = "Camara.findByCamaraCve", query = "SELECT c FROM Camara c WHERE c.camaraCve = :camaraCve"),
-    //@NamedQuery(name = "Camara.findByPlantaCve", query = "SELECT c.camaraDs FROM Camara c WHERE c.plantaCve = :plantaCve"),
+    @NamedQuery(name = "Camara.findByPlantaCve", query = "SELECT c FROM Camara c WHERE c.plantaCve.plantaCve = :plantaCve"),
     @NamedQuery(name = "Camara.findByCamaraDs", query = "SELECT c FROM Camara c WHERE c.camaraDs = :camaraDs"),
     @NamedQuery(name = "Camara.findByCamaraAbrev", query = "SELECT c FROM Camara c WHERE c.camaraAbrev = :camaraAbrev")})
 public class Camara implements Serializable {
