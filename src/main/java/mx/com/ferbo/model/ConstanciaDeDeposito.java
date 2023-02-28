@@ -37,6 +37,9 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaDeDeposito.findAll", query = "SELECT c FROM ConstanciaDeDeposito c"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByFolio", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.folio = :folio"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByCteCve", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.cteCve.cteCve = :cteCve"),
+    @NamedQuery(name = "ConstanciaDeDeposito.findByCteCveP", query = "SELECT DISTINCT (c) FROM ConstanciaDeDeposito c "
+    		+ "INNER JOIN c.partidaList p "
+    		+ "WHERE c.cteCve.cteCve = :cteCve and p.camaraCve.plantaCve.plantaCve = :plantaCve"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByFechaIngreso", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.fechaIngreso = :fechaIngreso"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByNombreTransportista", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.nombreTransportista = :nombreTransportista"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByPlacasTransporte", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.placasTransporte = :placasTransporte"),

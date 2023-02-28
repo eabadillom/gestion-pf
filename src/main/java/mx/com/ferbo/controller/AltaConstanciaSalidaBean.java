@@ -49,7 +49,7 @@ import mx.com.ferbo.util.conexion;
 @Named
 @ViewScoped
 
-public class AltaDetalleConstanciaSalidaBean implements Serializable{
+public class AltaConstanciaSalidaBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
 	
@@ -95,8 +95,9 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	private Date fechaSalida;
 	private int cantidadTotal;
 	private BigDecimal pesoTotal;
+	private Boolean impresion=false;
 	
-	public AltaDetalleConstanciaSalidaBean() {
+	public AltaConstanciaSalidaBean() {
 		clienteDAO = new ClienteDAO();
 		listadoClientes = new ArrayList<>();
 		
@@ -135,6 +136,8 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		listadoPlantas = plantaDAO.findall();
 		listadoConstanciasSalidas = constanciaSalidaDAO.buscarTodos();
 		listadoPrecioServicios = preciosServicioDAO.buscarTodos();
+		
+		plantaSelect = listadoPlantas.get(0);
 	}
 
 	public List<Cliente> getListadoClientes() {
@@ -423,7 +426,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 								:false)
 								.collect(Collectors.toList());
 		
-		listaInventario = inventarioDAO.buscarPorCliente(getClienteSelect());
+		listaInventario = inventarioDAO.buscarPorCliente(getClienteSelect(),getPlantaSelect());
 		
 	}
 	
@@ -506,7 +509,6 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 				mul = cantidad.multiply(peso);
 				calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);
 				d.setPeso(calculo);
-				//detalleConstanciaSalidas.add(d);
 				listadoTemp.add(d);
 				detalleT = d;
 			}
@@ -578,7 +580,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		 			
 		 			for(DetallePartida dp: detallePartidaLista) {
 		 				
-		 				if(d.getDetallePartida().equals(dp)) {//NO ACTUALIZA AL D EN DETALLEPARTIDA AL REGISTRAR UNO NUEVO DESPUES DE OTRO YA ANTERIORMENTE REGISTRADO
+		 				if(d.getDetallePartida().equals(dp)) {
 		 					int detalleNuevo = dp.getDetallePartidaPK().getDetPartCve() + 1;
 		 					int cantidadRestante;
 		 					BigDecimal pesoRestante;
@@ -619,7 +621,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
  		}
 		
  		constanciaSalidaDAO.guardar(cs); //REGISTRO LA CONTSANCIA SALIDA
-		
+		impresion = true;
  		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"CONSTANCIA DE SALIDA", "Se registro de forma correcta"));
  		PrimeFaces.current().ajax().update("form:messages");
 		
@@ -628,7 +630,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 	public void nuevoRegistro() {
 		
 		clienteSelect = new Cliente();
-		plantaSelect = new Planta();
+		plantaSelect = listadoPlantas.get(0);
 		partidaSelect = new Partida();
 		fechaSalida = new Date();
 		numFolio = "";
@@ -668,6 +670,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
 		try {
+			
 			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
 			URL resourceimg = getClass().getResource(images); 
 			String file = resource.getFile();//retorna la ubicacion del archivo
@@ -682,6 +685,7 @@ public class AltaDetalleConstanciaSalidaBean implements Serializable{
 			parameters.put("NUMERO", numFolio);
 			parameters.put("LogoPath", imgFile.getPath());
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			   
 		} catch (Exception e) {
 			e.printStackTrace();
 			message = String.format("No se pudo imprimir el folio %s", this.numFolio);

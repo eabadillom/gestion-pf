@@ -15,6 +15,7 @@ import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
@@ -45,12 +46,12 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 		return null;
 	}
 
-	public List<Inventario> buscarPorCliente(Cliente cliente) {
+	public List<Inventario> buscarPorCliente(Cliente cliente,Planta planta) {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
 		List<ConstanciaDeDeposito> constancia = new ArrayList<>();
 		List<Inventario> listaInventario = new ArrayList<>();
-		constancia = entity.createNamedQuery("ConstanciaDeDeposito.findByCteCve", ConstanciaDeDeposito.class)
-				.setParameter("cteCve", cliente.getCteCve()).getResultList();
+		constancia = entity.createNamedQuery("ConstanciaDeDeposito.findByCteCveP", ConstanciaDeDeposito.class)
+				.setParameter("cteCve", cliente.getCteCve()).setParameter("plantaCve", planta.getPlantaCve()).getResultList();//trae registros repetidos
 		//System.out.println(constancia);//imprimo para verificar
 		for (ConstanciaDeDeposito c : constancia) {
 			Inventario inventario = new Inventario(); // Inicializamos Inventario
