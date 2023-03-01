@@ -25,21 +25,25 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
-import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
+import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
 import mx.com.ferbo.dao.InventarioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.ConstanciaSalidaServiciosPK;
+import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.DetallePartidaPK;
+import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -85,19 +89,23 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private List<DetallePartida> detallePartidaLista;
 	
 	private DetallePartidaDAO detallePartidaDAO;
-	private DetalleConstanciaSalidaDAO detalleConstanciaSDAO;
 	
 	private List<Inventario> listaInventario;
 	private InventarioDAO inventarioDAO;
+	
+	private ConstanciaDeServicio constanciaDeServicio;
+	private ConstanciaServicioDAO constanciaServicioDAO;
 	
 	private String numFolio,nombreTransportista,placas,observaciones,temperatura;
 	private BigDecimal cantidadServicio;
 	private Date fechaSalida;
 	private int cantidadTotal;
 	private BigDecimal pesoTotal;
-	private Boolean impresion=false;
 	
 	public AltaConstanciaSalidaBean() {
+		constanciaDeServicio = new ConstanciaDeServicio();
+		constanciaServicioDAO = new ConstanciaServicioDAO();
+		
 		clienteDAO = new ClienteDAO();
 		listadoClientes = new ArrayList<>();
 		
@@ -118,10 +126,9 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		listaInventario = new ArrayList<Inventario>();
 		
 		detallePartidaDAO = new DetallePartidaDAO();
-		detalleConstanciaSDAO = new DetalleConstanciaSalidaDAO();
 		
 		listadoConstanciaSalidaServicios = new ArrayList<>();
-		
+
 		listadoPartida = new ArrayList<Partida>();
 		listadoDetalleConstanciaSalida = new ArrayList<>();
 		listadoTemp = new ArrayList<>();
@@ -621,7 +628,57 @@ public class AltaConstanciaSalidaBean implements Serializable{
  		}
 		
  		constanciaSalidaDAO.guardar(cs); //REGISTRO LA CONTSANCIA SALIDA
-		impresion = true;
+ 		
+ 		if(!(cs.getConstanciaSalidaServiciosList().isEmpty())) {
+ 			
+ 			EstadoConstancia estadoConstancia = new EstadoConstancia();
+ 			estadoConstancia.setEdoCve(1);
+ 			estadoConstancia.setDescripcion("NUEVA");
+ 			
+ 			constanciaDeServicio.setCteCve(clienteSelect);
+ 			constanciaDeServicio.setFecha(fechaSalida);
+ 			constanciaDeServicio.setNombreTransportista(nombreTransportista);
+ 			constanciaDeServicio.setPlacasTransporte(placas);
+ 			constanciaDeServicio.setObservaciones(observaciones);
+ 			constanciaDeServicio.setFolioCliente("S"+cs.getNumero());
+ 			constanciaDeServicio.setValorDeclarado(new BigDecimal(1));
+ 			constanciaDeServicio.setStatus(estadoConstancia);
+ 			
+ 			List<ConstanciaServicioDetalle> constanciaServicioDetalles = new ArrayList<ConstanciaServicioDetalle>(); 
+ 			List<PartidaServicio> partidaServicios = new ArrayList<PartidaServicio>(); 
+ 			
+ 			for(ConstanciaSalidaServicios css:listadoConstanciaSalidaServicios) {
+ 				ConstanciaServicioDetalle constanciaServicioDetalle = new ConstanciaServicioDetalle();
+ 				constanciaServicioDetalle.setServicioCve(css.getServicioCve());
+ 				constanciaServicioDetalle.setFolio(constanciaDeServicio);
+ 				constanciaServicioDetalle.setServicioCantidad(css.getNumCantidad());
+ 				constanciaServicioDetalles.add(constanciaServicioDetalle);
+ 			}
+ 			constanciaDeServicio.setConstanciaServicioDetalleList(new ArrayList<>());
+ 			constanciaDeServicio.setConstanciaServicioDetalleList(constanciaServicioDetalles);
+ 			
+ 			for(DetalleConstanciaSalida dcs: listadoTemp) {
+ 				
+ 				PartidaServicio partidaS = new PartidaServicio();
+ 				partidaS.setFolio(constanciaDeServicio);
+ 				partidaS.setCantidadDeCobro(dcs.getPeso());
+ 				partidaS.setCantidadTotal(dcs.getCantidad());
+ 				partidaS.setProductoCve(dcs.getPartidaCve().getUnidadDeProductoCve().getProductoCve());
+ 				partidaS.setUnidadDeManejoCve(dcs.getPartidaCve().getUnidadDeProductoCve().getUnidadDeManejoCve());
+ 				partidaS.setUnidadDeCobro(dcs.getPartidaCve().getUnidadDeProductoCve().getUnidadDeManejoCve());
+ 				partidaServicios.add(partidaS);
+ 			}
+ 			
+ 			constanciaDeServicio.setPartidaServicioList(new ArrayList<>());
+ 			constanciaDeServicio.setPartidaServicioList(partidaServicios);
+ 			
+ 			if(constanciaServicioDAO.guardar(constanciaDeServicio)==null) {
+ 				System.out.println("se guardo correctamente la constancia de servicio");
+ 			}
+ 			
+ 		}
+ 		
+ 		
  		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"CONSTANCIA DE SALIDA", "Se registro de forma correcta"));
  		PrimeFaces.current().ajax().update("form:messages");
 		
@@ -655,7 +712,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 	}
 	
-	public void imprimirTicket(){
+	public void imprimirTicket() throws Exception{
 		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
 		String filename = "ticket.pdf";
