@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Consultar Constancia De Deposito</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Inventarios" />
+				<p:menuitem value="Entradas" />
+				<p:menuitem value="Consultar" outcome="/inventarios/consultarConstanciaDeDeposito" />
+			</p:breadCrumb>
+			
+			<p:growl id="messages" showDetail="true" />
+			
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+				<!-- Por Fechas -->
+					<p:outputLabel value="Por Rango de Fechas:" styleClass="p-mr-2"/>
+					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" 
+					value="#{consultarConstanciaDeDepositoBean.fechaInicial}">
+					</p:datePicker>
+					
+					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" 
+					value="#{consultarConstanciaDeDepositoBean.fechaFinal}">
+					</p:datePicker>
+					
+				<!-- Por Folio -->
+				
+					<p:outputLabel value="Folio:" />
+					<p:inputText value="#{consultarConstanciaDeDepositoBean.folio}" styleClass="p-ml-2 p-mr-4" />
+					
+				<!-- Por Cliente -->
+				
+					<p:outputLabel value="Por Cliente:" />
+					<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.cliente}" styleClass="p-ml-2 p-mr-4">
+						<f:selectItem itemLabel="Seleccione un Cliente" itemValue="" noSelectionOption="true"/>
+						<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" />
+					</p:selectOneMenu>
+					
+					<p:commandButton value="Consultar" icon="pi pi-search" update="@widgetVar(dtconstanciaDD)" actionListener="#{consultarConstanciaDeDepositoBean.buscarConstanciaDD}"/>
+			
+					</div>
+				</div>
+			</div>
+			
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+			
+					<p:dataTable id="dt-constanciaDeDeposito" widgetVar="dtconstanciaDD" value="#{consultarConstanciaDeDepositoBean.listadoConstanciaDeDepositos}" 
+								rowKey="#{constanciaDD.folio}"	var="constanciaDD">
+						<p:column headerText="Folio">
+							<h:outputText value="#{constanciaDD.folio}" />
+						</p:column>
+						
+						<p:column headerText="Cliente">
+							<h:outputText value="#{constanciaDD.cteCve.cteNombre}" />
+						</p:column>
+						
+						<p:column headerText="Fecha De Ingreso">
+							<h:outputText value="#{constanciaDD.fechaIngreso}" />
+						</p:column>
+						
+						<p:column>
+							<p:commandButton value="Ver Detalle" icon="pi pi-search" oncomplete="PF('dlgProductos').show()" update="form:dlg-constancia" >
+								<f:setPropertyActionListener value="#{constanciaDD}" target="#{consultarConstanciaDeDepositoBean.selectConstanciaDD}"></f:setPropertyActionListener>
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+			
+					</div>
+				</div>
+			</div>
+			
+			<p:dialog widgetVar="dlgProductos" header="Productos" responsive="true" resizable="true" style="max-width:80em !important;" modal="true">
+				<p:outputPanel id="dlg-constancia" class="ui-fluid"> 
+					<p:outputPanel rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD}">
+						<div class="p-grid">
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel for="@next" value="Aviso:" />
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.avisoCve.avisoObservaciones}"/>
+							</div>
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Fecha Ingreso:"/>
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.fechaIngreso}" disabled="true" styleClass="p-ml-2 p-mr-4"/>
+							</div>
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Folio:" />
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.folio}" disabled="true" styleClass="p-ml-2"/>
+							</div>
+						</div>
+						
+						<div class="p-grid">
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 31em">
+								<p:outputLabel value="Cliente:" />
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.cteCve.cteNombre}" />
+							</div>
+						</div>
+						
+						<p:dataTable value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}"
+									rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList}">
+							<f:facet name="header">
+								<div>
+									<span style="font-size: 10px" >Mercancia</span>
+								</div>							
+							</f:facet>
+							
+							<p:column headerText="# de Tarimas">
+								<h:outputText value="#{partida.noTarimas}" />
+							</p:column> 
+							<!--  
+							<p:column headerText="Piezas Por Tarima">
+								<h:outputText value="" />
+							</p:column> -->
+							
+							<p:column headerText="Unidades">
+								<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
+							</p:column> 
+							
+							<p:column headerText="Producto" >
+								<h:outputText value="#{partida.unidadDeProductoCve.productoCve.numeroProd} | #{partida.unidadDeProductoCve.productoCve.productoDs}" />
+							</p:column> 
+						
+						</p:dataTable> 
+						
+					</p:outputPanel>
+				</p:outputPanel>
+			</p:dialog>
+			
+			
+		</h:form>
+	</ui:define>
+</ui:composition>
+	
