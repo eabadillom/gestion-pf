@@ -2,8 +2,11 @@ package mx.com.ferbo.dao;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaSalida;
+import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
@@ -15,8 +18,11 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
 	@Override
 	public List<ConstanciaSalida> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<ConstanciaSalida> lista = null;
+		lista = em.createNamedQuery("ConstanciaSalida.findAll",ConstanciaSalida.class).getResultList();
+		
+		return lista;
 	}
 
 	@Override
@@ -32,8 +38,19 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	}
 
 	@Override
-	public String guardar(ConstanciaSalida e) {
+	public String guardar(ConstanciaSalida constanciaSalida) {
 		// TODO Auto-generated method stub
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(constanciaSalida);//guarda el servicio dado (NO es gestionado)
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
+		
 		return null;
 	}
 
