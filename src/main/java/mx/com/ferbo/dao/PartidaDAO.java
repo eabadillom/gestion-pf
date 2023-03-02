@@ -3,6 +3,7 @@ package mx.com.ferbo.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -23,9 +24,10 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 	}
 	
 	@Override
-	public Partida buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Partida buscarPorId(Integer partidaClave) {
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		Partida p = em.createNamedQuery("Partida.findByPartidaCve", Partida.class).setParameter("partidaCve", partidaClave).getSingleResult();
+		return p;
 	}
 
 	@Override

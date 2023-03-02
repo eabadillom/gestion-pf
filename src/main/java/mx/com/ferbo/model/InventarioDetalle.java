@@ -14,15 +14,15 @@ public class InventarioDetalle extends Inventario {
 	private List<Posicion> listaposicion;
 	private Planta plantaDestino;
 	private Camara camaraDestino;
-	private Posicion posicionDestPosicion;
+	private Posicion posicionDestino;
 
-	public Posicion getPosicionDestPosicion() {
-		return posicionDestPosicion;
+	public Posicion getPosicionDestino() {
+		return posicionDestino;
 	}
 
 
-	public void setPosicionDestPosicion(Posicion posicionDestPosicion) {
-		this.posicionDestPosicion = posicionDestPosicion;
+	public void setPosicionDestino(Posicion posicionDestino) {
+		this.posicionDestino = posicionDestino;
 	}
 
 

@@ -7,8 +7,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
@@ -30,29 +27,28 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
+import mx.com.ferbo.dao.ConstanciaTraspasoDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.InventarioDAO;
 import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PartidaServicioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PosicionCamaraDAO;
+import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.TraspasoPartidaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
-import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.dao.UnidadDeProductoDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
-import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.Inventario;
-import mx.com.ferbo.model.InventarioDetalle;
 import mx.com.ferbo.model.InventarioDetalle;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
@@ -64,6 +60,7 @@ import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.model.TraspasoServicio;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -79,7 +76,7 @@ public class AltaTraspasoBean implements Serializable {
 
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;
-	private List<ConstanciaServicioDetalle> alServiciosDetalle;
+	private List<TraspasoServicio> alServiciosDetalle;
 	private List<PrecioServicio> alServicios;
 	private List<ProductoPorCliente> alProductosFiltered;
 	private List<UnidadDeManejo> alUnidades;
@@ -88,7 +85,7 @@ public class AltaTraspasoBean implements Serializable {
 	private List<Partida> partida;
 	private List<DetallePartida> ldpartida;
 	private List<InventarioDetalle> inventario;
-	//private List<Inventario> inventario;
+	private List<InventarioDetalle> destino;
 	private List<Planta> listaplanta;
 	private List<Camara> listacamara;
 	private List<Posicion> listaposicion;
@@ -119,6 +116,7 @@ public class AltaTraspasoBean implements Serializable {
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
 	private TraspasoPartida tp;
+	
 	private UnidadDeManejoDAO udmDAO;
 	private ConstanciaServicioDAO csDAO;
 	private EstadoConstanciaDAO edoDAO;
@@ -130,6 +128,10 @@ public class AltaTraspasoBean implements Serializable {
 	private CamaraDAO camaraDAO;
 	private PosicionCamaraDAO posicionDAO;
 	private TraspasoPartidaDAO tpDAO;
+	private ConstanciaTraspasoDAO constanciaTDAO;
+	private UnidadDeProductoDAO udpDAO;
+	private ProductoDAO prDAO;
+	
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
@@ -144,19 +146,23 @@ public class AltaTraspasoBean implements Serializable {
 		inventarioDAO = new InventarioDAO();
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
+		constanciaTDAO = new ConstanciaTraspasoDAO();
 		posicionDAO = new PosicionCamaraDAO();
 		tpDAO = new TraspasoPartidaDAO();
+		udpDAO = new UnidadDeProductoDAO();
+		prDAO = new ProductoDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
 		inventario = new ArrayList<InventarioDetalle>();
 		//inventario = new ArrayList<Inventario>();
-		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
+		alServiciosDetalle = new ArrayList<TraspasoServicio>();
 		alServicios = new ArrayList<PrecioServicio>();
 		alUnidades = new ArrayList<UnidadDeManejo>();
 		alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		listaconstanciadepo = new ArrayList<ConstanciaDeDeposito>();
 		listaTraspasoPartida = new ArrayList<TraspasoPartida>();
+		destino = new ArrayList<InventarioDetalle>();
 		selCliente = new Cliente();
 		alPartidas = partidaservicioDAO.findall();
 		clientes = clienteDAO.findall();
@@ -189,9 +195,8 @@ public class AltaTraspasoBean implements Serializable {
 		Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
 		List<PrecioServicio> precioServicioList = null;
 		//selCliente = clienteDAO.buscarPorId(idCliente);
-		Cliente buscarPorId = clienteDAO.buscarPorId(idCliente);
-		//inventario = inventarioDAO.buscarPorCliente(selCliente);
-		List<Inventario> inventario_antes = inventarioDAO.buscarPorCliente(buscarPorId);
+		this.selCliente = clienteDAO.buscarPorId(idCliente);
+		List<Inventario> inventario_antes = inventarioDAO.buscarPorCliente(selCliente);
 	try {
 			for( Inventario i : inventario_antes) {
 				InventarioDetalle invdet = new InventarioDetalle(i);
@@ -201,7 +206,6 @@ public class AltaTraspasoBean implements Serializable {
 				inventario.add(invdet);
 			}
 			log.info("Entrando a filtrar cliente...");
-			// selCliente = clientes.stream()
 			manager = EntityManagerUtil.getEntityManager();
 			cliente = manager.createNamedQuery("Cliente.findByCteCve", Cliente.class)
 					.setParameter("cteCve", this.idCliente).getSingleResult();
@@ -250,22 +254,18 @@ public class AltaTraspasoBean implements Serializable {
 			System.out.println(this.selectedInventario);
 			TraspasoPartida traspasoP = new TraspasoPartida();
 			Inventario inventario = new Inventario();
+			
 			if(tp != null) {
-				traspasoP.setCantidad(cantidad);
+				traspasoP.setCantidad(this.selectedInventario.getCantidad());
 				traspasoP.setDescripcion(this.selectedInventario.getProducto().getProductoDs());
 				traspasoP.setOrigen(this.selectedInventario.getPlanta().getPlantaDs() + " " + this.selectedInventario.getCamara().getCamaraDs());
-				traspasoP.setDestino(camarad);
-				inventario.setFolioCliente(this.selectedInventario.getFolioCliente());
-				inventario.setPeso(peso);
+				traspasoP.setDestino(this.selectedInventario.getPlantaDestino().getPlantaDs() + " " + this.selectedInventario.getCamaraDestino().getCamaraDs());
 				inventario.setProducto(this.selectedInventario.getProducto());
-				//inventario.setCamara(this.selectedInventario.getCamara().getCamaraDs());
-				inventario.setCamarad(this.selectedInventario.getCamarad());
-				inventario.setPosicion(this.selectedInventario.getPosicion());
-				inventario.setPosiciond(this.selectedInventario.getPosiciond());
+				inventario.setCamara(this.selectedInventario.getCamara());
 				
 				
 				
-				
+				destino.add(selectedInventario);
 				listaTraspasoPartida.add(tp);
 				tp = new TraspasoPartida();
 			}
@@ -277,7 +277,7 @@ public class AltaTraspasoBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		PrecioServicio precioServicio = null;
-		ConstanciaServicioDetalle servicio = null;
+		TraspasoServicio servicio = null;
 
 		try {
 			if (this.idCliente == null || this.idCliente == 0)
@@ -292,11 +292,13 @@ public class AltaTraspasoBean implements Serializable {
 			precioServicio = this.alServicios.stream().filter(ps -> this.idPrecioServicio.equals(ps.getId()))
 					.collect(Collectors.toList()).get(0);
 			if (alServiciosDetalle == null)
-				alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
+				alServiciosDetalle = new ArrayList<TraspasoServicio>();
 
-			servicio = new ConstanciaServicioDetalle();
-			servicio.setServicioCantidad(this.cantidadServicio);
-			servicio.setServicioCve(precioServicio.getServicio());
+			servicio = new TraspasoServicio();
+			servicio.setCantidad(this.cantidadServicio);
+			servicio.setServicio(precioServicio.getServicio().getServicioDs());
+			servicio.setPrecio(precioServicio.getPrecio());
+			servicio.setSubtotal(precioServicio.getPrecio());
 			alServiciosDetalle.add(servicio);
 			message = "Producto agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
@@ -321,52 +323,64 @@ public class AltaTraspasoBean implements Serializable {
 	}
 	public void camaraselect() {
 			Camara camD = this.selectedInventario.getCamaraDestino();
-			List<Posicion> listaposD = posicionDAO.buscarPorCamara(camD);
-			selectedInventario.setListaposicion(listaposD);
+			List<Posicion> listaposicionDestino = posicionDAO.buscarPorCamara(camD);
+			selectedInventario.setListaposicion(listaposicionDestino);
 		}
-	public void posicionselect() {
-//		Posicion pos = this.selectedInventario.getPosicionDestPosicion();
-		
-	}
+
 	public synchronized void guardar() {
 		String message = null;
 		Severity severity = null;
-		ConstanciaDeServicio constancia = null;
-		List<ConstanciaDeServicio> alConstancias = null;
+		ConstanciaTraspaso constancia = null;
+		List<ConstanciaTraspaso> alConstancias = null;
 		EstadoConstancia estado = null;
 		
 		try {
+			
 			if (this.isSaved)
 				throw new InventarioException("La constancia ya se encuentra registrada.");
 
 			if (this.numero == null || "".equalsIgnoreCase(this.numero.trim()))
 				throw new InventarioException("Debe indicar el folio de la constancia.");
 
-			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
-				throw new InventarioException("Debe seleccionar al menos un servicio");
+			if (this.destino == null || this.destino.size() == 0)
+				throw new InventarioException("Debe traspasar almenos un producto");
 
-			alConstancias = csDAO.buscarPorFolioCliente(this.numero);
+			alConstancias = constanciaTDAO.buscarporNumero(this.numero);
 
 			if (alConstancias != null && alConstancias.size() > 0)
 				throw new InventarioException(String.format("El folio %s ya se encuentra registrado.", this.numero));
 
 			estado = estados.stream().filter(e -> e.getEdoCve() == 1).collect(Collectors.toList()).get(0);
-			constancia = new ConstanciaDeServicio();
+			constancia = new ConstanciaTraspaso();
 			constancia.setFecha(this.fecha);
-			constancia.setFolioCliente(this.numero);
-			constancia.setCteCve(this.selCliente);
-			constancia.setObservaciones(this.observaciones);
-			constancia.setValorDeclarado(this.valorDeclarado);
-			constancia.setPartidaServicioList(this.alPartidas);
-			constancia.setConstanciaServicioDetalleList(this.alServiciosDetalle);
-			constancia.setStatus(estado);
-			for (PartidaServicio partida : this.alPartidas) {
-				partida.setFolio(constancia);
+			constancia.setNumero(this.numero);
+			constancia.setCliente(this.selCliente);
+			constancia.setObservacion(this.observaciones);
+			constancia.setNombreCliente(this.selCliente.getCteNombre());
+			List<TraspasoPartida> listaTraspasoPartida = new ArrayList<TraspasoPartida>();
+			
+			for(InventarioDetalle i : destino ) {
+				System.out.println(i);
+				TraspasoPartida partida = new TraspasoPartida();
+				partida.setTraspaso(constancia);
+				partida.setConstancia(i.getFolioCliente());
+				Partida p = partidaDAO.buscarPorId(i.getPartidaCve());
+				partida.setPartida(p);
+				UnidadDeProducto udp = p.getUnidadDeProductoCve();
+				Producto pr = udp.getProductoCve();
+				partida.setDescripcion(pr.getProductoDs());
+				partida.setCantidad(i.getCantidad());
+				partida.setOrigen(i.getCamara().getCamaraDs());
+				partida.setDestino(i.getCamaraDestino().getCamaraDs());
+				p.setCamaraCve(i.getCamaraDestino());
+				listaTraspasoPartida.add(partida);
+				
 			}
-			for (ConstanciaServicioDetalle servicio : this.alServiciosDetalle) {
-				servicio.setFolio(constancia);
+			for(TraspasoServicio servicio : alServiciosDetalle) {
+				servicio.setTraspaso(constancia);
 			}
-			csDAO.actualizar(constancia);
+			constancia.setTraspasoServicioList(alServiciosDetalle);
+			constanciaTDAO.actualizar(constancia);
 			this.isSaved = true;
 			this.habilitareporte = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.numero);
@@ -383,7 +397,7 @@ public class AltaTraspasoBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar servicio", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-altaTraspaso");
 		}
 	}
 
@@ -393,13 +407,13 @@ public class AltaTraspasoBean implements Serializable {
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
-		ConstanciaDeServicio constancia = null;
-		List<ConstanciaDeServicio> alConstancias = null;
-		alConstancias = csDAO.buscarPorFolioCliente(this.numero);
+		ConstanciaTraspaso constancia = null;
+		List<ConstanciaTraspaso> alConstancias = null;
+		alConstancias = constanciaTDAO.buscarporNumero(this.numero);
 		File reportFile = new File(jasperPath);
 		File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		ConstanciaDeServicio cds = new ConstanciaDeServicio();
+		ConstanciaTraspaso cds = new ConstanciaTraspaso();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
@@ -414,8 +428,8 @@ public class AltaTraspasoBean implements Serializable {
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
-			constancia = new ConstanciaDeServicio();
-			constancia.setFolioCliente(this.numero);
+			constancia = new ConstanciaTraspaso();
+			constancia.setNumero(this.numero);
 			numero = String.valueOf(getNumero());
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
@@ -451,6 +465,10 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void deletePartida(PartidaServicio partida) {
 		this.alPartidas.remove(partida);
+	}
+	
+	public void deleteTraspaso(Inventario inventario) {
+		this.inventario.remove(inventario);
 	}
 
 	public void deleteServicio(ConstanciaServicioDetalle servicio) {
@@ -585,11 +603,11 @@ public class AltaTraspasoBean implements Serializable {
 		this.alPartidas = alPartidas;
 	}
 
-	public List<ConstanciaServicioDetalle> getAlServiciosDetalle() {
+	public List<TraspasoServicio> getAlServiciosDetalle() {
 		return alServiciosDetalle;
 	}
 
-	public void setAlServiciosDetalle(List<ConstanciaServicioDetalle> alServiciosDetalle) {
+	public void setAlServiciosDetalle(List<TraspasoServicio> alServiciosDetalle) {
 		this.alServiciosDetalle = alServiciosDetalle;
 	}
 
@@ -759,6 +777,14 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void setTp(TraspasoPartida tp) {
 		this.tp = tp;
+	}
+
+	public List<InventarioDetalle> getDestino() {
+		return destino;
+	}
+
+	public void setDestino(List<InventarioDetalle> destino) {
+		this.destino = destino;
 	}
 
 	

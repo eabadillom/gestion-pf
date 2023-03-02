@@ -47,13 +47,11 @@ public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Posicion> buscarPorCamara(Camara c) {
 	List<Posicion> listaP = null;
 	EntityManager em = EntityManagerUtil.getEntityManager();
-	Query qr = entity.createNamedQuery("SELECT * FROM posicion where id_camara = :idCamara ")
-			.setParameter("id_camara", c.getCamaraCve());
-	listaP = qr.getResultList();
+	listaP = em.createNamedQuery("Posicion.findByCamara", Posicion.class)
+			.setParameter("camaraCve", c.getCamaraCve()).getResultList();
 	return listaP;
 	
 	}

@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Posicion.findAll", query = "SELECT p FROM Posicion p"),
     @NamedQuery(name = "Posicion.findByIdPosicion", query = "SELECT p FROM Posicion p WHERE p.idPosicion = :idPosicion"),
 //    @NamedQuery(name = "Posicion.findByIdPlanta", query = "SELECT p FROM Posicion p WHERE p.idPlanta = :idPlanta"),
-    @NamedQuery(name = "Posicion.findByCamara", query = "SELECT p FROM Posicion p WHERE p.camara = :camara"),
+    @NamedQuery(name = "Posicion.findByCamara", query = "SELECT p FROM Posicion p WHERE p.camara.camaraCve = :camaraCve"),
     @NamedQuery(name = "Posicion.findByCodPosicion", query = "SELECT p FROM Posicion p WHERE p.codPosicion = :codPosicion"),
     @NamedQuery(name = "Posicion.findByDescPosicion", query = "SELECT p FROM Posicion p WHERE p.descPosicion = :descPosicion"),
     @NamedQuery(name = "Posicion.findByTempIni", query = "SELECT p FROM Posicion p WHERE p.tempIni = :tempIni"),
