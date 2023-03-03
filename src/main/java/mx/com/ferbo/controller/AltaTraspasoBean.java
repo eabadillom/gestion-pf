@@ -52,6 +52,7 @@ import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.InventarioDetalle;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
+import mx.com.ferbo.model.PartidasAfectadas;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Posicion;
 import mx.com.ferbo.model.PrecioServicio;
@@ -108,17 +109,13 @@ public class AltaTraspasoBean implements Serializable {
 	private InventarioDetalle selectedInventario;
 	private Integer planta;
 	private Integer camara;
-	private String camarad;
-	private String posicion;
 	private Cliente selCliente;
-	private Posicion posicionSelect;
 	private ConstanciaDeDeposito ctecve;
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
 	private TraspasoPartida tp;
 	
 	private UnidadDeManejoDAO udmDAO;
-	private ConstanciaServicioDAO csDAO;
 	private EstadoConstanciaDAO edoDAO;
 	private ClienteDAO clienteDAO;
 	private PartidaServicioDAO partidaservicioDAO;
@@ -140,7 +137,6 @@ public class AltaTraspasoBean implements Serializable {
 		partidaservicioDAO = new PartidaServicioDAO();
 		clienteDAO = new ClienteDAO();
 		udmDAO = new UnidadDeManejoDAO();
-		csDAO = new ConstanciaServicioDAO();
 		edoDAO = new EstadoConstanciaDAO();
 		partidaDAO = new PartidaDAO();
 		inventarioDAO = new InventarioDAO();
@@ -155,7 +151,6 @@ public class AltaTraspasoBean implements Serializable {
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
 		inventario = new ArrayList<InventarioDetalle>();
-		//inventario = new ArrayList<Inventario>();
 		alServiciosDetalle = new ArrayList<TraspasoServicio>();
 		alServicios = new ArrayList<PrecioServicio>();
 		alUnidades = new ArrayList<UnidadDeManejo>();
@@ -258,13 +253,10 @@ public class AltaTraspasoBean implements Serializable {
 			if(tp != null) {
 				traspasoP.setCantidad(this.selectedInventario.getCantidad());
 				traspasoP.setDescripcion(this.selectedInventario.getProducto().getProductoDs());
-				traspasoP.setOrigen(this.selectedInventario.getPlanta().getPlantaDs() + " " + this.selectedInventario.getCamara().getCamaraDs());
+				traspasoP.setOrigen(this.selectedInventario.getPlanta().getPlantaDs() + " " + this.selectedInventario.getCamara().getCamaraDs());		
 				traspasoP.setDestino(this.selectedInventario.getPlantaDestino().getPlantaDs() + " " + this.selectedInventario.getCamaraDestino().getCamaraDs());
 				inventario.setProducto(this.selectedInventario.getProducto());
 				inventario.setCamara(this.selectedInventario.getCamara());
-				
-				
-				
 				destino.add(selectedInventario);
 				listaTraspasoPartida.add(tp);
 				tp = new TraspasoPartida();
@@ -358,6 +350,8 @@ public class AltaTraspasoBean implements Serializable {
 			constancia.setObservacion(this.observaciones);
 			constancia.setNombreCliente(this.selCliente.getCteNombre());
 			List<TraspasoPartida> listaTraspasoPartida = new ArrayList<TraspasoPartida>();
+			List<PartidasAfectadas> listaPartidasAfectadas = new ArrayList<PartidasAfectadas>();
+
 			
 			for(InventarioDetalle i : destino ) {
 				System.out.println(i);
@@ -374,13 +368,18 @@ public class AltaTraspasoBean implements Serializable {
 				partida.setDestino(i.getCamaraDestino().getCamaraDs());
 				p.setCamaraCve(i.getCamaraDestino());
 				listaTraspasoPartida.add(partida);
-				
+				PartidasAfectadas pa = new PartidasAfectadas();
+				pa.setPartidatraspaso(partida);
+				pa.setPartida(p);
+				listaPartidasAfectadas.add(pa);
 			}
 			for(TraspasoServicio servicio : alServiciosDetalle) {
 				servicio.setTraspaso(constancia);
 			}
 			constancia.setTraspasoServicioList(alServiciosDetalle);
+			constancia.setTraspasoPartidaList(listaTraspasoPartida);
 			constanciaTDAO.actualizar(constancia);
+			//////
 			this.isSaved = true;
 			this.habilitareporte = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.numero);
@@ -755,21 +754,6 @@ public class AltaTraspasoBean implements Serializable {
 		this.camara = camara;
 	}
 
-	public String getPosicion() {
-		return posicion;
-	}
-
-	public void setPosicion(String posicion) {
-		this.posicion = posicion;
-	}
-
-	public String getCamarad() {
-		return camarad;
-	}
-
-	public void setCamarad(String camarad) {
-		this.camarad = camarad;
-	}
 
 	public TraspasoPartida getTp() {
 		return tp;

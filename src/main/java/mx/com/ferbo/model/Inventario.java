@@ -22,7 +22,6 @@ public class Inventario {
 	protected Camara camara;
 	protected Integer camarad;
 	protected Posicion posicion;
-	protected Integer posiciond;
 	protected Integer partidaCve;
 	protected BigDecimal peso;
 	protected String inventarioCve;
@@ -65,7 +64,6 @@ public class Inventario {
 		this.camara = camara;
 		this.camarad = camarad;
 		this.posicion = posicion;
-		this.posiciond = posiciond;
 		this.partidaCve = partidaCve;
 		this.peso = peso;
 		this.inventarioCve = inventarioCve;
@@ -274,13 +272,6 @@ public class Inventario {
 		this.cliente = cliente;
 	}
 
-	public Integer getPosiciond() {
-		return posiciond;
-	}
-
-	public void setPosiciond(Integer posiciond) {
-		this.posiciond = posiciond;
-	}
 
 	public Integer getPlantad() {
 		return plantad;
@@ -319,7 +310,7 @@ public class Inventario {
 		return "Inventario [folio=" + folio + ", producto=" + producto + ", cliente=" + cliente + ", cantidad="
 				+ cantidad + ", unidadManejo=" + unidadManejo + ", planta=" + planta + ", plantad=" + plantad
 				+ ", caducidad=" + caducidad + ", codigo=" + codigo + ", lote=" + lote + ", sap=" + sap + ", camara="
-				+ camara + ", camarad=" + camarad + ", posicion=" + posicion + ", posiciond=" + posiciond
+				+ camara + ", camarad=" + camarad + ", posicion=" + posicion
 				+ ", partidaCve=" + partidaCve + ", peso=" + peso + ", inventarioCve=" + inventarioCve + ", detalleAnt="
 				+ detalleAnt + ", detallePartidaAnterior=" + detallePartidaAnterior + ", detallePadre=" + detallePadre
 				+ ", detallePartidaPadre=" + detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento="

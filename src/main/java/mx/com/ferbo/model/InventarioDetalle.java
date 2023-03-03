@@ -82,7 +82,6 @@ public class InventarioDetalle extends Inventario {
 		this.camara = inventario.getCamara();
 		this.camarad = inventario.getCamarad();
 		this.posicion = inventario.getPosicion();
-		this.posiciond = inventario.getPosiciond();
 		this.partidaCve = inventario.getPartidaCve();
 		this.peso = inventario.getPeso();
 		this.inventarioCve = inventario.getInventarioCve();

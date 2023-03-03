@@ -144,11 +144,7 @@
                 </div>
                 </p:panel>
                 
-				<p:panel id="Descripcion">
-					<div class="field col-12 md:col-4">
-						<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaTraspasoBean.observaciones}" placeholder="Descripcion corta.." style="width: 30em;"/>
-					</div>
-				</p:panel>
+				
                 					</p:panelGrid>
 						            </div>
 						        </div>
@@ -169,24 +165,19 @@
 			
             <p:dataTable id="destino" var="partida" value="#{altaTraspasoBean.destino}" reflow="true" rowKey="#{altaTraspasoBean.selectedInventario}"  scrollable="true" scrollHeight="9em" scrollRows="4" >
 				   <p:column style="width:32px;text-align: center"><p:commandButton styleClass="ui-button-flat" type="button" icon="pi pi-search" onclick="PF('dlg1').show()"/></p:column>
-				<p:column headerText="Folio" width="8em"><h:outputText value="#{partida.folioCliente}"/></p:column>
-				<p:column headerText="En existencia" width="10em"><h:outputText value="#{partida.cantidad}" /></p:column>
-				<p:column headerText="Unidad de Manejo" width="8em"><h:outputText value="#{partida.unidadManejo.unidadDeManejoDs}"/></p:column>
-				<p:column headerText="Kilos" width="10em"><h:outputText value="#{partida.peso}"/></p:column>
+				<!--<p:column headerText="Folio" width="8em"><h:outputText value="#{partida.folioCliente}"/></p:column>-->
+				<!--  <p:column headerText="En existencia" width="10em"><h:outputText value="#{partida.cantidad}" /></p:column>-->
+				<!--  <p:column headerText="Unidad de Manejo" width="8em"><h:outputText value="#{partida.unidadManejo.unidadDeManejoDs}"/></p:column>-->
+				<!--  <p:column headerText="Kilos" width="10em"><h:outputText value="#{partida.peso}"/></p:column>-->
 				<p:column headerText="Producto" width="8em"><h:outputText value="#{partida.producto.productoDs}"/></p:column>
 				<p:column headerText="Camara Origen" width="10em"><h:outputText value="#{partida.camara.camaraDs}"/></p:column>
 				<p:column headerText="Camara destinada" width="10em"><h:outputText value="#{partida.camara.camaraDs}"/></p:column>
 				<p:column headerText="Planta origen" width="8em"><h:outputText value="#{partida.planta.plantaDs}"/></p:column>
 				<p:column headerText="Planta destinada" width="10em"><h:outputText value="#{partida.planta.plantaDs}"/></p:column>
-				<p:column headerText="Posicion Origen" width="10em"><h:outputText value="#{partida.posicion.idPosicion}"/></p:column>
-				<p:column headerText="Posicion destinada" width="10em"><h:outputText value="#{partida.posicion.posicionDestino.descPosicion}"/></p:column>
+				<p:column headerText="Posicion Origen" width="10em"><h:outputText value="#{partida.idPosicion}"/></p:column>
+				<p:column headerText="Posicion destinada" width="10em"><h:outputText value="#{partida.posicionDestino}"/></p:column>
 				<p:fieldset legend="Header" toggleable="true" toggleSpeed="500">
             <p:ajax event="toggle" listener="#{fieldsetView.handleToggle}"/>
-            <p class="m-0">
-                <p:column headerText="Planta destinada" width="10em"><h:outputText value="#{partida.planta.plantaDs}"/></p:column>
-				<p:column headerText="Posicion Origen" width="10em"><h:outputText value="#{partida.posicion.idPosicion}"/></p:column>
-				<p:column headerText="Posicion destinada" width="10em"><h:outputText value="#{partida.posicion.posicionDestino.descPosicion}"/></p:column>
-            </p>
         </p:fieldset>
 				<p:column width="8em">
 				<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altatraspasoBean.deletePartida(partida)}" update="destino" />
@@ -225,6 +216,12 @@
 					<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deleteServicio(servicio)}" update="dtServicios"/>
 				</p:column>
 			</p:dataTable>
+			
+			<p:panel id="Descripcion">
+					<div class="field col-12 md:col-4">
+						<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaTraspasoBean.observaciones}" placeholder="Descripcion corta.." style="width: 30em;"/>
+					</div>
+				</p:panel>
 		</p:fieldset>				
 		
 		<div>
