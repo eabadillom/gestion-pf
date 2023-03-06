@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -19,13 +20,17 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
+import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
+import mx.com.ferbo.dao.UnidadDeProductoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 @Named
@@ -36,6 +41,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private Date fechaInicial;
 	private Date fechaFinal;
+	private Date fechaCaducidad;
+	
 	private String folio;
 	private BigDecimal piezasTarima;
 	
@@ -53,6 +60,15 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private List<ConstanciaDeDeposito> listadoConstanciaDeDepositos;
 	private ConstanciaDeDeposito selectConstanciaDD;
 	
+	private UnidadDeProductoDAO unidadDeProductoDAO;
+	
+	private List<PrecioServicio> listadoPrecioServicio;
+	private PrecioServicio precioServicio;
+	private PrecioServicioDAO precioServicioDAO;
+	
+	
+	private String otro,pedimento,contenedor,lote,tarima;
+	
 	public ConsultarConstanciaDeDepositoBean() {
 		
 		constanciaDeDepositoDAO = new ConstanciaDeDepositoDAO();
@@ -63,16 +79,22 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		listadoProductoPorCliente = new ArrayList<>();
 		pdtoPorCliDAO = new ProductoClienteDAO();
+		
+		unidadDeProductoDAO = new UnidadDeProductoDAO();
+		
+		listadoPrecioServicio = new ArrayList<PrecioServicio>();
+		precioServicioDAO = new PrecioServicioDAO();
 	}
 
 	@PostConstruct
 	public void init() {
 		
 		listadoClientes = clienteDAO.buscarTodos();
-		
+		listadoPrecioServicio = precioServicioDAO.buscarTodos();
 		
 		fechaInicial = new Date();
 		fechaFinal = new Date();
+		fechaCaducidad = new Date();
 		folio = "";
 		
 		
@@ -176,6 +198,54 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	public void setPartidaSelect(Partida partidaSelect) {
 		this.partidaSelect = partidaSelect;
 	}
+	
+	public Date getFechaCaducidad() {
+		return fechaCaducidad;
+	}
+
+	public void setFechaCaducidad(Date fechaCaducidad) {
+		this.fechaCaducidad = fechaCaducidad;
+	}
+
+	public String getOtro() {
+		return otro;
+	}
+
+	public void setOtro(String otro) {
+		this.otro = otro;
+	}
+
+	public String getPedimento() {
+		return pedimento;
+	}
+
+	public void setPedimento(String pedimento) {
+		this.pedimento = pedimento;
+	}
+
+	public String getContenedor() {
+		return contenedor;
+	}
+
+	public void setContenedor(String contenedor) {
+		this.contenedor = contenedor;
+	}
+
+	public String getLote() {
+		return lote;
+	}
+
+	public void setLote(String lote) {
+		this.lote = lote;
+	}
+
+	public String getTarima() {
+		return tarima;
+	}
+
+	public void setTarima(String tarima) {
+		this.tarima = tarima;
+	}
 
 	public void buscarConstanciaDD() {
 		
@@ -206,6 +276,15 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		productoPorCliente.setCteCve(cliente);
 		listadoProductoPorCliente = pdtoPorCliDAO.buscarPorCriterios(productoPorCliente);
 		
+		//Servicios Por Cliente
+		/*listaServicioUnidad.clear();
+		PrecioServicio precioServicio = new PrecioServicio();
+		precioServicio.setCliente(cliente);
+		listaServicioUnidad = listadoPrecioServicio.stream()
+								.filter(ps -> clienteSelect != null
+								?(ps.getCliente().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
+								:false)
+								.collect(Collectors.toList());*/
 		
 	
 	}
@@ -224,11 +303,18 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	public void updateConstanciaDD() {
 		
-		if(constanciaDeDepositoDAO.actualizar(selectConstanciaDD) == null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Constancia De Deposito Actualizada"));
+		
+		
+		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
+		unidadDeProducto = partidaSelect.getUnidadDeProductoCve();
+		unidadDeProducto.setProductoCve(productoSelect);
+		
+		if(unidadDeProductoDAO.actualizar(unidadDeProducto) == null && constanciaDeDepositoDAO.actualizar(selectConstanciaDD)==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Partida Actualizada"));
 		}
 		
-		PrimeFaces.current().ajax().update("form:messages");
+		
+		PrimeFaces.current().ajax().update("form:messages","form:dt-partida");
 	}
 	
 	public void updateDetallePartida() {
@@ -238,13 +324,25 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		List<DetallePartida> listadoDetallePartida = partidaSelect.getDetallePartidaList();
 		int size = listadoDetallePartida.size();
 		
+		DetallePartida detallePartida = listadoDetallePartida.get(size - 1);//obtengo el ultimo detalle de la Partidas
 		
+		detallePartida.setDtpPO(otro);//otro
+		detallePartida.setDtpPedimento(pedimento);
+		detallePartida.setDtpSAP(contenedor);//contenedor
+		detallePartida.setDtpLote(lote);
+		detallePartida.setDtpCaducidad(fechaCaducidad);
+		//detallePartida.setDtpPO(null);//otro
+		//detallePartida.setDtpTarimas(tarima);//duda ¿?
 		
-		System.out.println();
+		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Detalle de Partida Actualizada"));
+		}
 		
-		System.out.println();
+		PrimeFaces.current().ajax().update("form:messages");
 		
 	}
+	
+	
 	
 
 }
