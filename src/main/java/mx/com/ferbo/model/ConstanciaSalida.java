@@ -69,8 +69,18 @@ public class ConstanciaSalida implements Serializable {
     @Size(max = 75)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
+    @NotNull
+    @Size(max = 100)
+    @Column(name = "nombre_transportista")
+    private String nombreTransportista;
+    @NotNull
+    @Size(max = 10)
+    @Column(name = "placas_transporte")
+    private  String placasTransporte;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaCve")
     private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idConstancia")
+    private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
     @JoinColumn(name = "CLIENTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente clienteCve;
@@ -135,8 +145,24 @@ public class ConstanciaSalida implements Serializable {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
+    
+    public String getNombreTransportista() {
+		return nombreTransportista;
+	}
 
-    public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
+	public void setNombreTransportista(String nombreTransportista) {
+		this.nombreTransportista = nombreTransportista;
+	}
+
+	public String getPlacasTransporte() {
+		return placasTransporte;
+	}
+
+	public void setPlacasTransporte(String placasTransporte) {
+		this.placasTransporte = placasTransporte;
+	}
+
+	public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
         return detalleConstanciaSalidaList;
     }
 
@@ -144,7 +170,15 @@ public class ConstanciaSalida implements Serializable {
         this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
     }
 
-    public Cliente getClienteCve() {
+    public List<ConstanciaSalidaServicios> getConstanciaSalidaServiciosList() {
+		return constanciaSalidaServiciosList;
+	}
+
+	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
+		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
+	}
+
+	public Cliente getClienteCve() {
         return clienteCve;
     }
 

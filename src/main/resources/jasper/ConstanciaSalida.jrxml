@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConstanciaSalida" pageWidth="229" pageHeight="660" columnWidth="189" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="c5c48a35-06c6-47f9-8382-ea6bb2ea082e">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDB"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#FCFEFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<subDataset name="Dataset1" uuid="f44e5552-73b7-4ed0-8088-4e8b5b5fa93e">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDB"/>
+		<parameter name="Numero" class="java.lang.String">
+			<defaultValueExpression><![CDATA[$P{Numero}]]></defaultValueExpression>
+		</parameter>
+		<queryString language="SQL">
+			<![CDATA[SELECT 
+	s.SERVICIO_DS,
+	css.nu_cantidad 
+FROM 
+	CONSTANCIA_SALIDA cs 
+	LEFT OUTER JOIN constancia_salida_srv css ON cs.ID = css.id_constancia 
+	LEFT OUTER JOIN SERVICIO s ON css.id_servicio = s.SERVICIO_CVE 
+WHERE
+	NUMERO = $P{Numero}]]>
+		</queryString>
+		<field name="SERVICIO_DS" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SERVICIO_DS"/>
+			<property name="com.jaspersoft.studio.field.label" value="SERVICIO_DS"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+		</field>
+		<field name="nu_cantidad" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="nu_cantidad"/>
+			<property name="com.jaspersoft.studio.field.label" value="nu_cantidad"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="constancia_salida_srv"/>
+		</field>
+	</subDataset>
+	<parameter name="NUMERO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{NUMERO}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LogoPath" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+	c.CTE_NOMBRE, 
+	pl.PLANTA_DS,
+	cs.ID,
+	cs.NUMERO,
+	cs.FECHA, 
+	cs.OBSERVACIONES,
+	cs.nombre_transportista,
+	cs.placas_transporte,
+	dcs.PRODUCTO, 
+	dcs.FOLIO_ENTRADA, 
+	dcs.TEMPERATURA, 
+	dcs.CANTIDAD, 
+	dcs.UNIDAD, 
+	dcs.PESO, 
+	p.PARTIDA_CVE 
+FROM
+	CONSTANCIA_SALIDA cs
+	INNER JOIN CLIENTE c ON cs.CLIENTE_CVE = c.CTE_CVE 
+	INNER JOIN DETALLE_CONSTANCIA_SALIDA dcs ON cs.ID = dcs.CONSTANCIA_CVE
+	INNER JOIN PARTIDA p ON dcs.PARTIDA_CVE = p.PARTIDA_CVE 
+	INNER JOIN CAMARA ca ON p.CAMARA_CVE = ca.CAMARA_CVE 
+	INNER JOIN PLANTA pl ON ca.PLANTA_CVE = pl.PLANTA_CVE
+WHERE
+    NUMERO = $P{NUMERO}]]>
+	</queryString>
+	<field name="CTE_NOMBRE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CTE_NOMBRE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+	</field>
+	<field name="PLANTA_DS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PLANTA_DS"/>
+		<property name="com.jaspersoft.studio.field.label" value="PLANTA_DS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PLANTA"/>
+	</field>
+	<field name="ID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="NUMERO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NUMERO"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUMERO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="FECHA" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="FECHA"/>
+		<property name="com.jaspersoft.studio.field.label" value="FECHA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="OBSERVACIONES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OBSERVACIONES"/>
+		<property name="com.jaspersoft.studio.field.label" value="OBSERVACIONES"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="nombre_transportista" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nombre_transportista"/>
+		<property name="com.jaspersoft.studio.field.label" value="nombre_transportista"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="placas_transporte" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="placas_transporte"/>
+		<property name="com.jaspersoft.studio.field.label" value="placas_transporte"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="PRODUCTO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PRODUCTO"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRODUCTO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="FOLIO_ENTRADA" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FOLIO_ENTRADA"/>
+		<property name="com.jaspersoft.studio.field.label" value="FOLIO_ENTRADA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="TEMPERATURA" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TEMPERATURA"/>
+		<property name="com.jaspersoft.studio.field.label" value="TEMPERATURA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="CANTIDAD" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD"/>
+		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="UNIDAD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UNIDAD"/>
+		<property name="com.jaspersoft.studio.field.label" value="UNIDAD"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="PESO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PESO"/>
+		<property name="com.jaspersoft.studio.field.label" value="PESO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
+	</field>
+	<field name="PARTIDA_CVE" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="PARTIDA_CVE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PARTIDA_CVE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
+	</field>
+	<variable name="Peso_Unitario" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$F{PESO}.divide(new BigDecimal($F{CANTIDAD}),2,RoundingMode.HALF_UP)]]></variableExpression>
+	</variable>
+	<variable name="Cantidad Total" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{CANTIDAD}]]></variableExpression>
+	</variable>
+	<variable name="Peso Total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{PESO}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="44" splitType="Stretch">
+			<image>
+				<reportElement x="11" y="0" width="169" height="40" uuid="cbcb006e-0e61-414f-b035-55eab0f5d7c7"/>
+				<imageExpression><![CDATA[$P{LogoPath}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement x="10" y="0" width="169" height="26" uuid="32504963-d6a0-47d3-9b85-9cad346d2725">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[INDUSTRIAS DE REFRIGERACIÓN
+KELANGAN S.A. DE C.V.]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="73" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="1" width="130" height="12" uuid="b89705d5-0716-4d22-8b55-01386d18edbd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[CONSTANCIA DE SALIDA ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="134" y="1" width="55" height="12" uuid="63f46b41-db83-4342-822c-7797d16cdf52"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{NUMERO}+"</style>"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="20" width="50" height="12" uuid="14d9910b-df65-4741-bb45-b616c33874ec">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Cliente: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="50" height="12" uuid="70e393e2-c4b6-497e-a539-30793c3b710b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Planta:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="50" height="12" uuid="ef9186b7-a076-4452-8836-c14e87243bf6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Fecha:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="60" y="16" width="129" height="24" uuid="ec8c61d0-7452-4e7e-b5cb-c9fb7575a40c"/>
+				<textElement markup="styled">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{CTE_NOMBRE}+"</style>"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="60" y="40" width="129" height="12" uuid="7fed4499-e5e6-42dd-9072-bff600c480b7"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PLANTA_DS}+"</style>"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="60" y="60" width="129" height="12" uuid="db039c12-98e8-498a-a368-0e60b198ec59"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{FECHA}+"</style>"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="72" width="188" height="1" uuid="d6a09987-f500-4feb-8bd3-6b681a6dcc4f"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="72" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="5" width="129" height="12" uuid="28336fe5-ce6e-476d-a097-b21c2d0b49a2"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PRODUCTO}+"</style>"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="20" width="68" height="12" uuid="4c081392-7925-47c5-9e9b-d11dd52b7937">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<text><![CDATA[Fol. Entrada]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="68" y="20" width="52" height="12" uuid="0604ec5c-207d-49e3-8934-d087ee088e10"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{FOLIO_ENTRADA}+"</style>"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="122" y="20" width="37" height="12" uuid="70576079-a8a5-4130-aa0a-144804c967af">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<text><![CDATA[Temp:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="159" y="20" width="30" height="12" uuid="121db840-113d-454f-a83e-04a2b0747b1a"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{TEMPERATURA}+ "°C"+"</style>"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="45" y="40" width="48" height="12" uuid="7245452e-a3e3-451c-a386-b7943dfc7d28">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="39" height="12" uuid="ca80cfa9-ae45-4216-b6f4-b7fff0cd79c9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<text><![CDATA[Peso U]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="40" width="87" height="12" uuid="36fc360d-bc5c-4328-8174-ecc709681021"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{CANTIDAD} + "  " +$F{UNIDAD}+"</style>"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="41" y="60" width="56" height="12" uuid="b8ad73eb-c126-4dd0-b174-d6700af182e6"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Peso_Unitario}+"kg"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="100" y="60" width="52" height="12" uuid="5e17abfa-1866-45e8-9a3b-7c604a912c47">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<text><![CDATA[Peso]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="159" y="60" width="30" height="12" uuid="49a9e370-e7c1-4f71-84d4-5d471b36cfa3"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PESO}+"</style>"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="96" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="62" width="88" height="12" uuid="449df2ac-6f9d-4fc0-b5e0-0980ad967dca"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[<style pdfFontName="Helvetica-Bold">Cantidad Total</style>]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="82" width="88" height="12" uuid="529c61e0-bdb2-4d64-bbee-5a36334f537e"/>
+				<textElement textAlignment="Center" markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[<style pdfFontName="Helvetica-Bold">PesoTotal</style>]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="63" width="79" height="12" uuid="8f1f6cf5-e0e7-4df0-8ef1-9e84d655340e"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{Cantidad Total} + "pz"+"</style>"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="81" width="78" height="12" uuid="ea4a5d4f-9efd-481f-b3aa-0454438f4dbb"/>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{Peso Total}+ "kg"+"</style>"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="6" width="87" height="12" uuid="7f192c57-3c9f-43c7-9272-c2386e8e467b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[<style pdfFontName="Helvetica-Bold">Observaciones</style>]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="18" width="187" height="36" uuid="80809134-05d1-4558-97fc-2dcb6769c4c2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{OBSERVACIONES}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<lastPageFooter>
+		<band height="70">
+			<staticText>
+				<reportElement x="60" y="2" width="70" height="12" uuid="67d5eb81-2b7a-4ac1-a933-5ab338133e15">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<text><![CDATA[Transportista]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="35" y="36" width="118" height="12" uuid="93610a3a-90d4-474c-b1b8-704a7db1e22d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<text><![CDATA[Placas del Transporte:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="50" y="17" width="87" height="12" uuid="9fc29930-0471-4eca-bb9a-88585ad95c5a"/>
+				<textElement textAlignment="Center" markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{nombre_transportista}+"</style>"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="54" width="87" height="12" uuid="9bbc628f-5213-48bf-8751-74894925bec5"/>
+				<textElement textAlignment="Center" markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{placas_transporte}+"</style>"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="68" width="188" height="1" uuid="3a8bf0e2-71fd-482d-a985-cb36cd88aee8"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="188" height="1" uuid="973d9389-0156-4d9f-820e-e607d6a6b560"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="99" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="6" width="54" height="12" uuid="bde1e250-d165-4dc6-a660-b0d4c187aea0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled">
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[<style pdfFontName="Helvetica-Bold">Servicios</style>]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="0" y="19" width="188" height="73" uuid="e39dcbfb-5209-40d1-b2cd-60f777edca79">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset1" uuid="6a96ba3e-774f-4d24-b26b-c628da95c593">
+						<datasetParameter name="Numero">
+							<datasetParameterExpression><![CDATA[$P{NUMERO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="140" uuid="a9cd9c27-ff4b-41fd-b01f-a39649f4b32e">
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="140" height="30" uuid="6e09ef5b-0e32-4672-8e2a-367d28fe0132"/>
+								<textFieldExpression><![CDATA[$F{SERVICIO_DS}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="48" uuid="01670d52-c6a4-4a59-b2de-06bb905bcf9d">
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="48" height="30" uuid="ac10f2e3-e766-4068-9b81-85b8ba456ab0"/>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression><![CDATA[$F{nu_cantidad}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<line>
+				<reportElement x="0" y="0" width="188" height="1" uuid="7d8cf140-6777-46bd-aefc-7c159a473453"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

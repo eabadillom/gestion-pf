@@ -36,11 +36,11 @@ public class Inventario {
 	protected String folioCliente;
 	protected String Observaciones;
 	protected String descripcion;
-
+	protected ConstanciaDeDeposito constanciaDeDeposito;
+	protected Servicio srv;
 	public Inventario() {
 
 	}
-
 	public void listas() {
 	}
 
@@ -63,6 +63,29 @@ public class Inventario {
 		this.sap = sap;
 		this.camara = camara;
 		this.camarad = camarad;
+		this.folioCliente = folioCliente;
+		this.Observaciones = observaciones;
+		this.descripcion = descripcion;
+		
+	}
+		/*Codigo NJGS*/
+
+	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidadManejo, Planta planta,
+			Date caducidad, String codigo, String lote, String sap, Camara camara, Posicion posicion, Integer partidaCve,
+			BigDecimal peso, String inventarioCve, String detalleAnt, Integer detallePartidaAnterior,
+			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas,
+			Servicio srv, ConstanciaDeDeposito constanciaDeDeposito) {
+		this.folio = folio;
+		this.producto = producto;
+		this.cantidad = cantidad;
+		this.unidadManejo = unidadManejo;
+		this.planta = planta;
+		/*CODIGO GMA*/
+		this.caducidad = caducidad;
+		this.codigo = codigo;
+		this.lote = lote;
+		this.sap = sap;
+		this.camara = camara;
 		this.posicion = posicion;
 		this.partidaCve = partidaCve;
 		this.peso = peso;
@@ -75,9 +98,24 @@ public class Inventario {
 		this.mp = mp;
 		this.pedimento = pedimento;
 		this.tarimas = tarimas;
-		this.folioCliente = folioCliente;
-		this.Observaciones = observaciones;
-		this.descripcion = descripcion;
+		this.srv = srv;
+		this.constanciaDeDeposito = constanciaDeDeposito;
+	}
+	
+	public ConstanciaDeDeposito getConstanciaDeDeposito() {
+		return constanciaDeDeposito;
+	}
+
+	public void setConstanciaDeDeposito(ConstanciaDeDeposito constanciaDeDeposito) {
+		this.constanciaDeDeposito = constanciaDeDeposito;
+	}
+
+	public Servicio getSrv() {
+		return srv;
+	}
+
+	public void setSrv(Servicio srv) {
+		this.srv = srv;
 	}
 
 	public Integer getFolio() {
@@ -159,15 +197,7 @@ public class Inventario {
 	public void setCamara(Camara camara) {
 		this.camara = camara;
 	}
-
-	public Posicion getPosicion() {
-		return posicion;
-	}
-
-	public void setPosicion(Posicion posicion) {
-		this.posicion = posicion;
-	}
-
+	
 	public Integer getPartidaCve() {
 		return partidaCve;
 	}
@@ -304,16 +334,24 @@ public class Inventario {
 		this.descripcion = descripcion;
 	}
 
+	public Posicion getPosicion() {
+		return posicion;
+	}
+
+	public void setPosicion(Posicion posicion) {
+		this.posicion = posicion;
+	}
 	@Override
 	public String toString() {
 		return "Inventario [folio=" + folio + ", producto=" + producto + ", cliente=" + cliente + ", cantidad="
 				+ cantidad + ", unidadManejo=" + unidadManejo + ", planta=" + planta + ", plantad=" + plantad
 				+ ", caducidad=" + caducidad + ", codigo=" + codigo + ", lote=" + lote + ", sap=" + sap + ", camara="
-				+ camara + ", camarad=" + camarad + ", posicion=" + posicion
-				+ ", partidaCve=" + partidaCve + ", peso=" + peso + ", inventarioCve=" + inventarioCve + ", detalleAnt="
-				+ detalleAnt + ", detallePartidaAnterior=" + detallePartidaAnterior + ", detallePadre=" + detallePadre
-				+ ", detallePartidaPadre=" + detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento="
-				+ pedimento + ", tarimas=" + tarimas + ", folioCliente=" + folioCliente + "]";
+				+ camara + ", camarad=" + camarad + ", posicion=" + posicion + ", partidaCve=" + partidaCve + ", peso="
+				+ peso + ", inventarioCve=" + inventarioCve + ", detalleAnt=" + detalleAnt + ", detallePartidaAnterior="
+				+ detallePartidaAnterior + ", detallePadre=" + detallePadre + ", detallePartidaPadre="
+				+ detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento=" + pedimento + ", tarimas="
+				+ tarimas + ", folioCliente=" + folioCliente + ", Observaciones=" + Observaciones + ", descripcion="
+				+ descripcion + ", constanciaDeDeposito=" + constanciaDeDeposito + ", srv=" + srv + "]";
 	}
-
 }
+

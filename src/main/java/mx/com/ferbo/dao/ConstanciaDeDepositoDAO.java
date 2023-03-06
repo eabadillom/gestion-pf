@@ -24,6 +24,13 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				.getResultList();
 	}
 
+	public List<ConstanciaDeDeposito> buscarPorCliente(Integer cteCve){
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<ConstanciaDeDeposito> listado = null;
+		listado = em.createNamedQuery("ConstanciaDeDeposito.findByCteCve",ConstanciaDeDeposito.class).setParameter("cteCve", cteCve).getResultList();
+		return listado;
+	}
+	
 	@Override
 	public List<ConstanciaDeDeposito> buscarPorCriterios(ConstanciaDeDeposito e) {
 		// TODO Auto-generated method stub
