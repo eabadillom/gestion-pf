@@ -272,7 +272,6 @@ public class Inventario {
 		this.cliente = cliente;
 	}
 
-
 	public Integer getPlantad() {
 		return plantad;
 	}

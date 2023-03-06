@@ -41,6 +41,7 @@ import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.TraspasoPartidaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
+import mx.com.ferbo.dao.partidasAfectadasDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
@@ -128,6 +129,7 @@ public class AltaTraspasoBean implements Serializable {
 	private ConstanciaTraspasoDAO constanciaTDAO;
 	private UnidadDeProductoDAO udpDAO;
 	private ProductoDAO prDAO;
+	private partidasAfectadasDAO partidasAfectadasDAO;
 	
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
@@ -147,6 +149,7 @@ public class AltaTraspasoBean implements Serializable {
 		tpDAO = new TraspasoPartidaDAO();
 		udpDAO = new UnidadDeProductoDAO();
 		prDAO = new ProductoDAO();
+		partidasAfectadasDAO = new partidasAfectadasDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
@@ -379,7 +382,9 @@ public class AltaTraspasoBean implements Serializable {
 			constancia.setTraspasoServicioList(alServiciosDetalle);
 			constancia.setTraspasoPartidaList(listaTraspasoPartida);
 			constanciaTDAO.actualizar(constancia);
-			//////
+			for(PartidasAfectadas pa : listaPartidasAfectadas ) {
+				partidasAfectadasDAO.actualizar(pa);
+			}
 			this.isSaved = true;
 			this.habilitareporte = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.numero);
@@ -397,12 +402,13 @@ public class AltaTraspasoBean implements Serializable {
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar servicio", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-altaTraspaso");
+			
 		}
 	}
 
 	public void jasper() throws JRException, IOException, SQLException {
-		String jasperPath = "/jasper/ejemplo1.jrxml";
-		String filename = "Constancia_de_servicio.pdf";
+		String jasperPath = "/jasper/ReporteTraspaso.jrxml";
+		String filename = "Constancia_de_traspaso.pdf";
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
@@ -462,17 +468,12 @@ public class AltaTraspasoBean implements Serializable {
 		this.unidadcobro = unidadcobro;
 	}
 
-	public void deletePartida(PartidaServicio partida) {
-		this.alPartidas.remove(partida);
-	}
-	
-	public void deleteTraspaso(Inventario inventario) {
-		this.inventario.remove(inventario);
-	}
-
-	public void deleteServicio(ConstanciaServicioDetalle servicio) {
+		public void deleteServicio(ConstanciaServicioDetalle servicio) {
 		this.alServiciosDetalle.remove(servicio);
 	}
+		public void deletePartida(InventarioDetalle partida) {
+			this.destino.remove(partida);
+		}
 
 	public Cliente getSelCliente() {
 		return selCliente;
