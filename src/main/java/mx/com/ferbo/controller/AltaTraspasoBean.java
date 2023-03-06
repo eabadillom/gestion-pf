@@ -92,6 +92,7 @@ public class AltaTraspasoBean implements Serializable {
 	private List<Camara> listacamara;
 	private List<Posicion> listaposicion;
 	private List<TraspasoPartida> listaTraspasoPartida;
+
 	
 	private Date fecha;
 	private String numero;
@@ -468,7 +469,7 @@ public class AltaTraspasoBean implements Serializable {
 		this.unidadcobro = unidadcobro;
 	}
 
-		public void deleteServicio(ConstanciaServicioDetalle servicio) {
+		public void deleteServicio(TraspasoServicio servicio) {
 		this.alServiciosDetalle.remove(servicio);
 	}
 		public void deletePartida(InventarioDetalle partida) {

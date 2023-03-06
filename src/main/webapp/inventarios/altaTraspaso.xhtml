@@ -134,21 +134,19 @@
                 </div>
                 </p:panel>
                 
-                <p:panel id="Posicion">
-                <div class="field">
-                <p:outputLabel for="posiciondestino" value="Posicion destino" />
-                <p:selectOneMenu id="posiciondestino" value="#{altaTraspasoBean.selectedInventario.posicionDestino}" converter="entityConverter" >
-				<f:selectItem itemLabel="--Posicion--" itemValue=""  />
-				<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaposicion}" var="posiciondestino" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
-				<p:ajax /></p:selectOneMenu>
-                </div>
-                </p:panel>
-                
-				
-                					</p:panelGrid>
-						            </div>
-						        </div>
-							</div>
+	                <p:panel id="Posicion">
+		                <div class="field">
+			                <p:outputLabel for="posiciondestino" value="Posicion destino" />
+			                <p:selectOneMenu id="posiciondestino" value="#{altaTraspasoBean.selectedInventario.posicionDestino}" converter="entityConverter" >
+							<f:selectItem itemLabel="--Posicion--" itemValue=""  />
+							<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaposicion}" var="posiciondestino" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
+							<p:ajax /></p:selectOneMenu>
+		                </div>
+	                </p:panel>
+            					</p:panelGrid>
+		            </div>
+		        </div>
+			</div>
 							</p:outputPanel>
 							</p:outputPanel>
 						<f:facet name="footer">
@@ -187,16 +185,16 @@
         
 			
         <p:overlayPanel widgetVar="dlg1" dismissable="false" showCloseIcon="true" dynamic="true">
-<p:outputPanel rendered="#{not empty altaTraspasoBean.inventario}">
-		<p:panel id="folioC">
-              <div class="field">
-                  <span class="ui-float-label ui-input-icon-right">
-                      <p:inputText widgetVar="folioC-new" id="folioC-new" value="#{altaTraspasoBean.selectedInventario.folio}" readonly="true"/>
-                      <p:outputLabel for="folioC-new" value="Folio" styleClass="ml-4" />
-                      <i class="pi pi-user" />
-                  </span>
-              </div>
-          </p:panel>
+		<p:outputPanel rendered="#{not empty altaTraspasoBean.inventario}">
+			<p:panel id="folioC">
+	              <div class="field">
+	                  <span class="ui-float-label ui-input-icon-right">
+	                      <p:inputText widgetVar="folioC-new" id="folioC-new" value="#{altaTraspasoBean.selectedInventario.folio}" readonly="true"/>
+	                      <p:outputLabel for="folioC-new" value="Folio" styleClass="ml-4" />
+	                      <i class="pi pi-user" />
+	                  </span>
+	              </div>
+	          </p:panel>
 
 		<p:panel id="cantidad">
               <div class="field">
@@ -208,19 +206,17 @@
               </div>
           </p:panel>
 
-		<p:panel id="Kgs">
-              <div class="field">
-                  <span class="ui-float-label ui-input-icon-right">
-                      <p:inputText widgetVar="kg-new" id="kg-new" value="#{altaTraspasoBean.selectedInventario.peso}" readonly="true"/>
-                      <p:outputLabel for="kg-new" value="Kilogramos" styleClass="ml-4" />
-                      <i class="pi pi-user" />
-                  </span>
-              </div>
-          </p:panel>
-</p:outputPanel>
-        </p:overlayPanel>
-			
-			
+					<p:panel id="Kgs">
+			              <div class="field">
+			                  <span class="ui-float-label ui-input-icon-right">
+			                      <p:inputText widgetVar="kg-new" id="kg-new" value="#{altaTraspasoBean.selectedInventario.peso}" readonly="true"/>
+			                      <p:outputLabel for="kg-new" value="Kilogramos" styleClass="ml-4" />
+			                      <i class="pi pi-user" />
+			                  </span>
+			              </div>
+			          </p:panel>
+			</p:outputPanel>
+	        </p:overlayPanel>
             </p:toolbarGroup>
 		</p:toolbar>		
 			
@@ -235,7 +231,7 @@
 				<p:column>
 				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.agregarServicio}" update="dtServicios"/>
 				</p:column>
-				</p:panel>
+		</p:panel>
 				
 			<p:dataTable id="dtServicios"	var="servicio" selection="#{altaTraspasoBean.selServicio}" value="#{altaTraspasoBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" 
 							scrollRows="2" reflow="true">	
