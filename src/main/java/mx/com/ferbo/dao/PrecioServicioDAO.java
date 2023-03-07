@@ -9,6 +9,8 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -37,6 +39,26 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	public List<PrecioServicio> buscarPorCriterios(PrecioServicio e) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public List<PrecioServicio> buscarPorAviso(Aviso aviso, Cliente cliente){
+		
+		List<PrecioServicio> listaPrecioServicio = new ArrayList<>();
+		
+		try {
+			
+			EntityManager entity = EntityManagerUtil.getEntityManager();
+			listaPrecioServicio = entity.createNamedQuery("PrecioServicio.findByAvisoAndCliente", PrecioServicio.class)
+					.setParameter("cteCve", cliente.getCteCve())
+					.setParameter("avisoCve", aviso.getAvisoCve()).getResultList();
+			
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			
+		} 
+		
+		
+		return listaPrecioServicio;
 	}
 
 	@Override

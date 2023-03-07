@@ -6,7 +6,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -20,16 +19,19 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
+import mx.com.ferbo.dao.ConstanciaDepositoDetalleDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -45,6 +47,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private String folio;
 	private BigDecimal piezasTarima;
+	
+	private List<BigDecimal> piezas;
 	
 	private ClienteDAO clienteDAO;
 	private List<Cliente> listadoClientes;
@@ -66,8 +70,15 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private PrecioServicio precioServicio;
 	private PrecioServicioDAO precioServicioDAO;
 	
+	private List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle;
+	private ConstanciaDepositoDetalleDAO constanciaDepositoDetalleDAO;
+	private ConstanciaDepositoDetalle constanciaSelect;
 	
-	private String otro,pedimento,contenedor,lote,tarima;
+	private Servicio servicioSelected;
+	
+	private BigDecimal servicioCantidad,cantidadServicio;
+	
+	private String otro,pedimento,contenedor,lote,tarima,temperatura,observaciones;
 	
 	public ConsultarConstanciaDeDepositoBean() {
 		
@@ -84,13 +95,17 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		listadoPrecioServicio = new ArrayList<PrecioServicio>();
 		precioServicioDAO = new PrecioServicioDAO();
+		
+		listadoConstanciaDepositoDetalle = new ArrayList<ConstanciaDepositoDetalle>();
+		constanciaDepositoDetalleDAO = new ConstanciaDepositoDetalleDAO();
+		
+		piezas = new ArrayList<BigDecimal>();
 	}
 
 	@PostConstruct
 	public void init() {
 		
 		listadoClientes = clienteDAO.buscarTodos();
-		listadoPrecioServicio = precioServicioDAO.buscarTodos();
 		
 		fechaInicial = new Date();
 		fechaFinal = new Date();
@@ -159,7 +174,15 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	public ConstanciaDeDeposito getSelectConstanciaDD() {
 		if(selectConstanciaDD!=null) {
 			calculoPxT();
+			
+			//TODO OPTIMIZAR CARGA DE INFORMACION
+			listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
+			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+			
+			//System.out.println(listadoPrecioServicio);
+			
 		}
+		
 		return selectConstanciaDD;
 	}
 
@@ -247,6 +270,78 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		this.tarima = tarima;
 	}
 
+	public List<PrecioServicio> getListadoPrecioServicio() {
+		return listadoPrecioServicio;
+	}
+
+	public void setListadoPrecioServicio(List<PrecioServicio> listadoPrecioServicio) {
+		this.listadoPrecioServicio = listadoPrecioServicio;
+	}
+	
+	public List<ConstanciaDepositoDetalle> getListadoConstanciaDepositoDetalle() {
+		return listadoConstanciaDepositoDetalle;
+	}
+
+	public void setListadoConstanciaDepositoDetalle(List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle) {
+		this.listadoConstanciaDepositoDetalle = listadoConstanciaDepositoDetalle;
+	}
+
+	public Servicio getServicioSelected() {
+		return servicioSelected;
+	}
+
+	public void setServicioSelected(Servicio servicioSelected) {
+		this.servicioSelected = servicioSelected;
+	}
+	
+	public BigDecimal getServicioCantidad() {
+		return servicioCantidad;
+	}
+
+	public void setServicioCantidad(BigDecimal servicioCantidad) {
+		this.servicioCantidad = servicioCantidad;
+	}
+
+	public ConstanciaDepositoDetalle getConstanciaSelect() {
+		return constanciaSelect;
+	}
+
+	public void setConstanciaSelect(ConstanciaDepositoDetalle constanciaSelect) {
+		this.constanciaSelect = constanciaSelect;
+	}
+
+	public BigDecimal getCantidadServicio() {
+		return cantidadServicio;
+	}
+
+	public void setCantidadServicio(BigDecimal cantidadServicio) {
+		this.cantidadServicio = cantidadServicio;
+	}
+
+	public String getTemperatura() {
+		return temperatura;
+	}
+
+	public void setTemperatura(String temperatura) {
+		this.temperatura = temperatura;
+	}
+
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+
+	public List<BigDecimal> getPiezas() {
+		return piezas;
+	}
+
+	public void setPiezas(List<BigDecimal> piezas) {
+		this.piezas = piezas;
+	}
+
 	public void buscarConstanciaDD() {
 		
 		EntityManager em = EntityManagerUtil.getEntityManager();
@@ -262,6 +357,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		for (ConstanciaDeDeposito constanciaDeDeposito : listadoConstanciaDeDepositos) {
 			List<Partida> alPartidas = constanciaDeDeposito.getPartidaList();
 			alPartidas.size();//permite recuperar la lista de partidas de la Constancia de Deposito
+			List<ConstanciaDepositoDetalle> alConstanciaDD = constanciaDeDeposito.getConstanciaDepositoDetalleList();
+			alConstanciaDD.size();
 			for(Partida p: alPartidas) {
 				List<DetallePartida> listadoDetallePartida = p.getDetallePartidaList();
 				listadoDetallePartida.size();
@@ -276,16 +373,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		productoPorCliente.setCteCve(cliente);
 		listadoProductoPorCliente = pdtoPorCliDAO.buscarPorCriterios(productoPorCliente);
 		
-		//Servicios Por Cliente
-		/*listaServicioUnidad.clear();
-		PrecioServicio precioServicio = new PrecioServicio();
-		precioServicio.setCliente(cliente);
-		listaServicioUnidad = listadoPrecioServicio.stream()
-								.filter(ps -> clienteSelect != null
-								?(ps.getCliente().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
-								:false)
-								.collect(Collectors.toList());*/
-		
 	
 	}
 	
@@ -296,8 +383,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 				BigDecimal unidadT = new BigDecimal(p.getCantidadTotal()).setScale(2);
 				BigDecimal tarimas = unidadT.divide(p.getNoTarimas(),2,RoundingMode.HALF_UP);		
 				this.piezasTarima = new BigDecimal(tarimas.intValue()).setScale(2);
+				piezas.add(piezasTarima);//arraylist donde se guardan los calculos al tener dos partidas
 			}
-		
 		
 	}
 	
@@ -342,7 +429,66 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 	}
 	
+	public void updateServicio() {
+		
+		//List<ConstanciaDepositoDetalle> listaConstanciaDepositoDetalles = selectConstanciaDD.getConstanciaDepositoDetalleList();
+		
+		for(ConstanciaDepositoDetalle c: selectConstanciaDD.getConstanciaDepositoDetalleList()) {
+			
+			if(c.getConstanciaDepositoDetalleCve()==constanciaSelect.getConstanciaDepositoDetalleCve()) {
+				c.setServicioCantidad(servicioCantidad);
+			}
+			
+		}
+		
+		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Servicio Actualizado"));
+		}
+		
+		PrimeFaces.current().ajax().update("form:messages");
+	}
 	
+	public void saveServicio() {
+		
+		List<ConstanciaDepositoDetalle> lisConstanciaDepositoDetalles = selectConstanciaDD.getConstanciaDepositoDetalleList();
+		
+		ConstanciaDepositoDetalle conDepositoDetalle = new ConstanciaDepositoDetalle();
+		conDepositoDetalle.setFolio(selectConstanciaDD);
+		conDepositoDetalle.setServicioCantidad(cantidadServicio);
+		conDepositoDetalle.setServicioCve(servicioSelected);
+		
+		
+		if(constanciaDepositoDetalleDAO.guardar(conDepositoDetalle)== null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Servicio Agregado"));
+		}
+		
+		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
+		
+	}
+	
+	public void deleteServicio() {
+		
+		if(constanciaDepositoDetalleDAO.eliminar(this.constanciaSelect)== null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado","Servicio Eliminado"));
+		}
+		
+		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
+		
+	}
+	
+	public void updateDatosGenerales() {
+		
+		selectConstanciaDD.setTemperatura(temperatura);
+		selectConstanciaDD.setObservaciones(observaciones);
+		
+		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Constancia De Deposito Actualizada"));
+			temperatura = "";
+			observaciones = "";
+		}
+		
+		PrimeFaces.current().ajax().update("form:messages");
+	}
 	
 
 }
