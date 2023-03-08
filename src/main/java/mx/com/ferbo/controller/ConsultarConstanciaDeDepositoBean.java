@@ -55,9 +55,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private Date fechaIngreso;
 	
 	private String folio;
-	private BigDecimal piezasTarima;
-	
-	private List<BigDecimal> piezas;
 	
 	private ClienteDAO clienteDAO;
 	private List<Cliente> listadoClientes;
@@ -76,7 +73,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private UnidadDeProductoDAO unidadDeProductoDAO;
 	
 	private List<PrecioServicio> listadoPrecioServicio;
-	private PrecioServicio precioServicio;
 	private PrecioServicioDAO precioServicioDAO;
 	
 	private List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle;
@@ -87,7 +83,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private BigDecimal servicioCantidad,cantidadServicio;
 	
-	private String otro,pedimento,contenedor,lote,tarima,temperatura,observaciones;
+	private String otro,pedimento,contenedor,lote,tarima;
 	
 	public ConsultarConstanciaDeDepositoBean() {
 		
@@ -108,7 +104,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		listadoConstanciaDepositoDetalle = new ArrayList<ConstanciaDepositoDetalle>();
 		constanciaDepositoDetalleDAO = new ConstanciaDepositoDetalleDAO();
 		
-		piezas = new ArrayList<BigDecimal>();
 	}
 
 	@PostConstruct
@@ -119,7 +114,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		fechaInicial = new Date();
 		fechaFinal = new Date();
 		fechaCaducidad = new Date();
-		//fechaIngreso = new Date();
 		folio = "";
 		
 		
@@ -182,30 +176,11 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	}
 
 	public ConstanciaDeDeposito getSelectConstanciaDD() {
-		/*if(selectConstanciaDD!=null) {
-			//calculoPxT();
-			
-			//TODO OPTIMIZAR CARGA DE INFORMACION
-			listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
-			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
-			
-			//System.out.println(listadoPrecioServicio);
-			
-		}*/
-		
 		return selectConstanciaDD;
 	}
 
 	public void setSelectConstanciaDD(ConstanciaDeDeposito selectConstanciaDD) {
 		this.selectConstanciaDD = selectConstanciaDD;
-	}
-
-	public BigDecimal getPiezasTarima() {
-		return piezasTarima;
-	}
-
-	public void setPiezasTarima(BigDecimal piezasTarima) {
-		this.piezasTarima = piezasTarima;
 	}
 
 	public List<ProductoPorCliente> getListadoProductoPorCliente() {
@@ -327,30 +302,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	public void setCantidadServicio(BigDecimal cantidadServicio) {
 		this.cantidadServicio = cantidadServicio;
 	}
-
-	public String getTemperatura() {
-		return temperatura;
-	}
-
-	public void setTemperatura(String temperatura) {
-		this.temperatura = temperatura;
-	}
-
-	public String getObservaciones() {
-		return observaciones;
-	}
-
-	public void setObservaciones(String observaciones) {
-		this.observaciones = observaciones;
-	}
-
-	public List<BigDecimal> getPiezas() {
-		return piezas;
-	}
-
-	public void setPiezas(List<BigDecimal> piezas) {
-		this.piezas = piezas;
-	}
 	
 	public Date getFechaIngreso() {
 		return fechaIngreso;
@@ -395,19 +346,11 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	}
 	
 	public void cargaDeDatos() {
-			/*piezas.clear();
-			List<Partida> listadoPartidas = selectConstanciaDD.getPartidaList();
-			for(Partida p: listadoPartidas) {
-				BigDecimal unidadT = new BigDecimal(p.getCantidadTotal()).setScale(2);
-				BigDecimal tarimas = unidadT.divide(p.getNoTarimas(),2,RoundingMode.HALF_UP);		
-				this.piezasTarima = new BigDecimal(tarimas.intValue()).setScale(2);
-				piezas.add(piezasTarima);//arraylist donde se guardan los calculos al tener dos partidas
-			}*/
+			
 			
 			listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
 			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
 			
-			//PrimeFaces.current().ajax().update("form:constanciaD:dlg-constancia:dt-partida");
 	}
 	
 	public void updateConstanciaDD() {
@@ -428,8 +371,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	}
 	
 	public void updateDetallePartida() {
-		//tomar el ultimo detalle de la partida selecionada y modificarle en po,etc solo a ese ultimo registro
-		//partidaSelect nos trae el objeto partida seleccionado 
+		
 		
 		List<DetallePartida> listadoDetallePartida = partidaSelect.getDetallePartidaList();
 		int size = listadoDetallePartida.size();
@@ -453,8 +395,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	}
 	
 	public void updateServicio() {
-		
-		//List<ConstanciaDepositoDetalle> listaConstanciaDepositoDetalles = selectConstanciaDD.getConstanciaDepositoDetalleList();
 		
 		for(ConstanciaDepositoDetalle c: selectConstanciaDD.getConstanciaDepositoDetalleList()) {
 			
@@ -503,14 +443,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	public void updateDatosGenerales() {
 		
-		
-		/*selectConstanciaDD.setTemperatura(temperatura);
-		selectConstanciaDD.setObservaciones(observaciones);
-		selectConstanciaDD.setFechaIngreso(fechaIngreso);*/
 		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Constancia De Deposito Actualizada"));
-			temperatura = "";
-			observaciones = "";
 		}
 		
 		PrimeFaces.current().ajax().update("form:messages");
