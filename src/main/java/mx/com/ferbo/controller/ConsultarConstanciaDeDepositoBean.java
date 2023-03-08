@@ -1,14 +1,20 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -34,6 +40,8 @@ import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
@@ -44,6 +52,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private Date fechaInicial;
 	private Date fechaFinal;
 	private Date fechaCaducidad;
+	private Date fechaIngreso;
 	
 	private String folio;
 	private BigDecimal piezasTarima;
@@ -110,6 +119,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		fechaInicial = new Date();
 		fechaFinal = new Date();
 		fechaCaducidad = new Date();
+		//fechaIngreso = new Date();
 		folio = "";
 		
 		
@@ -172,8 +182,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	}
 
 	public ConstanciaDeDeposito getSelectConstanciaDD() {
-		if(selectConstanciaDD!=null) {
-			calculoPxT();
+		/*if(selectConstanciaDD!=null) {
+			//calculoPxT();
 			
 			//TODO OPTIMIZAR CARGA DE INFORMACION
 			listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
@@ -181,7 +191,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			
 			//System.out.println(listadoPrecioServicio);
 			
-		}
+		}*/
 		
 		return selectConstanciaDD;
 	}
@@ -341,6 +351,14 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	public void setPiezas(List<BigDecimal> piezas) {
 		this.piezas = piezas;
 	}
+	
+	public Date getFechaIngreso() {
+		return fechaIngreso;
+	}
+
+	public void setFechaIngreso(Date fechaIngreso) {
+		this.fechaIngreso = fechaIngreso;
+	}
 
 	public void buscarConstanciaDD() {
 		
@@ -376,16 +394,20 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	}
 	
-	public void calculoPxT() {
-		
+	public void cargaDeDatos() {
+			/*piezas.clear();
 			List<Partida> listadoPartidas = selectConstanciaDD.getPartidaList();
 			for(Partida p: listadoPartidas) {
 				BigDecimal unidadT = new BigDecimal(p.getCantidadTotal()).setScale(2);
 				BigDecimal tarimas = unidadT.divide(p.getNoTarimas(),2,RoundingMode.HALF_UP);		
 				this.piezasTarima = new BigDecimal(tarimas.intValue()).setScale(2);
 				piezas.add(piezasTarima);//arraylist donde se guardan los calculos al tener dos partidas
-			}
-		
+			}*/
+			
+			listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
+			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+			
+			//PrimeFaces.current().ajax().update("form:constanciaD:dlg-constancia:dt-partida");
 	}
 	
 	public void updateConstanciaDD() {
@@ -394,8 +416,9 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
 		unidadDeProducto = partidaSelect.getUnidadDeProductoCve();
-		unidadDeProducto.setProductoCve(productoSelect);
-		
+		if(productoSelect!=null) {
+			unidadDeProducto.setProductoCve(productoSelect);
+		}
 		if(unidadDeProductoDAO.actualizar(unidadDeProducto) == null && constanciaDeDepositoDAO.actualizar(selectConstanciaDD)==null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Partida Actualizada"));
 		}
@@ -460,6 +483,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		if(constanciaDepositoDetalleDAO.guardar(conDepositoDetalle)== null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Servicio Agregado"));
+			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
 		}
 		
 		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
@@ -470,6 +494,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		if(constanciaDepositoDetalleDAO.eliminar(this.constanciaSelect)== null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado","Servicio Eliminado"));
+			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
 		}
 		
 		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
@@ -478,9 +503,10 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	public void updateDatosGenerales() {
 		
-		selectConstanciaDD.setTemperatura(temperatura);
-		selectConstanciaDD.setObservaciones(observaciones);
 		
+		/*selectConstanciaDD.setTemperatura(temperatura);
+		selectConstanciaDD.setObservaciones(observaciones);
+		selectConstanciaDD.setFechaIngreso(fechaIngreso);*/
 		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Constancia De Deposito Actualizada"));
 			temperatura = "";
@@ -488,6 +514,45 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		}
 		
 		PrimeFaces.current().ajax().update("form:messages");
+	}
+	
+	public void imprimir() {
+		String jasperPath = "/jasper/GestionReport.jrxml";
+		String filename = "ticket.pdf";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
+		ConstanciaDeDeposito constancia = null;
+		 File reportFile = new File(jasperPath);
+		 File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			constancia = new ConstanciaDeDeposito();
+			constancia.setFolioCliente(this.selectConstanciaDD.getFolioCliente());
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("FOLIO", constancia.getFolioCliente());
+			parameters.put("LogoPath",imgfile.getPath());
+			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());		
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			message = String.format("No se pudo imprimir el folio %s", this.selectConstanciaDD.getFolioCliente());
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		} finally {
+			conexion.close((Connection) connection);
+		}
+		
 	}
 	
 

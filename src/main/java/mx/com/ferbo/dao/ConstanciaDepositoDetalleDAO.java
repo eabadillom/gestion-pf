@@ -72,18 +72,17 @@ public class ConstanciaDepositoDetalleDAO extends IBaseDAO<ConstanciaDepositoDet
 	@Override
 	public String eliminar(ConstanciaDepositoDetalle constanciaDepositoDetalle) {
 		// TODO Auto-generated method stub
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		
 		try {
-			
+			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(constanciaDepositoDetalle));
+			ConstanciaDepositoDetalle constancia = em.find(ConstanciaDepositoDetalle.class, constanciaDepositoDetalle.getConstanciaDepositoDetalleCve());
+			em.remove(constancia);
 			em.getTransaction().commit();
-			
+			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		}finally {
-			em.close();
 		}
 		
 		

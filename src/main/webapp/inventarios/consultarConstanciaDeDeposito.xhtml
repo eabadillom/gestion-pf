@@ -22,7 +22,7 @@
 				<!-- Por Fechas -->
 					<p:outputLabel value="Por Rango de Fechas:" styleClass="p-mr-2"/>
 					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" 
-					value="#{consultarConstanciaDeDepositoBean.fechaInicial}">
+					value="#{consultarConstanciaDeDepositoBean.fechaInicial}" >
 					</p:datePicker>
 					
 					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" 
@@ -89,29 +89,35 @@
 			
 			<p:dialog id="constanciaD" widgetVar="dlgProductos" header="Productos" responsive="true" resizable="true" style="max-width:100em !important;" 
 					  	hideEffect="fade" showEffect="fade"	modal="true" >
+					  	<p:ajax event="open" update="dt-partida dt-ConstanciaDepositoDetalle precioServicio" listener="#{consultarConstanciaDeDepositoBean.cargaDeDatos()}" />
 				<p:outputPanel id="dlg-constancia" class="ui-fluid"> 
 					<p:outputPanel rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD}" >
+						
+						
 						<div class="p-grid">
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel for="@next" value="Aviso:" />
-								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.avisoCve.avisoObservaciones}"/>
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.avisoCve.avisoObservaciones}" disabled="true"/>
 							</div>
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="Fecha Ingreso:"/>
-								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.fechaIngreso}" disabled="true" styleClass="p-ml-2 p-mr-4"/>
+								<p:datePicker value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.fechaIngreso}" showIcon="true" placeholder="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.fechaIngreso}">
+								
+								</p:datePicker>
 							</div>
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="Folio:" />
 								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.folio}" disabled="true" styleClass="p-ml-2"/>
 							</div>
-						</div>
-						
-						<div class="p-grid">
+							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 31em">
 								<p:outputLabel value="Recibimos de:" />
-								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.cteCve.cteNombre}" />
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.cteCve.cteNombre}" disabled="true"/>
 							</div>
+							
 						</div>
+						
+						
 						
 						<p:dataTable id="dt-partida" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}"
 									rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList}" editable="true" editMode="cell">
@@ -134,11 +140,9 @@
 								
 							</p:column> 
 							
-							<p:column headerText="Piezas Por Tarima">
-								<h:outputText value="#{consultarConstanciaDeDepositoBean.piezasTarima}">
-								</h:outputText>
-								
-							</p:column> 
+							<p:column headerText="Piezas por Tarima">
+								#{partida.cantidadTotal / partida.noTarimas}							
+							</p:column>							
 							
 							<p:column headerText="Piezas" >
 							<p:cellEditor>
@@ -209,7 +213,7 @@
 						
 						<!-- Tabla de servicios por aviso-cliente -->
 						
-						<p:dataTable id="dt-ConstanciaDepositoDetalle" value="#{consultarConstanciaDeDepositoBean.listadoConstanciaDepositoDetalle}" var="constanciaDepositoDetalle" 
+						<p:dataTable id="dt-ConstanciaDepositoDetalle" widgetVar="constanciaDD" value="#{consultarConstanciaDeDepositoBean.listadoConstanciaDepositoDetalle}" var="constanciaDepositoDetalle" 
 									editable="true" editMode="cell" style="max-width:60em !important;margin: auto;" styleClass="p-mt-2">
 							
 							<f:facet name="header">
@@ -249,7 +253,7 @@
 						
 						<div class="p-grid p-mt-2">
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
-								<p:selectOneMenu autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.servicioSelected}">
+								<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.servicioSelected}">
 									<f:selectItem itemLabel="Selecciona un servicio" itemValue="" noSelectionOption="true"/>
 									<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoPrecioServicio}" var="pServicio" itemValue="#{pServicio.servicio}" itemLabel="#{pServicio.servicio.servicioDs}" />
 								</p:selectOneMenu>
@@ -260,14 +264,14 @@
 							</div>
 							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em">
-								<p:commandButton value="Agregar" actionListener="#{consultarConstanciaDeDepositoBean.saveServicio()}"></p:commandButton>
+								<p:commandButton value="Agregar" actionListener="#{consultarConstanciaDeDepositoBean.saveServicio()}" update="dt-ConstanciaDepositoDetalle"></p:commandButton>
 							</div>
 						</div>
 						
 						<div class="p-grid">
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
 								<p:outputLabel value="Temperatura:" />
-								<p:inputText id="temperatura" value="#{consultarConstanciaDeDepositoBean.temperatura}" placeholder="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.temperatura}"/>								
+								<p:inputText id="temperatura" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.temperatura}" placeholder="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.temperatura}"/>								
 							</div>
 							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
@@ -275,14 +279,6 @@
 								<p:inputText disabled="true" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList.get(0).rendimiento}" />								
 							</div>
 							
-							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em;margin: auto;">
-								<p:outputLabel value="Observaciones:" />
-								<p:inputTextarea id="observacion" value="#{consultarConstanciaDeDepositoBean.observaciones}" placeholder="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.observaciones}" />								
-							</div>
-							
-						</div>
-						
-						<div class="p-grid">
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
 								<p:outputLabel value="Nombre del Transportista:" />
 								<p:inputText disabled="true" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.nombreTransportista}" />								
@@ -292,12 +288,22 @@
 								<p:outputLabel value="Placas del Vehiculo:" />
 								<p:inputText disabled="true" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.placasTransporte}" />								
 							</div>
+							
+						</div>
+						
+						<div class="p-grid">
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em;margin: auto;">
+								<p:outputLabel value="Observaciones:" />
+								<p:inputTextarea id="observacion" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.observaciones}" placeholder="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.observaciones}" />								
+							</div>
 						</div>
 						
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Modificar Datos Generales" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura" />
+					<p:splitButton value="Modificar Datos Generales" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura" styleClass="edit-button ui-button-success p-mr-2" >
+						<p:menuitem value="Reimprimir Ticket" icon="pi pi-print" actionListener="#{consultarConstanciaDeDepositoBean.imprimir()}" ajax="false" process="@this"></p:menuitem>
+					</p:splitButton>
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgProductos').hide()"></p:commandButton>
 				</f:facet>	
 				
