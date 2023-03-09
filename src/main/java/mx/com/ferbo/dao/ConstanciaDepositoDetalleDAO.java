@@ -1,10 +1,12 @@
 package mx.com.ferbo.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -29,6 +31,24 @@ public class ConstanciaDepositoDetalleDAO extends IBaseDAO<ConstanciaDepositoDet
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public List<ConstanciaDepositoDetalle> buscarPorFolio(ConstanciaDeDeposito constanciaDeDeposito){
+		
+		List<ConstanciaDepositoDetalle> lista = new ArrayList<>();
+		
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("ConstanciaDepositoDetalle.findFolio", ConstanciaDepositoDetalle.class)
+					.setParameter("folio", constanciaDeDeposito.getFolio()).getResultList();
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		
+		
+		return lista;
+	}
 
 	@Override
 	public String actualizar(ConstanciaDepositoDetalle e) {
@@ -52,8 +72,22 @@ public class ConstanciaDepositoDetalleDAO extends IBaseDAO<ConstanciaDepositoDet
 	}
 
 	@Override
-	public String eliminar(ConstanciaDepositoDetalle e) {
+	public String eliminar(ConstanciaDepositoDetalle constanciaDepositoDetalle) {
 		// TODO Auto-generated method stub
+		
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			ConstanciaDepositoDetalle constancia = em.find(ConstanciaDepositoDetalle.class, constanciaDepositoDetalle.getConstanciaDepositoDetalleCve());
+			em.remove(constancia);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
+		
+		
 		return null;
 	}
 

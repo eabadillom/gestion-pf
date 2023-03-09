@@ -29,8 +29,19 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 	}
 
 	@Override
-	public String actualizar(UnidadDeProducto e) {
-		// TODO Auto-generated method stub
+	public String actualizar(UnidadDeProducto unidadDeProducto) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(unidadDeProducto);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
+		
+		
 		return null;
 	}
 
