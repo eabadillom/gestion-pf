@@ -33,8 +33,16 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				.getResultList();
 	}
 
+	public List<ConstanciaDeDeposito> buscarPorCliente(Integer cteCve){
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<ConstanciaDeDeposito> listado = null;
+		listado = em.createNamedQuery("ConstanciaDeDeposito.findByCteCve",ConstanciaDeDeposito.class).setParameter("cteCve", cteCve).getResultList();
+		return listado;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<ConstanciaDeDeposito> buscarPorCriterios(String folioCliente, Date fechaInico, Date fechaFin, int idCliente) {
+
 		// TODO Auto-generated method stub
 		
 		

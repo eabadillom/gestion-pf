@@ -20,8 +20,10 @@ public class ConstanciaDepositoDetalleDAO extends IBaseDAO<ConstanciaDepositoDet
 
 	@Override
 	public List<ConstanciaDepositoDetalle> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<ConstanciaDepositoDetalle> listado = null;
+		listado = em.createNamedQuery("ConstanciaDepositoDetalle.findAll", ConstanciaDepositoDetalle.class).getResultList();
+		return listado;
 	}
 
 	@Override
