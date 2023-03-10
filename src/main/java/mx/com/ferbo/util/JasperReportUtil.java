@@ -1,14 +1,20 @@
 package mx.com.ferbo.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+
 import java.io.OutputStream;
+import java.nio.Buffer;
 
 import javassist.bytecode.ByteArray;
 import net.sf.jasperreports.engine.JRException;
@@ -51,4 +57,25 @@ public class JasperReportUtil {
 			ex.printStackTrace();
 		}
 	}
+	public StreamedContent getPdf(String fileName, Map<String, Object> parameters, String path) throws IOException {
+		StreamedContent respuesta = null;
+		ByteArrayOutputStream output = null;
+		JasperDesign design = null;
+		JasperReport report = null;
+		JasperPrint jasperPrint = null;
+		try {
+			output = new ByteArrayOutputStream();
+			design = JRXmlLoader.load(path);
+			report = JasperCompileManager.compileReport(design);
+			jasperPrint = JasperFillManager.fillReport(report, parameters);
+			JasperExportManager.exportReportToPdfStream(jasperPrint, output);
+			byte[] buffer = output.toByteArray();
+			respuesta = DefaultStreamedContent.builder().contentType("application/pdf").name("Actor_List").stream(() -> new ByteArrayInputStream(buffer)).build();
+		} catch (JRException ex) {
+			ex.printStackTrace();
+		}
+		
+		return respuesta;
+	}
+
 }

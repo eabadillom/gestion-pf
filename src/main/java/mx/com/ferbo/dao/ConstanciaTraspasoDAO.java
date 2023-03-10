@@ -19,6 +19,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>{
 
+	public EntityManager em = null;
 	@Override
 	public ConstanciaTraspaso buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -134,6 +135,14 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 	public List<ConstanciaTraspaso> buscarPorCriterios(ConstanciaTraspaso e) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
 	}
 	
 

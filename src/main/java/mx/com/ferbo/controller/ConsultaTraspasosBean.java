@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -27,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
@@ -78,7 +81,7 @@ public class ConsultaTraspasosBean implements Serializable {
 
 	private static final long serialVersionUID = -3109002730694247052L;
 	private static Logger log = Logger.getLogger(AltaConstanciaServicioBean.class);
-
+    private StreamedContent reporte;
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;
 	private List<TraspasoServicio> alServiciosDetalle;
@@ -121,7 +124,7 @@ public class ConsultaTraspasosBean implements Serializable {
 	private ConstanciaTraspasoDAO constanciaTDAO;
 	private ConstanciaTraspasoDAO constanciatraspasoDAO;
 	private TraspasoServicioDAO traspasoServicioDAO;
-	
+	private ConstanciaServicioDAO constanciaServicioDAO;
 	
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
@@ -136,6 +139,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		constanciatraspasoDAO = new ConstanciaTraspasoDAO();
 		tpDAO = new TraspasoPartidaDAO();
 		traspasoServicioDAO = new TraspasoServicioDAO();
+		constanciaServicioDAO= new ConstanciaServicioDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
@@ -167,7 +171,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		EntityTransaction tr = em.getTransaction();
 		tr.begin();
-		//constanciatraspasoDAO.setEntityManager(em);
+		constanciatraspasoDAO.setEm(em);
 		System.out.println(getIdCliente() + " " + getFecha_ini() +" "+ getFecha_final() + " " + getNumero());
 		System.out.print(idCliente + " " + fecha_ini + " "+ fecha_final+ " "  + numero);
 		 listaTraspasos = constanciatraspasoDAO.buscarporNumero(numero);
@@ -216,17 +220,11 @@ public class ConsultaTraspasosBean implements Serializable {
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
-		ConstanciaTraspaso constancia = null;
-		List<ConstanciaTraspaso> alConstancias = null;
-		
-		alConstancias = constanciatraspasoDAO.buscarporNumero(numero);
 		File reportFile = new File(jasperPath);
 		File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		ConstanciaTraspaso cds = new ConstanciaTraspaso();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
-		parameters = new HashMap<String, Object>();
 		try {
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
@@ -235,29 +233,27 @@ public class ConsultaTraspasosBean implements Serializable {
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
-			constancia = new ConstanciaTraspaso();
-			constancia.setNumero(this.numero);
 			numero = String.valueOf(getNumero());
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("FOLIO", numero);
+			parameters.put("FOLIO", this.selectedconstancia.getNumero());
 			parameters.put("LogoPath", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			String path = reportFile.getPath();
+			//jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			reporte = jasperReportUtil.getPdf(filename, parameters, path);
 		} catch (Exception ex) {
 			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
-			message = String.format("No se pudo imprimir el folio %s", this.numero);
+			message = String.format("No se pudo imprimir el folio %s", this.selectedconstancia.getNumero());
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(severity, "Error en impresion", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:constanciaDetalle");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		} finally {
 			conexion.close((Connection) connection);
 		}
 	}
-
-
 
 
 		public void deleteServicio(TraspasoServicio servicio) {
@@ -513,6 +509,14 @@ public class ConsultaTraspasosBean implements Serializable {
 
 	public void setIdCliente(Integer idCliente) {
 		this.idCliente = idCliente;
+	}
+
+	public StreamedContent getReporte() {
+		return reporte;
+	}
+
+	public void setReporte(StreamedContent reporte) {
+		this.reporte = reporte;
 	}
 
 

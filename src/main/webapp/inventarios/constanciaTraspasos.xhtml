@@ -3,6 +3,7 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
 	template="/WEB-INF/template.xhtml">
 
 	<ui:define name="title">Constancia de Traspasos</ui:define>
@@ -161,11 +162,11 @@
 								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.subtotal}"/> 
 							</p:column>
 						</p:dataTable>
-    
+    					<pe:documentViewer id="documento" height="500" value="#{consultaTraspasosBean.reporte}" download="ReporteTraspaso.pdf"/>
 				</p:outputPanel>
 				</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Generar constancia" icon="pi pi-file-pdf" styleClass="ui-button-raised ui-button-secondary" actionListener="#{consultaTraspasosBean.jasper}" process="constanciaDetalle @this" />
+								<p:commandButton value="Generar constancia" icon="pi pi-file-pdf" styleClass="ui-button-raised ui-button-secondary" actionListener="#{consultaTraspasosBean.jasper}" update="documento"/>
 								<p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('dlg-constancia').hide()" />
 							</f:facet>
 						</p:dialog>
