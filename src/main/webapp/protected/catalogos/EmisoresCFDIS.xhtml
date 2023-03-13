@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="title">Emisores</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Emisores" />
+				<p:menuitem value="Emisores CFDIS" outcome="/protected/catalogos/EmisoresCFDIS" />
+			</p:breadCrumb>
+
+					
+			<p:toolbar styleClass="p-mb-4">
+				<p:toolbarGroup>
+					<p:commandButton value="Agregar" icon="pi pi-plus" 
+						actionListener="#{usuariosBean.openNew()}" update="pnlEmisor" 
+						oncomplete="PF('dialogEmisor').show();" styleClass="ui-button-info p-mr-2 p-mb-2"
+						 style="margin-right: .5rem" process="@this" />
+				</p:toolbarGroup>
+			</p:toolbar>
+				<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" />
+						
+						<p:dataTable id="dt-emisor" lazy="true" widgetVar="dtEmisor" var="emisordt"
+							value="#{emisoresCFDISBean.listaEmisor}" reflow="true"
+							rowKey="#{emisordt.cd_emisor}" paginator="true" rows="10"
+							paginatorPosition="bottom" rowSelectMode="add">
+							
+							<p:column headerText="Nombre">
+								<h:outputText value="#{emisordt.nb_emisor}" />
+							</p:column>
+
+							<p:column headerText="Tipo">
+								<h:outputText value="#{emisordt.tp_persona}" />
+							</p:column>
+
+							<p:column headerText="RFC">
+								<h:outputText value="#{emisordt.nb_rfc}" />
+							</p:column>
+
+							<p:column headerText="Inicio de operacionesl">
+								<h:outputText value="#{emisordt.nb_rfc}" />
+							</p:column>
+
+							<p:column headerText="Ult. Cambio">
+								<h:outputText value="#{emisordt.ft_ult_cambio}" />
+							</p:column>
+							
+							<p:column headerText="Status Padron">
+								<h:outputText value="#{emisordt.st_padron}" />
+							</p:column>
+							
+							<p:column headerText="Status Facturama">
+								<h:outputText value="#{emisordt.st_padron}" />
+							</p:column>
+					<p:column headerText="Acción" style="text-align:center">
+					
+					<p:commandButton icon="pi pi-pencil" update=":form:pnlEmisor" value="Modificar" 
+									oncomplete="PF('dialogEmisor').show();" styleClass="edit-button" process="@this" >
+					<f:setPropertyActionListener value="#{userdt}" target="#{emisoresCFDISBean.emisor.cd_emisor}" />
+					</p:commandButton>
+					<p:commandButton value="Eliminar" class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteClienteDialog').show()">
+				    <f:setPropertyActionListener value="#{userdt}" target="#{emisoresCFDISBean.emisor.cd_emisor}" />
+					</p:commandButton>
+					</p:column>
+					</p:dataTable>
+					</div>
+				</div>
+			</div>
+	
+			<p:dialog header="Agregar emisor" showEffect="fade"
+				modal="true" widgetVar="dialogEmisor" responsive="true">
+				
+			<p:outputPanel id="pnlEmisor" class="ui-fluid">
+                  
+                 <div class="card" style="width: 100%">
+			        <div class="grid ui-fluid mt-3 floatlabel-demo">
+			            <div class="col-12 md:col-6">
+			             <p:panelGrid columns="2" >
+			             
+			             <p:panel id="NombreEmisor">
+			                    <span class="ui-float-label ui-input-icon-right">
+			                        <p:inputText widgetVar="nombre-new" id="nombre-new" value="#{emisoresCFDISBean.emisor.nb_emisor}" required="true"/>
+			                        <p:outputLabel for="nombre-new" value="Nombre del emisor" styleClass="ml-4" />
+			                        <i class="pi pi-user" />
+			                    </span>
+			            </p:panel>
+			    
+			            <p:panel id="pmoral-pfisica">
+				        <p:selectBooleanCheckbox value="#{emisoresCFDISBean.emisor.tp_persona}" itemLabel="Persona Moral">
+				            <p:ajax/>
+				        </p:selectBooleanCheckbox>
+				          <p:selectBooleanCheckbox value="#{emisoresCFDISBean.emisor.tp_persona}" itemLabel="Persona Fisica">
+				            <p:ajax/>
+				        </p:selectBooleanCheckbox>
+				        </p:panel>
+				        
+            <p:panel id="RC">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="regimenC-new" id="regimenC-new" value="#{emisoresCFDISBean.emisor.nb_regimen_capital}" required="true"/>
+                        <p:outputLabel for="regimenC-new" value="Regimen Capital" styleClass="ml-4" />
+                    </span>
+                </p:panel>
+                
+                <p:panel id="RFC">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="RFC-new" id="RFC-new" value="#{emisoresCFDISBean.emisor.nb_rfc}" required="true"/>
+                        <p:outputLabel for="RFC-new" value="RFC" styleClass="ml-4" />
+                    </span>
+                </p:panel>
+                
+                <p:panel id="RF">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                       <p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.emisor.cd_regimen}" converter="entityConverter" >
+                            <f:selectItems value="#{emisoresCFDISBean.listaEmisor}" var="regimenFiscal" itemLabel="" itemValue="" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="regimenFiscal" value="Regimen Fiscal" />
+                    </span>
+                </div>
+                </p:panel>
+                
+                 <p:panel id="IniOperaciones">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+						<p:datePicker id="fechaInicial" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{emisoresCFDISBean.emisor.fh_inicio_op}" readonly="true"/>
+							<p:outputLabel for="fechaInicial" value="Inicio de operaciones" />
+                   </span>
+                </div>
+                </p:panel>
+                
+                <p:panel id="CambioSAT">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+						<p:datePicker id="cambioSAT" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{emisoresCFDISBean.emisor.fh_ult_cambio}" readonly="true" />
+							<p:outputLabel for="cambioSAT" value="Ultimo cambio en el SAT" />
+                   </span>
+                </div>
+                </p:panel>
+                
+                <p:panel id="StatusPadron">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                       <p:selectOneMenu id="statusPadron" value="#{emisoresCFDISBean.listaEmisor}" converter="entityConverter">
+							<f:selectItems var="statusPadron" value="#{emisoresCFDISBean.emisor.st_padron}" itemLabel="" itemValue="" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="statusPadron" value="Status en el padron" />
+                    </span>
+                </div>
+               </p:panel>                
+            			</p:panelGrid>
+		            </div>
+		        </div>
+			</div>
+			</p:outputPanel>
+						<f:facet name="footer">							
+								<p:commandButton value="Guardar" icon="pi pi-check" onclick="PF('dialogEmisor').hide()" 
+										actionListener="#{usuariosBean.guardar()}" process="pnlEmisor @this" update="pnlEmisor" target="#{emisoresCFDISBean.emisor}" 
+										oncomplete="PF('dialogEmisor').hide()"/>
+								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogEmisor').hide();" class="ui-button-secondary" >
+								</p:commandButton>
+							</f:facet>
+						</p:dialog>
+
+						<p:confirmDialog widgetVar="deleteEmisorDialog" showEffect="fade" width="400" message="Desea eliminar el usuario?" header="Eliminar" severity="warn">
+							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{usuariosBean.eliminar()}" oncomplete="PF('deleteEDialog').hide()" />
+							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteEmisorDialog').hide()" />
+						</p:confirmDialog>
+
+						<p:confirmDialog global="true" showEffect="fade" width="400" header="Eliminar">
+							<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+							<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
+						</p:confirmDialog>
+			<style>
+body .ui-panelgrid .ui-panelgrid-cell {
+	border: none !important;
+	padding: 0px;
+}
+
+.ui-fluid .ui-password {
+	width: 90% !important;
+	display: inline-block !important;
+}
+
+body .ui-input-icon-right>i:last-of-type {
+	right: 1rem;
+}
+
+body .ui-input-icon-right>.ui-inputfield {
+	width: 100%;
+}
+</style>
+		</h:form>
+	</ui:define>
+</ui:composition>

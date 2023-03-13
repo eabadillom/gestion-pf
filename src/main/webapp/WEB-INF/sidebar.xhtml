@@ -74,12 +74,12 @@
 						</p:submenu>
 						<p:submenu id="om_hierarchy" label="Hierarchy" icon="pi pi-fw pi-align-left">
 							<p:submenu id="om_sm1" label="Submenu 1" icon="pi pi-fw pi-align-left">
-								<p:submenu id="om_sm11" label="Submenu 1.1" icon="pi pi-fw pi-align-left">
+								<p:submenu id="om_sm110" label="Submenu 1.1" icon="pi pi-fw pi-align-left">
 									<p:menuitem id="om_lnk111" value="Link 1.1.1" icon="pi pi-fw pi-align-left" url="#" />
 									<p:menuitem id="om_lnk112" value="Link 1.1.2" icon="pi pi-fw pi-align-left" url="#" />
 									<p:menuitem id="om_lnk113" value="Link 1.1.3" icon="pi pi-fw pi-align-left" url="#" />
 								</p:submenu>
-								<p:submenu id="om_sm12" label="Submenu 1.2" icon="pi pi-fw pi-align-left">
+								<p:submenu id="om_sm1211" label="Submenu 1.2" icon="pi pi-fw pi-align-left">
 									<p:menuitem id="om_lnk121" value="Link 1.2.1" icon="pi pi-fw pi-align-left" url="#" />
 								</p:submenu>
 							</p:submenu>
@@ -98,9 +98,9 @@
 				<p:menuitem id="om_doc" value="Documentation" icon="pi pi-fw pi-info-circle" outcome="/documentation" />
 				<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
 				<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
-				<p:menuitem id="frb_inventarios_sm11" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
-				<p:menuitem id="frb_inventarios_sm12" value="Consultar"	icon="pi pi-fw pi-search" url="#" />
-				<p:menuitem id="frb_inventarios_sm13" value="Modificar"	icon="pi pi-fw pi-desktop" url="#" />
+				<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
+				<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" url="#" />
+				<p:menuitem id="frb_inventarios_sm133" value="Modificar"	icon="pi pi-fw pi-desktop" url="#" />
 							</p:submenu>
 						
 							<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
@@ -109,9 +109,9 @@
 								</p:submenu>
 							<p:submenu id="frb_inventarios_sm3" label="Salidas"
 								icon="pi pi-fw pi-plus">
-								<p:menuitem id="frb_inventarios_sm11" value="Alta"
+								<p:menuitem id="frb_inventarios_sm110" value="Alta"
 									icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
-								<p:menuitem id="frb_inventarios_sm12" value="Consultar"
+								<p:menuitem id="frb_inventarios_sm120" value="Consultar"
 									icon="pi pi-fw pi-search" outcome="/inventarios/consultarConstanciaDeDeposito" />
 								<p:menuitem id="frb_inventarios_sm13" value="Ordenes de salida"
 									icon="pi pi-fw pi-desktop" url="#" />
@@ -144,7 +144,8 @@
 								<p:menuitem id="frb_facturacion_ingresos_actualizar" value="Actualizar" icon="pi pi-fw pi-pencil" outcome="/protected/catalogos/ingAct" />
 							</p:submenu>
 							<p:submenu id="frb_facturacion_sm1" label="Catálogos" icon="pi pi-fw pi-th-large">
-								<p:menuitem id="frb_facturacion_sm11" value="Banco" icon="pi pi-fw pi-money-bill" outcome="/protected/catalogos/bancos" />
+								<p:menuitem id="frb_facturacion_sm122" value="Emisores CFDI" icon="pi pi-building " outcome="/protected/catalogos/EmisoresCFDIS" />							
+								<p:menuitem id="frb_facturacion_sm113" value="Banco" icon="pi pi-fw pi-money-bill" outcome="/protected/catalogos/bancos" />
 								<p:submenu id="frb_facturacionsm2" label="Domicilios" icon="pi pi-fw pi-building">
 									<p:menuitem id="frb_facturacion_domicilioCliente" value="Domicilios por Cliente" icon="pi pi-fw pi-home" outcome="/protected/catalogos/domicilios" />
 
@@ -164,7 +165,7 @@
 									<p:menuitem value="Serie de Facturas" icon="pi pi-file-o" outcome="/protected/catalogos/seriesFacturas" />
 									<p:menuitem value="Serie de Notas" icon="pi pi-book" outcome="/protected/catalogos/serieNotas" />
 								</p:submenu>
-								<p:menuitem id="frb_facturacion_sm12" value="Ud de Medida" icon="pi pi-fw pi-tags" outcome="/protected/catalogos/unidadManejo" />
+								<p:menuitem id="frb_facturacion_sm121" value="Ud de Medida" icon="pi pi-fw pi-tags" outcome="/protected/catalogos/unidadManejo" />
 								<p:menuitem value="Servicios" outcome="/protected/catalogos/servicios" icon="pi pi-fw pi-list" />
 								<p:menuitem value="Servicios por cliente" outcome="/protected/catalogos/serviciosPorCliente" icon="pi pi-fw pi-user-edit" />
 								<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" icon="pi pi-fw pi-user" />
