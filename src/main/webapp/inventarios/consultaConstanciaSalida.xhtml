@@ -51,7 +51,8 @@
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">						
-						<p:dataTable id="dt-ConstanciaSalida" widgetVar="dtConstanciaS" value="#{consultarConstanciaSalidaBean.listadoConstanciaSalida}" var="constanciaSalida">
+						<p:dataTable id="dt-ConstanciaSalida" widgetVar="dtConstanciaS" value="#{consultarConstanciaSalidaBean.listadoConstanciaSalida}" var="constanciaSalida" 
+						rows="10" paginator="true" paginatorPosition="bottom">
 						
 						<f:facet name="header">
 							<div>
@@ -159,9 +160,9 @@
 							</p:column>
 						
 						</p:dataTable>
-						
+							
 						<div class="p-grid">
-						
+							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em;" >
 								<p:outputLabel value="Observaciones: " />
 								<p:inputTextarea value="#{consultarConstanciaSalidaBean.constanciaSelect.observaciones}" disabled="true" />
@@ -176,15 +177,15 @@
 								<p:outputLabel value="Observaciones: " />
 								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.placasTransporte}" disabled="true" />
 							</div>
-						
+							
 						</div>
 																
 					</p:outputPanel>				
 				</p:outputPanel>		
 				
 				<f:facet name="footer">
-					<p:commandButton value="Cancelar Constancia" onclick="PF('dlgdetalleConstancia').hide()"></p:commandButton>
-					<p:commandButton value="Reimprimir"></p:commandButton>
+					<p:commandButton value="Cancelar Constancia" actionListener="#{consultarConstanciaSalidaBean.cancelarConstancia()}" onclick="PF('dlgdetalleConstancia').hide()" ></p:commandButton>
+					<p:commandButton value="Reimprimir" actionListener="#{consultarConstanciaSalidaBean.imprimirTicket()}" ajax="false" process="this"></p:commandButton>
 				</f:facet>
 					
 			</p:dialog>

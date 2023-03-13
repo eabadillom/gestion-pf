@@ -1,24 +1,38 @@
 package mx.com.ferbo.controller;
 
 
+import java.io.File;
 import java.io.Serializable;
+import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import org.primefaces.PrimeFaces;
+
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
+import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
@@ -29,6 +43,9 @@ public class consultarConstanciaSalidaBean implements Serializable{
 	
 	private ConstanciaSalidaDAO constanciaSalidaDAO;
 	private List<ConstanciaSalida> listadoConstanciaSalida;
+	
+	private DetalleConstanciaSalidaDAO detalleCSDAO;
+	private List<DetalleConstanciaSalida> listadoDetalleConstanciaS;
 	
 	private Date fechaInicial;
 	private Date fechaFinal;
@@ -47,6 +64,9 @@ public class consultarConstanciaSalidaBean implements Serializable{
 		listadoClientes = new ArrayList<Cliente>();
 		clienteDAO = new ClienteDAO();
 		
+		detalleCSDAO = new DetalleConstanciaSalidaDAO();
+		listadoDetalleConstanciaS = new ArrayList<>();
+		
 	}
 	
 	
@@ -54,6 +74,7 @@ public class consultarConstanciaSalidaBean implements Serializable{
 	public void init() {
 		
 		listadoClientes = clienteDAO.buscarTodos();
+		listadoDetalleConstanciaS = detalleCSDAO.buscarTodos();
 		
 		fechaInicial = new Date();
 		fechaFinal = new Date();
@@ -81,14 +102,73 @@ public class consultarConstanciaSalidaBean implements Serializable{
 		em.close();
 	}
 
+	public void imprimirTicket(){
+		
+		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
+		String filename = "ticket.pdf";
+		String images = "/images/logoF.png";
+		String message = null;
+		Severity severity = null;
+		ConstanciaSalida constancia = null;
+		File reportFile = new File(jasperPath);
+		File imgFile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			
+			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
+			URL resourceimg = getClass().getResource(images); 
+			String file = resource.getFile();//retorna la ubicacion del archivo
+			String img = resourceimg.getFile();
+			reportFile = new File(file);//crea un archivo
+			imgFile = new File(img);
+			constancia = new ConstanciaSalida();
+			constancia.setNumero(constanciaSelect.getNumero());
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("NUMERO", constancia.getNumero());
+			parameters.put("LogoPath", imgFile.getPath());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			   
+		} catch (Exception e) {
+			e.printStackTrace();
+			message = String.format("No se pudo imprimir el folio %s", constancia.getNumero());
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
+			PrimeFaces.current().ajax().update("form:messages");
+			
+		}finally {
+			conexion.close((Connection) connection);
+		}
+		
+		
+	}
 
+	public void cancelarConstancia() {//metodo para validaciones al cancelar constancia salida 
+		
+		Date fechaSalida = constanciaSelect.getFecha();//tomo fecha de constancia salida a cancelar
+		
+		for(DetalleConstanciaSalida d: constanciaSelect.getDetalleConstanciaSalidaList()) {
+			Partida buscarPartida = d.getPartidaCve();//obtengo la partida del primer detalle salida
+			for(DetalleConstanciaSalida detalle: listadoDetalleConstanciaS) {
+			
+				if(buscarPartida.equals(detalle.getPartidaCve())) {//busqueda de regristros detalle salida con la misma partida
+					
+					
+				}
+				
+			}			
+		}
+		
+	}
 
 	//metodo get y setter
 	
 	public List<ConstanciaSalida> getListadoConstanciaSalida() {
 		return listadoConstanciaSalida;
 	}
-
 
 	public void setListadoConstanciaSalida(List<ConstanciaSalida> listadoConstanciaSalida) {
 		this.listadoConstanciaSalida = listadoConstanciaSalida;
