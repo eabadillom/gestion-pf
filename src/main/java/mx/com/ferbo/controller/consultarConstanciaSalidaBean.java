@@ -148,20 +148,32 @@ public class consultarConstanciaSalidaBean implements Serializable{
 
 	public void cancelarConstancia() {//metodo para validaciones al cancelar constancia salida 
 		
-		Date fechaSalida = constanciaSelect.getFecha();//tomo fecha de constancia salida a cancelar
+		Date fechaSalida;
+		int coincidencias = 0;//variable que nos permitira saber si tiene fechas posteriores 
 		
-		for(DetalleConstanciaSalida d: constanciaSelect.getDetalleConstanciaSalidaList()) {
+		for(DetalleConstanciaSalida d: constanciaSelect.getDetalleConstanciaSalidaList()) {//recorro todos los detalles de salida de la constancia salida 
 			Partida buscarPartida = d.getPartidaCve();//obtengo la partida del primer detalle salida
-			for(DetalleConstanciaSalida detalle: listadoDetalleConstanciaS) {
-			
+			for(DetalleConstanciaSalida detalle: listadoDetalleConstanciaS) {//recorro lista de destalles para buscar coincidencias de la partida del detalle de la constancia
+				
 				if(buscarPartida.equals(detalle.getPartidaCve())) {//busqueda de regristros detalle salida con la misma partida
 					
+					fechaSalida = detalle.getConstanciaCve().getFecha();//recupero la fecha del registro al que pertenece la partida
 					
+					if(constanciaSelect.getFecha().before(fechaSalida)) {//validar si tiene fechas posteriores	
+						coincidencias = coincidencias + 1;
+					}
 				}
-				
-			}			
+			}
+			
+			if(coincidencias >= 1 ) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No Cancelada", "La Constancia De Salida: " +constanciaSelect.getNumero()+ " tiene fechas posteriores"));
+				//FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"No Cancelada","El detalle "+d.getId()+" tiene fechas posteriores"));
+				break;//solucion 2: mandar el mensaje de d y quitar el break para que valide todos los detalles si existen mas de 1 
+			}
+			
 		}
 		
+		PrimeFaces.current().ajax().update("form:messages");
 	}
 
 	//metodo get y setter
