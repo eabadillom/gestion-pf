@@ -30,6 +30,7 @@ import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -74,7 +75,6 @@ public class consultarConstanciaSalidaBean implements Serializable{
 	public void init() {
 		
 		listadoClientes = clienteDAO.buscarTodos();
-		listadoDetalleConstanciaS = detalleCSDAO.buscarTodos();
 		
 		fechaInicial = new Date();
 		fechaFinal = new Date();
@@ -146,33 +146,35 @@ public class consultarConstanciaSalidaBean implements Serializable{
 		
 	}
 
-	public void cancelarConstancia() {//metodo para validaciones al cancelar constancia salida 
+	public void cancelarConstancia() {
 		
 		Date fechaSalida;
-		int coincidencias = 0;//variable que nos permitira saber si tiene fechas posteriores 
+		int coincidencias = 0;
 		
-		for(DetalleConstanciaSalida d: constanciaSelect.getDetalleConstanciaSalidaList()) {//recorro todos los detalles de salida de la constancia salida 
-			Partida buscarPartida = d.getPartidaCve();//obtengo la partida del primer detalle salida
-			for(DetalleConstanciaSalida detalle: listadoDetalleConstanciaS) {//recorro lista de destalles para buscar coincidencias de la partida del detalle de la constancia
+		for(DetalleConstanciaSalida d: constanciaSelect.getDetalleConstanciaSalidaList()) {
+			Partida buscarPartida = d.getPartidaCve();
+			listadoDetalleConstanciaS = detalleCSDAO.buscarPorPartidaCve(buscarPartida);
+			
+			for(DetalleConstanciaSalida detalle: listadoDetalleConstanciaS) {
 				
-				if(buscarPartida.equals(detalle.getPartidaCve())) {//busqueda de regristros detalle salida con la misma partida
+				if(buscarPartida.equals(detalle.getPartidaCve())) {
+					fechaSalida = detalle.getConstanciaCve().getFecha();
 					
-					fechaSalida = detalle.getConstanciaCve().getFecha();//recupero la fecha del registro al que pertenece la partida
-					
-					if(constanciaSelect.getFecha().before(fechaSalida)) {//validar si tiene fechas posteriores	
+					if(constanciaSelect.getFecha().before(fechaSalida)) {	
 						coincidencias = coincidencias + 1;
 					}
 				}
 			}
-			
 			if(coincidencias >= 1 ) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No Cancelada", "La Constancia De Salida: " +constanciaSelect.getNumero()+ " tiene fechas posteriores"));
-				//FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"No Cancelada","El detalle "+d.getId()+" tiene fechas posteriores"));
-				break;//solucion 2: mandar el mensaje de d y quitar el break para que valide todos los detalles si existen mas de 1 
+				break;
 			}
-			
 		}
 		
+		if(coincidencias==0) {
+			constanciaSalidaDAO.actualizarStatus(constanciaSelect);
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancelada", "La Constancia De Salida "+constanciaSelect.getNumero()+" fue cancelada"));
+		}
 		PrimeFaces.current().ajax().update("form:messages");
 	}
 

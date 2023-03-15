@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -91,8 +92,27 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	}
 
 	@Override
-	public String actualizar(ConstanciaSalida e) {
+	public String actualizar(ConstanciaSalida constanciaSalida) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public String actualizarStatus(ConstanciaSalida constanciaSalida) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			Query actualizar = em.createNativeQuery(" UPDATE CONSTANCIA_SALIDA SET STATUS  = :status WHERE ID = :id ") ;
+			actualizar.setParameter("status",2);//si constancia de salida status es null colocar 1 en otro caso colocar 2
+			actualizar.setParameter("id", constanciaSalida.getId());
+			actualizar.executeUpdate();
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("ERROR "+e.getMessage());
+			return "ERROR";
+		}
+		
 		return null;
 	}
 
