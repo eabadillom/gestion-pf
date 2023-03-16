@@ -7,11 +7,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.hibernate.validator.internal.util.privilegedactions.GetResource;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
-import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
@@ -38,37 +36,72 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 	public List<EmisoresCFDIS> buscarTodos() {
 		List<EmisoresCFDIS> listaEmisores = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		listaEmisores = em.createNamedQuery("", EmisoresCFDIS.class).getResultList();
+		listaEmisores = em.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class).getResultList();
 		return listaEmisores;
 	}
 
 	@Override
 	public List<EmisoresCFDIS> buscarPorCriterios(EmisoresCFDIS e) {
-		// TODO Auto-generated method stub
+		List<EmisoresCFDIS> listaEmisores =null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+			listaEmisores = em.createNamedQuery("EmisoresCFDIS.findByregimenFiscal", EmisoresCFDIS.class).setParameter("cd_regimen", e.getCd_regimen()).getResultList();
+		return listaEmisores;
+	}
+
+	@Override
+	public String actualizar(EmisoresCFDIS emi) {
+		try{
+			EntityManager ent = getEntityManager();
+			ent.getTransaction().begin();
+			ent.merge(emi);
+			ent.getTransaction().commit();
+			ent.close();
+		}catch(Exception e){
+			return "Failed!" + e.getMessage();
+		}
 		return null;
 	}
 
 	@Override
-	public String actualizar(EmisoresCFDIS e) {
-		// TODO Auto-generated method stub
+	public String guardar(EmisoresCFDIS emi) {
+		try {
+			EntityManager ent = getEntityManager();
+			ent.getTransaction().begin();
+			ent.persist(emi);
+			ent.getTransaction().commit();
+			ent.close();
+		}catch(Exception e){
+			return "Failed" + e.getMessage();
+		}
 		return null;
 	}
 
 	@Override
-	public String guardar(EmisoresCFDIS e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String eliminar(EmisoresCFDIS e) {
-		// TODO Auto-generated method stub
+	public String eliminar(EmisoresCFDIS emi) {
+		try {
+			EntityManager ent = getEntityManager();
+			ent.getTransaction().begin();
+			ent.remove(ent.merge(emi));
+			ent.getTransaction().commit();
+			ent.close();
+		}catch(Exception e) {
+			return "Failed!"+e.getMessage();
+		}
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<EmisoresCFDIS> listado) {
-		// TODO Auto-generated method stub
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			for(EmisoresCFDIS emisores : listado) {
+				em.remove(em.merge(emisores));
+			}
+			em.getTransaction().commit();
+		}catch(Exception e){
+			System.out.println("Error" + e.getMessage());
+		}
 		return null;
 	}
 

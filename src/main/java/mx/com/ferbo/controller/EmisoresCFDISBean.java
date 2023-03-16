@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,7 +13,9 @@ import javax.inject.Named;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
+import mx.com.ferbo.dao.RegimenFiscalDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
+import mx.com.ferbo.model.RegimenFiscal;
 
 @Named
 @ViewScoped
@@ -21,7 +24,7 @@ public class EmisoresCFDISBean implements Serializable {
 	String pmoral;
 	String pfisica;
 	EmisoresCFDIS emisor;
-	String regimenFiscal;
+	RegimenFiscal regimenFiscal;
 	String tipoPersona;
 	String regimenCapital;
 	String RFC;
@@ -32,11 +35,18 @@ public class EmisoresCFDISBean implements Serializable {
 	Date ultSAT;
 	
 	EmisoresCFDISDAO emisoresDAO;
-	
+	RegimenFiscalDAO regimenFiscalDAO;
 	List<EmisoresCFDIS> listaEmisor;
+	List<RegimenFiscal> listaRegimenFiscal;
 	
 	public EmisoresCFDISBean() {
+	listaEmisor = new ArrayList<EmisoresCFDIS>();
+	listaRegimenFiscal = new ArrayList<RegimenFiscal>();
 	emisoresDAO = new EmisoresCFDISDAO();
+	regimenFiscalDAO = new RegimenFiscalDAO();
+	listaRegimenFiscal = regimenFiscalDAO.findAll();
+	listaEmisor = emisoresDAO.findall();
+	
 	}
 	
 	
@@ -124,12 +134,12 @@ public class EmisoresCFDISBean implements Serializable {
 	}
 
 
-	public String getRegimenFiscal() {
+	public RegimenFiscal getRegimenFiscal() {
 		return regimenFiscal;
 	}
 
 
-	public void setRegimenFiscal(String regimenFiscal) {
+	public void setRegimenFiscal(RegimenFiscal regimenFiscal) {
 		this.regimenFiscal = regimenFiscal;
 	}
 
@@ -195,6 +205,16 @@ public class EmisoresCFDISBean implements Serializable {
 
 	public void setUltSAT(Date ultSAT) {
 		this.ultSAT = ultSAT;
+	}
+
+
+	public List<RegimenFiscal> getListaRegimenFiscal() {
+		return listaRegimenFiscal;
+	}
+
+
+	public void setListaRegimenFiscal(List<RegimenFiscal> listaRegimenFiscal) {
+		this.listaRegimenFiscal = listaRegimenFiscal;
 	}
 	
 }

@@ -26,7 +26,7 @@
 						
 						<p:dataTable id="dt-emisor" lazy="true" widgetVar="dtEmisor" var="emisordt"
 							value="#{emisoresCFDISBean.listaEmisor}" reflow="true"
-							rowKey="#{emisordt.cd_emisor}" paginator="true" rows="10"
+							rowKey="#{emisordt.emisor}" paginator="true" rows="10"
 							paginatorPosition="bottom" rowSelectMode="add">
 							
 							<p:column headerText="Nombre">
@@ -115,8 +115,8 @@
                 <p:panel id="RF">
                 <div class="field">
                     <span class="ui-float-label ui-input-icon-right">
-                       <p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.emisor.cd_regimen}" converter="entityConverter" >
-                            <f:selectItems value="#{emisoresCFDISBean.listaEmisor}" var="regimenFiscal" itemLabel="" itemValue="" />
+                       <p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.regimenFiscal}" converter="entityConverter" >
+                            <f:selectItems value="#{emisoresCFDISBean.listaRegimenFiscal}" var="regimenFiscal" itemLabel="#{regimenFiscal.cd_regimen}" itemValue="#{regimenFiscal.cd_regimen}" />
                         </p:selectOneMenu>
                         <p:outputLabel for="regimenFiscal" value="Regimen Fiscal" />
                     </span>
@@ -144,8 +144,8 @@
                 <p:panel id="StatusPadron">
                 <div class="field">
                     <span class="ui-float-label ui-input-icon-right">
-                       <p:selectOneMenu id="statusPadron" value="#{emisoresCFDISBean.listaEmisor}" converter="entityConverter">
-							<f:selectItems var="statusPadron" value="#{emisoresCFDISBean.emisor.st_padron}" itemLabel="" itemValue="" />
+                       <p:selectOneMenu id="statusPadron" value="#{emisoresCFDISBean.emisor.st_padron}" converter="entityConverter">
+							<f:selectItems var="statusPadron" value="#{emisoresCFDISBean.listaEmisor}" itemLabel="#{statusPadron.st_padron}" itemValue="#{statusPadron}" />
                         </p:selectOneMenu>
                         <p:outputLabel for="statusPadron" value="Status en el padron" />
                     </span>

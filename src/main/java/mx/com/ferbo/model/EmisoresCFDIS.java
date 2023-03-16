@@ -67,7 +67,7 @@ public class EmisoresCFDIS implements Serializable {
 		
 		@Size(min = 1, max = 15)
 		@Column(name = "cd_regimen")
-		private String cd_regimen;
+		private RegimenFiscal cd_regimen;
 
 		public EmisoresCFDIS() {
 		}
@@ -136,16 +136,17 @@ public class EmisoresCFDIS implements Serializable {
 			this.st_padron = st_padron;
 		}
 
-		public String getCd_regimen() {
+		public RegimenFiscal getCd_regimen() {
 			return cd_regimen;
 		}
 
-		public void setCd_regimen(String cd_regimen) {
+		public void setCd_regimen(RegimenFiscal cd_regimen) {
 			this.cd_regimen = cd_regimen;
 		}
-
+		
+		
 		public EmisoresCFDIS(Integer cd_emisor, String nb_emisor, String tp_persona, String nb_regimen_capital,String nb_rfc, Date fh_inicio_op, Date fh_ult_cambio, 
-				String st_padron,String cd_regimen) {
+				String st_padron,RegimenFiscal cd_regimen) {
 			this.cd_emisor = cd_emisor;
 			this.nb_emisor = nb_emisor;
 			this.tp_persona = tp_persona;
