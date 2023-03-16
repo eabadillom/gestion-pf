@@ -97,10 +97,10 @@
 				<p:menuitem id="om_buy" value="Buy Now" icon="pi pi-fw pi-shopping-cart" url="https://www.primefaces.org/store" />
 				<p:menuitem id="om_doc" value="Documentation" icon="pi pi-fw pi-info-circle" outcome="/documentation" />
 				<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
-				<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
-				<p:menuitem id="frb_inventarios_sm11" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
-				<p:menuitem id="frb_inventarios_sm12" value="Consultar"	icon="pi pi-fw pi-search" url="#" />
-				<p:menuitem id="frb_inventarios_sm13" value="Modificar"	icon="pi pi-fw pi-desktop" url="#" />
+							<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
+								<p:menuitem id="frb_inventarios_sm11" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
+								<p:menuitem id="frb_inventarios_sm12" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/consultarConstanciaDeDeposito" />
+								<p:menuitem id="frb_inventarios_sm13" value="Modificar"	icon="pi pi-fw pi-desktop" url="#" />
 							</p:submenu>
 						
 							<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
@@ -109,11 +109,11 @@
 								</p:submenu>
 							<p:submenu id="frb_inventarios_sm3" label="Salidas"
 								icon="pi pi-fw pi-plus">
-								<p:menuitem id="frb_inventarios_sm11" value="Alta"
-									icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
-								<p:menuitem id="frb_inventarios_sm12" value="Consultar"
-									icon="pi pi-fw pi-search" outcome="/inventarios/consultarConstanciaDeDeposito" />
-								<p:menuitem id="frb_inventarios_sm13" value="Ordenes de salida"
+								<p:menuitem id="frb_inventariossm11" value="Alta"
+									icon="pi pi-fw pi-check" outcome="/inventarios/altaConstanciaSalida" />
+								<p:menuitem id="frb_inventariossm12" value="Consultar"
+									icon="pi pi-fw pi-search" outcome="/inventarios/consultaConstanciaSalida" />
+								<p:menuitem id="frb_inventariossm13" value="Ordenes de salida"
 									icon="pi pi-fw pi-desktop" url="#" />
 							</p:submenu>
 							<p:submenu id="frb_inventarios_sm2" label="Servicios"

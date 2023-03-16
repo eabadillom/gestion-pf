@@ -21,7 +21,13 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 	@Override
 	public List<DetalleConstanciaSalida> buscarTodos() {
 		// TODO Auto-generated method stub
-		return null;
+		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<DetalleConstanciaSalida> listado = null;
+		
+		listado = em.createNamedQuery("DetalleConstanciaSalida.findAll",DetalleConstanciaSalida.class).getResultList();
+		
+		return listado;
 	}
 
 	@Override
@@ -30,6 +36,16 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 		return null;
 	}
 
+	public List<DetalleConstanciaSalida> buscarPorPartidaCve(Partida partida){
+		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<DetalleConstanciaSalida> lista = null;
+		lista = em.createNamedQuery("DetalleConstanciaSalida.findByPartidaCve", DetalleConstanciaSalida.class)
+				.setParameter("partidaCve", partida.getPartidaCve()).getResultList();
+		
+		return lista;
+	}
+	
 	@Override
 	public String actualizar(DetalleConstanciaSalida e) {
 		// TODO Auto-generated method stub
