@@ -102,7 +102,7 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			Query actualizar = em.createNativeQuery(" UPDATE CONSTANCIA_SALIDA SET STATUS  = :status WHERE ID = :id ") ;
-			actualizar.setParameter("status",2);//si constancia de salida status es null colocar 1 en otro caso colocar 2
+			actualizar.setParameter("status",(constanciaSalida.getStatus()==null) ? 1:2);//si constancia de salida status es null colocar 1 en otro caso colocar 2
 			actualizar.setParameter("id", constanciaSalida.getId());
 			actualizar.executeUpdate();
 			em.getTransaction().commit();

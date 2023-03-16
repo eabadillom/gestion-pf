@@ -166,7 +166,7 @@ public class consultarConstanciaSalidaBean implements Serializable{
 				}
 			}
 			if(coincidencias >= 1 ) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No Cancelada", "La Constancia De Salida: " +constanciaSelect.getNumero()+ " tiene fechas posteriores"));
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No Cancelada", "La Constancia De Salida: " +constanciaSelect.getNumero()+ " tiene salidas posteriores"));
 				break;
 			}
 		}
