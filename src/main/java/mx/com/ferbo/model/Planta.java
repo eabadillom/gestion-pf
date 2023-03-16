@@ -98,7 +98,9 @@ public class Planta implements Serializable {
 	@Column(name ="nu_interior")
 	private String numinterior;
 	
-	
+	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
+	@ManyToOne
+	private EmisoresCFDIS idEmisoresCFDIS;//agregado
 	
 	public Planta() {
 
@@ -268,6 +270,14 @@ public class Planta implements Serializable {
     public void setFacturaList(List<Factura> facturaList) {
         this.facturaList = facturaList;
     }
+
+	public EmisoresCFDIS getIdEmisoresCFDIS() {
+		return idEmisoresCFDIS;
+	}
+
+	public void setIdEmisoresCFDIS(EmisoresCFDIS idEmisoresCFDIS) {
+		this.idEmisoresCFDIS = idEmisoresCFDIS;
+	}
 
 	@Override
 	public int hashCode() {

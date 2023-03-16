@@ -152,6 +152,13 @@
 
 		<p:outputLabel for="numint-new" value ="Num interior:"/>
 		<p:inputText id="numint-new" value="#{plantaBean.planta.numinterior}" required="true"/>
+		
+		<p:outputLabel for="razonSocial" value="Razon Social:" />
+		<p:selectOneMenu id="razonSocial" autoWidth="false" converter="entityConverter" value="#{plantaBean.emisorSelect}" >
+			<f:selectItem itemLabel="#{plantaBean.planta.idEmisoresCFDIS.nb_emisor}" itemValue=""/>
+			<f:selectItems value="#{plantaBean.listaEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"/>
+		</p:selectOneMenu>
+		
 			</p:panelGrid>
 			
 					</p:outputPanel>
