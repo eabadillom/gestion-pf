@@ -11,10 +11,12 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.file.UploadedFile;
 
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.RegimenFiscal;
 
 @Named
@@ -22,9 +24,7 @@ import mx.com.ferbo.model.RegimenFiscal;
 public class EmisoresCFDISBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	String pmoral;
-	String pfisica;
-	EmisoresCFDIS emisor;
-	RegimenFiscal regimenFiscal;
+	Integer pfisica;
 	String tipoPersona;
 	String regimenCapital;
 	String RFC;
@@ -33,11 +33,17 @@ public class EmisoresCFDISBean implements Serializable {
 	String nombreEmisor;
 	Date iniOperacion;
 	Date ultSAT;
+
+	EmisoresCFDIS emisor;
+	RegimenFiscal regimenFiscal;
 	
 	EmisoresCFDISDAO emisoresDAO;
 	RegimenFiscalDAO regimenFiscalDAO;
+	
 	List<EmisoresCFDIS> listaEmisor;
 	List<RegimenFiscal> listaRegimenFiscal;
+	
+	private UploadedFile file;
 	
 	public EmisoresCFDISBean() {
 	listaEmisor = new ArrayList<EmisoresCFDIS>();
@@ -46,11 +52,15 @@ public class EmisoresCFDISBean implements Serializable {
 	regimenFiscalDAO = new RegimenFiscalDAO();
 	listaRegimenFiscal = regimenFiscalDAO.findAll();
 	listaEmisor = emisoresDAO.findall();
-	
+	emisor = new EmisoresCFDIS();
 	}
 	
+	public void openNew() {
+		this.emisor = new EmisoresCFDIS();
+	};
 	
 	public void guardaEmisor() {
+		EmisoresCFDIS emisor = new EmisoresCFDIS();
 		PrimeFaces.current().executeScript("PF('dialogEmisor').hide()");
 		System.out.print(emisor);
 		emisor.setNb_emisor(this.nombreEmisor);
@@ -61,12 +71,12 @@ public class EmisoresCFDISBean implements Serializable {
 		emisor.setFh_ult_cambio(this.ultSAT);
 		emisor.setSt_padron(this.padron);
 		emisor.setCd_regimen(this.regimenFiscal);
-		String em = emisoresDAO.guardar(emisor);
+		String em = emisoresDAO.actualizar(emisor);
 		if(em == null) {
 			listaEmisor.clear();
 			listaEmisor = emisoresDAO.findall();
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Emisor agregado con exito" + emisor.getNb_emisor(),null));
-			PrimeFaces.current().ajax().update("form:messages","form:dt-EmisoresCFDIS");
+			PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
 		}else{
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al agregar el emisor" + emisor.getNb_emisor(), em));
 			PrimeFaces.current().ajax().update("form:messages");
@@ -74,6 +84,20 @@ public class EmisoresCFDISBean implements Serializable {
 		this.emisor = new EmisoresCFDIS();
 	}
 	
+	 public void upload() {
+	        if (file != null) {
+	            FacesMessage message = new FacesMessage("Successful", file.getFileName() + " is uploaded.");
+	            FacesContext.getCurrentInstance().addMessage(null, message);
+	        }
+	    }
+	 public void RegimenSelect() {
+		 if(tipoPersona != null ) {
+			 this.regimenFiscal.setCd_regimen(getRegimenFiscal().getNb_regimen());
+			listaRegimenFiscal = regimenFiscalDAO.buscarPorCriterios(regimenFiscal);
+		 }else {
+			 
+		 }
+	 }
 	public void actualizaEmisor() {
 		PrimeFaces.current().executeScript("PF('dialogEmisor').hide()");
 	    System.out.println(emisor);
@@ -99,10 +123,11 @@ public class EmisoresCFDISBean implements Serializable {
     	}
     }
     
-	public String getPfisica() {
+
+	public Integer getPfisica() {
 		return pfisica;
 	}
-	public void setPfisica(String pfisica) {
+	public void setPfisica(Integer pfisica) {
 		this.pfisica = pfisica;
 	}
 
@@ -128,11 +153,9 @@ public class EmisoresCFDISBean implements Serializable {
 		return listaEmisor;
 	}
 
-
 	public void setListaEmisor(List<EmisoresCFDIS> listaEmisor) {
 		this.listaEmisor = listaEmisor;
 	}
-
 
 	public RegimenFiscal getRegimenFiscal() {
 		return regimenFiscal;
@@ -215,6 +238,14 @@ public class EmisoresCFDISBean implements Serializable {
 
 	public void setListaRegimenFiscal(List<RegimenFiscal> listaRegimenFiscal) {
 		this.listaRegimenFiscal = listaRegimenFiscal;
+	}
+
+	public UploadedFile getFile() {
+		return file;
+	}
+
+	public void setFile(UploadedFile file) {
+		this.file = file;
 	}
 	
 }

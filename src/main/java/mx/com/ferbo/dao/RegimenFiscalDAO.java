@@ -41,7 +41,7 @@ public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscal, String>{
 	public List<RegimenFiscal> buscarPorCriterios(RegimenFiscal r) {
 		List<RegimenFiscal> listaRegimen = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		listaRegimen = em.createNamedQuery("RegimenFiscal.findBycdRegimen", RegimenFiscal.class).setParameter("cd_regimen", r.getCd_regimen()).getResultList();
+		listaRegimen = em.createNamedQuery("RegimenFiscal.findBycdRegimen", RegimenFiscal.class).setParameter("cd_regimen", r.getCd_regimen() ).getResultList();
 		return listaRegimen;
 	}
 

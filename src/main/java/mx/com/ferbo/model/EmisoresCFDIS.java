@@ -9,9 +9,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -26,48 +30,54 @@ import javax.validation.constraints.Size;
 	@NamedQuery(name = "EmisoresCFDIS.findByIniOperaciones", query = "SELECT e FROM EmisoresCFDIS e WHERE e.fh_inicio_op = :fh_inicio_op"),
 	@NamedQuery(name = "EmisoresCFDIS.findByultimoCambio", query = "SELECT e FROM EmisoresCFDIS e WHERE e.fh_ult_cambio = :ft_ult_cambio"),
 	@NamedQuery(name = "EmisoresCFDIS.findByPadron", query = "SELECT e FROM EmisoresCFDIS e WHERE e.st_padron = :st_padron"),
+	@NamedQuery(name = "EmisoresCFDIS.findByuuid", query ="SELECT e FROM EmisoresCFDIS e WHERE e.uuid = :uuid"),
 	@NamedQuery(name = "EmisoresCFDIS.findByregimenFiscal", query ="SELECT e FROM EmisoresCFDIS e WHERE e.cd_regimen = :cd_regimen")})
 public class EmisoresCFDIS implements Serializable {
 	
 		private static final long serialVersionUID = 1L;
 
+		@SuppressWarnings("static-access")
 		@Id
 		@GeneratedValue(strategy = GenerationType.IDENTITY)
 		@Basic(optional = false)
 		@Column(name = "cd_emisor")
 		private Integer cd_emisor;
 		
-		@Size(min = 1 , max = 15)
+		@Size(max = 20)
 		@Column(name = "nb_emisor")
 		private String nb_emisor;
 		
-		@Size(min = 1, max = 15)
+		@Size(max = 20)
 		@Column(name ="tp_persona")
 		private String tp_persona;
 		
-		@Size(min = 1, max =15)
+		@Size(max = 20)
 		@Column(name = "nb_regimen_capital")
 		private String nb_regimen_capital;
 		
-		@Size(min = 1, max = 15)
+		@Size(max = 20)
 		@Column(name = "nb_rfc")
 		private String nb_rfc;
 		
-		@Size(min = 1, max = 15)
 		@Column(name = "fh_inicio_op")
+		@Temporal(TemporalType.DATE)
 		private Date fh_inicio_op;
 		
-		@Size(min = 1, max = 15)
 		@Column(name = "fh_ult_cambio")
+		@Temporal(TemporalType.DATE)
 		private Date fh_ult_cambio;
 		
-		@Size(min = 1, max = 15)
+		@Size(max = 20)
 		@Column(name = "st_padron")
 		private String st_padron;
+		@Size(max = 20)
+		@JoinColumn(name = "cd_regimen")
+	    @ManyToOne
+	    private RegimenFiscal cd_regimen;
 		
-		@Size(min = 1, max = 15)
-		@Column(name = "cd_regimen")
-		private RegimenFiscal cd_regimen;
+		@Column(name = "uuid")
+		@Size(max = 20)
+		private String uuid = null;
 
 		public EmisoresCFDIS() {
 		}
@@ -145,8 +155,16 @@ public class EmisoresCFDIS implements Serializable {
 		}
 		
 		
+		public String getUuid() {
+			return uuid;
+		}
+
+		public void setUuid(String uuid) {
+			this.uuid = uuid;
+		}
+
 		public EmisoresCFDIS(Integer cd_emisor, String nb_emisor, String tp_persona, String nb_regimen_capital,String nb_rfc, Date fh_inicio_op, Date fh_ult_cambio, 
-				String st_padron,RegimenFiscal cd_regimen) {
+				String st_padron,RegimenFiscal cd_regimen, String uuid) {
 			this.cd_emisor = cd_emisor;
 			this.nb_emisor = nb_emisor;
 			this.tp_persona = tp_persona;
@@ -155,6 +173,7 @@ public class EmisoresCFDIS implements Serializable {
 			this.fh_inicio_op = fh_inicio_op;
 			this.fh_ult_cambio = fh_ult_cambio;
 			this.st_padron = st_padron;
+			this.uuid = uuid;
 			this.cd_regimen = cd_regimen;
 		}
 
