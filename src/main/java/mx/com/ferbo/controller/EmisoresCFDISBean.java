@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -16,7 +17,6 @@ import org.primefaces.model.file.UploadedFile;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
-import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.RegimenFiscal;
 
 @Named
@@ -27,7 +27,7 @@ public class EmisoresCFDISBean implements Serializable {
 	Integer pfisica;
 	String tipoPersona;
 	String regimenCapital;
-	String RFC;
+	String rfc;
 	String ultimoCambio;
 	String padron;
 	String nombreEmisor;
@@ -35,7 +35,8 @@ public class EmisoresCFDISBean implements Serializable {
 	Date ultSAT;
 
 	EmisoresCFDIS emisor;
-	RegimenFiscal regimenFiscal;
+	//RegimenFiscal regimenFiscal;
+	String regimenFiscal;
 	
 	EmisoresCFDISDAO emisoresDAO;
 	RegimenFiscalDAO regimenFiscalDAO;
@@ -46,39 +47,55 @@ public class EmisoresCFDISBean implements Serializable {
 	private UploadedFile file;
 	
 	public EmisoresCFDISBean() {
-	listaEmisor = new ArrayList<EmisoresCFDIS>();
-	listaRegimenFiscal = new ArrayList<RegimenFiscal>();
-	emisoresDAO = new EmisoresCFDISDAO();
-	regimenFiscalDAO = new RegimenFiscalDAO();
-	listaRegimenFiscal = regimenFiscalDAO.findAll();
-	listaEmisor = emisoresDAO.findall();
-	emisor = new EmisoresCFDIS();
+		listaEmisor = new ArrayList<EmisoresCFDIS>();
+		listaRegimenFiscal = new ArrayList<RegimenFiscal>();
+		emisoresDAO = new EmisoresCFDISDAO();
+		regimenFiscalDAO = new RegimenFiscalDAO();
+		listaRegimenFiscal = regimenFiscalDAO.findAll();
+		listaEmisor = emisoresDAO.findall();
+		emisor = new EmisoresCFDIS();
 	}
 	
-	public void openNew() {
+	@PostConstruct
+	public void init() {
+		this.nombreEmisor = new String("");
+	}
+	
+	
+	
+	public void newEmisor() {
 		this.emisor = new EmisoresCFDIS();
-	};
+		System.out.println("NombreEmisor: " + this.nombreEmisor);
+		this.nombreEmisor = new String("");
+		System.out.println("Generando nuevo emisor");
+	}
+	
+	public void agregaEmisor() {
+		System.out.println("Guardando...");
+		PrimeFaces.current().executeScript("PF('dialogEmisor').hide()");
+		System.out.println("Emisor: " + this.nombreEmisor);
+		System.out.println("Emisor: " + this.emisor);
+	}
 	
 	public void guardaEmisor() {
-		EmisoresCFDIS emisor = new EmisoresCFDIS();
 		PrimeFaces.current().executeScript("PF('dialogEmisor').hide()");
-		System.out.print(emisor);
+		emisor = new EmisoresCFDIS();
 		emisor.setNb_emisor(this.nombreEmisor);
 		emisor.setTp_persona(this.tipoPersona);
 		emisor.setNb_regimen_capital(this.regimenCapital);
-		emisor.setNb_rfc(this.RFC);
+		emisor.setNb_rfc(this.rfc);
 		emisor.setFh_inicio_op(this.iniOperacion);
 		emisor.setFh_ult_cambio(this.ultSAT);
 		emisor.setSt_padron(this.padron);
-		emisor.setCd_regimen(this.regimenFiscal);
+		//emisor.setCd_regimen(regimenFiscal);
 		String em = emisoresDAO.actualizar(emisor);
 		if(em == null) {
 			listaEmisor.clear();
 			listaEmisor = emisoresDAO.findall();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Emisor agregado con exito" + emisor.getNb_emisor(),null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Emisor agregado con exito" + emisor.getCd_emisor(), null));
 			PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
 		}else{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al agregar el emisor" + emisor.getNb_emisor(), em));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al agregar el emisor" + emisor.getCd_emisor(), em));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 		this.emisor = new EmisoresCFDIS();
@@ -92,8 +109,8 @@ public class EmisoresCFDISBean implements Serializable {
 	    }
 	 public void RegimenSelect() {
 		 if(tipoPersona != null ) {
-			 this.regimenFiscal.setCd_regimen(getRegimenFiscal().getNb_regimen());
-			listaRegimenFiscal = regimenFiscalDAO.buscarPorCriterios(regimenFiscal);
+			 //this.regimenFiscal.setCd_regimen(getRegimenFiscal().getCd_regimen());
+			//listaRegimenFiscal = regimenFiscalDAO.buscarPorCriterios(regimenFiscal);
 		 }else {
 			 
 		 }
@@ -156,15 +173,16 @@ public class EmisoresCFDISBean implements Serializable {
 	public void setListaEmisor(List<EmisoresCFDIS> listaEmisor) {
 		this.listaEmisor = listaEmisor;
 	}
-
-	public RegimenFiscal getRegimenFiscal() {
+	
+	public String getRegimenFiscal() {
 		return regimenFiscal;
 	}
 
 
-	public void setRegimenFiscal(RegimenFiscal regimenFiscal) {
+	public void setRegimenFiscal(String regimenFiscal) {
 		this.regimenFiscal = regimenFiscal;
 	}
+
 
 	public String getTipoPersona() {
 		return tipoPersona;
@@ -182,13 +200,15 @@ public class EmisoresCFDISBean implements Serializable {
 		this.regimenCapital = regimenCapital;
 	}
 
-	public String getRFC() {
-		return RFC;
+	public String getRfc() {
+		return rfc;
 	}
 
-	public void setRFC(String rFC) {
-		RFC = rFC;
+
+	public void setRfc(String rfc) {
+		this.rfc = rfc;
 	}
+
 
 	public String getUltimoCambio() {
 		return ultimoCambio;

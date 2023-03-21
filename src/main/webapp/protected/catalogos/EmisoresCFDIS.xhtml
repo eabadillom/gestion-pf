@@ -1,5 +1,9 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:jsf="http://xmlns.jcp.org/jsf">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml"
+	xmlns:jsf="http://xmlns.jcp.org/jsf">
 	<ui:define name="title">Emisores</ui:define>
 
 	<ui:define name="content">
@@ -7,161 +11,141 @@
 			<p:breadCrumb>
 				<p:menuitem value="Home" outcome="/dashboard" />
 				<p:menuitem value="Emisores" />
-				<p:menuitem value="Emisores CFDIS" outcome="/protected/catalogos/EmisoresCFDIS" />
+				<p:menuitem value="Emisores CFDIS"
+					outcome="/protected/catalogos/EmisoresCFDIS" />
 			</p:breadCrumb>
 
-					
+
 			<p:toolbar styleClass="p-mb-4">
 				<p:toolbarGroup>
-					<p:commandButton value="Agregar" icon="pi pi-plus" 
-						actionListener="#{usuariosBean.openNew()}" update="pnlEmisor" 
-						oncomplete="PF('dialogEmisor').show();" styleClass="ui-button-info p-mr-2 p-mb-2"
-						 style="margin-right: .5rem" process="@this" />
+					<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{emisoresCFDISBean.newEmisor}" update="pnlEmisor" oncomplete="PF('dialogEmisor').show();" styleClass="ui-button-info p-mr-2 p-mb-2" style="margin-right: .5rem" process="@this" />
 				</p:toolbarGroup>
 			</p:toolbar>
-				<div class="p-grid crud-demo">
+			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
 						<p:growl id="messages" showDetail="true" />
-						
-						<p:dataTable id="dt-emisor" lazy="true" widgetVar="dtEmisor" var="emisordt"
-							value="#{emisoresCFDISBean.listaEmisor}" reflow="true"
-							rowKey="#{emisordt.emisor}" paginator="true" rows="10"
-							paginatorPosition="bottom" rowSelectMode="add">
-							
+						<p:dataTable id="dt-emisor" lazy="true" widgetVar="dtEmisor" var="emisordt" value="#{emisoresCFDISBean.listaEmisor}" reflow="true" rowKey="#{emisordt.emisor}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
 							<p:column headerText="Nombre">
 								<h:outputText value="#{emisordt.nb_emisor}" />
 							</p:column>
-
 							<p:column headerText="Tipo">
 								<h:outputText value="#{emisordt.tp_persona}" />
 							</p:column>
-
 							<p:column headerText="RFC">
 								<h:outputText value="#{emisordt.nb_rfc}" />
 							</p:column>
-
 							<p:column headerText="Inicio de operacionesl">
 								<h:outputText value="#{emisordt.nb_rfc}" />
 							</p:column>
-
 							<p:column headerText="Ult. Cambio">
 								<h:outputText value="#{emisordt.fh_ult_cambio}" />
 							</p:column>
-							
 							<p:column headerText="Status Padron">
 								<h:outputText value="#{emisordt.st_padron}" />
 							</p:column>
-							
-					<p:column headerText="Acción" style="text-align:right">
-					<p:commandButton icon="pi pi-pencil" update=":form:pnlEmisor" value="Modificar" oncomplete="PF('dialogEmisor').show();" styleClass="edit-button" process="@this" >
-					<f:setPropertyActionListener value="#{userdt}" target="#{emisoresCFDISBean.emisor}" />
-					</p:commandButton>
-					</p:column>
-					<p:column>
-					<p:commandButton value="Archivos CSD" styleClass="ui-button-raised ui-button-secondary" oncomplete="PF('dialogCSD').show()" icon="pi pi-upload" process="@this" >
-				    <f:setPropertyActionListener value="#{userdt}" target="#{emisoresCFDISBean.emisor}" />
-					</p:commandButton>
-					</p:column>
-					</p:dataTable>
+							<p:column headerText="Acción" style="text-align:right">
+								<p:commandButton icon="pi pi-pencil" update=":form:pnlEmisor" value="Modificar" oncomplete="PF('dialogEmisor').show();" styleClass="edit-button" process="@this">
+									<f:setPropertyActionListener value="#{userdt}" target="#{emisoresCFDISBean.emisor}" />
+								</p:commandButton>
+							</p:column>
+							<p:column>
+								<p:commandButton value="Archivos CSD" styleClass="ui-button-raised ui-button-secondary" oncomplete="PF('dialogCSD').show()" icon="pi pi-upload" process="@this">
+									<f:setPropertyActionListener value="#{userdt}" target="#{emisoresCFDISBean.emisor}" />
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
 					</div>
 				</div>
 			</div>
-	
-			<p:dialog header="Agregar emisor" showEffect="fade"
-				modal="true" widgetVar="dialogEmisor" responsive="true">	
-			<p:outputPanel id="pnlEmisor" class="ui-fluid">
-                  <p:outputPanel rendered="#{not empty emisoresCFDISBean.listaEmisor}">
-                 <div class="card" style="width: 100%">
-			        <div class="grid ui-fluid mt-3 floatlabel-demo">
-			            <div class="col-12 md:col-6">
-			             <p:panelGrid columns="2" >
-			             
-			             <p:panel id="NombreEmisor">
-			                    <span class="ui-float-label ui-input-icon-right">
-			                        <p:inputText widgetVar="nombre-new" id="nombre-new" value="#{emisoresCFDISBean.nombreEmisor}" required="true"/>
-			                        <p:outputLabel for="nombre-new" value="Nombre del emisor" styleClass="ml-4" />
-			                        <i class="pi pi-user" />
-			                    </span>
-			            </p:panel>
-			    
-			            <p:panel id="pmoral-pfisica">
-			            <p:selectOneRadio id="console" value="#{radioView.console}">
-					            <f:selectItem itemLabel="Persona Moral" itemValue="" value="#{emisoresCFDISBean.tipoPersona}" />
-					            <f:selectItem itemLabel="Persona Fisica" itemValue="" value="#{emisoresCFDISBean.tipoPersona}"/>
-								<p:ajax listener="#{emisoresCFDISBean.RegimenSelect}" process="@this" update = "regimenFiscal"/>
-					        </p:selectOneRadio>
-				        </p:panel>
-				        
-            <p:panel id="RC">
-                    <span class="ui-float-label ui-input-icon-right">
-                        <p:inputText widgetVar="regimenC-new" id="regimenC-new" value="#{emisoresCFDISBean.regimenCapital}" required="true" />
-                        <p:outputLabel for="regimenC-new" value="Regimen Capital" styleClass="ml-4" />
-                    </span>
-                </p:panel>
-                
-                <p:panel id="RFC">
-                    <span class="ui-float-label ui-input-icon-right">
-                        <p:inputText widgetVar="RFC-new" id="RFC-new" value="#{emisoresCFDISBean.RFC}" required="true" />
-                        <p:outputLabel for="RFC-new" value="RFC" styleClass="ml-4" />
-                    </span>
-                </p:panel>
-                
-                <p:panel id="RF">
-                <div class="field">
-                    <span class="ui-float-label ui-input-icon-right">
-                       <p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.regimenFiscal}" converter="entityConverter" >
-                       <f:selectItem itemLabel="---Seleccione---" itemValue=""  />
-                        <f:selectItems value="#{emisoresCFDISBean.listaRegimenFiscal}" var="regimenFiscal" itemLabel="#{regimenFiscal.nb_regimen}" itemValue="#{regimenFiscal.cd_regimen}"/>
-                        <p:ajax listener="#{plantaBean.handleContrySelect}" process="@this"  />
-                        </p:selectOneMenu>
-                        <p:outputLabel for="regimenFiscal" value="Regimen Fiscal" />
-                    </span>
-                </div>
-                </p:panel>
-                
-                 <p:panel id="IniOperaciones">
-                <div class="field">
-                    <span class="ui-float-label ui-input-icon-right">
-						<p:datePicker id="fechaInicial" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{emisoresCFDISBean.iniOperacion}" readonly="true"/>
-							<p:outputLabel for="fechaInicial" value="Inicio de operaciones" />
-                   </span>
-                </div>
-                </p:panel>
-                
-                <p:panel id="CambioSAT">
-                <div class="field">
-                    <span class="ui-float-label ui-input-icon-right">
-						<p:datePicker id="cambioSAT" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{emisoresCFDISBean.ultSAT}" readonly="true" />
-							<p:outputLabel for="cambioSAT" value="Ultimo cambio en el SAT" />
-                   </span>
-                </div>
-                </p:panel>
-                
-                <p:panel id="StatusPadron">
-                <div class="field">
-                    <span class="ui-float-label ui-input-icon-right">
-                       <p:selectOneMenu id="statusPadron" value="#{emisoresCFDISBean.padron}" converter="entityConverter">
-							<f:selectItems var="statusPadron" value="#{emisoresCFDISBean.listaEmisor}" itemLabel="#{statusPadron.st_padron}" itemValue="#{statusPadron}" />
-                        </p:selectOneMenu>
-                        <p:outputLabel for="statusPadron" value="Status en el padron" />
-                    </span>
-                </div>
-               </p:panel>                
-            			</p:panelGrid>
-		            </div>
-		        </div>
-			</div>
-			</p:outputPanel>
-			</p:outputPanel>
-						<f:facet name="footer">							
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardaEmisor}" process="@this" />
-								<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogEmisor').hide()"  >
-								</p:commandButton>
-							</f:facet>
-						</p:dialog>
+			<p:dialog header="Agregar emisor" showEffect="fade" modal="true" widgetVar="dialogEmisor" responsive="true">
+				<p:outputPanel id="pnlEmisor" class="ui-fluid">
+					<!-- <p:outputPanel rendered="#{not empty emisoresCFDISBean.emisor}"> -->
+					<p:outputPanel>
+						<div class="card" style="width: 100%">
+							<div class="grid ui-fluid mt-3 floatlabel-demo">
+								<div class="col-12 md:col-6">
+									<p:panelGrid columns="2">
+										<p:panel id="NombreEmisor">
+											<span class="ui-float-label ui-input-icon-right">
+												<p:outputLabel for="nombre-new" value="Nombre del emisor" styleClass="ml-4" />
+												<p:inputText widgetVar="nombre-new" id="nombre-new" value="#{emisoresCFDISBean.nombreEmisor}" required="true" /> <i class="pi pi-user" />
+											</span>
+										</p:panel>
+										<p:panel id="pmoral-pfisica">
+											<!-- <p:selectOneRadio id="console" value="#{emisoresCFDISBean.emisor.tp_persona}">
+											  <f:selectItem itemLabel="Persona Moral" itemValue="M" value="M" />
+											<f:selectItem itemLabel="Persona Fisica" itemValue="F" value="F"/>
+											<p:ajax />
+											 </p:selectOneRadio> -->
+										</p:panel>
+										<p:panel id="RC">
+											<span class="ui-float-label ui-input-icon-right">
+												<p:outputLabel for="regimenC-new" value="Regimen Capital" styleClass="ml-4" />
+												<p:inputText widgetVar="regimenC-new" id="regimenC-new" value="#{emisoresCFDISBean.emisor.nb_regimen_capital}" required="true" />
+											</span>
+										</p:panel>
+										<p:panel id="RFC">
+											<span class="ui-float-label ui-input-icon-right">
+												<p:outputLabel for="RFC-new" value="RFC" styleClass="ml-4" />
+												<p:inputText widgetVar="RFC-new" id="RFC-new" value="#{emisoresCFDISBean.emisor.nb_rfc}" required="true" />
+											</span>
+										</p:panel>
+										<p:panel id="RF">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+												<p:outputLabel for="regimenFiscal" value="Regimen Fiscal" />
+													<p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.regimenFiscal}" converter="entityConverter">
+															<f:selectItem itemLabel="---Seleccione---" itemValue="" />
+															<f:selectItems value="#{emisoresCFDISBean.listaRegimenFiscal}" var="regimenFiscal" itemLabel="#{regimenFiscal.nb_regimen}" itemValue="#{regimenFiscal.cd_regimen}" />
+															<p:ajax listener="#{plantaBean.handleContrySelect}" process="@this" />
+													</p:selectOneMenu>
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="IniOperaciones">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:outputLabel for="fechaInicial" value="Inicio de operaciones" />
+													<p:datePicker id="fechaInicial" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{emisoresCFDISBean.iniOperacion}" readonly="true" />
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="CambioSAT">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:datePicker id="cambioSAT" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{emisoresCFDISBean.ultSAT}" readonly="true" />
+													<p:outputLabel for="cambioSAT" value="Ultimo cambio en el SAT" />
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="StatusPadron">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right"> <p:outputLabel
+														for="statusPadron" value="Status en el padron" /> <p:selectOneMenu
+														id="statusPadron" value="#{emisoresCFDISBean.padron}"
+														converter="entityConverter">
+														<f:selectItem itemLabel="Activo" itemValue="A" />
+														<f:selectItem itemLabel="Baja" itemValue="B" />
+													</p:selectOneMenu>
+												</span>
+											</div>
+										</p:panel>
+									</p:panelGrid>
+								</div>
+							</div>
+						</div>
+					</p:outputPanel>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" icon="pi pi-check" process="@this"
+						actionListener="#{emisoresCFDISBean.agregaEmisor()}" />
+					<p:commandButton value="Cancelar" icon="pi pi-times"
+						class="ui-button-secondary" onclick="PF('dialogEmisor').hide()" />
+				</f:facet>
+			</p:dialog>
 
-			<p:dialog header="Carga de archivos CSD" showEffect="fade" modal="true" widgetVar="dialogCSD" responsive="true" width="800" height="300">  
+			<!-- <p:dialog header="Carga de archivos CSD" showEffect="fade" modal="true" widgetVar="dialogCSD" responsive="true" width="800" height="300">  
 			<p:outputPanel id="pnlCarga" class="ui-fluid">
 			        <div class="grid ui-fluid mt-3 floatlabel-demo">
 			             <p:panelGrid columns="2" >
@@ -193,9 +177,7 @@
 					                </div>
                						</p:panel>
                						 
-               						 <p:divider layout="vertical">
-						                <b>OR</b>
-						            </p:divider>
+               						
 						          
 						            
                				
@@ -206,11 +188,11 @@
 		        </div>
 			</p:outputPanel>
 						<f:facet name="footer">							
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardaEmisor}" />
+								<p:commandButton value="Guardar" icon="pi pi-check" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogCSD').hide()">
 								</p:commandButton>
 							</f:facet>
-						</p:dialog>
+						</p:dialog> -->
 
 			<style>
 body .ui-panelgrid .ui-panelgrid-cell {

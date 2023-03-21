@@ -32,9 +32,10 @@ public class RegimenFiscal implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
-	@Basic(optional = false)
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@NotNull
-	@Size(min = 1, max = 5)
+	@Size(max=5)
+	@Basic(optional = false)
 	@Column(name = "cd_regimen")
 	private String cd_regimen;
 	
