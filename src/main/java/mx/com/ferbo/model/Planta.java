@@ -100,7 +100,7 @@ public class Planta implements Serializable {
 	
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
 	@ManyToOne
-	private EmisoresCFDIS idEmisoresCFDIS;//agregado
+	private EmisoresCFDIS idEmisoresCFDIS;//agregado	
 	
 	public Planta() {
 
@@ -269,7 +269,7 @@ public class Planta implements Serializable {
 
     public void setFacturaList(List<Factura> facturaList) {
         this.facturaList = facturaList;
-    }
+    }	
 
 	public EmisoresCFDIS getIdEmisoresCFDIS() {
 		return idEmisoresCFDIS;

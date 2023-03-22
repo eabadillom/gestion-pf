@@ -34,17 +34,20 @@ public class RegimenFiscal implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@NotNull
-	@Size(min = 1, max = 5)
-	@Column(name = "cd_regimen")
+	@Column(name = "cd_regimen", nullable=false)
 	private String cd_regimen;
 	
 	@Size(min = 1, max = 255)
 	@Column (name = "nb_regimen")
 	private String nb_regimen;
 	
+	@Basic(optional = false)
+    @NotNull
 	@Column(name = "st_per_fisica")
 	private boolean personaFisica;
 	
+	@Basic(optional = false)
+    @NotNull
 	@Column(name = "st_per_moral")
 	private boolean personaMoral;
 	
@@ -64,11 +67,9 @@ public class RegimenFiscal implements Serializable {
 		return cd_regimen;
 	}
 
-
 	public void setCd_regimen(String cd_regimen) {
 		this.cd_regimen = cd_regimen;
 	}
-
 
 	public String getNb_regimen() {
 		return nb_regimen;
@@ -78,19 +79,19 @@ public class RegimenFiscal implements Serializable {
 		this.nb_regimen = nb_regimen;
 	}
 
-	public Boolean getPersonaFisica() {
+	public boolean isPersonaFisica() {
 		return personaFisica;
 	}
 
-	public void setPersonaFisica(Boolean personaFisica) {
+	public void setPersonaFisica(boolean personaFisica) {
 		this.personaFisica = personaFisica;
 	}
 
-	public Boolean getPersonaMoral() {
+	public boolean isPersonaMoral() {
 		return personaMoral;
 	}
 
-	public void setPersonaMoral(Boolean personaMoral) {
+	public void setPersonaMoral(boolean personaMoral) {
 		this.personaMoral = personaMoral;
 	}
 
@@ -125,8 +126,8 @@ public class RegimenFiscal implements Serializable {
 			return false;
 		RegimenFiscal other = (RegimenFiscal) obj;
 		return Objects.equals(cd_regimen, other.cd_regimen) && Objects.equals(nb_regimen, other.nb_regimen)
-				&& Objects.equals(personaFisica, other.personaFisica)
-				&& Objects.equals(personaMoral, other.personaMoral) && Objects.equals(vigenciaFin, other.vigenciaFin)
+				&& personaFisica == other.personaFisica && personaMoral == other.personaMoral
+				&& Objects.equals(vigenciaFin, other.vigenciaFin)
 				&& Objects.equals(vigenciaInicio, other.vigenciaInicio);
 	}
 
@@ -136,20 +137,5 @@ public class RegimenFiscal implements Serializable {
 				+ personaFisica + ", personaMoral=" + personaMoral + ", vigenciaInicio=" + vigenciaInicio
 				+ ", vigenciaFin=" + vigenciaFin + "]";
 	}
-
-	public RegimenFiscal(@NotNull @Size(min = 1, max = 15) String cd_regimen,
-			@Size(min = 1, max = 15) String nb_regimen, @Size(min = 1, max = 15) Boolean personaFisica,
-			@Size(min = 1, max = 15) Boolean personaMoral, @Size(min = 1, max = 15) Date vigenciaInicio,
-			@Size(min = 1, max = 15) Date vigenciaFin) {
-		super();
-		this.cd_regimen = cd_regimen;
-		this.nb_regimen = nb_regimen;
-		this.personaFisica = personaFisica;
-		this.personaMoral = personaMoral;
-		this.vigenciaInicio = vigenciaInicio;
-		this.vigenciaFin = vigenciaFin;
-	}
-
-	
 	
 }
