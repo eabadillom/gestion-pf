@@ -71,7 +71,7 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 			ent.getTransaction().commit();
 			ent.close();
 		}catch(Exception e){
-			return "Failed" + e.getMessage();
+ 			return "Failed" + e.getMessage();
 		}
 		return null;
 	}

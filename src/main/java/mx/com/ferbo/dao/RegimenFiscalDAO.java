@@ -11,6 +11,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscal, String>{
 
 	
+	@SuppressWarnings("unchecked")
 	public List<RegimenFiscal> findAll(){
 		EntityManager entity = EntityManagerUtil.getEntityManager();
 		List<RegimenFiscal> listaRegimen = null;
@@ -29,6 +30,24 @@ public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscal, String>{
 		return rf;
 	}
 
+		public List<RegimenFiscal> buscarPorPersonaFisica() {
+			List<RegimenFiscal> listaRegimen = null;
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			listaRegimen = em.createNamedQuery("RegimenFiscal.findByst_per_fisica", RegimenFiscal.class).getResultList();
+		return listaRegimen;
+	}
+	
+	
+		public List<RegimenFiscal> buscarPorPersonaMoral() {
+			List<RegimenFiscal> listaRegimen = null;
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			listaRegimen = em.createNamedQuery("RegimenFiscal.findByst_per_moral", RegimenFiscal.class).getResultList();
+		return listaRegimen;
+	}
+		
+
+	
+	
 	@Override
 	public List<RegimenFiscal> buscarTodos() {
 		List<RegimenFiscal> listaRegimen = null;
