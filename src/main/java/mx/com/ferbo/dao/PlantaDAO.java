@@ -2,7 +2,6 @@ package mx.com.ferbo.dao;
 
 import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,10 +9,7 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
-import mx.com.ferbo.facturacion.facturama.FacturamaBL;
-import mx.com.ferbo.facturacion.facturama.Product;
-
-import mx.com.ferbo.facturacion.facturama.response.BranchOfficeViewModel;
+import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
 
@@ -38,7 +34,14 @@ public class PlantaDAO {
 		return usuarios;
 	}
 
-	
+	@SuppressWarnings("unchecked")
+	public List<EmisoresCFDIS> getEmisor() {
+		EntityManager entity = getEntityManager();
+		List<EmisoresCFDIS> emisor = null;
+		Query sql = entity.createQuery("SELECT e FROM EmisoresCFDIS e ");
+		emisor = sql.getResultList();
+		return emisor;
+	}
 	
 	public String save(Planta p) {
 		try {

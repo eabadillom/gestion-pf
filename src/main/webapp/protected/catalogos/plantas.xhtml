@@ -51,8 +51,8 @@
 
 							<p:column headerText="Responsable Planta">
 								<h:outputText value="#{planta.idUsuario.usuario}" />
-							</p:column>
-
+							</p:column>							
+							
 							<p:column headerText="Acción" style="text-align:center">
 							
 								<p:commandButton icon="pi pi-pencil" update=":form:frm-agrega" value="Modificar"
@@ -100,7 +100,13 @@
 		<p:selectOneMenu id="responsable" value="#{plantaBean.planta.idUsuario}" converter="entityConverter" >
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""  />
 			<f:selectItems value="#{plantaBean.usuarios}" var="user" itemLabel="#{user.usuario}" itemValue="#{user}" />
-			<p:ajax />
+		</p:selectOneMenu>
+		
+		<p:outputLabel for="razonSocial" value="Razon Social:" />
+		<p:selectOneMenu id="razonSocial" autoWidth="false" value="#{plantaBean.planta.idEmisoresCFDIS}" converter="entityConverter" required="true" requiredMessage="Ingresa Razon Social">
+			<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
+			<f:selectItems value="#{plantaBean.listaEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"></f:selectItems>
+			<p:ajax update="messages" />
 		</p:selectOneMenu>
 		
 		<p:outputLabel for="pais" value="Pais:" />
@@ -152,6 +158,8 @@
 
 		<p:outputLabel for="numint-new" value ="Num interior:"/>
 		<p:inputText id="numint-new" value="#{plantaBean.planta.numinterior}" required="true"/>
+		
+		
 			</p:panelGrid>
 			
 					</p:outputPanel>
@@ -159,7 +167,7 @@
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-check" onclick="PF('dg-agrega').hide()"
 						actionListener="#{plantaBean.update()}"  update="frm-agrega" styleClass="p-mr-2 p-mb-2" target="#{plantaBean.planta}" oncomplete="PF('dg-agrega').hide()"/>
-					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dg-agrega').hide()" class="ui-button-danger" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dg-agrega').hide()" class="ui-button-danger" process="@this"/>
 				</f:facet>
 			</p:dialog>
 			

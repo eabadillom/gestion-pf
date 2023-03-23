@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -16,6 +17,7 @@ import mx.com.ferbo.facturacion.facturama.Product;
 import mx.com.ferbo.facturacion.facturama.TaxAddress;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
+import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.EntidadPostalDAO;
 import mx.com.ferbo.dao.EstadosDAO;
 import mx.com.ferbo.dao.MunicipiosDAO;
@@ -31,6 +33,7 @@ import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Ciudades;
 import mx.com.ferbo.model.CiudadesPK;
+import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.EstadosPK;
 import mx.com.ferbo.model.Municipios;
@@ -59,7 +62,6 @@ public class PlantaBean implements Serializable {
 	private TipoAsentamientoDAO tipoAsentamientoDao;
 	private AsentamientoHumandoDAO asentamientoHumandoDao;
 
-
 	private List<Planta> list;
 	private List<Usuario> usuarios;
 	private List<Paises> listaPaises;
@@ -68,6 +70,7 @@ public class PlantaBean implements Serializable {
 	private List<Ciudades> listaCiudades;
 	private List<TipoAsentamiento> listaTipoAsentamiento;
 	private List<AsentamientoHumano> asentamientoHumanoList;
+	private List<EmisoresCFDIS> listaEmisores;
 
 	private Paises paisSelect;
 	private EstadosPK estadoPkSelect;
@@ -110,6 +113,8 @@ public class PlantaBean implements Serializable {
 		list = daoPlanta.findall();
 		usuarios = daoPlanta.getUsuarios();
 		listaPaises = daoPaises.findall();
+		listaEmisores = daoPlanta.getEmisor();
+		
 		//estadosList = daoEstados.findall();
 		//listaMunicipios = daoMunicipios.findall();
 		//listaCiudades = ciudadesDao.findall();
@@ -123,6 +128,7 @@ public class PlantaBean implements Serializable {
 	public void init() {
 		listaPaises = daoPaises.buscarTodos();
 		listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
+		//listaEmisores = emisorDAO.findall();
 		asentamientoHumanoList = new ArrayList<>();
 		this.paisSelect = new Paises();
 		this.estadoSelect = new Estados();
@@ -228,19 +234,18 @@ public class PlantaBean implements Serializable {
 		}
 		this.planta = new Planta();
 
-	
-	
 };
 
 	public void update() {
 		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
-		System.out.println(planta);
+		System.out.println(planta + "" +planta.getIdEmisoresCFDIS());
 		planta.setIdPais(this.idPais);
 		planta.setIdEstado(this.idEstado);
 		planta.setIdMunicipio(this.idMunicipio);
 		planta.setIdCiudad(this.idCiudad);
 		planta.setIdAsentamiento(this.idAsentamiento);
 		planta.setTipoasentamiento(this.idTipoAsentamiento);
+		
 		//String message = daoPlanta.update(planta);
 		String message = null;
 		//boolean bandera = false;
@@ -343,6 +348,7 @@ public class PlantaBean implements Serializable {
 		
 		if (message == null) {
 			list.clear();
+			daoPlanta.update(planta);
 			list = daoPlanta.findall();
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Agregada" +  planta.getPlantaDs() , null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
@@ -387,6 +393,7 @@ public class PlantaBean implements Serializable {
 	public void limpiaPlanta() {
 		this.planta = new Planta();
 	}
+	
 	
 	
 	public String getUuid() {
@@ -645,6 +652,18 @@ public class PlantaBean implements Serializable {
 	public void setSeleccion(Planta seleccion) {
 		this.seleccion = seleccion;
 	}
+
+	public List<EmisoresCFDIS> getListaEmisores() {
+		return listaEmisores;
+	}
+
+	public void setListaEmisores(List<EmisoresCFDIS> listaEmisores) {
+		this.listaEmisores = listaEmisores;
+	}
+
+	
+
+	
 
 
 
