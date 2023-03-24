@@ -240,7 +240,7 @@ public class ConsultaTraspasosBean implements Serializable {
 			parameters.put("LogoPath", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
 			String path = reportFile.getPath();
-			//jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 			reporte = jasperReportUtil.getPdf(filename, parameters, path);
 		} catch (Exception ex) {
 			ex.fillInStackTrace();

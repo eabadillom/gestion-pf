@@ -162,11 +162,11 @@
 								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.subtotal}"/> 
 							</p:column>
 						</p:dataTable>
-    					<pe:documentViewer id="documento" height="500" value="#{consultaTraspasosBean.reporte}" download="ReporteTraspaso.pdf"/>
+    					
 				</p:outputPanel>
 				</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Generar constancia" icon="pi pi-file-pdf" styleClass="ui-button-raised ui-button-secondary" actionListener="#{consultaTraspasosBean.jasper}" update="documento"/>
+								<p:commandButton value="Generar constancia" icon="pi pi-file-pdf" styleClass="ui-button-raised ui-button-secondary" actionListener="#{consultaTraspasosBean.jasper}" update="documento" ajax="false"/>
 								<p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('dlg-constancia').hide()" />
 							</f:facet>
 						</p:dialog>
