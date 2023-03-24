@@ -2,47 +2,85 @@ package mx.com.ferbo.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.faces.application.FacesMessage.Severity;
 
 public class Inventario {
-	Integer folio;
-	Producto producto;
-	Integer cantidad;
-	UnidadDeManejo unidadManejo;
-	Planta planta;
-	Date caducidad;
-	String codigo;
-	String lote;
-	String sap;
-	Camara camara;
-	String posicion;
-	Integer partidaCve;
-	BigDecimal peso;
-	String inventarioCve;
-	String detalleAnt;
-	Integer detallePartidaAnterior;
-	Integer detallePadre;
-	Integer detallePartidaPadre;
-	String po;
-	String mp;
-	String pedimento;
-	String tarimas;
-	String folioCliente;
-	Servicio srv;
-
+	protected Integer folio;
+	protected Producto producto;
+	protected Cliente cliente;
+	protected Integer cantidad;
+	protected UnidadDeManejo unidadManejo;
+	protected Planta planta;
+	protected Integer plantad;
+	protected Date caducidad;
+	protected String codigo;
+	protected String lote;
+	protected String sap;
+	protected Camara camara;
+	protected Integer camarad;
+	protected Posicion posicion;
+	protected Integer partidaCve;
+	protected BigDecimal peso;
+	protected String inventarioCve;
+	protected String detalleAnt;
+	protected Integer detallePartidaAnterior;
+	protected Integer detallePadre;
+	protected Integer detallePartidaPadre;
+	protected String po;
+	protected String mp;
+	protected String pedimento;
+	protected String tarimas;
+	protected String folioCliente;
+	protected String Observaciones;
+	protected String descripcion;
+	protected ConstanciaDeDeposito constanciaDeDeposito;
+	protected Servicio srv;
 	public Inventario() {
 
 	}
+	public void listas() {
+	}
+
+	public Inventario(Integer folio, Producto producto, Cliente cliente, Integer cantidad, UnidadDeManejo unidadManejo,
+			Planta planta, Integer plantad, Date caducidad, String codigo, String lote, String sap, Camara camara,
+			Integer camarad, Posicion posicion, Integer posiciond, Integer partidaCve, BigDecimal peso,
+			String inventarioCve, String detalleAnt, Integer detallePartidaAnterior, Integer detallePadre,
+			Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas, String folioCliente,
+			String observaciones, String descripcion) {
+		this.folio = folio;
+		this.producto = producto;
+		this.cliente = cliente;
+		this.cantidad = cantidad;
+		this.unidadManejo = unidadManejo;
+		this.planta = planta;
+		this.plantad = plantad;
+		this.caducidad = caducidad;
+		this.codigo = codigo;
+		this.lote = lote;
+		this.sap = sap;
+		this.camara = camara;
+		this.camarad = camarad;
+		this.folioCliente = folioCliente;
+		this.Observaciones = observaciones;
+		this.descripcion = descripcion;
+		
+	}
+		/*Codigo NJGS*/
 
 	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidadManejo, Planta planta,
-			Date caducidad, String codigo, String lote, String sap, Camara camara, String posicion, Integer partidaCve,
+			Date caducidad, String codigo, String lote, String sap, Camara camara, Posicion posicion, Integer partidaCve,
 			BigDecimal peso, String inventarioCve, String detalleAnt, Integer detallePartidaAnterior,
 			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas,
-			Servicio srv) {
+			Servicio srv, ConstanciaDeDeposito constanciaDeDeposito) {
 		this.folio = folio;
 		this.producto = producto;
 		this.cantidad = cantidad;
 		this.unidadManejo = unidadManejo;
 		this.planta = planta;
+		/*CODIGO GMA*/
 		this.caducidad = caducidad;
 		this.codigo = codigo;
 		this.lote = lote;
@@ -61,6 +99,15 @@ public class Inventario {
 		this.pedimento = pedimento;
 		this.tarimas = tarimas;
 		this.srv = srv;
+		this.constanciaDeDeposito = constanciaDeDeposito;
+	}
+	
+	public ConstanciaDeDeposito getConstanciaDeDeposito() {
+		return constanciaDeDeposito;
+	}
+
+	public void setConstanciaDeDeposito(ConstanciaDeDeposito constanciaDeDeposito) {
+		this.constanciaDeDeposito = constanciaDeDeposito;
 	}
 
 	public Servicio getSrv() {
@@ -150,15 +197,7 @@ public class Inventario {
 	public void setCamara(Camara camara) {
 		this.camara = camara;
 	}
-
-	public String getPosicion() {
-		return posicion;
-	}
-
-	public void setPosicion(String posicion) {
-		this.posicion = posicion;
-	}
-
+	
 	public Integer getPartidaCve() {
 		return partidaCve;
 	}
@@ -255,15 +294,64 @@ public class Inventario {
 		this.folioCliente = folioCliente;
 	}
 
-	@Override
-	public String toString() {
-		return "Inventario [folio=" + folio + ", producto=" + producto + ", cantidad=" + cantidad + ", unidadManejo="
-				+ unidadManejo + ", planta=" + planta + ", caducidad=" + caducidad + ", codigo=" + codigo + ", lote="
-				+ lote + ", sap=" + sap + ", camara=" + camara + ", posicion=" + posicion + ", partidaCve=" + partidaCve
-				+ ", peso=" + peso + ", inventarioCve=" + inventarioCve + ", detalleAnt=" + detalleAnt
-				+ ", detallePartidaAnterior=" + detallePartidaAnterior + ", detallePadre=" + detallePadre
-				+ ", detallePartidaPadre=" + detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento="
-				+ pedimento + ", tarimas=" + tarimas + "]";
+	public Cliente getCliente() {
+		return cliente;
 	}
 
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public Integer getPlantad() {
+		return plantad;
+	}
+
+	public void setPlantad(Integer plantad) {
+		this.plantad = plantad;
+	}
+
+	public Integer getCamarad() {
+		return camarad;
+	}
+
+	public void setCamarad(Integer camarad) {
+		this.camarad = camarad;
+	}
+
+	public String getObservaciones() {
+		return Observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		Observaciones = observaciones;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	public Posicion getPosicion() {
+		return posicion;
+	}
+
+	public void setPosicion(Posicion posicion) {
+		this.posicion = posicion;
+	}
+	@Override
+	public String toString() {
+		return "Inventario [folio=" + folio + ", producto=" + producto + ", cliente=" + cliente + ", cantidad="
+				+ cantidad + ", unidadManejo=" + unidadManejo + ", planta=" + planta + ", plantad=" + plantad
+				+ ", caducidad=" + caducidad + ", codigo=" + codigo + ", lote=" + lote + ", sap=" + sap + ", camara="
+				+ camara + ", camarad=" + camarad + ", posicion=" + posicion + ", partidaCve=" + partidaCve + ", peso="
+				+ peso + ", inventarioCve=" + inventarioCve + ", detalleAnt=" + detalleAnt + ", detallePartidaAnterior="
+				+ detallePartidaAnterior + ", detallePadre=" + detallePadre + ", detallePartidaPadre="
+				+ detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento=" + pedimento + ", tarimas="
+				+ tarimas + ", folioCliente=" + folioCliente + ", Observaciones=" + Observaciones + ", descripcion="
+				+ descripcion + ", constanciaDeDeposito=" + constanciaDeDeposito + ", srv=" + srv + "]";
+	}
 }
+

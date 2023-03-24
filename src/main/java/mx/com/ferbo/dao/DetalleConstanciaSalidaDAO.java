@@ -21,7 +21,13 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 	@Override
 	public List<DetalleConstanciaSalida> buscarTodos() {
 		// TODO Auto-generated method stub
-		return null;
+		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<DetalleConstanciaSalida> listado = null;
+		
+		listado = em.createNamedQuery("DetalleConstanciaSalida.findAll",DetalleConstanciaSalida.class).getResultList();
+		
+		return listado;
 	}
 
 	@Override
@@ -30,6 +36,16 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 		return null;
 	}
 
+	public List<DetalleConstanciaSalida> buscarPorPartidaCve(Partida partida){
+		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<DetalleConstanciaSalida> lista = null;
+		lista = em.createNamedQuery("DetalleConstanciaSalida.findByPartidaCve", DetalleConstanciaSalida.class)
+				.setParameter("partidaCve", partida.getPartidaCve()).getResultList();
+		
+		return lista;
+	}
+	
 	@Override
 	public String actualizar(DetalleConstanciaSalida e) {
 		// TODO Auto-generated method stub
@@ -37,8 +53,18 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 	}
 
 	@Override
-	public String guardar(DetalleConstanciaSalida e) {
+	public String guardar(DetalleConstanciaSalida detalleConstanciaSalida) {
 		// TODO Auto-generated method stub
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(detalleConstanciaSalida);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return "ERROR";
+		}
 		return null;
 	}
 

@@ -34,10 +34,8 @@
 						<p:growl id="messages" showDetail="true" />
 
 						
-						<p:dataTable id="dt-planta" widgetVar="dtPlanta" var="planta"
-							value="#{plantaBean.list}" reflow="true"
-							rowKey="#{planta.plantaCve}" paginator="true" rows="5"
-							paginatorPosition="bottom" rowSelectMode="add">
+						<p:dataTable id="dt-planta" widgetVar="dtPlanta" var="planta" value="#{plantaBean.list}" reflow="true"
+							rowKey="#{planta.plantaCve}" paginator="true" rows="5" paginatorPosition="bottom" rowSelectMode="add">
 							
 							<p:column headerText="Nombre Planta">
 								<h:outputText value="#{planta.plantaDs}" />

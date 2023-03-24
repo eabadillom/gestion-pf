@@ -59,6 +59,8 @@ public class Servicio implements Serializable {
     private String uuId;
     @OneToMany(mappedBy = "servicioCve")
     private List<DetalleConstanciaServicios> detalleConstanciaServiciosList;
+    @OneToMany(mappedBy = "servicioCve")
+    private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
     
     @JoinColumn(name = "COBRO", referencedColumnName = "id")
     @ManyToOne
@@ -181,7 +183,15 @@ public class Servicio implements Serializable {
         this.constanciaServicioDetalleList = constanciaServicioDetalleList;
     }
 
-    @Override
+    public List<ConstanciaSalidaServicios> getConstanciaSalidaServiciosList() {
+		return constanciaSalidaServiciosList;
+	}
+
+	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
+		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (servicioCve != null ? servicioCve.hashCode() : 0);

@@ -892,13 +892,13 @@ public class ConstanciaDeDepositoBean implements Serializable{
 		detallePk.setDetPartCve(1);
 		detallePk.setPartidaCve(partida);
 		
-		detallePartida.setDetallePartidaPK(detallePk);
+		//detallePartida.setDetallePartidaPK(detallePk);
 		detallePartida.setDtpPedimento(pedimento);
 		detallePartida.setDtpSAP(contenedor);
 		detallePartida.setDtpLote(lote);
 		detallePartida.setDtpPO(otro);      
 		detallePartida.setDtpCaducidad(fechaCaducidad);
-		detallePartida.setPartida(partida);
+		detallePartida.setPartida(partida);//falta guardar pesoTotal y cantidadTotal en detallePartida
 		
 		partida.getDetallePartidaList().add(detallePartida);
 		

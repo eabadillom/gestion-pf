@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JPAEntity;
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Planta;
 
 import mx.com.ferbo.util.JPAEntity;
@@ -46,6 +47,14 @@ public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
 		return null;
 	}
 
+	public List<Posicion> buscarPorCamara(Camara c) {
+	List<Posicion> listaP = null;
+	EntityManager em = EntityManagerUtil.getEntityManager();
+	listaP = em.createNamedQuery("Posicion.findByCamara", Posicion.class)
+			.setParameter("camaraCve", c.getCamaraCve()).getResultList();
+	return listaP;
+	
+	}
 	@Override
 	public List<Posicion> buscarTodos() {
 		List<Posicion> posiciones = new ArrayList<Posicion>();
@@ -77,7 +86,7 @@ public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
 		}catch (Exception eBp) {
 			// TODO: handle exception
 		}
-		return null;
+		return posiciones;
 	}
 
 	@SuppressWarnings("unused")
