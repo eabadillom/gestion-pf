@@ -1,6 +1,8 @@
 package mx.com.ferbo.utils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -78,5 +80,20 @@ public class IOUtil {
             reader = null;
         }
         
+    }
+    
+    public static byte[] read(InputStream input) throws IOException {
+        byte[] resultado = null;
+        byte[] buffer = new byte[1024];
+        
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        int nRead;
+
+        while ((nRead = input.read(buffer, 0, buffer.length)) != -1) {
+          output.write(buffer, 0, nRead);
+        }
+        
+        resultado = output.toByteArray();
+        return resultado;
     }
 }
