@@ -32,7 +32,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "PrecioServicio.findAll", query = "SELECT p FROM PrecioServicio p"),
     @NamedQuery(name = "PrecioServicio.findByAvisoAndCliente", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.avisoCve.avisoCve = :avisoCve"),
     @NamedQuery(name = "PrecioServicio.findById", query = "SELECT p FROM PrecioServicio p WHERE p.id = :id"),
-    @NamedQuery(name = "PrecioServicio.findByPrecio", query = "SELECT p FROM PrecioServicio p WHERE p.precio = :precio"),
     @NamedQuery(name = "PrecioServicio.findByCliente", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve"),
     @NamedQuery(name = "PrecioServicio.findByClienteServicio", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.servicio.servicioCve = :servicioCve"),
     @NamedQuery(name = "PrecioServicio.getMaxPrecioServicioByIdServicio" , query = "SELECT p.servicio, MIN(p.precio) AS precio FROM PrecioServicio p WHERE p.servicio = :idServicio"),
