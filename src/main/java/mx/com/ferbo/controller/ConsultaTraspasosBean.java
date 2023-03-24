@@ -1,6 +1,6 @@
 package mx.com.ferbo.controller;
 
-import java.io.ByteArrayInputStream;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -13,25 +13,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
 
-import mx.com.ferbo.dao.CamaraDAO;
+
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.ConstanciaTraspasoDAO;
@@ -39,18 +34,10 @@ import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.InventarioDAO;
 import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PartidaServicioDAO;
-import mx.com.ferbo.dao.PlantaDAO;
-import mx.com.ferbo.dao.PosicionCamaraDAO;
-import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.TraspasoPartidaDAO;
 import mx.com.ferbo.dao.TraspasoServicioDAO;
-import mx.com.ferbo.dao.UnidadDeManejoDAO;
-import mx.com.ferbo.dao.UnidadDeProductoDAO;
-import mx.com.ferbo.dao.partidasAfectadasDAO;
-import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
-import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.model.DetallePartida;
@@ -59,18 +46,10 @@ import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.InventarioDetalle;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
-import mx.com.ferbo.model.PartidasAfectadas;
-import mx.com.ferbo.model.Planta;
-import mx.com.ferbo.model.Posicion;
-import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.model.TraspasoServicio;
-import mx.com.ferbo.model.UnidadDeManejo;
-import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 import net.sf.jasperreports.engine.JRException;
@@ -81,7 +60,6 @@ public class ConsultaTraspasosBean implements Serializable {
 
 	private static final long serialVersionUID = -3109002730694247052L;
 	private static Logger log = Logger.getLogger(AltaConstanciaServicioBean.class);
-    private StreamedContent reporte;
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;
 	private List<TraspasoServicio> alServiciosDetalle;
@@ -238,10 +216,9 @@ public class ConsultaTraspasosBean implements Serializable {
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", this.selectedconstancia.getNumero());
 			parameters.put("LogoPath", imgfile.getPath());
-			log.info("Parametros: " + parameters.toString());
-			String path = reportFile.getPath();
+			log.info("Parametros: " + parameters.toString());			
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			reporte = jasperReportUtil.getPdf(filename, parameters, path);
+			//reporte = jasperReportUtil.getPdf(filename, parameters, path);
 		} catch (Exception ex) {
 			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
@@ -511,13 +488,6 @@ public class ConsultaTraspasosBean implements Serializable {
 		this.idCliente = idCliente;
 	}
 
-	public StreamedContent getReporte() {
-		return reporte;
-	}
-
-	public void setReporte(StreamedContent reporte) {
-		this.reporte = reporte;
-	}
 
 
 }
