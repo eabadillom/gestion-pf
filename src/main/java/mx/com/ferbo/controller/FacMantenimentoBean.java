@@ -32,6 +32,7 @@ public class FacMantenimentoBean implements Serializable {
 	private FacMantenimientoDAO daoFac;
 	private Factura seleccion;
 
+	private Date actual = GregorianCalendar.getInstance().getTime();
 	private Date de;
 	private Date hasta;
 
@@ -41,12 +42,16 @@ public class FacMantenimentoBean implements Serializable {
 		daoFac = new FacMantenimientoDAO();
 		listClientes = daoCliente.buscarTodos();
 		listFac = new ArrayList<Factura>();
+		de = new Date();
+		hasta = new Date();
+	};
 
-		hasta = GregorianCalendar.getInstance().getTime();
+	public boolean hasClient() {
+		return this.clienteSelect != null;
 	};
 
 	public void findFacture() {
-		listFac = daoFac.findDacturas(clienteSelect);
+		listFac = daoFac.findDacturas(clienteSelect, de, hasta);
 	};
 
 	public void cancelFacture() {
@@ -55,7 +60,7 @@ public class FacMantenimentoBean implements Serializable {
 
 		if (message == null) {
 			listFac.clear();
-			listFac = daoFac.findDacturas(clienteSelect);
+			listFac = daoFac.findDacturas(clienteSelect, de, hasta);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 					"Factura " + seleccion.getNumero() + " cancelada", null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
@@ -99,20 +104,46 @@ public class FacMantenimentoBean implements Serializable {
 		this.seleccion = seleccion;
 	};
 
+	public Date getActual() {
+		return actual;
+	};
+
+	public void setActual(Date actual) {
+		this.actual = actual;
+	};
+
 	public Date getDe() {
 		return de;
 	};
 
+	@SuppressWarnings("deprecation")
 	public void setDe(Date de) {
-		this.de = de;
+		if (de.getDate() > hasta.getDate()) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+					"Fecha Invalida", "La fecha seleccionada debe ser menor a la fecha final"));
+			PrimeFaces.current().ajax().update("form:messages");
+			this.de = this.actual;
+			this.hasta = this.actual;
+		} else {
+			this.de = de;
+		}
 	};
 
 	public Date getHasta() {
 		return hasta;
 	};
 
+	@SuppressWarnings("deprecation")
 	public void setHasta(Date hasta) {
-		this.hasta = hasta;
+		if (de.getDate() > hasta.getDate()) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+					"Fecha Invalida", "La fecha seleccionada debe ser mayor a la fecha inicial"));
+			PrimeFaces.current().ajax().update("form:messages");
+			this.de = this.actual;
+			this.hasta = this.actual;
+		} else {
+			this.hasta = hasta;
+		}
 	};
 
 }

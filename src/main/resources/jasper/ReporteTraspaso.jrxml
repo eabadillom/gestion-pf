@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteTraspaso" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fcaa7500-ce1f-4ca0-9768-460b64cc8f6d">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<style/>
+		</conditionalStyle>
+	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#2097F7"/>
+			<bottomPen lineWidth="0.5" lineColor="#2097F7"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#2097F7"/>
+			<bottomPen lineWidth="0.5" lineColor="#2097F7"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#2097F7"/>
+			<bottomPen lineWidth="0.5" lineColor="#2097F7"/>
+		</box>
+	</style>
+	<style name="Table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#288EED"/>
+			<bottomPen lineWidth="0.5" lineColor="#288EED"/>
+		</box>
+	</style>
+	<style name="Table 2_CH" mode="Opaque" backcolor="#2DA2EB">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#288EED"/>
+			<bottomPen lineWidth="0.5" lineColor="#288EED"/>
+		</box>
+	</style>
+	<style name="Table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#288EED"/>
+			<bottomPen lineWidth="0.5" lineColor="#288EED"/>
+		</box>
+	</style>
+	<subDataset name="Dataset1" uuid="af5cfd3a-52a0-4f7b-9b7a-0bd89cd76b2d">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="FOLIO" class="java.lang.String">
+			<defaultValueExpression><![CDATA[$P{FOLIO}]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT gestiondb.`CONSTANCIA_TRASPASO`.numero,
+	gestiondb.traspaso_servicio.servicio,
+	gestiondb.traspaso_servicio.cantidad,
+	gestiondb.traspaso_servicio.precio,
+	gestiondb.traspaso_servicio.subtotal
+FROM gestiondb.traspaso_servicio
+	INNER JOIN gestiondb.`CONSTANCIA_TRASPASO` ON 
+	 gestiondb.traspaso_servicio.traspaso = gestiondb.`CONSTANCIA_TRASPASO`.id 
+	 AND gestiondb.traspaso_servicio.traspaso = gestiondb.`CONSTANCIA_TRASPASO`.id 
+WHERE 
+	 gestiondb.`CONSTANCIA_TRASPASO`.numero = $P{FOLIO}]]>
+		</queryString>
+		<field name="numero" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="numero"/>
+			<property name="com.jaspersoft.studio.field.label" value="numero"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		</field>
+		<field name="servicio" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="servicio"/>
+			<property name="com.jaspersoft.studio.field.label" value="servicio"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_servicio"/>
+		</field>
+		<field name="cantidad" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="cantidad"/>
+			<property name="com.jaspersoft.studio.field.label" value="cantidad"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_servicio"/>
+		</field>
+		<field name="precio" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="precio"/>
+			<property name="com.jaspersoft.studio.field.label" value="precio"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_servicio"/>
+		</field>
+		<field name="subtotal" class="java.math.BigDecimal">
+			<property name="com.jaspersoft.studio.field.name" value="subtotal"/>
+			<property name="com.jaspersoft.studio.field.label" value="subtotal"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_servicio"/>
+		</field>
+	</subDataset>
+	<parameter name="FOLIO" class="java.lang.String">
+		<parameterDescription><![CDATA[FOLIO DE LA CONSTANCIA DE SERVICIO]]></parameterDescription>
+		<defaultValueExpression><![CDATA[$P{FOLIO}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LogoPath" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT gestiondb.`CONSTANCIA_TRASPASO`.numero,
+	gestiondb.`CONSTANCIA_TRASPASO`.fecha,
+	gestiondb.`CONSTANCIA_TRASPASO`.observacion,
+	gestiondb.`CONSTANCIA_TRASPASO`.`nombreCliente`,
+	gestiondb.traspaso_partida.constancia,
+	gestiondb.traspaso_partida.descripcion,
+	gestiondb.traspaso_partida.cantidad,
+	gestiondb.traspaso_partida.origen,
+	gestiondb.traspaso_partida.destino,
+	gestiondb.`CONSTANCIA_TRASPASO`.numero,
+	gestiondb.`CONSTANCIA_TRASPASO`.fecha,
+	gestiondb.`CONSTANCIA_TRASPASO`.`nombreCliente`,
+	gestiondb.`CONSTANCIA_TRASPASO`.observacion,
+	gestiondb.traspaso_partida.traspaso
+FROM gestiondb.traspaso_partida
+	INNER JOIN gestiondb.`CONSTANCIA_TRASPASO` ON 
+	 gestiondb.traspaso_partida.traspaso = gestiondb.`CONSTANCIA_TRASPASO`.id 
+	 AND gestiondb.traspaso_partida.traspaso = gestiondb.`CONSTANCIA_TRASPASO`.id
+	 WHERE gestiondb.`CONSTANCIA_TRASPASO`.numero = $P{FOLIO}]]>
+	</queryString>
+	<field name="numero" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="numero"/>
+		<property name="com.jaspersoft.studio.field.label" value="numero"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+	</field>
+	<field name="fecha" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fecha"/>
+		<property name="com.jaspersoft.studio.field.label" value="fecha"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+	</field>
+	<field name="observacion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="observacion"/>
+		<property name="com.jaspersoft.studio.field.label" value="observacion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+	</field>
+	<field name="nombreCliente" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nombreCliente"/>
+		<property name="com.jaspersoft.studio.field.label" value="nombreCliente"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+	</field>
+	<field name="constancia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="constancia"/>
+		<property name="com.jaspersoft.studio.field.label" value="constancia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_partida"/>
+	</field>
+	<field name="descripcion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="descripcion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_partida"/>
+	</field>
+	<field name="cantidad" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="cantidad"/>
+		<property name="com.jaspersoft.studio.field.label" value="cantidad"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_partida"/>
+	</field>
+	<field name="origen" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="origen"/>
+		<property name="com.jaspersoft.studio.field.label" value="origen"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_partida"/>
+	</field>
+	<field name="destino" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="destino"/>
+		<property name="com.jaspersoft.studio.field.label" value="destino"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_partida"/>
+	</field>
+	<field name="COLUMN_10" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="numero"/>
+		<property name="com.jaspersoft.studio.field.label" value="numero"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+	</field>
+	<field name="COLUMN_11" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fecha"/>
+		<property name="com.jaspersoft.studio.field.label" value="fecha"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+	</field>
+	<field name="COLUMN_12" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nombreCliente"/>
+		<property name="com.jaspersoft.studio.field.label" value="nombreCliente"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+	</field>
+	<field name="COLUMN_13" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="observacion"/>
+		<property name="com.jaspersoft.studio.field.label" value="observacion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+	</field>
+	<field name="traspaso" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="traspaso"/>
+		<property name="com.jaspersoft.studio.field.label" value="traspaso"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="traspaso_partida"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="166" splitType="Stretch">
+			<textField>
+				<reportElement x="450" y="81" width="120" height="16" forecolor="#020303" uuid="6f61e3ea-ef2e-4325-bad0-f9b1bf2d9dcb"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numero}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="204" y="140" width="366" height="17" forecolor="#0C93ED" uuid="c023f513-c234-4846-837c-52b2090240c3"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombreCliente}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="201" y="31" width="169" height="16" forecolor="#0C93ED" uuid="4d8da24b-6cbb-44ce-8a30-244f6d8f231e"/>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TRASPASO DE SERVICIO]]></text>
+			</staticText>
+			<image>
+				<reportElement x="3" y="5" width="143" height="43" uuid="660a14fe-c518-4db5-bbc2-e2bdfa59d144">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{LogoPath}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="521" y="16" width="51" height="20" uuid="ab419236-051d-4f10-a972-8204c6bf0e03"/>
+				<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="133" y="14" width="343" height="20" uuid="adc537a8-cf42-406d-9d44-4d4ffb8bbe75"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INDUSTRIAS DE REFRIGERACION KELANGAN S. A. de C.V.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="140" width="196" height="14" uuid="aa3b5391-56f9-4aba-b4b6-016eccb7e54e"/>
+				<text><![CDATA[Traspaso de mercancia para el cliente:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="82" width="65" height="14" uuid="2a093430-1ec6-4620-9e96-9c04e5528c7c"/>
+				<text><![CDATA[No. de folio]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement x="2" y="2" width="580" height="20" forecolor="#1F9AF2" backcolor="rgba(22, 150, 247, 0.91764706)" uuid="0c534364-afc6-4b92-94f1-e401a5b8f726"/>
+				<graphicElement>
+					<pen lineColor="#FCEEED"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="245" y="4" width="54" height="16" forecolor="#FAEEED" backcolor="#FFFFFF" uuid="a7a6d823-2058-404e-a38c-657fba862d52"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="15" y="4" width="64" height="16" forecolor="#FCF5F5" backcolor="#1696F7" uuid="eb812bfc-0e3f-44eb-ad7a-9998ef8fde84"/>
+				<box>
+					<pen lineColor="#1696F7"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Constancia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="493" y="4" width="50" height="16" forecolor="#FCF7F7" uuid="b5faaf54-a9bd-4212-acf0-ff13fb2aa3f2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Destino]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="123" y="4" width="74" height="16" forecolor="#FCF5F5" backcolor="#1696F7" uuid="316cb9f8-d8ab-4451-b7ea-877df9fc9b0c"/>
+				<box>
+					<pen lineColor="#1696F7"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="3" width="54" height="16" forecolor="#FAEEED" backcolor="#FFFFFF" uuid="de096f0d-d932-42d5-b54e-7f8af79e5495"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Origen]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="48" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField>
+				<reportElement x="26" y="10" width="84" height="13" uuid="6017141a-00b1-4ead-82c8-e10b2d1aa284"/>
+				<textFieldExpression><![CDATA[$F{constancia}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="112" y="11" width="96" height="12" uuid="1a4c914e-c781-4aee-86d2-9f3c0040c8b4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="263" y="11" width="70" height="13" uuid="59c6a9a9-329c-492b-ac31-687f887d4563"/>
+				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="348" y="11" width="101" height="14" uuid="2856263f-62cb-4c98-bfe7-b19acc765d30"/>
+				<textFieldExpression><![CDATA[$F{origen}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="487" y="11" width="88" height="14" uuid="ed173c29-0caf-465f-ade1-ca8d261d6755"/>
+				<textFieldExpression><![CDATA[$F{destino}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="47" width="573" height="1" forecolor="#1696F7" backcolor="#1696F7" uuid="4e38a992-c0ab-4a0d-be66-2183feaba505"/>
+			</line>
+		</band>
+		<band height="63"/>
+	</detail>
+	<lastPageFooter>
+		<band height="167">
+			<rectangle>
+				<reportElement x="3" y="11" width="572" height="20" forecolor="#1F9AF2" backcolor="rgba(22, 150, 247, 0.91764706)" uuid="9247e6f1-21dd-48d1-9d73-ac4b5d65968e"/>
+				<graphicElement>
+					<pen lineColor="#FCEEED"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement mode="Transparent" x="19" y="15" width="107" height="16" forecolor="#FCF5F5" backcolor="#1696F7" uuid="1518c049-94cb-45c5-aa74-5454355093f8"/>
+				<box>
+					<pen lineColor="#1696F7"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Observaciones]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="16" y="40" width="100" height="30" uuid="8548a64f-5d49-45c0-8ca8-c2ec4fc85da6"/>
+				<textFieldExpression><![CDATA[$F{observacion}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="100">
+			<componentElement>
+				<reportElement x="1" y="2" width="573" height="60" uuid="676d06ad-32ff-4e8d-ba61-ed8b72e4401d">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 2_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 2_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 2_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset1" uuid="8d1bc534-f8b4-463b-925c-8d789f9c278e">
+						<datasetParameter name="FOLIO">
+							<datasetParameterExpression><![CDATA[$P{FOLIO}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="169" uuid="98059eca-c95d-4133-801a-d3eac78a9e3c">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table 2_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="169" height="30" uuid="b52c257e-7135-49fd-8aa2-e52552583139"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="SansSerif" size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{servicio}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="209" uuid="868608c7-f311-46a2-8d8b-16fbb72cd5bd">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table 2_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="209" height="30" uuid="cdb89570-156e-41ec-abb7-b4ca35b4f659"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="SansSerif" size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="209" uuid="f32f108f-8084-4ac9-a966-c0c992b50013">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table 2_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="209" height="30" uuid="9c54f159-f4a6-4a08-a9c8-0d920aa2c402"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="SansSerif" size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{precio}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="209" uuid="739c35f4-2fc0-4dde-baae-b079fcec26a7">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table 2_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="209" height="30" uuid="f856e6d8-35c4-4445-9d10-a0a0c0f5c24d"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="SansSerif" size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement mode="Transparent" x="47" y="7" width="79" height="16" forecolor="#FCF5F5" backcolor="#1696F7" uuid="8767ea2e-5ddb-49a5-8e12-3cc7f73478b0"/>
+				<box>
+					<pen lineColor="#1696F7"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Servicio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="246" y="9" width="55" height="16" forecolor="#FCF5F5" backcolor="#1696F7" uuid="1d457c60-0231-48c0-ba44-86a0400733b6"/>
+				<box>
+					<pen lineColor="#1696F7"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="462" y="8" width="59" height="16" forecolor="#FCF5F5" backcolor="#1696F7" uuid="431d7067-d8d4-4790-a0de-627152afd17c"/>
+				<box>
+					<pen lineColor="#1696F7"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Precio]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

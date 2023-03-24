@@ -152,14 +152,14 @@
 									update=":form:manage-cologne-content-new" value="Modificar"
 									oncomplete="PF('nuevoAsentemientoHumanoDialog').show()"
 									styleClass="p-mr-2 p-mb-2" process="@this">
-									<f:setPropertyActionListener value="#{ciudades}"
-										target="#{asentamientoHumanoBean.ciudadSelect}" />
+									<f:setPropertyActionListener value="#{asentamientoHumano}"
+										target="#{asentamientoHumanoBean.asentamientoHumanoSelect}" />
 								</p:commandButton>
 								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
 									icon="pi pi-trash" process="@this"
 									oncomplete="PF('deleteAsentamientoHumanoDialog').show()">
-									<f:setPropertyActionListener value="#{ciudades}"
-										target="#{asentamientoHumanoBean.ciudadSelect}" />
+									<f:setPropertyActionListener value="#{asentamientoHumano}"
+										target="#{asentamientoHumanoBean.asentamientoHumanoSelect}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>
@@ -204,6 +204,7 @@
 								value="#{asentamientoHumanoBean.listaCiudades}"
 								itemLabel="#{selectedCitiesOne.ciudadDs}"
 								itemValue="#{selectedCitiesOne.ciudadesPK.ciudadCve}" />
+							<p:ajax listener="#{asentamientoHumanoBean.handleCitySelect}" process="@this"/>
 						</p:selectOneMenu>
 						</div>
 						<div class="p-field">

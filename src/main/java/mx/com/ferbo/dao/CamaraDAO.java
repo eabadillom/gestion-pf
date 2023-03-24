@@ -1,15 +1,28 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 
+	
+	@SuppressWarnings("unchecked")
+	public List<Camara> findall() {
+		EntityManager entity = getEntityManager();
+		List<Camara> camara = null;
+		Query sql = entity.createNamedQuery("Camara.findAll", Camara.class);
+		camara = sql.getResultList();
+		return camara;
+	}
 	@Override
 	public Camara buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -26,8 +39,19 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 
 	@Override
 	public List<Camara> buscarPorCriterios(Camara e) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Camara> listaC = null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		listaC = em.createNamedQuery("Camara.findByplantaCve", Camara.class).setParameter("plantaCve",e.getPlantaCve()).getResultList();
+		return listaC;
+	}
+	
+	public List<Camara> buscarPorPlanta(Planta p) {
+		List<Camara> listaC = null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		listaC = em.createNamedQuery("Camara.findByPlantaCve", Camara.class)
+				.setParameter("plantaCve", p.getPlantaCve())
+				.getResultList();
+		return listaC;
 	}
 
 	@Override

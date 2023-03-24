@@ -1,0 +1,402 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Constancia de Deposito</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Inventarios" />
+				<p:menuitem value="Entradas" />
+				<p:menuitem value="Alta" outcome="/inventarios/constanciaDeposito" />
+			</p:breadCrumb>
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" life="2000"/>					
+						
+						<div style="text-align: center" class="p-field">
+							<p:outputLabel styleClass="p-mr-2" value="Cliente:"/>
+							<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{constanciaDeDepositoBean.clienteSelect}" converter="entityConverter" >
+								<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
+								<p:ajax listener="#{constanciaDeDepositoBean.productoPorCliente()}" update="claveProducto aviso precioServicio congelacion conservacion refrigeracion maniobras"/>		
+							</p:selectOneMenu>							
+						</div> 
+						
+						 
+						<div style="text-align: center">
+							<p:outputLabel value="Aviso:" styleClass="p-mr-2"/>
+							<p:selectOneMenu id="aviso" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.avisoSelect}">
+								<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.avisoPorCliente}" var="aviso" itemLabel="#{aviso.avisoObservaciones}" itemValue="#{aviso}"/>
+								<f:ajax render="cont-fecha cont-pedimento cont-contenedor cont-otro cont-lote" listener="#{constanciaDeDepositoBean.renderConstanciaDeDeposito()}"/>				
+							</p:selectOneMenu>
+													
+							<p:outputLabel for="planta" value="Planta:" styleClass="p-ml-6 p-mr-2"/>
+							<p:selectOneMenu id="planta" autoWidth="false" value="#{constanciaDeDepositoBean.plantaSelect}" converter="entityConverter">
+								<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.listadoPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
+								<p:ajax listener="#{constanciaDeDepositoBean.filtraListado()}" update="camara" />	
+							</p:selectOneMenu>	
+							
+							<p:outputLabel for="camara" value="Camara:" styleClass="p-ml-6 p-mr-2"/>
+							<p:selectOneMenu id="camara" autoWidth="false" value="#{constanciaDeDepositoBean.camaraSelect}" converter="entityConverter">
+								<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />	
+								<p:ajax listener="#{constanciaDeDepositoBean.filtrarPosicion()}" update="posiciones" ></p:ajax>		
+							</p:selectOneMenu>
+							
+							<p:outputLabel value="Fecha:" styleClass="p-ml-6 p-mr-2"/>
+							<p:datePicker id="fechaIngreso" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Ingreso" value="#{constanciaDeDepositoBean.fechaIngreso}" >
+								<p:ajax update="@this" />
+							</p:datePicker>
+							
+							<p:outputLabel styleClass="p-mr-2" value="No. Constancia:"/> 
+							<p:inputText id="numeroC" placeholder="No Asignado" disabled="true" value="#{constanciaDeDepositoBean.noConstanciaSelect}" required="true" requiredMessage="ingresa folio"/>
+							
+							
+							<p:commandButton value="Cambiar" icon="pi pi-pencil" style="margin-left: .5rem" styleClass="edit-button ui-button-success" oncomplete="PF('NoCambiarDialog').show()"/>										
+						</div> 
+						
+						<div class="" style="text-align: center;background-color: gray;">
+							<span style="font-weight: bold;color: white">SELECCIONE LA MERCANCIA</span>
+						</div>  
+						
+						
+						<p:toolbar styleClass="p-mb-4" id="seleccion-mercancia">
+							<div class="card">
+								<div class="">								
+									<p:toolbarGroup>
+									
+											<p:outputLabel value="Clave|Producto:" styleClass="p-mr-2"/>
+											<p:selectOneMenu id="claveProducto" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.productoSelect}">
+												<f:selectItem itemLabel="Selecciona Producto" itemValue="" noSelectionOption="true"></f:selectItem>
+												<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto}" />
+												<p:ajax update="@this"/>									
+											</p:selectOneMenu>
+											
+											<p:outputLabel value="Unidad de Manejo:" styleClass="p-ml-6 p-mr-2"/>
+											<p:selectOneMenu autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.unidadDeManejoSelect}" >
+												<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
+												<f:selectItems value="#{constanciaDeDepositoBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
+												<p:ajax update="@this"/> 
+											</p:selectOneMenu>	
+											
+											<p:outputLabel value="Ubicación*:" styleClass="p-ml-6 p-mr-2"/>
+											<p:selectOneMenu id="posiciones" autoWidth="false" value="#{constanciaDeDepositoBean.posicionCamaraSelect}" converter="entityConverter">
+												<f:selectItem itemLabel="Selecciona Ubicacion" itemValue="" noSelectionOption="true"></f:selectItem>
+												<f:selectItems value="#{constanciaDeDepositoBean.posiciones}" var="posicion" itemLabel="#{posicion.descPosicion}" itemValue="#{posicion}"/>
+												<p:ajax update="@this" />
+											</p:selectOneMenu>
+											
+											<p:outputLabel value="Cantidad:" styleClass="p-ml-6 p-mr-2"></p:outputLabel> 
+											<p:inputNumber value="#{constanciaDeDepositoBean.cantidadTotal}">
+												<p:ajax update="@this" />
+											</p:inputNumber>
+											
+											
+										<div style="margin-top: 5px;" >
+											
+											<p:outputLabel value="Peso Total:" styleClass="p-mr-2"/>								
+											<p:inputNumber id="pesoTotal" value="#{constanciaDeDepositoBean.pesoTotal}" >
+												<p:ajax update="@this"/>
+											</p:inputNumber>
+											
+											<p:outputLabel value="# Tarimas:" styleClass="p-ml-6 p-mr-2" />								
+											<p:inputNumber value="#{constanciaDeDepositoBean.numTarimas}">
+												<p:ajax event="blur" listener="#{constanciaDeDepositoBean.calculo()}" update="unidadesTarima" />
+											</p:inputNumber>
+											
+											<p:outputLabel value="Unidades por tarima:" styleClass="p-ml-6 p-mr-2" />								
+											<p:inputText id="unidadesTarima" value="#{constanciaDeDepositoBean.unidadesPorTarima}">
+												<p:ajax update="@this" />
+											</p:inputText>
+											
+											<p:outputLabel value="Valor($) Mercancia:" styleClass="p-ml-6 p-mr-2" />								
+											<p:inputNumber value="#{constanciaDeDepositoBean.valorMercancia}">
+												<p:ajax update="@this" />
+											</p:inputNumber>
+										</div>
+										
+										
+											<p:outputPanel id="cont-pedimento" styleClass="p-mt-2">
+												<p:outputLabel value="Pedimento:" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+												<p:inputText maxlength="13" value="#{constanciaDeDepositoBean.pedimento}" styleClass="p-ml-2">
+													<p:ajax update="@this" />
+												</p:inputText>
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<p:outputPanel id="cont-contenedor" styleClass="p-mt-2">
+												<p:outputLabel value="Contenedor:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+													<p:inputText maxlength="20" value="#{constanciaDeDepositoBean.contenedor}" styleClass="p-ml-2">
+														<p:ajax update="@this" />
+													</p:inputText>
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<p:outputPanel id="cont-lote" styleClass="p-mt-2">
+												<p:outputLabel value="Lote:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+													<p:inputText maxlength="20" value="#{constanciaDeDepositoBean.lote}" styleClass="p-ml-2">
+														<p:ajax update="@this" />
+													</p:inputText>
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<p:outputPanel id="cont-fecha" styleClass="p-mt-2">
+												<p:outputLabel value="Caducidad:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+													<p:datePicker id="fechaCaducidad" showIcon="true" placeholder="Fecha de Caducidad" value="#{constanciaDeDepositoBean.fechaCaducidad}" styleClass="p-ml-2">
+														<p:ajax update="@this" />
+													</p:datePicker>									
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<p:outputPanel id="cont-otro" styleClass="p-mt-2">
+												<p:outputLabel value="Otro:" styleClass="p-ml-6 p-mr-2" rendered="#{constanciaDeDepositoBean.respuesta != false}">
+													<p:inputText maxlength="12" value="#{constanciaDeDepositoBean.otro}" styleClass="p-ml-2">
+														<p:ajax update="@this" />
+													</p:inputText>
+												</p:outputLabel>
+											</p:outputPanel>
+											
+											<div  style="margin: 5px auto">
+												<p:outputLabel styleClass="p-mr-2" >m<sup>2</sup> Por Camara:</p:outputLabel>	
+												<p:inputNumber value="#{constanciaDeDepositoBean.metroCamara}" >
+													<p:ajax update="@this" />
+												</p:inputNumber>
+											</div>
+									</p:toolbarGroup>
+								</div>
+							</div>
+							<p:toolbarGroup styleClass="p-mt-2">
+										<p:commandButton value="Agregar" actionListener="#{constanciaDeDepositoBean.savePartida()}" styleClass="ui-button-success" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="form:dt-partidas"/>
+							</p:toolbarGroup>
+						</p:toolbar> 
+						
+						<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="true" paginatorPosition="bottom"
+									  rowSelectMode="add" rows="10" rowKey="#{partida.pesoTotal}" reflow="true" selection="#{constanciaDeDepositoBean.selectedPartidas}" >
+							<f:facet name="header">
+								<div class="products-table-header">
+									<span style="font-weight: bold;">Sus Productos</span>
+								</div>
+							</f:facet>
+							
+							<p:ajax event="rowSelect" />
+                            <p:ajax event="rowUnselect" />
+                            <p:ajax event="rowSelectCheckbox"/>
+                            <p:ajax event="rowUnselectCheckbox" />
+                            <p:ajax event="toggleSelect" />
+
+                            <p:column selectionMode="multiple" exportable="false"></p:column>
+							
+							<p:column exportable="false" width="3%">
+								<p:rowToggler />
+							</p:column>							
+							<p:column headerText="Id Camara">
+								<h:outputText value="#{partida.camaraCve.camaraAbrev}"/>
+							</p:column>
+							<p:column headerText="Folio">
+								<h:outputText value="#{partida.folio.folioCliente}"/>
+							</p:column>
+							<p:column headerText="Peso Total">
+								<h:outputText value="#{partida.pesoTotal}"/>
+							</p:column>
+							<p:column headerText="Cantidad Total">
+								<h:outputText value="#{partida.cantidadTotal}"/>
+							</p:column>
+							<p:column headerText="Unidad De Producto (Producto)">
+								<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
+							</p:column>
+							<p:column headerText="Valor de Mercancia">
+								<h:outputText value="#{partida.valorMercancia}"/>
+							</p:column>
+							<p:column headerText="# de Tarimas">
+								<h:outputText value="#{partida.noTarimas}"/>
+							</p:column>
+							
+							<p:rowExpansion>
+																			<div class="orders-subtable">
+									<p:dataTable id="dtDetallePartida" value="#{partida.detallePartidaList}" var="detallePartida" reflow="true">
+
+										<f:facet name="header">
+											<div class="products-table-header">
+												<span style="font-weight: bold;">Detalle Partida</span>
+											</div>
+										</f:facet>
+										
+										<p:column headerText="Pedimento">
+											<h:outputText value="#{detallePartida.dtpPedimento}" />
+										</p:column>
+										<p:column headerText="Contenedor">
+											<h:outputText value="#{detallePartida.dtpSAP}" />
+										</p:column>
+										<p:column headerText="Lote">
+											<h:outputText value="#{detallePartida.dtpLote}" />
+										</p:column>
+										<p:column headerText="Fecha Caducidad">
+											<h:outputText value="#{detallePartida.dtpCaducidad}" />
+										</p:column>
+										<p:column headerText="Lote">
+											<h:outputText value="#{detallePartida.dtpPO}" />
+										</p:column>
+									</p:dataTable>
+								</div>
+							</p:rowExpansion>
+							
+							
+								
+							
+							<p:column exportable="false" width="15%" style="text-align:center">
+                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" action="#{constanciaDeDepositoBean.deleteSelectedPartidas}"  width="45%">
+                                    <f:setPropertyActionListener value="#{partida}" target="#{constanciaDeDepositoBean.selectedPartida}" />
+                                </p:commandButton>
+                            </p:column>
+							
+						</p:dataTable>
+						
+						<div style="text-align: center;margin-top: 10px;background-color: gray">
+							<span style="font-weight: bold;color: white;">PARA LOS SERVICIOS DE</span>
+						</div>
+						
+						<div style="text-align: center;margin-top: 5px">
+							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{constanciaDeDepositoBean.isCongelacion}">
+								<p:ajax update="@this" />
+							</p:selectBooleanCheckbox>
+							<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{constanciaDeDepositoBean.isConservacion}">
+								<p:ajax update="@this"/>
+							</p:selectBooleanCheckbox>
+							<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{constanciaDeDepositoBean.isRefrigeracion}">
+								<p:ajax update="@this"/>
+							</p:selectBooleanCheckbox>
+							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{constanciaDeDepositoBean.isManiobras}">
+								<p:ajax update="@this"/>
+							</p:selectBooleanCheckbox>
+						</div>
+						
+						<p:outputPanel  styleClass="p-mt-2" id="seleccion-producto">
+							<p:outputLabel value="Servicios:" styleClass="p-mr-2"/>
+							<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.precioServicioSelect}" >
+								<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
+								<f:selectItems value="#{constanciaDeDepositoBean.listaServicioUnidad}" var="precioServicio" itemLabel="#{precioServicio.servicio.servicioDs} (Cobro por #{precioServicio.unidad.unidadDeManejoDs})" itemValue="#{precioServicio}" />	
+								<p:ajax update="@this" />																	
+							</p:selectOneMenu>
+							
+							
+							<p:outputLabel value="Cantidad:" styleClass="p-ml-6 p-mr-2"/>
+							<p:spinner id="cantidadServicio" min="1" value="#{constanciaDeDepositoBean.cantidadServicio}">
+								<p:ajax update="@this" />
+							</p:spinner>
+						
+							
+							<div style="text-align: right;">
+							<p:commandButton value="Agregar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" style="margin-right: .5rem" icon="pi pi-plus" update="form:dt-constanciaDD"/>
+							</div>
+						</p:outputPanel>
+						
+						<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" rows="10" value="#{constanciaDeDepositoBean.listadoConstanciaDepositoDetalle}"
+									rowSelectMode="add"	rowKey="#{constanciaDD}" var="constanciaDD" paginator="true" paginatorPosition="bottom" reflow="true" selection="#{constanciaDeDepositoBean.selectedConstanciaDD}">
+						
+							<f:facet name="header">
+								<div class="products-table-header">
+									<span style="font-weight: bold;">Sus Servicios</span>
+								</div>
+							</f:facet>
+							
+							<p:ajax event="rowSelect"/>
+                            <p:ajax event="rowUnselect"/>
+                            <p:ajax event="rowSelectCheckbox"/>
+                            <p:ajax event="rowUnselectCheckbox"/>
+                            <p:ajax event="toggleSelect"/>
+
+							<p:column selectionMode="multiple" exportable="false"></p:column>
+							
+							<p:column headerText="Servicio">
+								<h:outputText value="#{constanciaDD.servicioCve.servicioDs}" />
+							</p:column>
+							
+							<p:column headerText="Constancia De Deposito">
+								<h:outputText value="#{constanciaDD.folio.fechaIngreso}" />
+							</p:column>
+						
+							<p:column headerText="Cantidad">
+								<h:outputText value="#{constanciaDD.servicioCantidad}" />
+							</p:column>
+							
+							 <p:column exportable="false" width="15%" style="text-align:center">
+                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" action="#{constanciaDeDepositoBean.deleteConstanciaDD}"  width="45%">
+                                    <f:setPropertyActionListener value="#{constanciaDD}" target="#{constanciaDeDepositoBean.selectedConstanciasDD}" />
+                                </p:commandButton>
+                            </p:column>
+							
+						</p:dataTable>
+						
+						
+						<p:outputPanel styleClass="p-mt-4" id="datos-adicionales">
+							<p:outputLabel value="Temperatura De La Mercancia:" styleClass="p-mr-2" />
+							<p:spinner stepFactor=".01" value="#{constanciaDeDepositoBean.temperatura}" >
+								<p:ajax update="@this" />
+							</p:spinner>
+							
+							
+							<p:outputLabel styleClass="p-ml-6 p-mr-2" value="Nombre Transportista:"/>
+							<p:inputText value="#{constanciaDeDepositoBean.nombreTransportista}" >
+								<p:ajax update="@this" />
+							</p:inputText>
+							
+							<p:outputLabel styleClass="p-ml-6 p-mr-2" value="Placas Del Vehiculo:"/>
+							<p:inputText value="#{constanciaDeDepositoBean.placas}" >
+								<p:ajax update="@this" />
+							</p:inputText>
+							
+							<div style="margin-top: 5px;text-align: center;">
+							<p:outputLabel styleClass="p-ml-6 p-mr-2 p-mt-2" value="Observaciones:" />
+							<p:inputTextarea value="#{constanciaDeDepositoBean.observacion}" autoResize="true">
+								<p:ajax update="@this" />
+							</p:inputTextarea>
+							</div>
+							<div style="margin-top: 5px">
+								
+								<p:commandButton value="Limpiar" class="ui-button-warning" actionListener="#{constanciaDeDepositoBean.limpiar()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales dt-constanciaDD dt-partidas"/>
+								<p:splitButton value="Guardar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" icon="pi pi-save" update="@this">
+						            <p:menuitem value="Imprimir" actionListener="#{constanciaDeDepositoBean.imprimir()}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+						            <p:menuitem value="Cancelar" icon="pi pi-times"/>
+						        </p:splitButton>
+							</div>
+													
+						</p:outputPanel>
+						
+			<!-- Dialogo cambiar No. Constancia -->
+						<p:dialog header="No. Constancia" showEffect="hide" modal="true" widgetVar="NoCambiarDialog" responsive="true" style="text-align:center">
+							<p:outputPanel id="NoConstancia">
+								<p:outputPanel rendered="#{empty constanciaDeDepostioBean.noConstanciaSelect}" >
+									<div>
+										<p:outputLabel styleClass="p-mr-2" value="No. Constancia:" />
+										<p:inputText value="#{constanciaDeDepositoBean.noConstanciaSelect}">
+											<p:ajax event="blur" update="numeroC"/> 
+										</p:inputText>
+									</div>		
+								</p:outputPanel>
+							</p:outputPanel>
+							<f:facet name="footer">
+									<p:commandButton value="Validar" actionListener="#{constanciaDeDepositoBean.validar()}" oncomplete="PF('NoCambiarDialog').hide()" update="@this" process="NoConstancia @this"/>
+									<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('NoCambiarDialog').hide()" class="ui-button-secondary"/>
+							</f:facet>													
+						</p:dialog>
+			<!-- Dialogo de confirmacion a eliminar -->
+						<p:confirmDialog widgetVar="deleteConstanciaDialog" showEffect="fade" width="400" message="Desea eliminar la constancia?" header="Eliminar" severity="warn">
+                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{constanciaDeDepositoBean.deleteConstanciaDD}" process="@this" oncomplete="PF('deleteConstanciaDialog').hide()"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteConstanciaDialog').hide()" />
+                        </p:confirmDialog>
+						
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

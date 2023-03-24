@@ -10,7 +10,9 @@ import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.SerieFacturaDAO;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieFactura;
 import mx.com.ferbo.model.StatusSerie;
 
@@ -22,17 +24,21 @@ public class SerieFacturaBean implements Serializable {
 
 	private List<SerieFactura> listSerie;
 	private List<StatusSerie> status;
+	private List<Planta> listaPlanta;
 
 	private SerieFactura nuevo;
 	private SerieFactura seleccion;
 
 	private SerieFacturaDAO daoSerie;
+	private PlantaDAO plantaDAO;
 
 	public SerieFacturaBean() {
 		daoSerie = new SerieFacturaDAO();
 		listSerie = daoSerie.findAll();
 		status = daoSerie.findStatus();
 		seleccion = new SerieFactura();
+		plantaDAO = new PlantaDAO();
+		listaPlanta = plantaDAO.findall();
 	};
 
 	public void openNew() {
@@ -119,6 +125,16 @@ public class SerieFacturaBean implements Serializable {
 
 	public void setSeleccion(SerieFactura seleccion) {
 		this.seleccion = seleccion;
+	}
+
+	public List<Planta> getListaPlanta() {
+		return listaPlanta;
+	}
+
+	public void setListaPlanta(List<Planta> listaPlanta) {
+		this.listaPlanta = listaPlanta;
 	};
+	
+	
 
 }

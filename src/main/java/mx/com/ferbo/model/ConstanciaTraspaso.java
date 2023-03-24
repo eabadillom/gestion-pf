@@ -60,7 +60,7 @@ public class ConstanciaTraspaso implements Serializable {
     private Date fecha;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 500)
+    @Size(min = 0, max = 500)
     @Column(name = "observacion")
     private String observacion;
     @Basic(optional = false)

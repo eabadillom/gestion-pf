@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -48,57 +49,78 @@ import javax.validation.constraints.Size;
 public class DetallePartida implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
-    protected DetallePartidaPK detallePartidaPK;
+    private DetallePartidaPK detallePartidaPK;
+    
     @Column(name = "det_padre")
     private Integer detPadre;
+    
     @Column(name = "det_part_padre")
     private Integer detPartPadre;
+    
     @Column(name = "cantidad_u_manejo")
     private Integer cantidadUManejo;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    
     @Column(name = "cantidad_u_medida")
     private BigDecimal cantidadUMedida;
+    
     @Size(max = 12)
     @Column(name = "dtp_codigo")
     private String dtpCodigo;
+    
     @Size(max = 20)
     @Column(name = "dtp_lote")
     private String dtpLote;
+    
     @Column(name = "dtp_caducidad")
     @Temporal(TemporalType.DATE)
     private Date dtpCaducidad;
+    
     @Size(max = 12)
     @Column(name = "dtp_PO")
     private String dtpPO;
+    
     @Size(max = 20)
     @Column(name = "dtp_MP")
     private String dtpMP;
+    
     @Size(max = 13)
     @Column(name = "dtp_pedimento")
     private String dtpPedimento;
+    
     @Size(max = 20)
     @Column(name = "dtp_SAP")
     private String dtpSAP;
+    
     @Size(max = 15)
     @Column(name = "dtp_tarimas")
     private String dtpTarimas;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "detallePartida")
+    private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
+    
     @OneToMany(mappedBy = "detallePartida")
     private List<DetallePartida> detallePartidaList;
+    
     @JoinColumns({
         @JoinColumn(name = "det_anterior", referencedColumnName = "DET_PART_CVE"),
         @JoinColumn(name = "det_part_anterior", referencedColumnName = "PARTIDA_CVE")})
     @ManyToOne
     private DetallePartida detallePartida;
+    
     @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Partida partida;
+    
     @JoinColumn(name = "tipo_mov_cve", referencedColumnName = "CLAVE")
     @ManyToOne
     private TipoMovimiento tipoMovCve;
+    
     @JoinColumn(name = "u_medida_cve", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
     @ManyToOne
     private UnidadDeManejo uMedidaCve;
+    
     @JoinColumn(name = "edo_inv_cve", referencedColumnName = "edo_inv_cve")
     @ManyToOne
     private EstadoInventario edoInvCve;
@@ -110,7 +132,7 @@ public class DetallePartida implements Serializable {
         this.detallePartidaPK = detallePartidaPK;
     }
 
-    public DetallePartida(int detPartCve, int partidaCve) {
+    public DetallePartida(int detPartCve, Partida partidaCve) {
         this.detallePartidaPK = new DetallePartidaPK(detPartCve, partidaCve);
     }
 
@@ -216,6 +238,14 @@ public class DetallePartida implements Serializable {
 
     public void setDtpTarimas(String dtpTarimas) {
         this.dtpTarimas = dtpTarimas;
+    }
+
+    public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
+        return detalleConstanciaSalidaList;
+    }
+
+    public void setDetalleConstanciaSalidaList(List<DetalleConstanciaSalida> detalleConstanciaSalidaList) {
+        this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
     }
 
     public List<DetallePartida> getDetallePartidaList() {

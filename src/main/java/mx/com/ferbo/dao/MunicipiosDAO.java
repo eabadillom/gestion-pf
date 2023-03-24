@@ -1,18 +1,29 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 //import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.Municipios;
+import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
-
+	@SuppressWarnings("unchecked")
+	public List<Municipios> findall() {
+		EntityManager entity = getEntityManager();
+		List<Municipios> municipios = null;
+		Query sql = entity.createNamedQuery("Municipios.findAll", Municipios.class);
+		municipios = sql.getResultList();
+		return municipios;
+	}
 	@Override
 	public Municipios buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -86,7 +97,12 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(municipios));
+//			em.remove(em.merge(municipios));
+//			DELETE FROM `gestiondb`.`municipios` WHERE (`pais_cve` = '3') and (`estado_cve` = '9') and (`municipio_cve` = '18');
+			em.createQuery("DELETE FROM Municipios m WHERE m.municipiosPK.paisCve =:paisCve and m.municipiosPK.estadoCve =:estadoCve and m.municipiosPK.municipioCve =:municipioCve")
+			.setParameter("paisCve", municipios.getMunicipiosPK().getPaisCve())
+			.setParameter("estadoCve", municipios.getMunicipiosPK().getEstadoCve())
+			.setParameter("municipioCve", municipios.getMunicipiosPK().getMunicipioCve()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {

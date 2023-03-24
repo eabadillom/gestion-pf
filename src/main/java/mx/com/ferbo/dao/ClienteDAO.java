@@ -3,15 +3,25 @@ package mx.com.ferbo.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 
+	@SuppressWarnings("unchecked")
+	public List<Cliente> findall() {
+		EntityManager entity = EntityManagerUtil.getEntityManager();
+		List<Cliente> cliente = null;
+		Query sql = entity.createNamedQuery("Cliente.findAll", Cliente.class);
+		cliente = sql.getResultList();
+		return cliente;
+	}	
 	@Override
 	public Cliente buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -25,13 +35,13 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 	public List<Cliente> buscarTodos() {
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		List<Cliente> listado = null;
-		listado = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();
+		listado = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();		
 		return listado;
 	}
 
 	@Override
 	public List<Cliente> buscarPorCriterios(Cliente e) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

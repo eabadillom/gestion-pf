@@ -3,19 +3,31 @@ package mx.com.ferbo.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PartidaDAO extends IBaseDAO<Partida, Integer>{
-
+	@SuppressWarnings("unchecked")
+	public List<Partida> findall() {
+		EntityManager entity = EntityManagerUtil.getEntityManager();
+		List<Partida> partida= null;
+		Query sql = entity.createNamedQuery("Partida.findAll", Partida.class);
+		partida = sql.getResultList();
+		return partida;
+	}
+	
 	@Override
-	public Partida buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Partida buscarPorId(Integer partidaClave) {
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		Partida p = em.createNamedQuery("Partida.findByPartidaCve", Partida.class).setParameter("partidaCve", partidaClave).getSingleResult();
+		return p;
 	}
 
 	@Override
@@ -31,14 +43,32 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 	}
 
 	@Override
-	public String actualizar(Partida e) {
-		// TODO Auto-generated method stub
+	public String actualizar(Partida partida) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(partida);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
 		return null;
 	}
 
 	@Override
-	public String guardar(Partida e) {
-		// TODO Auto-generated method stub
+	public String guardar(Partida partida) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(partida);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
 		return null;
 	}
 

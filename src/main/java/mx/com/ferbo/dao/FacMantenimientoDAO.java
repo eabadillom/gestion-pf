@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -11,11 +12,12 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacMantenimientoDAO {
 
-	public List<Factura> findDacturas(Cliente c) {
+	public List<Factura> findDacturas(Cliente c, Date de, Date hasta) {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
 		@SuppressWarnings("unchecked")
-		List<Factura> list = entity.createQuery("SELECT f FROM Factura f WHERE f.cliente = :cliente AND f.status = 1")
-				.setParameter("cliente", c).getResultList();
+		List<Factura> list = entity.createQuery(
+				"SELECT f FROM Factura f WHERE f.cliente = :cliente AND f.status = 1 AND f.fecha BETWEEN :de AND :hasta")
+				.setParameter("cliente", c).setParameter("de", de).setParameter("hasta", hasta).getResultList();
 		return list;
 	};
 
