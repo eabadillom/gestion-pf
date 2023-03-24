@@ -65,9 +65,6 @@
 						<p:column headerText="Status" width="13%">
 							<h:outputText value="#{lista.statusSerie.descripcion}" />
 						</p:column>
-						<p:column headerText="Default" width="3%">
-							<h:outputText value="#{lista.isDflt ? 'SI' : 'No'}" />
-						</p:column>
 						<p:column headerText="Acción" class="p-text-center">
 							<p:commandButton value="Modificar" icon="pi pi-pencil"
 								styleClass="ui-button-info p-mr-2 p-mb-2"
@@ -96,6 +93,13 @@
 						<p:outputLabel for="@next">Serie:</p:outputLabel>
 						<p:inputText value="#{serieFacturaBean.nuevo.nomSerie}"
 							required="true" />
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="(SUCURSAL) PLANTA:" />
+						<p:selectOneMenu value="#{serieFacturaBean.nuevo.idPlanta}" converter="entityConverter">
+							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
+							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
@@ -139,7 +143,7 @@
 						process="frm-agrega @this" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
 						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()"
-						update="frm-agrega" />
+						update="frm-agrega" process="@this"/>
 				</f:facet>
 			</p:dialog>
 
@@ -150,6 +154,13 @@
 						<p:outputLabel for="@next">Serie:</p:outputLabel>
 						<p:inputText value="#{serieFacturaBean.seleccion.nomSerie}"
 							required="true" />
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="(SUCURSAL) PLANTA:" />
+						<p:selectOneMenu value="#{serieFacturaBean.seleccion.idPlanta}" converter="entityConverter">
+							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
+							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
@@ -193,7 +204,7 @@
 						actionListener="#{serieFacturaBean.update()}"
 						process="frm-modifica @this" update="frm-modifica" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" />
+						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" process="@this"/>
 				</f:facet>
 			</p:dialog>
 

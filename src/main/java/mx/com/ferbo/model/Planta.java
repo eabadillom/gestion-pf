@@ -100,7 +100,9 @@ public class Planta implements Serializable {
 	
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
 	@ManyToOne
-	private EmisoresCFDIS idEmisoresCFDIS;//agregado	
+	private EmisoresCFDIS idEmisoresCFDIS;//agregado
+	
+	
 	
 	public Planta() {
 
