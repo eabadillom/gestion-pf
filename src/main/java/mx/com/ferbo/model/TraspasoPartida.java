@@ -34,6 +34,7 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "TraspasoPartida.findByDescripcion", query = "SELECT t FROM TraspasoPartida t WHERE t.descripcion = :descripcion"),
         @NamedQuery(name = "TraspasoPartida.findByCantidad", query = "SELECT t FROM TraspasoPartida t WHERE t.cantidad = :cantidad"),
         @NamedQuery(name = "TraspasoPartida.findByOrigen", query = "SELECT t FROM TraspasoPartida t WHERE t.origen = :origen"),
+        @NamedQuery(name = "TraspasoPartida.findByTraspaso", query = "SELECT t FROM TraspasoPartida t WHERE t.traspaso.id = :traspaso"),
         @NamedQuery(name = "TraspasoPartida.findByDestino", query = "SELECT t FROM TraspasoPartida t WHERE t.destino = :destino") })
 public class TraspasoPartida implements Serializable {
 
