@@ -10,21 +10,25 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.FileChooserUI;
 
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.file.UploadedFile;
 
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
+import mx.com.ferbo.model.Certificado;
 import mx.com.ferbo.model.EmisoresCFDIS;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.RegimenFiscal;
 
 @Named
 @ViewScoped
 public class EmisoresCFDISBean implements Serializable {
-
 		private static final long serialVersionUID = 1L;
-		
+		private UploadedFile file;
 		private String pmoral;
 		private Integer pfisica;
 		private String tipoPersona;
@@ -34,20 +38,23 @@ public class EmisoresCFDISBean implements Serializable {
 		private String nombreEmisor;
 		private Date iniOperacion;
 		private Date ultSAT;
-		private EmisoresCFDIS emisor;
-		//RegimenFiscal regimenFiscal;
-		
 		private String regimenFiscal;
+		private EmisoresCFDIS emisor;
+		private EmisoresCFDIS nuevo;
+		private Certificado certificado;
+		
 		private EmisoresCFDISDAO emisoresDAO;
 		private RegimenFiscalDAO regimenFiscalDAO;
+		
 		private List<EmisoresCFDIS> listaEmisor;
 		private List<RegimenFiscal> listaRegimenFiscal;
-		private UploadedFile file;
+		
 		
 	public EmisoresCFDISBean() {
 		listaEmisor = new ArrayList<EmisoresCFDIS>();
 		listaRegimenFiscal = new ArrayList<RegimenFiscal>();
 		
+		//emisor = new EmisoresCFDIS();
 		emisoresDAO = new EmisoresCFDISDAO();
 		regimenFiscalDAO = new RegimenFiscalDAO();
 		
@@ -64,7 +71,6 @@ public void init() {
 	public void newEmisor() {
 		this.emisor = new EmisoresCFDIS();
 		this.emisor.setNb_emisor(nombreEmisor);
-		this.emisor.setCd_regimen(null);
 		this.emisor.setFh_inicio_op(iniOperacion);
 		this.emisor.setFh_ult_cambio(ultSAT);
 		this.emisor.setNb_regimen_capital(regimenCapital);
@@ -76,7 +82,9 @@ public void init() {
 		System.out.println("NombreEmisor: " + this.nombreEmisor);
 		System.out.println("Generando nuevo emisor");
 	}
-
+	public void openNew() {
+		emisor= new EmisoresCFDIS();
+	};
 	public void agregaEmisor() {
 		System.out.println("Guardando...");
 		PrimeFaces.current().executeScript("PF('dialogEmisor').hide()");
@@ -95,7 +103,12 @@ public void init() {
 	}
 
 	public void guardaEmisor() {
+//		this.rfc.length();
+//		if ( rfc.length() != 14) {
+//			System.out.println("El rfc debe ser menor a ............");
+//		}else {
 		PrimeFaces.current().executeScript("PF('dialogEmisor').hide()");
+		System.out.println(emisor);
 		emisor.setNb_emisor(this.nombreEmisor);
 		emisor.setTp_persona(this.tipoPersona);
 		emisor.setNb_regimen_capital(this.regimenCapital);
@@ -105,7 +118,7 @@ public void init() {
 		emisor.setSt_padron(this.padron);
 		RegimenFiscal regimenObj = regimenFiscalDAO.buscarPorId(this.regimenFiscal);
 		emisor.setCd_regimen(regimenObj);
-		String em = emisoresDAO.guardar(emisor);
+		String em = emisoresDAO.actualizar(emisor);
 		if(em == null) {
 		listaEmisor.clear();
 		listaEmisor = emisoresDAO.findall();
@@ -114,17 +127,26 @@ public void init() {
 		}else{
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al agregar el emisor" + emisor.getCd_emisor(), em));
 		PrimeFaces.current().ajax().update("form:messages");
-		}
+//		}
+	}
 
-this.emisor = new EmisoresCFDIS();
+		this.emisor = new EmisoresCFDIS();
 }
-
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivo cer", "cer");
 	public void upload() {
-		if (file != null) {
+		//JFileChooser filechoose = new JFileChooser();
+		//filechoose.setFileFilter(filter);
+		if (file != null){
+			//file.getInputStream()
 			FacesMessage message = new FacesMessage("Successful", file.getFileName() + " is uploaded.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
+		//int opcion = filechoose.showOpenDialog(filechoose);
+		//if(opcion == JFileChooser.APPROVE_OPTION) {
+			//String nombre_archivo= filechoose.getSelectedFile().getName();
+			//String ruta = filechoose.getSelectedFile().toString();
+			}
 		}
-	}
+	
 
 		public void RegimenSelect() {
 			System.out.println("Tipo de persona: " + this.tipoPersona);
@@ -274,6 +296,22 @@ this.emisor = new EmisoresCFDIS();
 
 	public void setFile(UploadedFile file) {
 	this.file = file;
+	}
+
+	public Certificado getCertificado() {
+		return certificado;
+	}
+
+	public void setCertificado(Certificado certificado) {
+		this.certificado = certificado;
+	}
+
+	public EmisoresCFDIS getNuevo() {
+		return nuevo;
+	}
+
+	public void setNuevo(EmisoresCFDIS nuevo) {
+		this.nuevo = nuevo;
 	}
 
 }

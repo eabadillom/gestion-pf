@@ -23,10 +23,8 @@ public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscal, String>{
 	@Override
 	public RegimenFiscal buscarPorId(String cd_regimen) {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
-		RegimenFiscal rf = null;
-		Query sql = (Query) entity.createNamedQuery("RegimenFiscal.findBycdRegimen", RegimenFiscal.class)
-				.setParameter("cd_regimen", cd_regimen);
-		rf = (RegimenFiscal) sql.getSingleResult();
+		RegimenFiscal rf = entity.createNamedQuery("RegimenFiscal.findBycdRegimen", RegimenFiscal.class)
+				.setParameter("cd_regimen", cd_regimen).getSingleResult();
 		return rf;
 	}
 

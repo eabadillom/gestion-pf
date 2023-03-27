@@ -41,7 +41,7 @@ private static final long serialVersionUID = 1L;
 		@Column(name = "cd_emisor")
 		private Integer cd_emisor;
 		
-		@Size(max = 20)
+		@Size(max = 150)
 		@Column(name = "nb_emisor")
 		private String nb_emisor;
 		
@@ -69,7 +69,7 @@ private static final long serialVersionUID = 1L;
 		@Column(name = "st_padron")
 		private String st_padron;
 		
-		@Size(max = 20)
+		
 		@JoinColumn(name = "cd_regimen")
 		 @ManyToOne
 		 private RegimenFiscal cd_regimen;
