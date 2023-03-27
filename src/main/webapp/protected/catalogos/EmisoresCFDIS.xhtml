@@ -148,7 +148,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 			</p:panel>
 
 			<f:facet name="footer">
-			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardaEmisor}" process="@this" />
+			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardaEmisor}" process="@this pnlEmisor" update="pnlEmisor" />
 			<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogEmisor').hide()" />
 			</f:facet>
 </p:dialog>
@@ -160,6 +160,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 
 						<p:outputLabel for="nombre-emisor" value="Nombre del emisor"/>
 						<p:inputText widgetVar="txtNombreEmisor" id="nombre-emisor" value="#{emisoresCFDISBean.emisor.nb_emisor}" required="true"/>
+						<p:ajax/>
 					
 					<div class= "p-col-12 p-md-6 p-lg-4">
 					  <p:selectOneRadio id="tipoP" value="#{emisoresCFDISBean.emisor.tp_persona}" layout="grid" columns="3" styleClass="grid-radio" >
@@ -226,7 +227,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
     		</p:divider>
     		
 			<div class="p-col-12 p-md-6 p-lg-4">
-				<p:fileUpload value="#{fileUploadView.file}" accept=".cer" allowTypes="/(\.|\/)(cer)$/" mode="simple" skinSimple="true" icon="pi pi-upload"/>
+				<p:fileUpload value="#{emisoresCFDISBean.file}" accept=".cer" allowTypes="/(\.|\/)(cer)$/" mode="simple" skinSimple="true" icon="pi pi-upload"/>
 			</div>
 				
 			<p:divider align="left">
@@ -246,7 +247,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
     			</p:divider>
 				<div class="p-col-12 p-md-6 p-lg-4">
 				    <p:outputLabel for="@next" value="Contraseña key" required="true"/>
-					<p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="" required="true"/>
+					<p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="#{emisoresCFDISBean.certificado.}" required="true"/>
 				</div>
 				
 				<p:divider align="left">
@@ -280,7 +281,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 			</div>
 		</p:outputPanel>
 			<f:facet name="footer">
-			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardaEmisor}" />
+			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardarCertificado}"  process="@this pnlCarga" update="pnlCarga"/>
 			<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogCarga').hide()" />
 			</f:facet>
 </p:dialog>

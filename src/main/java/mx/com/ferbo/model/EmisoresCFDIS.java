@@ -1,6 +1,8 @@
 package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,27 +35,25 @@ import javax.validation.constraints.Size;
 public class EmisoresCFDIS implements Serializable {
 
 private static final long serialVersionUID = 1L;
-
-		@SuppressWarnings("static-access")
 		@Id
 		@GeneratedValue(strategy = GenerationType.IDENTITY)
 		@Basic(optional = false)
 		@Column(name = "cd_emisor")
 		private Integer cd_emisor;
 		
-		@Size(max = 150)
+		@Size(min = 1, max = 150)
 		@Column(name = "nb_emisor")
 		private String nb_emisor;
 		
-		@Size(min = 0, max = 1)
+		@Size(min = 1, max = 1)
 		@Column(name ="tp_persona")
 		private String tp_persona;
 		
-		@Size(min = 0, max = 150)
+		@Size(min = 1, max = 150)
 		@Column(name = "nb_regimen_capital")
 		private String nb_regimen_capital;
 		
-		@Size(max = 20)
+		@Size(min= 1, max = 20)
 		@Column(name = "nb_rfc")
 		private String nb_rfc;
 		
@@ -69,13 +69,12 @@ private static final long serialVersionUID = 1L;
 		@Column(name = "st_padron")
 		private String st_padron;
 		
-		
 		@JoinColumn(name = "cd_regimen")
 		 @ManyToOne
 		 private RegimenFiscal cd_regimen;
 		
 		@Column(name = "uuid")
-		@Size(max = 50)
+		@Size(min = 1, max = 50)
 		private String uuid = null;
 		
 		public EmisoresCFDIS() {
@@ -162,6 +161,29 @@ private static final long serialVersionUID = 1L;
 		this.uuid = uuid;
 		}
 		
+		@Override
+		public int hashCode() {
+			return Objects.hash(cd_emisor, cd_regimen, fh_inicio_op, fh_ult_cambio, nb_emisor, nb_regimen_capital,
+					nb_rfc, st_padron, tp_persona, uuid);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			EmisoresCFDIS other = (EmisoresCFDIS) obj;
+			return Objects.equals(cd_emisor, other.cd_emisor) && Objects.equals(cd_regimen, other.cd_regimen)
+					&& Objects.equals(fh_inicio_op, other.fh_inicio_op)
+					&& Objects.equals(fh_ult_cambio, other.fh_ult_cambio) && Objects.equals(nb_emisor, other.nb_emisor)
+					&& Objects.equals(nb_regimen_capital, other.nb_regimen_capital)
+					&& Objects.equals(nb_rfc, other.nb_rfc) && Objects.equals(st_padron, other.st_padron)
+					&& Objects.equals(tp_persona, other.tp_persona) && Objects.equals(uuid, other.uuid);
+		}
+
 		public EmisoresCFDIS(Integer cd_emisor, String nb_emisor, String tp_persona, String nb_regimen_capital,String nb_rfc, Date fh_inicio_op, Date fh_ult_cambio,
 		String st_padron,RegimenFiscal cd_regimen, String uuid) {
 		this.cd_emisor = cd_emisor;

@@ -28,7 +28,8 @@ import mx.com.ferbo.model.RegimenFiscal;
 @ViewScoped
 public class EmisoresCFDISBean implements Serializable {
 		private static final long serialVersionUID = 1L;
-		private UploadedFile file;
+		private UploadedFile certificadoFile;
+		private UploadedFile llavePrivadaFile;
 		private String pmoral;
 		private Integer pfisica;
 		private String tipoPersona;
@@ -101,7 +102,10 @@ public void init() {
 			PrimeFaces.current().ajax().update("form:messages");
 			}
 	}
+public void guardarCertificado() {
+	System.out.println("Guardando certificado");
 
+}
 	public void guardaEmisor() {
 //		this.rfc.length();
 //		if ( rfc.length() != 14) {
@@ -132,13 +136,14 @@ public void init() {
 
 		this.emisor = new EmisoresCFDIS();
 }
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivo cer", "cer");
+
+
 	public void upload() {
 		//JFileChooser filechoose = new JFileChooser();
 		//filechoose.setFileFilter(filter);
-		if (file != null){
+		if (certificadoFile != null){
 			//file.getInputStream()
-			FacesMessage message = new FacesMessage("Successful", file.getFileName() + " is uploaded.");
+			FacesMessage message = new FacesMessage("Successful", certificadoFile.getFileName() + " is uploaded.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		//int opcion = filechoose.showOpenDialog(filechoose);
 		//if(opcion == JFileChooser.APPROVE_OPTION) {
@@ -290,12 +295,21 @@ public void init() {
 		this.listaRegimenFiscal = listaRegimenFiscal;
 	}
 	
-	public UploadedFile getFile() {
-		return file;
+
+	public UploadedFile getLlavePrivadaFile() {
+		return llavePrivadaFile;
 	}
 
-	public void setFile(UploadedFile file) {
-	this.file = file;
+	public void setLlavePrivadaFile(UploadedFile llavePrivadaFile) {
+		this.llavePrivadaFile = llavePrivadaFile;
+	}
+
+	public UploadedFile getCertificadoFile() {
+		return certificadoFile;
+	}
+
+	public void setCertificadoFile(UploadedFile certificadoFile) {
+		this.certificadoFile = certificadoFile;
 	}
 
 	public Certificado getCertificado() {
@@ -313,5 +327,6 @@ public void init() {
 	public void setNuevo(EmisoresCFDIS nuevo) {
 		this.nuevo = nuevo;
 	}
+
 
 }
