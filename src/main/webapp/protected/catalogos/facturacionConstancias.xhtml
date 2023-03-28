@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+	
+	<ui:define name="title">Facturacion Entradas/Salidas</ui:define>
+	
+	<ui:define name="content">
+	
+		<h:form id="form" >
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Facturación" />				
+				<p:menuitem value="Facturacion Entrada/Salida" outcome="/protected/catalogos/facturacionConstancias" />
+			</p:breadCrumb>
+		
+			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
+		
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						<div style="margin-bottom: 5px;text-align: center;">
+							<p:outputLabel value="Razon Social:" styleClass="p-ml-2"></p:outputLabel>
+							<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}">
+								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
+								<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
+								<p:ajax update="receptor"></p:ajax>						
+							</p:selectOneMenu>
+						</div>
+						
+					<p:fieldset legend="Datos del Receptor (Cliente)" >
+						<p:outputPanel id="receptor">
+							
+							<p:outputLabel value="Numero:" styleClass="p-mr-2" />
+							<p:inputNumber value="#{facturacionConstanciasBean.clienteSelect.numeroCte}" decimalPlaces="0"/>
+							
+							<p:outputLabel value="Razon Social:" styleClass="p-ml-4 p-mr-2" />
+							<p:inputText value="#{facturacionConstanciasBean.clienteSelect.cteNombre}" style="width: 22%;"/>
+							
+							<p:outputLabel value="RFC:" styleClass="p-ml-4 p-mr-2"/>
+							<p:inputText value="#{facturacionConstanciasBean.clienteSelect.cteRfc}" />
+							
+							<p:outputLabel value="Domicilio:" styleClass="p-ml-4 p-mr-2" />
+							<p:selectOneMenu id="domicilio" autoWidth="false">
+								<f:selectItem itemValue="---Seleccione---" />
+							</p:selectOneMenu>
+							
+							<!--<p:outputLabel value="Status:" styleClass="p-ml-4 p-mr-2"/>
+							<p:inputText value="" />-->
+							
+							
+						</p:outputPanel>
+					</p:fieldset>
+					
+					</div>
+				</div>
+			</div>
+		
+		
+		</h:form>
+	</ui:define>
+</ui:composition>
