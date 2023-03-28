@@ -2,10 +2,16 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EventListener;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
+
+import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
@@ -16,17 +22,10 @@ import mx.com.ferbo.dao.EstadosDAO;
 import mx.com.ferbo.dao.MunicipiosDAO;
 import mx.com.ferbo.dao.PaisDAO;
 import mx.com.ferbo.dao.PaisesDAO;
-import mx.com.ferbo.dao.PrecioServicioDAO;
-import mx.com.ferbo.dao.ProductoClienteDAO;
-import mx.com.ferbo.dao.ProductoDAO;
-import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.TiposDomicilioDAO;
-import mx.com.ferbo.dao.UnidadManejoDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
-import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Ciudades;
-import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Domicilios;
@@ -34,25 +33,7 @@ import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.Municipios;
 import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.Paises;
-import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.model.Producto;
-import mx.com.ferbo.model.ProductoPorCliente;
-import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.TiposDomicilio;
-import mx.com.ferbo.model.UnidadDeManejo;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.event.AjaxBehaviorListener;
-import javax.faces.view.ViewScoped;
-import javax.inject.Named;
-
-import org.primefaces.PrimeFaces;
-import org.primefaces.event.SelectEvent;
-
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 
 @Named
 @ViewScoped
@@ -184,7 +165,7 @@ public class DomiciliosBean implements Serializable {
 		lstClienteDomicilios = clienteDomiciliosDAO.buscarTodos();
 		lstDomicilios = domiciliosDAO.buscarTodos();
 		lstPaises = paisesDAO.buscarTodos();
-		Collections.swap(lstPaises, 0, 150);
+		//Collections.swap(lstPaises, 0, 150);
 		lstEstados = new ArrayList<>();
 		lstMunicipios = new ArrayList<>();
 		lstCiudades = new ArrayList<>();
@@ -247,10 +228,10 @@ public class DomiciliosBean implements Serializable {
 		estadoAux.setPaises(paisSelected);
 		lstEstados = estadosDAO.buscarPorCriterios(estadoAux);
 		lstEstadosFiltered = lstEstados;
-		System.out.println("Estados Filtrados:" + lstEstadosFiltered.toString());
-		System.out.println("Países todos:" + lstPaises);
-		System.out.println("Países todos:" + lstPaises.get(150));
-		System.out.println("Países todos:" + lstPaises.get(0));
+		//System.out.println("Estados Filtrados:" + lstEstadosFiltered.toString());
+		//System.out.println("Países todos:" + lstPaises);
+		//System.out.println("Países todos:" + lstPaises.get(150));
+		//System.out.println("Países todos:" + lstPaises.get(0));
 
 		PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion");
 
