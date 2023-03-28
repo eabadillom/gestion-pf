@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,12 +18,14 @@ import javax.swing.plaf.FileChooserUI;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.file.UploadedFile;
 
+import mx.com.ferbo.dao.CertificadoDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
 import mx.com.ferbo.model.Certificado;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.RegimenFiscal;
+import mx.com.ferbo.utils.IOUtil;
 
 @Named
 @ViewScoped
@@ -40,24 +43,28 @@ public class EmisoresCFDISBean implements Serializable {
 		private Date iniOperacion;
 		private Date ultSAT;
 		private String regimenFiscal;
+		private String nombrellavePrivada;
+		
 		private EmisoresCFDIS emisor;
-		private EmisoresCFDIS nuevo;
 		private Certificado certificado;
 		
 		private EmisoresCFDISDAO emisoresDAO;
 		private RegimenFiscalDAO regimenFiscalDAO;
+		private CertificadoDAO certificadoDAO;
 		
 		private List<EmisoresCFDIS> listaEmisor;
 		private List<RegimenFiscal> listaRegimenFiscal;
+		private List<Certificado> listaCertificado;
 		
 		
 	public EmisoresCFDISBean() {
 		listaEmisor = new ArrayList<EmisoresCFDIS>();
 		listaRegimenFiscal = new ArrayList<RegimenFiscal>();
-		
+		listaCertificado = new ArrayList<Certificado>();
 		//emisor = new EmisoresCFDIS();
 		emisoresDAO = new EmisoresCFDISDAO();
 		regimenFiscalDAO = new RegimenFiscalDAO();
+		certificadoDAO = new CertificadoDAO();
 		
 		listaRegimenFiscal = regimenFiscalDAO.findAll();
 		listaEmisor = emisoresDAO.findall();
@@ -66,7 +73,7 @@ public class EmisoresCFDISBean implements Serializable {
 @PostConstruct
 
 public void init() {
-
+	
 }
 
 	public void newEmisor() {
@@ -102,9 +109,60 @@ public void init() {
 			PrimeFaces.current().ajax().update("form:messages");
 			}
 	}
+	public void cargaCertificado() {
+		if (certificadoFile == null) {
+			FacesMessage message = new FacesMessage("Error", "Debe seleccionar un archivo.");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+		try {
+			byte[] contenidoCertificado = IOUtil.read(certificadoFile.getInputStream());
+			String nombreCertificado = certificadoFile.getFileName();
+			certificado.setCertificado(contenidoCertificado);
+			certificado.setNombreCertificado(nombreCertificado);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		FacesMessage message = new FacesMessage("Successful", certificadoFile.getFileName() + " is uploaded.");
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+	
+	public void cargaLlavePrivada() {
+		if (certificadoFile == null) {
+			FacesMessage message = new FacesMessage("Error", "Debe seleccionar un archivo.");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+		try {
+			byte[] contenidollavePrivada = IOUtil.read(llavePrivadaFile.getInputStream());
+			String nombreLPrivada = llavePrivadaFile.getFileName();
+			certificado.setLlavePrivada(nombreLPrivada);
+			certificado.setDt_llavePrivada(contenidollavePrivada);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		
+		FacesMessage message = new FacesMessage("Successful", certificadoFile.getFileName() + " is uploaded.");
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
 public void guardarCertificado() {
+	this.certificado = new Certificado();
 	System.out.println("Guardando certificado");
-
+	System.out.println(certificado);
+	certificado.setLlavePrivada(nombrellavePrivada);
+	
+	String certi = certificadoDAO.actualizar(certificado);
+	if(certi == null) {
+		listaCertificado.clear();
+		listaCertificado = certificadoDAO.findAll();
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Emisor agregado con exito" + certificado.getCdCertificado(), null));
+		PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
+		}else{
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al agregar el emisor" + certificado.getCdCertificado(), certi));
+		PrimeFaces.current().ajax().update("form:messages");
+		}
+	this.certificado = new Certificado();
 }
 	public void guardaEmisor() {
 //		this.rfc.length();
@@ -320,13 +378,14 @@ public void guardarCertificado() {
 		this.certificado = certificado;
 	}
 
-	public EmisoresCFDIS getNuevo() {
-		return nuevo;
+	public String getNombrellavePrivada() {
+		return nombrellavePrivada;
 	}
 
-	public void setNuevo(EmisoresCFDIS nuevo) {
-		this.nuevo = nuevo;
+	public void setNombrellavePrivada(String nombrellavePrivada) {
+		this.nombrellavePrivada = nombrellavePrivada;
 	}
+
 
 
 }

@@ -126,7 +126,7 @@ public class Certificado implements Serializable{
 
 
 
-	public Certificado(@NotNull Integer cdCertificado, Date fechaAlta, String nombreCertificado, byte[] certificado, String llavePrivada, 
+	public Certificado(Integer cdCertificado, Date fechaAlta, String nombreCertificado, byte[] certificado, String llavePrivada, 
 			byte[] dt_llavePrivada, String password, EmisoresCFDIS emisor) {
 		this.cdCertificado = cdCertificado;
 		this.fechaAlta = fechaAlta;

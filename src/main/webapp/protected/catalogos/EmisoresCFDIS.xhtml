@@ -92,14 +92,14 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 	<p:dialog header="Agregar emisor" showEffect="fade" modal="true" widgetVar="dialogEmisor" responsive="true">
 		<p:panel id="pnlEmisor" class="ui-fluid">
 
-		<div class="p-grid">
-					<div class="p-col-12 p-md-6 p-lg-4">
 						<i class="pi pi-user" />
-						<p:outputLabel for="@next" value="Nombre del emisor"/>
-						<p:inputText value="#{emisoresCFDISBean.nombreEmisor}" required="true"/>
-					</div>
-					
+						<span class="ui-float-label">
+							<p:inputText value="#{emisoresCFDISBean.nombreEmisor}" required="true"/>
+							<p:outputLabel for="@next" value="Nombre del emisor"/>
+						</span>
+						
 					<div class= "p-col-12 p-md-6 p-lg-4">
+					<p:outputLabel for="@next" value="Tipo persona"/>
 					  <p:selectOneRadio id="tP" value="#{emisoresCFDISBean.tipoPersona}" layout="grid" columns="3" styleClass="grid-radio" >
 					    <f:selectItem itemLabel="Persona Moral" itemValue="M"/>
            				<f:selectItem itemLabel="Persona Fisica" itemValue="F"/>
@@ -109,31 +109,39 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 					</div>
 
 					<div class="p-col-12 p-md-6 p-lg-4">
-						<p:outputLabel for="@next" value="Regimen Capital" styleClass="ml-4" />
-						<p:inputText value="#{emisoresCFDISBean.regimenCapital}"/>
+						<span class="ui-float-label">
+							<p:inputText value="#{emisoresCFDISBean.regimenCapital}"/>
+							<p:outputLabel for="@next" value="Regimen Capital" styleClass="ml-4" />
+						</span>
 					</div>
 					
 					<div class="p-col-12 p-md-6 p-lg-4">
-						<p:outputLabel for="@next" value="RFC" styleClass="ml-4" />
+					<span class="ui-float-label">
 						<p:inputText value="#{emisoresCFDISBean.rfc}" required="true" />
+						<p:outputLabel for="@next" value="RFC" styleClass="ml-4" />
+						</span>
 					</div>
 					
-					<div class="p-col-12 p-md-6 p-lg-4">
-					<p:outputLabel for="regimenFiscal" value="Regimen Fiscal" />
-					<p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.regimenFiscal}" converter="entityConverter" >
-                       <f:selectItem itemLabel="---Seleccione---" itemValue=""  />
-                        <f:selectItems value="#{emisoresCFDISBean.listaRegimenFiscal}" var="regimenFiscal" itemLabel="#{regimenFiscal.nb_regimen}" itemValue="#{regimenFiscal.cd_regimen}" />
-                        <p:ajax />
-                    </p:selectOneMenu>
-					</div>
+				<div class="p-col-12 p-md-6 p-lg-4">
+					<span class="ui-float-label">
+						<p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.regimenFiscal}" converter="entityConverter" >
+							<f:selectItem itemLabel="" itemValue="" />
+	                        <f:selectItems value="#{emisoresCFDISBean.listaRegimenFiscal}" var="regimenFiscal" itemLabel="#{regimenFiscal.nb_regimen}" itemValue="#{regimenFiscal.cd_regimen}" />
+	                    </p:selectOneMenu>
+                    </span>
+				</div>
 					
 					<div class="p-col-12 p-md-6 p-lg-4">
-						<p:outputLabel for="@next" value="Inicio de operaciones" styleClass="ml-4"/>
-						<p:datePicker value="#{emisoresCFDISBean.iniOperacion}" required="true"/>
+						<span class="ui-float-label">
+							<p:datePicker value="#{emisoresCFDISBean.iniOperacion}" required="true"/>
+							<p:outputLabel for="@next" value="Inicio de operaciones" styleClass="ml-4"/>
+						</span>
 					</div>
 					<div class="p-col-12 p-md-6 p-lg-4">
-						<p:outputLabel for="@next" value="Ulltimo cambio en el Sat" styleClass="ml-4"/>
+						<span class="ui-float-label">
 						<p:datePicker value="#{emisoresCFDISBean.ultSAT}" required="true"/>
+						<p:outputLabel for="@next" value="Ulltimo cambio en el Sat" styleClass="ml-4"/>
+						</span>
 					</div>
 					
 					<div class="p-col-12 p-md-6 p-lg-4">
@@ -144,7 +152,6 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
                         <p:ajax />
                         </p:selectOneMenu>
 					</div>
-				</div>
 			</p:panel>
 
 			<f:facet name="footer">
@@ -227,7 +234,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
     		</p:divider>
     		
 			<div class="p-col-12 p-md-6 p-lg-4">
-				<p:fileUpload value="#{emisoresCFDISBean.file}" accept=".cer" allowTypes="/(\.|\/)(cer)$/" mode="simple" skinSimple="true" icon="pi pi-upload"/>
+				<p:fileUpload value="#{emisoresCFDISBean.certificadoFile}" accept=".cer" allowTypes="/(\.|\/)(cer)$/" mode="simple" skinSimple="true" icon="pi pi-upload"/>
 			</div>
 				
 			<p:divider align="left">
@@ -237,7 +244,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
     		</p:divider>
     			
     			<div class="p-col-12 p-md-6 p-lg-4">
-					<p:fileUpload value="#{fileUploadView.file}" accept=".key" allowTypes="/(\.|\/)(key)$/" mode="simple" skinSimple="true" icon="pi pi-upload"/>
+					<p:fileUpload value="#{emisoresCFDISBean.certificadoFile}" accept=".key" allowTypes="/(\.|\/)(key)$/" mode="simple" skinSimple="true" icon="pi pi-upload"/>
 				</div>
 				
 				<p:divider align="left">
@@ -247,7 +254,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
     			</p:divider>
 				<div class="p-col-12 p-md-6 p-lg-4">
 				    <p:outputLabel for="@next" value="Contraseña key" required="true"/>
-					<p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="#{emisoresCFDISBean.certificado.}" required="true"/>
+					<p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="#{emisoresCFDISBean.nombrellavePrivada}" required="true"/>
 				</div>
 				
 				<p:divider align="left">
