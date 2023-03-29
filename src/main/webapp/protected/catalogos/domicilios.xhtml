@@ -15,11 +15,10 @@
 				<p:menuitem value="Domicilios por Cliente"
 					outcome="/protected/catalogos/domicilios" />
 			</p:breadCrumb>
-
+			<p:growl id="messages" showDetail="true" />
 			<div class="p-grid domiciliosCliente">
 				<div class="p-col-12">
 					<div class="card">
-						<p:growl id="messages" showDetail="true" />
 						<div class="p-col-12">
 							<div class="card">
 								<div class="ui-fluid p-formgrid p-grid">
@@ -32,7 +31,7 @@
 											<f:selectItems value="#{domiciliosBean.lstClientes}"
 												var="cliente" itemLabel="#{cliente.cteNombre}"
 												itemValue="#{cliente}" />
-											<p:ajax listener="#{domiciliosBean.filtraListado()}" />
+											<p:ajax listener="#{domiciliosBean.filtraListado()}" event="change" update="soClienteTipoDom btnAdd dt-domiciliosCliente" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field p-col">
@@ -48,15 +47,19 @@
 												var="tipoDomicilio"
 												itemLabel="#{tipoDomicilio.domicilioTipoDesc}"
 												itemValue="#{tipoDomicilio}" />
-											<p:ajax listener="#{domiciliosBean.filtraListadoDomicilio()}" />
+											<p:ajax listener="#{domiciliosBean.filtraListadoDomicilio()}" event="change" update="btnAdd dt-domiciliosCliente" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field p-col-3 p-md-6">
-										<p:commandButton id="buscarClienteDomicilio"
-											icon="pi pi-search" process="@this"
-											styleClass="edit-button ui-button-primary" value="Buscar"
-											disabled="#{domiciliosBean.clienteSelected eq null and domiciliosBean.clienteSelected.cteCve eq null and domiciliosBean.tipoDomicilioSelected eq null and domiciliosBean.tipoDomicilioSelected.domicilioTipoCve eq null}"
-											update="dt-domiciliosCliente" />
+										<span class="filter-container ui-input-icon-left"> <p:commandButton
+											id="btnAdd" icon="pi pi-plus" value="Agregar" process="@this"
+											update="form:panel-addClienteDireccion"
+											styleClass="ui-button-primary" style="margin-right: .5rem"
+											actionListener="#{domiciliosBean.limpiaClienteDomicilio()}"
+											oncomplete="PF('clienteDireccionesAddDialog').show()"
+											disabled="#{domiciliosBean.clienteSelected eq null or domiciliosBean.tipoDomicilioSelected eq null}"
+											resetValues="panel-addClienteDireccion" />
+										</span>
 									</div>
 								</div>
 							</div>
@@ -72,16 +75,8 @@
 							paginatorPosition="bottom">
 							<f:facet name="header">
 								<div class="domiciliosCliente-table-header">
-									<span style="font-weight: bold">Domicilios del cliente</span> <span
-										class="filter-container ui-input-icon-left"> <p:commandButton
-											id="btnAdd" icon="pi pi-plus" value="Agregar" process="@this"
-											update="form:panel-addClienteDireccion"
-											styleClass="ui-button-primary" style="margin-right: .5rem"
-											actionListener="#{domiciliosBean.limpiaClienteDomicilio()}"
-											oncomplete="PF('clienteDireccionesAddDialog').show()"
-											disabled="#{domiciliosBean.clienteSelected eq null and domiciliosBean.clienteSelected.cteCve eq null and domiciliosBean.tipoDomicilioSelected eq null and domiciliosBean.tipoDomicilioSelected.domicilioTipoCve eq null}"
-											resetValues="panel-addClienteDireccion" />
-									</span>
+									<span style="font-weight: bold">Domicilios del cliente</span>
+									
 								</div>
 							</f:facet>
 							<p:column headerText="Estado">
@@ -104,15 +99,19 @@
 								<h:outputText
 									value="#{pClienteDomicilios.domicilios.domicilioCalle}" />
 							</p:column>
-							<p:column headerText="Núm. Exterior">
+							<p:column headerText="Núm. Ext.">
 								<h:outputText
 									value="#{pClienteDomicilios.domicilios.domicilioNumExt}" />
 							</p:column>
-							<p:column headerText="Núm. Exterior">
+							<p:column headerText="Núm. Int.">
 								<h:outputText
-									value="#{pClienteDomicilios.domicilios.domicilioTel1}" />
+									value="#{pClienteDomicilios.domicilios.domicilioNumInt}" />
 							</p:column>
-							<p:column width="20%">
+							<p:column headerText="Tipo Domicilio">
+								<h:outputText
+									value="#{pClienteDomicilios.domicilios.domicilioTipoCve.domicilioTipoDesc}" />
+							</p:column>
+							<p:column>
 								<p:commandButton icon="pi pi-pencil" process="@this"
 									styleClass="edit-button ui-button-primary"
 									oncomplete="PF('clienteDireccionesActDialog').show()"
@@ -121,7 +120,7 @@
 										target="#{domiciliosBean.clienteDomicilioSelected}" />
 								</p:commandButton>
 								<p:commandButton class="ui-button-danger" icon="pi pi-trash"
-									value="Eliminar" process="@this"
+									process="@this"
 									oncomplete="PF('deleteClienteDireccionesDialog').show()">
 									<f:setPropertyActionListener value="#{pClienteDomicilios}"
 										target="#{domiciliosBean.clienteDomicilioSelected}" />
@@ -253,7 +252,7 @@
 								<p:commandButton value="Cancelar" icon="pi pi-times"
 									onclick="PF('clienteDireccionesAddDialog').hide()"
 									class="ui-button-secondary" update="panel-addClienteDireccion"
-									resetValues="true" />
+									/>
 							</f:facet>
 						</p:dialog>
 
