@@ -162,7 +162,7 @@ public class DomiciliosBean implements Serializable {
 	public void init() {
 		lstClientes = clienteDAO.buscarTodos();
 		lstTiposDomicilio = tiposDomicilioDAO.buscarTodos();
-		lstClienteDomicilios = clienteDomiciliosDAO.buscarTodos();
+		//lstClienteDomicilios = clienteDomiciliosDAO.buscarTodos();
 		lstDomicilios = domiciliosDAO.buscarTodos();
 		lstPaises = paisesDAO.buscarTodos();
 		//Collections.swap(lstPaises, 0, 150);
@@ -177,12 +177,12 @@ public class DomiciliosBean implements Serializable {
 	 */
 	public void filtraListado() {
 		lstClienteDomiciliosFiltered.clear();
+		lstClienteDomicilios = clienteDomiciliosDAO.buscaPorCliente(clienteSelected);
 		lstClienteDomiciliosFiltered = lstClienteDomicilios.stream()
 				.filter(ps -> clienteSelected != null
 						? (ps.getCteCve().getCteCve().intValue() == clienteSelected.getCteCve().intValue())
 						: false)
 				.collect(Collectors.toList());
-		System.out.println("Productos Cliente Filtrados:" + lstClienteDomiciliosFiltered.toString());
 		PrimeFaces.current().ajax().update("form:soClienteTipoDom");
 	}
 
@@ -199,7 +199,6 @@ public class DomiciliosBean implements Serializable {
 						: false)
 				.collect(Collectors.toList());
 		PrimeFaces.current().ajax().update("form:buscarClienteDomicilio");
-		System.out.println("Productos Cliente Filtrados:" + lstClienteDomiciliosFiltered.toString());
 	}
 
 	/**
@@ -335,6 +334,18 @@ public class DomiciliosBean implements Serializable {
 	}
 
 	public void guardaClienteDomicilio() {
+		List<ClienteDomicilios> listaDomiciliosCliente = clienteDomiciliosDAO.buscaPorCliente(clienteSelected);
+		List<ClienteDomicilios> domicilioFiscal = listaDomiciliosCliente
+				.stream().filter(ps -> ps.getDomicilios().getDomicilioTipoCve().getDomicilioTipoCve() == tipoDomicilioSelected
+				.getDomicilioTipoCve()).collect(Collectors.toList());
+		
+		if(domicilioFiscal != null && domicilioFiscal.size() > 0) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"Ya existe un domicilio fiscal registrado para el cliente."));
+			nuevoClienteDomicilio();
+			return;
+		}
+		
 		nuevoDomicilio();
 		if (clienteDomiciliosDAO.guardar(clienteDomicilioSelected) == null) {
 			lstClienteDomiciliosFiltered.add(clienteDomicilioSelected);
@@ -351,6 +362,12 @@ public class DomiciliosBean implements Serializable {
 	}
 
 	public void nuevoDomicilio() {
+		
+		if(this.tipoDomicilioSelected == null || this.tipoDomicilioSelected.getDomicilioTipoCve() <= 0) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"Debe seleccionar un tipo de domicilio."));
+			return;
+		}
 		domicilioNuevo = new Domicilios();
 		paisComplet = new Pais();
 		paisComplet.setPaisCve(ciudadSelected.getMunicipios().getEstados().getPaises().getPaisCve());
