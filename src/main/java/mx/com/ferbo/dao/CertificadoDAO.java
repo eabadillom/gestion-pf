@@ -1,11 +1,9 @@
 package mx.com.ferbo.dao;
 
+import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -28,12 +26,20 @@ public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
 			Query sql = entity.createNamedQuery("Certificado.findAll", Certificado.class);
 			certi = sql.getResultList();
 			return certi;
-			
 		}
 	@Override
 	public Certificado buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public Certificado buscarporFecha() {
+		EntityManager entity = getEntityManager();
+		Certificado dtCertificado = null;
+		Query sql = entity.createNamedQuery("Certificado.findByFecha", Certificado.class);
+		dtCertificado = (Certificado) sql.getSingleResult();
+		return dtCertificado;
+		
 	}
 
 	@Override
@@ -49,14 +55,32 @@ public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
 	}
 
 	@Override
-	public String actualizar(Certificado e) {
-		// TODO Auto-generated method stub
+	public String actualizar(Certificado c) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(c);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e){
+			System.out.println("Error al guardar datos" + e.getMessage());
+			return "ERROR";
+		}
 		return null;
 	}
 
 	@Override
 	public String guardar(Certificado e) {
-		// TODO Auto-generated method stub
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(e);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception ex){
+			System.out.println("Error al guardar datos" + ex.getMessage());
+			return "ERROR";
+		}
 		return null;
 	}
 

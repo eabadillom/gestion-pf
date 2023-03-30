@@ -1,9 +1,11 @@
 package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -49,7 +52,7 @@ private static final long serialVersionUID = 1L;
 		@Column(name ="tp_persona")
 		private String tp_persona;
 		
-		@Size(min = 1, max = 150)
+		@Size(min = 0, max = 150)
 		@Column(name = "nb_regimen_capital")
 		private String nb_regimen_capital;
 		
@@ -76,6 +79,10 @@ private static final long serialVersionUID = 1L;
 		@Column(name = "uuid")
 		@Size(min = 1, max = 50)
 		private String uuid = null;
+		
+		//mappedBy = "<atributo>": el "atributo" debe coincidir con el nombre "java" del atributo al que se está mapeando.
+		@OneToMany(cascade = CascadeType.ALL, mappedBy = "emisor")
+		private List<Certificado> listaCertificado;
 		
 		public EmisoresCFDIS() {
 		}
@@ -161,10 +168,19 @@ private static final long serialVersionUID = 1L;
 		this.uuid = uuid;
 		}
 		
+		
+		public List<Certificado> getListaCertificado() {
+			return listaCertificado;
+		}
+
+		public void setListaCertificado(List<Certificado> listaCertificado) {
+			this.listaCertificado = listaCertificado;
+		}
+
 		@Override
 		public int hashCode() {
-			return Objects.hash(cd_emisor, cd_regimen, fh_inicio_op, fh_ult_cambio, nb_emisor, nb_regimen_capital,
-					nb_rfc, st_padron, tp_persona, uuid);
+			return Objects.hash(cd_emisor, cd_regimen, fh_inicio_op, fh_ult_cambio, listaCertificado, nb_emisor,
+					nb_regimen_capital, nb_rfc, st_padron, tp_persona, uuid);
 		}
 
 		@Override
@@ -178,34 +194,37 @@ private static final long serialVersionUID = 1L;
 			EmisoresCFDIS other = (EmisoresCFDIS) obj;
 			return Objects.equals(cd_emisor, other.cd_emisor) && Objects.equals(cd_regimen, other.cd_regimen)
 					&& Objects.equals(fh_inicio_op, other.fh_inicio_op)
-					&& Objects.equals(fh_ult_cambio, other.fh_ult_cambio) && Objects.equals(nb_emisor, other.nb_emisor)
+					&& Objects.equals(fh_ult_cambio, other.fh_ult_cambio)
+					&& Objects.equals(listaCertificado, other.listaCertificado)
+					&& Objects.equals(nb_emisor, other.nb_emisor)
 					&& Objects.equals(nb_regimen_capital, other.nb_regimen_capital)
 					&& Objects.equals(nb_rfc, other.nb_rfc) && Objects.equals(st_padron, other.st_padron)
 					&& Objects.equals(tp_persona, other.tp_persona) && Objects.equals(uuid, other.uuid);
 		}
 
-		public EmisoresCFDIS(Integer cd_emisor, String nb_emisor, String tp_persona, String nb_regimen_capital,String nb_rfc, Date fh_inicio_op, Date fh_ult_cambio,
-		String st_padron,RegimenFiscal cd_regimen, String uuid) {
-		this.cd_emisor = cd_emisor;
-		this.nb_emisor = nb_emisor;
-		this.tp_persona = tp_persona;
-		this.nb_regimen_capital = nb_regimen_capital;
-		this.nb_rfc = nb_rfc;
-		this.fh_inicio_op = fh_inicio_op;
-		this.fh_ult_cambio = fh_ult_cambio;
-		this.st_padron = st_padron;
-		this.uuid = uuid;
-		this.cd_regimen = cd_regimen;
-		}
-		
 		@Override
 		public String toString() {
-		return "EmisoresCFDIS [cd_emisor=" + cd_emisor + ", nb_emisor=" + nb_emisor + ", tp_persona=" + tp_persona
-		+ ", nb_regimen_capital=" + nb_regimen_capital + ", nb_rfc=" + nb_rfc + ", fh_inicio_op="
-		+ fh_inicio_op + ", fh_ult_cambio=" + fh_ult_cambio + ", st_padron=" + st_padron + ", cd_regimen="
-		+ cd_regimen + "]";
+			return "EmisoresCFDIS [cd_emisor=" + cd_emisor + ", nb_emisor=" + nb_emisor + ", tp_persona=" + tp_persona
+					+ ", nb_regimen_capital=" + nb_regimen_capital + ", nb_rfc=" + nb_rfc + ", fh_inicio_op="
+					+ fh_inicio_op + ", fh_ult_cambio=" + fh_ult_cambio + ", st_padron=" + st_padron + ", cd_regimen="
+					+ cd_regimen + ", uuid=" + uuid + ", listaCertificado=" + listaCertificado + "]";
 		}
-		
-		
+
+		public EmisoresCFDIS(Integer cd_emisor, String nb_emisor,String tp_persona, String nb_regimen_capital, String nb_rfc, Date fh_inicio_op, Date fh_ult_cambio,
+				String st_padron, RegimenFiscal cd_regimen, String uuid, List<Certificado> listaCertificado) {
+			this.cd_emisor = cd_emisor;
+			this.nb_emisor = nb_emisor;
+			this.tp_persona = tp_persona;
+			this.nb_regimen_capital = nb_regimen_capital;
+			this.nb_rfc = nb_rfc;
+			this.fh_inicio_op = fh_inicio_op;
+			this.fh_ult_cambio = fh_ult_cambio;
+			this.st_padron = st_padron;
+			this.cd_regimen = cd_regimen;
+			this.uuid = uuid;
+			this.listaCertificado = listaCertificado;
+		}
+
+				
 		}
 		

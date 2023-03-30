@@ -7,11 +7,14 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -21,13 +24,14 @@ import javax.validation.constraints.Size;
 	@NamedQuery(name = "Certificado.findByCd_Certificado", query = "SELECT c FROM Certificado c WHERE c.cdCertificado = :cd_certificado"),
 	@NamedQuery(name = "Certificado.findByAlta", query = "SELECT c FROM Certificado c WHERE c.fechaAlta = :fh_alta"),
 	@NamedQuery(name = "Certificado.findByNombreCertificado", query = "SELECT c FROM Certificado c WHERE c.nombreCertificado = :nb_certificado"),
+	@NamedQuery(name= "Certificado.findByFecha", query = "SELECT max(c.fechaAlta), c.dtCertificado FROM Certificado c GROUP BY c.dtCertificado"),
 	@NamedQuery(name = "Certificado.findByemisor", query ="SELECT c FROM Certificado c WHERE c.emisor = :emisor")
 })
 public class Certificado implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
-	@NotNull
 	@Column(name="cd_certificado")
 	private Integer cdCertificado;
 	
@@ -54,7 +58,8 @@ public class Certificado implements Serializable{
 	@Column(name ="nb_pass")
 	private String password;
 	
-	@Column (name = "cd_emisor")
+	@JoinColumn(name = "cd_emisor")
+	@ManyToOne
 	private EmisoresCFDIS emisor;
 
 	public Certificado() {

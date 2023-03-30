@@ -71,14 +71,14 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 		</p:column>
 
 		<p:column headerText="Acción" style="text-align:right">
-				<p:commandButton icon="pi pi-pencil" update=":form:pnlEditarEmisor" value="Modificar" oncomplete="PF('dialogEditarEmisor').show();" 
-								styleClass="edit-button" process="@this">
+				<p:commandButton icon="pi pi-pencil" update=":form:pnlEditarEmisor" value="Modificar" oncomplete="PF('dialogEditarEmisor').show();" styleClass="edit-button" process="@this">
 					<f:setPropertyActionListener value="#{emisordt}" target="#{emisoresCFDISBean.emisor}" />
 				</p:commandButton>
 		</p:column>
 
 		<p:column>
-			<p:commandButton value="Archivos CSD" styleClass="ui-button-raised ui-button-secondary" oncomplete="PF('dialogCarga').show()" icon="pi pi-upload" process="@this">
+			<p:commandButton value="Archivos CSD" styleClass="ui-button-raised ui-button-secondary" actionListener="#{emisoresCFDISBean.download}" oncomplete="PF('dialogCarga').show()" 
+						icon="pi pi-upload" process="dt-emisor @this" update=":frmArchivos:pnlCarga">
 				<f:setPropertyActionListener value="#{emisordt}" target="#{emisoresCFDISBean.emisor}" />
 			</p:commandButton>
 		</p:column>
@@ -91,26 +91,25 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 
 	<p:dialog header="Agregar emisor" showEffect="fade" modal="true" widgetVar="dialogEmisor" responsive="true">
 		<p:panel id="pnlEmisor" class="ui-fluid">
-
-						<i class="pi pi-user" />
-						<span class="ui-float-label">
-							<p:inputText value="#{emisoresCFDISBean.nombreEmisor}" required="true"/>
-							<p:outputLabel for="@next" value="Nombre del emisor"/>
-						</span>
+									
+				<span class="ui-float-label">
+					<p:inputText value="#{emisoresCFDISBean.nombreEmisor}" required="true"/>
+					<p:outputLabel for="@next" value="Nombre del emisor"/>
+				</span>
 						
+						<h6>Tipo Persona</h6>
 					<div class= "p-col-12 p-md-6 p-lg-4">
-					<p:outputLabel for="@next" value="Tipo persona"/>
-					  <p:selectOneRadio id="tP" value="#{emisoresCFDISBean.tipoPersona}" layout="grid" columns="3" styleClass="grid-radio" >
+					  <p:selectOneRadio id="tP" value="#{emisoresCFDISBean.tipoPersona}" layout="grid" columns="3" styleClass="grid-radio" required="true" >
 					    <f:selectItem itemLabel="Persona Moral" itemValue="M"/>
            				<f:selectItem itemLabel="Persona Fisica" itemValue="F"/>
-				        <p:ajax listener="#{emisoresCFDISBean.RegimenSelect}" process="@this" update="regimenFiscal"/>
+				        <p:ajax listener="#{emisoresCFDISBean.RegimenSelect}" process="@this" update="regimenFiscal" render="pnlEmisor"/>
 				        </p:selectOneRadio>
 				       <!--   <input id="regimenFiscal" type="text" disabled>-->
 					</div>
 
 					<div class="p-col-12 p-md-6 p-lg-4">
 						<span class="ui-float-label">
-							<p:inputText value="#{emisoresCFDISBean.regimenCapital}"/>
+							<p:inputText value="#{emisoresCFDISBean.regimenCapital}" required="true" disabled="#{emisoresCFDISBean.tipoPersona == 'M'}" />
 							<p:outputLabel for="@next" value="Regimen Capital" styleClass="ml-4" />
 						</span>
 					</div>
@@ -122,14 +121,14 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 						</span>
 					</div>
 					
-				<div class="p-col-12 p-md-6 p-lg-4">
-					<span class="ui-float-label">
-						<p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.regimenFiscal}" converter="entityConverter" >
-							<f:selectItem itemLabel="" itemValue="" />
+				
+					<div class="p-col-12 p-md-6 p-lg-4">
+						<p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.regimenFiscal}" converter="entityConverter" required="true">
+							<f:selectItem itemLabel="---Regimen Fiscal---" itemValue="" />
 	                        <f:selectItems value="#{emisoresCFDISBean.listaRegimenFiscal}" var="regimenFiscal" itemLabel="#{regimenFiscal.nb_regimen}" itemValue="#{regimenFiscal.cd_regimen}" />
 	                    </p:selectOneMenu>
-                    </span>
-				</div>
+                    </div>
+				
 					
 					<div class="p-col-12 p-md-6 p-lg-4">
 						<span class="ui-float-label">
@@ -137,20 +136,20 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 							<p:outputLabel for="@next" value="Inicio de operaciones" styleClass="ml-4"/>
 						</span>
 					</div>
+					
 					<div class="p-col-12 p-md-6 p-lg-4">
 						<span class="ui-float-label">
-						<p:datePicker value="#{emisoresCFDISBean.ultSAT}" required="true"/>
+						<p:datePicker value="#{emisoresCFDISBean.ultSAT}" required="true" />
 						<p:outputLabel for="@next" value="Ulltimo cambio en el Sat" styleClass="ml-4"/>
 						</span>
 					</div>
 					
 					<div class="p-col-12 p-md-6 p-lg-4">
-					<p:outputLabel for="statusPadron" value="Padron" />
-					<p:selectOneMenu id="statusPadron" value="#{emisoresCFDISBean.padron}" converter="entityConverter" >
-                       <f:selectItem itemLabel="---Seleccione---" itemValue=""  />
-                        <f:selectItems value="#{emisoresCFDISBean.listaEmisor}" var="statusPadron" itemLabel="#{statusPadron.st_padron}" itemValue="#{statusPadron.st_padron}"/>
-                        <p:ajax />
-                        </p:selectOneMenu>
+							<p:selectOneMenu id="statusPadron" value="#{emisoresCFDISBean.padron}" converter="entityConverter" required="true">
+								<f:selectItem itemLabel="---Status Padron---" itemValue="" />
+								<f:selectItem itemLabel="Activo" itemValue="A" />
+								<f:selectItem itemLabel="Baja" itemValue="B" />
+		                  	</p:selectOneMenu>
 					</div>
 			</p:panel>
 
@@ -159,11 +158,11 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 			<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogEmisor').hide()" />
 			</f:facet>
 </p:dialog>
-
+	
 		<p:dialog header="Modificacion de emisor" showEffect="fade" 
 			modal="true" widgetVar="dialogEditarEmisor" responsive="true">
 		<p:outputPanel id="pnlEditarEmisor" class="ui-fluid">
-		<p:outputPanel rendered="#{not empty emisoresCFDISBean.emisor}">
+			<p:outputPanel rendered="#{not empty emisoresCFDISBean.emisor}">
 
 						<p:outputLabel for="nombre-emisor" value="Nombre del emisor"/>
 						<p:inputText widgetVar="txtNombreEmisor" id="nombre-emisor" value="#{emisoresCFDISBean.emisor.nb_emisor}" required="true"/>
@@ -220,13 +219,12 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 			</f:facet>
 </p:dialog>
 
-
-
+</h:form>
 		<p:dialog header="Carga/Descarga de archivos" showEffect="fade" modal="true" widgetVar="dialogCarga" responsive="true" width="600" height="500"> 
-		<p:outputPanel id="pnlCarga" class="ui-fluid">
-
-		<div class="p-grid">
-		
+			<h:form id="frmArchivos" enctype="multipart/form-data">
+				<p:outputPanel id="pnlCarga" class="ui-fluid">
+					<div class="p-grid">
+				
 		   <p:divider align="left">
 		        <div class="inline-flex align-items-center">
 		            <b>Archivo de certificado digital (.cer)</b>
@@ -244,9 +242,9 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
     		</p:divider>
     			
     			<div class="p-col-12 p-md-6 p-lg-4">
-					<p:fileUpload value="#{emisoresCFDISBean.certificadoFile}" accept=".key" allowTypes="/(\.|\/)(key)$/" mode="simple" skinSimple="true" icon="pi pi-upload"/>
+					<p:fileUpload value="#{emisoresCFDISBean.llavePrivadaFile}" accept=".key" allowTypes="/(\.|\/)(key)$/" mode="simple" skinSimple="true" icon="pi pi-upload"/>
 				</div>
-				
+        
 				<p:divider align="left">
 			        <div class="inline-flex align-items-center">
 			            <b>Password requerida para llave primaria</b>
@@ -254,15 +252,23 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
     			</p:divider>
 				<div class="p-col-12 p-md-6 p-lg-4">
 				    <p:outputLabel for="@next" value="Contraseña key" required="true"/>
-					<p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="#{emisoresCFDISBean.nombrellavePrivada}" required="true"/>
+					<p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="#{emisoresCFDISBean.password}" required="true"/>
 				</div>
-				
 				<p:divider align="left">
+			        <div class="inline-flex align-items-center">
+			            <b></b>
+			        </div>
+    			</p:divider>
+    			
+				<p:fieldset legend="Header" toggleable="true" toggleSpeed="500">
+	            	<p:ajax event="toggle" />
+	            <p class="m-0">
+               <p:divider align="left">
 			        <div class="inline-flex align-items-center">
 			            <b>Descarga de archivos .cer y .key</b>
 			        </div>
 			     </p:divider>
-			    <div class="p-col-12 p-md-6 p-lg-4">
+			     
 				 <p:commandButton value="Archivo .cer" ajax="false" onclick="" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
             		<p:fileDownload value=""/>
         		</p:commandButton>    
@@ -270,29 +276,27 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 				 <p:commandButton value="Archivo .key" ajax="false" onclick="" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
             		<p:fileDownload value=""/>
         		</p:commandButton>
-				</div>    
+        		
 				<p:divider align="left">
 			        <div class="inline-flex align-items-center">
 			            <b>Datos almacenados</b>
 			        </div>
 			     </p:divider>
-				<div class="p-col-12 p-md-6 p-lg-4">
+			     
 				    <p:outputLabel for="@next" value="Contraseña" required="true"/>
-					<p:inputTextarea rows="1" cols="25" widgetVar="constraseña-new" id="constraseña-new" value="#{emisoresCFDISBean.certificado.password}" readonly="true"/>
-				</div>
-				
-				<div class="p-col-12 p-md-6 p-lg-4">
+					<p:inputTextarea rows="1" cols="25" widgetVar="constraseña-new" id="constraseña-new" value="" readonly="true"/>
+				>
 				    <p:outputLabel for="@next" value="Fecha de registro" required="true"/>
-					<p:datePicker rows="1" cols="25" widgetVar="fecha-new" id="fecha-new" value="" readonly="true"/>
+					<p:datePicker rows="1" cols="25" widgetVar="fecha-new" id="fecha-new" value="#{emisoresCFDISBean.emisor.nb_emisor}" readonly="true"/>
+       				     </p>
+    			   </p:fieldset>
 				</div>
-			</div>
 		</p:outputPanel>
-			<f:facet name="footer">
-			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardarCertificado}"  process="@this pnlCarga" update="pnlCarga"/>
+					<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardarCertificado}"  process="@this pnlCarga" update="pnlCarga"/>
 			<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogCarga').hide()" />
-			</f:facet>
+</h:form>
 </p:dialog>
 
-</h:form>
+
 </ui:define>
 </ui:composition>
