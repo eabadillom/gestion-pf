@@ -48,13 +48,13 @@ public class Domicilios implements Serializable {
     @Basic(optional = false)
     @Column(name = "dom_cve")
     private Integer domCve;
-    @Size(max = 75)
+    @Size(max = 100)
     @Column(name = "domicilio_calle")
     private String domicilioCalle;
-    @Size(max = 10)
+    @Size(max = 50)
     @Column(name = "domicilio_num_ext")
     private String domicilioNumExt;
-    @Size(max = 10)
+    @Size(max = 50)
     @Column(name = "domicilio_num_int")
     private String domicilioNumInt;
     @Column(name = "domicilio_colonia")
