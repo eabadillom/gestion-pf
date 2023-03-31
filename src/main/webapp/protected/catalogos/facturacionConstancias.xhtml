@@ -26,7 +26,7 @@
 							<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 								<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
-								<p:ajax update="receptor" listener="#{facturacionConstanciasBean.domicilioCliente}"></p:ajax>						
+								<p:ajax update="receptor factura" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
 							</p:selectOneMenu>
 						</div>
 						
@@ -62,22 +62,70 @@
 						
 						<p:outputPanel id="emisor">
 						
-							<p:outputLabel value="Razon Social:" />
-							<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" />
+							<p:outputLabel value="Razon Social:" styleClass="p-mr-2" />
+							<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" style="width: 22%" />
 							
-							<p:outputLabel value="RFC:" styleClass="p-ml-4 p-mr-2"/>
+							<p:outputLabel value="Rfc:" styleClass="p-ml-4 p-mr-2"/>
 							<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_rfc}" />
 							
-							<p:outputLabel value="Factura:" styleClass="p-ml-4 p-mr-2"/>
-							<p:selectOneMenu id="factura" autoWidth="false" converter="entityConverter"  value="#{facturacionConstanciasBean.serieFacturaSelect}" >
+							<p:outputLabel value="factura:" styleClass="p-ml-4 p-mr-2"/>
+							<p:selectOneMenu id="serieFactura" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.serieFacturaSelect}">
 								<f:selectItem itemLabel="---Seleccione---" />
-								<f:selectItems value="#{facturacionConstanciasBean.listaSerieFactura}" var="serieFactura" itemLabel="#{serieFactura.nomSerie} - #{serieFactura.numeroActual + 1}" />								
+								<f:selectItems  value="#{facturacionConstanciasBean.listaSerieFactura}" var="serieFactura" itemLabel="#{serieFactura.nomSerie}-#{serieFactura.numeroActual + 1}"/>
 							</p:selectOneMenu>
 						
 						</p:outputPanel>
 												
 					</p:fieldset>
-					
+														
+					<p:fieldset legend="Datos de la Facturacion" styleClass="p-mt-2">
+						<p:outputPanel id="factura">
+							<div>
+								<p:outputLabel value="Fecha Facturacion:" />
+								<p:datePicker id="fechaFact" showIcon="true" placeholder="Fecha de Factura" value="#{facturaConstanciasBean.fechaFactura}" 
+												styleClass="p-ml-2 p-mr-4"/>
+								
+								<p:outputLabel value="Moneda:" />
+								<p:inputText value="#{facturacionConstanciasBean.moneda}" styleClass="p-ml-2 p-mr-4" style="width: 5%"/>
+								
+								<p:outputLabel value="Plazo de Pago:" />
+								<p:selectOneMenu id="plazo" autoWidth="false" value="#{facturacionConstanciasBean.plazoSelect}" styleClass="p-ml-2 p-mr-4" >
+									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
+									<f:selectItems value="#{facturacionConstanciasBean.listaAviso}" var="aviso" itemLabel="#{aviso.avisoPlazo}" itemValue="#{aviso.avisoPlazo}"/>
+								</p:selectOneMenu>
+								
+								<p:outputLabel value="Metodo de Pago (SAT):" />
+								<p:selectOneMenu styleClass="p-ml-2 p-mr-4">
+									<f:selectItem itemLabel="--- Seleccione ---" />
+								</p:selectOneMenu>
+								
+								<p:outputLabel value="Forma de Pago (SAT):" />
+								<p:selectOneMenu>
+									<f:selectItem itemLabel="--- Seleccione ---" />
+								</p:selectOneMenu>
+							</div>
+							
+							<div style="margin-top: 10px;">
+							
+							<p:outputLabel value="Referencia:" styleClass="p-mr-4"/>
+							<p:inputText value="" styleClass="p-ml-2 p-mr-4"/>
+							
+							<p:outputLabel value="IVA:" />
+							<p:inputText value="#{facturacionConstanciasBean.plazoSelect}%" style="width: 4%" styleClass="p-ml-2" />
+							
+							
+							<p:outputLabel value="Retencion:" styleClass="p-ml-4 p-mr-4"></p:outputLabel>
+							<p:selectBooleanCheckbox  styleClass="p-ml-2"></p:selectBooleanCheckbox>
+							<p:inputText value="%" styleClass="p-ml-2" style="width:5%;" />
+							
+							
+							
+							</div>
+							
+							
+							
+						</p:outputPanel>
+					</p:fieldset>													
 					
 					</div>
 				</div>

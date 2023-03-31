@@ -2,17 +2,24 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.springframework.util.comparator.Comparators;
+
+import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.SerieFacturaDAO;
+import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Domicilios;
@@ -35,6 +42,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
 	private PlantaDAO plantaDAO;
 	private SerieFacturaDAO serieFacturaDAO;
+	private AvisoDAO avisoDAO;
 	
 	private List<Cliente> listaCliente;
 	private List<ClienteDomicilios> listaClienteDom;//recupera datos de la tabla cliente-domicilio
@@ -42,6 +50,13 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<Planta> listaPlanta;
 	private List<SerieFactura> listaSerieF;//recupera todos los registros de serie factura
 	private List<SerieFactura> listaSerieFactura;
+	private List<Aviso> listaA;
+	private List<Aviso> listaAviso;
+	
+	private Date fechaFactura;
+	
+	private String moneda = "MX$";
+	private int plazoSelect;
 	
 	
 	public FacturacionConstanciasBean() {
@@ -50,6 +65,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		plantaDAO = new PlantaDAO();
 		serieFacturaDAO = new SerieFacturaDAO();
+		avisoDAO = new AvisoDAO();
 		
 		listaCliente = new ArrayList<>();
 		listaClienteDom = new ArrayList<>();
@@ -57,6 +73,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaPlanta = new ArrayList<>();
 		listaSerieF = new ArrayList<>();
 		listaSerieFactura = new ArrayList<>();
+		listaA = new ArrayList<>();
+		listaAviso = new ArrayList<>();
 		
 	}
 	
@@ -67,6 +85,9 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaClienteDom = clienteDomicilioDAO.buscarTodos();
 		listaPlanta = plantaDAO.findall();
 		listaSerieF = serieFacturaDAO.findAll();
+		listaA = avisoDAO.buscarTodos();
+		
+		fechaFactura = new Date();
 		
 	}
 
@@ -134,8 +155,42 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.serieFacturaSelect = serieFacturaSelect;
 	}
 
-	public void domicilioCliente() {
+	public Date getFechaFactura() {
+		return fechaFactura;
+	}
+
+	public void setFechaFactura(Date fechaFactura) {
+		this.fechaFactura = fechaFactura;
+	}
+
+	public String getMoneda() {
+		return moneda;
+	}
+
+	public void setMoneda(String moneda) {
+		this.moneda = moneda;
+	}
+
+	public List<Aviso> getListaAviso() {
+		return listaAviso;
+	}
+
+	public void setListaAviso(List<Aviso> listaAviso) {
+		this.listaAviso = listaAviso;
+	}
+
+	public int getPlazoSelect() {
+		return plazoSelect;
+	}
+
+	public void setPlazoSelect(int plazoSelect) {
+		this.plazoSelect = plazoSelect;
+	}
+
+	public void domicilioAvisoPorCliente() {
 		
+		
+		//Domicilio
 		listaClienteDomicilio.clear();
 		listaClienteDomicilio = listaClienteDom.stream()
 								.filter(cd -> clienteSelect != null
@@ -146,15 +201,40 @@ public class FacturacionConstanciasBean implements Serializable{
 			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
 			
 		}
+		
+		// -------------- comienza recuperado de Aviso ----------------
+		
+		listaAviso.clear();
+		listaAviso = listaA.stream()
+					 .filter(av -> clienteSelect != null
+					 ?(av.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
+					 :false).collect(Collectors.toList());
+		
+		//obtengo de la listaAviso el registro con el plazo maximo
+		Aviso aviso;
+		if(listaAviso.size()>1) {
+			Optional<Aviso> numeroMax =  listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
+			
+			aviso = numeroMax.get();
+			this.plazoSelect = aviso.getAvisoPlazo();
+			
+		}else {
+			aviso = listaAviso.get(0);
+			this.plazoSelect = aviso.getAvisoPlazo();
+		}
+		
+		// ------------------- termina recuperacion de aviso -----------------------
+		
 	}
 	
 	public void serieFactura() {
 		
 		listaSerieFactura.clear();
 		listaSerieFactura = listaSerieF.stream()
-									   .filter(s -> plantaSelect != null
-									   ?(s.getIdPlanta().getPlantaCve().intValue()==plantaSelect.getPlantaCve().intValue())
-									   :false).collect(Collectors.toList());
+							.filter(s -> plantaSelect != null
+							?(s.getIdPlanta().getPlantaCve().intValue()==plantaSelect.getPlantaCve().intValue())
+							:false)
+							.collect(Collectors.toList());
 		
 		if(listaSerieFactura.size()>0) {
 			serieFacturaSelect = listaSerieFactura.get(0);
@@ -162,6 +242,15 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 	}
 	
+	/*public void avisoCliente() {
+		
+		listaAviso.clear();
+		listaAviso = listaA.stream()
+					 .filter(av -> clienteSelect != null
+					 ?(av.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
+					 :false).collect(Collectors.toList());
+		
+	}*/
 	
 	
 
