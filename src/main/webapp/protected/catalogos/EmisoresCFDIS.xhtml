@@ -77,7 +77,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 		</p:column>
 
 		<p:column>
-			<p:commandButton value="Archivos CSD" styleClass="ui-button-raised ui-button-secondary" actionListener="#{emisoresCFDISBean.download}" oncomplete="PF('dialogCarga').show()" 
+			<p:commandButton value="Archivos CSD" styleClass="ui-button-raised ui-button-secondary" action="#{emisoresCFDISBean.download}" oncomplete="PF('dialogCarga').show()" 
 						icon="pi pi-upload" process="dt-emisor @this" update=":frmArchivos:pnlCarga">
 				<f:setPropertyActionListener value="#{emisordt}" target="#{emisoresCFDISBean.emisor}" />
 			</p:commandButton>
@@ -270,11 +270,11 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 			     </p:divider>
 			     
 				 <p:commandButton value="Archivo .cer" ajax="false" onclick="" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
-            		<p:fileDownload value=""/>
+            		<p:fileDownload value="#{emisoresCFDISBean.fileDownloadCer}"/>
         		</p:commandButton>    
 				
 				 <p:commandButton value="Archivo .key" ajax="false" onclick="" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
-            		<p:fileDownload value=""/>
+            		<p:fileDownload value="#{emisoresCFDISBean.fileDownloadKey}"/>
         		</p:commandButton>
         		
 				<p:divider align="left">

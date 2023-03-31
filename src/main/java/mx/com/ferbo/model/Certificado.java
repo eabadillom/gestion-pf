@@ -25,7 +25,7 @@ import javax.validation.constraints.Size;
 	@NamedQuery(name = "Certificado.findByAlta", query = "SELECT c FROM Certificado c WHERE c.fechaAlta = :fh_alta"),
 	@NamedQuery(name = "Certificado.findByNombreCertificado", query = "SELECT c FROM Certificado c WHERE c.nombreCertificado = :nb_certificado"),
 	@NamedQuery(name= "Certificado.findByFecha", query = "SELECT max(c.fechaAlta), c.dtCertificado FROM Certificado c GROUP BY c.dtCertificado"),
-	@NamedQuery(name = "Certificado.findByemisor", query ="SELECT c FROM Certificado c WHERE c.emisor = :emisor")
+	@NamedQuery(name = "Certificado.findByemisor", query ="SELECT c FROM Certificado c WHERE c.emisor.cd_emisor = :emisor")
 })
 public class Certificado implements Serializable{
 	private static final long serialVersionUID = 1L;

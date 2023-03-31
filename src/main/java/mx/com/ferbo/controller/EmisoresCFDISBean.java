@@ -1,6 +1,8 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import javax.inject.Named;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.file.UploadedFile;
 
 import mx.com.ferbo.dao.CertificadoDAO;
@@ -174,9 +178,28 @@ public void init() {
 	
 	public void download() {
 		System.out.println("Emisor: "+ emisor);
-		
-	}
-
+		listaCertificado = certificadoDAO.buscarporcdEmisor(emisor.getCd_emisor());
+		Certificado certi ;
+		Date fechaMax = listaCertificado.get(0);
+		for(Certificado cer : listaCertificado) {
+			Date fechaActual = cer.getFechaAlta();
+			//Date fechaMax = null;
+			if(fechaMax.equals(fechaActual)) {
+				fechaMax = fechaActual;
+			}
+		}
+			password = certificado.getPassword();
+		InputStream inputCertificado= new ByteArrayInputStream(certificado.getCertificado());
+		fileDownloadCer = DefaultStreamedContent.builder().name(certificado.getNombreCertificado())
+				.contentLength(certificado.getCertificado().length).contentType("aplication/x-x509-user-cert")
+				.stream(() -> inputCertificado).build();
+				;
+				InputStream inputLlavePrivada = new ByteArrayInputStream(certificado.getDt_llavePrivada());
+				fileDownloadKey = DefaultStreamedContent.builder().name(certificado.getLlavePrivada())
+						.contentLength(certificado.getDt_llavePrivada().length).contentType("aplication/ x-x509-user-cert")
+						.stream(() -> inputLlavePrivada).build();
+		}
+	
 		public void RegimenSelect() {
 			System.out.println("Tipo de persona: " + this.tipoPersona);
 			if("M".equals(tipoPersona)) {				
@@ -340,6 +363,22 @@ public void init() {
 		this.listaCertificado = listaCertificado;
 	}
 
+	private StreamedContent fileDownloadCer;
+	public StreamedContent getFileDownloadCer() {
+	return fileDownloadCer;
+	}
 
+	public void setFileDownloadCer(StreamedContent fileDownloadCer) {
+	this.fileDownloadCer = fileDownloadCer;
+	}
+	public StreamedContent getFileDownloadKey() {
+		return fileDownloadKey;
+		}
 
-}
+		public void setFileDownloadKey(StreamedContent fileDownloadKey) {
+		this.fileDownloadKey = fileDownloadKey;
+		}
+
+		private StreamedContent fileDownloadKey;
+
+		}

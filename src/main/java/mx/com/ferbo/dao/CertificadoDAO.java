@@ -16,6 +16,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Certificado;
+import mx.com.ferbo.model.EmisoresCFDIS;
 
 public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
 
@@ -39,7 +40,13 @@ public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
 		Query sql = entity.createNamedQuery("Certificado.findByFecha", Certificado.class);
 		dtCertificado = (Certificado) sql.getSingleResult();
 		return dtCertificado;
-		
+	}
+	public List<Certificado> buscarporcdEmisor(Integer emisor) {
+		List<Certificado> listaCertificado= null; 
+		EntityManager entity = getEntityManager();
+		Query sql = entity.createNamedQuery("Certificado.findByemisor",Certificado.class).setParameter("emisor", emisor);
+		listaCertificado = sql.getResultList();
+		return listaCertificado;
 	}
 
 	@Override
