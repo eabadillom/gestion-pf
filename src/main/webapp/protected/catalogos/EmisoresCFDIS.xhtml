@@ -252,7 +252,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
     			</p:divider>
 				<div class="p-col-12 p-md-6 p-lg-4">
 				    <p:outputLabel for="@next" value="Contraseña key" required="true"/>
-					<p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="#{emisoresCFDISBean.password}" required="true"/>
+					<p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="#{emisoresCFDISBean.password}" />
 				</div>
 				<p:divider align="left">
 			        <div class="inline-flex align-items-center">
@@ -269,11 +269,11 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 			        </div>
 			     </p:divider>
 			     
-				 <p:commandButton value="Archivo .cer" ajax="false" onclick="" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
+				 <p:commandButton value="Archivo .cer" ajax="false" onclick="PF('dialogCarga').hide()" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
             		<p:fileDownload value="#{emisoresCFDISBean.fileDownloadCer}"/>
         		</p:commandButton>    
 				
-				 <p:commandButton value="Archivo .key" ajax="false" onclick="" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
+				 <p:commandButton value="Archivo .key" ajax="false" onclick="PF('dialogCarga').hide()" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
             		<p:fileDownload value="#{emisoresCFDISBean.fileDownloadKey}"/>
         		</p:commandButton>
         		

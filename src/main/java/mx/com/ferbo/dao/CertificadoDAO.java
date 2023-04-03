@@ -41,6 +41,7 @@ public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
 		dtCertificado = (Certificado) sql.getSingleResult();
 		return dtCertificado;
 	}
+
 	public List<Certificado> buscarporcdEmisor(Integer emisor) {
 		List<Certificado> listaCertificado= null; 
 		EntityManager entity = getEntityManager();

@@ -179,16 +179,25 @@ public void init() {
 	public void download() {
 		System.out.println("Emisor: "+ emisor);
 		listaCertificado = certificadoDAO.buscarporcdEmisor(emisor.getCd_emisor());
-		Certificado certi ;
-		Date fechaMax = listaCertificado.get(0);
+		Certificado certificadoConFechaMax = listaCertificado.get(0);
+		Date fechaAltaMax = certificadoConFechaMax.getFechaAlta();
+		//Certificado certificadoAltaMax;
 		for(Certificado cer : listaCertificado) {
 			Date fechaActual = cer.getFechaAlta();
-			//Date fechaMax = null;
-			if(fechaMax.equals(fechaActual)) {
-				fechaMax = fechaActual;
-			}
-		}
-			password = certificado.getPassword();
+			System.out.println("Fecha maxima" + fechaAltaMax);
+			if(fechaAltaMax.compareTo(fechaActual) < 0) {
+				System.out.println(fechaAltaMax + " menor a " + fechaActual);
+				}
+					if(fechaAltaMax.compareTo(fechaActual) == 0)  {
+					System.out.println(fechaAltaMax + " igual a"+ fechaActual);
+				}
+					if(fechaAltaMax.compareTo(fechaActual) > 0) {
+					System.out.println(fechaAltaMax + " mayor a "+ fechaActual);
+				}
+	}
+		System.out.println("Fecha maxima" + fechaAltaMax);
+			//password = certificado.getPassword();
+			
 		InputStream inputCertificado= new ByteArrayInputStream(certificado.getCertificado());
 		fileDownloadCer = DefaultStreamedContent.builder().name(certificado.getNombreCertificado())
 				.contentLength(certificado.getCertificado().length).contentType("aplication/x-x509-user-cert")
@@ -196,7 +205,7 @@ public void init() {
 				;
 				InputStream inputLlavePrivada = new ByteArrayInputStream(certificado.getDt_llavePrivada());
 				fileDownloadKey = DefaultStreamedContent.builder().name(certificado.getLlavePrivada())
-						.contentLength(certificado.getDt_llavePrivada().length).contentType("aplication/ x-x509-user-cert")
+						.contentLength(certificado.getDt_llavePrivada().length).contentType("aplication/x-x509-user-cert")
 						.stream(() -> inputLlavePrivada).build();
 		}
 	
