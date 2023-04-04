@@ -6,14 +6,13 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -41,11 +40,7 @@ public class EstadoConstancia implements Serializable {
     @Size(min = 1, max = 50)
     @Column(name = "descripcion")
     private String descripcion;
-    @OneToMany(mappedBy = "status")
-    private List<ConstanciaDeServicio> constanciaDeServicioList;
-    @OneToMany(mappedBy = "status")
-    private List<ConstanciaDeDeposito> constanciaDeDepositoList;
-
+    
     public EstadoConstancia() {
     }
 
@@ -72,22 +67,6 @@ public class EstadoConstancia implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public List<ConstanciaDeServicio> getConstanciaDeServicioList() {
-        return constanciaDeServicioList;
-    }
-
-    public void setConstanciaDeServicioList(List<ConstanciaDeServicio> constanciaDeServicioList) {
-        this.constanciaDeServicioList = constanciaDeServicioList;
-    }
-
-    public List<ConstanciaDeDeposito> getConstanciaDeDepositoList() {
-        return constanciaDeDepositoList;
-    }
-
-    public void setConstanciaDeDepositoList(List<ConstanciaDeDeposito> constanciaDeDepositoList) {
-        this.constanciaDeDepositoList = constanciaDeDepositoList;
     }
 
     @Override
