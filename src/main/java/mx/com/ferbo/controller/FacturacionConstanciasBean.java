@@ -17,6 +17,7 @@ import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
+import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.SerieFacturaDAO;
 import mx.com.ferbo.model.Aviso;
@@ -25,6 +26,7 @@ import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieFactura;
 
@@ -41,6 +43,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private SerieFactura serieFacturaSelect;
 	private MetodoPago metodoPagoSelect;
 	private MedioPago medioPagoSelect;
+	private Parametro iva,retencion;
 	
 	private ClienteDAO clienteDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
@@ -49,6 +52,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private AvisoDAO avisoDAO;
 	private MetodoPagoDAO metodoPagoDAO;
 	private MedioPagoDAO medioPagoDAO;	
+	private ParametroDAO parametroDAO;
 	
 	private List<Cliente> listaCliente;
 	private List<ClienteDomicilios> listaClienteDom;//recupera datos de la tabla cliente-domicilio
@@ -65,7 +69,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	private String moneda = "MX$";
 	private int plazoSelect;
-	
+
 	
 	public FacturacionConstanciasBean() {
 		
@@ -76,6 +80,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		avisoDAO = new AvisoDAO();
 		metodoPagoDAO = new MetodoPagoDAO();
 		medioPagoDAO = new MedioPagoDAO();
+		parametroDAO = new ParametroDAO();
 		
 		
 		listaCliente = new ArrayList<>();
@@ -100,6 +105,10 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaA = avisoDAO.buscarTodos();
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
 		listaMedioPago = medioPagoDAO.buscarTodos();
+		
+		//iva = parametroDAO.buscarPorNombre("IVA");
+		//retencion = parametroDAO.buscarPorNombre("RETENCION");
+		
 		
 		fechaFactura = new Date();
 		
@@ -240,10 +249,27 @@ public class FacturacionConstanciasBean implements Serializable{
 	public void setListaMedioPago(List<MedioPago> listaMedioPago) {
 		this.listaMedioPago = listaMedioPago;
 	}
+	
+	public Parametro getRetencion() {
+		return retencion;
+	}
+
+	public void setRetencion(Parametro retencion) {
+		this.retencion = retencion;
+	}
+
+	public Parametro getIva() {
+		return iva;
+	}
+
+	public void setIva(Parametro iva) {
+		this.iva = iva;
+	}
 
 	public void domicilioAvisoPorCliente() {
 		
-		
+		iva = parametroDAO.buscarPorNombre("IVA");//ES MEJOR AQUI O EN EL INIT?***
+		retencion = parametroDAO.buscarPorNombre("RETENCION");//***
 		//Domicilio
 		listaClienteDomicilio.clear();
 		listaClienteDomicilio = listaClienteDom.stream()
@@ -273,8 +299,13 @@ public class FacturacionConstanciasBean implements Serializable{
 			this.plazoSelect = aviso.getAvisoPlazo();
 			
 		}else {
-			aviso = listaAviso.get(0);//error en elegir empresa s. a. viene vacia la lista aviso
-			this.plazoSelect = aviso.getAvisoPlazo();
+			
+			if(listaAviso.size()==1) {
+				aviso = listaAviso.get(0);
+				this.plazoSelect = aviso.getAvisoPlazo();
+			}else {
+				System.out.println("el cliente no tiene aviso");
+			}
 		}
 		
 		// ------------------- termina recuperacion de aviso -----------------------
@@ -295,16 +326,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		}
 		
 	}
-	
-	/*public void avisoCliente() {
-		
-		listaAviso.clear();
-		listaAviso = listaA.stream()
-					 .filter(av -> clienteSelect != null
-					 ?(av.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
-					 :false).collect(Collectors.toList());
-		
-	}*/
 	
 	
 

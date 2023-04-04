@@ -65,7 +65,7 @@
 							<p:outputLabel value="Razon Social:" styleClass="p-mr-2" />
 							<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" style="width: 22%" />
 							
-							<p:outputLabel value="Rfc:" styleClass="p-ml-4 p-mr-2"/>
+							<p:outputLabel value="RFC:" styleClass="p-ml-4 p-mr-2"/>
 							<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_rfc}" />
 							
 							<p:outputLabel value="factura:" styleClass="p-ml-4 p-mr-2"/>
@@ -108,6 +108,33 @@
 								
 							</div>
 							
+							<div style="margin-top:10px">
+								
+								<p:outputLabel value="Referencia:" />
+								<p:inputText styleClass="p-ml-2 p-mr-4" ></p:inputText>
+								
+								<p:outputLabel value="IVA:"/>
+								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.iva.valor * 100}"/>%
+								
+								<p:outputLabel value="Retencion:" styleClass="p-ml-4 p-mr-2"/>
+								<p:selectBooleanCheckbox/>
+								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.retencion.valor * 100}"/>%
+								
+								<p:outputLabel value="Valor Declarado:"  styleClass="p-ml-4 p-mr-2"/>
+								<p:inputNumber />
+								
+								<p:outputLabel value="Seguro:" styleClass="p-ml-4 p-mr-2"/>
+								<p:inputNumber  />%
+							
+							</div>
+							
+							<div style="margin-top:10px">
+							
+								<p:outputLabel value="Observaciones:" styleClass="p-mr-2" />
+								<p:inputTextarea autoResize="true"/>
+							
+							</div>
+												
 							
 						</p:outputPanel>
 					</p:fieldset>													
