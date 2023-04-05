@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,6 +54,11 @@ public class EmisoresCFDISBean implements Serializable {
 		private String regimenFiscal;
 		private String nombrellavePrivada;
 		private String password;
+		private boolean estado;
+		
+		private Certificado certificadoConFechaMax;
+		private StreamedContent fileDownloadCer;
+		private StreamedContent fileDownloadKey;
 		private EmisoresCFDIS emisor;
 		private Certificado certificado;
 		
@@ -79,9 +85,7 @@ public class EmisoresCFDISBean implements Serializable {
 	}
 
 @PostConstruct
-
 public void init() {
-	
 }
 
 	public void newEmisor() {
@@ -101,7 +105,6 @@ public void init() {
 		emisor= new EmisoresCFDIS();
 	};
 
-		
 	public void guardarCertificado() {
 		this.certificado = new Certificado();
 		byte[] contenidoCertificado = null;
@@ -113,7 +116,6 @@ public void init() {
 			certificado.setLlavePrivada(nombreLPrivada);
 			certificado.setDt_llavePrivada(contenidollavePrivada);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String nombreCertificado = certificadoFile.getFileName();
@@ -137,23 +139,24 @@ public void init() {
 		this.certificado = new Certificado();
 	}
 	
-		public void guardaEmisor() {
-			this.rfc.length();
-			if ( rfc.length() != 14) {
+		public void actualizarEmisor() {
+			System.out.println(emisor);
+			System.out.println(regimenFiscal);
+			String rfcValidacion, tipoP;
+			rfcValidacion = emisor.getNb_rfc();
+			tipoP = emisor.getTp_persona();
+			if (validacion(tipoP, rfcValidacion)== false ) {
 		        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Message", " El RFC debe tener almenos 13 caracteres");
 		        PrimeFaces.current().dialog().showMessageDynamic(message);
-			}else {
-			PrimeFaces.current().executeScript("PF('dialogEmisor').hide()");
+		        return;
+			}else {	
+				if(tipoPersona == "M" || regimenCapital == "") {
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Favor de ingresar el regimen capital",null));
+					PrimeFaces.current().ajax().update("form:messages");
+					return;
+			}
+				
 			System.out.println(emisor);
-			emisor.setNb_emisor(this.nombreEmisor);
-			emisor.setTp_persona(this.tipoPersona);
-			emisor.setNb_regimen_capital(this.regimenCapital);
-			emisor.setNb_rfc(this.rfc);
-			emisor.setFh_inicio_op(this.iniOperacion);
-			emisor.setFh_ult_cambio(this.ultSAT);
-			emisor.setSt_padron(this.padron);
-			RegimenFiscal regimenObj = regimenFiscalDAO.buscarPorId(this.regimenFiscal);
-			emisor.setCd_regimen(regimenObj);
 			String em = emisoresDAO.actualizar(emisor);
 			if(em == null) {
 			listaEmisor.clear();
@@ -168,55 +171,97 @@ public void init() {
 			this.emisor = new EmisoresCFDIS();
 	}
 
-
-	public void upload() {
-		if (certificadoFile != null){
-			FacesMessage message = new FacesMessage("Successful", certificadoFile.getFileName() + " is uploaded.");
-			FacesContext.getCurrentInstance().addMessage(null, message);
+		public void guardarEmisor() {
+			this.emisor = new EmisoresCFDIS();
+			emisor.setNb_emisor(this.nombreEmisor);
+			emisor.setTp_persona(this.tipoPersona);
+			emisor.setNb_regimen_capital(this.regimenCapital);
+			emisor.setNb_rfc(this.rfc);
+			emisor.setFh_inicio_op(this.iniOperacion);
+			emisor.setFh_ult_cambio(this.ultSAT);
+			emisor.setSt_padron(this.padron);
+			RegimenFiscal regimenObj = regimenFiscalDAO.buscarPorId(this.regimenFiscal);
+			emisor.setCd_regimen(regimenObj);
+			if(tipoPersona == "M" || regimenCapital == "") {
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Favor de ingresar el regimen capital",null));
+					PrimeFaces.current().ajax().update("form:messages");
+					return;
 			}
+			String em = emisoresDAO.guardar(emisor);
+			if(em == null) {
+				listaEmisor.clear();
+				listaEmisor = emisoresDAO.findall();
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Emisor agregado con exito" + emisor.getCd_emisor(), null));
+				PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
+				}
+				else{
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al agregar el emisor" + emisor.getCd_emisor(), em));
+				PrimeFaces.current().ajax().update("form:messages");
+				}
 		}
+		
+		
+		public void upload() {
+			if (certificadoFile != null){
+				FacesMessage message = new FacesMessage("Successful", certificadoFile.getFileName() + " is uploaded.");
+				FacesContext.getCurrentInstance().addMessage(null, message);
+				}
+			}
 	
-	public void download() {
+	public void cargaDeArchivos() {
 		System.out.println("Emisor: "+ emisor);
 		listaCertificado = certificadoDAO.buscarporcdEmisor(emisor.getCd_emisor());
-		Certificado certificadoConFechaMax = listaCertificado.get(0);
-		Date fechaAltaMax = certificadoConFechaMax.getFechaAlta();
-		//Certificado certificadoAltaMax;
-		for(Certificado cer : listaCertificado) {
-			Date fechaActual = cer.getFechaAlta();
-			System.out.println("Fecha maxima" + fechaAltaMax);
-			if(fechaAltaMax.compareTo(fechaActual) < 0) {
-				System.out.println(fechaAltaMax + " menor a " + fechaActual);
-				}
-					if(fechaAltaMax.compareTo(fechaActual) == 0)  {
-					System.out.println(fechaAltaMax + " igual a"+ fechaActual);
-				}
-					if(fechaAltaMax.compareTo(fechaActual) > 0) {
-					System.out.println(fechaAltaMax + " mayor a "+ fechaActual);
-				}
-	}
+		Integer size = listaCertificado.size()-1;
+		this.certificado = listaCertificado.get(size);
+		Date fechaAltaMax = certificado.getFechaAlta();
+	
 		System.out.println("Fecha maxima" + fechaAltaMax);
-			//password = certificado.getPassword();
-			
-		InputStream inputCertificado= new ByteArrayInputStream(certificado.getCertificado());
-		fileDownloadCer = DefaultStreamedContent.builder().name(certificado.getNombreCertificado())
-				.contentLength(certificado.getCertificado().length).contentType("aplication/x-x509-user-cert")
-				.stream(() -> inputCertificado).build();
-				;
-				InputStream inputLlavePrivada = new ByteArrayInputStream(certificado.getDt_llavePrivada());
-				fileDownloadKey = DefaultStreamedContent.builder().name(certificado.getLlavePrivada())
-						.contentLength(certificado.getDt_llavePrivada().length).contentType("aplication/x-x509-user-cert")
-						.stream(() -> inputLlavePrivada).build();
+			InputStream inputCertificado= new ByteArrayInputStream(certificado.getCertificado());
+			fileDownloadCer = DefaultStreamedContent.builder()
+	                .name(certificado.getNombreCertificado())
+	                .contentType("aplication/x-x509-user-cert")
+	                .stream(() -> inputCertificado)
+	                .build();
+			;
+			InputStream inputLlavePrivada = new ByteArrayInputStream(certificado.getDt_llavePrivada());
+			fileDownloadKey = DefaultStreamedContent.builder()
+	                .name(certificado.getLlavePrivada())
+	                .contentType("aplication/x-x509-user-cert")
+	                .stream(() -> inputLlavePrivada)
+	                .build();
+	        }
+	public boolean validacion(String tipoPersona, String rfc) {
+		boolean esRfcValido = false;
+		if("F".equals(tipoPersona)) {
+			if(rfc.length() == 13){
+				esRfcValido = true;
+			}
 		}
+		if("M".equals(tipoPersona)) {
+			if(rfc.length() == 12) {
+				esRfcValido =true; 
+			}
+		}
+		return esRfcValido;
+	}
 	
 		public void RegimenSelect() {
 			System.out.println("Tipo de persona: " + this.tipoPersona);
-			if("M".equals(tipoPersona)) {				
- 				listaRegimenFiscal = regimenFiscalDAO.buscarPorPersonaMoral();	
+			if("M".equals(tipoPersona)) {	
+				estado = false;
+ 				listaRegimenFiscal = regimenFiscalDAO.buscarPorPersonaMoral();
+ 				
 			}else if("F".equals(tipoPersona)) {
+				estado = true;
 				listaRegimenFiscal = regimenFiscalDAO.buscarPorPersonaFisica();
-			}		
+			}
+			if(validacion(tipoPersona, rfc) == false ) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"El RFC es incorrecto",null));
+				PrimeFaces.current().ajax().update("form:messages");
+			}
+			
 		}
+
 
 	public Integer getPfisica() {
 		return pfisica;
@@ -371,10 +416,9 @@ public void init() {
 	public void setListaCertificado(List<Certificado> listaCertificado) {
 		this.listaCertificado = listaCertificado;
 	}
-
-	private StreamedContent fileDownloadCer;
+	
 	public StreamedContent getFileDownloadCer() {
-	return fileDownloadCer;
+		return fileDownloadCer;
 	}
 
 	public void setFileDownloadCer(StreamedContent fileDownloadCer) {
@@ -388,6 +432,20 @@ public void init() {
 		this.fileDownloadKey = fileDownloadKey;
 		}
 
-		private StreamedContent fileDownloadKey;
+		public Certificado getCertificadoConFechaMax() {
+			return certificadoConFechaMax;
+		}
+
+		public void setCertificadoConFechaMax(Certificado certificadoConFechaMax) {
+			this.certificadoConFechaMax = certificadoConFechaMax;
+		}
+
+		public boolean isEstado() {
+			return estado;
+		}
+
+		public void setEstado(boolean estado) {
+			this.estado = estado;
+		}
 
 		}
