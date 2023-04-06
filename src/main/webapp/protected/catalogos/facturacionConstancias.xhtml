@@ -139,13 +139,74 @@
 						</p:outputPanel>
 					</p:fieldset>			
 					
-					<p:fieldset legend="A Facturar" style="margin-top:10px;">
-						
-						<p:selectBooleanCheckbox itemLabel="Facturar Constancias de Deposito (Entradas)" />
-						<p:outputLabel><b>Se facturan por primera vez las constancias de deposito. Si la constancia que desea no 
-											se encuentra, ya fue facturada </b></p:outputLabel>
+					<p:fieldset legend="Constancias a Facturar" style="margin-top:10px">
 					
-					</p:fieldset>									
+						<p:selectBooleanCheckbox styleClass="p-mr-2"></p:selectBooleanCheckbox><b>Facturar Constancias de deposito (Entradas)</b>
+						
+						<div style="margin-top:10px" >
+							<p:outputLabel value="Se facturan por primera vez las constancias de deposito. Si la constancia que desea no se encuentra, ya fue facturada"/>
+						</div>
+						
+						<p:dataTable lazy="true">
+						
+							<f:facet name="header">
+							
+								<div>
+								
+									<span>Constancias que se incluiran en la factura</span>
+								
+								</div>
+							
+							</f:facet>
+						
+						</p:dataTable>
+						
+						
+						<p:separator/>
+						
+						<p:selectBooleanCheckbox styleClass="p-mr-2"></p:selectBooleanCheckbox><b>Facturar Inventario</b>
+						<p:outputLabel styleClass="p-ml-4"/><b>Fecha de corte:</b>
+						<p:datePicker showIcon="true" styleClass="p-ml-2"></p:datePicker>
+						
+						<div style="margin-top:20px">
+							<p:outputLabel value="Facturar las vigencias del inventario del cliente" />
+						</div>
+						
+						<p:separator/>
+						
+						<p:selectBooleanCheckbox styleClass="p-mr-2" ></p:selectBooleanCheckbox><b>Facturar Constancias de Servicio</b>
+						
+						<div style="margin-top:4px">
+							<p:outputLabel>Se facturan las constancias de servicio. Si la constancia que desea no se encuentra, ya fue facturada</p:outputLabel>
+						</div>
+					
+						<div style="margin-top:20px">						
+						<p:outputLabel>[UNIDAD] indica la unidad en que se cobra el servicio</p:outputLabel>						
+						</div>
+						
+						<div>
+							<p:outputLabel>[*] Los servicios asi marcados se cobran por tiempo en base al periodo declarado en los campos 
+								"Inicio periodo" y "Fin periodo", la CANTIDAD indica el numero de veces que se cobrara ese periodo</p:outputLabel>						
+						</div>
+						
+						<p:dataTable lazy="true">
+						
+							<f:facet name="header">
+							
+								<div>
+									<span>Servicios a Facturar</span>
+								</div>
+							
+							</f:facet>
+						
+						</p:dataTable>
+					
+					</p:fieldset>
+					
+					
+					<div style="margin-top:10px; text-align: center">
+						<p:commandButton value="Guardar" ></p:commandButton>
+					</div>
 					
 					</div>
 				</div>
