@@ -57,7 +57,7 @@ public class ConstanciaDeDeposito implements Serializable {
     @Size(max = 100)
     @Column(name = "NOMBRE_TRANSPORTISTA")
     private String nombreTransportista;
-    @Size(max = 5)
+    @Size(max = 10)
     @Column(name = "PLACAS_TRANSPORTE")
     private String placasTransporte;
     @Size(max = 200)
