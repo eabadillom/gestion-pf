@@ -31,6 +31,7 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "DetalleConstanciaSalida.findAll", query = "SELECT d FROM DetalleConstanciaSalida d"),
     @NamedQuery(name = "DetalleConstanciaSalida.findById", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.id = :id"),
+    @NamedQuery(name = "DetalleConstanciaSalida.findByPartidaCve", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.partidaCve.partidaCve = :partidaCve"),//nueva
     @NamedQuery(name = "DetalleConstanciaSalida.findByCamaraCve", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.camaraCve = :camaraCve"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByCantidad", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.cantidad = :cantidad"),
     @NamedQuery(name = "DetalleConstanciaSalida.findByPeso", query = "SELECT d FROM DetalleConstanciaSalida d WHERE d.peso = :peso"),

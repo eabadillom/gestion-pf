@@ -26,8 +26,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "CLIENTE_DOMICILIOS")
 @NamedQueries({
-    @NamedQuery(name = "ClienteDomicilios.findAll", query = "SELECT c FROM ClienteDomicilios c"),
-    @NamedQuery(name = "ClienteDomicilios.findById", query = "SELECT c FROM ClienteDomicilios c WHERE c.id = :id")})
+        @NamedQuery(name = "ClienteDomicilios.findAll", query = "SELECT c FROM ClienteDomicilios c"),
+        @NamedQuery(name = "ClienteDomicilios.findById", query = "SELECT c FROM ClienteDomicilios c WHERE c.id = :id"),
+        @NamedQuery(name = "ClienteDomicilios.findByCliente", query = "SELECT c FROM ClienteDomicilios c WHERE c.cteCve.cteCve = :cteCve"),
+        @NamedQuery(name = "ClienteDomicilios.findByClienteTipoDomicilio", query = "SELECT c FROM ClienteDomicilios c WHERE c.cteCve.cteCve = :cteCve AND c.domicilios.domicilioTipoCve.domicilioTipoCve = :tipoDomicilioCve")})
+
 public class ClienteDomicilios implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,8 +43,8 @@ public class ClienteDomicilios implements Serializable {
     @ManyToOne(optional = false)
     private Cliente cteCve;
     @JoinColumns({
-        @JoinColumn(name = "domicilio_tipo_cve", referencedColumnName = "domicilio_tipo_cve"),
-        @JoinColumn(name = "dom_cve", referencedColumnName = "dom_cve")})
+            @JoinColumn(name = "domicilio_tipo_cve", referencedColumnName = "domicilio_tipo_cve"),
+            @JoinColumn(name = "dom_cve", referencedColumnName = "dom_cve") })
     @ManyToOne(optional = false)
     private Domicilios domicilios;
 
@@ -100,5 +103,5 @@ public class ClienteDomicilios implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.ClienteDomicilios[ id=" + id + " ]";
     }
-    
+
 }

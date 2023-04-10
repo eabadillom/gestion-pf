@@ -9,6 +9,7 @@ import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
+import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.model.Posicion;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -45,6 +46,13 @@ public class TraspasoPartidaDAO extends IBaseDAO<TraspasoPartida, Integer>{
 				getResultList();
 	}
 
+	public List<TraspasoPartida> buscarPorConstancia(ConstanciaTraspaso ct) {
+		// TODO Auto-generated method stub
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("TraspasoPartida.findByTraspaso", TraspasoPartida.class).
+				setParameter("traspaso", ct.getId()).
+				getResultList();
+	}
 	@Override
 	public String actualizar(TraspasoPartida e) {
 		// TODO Auto-generated method stub

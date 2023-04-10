@@ -68,7 +68,6 @@ public class Inventario {
 		this.descripcion = descripcion;
 		
 	}
-		/*Codigo NJGS*/
 
 	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidadManejo, Planta planta,
 			Date caducidad, String codigo, String lote, String sap, Camara camara, Posicion posicion, Integer partidaCve,
@@ -80,7 +79,6 @@ public class Inventario {
 		this.cantidad = cantidad;
 		this.unidadManejo = unidadManejo;
 		this.planta = planta;
-		/*CODIGO GMA*/
 		this.caducidad = caducidad;
 		this.codigo = codigo;
 		this.lote = lote;

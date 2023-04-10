@@ -139,4 +139,6 @@ public class RegimenFiscal implements Serializable {
 				+ ", vigenciaFin=" + vigenciaFin + "]";
 	}
 	
-}
+ }
+
+

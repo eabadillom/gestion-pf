@@ -42,9 +42,6 @@ public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscal, String>{
 			listaRegimen = em.createNamedQuery("RegimenFiscal.findByst_per_moral", RegimenFiscal.class).getResultList();
 		return listaRegimen;
 	}
-		
-
-	
 	
 	@Override
 	public List<RegimenFiscal> buscarTodos() {

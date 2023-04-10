@@ -34,22 +34,24 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "aviso")
 @NamedQueries({
-    @NamedQuery(name = "Aviso.findAll", query = "SELECT a FROM Aviso a"),
-    @NamedQuery(name = "Aviso.findByAvisoCve", query = "SELECT a FROM Aviso a WHERE a.avisoCve = :avisoCve"),
-    @NamedQuery(name = "Aviso.findByAvisoPo", query = "SELECT a FROM Aviso a WHERE a.avisoPo = :avisoPo"),
-    @NamedQuery(name = "Aviso.findByAvisoPedimento", query = "SELECT a FROM Aviso a WHERE a.avisoPedimento = :avisoPedimento"),
-    @NamedQuery(name = "Aviso.findByAvisoSap", query = "SELECT a FROM Aviso a WHERE a.avisoSap = :avisoSap"),
-    @NamedQuery(name = "Aviso.findByAvisoLote", query = "SELECT a FROM Aviso a WHERE a.avisoLote = :avisoLote"),
-    @NamedQuery(name = "Aviso.findByAvisoCaducidad", query = "SELECT a FROM Aviso a WHERE a.avisoCaducidad = :avisoCaducidad"),
-    @NamedQuery(name = "Aviso.findByAvisoTarima", query = "SELECT a FROM Aviso a WHERE a.avisoTarima = :avisoTarima"),
-    @NamedQuery(name = "Aviso.findByAvisoOtro", query = "SELECT a FROM Aviso a WHERE a.avisoOtro = :avisoOtro"),
-    @NamedQuery(name = "Aviso.findByAvisoTemp", query = "SELECT a FROM Aviso a WHERE a.avisoTemp = :avisoTemp"),
-    @NamedQuery(name = "Aviso.findByAvisoFecha", query = "SELECT a FROM Aviso a WHERE a.avisoFecha = :avisoFecha"),
-    @NamedQuery(name = "Aviso.findByAvisoObservaciones", query = "SELECT a FROM Aviso a WHERE a.avisoObservaciones = :avisoObservaciones"),
-    @NamedQuery(name = "Aviso.findByAvisoVigencia", query = "SELECT a FROM Aviso a WHERE a.avisoVigencia = :avisoVigencia"),
-    @NamedQuery(name = "Aviso.findByAvisoValSeg", query = "SELECT a FROM Aviso a WHERE a.avisoValSeg = :avisoValSeg"),
-    @NamedQuery(name = "Aviso.findByAvisoPlazo", query = "SELECT a FROM Aviso a WHERE a.avisoPlazo = :avisoPlazo"),
-    @NamedQuery(name = "Aviso.findByAvisoTpFacturacion", query = "SELECT a FROM Aviso a WHERE a.avisoTpFacturacion = :avisoTpFacturacion")})
+        @NamedQuery(name = "Aviso.findAll", query = "SELECT a FROM Aviso a"),
+        @NamedQuery(name = "Aviso.findByAvisoCve", query = "SELECT a FROM Aviso a WHERE a.avisoCve = :avisoCve"),
+        @NamedQuery(name = "Aviso.findByAvisoPo", query = "SELECT a FROM Aviso a WHERE a.avisoPo = :avisoPo"),
+        @NamedQuery(name = "Aviso.findByAvisoPedimento", query = "SELECT a FROM Aviso a WHERE a.avisoPedimento = :avisoPedimento"),
+        @NamedQuery(name = "Aviso.findByAvisoSap", query = "SELECT a FROM Aviso a WHERE a.avisoSap = :avisoSap"),
+        @NamedQuery(name = "Aviso.findByAvisoLote", query = "SELECT a FROM Aviso a WHERE a.avisoLote = :avisoLote"),
+        @NamedQuery(name = "Aviso.findByAvisoCaducidad", query = "SELECT a FROM Aviso a WHERE a.avisoCaducidad = :avisoCaducidad"),
+        @NamedQuery(name = "Aviso.findByAvisoTarima", query = "SELECT a FROM Aviso a WHERE a.avisoTarima = :avisoTarima"),
+        @NamedQuery(name = "Aviso.findByAvisoOtro", query = "SELECT a FROM Aviso a WHERE a.avisoOtro = :avisoOtro"),
+        @NamedQuery(name = "Aviso.findByAvisoTemp", query = "SELECT a FROM Aviso a WHERE a.avisoTemp = :avisoTemp"),
+        @NamedQuery(name = "Aviso.findByAvisoFecha", query = "SELECT a FROM Aviso a WHERE a.avisoFecha = :avisoFecha"),
+        @NamedQuery(name = "Aviso.findByAvisoObservaciones", query = "SELECT a FROM Aviso a WHERE a.avisoObservaciones = :avisoObservaciones"),
+        @NamedQuery(name = "Aviso.findByAvisoVigencia", query = "SELECT a FROM Aviso a WHERE a.avisoVigencia = :avisoVigencia"),
+        @NamedQuery(name = "Aviso.findByAvisoValSeg", query = "SELECT a FROM Aviso a WHERE a.avisoValSeg = :avisoValSeg"),
+        @NamedQuery(name = "Aviso.findByAvisoPlazo", query = "SELECT a FROM Aviso a WHERE a.avisoPlazo = :avisoPlazo"),
+        @NamedQuery(name = "Aviso.findByAvisoTpFacturacion", query = "SELECT a FROM Aviso a WHERE a.avisoTpFacturacion = :avisoTpFacturacion"),
+        @NamedQuery(name = "Aviso.findByAvisoCliente", query = "SELECT a FROM Aviso a WHERE a.cteCve.cteCve = :cteCve") })
+
 public class Aviso implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -101,7 +103,8 @@ public class Aviso implements Serializable {
     @NotNull
     @Column(name = "aviso_vigencia")
     private int avisoVigencia;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+    // consider using these annotations to enforce field validation
     @Column(name = "aviso_val_seg")
     private BigDecimal avisoValSeg;
     @Basic(optional = false)
@@ -136,7 +139,9 @@ public class Aviso implements Serializable {
         this.avisoCve = avisoCve;
     }
 
-    public Aviso(Integer avisoCve, boolean avisoPo, boolean avisoPedimento, boolean avisoSap, boolean avisoLote, boolean avisoCaducidad, boolean avisoTarima, boolean avisoOtro, Date avisoFecha, int avisoVigencia, int avisoPlazo, String avisoTpFacturacion) {
+    public Aviso(Integer avisoCve, boolean avisoPo, boolean avisoPedimento, boolean avisoSap, boolean avisoLote,
+            boolean avisoCaducidad, boolean avisoTarima, boolean avisoOtro, Date avisoFecha, int avisoVigencia,
+            int avisoPlazo, String avisoTpFacturacion) {
         this.avisoCve = avisoCve;
         this.avisoPo = avisoPo;
         this.avisoPedimento = avisoPedimento;
@@ -333,7 +338,8 @@ public class Aviso implements Serializable {
             return false;
         }
         Aviso other = (Aviso) object;
-        if ((this.avisoCve == null && other.avisoCve != null) || (this.avisoCve != null && !this.avisoCve.equals(other.avisoCve))) {
+        if ((this.avisoCve == null && other.avisoCve != null)
+                || (this.avisoCve != null && !this.avisoCve.equals(other.avisoCve))) {
             return false;
         }
         return true;
@@ -343,5 +349,5 @@ public class Aviso implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Aviso[ avisoCve=" + avisoCve + " ]";
     }
-    
+
 }
