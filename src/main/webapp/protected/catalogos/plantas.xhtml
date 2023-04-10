@@ -55,8 +55,7 @@
 							
 							<p:column headerText="Acción" style="text-align:center">
 							
-								<p:commandButton icon="pi pi-pencil" update=":form:frm-agrega" value="Modificar"
-												oncomplete="PF('dg-agrega').show()" styleClass="p-mr-2 p-mb-2" process="@this">
+								<p:commandButton icon="pi pi-pencil" update=":form:frm-agrega" value="Modificar" oncomplete="PF('dg-agrega').show()" styleClass="p-mr-2 p-mb-2" process="@this">
 									<f:setPropertyActionListener value="#{planta}" target="#{plantaBean.planta}" />
 								</p:commandButton>
 								
@@ -74,7 +73,6 @@
 			</div>
 			<p:dialog header="Agregar/Editar una Planta" showEffect="fade"
 				modal="true" widgetVar="dg-agrega" responsive="true">
-				
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 				
 					<p:outputPanel rendered="#{not empty plantaBean.planta}">

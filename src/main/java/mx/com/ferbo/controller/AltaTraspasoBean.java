@@ -193,7 +193,6 @@ public class AltaTraspasoBean implements Serializable {
 		
 		Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
 		List<PrecioServicio> precioServicioList = null;
-		//selCliente = clienteDAO.buscarPorId(idCliente);
 		this.selCliente = clienteDAO.buscarPorId(idCliente);
 		List<Inventario> inventario_antes = inventarioDAO.buscarPorCliente(selCliente);
 	try {
@@ -331,7 +330,6 @@ public class AltaTraspasoBean implements Serializable {
 		EstadoConstancia estado = null;
 		
 		try {
-			
 			if (this.isSaved)
 				throw new InventarioException("La constancia ya se encuentra registrada.");
 
@@ -403,7 +401,6 @@ public class AltaTraspasoBean implements Serializable {
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar servicio", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-altaTraspaso");
-			
 		}
 	}
 
