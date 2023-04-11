@@ -147,7 +147,7 @@
 							<p:outputLabel value="Se facturan por primera vez las constancias de deposito. Si la constancia que desea no se encuentra, ya fue facturada"/>
 						</div>
 						
-						<p:dataTable lazy="true">
+						<p:dataTable lazy="true" emptyMessage="No Hay Constancias Por Facturar" >
 						
 							<f:facet name="header">
 							
@@ -189,9 +189,9 @@
 								"Inicio periodo" y "Fin periodo", la CANTIDAD indica el numero de veces que se cobrara ese periodo</p:outputLabel>						
 						</div>
 						
-						<p:dataTable lazy="true">
+						<p:dataTable lazy="true" emptyMessage="No Hay Constancias Por Facturar">
 						
-							<f:facet name="header">
+							<f:facet name="header" >
 							
 								<div>
 									<span>Servicios a Facturar</span>
