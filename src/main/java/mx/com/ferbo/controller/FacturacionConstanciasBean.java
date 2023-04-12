@@ -15,6 +15,7 @@ import javax.inject.Named;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
+import mx.com.ferbo.dao.FacturacionDepositosDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.ParametroDAO;
@@ -23,6 +24,7 @@ import mx.com.ferbo.dao.SerieFacturaDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
+import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
@@ -53,6 +55,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private MetodoPagoDAO metodoPagoDAO;
 	private MedioPagoDAO medioPagoDAO;	
 	private ParametroDAO parametroDAO;
+	private FacturacionDepositosDAO facturacionConstanciasDAO;
 	
 	private List<Cliente> listaCliente;
 	private List<ClienteDomicilios> listaClienteDom;//recupera datos de la tabla cliente-domicilio
@@ -64,6 +67,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<Aviso> listaAviso;
 	private List<MetodoPago> listaMetodoPago;
 	private List<MedioPago> listaMedioPago;
+	private List<ConstanciaDeDeposito> listaConstanciasEntrada;
 	
 	private Date fechaFactura;
 	
@@ -81,7 +85,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		metodoPagoDAO = new MetodoPagoDAO();
 		medioPagoDAO = new MedioPagoDAO();
 		parametroDAO = new ParametroDAO();
-		
+		facturacionConstanciasDAO = new FacturacionDepositosDAO();
 		
 		listaCliente = new ArrayList<>();
 		listaClienteDom = new ArrayList<>();
@@ -93,6 +97,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaAviso = new ArrayList<>();
 		listaMetodoPago = new ArrayList<>();
 		listaMedioPago = new ArrayList<>();
+		listaConstanciasEntrada = new ArrayList<>();
 	}
 	
 	@PostConstruct
@@ -105,6 +110,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaA = avisoDAO.buscarTodos();
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
 		listaMedioPago = medioPagoDAO.buscarTodos();
+		
 		
 		//iva = parametroDAO.buscarPorNombre("IVA");
 		//retencion = parametroDAO.buscarPorNombre("RETENCION");
@@ -264,6 +270,14 @@ public class FacturacionConstanciasBean implements Serializable{
 
 	public void setIva(Parametro iva) {
 		this.iva = iva;
+	}	
+
+	public List<ConstanciaDeDeposito> getListaConstanciasEntrada() {
+		return listaConstanciasEntrada;
+	}
+
+	public void setListaConstanciasEntrada(List<ConstanciaDeDeposito> listaConstanciasEntrada) {
+		this.listaConstanciasEntrada = listaConstanciasEntrada;
 	}
 
 	public void domicilioAvisoPorCliente() {
@@ -282,33 +296,40 @@ public class FacturacionConstanciasBean implements Serializable{
 			
 		}
 		
+		//llenado de select plazo de pago
+		AvisoCliente();
+		
+	}
+	
+	public void AvisoCliente() {
+		
 		// -------------- comienza recuperado de Aviso ----------------
 		
-		listaAviso.clear();
-		listaAviso = listaA.stream()
-					 .filter(av -> clienteSelect != null
-					 ?(av.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
-					 :false).collect(Collectors.toList());
-		
-		//obtengo de la listaAviso el registro con el plazo maximo
-		Aviso aviso;
-		if(listaAviso.size()>1) {//debe traer dos registros la lista o mas para poder comparar cul es el maximo
-			Optional<Aviso> numeroMax =  listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
-			
-			aviso = numeroMax.get();
-			this.plazoSelect = aviso.getAvisoPlazo();
-			
-		}else {
-			
-			if(listaAviso.size()==1) {
-				aviso = listaAviso.get(0);
-				this.plazoSelect = aviso.getAvisoPlazo();
-			}else {
-				System.out.println("el cliente no tiene aviso");
-			}
-		}
-		
-		// ------------------- termina recuperacion de aviso -----------------------
+				listaAviso.clear();
+				listaAviso = listaA.stream()
+							 .filter(av -> clienteSelect != null
+							 ?(av.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
+							 :false).collect(Collectors.toList());
+				
+				//obtengo de la listaAviso el registro con el plazo maximo
+				Aviso aviso;
+				if(listaAviso.size()>1) {//debe traer dos registros la lista o mas para poder comparar cul es el maximo
+					Optional<Aviso> numeroMax =  listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
+					
+					aviso = numeroMax.get();
+					this.plazoSelect = aviso.getAvisoPlazo();
+					
+				}else {
+					
+					if(listaAviso.size()==1) {
+						aviso = listaAviso.get(0);
+						this.plazoSelect = aviso.getAvisoPlazo();
+					}else {
+						System.out.println("el cliente no tiene aviso");
+					}
+				}
+				
+				// ------------------- termina recuperacion de aviso -----------------------
 		
 	}
 	
@@ -326,6 +347,24 @@ public class FacturacionConstanciasBean implements Serializable{
 		}
 		
 	}
+	
+	public void cargaDeConstancias(){
+		
+	}
+	
+	public void entradasNoFacturadas(){
+		
+		if(clienteSelect==null){
+			return;
+		}
+		
+		if(clienteSelect==null) {
+			return;
+		}
+		
+	}
+	
+	
 	
 	
 
