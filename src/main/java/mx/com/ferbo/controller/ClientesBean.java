@@ -54,6 +54,7 @@ public class ClientesBean implements Serializable {
 		lstClienteContactoSelected = new ArrayList<>();
 		lstClientesSelected = new ArrayList<>();
 		clienteDAO = new ClienteDAO();
+		tipoMailDAO = new TipoMailDAO();
 		nuevoCliente();
 //		contactoSelected = new Contacto();
 		clienteContactoSelected = new ClienteContacto();
