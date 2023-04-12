@@ -5,13 +5,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
+	private static Logger log = Logger.getLogger(FacturacionDepositosDAO.class);
 	
 	@Override
 	public ConstanciaDeDeposito buscarPorId(Integer id) {
@@ -79,7 +80,7 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			
 			
 		} catch(Exception ex) {
-			Log.error("Problema para obtener la lista de entradas no facturadas...", ex);
+			log.error("Problema para obtener la lista de entradas no facturadas...", ex);
 		} finally {
 			if(em != null)
 				em.close();
