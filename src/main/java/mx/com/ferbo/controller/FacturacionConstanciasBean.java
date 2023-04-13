@@ -67,7 +67,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<Aviso> listaAviso;
 	private List<MetodoPago> listaMetodoPago;
 	private List<MedioPago> listaMedioPago;
-	private List<ConstanciaDeDeposito> listaConstanciasEntrada;
+	private List<ConstanciaDeDeposito> listaEntradas;
 	
 	private Date fechaFactura;
 	
@@ -97,7 +97,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaAviso = new ArrayList<>();
 		listaMetodoPago = new ArrayList<>();
 		listaMedioPago = new ArrayList<>();
-		listaConstanciasEntrada = new ArrayList<>();
+		listaEntradas = new ArrayList<>();
+		
 	}
 	
 	@PostConstruct
@@ -263,7 +264,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	public void setRetencion(Parametro retencion) {
 		this.retencion = retencion;
 	}
-
+	
 	public Parametro getIva() {
 		return iva;
 	}
@@ -272,12 +273,12 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.iva = iva;
 	}	
 
-	public List<ConstanciaDeDeposito> getListaConstanciasEntrada() {
-		return listaConstanciasEntrada;
+	public List<ConstanciaDeDeposito> getListaEntradas() {
+		return listaEntradas;
 	}
 
-	public void setListaConstanciasEntrada(List<ConstanciaDeDeposito> listaConstanciasEntrada) {
-		this.listaConstanciasEntrada = listaConstanciasEntrada;
+	public void setListaEntradas(List<ConstanciaDeDeposito> listaEntradas) {
+		this.listaEntradas = listaEntradas;
 	}
 
 	public void domicilioAvisoPorCliente() {
@@ -299,6 +300,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		//llenado de select plazo de pago
 		AvisoCliente();
 		
+		//carga de constancias si existe un cambio de cliente
+		cargarConstancias();
 	}
 	
 	public void AvisoCliente() {
@@ -346,26 +349,30 @@ public class FacturacionConstanciasBean implements Serializable{
 			serieFacturaSelect = listaSerieFactura.get(0);
 		}
 		
+		//Carga de constancias si existe cambio en planta 
+		cargarConstancias();
+	}
+
+	public void cargarConstancias(){
+		this.facturacionEntradas();
 	}
 	
-	public void cargaDeConstancias(){
-		
-	}
+	public void facturacionEntradas(){
 	
-	public void entradasNoFacturadas(){
-		
 		if(clienteSelect==null){
 			return;
 		}
 		
-		if(clienteSelect==null) {
+		if(plantaSelect==null){
 			return;
 		}
 		
+		listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
+		
+		if(listaEntradas.isEmpty()){
+			listaEntradas = new ArrayList<>();
+		}
+		
 	}
-	
-	
-	
-	
 
 }

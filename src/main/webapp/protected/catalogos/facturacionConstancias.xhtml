@@ -26,7 +26,7 @@
 							<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 								<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
-								<p:ajax update="receptor factura" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
+								<p:ajax update="receptor factura dt-constanciasE" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
 							</p:selectOneMenu>
 						</div>
 						
@@ -56,7 +56,7 @@
 							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" styleClass="p-ml-2 p-mr-4">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
 								<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
-								<p:ajax update="emisor " listener="#{facturacionConstanciasBean.serieFactura}"/>
+								<p:ajax update="emisor dt-constanciasE" listener="#{facturacionConstanciasBean.serieFactura}"/>
 							</p:selectOneMenu>
 						</p:outputLabel>
 						
@@ -147,16 +147,24 @@
 							<p:outputLabel value="Se facturan por primera vez las constancias de deposito. Si la constancia que desea no se encuentra, ya fue facturada"/>
 						</div>
 						
-						<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" lazy="true"
-									var="entrada" >
-						
-							<f:facet name="header">							
+						<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}"
+						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" >
+							<f:facet name="header">							 
 								<div>								
 									<span>Constancias De Entradas A Factura</span>								
 								</div>							
 							</f:facet>
+						
+							<p:column selectionMode="multiple" exportable="false"/>
+						
+							<p:column headerText="Folio Cliente">
+								<h:outputText value="#{entrada.folioCliente}"/>
+							</p:column>
 							
-							
+							<p:column headerText="Fecha Ingreso">
+								<h:outputText value="#{entrada.fechaIngreso}" />
+							</p:column>
+					
 						
 						</p:dataTable>
 						
