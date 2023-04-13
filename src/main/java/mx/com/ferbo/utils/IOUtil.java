@@ -82,18 +82,18 @@ public class IOUtil {
         
     }
     
-    public static byte[] read(InputStream input) throws IOException {
-        byte[] resultado = null;
-        byte[] buffer = new byte[1024];
-        
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        int nRead;
+	public static byte[] read(InputStream input) throws IOException {
+		byte[] resultado = null;
+		byte[] buffer = new byte[1024];
 
-        while ((nRead = input.read(buffer, 0, buffer.length)) != -1) {
-          output.write(buffer, 0, nRead);
-        }
-        
-        resultado = output.toByteArray();
-        return resultado;
-    }
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		int nRead;
+
+		while ((nRead = input.read(buffer, 0, buffer.length)) != -1) {
+			output.write(buffer, 0, nRead);
+		}
+
+		resultado = output.toByteArray();
+		return resultado;
+	}
 }

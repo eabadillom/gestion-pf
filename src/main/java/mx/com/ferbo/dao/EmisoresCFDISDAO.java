@@ -26,26 +26,26 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 	
 	@Override
 	public EmisoresCFDIS buscarPorId(Integer cd_emisor) {
-		/*EmisoresCFDIS emi = null;
+		EmisoresCFDIS emi = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		emi = em.createNamedQuery("findBycdEmisor", EmisoresCFDIS.class).getSingleResult();*/
-		return null;
+		emi = em.createNamedQuery("findBycdEmisor", EmisoresCFDIS.class).getSingleResult();
+		return emi;
 	}
 
 	@Override
 	public List<EmisoresCFDIS> buscarTodos() {
-		/*List<EmisoresCFDIS> listaEmisores = null;
+		List<EmisoresCFDIS> listaEmisores = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		listaEmisores = em.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class).getResultList();*/
-		return null;
+		listaEmisores = em.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class).getResultList();
+		return listaEmisores;
 	}
 
 	@Override
 	public List<EmisoresCFDIS> buscarPorCriterios(EmisoresCFDIS e) {
-		/*List<EmisoresCFDIS> listaEmisores =null;
+		List<EmisoresCFDIS> listaEmisores =null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-			listaEmisores = em.createNamedQuery("EmisoresCFDIS.findByregimenFiscal", EmisoresCFDIS.class).setParameter("cd_regimen", e.getCd_regimen()).getResultList();*/
-		return null;
+			listaEmisores = em.createNamedQuery("EmisoresCFDIS.findByregimenFiscal", EmisoresCFDIS.class).setParameter("cd_regimen", e.getCd_regimen()).getResultList();
+		return listaEmisores;
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 			ent.getTransaction().commit();
 			ent.close();
 		}catch(Exception e){
-			return "Failed" + e.getMessage();
+ 			return "Failed" + e.getMessage();
 		}
 		return null;
 	}

@@ -11,6 +11,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscal, String>{
 
 	
+	@SuppressWarnings("unchecked")
 	public List<RegimenFiscal> findAll(){
 		EntityManager entity = EntityManagerUtil.getEntityManager();
 		List<RegimenFiscal> listaRegimen = null;
@@ -22,13 +23,26 @@ public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscal, String>{
 	@Override
 	public RegimenFiscal buscarPorId(String cd_regimen) {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
-		RegimenFiscal rf = null;
-		Query sql = (Query) entity.createNamedQuery("RegimenFiscal.findBycdRegimen", RegimenFiscal.class)
-				.setParameter("cd_regimen", cd_regimen);
-		rf = (RegimenFiscal) sql.getSingleResult();
+		RegimenFiscal rf = entity.createNamedQuery("RegimenFiscal.findBycdRegimen", RegimenFiscal.class)
+				.setParameter("cd_regimen", cd_regimen).getSingleResult();
 		return rf;
 	}
 
+		public List<RegimenFiscal> buscarPorPersonaFisica() {
+			List<RegimenFiscal> listaRegimen = null;
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			listaRegimen = em.createNamedQuery("RegimenFiscal.findByst_per_fisica", RegimenFiscal.class).getResultList();
+		return listaRegimen;
+	}
+	
+	
+		public List<RegimenFiscal> buscarPorPersonaMoral() {
+			List<RegimenFiscal> listaRegimen = null;
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			listaRegimen = em.createNamedQuery("RegimenFiscal.findByst_per_moral", RegimenFiscal.class).getResultList();
+		return listaRegimen;
+	}
+	
 	@Override
 	public List<RegimenFiscal> buscarTodos() {
 		List<RegimenFiscal> listaRegimen = null;

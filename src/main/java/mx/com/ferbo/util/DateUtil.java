@@ -18,7 +18,7 @@ public class DateUtil {
 	
 	public static final String FORMATO_DD_MM_YYYY          = "dd/MM/yyyy";
 	public static final String FORMATO_YYYY_MM_DD          = "yyyy-MM-dd";
-	public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd hh:mm:ss.SSS";
+	public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss.SSS";
 	public static final String FORMATO_DD_MM_YYYY_FULL     = "dd MMMM yyyy";
 	
 	public static final int ENERO      = Calendar.JANUARY;
@@ -385,7 +385,7 @@ public class DateUtil {
 	public static void setTime(Date fecha, int hour, int minute, int second){
 		Calendar cal = null;
 		
-		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		cal = GregorianCalendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
 		cal.setTime(fecha);
 		cal.set(Calendar.HOUR, hour);
 		cal.set(Calendar.MINUTE, minute);
@@ -397,9 +397,9 @@ public class DateUtil {
 	public static void setTime(Date fecha, int hour, int minute, int second, int millisecond){
 		Calendar cal = null;
 		
-		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		cal = GregorianCalendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
 		cal.setTime(fecha);
-		cal.set(Calendar.HOUR, hour);
+		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
 		cal.set(Calendar.SECOND, second);
 		cal.set(Calendar.MILLISECOND, millisecond);
@@ -410,7 +410,7 @@ public class DateUtil {
 	public static void setTime(Date fecha, int hour, int AM_PM, int minute, int second, int millisecond) {
 		Calendar cal = null;
 		
-		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		cal = GregorianCalendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
 		cal.setTime(fecha);
 		cal.set(Calendar.HOUR, hour);
 		cal.set(Calendar.AM_PM, AM_PM);
@@ -581,5 +581,41 @@ public class DateUtil {
 			resultado = true;
 		
 		return resultado;
+	}
+	
+	public static Date fechaVencimiento(Date fecha, int diasVencimiento, boolean esVigenciaNatural){
+		Date vencimiento = null;
+		Date fechaAux = null;
+		
+		vencimiento = new Date(fecha.getTime());
+		fechaAux = new Date(fecha.getTime());
+		
+		int dia = -1;
+		int mes = -1;
+		int anio = -1;
+		
+		GregorianCalendar c = new GregorianCalendar();
+		
+		if(diasVencimiento == 30 && (esVigenciaNatural == false) ) {
+			
+			vencimiento = DateUtil.addMonth(vencimiento, 1);
+			dia = DateUtil.getDia(fechaAux);
+			mes = DateUtil.getMes(fechaAux);
+			anio = DateUtil.getAnio(fechaAux);
+			
+			if(c.isLeapYear(anio)) {
+				if( !(mes == DateUtil.ENERO && dia > 29) ){
+					vencimiento = DateUtil.addDay(vencimiento, -1);
+				} 
+			} else {
+				if( !(mes == DateUtil.ENERO && dia > 28)) {
+					vencimiento = DateUtil.addDay(vencimiento, -1);
+				}
+			}
+		} else {
+			vencimiento = DateUtil.addDay(vencimiento, diasVencimiento);
+		}
+		
+		return vencimiento;
 	}
 }
