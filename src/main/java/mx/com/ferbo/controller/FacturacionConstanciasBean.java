@@ -283,7 +283,7 @@ public class FacturacionConstanciasBean implements Serializable{
 
 	public void domicilioAvisoPorCliente() {
 		
-		iva = parametroDAO.buscarPorNombre("IVA");//ES MEJOR AQUI O EN EL INIT?***
+		iva = parametroDAO.buscarPorNombre("IVA");//
 		retencion = parametroDAO.buscarPorNombre("RETENCION");//***
 		//Domicilio
 		listaClienteDomicilio.clear();

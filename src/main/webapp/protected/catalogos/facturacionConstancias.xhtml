@@ -21,17 +21,18 @@
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-						<div style="margin-bottom: 5px;text-align: center;">
-							<p:outputLabel value="Razon Social:" styleClass="p-ml-2"></p:outputLabel>
-							<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}">
-								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
-								<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
-								<p:ajax update="receptor factura dt-constanciasE" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
-							</p:selectOneMenu>
-						</div>
+						
 						
 					<p:fieldset legend="Datos del Receptor (Cliente)" >
 						<p:outputPanel id="receptor">
+							<div style="text-align: center;margin-bottom: 10px">
+								<p:outputLabel value="Cliente:" styleClass="p-ml-2"></p:outputLabel>
+								<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}">
+									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
+									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
+									<p:ajax update="receptor factura dt-constanciasE" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
+								</p:selectOneMenu>
+							</div>
 							
 							<p:outputLabel value="Numero:" styleClass="p-mr-2" />
 							<p:inputNumber value="#{facturacionConstanciasBean.clienteSelect.numeroCte}" decimalPlaces="0"/>
@@ -140,9 +141,7 @@
 					</p:fieldset>			
 					
 					<p:fieldset legend="Constancias a Facturar" style="margin-top:10px"> <!-- falta outputPanel para Autoupdate -->
-					
-						<p:selectBooleanCheckbox styleClass="p-mr-2"></p:selectBooleanCheckbox><b>Facturar Constancias de deposito (Entradas)</b>
-						
+										
 						<div style="margin-top:10px" >
 							<p:outputLabel value="Se facturan por primera vez las constancias de deposito. Si la constancia que desea no se encuentra, ya fue facturada"/>
 						</div>
