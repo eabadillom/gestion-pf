@@ -14,6 +14,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -39,32 +41,63 @@ import javax.validation.constraints.Size;
 public class Cliente implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "CTE_CVE")
     private Integer cteCve;
+    
     @Size(max = 150)
     @Column(name = "CTE_NOMBRE")
     private String cteNombre;
+    
     @Size(max = 20)
     @Column(name = "CTE_RFC")
     private String cteRfc;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "numero_cte")
     private String numeroCte;
+    
     @Size(max = 255)
     @Column(name = "cte_mail")
     private String cteMail;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "habilitado")
     private boolean habilitado;
+    
     @Size(max = 3)
     @Column(name = "COD_UNICO")
     private String codUnico;
+    
+    @Size(min = 1, max = 1)
+    @Column(name = "tp_persona")
+    private String tipoPersona;
+    
+    @ManyToOne
+    @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
+    private RegimenFiscal regimenFiscal;
+    
+    @ManyToOne
+    @JoinColumn(name = "cd_uso_cfdi", referencedColumnName = "cd_uso_cfdi")
+    private UsoCfdi usoCfdi;
+    
+    
+    
+    
+    @Size(max = 150)
+    @Column(name = "nb_regimen_capital")
+    private String regimenCapital;
+    
+    @Size(max = 50)
+    @Column(name = "uuid")
+    private String uuid;
+    
     @OneToMany(mappedBy = "clienteCve")
     private List<ConstanciaServicios> constanciaServiciosList;
     @OneToMany(mappedBy = "cliente")
@@ -299,5 +332,45 @@ public class Cliente implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Cliente[ cteCve=" + cteCve + " ]";
     }
+
+	public String getRegimenCapital() {
+		return regimenCapital;
+	}
+
+	public void setRegimenCapital(String regimenCapital) {
+		this.regimenCapital = regimenCapital;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public String getTipoPersona() {
+		return tipoPersona;
+	}
+
+	public void setTipoPersona(String tipoPersona) {
+		this.tipoPersona = tipoPersona;
+	}
+
+	public RegimenFiscal getRegimenFiscal() {
+		return regimenFiscal;
+	}
+
+	public void setRegimenFiscal(RegimenFiscal regimenFiscal) {
+		this.regimenFiscal = regimenFiscal;
+	}
+
+	public UsoCfdi getUsoCfdi() {
+		return usoCfdi;
+	}
+
+	public void setUsoCfdi(UsoCfdi usoCfdi) {
+		this.usoCfdi = usoCfdi;
+	}
     
 }

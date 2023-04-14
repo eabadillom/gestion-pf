@@ -100,33 +100,39 @@
 						<p:dialog id="dialogCliente" header="Agregar/modificar cliente" widgetVar="dialogCliente" showEffect="fade" modal="true" responsive="true">
 							<p:outputPanel id="pnlCliente" class="ui-fluid">
 								<p:outputPanel>
-									<div class="p-field">
-										<p:outputLabel for="txtNombre">Nombre</p:outputLabel>
-										<p:inputTextarea id="txtNombre" value="#{clientesBean.clienteSelected.cteNombre}" required="true" requiredMessage="Campo requerido" rows="2" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel for="txtRFC">RFC</p:outputLabel>
-										<p:inputText id="txtRFC" value="#{clientesBean.clienteSelected.cteRfc}" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel>Número cliente</p:outputLabel>
-										<p:inputText value="#{clientesBean.clienteSelected.numeroCte}" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel>Correo</p:outputLabel>
-										<p:inputText value="#{clientesBean.clienteSelected.cteMail}" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel for="chkHabilitado" value="Habilitado" />
-										<p:selectOneMenu id="chkHabilitado" value="#{clientesBean.clienteSelected.habilitado}">
-											<f:selectItem itemLabel="Sí" itemValue="true" />
-											<f:selectItem itemLabel="No" itemValue="false" />
-										</p:selectOneMenu>
-									</div>
-									<div class="p-field">
-										<p:outputLabel for="txtCodigo">Código único</p:outputLabel>
-										<p:inputText id="txtCodigo" value="#{clientesBean.clienteSelected.codUnico}" />
-									</div>
+									<p:panelGrid columns="6" layout="flex" contentStyleClass="align-items-baseline ui-fluid">
+									</p:panelGrid>
+										<div class="p-field">
+											<p:outputLabel>Número cliente</p:outputLabel>
+											<p:inputText value="#{clientesBean.clienteSelected.numeroCte}" />
+										</div>
+										<div class="p-field">
+											<p:outputLabel for="txtRFC">RFC</p:outputLabel>
+											<p:inputText id="txtRFC" value="#{clientesBean.clienteSelected.cteRfc}" />
+										</div>
+										<div class="p-field">
+											<p:outputLabel for="txtNombre">Nombre</p:outputLabel>
+											<p:inputTextarea id="txtNombre" value="#{clientesBean.clienteSelected.cteNombre}" required="true" requiredMessage="Campo requerido" rows="2" />
+										</div>
+										<div class="p-field">
+											<p:outputLabel for="txtRegimenCapital">Régimen capital</p:outputLabel>
+											<p:inputTextarea id="txtRegimenCapital" value="#{clientesBean.clienteSelected.regimenCapital}" required="true" requiredMessage="Campo requerido" rows="2" />
+										</div>
+										<div class="p-field">
+											<p:outputLabel>Correo</p:outputLabel>
+											<p:inputText value="#{clientesBean.clienteSelected.cteMail}" />
+										</div>
+										<div class="p-field">
+											<p:outputLabel for="chkHabilitado" value="Habilitado" />
+											<p:selectOneMenu id="chkHabilitado" value="#{clientesBean.clienteSelected.habilitado}">
+												<f:selectItem itemLabel="Sí" itemValue="true" />
+												<f:selectItem itemLabel="No" itemValue="false" />
+											</p:selectOneMenu>
+										</div>
+										<div class="p-field">
+											<p:outputLabel for="txtCodigo">Código único</p:outputLabel>
+											<p:inputText id="txtCodigo" value="#{clientesBean.clienteSelected.codUnico}" />
+										</div>
 								</p:outputPanel>
 							</p:outputPanel>
 							<f:facet name="footer">
