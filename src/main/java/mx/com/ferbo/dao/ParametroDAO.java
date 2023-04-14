@@ -16,6 +16,16 @@ public class ParametroDAO extends IBaseDAO<Parametro,Integer>{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public Parametro buscarPorNombre(String nombre) {
+		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		Parametro parametro = null;
+		parametro = em.createNamedQuery("Parametro.findByNombre", Parametro.class)
+				.setParameter("nombre", nombre).getSingleResult();
+		
+		return parametro;
+	}
 
 	@Override
 	public List<Parametro> buscarTodos() {
