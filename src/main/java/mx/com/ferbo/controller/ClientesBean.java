@@ -3,30 +3,28 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteContactoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.ContactoDAO;
-import mx.com.ferbo.dao.MedioCntDAO;
+import mx.com.ferbo.dao.RegimenFiscalDAO;
 import mx.com.ferbo.dao.TipoMailDAO;
-import mx.com.ferbo.dao.TipoTelefonoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
-import mx.com.ferbo.model.Contacto;
-import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
-import mx.com.ferbo.model.Telefono;
+import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.TipoMail;
-import mx.com.ferbo.model.TipoTelefono;
+import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.util.ClienteUtil;
+import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.SecurityUtil;
 
 @Named
@@ -34,19 +32,24 @@ import mx.com.ferbo.util.SecurityUtil;
 public class ClientesBean implements Serializable {
 
 	private static final long serialVersionUID = 8438449261015571241L;
+	private static Logger log = Logger.getLogger(ClientesBean.class);
 
 	private List<Cliente> lstClientes;
 	private List<Cliente> lstClientesSelected;
 	private List<ClienteContacto> lstClienteContactoSelected;
 	private List<TipoMail> lstTipoMail;
+	private List<RegimenFiscal> lstRegimenFiscal;
+	private List<UsoCfdi> lstUsoCfdi;
 
 	private Cliente clienteSelected;
 	private ClienteContacto clienteContactoSelected;
-//	private Contacto contactoSelected;
 	private MedioCnt medioContactoSelected;
+	private RegimenFiscal regimenFiscalSelected;
+	private UsoCfdi usoCfdiSelected;
 
 	private ClienteDAO clienteDAO;
 	private TipoMailDAO tipoMailDAO;
+	private RegimenFiscalDAO regimenFiscalDAO;
 	
 	SecurityUtil util;
 
@@ -56,10 +59,10 @@ public class ClientesBean implements Serializable {
 		clienteDAO = new ClienteDAO();
 		tipoMailDAO = new TipoMailDAO();
 		nuevoCliente();
-//		contactoSelected = new Contacto();
 		clienteContactoSelected = new ClienteContacto();
 		medioContactoSelected = new MedioCnt();
 		util = new SecurityUtil();
+		regimenFiscalDAO = new RegimenFiscalDAO();
 	}
 
 	@PostConstruct
@@ -86,6 +89,22 @@ public class ClientesBean implements Serializable {
 		}
 		return "Eliminar";
 	}
+	
+	public void cargaInfoCliente() {
+		log.info("Cargando información del cliente: " + this.clienteSelected);
+		if("M".equals(clienteSelected.getTipoPersona()))
+			lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaMoral();
+		if("F".equals(clienteSelected.getTipoPersona()))
+			lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaFisica();
+		
+		String s = null;
+		if(this.clienteSelected.getRegimenFiscal() != null) {
+			s = String.format("PF('selectRegimenFiscal').selectValue('%s')", this.clienteSelected.getRegimenFiscal().getCd_regimen());
+			log.info("Estableciendo regimen fiscal por defecto: " + this.clienteSelected.getRegimenFiscal());
+			PrimeFaces.current().executeScript(s);
+			PrimeFaces.current().ajax().update("form:regimenFiscal");
+		}
+	}
 
 	/**
 	 * Método para inicializar objeto tipo Cliente
@@ -99,7 +118,6 @@ public class ClientesBean implements Serializable {
 	 * Método para inicializar objeto tipo Contacto
 	 */
 	public void nuevoContacto(Cliente clienteSel) {
-//		contactoSelected = new Contacto();
 		clienteSelected = clienteSel;
 		clienteContactoSelected = new ClienteContacto();
 		clienteContactoSelected.setIdCliente(clienteSelected);
@@ -162,8 +180,8 @@ public class ClientesBean implements Serializable {
 
 
 	public void consultaContactos(ClienteContacto clienteContacto) {
-//		contactoSelected = contacto;
 		clienteContactoSelected = clienteContacto;
+		
 		PrimeFaces.current().ajax().update("form:dialogEditContacto", "form:pnlEditContacto");
 		PrimeFaces.current().executeScript("PF('dialogEditContacto').show();");
 
@@ -171,6 +189,41 @@ public class ClientesBean implements Serializable {
 	
 	public void generaPassword() {
 		clienteContactoSelected.setNbPassword(util.getRandomString());
+	}
+	
+	public void regimenSelect() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			
+			if(ClienteUtil.validarRFC(this.clienteSelected.getTipoPersona(), this.clienteSelected.getCteRfc()) == false ) {
+				mensaje = "El RFC es incorrecto";
+				throw new InventarioException("El RFC es incorrecto");
+			}
+			
+			if("M".equals(this.clienteSelected.getTipoPersona())) {	
+				lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaMoral();
+				log.info(String.format("Lista de regimenes para personas morales: (%d) ", lstRegimenFiscal.size()));
+			}else if("F".equals(this.clienteSelected.getTipoPersona())) {
+				lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaFisica();
+				log.info(String.format("Lista de regimenes para personas físicas: (%d) ", lstRegimenFiscal.size()));
+			}
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Seleccione el régimen fiscal";
+			
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages");
+		}
 	}
 
 	/**
@@ -231,6 +284,38 @@ public class ClientesBean implements Serializable {
 
 	public void setMedioContactoSelected(MedioCnt medioContactoSelected) {
 		this.medioContactoSelected = medioContactoSelected;
+	}
+
+	public List<RegimenFiscal> getLstRegimenFiscal() {
+		return lstRegimenFiscal;
+	}
+
+	public void setLstRegimenFiscal(List<RegimenFiscal> lstRegimenFiscal) {
+		this.lstRegimenFiscal = lstRegimenFiscal;
+	}
+
+	public RegimenFiscal getRegimenFiscalSelected() {
+		return regimenFiscalSelected;
+	}
+
+	public void setRegimenFiscalSelected(RegimenFiscal regimenFiscalSelected) {
+		this.regimenFiscalSelected = regimenFiscalSelected;
+	}
+
+	public UsoCfdi getUsoCfdiSelected() {
+		return usoCfdiSelected;
+	}
+
+	public void setUsoCfdiSelected(UsoCfdi usoCfdiSelected) {
+		this.usoCfdiSelected = usoCfdiSelected;
+	}
+
+	public List<UsoCfdi> getLstUsoCfdi() {
+		return lstUsoCfdi;
+	}
+
+	public void setLstUsoCfdi(List<UsoCfdi> lstUsoCfdi) {
+		this.lstUsoCfdi = lstUsoCfdi;
 	}
 
 }

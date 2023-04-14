@@ -7,6 +7,8 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -15,6 +17,11 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "uso_cfdi")
+@NamedQueries({
+    @NamedQuery(name = "UsoCfdi.findByPersonaFisica", query = "SELECT u FROM UsoCfdi u WHERE u.aplicaPersonaFisica = true "),
+    @NamedQuery(name = "UsoCfdi.findByPersonaMoral", query = "SELECT u FROM  UsoCfdi u WHERE u.aplicaPersonaMoral = true ")
+    }
+)
 public class UsoCfdi implements Serializable {
 	
 	private static final long serialVersionUID = 2460444038539852730L;
