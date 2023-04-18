@@ -12,10 +12,13 @@ import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.primefaces.PrimeFaces;
+
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturacionDepositosDAO;
+import mx.com.ferbo.dao.FacturacionVigenciasDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.ParametroDAO;
@@ -25,12 +28,14 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieFactura;
+import mx.com.ferbo.util.DateUtil;
 
 
 @Named
@@ -56,6 +61,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private MedioPagoDAO medioPagoDAO;	
 	private ParametroDAO parametroDAO;
 	private FacturacionDepositosDAO facturacionConstanciasDAO;
+	private FacturacionVigenciasDAO facturacionVigenciasDAO;
 	
 	private List<Cliente> listaCliente;
 	private List<ClienteDomicilios> listaClienteDom;//recupera datos de la tabla cliente-domicilio
@@ -68,8 +74,10 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<MetodoPago> listaMetodoPago;
 	private List<MedioPago> listaMedioPago;
 	private List<ConstanciaDeDeposito> listaEntradas;
+	private List<ConstanciaFactura> listaVigencias;
 	
 	private Date fechaFactura;
+	private Date fechaCorte;
 	
 	private String moneda = "MX$";
 	private int plazoSelect;
@@ -86,6 +94,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		medioPagoDAO = new MedioPagoDAO();
 		parametroDAO = new ParametroDAO();
 		facturacionConstanciasDAO = new FacturacionDepositosDAO();
+		facturacionVigenciasDAO = new FacturacionVigenciasDAO();
 		
 		listaCliente = new ArrayList<>();
 		listaClienteDom = new ArrayList<>();
@@ -98,6 +107,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaMetodoPago = new ArrayList<>();
 		listaMedioPago = new ArrayList<>();
 		listaEntradas = new ArrayList<>();
+		listaVigencias = new ArrayList<>();
 		
 	}
 	
@@ -116,8 +126,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		//iva = parametroDAO.buscarPorNombre("IVA");
 		//retencion = parametroDAO.buscarPorNombre("RETENCION");
 		
-		
 		fechaFactura = new Date();
+		fechaCorte = new Date();
 		
 	}
 
@@ -279,6 +289,22 @@ public class FacturacionConstanciasBean implements Serializable{
 
 	public void setListaEntradas(List<ConstanciaDeDeposito> listaEntradas) {
 		this.listaEntradas = listaEntradas;
+	}	
+
+	public Date getFechaCorte() {
+		return fechaCorte;
+	}
+
+	public void setFechaCorte(Date fechaCorte) {
+		this.fechaCorte = fechaCorte;
+	}
+
+	public List<ConstanciaFactura> getListaVigencias() {
+		return listaVigencias;
+	}
+
+	public void setListaVigencias(List<ConstanciaFactura> listaVigencias) {
+		this.listaVigencias = listaVigencias;
 	}
 
 	public void domicilioAvisoPorCliente() {
@@ -355,15 +381,19 @@ public class FacturacionConstanciasBean implements Serializable{
 
 	public void cargarConstancias(){
 		this.facturacionEntradas();
+		this.facturacionVigencias();
+		
+		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias");
+		
 	}
 	
 	public void facturacionEntradas(){
 	
-		if(clienteSelect==null){
+		if(clienteSelect == null){
 			return;
 		}
 		
-		if(plantaSelect==null){
+		if(plantaSelect == null){
 			return;
 		}
 		
@@ -374,5 +404,30 @@ public class FacturacionConstanciasBean implements Serializable{
 		}
 		
 	}
+	
+	public void facturacionVigencias(){
+		
+		if(clienteSelect == null){
+			return;			
+		}
+		
+		if(plantaSelect == null){
+			return;			
+		}
+		
+		System.out.println("fecha corte antes:" + fechaCorte);
+		
+		DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
+		
+		System.out.println("fecha corte despues:" + fechaCorte);
+		
+		listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
+		
+		if(listaVigencias.isEmpty()){
+			listaVigencias = new ArrayList<>();
+		}
+		
+	}
+	
 
 }

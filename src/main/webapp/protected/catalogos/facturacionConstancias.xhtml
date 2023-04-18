@@ -30,7 +30,7 @@
 								<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}">
 									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
-									<p:ajax update="receptor factura dt-constanciasE" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
+									<p:ajax update="receptor factura" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
 								</p:selectOneMenu>
 							</div>
 							
@@ -57,7 +57,7 @@
 							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" styleClass="p-ml-2 p-mr-4">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
 								<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
-								<p:ajax update="emisor dt-constanciasE" listener="#{facturacionConstanciasBean.serieFactura}"/>
+								<p:ajax update="emisor" listener="#{facturacionConstanciasBean.serieFactura}"/>
 							</p:selectOneMenu>
 						</p:outputLabel>
 						
@@ -147,7 +147,7 @@
 						</div>
 						
 						<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}"
-						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" >
+						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5">
 							<f:facet name="header">							 
 								<div>								
 									<span>Constancias De Entradas A Factura</span>								
@@ -161,22 +161,50 @@
 							</p:column>
 							
 							<p:column headerText="Fecha Ingreso">
-								<h:outputText value="#{entrada.fechaIngreso}" />
+								<h:outputText value="#{entrada.fechaIngreso}" >
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
 							</p:column>
-					
 						
 						</p:dataTable>
 						
-						
 						<p:separator/>
-						
-						<p:selectBooleanCheckbox styleClass="p-mr-2"></p:selectBooleanCheckbox><b>Facturar Inventario</b>
+												
 						<p:outputLabel styleClass="p-ml-4"/><b>Fecha de corte:</b>
-						<p:datePicker showIcon="true" styleClass="p-ml-2" placeholder="Fecha de Corte"></p:datePicker>
+						<p:datePicker showIcon="true" styleClass="p-ml-2" placeholder="Fecha de Corte" value="#{facturacionConstanciasBean.fechaCorte}"></p:datePicker>
 						
 						<div style="margin-top:20px">
 							<p:outputLabel value="Facturar las vigencias del inventario del cliente" />
 						</div>
+						
+						<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" paginator="true" paginatorPosition="bottom"
+									 value="#{facturacionConstanciasBean.listaVigencias}" var="vigencia" rows="5" rowKey="#{vigencia.id}" rowSelectMode="add">
+						
+							<f:facet name="header">
+								<div>
+									<span>Vigencias A Facturar</span>
+								</div>
+							</f:facet>	
+							
+							<p:column selectionMode="multiple" exportable="false" />
+							
+							<p:column headerText="Folio Cliente">
+								<h:outputText value="#{vigencia.folio.folioCliente}" />
+							</p:column>
+							
+							<p:column headerText="Fecha Inicio">
+								<h:outputText value="#{vigencia.vigenciaInicio}" >
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+							
+							<p:column headerText="Fecha Final">
+								<h:outputText value="#{vigencia.vigenciaFin}" >
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+						
+						</p:dataTable>
 						
 						<p:separator/>
 						
