@@ -147,7 +147,7 @@
 						</div>
 						
 						<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}"
-						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5">
+						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="1" >
 							<f:facet name="header">							 
 								<div>								
 									<span>Constancias De Entradas A Factura</span>								
@@ -177,8 +177,9 @@
 							<p:outputLabel value="Facturar las vigencias del inventario del cliente" />
 						</div>
 						
-						<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" paginator="true" paginatorPosition="bottom"
-									 value="#{facturacionConstanciasBean.listaVigencias}" var="vigencia" rows="5" rowKey="#{vigencia.id}" rowSelectMode="add">
+						<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" value="#{facturacionConstanciasBean.listaVigencias}" 
+									 var="vigencia" rowKey="#{vigencia.id}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="1" reflow="true" 
+									 lazy="true">
 						
 							<f:facet name="header">
 								<div>
@@ -186,7 +187,7 @@
 								</div>
 							</f:facet>	
 							
-							<p:column selectionMode="multiple" exportable="false" />
+							<p:column selectionMode="multiple" exportable="false"/>
 							
 							<p:column headerText="Folio Cliente">
 								<h:outputText value="#{vigencia.folio.folioCliente}" />
@@ -215,7 +216,7 @@
 						</div>
 					
 						<div style="margin-top:20px">						
-						<p:outputLabel>[UNIDAD] indica la unidad en que se cobra el servicio</p:outputLabel>						
+							<p:outputLabel>[UNIDAD] indica la unidad en que se cobra el servicio</p:outputLabel>						
 						</div>
 						
 						<div>
@@ -223,15 +224,20 @@
 								"Inicio periodo" y "Fin periodo", la CANTIDAD indica el numero de veces que se cobrara ese periodo</p:outputLabel>						
 						</div>
 						
-						<p:dataTable lazy="true" emptyMessage="No Hay Constancias Por Facturar">
-						
-							<f:facet name="header" >
-							
-								<div>
-									<span>Servicios A Facturar</span>
-								</div>
-							
+						<p:dataTable id="dt-servicios" emptyMessage="No Hay Servicios Por Facturar" value="#{facturacionConstanciasBean.listaServicios}"
+						 var="servicio" rowKey="#{servicio.id}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5"  >
+							<f:facet name="header">							 
+								<div>								
+									<span>Constancias De Entradas A Factura</span>								
+								</div>							
 							</f:facet>
+						
+							<p:column selectionMode="multiple" exportable="false"/>
+						
+							<p:column headerText="Folio Cliente">
+								<h:outputText value="#{servicio.constanciaDeServicio.folioCliente}"/>
+							</p:column>
+							
 						
 						</p:dataTable>
 					
@@ -245,6 +251,7 @@
 					</div>
 				</div>
 			</div>
+		
 		
 		
 		</h:form>

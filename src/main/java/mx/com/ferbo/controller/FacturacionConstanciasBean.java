@@ -18,6 +18,7 @@ import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturacionDepositosDAO;
+import mx.com.ferbo.dao.FacturacionServiciosDAO;
 import mx.com.ferbo.dao.FacturacionVigenciasDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
@@ -29,6 +30,7 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
+import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
@@ -62,6 +64,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private ParametroDAO parametroDAO;
 	private FacturacionDepositosDAO facturacionConstanciasDAO;
 	private FacturacionVigenciasDAO facturacionVigenciasDAO;
+	private FacturacionServiciosDAO facturacionServiciosDAO;
 	
 	private List<Cliente> listaCliente;
 	private List<ClienteDomicilios> listaClienteDom;//recupera datos de la tabla cliente-domicilio
@@ -75,6 +78,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<MedioPago> listaMedioPago;
 	private List<ConstanciaDeDeposito> listaEntradas;
 	private List<ConstanciaFactura> listaVigencias;
+	private List<ConstanciaFacturaDs> listaServicios;
 	
 	private Date fechaFactura;
 	private Date fechaCorte;
@@ -95,6 +99,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		parametroDAO = new ParametroDAO();
 		facturacionConstanciasDAO = new FacturacionDepositosDAO();
 		facturacionVigenciasDAO = new FacturacionVigenciasDAO();
+		facturacionServiciosDAO = new FacturacionServiciosDAO();
 		
 		listaCliente = new ArrayList<>();
 		listaClienteDom = new ArrayList<>();
@@ -108,6 +113,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaMedioPago = new ArrayList<>();
 		listaEntradas = new ArrayList<>();
 		listaVigencias = new ArrayList<>();
+		listaServicios = new ArrayList<>();
 		
 	}
 	
@@ -306,6 +312,14 @@ public class FacturacionConstanciasBean implements Serializable{
 	public void setListaVigencias(List<ConstanciaFactura> listaVigencias) {
 		this.listaVigencias = listaVigencias;
 	}
+	
+	public List<ConstanciaFacturaDs> getListaServicios() {
+		return listaServicios;
+	}
+
+	public void setListaServicios(List<ConstanciaFacturaDs> listaServicios) {
+		this.listaServicios = listaServicios;
+	}
 
 	public void domicilioAvisoPorCliente() {
 		
@@ -382,8 +396,9 @@ public class FacturacionConstanciasBean implements Serializable{
 	public void cargarConstancias(){
 		this.facturacionEntradas();
 		this.facturacionVigencias();
+		this.facturacionServicios();
 		
-		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias");
+		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios");
 		
 	}
 	
@@ -426,6 +441,21 @@ public class FacturacionConstanciasBean implements Serializable{
 		if(listaVigencias.isEmpty()){
 			listaVigencias = new ArrayList<>();
 		}
+		
+	}
+	
+	public void facturacionServicios(){
+		
+		if(clienteSelect == null) {
+			return;
+		}
+		
+		if(plantaSelect == null) {
+			return;
+		}
+		
+		listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
+		
 		
 	}
 	
