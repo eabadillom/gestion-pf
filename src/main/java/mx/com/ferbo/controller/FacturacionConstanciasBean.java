@@ -80,6 +80,8 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
 	
+	private List<ConstanciaFactura> selectedVigencias;
+	
 	private Date fechaFactura;
 	private Date fechaCorte;
 	
@@ -114,6 +116,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaEntradas = new ArrayList<>();
 		listaVigencias = new ArrayList<>();
 		listaServicios = new ArrayList<>();
+		selectedVigencias = new ArrayList<>();
 		
 	}
 	
@@ -321,6 +324,14 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.listaServicios = listaServicios;
 	}
 
+	public List<ConstanciaFactura> getSelectedVigencias() {
+		return selectedVigencias;
+	}
+
+	public void setSelectedVigencias(List<ConstanciaFactura> selectedVigencias) {
+		this.selectedVigencias = selectedVigencias;
+	}
+
 	public void domicilioAvisoPorCliente() {
 		
 		iva = parametroDAO.buscarPorNombre("IVA");//
@@ -459,5 +470,11 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 	}
 	
+	
+	/* funcion para comprobacion
+	public void verVigencias() {
+		System.out.println("vigencias" + selectedVigencias.get(0));
+	}
+	*/
 
 }
