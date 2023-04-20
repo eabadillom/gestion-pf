@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -9,6 +10,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -87,7 +90,6 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	private String moneda = "MX$";
 	private int plazoSelect;
-
 	
 	public FacturacionConstanciasBean() {
 		
@@ -332,6 +334,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.selectedVigencias = selectedVigencias;
 	}
 
+
 	public void domicilioAvisoPorCliente() {
 		
 		iva = parametroDAO.buscarPorNombre("IVA");//
@@ -470,10 +473,27 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 	}
 	
+	public String paginaCalculoPrevio() throws IOException {
+		
+		if(clienteSelect==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Seleccione un cliente"));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
+		if(plantaSelect==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Seleccione una planta"));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
+		return "calculoPrevio.xhtml?faces-redirect=true";
+		
+	}
 	
 	/* funcion para comprobacion
 	public void verVigencias() {
 		System.out.println("vigencias" + selectedVigencias.get(0));
+		
+		"index?faces-redirect=true"
 	}
 	*/
 

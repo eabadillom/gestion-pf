@@ -13,7 +13,7 @@
 			<p:breadCrumb>
 				<p:menuitem value="Home" outcome="/dashboard" />
 				<p:menuitem value="Facturación" />				
-				<p:menuitem value="Facturacion Entrada/Salida" outcome="/protected/catalogos/facturacionConstancias" />
+				<p:menuitem value="Facturacion Entrada/Salida" outcome="/protected/catalogos/facturacionConstancias"  />
 			</p:breadCrumb>
 		
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
@@ -27,10 +27,10 @@
 						<p:outputPanel id="receptor">
 							<div style="text-align: center;margin-bottom: 10px">
 								<p:outputLabel value="Cliente:" styleClass="p-ml-2"></p:outputLabel>
-								<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}">
+								<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}" required="true" requiredMessage="Seleccione un Cliente">
 									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
-									<p:ajax update="receptor factura" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
+									<p:ajax update="receptor factura messages" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>						
 								</p:selectOneMenu>
 							</div>
 							
@@ -54,10 +54,10 @@
 					
 					<p:fieldset legend="Datos del Emisor" styleClass="p-mt-2">
 						<p:outputLabel value="Sucursal (Planta):" style="float:left;">		
-							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" styleClass="p-ml-2 p-mr-4">
+							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" styleClass="p-ml-2 p-mr-4" required="true" requiredMessage="Selecciona una Planta">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
 								<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
-								<p:ajax update="emisor" listener="#{facturacionConstanciasBean.serieFactura}"/>
+								<p:ajax update="emisor messages" listener="#{facturacionConstanciasBean.serieFactura}"/>
 							</p:selectOneMenu>
 						</p:outputLabel>
 						
@@ -82,9 +82,7 @@
 					<p:fieldset legend="Datos de la Facturacion" styleClass="p-mt-2">
 						<p:outputPanel id="factura">
 							<div>
-								<p:outputLabel value="Fecha Facturacion:" />
-								<p:datePicker id="fechaFact" showIcon="true" placeholder="Fecha de Factura" value="#{facturaConstanciasBean.fechaFactura}" 
-												styleClass="p-ml-2 p-mr-4" size="13"/>
+								
 								
 								<p:outputLabel value="Moneda:" />
 								<p:inputText value="#{facturacionConstanciasBean.moneda}" styleClass="p-ml-2 p-mr-4" style="width: 5%"/>
@@ -115,11 +113,11 @@
 								<p:inputText styleClass="p-ml-2 p-mr-4" ></p:inputText>
 								
 								<p:outputLabel value="IVA:"/>
-								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.iva.valor * 100}"/>%
+								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.iva.valor}"/>%
 								
 								<p:outputLabel value="Retencion:" styleClass="p-ml-4 p-mr-2"/>
 								<p:selectBooleanCheckbox/>
-								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.retencion.valor * 100}"/>%
+								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.retencion.valor}"/>%
 								
 								<p:outputLabel value="Valor Declarado:"  styleClass="p-ml-4 p-mr-2"/>
 								<p:inputNumber />
@@ -242,17 +240,17 @@
 						
 						</p:dataTable>
 					
-					</p:fieldset>
-					
-					
-					<div style="margin-top:10px; text-align: center">
-						<p:commandButton value="Guardar" ></p:commandButton>
-					</div>
+					</p:fieldset>		
+						
+																	
 					
 					</div>
 				</div>
 			</div>
 		
+		<div style="text-align: center;">
+				<p:commandButton value="Siguiente" action="#{facturacionConstanciasBean.paginaCalculoPrevio}"></p:commandButton>
+		</div>			
 		
 		
 		</h:form>
