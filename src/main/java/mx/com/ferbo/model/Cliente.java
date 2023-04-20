@@ -81,14 +81,18 @@ public class Cliente implements Serializable {
     
     @ManyToOne
     @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
-    private RegimenFiscal regimenFiscal;
+    private RegimenFiscal  regimenFiscal;
     
     @ManyToOne
     @JoinColumn(name = "cd_uso_cfdi", referencedColumnName = "cd_uso_cfdi")
     private UsoCfdi usoCfdi;
     
+    @ManyToOne
+    @JoinColumn(name = "cd_metodo_pago", referencedColumnName = "cd_metodo_pago")
+    private MetodoPago metodoPago;
     
-    
+    @Column(name="cd_forma_pago")
+    private String formaPago;
     
     @Size(max = 150)
     @Column(name = "nb_regimen_capital")
@@ -372,5 +376,23 @@ public class Cliente implements Serializable {
 	public void setUsoCfdi(UsoCfdi usoCfdi) {
 		this.usoCfdi = usoCfdi;
 	}
+
+	public MetodoPago getMetodoPago() {
+		return metodoPago;
+	}
+
+	public void setMetodoPago(MetodoPago metodoPago) {
+		this.metodoPago = metodoPago;
+	}
+
+	public String getFormaPago() {
+		return formaPago;
+	}
+
+	public void setFormaPago(String formaPago) {
+		this.formaPago = formaPago;
+	}
+
+	
     
 }

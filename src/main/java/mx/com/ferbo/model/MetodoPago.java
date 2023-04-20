@@ -21,6 +21,7 @@ import javax.validation.constraints.Size;
 
 @NamedQueries({
 		@NamedQuery(name = "MetodoPago.findAll",query = "SELECT mp FROM MetodoPago mp " ),
+		@NamedQuery(name = "MetodoPago.buscarVigentes",query = "SELECT mp FROM MetodoPago mp WHERE mp.fechaInicio <= :fecha AND (mp.fechaFinal IS NULL OR mp.fechaFinal >= :fecha) ORDER BY mp.nbMetodoPago"),
 		@NamedQuery(name = "MetodoPago.findByCdMetodoPago" ,query = "SELECT mp FROM MetodoPago mp WHERE mp.cdMetodoPago =  :cdMetodoPago"),
 		@NamedQuery(name = "MetodoPago.findByNbMetodoPago",query = "SELECT mp FROM MetodoPago mp WHERE mp.nbMetodoPago = :nbMetodoPago")})
 		//@NamedQuery(name = "MetodoPago.findByFechaInicio" ,query = "SELECT mp FROM MetodoPago mp WHERE mp.fechaInicio = :fechaInicio"),

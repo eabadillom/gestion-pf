@@ -51,6 +51,25 @@ public class UsoCfdiDAO extends IBaseDAO<UsoCfdi, String> {
 		
 		return list;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<UsoCfdi> buscaPorPersonaMoral() {
+		List<UsoCfdi> list = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("UsoCfdi.findByPersonaMoral", UsoCfdi.class);
+			list = query.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de Usos del CFDI...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return list;
+	}
 
 	@Override
 	public String actualizar(UsoCfdi e) {
@@ -75,5 +94,7 @@ public class UsoCfdiDAO extends IBaseDAO<UsoCfdi, String> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
 
 }
