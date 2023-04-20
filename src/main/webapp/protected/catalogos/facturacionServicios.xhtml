@@ -5,205 +5,175 @@
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
 	<ui:define name="title">Facturacion Servicios</ui:define>
-
 	<ui:define name="content">
-
 		<h:form id="form">
 			<p:breadCrumb>
 				<p:menuitem value="Home" outcome="/dashboard" />
 				<p:menuitem value="Facturación" />
-				<p:menuitem value="Facturacion Servicios" outcome="/protected/catalogos/facturacionServicios" />
+				<p:menuitem value="Facturacion Servicios"
+					outcome="/protected/catalogos/facturacionServicios" />
 			</p:breadCrumb>
 
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
-<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altaConstanciaServicioBean.fecha}" />
+			<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2"
+				placeholder="Fecha" disabled="true"
+				value="#{facturaServiciosBean.fecha}" />
 
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-					<p:toolbar>
-								<p:toolbarGroup>
-									<p:outputLabel value="Cliente:" styleClass="p-ml-2"></p:outputLabel>
-									<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}">
-										<f:selectItem itemLabel=" " noSelectionOption="true"></f:selectItem>
-										<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-										<p:ajax listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura detalleServicio" />
-									</p:selectOneMenu>
-					</p:toolbarGroup>
-					</p:toolbar>
-					
 						<p:fieldset legend="Datos del Receptor (Cliente)">
-						
-							<div style="width: 100%">
-								<p:outputPanel id="receptor">
 
-								<div class="field">
-				                    <span class="ui-float-label ui-input-icon-left">
-				                        <p:inputNumber value="#{facturacionConstanciasBean.clienteSelect.numeroCte}" decimalPlaces="0" readonly="true" />
-				                       <p:outputLabel value="Numero" styleClass="p-mr-2" />	
-				                    </span>
-								
+			<div style="width: 100%">
+				<p:outputPanel id="receptor">
+					<p:toolbar>
+						<p:toolbarGroup>
+							<p:outputLabel value="Cliente:" styleClass="p-ml-2"/>
+							
+						<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filterMatchMode="startsWith">
+							<f:selectItem itemLabel=" " itemValue="" noSelectionOption="true" />
+							<f:selectItems var="cte" value="#{facturaServiciosBean.listaCliente}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
+							<p:ajax update="receptor factura"  listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" />
+						</p:selectOneMenu>
+						</p:toolbarGroup>
+					</p:toolbar>
 
-				                    <span class="ui-float-label ui-input-icon-left">
-				                      <p:inputText value="#{facturacionConstanciasBean.clienteSelect.cteNombre}" size="50" readonly="true"/>
-				                       <p:outputLabel value="Razon Social" styleClass="p-mr-2" />
-				                    </span>
-				                    
-				                    <span class="ui-float-label ui-input-icon-left">
-				                  		<p:inputText value="#{facturacionConstanciasBean.clienteSelect.cteRfc}" styleClass="p-ml-2 p-mr-4" readonly="true"/>
-				                        <p:outputLabel value="RFC" styleClass="p-mr-2 p-mr-4" />
-				                    </span>
-				                    
-				                <p:outputLabel value="Domicilio:" />    
-								<p:selectOneMenu id="domicilio" autoWidth="flase" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturacionConstanciasBean.domicilioSelect}">
-									<f:selectItem itemLabel=" " noSelectionOption="true" />
-									<f:selectItems value="#{facturacionConstanciasBean.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios}" />
-								</p:selectOneMenu>
-								</div>
-				                    	
-							</p:outputPanel>
+									<div class="field">
+										<span class="ui-float-label ui-input-icon-left"> 
+										<p:inputNumber value="#{facturaServiciosBean.clienteSelect.numeroCte}" decimalPlaces="0" readonly="true" /> 
+										<p:outputLabel value="Numero" styleClass="p-mr-2" />
+										</span> 
+										
+										<span class="ui-float-label ui-input-icon-left"> 
+										<p:inputText value="#{facturaServiciosBean.clienteSelect.cteNombre}" size="50" readonly="true" /> 
+										<p:outputLabel value="Razon Social" styleClass="p-mr-2" />
+										</span> 
+										
+										<span class="ui-float-label ui-input-icon-left"> 
+										<p:inputText value="#{facturaServiciosBean.clienteSelect.cteRfc}" styleClass="p-ml-2 p-mr-4" readonly="true" /> 
+										<p:outputLabel value="RFC" styleClass="p-mr-2 p-mr-4" />
+										</span>
+
+										<p:outputLabel value="Domicilio:" />
+										<p:selectOneMenu id="domicilio" autoWidth="flase" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="">
+											<f:selectItem itemLabel=" " noSelectionOption="true" />
+											<f:selectItems value="#{facturacionConstanciasBean.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios}" />
+										</p:selectOneMenu>
+									</div>
+								</p:outputPanel>
 							</div>
 						</p:fieldset>
 
 						<p:fieldset legend="Datos del Emisor" styleClass="p-mt-2">
-						<p:outputPanel id="emisor">
-						<div class="field">
-						
-							<p:outputLabel value="Sucursal(Planta): " styleClass="p-ml-4 p-mr-2" />
-								<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" styleClass="p-ml-2 p-mr-4">
-									<f:selectItem itemLabel=" " noSelectionOption="true" />
-									<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-									<p:ajax update="emisor" listener="#{facturacionConstanciasBean.serieFactura}" />
-								</p:selectOneMenu>
+							<p:outputPanel id="emisor">
+								<div class="field">
 
-									<span class="ui-float-label ui-input-icon-left">
-				                  		<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" readonly="true" />
-				                        <p:outputLabel value="Razon Social" styleClass="p-mr-2" />
-				                    </span>
-				                    
-				                    <span class="ui-float-label ui-input-icon-left">
-								<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_rfc}" readonly="true" />
-								<p:outputLabel value="RFC" styleClass="p-mr-2" />
-							</span>
+									<p:outputLabel value="Sucursal(Planta): " styleClass="p-ml-4 p-mr-2" />
+									<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="" styleClass="p-ml-2 p-mr-4">
+										<f:selectItem itemLabel=" " noSelectionOption="true" />
+										<f:selectItems value="" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+										<p:ajax update="emisor" />
+									</p:selectOneMenu>
 
-								<p:outputLabel value="Factura: " styleClass="p-ml-4 p-mr-2" />
-								<p:selectOneMenu id="serieFactura" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.serieFacturaSelect}" styleClass="p-ml-2 p-mr-4">
-									<f:selectItem itemLabel=" " noSelectionOption="true" />
-									<f:selectItems value="#{facturacionConstanciasBean.listaSerieFactura}" var="serieFactura" itemLabel="#{serieFactura.nomSerie}-#{serieFactura.numeroActual + 1}" />
-								</p:selectOneMenu>
-							</div>
+									<span class="ui-float-label ui-input-icon-left"> <p:inputText value="" readonly="true" /> 
+									<p:outputLabel value="Razon Social" styleClass="p-mr-2" />
+									</span> <span class="ui-float-label ui-input-icon-left"> <p:inputText value="" readonly="true" /> 
+											<p:outputLabel value="RFC" styleClass="p-mr-2" />
+									</span>
+
+									<p:outputLabel value="Factura: " styleClass="p-ml-4 p-mr-2" />
+									<p:selectOneMenu id="serieFactura" autoWidth="false" converter="entityConverter" value="" styleClass="p-ml-2 p-mr-4">
+										<f:selectItem itemLabel=" " noSelectionOption="true" />
+										<f:selectItems value="" var="serieFactura" itemLabel="#{serieFactura.nomSerie}-#{serieFactura.numeroActual + 1}" />
+									</p:selectOneMenu>
+								</div>
 							</p:outputPanel>
 						</p:fieldset>
 
 						<p:fieldset legend="Datos de la Facturacion" styleClass="p-mt-2">
 							<p:outputPanel id="factura">
 								<div>
-								
-								
-						<p:divider align="left">
-						        <div class="inline-flex align-items-center">
-						            <i class="pi pi-user mr-2"/>
-						            <b>Terminos de Pago</b>
-						        </div>
-						    </p:divider>
-						    
-									<p:outputLabel value="Fecha Facturacion:" />
-									<p:datePicker id="fechaFact" showIcon="true" placeholder="Fecha de Factura" value="#{facturaConstanciasBean.fechaFactura}" styleClass="p-ml-2 p-mr-4" size="13" />
 									
+									<p:divider align="left">
+										<div class="inline-flex align-items-center">
+											<i class="pi pi-user mr-2" /> <b>Terminos de Pago</b>
+										</div>
+									</p:divider>
+
+									<p:datePicker id="fechaFact" showIcon="true" placeholder="Fecha de Factura" value="#{facturaConstanciasBean.fechaFactura}" styleClass="p-ml-2 p-mr-4" size="13" />
+
 									<p:outputLabel value="Moneda:" />
-									<p:inputText value="#{facturacionConstanciasBean.moneda}" styleClass="p-ml-2 p-mr-4" style="width: 5%" readonly="true"/>
+									<p:inputText value="#{facturacionConstanciasBean.moneda}" styleClass="p-ml-2 p-mr-4" style="width: 5%" readonly="true" />
 
 									<p:outputLabel value="Forma de pago (SAT):" />
 									<p:selectOneMenu id="medioPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturacionConstanciasBean.medioPagoSelect}">
 										<f:selectItem itemLabel=" " noSelectionOption="true" />
-										<f:selectItems value="#{facturacionConstanciasBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.mpId}-#{medioP.mpDescripcion}" itemValue="#{medioP}" />
+										<f:selectItems value="#{facturacionConstanciasBean.listaMedioPago}" var="medioP" itemLabel="" itemValue="#{medioP}" />
 									</p:selectOneMenu>
 
-									<p:outputLabel value="Metodo de Pago (SAT):" />
-									<p:selectOneMenu id="metodoPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturacionConstanciasBean.metodoPagoSelect}">
-										<f:selectItem itemLabel=" " noSelectionOption="true" />
-										<f:selectItems value="#{facturacionConstanciasBean.listaMetodoPago}" var="metodoP"
-											itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" />
-									</p:selectOneMenu>
-									
-
-									<p:outputLabel value="Plazo de Pago:" />
-									<p:selectOneMenu id="plazo" autoWidth="false" value="#{facturacionConstanciasBean.plazoSelect}" styleClass="p-ml-2 p-mr-4">
-										<f:selectItem itemLabel=" " noSelectionOption="true" />
-										<f:selectItems value="#{facturacionConstanciasBean.listaAviso}" var="aviso" itemLabel="#{aviso.avisoPlazo}" itemValue="#{aviso.avisoPlazo}" />
-									</p:selectOneMenu>									
-									</div>
-							<p:divider align="left">
-							        <div class="inline-flex align-items-center">
-							            <i class="pi pi-user mr-2"/>
-							            <b>Traslados</b>
-							        </div>
-							    </p:divider>		
-							    
-								<div style="margin-top: 10px">
-
-									 <span class="ui-float-label ui-input-icon-left">
-									<p:inputText styleClass="p-ml-2 p-mr-4"></p:inputText>
+									<span class="ui-float-label ui-input-icon-left"> 
+									<p:inputText styleClass="p-ml-2 p-mr-4"></p:inputText> 
 									<p:outputLabel value="Referencia" />
 									</span>
-									
+
+									<p:outputLabel value="Metodo de Pago (SAT):" />
+									<p:selectOneMenu id="metodoPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="">
+										<f:selectItem itemLabel=" " noSelectionOption="true" />
+										<f:selectItems value="" var="metodoP" itemLabel="" />
+									</p:selectOneMenu>
+
+									<p:outputLabel value="Plazo de Pago:" />
+									<p:selectOneMenu id="plazo" autoWidth="false" value="" styleClass="p-ml-2 p-mr-4">
+										<f:selectItem itemLabel=" " noSelectionOption="true" />
+										<f:selectItems value="#{facturacionConstanciasBean.listaAviso}" var="aviso" itemLabel="#{aviso.avisoPlazo}" itemValue="#{aviso.avisoPlazo}" />
+									</p:selectOneMenu>
+								</div>
+								<p:divider align="left">
+									<div class="inline-flex align-items-center">
+										<i class="pi pi-user mr-2" /> <b>Traslados</b>
+									</div>
+								</p:divider>
+
+								<div style="margin-top: 10px">
 									<p:outputLabel value="IVA:" />
-									<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.iva.valor * 100}" />
+									<p:inputNumber styleClass="p-ml-2" size="4" value="" />
 									%
 									<p:outputLabel value="Retencion:" styleClass="p-ml-4 p-mr-2" />
 									<p:selectBooleanCheckbox />
-									<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.retencion.valor * 100}" />
+									<p:inputNumber styleClass="p-ml-2" size="4" value="" />
 									%
-								<p:divider align="left">
-								        <div class="inline-flex align-items-center">
-								            <i class="pi pi-user mr-2"/>
-								            <b>Impuestos locales</b>
-								        </div>
-								    </p:divider>		
-
-									<p:outputLabel value="Valor Declarado:" styleClass="p-ml-4 p-mr-2" />
-									<p:inputNumber />
-									
-									<p:outputLabel value="Seguro:" styleClass="p-ml-4 p-mr-2" />
-									<p:inputNumber />
-									%
-
 								</div>
 
 								<div style="margin-top: 10px">
-								<p:panel>
-								<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." style="width: 30em;"/>
-								</p:panel>
-
+									<p:panel>
+										<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="" placeholder="Observaciones." style="width: 30em;" />
+									</p:panel>
 								</div>
-
 
 							</p:outputPanel>
 						</p:fieldset>
-						
-		<p:fieldset legend="Servicios">
-			<p:outputPanel id="detalleServicio">
 
-				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaConstanciaServicioBean.idPrecioServicio}" filterMatchMode="startsWith">
-					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
-					<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}"
-						itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
-				</p:selectOneMenu>
-				<p:column><p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/></p:column>
-				<p:column>
-				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.agregarServicio}" update="dt-servicios"/>
-				</p:column>
+						<p:fieldset legend="Servicios">
+							<p:outputPanel id="detalleServicio">
+								<p:outputLabel value="Servicio: " />
+								<p:selectOneMenu id="selServicio" autoWidth="true" value="" filterMatchMode="startsWith">
+									<f:selectItem itemLabel=" " itemValue="" noSelectionOption="true" />
+									<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{serviciosBean.selectedServicio.servicioDs}" itemValue="" />
+								</p:selectOneMenu>
+								<p:column>
+									<p:inputNumber id="txtCantidadSrv" value="" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;" />
+								</p:column>
+								<p:column>
+									<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" update="dt-servicios" />
+								</p:column>
 
-			<p:dataTable id="dt-servicios"	var="servicio" selection="#{altaConstanciaServicioBean.selServicio}" value="#{altaConstanciaServicioBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" 
-							scrollRows="2" reflow="true">	
-				<p:column headerText="Servicio seleccionado" width="8em"><h:outputText value="#{servicio.servicioCve.servicioDs}" /></p:column>
-				<p:column headerText="Cantidad" width="10em"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
-				<p:column width="8em">
-					<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.deleteServicio(servicio)}" update="dt-servicios"/>
-				</p:column>
-			</p:dataTable>
-			</p:outputPanel>
-	    </p:fieldset>
+								<p:dataTable id="dt-servicios" var="servicio" selection="" value="" scrollable="true" scrollHeight="9em" scrollRows="2" reflow="true">
+									<p:column headerText="Servicio seleccionado" width="8em"><h:outputText value="" /></p:column>
+									<p:column headerText="Cantidad" width="10em"><h:outputText value="" /></p:column>
+									<p:column width="8em"><p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2"  update="dt-servicios" /></p:column>
+								</p:dataTable>
+							</p:outputPanel>
+						</p:fieldset>
 					</div>
 				</div>
 			</div>
