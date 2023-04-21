@@ -1,6 +1,8 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -13,10 +15,12 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
@@ -24,6 +28,7 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
+import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.FacturacionDepositosDAO;
 import mx.com.ferbo.dao.FacturacionServiciosDAO;
 import mx.com.ferbo.dao.FacturacionVigenciasDAO;
@@ -31,13 +36,16 @@ import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.PlantaDAO;
+import mx.com.ferbo.dao.SerieFacturaDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
+import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.Domicilios;
+import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
@@ -46,9 +54,11 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.SerieFactura;
+import mx.com.ferbo.model.ServicioFactura;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
@@ -72,6 +82,8 @@ public class FacturaServiciosBean implements Serializable {
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
 	private List<SerieFactura> listaSerieF;
+	private List<SerieFactura> listaSerieFactura;
+	private List<ServicioFactura> alServiciosDetalle;
 
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
@@ -79,6 +91,8 @@ public class FacturaServiciosBean implements Serializable {
 	private MetodoPago metodoPagoSelect;
 	private MedioPago medioPagoSelect;
 	private Parametro iva, retencion;
+	private SerieFactura serieFacturaSelect;
+	private ServicioFactura selServicio;
 
 	private ClienteDAO clienteDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
@@ -87,9 +101,9 @@ public class FacturaServiciosBean implements Serializable {
 	private MetodoPagoDAO metodoPagoDAO;
 	private MedioPagoDAO medioPagoDAO;
 	private ParametroDAO parametroDAO;
+	private SerieFacturaDAO seriefacturaDAO;
 	private FacturacionDepositosDAO facturacionConstanciasDAO;
-	private FacturacionVigenciasDAO facturacionVigenciasDAO;
-	private FacturacionServiciosDAO facturacionServiciosDAO;
+	private FacturaDAO facturaDAO;
 
 	private Date fechaFactura;
 	private Date fechaCorte;
@@ -97,6 +111,9 @@ public class FacturaServiciosBean implements Serializable {
 	private String moneda = "MX$";
 	private int plazoSelect;
 	private Integer idCliente;
+	private Integer idPrecioServicio;
+	private BigDecimal cantidadServicio;
+	private String Obervaciones;
 
 	public FacturaServiciosBean() {
 		clientes = new ArrayList<Cliente>();
@@ -105,13 +122,15 @@ public class FacturaServiciosBean implements Serializable {
 		listaClienteDomicilio = new ArrayList<ClienteDomicilios>();
 		listaPlanta = new ArrayList<Planta>();
 		listaSerieF = new ArrayList<SerieFactura>();
+		listaSerieFactura = new ArrayList<SerieFactura>();
 		listaA = new ArrayList<Aviso>();
 		listaAviso = new ArrayList<Aviso>();
 		listaMetodoPago = new ArrayList<MetodoPago>();
+		alServiciosDetalle = new ArrayList<ServicioFactura>();
 		listaEntradas = new ArrayList<>();
 		listaVigencias = new ArrayList<>();
 		listaServicios = new ArrayList<>();
-		clienteSelect = new Cliente();
+		
 		clienteDAO = new ClienteDAO();
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		plantaDAO = new PlantaDAO();
@@ -119,7 +138,9 @@ public class FacturaServiciosBean implements Serializable {
 		metodoPagoDAO = new MetodoPagoDAO();
 		medioPagoDAO = new MedioPagoDAO();
 		parametroDAO = new ParametroDAO();
-
+		seriefacturaDAO = new SerieFacturaDAO();
+		facturacionConstanciasDAO = new FacturacionDepositosDAO();
+		clienteSelect = new Cliente();
 	}
 
 	@PostConstruct
@@ -131,13 +152,17 @@ public class FacturaServiciosBean implements Serializable {
 		listaA = avisoDAO.buscarTodos();
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
 		listaMedioPago = medioPagoDAO.buscarTodos();
+		listaSerieF = seriefacturaDAO.findAll();
 
 	}
 
 	public void domicilioAvisoPorCliente() {
+		String message = null;
+		Severity severity = null;
 		iva = parametroDAO.buscarPorNombre("IVA");//
 		retencion = parametroDAO.buscarPorNombre("RETENCION");
-		
+		Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
+		List<PrecioServicio> precioServicioList = null;
 		listaClienteDomicilio.clear();
 		listaClienteDomicilio = listaClienteDom.stream()
 				.filter(cd -> clienteSelect != null
@@ -147,19 +172,71 @@ public class FacturaServiciosBean implements Serializable {
 		if (listaClienteDomicilio.size() > 0) {
 			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
 		}
+		precioServicioList = clienteSelect.getPrecioServicioList();
+		Integer idAviso = new Integer(-1);
+		for (PrecioServicio ps : precioServicioList) {
+			Integer avisoCve = ps.getAvisoCve().getAvisoCve();
+			if (avisoCve > idAviso)
+				idAviso = new Integer(avisoCve);
+			List<PrecioServicio> list = mpPrecioServicio.get(avisoCve);
+			if (list == null) {
+				list = new ArrayList<PrecioServicio>();
+				mpPrecioServicio.put(avisoCve, list);
+			}
+			list.add(ps);
+		}
+		mpPrecioServicio.get(idAviso);
+		alServicios.clear();
+		alServicios = mpPrecioServicio.get(idAviso);
+		for (PrecioServicio ps : alServicios) {
+			log.info(ps.getServicio().getServicioDs());
+			log.info(ps.getUnidad().getUnidadDeManejoDs());
+		}
+		message = "Agregue sus servicios.";
+		severity = FacesMessage.SEVERITY_INFO;
 		AvisoCliente();
 		constancias();
 	}
 
+	public void AvisoCliente() {
+		listaAviso.clear();
+		listaAviso = listaA.stream()
+				.filter(av -> clienteSelect != null
+				? (av.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())
+						: false)
+				.collect(Collectors.toList());
+		Aviso aviso;
+		if (listaAviso.size() > 1) {
+			Optional<Aviso> numeroMax = listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
+			aviso = numeroMax.get();
+			this.plazoSelect = aviso.getAvisoPlazo();
+		} else {
+			if (listaAviso.size() == 1) {
+				aviso = listaAviso.get(0);
+				this.plazoSelect = aviso.getAvisoPlazo();
+			} else {
+				System.out.println("el cliente no tiene aviso");
+			}
+		}	
+	}
+	
+	public void serieFactura() {
+		listaSerieFactura.clear();
+		listaSerieFactura = listaSerieF.stream()
+							.filter(s -> plantaSelect != null		
+							?(s.getIdPlanta().getPlantaCve().intValue()==plantaSelect.getPlantaCve().intValue())
+									:false).collect(Collectors.toList());
+		if(listaSerieFactura.size()>0) {
+			serieFacturaSelect = listaSerieFactura.get(0);
+		}
+		constancias();
+	}
+	
 	public void constancias() {
 		this.facturacionEntradas();
 		this.facturacionVigencias();
-		this.facturacionServicios();
-
 		PrimeFaces.current().ajax().update("form:dt-constanciasE", "form:dt-vigencias", "form:dt-servicios");
-
 	}
-
 	public void facturacionEntradas() {
 
 		if (clienteSelect == null) {
@@ -180,7 +257,6 @@ public class FacturaServiciosBean implements Serializable {
 	}
 
 	public void facturacionVigencias() {
-
 		if (clienteSelect == null) {
 			return;
 		}
@@ -189,31 +265,54 @@ public class FacturaServiciosBean implements Serializable {
 			return;
 		}
 
-		System.out.println("fecha corte antes:" + fechaCorte);
-		DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
-		System.out.println("fecha corte despues:" + fechaCorte);
-		listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte,
-				plantaSelect.getPlantaCve());
-
-		if (listaVigencias.isEmpty()) {
-			listaVigencias = new ArrayList<>();
-		}
-
 	}
 
-	public void facturacionServicios() {
+	public void agregarServicio() {
+		String message = null;
+		Severity severity = null;
+		PrecioServicio precioServicio = null;
+		ServicioFactura servicio = null;
 
-		if (clienteSelect == null) {
-			return;
+		try {
+			if (this.clienteSelect == null )
+				throw new InventarioException("Debe seleccionar el cliente");
+
+			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
+				throw new InventarioException("Debe indicar la cantidad de servicios.");
+
+			if (this.idPrecioServicio == null)
+				throw new InventarioException("Debe seleccionar un servicio.");
+
+			precioServicio = this.alServicios.stream().filter(ps -> this.idPrecioServicio.equals(ps.getId()))
+					.collect(Collectors.toList()).get(0);
+			if (alServiciosDetalle == null)
+				alServiciosDetalle = new ArrayList<ServicioFactura>();
+
+			servicio = new ServicioFactura();
+			servicio.setDescripcion(precioServicio.getServicio().getServicioDs());
+			servicio.setCantidad(cantidadServicio);
+			servicio.setUdCobro(precioServicio.getUnidad().getUnidadDeManejoDs());
+			servicio.setUnidad(precioServicio.getUnidad().getUnidadDeManejoDs());
+			servicio.setTarifa(precioServicio.getPrecio());
+			servicio.setCosto(cantidadServicio.multiply(precioServicio.getPrecio()));
+			alServiciosDetalle.add(servicio);
+			
+			message = "Servicio(s) agregado(s) correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			log.error("Problema para obtener la información de los productos...", ex);
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de servicios del cliente.", ex);
+			message = "Problema con la información de servicios.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Servicio",message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
 		}
-
-		if (plantaSelect == null) {
-			return;
-		}
-
-		listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
-
 	}
+
 
 	/*
 	 * public void filtrarCliente() { String message = null; Severity severity =
@@ -246,29 +345,38 @@ public class FacturaServiciosBean implements Serializable {
 	 * 
 	 * }
 	 */
-	public void AvisoCliente() {
-		listaAviso.clear();
-		listaAviso = listaA.stream()
-				.filter(av -> clienteSelect != null
-						? (av.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())
-						: false)
-				.collect(Collectors.toList());
-		Aviso aviso;
-		if (listaAviso.size() > 1) {
-			Optional<Aviso> numeroMax = listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
-			aviso = numeroMax.get();
-			this.plazoSelect = aviso.getAvisoPlazo();
-		} else {
-			if (listaAviso.size() == 1) {
-				aviso = listaAviso.get(0);
-				this.plazoSelect = aviso.getAvisoPlazo();
-			} else {
-				System.out.println("el cliente no tiene aviso");
+		public void SaveFactura() {
+			String message = null;
+			Severity severity = null;
+			Factura factura;
+			Cliente cliente;
+			List<Factura> listaFactura = null;
+			
+			try {
+				if(this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
+					throw new InventarioException("Debe seleccionar almenos un servicio");
+				/*factura.setNombreCliente(null);
+				factura.setNumero(null);
+				factura.setRetencion(null);
+				factura.setRfc(null);*/
+				
+			}catch (Exception ex) {
+				
 			}
 		}
-
+		
+	public void deleteServicio(ServicioFactura Srv) {
+		this.alServiciosDetalle.remove(Srv);
+		
 	}
-
+	
+	public void reload() throws IOException {
+	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+	}
+	
+	
+	/*Getters y Setters*/
 	public Cliente getClienteSelect() {
 		return clienteSelect;
 	}
@@ -499,6 +607,62 @@ public class FacturaServiciosBean implements Serializable {
 
 	public void setListaSerieF(List<SerieFactura> listaSerieF) {
 		this.listaSerieF = listaSerieF;
+	}
+
+	public List<SerieFactura> getListaSerieFactura() {
+		return listaSerieFactura;
+	}
+
+	public void setListaSerieFactura(List<SerieFactura> listaSerieFactura) {
+		this.listaSerieFactura = listaSerieFactura;
+	}
+
+	public SerieFactura getSerieFacturaSelect() {
+		return serieFacturaSelect;
+	}
+
+	public void setSerieFacturaSelect(SerieFactura serieFacturaSelect) {
+		this.serieFacturaSelect = serieFacturaSelect;
+	}
+
+	public Integer getIdPrecioServicio() {
+		return idPrecioServicio;
+	}
+
+	public void setIdPrecioServicio(Integer idPrecioServicio) {
+		this.idPrecioServicio = idPrecioServicio;
+	}
+
+	public List<ServicioFactura> getAlServiciosDetalle() {
+		return alServiciosDetalle;
+	}
+
+	public void setAlServiciosDetalle(List<ServicioFactura> alServiciosDetalle) {
+		this.alServiciosDetalle = alServiciosDetalle;
+	}
+
+	public ServicioFactura getSelServicio() {
+		return selServicio;
+	}
+
+	public void setSelServicio(ServicioFactura selServicio) {
+		this.selServicio = selServicio;
+	}
+
+	public BigDecimal getCantidadServicio() {
+		return cantidadServicio;
+	}
+
+	public void setCantidadServicio(BigDecimal cantidadServicio) {
+		this.cantidadServicio = cantidadServicio;
+	}
+
+	public String getObervaciones() {
+		return Obervaciones;
+	}
+
+	public void setObervaciones(String obervaciones) {
+		Obervaciones = obervaciones;
 	}
 	
 }
