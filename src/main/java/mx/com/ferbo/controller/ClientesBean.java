@@ -300,6 +300,14 @@ public class ClientesBean implements Serializable {
 	        PrimeFaces.current().ajax().update(":form:messages");
 		}
 	}
+	
+	public void eliminarClienteContacto() {
+		
+	}
+	
+	public void eliminarMedioContacto() {
+		
+	}
 
 	/**
 	 * Getters & Setters
