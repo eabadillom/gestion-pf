@@ -1,14 +1,19 @@
 package mx.com.ferbo.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class MedioPagoDAO extends IBaseDAO<MedioPago,Integer>{
+	private static Logger log = Logger.getLogger(MedioPagoDAO.class);
 
 	@Override
 	public MedioPago buscarPorId(Integer id) {
@@ -30,6 +35,27 @@ public class MedioPagoDAO extends IBaseDAO<MedioPago,Integer>{
 	public List<MedioPago> buscarPorCriterios(MedioPago e) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<MedioPago> buscarVigentes(Date fecha) {
+		List<MedioPago> list = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("MedioPago.findVigentes", MedioPago.class)
+					.setParameter("fecha", fecha)
+					;
+			list = query.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para leer el catálogo de medios de pago...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return list;
 	}
 
 	@Override

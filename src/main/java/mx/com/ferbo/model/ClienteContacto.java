@@ -42,43 +42,59 @@ import javax.validation.constraints.Size;
 public class ClienteContacto implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "st_habilitado")
     private boolean stHabilitado;
+    
     @Size(max = 50)
     @Column(name = "nb_usuario")
     private String nbUsuario;
+    
     @Size(max = 1024)
     @Column(name = "nb_password")
     private String nbPassword;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 1)
     @Column(name = "st_usuario")
     private String stUsuario;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fh_alta")
     @Temporal(TemporalType.DATE)
     private Date fhAlta;
+    
     @Column(name = "fh_cad_passwd")
     @Temporal(TemporalType.DATE)
     private Date fhCadPasswd;
+    
     @Column(name = "fh_ult_acceso")
     @Temporal(TemporalType.DATE)
     private Date fhUltAcceso;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @JoinColumn(name = "id_cliente", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente idCliente;
+    
     @JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
     @ManyToOne(optional = false)
     private Contacto idContacto;
+    
+    @Column(name="st_facturacion")
+    private Boolean recibeFacturacion;
+    
+    @Column(name="st_inventario")
+    private Boolean recibeInventario;
 
     public ClienteContacto() {
     	idCliente = new Cliente();
@@ -200,5 +216,21 @@ public class ClienteContacto implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.ClienteContacto[ id=" + id + " ]";
     }
+
+	public Boolean getRecibeFacturacion() {
+		return recibeFacturacion;
+	}
+
+	public void setRecibeFacturacion(Boolean recibeFacturacion) {
+		this.recibeFacturacion = recibeFacturacion;
+	}
+
+	public Boolean getRecibeInventario() {
+		return recibeInventario;
+	}
+
+	public void setRecibeInventario(Boolean recibeInventario) {
+		this.recibeInventario = recibeInventario;
+	}
     
 }
