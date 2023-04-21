@@ -10,8 +10,21 @@
 	<ui:define name="content">
 	
 	<h:form id="form">
+	
+	<p:breadCrumb>
+		<p:menuitem value="Home" outcome="/dashboard"/>
+		<p:menuitem value="Facturacion Constancias" outcome="facturacionConstancias"/>
+		<p:menuitem value="calculo Previo" outcome="calculoPrevio" />
+	</p:breadCrumb>
+	
+		<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
 		
-	<p:button value="Atras" outcome="/protected/catalogos/facturacionConstancias"></p:button>
+					<p:button value="Atras" outcome="/protected/catalogos/facturacionConstancias"></p:button>
+					</div>
+				</div>
+		</div>
 	
 	</h:form>
 	

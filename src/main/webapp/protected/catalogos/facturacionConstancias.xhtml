@@ -113,11 +113,11 @@
 								<p:inputText styleClass="p-ml-2 p-mr-4" ></p:inputText>
 								
 								<p:outputLabel value="IVA:"/>
-								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.iva.valor}"/>%
+								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.resIva}"/>%
 								
 								<p:outputLabel value="Retencion:" styleClass="p-ml-4 p-mr-2"/>
 								<p:selectBooleanCheckbox/>
-								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.retencion.valor}"/>%
+								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.resRetencion}"/>%
 								
 								<p:outputLabel value="Valor Declarado:"  styleClass="p-ml-4 p-mr-2"/>
 								<p:inputNumber />
@@ -145,12 +145,17 @@
 						</div>
 						
 						<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}"
-						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="3" >
+						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="3" selection="#{facturacionConstanciasBean.selectedEntradas}">
 							<f:facet name="header">							 
 								<div>								
 									<span>Constancias De Entradas A Factura</span>								
 								</div>							
 							</f:facet>
+							
+							<p:ajax event="rowSelect" />
+							<p:ajax event="rowSelectCheckbox" />
+							<p:ajax event="rowUnselect" update="form:dt-constanciasE" />
+							<p:ajax event="rowUnselectCheckbox" update="form:dt-constanciasE" />
 						
 							<p:column selectionMode="multiple" exportable="false"/>
 						
@@ -184,6 +189,11 @@
 									<span>Vigencias A Facturar</span>
 								</div>
 							</f:facet>	
+							
+							<p:ajax event="rowSelect" />
+							<p:ajax event="rowSelectCheckbox" />
+							<p:ajax event="rowUnselect" update="form:dt-vigencias" />
+							<p:ajax event="rowUnselectCheckbox" update="form:dt-vigencias" />
 							
 							<p:column selectionMode="multiple" exportable="false"></p:column>
 							
@@ -224,12 +234,17 @@
 						
 						
 						<p:dataTable id="dt-servicios" emptyMessage="No Hay Servicios Por Facturar" value="#{facturacionConstanciasBean.listaServicios}"
-						 var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}" paginator="true" paginatorPosition="bottom" rows="5" rowSelectMode="add">
+						 var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}" paginator="true" paginatorPosition="bottom" rows="5" rowSelectMode="add" selection="#{facturacionConstanciasBean.selectedServicios}">
 							<f:facet name="header">							 
 								<div>								
 									<span>Constancias De Servicio A Factura</span>								
 								</div>							
 							</f:facet>
+						
+							<p:ajax event="rowSelect" />
+							<p:ajax event="rowSelectCheckbox" />
+							<p:ajax event="rowUnselect" update="form:dt-servicios"/>
+							<p:ajax event="rowUnselectCheckbox" update="form:dt-servicios" />
 						
 							<p:column selectionMode="multiple" exportable="false"/>
 						
@@ -241,15 +256,14 @@
 						</p:dataTable>
 					
 					</p:fieldset>		
-						
-																	
+															
 					
 					</div>
 				</div>
 			</div>
 		
 		<div style="text-align: center;">
-				<p:commandButton value="Siguiente" action="#{facturacionConstanciasBean.paginaCalculoPrevio}"></p:commandButton>
+				<p:commandButton value="Siguiente" action="#{facturacionConstanciasBean.paginaCalculoPrevio}" process="@this" actionListener="#{facturacionConstanciasBean.validar()}"/>				
 		</div>			
 		
 		

@@ -2,6 +2,7 @@ package mx.com.ferbo.controller;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -15,7 +16,10 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.eclipse.persistence.sessions.server.Server;
 import org.primefaces.PrimeFaces;
+
+import com.mysql.cj.x.protobuf.Mysqlx.Error.Severity;
 
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
@@ -83,13 +87,17 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
 	
+	private List<ConstanciaDeDeposito> selectedEntradas;
 	private List<ConstanciaFactura> selectedVigencias;
+	private List<ConstanciaFacturaDs> selectedServicios;
 	
 	private Date fechaFactura;
 	private Date fechaCorte;
 	
 	private String moneda = "MX$";
 	private int plazoSelect;
+	private BigDecimal resIva = new BigDecimal(0);
+	private BigDecimal resRetencion = new BigDecimal(0);
 	
 	public FacturacionConstanciasBean() {
 		
@@ -118,7 +126,9 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaEntradas = new ArrayList<>();
 		listaVigencias = new ArrayList<>();
 		listaServicios = new ArrayList<>();
+		selectedEntradas = new ArrayList<>();
 		selectedVigencias = new ArrayList<>();
+		selectedServicios = new ArrayList<>();
 		
 	}
 	
@@ -276,22 +286,6 @@ public class FacturacionConstanciasBean implements Serializable{
 
 	public void setListaMedioPago(List<MedioPago> listaMedioPago) {
 		this.listaMedioPago = listaMedioPago;
-	}
-	
-	public Parametro getRetencion() {
-		return retencion;
-	}
-
-	public void setRetencion(Parametro retencion) {
-		this.retencion = retencion;
-	}
-	
-	public Parametro getIva() {
-		return iva;
-	}
-
-	public void setIva(Parametro iva) {
-		this.iva = iva;
 	}	
 
 	public List<ConstanciaDeDeposito> getListaEntradas() {
@@ -334,11 +328,46 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.selectedVigencias = selectedVigencias;
 	}
 
+	public List<ConstanciaDeDeposito> getSelectedEntradas() {
+		return selectedEntradas;
+	}
+
+	public void setSelectedEntradas(List<ConstanciaDeDeposito> selectedEntradas) {
+		this.selectedEntradas = selectedEntradas;
+	}
+
+	public List<ConstanciaFacturaDs> getSelectedServicios() {
+		return selectedServicios;
+	}
+
+	public void setSelectedServicios(List<ConstanciaFacturaDs> selectedServicios) {
+		this.selectedServicios = selectedServicios;
+	}
+
+	public BigDecimal getResIva() {
+		return resIva;
+	}
+
+	public void setResIva(BigDecimal resIva) {
+		this.resIva = resIva;
+	}
+
+	public BigDecimal getResRetencion() {
+		return resRetencion;
+	}
+
+	public void setResRetencion(BigDecimal resRetencion) {
+		this.resRetencion = resRetencion;
+	}
 
 	public void domicilioAvisoPorCliente() {
 		
 		iva = parametroDAO.buscarPorNombre("IVA");//
+		resIva = new BigDecimal(iva.getValor()); 
+		resIva = resIva.multiply(new BigDecimal(100));//necesario ya que manda error al multiplicar desde el fron-end+++
 		retencion = parametroDAO.buscarPorNombre("RETENCION");//***
+		resRetencion = new BigDecimal(retencion.getValor());
+		resRetencion = resRetencion.multiply(new BigDecimal(100));//+++
 		//Domicilio
 		listaClienteDomicilio.clear();
 		listaClienteDomicilio = listaClienteDom.stream()
@@ -475,26 +504,36 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public String paginaCalculoPrevio() throws IOException {
 		
-		if(clienteSelect==null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Seleccione un cliente"));
-			PrimeFaces.current().ajax().update("form:messages");
-		}
+		if(clienteSelect!=null & plantaSelect!=null) {
+			return "calculoPrevio.xhtml?faces-redirect=true";
+		} 
 		
-		if(plantaSelect==null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Seleccione una planta"));
-			PrimeFaces.current().ajax().update("form:messages");
-		}
-		
-		return "calculoPrevio.xhtml?faces-redirect=true";
+		return "";
 		
 	}
 	
-	/* funcion para comprobacion
-	public void verVigencias() {
-		System.out.println("vigencias" + selectedVigencias.get(0));
+	public void validar() {
 		
-		"index?faces-redirect=true"
+		if(clienteSelect==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Cliente","Seleccione un cliente"));
+		}
+		
+		if(plantaSelect==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Planta","Seleccione una Planta"));
+		}
+		
+		PrimeFaces.current().ajax().update("form:messages");
+		
 	}
-	*/
+	
+	// funcion para comprobacion
+	public void verVigencias() {
+		System.out.println("entradas" + selectedEntradas.get(0));
+		System.out.println("vigencias" + selectedVigencias.get(0));
+		System.out.println("servicios" + selectedServicios.get(0));
+		//"index?faces-redirect=true"
+		//calculoPrevio.xhtml?faces-redirect=true
+	}
+	
 
 }
