@@ -17,11 +17,37 @@
 		<p:menuitem value="calculo Previo" outcome="calculoPrevio" />
 	</p:breadCrumb>
 	
+	<p:growl id="messages" showDetail="true" life="4000"></p:growl>
+	
 		<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-		
+					
 					<p:button value="Atras" outcome="/protected/catalogos/facturacionConstancias"></p:button>
+					
+					<p:dataTable id="dt-selectedEntradas" value="#{calculoPrevioBean.listaEntradas}" var="entrada" rowKey="#{entrada.folio}">
+					
+					<f:facet name="header">
+						<div>
+							<span>Constancias De Entrada</span>
+						</div>
+					</f:facet>
+					
+					<p:column headerText="Folio Cliente">
+						<h:outputText value="#{entrada.folioCliente}" />
+					</p:column>
+					
+					<p:column headerText="Fecha Ingreso">
+						<h:outputText value="#{entrada.fechaIngreso}">
+							<f:convertDateTime pattern="dd/MMM/YYYY" />
+						</h:outputText>
+					</p:column>
+					
+					</p:dataTable>
+					
+					
+					
+					
 					</div>
 				</div>
 		</div>

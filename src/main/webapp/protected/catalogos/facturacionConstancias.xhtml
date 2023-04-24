@@ -156,6 +156,7 @@
 							<p:ajax event="rowSelectCheckbox" />
 							<p:ajax event="rowUnselect" update="form:dt-constanciasE" />
 							<p:ajax event="rowUnselectCheckbox" update="form:dt-constanciasE" />
+							<p:ajax event="toggleSelect" />
 						
 							<p:column selectionMode="multiple" exportable="false"/>
 						
@@ -194,6 +195,7 @@
 							<p:ajax event="rowSelectCheckbox" />
 							<p:ajax event="rowUnselect" update="form:dt-vigencias" />
 							<p:ajax event="rowUnselectCheckbox" update="form:dt-vigencias" />
+							<p:ajax event="toggleSelect" />
 							
 							<p:column selectionMode="multiple" exportable="false"></p:column>
 							
@@ -240,11 +242,12 @@
 									<span>Constancias De Servicio A Factura</span>								
 								</div>							
 							</f:facet>
-						
+							
 							<p:ajax event="rowSelect" />
 							<p:ajax event="rowSelectCheckbox" />
 							<p:ajax event="rowUnselect" update="form:dt-servicios"/>
 							<p:ajax event="rowUnselectCheckbox" update="form:dt-servicios" />
+							<p:ajax event="toggleSelect" />
 						
 							<p:column selectionMode="multiple" exportable="false"/>
 						
@@ -263,7 +266,7 @@
 			</div>
 		
 		<div style="text-align: center;">
-				<p:commandButton value="Siguiente" action="#{facturacionConstanciasBean.paginaCalculoPrevio}" process="@this" actionListener="#{facturacionConstanciasBean.validar()}"/>				
+				<p:commandButton value="Siguiente" action="#{facturacionConstanciasBean.inyeccionBean}" process="@this " />				
 		</div>			
 		
 		

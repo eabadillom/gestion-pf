@@ -11,15 +11,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
-import org.eclipse.persistence.sessions.server.Server;
 import org.primefaces.PrimeFaces;
-
-import com.mysql.cj.x.protobuf.Mysqlx.Error.Severity;
 
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
@@ -48,7 +47,7 @@ import mx.com.ferbo.util.DateUtil;
 
 
 @Named
-@ViewScoped
+@SessionScoped
 public class FacturacionConstanciasBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
@@ -98,6 +97,11 @@ public class FacturacionConstanciasBean implements Serializable{
 	private int plazoSelect;
 	private BigDecimal resIva = new BigDecimal(0);
 	private BigDecimal resRetencion = new BigDecimal(0);
+	
+    private FacesContext faceContext;
+    private HttpServletRequest request;
+    private HttpSession session;
+	
 	
 	public FacturacionConstanciasBean() {
 		
@@ -512,28 +516,34 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 	}
 	
-	public void validar() {
+	public String inyeccionBean(){
 		
-		if(clienteSelect==null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Cliente","Seleccione un cliente"));
+		
+		try {
+			
+			faceContext = FacesContext.getCurrentInstance();
+            request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+            session = request.getSession(true);
+			session.setAttribute("entradas", selectedEntradas);
+			session.setAttribute("vigencias", selectedVigencias);
+			
+		}catch(Exception e) {
+			System.out.println("ERROR:" + e.getMessage());
 		}
 		
-		if(plantaSelect==null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Planta","Seleccione una Planta"));
-		}
-		
-		PrimeFaces.current().ajax().update("form:messages");
+		return "calculoPrevio.xhtml?faces-redirect=true";
 		
 	}
 	
+	
 	// funcion para comprobacion
-	public void verVigencias() {
+	/*public void verVigencias() {
 		System.out.println("entradas" + selectedEntradas.get(0));
 		System.out.println("vigencias" + selectedVigencias.get(0));
 		System.out.println("servicios" + selectedServicios.get(0));
 		//"index?faces-redirect=true"
 		//calculoPrevio.xhtml?faces-redirect=true
-	}
+	}*/
 	
 
 }
