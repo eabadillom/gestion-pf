@@ -5,7 +5,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	template="/WEB-INF/template.xhtml">
 	
-	<ui:define name="title">Facturacion Entradas/Salidas</ui:define>
+	<ui:define name="title">Facturacion Constancias</ui:define>
 	
 	<ui:define name="content">
 	
@@ -145,7 +145,7 @@
 						</div>
 						
 						<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}"
-						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="3" selection="#{facturacionConstanciasBean.selectedEntradas}">
+						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5" selection="#{facturacionConstanciasBean.selectedEntradas}">
 							<f:facet name="header">							 
 								<div>								
 									<span>Constancias De Entradas A Factura</span>								
@@ -183,11 +183,11 @@
 						
 						<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" value="#{facturacionConstanciasBean.listaVigencias}" 
 						selection="#{facturacionConstanciasBean.selectedVigencias}" var="vigencia" rowKey="#{vigencia.folio.folio}" rowSelectMode="add"
-						paginator="true" paginatorPosition="bottom" rows="1">
+						paginator="true" paginatorPosition="bottom" rows="5">
 						
 							<f:facet name="header">
 								<div>
-									<span>Vigencias A Facturar</span>
+									<span>Constancias De Vigencias A Facturar</span>
 								</div>
 							</f:facet>	
 							
@@ -255,7 +255,12 @@
 								<h:outputText value="#{servicio.constanciaDeServicio.folioCliente}"/>
 							</p:column>
 							
-						
+							<p:column headerText="Fecha">
+								<h:outputText value="#{servicio.constanciaDeServicio.fecha}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+							
 						</p:dataTable>
 					
 					</p:fieldset>		

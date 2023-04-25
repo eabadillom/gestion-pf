@@ -25,7 +25,8 @@
 					
 					<p:button value="Atras" outcome="/protected/catalogos/facturacionConstancias"></p:button>
 					
-					<p:dataTable id="dt-selectedEntradas" value="#{calculoPrevioBean.listaEntradas}" var="entrada" rowKey="#{entrada.folio}">
+					<p:dataTable id="dt-selectedEntradas" value="#{calculoPrevioBean.listaEntradas}" var="entrada" 
+					rowKey="#{entrada.folio}" rows="5" reflow="true" paginator="true" paginatorPosition="bottom">
 					
 					<f:facet name="header">
 						<div>
@@ -45,6 +46,48 @@
 					
 					</p:dataTable>
 					
+					<p:dataTable id="dt-selectVigencias" value="#{calculoPrevioBean.listaVigencias}" var="vigencia" rowKey="#{vigencia.folio.folio}" 
+								rows="5" reflow="true" paginator="true" paginatorPosition="bottom">
+					
+					<f:facet name="header">
+						<div>
+							<span>Constancias De Vigencias</span>
+						</div>
+					</f:facet>
+					
+					<p:column headerText="Folio Cliente">
+						<h:outputText value="#{vigencia.folioCliente}" />
+					</p:column>
+					
+					<p:column headerText="Fecha Inicial">
+						<h:outputText value="#{vigencia.vigenciaInicio}" >
+							<f:convertDateTime pattern="dd/MMM/YYYY" />
+						</h:outputText>
+					</p:column>					
+					
+					<p:column headerText="Fecha Final">
+						<h:outputText value="#{vigencia.vigenciaFin}">
+						<f:convertDateTime pattern="dd/MMM/YYYY" />
+						</h:outputText>
+					</p:column>
+					
+					</p:dataTable>
+					
+					<p:dataTable id="dt-selectServicios" value="#{calculoPrevioBean.listaServicios}" var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}"
+								 rows="5" paginator="true" paginatorPosition="bottom">
+					
+					<p:column headerText="Folio Cliente">
+						<h:outputText value="#{servicio.folioCliente}" />
+					</p:column>
+					
+					
+					<p:column headerText="Fecha">
+						<h:outputText value="#{servicio.constanciaDeServicio.fecha}">
+							<f:convertDateTime pattern="dd/MMM/YYYY" />
+						</h:outputText>
+					</p:column>
+					
+					</p:dataTable>
 					
 					
 					

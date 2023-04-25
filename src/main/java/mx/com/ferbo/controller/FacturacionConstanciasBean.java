@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -441,6 +440,15 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 
 	public void cargarConstancias(){
+		
+		if(clienteSelect == null){
+			return;
+		}
+		
+		if(plantaSelect == null){
+			return;
+		}
+		
 		this.facturacionEntradas();
 		this.facturacionVigencias();
 		this.facturacionServicios();
@@ -451,13 +459,6 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionEntradas(){
 	
-		if(clienteSelect == null){
-			return;
-		}
-		
-		if(plantaSelect == null){
-			return;
-		}
 		
 		listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
 		
@@ -469,13 +470,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionVigencias(){
 		
-		if(clienteSelect == null){
-			return;			
-		}
 		
-		if(plantaSelect == null){
-			return;			
-		}
 		
 		System.out.println("fecha corte antes:" + fechaCorte);
 		
@@ -493,16 +488,12 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionServicios(){
 		
-		if(clienteSelect == null) {
-			return;
-		}
-		
-		if(plantaSelect == null) {
-			return;
-		}
 		
 		listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
 		
+		if(listaServicios.isEmpty()) {
+			listaServicios = new ArrayList<>();
+		}
 		
 	}
 	
@@ -520,12 +511,12 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		
 		try {
-			
 			faceContext = FacesContext.getCurrentInstance();
             request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
             session = request.getSession(true);
 			session.setAttribute("entradas", selectedEntradas);
 			session.setAttribute("vigencias", selectedVigencias);
+			session.setAttribute("servicios", selectedServicios);
 			
 		}catch(Exception e) {
 			System.out.println("ERROR:" + e.getMessage());
