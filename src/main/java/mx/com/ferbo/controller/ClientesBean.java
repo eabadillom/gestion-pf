@@ -16,7 +16,9 @@ import javax.inject.Named;
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.ClienteContactoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
+import mx.com.ferbo.dao.MedioCntDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
@@ -24,10 +26,12 @@ import mx.com.ferbo.dao.TipoMailDAO;
 import mx.com.ferbo.dao.UsoCfdiDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
+import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
+import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.ClienteUtil;
@@ -65,6 +69,8 @@ public class ClientesBean implements Serializable {
 	private UsoCfdiDAO usoCfdiDAO;
 	private MetodoPagoDAO metodoPagoDAO;
 	private MedioPagoDAO medioPagoDAO;
+	private ClienteContactoDAO clienteContactoDAO;
+	private MedioCntDAO medioCntDAO;
 	
 	SecurityUtil util;
 
@@ -81,6 +87,8 @@ public class ClientesBean implements Serializable {
 		usoCfdiDAO = new UsoCfdiDAO();
 		metodoPagoDAO = new MetodoPagoDAO();
 		medioPagoDAO = new MedioPagoDAO();
+		clienteContactoDAO = new ClienteContactoDAO();
+		medioCntDAO = new MedioCntDAO();
 	}
 
 	@PostConstruct
@@ -264,6 +272,20 @@ public class ClientesBean implements Serializable {
 		clienteContactoSelected.setNbPassword(util.getRandomString());
 	}
 	
+	public void nuevoMedio() {
+		System.out.println("Nuevo medio de contacto...");
+		this.medioContactoSelected = new MedioCnt();
+		
+	}
+	
+	public void addTipoMedioContacto() {
+		if( "t".equalsIgnoreCase(this.medioContactoSelected.getTpMedio()) ) {
+			this.medioContactoSelected.setIdTelefono(new Telefono());
+		} else if ("m".equalsIgnoreCase(this.medioContactoSelected.getTpMedio())) {
+			this.medioContactoSelected.setIdMail(new Mail());
+		}
+	}
+	
 	public void regimenSelect() {
 		FacesMessage message = null;
 		Severity severity = null;
@@ -301,12 +323,94 @@ public class ClientesBean implements Serializable {
 		}
 	}
 	
+	public void guardarContacto() {
+		System.out.println("Guardando datos generales del contacto...");
+	}
+	
 	public void eliminarClienteContacto() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
 		
+		try {
+			if(this.clienteContactoSelected == null)
+				throw new InventarioException("No hay un contacto seleccionado.");
+			clienteContactoDAO.eliminar(clienteContactoSelected);
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Contacto eliminado correctamente.";
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			mensaje = "Ha ocurrido un problema al eliminar el contacto.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages");
+		}
+		
+		
+	}
+	
+	public void guardaMedioContacto() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			if(this.medioContactoSelected == null)
+				throw new InventarioException("No hay un medio de contacto seleccionado.");
+			
+			this.medioContactoSelected.setIdContacto(this.clienteContactoSelected.getIdContacto());
+			List<MedioCnt> medioCntList = new ArrayList<>();
+			medioCntList.add(this.medioContactoSelected);
+			this.medioContactoSelected.getIdMail().setMedioCntList(medioCntList);
+			this.clienteContactoSelected.getIdContacto().getMedioCntList().add(this.medioContactoSelected);
+			
+			clienteContactoDAO.actualizar(this.clienteContactoSelected);
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Medio de contacto registrado correctamente.";
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			mensaje = "Ha ocurrido un problema al eliminar el contacto.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages");
+		}
 	}
 	
 	public void eliminarMedioContacto() {
 		
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			if( this.medioContactoSelected == null )
+				throw new InventarioException("No hay un medio de contacto seleccionado.");
+			
+			medioCntDAO.eliminar(this.medioContactoSelected);
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Medio de contacto eliminado correctamente.";
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			mensaje = "Ha ocurrido un problema al eliminar el medio de contacto.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages");
+		}
 	}
 
 	/**

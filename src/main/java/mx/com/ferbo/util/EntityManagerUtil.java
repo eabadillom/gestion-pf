@@ -47,7 +47,12 @@ public class EntityManagerUtil {
 	}
 	
 	public static void close(EntityManager em) {
-		if(em != null)
+		if(em == null)
+			return;
+		
+		if(em.isOpen())
 			em.close();
+		em = null;
+		return;
 	}
 }
