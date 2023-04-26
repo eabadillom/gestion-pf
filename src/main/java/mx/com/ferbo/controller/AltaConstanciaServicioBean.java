@@ -119,8 +119,8 @@ public class AltaConstanciaServicioBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		log.info("Entrando a Init...");
-		clientes = clienteDAO.buscarTodos();
 		fecha = new Date();
+		clientes = clienteDAO.buscarTodos();
 		alUnidades = udmDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
@@ -128,7 +128,6 @@ public class AltaConstanciaServicioBean implements Serializable {
 	}
 
 	public void filtrarCliente() {
-
 		String message = null;
 		Severity severity = null;
 		EntityManager manager = null;
