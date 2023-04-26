@@ -67,9 +67,11 @@
 									<p:dataTable id="dtContactos" var="contacto" value="#{cliente.clienteContactoList}" reflow="true" rowKey="#{contaco.idContacto.idContacto}">
 										<f:facet name="header">
 											<div class="products-table-header" style="background-color: #CCCCCC;">
-												<span style="font-weight: bold">Contactos del cliente</span> <span class="filter-container ui-input-icon-left"> </span> <span
-													class="filter-container ui-input-icon-left"> <p:commandButton icon="pi pi-user-plus" styleClass="ui-button-success" style="margin-right: .5rem"
-														actionListener="#{clientesBean.nuevoContacto(cliente)}" process="@this" oncomplete="PF('dialogAddContacto').show();" resetValues="true" update="form:pnlContacto" />
+												<span style="font-weight: bold">Contactos del cliente</span> <span class="filter-container ui-input-icon-left"> </span>
+												<span class="filter-container ui-input-icon-left">
+													<p:commandButton icon="pi pi-user-plus" styleClass="ui-button-success" style="margin-right: .5rem"
+														actionListener="#{clientesBean.nuevoContacto(cliente)}" process="@this" oncomplete="PF('dialogAddContacto').show();"
+														resetValues="true" update="form:pnlContacto" />
 												</span>
 											</div>
 										</f:facet>
@@ -302,7 +304,7 @@
 											</div>
 										</div>
 									</div>
-									<p:dataTable lazy="true" value="#{clientesBean.clienteContactoSelected.idContacto.medioCntList}" var="medio" rowKey="#{medio.idMedio}">
+									<p:dataTable id="dtMedioContacto" lazy="true" value="#{clientesBean.clienteContactoSelected.idContacto.medioCntList}" var="medio" rowKey="#{medio.idMedio}">
 										<f:facet name="header">
 											<div class="products-table-header">
 												<span style="font-weight: bold"></span> <span class="filter-container ui-input-icon-left"> </span> <span class="filter-container ui-input-icon-left"> <p:commandButton
@@ -331,7 +333,7 @@
 											<h:outputText value="#{medio.stMedio eq true ? 'ACTIVO' : 'INACTIVO'}" />
 										</p:column>
 										<p:column width="5%" style="text-align: right !important;">
-											<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteMedioContactoDialog').show()">
+											<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteMedioContactoDialog').show()" update="dtMedioContacto">
 												<f:setPropertyActionListener value="#{medio}" target="#{clientesBean.medioContactoSelected}" />
 											</p:commandButton>
 										</p:column>
@@ -352,7 +354,7 @@
 									<div class="p-field">
 										<p:outputLabel>Tipo de medio</p:outputLabel>
 										<p:selectOneMenu id="tpMedio" value="#{clientesBean.medioContactoSelected.tpMedio}">
-											<p:ajax process="@this tpMedio" update="pnlAddMedio" />
+											<p:ajax process="@this tpMedio" update="pnlAddMedio" listener="#{clientesBean.addTipoMedioContacto}" />
 											<f:selectItem itemLabel="--Seleccione--" />
 											<f:selectItem itemLabel="Teléfono" itemValue="t" />
 											<f:selectItem itemLabel="Mail" itemValue="m" />
@@ -403,7 +405,7 @@
 								</p:outputPanel>
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" process="@this pnlAddMedio" actionListener="#{clientesBean.guardaMedioContacto()}" update="pnlAddMedio" />
+								<p:commandButton value="Guardar" icon="pi pi-check" process="@this pnlAddMedio" actionListener="#{clientesBean.guardaMedioContacto()}" update="pnlAddMedio" oncomplete="PF('dialogMedioContacto').hide()" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogMedioContacto').hide()" class="ui-button-secondary" />
 							</f:facet>
 						</p:dialog>
