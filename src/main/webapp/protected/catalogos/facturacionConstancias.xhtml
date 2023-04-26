@@ -12,7 +12,7 @@
 		<h:form id="form" >
 			<p:breadCrumb>
 				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />				
+				<p:menuitem value="Facturación" />
 				<p:menuitem value="Facturacion Entrada/Salida" outcome="/protected/catalogos/facturacionConstancias" />
 			</p:breadCrumb>
 		
@@ -147,7 +147,7 @@
 						</div>
 						
 						<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}"
-						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="1" >
+						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="3" >
 							<f:facet name="header">							 
 								<div>								
 									<span>Constancias De Entradas A Factura</span>								
@@ -178,8 +178,8 @@
 						</div>
 						
 						<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" value="#{facturacionConstanciasBean.listaVigencias}" 
-									 var="vigencia" rowKey="#{vigencia.id}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="1" reflow="true" 
-									 lazy="true">
+						selection="#{facturacionConstanciasBean.selectedVigencias}" var="vigencia" rowKey="#{vigencia.folio.folio}" rowSelectMode="add"
+						paginator="true" paginatorPosition="bottom" rows="1">
 						
 							<f:facet name="header">
 								<div>
@@ -187,10 +187,10 @@
 								</div>
 							</f:facet>	
 							
-							<p:column selectionMode="multiple" exportable="false"/>
+							<p:column selectionMode="multiple" exportable="false"></p:column>
 							
 							<p:column headerText="Folio Cliente">
-								<h:outputText value="#{vigencia.folio.folioCliente}" />
+								<h:outputText value="#{vigencia.folioCliente}" />
 							</p:column>
 							
 							<p:column headerText="Fecha Inicio">
@@ -224,11 +224,12 @@
 								"Inicio periodo" y "Fin periodo", la CANTIDAD indica el numero de veces que se cobrara ese periodo</p:outputLabel>						
 						</div>
 						
+						
 						<p:dataTable id="dt-servicios" emptyMessage="No Hay Servicios Por Facturar" value="#{facturacionConstanciasBean.listaServicios}"
-						 var="servicio" rowKey="#{servicio.id}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5"  >
+						 var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}" paginator="true" paginatorPosition="bottom" rows="5" rowSelectMode="add">
 							<f:facet name="header">							 
 								<div>								
-									<span>Constancias De Entradas A Factura</span>								
+									<span>Constancias De Servicio A Factura</span>								
 								</div>							
 							</f:facet>
 						
