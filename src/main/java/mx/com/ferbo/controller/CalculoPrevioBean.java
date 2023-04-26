@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
-
 @Named
 
 public class CalculoPrevioBean implements Serializable{
@@ -28,9 +27,10 @@ public class CalculoPrevioBean implements Serializable{
 	private List<ConstanciaDeDeposito> listaEntradas;
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
-
+	
 	@SuppressWarnings("unchecked")
 	public CalculoPrevioBean() {
+		
 		
 		try {
 			context = FacesContext.getCurrentInstance();
@@ -83,8 +83,11 @@ public class CalculoPrevioBean implements Serializable{
 		this.listaServicios = listaServicios;
 	}
 
+	public void verServicios() {
+		
+		System.out.println("jhb");	
+	}
 	
-
 
 	
 	/* Metodo de prueba 

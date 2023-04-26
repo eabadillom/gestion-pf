@@ -14,6 +14,8 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -36,6 +38,7 @@ import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
+import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
@@ -43,6 +46,7 @@ import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieFactura;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.EntityManagerUtil;
 
 
 @Named
@@ -488,12 +492,23 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionServicios(){
 		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityTransaction trans = em.getTransaction();
+		trans.begin();
+		facturacionServiciosDAO.setEm(em);
 		
 		listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
+		
+		/*for(ConstanciaFacturaDs cfd: listaServicios) {
+			List<ConstanciaServicioDetalle> allServiciosDetalle = cfd.getConstanciaDeServicio().getConstanciaServicioDetalleList();
+			allServiciosDetalle.size();
+		}*/
+		
 		
 		if(listaServicios.isEmpty()) {
 			listaServicios = new ArrayList<>();
 		}
+		
 		
 	}
 	

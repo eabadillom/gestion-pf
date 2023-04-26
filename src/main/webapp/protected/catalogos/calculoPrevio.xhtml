@@ -80,7 +80,6 @@
 						<h:outputText value="#{servicio.folioCliente}" />
 					</p:column>
 					
-					
 					<p:column headerText="Fecha">
 						<h:outputText value="#{servicio.constanciaDeServicio.fecha}">
 							<f:convertDateTime pattern="dd/MMM/YYYY" />
@@ -89,10 +88,10 @@
 					
 					</p:dataTable>
 					
+					<p:commandButton value="Ver" actionListener="#{calculoPrevioBean.verServicios()}" />
 					
-					
-					</div>
 				</div>
+			</div>
 		</div>
 	
 	</h:form>

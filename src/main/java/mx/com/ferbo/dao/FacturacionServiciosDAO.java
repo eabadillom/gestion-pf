@@ -18,7 +18,9 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integer> {
 	
 	private static Logger log = Logger.getLogger(FacturacionServiciosDAO.class);
-
+	 
+	public EntityManager em = null;
+	
 	@Override
 	public ConstanciaFacturaDs buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -44,11 +46,11 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 		List<ConstanciaDeServicio> listaConstancias = null;
 		List<ConstanciaFacturaDs> lConstanciaFactura = null;
 		ConstanciaFacturaDs cf = null;
-		EntityManager em = null;
+		//EntityManager em = null;
 		String sql = null;
 		
 		try {
-			em = EntityManagerUtil.getEntityManager();
+			//em = EntityManagerUtil.getEntityManager();
 			list = new ArrayList<>();
 			sql = "SELECT "
 					+ " cs.FOLIO, "
@@ -137,6 +139,14 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 	public String eliminarListado(List<ConstanciaFacturaDs> listado) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
 	}
 
 	
