@@ -213,7 +213,7 @@ public class Factura implements Serializable {
     @Column(name = "metodo_pago")
     private String metodoPago;
     @Size(max = 1)
-    @Column(name = "tipo_persona")
+    @Column(name = "tp_persona")
     private String tipoPersona;    
     @Size(max = 5)
     @Column(name = "cd_regimen")

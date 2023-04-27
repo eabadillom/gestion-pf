@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.TipoAsentamiento;
+import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer> {
@@ -22,10 +23,16 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 		AsH = sql.getResultList();
 		return AsH;
 	}
-	@Override
-	public AsentamientoHumano buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+	public AsentamientoHumano buscarPorAsentamiento(Integer paisCve, Integer estadoCve, Integer municipioCve, Integer ciudadCve, Integer asentamientoCve) {
+		EntityManager entity = EntityManagerUtil.getEntityManager();
+		AsentamientoHumano asn = entity.createNamedQuery("AsentamientoHumano.findAsentamiento", AsentamientoHumano.class)
+				.setParameter("paisCve",paisCve)
+				.setParameter("estadoCve",estadoCve)
+				.setParameter("municipioCve",municipioCve)
+				.setParameter("ciudadCve",ciudadCve)
+				.setParameter("asentamientoCve",asentamientoCve)
+				.getSingleResult();
+		return asn;
 	}
 
 	@Override
@@ -116,6 +123,11 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 
 	@Override
 	public String eliminarListado(List<AsentamientoHumano> listado) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public AsentamientoHumano buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

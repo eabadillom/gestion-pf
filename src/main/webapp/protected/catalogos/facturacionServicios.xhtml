@@ -15,9 +15,7 @@
 			</p:breadCrumb>
 
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
-			<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2"
-				placeholder="Fecha" disabled="true"
-				value="#{facturaServiciosBean.fecha}" />
+
 
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
@@ -124,7 +122,7 @@
 									<p:outputLabel value="Metodo de Pago (SAT):" />
 									<p:selectOneMenu id="metodoPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturaServiciosBean.metodoPagoSelect}">
 										<f:selectItem itemLabel=" " noSelectionOption="true" />
-										<f:selectItems value="#{facturaServiciosBean.listaMetodoPago}" var="metodoP" itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" />
+										<f:selectItems value="#{facturaServiciosBean.listaMetodoPago}" var="metodoP"  itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" />
 									</p:selectOneMenu>
 									
 								<p:toolbar>
@@ -169,7 +167,8 @@
 					<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" 
 						itemValue="#{selectedPrecioServicio.id}" />
 				</p:selectOneMenu>
-				<p:column><p:inputNumber id="txtCantidadSrv" value="#{facturaServiciosBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/></p:column>
+				<p:column>
+				<p:inputNumber id="txtCantidadSrv" value="#{facturaServiciosBean.cantidadServicio}" placeholder="Cantidad" decimalPlaces="0" style="width: 6em;"/></p:column>
 				<p:column>
 				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{facturaServiciosBean.agregarServicio}" update="dt-servicios subtotal iva total"/>
 				</p:column>
@@ -193,24 +192,27 @@
 									<DIV ALIGN="left">
 									<b><p:outputLabel value="Subtotal" /></b>
 									<b><p:outputLabel id="subtotal" value="#{facturaServiciosBean.subtotal}" styleClass="p-ml-2 p-mr-4" style="width: 5%" /></b>
+									<DIV ALIGN="left">
+									<b><p:outputLabel value="Monto en letra" /></b>
+									<b><p:outputLabel id="montoLetra" value="#{facturaServiciosBean.montoLetra}" styleClass="p-ml-2 p-mr-4" style="width: 5%" /></b>
 									<DIV ALIGN="right">
 									<b><p:outputLabel value="IVA" /></b>
 									<b><p:outputLabel id="iva" value="#{facturaServiciosBean.bdIva}" styleClass="p-ml-2 p-mr-4" style="width: 5% "/></b>
 									<DIV ALIGN="right">
 									<b><p:outputLabel value="TOTAL" /></b>
 									<b><p:outputLabel id="total" value="#{facturaServiciosBean.total}" styleClass="p-ml-2 p-mr-4" style="width: 5% "/></b>
-									</DIV></DIV></DIV>
+									</DIV></DIV></DIV></DIV>
 
 			</div>
 			</p:outputPanel>
 			</p:fieldset>
 		
 <div>
-        <p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.SaveFactura()}" icon="pi pi-save">
-            <p:menuitem value="Generar reporte" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+        <p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.SaveFactura}" icon="pi pi-save">
+          <!--    <p:menuitem value="Generar reporte" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
             <p:menuitem value="Vista Preliminar" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
             <p:menuitem value="Timbrar" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-times"/>
+            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-times"/>-->
         </p:splitButton>
 </div>
 					</div>
