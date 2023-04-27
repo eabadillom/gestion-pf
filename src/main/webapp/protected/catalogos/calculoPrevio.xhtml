@@ -76,6 +76,12 @@
 					<p:dataTable id="dt-selectServicios" value="#{calculoPrevioBean.listaServicios}" var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}"
 								 rows="5" paginator="true" paginatorPosition="bottom">
 					
+					<f:facet name="header">
+						<div>
+							<span>Constancias De Servicios</span>
+						</div>
+					</f:facet>
+					
 					<p:column headerText="Folio Cliente">
 						<h:outputText value="#{servicio.folioCliente}" />
 					</p:column>

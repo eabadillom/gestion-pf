@@ -474,13 +474,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionVigencias(){
 		
-		
-		
-		System.out.println("fecha corte antes:" + fechaCorte);
-		
 		DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
-		
-		System.out.println("fecha corte despues:" + fechaCorte);
 		
 		listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
 		
@@ -498,11 +492,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		facturacionServiciosDAO.setEm(em);
 		
 		listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
-		
-		/*for(ConstanciaFacturaDs cfd: listaServicios) {
-			List<ConstanciaServicioDetalle> allServiciosDetalle = cfd.getConstanciaDeServicio().getConstanciaServicioDetalleList();
-			allServiciosDetalle.size();
-		}*/
 		
 		
 		if(listaServicios.isEmpty()) {
@@ -529,9 +518,11 @@ public class FacturacionConstanciasBean implements Serializable{
 			faceContext = FacesContext.getCurrentInstance();
             request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
             session = request.getSession(true);
+            
 			session.setAttribute("entradas", selectedEntradas);
-			session.setAttribute("vigencias", selectedVigencias);
+			session.setAttribute("vigencias",selectedVigencias);
 			session.setAttribute("servicios", selectedServicios);
+			session.setAttribute("cliente", clienteSelect);
 			
 		}catch(Exception e) {
 			System.out.println("ERROR:" + e.getMessage());
