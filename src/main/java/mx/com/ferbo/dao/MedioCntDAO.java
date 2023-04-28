@@ -30,45 +30,68 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 
 	@Override
 	public String actualizar(MedioCnt medio) {
+		
+		//Implementación que dejó Gabriel
+//		EntityManager em = null;
+//		try {
+//			em = EntityManagerUtil.getEntityManager();
+//			em.getTransaction().begin();
+//			if (medio.getTpMedio().equalsIgnoreCase("m")) {
+//				if (medio.getIdMail().getIdMail() == null) {
+//					em.persist(medio.getIdMail());
+//				} else {
+//					em.merge(medio.getIdMail());
+//				}
+//				medio.setIdTelefono(null);
+//			} else {
+//				if (medio.getIdTelefono().getIdTelefono() == null) {
+//					em.persist(medio.getIdTelefono());
+//				} else {
+//					em.merge(medio.getIdTelefono());
+//				}
+//				medio.setIdMail(null);
+//			}
+//			em.merge(medio);
+//			em.getTransaction().commit();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return "ERROR";
+//		}finally {
+//			EntityManagerUtil.close(em);
+//		}
+//		return null;
+		
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			if (medio.getTpMedio().equalsIgnoreCase("m")) {
-				if (medio.getIdMail().getIdMail() == null) {
-					em.persist(medio.getIdMail());
-				} else {
-					em.merge(medio.getIdMail());
-				}
-				medio.setIdTelefono(null);
-			} else {
-				if (medio.getIdTelefono().getIdTelefono() == null) {
-					em.persist(medio.getIdTelefono());
-				} else {
-					em.merge(medio.getIdTelefono());
-				}
-				medio.setIdMail(null);
-			}
 			em.merge(medio);
 			em.getTransaction().commit();
-		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return "ERROR";
-		}finally {
-			if(em.isOpen()) {
-				try {
-					em.close();
-				} catch (Exception e) {
-					System.out.println("ERROR" + e.getMessage());
-					return "ERROR";
-				}
-			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			return ex.getMessage();
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(MedioCnt medio) {
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(medio);
+			em.getTransaction().commit();
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			return ex.getMessage();
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return null;
 	}
 
@@ -83,14 +106,7 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			try {
-				if(em.isOpen()) {
-					em.close();
-				}
-			}catch (Exception e) {
-				System.out.println("ERROR" + e.getMessage());
-				return "ERROR";
-			}
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

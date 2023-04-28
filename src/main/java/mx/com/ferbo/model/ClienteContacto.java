@@ -8,6 +8,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -87,7 +88,7 @@ public class ClienteContacto implements Serializable {
     private Cliente idCliente;
     
     @JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private Contacto idContacto;
     
     @Column(name="st_facturacion")

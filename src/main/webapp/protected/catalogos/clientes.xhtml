@@ -41,18 +41,9 @@
 							<p:column headerText="RFC">
 								<h:outputText value="#{cliente.cteRfc}" />
 							</p:column>
-							<!-- <p:column headerText="Número de cliente">
-								<h:outputText value="#{cliente.numeroCte}" />
-							</p:column>
-							<p:column headerText="Correo">
-								<h:outputText value="#{cliente.cteMail}" />
-							</p:column> -->
 							<p:column headerText="Habilitado">
 								<h:outputText value="#{cliente.habilitado ? 'Sí' : 'No'}" />
 							</p:column>
-							<!-- <p:column headerText="Código">
-								<h:outputText value="#{cliente.codUnico}" />
-							</p:column> -->
 							<p:column >
 								<p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show();" process="@this" update=":form:dialogCliente :form:regimenFiscal :form:usoCFDI :form:metodoPago :form:formaPago" action="#{clientesBean.cargaInfoCliente}">
 									<f:setPropertyActionListener value="#{cliente}" target="#{clientesBean.clienteSelected}"/>
@@ -223,10 +214,18 @@
 											<p:ajax process="@this soEstatus"/>
 										</p:selectOneMenu>
 									</div>
+									<div class="p-field">
+										<p:outputLabel>¿Recibe correos de facturacion?</p:outputLabel>
+										<p:toggleSwitch value="#{clientesBean.clienteContactoSelected.recibeFacturacion}"></p:toggleSwitch>
+									</div>
+									<div class="p-field">
+										<p:outputLabel>¿Recibe correos de inventario?</p:outputLabel>
+										<p:toggleSwitch value="#{clientesBean.clienteContactoSelected.recibeInventario}"></p:toggleSwitch>
+									</div>
 								</p:outputPanel>
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto" process="pnlContacto @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" onclick="PF('dialogAddContacto').hide()" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto" process="pnlContacto @this" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogAddContacto').hide()" class="ui-button-secondary" />
 							</f:facet>
 						</p:dialog>
@@ -259,7 +258,7 @@
 										<div class="p-col-12 p-md-4 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Usuario</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-4 p-lg-4">
@@ -426,7 +425,7 @@
 						</p:confirmDialog>
 
 						<p:confirmDialog widgetVar="deleteMedioContactoDialog" showEffect="fade" width="400" message="Desea eliminar el medio de contacto?" header="Eliminar" severity="warn">
-							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarMedioContacto()}" oncomplete="PF('deleteMedioContactoDialog').hide()" />
+							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarMedioContacto()}" oncomplete="PF('deleteMedioContactoDialog').hide()" update="dtMedioContacto" />
 							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteMedioContactoDialog').hide()" />
 						</p:confirmDialog>
 					</div>

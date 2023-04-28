@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -142,6 +143,13 @@ public class Cliente implements Serializable {
         this.cteCve = cteCve;
         this.numeroCte = numeroCte;
         this.habilitado = habilitado;
+    }
+    
+    public void add(ClienteContacto clienteContacto) {
+    	if(this.clienteContactoList == null)
+    		this.clienteContactoList = new ArrayList<ClienteContacto>();
+    	clienteContacto.setIdCliente(this);
+    	this.clienteContactoList.add(clienteContacto);
     }
 
 	public Integer getCteCve() {

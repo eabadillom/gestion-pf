@@ -7,7 +7,9 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -53,7 +55,7 @@ public class Mail implements Serializable {
     @JoinColumn(name = "tp_mail", referencedColumnName = "tp_mail")
     @ManyToOne(optional = false)
     private TipoMail tpMail;
-    @OneToMany(mappedBy = "idMail")
+    @OneToMany(mappedBy = "idMail", cascade=CascadeType.ALL)
     private List<MedioCnt> medioCntList;
 
     public Mail() {

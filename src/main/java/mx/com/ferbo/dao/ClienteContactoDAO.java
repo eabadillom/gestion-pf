@@ -53,9 +53,6 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.persist(clienteContacto.getIdContacto());
-			em.flush();
-			clienteContacto.setFhAlta(new Date());
 			em.persist(clienteContacto);
 			em.getTransaction().commit();
 			em.close();

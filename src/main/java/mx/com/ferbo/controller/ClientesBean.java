@@ -18,14 +18,18 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteContactoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
+import mx.com.ferbo.dao.ContactoDAO;
+import mx.com.ferbo.dao.MailDAO;
 import mx.com.ferbo.dao.MedioCntDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
 import mx.com.ferbo.dao.TipoMailDAO;
+import mx.com.ferbo.dao.TipoTelefonoDAO;
 import mx.com.ferbo.dao.UsoCfdiDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
+import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.model.MedioPago;
@@ -33,6 +37,7 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.model.TipoMail;
+import mx.com.ferbo.model.TipoTelefono;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.ClienteUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -49,6 +54,7 @@ public class ClientesBean implements Serializable {
 	private List<Cliente> lstClientesSelected;
 	private List<ClienteContacto> lstClienteContactoSelected;
 	private List<TipoMail> lstTipoMail;
+	private List<TipoTelefono> lstTipoTelefono;
 	private List<RegimenFiscal> lstRegimenFiscal;
 	private List<UsoCfdi> lstUsoCfdi;
 	private List<MetodoPago> lstMetodoPago;
@@ -64,7 +70,10 @@ public class ClientesBean implements Serializable {
 	
 
 	private ClienteDAO clienteDAO;
+	private ContactoDAO contactoDAO;
 	private TipoMailDAO tipoMailDAO;
+	private TipoTelefonoDAO tipoTelefonoDAO;
+	private MailDAO mailDAO;
 	private RegimenFiscalDAO regimenFiscalDAO;
 	private UsoCfdiDAO usoCfdiDAO;
 	private MetodoPagoDAO metodoPagoDAO;
@@ -78,7 +87,10 @@ public class ClientesBean implements Serializable {
 		lstClienteContactoSelected = new ArrayList<>();
 		lstClientesSelected = new ArrayList<>();
 		clienteDAO = new ClienteDAO();
+		contactoDAO = new ContactoDAO();
 		tipoMailDAO = new TipoMailDAO();
+		tipoTelefonoDAO = new TipoTelefonoDAO();
+		mailDAO = new MailDAO();
 		nuevoCliente();
 		clienteContactoSelected = new ClienteContacto();
 		medioContactoSelected = new MedioCnt();
@@ -103,6 +115,7 @@ public class ClientesBean implements Serializable {
 
 	private void consultaCatalogos() {
 		this.lstTipoMail = tipoMailDAO.buscarTodos();
+		this.lstTipoTelefono = tipoTelefonoDAO.buscarTodos();
 		this.lstMetodoPago = metodoPagoDAO.buscarVigentes(new Date());
 		this.lstMedioPago = medioPagoDAO.buscarVigentes(new Date());
 	}
@@ -169,9 +182,14 @@ public class ClientesBean implements Serializable {
 	 * Método para inicializar objeto tipo Contacto
 	 */
 	public void nuevoContacto(Cliente clienteSel) {
-		clienteSelected = clienteSel;
 		clienteContactoSelected = new ClienteContacto();
-		clienteContactoSelected.setIdCliente(clienteSelected);
+		clienteContactoSelected.setFhAlta(new Date());
+		Contacto contacto = new Contacto();
+		clienteContactoSelected.setIdContacto(contacto);
+		contacto.setClienteContactoList(this.clienteSelected.getClienteContactoList());
+		
+		clienteSelected = clienteSel;
+		clienteSelected.add(clienteContactoSelected);
 		medioContactoSelected = new MedioCnt();
 	}
 
@@ -280,9 +298,13 @@ public class ClientesBean implements Serializable {
 	
 	public void addTipoMedioContacto() {
 		if( "t".equalsIgnoreCase(this.medioContactoSelected.getTpMedio()) ) {
-			this.medioContactoSelected.setIdTelefono(new Telefono());
+			Telefono telefono = new Telefono();
+			this.medioContactoSelected.setIdTelefono(telefono);
+			this.medioContactoSelected.setIdMail(null);
 		} else if ("m".equalsIgnoreCase(this.medioContactoSelected.getTpMedio())) {
-			this.medioContactoSelected.setIdMail(new Mail());
+			Mail mail = new Mail();
+			this.medioContactoSelected.setIdMail(mail);
+			this.medioContactoSelected.setIdTelefono(null);
 		}
 	}
 	
@@ -324,7 +346,35 @@ public class ClientesBean implements Serializable {
 	}
 	
 	public void guardarContacto() {
-		System.out.println("Guardando datos generales del contacto...");
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			if(this.clienteContactoSelected == null)
+				throw new InventarioException("No hay un contacto seleccionado.");
+			
+			if(this.clienteContactoSelected.getId() == null) {
+				clienteContactoDAO.guardar(clienteContactoSelected);
+			} else {
+				clienteContactoDAO.actualizar(clienteContactoSelected);
+			}
+			
+			this.clienteSelected = clienteDAO.buscarPorId(this.clienteSelected.getCteCve());
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Contacto actualizado correctamente.";
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			mensaje = "Ha ocurrido un problema al eliminar el contacto.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages", ":form:dialogEditContacto", "dtContactos");
+		}
 	}
 	
 	public void eliminarClienteContacto() {
@@ -363,13 +413,15 @@ public class ClientesBean implements Serializable {
 			if(this.medioContactoSelected == null)
 				throw new InventarioException("No hay un medio de contacto seleccionado.");
 			
-			this.medioContactoSelected.setIdContacto(this.clienteContactoSelected.getIdContacto());
-			List<MedioCnt> medioCntList = new ArrayList<>();
+			List<MedioCnt> medioCntList = this.clienteContactoSelected.getIdContacto().getMedioCntList();
+			if(medioCntList == null)
+				medioCntList = new ArrayList<MedioCnt>();
 			medioCntList.add(this.medioContactoSelected);
 			this.medioContactoSelected.getIdMail().setMedioCntList(medioCntList);
-			this.clienteContactoSelected.getIdContacto().getMedioCntList().add(this.medioContactoSelected);
+			Contacto contacto = this.clienteContactoSelected.getIdContacto();
+			medioContactoSelected.setIdContacto(contacto);
+			medioCntDAO.actualizar(medioContactoSelected);
 			
-			clienteContactoDAO.actualizar(this.clienteContactoSelected);
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Medio de contacto registrado correctamente.";
@@ -382,7 +434,7 @@ public class ClientesBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
 	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages");
+	        PrimeFaces.current().ajax().update(":form:messages", ":form:dtMedioContacto");
 		}
 	}
 	
@@ -396,7 +448,12 @@ public class ClientesBean implements Serializable {
 			if( this.medioContactoSelected == null )
 				throw new InventarioException("No hay un medio de contacto seleccionado.");
 			
-			medioCntDAO.eliminar(this.medioContactoSelected);
+			String sTmp = medioCntDAO.eliminar(this.medioContactoSelected);
+			
+			if(sTmp == null || "".equalsIgnoreCase(sTmp.trim()))
+				this.clienteContactoSelected.getIdContacto().getMedioCntList().remove(this.medioContactoSelected);
+			//this.medioContactoSelected.setIdContacto(null);
+			//contactoDAO.actualizar(clienteContactoSelected.getIdContacto());
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Medio de contacto eliminado correctamente.";
@@ -409,7 +466,7 @@ public class ClientesBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
 	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages");
+	        PrimeFaces.current().ajax().update(":form:messages", "dtMedioContacto");
 		}
 	}
 
@@ -535,6 +592,14 @@ public class ClientesBean implements Serializable {
 
 	public void setIdMedioPagoSelected(Integer idMedioPagoSelected) {
 		this.idMedioPagoSelected = idMedioPagoSelected;
+	}
+
+	public List<TipoTelefono> getLstTipoTelefono() {
+		return lstTipoTelefono;
+	}
+
+	public void setLstTipoTelefono(List<TipoTelefono> lstTipoTelefono) {
+		this.lstTipoTelefono = lstTipoTelefono;
 	}
 
 }
