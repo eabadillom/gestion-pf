@@ -80,7 +80,7 @@
 										<p:column width="10%" style="text-align:right;">
 											<p:commandButton icon="pi pi-user-edit" styleClass=" p-mr-2 p-mb-2" process="@this" actionListener="#{clientesBean.consultaContactos(contacto)}" resetValues="true" update="form:pnlEditContacto">
 											</p:commandButton>
-											<p:commandButton icon="pi pi-user-minus" styleClass="ui-button-danger p-mr-2 p-mb-2" process="@this" oncomplete="PF('deleteContactoDialog').show();">
+											<p:commandButton icon="pi pi-user-minus" styleClass="ui-button-danger p-mr-2 p-mb-2" process="@this" oncomplete="PF('deleteContactoDialog').show();" update="form:dt-clientes">
 												<f:setPropertyActionListener value="#{contacto}" target="#{clientesBean.clienteContactoSelected}" />
 											</p:commandButton>
 										</p:column>

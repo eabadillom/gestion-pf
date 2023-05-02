@@ -1,21 +1,35 @@
 package mx.com.ferbo.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ClienteContacto;
-import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 
 public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 
 	@Override
 	public ClienteContacto buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		ClienteContacto clienteContacto = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class)
+					.setParameter("id", id);
+			clienteContacto = (ClienteContacto) query.getSingleResult();
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return clienteContacto;
 	}
 
 	@Override
@@ -65,44 +79,27 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 
 	@Override
 	public String eliminar(ClienteContacto clienteContacto) {
-		EntityManager em = null;;
+		EntityManager em = null;
+		Query query = null;
+		ClienteContacto tmpObj = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			
-			
-			for (MedioCnt medio : clienteContacto.getIdContacto().getMedioCntList()) {
-
-				em.remove(em.merge(medio));
-				
-				if (medio.getIdTelefono() != null) {
-					em.remove(em.merge(medio.getIdTelefono()));
-				}
-
-				if (medio.getIdMail() != null) {
-					em.remove(em.merge(medio.getIdMail()));
-				}
-//				em.createQuery("DELETE MedioCnt m WHERE m.idMedio =:idMedio")
-//						.setParameter("idMedio", medio.getIdMedio()).executeUpdate();
-			}
-//			
-//			em.createQuery("DELETE FROM Contacto con WHERE con.idContacto = :idCon")
-//					.setParameter("idCon", clienteContacto.getIdContacto().getIdContacto()).executeUpdate();
-
-			em.remove(em.merge(clienteContacto));
-			em.remove(em.merge(clienteContacto.getIdContacto()));
-//			em.createQuery("DELETE ClienteContacto c WHERE c.id =:clienteContacto")
-//					.setParameter("clienteContacto", clienteContacto.getId()).executeUpdate();
-			
+			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class)
+					.setParameter("id", clienteContacto.getId());
+			tmpObj = (ClienteContacto) query.getSingleResult();
+			em.remove(tmpObj);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return "ERROR";
+			e.printStackTrace();
 		}finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
+	
+	
 
 	@Override
 	public String eliminarListado(List<ClienteContacto> listado) {

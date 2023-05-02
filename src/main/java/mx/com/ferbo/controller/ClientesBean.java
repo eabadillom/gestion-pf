@@ -385,7 +385,10 @@ public class ClientesBean implements Serializable {
 		try {
 			if(this.clienteContactoSelected == null)
 				throw new InventarioException("No hay un contacto seleccionado.");
-			clienteContactoDAO.eliminar(clienteContactoSelected);
+			String respuesta = clienteContactoDAO.eliminar(this.clienteContactoSelected);
+			if(respuesta != null)
+				throw new InventarioException("Ocurrió un problema al eliminar al contacto del cliente.");
+			this.clienteSelected.remove(clienteContactoSelected);
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Contacto eliminado correctamente.";
@@ -398,7 +401,7 @@ public class ClientesBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
 	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages");
+	        PrimeFaces.current().ajax().update(":form:messages", "dtContactos");
 		}
 		
 		
