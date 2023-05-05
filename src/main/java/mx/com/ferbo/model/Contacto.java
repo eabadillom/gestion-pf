@@ -62,7 +62,7 @@ public class Contacto implements Serializable {
     @Column(name = "nb_apellido_2")
     private String nbApellido2;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto")
     private List<ClienteContacto> clienteContactoList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto", orphanRemoval = true)

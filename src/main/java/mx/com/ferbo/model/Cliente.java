@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -31,7 +32,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "CLIENTE")
 @NamedQueries({
-    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c"),
+    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c ORDER BY c.cteNombre"),
     @NamedQuery(name = "Cliente.findByCteCve", query = "SELECT c FROM Cliente c WHERE c.cteCve = :cteCve"),
     @NamedQuery(name = "Cliente.findByCteNombre", query = "SELECT c FROM Cliente c WHERE c.cteNombre = :cteNombre"),
     @NamedQuery(name = "Cliente.findByCteRfc", query = "SELECT c FROM Cliente c WHERE c.cteRfc = :cteRfc"),
@@ -105,32 +106,48 @@ public class Cliente implements Serializable {
     
     @OneToMany(mappedBy = "clienteCve")
     private List<ConstanciaServicios> constanciaServiciosList;
+    
     @OneToMany(mappedBy = "cliente")
     private List<Factura> facturaList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
     private List<ProductoPorCliente> productoPorClienteList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
     private List<ClienteDomicilios> clienteDomiciliosList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<DetalleFacturacion> detalleFacturacionList;
+    
     @OneToMany(mappedBy = "cteCve")
     private List<Aviso> avisoList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
     private List<CuotaMensualServicio> cuotaMensualServicioList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<PrecioServicio> precioServicioList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true)
     private List<ClienteContacto> clienteContactoList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
     private List<ConstanciaDeServicio> constanciaDeServicioList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
     private List<ConstanciaDeDeposito> constanciaDeDepositoList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clienteCve")
     private List<ConstanciaSalida> constanciaSalidaList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<CuotaMinima> cuotaMinimaList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<ConstanciaTraspaso> constanciaTraspasoList;
+    
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente")
+    private CandadoSalida candadoSalida;
 
     public Cliente() {
     }
@@ -406,6 +423,14 @@ public class Cliente implements Serializable {
 
 	public void setFormaPago(String formaPago) {
 		this.formaPago = formaPago;
+	}
+
+	public CandadoSalida getCandadoSalida() {
+		return candadoSalida;
+	}
+
+	public void setCandadoSalida(CandadoSalida candadoSalida) {
+		this.candadoSalida = candadoSalida;
 	}
 
 	

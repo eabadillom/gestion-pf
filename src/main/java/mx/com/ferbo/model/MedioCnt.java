@@ -63,7 +63,7 @@ public class MedioCnt implements Serializable {
     private Mail idMail;
     
     @JoinColumn(name = "id_telefono", referencedColumnName = "id_telefono")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Telefono idTelefono;
 
     public MedioCnt() {

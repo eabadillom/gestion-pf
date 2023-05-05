@@ -5,12 +5,17 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ClienteContacto;
+import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 
 public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
+	
+	private static Logger log = Logger.getLogger(ClienteContactoDAO.class);
 
 	@Override
 	public ClienteContacto buscarPorId(Integer id) {
@@ -23,6 +28,33 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class)
 					.setParameter("id", id);
 			clienteContacto = (ClienteContacto) query.getSingleResult();
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return clienteContacto;
+	}
+	
+	public ClienteContacto buscarPorId(Integer id, boolean isAllInfo) {
+		ClienteContacto clienteContacto = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class)
+					.setParameter("id", id);
+			clienteContacto = (ClienteContacto) query.getSingleResult();
+			
+			if(isAllInfo == false)
+				return clienteContacto;
+			
+			for(MedioCnt medioContacto : clienteContacto.getIdContacto().getMedioCntList()) {
+				log.debug("Tipo mail: " + medioContacto.getIdMail().getTpMail().getTpMail() );
+				log.debug("Tipo Telefono: " + medioContacto.getIdTelefono().getTpTelefono().getTpTelefono());
+			}
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		} finally {
@@ -51,7 +83,7 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.merge(clienteContacto.getIdContacto());
+//			em.merge(clienteContacto.getIdContacto());
 			em.merge(clienteContacto);
 			em.getTransaction().commit();
 			em.close();

@@ -3,6 +3,7 @@ package mx.com.ferbo.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.MedioCnt;
@@ -12,8 +13,22 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 
 	@Override
 	public MedioCnt buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		MedioCnt medioContacto = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("MedioCnt.findByIdMedio", MedioCnt.class)
+					.setParameter("idMedio", id)
+					;
+			
+			medioContacto = (MedioCnt) query.getSingleResult();
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return medioContacto;
 	}
 
 	@Override
@@ -100,7 +115,8 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		try {
 			em.getTransaction().begin();
-			em.remove(em.merge(medio));
+			medio = em.merge(medio);
+			em.remove(medio);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
