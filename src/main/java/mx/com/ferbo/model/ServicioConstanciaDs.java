@@ -63,6 +63,9 @@ public class ServicioConstanciaDs implements Serializable {
     @Size(max = 10)
     @Column(name = "UD_COBRO")
     private String udCobro;
+    @Size(max = 5)
+    @Column(name = "cd_unidad")
+    private String cdUnidad;
     @JoinColumn(name = "CONSTANCIA", referencedColumnName = "ID")
     @ManyToOne(optional = false)
     private ConstanciaFacturaDs constancia;
@@ -137,7 +140,15 @@ public class ServicioConstanciaDs implements Serializable {
         this.constancia = constancia;
     }
 
-    @Override
+    public String getCdUnidad() {
+		return cdUnidad;
+	}
+
+	public void setCdUnidad(String cdUnidad) {
+		this.cdUnidad = cdUnidad;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

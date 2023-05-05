@@ -523,6 +523,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			session.setAttribute("vigencias",selectedVigencias);
 			session.setAttribute("servicios", selectedServicios);
 			session.setAttribute("cliente", clienteSelect);
+			session.setAttribute("fechaEmision", fechaCorte);
 			
 		}catch(Exception e) {
 			System.out.println("ERROR:" + e.getMessage());

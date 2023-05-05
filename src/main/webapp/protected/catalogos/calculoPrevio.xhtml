@@ -94,7 +94,57 @@
 					
 					</p:dataTable>
 					
+					
+					
 					<p:commandButton value="Ver" actionListener="#{calculoPrevioBean.verServicios()}" />
+					
+					<p:dataTable id="dt-constanciaFacturaDs" value="#{calculoPrevioBean.listaConstanciaFacturaDs}" var="constanciaFacturaDs"
+							rowKey="#{constanciaFacturaDs.id}">
+							
+					<f:facet name="header">
+						<div>
+							<span>Constancias De Servicios</span>	
+						</div>
+					</f:facet>									
+					
+					<p:column exportable="false" width="3%">
+						<p:rowToggler />
+					</p:column>
+					
+					<p:column headerText="Folio">
+						<h:outputText value="#{constanciaFacturaDs.constanciaDeServicio.folioCliente}" />
+					</p:column>
+					
+					<p:column headerText="Fecha de Emisión">
+						<h:outputText value="#{calculoPrevioBean.fechaEmision}">
+							<f:convertDateTime pattern="dd/MMM/YYYY" />
+						</h:outputText>
+					</p:column>
+					
+					<p:rowExpansion>
+						<p:dataTable value="#{constanciaFacturaDs.servicioConstanciaDsList}" var="servicioConstancia">
+								
+								<p:column headerText="Servicio">
+									<h:outputText value="#{servicioConstancia.descripcion}" />
+								</p:column>															
+								
+								<p:column headerText="Cantidad">
+									<h:outputText value="#{calculoPrevioBean.cantidad}" />
+								</p:column>
+								
+								<p:column headerText="Precio Unitario">
+									<h:outputText value="#{servicioConstancia.tarifa}" />
+								</p:column>
+								
+								<p:column headerText="Importe" >
+									<h:outputText value="#{servicioConstancia.costo}" />
+								</p:column>
+						
+						</p:dataTable>
+					
+					</p:rowExpansion>
+					
+					</p:dataTable>
 					
 				</div>
 			</div>
