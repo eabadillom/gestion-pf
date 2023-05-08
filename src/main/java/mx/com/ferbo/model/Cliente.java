@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -146,7 +147,7 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<ConstanciaTraspaso> constanciaTraspasoList;
     
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY, orphanRemoval = true)
     private CandadoSalida candadoSalida;
 
     public Cliente() {
@@ -174,6 +175,11 @@ public class Cliente implements Serializable {
     		return;
     	clienteContacto.setIdCliente(null);
     	this.clienteContactoList.remove(clienteContacto);
+    }
+    
+    public void remove(CandadoSalida candadoSalida) {
+    	candadoSalida.setCliente(null);
+    	this.candadoSalida = null;
     }
 
 	public Integer getCteCve() {

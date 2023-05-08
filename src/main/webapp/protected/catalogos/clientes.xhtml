@@ -178,25 +178,25 @@
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Nombre</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true" requiredMessage="Debe indicar el nombre del contacto." />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Primer apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Debe indicar el primer apellido del contacto." />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Segundo apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Debe indicar el segundo apellido del contacto." />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-4 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Usuario</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto." />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-4 p-lg-4">
@@ -248,7 +248,7 @@
 								
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" onclick="PF('dialogAddContacto').hide()" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes" process="pnlContacto @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes messages" process="pnlContacto @this" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogAddContacto').hide()" class="ui-button-secondary" />
 							</f:facet>
 						</p:dialog>
@@ -262,26 +262,26 @@
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Nombre</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true" requiredMessage="Debe indicar el nombre del contacto." />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Primer apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Debe indicar el primer apellido del contacto." />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Segundo apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Debe indicar el segundo apellido del contacto." />
 											</div>
 										</div>
 
 										<div class="p-col-12 p-md-4 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Usuario</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto."/>
 											</div>
 										</div>
 										<div class="p-col-12 p-md-4 p-lg-4">
@@ -365,7 +365,7 @@
 								</p:scrollPanel>
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlEditContacto" process="pnlEditContacto @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes messages" process="pnlEditContacto @this" />
 								<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogEditContacto').hide()" class="ui-button-secondary" />
 							</f:facet>
 						</p:dialog>
@@ -443,8 +443,8 @@
 						</p:confirmDialog>
 
 						<p:confirmDialog widgetVar="deleteContactoDialog" showEffect="fade" width="400" message="¿Desea eliminar el contacto?" header="Eliminar" severity="warn">
-							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarClienteContacto()}" oncomplete="PF('deleteContactoDialog').hide()"/>
-							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteContactoDialog').hide()" />
+							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarContacto()}" oncomplete="PF('deleteContactoDialog').hide()" update="pnlContacto dt-clientes"/>
+							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteContactoDialog').hide()" update="dtContactos" />
 						</p:confirmDialog>
 
 						<p:confirmDialog widgetVar="deleteMedioContactoDialog" showEffect="fade" width="400" message="Desea eliminar el medio de contacto?" header="Eliminar" severity="warn">

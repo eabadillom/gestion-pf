@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -185,6 +184,8 @@ public class ClientesBean implements Serializable {
 	public void nuevoContacto(Cliente clienteSel) {
 		clienteContactoSelected = new ClienteContacto();
 		clienteContactoSelected.setFhAlta(new Date());
+		clienteContactoSelected.setStHabilitado(true);
+		clienteContactoSelected.setStUsuario("A");
 		Contacto contacto = new Contacto();
 		clienteContactoSelected.setIdContacto(contacto);
 		contacto.setClienteContactoList(this.clienteSelected.getClienteContactoList());
@@ -255,7 +256,8 @@ public class ClientesBean implements Serializable {
 	}
 
 	public void eliminarCliente() {
-		if (clienteDAO.eliminar(clienteSelected) == null) {
+		//if (clienteDAO.eliminar(clienteSelected) == null) {
+		if (clienteDAO.eliminar(clienteSelected.getCteCve()) == null) {
 			lstClientes.remove(clienteSelected);
 			clienteSelected = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Eliminado"));
@@ -378,20 +380,25 @@ public class ClientesBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		
+		Cliente cliente = null;
+		
 		try {
+			cliente = this.clienteContactoSelected.getIdCliente();
+			cliente = clienteDAO.buscarPorId(cliente.getCteCve(), true);
+			
 			if(this.clienteContactoSelected == null)
 				throw new InventarioException("No hay un contacto seleccionado.");
 			
-			this.clienteSelected.add(clienteContactoSelected);
+			int indexOf = cliente.getClienteContactoList().indexOf(this.clienteContactoSelected);
+			if(indexOf < 0)
+				cliente.add(clienteContactoSelected);
 			
-			if(this.clienteContactoSelected.getId() == null) {
-				clienteContactoDAO.guardar(clienteContactoSelected);
-			} else {
-				clienteContactoDAO.actualizar(clienteContactoSelected);
-			}
+			clienteDAO.actualizar(cliente);
 			
-			this.clienteSelected = clienteDAO.buscarPorId(this.clienteSelected.getCteCve());
+			this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
 			this.consultaClientes();
+			PrimeFaces.current().executeScript("PF('dialogAddContacto').hide()");
+			PrimeFaces.current().executeScript("PF('dialogEditContacto').hide()");
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Contacto actualizado correctamente.";
@@ -399,29 +406,42 @@ public class ClientesBean implements Serializable {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 		} catch (Exception ex) {
+			log.error(ex);
 			mensaje = "Ha ocurrido un problema al eliminar el contacto.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
 	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages", ":form:dialogEditContacto", "dtContactos");
+	        PrimeFaces.current().ajax().update("pnlContacto", "pnlEditContacto", "dt-clientes", "messages");
+	          
 		}
 	}
 	
-	public void eliminarClienteContacto() {
+	public void eliminarContacto() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		
+		Cliente cliente = null;
+		
 		try {
 			if(this.clienteContactoSelected == null)
 				throw new InventarioException("No hay un contacto seleccionado.");
-			String respuesta = clienteContactoDAO.eliminar(this.clienteContactoSelected);
+			
+			cliente = this.clienteContactoSelected.getIdCliente();
+			cliente = clienteDAO.buscarPorId(cliente.getCteCve(), true);
+			
+			int indexOf = cliente.getClienteContactoList().indexOf(this.clienteContactoSelected);
+			if(indexOf < 0)
+				throw new InventarioException("El contacto seleccionado es incorrecto.");
+			
+			cliente.remove(clienteContactoSelected);
+			String respuesta = clienteDAO.actualizar(cliente);
 			
 			if(respuesta != null)
 				throw new InventarioException("Ocurrió un problema al eliminar al contacto del cliente.");
 			
-			this.clienteSelected = clienteDAO.buscarPorId(this.clienteSelected.getCteCve());
+			this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
 			this.consultaClientes();
 			
 			severity = FacesMessage.SEVERITY_INFO;
