@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -45,8 +46,9 @@ public class CandadoSalida implements Serializable {
 	@NotNull
 	@Column(name = "num_salidas")
 	private int numSalidas;
+	
 	@JoinColumn(name = "cte_cve", referencedColumnName = "CTE_CVE")
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private Cliente cliente;
 
 	public CandadoSalida() {

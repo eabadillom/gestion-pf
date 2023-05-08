@@ -1,5 +1,7 @@
 package mx.com.ferbo.util;
 
+import java.text.NumberFormat;
+
 public class FormatUtil {
 	
 	/**
@@ -202,6 +204,20 @@ public class FormatUtil {
         }
 
         return stringbuffer.toString();
+    }
+	
+	public String getMontoConLetra(double total) {
+		String montoConLetra = null;
+        NumberFormat format = NumberFormat.getInstance();
+        format.setMaximumFractionDigits(2);
+        format.setMinimumFractionDigits(2);
+        StringBuffer stringbuffer = new StringBuffer(numeroPalabras(total));
+        stringbuffer.append(" PESOS ");
+        String s = format.format(total);
+        stringbuffer.append(s.substring(s.indexOf('.') + 1, s.indexOf('.') + 3));
+        stringbuffer.append("/100 M.N.");
+        montoConLetra = "(" + stringbuffer.toString() + ")";
+        return montoConLetra;
     }
 
 }

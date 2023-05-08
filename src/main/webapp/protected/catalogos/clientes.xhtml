@@ -41,18 +41,9 @@
 							<p:column headerText="RFC">
 								<h:outputText value="#{cliente.cteRfc}" />
 							</p:column>
-							<!-- <p:column headerText="Número de cliente">
-								<h:outputText value="#{cliente.numeroCte}" />
-							</p:column>
-							<p:column headerText="Correo">
-								<h:outputText value="#{cliente.cteMail}" />
-							</p:column> -->
 							<p:column headerText="Habilitado">
 								<h:outputText value="#{cliente.habilitado ? 'Sí' : 'No'}" />
 							</p:column>
-							<!-- <p:column headerText="Código">
-								<h:outputText value="#{cliente.codUnico}" />
-							</p:column> -->
 							<p:column >
 								<p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show();" process="@this" update=":form:dialogCliente :form:regimenFiscal :form:usoCFDI :form:metodoPago :form:formaPago" action="#{clientesBean.cargaInfoCliente}">
 									<f:setPropertyActionListener value="#{cliente}" target="#{clientesBean.clienteSelected}"/>
@@ -64,7 +55,7 @@
 
 							<p:rowExpansion>
 								<div class="orders-subtable">
-									<p:dataTable id="dtContactos" var="contacto" value="#{cliente.clienteContactoList}" reflow="true" rowKey="#{contaco.idContacto.idContacto}">
+									<p:dataTable id="dtContactos" widgetVar="dtContactos" var="contacto" value="#{cliente.clienteContactoList}" reflow="true" rowKey="#{contaco.idContacto.idContacto}" lazy="true">
 										<f:facet name="header">
 											<div class="products-table-header" style="background-color: #CCCCCC;">
 												<span style="font-weight: bold">Contactos del cliente</span> <span class="filter-container ui-input-icon-left"> </span>
@@ -103,62 +94,67 @@
 							responsive="true">
 							<p:outputPanel id="pnlCliente" class="ui-fluid">
 								<p:outputPanel class="p-grid p-col-12">
-									<div class="p-field p-col-2 p-md-2">
-										<p:outputLabel>Número cliente</p:outputLabel>
-										<p:inputText value="#{clientesBean.clienteSelected.numeroCte}" />
-									</div>
-									<div class="p-field p-col-2 p-md-2">
-										<p:outputLabel for="txtRFC">RFC</p:outputLabel>
-										<p:inputText id="txtRFC" value="#{clientesBean.clienteSelected.cteRfc}" />
-									</div>
-									<div class="p-field p-col-4 p-md-4">
-										<p:outputLabel for="txtNombre">Nombre</p:outputLabel>
-										<p:inputText id="txtNombre" value="#{clientesBean.clienteSelected.cteNombre}" required="true" requiredMessage="Campo requerido" rows="2" />
-									</div>
-									<div class="p-field p-col-4 p-md-4">
-										<p:outputLabel for="txtRegimenCapital">Régimen capital</p:outputLabel>
-										<p:inputText id="txtRegimenCapital" value="#{clientesBean.clienteSelected.regimenCapital}" required="true" requiredMessage="Campo requerido" rows="2" />
-									</div>
-									<!-- Nuevo renglon del grid -->
 									<div class="p-field p-col-4 p-md-4">
 										<p:outputLabel>Tipo persona</p:outputLabel>
-										<p:selectOneRadio id="tP" value="#{clientesBean.clienteSelected.tipoPersona}" layout="grid" columns="3" styleClass="grid-radio" required="true" >
+										<p:selectOneRadio id="tP" value="#{clientesBean.clienteSelected.tipoPersona}" layout="grid" columns="3" styleClass="grid-radio" required="true" requiredMessage="Debe indicar el tipo de persona">
 										    <f:selectItem itemLabel="Persona Moral" itemValue="M"/>
 					           				<f:selectItem itemLabel="Persona Fisica" itemValue="F"/>
 									        <p:ajax listener="#{clientesBean.regimenSelect}" process="@this txtRFC" update="regimenFiscal usoCFDI" />
 								        </p:selectOneRadio>
 									</div>
+									<div class="p-field p-col-2 p-md-2">
+										<p:outputLabel for="txtRFC">RFC</p:outputLabel>
+										<p:inputText id="txtRFC" value="#{clientesBean.clienteSelected.cteRfc}">
+											<p:ajax event="blur" listener="#{clientesBean.validarRFC()}" />
+										</p:inputText>
+									</div>
+									<div class="p-field p-col-2 p-md-2">
+										<p:outputLabel>Número cliente</p:outputLabel>
+										<p:inputText value="#{clientesBean.clienteSelected.numeroCte}" maxlength="15" />
+									</div>
+									<div class="p-field p-col-4 p-md-4">
+										<p:outputLabel for="txtNombre">Nombre</p:outputLabel>
+										<p:inputText id="txtNombre" value="#{clientesBean.clienteSelected.cteNombre}" required="true" requiredMessage="Debe indicar el nombre" rows="2" />
+									</div>
+									<div class="p-field p-col-4 p-md-4">
+										<p:outputLabel for="txtRegimenCapital">Régimen capital</p:outputLabel>
+										<p:inputText id="txtRegimenCapital" value="#{clientesBean.clienteSelected.regimenCapital}" required="#{clientesBean.clienteSelected.tipoPersona eq 'M'}" requiredMessage="Debe indicar el régimen capital" rows="2" />
+									</div>
 									<div class="p-field p-col-6 p-md-6">
 										<p:outputLabel>Régimen Fiscal</p:outputLabel>
-										<p:selectOneMenu id="regimenFiscal" value="#{clientesBean.cdRegimenFiscalSelected}" required="true" widgetVar="selectRegimenFiscal">
+										<p:selectOneMenu id="regimenFiscal" value="#{clientesBean.cdRegimenFiscalSelected}" required="true" requiredMessage="Debe indicar el régimen fiscal" widgetVar="selectRegimenFiscal">
 											<f:selectItem itemLabel="---Regimen Fiscal---" itemValue="" />
 											<f:selectItems value="#{clientesBean.lstRegimenFiscal}" var="regimen" itemLabel="#{regimen.cd_regimen} - #{regimen.nb_regimen}" itemValue="#{regimen.cd_regimen}" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field p-col-6 p-md-6">
 										<p:outputLabel>Uso del CFDI</p:outputLabel>
-										<p:selectOneMenu id="usoCFDI" value="#{clientesBean.cdUsoCfdiSelected}" converter="entityConverter" required="true">
+										<p:selectOneMenu id="usoCFDI" value="#{clientesBean.cdUsoCfdiSelected}" converter="entityConverter" required="true" requiredMessage="Debe indicar el uso del CFDI">
 											<f:selectItem itemLabel="---Uso del CFDI---" itemValue="" />
 											<f:selectItems value="#{clientesBean.lstUsoCfdi}" var="usoCFDI" itemLabel="#{usoCFDI.cdUsoCfdi} - #{usoCFDI.usoCfdi}" itemValue="#{usoCFDI.cdUsoCfdi}" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field p-col-6 p-md-6">
 										<p:outputLabel>Método de pago</p:outputLabel>
-										<p:selectOneMenu id="metodoPago" value="#{clientesBean.cdMetodoPagoSelected}" converter="entityConverter" required="true">
+										<p:selectOneMenu id="metodoPago" value="#{clientesBean.cdMetodoPagoSelected}" converter="entityConverter" required="true" requiredMessage="Debe indicar el método de pago">
 											<f:selectItem itemLabel="---Método de pago---" itemValue="" />
 											<f:selectItems value="#{clientesBean.lstMetodoPago}" var="metodoPago" itemLabel="#{metodoPago.cdMetodoPago} - #{metodoPago.nbMetodoPago}" itemValue="#{metodoPago.cdMetodoPago}" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field p-col-6 p-md-6">
 										<p:outputLabel>Forma de pago</p:outputLabel>
-										<p:selectOneMenu id="formaPago" value="#{clientesBean.idMedioPagoSelected}" required="true">
+										<p:selectOneMenu id="formaPago" value="#{clientesBean.idMedioPagoSelected}" required="true" requiredMessage="Debe indicar la forma de pago">
 											<f:selectItem itemLabel="---Forma de pago---" itemValue="" />
 											<f:selectItems value="#{clientesBean.lstMedioPago}" var="medioPago" itemLabel="#{medioPago.formaPago} - #{medioPago.mpDescripcion}" itemValue="#{medioPago.mpId}" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field p-col-2 p-md-2">
 										<p:outputLabel>Correo</p:outputLabel>
-										<p:inputText value="#{clientesBean.clienteSelected.cteMail}" />
+										<p:inputText value="#{clientesBean.clienteSelected.cteMail}" required="true" requiredMessage="Debe indicar un correo electrónico"/>
+									</div>
+									<div class="p-field p-col-2 p-md-2">
+										<p:outputLabel for="txtCodigo">Código único</p:outputLabel>
+										<p:inputText id="txtCodigo" value="#{clientesBean.clienteSelected.codUnico}" />
 									</div>
 									<div class="p-field p-col-2 p-md-2">
 										<p:outputLabel for="chkHabilitado" value="Habilitado" />
@@ -166,10 +162,6 @@
 											<f:selectItem itemLabel="Sí" itemValue="true" />
 											<f:selectItem itemLabel="No" itemValue="false" />
 										</p:selectOneMenu>
-									</div>
-									<div class="p-field p-col-2 p-md-2">
-										<p:outputLabel for="txtCodigo">Código único</p:outputLabel>
-										<p:inputText id="txtCodigo" value="#{clientesBean.clienteSelected.codUnico}" />
 									</div>
 								</p:outputPanel>
 							</p:outputPanel>
@@ -181,52 +173,82 @@
 
 						<p:dialog id="dialogAddContacto" widgetVar="dialogAddContacto" header="Agregar contacto" showEffect="fade" modal="true" responsive="true" resizable="false" cache="false">
 							<p:outputPanel id="pnlContacto" class="ui-fluid">
-								<p:outputPanel>
-									<div class="p-field">
-										<p:outputLabel>Nombre</p:outputLabel>
-										<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true" requiredMessage="Campo requerido" />
+								<p:scrollPanel mode="native" style="height: 500px; overflow:auto;">
+									<div class="p-grid">
+										<div class="p-col-12 p-md-6 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>Nombre</p:outputLabel>
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true" requiredMessage="Debe indicar el nombre del contacto." />
+											</div>
+										</div>
+										<div class="p-col-12 p-md-6 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>Primer apellido</p:outputLabel>
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Debe indicar el primer apellido del contacto." />
+											</div>
+										</div>
+										<div class="p-col-12 p-md-6 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>Segundo apellido</p:outputLabel>
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Debe indicar el segundo apellido del contacto." />
+											</div>
+										</div>
+										<div class="p-col-12 p-md-4 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>Usuario</p:outputLabel>
+												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto." />
+											</div>
+										</div>
+										<div class="p-col-12 p-md-4 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>Contraseña</p:outputLabel>
+												<p:panelGrid id="pgPass" columns="2" style="width:100%" styleClass="border-none">
+													<p:password id="toggle" value="#{clientesBean.clienteContactoSelected.nbPassword}" toggleMask="true" redisplay="true" />
+													<p:commandButton icon="icon-varita" actionListener="#{clientesBean.generaPassword()}" styleClass="edit-button" process="@this" update="pgPass" />
+												</p:panelGrid>
+											</div>
+										</div>
+										<div class="p-col-12 p-md-6 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>Estatus usuario</p:outputLabel>
+												<p:selectOneMenu id="soEstatusUsuario" value="#{clientesBean.clienteContactoSelected.stUsuario}">
+													<f:selectItem itemLabel="--Seleccione--" />
+													<f:selectItem itemLabel="Activo" itemValue="A" />
+													<f:selectItem itemLabel="Baja" itemValue="B" />
+													<f:selectItem itemLabel="Bloqueado" itemValue="L" />
+													<p:ajax process="@this soEstatusUsuario"/>
+												</p:selectOneMenu>
+											</div>
+										</div>
+										<div class="p-col-12 p-md-6 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>Estatus</p:outputLabel>
+												<p:selectOneMenu id="soEstatus" value="#{clientesBean.clienteContactoSelected.stHabilitado}">
+													<f:selectItem itemLabel="--Seleccione--" />
+													<f:selectItem itemLabel="Activo" itemValue="true" />
+													<f:selectItem itemLabel="Inactivo" itemValue="false" />
+													<p:ajax process="@this soEstatus"/>
+												</p:selectOneMenu>
+											</div>
+										</div>
+										<div class="p-col-12 p-md-6 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>¿Recibe correos de facturacion?</p:outputLabel>
+												<p:toggleSwitch value="#{clientesBean.clienteContactoSelected.recibeFacturacion}"></p:toggleSwitch>
+											</div>
+										</div>
+										<div class="p-col-12 p-md-6 p-lg-4">
+											<div class="p-field">
+												<p:outputLabel>¿Recibe correos de inventario?</p:outputLabel>
+												<p:toggleSwitch value="#{clientesBean.clienteContactoSelected.recibeInventario}"></p:toggleSwitch>
+											</div>
+										</div>
 									</div>
-									<div class="p-field">
-										<p:outputLabel>Primer apellido</p:outputLabel>
-										<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Campo requerido" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel>Segundo apellido</p:outputLabel>
-										<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Campo requerido" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel>Usuario</p:outputLabel>
-										<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Campo requerido" />
-									</div>
-									<div class="p-field">
-										<p:outputLabel>Contraseña</p:outputLabel>
-										<p:panelGrid id="pgPass" columns="2" style="width:100%" styleClass="border-none">
-											<p:password id="toggle" value="#{clientesBean.clienteContactoSelected.nbPassword}" toggleMask="true" redisplay="true" />
-											<p:commandButton icon="icon-varita" actionListener="#{clientesBean.generaPassword()}" styleClass="edit-button" process="@this" update="pgPass" />
-										</p:panelGrid>
-									</div>
-									<div class="p-field">
-										<p:outputLabel>Estatus usuario</p:outputLabel>
-										<p:selectOneMenu id="soEstatusUsuario" value="#{clientesBean.clienteContactoSelected.stUsuario}">
-											<f:selectItem itemLabel="--Seleccione--" />
-											<f:selectItem itemLabel="Activo" itemValue="A" />
-											<f:selectItem itemLabel="Baja" itemValue="B" />
-											<f:selectItem itemLabel="Bloqueado" itemValue="L" />
-											<p:ajax process="@this soEstatusUsuario"/>
-										</p:selectOneMenu>
-									</div>
-									<div class="p-field">
-										<p:outputLabel>Estatus</p:outputLabel>
-										<p:selectOneMenu id="soEstatus" value="#{clientesBean.clienteContactoSelected.stHabilitado}">
-											<f:selectItem itemLabel="Activo" itemValue="true" />
-											<f:selectItem itemLabel="Inactivo" itemValue="false" />
-											<p:ajax process="@this soEstatus"/>
-										</p:selectOneMenu>
-									</div>
-								</p:outputPanel>
+								</p:scrollPanel>
+								
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto" process="pnlContacto @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes messages" process="pnlContacto @this" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogAddContacto').hide()" class="ui-button-secondary" />
 							</f:facet>
 						</p:dialog>
@@ -240,26 +262,26 @@
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Nombre</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true" requiredMessage="Debe indicar el nombre del contacto." />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Primer apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Debe indicar el primer apellido del contacto." />
 											</div>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Segundo apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Debe indicar el segundo apellido del contacto." />
 											</div>
 										</div>
 
 										<div class="p-col-12 p-md-4 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Usuario</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Campo requerido" />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto."/>
 											</div>
 										</div>
 										<div class="p-col-12 p-md-4 p-lg-4">
@@ -308,7 +330,7 @@
 										<f:facet name="header">
 											<div class="products-table-header">
 												<span style="font-weight: bold"></span> <span class="filter-container ui-input-icon-left"> </span> <span class="filter-container ui-input-icon-left"> <p:commandButton
-														actionListener="#{clientesBean.nuevoMedio()}" value="Agregar medio" icon="pi pi-plus" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
+														actionListener="#{clientesBean.nuevoMedio()}" value="Agregar medio" icon="pi pi-envelope" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
 														resetValues="true" update="form:pnlAddMedio" oncomplete="PF('dialogMedioContacto').show()" />
 												</span>
 											</div>
@@ -343,8 +365,8 @@
 								</p:scrollPanel>
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlEditContacto" process="pnlEditContacto @this" />
-								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogEditContacto').hide()" class="ui-button-secondary" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes messages" process="pnlEditContacto @this" />
+								<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogEditContacto').hide()" class="ui-button-secondary" />
 							</f:facet>
 						</p:dialog>
 
@@ -420,13 +442,13 @@
 							<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
 						</p:confirmDialog>
 
-						<p:confirmDialog widgetVar="deleteContactoDialog" showEffect="fade" width="400" message="Desea eliminar el contacto?" header="Eliminar" severity="warn">
-							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarClienteContacto()}" oncomplete="PF('deleteContactoDialog').hide()" />
-							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteContactoDialog').hide()" />
+						<p:confirmDialog widgetVar="deleteContactoDialog" showEffect="fade" width="400" message="¿Desea eliminar el contacto?" header="Eliminar" severity="warn">
+							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarContacto()}" oncomplete="PF('deleteContactoDialog').hide()" update="pnlContacto dt-clientes"/>
+							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteContactoDialog').hide()" update="dtContactos" />
 						</p:confirmDialog>
 
 						<p:confirmDialog widgetVar="deleteMedioContactoDialog" showEffect="fade" width="400" message="Desea eliminar el medio de contacto?" header="Eliminar" severity="warn">
-							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarMedioContacto()}" oncomplete="PF('deleteMedioContactoDialog').hide()" />
+							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarMedioContacto()}" oncomplete="PF('deleteMedioContactoDialog').hide()" update="dtMedioContacto" />
 							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteMedioContactoDialog').hide()" />
 						</p:confirmDialog>
 					</div>
