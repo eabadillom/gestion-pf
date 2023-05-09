@@ -86,6 +86,7 @@ public class CalculoPrevioBean implements Serializable{
 	public void init() {
 		
 		//fechaEmision = new Date();
+		procesarEntradas();
 		
 	}
 
@@ -227,6 +228,14 @@ public class CalculoPrevioBean implements Serializable{
 		PrecioServicio precioServicio= precioServicioMax.get();
 		
 		return precioServicio;
+	}
+	
+	
+	public void procesarEntradas() {
+		
+		System.out.println(listaEntradas);
+		
+		
 	}
 	
 }

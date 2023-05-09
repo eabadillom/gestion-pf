@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -8,9 +9,12 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
+import com.ctc.wstx.util.DataUtil;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
@@ -32,7 +36,11 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public List<ConstanciaFactura> buscarNoFacturados(Integer idCliente, Integer idPlanta) {
 		List<ConstanciaDeDeposito> listaConstancias = null;
 		List<ConstanciaFactura> listaConstanciaFactura = null;
+		
 		ConstanciaFactura cf = null;
+		Date vigenciaInicio = null;
+		Date vigenciaFin = null;
+		int vigencia = 0;
 		
 		EntityManager em = null;
 		String sql = null;
@@ -85,11 +93,16 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			
 			for(ConstanciaDeDeposito cdd: listaConstancias){
 				
+				vigencia = cdd.getAvisoCve().getAvisoVigencia();
+				vigenciaInicio = cdd.getFechaIngreso();
+				vigenciaFin = DateUtil.fechaVencimiento(vigenciaInicio, vigencia, false);
+				
 				cf = new ConstanciaFactura();
 				
 				cf.setFolio(cdd);
 				cf.setFolioCliente(cdd.getFolioCliente());
 				cf.setVigenciaInicio(cdd.getFechaIngreso());
+				cf.setVigenciaFin(vigenciaFin);
 				
 				listaConstanciaFactura.add(cf);
 			}
