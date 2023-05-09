@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
@@ -37,7 +36,7 @@ public class CalculoPrevioBean implements Serializable{
 	private FacesContext context;
 	private HttpServletRequest request;
 	
-	private List<ConstanciaDeDeposito> listaEntradas;
+	private List<ConstanciaFactura> listaEntradas;
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
 	private List<ConstanciaFacturaDs> listaConstanciaFacturaDs;
@@ -55,7 +54,7 @@ public class CalculoPrevioBean implements Serializable{
 		try {
 			context = FacesContext.getCurrentInstance();
 			request = (HttpServletRequest) context.getExternalContext().getRequest();
-			listaEntradas = (List<ConstanciaDeDeposito>) request.getSession(false).getAttribute("entradas");
+			listaEntradas = (List<ConstanciaFactura>) request.getSession(false).getAttribute("entradas");
 			listaVigencias = (List<ConstanciaFactura>) request.getSession(false).getAttribute("vigencias");	
 			listaServicios = (List<ConstanciaFacturaDs>) request.getSession(false).getAttribute("servicios");
 			clienteSelect = (Cliente) request.getSession(false).getAttribute("cliente");
@@ -98,11 +97,11 @@ public class CalculoPrevioBean implements Serializable{
 		this.facturacionBean = facturacionBean;
 	}
 
-	public List<ConstanciaDeDeposito> getListaEntradas() {
+	public List<ConstanciaFactura> getListaEntradas() {
 		return listaEntradas;
 	}
 
-	public void setListaEntradas(List<ConstanciaDeDeposito> listaEntradas) {
+	public void setListaEntradas(List<ConstanciaFactura> listaEntradas) {
 		this.listaEntradas = listaEntradas;
 	}
 
@@ -177,7 +176,7 @@ public class CalculoPrevioBean implements Serializable{
 				
 				List<PrecioServicio> listaPrecioS =  csd.getServicioCve().getPrecioServicioList();				
 				PrecioServicio precioServicio = getPrecioServicio(clienteSelect.getCteCve(),listaPrecioS);				
-				cantidad = precioServicio.getPrecio();//variable agregada
+				cantidad = precioServicio.getPrecio().setScale(2);//variable agregada
 				
 				importe = csd.getServicioCantidad().multiply(cantidad);
 				
@@ -202,7 +201,7 @@ public class CalculoPrevioBean implements Serializable{
 				productoConstanciaDs.setConstancia(cfd);
 				productoConstanciaDs.setCatidadCobro(ps.getCantidadDeCobro());
 				productoConstanciaDs.setUnidadCobro(ps.getUnidadDeCobro().getUnidadDeManejoDs());
-				productoConstanciaDs.setCantidadManejo(new BigDecimal(ps.getCantidadTotal()));
+				productoConstanciaDs.setCantidadManejo(new BigDecimal(ps.getCantidadTotal()).setScale(2));
 				productoConstanciaDs.setUnidadManejo(ps.getUnidadDeManejoCve().getUnidadDeManejoDs());
 								
 				constanciaFacturaDs.getProductoConstanciaDsList().add(productoConstanciaDs);
@@ -213,7 +212,6 @@ public class CalculoPrevioBean implements Serializable{
 		}
 			
 	}
-	
 	
 	
 	private PrecioServicio getPrecioServicio(Integer idCliente, List<PrecioServicio> listaPrecioS) {
@@ -230,17 +228,5 @@ public class CalculoPrevioBean implements Serializable{
 		
 		return precioServicio;
 	}
-	
-
-	
-	/* Metodo de prueba 
-	public void verAtributos() {
-		
-		
-		context = FacesContext.getCurrentInstance();
-		request = (HttpServletRequest) context.getExternalContext().getRequest();
-		listaEntradas = (List<ConstanciaDeDeposito>) request.getSession(false).getAttribute("lista");
-		
-	}*/
 	
 }

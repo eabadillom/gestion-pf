@@ -145,7 +145,7 @@
 						</div>
 						
 						<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}"
-						 var="entrada" rowKey="#{entrada.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5" selection="#{facturacionConstanciasBean.selectedEntradas}">
+						 var="entrada" rowKey="#{entrada.folio.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5" selection="#{facturacionConstanciasBean.selectedEntradas}">
 							<f:facet name="header">							 
 								<div>								
 									<span>Constancias De Entradas A Factura</span>								
@@ -161,11 +161,11 @@
 							<p:column selectionMode="multiple" exportable="false"/>
 						
 							<p:column headerText="Folio Cliente">
-								<h:outputText value="#{entrada.folioCliente}"/>
+								<h:outputText value="#{entrada.folio.folioCliente}"/>
 							</p:column>
 							
 							<p:column headerText="Fecha Ingreso">
-								<h:outputText value="#{entrada.fechaIngreso}" >
+								<h:outputText value="#{entrada.folio.fechaIngreso}" >
 									<f:convertDateTime pattern="dd/MMM/YYYY" />
 								</h:outputText>
 							</p:column>

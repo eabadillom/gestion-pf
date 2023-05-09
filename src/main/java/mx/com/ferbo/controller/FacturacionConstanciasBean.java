@@ -85,11 +85,11 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<Aviso> listaAviso;
 	private List<MetodoPago> listaMetodoPago;
 	private List<MedioPago> listaMedioPago;
-	private List<ConstanciaDeDeposito> listaEntradas;
+	private List<ConstanciaFactura> listaEntradas;
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
 	
-	private List<ConstanciaDeDeposito> selectedEntradas;
+	private List<ConstanciaFactura> selectedEntradas;
 	private List<ConstanciaFactura> selectedVigencias;
 	private List<ConstanciaFacturaDs> selectedServicios;
 	
@@ -279,6 +279,14 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.listaMetodoPago = listaMetodoPago;
 	}
 
+	public List<ConstanciaFactura> getListaEntradas() {
+		return listaEntradas;
+	}
+
+	public void setListaEntradas(List<ConstanciaFactura> listaEntradas) {
+		this.listaEntradas = listaEntradas;
+	}
+
 	public MedioPago getMedioPagoSelect() {
 		return medioPagoSelect;
 	}
@@ -293,14 +301,6 @@ public class FacturacionConstanciasBean implements Serializable{
 
 	public void setListaMedioPago(List<MedioPago> listaMedioPago) {
 		this.listaMedioPago = listaMedioPago;
-	}	
-
-	public List<ConstanciaDeDeposito> getListaEntradas() {
-		return listaEntradas;
-	}
-
-	public void setListaEntradas(List<ConstanciaDeDeposito> listaEntradas) {
-		this.listaEntradas = listaEntradas;
 	}	
 
 	public Date getFechaCorte() {
@@ -335,11 +335,11 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.selectedVigencias = selectedVigencias;
 	}
 
-	public List<ConstanciaDeDeposito> getSelectedEntradas() {
+	public List<ConstanciaFactura> getSelectedEntradas() {
 		return selectedEntradas;
 	}
 
-	public void setSelectedEntradas(List<ConstanciaDeDeposito> selectedEntradas) {
+	public void setSelectedEntradas(List<ConstanciaFactura> selectedEntradas) {
 		this.selectedEntradas = selectedEntradas;
 	}
 

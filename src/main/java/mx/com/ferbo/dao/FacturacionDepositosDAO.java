@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -9,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
@@ -27,14 +29,17 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ConstanciaDeDeposito> buscarNoFacturados(Integer idCliente, Integer idPlanta) {
+	public List<ConstanciaFactura> buscarNoFacturados(Integer idCliente, Integer idPlanta) {
 		List<ConstanciaDeDeposito> listaConstancias = null;
+		List<ConstanciaFactura> listaConstanciaFactura = null;
+		ConstanciaFactura cf = null;
 		
 		EntityManager em = null;
 		String sql = null;
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
+			listaConstanciaFactura = new ArrayList<>();
 			
 			//La siguiente consulta recibe dos parámetros: cteCve y plantaCve
 			sql = "select "
@@ -78,6 +83,18 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			
 			listaConstancias = query.getResultList();
 			
+			for(ConstanciaDeDeposito cdd: listaConstancias){
+				
+				cf = new ConstanciaFactura();
+				
+				cf.setFolio(cdd);
+				cf.setFolioCliente(cdd.getFolioCliente());
+				cf.setVigenciaInicio(cdd.getFechaIngreso());
+				
+				listaConstanciaFactura.add(cf);
+			}
+			
+			
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener la lista de entradas no facturadas...", ex);
@@ -86,7 +103,7 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				em.close();
 		}
 		
-		return listaConstancias;
+		return listaConstanciaFactura;
 	}
 
 	@Override

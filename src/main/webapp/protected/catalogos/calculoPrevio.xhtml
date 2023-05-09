@@ -26,7 +26,7 @@
 					<p:button value="Atras" outcome="/protected/catalogos/facturacionConstancias"></p:button>
 					
 					<p:dataTable id="dt-selectedEntradas" value="#{calculoPrevioBean.listaEntradas}" var="entrada" 
-					rowKey="#{entrada.folio}" rows="5" reflow="true" paginator="true" paginatorPosition="bottom">
+					rowKey="#{entrada.folio.folio}" rows="5" reflow="true" paginator="true" paginatorPosition="bottom">
 					
 					<f:facet name="header">
 						<div>
@@ -35,11 +35,11 @@
 					</f:facet>
 					
 					<p:column headerText="Folio Cliente">
-						<h:outputText value="#{entrada.folioCliente}" />
+						<h:outputText value="#{entrada.folio.folioCliente}" />
 					</p:column>
 					
 					<p:column headerText="Fecha Ingreso">
-						<h:outputText value="#{entrada.fechaIngreso}">
+						<h:outputText value="#{entrada.folio.fechaIngreso}">
 							<f:convertDateTime pattern="dd/MMM/YYYY" />
 						</h:outputText>
 					</p:column>
@@ -92,18 +92,14 @@
 						</h:outputText>
 					</p:column>
 					
-					</p:dataTable>
-					
-					
-					
-					<p:commandButton value="Ver" actionListener="#{calculoPrevioBean.verServicios()}" />
+					</p:dataTable>																			
 					
 					<p:dataTable id="dt-constanciaFacturaDs" value="#{calculoPrevioBean.listaConstanciaFacturaDs}" var="constanciaFacturaDs"
 							rowKey="#{constanciaFacturaDs.id}">
 							
 					<f:facet name="header">
 						<div>
-							<span>Constancias De Servicios</span>	
+							<span>Detalle Constancias De Servicio</span>	
 						</div>
 					</f:facet>									
 					
