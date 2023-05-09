@@ -103,7 +103,7 @@
 										</div>
 									</p:divider>
 
-									<p:datePicker id="fechaFact" showIcon="true" placeholder="Fecha de Factura" value="#{facturaServiciosBean.fechaFactura}" styleClass="p-ml-2 p-mr-4" size="13" />
+									<p:datePicker id="fechaFact" showIcon="true" value="#{facturaServiciosBean.fechaFactura}" styleClass="p-ml-2 p-mr-4" size="13" />
 
 									<p:outputLabel value="Moneda:" />
 									<p:inputText value="#{facturaServiciosBean.moneda}" styleClass="p-ml-2 p-mr-4" style="width: 5%" readonly="true" />
@@ -115,7 +115,7 @@
 									</p:selectOneMenu>
 
 									<span class="ui-float-label ui-input-icon-left"> 
-									<p:inputText styleClass="p-ml-2 p-mr-4"></p:inputText> 
+									<p:inputText styleClass="p-ml-2 p-mr-4" value="#{facturaServiciosBean.referencia}"></p:inputText> 
 									<p:outputLabel value="Referencia" />
 									</span>
 
@@ -162,10 +162,10 @@
 
 		<p:fieldset legend="Servicios">
 			<p:outputPanel id="servicioSelect">
-				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{facturaServiciosBean.idPrecioServicio}" filterMatchMode="startsWith">
+				<p:selectOneMenu id="selServicio" autoWidth="true" converter="entityConverter" value="#{facturaServiciosBean.precioServicio}" filterMatchMode="startsWith">
 					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
 					<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" 
-						itemValue="#{selectedPrecioServicio.id}" />
+						itemValue="#{selectedPrecioServicio}" />
 				</p:selectOneMenu>
 				<p:column>
 				<p:inputNumber id="txtCantidadSrv" value="#{facturaServiciosBean.cantidadServicio}" placeholder="Cantidad" decimalPlaces="0" style="width: 6em;"/></p:column>
@@ -209,10 +209,11 @@
 		
 <div>
         <p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.SaveFactura}" icon="pi pi-save">
-          <!--    <p:menuitem value="Generar reporte" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-            <p:menuitem value="Vista Preliminar" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+            <p:menuitem value="Generar reporte" actionListener="#{facturaServiciosBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-times"/>
+            <!--  <p:menuitem value="Vista Preliminar" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
             <p:menuitem value="Timbrar" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-times"/>-->
+            -->
         </p:splitButton>
 </div>
 					</div>

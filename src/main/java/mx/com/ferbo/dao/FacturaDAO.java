@@ -7,14 +7,17 @@ import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.StatusFactura;
+import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 
 	@Override
 	public Factura buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager entity = EntityManagerUtil.getEntityManager();
+		Factura fact = entity.createNamedQuery("Factura.findById", Factura.class)
+				.setParameter("id",id).getSingleResult();
+		return fact;
 	}
 
 	@Override

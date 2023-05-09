@@ -1,8 +1,12 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -44,9 +48,12 @@ import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
+import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.FacturaMedioPago;
+import mx.com.ferbo.model.FacturaMedioPagoPK;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
@@ -58,8 +65,12 @@ import mx.com.ferbo.model.ServicioFactura;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.FormatUtil;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
+import net.sf.jasperreports.engine.JRException;
 
 @Named
 @ViewScoped
@@ -85,6 +96,7 @@ public class FacturaServiciosBean implements Serializable {
 	private List<SerieFactura> listaSerieF;
 	private List<SerieFactura> listaSerieFactura;
 	private List<ServicioFactura> alServiciosDetalle;
+	private List<FacturaMedioPago> listaFacturaMedioPago;
 
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
@@ -94,11 +106,8 @@ public class FacturaServiciosBean implements Serializable {
 	private Parametro iva, retencion;
 	private SerieFactura serieFacturaSelect;
 	private ServicioFactura selServicio;
-	private BigDecimal subtotal;
-	private BigDecimal bdIva;
-	private BigDecimal total;
-	private BigDecimal tasaIva;
-	private String montoLetra;
+	private PrecioServicio precioServicio;
+	private Factura factura;
 
 	private ClienteDAO clienteDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
@@ -114,14 +123,20 @@ public class FacturaServiciosBean implements Serializable {
 	private StatusFacturaDAO statusDAO;
 	private TipoFacturacionDAO tipoDAO;
 
+	private int plazoSelect;
+	private Integer idPrecioServicio;
+	private Integer idFactura;
 	private Date fechaFactura;
 	private Date fechaCorte;
 	private String moneda = "MX$";
-	private int plazoSelect;
-	private Integer idCliente;
-	private Integer idPrecioServicio;
-	private BigDecimal cantidadServicio;
+	private String montoLetra;
 	private String Obervaciones;
+	private BigDecimal cantidadServicio;
+	private BigDecimal subtotal;
+	private BigDecimal bdIva;
+	private BigDecimal total;
+	private BigDecimal tasaIva;
+	private String referencia;
 
 	public FacturaServiciosBean() {
 		clientes = new ArrayList<Cliente>();
@@ -135,9 +150,10 @@ public class FacturaServiciosBean implements Serializable {
 		listaAviso = new ArrayList<Aviso>();
 		listaMetodoPago = new ArrayList<MetodoPago>();
 		alServiciosDetalle = new ArrayList<ServicioFactura>();
-		listaEntradas = new ArrayList<>();
-		listaVigencias = new ArrayList<>();
-		listaServicios = new ArrayList<>();
+		listaEntradas = new ArrayList<ConstanciaDeDeposito>();
+		listaVigencias = new ArrayList<ConstanciaFactura>();
+		listaServicios = new ArrayList<ConstanciaFacturaDs>();
+		listaFacturaMedioPago = new ArrayList<FacturaMedioPago>();
 		subtotal = new BigDecimal(0);
 		bdIva = new BigDecimal(0);
 		total  = new BigDecimal(0);
@@ -286,23 +302,14 @@ public class FacturaServiciosBean implements Serializable {
 	public void agregarServicio() {
 		String message = null;
 		Severity severity = null;
-		PrecioServicio precioServicio = null;
 		ServicioFactura servicio = null;
-
 		try {
-			if (this.clienteSelect == null )
-				throw new InventarioException("Debe seleccionar el cliente");
-
 			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
 				throw new InventarioException("Debe indicar la cantidad de servicios.");
-
-			if (this.idPrecioServicio == null)
-				throw new InventarioException("Debe seleccionar un servicio.");
-
-			precioServicio = this.alServicios.stream().filter(ps -> this.idPrecioServicio.equals(ps.getId())).collect(Collectors.toList()).get(0);
+			if (this.precioServicio == null)
+				throw new InventarioException("Debe seleccionar un servicio.");			
 			if (alServiciosDetalle == null)
 				alServiciosDetalle = new ArrayList<ServicioFactura>();
-
 			servicio = new ServicioFactura();
 			servicio.setDescripcion(precioServicio.getServicio().getServicioDs());
 			servicio.setCantidad(cantidadServicio);
@@ -310,8 +317,28 @@ public class FacturaServiciosBean implements Serializable {
 			servicio.setUnidad(precioServicio.getUnidad().getUnidadDeManejoDs());
 			servicio.setTarifa(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP));
 			servicio.setCosto(cantidadServicio.multiply(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP)));
-			alServiciosDetalle.add(servicio);
+			//alServiciosDetalle.add(servicio);
 			subtotal= BigDecimal.ZERO;
+			int coincidencias = 0, diferentes = 0;
+			if(alServiciosDetalle.size() == 0){
+				alServiciosDetalle.add(servicio);
+			}else {
+				for(ServicioFactura srv : alServiciosDetalle) {
+					if(srv.getDescripcion() == servicio.getDescripcion()) {
+						//alServiciosDetalle.add(servicio);+
+						coincidencias++;
+					}else {
+						diferentes++;
+					}
+				}
+				
+				if(coincidencias==1) {
+					System.out.println("ya existe el servicio");
+				}
+				else if(diferentes>0) {
+					alServiciosDetalle.add(servicio);
+				}
+			}
 			for(ServicioFactura sf : alServiciosDetalle  )
 			{
 				subtotal = subtotal.add(sf.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -321,6 +348,7 @@ public class FacturaServiciosBean implements Serializable {
 			montoLetra = FormatUtil.numeroPalabras(total.doubleValue());
 			message = "Servicio(s) agregado(s) correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
+			
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -335,42 +363,9 @@ public class FacturaServiciosBean implements Serializable {
 		}
 	}
 
-
-	/*
-	 * public void filtrarCliente() { String message = null; Severity severity =
-	 * null; EntityManager manager = null; Cliente cliente; Map<Integer,
-	 * List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer,
-	 * List<PrecioServicio>>(); List<PrecioServicio> precioServicioList = null;
-	 * clienteSelect.setCteCve(this.idCliente);
-	 * 
-	 * try { log.info("Entrando a filtrar cliente..."); manager =
-	 * EntityManagerUtil.getEntityManager(); cliente =
-	 * manager.createNamedQuery("Cliente.findByCteCve",
-	 * Cliente.class).setParameter("cteCve", this.idCliente).getSingleResult();
-	 * precioServicioList = cliente.getPrecioServicioList(); Integer idAviso = new
-	 * Integer(-1); for (PrecioServicio ps : precioServicioList) { Integer avisoCve
-	 * = ps.getAvisoCve().getAvisoCve(); if (avisoCve > idAviso) idAviso = new
-	 * Integer(avisoCve); List<PrecioServicio> list =
-	 * mpPrecioServicio.get(avisoCve); if (list == null) { list = new
-	 * ArrayList<PrecioServicio>(); mpPrecioServicio.put(avisoCve, list); }
-	 * list.add(ps); } mpPrecioServicio.get(idAviso); alServicios.clear();
-	 * alServicios = mpPrecioServicio.get(idAviso); for (PrecioServicio ps :
-	 * alServicios) { log.info(ps.getServicio().getServicioDs());
-	 * log.info(ps.getUnidad().getUnidadDeManejoDs()); } message =
-	 * "Agregue sus servicios."; severity = FacesMessage.SEVERITY_INFO; } catch
-	 * (Exception ex) { log.error("Problema para recuperar los datos del cliente.",
-	 * ex); message = ex.getMessage(); severity = FacesMessage.SEVERITY_ERROR; }
-	 * finally { if (manager != null) manager.close();
-	 * FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,
-	 * "Cliente", message)); PrimeFaces.current().ajax().update("form:messages",
-	 * "form:receptor"); } log.info("servicios del cliente filtrados.");
-	 * 
-	 * }
-	 */
 		public void SaveFactura() {
 			String message = null;
 			Severity severity = null;
-			Factura factura = null;
 			Cliente cliente = null;
 			ServicioFactura servicio = null;
 			Planta planta=  null;
@@ -422,9 +417,25 @@ public class FacturaServiciosBean implements Serializable {
 				factura.setInicioServicios(this.fechaFactura);
 				factura.setFinServicios(this.fechaFactura);
 				factura.setMontoLetra(FormatUtil.numeroPalabras(total.doubleValue())); 
+				factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
+				//FacturaMedioPago fmp = new FacturaMedioPago();
+					//int facturaid = facMP.getFacturaMedioPagoPK().getFacturaId();
+					FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();
+					facturaPK.setFacturaId(factura);
+					facturaPK.setFmpId(0);
+					FacturaMedioPago fmp = new FacturaMedioPago();
+					fmp.setFacturaMedioPagoPK(facturaPK);
+					fmp.setMpId(medioPagoSelect);
+					fmp.setFactura(factura);
+					fmp.setFmpPorcentaje(100);
+					fmp.setMpDescripcion(medioPagoSelect.getMpDescripcion());
+					fmp.setFmpReferencia(referencia);
+					factura.getFacturaMedioPagoList().add(fmp);
+					//fmp.getFacturaMedioPagoPK().setFacturaId(1);
+				
 				StatusFactura status = statusDAO.buscarPorId(1);
 				factura.setStatus(status);
-				TipoFacturacion tipo = tipoDAO.buscarPorId(5);
+				TipoFacturacion tipo = tipoDAO.buscarPorId(1);
 				factura.setTipoFacturacion(tipo);
 				//datos Emisor
 				factura.setPlanta(plantaSelect);//sucursal
@@ -444,6 +455,7 @@ public class FacturaServiciosBean implements Serializable {
 					sef.setFactura(factura);
 				}
 				facturaDAO.guardar(factura);
+				
 				severity = FacesMessage.SEVERITY_INFO;
 				message = "La factura se guardo correctamente";
 			}catch (Exception ex) {
@@ -469,6 +481,52 @@ public class FacturaServiciosBean implements Serializable {
 		montoLetra = FormatUtil.numeroPalabras(total.doubleValue());
 		PrimeFaces.current().ajax().update("form:subtotal","form:iva","form:total","form:montoLetra");
 	}
+	
+	public void jasper() throws JRException, IOException, SQLException {
+		String jasperPath = "/jasper/Factura.jrxml";
+		String filename = "Factura " + fechaFactura + ".pdf";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
+		Factura sf = null;
+		/*List<Factura> listaFactura = null;
+		facturaDAO.buscarPorId(selServicio.getFactura().getId());*/
+ 		File reportFile = new File(jasperPath);
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		//ServicioFactura serviF = new ServicioFactura();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			log.info(reportFile.getPath());
+			sf = new Factura();
+			Integer num = factura.getId();
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("idFactura", num);
+			parameters.put("imagen", imgfile.getPath());
+			log.info("Parametros: " + parameters.toString());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+		} catch (Exception ex) {
+			ex.fillInStackTrace();
+			log.error("Problema general...", ex);
+			message = String.format("No se pudo imprimir el folio %s", this.selServicio);
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
+		} finally {
+			conexion.close((Connection) connection);
+		}
+	
+}
 
 	public void reload() throws IOException {
 	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
@@ -628,15 +686,6 @@ public class FacturaServiciosBean implements Serializable {
 		this.listaMedioPago = listaMedioPago;
 	}
 
-
-	public Integer getIdCliente() {
-		return idCliente;
-	}
-
-	public void setIdCliente(Integer idCliente) {
-		this.idCliente = idCliente;
-	}
-
 	public List<PrecioServicio> getAlServicios() {
 		return alServicios;
 	}
@@ -788,5 +837,39 @@ public class FacturaServiciosBean implements Serializable {
 	public void setMontoLetra(String montoLetra) {
 		this.montoLetra = montoLetra;
 	}
+
+	public PrecioServicio getPrecioServicio() {
+		return precioServicio;
+	}
+
+	public void setPrecioServicio(PrecioServicio precioServicio) {
+		this.precioServicio = precioServicio;
+	}
+
+	public Integer getIdFactura() {
+		return idFactura;
+	}
+
+	public void setIdFactura(Integer idFactura) {
+		this.idFactura = idFactura;
+	}
+
+	public BigDecimal getTasaIva() {
+		return tasaIva;
+	}
+
+	public void setTasaIva(BigDecimal tasaIva) {
+		this.tasaIva = tasaIva;
+	}
+
+	public String getReferencia() {
+		return referencia;
+	}
+
+	public void setReferencia(String referencia) {
+		this.referencia = referencia;
+	}
+	
+	
 	
 }
