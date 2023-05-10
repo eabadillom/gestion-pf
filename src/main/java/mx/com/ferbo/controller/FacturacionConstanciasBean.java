@@ -462,13 +462,19 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 	
 	public void facturacionEntradas(){
-	
+		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityTransaction trans = em.getTransaction();
+		trans.begin();
+		facturacionConstanciasDAO.setEm(em);
 		
 		listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
 		
 		if(listaEntradas.isEmpty()){
 			listaEntradas = new ArrayList<>();
 		}
+		
+		em.close();
 		
 	}
 	
@@ -498,6 +504,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			listaServicios = new ArrayList<>();
 		}
 		
+		em.close();//agregado 
 		
 	}
 	

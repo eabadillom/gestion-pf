@@ -20,6 +20,8 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 	private static Logger log = Logger.getLogger(FacturacionDepositosDAO.class);
 	
+	EntityManager em = null;
+	
 	@Override
 	public ConstanciaDeDeposito buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -42,11 +44,11 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		Date vigenciaFin = null;
 		int vigencia = 0;
 		
-		EntityManager em = null;
+		//EntityManager em = null;
 		String sql = null;
 		
 		try {
-			em = EntityManagerUtil.getEntityManager();
+			//em = EntityManagerUtil.getEntityManager();
 			listaConstanciaFactura = new ArrayList<>();
 			
 			//La siguiente consulta recibe dos parámetros: cteCve y plantaCve
@@ -148,5 +150,15 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
+	}
+	
+	
 
 }

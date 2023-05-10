@@ -16,14 +16,19 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.ProductoConstanciaDs;
+import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.ServicioConstanciaDs;
+import mx.com.ferbo.model.TipoCobro;
 @Named
 
 public class CalculoPrevioBean implements Serializable{
@@ -41,16 +46,62 @@ public class CalculoPrevioBean implements Serializable{
 	private List<ConstanciaFacturaDs> listaServicios;
 	private List<ConstanciaFacturaDs> listaConstanciaFacturaDs;
 	
+	private PrecioServicioDAO precioServicioDAO;
+	
 	private Cliente clienteSelect;
 	
 	private Date fechaEmision;
 	private BigDecimal cantidad;
 	
-	@SuppressWarnings("unchecked")
 	public CalculoPrevioBean() {
 		
 		listaConstanciaFacturaDs = new ArrayList<>();
+		listaEntradas = new ArrayList<>();
+		listaServicios = new ArrayList<>();
+		listaVigencias = new ArrayList<>();
 		
+		clienteSelect = new Cliente();
+		
+		precioServicioDAO = new PrecioServicioDAO();
+		
+		
+		/*try {
+			context = FacesContext.getCurrentInstance();
+			request = (HttpServletRequest) context.getExternalContext().getRequest();
+			listaEntradas = (List<ConstanciaFactura>) request.getSession(false).getAttribute("entradas");
+			listaVigencias = (List<ConstanciaFactura>) request.getSession(false).getAttribute("vigencias");	
+			listaServicios = (List<ConstanciaFacturaDs>) request.getSession(false).getAttribute("servicios");
+			clienteSelect = (Cliente) request.getSession(false).getAttribute("cliente");
+			fechaEmision = (Date) request.getSession(false).getAttribute("fechaEmision");
+			
+			if(listaEntradas.isEmpty()) {
+				listaEntradas = new ArrayList<>();
+			}
+			
+			if(listaVigencias.isEmpty()) {
+				listaVigencias = new ArrayList<>();
+			}
+			
+			if(listaServicios.isEmpty()) {
+				listaServicios = new ArrayList<>();
+			}
+			
+			verServicios();
+			//procesarEntradas();
+			PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs");
+			
+		} catch (Exception e) {
+			
+			System.out.println("ERROR" + e.getMessage());
+		}*/
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@PostConstruct
+	public void init() {
+		
+		//fechaEmision = new Date();
 		try {
 			context = FacesContext.getCurrentInstance();
 			request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -73,20 +124,13 @@ public class CalculoPrevioBean implements Serializable{
 			}
 			
 			verServicios();
+			procesarEntradas();
 			PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs");
 			
 		} catch (Exception e) {
 			
 			System.out.println("ERROR" + e.getMessage());
 		}
-		
-	}
-	
-	@PostConstruct
-	public void init() {
-		
-		//fechaEmision = new Date();
-		procesarEntradas();
 		
 	}
 
@@ -233,9 +277,38 @@ public class CalculoPrevioBean implements Serializable{
 	
 	public void procesarEntradas() {
 		
-		System.out.println(listaEntradas);
+		BigDecimal importe = new BigDecimal(0);
 		
-		
+		for(ConstanciaFactura cf: listaEntradas) {
+			
+			ConstanciaDeDeposito cdd = cf.getFolio();
+			
+			for(ConstanciaDepositoDetalle cs: cdd.getConstanciaDepositoDetalleList()) {
+				
+				//System.out.println(cs.getServicioCve().getCobro().getId());
+				Servicio servicio = cs.getServicioCve();
+				TipoCobro tipoCobro = servicio.getCobro();
+				
+				PrecioServicio precioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(), clienteSelect.getCteCve(), servicio.getServicioCve());
+				
+				switch(tipoCobro.getId()) {
+				
+				case 1:
+				case 2:
+					
+					importe = cs.getServicioCantidad().multiply(precioServicio.getPrecio());
+					System.out.println("El tipo cobor es 1 o 2 y su importe es: "+importe);
+					break;
+				default:
+					
+					System.out.println("Tiene ntipo de cobro 3 o 4");
+					break;
+				}
+				
+			}
+		}
 	}
+	
+	
 	
 }
