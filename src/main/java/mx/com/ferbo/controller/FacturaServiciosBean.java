@@ -28,8 +28,18 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import com.ferbo.facturama.business.CfdiBL;
+import com.ferbo.facturama.request.CFDIInfo;
+import com.ferbo.facturama.request.IssuerBindingModel;
+import com.ferbo.facturama.request.ItemFullBindingModel;
+import com.ferbo.facturama.request.ReceiverBindingModel;
+import com.ferbo.facturama.request.Tax;
+import com.ferbo.facturama.response.CfdiInfoModel;
+import com.ferbo.facturama.tools.FacturamaException;
+
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
+import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
@@ -43,14 +53,13 @@ import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoFacturacionDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
-import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.model.Domicilios;
-import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturaMedioPago;
 import mx.com.ferbo.model.FacturaMedioPagoPK;
@@ -77,7 +86,7 @@ import net.sf.jasperreports.engine.JRException;
 public class FacturaServiciosBean implements Serializable {
 
 	private static final long serialVersionUID = 3500528042991256313L;
-	private static Logger log = Logger.getLogger(FacturaServiciosBean.class);	
+	private static Logger log = Logger.getLogger(FacturaServiciosBean.class);
 
 	private List<Cliente> clientes;
 	private List<ClienteDomicilios> listaClienteDom;
@@ -101,8 +110,8 @@ public class FacturaServiciosBean implements Serializable {
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
 	private Planta plantaSelect;
-	private MetodoPago metodoPagoSelect;
-	private MedioPago medioPagoSelect;
+	private String metodoPagoSelect;
+	private String medioPagoSelect;
 	private Parametro iva, retencion;
 	private SerieFactura serieFacturaSelect;
 	private ServicioFactura selServicio;
@@ -122,13 +131,14 @@ public class FacturaServiciosBean implements Serializable {
 	private AsentamientoHumandoDAO asnDAO;
 	private StatusFacturaDAO statusDAO;
 	private TipoFacturacionDAO tipoDAO;
+	private ClaveUnidadDAO claveDAO;
 
 	private int plazoSelect;
 	private Integer idPrecioServicio;
 	private Integer idFactura;
 	private Date fechaFactura;
 	private Date fechaCorte;
-	private String moneda = "MX$";
+	private String moneda = "MXN";
 	private String montoLetra;
 	private String Obervaciones;
 	private BigDecimal cantidadServicio;
@@ -139,6 +149,7 @@ public class FacturaServiciosBean implements Serializable {
 	private String referencia;
 
 	public FacturaServiciosBean() {
+		
 		clientes = new ArrayList<Cliente>();
 		alServicios = new ArrayList<PrecioServicio>();
 		listaClienteDom = new ArrayList<ClienteDomicilios>();
@@ -154,10 +165,14 @@ public class FacturaServiciosBean implements Serializable {
 		listaVigencias = new ArrayList<ConstanciaFactura>();
 		listaServicios = new ArrayList<ConstanciaFacturaDs>();
 		listaFacturaMedioPago = new ArrayList<FacturaMedioPago>();
+		
 		subtotal = new BigDecimal(0);
 		bdIva = new BigDecimal(0);
-		total  = new BigDecimal(0);
+		total = new BigDecimal(0);
 		fechaFactura = new Date();
+		clienteSelect = new Cliente();
+		metodoPagoSelect = null;
+		medioPagoSelect = null;
 		
 		clienteDAO = new ClienteDAO();
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
@@ -168,11 +183,11 @@ public class FacturaServiciosBean implements Serializable {
 		parametroDAO = new ParametroDAO();
 		seriefacturaDAO = new SerieFacturaDAO();
 		facturacionConstanciasDAO = new FacturacionDepositosDAO();
-		clienteSelect = new Cliente();
 		asnDAO = new AsentamientoHumandoDAO();
 		statusDAO = new StatusFacturaDAO();
 		tipoDAO = new TipoFacturacionDAO();
 		facturaDAO = new FacturaDAO();
+		claveDAO = new ClaveUnidadDAO();
 	}
 
 	@PostConstruct
@@ -190,7 +205,7 @@ public class FacturaServiciosBean implements Serializable {
 	public void domicilioAvisoPorCliente() {
 		String message = null;
 		Severity severity = null;
-		iva = parametroDAO.buscarPorNombre("IVA");//
+		iva = parametroDAO.buscarPorNombre("IVA");
 		tasaIva = new BigDecimal(iva.getValor()).setScale(2, BigDecimal.ROUND_HALF_UP);
 		retencion = parametroDAO.buscarPorNombre("RETENCION");
 		Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
@@ -198,12 +213,13 @@ public class FacturaServiciosBean implements Serializable {
 		listaClienteDomicilio.clear();
 		listaClienteDomicilio = listaClienteDom.stream()
 				.filter(cd -> clienteSelect != null
-						? (cd.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
-						:false)
+						? (cd.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())
+						: false)
 				.collect(Collectors.toList());
 		if (listaClienteDomicilio.size() > 0) {
 			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
 		}
+		
 		precioServicioList = clienteSelect.getPrecioServicioList();
 		Integer idAviso = new Integer(-1);
 		for (PrecioServicio ps : precioServicioList) {
@@ -224,19 +240,29 @@ public class FacturaServiciosBean implements Serializable {
 			log.info(ps.getServicio().getServicioDs());
 			log.info(ps.getUnidad().getUnidadDeManejoDs());
 		}
+		//
 		message = "Agregue sus servicios.";
 		severity = FacesMessage.SEVERITY_INFO;
 		AvisoCliente();
 		constancias();
+		setMedioPago();
+		setMetodoPago();
 	}
+	
+		public void setMedioPago() {
+			medioPagoSelect =  clienteSelect.getFormaPago();
+		}
+		
+		public void setMetodoPago() {
+			metodoPagoSelect = clienteSelect.getMetodoPago().getCdMetodoPago();
+		}
+
 
 	public void AvisoCliente() {
 		listaAviso.clear();
-		listaAviso = listaA.stream()
-				.filter(av -> clienteSelect != null
-				? (av.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())
-						: false)
-				.collect(Collectors.toList());
+		listaAviso = listaA.stream().filter(av -> clienteSelect != null
+						? (av.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())
+						: false).collect(Collectors.toList());
 		Aviso aviso;
 		if (listaAviso.size() > 1) {
 			Optional<Aviso> numeroMax = listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
@@ -249,26 +275,28 @@ public class FacturaServiciosBean implements Serializable {
 			} else {
 				System.out.println("el cliente no tiene aviso");
 			}
-		}	
+		}
 	}
-	
+
 	public void serieFactura() {
 		listaSerieFactura.clear();
 		listaSerieFactura = listaSerieF.stream()
-							.filter(s -> plantaSelect != null		
-							?(s.getIdPlanta().getPlantaCve().intValue()==plantaSelect.getPlantaCve().intValue())
-									:false).collect(Collectors.toList());
-		if(listaSerieFactura.size()>0) {
+				.filter(s -> plantaSelect != null
+						? (s.getIdPlanta().getPlantaCve().intValue() == plantaSelect.getPlantaCve().intValue())
+						: false)
+				.collect(Collectors.toList());
+		if (listaSerieFactura.size() > 0) {
 			serieFacturaSelect = listaSerieFactura.get(0);
 		}
 		constancias();
 	}
-	
+
 	public void constancias() {
 		this.facturacionEntradas();
 		this.facturacionVigencias();
 		PrimeFaces.current().ajax().update("form:dt-constanciasE", "form:dt-vigencias", "form:dt-servicios");
 	}
+
 	public void facturacionEntradas() {
 
 		if (clienteSelect == null) {
@@ -279,8 +307,8 @@ public class FacturaServiciosBean implements Serializable {
 			return;
 		}
 
-		listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(),
-				plantaSelect.getPlantaCve());
+			listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(),
+																			plantaSelect.getPlantaCve());
 
 		if (listaEntradas.isEmpty()) {
 			listaEntradas = new ArrayList<>();
@@ -307,48 +335,52 @@ public class FacturaServiciosBean implements Serializable {
 			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
 				throw new InventarioException("Debe indicar la cantidad de servicios.");
 			if (this.precioServicio == null)
-				throw new InventarioException("Debe seleccionar un servicio.");			
+				throw new InventarioException("Debe seleccionar un servicio.");
+
 			if (alServiciosDetalle == null)
 				alServiciosDetalle = new ArrayList<ServicioFactura>();
+
 			servicio = new ServicioFactura();
 			servicio.setDescripcion(precioServicio.getServicio().getServicioDs());
 			servicio.setCantidad(cantidadServicio);
-			servicio.setUdCobro(precioServicio.getUnidad().getUnidadDeManejoDs());
 			servicio.setUnidad(precioServicio.getUnidad().getUnidadDeManejoDs());
 			servicio.setTarifa(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP));
-			servicio.setCosto(cantidadServicio.multiply(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP)));
-			//alServiciosDetalle.add(servicio);
-			subtotal= BigDecimal.ZERO;
+			servicio.setCosto(
+					cantidadServicio.multiply(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP)));
+			servicio.setTipoCobro(precioServicio.getServicio().getCobro());
+			servicio.setUdCobro("Servicio");
+			servicio.setCodigo(precioServicio.getServicio().getServicioCod());
+			servicio.setCdUnidad(precioServicio.getServicio().getCdUnidad());
+			// alServiciosDetalle.add(servicio);
+			subtotal = BigDecimal.ZERO;
 			int coincidencias = 0, diferentes = 0;
-			if(alServiciosDetalle.size() == 0){
+			if (alServiciosDetalle.size() == 0) {
 				alServiciosDetalle.add(servicio);
-			}else {
-				for(ServicioFactura srv : alServiciosDetalle) {
-					if(srv.getDescripcion() == servicio.getDescripcion()) {
-						//alServiciosDetalle.add(servicio);+
+			} else {
+				for (ServicioFactura srv : alServiciosDetalle) {
+					if (srv.getDescripcion() == servicio.getDescripcion()) {
+						// alServiciosDetalle.add(servicio);+
 						coincidencias++;
-					}else {
+					} else {
 						diferentes++;
 					}
 				}
-				
-				if(coincidencias==1) {
+
+				if (coincidencias == 1) {
 					System.out.println("ya existe el servicio");
-				}
-				else if(diferentes>0) {
+				} else if (diferentes > 0) {
 					alServiciosDetalle.add(servicio);
 				}
 			}
-			for(ServicioFactura sf : alServiciosDetalle  )
-			{
+			for (ServicioFactura sf : alServiciosDetalle) {
 				subtotal = subtotal.add(sf.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
 			}
-			bdIva =subtotal.multiply(tasaIva).setScale(2, BigDecimal.ROUND_HALF_UP);
+			bdIva = subtotal.multiply(tasaIva).setScale(2, BigDecimal.ROUND_HALF_UP);
 			total = bdIva.add(subtotal).setScale(2, BigDecimal.ROUND_HALF_UP);
 			montoLetra = FormatUtil.numeroPalabras(total.doubleValue());
 			message = "Servicio(s) agregado(s) correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-			
+
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -358,130 +390,121 @@ public class FacturaServiciosBean implements Serializable {
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Servicio",message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios","form:montoLetra");
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Servicio", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios", "form:montoLetra");
 		}
 	}
 
-		public void SaveFactura() {
-			String message = null;
-			Severity severity = null;
-			Cliente cliente = null;
-			ServicioFactura servicio = null;
-			Planta planta=  null;
-			SerieFactura serieFactura = null;
-			ClienteDomicilios domicilioCliente = null;
-			EmisoresCFDIS emisor = null;
-			
-			List<Factura> listaFactura = null;
-			
-			try {
-				if(this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
-					throw new InventarioException("Debe seleccionar almenos un servicio");
-				if (this.clienteSelect == null)
-					throw new InventarioException("Debe seleccionar el cliente");
-				if (this.iva == null)
-					throw new InventarioException("Debe indicar la cantidad de servicios.");
-				//Datos receptor
-				factura = new Factura();
-				List<Factura> alFacturas =  new ArrayList<>();
-				alFacturas.add(factura);
-				clienteSelect.setFacturaList(alFacturas);
-				factura.setCliente(clienteSelect);
-				factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()+1));
-				factura.setMoneda(this.moneda);
-				factura.setRfc(clienteSelect.getCteRfc());
-				factura.setNombreCliente(clienteSelect.getCteNombre());
-				factura.setFecha(this.fechaFactura);
-				factura.setObservacion(this.Obervaciones);
-				factura.setSubtotal(subtotal);
-				factura.setIva(bdIva);
-				factura.setTotal(total);
-				factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
-				factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
-				factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
-				factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
-				AsentamientoHumano asentamiento = asnDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
-						domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
-						domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(), domicilioSelect.getDomicilioColonia());
-				factura.setColonia(asentamiento.getAsentamientoDs());
-				factura.setCp(domicilioSelect.getDomicilioCp());
-				factura.setCalle(domicilioSelect.getDomicilioCalle());
-				factura.setNumExt(domicilioSelect.getDomicilioNumExt());
-				factura.setNumInt(domicilioSelect.getDomicilioNumInt());
-				factura.setTelefono(domicilioSelect.getDomicilioTel1());
-				factura.setFax(domicilioSelect.getDomicilioFax());
-				factura.setPorcentajeIva(tasaIva.multiply(new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP)));
-				factura.setNumeroCliente(clienteSelect.getNumeroCte());
-				factura.setValorDeclarado(BigDecimal.ZERO);
-				factura.setInicioServicios(this.fechaFactura);
-				factura.setFinServicios(this.fechaFactura);
-				factura.setMontoLetra(FormatUtil.numeroPalabras(total.doubleValue())); 
-				factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
-				//FacturaMedioPago fmp = new FacturaMedioPago();
-					//int facturaid = facMP.getFacturaMedioPagoPK().getFacturaId();
-					FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();
-					facturaPK.setFacturaId(factura);
-					facturaPK.setFmpId(0);
-					FacturaMedioPago fmp = new FacturaMedioPago();
-					fmp.setFacturaMedioPagoPK(facturaPK);
-					fmp.setMpId(medioPagoSelect);
-					fmp.setFactura(factura);
-					fmp.setFmpPorcentaje(100);
-					fmp.setMpDescripcion(medioPagoSelect.getMpDescripcion());
-					fmp.setFmpReferencia(referencia);
-					factura.getFacturaMedioPagoList().add(fmp);
-					//fmp.getFacturaMedioPagoPK().setFacturaId(1);
-				
-				StatusFactura status = statusDAO.buscarPorId(1);
-				factura.setStatus(status);
-				TipoFacturacion tipo = tipoDAO.buscarPorId(1);
-				factura.setTipoFacturacion(tipo);
-				//datos Emisor
-				factura.setPlanta(plantaSelect);//sucursal
-				factura.setPlazo(this.plazoSelect);
-				factura.setRetencion(BigDecimal.ZERO);
-				factura.setNomSerie(serieFacturaSelect.getNomSerie());
-				factura.setMetodoPago(this.metodoPagoSelect.getCdMetodoPago());
-				factura.setTipoPersona(clienteSelect.getTipoPersona());
-				factura.setCdRegimen(clienteSelect.getRegimenFiscal().getCd_regimen());
-				factura.setCdUsoCfdi(clienteSelect.getUsoCfdi().getCdUsoCfdi());
-				factura.setUuid(null);
-				factura.setEmisorNombre(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
-				factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
-				factura.setEmisorCdRegimen(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
-				factura.setServicioFacturaList(alServiciosDetalle);
-				for(ServicioFactura sef : alServiciosDetalle ) {
-					sef.setFactura(factura);
-				}
-				facturaDAO.guardar(factura);
-				
-				severity = FacesMessage.SEVERITY_INFO;
-				message = "La factura se guardo correctamente";
-			}catch (Exception ex) {
-				log.error("Problema para obtener los servicios del cliente.", ex);
-				ex.printStackTrace();
-				message = "Problema con la información de servicios.";
-				severity = FacesMessage.SEVERITY_ERROR;
-			} finally {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Factura guardada", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
+	public synchronized void SaveFactura() {
+		String message = null;
+		Severity severity = null;
+		try {
+			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
+				throw new InventarioException("Debe traspasar almenos un producto");
+
+			// Datos receptor
+			factura = new Factura();
+			List<Factura> alFacturas = new ArrayList<>();
+			alFacturas.add(factura);
+			clienteSelect.setFacturaList(alFacturas);
+			factura.setCliente(clienteSelect);
+			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()+1));
+			factura.setMoneda(this.moneda);
+			factura.setRfc(clienteSelect.getCteRfc());
+			factura.setNombreCliente(clienteSelect.getCteNombre());
+			factura.setFecha(this.fechaFactura);
+			factura.setObservacion(this.Obervaciones);
+			factura.setSubtotal(subtotal);
+			factura.setIva(bdIva);
+			factura.setTotal(total);
+			factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
+			factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
+			factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
+			factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
+			AsentamientoHumano asentamiento = asnDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
+					domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
+					domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+					domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
+					domicilioSelect.getDomicilioColonia());
+			factura.setColonia(asentamiento.getAsentamientoDs());
+			factura.setCp(domicilioSelect.getDomicilioCp());
+			factura.setCalle(domicilioSelect.getDomicilioCalle());
+			factura.setNumExt(domicilioSelect.getDomicilioNumExt());
+			factura.setNumInt(domicilioSelect.getDomicilioNumInt());
+			factura.setTelefono(domicilioSelect.getDomicilioTel1());
+			factura.setFax(domicilioSelect.getDomicilioFax());
+			factura.setPorcentajeIva(tasaIva.multiply(new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP)));
+			factura.setNumeroCliente(clienteSelect.getNumeroCte());
+			factura.setValorDeclarado(BigDecimal.ZERO);
+			factura.setInicioServicios(this.fechaFactura);
+			factura.setFinServicios(this.fechaFactura);
+			factura.setMontoLetra(FormatUtil.numeroPalabras(total.doubleValue()));
+			factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
+			FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();
+			facturaPK.setFacturaId(factura);
+			facturaPK.setFmpId(0);
+			FacturaMedioPago fmp = new FacturaMedioPago();
+			fmp.setFacturaMedioPagoPK(facturaPK);
+			MedioPago medioP = medioPagoDAO.buscarPorFormaPago(medioPagoSelect);
+			fmp.setMpId(medioP);
+			fmp.setFactura(factura);
+			fmp.setFmpPorcentaje(100);
+			fmp.setMpDescripcion(medioP.getMpDescripcion());
+			fmp.setFmpReferencia(referencia);
+			factura.getFacturaMedioPagoList().add(fmp);
+			StatusFactura status = statusDAO.buscarPorId(1);
+			factura.setStatus(status);
+			TipoFacturacion tipo = tipoDAO.buscarPorId(1);
+			factura.setTipoFacturacion(tipo);
+			// datos Emisor
+			factura.setPlanta(plantaSelect);// sucursal
+			factura.setPlazo(this.plazoSelect);
+			factura.setRetencion(BigDecimal.ZERO);
+			factura.setNomSerie(serieFacturaSelect.getNomSerie());
+			MetodoPago metodoP = metodoPagoDAO.buscarPorMetodoPago(metodoPagoSelect);
+			factura.setMetodoPago(metodoP.getCdMetodoPago());
+			factura.setTipoPersona(clienteSelect.getTipoPersona());
+			factura.setCdRegimen(clienteSelect.getRegimenFiscal().getCd_regimen());
+			factura.setCdUsoCfdi(clienteSelect.getUsoCfdi().getCdUsoCfdi());
+			factura.setUuid(null);
+			factura.setEmisorNombre(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
+			factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
+			factura.setEmisorCdRegimen(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
+			factura.setServicioFacturaList(alServiciosDetalle);
+			for (ServicioFactura sef : alServiciosDetalle) {
+				sef.setFactura(factura);
 			}
+			facturaDAO.guardar(factura);
+
+			severity = FacesMessage.SEVERITY_INFO;
+			message = "La factura se guardo correctamente";
+		} catch (InventarioException ex) {
+			log.error("Problema para obtener la información de los productos...", ex);
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			log.error("Problema para obtener los servicios del cliente.", ex);
+			ex.printStackTrace();
+			message = "Problema con la información de servicios.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Factura guardada", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
 		}
-		
+	}
+
 	public void deleteServicio(ServicioFactura servicio) {
 		this.alServiciosDetalle.remove(servicio);
-		subtotal= BigDecimal.ZERO;
-		for(ServicioFactura sf : alServiciosDetalle  )
-		{
+		subtotal = BigDecimal.ZERO;
+		for (ServicioFactura sf : alServiciosDetalle) {
 			subtotal = subtotal.add(sf.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
 		}
-		bdIva =subtotal.multiply(tasaIva).setScale(2, BigDecimal.ROUND_HALF_UP);
+		bdIva = subtotal.multiply(tasaIva).setScale(2, BigDecimal.ROUND_HALF_UP);
 		total = bdIva.add(subtotal).setScale(2, BigDecimal.ROUND_HALF_UP);
 		montoLetra = FormatUtil.numeroPalabras(total.doubleValue());
-		PrimeFaces.current().ajax().update("form:subtotal","form:iva","form:total","form:montoLetra");
+		PrimeFaces.current().ajax().update("form:subtotal", "form:iva", "form:total", "form:montoLetra");
 	}
-	
+
 	public void jasper() throws JRException, IOException, SQLException {
 		String jasperPath = "/jasper/Factura.jrxml";
 		String filename = "Factura " + fechaFactura + ".pdf";
@@ -489,16 +512,18 @@ public class FacturaServiciosBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		Factura sf = null;
-		/*List<Factura> listaFactura = null;
-		facturaDAO.buscarPorId(selServicio.getFactura().getId());*/
- 		File reportFile = new File(jasperPath);
+		File reportFile = new File(jasperPath);
 		File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		//ServicioFactura serviF = new ServicioFactura();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
 		try {
+			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
+				throw new InventarioException("Debe seleccionar almenos un servicio");
+			if (this.clienteSelect == null)
+				throw new InventarioException("Debe seleccionar el cliente");
+
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
@@ -525,15 +550,84 @@ public class FacturaServiciosBean implements Serializable {
 		} finally {
 			conexion.close((Connection) connection);
 		}
-	
-}
+
+	}
 
 	public void reload() throws IOException {
-	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
-	
-	/*Getters y Setters*/
+
+	public void timbrado() {
+		CFDIInfo cfdi = new CFDIInfo();
+		CfdiBL cfdiBL = new CfdiBL();
+		try {
+			// Datos de emisor
+			IssuerBindingModel is = new IssuerBindingModel();
+			is.setName(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
+			is.setFiscalRegime(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
+			is.setRfc(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
+			cfdi.setIssuer(is);
+
+			// Datos de receptor
+			ReceiverBindingModel receptor = new ReceiverBindingModel();
+			receptor.setRfc(factura.getRfc());
+			receptor.setCfdiUse(factura.getCdUsoCfdi());
+			receptor.setName(factura.getNombreCliente());
+			receptor.setFiscalRegime(factura.getCdRegimen());
+			receptor.setTaxZipCode(factura.getCp());
+			cfdi.setReceiver(receptor);
+			// Datos generales de la factura
+			cfdi.setDate(factura.getFecha());
+			cfdi.setFolio(factura.getNomSerie());
+			cfdi.setSerie(factura.getNumero());
+			//TODO
+			//cfdi.setPaymentForm(medioPagoSelect.getFormaPago());
+			cfdi.setCurrency(moneda);
+			cfdi.setCfdiType("I");
+			cfdi.setExpeditionPlace(plantaSelect.getCodigopostal().toString());
+			cfdi.setPaymentMethod(factura.getMetodoPago());
+			cfdi.setObservations(Obervaciones);
+
+			// Productos/Servicios a facturar
+			List<ItemFullBindingModel> listaItems = new ArrayList<ItemFullBindingModel>();
+			for (ServicioFactura sf : alServiciosDetalle) {
+				ItemFullBindingModel item = new ItemFullBindingModel();
+				item.setProductCode(sf.getCodigo());
+				item.setDescription(sf.getDescripcion());
+				item.setUnitCode(sf.getCdUnidad());
+				ClaveUnidad claveUnidad = claveDAO.buscarPorId(sf.getCodigo());
+				// item.setUnit(claveUnidad.getNombre());
+				item.setQuantity(sf.getCantidad());
+				item.setUnitPrice(sf.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
+				item.setSubtotal(sf.getCosto()); // importe
+				item.setTaxObject("02");
+
+				Tax tx = new Tax();
+				tx.setBase(sf.getCosto());
+				BigDecimal ivaServicio = sf.getCosto().multiply(bdIva);
+				tx.setTotal(ivaServicio);
+				tx.setName("IVA");
+				tx.setRate(tasaIva);
+				tx.setIsRetention(false);
+				item.setTaxes(new ArrayList<Tax>());
+				item.setTotal(sf.getCosto().add(ivaServicio));
+				item.getTaxes().add(tx);
+				listaItems.add(item);
+			}
+			cfdi.setItems(listaItems);
+			CfdiInfoModel registra = cfdiBL.registra(cfdi);
+			factura.setUuid(registra.getId());
+			facturaDAO.actualizar(factura);
+		} catch (FacturamaException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+	}
+
+	/* Getters y Setters */
 	public Cliente getClienteSelect() {
 		return clienteSelect;
 	}
@@ -558,19 +652,19 @@ public class FacturaServiciosBean implements Serializable {
 		this.plantaSelect = plantaSelect;
 	}
 
-	public MetodoPago getMetodoPagoSelect() {
+	public String getMetodoPagoSelect() {
 		return metodoPagoSelect;
 	}
 
-	public void setMetodoPagoSelect(MetodoPago metodoPagoSelect) {
+	public void setMetodoPagoSelect(String metodoPagoSelect) {
 		this.metodoPagoSelect = metodoPagoSelect;
 	}
 
-	public MedioPago getMedioPagoSelect() {
+	public String getMedioPagoSelect() {
 		return medioPagoSelect;
 	}
 
-	public void setMedioPagoSelect(MedioPago medioPagoSelect) {
+	public void setMedioPagoSelect(String medioPagoSelect) {
 		this.medioPagoSelect = medioPagoSelect;
 	}
 
@@ -869,7 +963,21 @@ public class FacturaServiciosBean implements Serializable {
 	public void setReferencia(String referencia) {
 		this.referencia = referencia;
 	}
-	
-	
-	
+
+	public Factura getFactura() {
+		return factura;
+	}
+
+	public void setFactura(Factura factura) {
+		this.factura = factura;
+	}
+
+	public List<FacturaMedioPago> getListaFacturaMedioPago() {
+		return listaFacturaMedioPago;
+	}
+
+	public void setListaFacturaMedioPago(List<FacturaMedioPago> listaFacturaMedioPago) {
+		this.listaFacturaMedioPago = listaFacturaMedioPago;
+	}
+
 }

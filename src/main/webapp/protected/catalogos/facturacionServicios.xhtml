@@ -31,9 +31,9 @@
 							<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filterMatchMode="startsWith">
 								<f:selectItem itemLabel=" " itemValue="" noSelectionOption="true" />
 								<f:selectItems var="cte" value="#{facturaServiciosBean.listaCliente}" itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
-								<p:ajax listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura servicioSelect"   />
+								<p:ajax listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago"   />
 							</p:selectOneMenu>
-							</p:toolbarGroup>
+							</p:toolbarGroup>	
 					</p:toolbar>
 
 									<div class="field">
@@ -95,23 +95,22 @@
 
 						<p:fieldset legend="Datos de la Facturacion" styleClass="p-mt-2">
 							<p:outputPanel id="factura">
-								<div>
-									
+							
 									<p:divider align="left">
 										<div class="inline-flex align-items-center">
 											<i class="pi pi-user mr-2" /> <b>Terminos de Pago</b>
 										</div>
 									</p:divider>
 
-									<p:datePicker id="fechaFact" showIcon="true" value="#{facturaServiciosBean.fechaFactura}" styleClass="p-ml-2 p-mr-4" size="13" />
+									<p:datePicker id="fechaFact" showIcon="true" value="#{facturaServiciosBean.fechaFactura}" disabled="true" styleClass="p-ml-2 p-mr-4" size="13" />
 
 									<p:outputLabel value="Moneda:" />
 									<p:inputText value="#{facturaServiciosBean.moneda}" styleClass="p-ml-2 p-mr-4" style="width: 5%" readonly="true" />
 
 									<p:outputLabel value="Forma de pago (SAT):" />
-									<p:selectOneMenu id="medioPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturaServiciosBean.medioPagoSelect}">
-										<f:selectItem itemLabel=" " noSelectionOption="true" />
-										<f:selectItems value="#{facturaServiciosBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.mpDescripcion}" itemValue="#{medioP}" />
+									<p:selectOneMenu id="medioPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" value="#{facturaServiciosBean.medioPagoSelect}">
+										<f:selectItem itemLabel=" Seleccione la forma de pago" noSelectionOption="true" />
+										<f:selectItems value="#{facturaServiciosBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.formaPago}-#{medioP.mpDescripcion}" itemValue="#{medioP.formaPago}" />
 									</p:selectOneMenu>
 
 									<span class="ui-float-label ui-input-icon-left"> 
@@ -121,21 +120,20 @@
 
 									<p:outputLabel value="Metodo de Pago (SAT):" />
 									<p:selectOneMenu id="metodoPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturaServiciosBean.metodoPagoSelect}">
-										<f:selectItem itemLabel=" " noSelectionOption="true" />
-										<f:selectItems value="#{facturaServiciosBean.listaMetodoPago}" var="metodoP"  itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" />
+										<f:selectItem itemLabel="#{facturaServiciosBean.clienteSelect.metodoPago.nbMetodoPago} " noSelectionOption="true" />
+										<f:selectItems value="#{facturaServiciosBean.listaMetodoPago}" var="metodoP" itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" itemValue="#{metodoP.cdMetodoPago}" />
 									</p:selectOneMenu>
 									
 								<p:toolbar>
 									<p:toolbarGroup>
 									<p:outputLabel value="Plazo de Pago:" />
-									<p:selectOneMenu id="plazo" autoWidth="false" value="#{facturaServiciosBean.plazoSelect}" styleClass="p-ml-2 p-mr-4">
+									<p:selectOneMenu id="plazo" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturaServiciosBean.plazoSelect}" >
 										<f:selectItem itemLabel=" " noSelectionOption="true" />
 										<f:selectItems value="#{facturaServiciosBean.listaAviso}" var="aviso" itemLabel="#{aviso.avisoPlazo}" itemValue="#{aviso.avisoPlazo}" />
 									</p:selectOneMenu>
 								</p:toolbarGroup>
 							</p:toolbar>									
 									
-								</div>
 								<p:divider align="left">
 									<div class="inline-flex align-items-center">
 										<i class="pi pi-user mr-2" /> <b>Traslados</b>
@@ -143,11 +141,12 @@
 								</p:divider>
 
 								<div style="margin-top: 10px">
-									<p:inputNumber styleClass="p-ml-2" size="4" placeholder="IVA" value="#{facturaServiciosBean.iva.valor}" />
+								<p:outputLabel value="IVA" styleClass="p-ml-4 p-mr-2" />
+									<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturaServiciosBean.iva.valor}" readonly="true"/>
 									%
 									<p:outputLabel value="Retencion:" styleClass="p-ml-4 p-mr-2" />
 									<p:selectBooleanCheckbox />
-									<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturaServiciosBean.retencion.valor}" />
+									<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturaServiciosBean.retencion.valor}" readonly="true"/>
 									%
 								</div>
 
@@ -202,18 +201,15 @@
 									<b><p:outputLabel value="TOTAL" /></b>
 									<b><p:outputLabel id="total" value="#{facturaServiciosBean.total}" styleClass="p-ml-2 p-mr-4" style="width: 5% "/></b>
 									</DIV></DIV></DIV></DIV>
-
 			</div>
 			</p:outputPanel>
 			</p:fieldset>
 		
 <div>
         <p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.SaveFactura}" icon="pi pi-save">
-            <p:menuitem value="Generar reporte" actionListener="#{facturaServiciosBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-times"/>
-            <!--  <p:menuitem value="Vista Preliminar" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-            <p:menuitem value="Timbrar" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-            -->
+            <p:menuitem value="Generar reporte" actionListener="#{facturaServiciosBean.jasper}" action="#{facturaServiciosBean.reload}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-file"/>
+            <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-file-pdf" ajax="false" process="@this"/> 
         </p:splitButton>
 </div>
 					</div>

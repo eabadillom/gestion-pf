@@ -35,7 +35,9 @@ import javax.validation.constraints.Size;
 		@NamedQuery(name = "MedioPago.findByMpId", query = "SELECT m FROM MedioPago m WHERE m.mpId = :mpId"),
 		@NamedQuery(name = "MedioPago.findByMpDescripcion", query = "SELECT m FROM MedioPago m WHERE m.mpDescripcion = :mpDescripcion"),
 		@NamedQuery(name = "MedioPago.findVigentes", query = "SELECT m FROM MedioPago m WHERE m.vigenciaInicio <= :fecha AND (m.vigenciaFin IS NULL OR m.vigenciaFin >= :fecha) ORDER BY m.mpDescripcion"),
-		@NamedQuery(name = "MedioPago.findByMpReqReferencia", query = "SELECT m FROM MedioPago m WHERE m.mpReqReferencia = :mpReqReferencia") })
+		@NamedQuery(name = "MedioPago.findByMpReqReferencia", query = "SELECT m FROM MedioPago m WHERE m.mpReqReferencia = :mpReqReferencia"), 
+		@NamedQuery(name = "MedioPago.findBympformaPago", query = "SELECT m FROM MedioPago m WHERE m.formaPago = :mpformaPago") 
+})
 public class MedioPago implements Serializable {
 
 	private static final long serialVersionUID = 1L;

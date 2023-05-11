@@ -86,7 +86,7 @@ public class Planta implements Serializable {
 	private Integer tipoasentamiento;
 	
 	@Column(name ="nb_cp")
-	private Integer codigopostal;
+	private String codigopostal;
 	
 	@Size (max = 20)
 	@Column(name ="nb_calle")
@@ -172,11 +172,11 @@ public class Planta implements Serializable {
 		this.calle = calle;
 	}
 
-	public Integer getCodigopostal() {
+	public String getCodigopostal() {
 		return codigopostal;
 	}
 
-	public void setCodigopostal(Integer codigopostal) {
+	public void setCodigopostal(String codigopostal) {
 		this.codigopostal = codigopostal;
 	}
 
