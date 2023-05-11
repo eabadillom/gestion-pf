@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.Cliente;
@@ -27,10 +27,12 @@ import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.ProductoConstanciaDs;
 import mx.com.ferbo.model.Servicio;
+import mx.com.ferbo.model.ServicioConstancia;
 import mx.com.ferbo.model.ServicioConstanciaDs;
 import mx.com.ferbo.model.TipoCobro;
-@Named
 
+@Named
+@ViewScoped
 public class CalculoPrevioBean implements Serializable{
 
 	private static final long serialVersionUID = -1785488265380235016L;
@@ -64,44 +66,12 @@ public class CalculoPrevioBean implements Serializable{
 		
 		precioServicioDAO = new PrecioServicioDAO();
 		
-		
-		/*try {
-			context = FacesContext.getCurrentInstance();
-			request = (HttpServletRequest) context.getExternalContext().getRequest();
-			listaEntradas = (List<ConstanciaFactura>) request.getSession(false).getAttribute("entradas");
-			listaVigencias = (List<ConstanciaFactura>) request.getSession(false).getAttribute("vigencias");	
-			listaServicios = (List<ConstanciaFacturaDs>) request.getSession(false).getAttribute("servicios");
-			clienteSelect = (Cliente) request.getSession(false).getAttribute("cliente");
-			fechaEmision = (Date) request.getSession(false).getAttribute("fechaEmision");
-			
-			if(listaEntradas.isEmpty()) {
-				listaEntradas = new ArrayList<>();
-			}
-			
-			if(listaVigencias.isEmpty()) {
-				listaVigencias = new ArrayList<>();
-			}
-			
-			if(listaServicios.isEmpty()) {
-				listaServicios = new ArrayList<>();
-			}
-			
-			verServicios();
-			//procesarEntradas();
-			PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs");
-			
-		} catch (Exception e) {
-			
-			System.out.println("ERROR" + e.getMessage());
-		}*/
-		
 	}
 	
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
-		//fechaEmision = new Date();
 		try {
 			context = FacesContext.getCurrentInstance();
 			request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -125,7 +95,7 @@ public class CalculoPrevioBean implements Serializable{
 			
 			verServicios();
 			procesarEntradas();
-			PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs");
+			//PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs");
 			
 		} catch (Exception e) {
 			
@@ -278,16 +248,19 @@ public class CalculoPrevioBean implements Serializable{
 	public void procesarEntradas() {
 		
 		BigDecimal importe = new BigDecimal(0);
+		List<ServicioConstancia> listaServiciosConstancias = null;
 		
 		for(ConstanciaFactura cf: listaEntradas) {
 			
 			ConstanciaDeDeposito cdd = cf.getFolio();
+			listaServiciosConstancias = new ArrayList<>();
 			
 			for(ConstanciaDepositoDetalle cs: cdd.getConstanciaDepositoDetalleList()) {
 				
 				//System.out.println(cs.getServicioCve().getCobro().getId());
 				Servicio servicio = cs.getServicioCve();
 				TipoCobro tipoCobro = servicio.getCobro();
+				ServicioConstancia sc = new ServicioConstancia();
 				
 				PrecioServicio precioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(), clienteSelect.getCteCve(), servicio.getServicioCve());
 				
@@ -297,11 +270,12 @@ public class CalculoPrevioBean implements Serializable{
 				case 2:
 					
 					importe = cs.getServicioCantidad().multiply(precioServicio.getPrecio());
-					System.out.println("El tipo cobor es 1 o 2 y su importe es: "+importe);
+					sc.setCosto(importe);
+					System.out.println("El tipo cobro es 1 o 2 y su importe es: "+ importe);
 					break;
 				default:
 					
-					System.out.println("Tiene ntipo de cobro 3 o 4");
+					System.out.println("Tiene tipo de cobro 3 o 4");
 					break;
 				}
 				
