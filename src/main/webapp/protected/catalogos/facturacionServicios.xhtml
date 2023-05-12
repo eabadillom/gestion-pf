@@ -27,14 +27,13 @@
 				<p:toolbar>
 						<p:toolbarGroup>
 							<p:outputLabel value="Cliente:" styleClass="p-ml-2"/>
-							
 							<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filterMatchMode="startsWith">
 								<f:selectItem itemLabel=" " itemValue="" noSelectionOption="true" />
 								<f:selectItems var="cte" value="#{facturaServiciosBean.listaCliente}" itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
 								<p:ajax listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago"   />
 							</p:selectOneMenu>
 							</p:toolbarGroup>	
-					</p:toolbar>
+						</p:toolbar>
 
 									<div class="field">
 										<span class="ui-float-label ui-input-icon-left"> 
@@ -51,31 +50,35 @@
 										<p:inputText value="#{facturaServiciosBean.clienteSelect.cteRfc}" styleClass="p-ml-2 p-mr-4" readonly="true" /> 
 										<p:outputLabel value="RFC" styleClass="p-mr-2 p-mr-4" />
 										</span>
-
-										<p:outputLabel value="Domicilio:" />
-										<p:selectOneMenu id="domicilio" autoWidth="flase" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturaServiciosBean.domicilioSelect}">
-											<f:selectItem itemLabel="" noSelectionOption="true" />
+										
+										<span class="ui-float-label ui-input-icon-left">
+										<p:selectOneMenu id="domicilio" autoWidth="false" value="#{facturaServiciosBean.domicilioSelect}" style="width:300px;" disabled="true">
+											<f:selectItem itemLabel="" itemValue="" />
 											<f:selectItems value="#{facturaServiciosBean.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios}" />
 										</p:selectOneMenu>
+										<p:outputLabel for="@previous" value="Domicilio" />
+										</span>
+										
 									</div>
 								</p:outputPanel>
 							</div>
 						</p:fieldset>
 
 						<p:fieldset legend="Datos del Emisor" styleClass="p-mt-2">
-						<p:toolbar>
-						<p:toolbarGroup>
-									<p:outputLabel value="Sucursal(Planta): " styleClass="p-ml-4 p-mr-2" />
-									<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.plantaSelect}" styleClass="p-ml-2 p-mr-4">
-										<f:selectItem itemLabel=" " noSelectionOption="true" />
-										<f:selectItems value="#{facturaServiciosBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-										<p:ajax update="emisor" listener="#{facturaServiciosBean.serieFactura}"/>
-									</p:selectOneMenu>
-					</p:toolbarGroup></p:toolbar>
+							<p:toolbar>
+							<p:toolbarGroup>
+										<p:outputLabel value="Sucursal(Planta): " styleClass="p-ml-4 p-mr-2" />
+										<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.plantaSelect}" styleClass="p-ml-2 p-mr-4">
+											<f:selectItem itemLabel=" " noSelectionOption="true" />
+											<f:selectItems value="#{facturaServiciosBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+											<p:ajax update="emisor" listener="#{facturaServiciosBean.serieFactura}"/>
+										</p:selectOneMenu>
+							</p:toolbarGroup>
+						</p:toolbar>
 					
 							<p:outputPanel id="emisor">
 									<span class="ui-float-label ui-input-icon-left"> 
-									<p:inputText value="#{facturaServiciosBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" readonly="true" /> 
+									<p:inputText value="#{facturaServiciosBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" readonly="true" style="width:400px;"/> 
 									<p:outputLabel value="Razon Social" styleClass="p-mr-2" />
 									</span> 
 									
@@ -84,61 +87,64 @@
 										<p:outputLabel value="RFC" styleClass="p-mr-2" />
 									</span>
 
-									<p:outputLabel value="Factura: " styleClass="p-ml-4 p-mr-2" />
-									<p:selectOneMenu id="serieFactura" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.serieFacturaSelect}" styleClass="p-ml-2 p-mr-4">
+								<span class="ui-float-label ui-input-icon-left"> 
+									<p:selectOneMenu id="serieFactura" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.serieFacturaSelect}" style="width:130px;">
 										<f:selectItem itemLabel="" noSelectionOption="true" />
 										<f:selectItems value="#{facturaServiciosBean.listaSerieFactura}" var="serieFactura" itemLabel="#{serieFactura.nomSerie}-#{serieFactura.numeroActual + 1}" />
 									</p:selectOneMenu>
-									
+									<p:outputLabel value="Factura " />
+									</span>
 							</p:outputPanel>
 						</p:fieldset>
 
 						<p:fieldset legend="Datos de la Facturacion" styleClass="p-mt-2">
-							<p:outputPanel id="factura">
-							
-									<p:divider align="left">
-										<div class="inline-flex align-items-center">
-											<i class="pi pi-user mr-2" /> <b>Terminos de Pago</b>
-										</div>
-									</p:divider>
+						<p:divider align="left">
+								<div class="inline-flex align-items-center">
+									<i class="pi pi-user mr-2" /> <b>Terminos de Pago</b>
+								</div>
+							</p:divider>
 
+							<p:outputPanel id="factura">
 									<p:datePicker id="fechaFact" showIcon="true" value="#{facturaServiciosBean.fechaFactura}" disabled="true" styleClass="p-ml-2 p-mr-4" size="13" />
 
 									<p:outputLabel value="Moneda:" />
 									<p:inputText value="#{facturaServiciosBean.moneda}" styleClass="p-ml-2 p-mr-4" style="width: 5%" readonly="true" />
 
-									<p:outputLabel value="Forma de pago (SAT):" />
-									<p:selectOneMenu id="medioPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" value="#{facturaServiciosBean.medioPagoSelect}">
-										<f:selectItem itemLabel=" Seleccione la forma de pago" noSelectionOption="true" />
-										<f:selectItems value="#{facturaServiciosBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.formaPago}-#{medioP.mpDescripcion}" itemValue="#{medioP.formaPago}" />
-									</p:selectOneMenu>
-
 									<span class="ui-float-label ui-input-icon-left"> 
-									<p:inputText styleClass="p-ml-2 p-mr-4" value="#{facturaServiciosBean.referencia}"></p:inputText> 
-									<p:outputLabel value="Referencia" />
+										<p:selectOneMenu id="medioPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" value="#{facturaServiciosBean.medioPagoSelect}" style="width:300px;">
+										<f:selectItem itemLabel="" noSelectionOption="true" />
+										<f:selectItems value="#{facturaServiciosBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.mpDescripcion}" itemValue="#{medioP.formaPago}" />
+										</p:selectOneMenu>
+										<p:outputLabel value="Forma de pago (SAT)" />
+									</span>
+								
+									<span class="ui-float-label ui-input-icon-left "> 
+										<p:inputText styleClass="p-ml-2 p-mr-4" value="#{facturaServiciosBean.referencia}"></p:inputText> 
+										<p:outputLabel value="Referencia" />
 									</span>
 
-									<p:outputLabel value="Metodo de Pago (SAT):" />
-									<p:selectOneMenu id="metodoPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturaServiciosBean.metodoPagoSelect}">
+									<span class="ui-float-label ui-input-icon-left ">
+									<p:selectOneMenu id="metodoPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" value="#{facturaServiciosBean.metodoPagoSelect}" style="width:280px;">
 										<f:selectItem itemLabel="#{facturaServiciosBean.clienteSelect.metodoPago.nbMetodoPago} " noSelectionOption="true" />
 										<f:selectItems value="#{facturaServiciosBean.listaMetodoPago}" var="metodoP" itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" itemValue="#{metodoP.cdMetodoPago}" />
 									</p:selectOneMenu>
-									
-								<p:toolbar>
-									<p:toolbarGroup>
-									<p:outputLabel value="Plazo de Pago:" />
-									<p:selectOneMenu id="plazo" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturaServiciosBean.plazoSelect}" >
-										<f:selectItem itemLabel=" " noSelectionOption="true" />
+									<p:outputLabel value="Metodo de Pago (SAT)" />
+									</span>
+
+									<span class="ui-float-label ui-input-icon-left ">
+									<p:selectOneMenu id="plazo" autoWidth="false" value="#{facturaServiciosBean.plazoSelect}" style="width:130px;">
+										<f:selectItem itemLabel="" itemValue=""/>
 										<f:selectItems value="#{facturaServiciosBean.listaAviso}" var="aviso" itemLabel="#{aviso.avisoPlazo}" itemValue="#{aviso.avisoPlazo}" />
 									</p:selectOneMenu>
-								</p:toolbarGroup>
-							</p:toolbar>									
+									<p:outputLabel for="@previous"  value="Plazo de Pago" />
+									</span>
 									
 								<p:divider align="left">
 									<div class="inline-flex align-items-center">
 										<i class="pi pi-user mr-2" /> <b>Traslados</b>
 									</div>
 								</p:divider>
+
 
 								<div style="margin-top: 10px">
 								<p:outputLabel value="IVA" styleClass="p-ml-4 p-mr-2" />
@@ -155,7 +161,7 @@
 										<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{facturaServiciosBean.obervaciones}" placeholder="Observaciones." style="width: 30em;" />
 									</p:panel>
 								</div>
-
+								
 							</p:outputPanel>
 						</p:fieldset>
 

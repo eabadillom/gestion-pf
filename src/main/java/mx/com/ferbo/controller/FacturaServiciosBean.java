@@ -302,11 +302,9 @@ public class FacturaServiciosBean implements Serializable {
 		if (clienteSelect == null) {
 			return;
 		}
-
 		if (plantaSelect == null) {
 			return;
 		}
-
 			listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(),
 																			plantaSelect.getPlantaCve());
 
@@ -336,7 +334,6 @@ public class FacturaServiciosBean implements Serializable {
 				throw new InventarioException("Debe indicar la cantidad de servicios.");
 			if (this.precioServicio == null)
 				throw new InventarioException("Debe seleccionar un servicio.");
-
 			if (alServiciosDetalle == null)
 				alServiciosDetalle = new ArrayList<ServicioFactura>();
 
@@ -345,8 +342,7 @@ public class FacturaServiciosBean implements Serializable {
 			servicio.setCantidad(cantidadServicio);
 			servicio.setUnidad(precioServicio.getUnidad().getUnidadDeManejoDs());
 			servicio.setTarifa(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP));
-			servicio.setCosto(
-					cantidadServicio.multiply(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP)));
+			servicio.setCosto(cantidadServicio.multiply(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP)));
 			servicio.setTipoCobro(precioServicio.getServicio().getCobro());
 			servicio.setUdCobro("Servicio");
 			servicio.setCodigo(precioServicio.getServicio().getServicioCod());
@@ -380,7 +376,6 @@ public class FacturaServiciosBean implements Serializable {
 			montoLetra = FormatUtil.numeroPalabras(total.doubleValue());
 			message = "Servicio(s) agregado(s) correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -401,7 +396,6 @@ public class FacturaServiciosBean implements Serializable {
 		try {
 			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
 				throw new InventarioException("Debe traspasar almenos un producto");
-
 			// Datos receptor
 			factura = new Factura();
 			List<Factura> alFacturas = new ArrayList<>();
@@ -558,7 +552,9 @@ public class FacturaServiciosBean implements Serializable {
 		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
 
-	public void timbrado() {
+	public void timbrado() throws InventarioException {
+		String message = null;
+		Severity severity = null;
 		CFDIInfo cfdi = new CFDIInfo();
 		CfdiBL cfdiBL = new CfdiBL();
 		try {
@@ -579,12 +575,12 @@ public class FacturaServiciosBean implements Serializable {
 			cfdi.setReceiver(receptor);
 			// Datos generales de la factura
 			cfdi.setDate(factura.getFecha());
-			cfdi.setFolio(factura.getNomSerie());
-			cfdi.setSerie(factura.getNumero());
-			//TODO
-			//cfdi.setPaymentForm(medioPagoSelect.getFormaPago());
+			cfdi.setFolio(factura.getNumero());
+			cfdi.setSerie(factura.getNomSerie());
 			cfdi.setCurrency(moneda);
 			cfdi.setCfdiType("I");
+			FacturaMedioPago facturaMedioPago = factura.getFacturaMedioPagoList().get(0);
+			cfdi.setPaymentForm(facturaMedioPago.getMpId().getFormaPago());
 			cfdi.setExpeditionPlace(plantaSelect.getCodigopostal().toString());
 			cfdi.setPaymentMethod(factura.getMetodoPago());
 			cfdi.setObservations(Obervaciones);
@@ -596,7 +592,8 @@ public class FacturaServiciosBean implements Serializable {
 				item.setProductCode(sf.getCodigo());
 				item.setDescription(sf.getDescripcion());
 				item.setUnitCode(sf.getCdUnidad());
-				ClaveUnidad claveUnidad = claveDAO.buscarPorId(sf.getCodigo());
+				ClaveUnidad claveUnidad = claveDAO.buscarPorId(sf.getCdUnidad());
+				item.setUnit(claveUnidad.getNbUnidad());
 				// item.setUnit(claveUnidad.getNombre());
 				item.setQuantity(sf.getCantidad());
 				item.setUnitPrice(sf.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -605,7 +602,7 @@ public class FacturaServiciosBean implements Serializable {
 
 				Tax tx = new Tax();
 				tx.setBase(sf.getCosto());
-				BigDecimal ivaServicio = sf.getCosto().multiply(bdIva);
+				BigDecimal ivaServicio = sf.getCosto().multiply(tasaIva);
 				tx.setTotal(ivaServicio);
 				tx.setName("IVA");
 				tx.setRate(tasaIva);
@@ -617,17 +614,25 @@ public class FacturaServiciosBean implements Serializable {
 			}
 			cfdi.setItems(listaItems);
 			CfdiInfoModel registra = cfdiBL.registra(cfdi);
-			factura.setUuid(registra.getId());
+			this.factura.setUuid(registra.getId());
 			facturaDAO.actualizar(factura);
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			message = "El timbrado se genero correctamente";
 		} catch (FacturamaException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}catch (Exception ex) {
+			log.error("Problema para obtener los servicios del cliente.", ex);
+			ex.printStackTrace();
+			message = "Problema con la información de servicios.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado exitoso", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
 		}
-
-
+		
 	}
 
-	/* Getters y Setters */
 	public Cliente getClienteSelect() {
 		return clienteSelect;
 	}

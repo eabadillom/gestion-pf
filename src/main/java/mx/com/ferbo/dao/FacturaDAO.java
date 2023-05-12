@@ -1,7 +1,7 @@
 package mx.com.ferbo.dao;
 
 import java.util.List;
-
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
 import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
@@ -35,7 +35,16 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 
 	@Override
 	public String actualizar(Factura f) {
-		// TODO Auto-generated method stub
+		try {
+			EntityManager entity = getEntityManager();
+			entity.getTransaction().begin();
+			entity.merge(f);
+			entity.getTransaction().commit();
+			entity.close();
+		}catch (Exception e){
+			System.out.println("Error al timbrar " + e.getMessage());
+			return "Failed!!";
+		}
 		return null;
 	}
 
