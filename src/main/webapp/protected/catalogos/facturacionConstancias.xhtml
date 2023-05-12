@@ -130,7 +130,7 @@
 							<div style="margin-top:10px">
 							
 								<p:outputLabel value="Observaciones:" styleClass="p-mr-2" />
-								<p:inputTextarea autoResize="true"/>
+								<p:inputTextarea autoResize="true" value="#{facturacionConstanciasBean.observacion}"/>
 							
 							</div>
 												
@@ -271,7 +271,7 @@
 			</div>
 		
 		<div style="text-align: center;">
-				<p:commandButton value="Siguiente" action="#{facturacionConstanciasBean.inyeccionBean}" process="@this " />				
+				<p:commandButton value="Siguiente" action="#{facturacionConstanciasBean.inyeccionBean}"  update="factura"/>				
 		</div>			
 		
 		

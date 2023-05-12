@@ -209,6 +209,30 @@ public class Factura implements Serializable {
     @JoinColumn(name = "status", referencedColumnName = "id")
     @ManyToOne
     private StatusFactura status;
+    @Size(max = 5)
+    @Column(name = "metodo_pago")
+    private String metodoPago;
+    @Size(max = 1)
+    @Column(name = "tp_persona")
+    private String tipoPersona;    
+    @Size(max = 5)
+    @Column(name = "cd_regimen")
+    private String cdRegimen;
+    @Size(max = 5)
+    @Column(name = "cd_uso_cfdi")
+    private String cdUsoCfdi;
+    @Size(max = 50)
+    @Column(name = "uuid")
+    private String uuid;
+    @Size(max = 80)
+    @Column(name = "emi_nombre")
+    private String emisorNombre;
+    @Size(max = 14)
+    @Column(name = "emi_rfc")
+    private String emisorRFC;
+    @Size(max = 5)
+    @Column(name = "emi_cd_regimen")
+    private String emisorCdRegimen;
     @OneToMany(mappedBy = "facturaId")
     private List<ChequeDevuelto> chequeDevueltoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
@@ -233,33 +257,57 @@ public class Factura implements Serializable {
         this.id = id;
     }
 
-    public Factura(Integer id, String numero, String moneda, String rfc, String nombreCliente, Date fecha, String observacion, BigDecimal subtotal, BigDecimal iva, BigDecimal total, String pais, String estado, String municipio, String ciudad, String colonia, String cp, String calle, String numExt, String numInt, String telefono, BigDecimal porcentajeIva, int plazo, String nomSerie) {
-        this.id = id;
-        this.numero = numero;
-        this.moneda = moneda;
-        this.rfc = rfc;
-        this.nombreCliente = nombreCliente;
-        this.fecha = fecha;
-        this.observacion = observacion;
-        this.subtotal = subtotal;
-        this.iva = iva;
-        this.total = total;
-        this.pais = pais;
-        this.estado = estado;
-        this.municipio = municipio;
-        this.ciudad = ciudad;
-        this.colonia = colonia;
-        this.cp = cp;
-        this.calle = calle;
-        this.numExt = numExt;
-        this.numInt = numInt;
-        this.telefono = telefono;
-        this.porcentajeIva = porcentajeIva;
-        this.plazo = plazo;
-        this.nomSerie = nomSerie;
-    }
+    
+    public Factura(Integer id, String numero,String moneda, String rfc, String nombreCliente, Date fecha, String observacion, BigDecimal subtotal, BigDecimal iva, BigDecimal total, String pais, String estado,
+    		String municipio, String ciudad, String colonia, String cp,String calle, String numExt,String numInt, String telefono,String fax, BigDecimal porcentajeIva, String numeroCliente, BigDecimal valorDeclarado, 
+    		Date inicioServicios, Date finServicios, String montoLetra,TipoFacturacion tipoFacturacion, Planta planta, int plazo, BigDecimal retencion,String nomSerie, Cliente cliente, 
+    		StatusFactura status,	String metodoPago, String tipoPersona, String cdRegimen, String cdUsoCfdi, String uuid, String emisorNombre, String emisorRFC,String emisorCdRegimen) {
+		this.id = id;
+		this.numero = numero;
+		this.moneda = moneda;
+		this.rfc = rfc;
+		this.nombreCliente = nombreCliente;
+		this.fecha = fecha;
+		this.observacion = observacion;
+		this.subtotal = subtotal;
+		this.iva = iva;
+		this.total = total;
+		this.pais = pais;
+		this.estado = estado;
+		this.municipio = municipio;
+		this.ciudad = ciudad;
+		this.colonia = colonia;
+		this.cp = cp;
+		this.calle = calle;
+		this.numExt = numExt;
+		this.numInt = numInt;
+		this.telefono = telefono;
+		this.fax = fax;
+		this.porcentajeIva = porcentajeIva;
+		this.numeroCliente = numeroCliente;
+		this.valorDeclarado = valorDeclarado;
+		this.inicioServicios = inicioServicios;
+		this.finServicios = finServicios;
+		this.montoLetra = montoLetra;
+		this.tipoFacturacion = tipoFacturacion;
+		this.planta = planta;
+		this.plazo = plazo;
+		this.retencion = retencion;
+		this.nomSerie = nomSerie;
+		this.cliente = cliente;
+		this.status = status;
+		this.metodoPago = metodoPago;
+		this.tipoPersona = tipoPersona;
+		this.cdRegimen = cdRegimen;
+		this.cdUsoCfdi = cdUsoCfdi;
+		this.uuid = uuid;
+		this.emisorNombre = emisorNombre;
+		this.emisorRFC = emisorRFC;
+		this.emisorCdRegimen = emisorCdRegimen;
 
-    public Integer getId() {
+	}
+
+	public Integer getId() {
         return id;
     }
 
@@ -539,7 +587,71 @@ public class Factura implements Serializable {
         this.chequeDevueltoList = chequeDevueltoList;
     }
 
-    public List<Pago> getPagoList() {
+    public String getMetodoPago() {
+		return metodoPago;
+	}
+
+	public void setMetodoPago(String metodoPago) {
+		this.metodoPago = metodoPago;
+	}
+
+	public String getTipoPersona() {
+		return tipoPersona;
+	}
+
+	public void setTipoPersona(String tipoPersona) {
+		this.tipoPersona = tipoPersona;
+	}
+
+	public String getCdRegimen() {
+		return cdRegimen;
+	}
+
+	public void setCdRegimen(String cdRegimen) {
+		this.cdRegimen = cdRegimen;
+	}
+
+	public String getCdUsoCfdi() {
+		return cdUsoCfdi;
+	}
+
+	public void setCdUsoCfdi(String cdUsoCfdi) {
+		this.cdUsoCfdi = cdUsoCfdi;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public String getEmisorNombre() {
+		return emisorNombre;
+	}
+
+	public void setEmisorNombre(String emisorNombre) {
+		this.emisorNombre = emisorNombre;
+	}
+
+	public String getEmisorRFC() {
+		return emisorRFC;
+	}
+
+	public void setEmisorRFC(String emisorRFC) {
+		this.emisorRFC = emisorRFC;
+	}
+
+	public String getEmisorCdRegimen() {
+		return emisorCdRegimen;
+	}
+
+	public void setEmisorCdRegimen(String emisorCdRegimen) {
+		this.emisorCdRegimen = emisorCdRegimen;
+	}
+
+	public List<Pago> getPagoList() {
         return pagoList;
     }
 

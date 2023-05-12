@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
 
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
@@ -32,19 +33,23 @@ import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.SerieFacturaDAO;
+import mx.com.ferbo.dao.StatusFacturaDAO;
+import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
-import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.Domicilios;
+import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieFactura;
+import mx.com.ferbo.model.StatusFactura;
+import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -62,6 +67,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private MetodoPago metodoPagoSelect;
 	private MedioPago medioPagoSelect;
 	private Parametro iva,retencion;
+	private Factura factura;
 	
 	private ClienteDAO clienteDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
@@ -74,6 +80,8 @@ public class FacturacionConstanciasBean implements Serializable{
 	private FacturacionDepositosDAO facturacionConstanciasDAO;
 	private FacturacionVigenciasDAO facturacionVigenciasDAO;
 	private FacturacionServiciosDAO facturacionServiciosDAO;
+	private StatusFacturaDAO statusFacturaDAO;
+	
 	
 	private List<Cliente> listaCliente;
 	private List<ClienteDomicilios> listaClienteDom;//recupera datos de la tabla cliente-domicilio
@@ -96,7 +104,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private Date fechaFactura;
 	private Date fechaCorte;
 	
-	private String moneda = "MX$";
+	private String moneda = "MX$", observacion;
 	private int plazoSelect;
 	private BigDecimal resIva = new BigDecimal(0);
 	private BigDecimal resRetencion = new BigDecimal(0);
@@ -119,6 +127,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		facturacionConstanciasDAO = new FacturacionDepositosDAO();
 		facturacionVigenciasDAO = new FacturacionVigenciasDAO();
 		facturacionServiciosDAO = new FacturacionServiciosDAO();
+		statusFacturaDAO = new StatusFacturaDAO();
 		
 		listaCliente = new ArrayList<>();
 		listaClienteDom = new ArrayList<>();
@@ -367,6 +376,22 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.resRetencion = resRetencion;
 	}
 
+	public Factura getFactura() {
+		return factura;
+	}
+
+	public void setFactura(Factura factura) {
+		this.factura = factura;
+	}
+
+	public String getObservacion() {
+		return observacion;
+	}
+
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+
 	public void domicilioAvisoPorCliente() {
 		
 		iva = parametroDAO.buscarPorNombre("IVA");//
@@ -520,6 +545,73 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public String inyeccionBean(){
 		
+		factura = new Factura();
+		
+		factura.setCliente(clienteSelect);
+		factura.setNumero(clienteSelect.getNumeroCte());
+		factura.setMoneda(moneda);
+		factura.setRfc(clienteSelect.getCteRfc());//duda*
+		factura.setNombreCliente(clienteSelect.getCteNombre());
+		factura.setFecha(fechaCorte);
+		factura.setObservacion(observacion);
+		factura.setSubtotal(null);//duda*
+		factura.setIva(resIva);//duda*
+		factura.setTotal(null);//duda*
+		factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
+		factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
+		factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
+		factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
+		
+		AsentamientoHumandoDAO asentamientoDAO = new AsentamientoHumandoDAO();
+		
+		AsentamientoHumanoPK asentamientoPk = new AsentamientoHumanoPK();
+		
+		asentamientoPk.setPaisCve(domicilioSelect.getPaisCved().getPaisCve());
+		asentamientoPk.setEstadoCve(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve());
+		asentamientoPk.setMunicipioCve(domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve());
+		asentamientoPk.setCiudadCve(domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve());
+		asentamientoPk.setAsentamientoCve(domicilioSelect.getDomicilioColonia());
+		
+		AsentamientoHumano asentamiento = new AsentamientoHumano();
+		
+		asentamiento.setAsentamientoHumanoPK(asentamientoPk);
+		asentamiento = asentamientoDAO.buscar(asentamiento);
+		
+		factura.setColonia(asentamiento.getAsentamientoDs());//duda*
+		factura.setCp(domicilioSelect.getDomicilioCp());
+		factura.setCalle(domicilioSelect.getDomicilioCalle());
+		factura.setNumExt(domicilioSelect.getDomicilioNumExt());
+		factura.setNumInt(domicilioSelect.getDomicilioNumInt());
+		factura.setTelefono(domicilioSelect.getDomicilioTel1());//duda*
+		//factura.setFax(null);//duda*
+		factura.setPorcentajeIva(resIva);
+		factura.setNumeroCliente(clienteSelect.getNumeroCte());
+		factura.setValorDeclarado(null);//duda*
+		factura.setInicioServicios(fechaCorte);//duda*
+		factura.setFinServicios(fechaCorte);//duda*
+		factura.setMontoLetra(null);//duda*
+		
+		StatusFactura statusF = statusFacturaDAO.buscarPorId(1);
+		
+		factura.setStatus(statusF);//duda*
+		
+		TipoFacturacion tipoF;//duda*
+		
+		factura.setTipoFacturacion(null);
+		factura.setPlanta(plantaSelect);
+		factura.setPlazo(plazoSelect);//duda*
+		factura.setRetencion(new BigDecimal(0));
+		factura.setNomSerie(null);//duda*
+		factura.setMetodoPago(null);
+		factura.setTipoPersona(null);
+		factura.setCdRegimen(null);
+		factura.setCdUsoCfdi(null);
+		factura.setUuid(null);
+		factura.setEmisorNombre(null);
+		factura.setEmisorRFC(null);
+		factura.setEmisorCdRegimen(null);//*
+		
+		
 		
 		try {
 			faceContext = FacesContext.getCurrentInstance();
@@ -530,6 +622,8 @@ public class FacturacionConstanciasBean implements Serializable{
 			session.setAttribute("vigencias",selectedVigencias);
 			session.setAttribute("servicios", selectedServicios);
 			session.setAttribute("cliente", clienteSelect);
+			session.setAttribute("plantaSelect", plantaSelect);
+			session.setAttribute("factura", factura);
 			session.setAttribute("fechaEmision", fechaCorte);
 			
 		}catch(Exception e) {

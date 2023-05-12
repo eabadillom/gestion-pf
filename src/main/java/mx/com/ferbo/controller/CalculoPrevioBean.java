@@ -15,15 +15,19 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-
 import mx.com.ferbo.dao.PrecioServicioDAO;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.ProductoConstanciaDs;
 import mx.com.ferbo.model.Servicio;
@@ -51,6 +55,8 @@ public class CalculoPrevioBean implements Serializable{
 	private PrecioServicioDAO precioServicioDAO;
 	
 	private Cliente clienteSelect;
+	private Planta plantaSelect;
+	private Factura factura;
 	
 	private Date fechaEmision;
 	private BigDecimal cantidad;
@@ -63,6 +69,8 @@ public class CalculoPrevioBean implements Serializable{
 		listaVigencias = new ArrayList<>();
 		
 		clienteSelect = new Cliente();
+		plantaSelect = new Planta();
+		factura = new Factura();
 		
 		precioServicioDAO = new PrecioServicioDAO();
 		
@@ -79,6 +87,9 @@ public class CalculoPrevioBean implements Serializable{
 			listaVigencias = (List<ConstanciaFactura>) request.getSession(false).getAttribute("vigencias");	
 			listaServicios = (List<ConstanciaFacturaDs>) request.getSession(false).getAttribute("servicios");
 			clienteSelect = (Cliente) request.getSession(false).getAttribute("cliente");
+			plantaSelect = (Planta) request.getSession(false).getAttribute("plantaSelect");
+			factura = (Factura) request.getSession(false).getAttribute("factura");
+			
 			fechaEmision = (Date) request.getSession(false).getAttribute("fechaEmision");
 			
 			if(listaEntradas.isEmpty()) {
@@ -168,6 +179,22 @@ public class CalculoPrevioBean implements Serializable{
 		this.cantidad = cantidad;
 	}
 
+	public Planta getPlantaSelect() {
+		return plantaSelect;
+	}
+
+	public void setPlantaSelect(Planta plantaSelect) {
+		this.plantaSelect = plantaSelect;
+	}
+
+	public Factura getFactura() {
+		return factura;
+	}
+
+	public void setFactura(Factura factura) {
+		this.factura = factura;
+	}
+
 	public void verServicios() {
 		
 		BigDecimal importe = new BigDecimal(0); 		
@@ -254,6 +281,8 @@ public class CalculoPrevioBean implements Serializable{
 			
 			ConstanciaDeDeposito cdd = cf.getFolio();
 			listaServiciosConstancias = new ArrayList<>();
+			Aviso aviso = cdd.getAvisoCve();
+			String tipoFacturacion = aviso.getAvisoTpFacturacion();
 			
 			for(ConstanciaDepositoDetalle cs: cdd.getConstanciaDepositoDetalleList()) {
 				
@@ -262,6 +291,8 @@ public class CalculoPrevioBean implements Serializable{
 				TipoCobro tipoCobro = servicio.getCobro();
 				ServicioConstancia sc = new ServicioConstancia();
 				
+				BigDecimal cantidad = null;
+				
 				PrecioServicio precioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(), clienteSelect.getCteCve(), servicio.getServicioCve());
 				
 				switch(tipoCobro.getId()) {
@@ -269,20 +300,75 @@ public class CalculoPrevioBean implements Serializable{
 				case 1:
 				case 2:
 					
-					importe = cs.getServicioCantidad().multiply(precioServicio.getPrecio());
+					cantidad = cs.getServicioCantidad();
+					
+					importe = cantidad.multiply(precioServicio.getPrecio());
 					sc.setCosto(importe);
+					sc.setUnidadMedida("SRV");
 					System.out.println("El tipo cobro es 1 o 2 y su importe es: "+ importe);
 					break;
+				
+				case 3:
+				case 4:
+					
+					cantidad = getCantidadPartidas(cdd.getPartidaList(),tipoFacturacion);
+					
+					importe = cantidad.multiply(precioServicio.getPrecio());
+					sc.setCosto(importe);
+					System.out.println("El tipo de cobro es 3 o 4 y su importe es: "+importe);
+					
+					if(aviso.getAvisoTpFacturacion().equals("T")) {
+						sc.setUnidadMedida("TRM");
+					}else {
+						sc.setUnidadMedida("KG");
+					}
+					
+					break;
+				
 				default:
 					
-					System.out.println("Tiene tipo de cobro 3 o 4");
+					System.out.println("No existe el tipo de cobro");
 					break;
 				}
+				
+				sc.setTarifa(precioServicio.getPrecio());
+				sc.setBaseCargo(cantidad);
+				sc.setDescripcion(cs.getServicioCve().getServicioDs());
+				sc.setPlantaCve(plantaSelect.getPlantaCve());
+				sc.setPlantaDs(plantaSelect.getPlantaDs());
+				sc.setPlantaAbrev(plantaSelect.getPlantaAbrev());
+				sc.setPlantaCod(plantaSelect.getPlantaCod());
+				
+				Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
+				sc.setCamaraCve(camara.getCamaraCve());
+				sc.setCamaraDs(camara.getCamaraDs());
+				sc.setCamaraAbrev(camara.getCamaraAbrev());
+				
+				sc.setCodigo(null);
+				listaServiciosConstancias.add(sc);
+				
 				
 			}
 		}
 	}
 	
+	
+	public BigDecimal getCantidadPartidas(List<Partida> listaPartidas, String tipoFacturacion) {
+		
+		BigDecimal cantidad = new BigDecimal(0);
+		
+		for(Partida p: listaPartidas){
+			
+			if(tipoFacturacion.equals("T")) {
+				cantidad = cantidad.add(p.getNoTarimas());
+			}else {
+				cantidad = cantidad.add(p.getPesoTotal());
+			}
+			
+		}
+		
+		return cantidad;
+	}
 	
 	
 }
