@@ -104,7 +104,7 @@ public class CalculoPrevioBean implements Serializable{
 				listaServicios = new ArrayList<>();
 			}
 			
-			verServicios();
+			procesarServicios();//error
 			procesarEntradas();
 			//PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs");
 			
@@ -195,7 +195,7 @@ public class CalculoPrevioBean implements Serializable{
 		this.factura = factura;
 	}
 
-	public void verServicios() {
+	public void procesarServicios() {
 		
 		BigDecimal importe = new BigDecimal(0); 		
 		
@@ -217,17 +217,21 @@ public class CalculoPrevioBean implements Serializable{
 				cantidad = new BigDecimal(0);
 				
 				List<PrecioServicio> listaPrecioS =  csd.getServicioCve().getPrecioServicioList();				
-				PrecioServicio precioServicio = getPrecioServicio(clienteSelect.getCteCve(),listaPrecioS);				
-				cantidad = precioServicio.getPrecio().setScale(2);//variable agregada
-				
-				importe = csd.getServicioCantidad().multiply(cantidad);
+				PrecioServicio precioServicio = getPrecioServicio(clienteSelect.getCteCve(),listaPrecioS);			
 				
 				ServicioConstanciaDs servicioConstanciaDs = new ServicioConstanciaDs();
 				
 				servicioConstanciaDs.setDescripcion(csd.getServicioCve().getServicioDs());
 				servicioConstanciaDs.setConstancia(cfd);
-				servicioConstanciaDs.setCosto(importe.setScale(2));
-				servicioConstanciaDs.setTarifa(precioServicio.getPrecio().setScale(2));
+				
+				
+				if(precioServicio.getPrecio() != null) {//modificado por error null al llamar al metodo getPrecioServicio
+					cantidad = precioServicio.getPrecio().setScale(2);//variable agregada
+					importe = csd.getServicioCantidad().multiply(cantidad);
+					
+					servicioConstanciaDs.setCosto(importe.setScale(2));
+					servicioConstanciaDs.setTarifa(precioServicio.getPrecio().setScale(2));
+				}
 				servicioConstanciaDs.setCodigo(csd.getServicioCve().getServicioCod());
 				servicioConstanciaDs.setUdCobro("SRV");
 				servicioConstanciaDs.setCdUnidad(csd.getServicioCve().getCdUnidad());
@@ -258,15 +262,16 @@ public class CalculoPrevioBean implements Serializable{
 	
 	private PrecioServicio getPrecioServicio(Integer idCliente, List<PrecioServicio> listaPrecioS) {
 		
-		List<PrecioServicio> listaPrecioSTemp = new ArrayList<>();
+		List<PrecioServicio> listaPrecioSTemp = null;
+		PrecioServicio precioServicio = new PrecioServicio();
 		
 		listaPrecioSTemp = listaPrecioS.stream().filter(ps -> ps.getCliente().getCteCve().intValue() == idCliente)
 							.collect(Collectors.toList());
 		
-		
-		Optional<PrecioServicio> precioServicioMax = listaPrecioSTemp.stream().max((i,j) -> i.getAvisoCve().getAvisoCve().compareTo(j.getAvisoCve().getAvisoCve()));
-
-		PrecioServicio precioServicio= precioServicioMax.get();
+		if(!(listaPrecioSTemp.isEmpty())) { //modificado por error de retornar objeto precioServicio en null
+			Optional<PrecioServicio> precioServicioMax = listaPrecioSTemp.stream().max((i,j) -> i.getAvisoCve().getAvisoCve().compareTo(j.getAvisoCve().getAvisoCve()));
+			precioServicio = precioServicioMax.get();//colocar condicional, si y solo si precioServicioMax != null
+		}
 		
 		return precioServicio;
 	}
@@ -331,6 +336,7 @@ public class CalculoPrevioBean implements Serializable{
 					break;
 				}
 				
+				sc.setConstancia(cf);
 				sc.setTarifa(precioServicio.getPrecio());
 				sc.setBaseCargo(cantidad);
 				sc.setDescripcion(cs.getServicioCve().getServicioDs());
@@ -345,7 +351,11 @@ public class CalculoPrevioBean implements Serializable{
 				sc.setCamaraAbrev(camara.getCamaraAbrev());
 				
 				sc.setCodigo(null);
-				listaServiciosConstancias.add(sc);
+				
+				
+				/*listaServiciosConstancias.add(sc);				
+				cf.setServicioConstanciaList(listaServiciosConstancias);*/
+				
 				
 				
 			}

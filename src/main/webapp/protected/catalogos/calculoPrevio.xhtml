@@ -125,10 +125,10 @@
 								</p:column>															
 								
 								<p:column headerText="Cantidad">
-									<h:outputText value="#{calculoPrevioBean.cantidad}" />
+									<h:outputText value="#{servicioConstancia.constancia.constanciaDeServicio.getConstanciaServicioDetalleList().get(0).servicioCantidad}" />
 								</p:column>
 								
-								<p:column headerText="Precio Unitario">
+								<p:column headerText="Precio Unitario" >
 									<h:outputText value="#{servicioConstancia.tarifa}" />
 								</p:column>
 								

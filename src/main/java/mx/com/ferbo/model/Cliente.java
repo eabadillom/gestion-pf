@@ -14,6 +14,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -65,6 +67,28 @@ public class Cliente implements Serializable {
     @Size(max = 3)
     @Column(name = "COD_UNICO")
     private String codUnico;
+    @Size(max = 1)
+    @Column(name = "tp_persona")
+    private String tipoPersona;
+    @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
+    @ManyToOne
+    private RegimenFiscal regimenFiscal;
+    @JoinColumn(name = "cd_uso_cfdi", referencedColumnName = "cd_uso_cfdi")
+    @ManyToOne
+    private UsoCfdi cdUsoCfdi;
+    @JoinColumn(name = "cd_metodo_pago", referencedColumnName = "cd_metodo_pago")
+    @ManyToOne
+    private MetodoPago cdMetodoPago;
+    @Size(max = 5)
+    @Column(name = "cd_forma_pago")
+    private String cdFormaPago;
+    @Size(max = 150)
+    @Column(name = "nb_regimen_capital")
+    private String nbRegimenCapital;
+    @Size(max = 50)
+    @Column(name = "uuid")
+    private String uuid;
+    
     @OneToMany(mappedBy = "clienteCve")
     private List<ConstanciaServicios> constanciaServiciosList;
     @OneToMany(mappedBy = "cliente")
@@ -275,7 +299,63 @@ public class Cliente implements Serializable {
         this.constanciaTraspasoList = constanciaTraspasoList;
     }
 
-    @Override
+    public String getTipoPersona() {
+		return tipoPersona;
+	}
+
+	public void setTipoPersona(String tipoPersona) {
+		this.tipoPersona = tipoPersona;
+	}
+
+	public RegimenFiscal getRegimenFiscal() {
+		return regimenFiscal;
+	}
+
+	public void setRegimenFiscal(RegimenFiscal regimenFiscal) {
+		this.regimenFiscal = regimenFiscal;
+	}
+
+	public UsoCfdi getCdUsoCfdi() {
+		return cdUsoCfdi;
+	}
+
+	public void setCdUsoCfdi(UsoCfdi cdUsoCfdi) {
+		this.cdUsoCfdi = cdUsoCfdi;
+	}
+
+	public MetodoPago getCdMetodoPago() {
+		return cdMetodoPago;
+	}
+
+	public void setCdMetodoPago(MetodoPago cdMetodoPago) {
+		this.cdMetodoPago = cdMetodoPago;
+	}
+
+	public String getCdFormaPago() {
+		return cdFormaPago;
+	}
+
+	public void setCdFormaPago(String cdFormaPago) {
+		this.cdFormaPago = cdFormaPago;
+	}
+
+	public String getNbRegimenCapital() {
+		return nbRegimenCapital;
+	}
+
+	public void setNbRegimenCapital(String nbRegimenCapital) {
+		this.nbRegimenCapital = nbRegimenCapital;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (cteCve != null ? cteCve.hashCode() : 0);
