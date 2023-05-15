@@ -1,19 +1,26 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.StatusFactura;
+import mx.com.ferbo.model.TipoAsentamiento;
+import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class StatusFacturaDAO extends IBaseDAO<StatusFactura, Integer>{
 
 	@Override
 	public StatusFactura buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager entity = EntityManagerUtil.getEntityManager();
+		StatusFactura sf = entity.createNamedQuery("StatusFactura.findById", StatusFactura.class)
+				.setParameter("id",id).getSingleResult();
+		return sf;
 	}
 
 	@Override

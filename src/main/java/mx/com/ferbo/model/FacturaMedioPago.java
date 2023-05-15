@@ -12,6 +12,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -39,18 +40,22 @@ public class FacturaMedioPago implements Serializable {
     @JoinColumn(name = "mp_id", referencedColumnName = "mp_id")
     @ManyToOne(optional = false)
     private MedioPago mpId;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "mp_descripcion")
     private String mpDescripcion;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fmp_porcentaje")
     private int fmpPorcentaje;
+    
     @Size(max = 50)
     @Column(name = "fmp_referencia")
     private String fmpReferencia;
+    
     @JoinColumn(name = "factura_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Factura factura;
@@ -68,7 +73,7 @@ public class FacturaMedioPago implements Serializable {
         this.fmpPorcentaje = fmpPorcentaje;
     }
 
-    public FacturaMedioPago(int facturaId, int fmpId) {
+    public FacturaMedioPago(Factura facturaId, int fmpId) {
         this.facturaMedioPagoPK = new FacturaMedioPagoPK(facturaId, fmpId);
     }
 
