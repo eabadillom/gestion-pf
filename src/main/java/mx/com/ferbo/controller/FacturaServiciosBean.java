@@ -247,6 +247,8 @@ public class FacturaServiciosBean implements Serializable {
 		constancias();
 		setMedioPago();
 		setMetodoPago();
+		PrimeFaces.current().ajax().update("receptor", "factura", "servicioSelect", "metodoPago", "medioPago");
+		
 	}
 	
 		public void setMedioPago() {
@@ -468,8 +470,14 @@ public class FacturaServiciosBean implements Serializable {
 			for (ServicioFactura sef : alServiciosDetalle) {
 				sef.setFactura(factura);
 			}
-			facturaDAO.guardar(factura);
-
+			String resultado = facturaDAO.guardar(factura);
+			if(resultado != null)
+				throw new InventarioException("Ocurrió un problema al guardar la factura.");
+			int serie = this.serieFacturaSelect.getNumeroActual() + 1;
+			serieFacturaSelect.setNumeroActual(serie);
+			String resultadoSerie = seriefacturaDAO.update(serieFacturaSelect);
+			if(resultadoSerie != null)
+				throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "La factura se guardo correctamente";
 		} catch (InventarioException ex) {
