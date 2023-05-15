@@ -277,7 +277,11 @@
             <artifactId>primefaces-extensions</artifactId>
             <version>11.0.6</version>
         </dependency>
-        
+        <dependency>
+			<groupId>com.ferbo</groupId>
+			<artifactId>facturama-client</artifactId>
+			<version>0.1.4</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -289,6 +293,8 @@
 	</repositories>
 
 	<build>
+		<!-- Se establece el nombre del archivo war (gestion.war) -->
+		<finalName>${project.artifactId}</finalName>
 		<resources>
 			   <resource> 
                  <directory>src/main/resources</directory>  

@@ -12,8 +12,10 @@
 		<h:form id="form" >
 			<p:breadCrumb>
 				<p:menuitem value="Home" outcome="/dashboard" />
+
 				<p:menuitem value="Facturación" />				
 				<p:menuitem value="Facturacion Entrada/Salida" outcome="/protected/catalogos/facturacionConstancias"  />
+
 			</p:breadCrumb>
 		
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
@@ -116,6 +118,7 @@
 								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.resIva}"/>%
 								
 								<p:outputLabel value="Retencion:" styleClass="p-ml-4 p-mr-2"/>
+
 								<p:selectBooleanCheckbox/>
 								<p:inputNumber styleClass="p-ml-2" size="4" value="#{facturacionConstanciasBean.resRetencion}"/>%
 								

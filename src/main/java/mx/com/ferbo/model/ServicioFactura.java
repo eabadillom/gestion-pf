@@ -45,39 +45,51 @@ public class ServicioFactura implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "descripcion")
     private String descripcion;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "cantidad")
     private BigDecimal cantidad;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "unidad")
     private String unidad;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "costo")
     private BigDecimal costo;
+    
     @Column(name = "tarifa")
     private BigDecimal tarifa;
+    
     @Size(max = 10)
     @Column(name = "ud_cobro")
     private String udCobro;
+    
     @Size(max = 20)
     @Column(name = "codigo")
     private String codigo;
+    
     @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Factura factura;
+    
     @JoinColumn(name = "tipo_cobro", referencedColumnName = "id")
     @ManyToOne
     private TipoCobro tipoCobro;
+    
+    @Column(name = "cd_unidad")
+    private String cdUnidad;
 
     public ServicioFactura() {
     }
@@ -174,7 +186,15 @@ public class ServicioFactura implements Serializable {
         this.factura = factura;
     }
 
-    @Override
+    public String getCdUnidad() {
+		return cdUnidad;
+	}
+
+	public void setCdUnidad(String cdUnidad) {
+		this.cdUnidad = cdUnidad;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

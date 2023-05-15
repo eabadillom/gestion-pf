@@ -3,16 +3,23 @@ package mx.com.ferbo.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
+import mx.com.ferbo.model.Contacto;
+import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
-import mx.com.ferbo.model.PartidaServicio;
+import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
+	Logger log = Logger.getLogger(ClienteDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Cliente> findall() {
@@ -29,6 +36,55 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		return em.createNamedQuery("Cliente.findByCteCve", Cliente.class).
 				setParameter("cteCve", id)
 				.getSingleResult();
+	}
+	
+	public Cliente buscarPorId(Integer id, boolean isFullInfo) {
+		Cliente cliente = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("Cliente.findByCteCve", Cliente.class)
+			.setParameter("cteCve", id);
+			cliente = (Cliente) query.getSingleResult();
+			
+			if(isFullInfo == false)
+				return cliente;
+			
+			if(cliente.getCandadoSalida() != null)
+				cliente.getCandadoSalida().getId();
+			
+			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
+			
+			for(ClienteContacto clienteContacto : clienteContactoList) {
+				
+				Contacto contacto = clienteContacto.getIdContacto();
+				
+				List<MedioCnt> medioCntList = contacto.getMedioCntList();
+				
+				for(MedioCnt medioContacto : medioCntList) {
+					
+					Mail idMail = medioContacto.getIdMail();
+					Telefono idTelefono = medioContacto.getIdTelefono();
+					
+					if(idMail != null)
+						idMail.getTpMail().getNbTipo();
+					
+					if(idTelefono != null)
+						idTelefono.getTpTelefono().getNbTelefono();
+					
+				}
+			}
+		} catch(NoResultException ex){
+			log.error("Problema para obtener la información completa del cliente...", ex);
+		} catch(Exception ex) {
+			log.error("Problema para obtener la información completa del cliente...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+				
+		return cliente;
 	}
 
 	@Override
@@ -58,14 +114,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			if(em.isOpen()) {
-				try {
-					em.close();
-				}catch (Exception e) {
-					System.out.println("ERROR" + e.getMessage());
-					return "ERROR";
-				}
-			}
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -83,14 +132,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			if(em.isOpen()) {
-				try {
-					em.close();
-				}catch (Exception e) {
-					System.out.println("ERROR" + e.getMessage());
-					return "ERROR";
-				}
-			}
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -100,7 +142,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();			
+			em.getTransaction().begin();
 			
 			for (ClienteContacto ct : cliente.getClienteContactoList()) {
 				for (MedioCnt medio : ct.getIdContacto().getMedioCntList()) {
@@ -133,14 +175,46 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			if(em.isOpen()) {
-				try {
-					em.close();
-				}catch (Exception e) {
-					System.out.println("ERROR" + e.getMessage());
-					return "ERROR";
+			EntityManagerUtil.close(em);
+		}
+		return null;
+	}
+	
+	public String eliminar(Integer cteCve) {
+		EntityManager em = null;
+		Cliente cliente = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			cliente = em.createNamedQuery("Cliente.findByCteCve", Cliente.class).
+			setParameter("cteCve", cteCve)
+			.getSingleResult();
+			CandadoSalida candadoSalida = cliente.getCandadoSalida();
+			if(candadoSalida != null) {
+				System.out.println(cliente.getCandadoSalida().getId());
+				cliente.remove(candadoSalida);
+				em.merge(cliente);
+			}
+			
+			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
+			
+			for (ClienteContacto ct : clienteContactoList) {
+				Contacto contacto = ct.getIdContacto();
+				List<MedioCnt> medioCntList = ct.getIdContacto().getMedioCntList();
+				
+				for (MedioCnt medio : medioCntList) {
+					Telefono telefono = medio.getIdTelefono();
+					Mail mail = medio.getIdMail();
 				}
 			}
+			em.createQuery("DELETE FROM Cliente cte WHERE cte.cteCve = :idCliente")
+			.setParameter("idCliente", cliente.getCteCve()).executeUpdate();
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			log.error("Problema al eliminar al cliente: " + cliente, e);
+			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -160,14 +234,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			if(em.isOpen()) {
-				try {
-					em.close();
-				}catch (Exception e) {
-					System.out.println("ERROR" + e.getMessage());
-					return "ERROR";
-				}
-			}
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
