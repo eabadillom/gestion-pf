@@ -106,10 +106,10 @@ public class FacturacionConstanciasBean implements Serializable{
 	private Date fechaFactura;
 	private Date fechaCorte;
 	
-	private String moneda = "MX$", observacion;
+	private String moneda, observacion;
 	private int plazoSelect;
-	private BigDecimal resIva = new BigDecimal(0);
-	private BigDecimal resRetencion = new BigDecimal(0), valorDeclarado = new BigDecimal(0);
+	private BigDecimal resIva;
+	private BigDecimal resRetencion, valorDeclarado;
 	
     private FacesContext faceContext;
     private HttpServletRequest request;
@@ -148,6 +148,11 @@ public class FacturacionConstanciasBean implements Serializable{
 		selectedEntradas = new ArrayList<>();
 		selectedVigencias = new ArrayList<>();
 		selectedServicios = new ArrayList<>();
+		
+		valorDeclarado = new BigDecimal(0);
+		resRetencion = new BigDecimal(0);
+		resIva = new BigDecimal(0);
+		moneda = "MX$";
 		
 	}
 	
@@ -575,18 +580,11 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		AsentamientoHumandoDAO asentamientoDAO = new AsentamientoHumandoDAO();
 		
-		AsentamientoHumanoPK asentamientoPk = new AsentamientoHumanoPK();
-		
-		asentamientoPk.setPaisCve(domicilioSelect.getPaisCved().getPaisCve());
-		asentamientoPk.setEstadoCve(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve());
-		asentamientoPk.setMunicipioCve(domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve());
-		asentamientoPk.setCiudadCve(domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve());
-		asentamientoPk.setAsentamientoCve(domicilioSelect.getDomicilioColonia());
-		
-		AsentamientoHumano asentamiento = new AsentamientoHumano();
-		
-		asentamiento.setAsentamientoHumanoPK(asentamientoPk);
-		asentamiento = asentamientoDAO.buscar(asentamiento);
+		AsentamientoHumano asentamiento = asentamientoDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
+				domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
+				domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+				domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
+				domicilioSelect.getDomicilioColonia());
 		
 		factura.setColonia(asentamiento.getAsentamientoDs());
 		factura.setCp(domicilioSelect.getDomicilioCp());
@@ -616,7 +614,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setMetodoPago(metodoPagoSelect.getCdMetodoPago());
 		factura.setTipoPersona(clienteSelect.getTipoPersona());
 		factura.setCdRegimen(clienteSelect.getRegimenFiscal().getCd_regimen());
-		factura.setCdUsoCfdi(clienteSelect.getCdUsoCfdi().getUsoCfdi());
+		factura.setCdUsoCfdi(clienteSelect.getUsoCfdi().getUsoCfdi());
 		factura.setUuid(null);//se coloca al timbrar
 		factura.setEmisorNombre(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
 		factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());

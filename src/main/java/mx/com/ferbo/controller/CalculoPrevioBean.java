@@ -106,6 +106,7 @@ public class CalculoPrevioBean implements Serializable{
 			
 			procesarServicios();//error
 			procesarEntradas();
+			procesarVigencias();
 			//PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs");
 			
 		} catch (Exception e) {
@@ -194,6 +195,8 @@ public class CalculoPrevioBean implements Serializable{
 	public void setFactura(Factura factura) {
 		this.factura = factura;
 	}
+	
+	//SERVICIOS (CONSTANCIA DE SERVICIOS)
 
 	public void procesarServicios() {
 		
@@ -276,13 +279,120 @@ public class CalculoPrevioBean implements Serializable{
 		return precioServicio;
 	}
 	
+	//ENTRADAS (CONSTANCIA DE DEPOSITO)
 	
 	public void procesarEntradas() {
+		
+		//BigDecimal importe = new BigDecimal(0);
+		List<ServicioConstancia> listaServiciosConstancias = null;
+		
+		for(ConstanciaFactura cf: listaEntradas) {
+			
+			ConstanciaDeDeposito cdd = cf.getFolio();
+			listaServiciosConstancias = new ArrayList<>();
+			Aviso aviso = cdd.getAvisoCve();
+			String tipoFacturacion = aviso.getAvisoTpFacturacion();
+			
+			for(ConstanciaDepositoDetalle cs: cdd.getConstanciaDepositoDetalleList()) {
+				
+				//System.out.println(cs.getServicioCve().getCobro().getId());
+				Servicio servicio = cs.getServicioCve();
+				TipoCobro tipoCobro = servicio.getCobro();
+				ServicioConstancia sc = new ServicioConstancia();
+				
+				BigDecimal importe = new BigDecimal(0);
+				BigDecimal cantidad = null;
+				
+				PrecioServicio precioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(), clienteSelect.getCteCve(), servicio.getServicioCve());
+				
+				switch(tipoCobro.getId()) {
+				
+				case 1:
+				case 2:
+					
+					cantidad = cs.getServicioCantidad();
+					
+					importe = cantidad.multiply(precioServicio.getPrecio());
+					sc.setCosto(importe);
+					sc.setUnidadMedida("SRV");
+					System.out.println("El tipo cobro es 1 o 2 y su importe es: "+ importe);
+					break;
+				
+				case 3:
+				case 4:
+					
+					cantidad = getCantidadPartidas(cdd.getPartidaList(),tipoFacturacion);
+					
+					importe = cantidad.multiply(precioServicio.getPrecio());
+					sc.setCosto(importe);
+					System.out.println("El tipo de cobro es 3 o 4 y su importe es: "+importe);
+					
+					if(aviso.getAvisoTpFacturacion().equals("T")) {
+						sc.setUnidadMedida("TRM");
+					}else {
+						sc.setUnidadMedida("KG");
+					}
+					
+					break;
+				
+				default:
+					
+					System.out.println("No existe el tipo de cobro");
+					break;
+				}
+				
+				sc.setConstancia(cf);
+				sc.setTarifa(precioServicio.getPrecio());
+				sc.setBaseCargo(cantidad);
+				sc.setDescripcion(cs.getServicioCve().getServicioDs());
+				sc.setPlantaCve(plantaSelect.getPlantaCve());
+				sc.setPlantaDs(plantaSelect.getPlantaDs());
+				sc.setPlantaAbrev(plantaSelect.getPlantaAbrev());
+				sc.setPlantaCod(plantaSelect.getPlantaCod());
+				
+				Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
+				sc.setCamaraCve(camara.getCamaraCve());
+				sc.setCamaraDs(camara.getCamaraDs());
+				sc.setCamaraAbrev(camara.getCamaraAbrev());
+				
+				sc.setCodigo(null);
+				
+				
+				/*listaServiciosConstancias.add(sc);				
+				cf.setServicioConstanciaList(listaServiciosConstancias);*/
+				
+				
+				
+			}
+		}
+	}
+	
+	public BigDecimal getCantidadPartidas(List<Partida> listaPartidas, String tipoFacturacion) {
+		
+		BigDecimal cantidad = new BigDecimal(0);
+		
+		for(Partida p: listaPartidas){
+			
+			if(tipoFacturacion.equals("T")) {
+				cantidad = cantidad.add(p.getNoTarimas());
+			}else {
+				cantidad = cantidad.add(p.getPesoTotal());
+			}
+			
+		}
+		
+		return cantidad;
+	}
+	
+	
+	//VIGENCIAS (CONSTANCIA DE DEPOSITO)
+	
+	public void procesarVigencias() {
 		
 		BigDecimal importe = new BigDecimal(0);
 		List<ServicioConstancia> listaServiciosConstancias = null;
 		
-		for(ConstanciaFactura cf: listaEntradas) {
+		for(ConstanciaFactura cf: listaVigencias) {
 			
 			ConstanciaDeDeposito cdd = cf.getFolio();
 			listaServiciosConstancias = new ArrayList<>();
@@ -357,13 +467,11 @@ public class CalculoPrevioBean implements Serializable{
 				cf.setServicioConstanciaList(listaServiciosConstancias);*/
 				
 				
-				
 			}
 		}
 	}
 	
-	
-	public BigDecimal getCantidadPartidas(List<Partida> listaPartidas, String tipoFacturacion) {
+	/*public BigDecimal getCantidadPartidasVig(List<Partida> listaPartidas, String tipoFacturacion) {
 		
 		BigDecimal cantidad = new BigDecimal(0);
 		
@@ -378,7 +486,8 @@ public class CalculoPrevioBean implements Serializable{
 		}
 		
 		return cantidad;
-	}
+	}*/
+	
 	
 	
 }
