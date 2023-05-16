@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,9 @@ import org.apache.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
+import mx.com.ferbo.model.ConstanciaSalida;
+import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -152,8 +156,39 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				if(lConstanciaFactura.size() > 0)
 					continue;
 				
+				//constancia.getPartidaList();
+				
 				cf = this.getConstanciaFactura(constancia, fechaCorte);
 				list.add(cf);
+				
+				for(Partida p: constancia.getPartidaList()) {
+					BigDecimal cantidadT = new BigDecimal(p.getCantidadTotal());
+					BigDecimal pesoTotal = p.getPesoTotal();
+					BigDecimal noTarima = p.getNoTarimas();
+					BigDecimal salidaCantidad = new BigDecimal(0),salidaPeso = new BigDecimal(0);
+					
+					for(DetalleConstanciaSalida dcs: p.getDetalleConstanciaSalidaList()) {
+						
+						BigDecimal cantidad = new BigDecimal(dcs.getCantidad());
+						BigDecimal peso = dcs.getPeso();
+						
+						salidaCantidad = salidaCantidad.add(cantidad);
+						salidaPeso = salidaPeso.add(peso);
+						
+						ConstanciaSalida constanciaSalida = new ConstanciaSalida();
+						
+						constanciaSalida = dcs.getConstanciaCve();//OBTENGO OBJETO SIMPLE
+						
+						System.out.println("Fecha "+constanciaSalida.getFecha());
+						
+					}
+					
+					cantidadT = cantidadT.subtract(salidaCantidad);
+					pesoTotal = pesoTotal.subtract(salidaPeso);
+					System.out.println("La cantidad restante es: "+cantidadT + "El peso Total es: "+pesoTotal);
+					
+				}
+				
 			}
 			
 		} catch(Exception ex) {

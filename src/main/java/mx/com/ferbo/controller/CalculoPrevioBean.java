@@ -111,7 +111,7 @@ public class CalculoPrevioBean implements Serializable{
 			
 		} catch (Exception e) {
 			
-			System.out.println("ERROR" + e.getMessage());
+			System.out.println("ERROR Aqui" + e.getMessage());
 		}
 		
 	}
