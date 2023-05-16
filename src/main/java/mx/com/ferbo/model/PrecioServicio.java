@@ -140,9 +140,14 @@ public class PrecioServicio implements Serializable {
             return false;
         }
         PrecioServicio other = (PrecioServicio) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
+        
+        if( this.avisoCve != other.avisoCve || this.getCliente().getCteCve() != other.getCliente().getCteCve() || this.getServicio().getServicioCve() != other.getServicio().getServicioCve() )
+        	return false;
+//        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+//            return false;
+//        }
+        System.out.println("PrecioServicio 1: " + this + " - PrecioServicio 2: " + other);
+        
         return true;
     }
 

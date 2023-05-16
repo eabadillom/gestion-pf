@@ -89,9 +89,17 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 
 	@Override
 	public List<Cliente> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
 		List<Cliente> listado = null;
-		listado = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();		
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de clientes...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listado;
 	}
 

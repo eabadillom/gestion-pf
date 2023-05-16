@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PlantaDAO {
 	private static Logger log = Logger.getLogger(PlantaDAO.class);
@@ -20,8 +21,15 @@ public class PlantaDAO {
 	public List<Planta> findall() {
 		EntityManager entity = getEntityManager();
 		List<Planta> plantas = null;
-		Query sql = entity.createNamedQuery("Planta.findAll", Planta.class);
-		plantas = sql.getResultList();
+		try {
+			Query sql = entity.createNamedQuery("Planta.findAll", Planta.class);
+			plantas = sql.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de Plantas...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		return plantas;
 	}
 

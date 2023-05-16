@@ -5,12 +5,16 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
+	
+	private Logger log = Logger.getLogger(AvisoDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Aviso> findall() {
@@ -23,8 +27,49 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 	
 	@Override
 	public Aviso buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		Aviso aviso = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("Aviso.findByAvisoCve", Aviso.class)
+					.setParameter("avisoCve", id)
+					;
+			aviso = (Aviso) query.getSingleResult();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el aviso " + id, ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return aviso;
+	}
+	
+	public Aviso buscarPorId(Integer id, boolean isFullInfo) {
+		Aviso aviso = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("Aviso.findByAvisoCve", Aviso.class)
+					.setParameter("avisoCve", id)
+					;
+			aviso = (Aviso) query.getSingleResult();
+			
+			if(isFullInfo)
+				return aviso;
+			aviso.getPlantaCve().getPlantaCve();
+			aviso.getCteCve().getCteCve();
+			aviso.getCategoriaCve().getCategoriaCve();
+			aviso.getPrecioServicioList().size();
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el aviso " + id, ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return aviso;
 	}
 
 	@Override
@@ -47,21 +92,23 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createNativeQuery(
-					"UPDATE aviso SET aviso_po = :avisoPo , aviso_pedimento = :avisoPedimento, aviso_sap = :avisoSap, aviso_lote = :avisoLote,aviso_caducidad = :avisoCaducidad,aviso_tarima = :avisoTarima,aviso_otro = :avisoOtro,aviso_vigencia = :avisoVigencia,aviso_plazo = :avisoPlazo, aviso_val_seg = :avisoValSeg  WHERE (cte_cve = :cteCve) and (aviso_cve = :avisoCve)") 
-			.setParameter("avisoCve",e.getAvisoCve())
-			.setParameter("avisoPo",e.getAvisoPo())
-			.setParameter("avisoPedimento",e.getAvisoPedimento())
-			.setParameter("avisoSap",e.getAvisoSap())
-			.setParameter("avisoLote",e.getAvisoLote())
-			.setParameter("avisoCaducidad",e.getAvisoCaducidad())
-			.setParameter("avisoTarima",e.getAvisoTarima())
-			.setParameter("avisoOtro",e.getAvisoOtro())
-			.setParameter("cteCve",e.getCteCve())
-			.setParameter("avisoVigencia", e.getAvisoVigencia())
-			.setParameter("avisoPlazo", e.getAvisoPlazo())
-			.setParameter("avisoValSeg", e.getAvisoValSeg())
-					.executeUpdate();
+//			em.createNativeQuery(
+//					"UPDATE aviso SET aviso_po = :avisoPo , aviso_pedimento = :avisoPedimento, aviso_sap = :avisoSap, aviso_lote = :avisoLote,aviso_caducidad = :avisoCaducidad,aviso_tarima = :avisoTarima,aviso_otro = :avisoOtro,aviso_vigencia = :avisoVigencia,aviso_plazo = :avisoPlazo, aviso_val_seg = :avisoValSeg  WHERE (cte_cve = :cteCve) and (aviso_cve = :avisoCve)") 
+//			.setParameter("avisoCve",e.getAvisoCve())
+//			.setParameter("avisoPo",e.getAvisoPo())
+//			.setParameter("avisoPedimento",e.getAvisoPedimento())
+//			.setParameter("avisoSap",e.getAvisoSap())
+//			.setParameter("avisoLote",e.getAvisoLote())
+//			.setParameter("avisoCaducidad",e.getAvisoCaducidad())
+//			.setParameter("avisoTarima",e.getAvisoTarima())
+//			.setParameter("avisoOtro",e.getAvisoOtro())
+//			.setParameter("cteCve",e.getCteCve())
+//			.setParameter("avisoVigencia", e.getAvisoVigencia())
+//			.setParameter("avisoPlazo", e.getAvisoPlazo())
+//			.setParameter("avisoValSeg", e.getAvisoValSeg())
+//					.executeUpdate();
+			
+			em.merge(e);
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception ex) {
@@ -119,7 +166,7 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 			return "ERROR";
 		}
 		return null;
-	}	
+	}
 
 	@Override
 	public String eliminarListado(List<Aviso> listado) {
