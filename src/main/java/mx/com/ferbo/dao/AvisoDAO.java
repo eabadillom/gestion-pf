@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
@@ -52,17 +52,17 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("Aviso.findByAvisoCve", Aviso.class)
-					.setParameter("avisoCve", id)
-					;
-			aviso = (Aviso) query.getSingleResult();
+			aviso = em.find(Aviso.class, id);
 			
-			if(isFullInfo)
+			if(isFullInfo == false)
 				return aviso;
-			aviso.getPlantaCve().getPlantaCve();
-			aviso.getCteCve().getCteCve();
-			aviso.getCategoriaCve().getCategoriaCve();
-			aviso.getPrecioServicioList().size();
+			log.debug(aviso.getPlantaCve().getPlantaCve());
+			log.debug(aviso.getCteCve().getCteCve());
+			log.debug(aviso.getCategoriaCve().getCategoriaCve());
+			log.debug(aviso.getPrecioServicioList().size());
+			for(PrecioServicio ps : aviso.getPrecioServicioList()) {
+				log.debug("ID Precio Servicio: " + ps.getId());
+			}
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el aviso " + id, ex);
@@ -177,8 +177,26 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 	public List<Aviso> buscarPorCliente(Aviso e){
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Aviso.findByAvisoCliente", Aviso.class)
-				.setParameter("cteCve", e.getCteCve().getCteCve())
-				.getResultList();	
+				.setParameter("cteCve", e.getCteCve().getCteCve()).getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Aviso> buscarPorCliente(Integer cteCve) {
+		List<Aviso> lista = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("Aviso.findByAvisoCliente", Aviso.class)
+					.setParameter("cteCve", cteCve);
+			lista = query.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema en la consulta de los avisos del cliente " + cteCve, ex);
+		} finally {
+			EntityManagerUtil.close(em);
 		}
+		return lista;
+	}
 
 }

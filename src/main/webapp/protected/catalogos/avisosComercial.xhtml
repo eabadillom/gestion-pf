@@ -92,9 +92,7 @@
 									styleClass="edit-button ui-button-primary"
 									actionListener="#{avisosComercialBean.buscaPrecioServicioAviso(pAviso)}"
 									oncomplete="PF('actAvisoDialog').show()"
-									update="dt-avisos form:panel-actAviso">
-									<f:setPropertyActionListener value="#{pAviso}"
-										target="#{avisosComercialBean.avisoSelected}" />
+									update="dt-avisos form:panel-actAviso form:soPlantaAct">
 								</p:commandButton>
 								<p:commandButton class="ui-button-danger" icon="pi pi-trash"
 									process="@this" oncomplete="PF('avisoDialogDelete').show()">
@@ -271,7 +269,7 @@
 									update="panel-actAviso dt-avisos"
 									process="@this panel-actAviso" />
 								<p:commandButton value="Cancelar" icon="pi pi-times"
-									onclick="PF('actAvisoDialog').hide()"
+									onclick="PF('actAvisoDialog').hide()" actionListener="#{avisosComercialBean.resetSelectedItems()}"
 									class="ui-button-secondary" resetValues="true" />
 							</f:facet>
 						</p:dialog>
