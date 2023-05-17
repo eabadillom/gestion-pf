@@ -153,6 +153,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		resRetencion = new BigDecimal(0);
 		resIva = new BigDecimal(0);
 		moneda = "MX$";
+
+		
 		
 	}
 	
@@ -171,8 +173,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		//iva = parametroDAO.buscarPorNombre("IVA");
 		//retencion = parametroDAO.buscarPorNombre("RETENCION");
 		
-		fechaFactura = new Date();
 		fechaCorte = new Date();
+		fechaFactura = new Date();
 		
 	}
 
@@ -521,7 +523,10 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionVigencias(){
 		
+		System.out.println(fechaFactura);
 		DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
+		
+		//getFechaCorte();
 		
 		listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
 		

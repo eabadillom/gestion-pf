@@ -164,10 +164,19 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				for(Partida p: constancia.getPartidaList()) {
 					BigDecimal cantidadT = new BigDecimal(p.getCantidadTotal());
 					BigDecimal pesoTotal = p.getPesoTotal();
-					BigDecimal noTarima = p.getNoTarimas();
+					BigDecimal noTarima = p.getNoTarimas();//*** pendiente explicacion
 					BigDecimal salidaCantidad = new BigDecimal(0),salidaPeso = new BigDecimal(0);
 					
 					for(DetalleConstanciaSalida dcs: p.getDetalleConstanciaSalidaList()) {
+						
+						ConstanciaSalida constanciaSalida = new ConstanciaSalida();
+						constanciaSalida = dcs.getConstanciaCve();//OBTENGO OBJETO SIMPLE
+						
+						if(constanciaSalida.getStatus().getId()==2)
+							continue;
+						
+						if(constanciaSalida.getFecha().after(fechaCorte))
+							continue;
 						
 						BigDecimal cantidad = new BigDecimal(dcs.getCantidad());
 						BigDecimal peso = dcs.getPeso();
@@ -175,9 +184,7 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 						salidaCantidad = salidaCantidad.add(cantidad);
 						salidaPeso = salidaPeso.add(peso);
 						
-						ConstanciaSalida constanciaSalida = new ConstanciaSalida();
 						
-						constanciaSalida = dcs.getConstanciaCve();//OBTENGO OBJETO SIMPLE
 						
 						System.out.println("Fecha "+constanciaSalida.getFecha());
 						
