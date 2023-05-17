@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -55,13 +56,13 @@ public class Planta implements Serializable {
 	@Column(name = "PLANTA_COD")
 	private String plantaCod;
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id")
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Usuario idUsuario;
-	@OneToMany(mappedBy = "plantaCve")
+	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Camara> camaraList;
-	@OneToMany(mappedBy = "plantaCve")
+	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Aviso> avisoList;
-	@OneToMany(mappedBy = "planta")
+	@OneToMany(mappedBy = "planta", fetch = FetchType.LAZY)
     private List<Factura> facturaList;
 	
 	@Column(name = " id_pais")

@@ -110,22 +110,18 @@ public class PlantaBean implements Serializable {
 		ciudadesDao = new CiudadesDAO();
 		tipoAsentamientoDao = new TipoAsentamientoDAO();
 		asentamientoHumandoDao = new AsentamientoHumandoDAO();
-		list = daoPlanta.findall();
-		usuarios = daoPlanta.getUsuarios();
-		listaPaises = daoPaises.findall();
-		listaEmisores = daoPlanta.getEmisor();
 		
-		//estadosList = daoEstados.findall();
-		//listaMunicipios = daoMunicipios.findall();
-		//listaCiudades = ciudadesDao.findall();
-		//listaTipoAsentamiento = tipoAsentamientoDao.findall();
-		//listaAsentamientoHumano = asentamientoHumandoDao.findall();
 		planta = new Planta();
 		seleccion = new Planta();
 	};
 	
 	@PostConstruct
 	public void init() {
+		list = daoPlanta.findall(true);
+		usuarios = daoPlanta.getUsuarios();
+		listaPaises = daoPaises.findall();
+		listaEmisores = daoPlanta.getEmisor();
+		
 		listaPaises = daoPaises.buscarTodos();
 		listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
 		//listaEmisores = emisorDAO.findall();

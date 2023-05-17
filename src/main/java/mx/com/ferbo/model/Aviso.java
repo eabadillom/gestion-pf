@@ -55,50 +55,62 @@ import javax.validation.constraints.Size;
 public class Aviso implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "aviso_cve")
     private Integer avisoCve;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_po")
     private boolean avisoPo;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_pedimento")
     private boolean avisoPedimento;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_sap")
     private boolean avisoSap;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_lote")
     private boolean avisoLote;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_caducidad")
     private boolean avisoCaducidad;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_tarima")
     private boolean avisoTarima;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_otro")
     private boolean avisoOtro;
+    
     @Size(max = 50)
     @Column(name = "aviso_temp")
     private String avisoTemp;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_fecha")
     @Temporal(TemporalType.DATE)
     private Date avisoFecha;
+    
     @Size(max = 255)
     @Column(name = "aviso_observaciones")
     private String avisoObservaciones;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_vigencia")
@@ -107,28 +119,36 @@ public class Aviso implements Serializable {
     // consider using these annotations to enforce field validation
     @Column(name = "aviso_val_seg")
     private BigDecimal avisoValSeg;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_plazo")
     private int avisoPlazo;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 1)
     @Column(name = "aviso_tp_facturacion")
     private String avisoTpFacturacion;
+    
     @JoinColumn(name = "cte_cve", referencedColumnName = "CTE_CVE")
     @ManyToOne
     private Cliente cteCve;
+    
     @JoinColumn(name = "planta_cve", referencedColumnName = "PLANTA_CVE")
     @ManyToOne
     private Planta plantaCve;
+    
     @JoinColumn(name = "categoria_cve", referencedColumnName = "categoria_cve")
     @ManyToOne
     private Categoria categoriaCve;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve")
     private List<CuotaMensualServicio> cuotaMensualServicioList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve", orphanRemoval = true)
     private List<PrecioServicio> precioServicioList;
+    
     @OneToMany(mappedBy = "avisoCve")
     private List<ConstanciaDeDeposito> constanciaDeDepositoList;
 
@@ -323,7 +343,21 @@ public class Aviso implements Serializable {
     public void setConstanciaDeDepositoList(List<ConstanciaDeDeposito> constanciaDeDepositoList) {
         this.constanciaDeDepositoList = constanciaDeDepositoList;
     }
-
+    
+    public void add(PrecioServicio ps) {
+    	precioServicioList.add(ps);
+    	ps.setAvisoCve(this);
+    	ps.setCliente(this.cteCve);
+    }
+    
+    public void remove(PrecioServicio ps) {
+    	precioServicioList.remove(ps);
+    	ps.setAvisoCve(null);
+    	ps.setCliente(null);
+    	ps.setServicio(null);
+    	ps.setUnidad(null);
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
