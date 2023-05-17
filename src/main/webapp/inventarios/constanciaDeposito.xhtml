@@ -198,30 +198,29 @@
 							<p:column exportable="false" width="3%">
 								<p:rowToggler />
 							</p:column>							
-							<p:column headerText="Id Camara">
+							<p:column headerText="Camara">
 								<h:outputText value="#{partida.camaraCve.camaraAbrev}"/>
 							</p:column>
-							<p:column headerText="Folio">
-								<h:outputText value="#{partida.folio.folioCliente}"/>
-							</p:column>
-							<p:column headerText="Peso Total">
+							<p:column headerText="Peso">
 								<h:outputText value="#{partida.pesoTotal}"/>
 							</p:column>
-							<p:column headerText="Cantidad Total">
+							<p:column headerText="Cantidad">
 								<h:outputText value="#{partida.cantidadTotal}"/>
 							</p:column>
-							<p:column headerText="Unidad De Producto (Producto)">
+							<p:column headerText="Unidad">
+								<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}"/>
+							</p:column>
+							<p:column headerText="Producto">
 								<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
 							</p:column>
-							<p:column headerText="Valor de Mercancia">
+							<p:column headerText="Valor($) Mercancia">
 								<h:outputText value="#{partida.valorMercancia}"/>
 							</p:column>
-							<p:column headerText="# de Tarimas">
+							<p:column headerText="#Tarimas">
 								<h:outputText value="#{partida.noTarimas}"/>
 							</p:column>
-							
 							<p:rowExpansion>
-																			<div class="orders-subtable">
+								<div class="orders-subtable">
 									<p:dataTable id="dtDetallePartida" value="#{partida.detallePartidaList}" var="detallePartida" reflow="true">
 
 										<f:facet name="header">
@@ -248,16 +247,11 @@
 									</p:dataTable>
 								</div>
 							</p:rowExpansion>
-							
-							
-								
-							
 							<p:column exportable="false" width="15%" style="text-align:center">
-                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" action="#{constanciaDeDepositoBean.deleteSelectedPartidas}"  width="45%">
+                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" action="#{constanciaDeDepositoBean.deleteSelectedPartidas}"  width="45%">
                                     <f:setPropertyActionListener value="#{partida}" target="#{constanciaDeDepositoBean.selectedPartida}" />
                                 </p:commandButton>
                             </p:column>
-							
 						</p:dataTable>
 						
 						<div style="text-align: center;margin-top: 10px;background-color: gray">
@@ -319,54 +313,40 @@
 							<p:column headerText="Servicio">
 								<h:outputText value="#{constanciaDD.servicioCve.servicioDs}" />
 							</p:column>
-							
-							<p:column headerText="Constancia De Deposito">
-								<h:outputText value="#{constanciaDD.folio.fechaIngreso}" />
-							</p:column>
-						
 							<p:column headerText="Cantidad">
 								<h:outputText value="#{constanciaDD.servicioCantidad}" />
 							</p:column>
-							
-							 <p:column exportable="false" width="15%" style="text-align:center">
+							<p:column exportable="false" width="15%" style="text-align:center">
                                 <p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" action="#{constanciaDeDepositoBean.deleteConstanciaDD}"  width="45%">
                                     <f:setPropertyActionListener value="#{constanciaDD}" target="#{constanciaDeDepositoBean.selectedConstanciasDD}" />
                                 </p:commandButton>
                             </p:column>
-							
 						</p:dataTable>
-						
-						
 						<p:outputPanel styleClass="p-mt-4" id="datos-adicionales">
 							<p:outputLabel value="Temperatura De La Mercancia:" styleClass="p-mr-2" />
 							<p:spinner stepFactor=".01" value="#{constanciaDeDepositoBean.temperatura}" >
 								<p:ajax update="@this" />
 							</p:spinner>
-							
-							
 							<p:outputLabel styleClass="p-ml-6 p-mr-2" value="Nombre Transportista:"/>
 							<p:inputText value="#{constanciaDeDepositoBean.nombreTransportista}" >
 								<p:ajax update="@this" />
 							</p:inputText>
-							
 							<p:outputLabel styleClass="p-ml-6 p-mr-2" value="Placas Del Vehiculo:"/>
 							<p:inputText value="#{constanciaDeDepositoBean.placas}" >
 								<p:ajax update="@this" />
 							</p:inputText>
-							
 							<div style="margin-top: 5px;text-align: center;">
 							<p:outputLabel styleClass="p-ml-6 p-mr-2 p-mt-2" value="Observaciones:" />
 							<p:inputTextarea value="#{constanciaDeDepositoBean.observacion}" autoResize="true">
 								<p:ajax update="@this" />
 							</p:inputTextarea>
 							</div>
-							<div style="margin-top: 5px">
-								
-								<p:commandButton value="Limpiar" class="ui-button-warning" actionListener="#{constanciaDeDepositoBean.limpiar()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales dt-constanciaDD dt-partidas"/>
+							<div style="margin-top: 5px" align="center">
 								<p:splitButton value="Guardar" styleClass="ui-button-success" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" icon="pi pi-save" update="@this">
 						            <p:menuitem value="Imprimir" actionListener="#{constanciaDeDepositoBean.imprimir()}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
 						            <p:menuitem value="Cancelar" icon="pi pi-times"/>
-						        </p:splitButton>
+						        </p:splitButton>								
+						        <p:commandButton value="Limpiar" class="ui-button-warning" actionListener="#{constanciaDeDepositoBean.limpiar()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales dt-constanciaDD dt-partidas"/>
 							</div>
 													
 						</p:outputPanel>

@@ -6,17 +6,22 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -28,7 +33,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "CLIENTE")
 @NamedQueries({
-    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c"),
+    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c ORDER BY c.cteNombre"),
     @NamedQuery(name = "Cliente.findByCteCve", query = "SELECT c FROM Cliente c WHERE c.cteCve = :cteCve"),
     @NamedQuery(name = "Cliente.findByCteNombre", query = "SELECT c FROM Cliente c WHERE c.cteNombre = :cteNombre"),
     @NamedQuery(name = "Cliente.findByCteRfc", query = "SELECT c FROM Cliente c WHERE c.cteRfc = :cteRfc"),
@@ -39,60 +44,111 @@ import javax.validation.constraints.Size;
 public class Cliente implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "CTE_CVE")
     private Integer cteCve;
+    
     @Size(max = 150)
     @Column(name = "CTE_NOMBRE")
     private String cteNombre;
+    
     @Size(max = 20)
     @Column(name = "CTE_RFC")
     private String cteRfc;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "numero_cte")
     private String numeroCte;
+    
     @Size(max = 255)
     @Column(name = "cte_mail")
     private String cteMail;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "habilitado")
     private boolean habilitado;
+    
     @Size(max = 3)
     @Column(name = "COD_UNICO")
     private String codUnico;
-    @OneToMany(mappedBy = "clienteCve")
+    
+    @Size(min = 1, max = 1)
+    @Column(name = "tp_persona")
+    private String tipoPersona;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
+    private RegimenFiscal  regimenFiscal;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_uso_cfdi", referencedColumnName = "cd_uso_cfdi")
+    private UsoCfdi usoCfdi;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_metodo_pago", referencedColumnName = "cd_metodo_pago")
+    private MetodoPago metodoPago;
+    
+    @Column(name="cd_forma_pago")
+    private String formaPago;
+    
+    @Size(max = 150)
+    @Column(name = "nb_regimen_capital")
+    private String regimenCapital;
+    
+    @Size(max = 50)
+    @Column(name = "uuid")
+    private String uuid;
+    
+    @OneToMany(mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaServicios> constanciaServiciosList;
-    @OneToMany(mappedBy = "cliente")
+    
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<Factura> facturaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ProductoPorCliente> productoPorClienteList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ClienteDomicilios> clienteDomiciliosList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<DetalleFacturacion> detalleFacturacionList;
-    @OneToMany(mappedBy = "cteCve")
+    
+    @OneToMany(mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<Aviso> avisoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<CuotaMensualServicio> cuotaMensualServicioList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<PrecioServicio> precioServicioList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ClienteContacto> clienteContactoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ConstanciaDeServicio> constanciaDeServicioList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ConstanciaDeDeposito> constanciaDeDepositoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clienteCve")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaSalida> constanciaSalidaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<CuotaMinima> cuotaMinimaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<ConstanciaTraspaso> constanciaTraspasoList;
+    
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY, orphanRemoval = true)
+    private CandadoSalida candadoSalida;
 
     public Cliente() {
     }
@@ -105,6 +161,25 @@ public class Cliente implements Serializable {
         this.cteCve = cteCve;
         this.numeroCte = numeroCte;
         this.habilitado = habilitado;
+    }
+    
+    public void add(ClienteContacto clienteContacto) {
+    	if(this.clienteContactoList == null)
+    		this.clienteContactoList = new ArrayList<ClienteContacto>();
+    	clienteContacto.setIdCliente(this);
+    	this.clienteContactoList.add(clienteContacto);
+    }
+    
+    public void remove(ClienteContacto clienteContacto) {
+    	if(this.clienteContactoList == null)
+    		return;
+    	clienteContacto.setIdCliente(null);
+    	this.clienteContactoList.remove(clienteContacto);
+    }
+    
+    public void remove(CandadoSalida candadoSalida) {
+    	candadoSalida.setCliente(null);
+    	this.candadoSalida = null;
     }
 
 	public Integer getCteCve() {
@@ -299,5 +374,71 @@ public class Cliente implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Cliente[ cteCve=" + cteCve + " ]";
     }
+
+	public String getRegimenCapital() {
+		return regimenCapital;
+	}
+
+	public void setRegimenCapital(String regimenCapital) {
+		this.regimenCapital = regimenCapital;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public String getTipoPersona() {
+		return tipoPersona;
+	}
+
+	public void setTipoPersona(String tipoPersona) {
+		this.tipoPersona = tipoPersona;
+	}
+
+	public RegimenFiscal getRegimenFiscal() {
+		return regimenFiscal;
+	}
+
+	public void setRegimenFiscal(RegimenFiscal regimenFiscal) {
+		this.regimenFiscal = regimenFiscal;
+	}
+
+	public UsoCfdi getUsoCfdi() {
+		return usoCfdi;
+	}
+
+	public void setUsoCfdi(UsoCfdi usoCfdi) {
+		this.usoCfdi = usoCfdi;
+	}
+
+	public MetodoPago getMetodoPago() {
+		return metodoPago;
+	}
+
+	public void setMetodoPago(MetodoPago metodoPago) {
+		this.metodoPago = metodoPago;
+	}
+
+	public String getFormaPago() {
+		return formaPago;
+	}
+
+	public void setFormaPago(String formaPago) {
+		this.formaPago = formaPago;
+	}
+
+	public CandadoSalida getCandadoSalida() {
+		return candadoSalida;
+	}
+
+	public void setCandadoSalida(CandadoSalida candadoSalida) {
+		this.candadoSalida = candadoSalida;
+	}
+
+	
     
 }

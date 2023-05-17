@@ -3,6 +3,7 @@ package mx.com.ferbo.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EstadoConstancia;
@@ -12,8 +13,23 @@ public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
 
 	@Override
 	public EstadoConstancia buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		EstadoConstancia bean = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("EstadoConstancia.findByEdoCve", EstadoConstancia.class)
+					.setParameter("edoCve", id)
+					;
+			bean = (EstadoConstancia) query.getSingleResult();
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			if(em != null)
+				em.close();
+		}
+		return bean;
 	}
 
 	@Override
@@ -25,7 +41,8 @@ public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
 			alEstados = entity.createNamedQuery("EstadoConstancia.findAll", EstadoConstancia.class)
 					.getResultList();
 		} finally {
-			entity.close();
+			if(entity != null)
+				entity.close();
 		}
 		return alEstados;
 	}

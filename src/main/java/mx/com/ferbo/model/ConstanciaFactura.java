@@ -24,7 +24,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -36,6 +35,7 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "ConstanciaFactura.findAll", query = "SELECT c FROM ConstanciaFactura c"),
     @NamedQuery(name = "ConstanciaFactura.findById", query = "SELECT c FROM ConstanciaFactura c WHERE c.id = :id"),
+    @NamedQuery(name = "ConstanciaFactura.findByFolioVigenciaInicioVigenciaFin", query = "SELECT c FROM ConstanciaFactura c WHERE c.folio.folio = :folio AND c.vigenciaInicio = :vigenciaInicio and c.vigenciaFin = :vigenciaFin"), 
     @NamedQuery(name = "ConstanciaFactura.findByFolio", query = "SELECT c FROM ConstanciaFactura c WHERE c.folio = :folio"),
     @NamedQuery(name = "ConstanciaFactura.findByFolioCliente", query = "SELECT c FROM ConstanciaFactura c WHERE c.folioCliente = :folioCliente"),
     @NamedQuery(name = "ConstanciaFactura.findByVigenciaInicio", query = "SELECT c FROM ConstanciaFactura c WHERE c.vigenciaInicio = :vigenciaInicio"),
@@ -54,40 +54,50 @@ public class ConstanciaFactura implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "folio")
-    private int folio;
+    
+    @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
+    @ManyToOne(optional = false)
+    private ConstanciaDeDeposito folio;
+    
     @Size(max = 30)
     @Column(name = "folio_cliente")
     private String folioCliente;
+    
     @Column(name = "vigencia_inicio")
     @Temporal(TemporalType.DATE)
     private Date vigenciaInicio;
+    
     @Column(name = "vigencia_fin")
     @Temporal(TemporalType.DATE)
     private Date vigenciaFin;
+    
     @Column(name = "planta_cve")
     private Integer plantaCve;
     @Size(max = 80)
     @Column(name = "planta_ds")
     private String plantaDs;
+    
     @Size(max = 6)
     @Column(name = "planta_abrev")
     private String plantaAbrev;
+    
     @Column(name = "camara_cve")
     private Integer camaraCve;
+    
     @Size(max = 80)
     @Column(name = "camara_ds")
     private String camaraDs;
+    
     @Size(max = 6)
     @Column(name = "camara_abrev")
     private String camaraAbrev;
+    
     @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne
     private Factura factura;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constancia")
     private List<ServicioConstancia> servicioConstanciaList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaFactura")
     private List<ProductoConstancia> productoConstanciaList;
 
@@ -98,25 +108,12 @@ public class ConstanciaFactura implements Serializable {
         this.id = id;
     }
 
-    public ConstanciaFactura(Integer id, int folio) {
-        this.id = id;
-        this.folio = folio;
-    }
-
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public int getFolio() {
-        return folio;
-    }
-
-    public void setFolio(int folio) {
-        this.folio = folio;
     }
 
     public String getFolioCliente() {
@@ -214,6 +211,14 @@ public class ConstanciaFactura implements Serializable {
     public void setProductoConstanciaList(List<ProductoConstancia> productoConstanciaList) {
         this.productoConstanciaList = productoConstanciaList;
     }
+    
+    public ConstanciaDeDeposito getFolio() {
+		return folio;
+	}
+
+	public void setFolio(ConstanciaDeDeposito constanciaDeDeposito) {
+		this.folio = constanciaDeDeposito;
+	}
 
     @Override
     public int hashCode() {
@@ -235,9 +240,13 @@ public class ConstanciaFactura implements Serializable {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.ConstanciaFactura[ id=" + id + " ]";
-    }
-    
+	@Override
+	public String toString() {
+		return "ConstanciaFactura [id=" + id + ", folio=" + folio + ", folioCliente="
+				+ folioCliente + ", vigenciaInicio=" + vigenciaInicio + ", vigenciaFin=" + vigenciaFin + ", plantaCve="
+				+ plantaCve + ", plantaDs=" + plantaDs + ", plantaAbrev=" + plantaAbrev + ", camaraCve=" + camaraCve
+				+ ", camaraDs=" + camaraDs + ", camaraAbrev=" + camaraAbrev + ", factura=" + factura
+				+ ", servicioConstanciaList=" + servicioConstanciaList + ", productoConstanciaList="
+				+ productoConstanciaList + "]";
+	}
 }

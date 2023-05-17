@@ -56,12 +56,11 @@
 	 <h5></h5>
 	 
         <p:fieldset legend="Servicios">
-
 			<p:panel>	
 				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaConstanciaServicioBean.idPrecioServicio}" filterMatchMode="startsWith">
 					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
-					<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}"
-						itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
+					<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" 
+						itemValue="#{selectedPrecioServicio.id}" />
 				</p:selectOneMenu>
 				<p:column><p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/></p:column>
 				<p:column>

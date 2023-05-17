@@ -8,6 +8,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
@@ -16,6 +18,8 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
+	
+	private static Logger log = Logger.getLogger(PrecioServicioDAO.class);
 
 	@Override
 	public PrecioServicio buscarPorId(Integer id) {
@@ -37,8 +41,17 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 
 	@Override
 	public List<PrecioServicio> buscarPorCriterios(PrecioServicio e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(e.getCliente().getCteCve() == null)
+			return null;
+		
+		if(e.getServicio()!=null) {
+			return this.buscarPorClienteServicio(e);
+		}
+		
+		if(e.getAvisoCve()!=null) {
+			return this.buscarPorClienteAviso(e);
+		}
+		return this.buscarPorCliente(e);
 	}
 	
 	public List<PrecioServicio> buscarPorAviso(Aviso aviso, Cliente cliente){
@@ -59,6 +72,34 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		
 		
 		return listaPrecioServicio;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<PrecioServicio> buscarDisponibles(Integer cteCve, Integer avisoCve) {
+		List<PrecioServicio> lista = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNativeQuery("SELECT ps.id, ps.cliente, ps.servicio, ps.unidad, ps.precio, ps.aviso_cve FROM precio_servicio ps "
+					+ "					LEFT OUTER JOIN (SELECT t.cliente, t.servicio, t.unidad, "
+					+ "					t.precio, t.aviso_cve FROM precio_servicio t "
+					+ "					WHERE t.cliente = :cteCve AND t.aviso_cve = :avisoCve ) tmp ON "
+					+ "					ps.cliente = tmp.cliente AND ps.servicio = tmp.servicio WHERE ps.aviso_cve = 1 "
+					+ "					AND ps.cliente = :cteCve AND (tmp.cliente IS NULL AND tmp.servicio IS NULL)", PrecioServicio.class)
+					.setParameter("cteCve", cteCve)
+					.setParameter("avisoCve", avisoCve)
+					;
+			lista = query.getResultList();
+			
+		} catch(Exception ex) {
+			log.error("", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return lista;
 	}
 
 	@Override
@@ -82,9 +123,9 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			em.getTransaction().begin();
 			em.persist(precioServicio);
 			em.getTransaction().commit();
-//			em.close();
+			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+ 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}
 		return null;
@@ -92,15 +133,24 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 
 	@Override
 	public String eliminar(PrecioServicio precioServicio) {
+		EntityManager em = null;
+		Query query = null;
+		PrecioServicio ps = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(precioServicio));
+			query = em.createNamedQuery("PrecioServicio.findById", PrecioServicio.class)
+					.setParameter("id", precioServicio.getId())
+					;
+			ps = (PrecioServicio) query.getSingleResult();
+			em.remove(ps);
 			em.getTransaction().commit();
-//			em.close();
+			
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -108,7 +158,11 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	@Override
 	public String eliminarListado(List<PrecioServicio> listado) {
 		// TODO Auto-generated method stub
-		return null;
+		String val = "";
+		for(PrecioServicio ps:listado) {
+			val=this.eliminar(ps);
+		}
+		return val != null ? val:null;
 	}
 	
 	public PrecioServicio getPrecioMinimoPorServicio(Integer idServicio) {
@@ -140,4 +194,41 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		return bean;
 	}
 
+	private List<PrecioServicio> buscarPorCliente(PrecioServicio e) {
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
+				.setParameter("cteCve", e.getCliente().getCteCve()).getResultList();
+	}
+	
+	private List<PrecioServicio> buscarPorClienteServicio(PrecioServicio e){
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("PrecioServicio.findByClienteServicio", PrecioServicio.class)
+				.setParameter("cteCve", e.getCliente().getCteCve())
+				.setParameter("servicioCve", e.getServicio())
+				.getResultList();
+	}
+	
+	private List<PrecioServicio> buscarPorClienteAviso(PrecioServicio e){
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("PrecioServicio.findByClienteAviso", PrecioServicio.class)
+				.setParameter("cteCve", e.getCliente().getCteCve())
+				.setParameter("avisoCve", e.getAvisoCve().getAvisoCve())
+				.getResultList();
+	}	
+	
+	public int obtenFinal() {
+		int valorFinal=0;
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			valorFinal=(int) em.createNativeQuery("Select max(id) from precio_servicio").getSingleResult();
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception ex) {
+			System.out.println("ERROR" + ex.getMessage());
+			return 0;
+		}
+		return valorFinal;
+		
+	}
 }

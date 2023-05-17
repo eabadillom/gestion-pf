@@ -57,7 +57,7 @@ public class ConstanciaDeDeposito implements Serializable {
     @Size(max = 100)
     @Column(name = "NOMBRE_TRANSPORTISTA")
     private String nombreTransportista;
-    @Size(max = 5)
+    @Size(max = 10)
     @Column(name = "PLACAS_TRANSPORTE")
     private String placasTransporte;
     @Size(max = 200)
@@ -87,6 +87,9 @@ public class ConstanciaDeDeposito implements Serializable {
     @JoinColumn(name = "status", referencedColumnName = "edo_cve")
     @ManyToOne
     private EstadoConstancia status;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
+    private List<ConstanciaFactura> constanciaFacturaList;
 
     public ConstanciaDeDeposito() {
     }
@@ -209,6 +212,14 @@ public class ConstanciaDeDeposito implements Serializable {
     public void setStatus(EstadoConstancia status) {
         this.status = status;
     }
+    
+    public List<ConstanciaFactura> getConstanciaFacturaList() {
+		return constanciaFacturaList;
+	}
+
+	public void setConstanciaFacturaList(List<ConstanciaFactura> constanciaFacturaList) {
+		this.constanciaFacturaList = constanciaFacturaList;
+	}
 
     @Override
     public int hashCode() {

@@ -31,6 +31,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "TraspasoServicio.findAll", query = "SELECT t FROM TraspasoServicio t"),
     @NamedQuery(name = "TraspasoServicio.findById", query = "SELECT t FROM TraspasoServicio t WHERE t.id = :id"),
     @NamedQuery(name = "TraspasoServicio.findByServicio", query = "SELECT t FROM TraspasoServicio t WHERE t.servicio = :servicio"),
+    @NamedQuery(name = "TraspasoServicio.findByTraspaso", query = "SELECT t FROM TraspasoServicio t WHERE t.traspaso.id = :traspaso"),
     @NamedQuery(name = "TraspasoServicio.findByCantidad", query = "SELECT t FROM TraspasoServicio t WHERE t.cantidad = :cantidad"),
     @NamedQuery(name = "TraspasoServicio.findByPrecio", query = "SELECT t FROM TraspasoServicio t WHERE t.precio = :precio"),
     @NamedQuery(name = "TraspasoServicio.findBySubtotal", query = "SELECT t FROM TraspasoServicio t WHERE t.subtotal = :subtotal")})
@@ -126,6 +127,7 @@ public class TraspasoServicio implements Serializable {
     public void setTraspaso(ConstanciaTraspaso traspaso) {
         this.traspaso = traspaso;
     }
+    
 
     @Override
     public int hashCode() {
