@@ -523,16 +523,21 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionVigencias(){
 		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityTransaction t = em.getTransaction();
+		t.begin();
+		facturacionVigenciasDAO.setEm(em);
+		
 		System.out.println(fechaFactura);
 		DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
-		
-		//getFechaCorte();
 		
 		listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
 		
 		if(listaVigencias.isEmpty()){
 			listaVigencias = new ArrayList<>();
 		}
+		
+		em.close();
 		
 	}
 	
@@ -626,7 +631,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setEmisorCdRegimen(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
 		
 		
-		
 		try {
 			faceContext = FacesContext.getCurrentInstance();
             request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
@@ -647,16 +651,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		return "calculoPrevio.xhtml?faces-redirect=true";
 		
 	}
-	
-	
-	// funcion para comprobacion
-	/*public void verVigencias() {
-		System.out.println("entradas" + selectedEntradas.get(0));
-		System.out.println("vigencias" + selectedVigencias.get(0));
-		System.out.println("servicios" + selectedServicios.get(0));
-		//"index?faces-redirect=true"
-		//calculoPrevio.xhtml?faces-redirect=true
-	}*/
 	
 
 }

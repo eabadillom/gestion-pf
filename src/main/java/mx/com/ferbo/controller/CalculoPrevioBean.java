@@ -413,17 +413,9 @@ public class CalculoPrevioBean implements Serializable{
 				switch(tipoCobro.getId()) {
 				
 				case 1:
-				case 2:
-					
-					cantidad = cs.getServicioCantidad();
-					
-					importe = cantidad.multiply(precioServicio.getPrecio());
-					sc.setCosto(importe);
-					sc.setUnidadMedida("SRV");
-					System.out.println("El tipo cobro es 1 o 2 y su importe es: "+ importe);
-					break;
-				
+				case 2:				
 				case 3:
+					break;
 				case 4:
 					
 					cantidad = getCantidadPartidas(cdd.getPartidaList(),tipoFacturacion);
@@ -470,24 +462,6 @@ public class CalculoPrevioBean implements Serializable{
 			}
 		}
 	}
-	
-	/*public BigDecimal getCantidadPartidasVig(List<Partida> listaPartidas, String tipoFacturacion) {
-		
-		BigDecimal cantidad = new BigDecimal(0);
-		
-		for(Partida p: listaPartidas){
-			
-			if(tipoFacturacion.equals("T")) {
-				cantidad = cantidad.add(p.getNoTarimas());
-			}else {
-				cantidad = cantidad.add(p.getPesoTotal());
-			}
-			
-		}
-		
-		return cantidad;
-	}*/
-	
 	
 	
 }

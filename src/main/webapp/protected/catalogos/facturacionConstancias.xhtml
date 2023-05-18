@@ -96,15 +96,17 @@
 								</p:selectOneMenu>
 								
 								<p:outputLabel value="Metodo de Pago (SAT):"/>
-								<p:selectOneMenu id="metodoPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturacionConstanciasBean.metodoPagoSelect}" >
+								<p:selectOneMenu id="metodoPago" autoWidth="false" styleClass="p-ml-2 p-mr-4" converter="entityConverter" value="#{facturacionConstanciasBean.metodoPagoSelect}" required="true" requiredMessage="Ingresa un Metodo de Pago">
 									<f:selectItem itemLabel="---Seleccione---"  noSelectionOption="true"/>
 									<f:selectItems value="#{facturacionConstanciasBean.listaMetodoPago}" var="metodoP" itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" />
+									<p:ajax update="messages" />
 								</p:selectOneMenu>
 								
 								<p:outputLabel value="Forma de pago (SAT):" />
-								<p:selectOneMenu id="medioPago" autoWidth="false" styleClass="p-ml-2" converter="entityConverter" value="#{facturacionConstanciasBean.medioPagoSelect}" >
+								<p:selectOneMenu id="medioPago" autoWidth="false" styleClass="p-ml-2" converter="entityConverter" value="#{facturacionConstanciasBean.medioPagoSelect}" required="true" requiredMessage="Ingresa una Forma de Pago" >
 									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
 									<f:selectItems value="#{facturacionConstanciasBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.mpId}-#{medioP.mpDescripcion}" itemValue="#{medioP}" />
+									<p:ajax update="messages" />
 								</p:selectOneMenu>
 								
 							</div>

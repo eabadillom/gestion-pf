@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +25,8 @@ import mx.com.ferbo.util.InventarioException;
 public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer> {
 	
 	private static Logger log = Logger.getLogger(FacturacionVigenciasDAO.class);
+	
+	EntityManager em = null;
 
 	@Override
 	public ConstanciaFactura buscarPorId(Integer id) {
@@ -50,11 +53,11 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 		List<ConstanciaDeDeposito> listaConstancias = null;
 		List<ConstanciaFactura> lConstanciaFactura = null;
 		ConstanciaFactura cf = null;
-		EntityManager em = null;
+		//EntityManager em = null;
 		String sql = null;
 		
 		try {
-			em = EntityManagerUtil.getEntityManager();
+			//em = EntityManagerUtil.getEntityManager();
 			list = new ArrayList<>();
 			sql = "SELECT "
 					+ "     folio, "
@@ -164,8 +167,14 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				for(Partida p: constancia.getPartidaList()) {
 					BigDecimal cantidadT = new BigDecimal(p.getCantidadTotal());
 					BigDecimal pesoTotal = p.getPesoTotal();
-					BigDecimal noTarima = p.getNoTarimas();//*** pendiente explicacion
+					BigDecimal cajasTarima = null;//cajas x Tarima
+					BigDecimal noTarimas = new BigDecimal(0);//noTarimas
+					BigDecimal tarimas = p.getNoTarimas();//cantidad_total
 					BigDecimal salidaCantidad = new BigDecimal(0),salidaPeso = new BigDecimal(0);
+					
+					cajasTarima = cantidadT.divide(tarimas).setScale(2);
+					
+					System.out.println("caja x tarima "+cajasTarima);
 					
 					for(DetalleConstanciaSalida dcs: p.getDetalleConstanciaSalidaList()) {
 						
@@ -181,10 +190,8 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 						BigDecimal cantidad = new BigDecimal(dcs.getCantidad());
 						BigDecimal peso = dcs.getPeso();
 						
-						salidaCantidad = salidaCantidad.add(cantidad);
-						salidaPeso = salidaPeso.add(peso);
-						
-						
+						salidaCantidad = salidaCantidad.add(cantidad);//suma total de cantidad salida
+						salidaPeso = salidaPeso.add(peso);//suma total de peso salida 
 						
 						System.out.println("Fecha "+constanciaSalida.getFecha());
 						
@@ -192,7 +199,15 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					
 					cantidadT = cantidadT.subtract(salidaCantidad);
 					pesoTotal = pesoTotal.subtract(salidaPeso);
-					System.out.println("La cantidad restante es: "+cantidadT + "El peso Total es: "+pesoTotal);
+					noTarimas = cantidadT.divide(cajasTarima,0,RoundingMode.UP);
+					
+					//seteo en partida
+					p.setCantidadTotal(cantidadT.intValue());
+					p.setPesoTotal(pesoTotal);
+					p.setNoTarimas(noTarimas);
+					
+					
+					System.out.println("La cantidad restante es: "+cantidadT + " El peso Total es: "+pesoTotal +" TarimaPre: "+noTarimas);
 					
 				}
 				
@@ -243,6 +258,14 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 		cf.setVigenciaFin(vigenciaFin);
 		
 		return cf;
+	}
+	
+	public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
 	}
 
 	@Override
