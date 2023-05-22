@@ -15,6 +15,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import org.primefaces.PrimeFaces;
+
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
@@ -51,12 +53,14 @@ public class CalculoPrevioBean implements Serializable{
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
 	private List<ConstanciaFacturaDs> listaConstanciaFacturaDs;
+	private List<ServicioConstancia> listaServiciosEntradas; 
 	
 	private PrecioServicioDAO precioServicioDAO;
 	
 	private Cliente clienteSelect;
 	private Planta plantaSelect;
 	private Factura factura;
+	private ServicioConstancia selectServicioE;
 	
 	private Date fechaEmision;
 	private BigDecimal cantidad;
@@ -67,10 +71,12 @@ public class CalculoPrevioBean implements Serializable{
 		listaEntradas = new ArrayList<>();
 		listaServicios = new ArrayList<>();
 		listaVigencias = new ArrayList<>();
+		listaServiciosEntradas = new ArrayList<>();
 		
 		clienteSelect = new Cliente();
 		plantaSelect = new Planta();
 		factura = new Factura();
+		selectServicioE = new ServicioConstancia();
 		
 		precioServicioDAO = new PrecioServicioDAO();
 		
@@ -88,9 +94,10 @@ public class CalculoPrevioBean implements Serializable{
 			listaServicios = (List<ConstanciaFacturaDs>) request.getSession(false).getAttribute("servicios");
 			clienteSelect = (Cliente) request.getSession(false).getAttribute("cliente");
 			plantaSelect = (Planta) request.getSession(false).getAttribute("plantaSelect");
-			factura = (Factura) request.getSession(false).getAttribute("factura");
-			
+			factura = (Factura) request.getSession(false).getAttribute("factura");			
 			fechaEmision = (Date) request.getSession(false).getAttribute("fechaEmision");
+			
+			
 			
 			if(listaEntradas.isEmpty()) {
 				listaEntradas = new ArrayList<>();
@@ -104,10 +111,9 @@ public class CalculoPrevioBean implements Serializable{
 				listaServicios = new ArrayList<>();
 			}
 			
-			procesarServicios();//error
+			procesarServicios();
 			procesarEntradas();
 			procesarVigencias();
-			//PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs");
 			
 		} catch (Exception e) {
 			
@@ -195,6 +201,22 @@ public class CalculoPrevioBean implements Serializable{
 	public void setFactura(Factura factura) {
 		this.factura = factura;
 	}
+
+	public List<ServicioConstancia> getListaServiciosEntradas() {
+		return listaServiciosEntradas;
+	}
+
+	public void setListaServiciosEntradas(List<ServicioConstancia> listaServiciosEntradas) {
+		this.listaServiciosEntradas = listaServiciosEntradas;
+	}
+
+	public ServicioConstancia getSelectServicioE() {
+		return selectServicioE;
+	}
+
+	public void setSelectServicioE(ServicioConstancia selectServicioE) {
+		this.selectServicioE = selectServicioE;
+	}
 	
 	//SERVICIOS (CONSTANCIA DE SERVICIOS)
 
@@ -206,7 +228,6 @@ public class CalculoPrevioBean implements Serializable{
 			
 			List<ConstanciaServicioDetalle> listaConstanciaSD = cfd.getConstanciaDeServicio().getConstanciaServicioDetalleList();
 			List<PartidaServicio> listaPartidaServicio = cfd.getConstanciaDeServicio().getPartidaServicioList();
-			
 			
 			ConstanciaFacturaDs constanciaFacturaDs = new ConstanciaFacturaDs();			
 			
@@ -284,14 +305,15 @@ public class CalculoPrevioBean implements Serializable{
 	public void procesarEntradas() {
 		
 		//BigDecimal importe = new BigDecimal(0);
-		List<ServicioConstancia> listaServiciosConstancias = null;
+		//List<ServicioConstancia> listaServiciosConstancias = null;
 		
 		for(ConstanciaFactura cf: listaEntradas) {
 			
 			ConstanciaDeDeposito cdd = cf.getFolio();
-			listaServiciosConstancias = new ArrayList<>();
+			//listaServiciosConstancias = new ArrayList<>();
 			Aviso aviso = cdd.getAvisoCve();
 			String tipoFacturacion = aviso.getAvisoTpFacturacion();
+			cf.setServicioConstanciaList(new ArrayList<>());
 			
 			for(ConstanciaDepositoDetalle cs: cdd.getConstanciaDepositoDetalleList()) {
 				
@@ -311,7 +333,6 @@ public class CalculoPrevioBean implements Serializable{
 				case 2:
 					
 					cantidad = cs.getServicioCantidad();
-					
 					importe = cantidad.multiply(precioServicio.getPrecio());
 					sc.setCosto(importe);
 					sc.setUnidadMedida("SRV");
@@ -322,10 +343,11 @@ public class CalculoPrevioBean implements Serializable{
 				case 4:
 					
 					cantidad = getCantidadPartidas(cdd.getPartidaList(),tipoFacturacion);
+					//cantidad = cs.getServicioCantidad();
 					
 					importe = cantidad.multiply(precioServicio.getPrecio());
 					sc.setCosto(importe);
-					System.out.println("El tipo de cobro es 3 o 4 y su importe es: "+importe);
+					System.out.println("El tipo de cobro es 3 o 4 y su importe es entradas: "+importe);
 					
 					if(aviso.getAvisoTpFacturacion().equals("T")) {
 						sc.setUnidadMedida("TRM");
@@ -357,10 +379,11 @@ public class CalculoPrevioBean implements Serializable{
 				
 				sc.setCodigo(null);
 				
-				
 				/*listaServiciosConstancias.add(sc);				
 				cf.setServicioConstanciaList(listaServiciosConstancias);*/
 				
+				cf.getServicioConstanciaList().add(sc); //datos a mostrar row ex--
+				//listaServiciosEntradas.add(sc);
 				
 				
 			}
@@ -375,8 +398,10 @@ public class CalculoPrevioBean implements Serializable{
 			
 			if(tipoFacturacion.equals("T")) {
 				cantidad = cantidad.add(p.getNoTarimas());
+				//cantidad = p.getNoTarimas();
 			}else {
 				cantidad = cantidad.add(p.getPesoTotal());
+				//cantidad = p.getPesoTotal();
 			}
 			
 		}
@@ -390,14 +415,15 @@ public class CalculoPrevioBean implements Serializable{
 	public void procesarVigencias() {
 		
 		BigDecimal importe = new BigDecimal(0);
-		List<ServicioConstancia> listaServiciosConstancias = null;
+		//List<ServicioConstancia> listaServiciosConstancias = null;
 		
 		for(ConstanciaFactura cf: listaVigencias) {
 			
 			ConstanciaDeDeposito cdd = cf.getFolio();
-			listaServiciosConstancias = new ArrayList<>();
+			//listaServiciosConstancias = new ArrayList<>();
 			Aviso aviso = cdd.getAvisoCve();
 			String tipoFacturacion = aviso.getAvisoTpFacturacion();
+			cf.setServicioConstanciaList(new ArrayList<>());
 			
 			for(ConstanciaDepositoDetalle cs: cdd.getConstanciaDepositoDetalleList()) {
 				
@@ -413,13 +439,12 @@ public class CalculoPrevioBean implements Serializable{
 				switch(tipoCobro.getId()) {
 				
 				case 1:
-				case 2:				
+				case 2:
 				case 3:
 					break;
 				case 4:
 					
 					cantidad = getCantidadPartidas(cdd.getPartidaList(),tipoFacturacion);
-					
 					importe = cantidad.multiply(precioServicio.getPrecio());
 					sc.setCosto(importe);
 					System.out.println("El tipo de cobro es 3 o 4 y su importe es: "+importe);
@@ -454,14 +479,40 @@ public class CalculoPrevioBean implements Serializable{
 				
 				sc.setCodigo(null);
 				
-				
+				if(tipoCobro.getId()==4) {
+					cf.getServicioConstanciaList().add(sc);
+				}
 				/*listaServiciosConstancias.add(sc);				
-				cf.setServicioConstanciaList(listaServiciosConstancias);*/
+				cf.setServicioConstanciaList(listaServiciosConstancias);//datos a mostrar row ex--*/
 				
 				
 			}
 		}
 	}
 	
+	public void eliminarServicioEntrada() {
+		
+		ServicioConstancia temp = null;
+		
+		for(ConstanciaFactura cf: listaEntradas) {
+			
+			for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
+				
+				if(selectServicioE.getDescripcion().equals(sc.getDescripcion())) {
+					
+					
+					
+					
+				}
+				
+			}
+			
+		}
+		
+		
+		
+		PrimeFaces.current().ajax().update("form:dt-selectedEntradas:dt-serviciosEntrada");
+		
+	}
 	
 }
