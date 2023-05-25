@@ -66,6 +66,9 @@ public class ServicioConstanciaDs implements Serializable {
     @Size(max = 5)
     @Column(name = "cd_unidad")
     private String cdUnidad;
+    @Basic(optional = false)
+    @Column(name = "cantidad")
+    private BigDecimal cantidad;
     @JoinColumn(name = "CONSTANCIA", referencedColumnName = "ID")
     @ManyToOne(optional = false)
     private ConstanciaFacturaDs constancia;
@@ -146,6 +149,14 @@ public class ServicioConstanciaDs implements Serializable {
 
 	public void setCdUnidad(String cdUnidad) {
 		this.cdUnidad = cdUnidad;
+	}
+
+	public BigDecimal getCantidad() {
+		return cantidad;
+	}
+
+	public void setCantidad(BigDecimal cantidad) {
+		this.cantidad = cantidad;
 	}
 
 	@Override

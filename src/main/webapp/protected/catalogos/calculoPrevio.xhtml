@@ -55,7 +55,7 @@
 					</p:column>
 					
 					<p:rowExpansion>
-						<p:dataTable id="dt-serviciosEntrada" value="#{entrada.servicioConstanciaList}" var="servicioConstancia" rowIndexVar="row">
+						<p:dataTable id="dt-serviciosEntrada" value="#{entrada.servicioConstanciaList}" var="servicioConstancia" >
 								
 								<p:column headerText="Servicio">
 									<h:outputText value="#{servicioConstancia.descripcion}" />
@@ -116,7 +116,7 @@
 					</p:column>
 					
 					<p:rowExpansion>
-						<p:dataTable value="#{vigencia.servicioConstanciaList}" var="servicioConstancia" rowIndexVar="row">
+						<p:dataTable id="dt-serviciosVigencia" value="#{vigencia.servicioConstanciaList}" var="servicioConstancia" rowIndexVar="row">
 								
 								<p:column headerText="Servicio">
 									<h:outputText value="#{servicioConstancia.descripcion}" />
@@ -133,6 +133,12 @@
 								<p:column headerText="Importe" >
 									<h:outputText value="#{servicioConstancia.costo}" />
 								</p:column>
+								
+								<p:column>
+									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioVigencia()}">
+										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{calculoPrevioBean.selectServicioV}"></f:setPropertyActionListener>
+									</p:commandButton>
+								</p:column>
 						
 						</p:dataTable>
 					
@@ -141,8 +147,8 @@
 					</p:dataTable>
 																							
 					
-					<p:dataTable id="dt-constanciaFacturaDs" value="#{calculoPrevioBean.listaConstanciaFacturaDs}" var="constanciaFacturaDs"
-							rowKey="#{constanciaFacturaDs.id}">
+					<p:dataTable id="dt-constanciaFacturaDs" value="#{calculoPrevioBean.listaServicios}" var="constanciaFacturaDs"
+							rowKey="#{constanciaFacturaDs.constanciaDeServicio.folio}" reflow="true" >
 							
 					<f:facet name="header">
 						<div>
@@ -164,15 +170,19 @@
 						</h:outputText>
 					</p:column>
 					
+					<p:column>
+						<h:outputText value="#{constanciaFacturaDs.constanciaDeServicio.folio}"></h:outputText>
+					</p:column>
+					
 					<p:rowExpansion>
-						<p:dataTable value="#{constanciaFacturaDs.servicioConstanciaDsList}" var="servicioConstancia" rowIndexVar="row">
+						<p:dataTable id="dt-serviciosDs" value="#{constanciaFacturaDs.servicioConstanciaDsList}" var="servicioConstancia" rowIndexVar="row">
 								
 								<p:column headerText="Servicio">
 									<h:outputText value="#{servicioConstancia.descripcion}" />
 								</p:column>															
 								
 								<p:column headerText="Cantidad">
-									<h:outputText value="#{servicioConstancia.constancia.constanciaDeServicio.getConstanciaServicioDetalleList().get(row).servicioCantidad}" />
+									<h:outputText value="#{servicioConstancia.cantidad}"></h:outputText>
 								</p:column>
 								
 								<p:column headerText="Precio Unitario" >
@@ -181,6 +191,12 @@
 								
 								<p:column headerText="Importe" >
 									<h:outputText value="#{servicioConstancia.costo}" />
+								</p:column>
+								
+								<p:column>
+									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioDs()}">
+										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{calculoPrevioBean.selectServicioDs}"></f:setPropertyActionListener>		
+									</p:commandButton>
 								</p:column>
 						
 						</p:dataTable>
