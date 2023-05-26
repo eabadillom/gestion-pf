@@ -14,6 +14,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.primefaces.PrimeFaces;
 
@@ -239,13 +240,6 @@ public class CalculoPrevioBean implements Serializable {
 					.getConstanciaServicioDetalleList();
 			List<PartidaServicio> listaPartidaServicio = cfd.getConstanciaDeServicio().getPartidaServicioList();
 
-			//ConstanciaFacturaDs constanciaFacturaDs = new ConstanciaFacturaDs();
-			
-			//constanciaFacturaDs.setConstanciaDeServicio(cfd.getConstanciaDeServicio());
-
-			//constanciaFacturaDs.setServicioConstanciaDsList(new ArrayList<>());
-			//constanciaFacturaDs.setProductoConstanciaDsList(new ArrayList<>());
-			//cfd.setConstanciaDeServicio(cfd.getConstanciaDeServicio());
 			cfd.setServicioConstanciaDsList(new ArrayList<>());
 			cfd.setProductoConstanciaDsList(new ArrayList<>());
 
@@ -276,7 +270,6 @@ public class CalculoPrevioBean implements Serializable {
 				servicioConstanciaDs.setCantidad(csd.getServicioCantidad());
 
 				cfd.getServicioConstanciaDsList().add(servicioConstanciaDs);
-				//constanciaFacturaDs.getServicioConstanciaDsList().add(servicioConstanciaDs);
 				idS++;
 			}
 
@@ -292,12 +285,9 @@ public class CalculoPrevioBean implements Serializable {
 				productoConstanciaDs.setCantidadManejo(new BigDecimal(ps.getCantidadTotal()).setScale(2));
 				productoConstanciaDs.setUnidadManejo(ps.getUnidadDeManejoCve().getUnidadDeManejoDs());
 
-				//constanciaFacturaDs.getProductoConstanciaDsList().add(productoConstanciaDs);
 				cfd.getProductoConstanciaDsList().add(productoConstanciaDs);
 				idP++;
 			}
-
-			//listaConstanciaFacturaDs.add(constanciaFacturaDs);
 		}
 
 	}
@@ -323,8 +313,6 @@ public class CalculoPrevioBean implements Serializable {
 
 	public void procesarEntradas() {
 
-		// BigDecimal importe = new BigDecimal(0);
-		// List<ServicioConstancia> listaServiciosConstancias = null;
 		Integer id = 0;
 
 		for (ConstanciaFactura cf : listaEntradas) {
@@ -364,7 +352,6 @@ public class CalculoPrevioBean implements Serializable {
 				case 4:
 
 					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
-					// cantidad = cs.getServicioCantidad();
 
 					importe = cantidad.multiply(precioServicio.getPrecio());
 					sc.setCosto(importe);
@@ -574,5 +561,15 @@ public class CalculoPrevioBean implements Serializable {
 		
 	}
 	
-
+	public void cerrarSesion() {
+		
+		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+		
+		response.addHeader("Pragma", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        response.addHeader("Cache-Control", "no-store");
+        response.addHeader("Cache-Control", "must-revalidate");
+		
+	}
+	
 }

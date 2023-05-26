@@ -24,7 +24,7 @@
 					<div class="card">
 					
 					<p:button value="Atras" outcome="/protected/catalogos/facturacionConstancias" ></p:button>
-					
+										
 					<p:dataTable id="dt-selectedEntradas" value="#{calculoPrevioBean.listaEntradas}" var="entrada" 
 					rowKey="#{entrada.folio.folio}" rows="5" reflow="true" paginator="true" paginatorPosition="bottom">
 					
@@ -152,7 +152,7 @@
 							
 					<f:facet name="header">
 						<div>
-							<span>Detalle Constancias De Servicio</span>	
+							<span>Constancias De Servicios</span>	
 						</div>
 					</f:facet>									
 					
@@ -168,10 +168,6 @@
 						<h:outputText value="#{calculoPrevioBean.fechaEmision}">
 							<f:convertDateTime pattern="dd/MMM/YYYY" />
 						</h:outputText>
-					</p:column>
-					
-					<p:column>
-						<h:outputText value="#{constanciaFacturaDs.constanciaDeServicio.folio}"></h:outputText>
 					</p:column>
 					
 					<p:rowExpansion>

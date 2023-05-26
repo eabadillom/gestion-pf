@@ -17,8 +17,10 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
@@ -60,6 +62,8 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class FacturacionConstanciasBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
+	
+	private static Logger log = Logger.getLogger(FacturacionConstanciasBean.class);
 	
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
@@ -169,6 +173,19 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
 		listaMedioPago = medioPagoDAO.buscarTodos();
 		
+		log.info("Entrando al init");
+		
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        session = request.getSession(false);
+		
+		session.removeAttribute("entradas");
+		session.removeAttribute("vigencias");
+		session.removeAttribute("servicios");
+		session.removeAttribute("cliente");
+		session.removeAttribute("plantaSelect");
+		session.removeAttribute("factura");
+		session.removeAttribute("fechaEmision");
 		
 		//iva = parametroDAO.buscarPorNombre("IVA");
 		//retencion = parametroDAO.buscarPorNombre("RETENCION");
@@ -632,9 +649,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		
 		try {
-			faceContext = FacesContext.getCurrentInstance();
-            request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-            session = request.getSession(true);
+			
             
 			session.setAttribute("entradas", selectedEntradas);
 			session.setAttribute("vigencias",selectedVigencias);
@@ -643,6 +658,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			session.setAttribute("plantaSelect", plantaSelect);
 			session.setAttribute("factura", factura);
 			session.setAttribute("fechaEmision", fechaCorte);
+			
 			
 		}catch(Exception e) {
 			System.out.println("ERROR:" + e.getMessage());

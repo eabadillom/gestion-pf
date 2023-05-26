@@ -184,7 +184,7 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 						if(constanciaSalida.getStatus().getId()==2)
 							continue;
 						
-						if(constanciaSalida.getFecha().after(fechaCorte))
+						if(constanciaSalida.getFecha().after(cf.getVigenciaInicio()))
 							continue;
 						
 						BigDecimal cantidad = new BigDecimal(dcs.getCantidad());
