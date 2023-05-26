@@ -39,7 +39,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Cliente.findByCteRfc", query = "SELECT c FROM Cliente c WHERE c.cteRfc = :cteRfc"),
     @NamedQuery(name = "Cliente.findByNumeroCte", query = "SELECT c FROM Cliente c WHERE c.numeroCte = :numeroCte"),
     @NamedQuery(name = "Cliente.findByCteMail", query = "SELECT c FROM Cliente c WHERE c.cteMail = :cteMail"),
-    @NamedQuery(name = "Cliente.findByHabilitado", query = "SELECT c FROM Cliente c WHERE c.habilitado = :habilitado"),
+    @NamedQuery(name = "Cliente.findByHabilitado", query = "SELECT c FROM Cliente c WHERE c.habilitado = :habilitado ORDER BY c.cteNombre"),
     @NamedQuery(name = "Cliente.findByCodUnico", query = "SELECT c FROM Cliente c WHERE c.codUnico = :codUnico")})
 public class Cliente implements Serializable {
 

@@ -7,107 +7,159 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class CamaraDAO extends IBaseDAO<Camara, Integer> {
-
+	private static Logger log = Logger.getLogger(CamaraDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<Camara> findall() {
-		EntityManager entity = getEntityManager();
 		List<Camara> camara = null;
-		Query sql = entity.createNamedQuery("Camara.findAll", Camara.class);
-		camara = sql.getResultList();
+		Query sql = null;
+		EntityManager entity = null;
+		try {
+			entity = getEntityManager();
+			sql = entity.createNamedQuery("Camara.findAll", Camara.class);
+			camara = sql.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de cámaras...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
 		return camara;
 	}
 	@Override
 	public Camara buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		Camara camara = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			camara = em.find(Camara.class, id);
+		} catch(Exception ex) {
+			log.error("Problema para obtener la camara...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return camara;
 	}
 
 	@Override
 	public List<Camara> buscarTodos() {
 		List<Camara> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Camara.findAll", Camara.class).getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Camara.findAll", Camara.class).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de cámaras...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 
 	@Override
 	public List<Camara> buscarPorCriterios(Camara e) {
+		EntityManager em = null;
 		List<Camara> listaC = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listaC = em.createNamedQuery("Camara.findByplantaCve", Camara.class).setParameter("plantaCve",e.getPlantaCve()).getResultList();
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listaC = em.createNamedQuery("Camara.findByplantaCve", Camara.class).setParameter("plantaCve",e.getPlantaCve()).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de cámaras...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listaC;
 	}
 	
 	public List<Camara> buscarPorPlanta(Planta p) {
 		List<Camara> listaC = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listaC = em.createNamedQuery("Camara.findByPlantaCve", Camara.class)
-				.setParameter("plantaCve", p.getPlantaCve())
-				.getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listaC = em.createNamedQuery("Camara.findByPlantaCve", Camara.class)
+					.setParameter("plantaCve", p.getPlantaCve())
+					.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de cámaras...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listaC;
 	}
 
 	@Override
 	public String actualizar(Camara camara) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(camara);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para actualizar la cámara...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(Camara camara) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(camara);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para guardar la cámara...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(Camara camara) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(camara));
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para eliminar la cámara...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<Camara> listado) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			for (Camara camara : listado) {
 				em.remove(em.merge(camara));
 			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			EntityManagerUtil.rollback(em);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

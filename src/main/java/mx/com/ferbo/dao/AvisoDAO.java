@@ -48,7 +48,6 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 	public Aviso buscarPorId(Integer id, boolean isFullInfo) {
 		Aviso aviso = null;
 		EntityManager em = null;
-		Query query = null;
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
@@ -74,10 +73,45 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 
 	@Override
 	public List<Aviso> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
 		List<Aviso> lista = null;
-		lista = em.createNamedQuery("Aviso.findAll", Aviso.class).getResultList();
+		try {
+			em = EntityManagerUtil.getEntityManager();			
+			lista = em.createNamedQuery("Aviso.findAll", Aviso.class).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de avisos...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 
+		return lista;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Aviso> buscarTodos(boolean isFullInfo) {
+		List<Aviso> lista = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("Aviso.findAll", Aviso.class);
+			
+			lista = query.getResultList();
+			
+			if(isFullInfo == false)
+				return lista;
+			
+			for(Aviso aviso : lista) {
+				aviso.getCategoriaCve().getCategoriaCve();
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de avisos...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return lista;
 	}
 

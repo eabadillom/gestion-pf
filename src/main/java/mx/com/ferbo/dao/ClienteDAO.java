@@ -110,6 +110,26 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		
 		return null;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Cliente> buscarHabilitados(boolean isHabilitado) {
+		List<Cliente> lista = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("Cliente.findByHabilitado", Cliente.class)
+					.setParameter("habilitado", isHabilitado)
+					;
+			lista = query.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de clientes...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return lista;
+	}
 
 	@Override
 	public String actualizar(Cliente cliente) {

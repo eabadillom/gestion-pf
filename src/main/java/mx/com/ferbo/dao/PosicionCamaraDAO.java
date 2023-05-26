@@ -6,18 +6,19 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.JPAEntity;
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
-import mx.com.ferbo.model.Planta;
-
-import mx.com.ferbo.util.JPAEntity;
 import mx.com.ferbo.model.Posicion;
+import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.JPAEntity;
 
 public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
 	
 	EntityManager entity = JPAEntity.getEntity().createEntityManager();
+	
+	private static Logger log = Logger.getLogger(PosicionCamaraDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<Posicion> findAll(){
@@ -58,41 +59,37 @@ public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
 	@Override
 	public List<Posicion> buscarTodos() {
 		List<Posicion> posiciones = new ArrayList<Posicion>();
-		//Query sql = entity.createNamedQuery("Posicion.findAll", Posicion.class);
-//		try {
-//		EntityManager entity = EntityManagerUtil.getEntityManager();
-//		entity.getTransaction().begin();
-//		Query qr = entity.createNamedQuery(" SELECT * FROM gestiondb.posicion  ");
-//		List<Object[]> resultQuery = qr.getResultList();
-//		System.out.println(resultQuery + "--------------------------------------");
-//		}catch (Exception e) {
-//			// TODO: handle exception
-//		}
-		//posiciones = sql.getResultList();
 		System.out.println(posiciones + "*****************************************************");
 		return posiciones;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Posicion> buscarPorCriterios(Posicion e) {
-		List<Posicion> posiciones = new ArrayList<Posicion>();
-		//Query sql = entity.createNamedQuery("Posicion.findAll", Posicion.class);
+		List<Posicion> posiciones = null;
+		EntityManager entity = null;
+		Query query = null;
 		try {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		entity.getTransaction().begin();
-		Query qr = entity.createNamedQuery(" SELECT * FROM posicion where id_planta = :idPlanta and id_camara = :idCamara ").setParameter("id_planta", e.getPlanta().getPlantaCve()).setParameter("id_camara", e.getCamara().getCamaraCve());
-		List<Object[]> resultQuery = qr.getResultList();
-		System.out.println(resultQuery + "--------------------------------------");
-		}catch (Exception eBp) {
-			// TODO: handle exception
+			entity = EntityManagerUtil.getEntityManager();
+			query = entity
+					.createNamedQuery("Posicion.findByPlantaCamara", Posicion.class)
+					.setParameter("plantaCve", e.getPlanta().getPlantaCve())
+					.setParameter("camaraCve", e.getCamara().getCamaraCve());
+			
+			posiciones = query.getResultList();
+			
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de posiciones por cámara...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
+		
 		return posiciones;
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public String actualizar(Posicion e) {
-		System.out.println(e + "ACTUALIZAR+++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		
 		try {
 			EntityManager entity = EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
