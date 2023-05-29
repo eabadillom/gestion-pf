@@ -14,7 +14,6 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.primefaces.PrimeFaces;
 
@@ -66,6 +65,10 @@ public class CalculoPrevioBean implements Serializable {
 
 	private Date fechaEmision;
 	private BigDecimal cantidad;
+	private BigDecimal subTotalEntrada;
+	private BigDecimal subTotalVigencias;
+	private BigDecimal subTotalServicios;
+	private BigDecimal subTotalGeneral;
 
 	public CalculoPrevioBean() {
 
@@ -88,6 +91,11 @@ public class CalculoPrevioBean implements Serializable {
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		
+		subTotalServicios = new BigDecimal(0);
+		subTotalEntrada = new BigDecimal(0);
+		subTotalVigencias = new BigDecimal(0);
+		subTotalGeneral = new BigDecimal(0);
 
 		try {
 			context = FacesContext.getCurrentInstance();
@@ -115,6 +123,7 @@ public class CalculoPrevioBean implements Serializable {
 			procesarServicios();
 			procesarEntradas();
 			procesarVigencias();
+			sumaGeneral();
 
 		} catch (Exception e) {
 
@@ -227,11 +236,44 @@ public class CalculoPrevioBean implements Serializable {
 		this.selectServicioE = selectServicioE;
 	}
 
+	public BigDecimal getSubTotalEntrada() {
+		return subTotalEntrada;
+	}
+
+	public void setSubTotalEntrada(BigDecimal subTotalEntrada) {
+		this.subTotalEntrada = subTotalEntrada;
+	}
+
+	public BigDecimal getSubTotalVigencias() {
+		return subTotalVigencias;
+	}
+
+	public void setSubTotalVigencias(BigDecimal subTotalVigencias) {
+		this.subTotalVigencias = subTotalVigencias;
+	}
+	
+	public BigDecimal getSubTotalServicios() {
+		return subTotalServicios;
+	}
+
+	public void setSubTotalServicios(BigDecimal subTotalServicios) {
+		this.subTotalServicios = subTotalServicios;
+	}
+	
+	public BigDecimal getSubTotalGeneral() {
+		return subTotalGeneral;
+	}
+
+	public void setSubTotalGeneral(BigDecimal subTotalGeneral) {
+		this.subTotalGeneral = subTotalGeneral;
+	}
+	
 	// SERVICIOS (CONSTANCIA DE SERVICIOS)
 
 	public void procesarServicios() {
 
 		BigDecimal importe = new BigDecimal(0);
+		BigDecimal sumTmp;
 		Integer idS = 0,idP = 0;
 		
 		for (ConstanciaFacturaDs cfd : listaServicios) {
@@ -288,6 +330,10 @@ public class CalculoPrevioBean implements Serializable {
 				cfd.getProductoConstanciaDsList().add(productoConstanciaDs);
 				idP++;
 			}
+			
+			sumTmp = subTotalServicios(cfd.getServicioConstanciaDsList());
+			subTotalServicios = subTotalServicios.add(sumTmp);
+		
 		}
 
 	}
@@ -314,7 +360,8 @@ public class CalculoPrevioBean implements Serializable {
 	public void procesarEntradas() {
 
 		Integer id = 0;
-
+		BigDecimal sumTmp;
+		
 		for (ConstanciaFactura cf : listaEntradas) {
 
 			ConstanciaDeDeposito cdd = cf.getFolio();
@@ -399,6 +446,10 @@ public class CalculoPrevioBean implements Serializable {
 				id++;
 
 			}
+			
+			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2);
+			subTotalEntrada = subTotalEntrada.add(sumTmp);
+	
 		}
 	}
 
@@ -427,6 +478,7 @@ public class CalculoPrevioBean implements Serializable {
 
 		Integer id = 0;
 		BigDecimal importe = new BigDecimal(0);
+		BigDecimal sumTmp;
 		// List<ServicioConstancia> listaServiciosConstancias = null;
 
 		for (ConstanciaFactura cf : listaVigencias) {
@@ -503,6 +555,10 @@ public class CalculoPrevioBean implements Serializable {
 				 */
 
 			}
+			
+			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2);
+			subTotalVigencias = subTotalVigencias.add(sumTmp);
+			
 		}
 	}
 
@@ -510,15 +566,22 @@ public class CalculoPrevioBean implements Serializable {
 	public void eliminarServicioEntrada() {
 
 		for (ConstanciaFactura cf : listaEntradas) {
-			for (ServicioConstancia sc : cf.getServicioConstanciaList()) {
-
-				if (sc.getDescripcion().equals(selectServicioE.getDescripcion())) {
-					break;
+			
+			if(cf.getFolio().getFolioCliente().equals(selectServicioE.getConstancia().getFolio().getFolioCliente())) {
+			
+				for (ServicioConstancia sc : cf.getServicioConstanciaList()) {
+	
+					if (sc.getDescripcion().equals(selectServicioE.getDescripcion())) {
+						cf.getServicioConstanciaList().remove(selectServicioE);
+						break;
+					}
+					
 				}
-				
 			}
-			cf.getServicioConstanciaList().remove(selectServicioE);
+			
 		}
+		
+		recalculoEntradas();
 		
 		PrimeFaces.current().ajax().update("form:dt-selectedEntradas:dt-serviciosEntrada");
 
@@ -528,15 +591,19 @@ public class CalculoPrevioBean implements Serializable {
 	public void eliminarServicioVigencia() {
 		
 		for (ConstanciaFactura cf : listaVigencias) {
-			for (ServicioConstancia sc : cf.getServicioConstanciaList()) {
-
-				if (sc.getDescripcion().equals(selectServicioV.getDescripcion())) {
-					break;
-				}
-				
+			
+			if(cf.getFolio().getFolioCliente().equals(selectServicioV.getConstancia().getFolio().getFolioCliente())) {
+				for (ServicioConstancia sc : cf.getServicioConstanciaList()) {
+						if (sc.getDescripcion().equals(selectServicioV.getDescripcion())) {
+							cf.getServicioConstanciaList().remove(selectServicioV);
+							break;
+						}
+					}
 			}
-			cf.getServicioConstanciaList().remove(selectServicioV);
+			
 		}
+		
+		recalculoVigencias();
 		
 		PrimeFaces.current().ajax().update("form:dt-selectVigencias:dt-serviciosVigencia");
 		
@@ -544,24 +611,109 @@ public class CalculoPrevioBean implements Serializable {
 	
 	public void eliminarServicioDs() {
 		
+		BigDecimal sum;
+		
 		for(ConstanciaFacturaDs cfd: listaServicios) {
 			
-			for(ServicioConstanciaDs sc: cfd.getServicioConstanciaDsList()) {
-				
-				if(sc.getDescripcion().equals(selectServicioDs.getDescripcion())) {
-					break;
+			if(cfd.getFolioCliente().equals(selectServicioDs.getConstancia().getFolioCliente())) {
+			
+				for(ServicioConstanciaDs sc: cfd.getServicioConstanciaDsList()) {
+					
+					if(sc.getDescripcion().equals(selectServicioDs.getDescripcion())) {
+						cfd.getServicioConstanciaDsList().remove(selectServicioDs);
+						break;
+					}
 				}
 			}
 			
-			cfd.getServicioConstanciaDsList().remove(selectServicioDs);
-			
 		}
+		
+		recalculoServicioDs();//llamo al metodo ya con lista actualizada 
 		
 		PrimeFaces.current().ajax().update("form:dt-constanciaFacturaDs:dt-serviciosDs");
 		
 	}
 	
-	public void cerrarSesion() {
+	//Calculo el subTotal antes de eliminar un servicio
+	
+	public BigDecimal subTotalEntradaVigencias(List<ServicioConstancia> lista) {
+		
+		BigDecimal subTotal = new BigDecimal(0);
+		
+		for(ServicioConstancia sc: lista) {
+			subTotal = subTotal.add(sc.getCosto());
+		}
+		
+		return subTotal;
+	}
+	
+	public BigDecimal subTotalServicios(List<ServicioConstanciaDs> lista) {
+		BigDecimal subTotal = new BigDecimal(0);
+		
+		for(ServicioConstanciaDs scd: lista) {
+			subTotal = subTotal.add(scd.getCosto());
+		}
+		
+		return subTotal;
+		
+	}
+	
+	public void recalculoServicioDs() {//calculo el subtotal con la lista actualizada despues de eliminar un servicio 
+		
+		subTotalServicios = new BigDecimal(0);
+		BigDecimal sum;
+		
+		for(ConstanciaFacturaDs cf: listaServicios) {
+			
+			sum = subTotalServicios(cf.getServicioConstanciaDsList());	
+			subTotalServicios = subTotalServicios.add(sum);
+		}
+		
+		sumaGeneral();
+		
+	}
+	
+	public void recalculoEntradas() {
+		
+		subTotalEntrada = new BigDecimal(0);
+		
+		BigDecimal sum;
+		
+		for(ConstanciaFactura cf: listaEntradas) {
+			
+			sum = subTotalEntradaVigencias(cf.getServicioConstanciaList());
+			subTotalEntrada = subTotalEntrada.add(sum);
+			
+		}
+		
+		sumaGeneral();
+		
+	}
+	
+	public void recalculoVigencias() {
+		
+		subTotalVigencias = new BigDecimal(0);
+		
+		BigDecimal sum;
+		
+		for(ConstanciaFactura cf: listaVigencias) {
+			
+			sum = subTotalEntradaVigencias(cf.getServicioConstanciaList());
+			subTotalVigencias = subTotalVigencias.add(sum);
+			
+		}
+		
+		sumaGeneral();
+		
+	}
+	
+	public void sumaGeneral() {
+		
+		subTotalGeneral = subTotalEntrada.add(subTotalServicios.add(subTotalVigencias)).setScale(2);
+		
+	}
+	
+	/*public void cerrarSesion() {
 		
 		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
 		
@@ -570,6 +722,6 @@ public class CalculoPrevioBean implements Serializable {
         response.addHeader("Cache-Control", "no-store");
         response.addHeader("Cache-Control", "must-revalidate");
 		
-	}
+	}*/
 	
 }

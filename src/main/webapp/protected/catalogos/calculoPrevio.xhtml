@@ -75,7 +75,7 @@
 								</p:column>
 								
 								<p:column headerText="">
-									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioEntrada()}">
+									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioEntrada()}" update="form:dt-selectedEntradas form:subTotalGeneral">
 										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{calculoPrevioBean.selectServicioE}"></f:setPropertyActionListener>
 									</p:commandButton>
 								</p:column>
@@ -83,6 +83,12 @@
 						</p:dataTable>
 					
 					</p:rowExpansion>
+					
+					<f:facet name="footer">
+						<span>
+							SubTotal: <h:outputText value="#{calculoPrevioBean.subTotalEntrada}"></h:outputText>
+						</span>
+					</f:facet>
 					
 					</p:dataTable>
 					
@@ -116,7 +122,7 @@
 					</p:column>
 					
 					<p:rowExpansion>
-						<p:dataTable id="dt-serviciosVigencia" value="#{vigencia.servicioConstanciaList}" var="servicioConstancia" rowIndexVar="row">
+						<p:dataTable id="dt-serviciosVigencia" value="#{vigencia.servicioConstanciaList}" var="servicioConstancia" >
 								
 								<p:column headerText="Servicio">
 									<h:outputText value="#{servicioConstancia.descripcion}" />
@@ -135,7 +141,7 @@
 								</p:column>
 								
 								<p:column>
-									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioVigencia()}">
+									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioVigencia()}" update="form:dt-selectVigencias form:subTotalGeneral">
 										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{calculoPrevioBean.selectServicioV}"></f:setPropertyActionListener>
 									</p:commandButton>
 								</p:column>
@@ -144,11 +150,17 @@
 					
 					</p:rowExpansion>
 					
+					<f:facet name="footer">
+						<span>
+							SubTotal:<h:outputText value="#{calculoPrevioBean.subTotalVigencias}" />
+						</span>
+					</f:facet>
+					
 					</p:dataTable>
 																							
 					
 					<p:dataTable id="dt-constanciaFacturaDs" value="#{calculoPrevioBean.listaServicios}" var="constanciaFacturaDs"
-							rowKey="#{constanciaFacturaDs.constanciaDeServicio.folio}" reflow="true" >
+							rowKey="#{constanciaFacturaDs.constanciaDeServicio.folio}" reflow="true" rows="5" paginatorPosition="bottom" paginator="true">
 							
 					<f:facet name="header">
 						<div>
@@ -170,7 +182,7 @@
 						</h:outputText>
 					</p:column>
 					
-					<p:rowExpansion>
+					<p:rowExpansion >
 						<p:dataTable id="dt-serviciosDs" value="#{constanciaFacturaDs.servicioConstanciaDsList}" var="servicioConstancia" rowIndexVar="row">
 								
 								<p:column headerText="Servicio">
@@ -190,16 +202,30 @@
 								</p:column>
 								
 								<p:column>
-									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioDs()}">
+									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioDs()}" update="form:dt-constanciaFacturaDs form:subTotalGeneral">
 										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{calculoPrevioBean.selectServicioDs}"></f:setPropertyActionListener>		
 									</p:commandButton>
 								</p:column>
-						
+								
 						</p:dataTable>
 					
 					</p:rowExpansion>
 					
+					<f:facet name="footer">
+						<span>
+							SubTotal: <h:outputText id="subServiciosDs" value="#{calculoPrevioBean.subTotalServicios}"/>
+						</span>
+					</f:facet>
+					
 					</p:dataTable>
+					
+					<p:panel styleClass="p-mt-4">
+					<p:outputLabel value="SubTotal General: ">
+					
+						<b><h:outputText id="subTotalGeneral" value="#{calculoPrevioBean.subTotalGeneral}"/></b>
+					
+					</p:outputLabel>
+					</p:panel>
 					
 				</div>
 			</div>
