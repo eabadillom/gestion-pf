@@ -89,9 +89,19 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 
 	@Override
 	public List<Cliente> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
 		List<Cliente> listado = null;
-		listado = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Cliente.findAll", Cliente.class)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de clientes...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listado;
 	}
 
@@ -111,7 +121,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema en la actualización del cliente: " + cliente.getCteCve(), e);
 			return "ERROR";
 		}finally {
 			EntityManagerUtil.close(em);
@@ -127,9 +137,8 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.getTransaction().begin();
 			em.persist(cliente);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema al guardar el cliente: " + cliente.getCteCve(), e);
 			return "ERROR";
 		}finally {
 			EntityManagerUtil.close(em);
@@ -172,7 +181,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			.setParameter("idCliente", cliente.getCteCve()).executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para eliminar el cliente: " + cliente.getCteCve(), e);
 			return "ERROR";
 		}finally {
 			EntityManagerUtil.close(em);
@@ -191,7 +200,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			.getSingleResult();
 			CandadoSalida candadoSalida = cliente.getCandadoSalida();
 			if(candadoSalida != null) {
-				System.out.println(cliente.getCandadoSalida().getId());
+				log.debug(cliente.getCandadoSalida().getId());
 				cliente.remove(candadoSalida);
 				em.merge(cliente);
 			}
@@ -231,7 +240,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para eliminar el listado de clientes: " + listado, e);
 			return "ERROR";
 		}finally {
 			EntityManagerUtil.close(em);

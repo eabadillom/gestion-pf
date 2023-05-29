@@ -1,9 +1,6 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,58 +8,44 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AvisoDAO;
-import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.dao.CategoriaDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.CuotaMinimaDAO;
 import mx.com.ferbo.dao.DomiciliosDAO;
-import mx.com.ferbo.dao.FacturaDAO;
-import mx.com.ferbo.dao.PagoDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
-import mx.com.ferbo.dao.ProductoClienteDAO;
-import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.ServicioDAO;
-import mx.com.ferbo.dao.StatusFacturaDAO;
-import mx.com.ferbo.dao.TipoPagoDAO;
 import mx.com.ferbo.dao.UdCobroDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.CuotaMinima;
 import mx.com.ferbo.model.Domicilios;
-import mx.com.ferbo.model.Factura;
-import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.model.Producto;
-import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
-import mx.com.ferbo.model.StatusFactura;
-import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.model.UdCobro;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
 public class AvisosComercialBean implements Serializable {
 
-	/**
-	 * @author Juan_Cervantes
-	 */
-
 	private static final long serialVersionUID = -626048119540963939L;
+	private static Logger log = Logger.getLogger(AvisosComercialBean.class);
 
 	/**
 	 * Objetos para clientes
@@ -76,6 +59,7 @@ public class AvisosComercialBean implements Serializable {
 	 */
 	private List<Aviso> lstAvisos;
 	private Aviso avisoSelected;
+	private Aviso aviso;
 	private AvisoDAO avisoDAO;
 
 	/**
@@ -103,7 +87,7 @@ public class AvisosComercialBean implements Serializable {
 	 */
 	private Servicio servicioSelected;
 	private ServicioDAO servicioDAO;
-	private List<Servicio> lstServicios;
+//	private List<Servicio> lstServicios;
 	private List<Servicio> lstServiciosAviso;
 
 	/**
@@ -119,14 +103,13 @@ public class AvisosComercialBean implements Serializable {
 	 * Objetos para Plantas
 	 */
 
-	private Planta plantaSelected;
 	private List<Planta> lstPlanta;
 	private PlantaDAO plantaDAO;
 
 	/**
 	 * Objetos para Categoria
 	 */
-	private Categoria categoriaSelected;
+	private Integer categoriaSelected;
 	private CategoriaDAO categoriaDAO;
 	private List<Categoria> lstCategoria;
 	
@@ -134,32 +117,20 @@ public class AvisosComercialBean implements Serializable {
 	 * Objetos para Unidad de Cobro
 	 */
 	private UdCobro udCobroSelected;
-	private List<UdCobro> lstUdCobro;
 	private UdCobroDAO udCobroDAO;
 	
 	/**
 	 * Objetos para unidad de Manejo
 	 */
 	private UnidadDeManejo unidadDeManejoSelected;
-	private List<UnidadDeManejo> lstUnidadDeManejo;
 	private UnidadDeManejoDAO unidadDeManejoDAO;
 
 	/**
 	 * Objetos auxiliares
 	 */
 	private String renderAvisosTable;
-	private boolean avisoPo;
-	private boolean avisoPed;
-	private boolean avisoSAP;
-	private boolean avisoLote;
-	private boolean avisoCad;
-	private boolean avisoTarima;
-	private boolean avisoOtro;
-	private String avisoTemp;
-	private String avisoObservaciones;
-	private int avisoVigencia;
-	private BigDecimal avisoValSeg;
-	private int avisoPlazo;
+	private String avisoTipoFacturacion;
+	private Integer plantaCveSelected;
 
 	/**
 	 * Constructores
@@ -172,32 +143,18 @@ public class AvisosComercialBean implements Serializable {
 		avisoDAO = new AvisoDAO();
 		lstClientes = new ArrayList<>();
 		lstAvisos = new ArrayList<>();
-		avisoSelected = new Aviso();
 		cuotaMinimaSelected = new CuotaMinima();
 		hasCuotaMinima = false;
 		cuotaMinimaDAO = new CuotaMinimaDAO();
 		lstCuotaMinima = new ArrayList<>();
-		lstServicios = new ArrayList<>();
 		this.setRenderAvisosTable("false");
 		categoriaDAO = new CategoriaDAO();
 		plantaDAO = new PlantaDAO();
 		precioServicioDAO = new PrecioServicioDAO();
 		lstPrecioServicio = new ArrayList<>();
-		lstUdCobro = new ArrayList<>();
+		
 		udCobroDAO = new UdCobroDAO();
 		unidadDeManejoDAO = new UnidadDeManejoDAO();
-		avisoPo=false;
-		avisoPed=false;
-		avisoSAP=false;
-		avisoLote=false;
-		avisoCad=false;
-		avisoTarima=false;
-		avisoOtro=false;
-		avisoTemp="";
-		avisoObservaciones="";
-		avisoVigencia=0;
-		avisoValSeg=new BigDecimal(0);
-		avisoPlazo = 0;
 		lstPrecioServicioSelected = new ArrayList<>();
 		
 
@@ -207,55 +164,45 @@ public class AvisosComercialBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		lstClientes = clienteDAO.buscarTodos();
-		// lstServicios = servicioDAO.buscarTodos();
 		lstCategoria = categoriaDAO.buscarTodos();
+		categoriaSelected = 1;
 		lstPlanta = plantaDAO.findall();
-		lstUdCobro = udCobroDAO.buscarTodos();
-		lstUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 	}
 
-	/**
-	 * Métodos de filtrado
-	 */
 	public void filtraAvisos() {
-		avisoSelected.setCteCve(clienteSelected);
-		lstAvisos = avisoDAO.buscarPorCliente(avisoSelected);
-		buscaDomicilioCliente();
+		lstAvisos = avisoDAO.buscarPorCliente(clienteSelected.getCteCve());
 		this.setRenderAvisosTable("true");
-		buscaCuotaMinima();
-		buscaServicios();
 		PrimeFaces.current().ajax().update("form:dt-avisos");
-		hasCuotaMinima = false;
-		cuotaMinimaSelected = new CuotaMinima();
-
 	}
 
-	public void buscaServicios() {
-		List<Servicio> lstServAux = new ArrayList<>();
-		precioServicioSelected = new PrecioServicio();
-		precioServicioSelected.setCliente(clienteSelected);
-		lstPrecioServicio = precioServicioDAO.buscarPorCriterios(precioServicioSelected);
-		for (PrecioServicio p : lstPrecioServicio) {
-			lstServAux.add(p.getServicio());
-		}
-		lstServicios = lstServAux;
-
-	}
-	
-	public void buscaPrecioServicioAviso() {
-		Aviso avisoAux = new Aviso();
-		avisoAux.setAvisoCve(1);
+	public void buscaPrecioServicioAviso(Aviso a) {
+		Aviso aviso = avisoDAO.buscarPorId(a.getAvisoCve(), true);
+		
+		System.out.println(a.hashCode());
+		System.out.println(aviso.hashCode());
+		this.aviso = aviso;
+		this.avisoSelected = aviso;
+		System.out.println(this.avisoSelected.hashCode());
+		//this.avisoSelected = a;
+		this.plantaCveSelected = avisoSelected.getPlantaCve().getPlantaCve();
+		
+		Aviso aviso_1 = new Aviso();
+		aviso_1.setAvisoCve(1);
 		PrecioServicio precioServicioAux = new PrecioServicio();
+		
 		precioServicioAux = new PrecioServicio();
 		precioServicioAux.setCliente(clienteSelected);
-		precioServicioAux.setAvisoCve(avisoAux);
-		lstPrecioServicio = precioServicioDAO.buscarPorCriterios(precioServicioAux);
+		precioServicioAux.setAvisoCve(aviso_1);
+		lstPrecioServicio = precioServicioDAO.buscarDisponibles(clienteSelected.getCteCve(), avisoSelected.getAvisoCve());
+		
 		precioServicioAux = new PrecioServicio();
 		precioServicioAux.setCliente(clienteSelected);
 		precioServicioAux.setAvisoCve(avisoSelected);
 		lstPrecioServicioAviso = precioServicioDAO.buscarPorCriterios(precioServicioAux);
+		
+		PrimeFaces.current().ajax().update("soPlantaAct");
 	}
-
+	
 	public List<Servicio> getLstServiciosAviso() {
 		return lstServiciosAviso;
 	}
@@ -288,15 +235,6 @@ public class AvisosComercialBean implements Serializable {
 		PrimeFaces.current().ajax().update("form:dt-avisos", "form:monto-minimo");
 	}
 
-	private void buscaDomicilioCliente() {
-		List<ClienteDomicilios> listClienteDomicilios = clienteDomiciliosDAO.buscaPorCliente(clienteSelected);
-		if (!listClienteDomicilios.isEmpty()) {
-			clienteDomicilioSelected = listClienteDomicilios.get(0);
-		} else {
-			clienteDomicilioSelected = new ClienteDomicilios();
-		}
-	}
-
 	public boolean buscaCuotaMinima() {
 		cuotaMinimaSelected.setCliente(clienteSelected);
 		lstCuotaMinima = cuotaMinimaDAO.buscarPorCriterios(cuotaMinimaSelected);
@@ -307,43 +245,35 @@ public class AvisosComercialBean implements Serializable {
 		}
 		return false;
 	}
+	
+	public void nuevoAviso() {
+		Categoria categoria = null;
+		
+		categoria = categoriaDAO.buscarPorId(this.categoriaSelected);
+		this.avisoSelected = new Aviso();
+		this.categoriaSelected = 1;
+		this.avisoSelected.setCteCve(clienteSelected);
+		this.avisoSelected.setCategoriaCve(categoria);
+	}
 
 	public void guardaAviso() {
-		List<PrecioServicio> psLst = new ArrayList<>();
-		PrecioServicio nPs = new PrecioServicio();
-		nPs.setCliente(clienteSelected);
-		nPs.setAvisoCve(avisoSelected);
-		nPs.setServicio(servicioSelected);
-		psLst.add(nPs);
-		avisoSelected.setPrecioServicioList(psLst);
 		Date fechaActual = new Date();
+		
 		avisoSelected.setAvisoFecha(fechaActual);
-		avisoSelected.setAvisoTpFacturacion("");
-		avisoSelected.setCategoriaCve(categoriaSelected);
-		avisoSelected.setAvisoPo(avisoPo);
-		avisoSelected.setAvisoPedimento(avisoPed);
-		avisoSelected.setAvisoSap(avisoSAP);
-		avisoSelected.setAvisoLote(avisoLote);
-		avisoSelected.setAvisoCaducidad(avisoCad);
-		avisoSelected.setAvisoTarima(avisoTarima);
-		avisoSelected.setAvisoOtro(avisoOtro);
-		avisoSelected.setAvisoTemp(avisoTemp);
-		avisoSelected.setAvisoObservaciones(avisoObservaciones);
-		avisoSelected.setAvisoVigencia(avisoVigencia);
-		avisoSelected.setAvisoValSeg(avisoValSeg);
-		avisoSelected.setAvisoPlazo(avisoPlazo);
+		
+		Categoria categoria = categoriaDAO.buscarPorId(categoriaSelected);
+		avisoSelected.setCategoriaCve(categoria);
+		
+		Planta planta = plantaDAO.buscarPorId(this.plantaCveSelected);
+		avisoSelected.setPlantaCve(planta);
+		
 		avisoDAO.guardar(avisoSelected);
-		for(PrecioServicio ps : psLst) {
-			ps.setAvisoCve(avisoSelected);
-			precioServicioDAO.actualizar(ps);
-		}
-		precioServicioDAO.guardar(nPs); 
+		
 		filtraAvisos();
-		PrimeFaces.current().ajax().update("form:dt-avisos");
+		PrimeFaces.current().ajax().update("dt-avisos");
 	}
 
 	public void actualizaAviso() {
-		List<PrecioServicio> psLst = new ArrayList<>();
 		PrecioServicio nPs = new PrecioServicio();
 		nPs.setCliente(clienteSelected);
 		nPs.setAvisoCve(avisoSelected);
@@ -355,23 +285,21 @@ public class AvisosComercialBean implements Serializable {
 		avisoSelected.setPrecioServicioList(lstPrecioServicioAviso);
 		Date fechaActual = new Date();
 		avisoSelected.setAvisoFecha(fechaActual);
-		avisoSelected.setAvisoTpFacturacion("");
-		avisoSelected.setCategoriaCve(categoriaSelected);
-		avisoSelected.setAvisoPo(avisoPo);
-		avisoSelected.setAvisoPedimento(avisoPed);
-		avisoSelected.setAvisoSap(avisoSAP);
-		avisoSelected.setAvisoLote(avisoLote);
-		avisoSelected.setAvisoCaducidad(avisoCad);
-		avisoSelected.setAvisoTarima(avisoTarima);
-		avisoSelected.setAvisoOtro(avisoOtro);
-		avisoSelected.setAvisoTemp(avisoTemp);
-		avisoSelected.setAvisoObservaciones(avisoObservaciones);
-		avisoSelected.setAvisoVigencia(avisoVigencia);
-		avisoSelected.setAvisoValSeg(avisoValSeg);
-		avisoSelected.setAvisoPlazo(avisoPlazo);
+		Categoria categoria = categoriaDAO.buscarPorId(categoriaSelected);
+		avisoSelected.setCategoriaCve(categoria);
+		Planta planta = plantaDAO.buscarPorId(this.plantaCveSelected);
+		avisoSelected.setPlantaCve(planta);
 		
-		avisoDAO.actualizar(avisoSelected);		
+		avisoDAO.actualizar(avisoSelected);
+		
+		this.resetSelectedItems();
+		
 		PrimeFaces.current().ajax().update("form:dt-avisos");
+	}
+	
+	public void resetSelectedItems() {
+		this.plantaCveSelected = null;
+		this.categoriaSelected = null;
 	}
 
 	public void eliminaAviso() {
@@ -385,25 +313,98 @@ public class AvisosComercialBean implements Serializable {
 		PrimeFaces.current().ajax().update("form:dt-avisos");
 	}
 	
-	public void agregaAviso() {
-		for(PrecioServicio ps :lstPrecioServicioSelected) {
-			//int calcId = precioServicioDAO.obtenFinal();
-			//ps.setId(calcId+1);
-			ps.setId(null);
-			ps.setAvisoCve(avisoSelected);
-			precioServicioDAO.guardar(ps);
-		}
-		this.buscaPrecioServicioAviso();
-		List<PrecioServicio> lstPsAux = new ArrayList<>();
-		for(PrecioServicio pser :lstPrecioServicio) {
-			for(PrecioServicio pserAv : lstPrecioServicioAviso) {
-				if(pser.getServicio() == pserAv.getServicio()) {
-					lstPsAux.add(pser);
-				}
+	public void eliminaServicio(PrecioServicio ps) {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		String eliminar = null;
+		
+		try {
+			
+			eliminar = precioServicioDAO.eliminar(ps);
+			
+			if(eliminar != null) {
+				throw new InventarioException("Problema para eliminar el servicio seleccionado.");
 			}
+			
+			avisoSelected.remove(ps);
+			
+			this.lstPrecioServicioAviso = precioServicioDAO.buscarPorAviso(avisoSelected, clienteSelected);
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Servicio eliminado correctamente.";
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages", "dt-servicioAviso");
 		}
-		lstPrecioServicio.removeAll(lstPsAux);
-		PrimeFaces.current().ajax().update("form:dt-avisos", "form:panel-actAviso", "form:dt-servicioAviso", "form:dt-servicioSinAviso");
+		
+	}
+	
+	public void agregaServicio() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		String respuesta = null;
+		
+		try {
+			
+			for(PrecioServicio ps :lstPrecioServicioSelected) {
+				PrecioServicio precioServicio = new PrecioServicio();
+				precioServicio.setAvisoCve(this.avisoSelected);
+				precioServicio.setCliente(clienteSelected);
+				precioServicio.setPrecio(ps.getPrecio());
+				precioServicio.setServicio(ps.getServicio());
+				precioServicio.setUnidad(ps.getUnidad());
+				
+				
+				//TEST
+				ps.equals(precioServicio);
+				
+				List<PrecioServicio> list = lstPrecioServicioAviso.stream()
+						.filter(
+								p -> precioServicio.equals(p)
+						)
+						.collect(Collectors.toList());
+				
+				if(list.size() > 0) //La lista lstPrecioServicioAviso ya tiene el precioServicio?
+					continue;
+				
+				System.out.println(this.avisoSelected.hashCode());
+				this.avisoSelected.add(precioServicio);
+			}
+			
+			respuesta = avisoDAO.actualizar(avisoSelected);
+			if(respuesta != null)
+				throw new InventarioException("Problema para actualizar los servicios.");
+			
+			this.buscaPrecioServicioAviso(avisoSelected);
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Servicio eliminado correctamente.";
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			log.error("Problema para guardar el/los servicio(s) al aviso...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        //PrimeFaces.current().ajax().update(":form:messages", "dt-servicioAviso");
+	        PrimeFaces.current().ajax().update("form:dt-avisos", "form:panel-actAviso", "form:dt-servicioAviso", "form:dt-servicioSinAviso", "messages");
+		}
+		
+		
 	}
 	
 	public void remueveAviso() {		
@@ -552,22 +553,6 @@ public class AvisosComercialBean implements Serializable {
 		this.servicioDAO = servicioDAO;
 	}
 
-	public List<Servicio> getLstServicios() {
-		return lstServicios;
-	}
-
-	public void setLstServicios(List<Servicio> lstServicios) {
-		this.lstServicios = lstServicios;
-	}
-
-	public Planta getPlantaSelected() {
-		return plantaSelected;
-	}
-
-	public void setPlantaSelected(Planta plantaSelected) {
-		this.plantaSelected = plantaSelected;
-	}
-
 	public List<Planta> getLstPlanta() {
 		return lstPlanta;
 	}
@@ -592,11 +577,11 @@ public class AvisosComercialBean implements Serializable {
 		this.categoriaDAO = categoriaDAO;
 	}
 
-	public Categoria getCategoriaSelected() {
+	public Integer getCategoriaSelected() {
 		return categoriaSelected;
 	}
 
-	public void setCategoriaSelected(Categoria categoriaSelected) {
+	public void setCategoriaSelected(Integer categoriaSelected) {
 		this.categoriaSelected = categoriaSelected;
 	}
 
@@ -632,102 +617,6 @@ public class AvisosComercialBean implements Serializable {
 		this.lstPrecioServicio = lstPrecioServicio;
 	}
 
-	public boolean isAvisoPo() {
-		return avisoPo;
-	}
-
-	public void setAvisoPo(boolean avisoPo) {
-		this.avisoPo = avisoPo;
-	}
-
-	public boolean isAvisoPed() {
-		return avisoPed;
-	}
-
-	public void setAvisoPed(boolean avisoPed) {
-		this.avisoPed = avisoPed;
-	}
-
-	public boolean isAvisoSAP() {
-		return avisoSAP;
-	}
-
-	public void setAvisoSAP(boolean avisoSAP) {
-		this.avisoSAP = avisoSAP;
-	}
-
-	public boolean isAvisoLote() {
-		return avisoLote;
-	}
-
-	public void setAvisoLote(boolean avisoLote) {
-		this.avisoLote = avisoLote;
-	}
-
-	public boolean isAvisoCad() {
-		return avisoCad;
-	}
-
-	public void setAvisoCad(boolean avisoCad) {
-		this.avisoCad = avisoCad;
-	}
-
-	public boolean isAvisoTarima() {
-		return avisoTarima;
-	}
-
-	public void setAvisoTarima(boolean avisoTarima) {
-		this.avisoTarima = avisoTarima;
-	}
-
-	public boolean isAvisoOtro() {
-		return avisoOtro;
-	}
-
-	public void setAvisoOtro(boolean avisoOtro) {
-		this.avisoOtro = avisoOtro;
-	}
-
-	public String getAvisoTemp() {
-		return avisoTemp;
-	}
-
-	public void setAvisoTemp(String avisoTemp) {
-		this.avisoTemp = avisoTemp;
-	}
-
-	public String getAvisoObservaciones() {
-		return avisoObservaciones;
-	}
-
-	public void setAvisoObservaciones(String avisoObservaciones) {
-		this.avisoObservaciones = avisoObservaciones;
-	}
-
-	public int getAvisoVigencia() {
-		return avisoVigencia;
-	}
-
-	public void setAvisoVigencia(int avisoVigencia) {
-		this.avisoVigencia = avisoVigencia;
-	}
-
-	public BigDecimal getAvisoValSeg() {
-		return avisoValSeg;
-	}
-
-	public void setAvisoValSeg(BigDecimal avisoValSeg) {
-		this.avisoValSeg = avisoValSeg;
-	}
-
-	public int getAvisoPlazo() {
-		return avisoPlazo;
-	}
-
-	public void setAvisoPlazo(int avisoPlazo) {
-		this.avisoPlazo = avisoPlazo;
-	}
-
 	public List<PrecioServicio> getLstPrecioServicioSelected() {
 		return lstPrecioServicioSelected;
 	}
@@ -752,14 +641,6 @@ public class AvisosComercialBean implements Serializable {
 		this.udCobroSelected = udCobroSelected;
 	}
 
-	public List<UdCobro> getLstUdCobro() {
-		return lstUdCobro;
-	}
-
-	public void setLstUdCobro(List<UdCobro> lstUdCobro) {
-		this.lstUdCobro = lstUdCobro;
-	}
-
 	public UdCobroDAO getUdCobroDAO() {
 		return udCobroDAO;
 	}
@@ -776,20 +657,36 @@ public class AvisosComercialBean implements Serializable {
 		this.unidadDeManejoSelected = unidadDeManejoSelected;
 	}
 
-	public List<UnidadDeManejo> getLstUnidadDeManejo() {
-		return lstUnidadDeManejo;
-	}
-
-	public void setLstUnidadDeManejo(List<UnidadDeManejo> lstUnidadDeManejo) {
-		this.lstUnidadDeManejo = lstUnidadDeManejo;
-	}
-
 	public UnidadDeManejoDAO getUnidadDeManejoDAO() {
 		return unidadDeManejoDAO;
 	}
 
 	public void setUnidadDeManejoDAO(UnidadDeManejoDAO unidadDeManejoDAO) {
 		this.unidadDeManejoDAO = unidadDeManejoDAO;
+	}
+
+	public String getAvisoTipoFacturacion() {
+		return avisoTipoFacturacion;
+	}
+
+	public void setAvisoTipoFacturacion(String avisoTipoFacturacion) {
+		this.avisoTipoFacturacion = avisoTipoFacturacion;
+	}
+
+	public Integer getPlantaCveSelected() {
+		return plantaCveSelected;
+	}
+
+	public void setPlantaCveSelected(Integer plantaCveSelected) {
+		this.plantaCveSelected = plantaCveSelected;
+	}
+
+	public Aviso getAviso() {
+		return aviso;
+	}
+
+	public void setAviso(Aviso aviso) {
+		this.aviso = aviso;
 	}
 
 }
