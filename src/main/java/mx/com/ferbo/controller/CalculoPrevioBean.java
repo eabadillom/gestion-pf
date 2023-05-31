@@ -14,6 +14,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.primefaces.PrimeFaces;
 
@@ -26,13 +27,17 @@ import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.ProductoConstanciaDs;
+import mx.com.ferbo.model.SerieFactura;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.ServicioConstancia;
 import mx.com.ferbo.model.ServicioConstanciaDs;
@@ -60,10 +65,14 @@ public class CalculoPrevioBean implements Serializable {
 
 	private Cliente clienteSelect;
 	private Planta plantaSelect;
+	private Domicilios domicilioSelect;
+	private SerieFactura serieFacturaSelect;
 	private Factura factura;
 	private ServicioConstancia selectServicioE;
 	private ServicioConstancia selectServicioV;
 	private ServicioConstanciaDs selectServicioDs;
+	private MedioPago medioPago;
+	private MetodoPago metodoPago;
 	private Parametro iva;
 
 	private Date fechaEmision;
@@ -85,6 +94,8 @@ public class CalculoPrevioBean implements Serializable {
 
 		clienteSelect = new Cliente();
 		plantaSelect = new Planta();
+		domicilioSelect = new Domicilios();
+		serieFacturaSelect = new SerieFactura();
 		factura = new Factura();
 		selectServicioE = new ServicioConstancia();
 		selectServicioV = new ServicioConstancia();
@@ -116,6 +127,10 @@ public class CalculoPrevioBean implements Serializable {
 			factura = (Factura) request.getSession(false).getAttribute("factura");
 			fechaEmision = (Date) request.getSession(false).getAttribute("fechaEmision");
 			iva = (Parametro) request.getSession(false).getAttribute("iva"); 
+			medioPago = (MedioPago) request.getSession(false).getAttribute("medioPago");
+			metodoPago = (MetodoPago) request.getSession(false).getAttribute("metodoPago");
+			domicilioSelect = (Domicilios) request.getSession(false).getAttribute("domicilioSelect");
+			serieFacturaSelect = (SerieFactura) request.getSession(false).getAttribute("serieFacturaSelect");
 
 			if (listaEntradas.isEmpty()) {
 				listaEntradas = new ArrayList<>();
@@ -135,9 +150,7 @@ public class CalculoPrevioBean implements Serializable {
 			sumaGeneral();
 
 		} catch (Exception e) {
-
 			System.out.println("ERROR Aqui" + e.getLocalizedMessage());
-			System.out.println("ERROR Aqui" + e.getCause());
 		}
 
 	}
@@ -300,6 +313,38 @@ public class CalculoPrevioBean implements Serializable {
 
 	public void setMontoLetra(String montoLetra) {
 		this.montoLetra = montoLetra;
+	} 
+
+	public MedioPago getMedioPago() {
+		return medioPago;
+	}
+
+	public void setMedioPago(MedioPago medioPago) {
+		this.medioPago = medioPago;
+	}
+
+	public MetodoPago getMetodoPago() {
+		return metodoPago;
+	}
+
+	public void setMetodoPago(MetodoPago metodoPago) {
+		this.metodoPago = metodoPago;
+	}
+	
+	public Domicilios getDomicilioSelect() {
+		return domicilioSelect;
+	}
+
+	public void setDomicilioSelect(Domicilios domicilioSelect) {
+		this.domicilioSelect = domicilioSelect;
+	}
+
+	public SerieFactura getSerieFacturaSelect() {
+		return serieFacturaSelect;
+	}
+
+	public void setSerieFacturaSelect(SerieFactura serieFacturaSelect) {
+		this.serieFacturaSelect = serieFacturaSelect;
 	}
 
 	public void procesarServicios() {
@@ -358,7 +403,7 @@ public class CalculoPrevioBean implements Serializable {
 				productoConstanciaDs.setUnidadCobro(ps.getUnidadDeCobro().getUnidadDeManejoDs());
 				productoConstanciaDs.setCantidadManejo(new BigDecimal(ps.getCantidadTotal()).setScale(2));
 				productoConstanciaDs.setUnidadManejo(ps.getUnidadDeManejoCve().getUnidadDeManejoDs());
-
+				
 				cfd.getProductoConstanciaDsList().add(productoConstanciaDs);
 				idP++;
 			}
@@ -752,11 +797,30 @@ public class CalculoPrevioBean implements Serializable {
 		FormatUtil formato = new FormatUtil();
 		
 		montoLetra = formato.getMontoConLetra(total.doubleValue());
+		
+		factura.setSubtotal(subTotalGeneral);
+		factura.setIva(ivaTotal);
+		factura.setTotal(total);
+		factura.setMontoLetra(montoLetra);
+		
 	}
 	
 	/*public void cerrarSesion() {
 		
-		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+		HttpSession session = request.getSession(false);
+		
+		session.removeAttribute("entradas");
+		session.removeAttribute("vigencias");
+		session.removeAttribute("servicios");
+		session.removeAttribute("cliente");
+		session.removeAttribute("plantaSelect");
+		session.removeAttribute("factura");
+		session.removeAttribute("fechaEmision");
+		session.removeAttribute("iva");
+		session.removeAttribute("medioPago");
+		session.removeAttribute("metodoPago");
+		
+		/*HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
 		
 		response.addHeader("Pragma", "no-cache");
         response.addHeader("Cache-Control", "no-cache");

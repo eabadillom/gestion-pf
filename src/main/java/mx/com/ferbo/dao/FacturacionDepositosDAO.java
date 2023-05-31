@@ -9,13 +9,11 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
-import com.ctc.wstx.util.DataUtil;
-
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 	private static Logger log = Logger.getLogger(FacturacionDepositosDAO.class);
@@ -105,8 +103,16 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				cf.setFolioCliente(cdd.getFolioCliente());
 				cf.setVigenciaInicio(cdd.getFechaIngreso());
 				cf.setVigenciaFin(vigenciaFin);
-				
+				//FALTA RELACION DE POR CAD CONSTANCIA DE DEPOSITO AGREGAR LAS CONSTANCIAS FACTURAS CDD.SETLISTAFACTURAS
 				listaConstanciaFactura.add(cf);
+				cdd.setConstanciaFacturaList(new ArrayList<>());
+				cdd.setConstanciaFacturaList(listaConstanciaFactura);
+				
+				List<Partida> allPartida = cdd.getPartidaList();
+				
+				System.out.println(allPartida.size());
+				
+				
 			}
 			
 			

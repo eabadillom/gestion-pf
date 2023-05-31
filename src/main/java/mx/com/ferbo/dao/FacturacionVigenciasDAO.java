@@ -210,6 +210,9 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					
 				}
 				
+				constancia.setConstanciaFacturaList(new ArrayList<>());
+				constancia.setConstanciaFacturaList(list);
+				
 			}
 			
 		} catch(Exception ex) {

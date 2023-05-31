@@ -106,8 +106,10 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 				cf.setConstanciaDeServicio(constancia);
 				cf.setFolioCliente(constancia.getFolioCliente());
 				
-				
+				// FALTA RELACION DE CONSTANCIA FACTURA DS CON LA CONSTANCIA DE SERVICIO constancia.setConstanciaFacturaDsList(null);
 				list.add(cf);
+				constancia.setConstanciaFacturaDsList(new ArrayList<>());
+				constancia.setConstanciaFacturaDsList(list);
 				//modificacion
 				for(ConstanciaServicioDetalle csd: allConstanciaServicioDetalle) {
 					List<PrecioServicio> allPrecioServicio = csd.getServicioCve().getPrecioServicioList();

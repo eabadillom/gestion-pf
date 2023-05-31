@@ -24,7 +24,60 @@
 					<div class="card">
 
 						<p:button value="Atras"
-							outcome="/protected/catalogos/facturacionConstancias"></p:button>
+							outcome="/protected/catalogos/facturacionConstancias"
+							icon="pi pi-arrow-circle-left"></p:button>
+						<div style="margin-top: 10px">
+							<p:fieldset legend="Datos De Receptor (Cliente)">
+								
+								<div style="text-align: center;">
+									<p:outputLabel value="Cliente:" style="p-mr-2" ></p:outputLabel>
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteNombre}" /></b>
+								</div>
+								
+								<div style="text-align: center;margin-top: 4px">
+									<p:outputLabel value="Numero:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.numeroCte}" styleClass="p-ml-2 p-mr-6"/></b>
+	
+									<p:outputLabel value="Razon Social:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteNombre}" styleClass="p-ml-2 p-mr-6"/></b>
+	
+									<p:outputLabel value="RFC:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteRfc}" styleClass="p-ml-2 p-mr-6" /></b>
+	
+									<p:outputLabel value="Domicilio"></p:outputLabel>
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioCalle}" styleClass="p-ml-2 p-mr-6"/></b>
+								</div>
+							</p:fieldset>
+						</div>
+
+						<div style="margin-top: 10px">
+							<p:fieldset legend="Datos De Emisor">
+								<div style="text-align: center;">
+									<p:outputLabel value="Planta:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.plantaSelect.plantaDs}" styleClass="p-ml-2 p-mr-6"/></b>
+	
+									<p:outputLabel value="Razo Social:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" styleClass="p-ml-2 p-mr-6"/></b>
+	
+									<p:outputLabel value="RFC:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.plantaSelect.idEmisoresCFDIS.nb_rfc}" styleClass="p-ml-2 p-mr-6"/></b>
+	
+									<p:outputLabel value="Factura:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.serieFacturaSelect.nomSerie} - #{calculoPrevioBean.serieFacturaSelect.numeroActual + 1}" styleClass="p-ml2- pmr-6"/></b>
+								</div>
+							</p:fieldset>
+						</div>
+
+
 
 						<p:dataTable id="dt-selectedEntradas"
 							value="#{calculoPrevioBean.listaEntradas}" var="entrada"
@@ -79,10 +132,11 @@
 										<h:outputText value="#{servicioConstancia.costo}" />
 									</p:column>
 
-									<p:column headerText="">
+									<p:column headerText="Acción">
 										<p:commandButton value="Eliminar"
 											action="#{calculoPrevioBean.eliminarServicioEntrada()}"
-											update="form:dt-selectedEntradas form:subTotalGeneral form:iva form:total form:montoLetra">
+											update="form:dt-selectedEntradas form:subTotalGeneral form:iva form:total form:montoLetra"
+											icon="pi pi-times" styleClass="ui-button-danger">
 											<f:setPropertyActionListener value="#{servicioConstancia}"
 												target="#{calculoPrevioBean.selectServicioE}"></f:setPropertyActionListener>
 										</p:commandButton>
@@ -152,10 +206,11 @@
 										<h:outputText value="#{servicioConstancia.costo}" />
 									</p:column>
 
-									<p:column>
+									<p:column headerText="Acción">
 										<p:commandButton value="Eliminar"
 											action="#{calculoPrevioBean.eliminarServicioVigencia()}"
-											update="form:dt-selectVigencias form:subTotalGeneral form:iva form:total form:montoLetra">
+											update="form:dt-selectVigencias form:subTotalGeneral form:iva form:total form:montoLetra"
+											icon="pi pi-times" styleClass="ui-button-danger">
 											<f:setPropertyActionListener value="#{servicioConstancia}"
 												target="#{calculoPrevioBean.selectServicioV}"></f:setPropertyActionListener>
 										</p:commandButton>
@@ -223,10 +278,11 @@
 										<h:outputText value="#{servicioConstancia.costo}" />
 									</p:column>
 
-									<p:column>
+									<p:column headerText="Acción">
 										<p:commandButton value="Eliminar"
 											action="#{calculoPrevioBean.eliminarServicioDs()}"
-											update="form:dt-constanciaFacturaDs form:subTotalGeneral form:iva form:total form:montoLetra">
+											update="form:dt-constanciaFacturaDs form:subTotalGeneral form:iva form:total form:montoLetra"
+											icon="pi pi-times" styleClass="ui-button-danger">
 											<f:setPropertyActionListener value="#{servicioConstancia}"
 												target="#{calculoPrevioBean.selectServicioDs}"></f:setPropertyActionListener>
 										</p:commandButton>
@@ -247,6 +303,18 @@
 
 						<p:fieldset legend="Totales" styleClass="p-mt-2">
 
+							<div>
+								<p:outputLabel value="Metodo de Pago:" styleClass="p-mr-2" />
+								<b><p:outputLabel
+										value="#{calculoPrevioBean.metodoPago.cdMetodoPago} - #{calculoPrevioBean.metodoPago.nbMetodoPago}" /></b>
+							</div>
+
+							<div>
+								<p:outputLabel value="Forma de Pago:" styleClass="p-mr-2" />
+								<b><p:outputLabel
+										value="#{calculoPrevioBean.medioPago.formaPago} - #{calculoPrevioBean.medioPago.mpDescripcion}" /></b>
+							</div>
+
 							<div style="text-align: right">
 								<p:outputLabel>Subtotal:</p:outputLabel>
 								<b><h:outputText id="subTotalGeneral"
@@ -261,12 +329,14 @@
 
 							<div style="float: left;">
 								<p:outputLabel>Monto en letra:</p:outputLabel>
-								<b><h:outputText id="montoLetra" value="#{calculoPrevioBean.montoLetra}"></h:outputText></b>
+								<b><h:outputText id="montoLetra"
+										value="#{calculoPrevioBean.montoLetra}"></h:outputText></b>
 							</div>
 
 							<div style="text-align: right">
 								<p:outputLabel>Total:</p:outputLabel>
-								<b><h:outputText id="total" value="#{calculoPrevioBean.total}" /></b>
+								<b><h:outputText id="total"
+										value="#{calculoPrevioBean.total}" /></b>
 							</div>
 
 						</p:fieldset>

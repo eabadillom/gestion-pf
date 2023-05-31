@@ -188,7 +188,10 @@ public class FacturacionConstanciasBean implements Serializable{
 		session.removeAttribute("cliente");
 		session.removeAttribute("plantaSelect");
 		session.removeAttribute("factura");
-		session.removeAttribute("fechaEmision");*/
+		session.removeAttribute("fechaEmision");
+		session.removeAttribute("iva");
+		session.removeAttribute("medioPago");
+		session.removeAttribute("metodoPago");*/
 		
 		//iva = parametroDAO.buscarPorNombre("IVA");
 		//retencion = parametroDAO.buscarPorNombre("RETENCION");
@@ -685,7 +688,10 @@ public class FacturacionConstanciasBean implements Serializable{
 			session.setAttribute("factura", factura);
 			session.setAttribute("fechaEmision", fechaCorte);
 			session.setAttribute("iva", iva);
-			
+			session.setAttribute("medioPago", medioPagoSelect);
+			session.setAttribute("metodoPago", metodoPagoSelect);
+			session.setAttribute("domicilioSelect",domicilioSelect);
+			session.setAttribute("serieFacturaSelect",serieFacturaSelect);
 			
 		}catch(Exception e) {
 			System.out.println("ERROR:" + e.getMessage());
