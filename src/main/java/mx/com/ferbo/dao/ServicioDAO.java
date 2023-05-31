@@ -5,16 +5,28 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
+	Logger log = Logger.getLogger(ServicioDAO.class);
 	
 	@Override
 	public Servicio buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		Servicio servicio = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			servicio = em.find(Servicio.class, id);
+		} catch(Exception ex) {
+			log.error("Problema para obtener el servicio: " + id, ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return servicio;
 	}
 
 	@Override

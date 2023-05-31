@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
@@ -17,6 +18,7 @@ import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
+	private static Logger log = Logger.getLogger(ConstanciaDeDepositoDAO.class);
 
 	public EntityManager em = null;
 	
@@ -117,12 +119,12 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			em.getTransaction().begin();
 			em.persist(constanciaDeDeposito);
 			em.getTransaction().commit();
-			em.close();
 		}catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			e.printStackTrace();
-			e.getCause();
+			log.error("Problema al guardar la constancia de depósito...", e);
+			EntityManagerUtil.rollback(em);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		
 		return null;
@@ -141,13 +143,43 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	}
 
 	public List<ConstanciaDeDeposito> buscarPorFolioCliente(ConstanciaDeDeposito cons) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		List<ConstanciaDeDeposito> lstAux = new ArrayList<>();
-		lstAux = em.createNamedQuery("ConstanciaDeDeposito.findByFolioCliente",ConstanciaDeDeposito.class)
-				.setParameter("folioCliente",cons.getFolioCliente())
-				.getResultList();	
-		System.out.println(lstAux);
+		List<ConstanciaDeDeposito> lstAux = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			
+			lstAux = em.createNamedQuery("ConstanciaDeDeposito.findByFolioCliente",ConstanciaDeDeposito.class)
+					.setParameter("folioCliente",cons.getFolioCliente())
+					.getResultList();
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la constancia de depósito...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+			
 		return lstAux;
+	}
+	
+	public ConstanciaDeDeposito buscarPorFolioCliente(String folio) {
+		ConstanciaDeDeposito constancia = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			
+			constancia = em.createNamedQuery("ConstanciaDeDeposito.findByFolioCliente",ConstanciaDeDeposito.class)
+					.setParameter("folioCliente", folio)
+					.getSingleResult();
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la constancia de depósito...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+			
+		return constancia;
 	}
 
 	@Override

@@ -7,7 +7,9 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,7 +18,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -42,7 +43,7 @@ import javax.validation.constraints.NotNull;
         @NamedQuery(name = "Partida.findByRendimiento", query = "SELECT p FROM Partida p WHERE p.rendimiento = :rendimiento"),
         @NamedQuery(name = "Partida.findByNoTarimas", query = "SELECT p FROM Partida p WHERE p.noTarimas = :noTarimas"),
         @NamedQuery(name = "Partida.findByConstanciaDeDeposito", query = "SELECT p FROM Partida p WHERE p.folio.folioCliente = :folioCliente") })
-public class Partida implements Serializable {
+public class Partida implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -87,6 +88,20 @@ public class Partida implements Serializable {
     @JoinColumn(name = "UNIDAD_DE_PRODUCTO_CVE", referencedColumnName = "UNIDAD_DE_PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private UnidadDeProducto unidadDeProductoCve;
+    
+    public Partida clone() throws CloneNotSupportedException{  
+    	return (Partida) super.clone();  
+	} 
+    
+    public void add(DetallePartida detalle) {
+    	if(this.detallePartidaList == null)
+    		this.detallePartidaList = new ArrayList<DetallePartida>();
+    	
+    	if(detalle.getDetallePartidaPK() == null)
+    		detalle.setDetallePartidaPK(new DetallePartidaPK(detallePartidaList.size(), this));
+    	
+    	this.detallePartidaList.add(detalle);
+    }
 
     public void setUnidadDeProductoCve(UnidadDeProducto unidadDeProductoCve) {
         this.unidadDeProductoCve = unidadDeProductoCve;

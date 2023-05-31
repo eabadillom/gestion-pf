@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Embeddable
-public class DetallePartidaPK implements Serializable {
+public class DetallePartidaPK implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = -7593443111857351832L;
 	

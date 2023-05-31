@@ -15,8 +15,19 @@ public class UnidadDeManejoDAO extends IBaseDAO<UnidadDeManejo, Integer> {
 
 	@Override
 	public UnidadDeManejo buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		UnidadDeManejo unidad = null;;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			unidad = em.find(UnidadDeManejo.class, id);
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la unidad de manejo...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return unidad;
 	}
 
 	@Override
