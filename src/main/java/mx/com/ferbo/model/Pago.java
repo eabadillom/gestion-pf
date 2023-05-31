@@ -62,9 +62,10 @@ public class Pago implements Serializable {
     @Size(max = 20)
     @Column(name = "referencia")
     private String referencia;
+    //El campo cheque se va a mostrar como "referencia" en la pantalla de usuario.
     @Size(max = 10)
     @Column(name = "cheque")
-    private String cheque;
+    private String cheque; 
     @Column(name = "cheque_devuelto")
     private Boolean chequeDevuelto;
     @JoinColumn(name = "banco", referencedColumnName = "id")

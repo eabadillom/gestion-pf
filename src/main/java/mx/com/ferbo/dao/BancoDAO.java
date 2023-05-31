@@ -8,20 +8,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.apache.log4j.Logger;
 
 //import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Bancos;
+import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class BancoDAO extends IBaseDAO<Bancos, Integer> {
-
+	private static Logger log = Logger.getLogger(BancoDAO.class);
+	
+	@SuppressWarnings("unchecked")
+	public List<Bancos> findall() {
+		EntityManager entity = EntityManagerUtil.getEntityManager();
+		List<Bancos> b = null;
+		Query sql = entity.createNamedQuery("Bancos.findAll", Bancos.class);
+		b = sql.getResultList();
+		return b;
+	}	 
 	@Override
 	public Bancos buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		Bancos bc = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			bc = em.find(Bancos.class, id);
+			
+		}catch(Exception e) {
+			log.error("Error al buscar banco...",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return bc;
 	}
 
 	@Override
