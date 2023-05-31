@@ -46,6 +46,8 @@ import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.FacturaMedioPago;
+import mx.com.ferbo.model.FacturaMedioPagoPK;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
@@ -111,6 +113,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private Date fechaCorte;
 	
 	private String moneda, observacion;
+	private String referencia;
 	private int plazoSelect;
 	private BigDecimal resIva;
 	private BigDecimal resRetencion, valorDeclarado;
@@ -179,13 +182,13 @@ public class FacturacionConstanciasBean implements Serializable{
         request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         session = request.getSession(false);
 		
-		session.removeAttribute("entradas");
+		/*session.removeAttribute("entradas");
 		session.removeAttribute("vigencias");
 		session.removeAttribute("servicios");
 		session.removeAttribute("cliente");
 		session.removeAttribute("plantaSelect");
 		session.removeAttribute("factura");
-		session.removeAttribute("fechaEmision");
+		session.removeAttribute("fechaEmision");*/
 		
 		//iva = parametroDAO.buscarPorNombre("IVA");
 		//retencion = parametroDAO.buscarPorNombre("RETENCION");
@@ -427,7 +430,17 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.valorDeclarado = valorDeclarado;
 	}
 
+	public String getReferencia() {
+		return referencia;
+	}
+
+	public void setReferencia(String referencia) {
+		this.referencia = referencia;
+	}
+
 	public void domicilioAvisoPorCliente() {
+		
+		clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), false);
 		
 		iva = parametroDAO.buscarPorNombre("IVA");//
 		resIva = new BigDecimal(iva.getValor()); 
@@ -587,7 +600,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 	
 	public String inyeccionBean(){
-		
+		clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 		factura = new Factura();
 		
 		factura.setCliente(clienteSelect);
@@ -626,7 +639,21 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setInicioServicios(fechaCorte);
 		factura.setFinServicios(fechaCorte);
 		factura.setMontoLetra(null);//duda*
-		
+		//verificar- ------------
+		factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
+		FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();
+		facturaPK.setFacturaId(factura);
+		facturaPK.setFmpId(0);
+		FacturaMedioPago fmp = new FacturaMedioPago();
+		fmp.setFacturaMedioPagoPK(facturaPK);
+		MedioPago medioP = medioPagoDAO.buscarPorFormaPago(medioPagoSelect.getFormaPago());
+		fmp.setMpId(medioP);
+		fmp.setFactura(factura);
+		fmp.setFmpPorcentaje(100);
+		fmp.setMpDescripcion(medioP.getMpDescripcion());
+		fmp.setFmpReferencia(referencia);
+		factura.getFacturaMedioPagoList().add(fmp);
+		//---------------------
 		StatusFactura statusF = statusFacturaDAO.buscarPorId(1);
 		
 		factura.setStatus(statusF);//duda*			
@@ -641,7 +668,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setMetodoPago(metodoPagoSelect.getCdMetodoPago());
 		factura.setTipoPersona(clienteSelect.getTipoPersona());
 		factura.setCdRegimen(clienteSelect.getRegimenFiscal().getCd_regimen());
-		factura.setCdUsoCfdi(clienteSelect.getUsoCfdi().getUsoCfdi());
+		factura.setCdUsoCfdi(clienteSelect.getUsoCfdi().getCdUsoCfdi());
 		factura.setUuid(null);//se coloca al timbrar
 		factura.setEmisorNombre(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
 		factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
@@ -650,7 +677,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		try {
 			
-            
 			session.setAttribute("entradas", selectedEntradas);
 			session.setAttribute("vigencias",selectedVigencias);
 			session.setAttribute("servicios", selectedServicios);
@@ -658,6 +684,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			session.setAttribute("plantaSelect", plantaSelect);
 			session.setAttribute("factura", factura);
 			session.setAttribute("fechaEmision", fechaCorte);
+			session.setAttribute("iva", iva);
 			
 			
 		}catch(Exception e) {

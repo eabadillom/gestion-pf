@@ -27,6 +27,7 @@ import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
@@ -36,6 +37,7 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.ServicioConstancia;
 import mx.com.ferbo.model.ServicioConstanciaDs;
 import mx.com.ferbo.model.TipoCobro;
+import mx.com.ferbo.util.FormatUtil;
 
 @Named
 @ViewScoped
@@ -62,6 +64,7 @@ public class CalculoPrevioBean implements Serializable {
 	private ServicioConstancia selectServicioE;
 	private ServicioConstancia selectServicioV;
 	private ServicioConstanciaDs selectServicioDs;
+	private Parametro iva;
 
 	private Date fechaEmision;
 	private BigDecimal cantidad;
@@ -69,6 +72,9 @@ public class CalculoPrevioBean implements Serializable {
 	private BigDecimal subTotalVigencias;
 	private BigDecimal subTotalServicios;
 	private BigDecimal subTotalGeneral;
+	private BigDecimal ivaTotal;
+	private BigDecimal total;
+	private String montoLetra;
 
 	public CalculoPrevioBean() {
 
@@ -96,6 +102,8 @@ public class CalculoPrevioBean implements Serializable {
 		subTotalEntrada = new BigDecimal(0);
 		subTotalVigencias = new BigDecimal(0);
 		subTotalGeneral = new BigDecimal(0);
+		ivaTotal = new BigDecimal(0);
+		total = new BigDecimal(0);
 
 		try {
 			context = FacesContext.getCurrentInstance();
@@ -107,6 +115,7 @@ public class CalculoPrevioBean implements Serializable {
 			plantaSelect = (Planta) request.getSession(false).getAttribute("plantaSelect");
 			factura = (Factura) request.getSession(false).getAttribute("factura");
 			fechaEmision = (Date) request.getSession(false).getAttribute("fechaEmision");
+			iva = (Parametro) request.getSession(false).getAttribute("iva"); 
 
 			if (listaEntradas.isEmpty()) {
 				listaEntradas = new ArrayList<>();
@@ -127,7 +136,8 @@ public class CalculoPrevioBean implements Serializable {
 
 		} catch (Exception e) {
 
-			System.out.println("ERROR Aqui" + e.getMessage());
+			System.out.println("ERROR Aqui" + e.getLocalizedMessage());
+			System.out.println("ERROR Aqui" + e.getCause());
 		}
 
 	}
@@ -267,8 +277,30 @@ public class CalculoPrevioBean implements Serializable {
 	public void setSubTotalGeneral(BigDecimal subTotalGeneral) {
 		this.subTotalGeneral = subTotalGeneral;
 	}
-	
-	// SERVICIOS (CONSTANCIA DE SERVICIOS)
+
+	public BigDecimal getIvaTotal() {
+		return ivaTotal;
+	}
+
+	public void setIvaTotal(BigDecimal ivaTotal) {
+		this.ivaTotal = ivaTotal;
+	}
+
+	public BigDecimal getTotal() {
+		return total;
+	}
+
+	public void setTotal(BigDecimal total) {
+		this.total = total;
+	}
+
+	public String getMontoLetra() {
+		return montoLetra;
+	}
+
+	public void setMontoLetra(String montoLetra) {
+		this.montoLetra = montoLetra;
+	}
 
 	public void procesarServicios() {
 
@@ -390,7 +422,7 @@ public class CalculoPrevioBean implements Serializable {
 
 					cantidad = cs.getServicioCantidad();
 					importe = cantidad.multiply(precioServicio.getPrecio());
-					sc.setCosto(importe);
+					sc.setCosto(importe.setScale(2));
 					sc.setUnidadMedida("SRV");
 					System.out.println("El tipo cobro es 1 o 2 y su importe es: " + importe);
 					break;
@@ -401,7 +433,7 @@ public class CalculoPrevioBean implements Serializable {
 					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
 
 					importe = cantidad.multiply(precioServicio.getPrecio());
-					sc.setCosto(importe);
+					sc.setCosto(importe.setScale(2));
 					System.out.println("El tipo de cobro es 3 o 4 y su importe es entradas: " + importe);
 
 					if (aviso.getAvisoTpFacturacion().equals("T")) {
@@ -420,8 +452,8 @@ public class CalculoPrevioBean implements Serializable {
 
 				sc.setId(id);
 				sc.setConstancia(cf);
-				sc.setTarifa(precioServicio.getPrecio());
-				sc.setBaseCargo(cantidad);
+				sc.setTarifa(precioServicio.getPrecio().setScale(2));
+				sc.setBaseCargo(cantidad.setScale(2));
 				sc.setDescripcion(cs.getServicioCve().getServicioDs());
 				sc.setPlantaCve(plantaSelect.getPlantaCve());
 				sc.setPlantaDs(plantaSelect.getPlantaDs());
@@ -511,7 +543,7 @@ public class CalculoPrevioBean implements Serializable {
 
 					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
 					importe = cantidad.multiply(precioServicio.getPrecio());
-					sc.setCosto(importe);
+					sc.setCosto(importe.setScale(2));
 					System.out.println("El tipo de cobro es 3 o 4 y su importe es: " + importe);
 
 					if (aviso.getAvisoTpFacturacion().equals("T")) {
@@ -529,8 +561,10 @@ public class CalculoPrevioBean implements Serializable {
 				}
 
 				sc.setConstancia(cf);
-				sc.setTarifa(precioServicio.getPrecio());
-				sc.setBaseCargo(cantidad);
+				sc.setTarifa(precioServicio.getPrecio().setScale(2));
+				if(cantidad!=null) {
+					sc.setBaseCargo(cantidad.setScale(2));
+				}
 				sc.setDescripcion(cs.getServicioCve().getServicioDs());
 				sc.setPlantaCve(plantaSelect.getPlantaCve());
 				sc.setPlantaDs(plantaSelect.getPlantaDs());
@@ -709,8 +743,15 @@ public class CalculoPrevioBean implements Serializable {
 	
 	public void sumaGeneral() {
 		
-		subTotalGeneral = subTotalEntrada.add(subTotalServicios.add(subTotalVigencias)).setScale(2);
+		subTotalGeneral = subTotalEntrada.add(subTotalServicios.add(subTotalVigencias)).setScale(2,BigDecimal.ROUND_HALF_UP);
 		
+		ivaTotal = subTotalGeneral.multiply(new BigDecimal(iva.getValor())).setScale(2, BigDecimal.ROUND_HALF_UP);
+		
+		total = subTotalGeneral.add(ivaTotal).setScale(2,BigDecimal.ROUND_HALF_UP);
+		
+		FormatUtil formato = new FormatUtil();
+		
+		montoLetra = formato.getMontoConLetra(total.doubleValue());
 	}
 	
 	/*public void cerrarSesion() {

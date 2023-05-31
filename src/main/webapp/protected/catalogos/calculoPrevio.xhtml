@@ -2,236 +2,280 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:p="http://primefaces.org/ui"
-	template="/WEB-INF/template.xhtml">
-	
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
 	<ui:define name="title">Calculo Previo</ui:define>
-	
+
 	<ui:define name="content">
-	
-	<h:form id="form">
-	
-	<p:breadCrumb>
-		<p:menuitem value="Home" outcome="/dashboard"/>
-		<p:menuitem value="Facturacion Constancias" outcome="facturacionConstancias"/>
-		<p:menuitem value="calculo Previo" outcome="calculoPrevio" />
-	</p:breadCrumb>
-	
-	<p:growl id="messages" showDetail="true" life="4000"></p:growl>
-	
-		<div class="p-grid crud-demo">
+
+		<h:form id="form">
+
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Facturacion Constancias"
+					outcome="facturacionConstancias" />
+				<p:menuitem value="calculo Previo" outcome="calculoPrevio" />
+			</p:breadCrumb>
+
+			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
+
+			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-					
-					<p:button value="Atras" outcome="/protected/catalogos/facturacionConstancias" ></p:button>
-										
-					<p:dataTable id="dt-selectedEntradas" value="#{calculoPrevioBean.listaEntradas}" var="entrada" 
-					rowKey="#{entrada.folio.folio}" rows="5" reflow="true" paginator="true" paginatorPosition="bottom">
-					
-					<f:facet name="header">
-						<div>
-							<span>Constancias De Entrada</span>
-						</div>
-					</f:facet>
-					
-					<p:column exportable="false" width="3%">
-						<p:rowToggler  />
-					</p:column>
-					
-					<p:column headerText="Folio Cliente">
-						<h:outputText value="#{entrada.folio.folioCliente}" />
-					</p:column>
-					
-					<p:column headerText="Fecha Ingreso">
-						<h:outputText value="#{entrada.folio.fechaIngreso}">
-							<f:convertDateTime pattern="dd/MMM/YYYY" />
-						</h:outputText>
-					</p:column>
-					
-					<p:column headerText="Vigencia Fin">
-						<h:outputText value="#{entrada.vigenciaFin}" >
-							<f:convertDateTime pattern="dd/MMM/YYYY" />
-						</h:outputText>
-					</p:column>
-					
-					<p:rowExpansion>
-						<p:dataTable id="dt-serviciosEntrada" value="#{entrada.servicioConstanciaList}" var="servicioConstancia" >
-								
-								<p:column headerText="Servicio">
-									<h:outputText value="#{servicioConstancia.descripcion}" />
-								</p:column>															
-								
-								<p:column headerText="Cantidad">
-									<h:outputText value="#{servicioConstancia.baseCargo}" />
-								
-								</p:column>
-								
-								<p:column headerText="Precio Unitario" >
-									<h:outputText value="#{servicioConstancia.tarifa}" />
-								</p:column>
-								
-								<p:column headerText="Importe" >
-									<h:outputText value="#{servicioConstancia.costo}" />
-								</p:column>
-								
-								<p:column headerText="">
-									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioEntrada()}" update="form:dt-selectedEntradas form:subTotalGeneral">
-										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{calculoPrevioBean.selectServicioE}"></f:setPropertyActionListener>
-									</p:commandButton>
-								</p:column>
-						
+
+						<p:button value="Atras"
+							outcome="/protected/catalogos/facturacionConstancias"></p:button>
+
+						<p:dataTable id="dt-selectedEntradas"
+							value="#{calculoPrevioBean.listaEntradas}" var="entrada"
+							rowKey="#{entrada.folio.folio}" rows="5" reflow="true"
+							paginator="true" paginatorPosition="bottom">
+
+							<f:facet name="header">
+								<div>
+									<span>Constancias De Entrada</span>
+								</div>
+							</f:facet>
+
+							<p:column exportable="false" width="3%">
+								<p:rowToggler />
+							</p:column>
+
+							<p:column headerText="Folio Cliente">
+								<h:outputText value="#{entrada.folio.folioCliente}" />
+							</p:column>
+
+							<p:column headerText="Fecha Ingreso">
+								<h:outputText value="#{entrada.folio.fechaIngreso}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Vigencia Fin">
+								<h:outputText value="#{entrada.vigenciaFin}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:rowExpansion>
+								<p:dataTable id="dt-serviciosEntrada"
+									value="#{entrada.servicioConstanciaList}"
+									var="servicioConstancia">
+
+									<p:column headerText="Servicio">
+										<h:outputText value="#{servicioConstancia.descripcion}" />
+									</p:column>
+
+									<p:column headerText="Cantidad">
+										<h:outputText value="#{servicioConstancia.baseCargo}" />
+
+									</p:column>
+
+									<p:column headerText="Precio Unitario">
+										<h:outputText value="#{servicioConstancia.tarifa}" />
+									</p:column>
+
+									<p:column headerText="Importe">
+										<h:outputText value="#{servicioConstancia.costo}" />
+									</p:column>
+
+									<p:column headerText="">
+										<p:commandButton value="Eliminar"
+											action="#{calculoPrevioBean.eliminarServicioEntrada()}"
+											update="form:dt-selectedEntradas form:subTotalGeneral form:iva form:total form:montoLetra">
+											<f:setPropertyActionListener value="#{servicioConstancia}"
+												target="#{calculoPrevioBean.selectServicioE}"></f:setPropertyActionListener>
+										</p:commandButton>
+									</p:column>
+
+								</p:dataTable>
+
+							</p:rowExpansion>
+
+							<f:facet name="footer">
+								<span> Subtotal Entradas: <h:outputText
+										value="#{calculoPrevioBean.subTotalEntrada}"></h:outputText>
+								</span>
+							</f:facet>
+
 						</p:dataTable>
-					
-					</p:rowExpansion>
-					
-					<f:facet name="footer">
-						<span>
-							SubTotal: <h:outputText value="#{calculoPrevioBean.subTotalEntrada}"></h:outputText>
-						</span>
-					</f:facet>
-					
-					</p:dataTable>
-					
-					<p:dataTable id="dt-selectVigencias" value="#{calculoPrevioBean.listaVigencias}" var="vigencia" rowKey="#{vigencia.folio.folio}" 
-								rows="5" reflow="true" paginator="true" paginatorPosition="bottom">
-					
-					<f:facet name="header">
-						<div>
-							<span>Constancias De Vigencias</span>
-						</div>
-					</f:facet>
-					
-					<p:column exportable="true" width="3%">
-						<p:rowToggler/>
-					</p:column>
-					
-					<p:column headerText="Folio Cliente">
-						<h:outputText value="#{vigencia.folioCliente}" />
-					</p:column>
-					
-					<p:column headerText="Vigencia Inicio">
-						<h:outputText value="#{vigencia.vigenciaInicio}" >
-							<f:convertDateTime pattern="dd/MMM/YYYY" />
-						</h:outputText>
-					</p:column>					
-					
-					<p:column headerText="Vigencia Fin">
-						<h:outputText value="#{vigencia.vigenciaFin}">
-						<f:convertDateTime pattern="dd/MMM/YYYY" />
-						</h:outputText>
-					</p:column>
-					
-					<p:rowExpansion>
-						<p:dataTable id="dt-serviciosVigencia" value="#{vigencia.servicioConstanciaList}" var="servicioConstancia" >
-								
-								<p:column headerText="Servicio">
-									<h:outputText value="#{servicioConstancia.descripcion}" />
-								</p:column>															
-								
-								<p:column headerText="Cantidad">
-									<h:outputText value="#{servicioConstancia.baseCargo}" />
-								</p:column>
-								
-								<p:column headerText="Precio Unitario" >
-									<h:outputText value="#{servicioConstancia.tarifa}" />
-								</p:column>
-								
-								<p:column headerText="Importe" >
-									<h:outputText value="#{servicioConstancia.costo}" />
-								</p:column>
-								
-								<p:column>
-									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioVigencia()}" update="form:dt-selectVigencias form:subTotalGeneral">
-										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{calculoPrevioBean.selectServicioV}"></f:setPropertyActionListener>
-									</p:commandButton>
-								</p:column>
-						
+
+						<p:dataTable id="dt-selectVigencias"
+							value="#{calculoPrevioBean.listaVigencias}" var="vigencia"
+							rowKey="#{vigencia.folio.folio}" rows="5" reflow="true"
+							paginator="true" paginatorPosition="bottom">
+
+							<f:facet name="header">
+								<div>
+									<span>Constancias De Vigencias</span>
+								</div>
+							</f:facet>
+
+							<p:column exportable="true" width="3%">
+								<p:rowToggler />
+							</p:column>
+
+							<p:column headerText="Folio Cliente">
+								<h:outputText value="#{vigencia.folioCliente}" />
+							</p:column>
+
+							<p:column headerText="Vigencia Inicio">
+								<h:outputText value="#{vigencia.vigenciaInicio}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Vigencia Fin">
+								<h:outputText value="#{vigencia.vigenciaFin}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:rowExpansion>
+								<p:dataTable id="dt-serviciosVigencia"
+									value="#{vigencia.servicioConstanciaList}"
+									var="servicioConstancia">
+
+									<p:column headerText="Servicio">
+										<h:outputText value="#{servicioConstancia.descripcion}" />
+									</p:column>
+
+									<p:column headerText="Cantidad">
+										<h:outputText value="#{servicioConstancia.baseCargo}" />
+									</p:column>
+
+									<p:column headerText="Precio Unitario">
+										<h:outputText value="#{servicioConstancia.tarifa}" />
+									</p:column>
+
+									<p:column headerText="Importe">
+										<h:outputText value="#{servicioConstancia.costo}" />
+									</p:column>
+
+									<p:column>
+										<p:commandButton value="Eliminar"
+											action="#{calculoPrevioBean.eliminarServicioVigencia()}"
+											update="form:dt-selectVigencias form:subTotalGeneral form:iva form:total form:montoLetra">
+											<f:setPropertyActionListener value="#{servicioConstancia}"
+												target="#{calculoPrevioBean.selectServicioV}"></f:setPropertyActionListener>
+										</p:commandButton>
+									</p:column>
+
+								</p:dataTable>
+
+							</p:rowExpansion>
+
+							<f:facet name="footer">
+								<span> Subtotal Vigencias:<h:outputText
+										value="#{calculoPrevioBean.subTotalVigencias}" />
+								</span>
+							</f:facet>
+
 						</p:dataTable>
-					
-					</p:rowExpansion>
-					
-					<f:facet name="footer">
-						<span>
-							SubTotal:<h:outputText value="#{calculoPrevioBean.subTotalVigencias}" />
-						</span>
-					</f:facet>
-					
-					</p:dataTable>
-																							
-					
-					<p:dataTable id="dt-constanciaFacturaDs" value="#{calculoPrevioBean.listaServicios}" var="constanciaFacturaDs"
-							rowKey="#{constanciaFacturaDs.constanciaDeServicio.folio}" reflow="true" rows="5" paginatorPosition="bottom" paginator="true">
-							
-					<f:facet name="header">
-						<div>
-							<span>Constancias De Servicios</span>	
-						</div>
-					</f:facet>									
-					
-					<p:column exportable="false" width="3%">
-						<p:rowToggler />
-					</p:column>
-					
-					<p:column headerText="Folio">
-						<h:outputText value="#{constanciaFacturaDs.constanciaDeServicio.folioCliente}" />
-					</p:column>
-					
-					<p:column headerText="Fecha de Emisión">
-						<h:outputText value="#{calculoPrevioBean.fechaEmision}">
-							<f:convertDateTime pattern="dd/MMM/YYYY" />
-						</h:outputText>
-					</p:column>
-					
-					<p:rowExpansion >
-						<p:dataTable id="dt-serviciosDs" value="#{constanciaFacturaDs.servicioConstanciaDsList}" var="servicioConstancia" rowIndexVar="row">
-								
-								<p:column headerText="Servicio">
-									<h:outputText value="#{servicioConstancia.descripcion}" />
-								</p:column>															
-								
-								<p:column headerText="Cantidad">
-									<h:outputText value="#{servicioConstancia.cantidad}"></h:outputText>
-								</p:column>
-								
-								<p:column headerText="Precio Unitario" >
-									<h:outputText value="#{servicioConstancia.tarifa}" />
-								</p:column>
-								
-								<p:column headerText="Importe" >
-									<h:outputText value="#{servicioConstancia.costo}" />
-								</p:column>
-								
-								<p:column>
-									<p:commandButton value="Eliminar" action="#{calculoPrevioBean.eliminarServicioDs()}" update="form:dt-constanciaFacturaDs form:subTotalGeneral">
-										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{calculoPrevioBean.selectServicioDs}"></f:setPropertyActionListener>		
-									</p:commandButton>
-								</p:column>
-								
+
+
+						<p:dataTable id="dt-constanciaFacturaDs"
+							value="#{calculoPrevioBean.listaServicios}"
+							var="constanciaFacturaDs"
+							rowKey="#{constanciaFacturaDs.constanciaDeServicio.folio}"
+							reflow="true" rows="5" paginatorPosition="bottom"
+							paginator="true">
+
+							<f:facet name="header">
+								<div>
+									<span>Constancias De Servicios</span>
+								</div>
+							</f:facet>
+
+							<p:column exportable="false" width="3%">
+								<p:rowToggler />
+							</p:column>
+
+							<p:column headerText="Folio">
+								<h:outputText
+									value="#{constanciaFacturaDs.constanciaDeServicio.folioCliente}" />
+							</p:column>
+
+							<p:column headerText="Fecha de Emisión">
+								<h:outputText value="#{calculoPrevioBean.fechaEmision}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:rowExpansion>
+								<p:dataTable id="dt-serviciosDs"
+									value="#{constanciaFacturaDs.servicioConstanciaDsList}"
+									var="servicioConstancia" rowIndexVar="row">
+
+									<p:column headerText="Servicio">
+										<h:outputText value="#{servicioConstancia.descripcion}" />
+									</p:column>
+
+									<p:column headerText="Cantidad">
+										<h:outputText value="#{servicioConstancia.cantidad}"></h:outputText>
+									</p:column>
+
+									<p:column headerText="Precio Unitario">
+										<h:outputText value="#{servicioConstancia.tarifa}" />
+									</p:column>
+
+									<p:column headerText="Importe">
+										<h:outputText value="#{servicioConstancia.costo}" />
+									</p:column>
+
+									<p:column>
+										<p:commandButton value="Eliminar"
+											action="#{calculoPrevioBean.eliminarServicioDs()}"
+											update="form:dt-constanciaFacturaDs form:subTotalGeneral form:iva form:total form:montoLetra">
+											<f:setPropertyActionListener value="#{servicioConstancia}"
+												target="#{calculoPrevioBean.selectServicioDs}"></f:setPropertyActionListener>
+										</p:commandButton>
+									</p:column>
+
+								</p:dataTable>
+
+							</p:rowExpansion>
+
+							<f:facet name="footer">
+								<span> Subtotal Servicios: <h:outputText
+										id="subServiciosDs"
+										value="#{calculoPrevioBean.subTotalServicios}" />
+								</span>
+							</f:facet>
+
 						</p:dataTable>
-					
-					</p:rowExpansion>
-					
-					<f:facet name="footer">
-						<span>
-							SubTotal: <h:outputText id="subServiciosDs" value="#{calculoPrevioBean.subTotalServicios}"/>
-						</span>
-					</f:facet>
-					
-					</p:dataTable>
-					
-					<p:panel styleClass="p-mt-4">
-					<p:outputLabel value="SubTotal General: ">
-					
-						<b><h:outputText id="subTotalGeneral" value="#{calculoPrevioBean.subTotalGeneral}"/></b>
-					
-					</p:outputLabel>
-					</p:panel>
-					
+
+						<p:fieldset legend="Totales" styleClass="p-mt-2">
+
+							<div style="text-align: right">
+								<p:outputLabel>Subtotal:</p:outputLabel>
+								<b><h:outputText id="subTotalGeneral"
+										value="#{calculoPrevioBean.subTotalGeneral}" /></b>
+							</div>
+
+							<div style="text-align: right">
+								<p:outputLabel>Iva:</p:outputLabel>
+								<b><h:outputText id="iva"
+										value="#{calculoPrevioBean.ivaTotal}" /></b>
+							</div>
+
+							<div style="float: left;">
+								<p:outputLabel>Monto en letra:</p:outputLabel>
+								<b><h:outputText id="montoLetra" value="#{calculoPrevioBean.montoLetra}"></h:outputText></b>
+							</div>
+
+							<div style="text-align: right">
+								<p:outputLabel>Total:</p:outputLabel>
+								<b><h:outputText id="total" value="#{calculoPrevioBean.total}" /></b>
+							</div>
+
+						</p:fieldset>
+
+					</div>
 				</div>
 			</div>
-		</div>
-	
-	</h:form>
-	
+
+		</h:form>
+
 	</ui:define>
 </ui:composition>

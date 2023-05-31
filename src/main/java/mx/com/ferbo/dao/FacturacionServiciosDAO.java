@@ -13,6 +13,8 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
+import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integer> {
@@ -87,6 +89,7 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 			listaConstancias = query.getResultList();
 			
 			for(ConstanciaDeServicio constancia : listaConstancias) {
+				List<ConstanciaServicioDetalle> allConstanciaServicioDetalle = constancia.getConstanciaServicioDetalleList();//recuperando constancias de servicio detalle de servicio ds
 				listaTmpConstancias = constancia.getConstanciaFacturaDsList();
 				lConstanciaFactura = listaTmpConstancias.stream()
 						.filter(c ->
@@ -105,6 +108,12 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 				
 				
 				list.add(cf);
+				//modificacion
+				for(ConstanciaServicioDetalle csd: allConstanciaServicioDetalle) {
+					List<PrecioServicio> allPrecioServicio = csd.getServicioCve().getPrecioServicioList();
+					System.out.println(allPrecioServicio.size());
+				}
+				
 			}
 			
 			

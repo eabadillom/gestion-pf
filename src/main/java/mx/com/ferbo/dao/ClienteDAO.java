@@ -15,7 +15,11 @@ import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.Telefono;
+import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
@@ -56,6 +60,9 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 				cliente.getCandadoSalida().getId();
 			
 			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
+			RegimenFiscal regimen = cliente.getRegimenFiscal();
+			log.info(cliente.getRegimenFiscal().getCd_regimen());
+			String usoCfdi = cliente.getUsoCfdi().getUsoCfdi();
 			
 			for(ClienteContacto clienteContacto : clienteContactoList) {
 				
