@@ -42,7 +42,8 @@
             <div class="p-grid ui-fluid">
     
 				<div class="p-field p-col-2 p-md-2" align="center">
-					<p:outputLabel for="@next" styleClass="block" value="Código" /><p:inputText value="#{inventario.codigo}" readonly="true" styleClass="block" />
+					<p:outputLabel for="@next" styleClass="block" value="Código" />
+					<p:inputText value="#{inventario.codigo}" readonly="true" styleClass="block" />
 				</div>
 				
 				<div class="p-field p-col-2 p-md-2" align="center">
@@ -142,8 +143,8 @@
 							<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaposicion}" var="posiciondestino" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
 							<p:ajax /></p:selectOneMenu>
 		                </div>
-	                </p:panel>
-            					</p:panelGrid>
+	              		  </p:panel>
+            			</p:panelGrid>
 		            </div>
 		        </div>
 			</div>
