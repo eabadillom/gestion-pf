@@ -46,7 +46,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "DetallePartida.findByDtpPedimento", query = "SELECT d FROM DetallePartida d WHERE d.dtpPedimento = :dtpPedimento"),
     @NamedQuery(name = "DetallePartida.findByDtpSAP", query = "SELECT d FROM DetallePartida d WHERE d.dtpSAP = :dtpSAP"),
     @NamedQuery(name = "DetallePartida.findByDtpTarimas", query = "SELECT d FROM DetallePartida d WHERE d.dtpTarimas = :dtpTarimas")})
-public class DetallePartida implements Serializable {
+public class DetallePartida implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
     
@@ -124,6 +124,10 @@ public class DetallePartida implements Serializable {
     @JoinColumn(name = "edo_inv_cve", referencedColumnName = "edo_inv_cve")
     @ManyToOne
     private EstadoInventario edoInvCve;
+    
+    public DetallePartida clone() throws CloneNotSupportedException {
+    	return (DetallePartida) super.clone();
+    }
 
     public DetallePartida() {
     }

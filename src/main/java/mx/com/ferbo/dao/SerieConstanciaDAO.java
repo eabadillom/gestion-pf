@@ -46,7 +46,20 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 
 	@Override
 	public String actualizar(SerieConstancia e) {
-		// TODO Auto-generated method stub
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(e);
+			em.getTransaction().commit();
+		} catch(Exception ex) {
+			log.error("Problema para actualizar la serie-constancia", ex);
+			EntityManagerUtil.rollback(em);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return null;
 	}
 

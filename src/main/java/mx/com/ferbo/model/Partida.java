@@ -43,7 +43,7 @@ import javax.validation.constraints.NotNull;
         @NamedQuery(name = "Partida.findByRendimiento", query = "SELECT p FROM Partida p WHERE p.rendimiento = :rendimiento"),
         @NamedQuery(name = "Partida.findByNoTarimas", query = "SELECT p FROM Partida p WHERE p.noTarimas = :noTarimas"),
         @NamedQuery(name = "Partida.findByConstanciaDeDeposito", query = "SELECT p FROM Partida p WHERE p.folio.folioCliente = :folioCliente") })
-public class Partida implements Serializable {
+public class Partida implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -88,6 +88,10 @@ public class Partida implements Serializable {
     @JoinColumn(name = "UNIDAD_DE_PRODUCTO_CVE", referencedColumnName = "UNIDAD_DE_PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private UnidadDeProducto unidadDeProductoCve;
+    
+    public Partida clone() throws CloneNotSupportedException{  
+    	return (Partida) super.clone();  
+	} 
     
     public void add(DetallePartida detalle) {
     	if(this.detallePartidaList == null)

@@ -122,14 +122,10 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 	public Planta buscarPorId(Integer id) {
 		Planta planta = null;
 		EntityManager em = null;
-		Query query = null;
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("Planta.findByPlantaCve", Planta.class)
-					.setParameter("plantaCve", id)
-					;
-			planta = (Planta) query.getSingleResult();
+			planta = em.find(Planta.class, id);
 		} catch(Exception ex) {
 			log.error("Problema para obtener la planta: " + id, ex);
 		} finally {

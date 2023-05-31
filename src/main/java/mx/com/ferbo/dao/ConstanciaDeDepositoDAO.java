@@ -119,12 +119,12 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			em.getTransaction().begin();
 			em.persist(constanciaDeDeposito);
 			em.getTransaction().commit();
-			em.close();
 		}catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			e.printStackTrace();
-			e.getCause();
+			log.error("Problema al guardar la constancia de depósito...", e);
+			EntityManagerUtil.rollback(em);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		
 		return null;

@@ -54,6 +54,33 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		return this.buscarPorCliente(e);
 	}
 	
+	public PrecioServicio buscar(Integer cteCve, Integer avisoCve, Integer servicioCve, boolean isFullInfo) {
+		PrecioServicio precio = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("PrecioServicio.findByClienteAvisoServicio", PrecioServicio.class);
+			precio = (PrecioServicio) query
+					.setParameter("cteCve", cteCve)
+					.setParameter("avisoCve", avisoCve)
+					.getSingleResult();
+			
+			if(isFullInfo == false)
+				return precio;
+			
+			precio.getServicio().getServicioCve();
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el precio-servicio...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return precio;
+	}
+	
 	public List<PrecioServicio> buscarPorAviso(Aviso aviso, Cliente cliente){
 		
 		List<PrecioServicio> listaPrecioServicio = new ArrayList<>();
@@ -188,7 +215,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			em.close();
+			EntityManagerUtil.close(em);
 		}
 		
 		return bean;
