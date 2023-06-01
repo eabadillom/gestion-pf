@@ -95,7 +95,7 @@ public class ConstanciaFactura implements Serializable {
     @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne
     private Factura factura;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "constancia")
+    @OneToMany(mappedBy = "constancia")//Modificado 1 junio
     private List<ServicioConstancia> servicioConstanciaList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaFactura")

@@ -29,6 +29,20 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public Domicilios buscarPorAsentamiento(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idCiudad, Integer idAsentamiento) {
+		Domicilios domicilio = null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		
+		domicilio = em.createNamedQuery("Domicilios.findByAsentamiento", Domicilios.class)
+				.setParameter("paisCve", idPais)
+				.setParameter("estadoCve", idEstado)
+				.setParameter("municipioCve", idMunicipio)
+				.setParameter("ciudadCve", idCiudad)
+				.setParameter("domicilioColonia", idAsentamiento).getSingleResult();
+		
+		return domicilio;
+	}
 
 	@Override
 	public String actualizar(Domicilios dom) {

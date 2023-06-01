@@ -8,6 +8,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -70,7 +71,7 @@ public class ServicioConstanciaDs implements Serializable {
     @Column(name = "cantidad")
     private BigDecimal cantidad;
     @JoinColumn(name = "CONSTANCIA", referencedColumnName = "ID")
-    @ManyToOne(optional = false)
+    @ManyToOne(cascade = CascadeType.ALL,optional = false)//modifica 1 junio
     private ConstanciaFacturaDs constancia;
 
     public ServicioConstanciaDs() {

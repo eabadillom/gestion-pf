@@ -57,7 +57,9 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Factura" + e.getMessage());
+			System.out.println("ERROR guardando Factura" + e.getStackTrace());
+			System.out.println("ERROR guardando Factura" + e.getLocalizedMessage());
+			
 			return "ERROR";
 		}
 		return null;

@@ -243,9 +243,9 @@ public class Factura implements Serializable {
     private List<ServicioFactura> servicioFacturaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
     private List<CancelaFactura> cancelaFacturaList;
-    @OneToMany(mappedBy = "factura")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "factura")//MODIFIQUE 1 JUNIO
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
-    @OneToMany(mappedBy = "factura")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "factura")//MODIFIQUE 1 JUNIO
     private List<ConstanciaFactura> constanciaFacturaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
     private List<ConstanciaFacturaCmp> constanciaFacturaCmpList;

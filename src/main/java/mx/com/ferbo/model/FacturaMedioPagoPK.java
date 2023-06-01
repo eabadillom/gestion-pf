@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
@@ -23,7 +24,7 @@ import javax.validation.constraints.NotNull;
 public class FacturaMedioPagoPK implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,cascade = CascadeType.ALL)//MODIFIQUE JUNIO 1
     @JoinColumn(name = "factura_id")
     private Factura facturaId;
 	

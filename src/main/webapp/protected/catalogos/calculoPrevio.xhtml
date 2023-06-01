@@ -26,57 +26,128 @@
 						<p:button value="Atras"
 							outcome="/protected/catalogos/facturacionConstancias"
 							icon="pi pi-arrow-circle-left"></p:button>
-						<div style="margin-top: 10px">
-							<p:fieldset legend="Datos De Receptor (Cliente)">
-								
-								<div style="text-align: center;">
-									<p:outputLabel value="Cliente:" style="p-mr-2" ></p:outputLabel>
-									<b><p:outputLabel
-											value="#{calculoPrevioBean.clienteSelect.cteNombre}" /></b>
-								</div>
-								
-								<div style="text-align: center;margin-top: 4px">
-									<p:outputLabel value="Numero:" />
-									<b><p:outputLabel
-											value="#{calculoPrevioBean.clienteSelect.numeroCte}" styleClass="p-ml-2 p-mr-6"/></b>
-	
-									<p:outputLabel value="Razon Social:" />
-									<b><p:outputLabel
-											value="#{calculoPrevioBean.clienteSelect.cteNombre}" styleClass="p-ml-2 p-mr-6"/></b>
-	
-									<p:outputLabel value="RFC:" />
-									<b><p:outputLabel
-											value="#{calculoPrevioBean.clienteSelect.cteRfc}" styleClass="p-ml-2 p-mr-6" /></b>
-	
-									<p:outputLabel value="Domicilio"></p:outputLabel>
-									<b><p:outputLabel
-											value="#{calculoPrevioBean.domicilioSelect.domicilioCalle}" styleClass="p-ml-2 p-mr-6"/></b>
-								</div>
-							</p:fieldset>
-						</div>
 
 						<div style="margin-top: 10px">
 							<p:fieldset legend="Datos De Emisor">
 								<div style="text-align: center;">
 									<p:outputLabel value="Planta:" />
 									<b><p:outputLabel
-											value="#{calculoPrevioBean.plantaSelect.plantaDs}" styleClass="p-ml-2 p-mr-6"/></b>
-	
+											value="#{calculoPrevioBean.plantaSelect.plantaDs}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
 									<p:outputLabel value="Razo Social:" />
 									<b><p:outputLabel
-											value="#{calculoPrevioBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" styleClass="p-ml-2 p-mr-6"/></b>
-	
+											value="#{calculoPrevioBean.plantaSelect.idEmisoresCFDIS.nb_emisor}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
 									<p:outputLabel value="RFC:" />
 									<b><p:outputLabel
-											value="#{calculoPrevioBean.plantaSelect.idEmisoresCFDIS.nb_rfc}" styleClass="p-ml-2 p-mr-6"/></b>
-	
+											value="#{calculoPrevioBean.plantaSelect.idEmisoresCFDIS.nb_rfc}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
 									<p:outputLabel value="Factura:" />
 									<b><p:outputLabel
-											value="#{calculoPrevioBean.serieFacturaSelect.nomSerie} - #{calculoPrevioBean.serieFacturaSelect.numeroActual + 1}" styleClass="p-ml2- pmr-6"/></b>
+											value="#{calculoPrevioBean.serieFacturaSelect.nomSerie} - #{calculoPrevioBean.serieFacturaSelect.numeroActual + 1}"
+											styleClass="p-ml2- pmr-6" /></b>
 								</div>
+
+								<div style="text-align: center; margin-top: 10px">
+
+									<p:outputLabel value="Domicilio:" styleClass="p-mr-4" />
+
+									<b> <p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.paisCved.paisDesc}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.ciudades.municipios.estados.estadoDesc}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.ciudades.municipios.municipioDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.ciudades.ciudadDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.asentamientoPlanta.asentamientoDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.domicilioCalle}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.domicilioCp}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.domicilioNumExt}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.domicilioNumInt}" />
+									</b>
+
+								</div>
+
 							</p:fieldset>
 						</div>
 
+						<div style="margin-top: 10px">
+							<p:fieldset legend="Datos De Receptor (Cliente)">
+
+								<div style="text-align: center;">
+									<p:outputLabel value="Cliente:" style="p-mr-2"></p:outputLabel>
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteNombre}" /></b>
+								</div>
+
+								<div style="text-align: center; margin-top: 4px">
+									<p:outputLabel value="Numero:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.numeroCte}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="Razon Social:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteNombre}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="RFC:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteRfc}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="Domicilio"></p:outputLabel>
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioCalle}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+								</div>
+
+								<div style="text-align: center; margin-top: 10px;">
+
+									<p:outputLabel value="Domicilio:" styleClass="p-mr-4" />
+
+									<b> <p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.paisCved.paisDesc}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.ciudades.municipios.estados.estadoDesc}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.ciudades.municipios.municipioDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.ciudades.ciudadDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.asentamientoCliente.asentamientoDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioCalle}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioCp}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioNumExt}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioNumInt}" />
+									</b>
+
+								</div>
+
+								<div style="text-align: center; margin-top: 10px;">
+
+									<p:outputLabel value="UsoCfdi:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.usoCfdi.cdUsoCfdi} - #{calculoPrevioBean.clienteSelect.usoCfdi.usoCfdi}"
+											styleClass="p-ml-2 p-mr-4" /></b>
+
+								</div>
+
+							</p:fieldset>
+						</div>
 
 
 						<p:dataTable id="dt-selectedEntradas"
@@ -148,7 +219,9 @@
 
 							<f:facet name="footer">
 								<span> Subtotal Entradas: <h:outputText
-										value="#{calculoPrevioBean.subTotalEntrada}"></h:outputText>
+										value="#{calculoPrevioBean.subTotalEntrada}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText>
 								</span>
 							</f:facet>
 
@@ -222,7 +295,9 @@
 
 							<f:facet name="footer">
 								<span> Subtotal Vigencias:<h:outputText
-										value="#{calculoPrevioBean.subTotalVigencias}" />
+										value="#{calculoPrevioBean.subTotalVigencias}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText>
 								</span>
 							</f:facet>
 
@@ -295,7 +370,9 @@
 							<f:facet name="footer">
 								<span> Subtotal Servicios: <h:outputText
 										id="subServiciosDs"
-										value="#{calculoPrevioBean.subTotalServicios}" />
+										value="#{calculoPrevioBean.subTotalServicios}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText>
 								</span>
 							</f:facet>
 
@@ -318,13 +395,17 @@
 							<div style="text-align: right">
 								<p:outputLabel>Subtotal:</p:outputLabel>
 								<b><h:outputText id="subTotalGeneral"
-										value="#{calculoPrevioBean.subTotalGeneral}" /></b>
+										value="#{calculoPrevioBean.subTotalGeneral}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText></b>
 							</div>
 
 							<div style="text-align: right">
 								<p:outputLabel>Iva:</p:outputLabel>
 								<b><h:outputText id="iva"
-										value="#{calculoPrevioBean.ivaTotal}" /></b>
+										value="#{calculoPrevioBean.ivaTotal}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText> </b>
 							</div>
 
 							<div style="float: left;">
@@ -336,11 +417,21 @@
 							<div style="text-align: right">
 								<p:outputLabel>Total:</p:outputLabel>
 								<b><h:outputText id="total"
-										value="#{calculoPrevioBean.total}" /></b>
+										value="#{calculoPrevioBean.total}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText> </b>
 							</div>
 
 						</p:fieldset>
-
+						
+						<div>
+							<p:splitButton value="Guardar" actionListener="#{calculoPrevioBean.saveFactura}" icon="pi pi-save">
+					            <p:menuitem value="Generar reporte" actionListener="#{facturaServiciosBean.jasper}" action="#{facturaServiciosBean.reload}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+					            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-file"/>
+					            <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-file-pdf" ajax="false" process="@this"/> 
+					        </p:splitButton>
+						</div>
+						
 					</div>
 				</div>
 			</div>

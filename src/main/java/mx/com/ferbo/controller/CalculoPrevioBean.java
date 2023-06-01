@@ -14,11 +14,14 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.AsentamientoHumandoDAO;
+import mx.com.ferbo.dao.DomiciliosDAO;
+import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
+import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
@@ -62,6 +65,9 @@ public class CalculoPrevioBean implements Serializable {
 	private List<ConstanciaFacturaDs> listaConstanciaFacturaDs;
 
 	private PrecioServicioDAO precioServicioDAO;
+	private AsentamientoHumandoDAO asentamientoDAO;
+	private DomiciliosDAO domiciliosDAO;
+	private FacturaDAO facturaDAO;
 
 	private Cliente clienteSelect;
 	private Planta plantaSelect;
@@ -74,6 +80,8 @@ public class CalculoPrevioBean implements Serializable {
 	private MedioPago medioPago;
 	private MetodoPago metodoPago;
 	private Parametro iva;
+	private AsentamientoHumano asentamientoPlanta,asentamientoCliente;
+	private Domicilios domicilioPlanta;
 
 	private Date fechaEmision;
 	private BigDecimal cantidad;
@@ -97,11 +105,15 @@ public class CalculoPrevioBean implements Serializable {
 		domicilioSelect = new Domicilios();
 		serieFacturaSelect = new SerieFactura();
 		factura = new Factura();
+		asentamientoPlanta = new AsentamientoHumano();
 		selectServicioE = new ServicioConstancia();
 		selectServicioV = new ServicioConstancia();
 		selectServicioDs = new ServicioConstanciaDs();
 
 		precioServicioDAO = new PrecioServicioDAO();
+		asentamientoDAO = new AsentamientoHumandoDAO();
+		domiciliosDAO = new DomiciliosDAO();
+		facturaDAO = new FacturaDAO();
 
 	}
 
@@ -148,6 +160,7 @@ public class CalculoPrevioBean implements Serializable {
 			procesarEntradas();
 			procesarVigencias();
 			sumaGeneral();
+			cargaDomicilio();
 
 		} catch (Exception e) {
 			System.out.println("ERROR Aqui" + e.getLocalizedMessage());
@@ -347,6 +360,30 @@ public class CalculoPrevioBean implements Serializable {
 		this.serieFacturaSelect = serieFacturaSelect;
 	}
 
+	public AsentamientoHumano getAsentamientoPlanta() {
+		return asentamientoPlanta;
+	}
+
+	public void setAsentamientoPlanta(AsentamientoHumano asentamientoPlanta) {
+		this.asentamientoPlanta = asentamientoPlanta;
+	}
+
+	public AsentamientoHumano getAsentamientoCliente() {
+		return asentamientoCliente;
+	}
+
+	public void setAsentamientoCliente(AsentamientoHumano asentamientoCliente) {
+		this.asentamientoCliente = asentamientoCliente;
+	}
+
+	public Domicilios getDomicilioPlanta() {
+		return domicilioPlanta;
+	}
+
+	public void setDomicilioPlanta(Domicilios domicilioPlanta) {
+		this.domicilioPlanta = domicilioPlanta;
+	}
+
 	public void procesarServicios() {
 
 		BigDecimal importe = new BigDecimal(0);
@@ -408,6 +445,7 @@ public class CalculoPrevioBean implements Serializable {
 				idP++;
 			}
 			
+			cfd.setFactura(factura);
 			sumTmp = subTotalServicios(cfd.getServicioConstanciaDsList());
 			subTotalServicios = subTotalServicios.add(sumTmp);
 		
@@ -516,17 +554,21 @@ public class CalculoPrevioBean implements Serializable {
 				 * listaServiciosConstancias.add(sc);
 				 * cf.setServicioConstanciaList(listaServiciosConstancias);
 				 */
-
 				cf.getServicioConstanciaList().add(sc); // datos a mostrar row ex--
-
 				// listaServiciosEntradas.add(sc);
 				id++;
 
 			}
 			
+			
+			cf.setFactura(factura);
 			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2);
 			subTotalEntrada = subTotalEntrada.add(sumTmp);
-	
+			
+			cdd.setConstanciaFacturaList(new ArrayList<>());
+			cdd.getConstanciaFacturaList().addAll(listaEntradas);
+			cdd.getConstanciaFacturaList().addAll(listaVigencias);
+			
 		}
 	}
 
@@ -620,11 +662,11 @@ public class CalculoPrevioBean implements Serializable {
 				sc.setCamaraCve(camara.getCamaraCve());
 				sc.setCamaraDs(camara.getCamaraDs());
 				sc.setCamaraAbrev(camara.getCamaraAbrev());
-
+				
 				sc.setCodigo(null);
 
 				if (tipoCobro.getId() == 4) {
-					cf.getServicioConstanciaList().add(sc);
+					cf.getServicioConstanciaList().add(sc);					
 					id++;
 				}
 				/*
@@ -632,8 +674,13 @@ public class CalculoPrevioBean implements Serializable {
 				 * cf.setServicioConstanciaList(listaServiciosConstancias);//datos a mostrar row
 				 * ex--
 				 */
-
+				
 			}
+			
+			cf.setFactura(factura);
+			cdd.setConstanciaFacturaList(new ArrayList<>());
+			cdd.getConstanciaFacturaList().addAll(listaEntradas);
+			cdd.getConstanciaFacturaList().addAll(listaVigencias);
 			
 			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2);
 			subTotalVigencias = subTotalVigencias.add(sumTmp);
@@ -802,6 +849,38 @@ public class CalculoPrevioBean implements Serializable {
 		factura.setIva(ivaTotal);
 		factura.setTotal(total);
 		factura.setMontoLetra(montoLetra);
+		factura.setConstanciaFacturaList(new ArrayList<>());
+		factura.setConstanciaFacturaDsList(new ArrayList<>());
+		
+		factura.getConstanciaFacturaList().addAll(listaEntradas);
+		
+		factura.getConstanciaFacturaList().addAll(listaVigencias);
+		
+		factura.setConstanciaFacturaDsList(listaServicios);
+			
+	}
+	
+	public void cargaDomicilio() {
+		
+		asentamientoCliente = asentamientoDAO.buscarPorAsentamiento(domicilioSelect.getCiudades().getCiudadesPK().getPaisCve(),
+			    domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(), 
+				domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+				domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(), domicilioSelect.getDomicilioColonia());
+		
+		asentamientoPlanta = asentamientoDAO.buscarPorAsentamiento(plantaSelect.getIdPais(), plantaSelect.getIdEstado(), plantaSelect.getIdMunicipio(), plantaSelect.getIdCiudad(), plantaSelect.getIdAsentamiento());
+		
+		domicilioPlanta = domiciliosDAO.buscarPorAsentamiento(plantaSelect.getIdPais(), plantaSelect.getIdEstado(), plantaSelect.getIdMunicipio(), plantaSelect.getIdCiudad(), plantaSelect.getIdAsentamiento());
+		
+		System.out.println(asentamientoPlanta); 
+		
+	}
+	
+	
+	public void saveFactura() {
+		
+		System.out.println(factura);
+		
+		facturaDAO.guardar(factura);
 		
 	}
 	
