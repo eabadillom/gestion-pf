@@ -43,9 +43,9 @@ public class ConstanciaFacturaDs implements Serializable {
     @Size(max = 30)
     @Column(name = "FOLIO_CLIENTE")
     private String folioCliente;
-    @OneToMany(mappedBy = "constancia")//MODIFICADO 1 JUNIO
+    @OneToMany(mappedBy = "constancia", cascade = CascadeType.ALL)//MODIFICADO 1 JUNIO
     private List<ServicioConstanciaDs> servicioConstanciaDsList;
-    @OneToMany(mappedBy = "constancia")//MODIFICADO 1 JUNIO
+    @OneToMany(mappedBy = "constancia", cascade = CascadeType.ALL)//MODIFICADO 1 JUNIO
     private List<ProductoConstanciaDs> productoConstanciaDsList;
     @JoinColumn(name = "FACTURA", referencedColumnName = "id")
     @ManyToOne

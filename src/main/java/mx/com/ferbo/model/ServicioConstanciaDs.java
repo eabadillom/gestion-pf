@@ -71,7 +71,7 @@ public class ServicioConstanciaDs implements Serializable {
     @Column(name = "cantidad")
     private BigDecimal cantidad;
     @JoinColumn(name = "CONSTANCIA", referencedColumnName = "ID")
-    @ManyToOne(cascade = CascadeType.ALL,optional = false)//modifica 1 junio
+    @ManyToOne//modifica 1 junio
     private ConstanciaFacturaDs constancia;
 
     public ServicioConstanciaDs() {

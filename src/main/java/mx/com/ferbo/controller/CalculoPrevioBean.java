@@ -1,19 +1,31 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.primefaces.PrimeFaces;
 
@@ -45,7 +57,12 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.ServicioConstancia;
 import mx.com.ferbo.model.ServicioConstanciaDs;
 import mx.com.ferbo.model.TipoCobro;
+import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.FormatUtil;
+import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
+import net.sf.jasperreports.engine.JRException;
 
 @Named
 @ViewScoped
@@ -58,6 +75,7 @@ public class CalculoPrevioBean implements Serializable {
 
 	private FacesContext context;
 	private HttpServletRequest request;
+	HttpSession session;
 
 	private List<ConstanciaFactura> listaEntradas;
 	private List<ConstanciaFactura> listaVigencias;
@@ -131,18 +149,32 @@ public class CalculoPrevioBean implements Serializable {
 		try {
 			context = FacesContext.getCurrentInstance();
 			request = (HttpServletRequest) context.getExternalContext().getRequest();
-			listaEntradas = (List<ConstanciaFactura>) request.getSession(false).getAttribute("entradas");
-			listaVigencias = (List<ConstanciaFactura>) request.getSession(false).getAttribute("vigencias");
-			listaServicios = (List<ConstanciaFacturaDs>) request.getSession(false).getAttribute("servicios");
-			clienteSelect = (Cliente) request.getSession(false).getAttribute("cliente");
-			plantaSelect = (Planta) request.getSession(false).getAttribute("plantaSelect");
-			factura = (Factura) request.getSession(false).getAttribute("factura");
-			fechaEmision = (Date) request.getSession(false).getAttribute("fechaEmision");
-			iva = (Parametro) request.getSession(false).getAttribute("iva"); 
-			medioPago = (MedioPago) request.getSession(false).getAttribute("medioPago");
-			metodoPago = (MetodoPago) request.getSession(false).getAttribute("metodoPago");
-			domicilioSelect = (Domicilios) request.getSession(false).getAttribute("domicilioSelect");
-			serieFacturaSelect = (SerieFactura) request.getSession(false).getAttribute("serieFacturaSelect");
+			session = request.getSession(false);
+			listaEntradas = (List<ConstanciaFactura>) session.getAttribute("entradas");
+			listaVigencias = (List<ConstanciaFactura>) session.getAttribute("vigencias");
+			listaServicios = (List<ConstanciaFacturaDs>) session.getAttribute("servicios");
+			clienteSelect = (Cliente) session.getAttribute("cliente");
+			plantaSelect = (Planta) session.getAttribute("plantaSelect");
+			factura = (Factura) session.getAttribute("factura");
+			fechaEmision = (Date) session.getAttribute("fechaEmision");
+			iva = (Parametro) session.getAttribute("iva"); 
+			medioPago = (MedioPago) session.getAttribute("medioPago");
+			metodoPago = (MetodoPago) session.getAttribute("metodoPago");
+			domicilioSelect = (Domicilios) session.getAttribute("domicilioSelect");
+			serieFacturaSelect = (SerieFactura) session.getAttribute("serieFacturaSelect");
+			
+			/*listaEntradas = facturacionBean.getListaEntradas();
+			listaVigencias = facturacionBean.getListaVigencias();
+			listaServicios = facturacionBean.getListaServicios();
+			clienteSelect = facturacionBean.getClienteSelect();
+			plantaSelect = facturacionBean.getPlantaSelect();
+			factura = facturacionBean.getFactura();
+			fechaEmision = facturacionBean.getFechaCorte();
+			iva = facturacionBean.getIva();
+			medioPago = facturacionBean.getMedioPagoSelect();
+			metodoPago = facturacionBean.getMetodoPagoSelect();
+			domicilioSelect = facturacionBean.getDomicilioSelect();
+			serieFacturaSelect = facturacionBean.getSerieFacturaSelect();*/
 
 			if (listaEntradas.isEmpty()) {
 				listaEntradas = new ArrayList<>();
@@ -161,6 +193,7 @@ public class CalculoPrevioBean implements Serializable {
 			procesarVigencias();
 			sumaGeneral();
 			cargaDomicilio();
+			
 
 		} catch (Exception e) {
 			System.out.println("ERROR Aqui" + e.getLocalizedMessage());
@@ -646,7 +679,7 @@ public class CalculoPrevioBean implements Serializable {
 					System.out.println("No existe el tipo de cobro");
 					break;
 				}
-
+				sc.setId(id);
 				sc.setConstancia(cf);
 				sc.setTarifa(precioServicio.getPrecio().setScale(2));
 				if(cantidad!=null) {
@@ -736,8 +769,6 @@ public class CalculoPrevioBean implements Serializable {
 	}
 	
 	public void eliminarServicioDs() {
-		
-		BigDecimal sum;
 		
 		for(ConstanciaFacturaDs cfd: listaServicios) {
 			
@@ -878,15 +909,103 @@ public class CalculoPrevioBean implements Serializable {
 	
 	public void saveFactura() {
 		
-		System.out.println(factura);
+		//haciendo null id de los servicios constancias de constancias de deposito 
 		
-		facturaDAO.guardar(factura);
+		for(ConstanciaFactura cf: listaEntradas) {
+			for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
+				sc.setId(null);
+			}
+		}
+		
+		for(ConstanciaFactura cf: listaVigencias) {
+			for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
+				sc.setId(null);
+			}
+		}
+		
+		//haciendo null id de serviciosDs  y productosDs de constancia servicios 
+		
+		for(ConstanciaFacturaDs cfd: listaServicios) {
+			for(ServicioConstanciaDs scd: cfd.getServicioConstanciaDsList()) {
+				scd.setId(null);
+			}
+			
+			for(ProductoConstanciaDs pcd: cfd.getProductoConstanciaDsList()) {
+				pcd.setId(null);
+			}	
+			
+		}
+		
+		try {
+			
+			if(factura.getId()==null) {
+				facturaDAO.guardar(factura);
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
+				PrimeFaces.current().ajax().update("form:messages");
+			}
+			
+			//cerrarSesion();
+			
+		} catch (Exception e) {
+			System.out.println("Error al guardar Factura" + e.getMessage());
+		}
+		
+		
 		
 	}
 	
+	public void jasper() throws JRException, IOException, SQLException {
+		String jasperPath = "/jasper/Factura.jrxml";
+		String filename = "Factura " + fechaEmision + ".pdf";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
+		Factura sf = null;
+		File reportFile = new File(jasperPath);
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			
+			if (this.factura.getId() == null)
+				throw new InventarioException("Debe Guardar la Factura primero");
+			
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			//log.info(reportFile.getPath());
+			sf = new Factura();
+			Integer num = factura.getId();
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("idFactura", num);
+			parameters.put("imagen", imgfile.getPath());
+			//log.info("Parametros: " + parameters.toString());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+		} catch (InventarioException ex) {
+			ex.fillInStackTrace();
+			//log.error("Problema general...", ex);
+			message = String.format("Guarda primero la factura para poder realizar la impresion");
+			severity = FacesMessage.SEVERITY_ERROR;
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		} finally {
+			conexion.close((Connection) connection);
+		}
+
+	}
+	
+	
+	
 	/*public void cerrarSesion() {
 		
-		HttpSession session = request.getSession(false);
+		
 		
 		session.removeAttribute("entradas");
 		session.removeAttribute("vigencias");
@@ -898,13 +1017,10 @@ public class CalculoPrevioBean implements Serializable {
 		session.removeAttribute("iva");
 		session.removeAttribute("medioPago");
 		session.removeAttribute("metodoPago");
+		session.removeAttribute("domicilioSelect");
+		session.removeAttribute("serieFacturaSelect");
 		
-		/*HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
 		
-		response.addHeader("Pragma", "no-cache");
-        response.addHeader("Cache-Control", "no-cache");
-        response.addHeader("Cache-Control", "no-store");
-        response.addHeader("Cache-Control", "must-revalidate");
 		
 	}*/
 	

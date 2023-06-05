@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -166,7 +167,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 	
 	@PostConstruct
-	public void init() {
+	public void init(){
 		
 		listaCliente = clienteDAO.buscarTodos();
 		listaClienteDom = clienteDomicilioDAO.buscarTodos();
@@ -176,13 +177,15 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
 		listaMedioPago = medioPagoDAO.buscarTodos();
 		
+		
 		log.info("Entrando al init");
 		
 		faceContext = FacesContext.getCurrentInstance();
         request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         session = request.getSession(false);
 		
-		/*session.removeAttribute("entradas");
+        
+        /*session.removeAttribute("entradas");
 		session.removeAttribute("vigencias");
 		session.removeAttribute("servicios");
 		session.removeAttribute("cliente");
@@ -191,13 +194,15 @@ public class FacturacionConstanciasBean implements Serializable{
 		session.removeAttribute("fechaEmision");
 		session.removeAttribute("iva");
 		session.removeAttribute("medioPago");
-		session.removeAttribute("metodoPago");*/
+		session.removeAttribute("metodoPago");
+		session.removeAttribute("domicilioSelect");
+		session.removeAttribute("serieFacturaSelect");*/
 		
-		//iva = parametroDAO.buscarPorNombre("IVA");
-		//retencion = parametroDAO.buscarPorNombre("RETENCION");
 		
 		fechaCorte = new Date();
 		fechaFactura = new Date();
+
+		PrimeFaces.current().ajax().update("form:dt-constanciasE", "form:dt-vigencias", "form:dt-servicios");
 		
 	}
 
@@ -693,6 +698,8 @@ public class FacturacionConstanciasBean implements Serializable{
 			session.setAttribute("domicilioSelect",domicilioSelect);
 			session.setAttribute("serieFacturaSelect",serieFacturaSelect);
 			
+			
+			
 		}catch(Exception e) {
 			System.out.println("ERROR:" + e.getMessage());
 		}
@@ -700,6 +707,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		return "calculoPrevio.xhtml?faces-redirect=true";
 		
 	}
+	
+	
 	
 
 }

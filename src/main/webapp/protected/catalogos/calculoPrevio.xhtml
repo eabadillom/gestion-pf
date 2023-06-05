@@ -25,7 +25,7 @@
 
 						<p:button value="Atras"
 							outcome="/protected/catalogos/facturacionConstancias"
-							icon="pi pi-arrow-circle-left"></p:button>
+							icon="pi pi-arrow-circle-left"  ></p:button>
 
 						<div style="margin-top: 10px">
 							<p:fieldset legend="Datos De Emisor">
@@ -424,10 +424,9 @@
 
 						</p:fieldset>
 						
-						<div>
+						<div style="margin-top: 10px;">
 							<p:splitButton value="Guardar" actionListener="#{calculoPrevioBean.saveFactura}" icon="pi pi-save">
-					            <p:menuitem value="Generar reporte" actionListener="#{facturaServiciosBean.jasper}" action="#{facturaServiciosBean.reload}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-					            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-file"/>
+					            <p:menuitem value="Generar reporte" actionListener="#{calculoPrevioBean.jasper}"  icon="pi pi-file-pdf" ajax="false" process="@this"/>					 
 					            <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-file-pdf" ajax="false" process="@this"/> 
 					        </p:splitButton>
 						</div>
