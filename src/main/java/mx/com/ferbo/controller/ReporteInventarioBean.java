@@ -56,13 +56,13 @@ public class ReporteInventarioBean implements Serializable {
 		
 		listaClientes = clienteDAO.buscarHabilitados(true);
 		listaPlanta = plantaDAO.buscarTodos();
-		listaCamara = camaraDAO.buscarPorPlanta(plantaSelect);
+		listaCamara = camaraDAO.buscarTodos();
+		//listaCamara = camaraDAO.buscarPorPlanta(plantaSelect);
 	}
 	
 	public void filtradoCamara() {
-		List<Camara> listaFiltroCamara = camaraDAO.buscarPorPlanta(plantaSelect);
-		plantaSelect.setCamaraList(listaFiltroCamara);
-		
+		listaCamara = camaraDAO.buscarPorPlanta(plantaSelect);
+		plantaSelect.setCamaraList(listaCamara);
 	}
 
 
