@@ -7,7 +7,7 @@
 	<ui:define name="title">Calculo Previo</ui:define>
 
 	<ui:define name="content">
-
+	
 		<h:form id="form">
 
 			<p:breadCrumb>
@@ -22,11 +22,14 @@
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-
-						<p:button value="Atras"
-							outcome="/protected/catalogos/facturacionConstancias"
-							icon="pi pi-arrow-circle-left"  ></p:button>
-
+							
+						<div style="margin-top: 10px;">
+							<p:commandButton value="Atras" 
+								action="#{calculoPrevioBean.paginaFactura}"
+							 icon="pi pi-arrow-circle-left" />
+							 
+						</div>
+						
 						<div style="margin-top: 10px">
 							<p:fieldset legend="Datos De Emisor">
 								<div style="text-align: center;">

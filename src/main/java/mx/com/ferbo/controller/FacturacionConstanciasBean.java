@@ -177,32 +177,30 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
 		listaMedioPago = medioPagoDAO.buscarTodos();
 		
+		fechaCorte = new Date();
+		fechaFactura = new Date();
 		
 		log.info("Entrando al init");
 		
 		faceContext = FacesContext.getCurrentInstance();
         request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         session = request.getSession(false);
-		
         
-        /*session.removeAttribute("entradas");
-		session.removeAttribute("vigencias");
-		session.removeAttribute("servicios");
-		session.removeAttribute("cliente");
-		session.removeAttribute("plantaSelect");
-		session.removeAttribute("factura");
-		session.removeAttribute("fechaEmision");
-		session.removeAttribute("iva");
-		session.removeAttribute("medioPago");
-		session.removeAttribute("metodoPago");
-		session.removeAttribute("domicilioSelect");
-		session.removeAttribute("serieFacturaSelect");*/
-		
-		
-		fechaCorte = new Date();
-		fechaFactura = new Date();
+        //variables a inicializar en null al regreso de la pantalla
 
-		PrimeFaces.current().ajax().update("form:dt-constanciasE", "form:dt-vigencias", "form:dt-servicios");
+        selectedEntradas = new ArrayList<>();
+		selectedVigencias = new ArrayList<>();
+		selectedServicios = new ArrayList<>();
+		
+		if((clienteSelect!=null)&&(plantaSelect!=null)) {
+			facturacionEntradas();
+			facturacionServicios();
+			facturacionVigencias();
+			
+			PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios");
+		}
+		
+		
 		
 	}
 
@@ -444,6 +442,14 @@ public class FacturacionConstanciasBean implements Serializable{
 
 	public void setReferencia(String referencia) {
 		this.referencia = referencia;
+	}
+
+	public Parametro getIva() {
+		return iva;
+	}
+
+	public void setIva(Parametro iva) {
+		this.iva = iva;
 	}
 
 	public void domicilioAvisoPorCliente() {
@@ -699,7 +705,6 @@ public class FacturacionConstanciasBean implements Serializable{
 			session.setAttribute("serieFacturaSelect",serieFacturaSelect);
 			
 			
-			
 		}catch(Exception e) {
 			System.out.println("ERROR:" + e.getMessage());
 		}
@@ -709,6 +714,4 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 	
 	
-	
-
 }

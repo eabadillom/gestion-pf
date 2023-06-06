@@ -16,13 +16,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.New;
+import javax.faces.annotation.ManagedProperty;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.bean.RequestScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -32,6 +37,7 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.DomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
+import mx.com.ferbo.dao.FacturacionDepositosDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
@@ -86,6 +92,7 @@ public class CalculoPrevioBean implements Serializable {
 	private AsentamientoHumandoDAO asentamientoDAO;
 	private DomiciliosDAO domiciliosDAO;
 	private FacturaDAO facturaDAO;
+	//private FacturacionDepositosDAO facturacionConstanciasDAO;
 
 	private Cliente clienteSelect;
 	private Planta plantaSelect;
@@ -132,6 +139,7 @@ public class CalculoPrevioBean implements Serializable {
 		asentamientoDAO = new AsentamientoHumandoDAO();
 		domiciliosDAO = new DomiciliosDAO();
 		facturaDAO = new FacturaDAO();
+		//facturacionConstanciasDAO = new FacturacionDepositosDAO();
 
 	}
 
@@ -163,9 +171,9 @@ public class CalculoPrevioBean implements Serializable {
 			domicilioSelect = (Domicilios) session.getAttribute("domicilioSelect");
 			serieFacturaSelect = (SerieFactura) session.getAttribute("serieFacturaSelect");
 			
-			/*listaEntradas = facturacionBean.getListaEntradas();
-			listaVigencias = facturacionBean.getListaVigencias();
-			listaServicios = facturacionBean.getListaServicios();
+			/*listaEntradas = facturacionBean.getSelectedEntradas();
+			listaVigencias = facturacionBean.getSelectedVigencias();
+			listaServicios = facturacionBean.getSelectedServicios();
 			clienteSelect = facturacionBean.getClienteSelect();
 			plantaSelect = facturacionBean.getPlantaSelect();
 			factura = facturacionBean.getFactura();
@@ -1001,11 +1009,7 @@ public class CalculoPrevioBean implements Serializable {
 
 	}
 	
-	
-	
-	/*public void cerrarSesion() {
-		
-		
+	public String paginaFactura() {
 		
 		session.removeAttribute("entradas");
 		session.removeAttribute("vigencias");
@@ -1019,9 +1023,16 @@ public class CalculoPrevioBean implements Serializable {
 		session.removeAttribute("metodoPago");
 		session.removeAttribute("domicilioSelect");
 		session.removeAttribute("serieFacturaSelect");
+
 		
+		if(factura.getId()!=null) {
+			facturacionBean.init();
+		}
 		
+		return "facturacionConstancias.xhtml?faces-redirect=true";
 		
-	}*/
+	}
+	
+	
 	
 }
