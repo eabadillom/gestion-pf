@@ -41,7 +41,7 @@
 									<p:selectOneMenu id="so-planta" value="#{reporteInventarioBean.plantaSelect}" converter="entityConverter"  style="width:220px;">
 										<f:selectItem itemLabel="" itemValue="" />
 										<f:selectItems value="#{reporteInventarioBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
-										<p:ajax listener="#{reporteInventarioBean.filtradoCamara()}" process=" @this" update=":form:so-camara"/>
+										 <p:ajax listener="#{reporteInventarioBean.filtradoCamara()}" process=" @this" update=":form:so-camara"/>
 									</p:selectOneMenu>
 								<p:outputLabel  for="so-planta" value="Planta" />
 								</span>
@@ -61,13 +61,12 @@
 					
 					  <p:fieldset legend="Opciones de descarga" styleClass="p-mt-2">
 					<div class="card">
-					    <h:form>
-					        <p:selectManyButton value="#{selectManyButtonView.selectedOptions}">
-					            <f:selectItem itemLabel="PDF" itemValue="Option 1"/>
-					            <f:selectItem itemLabel="Excel" itemValue="Option 2"/>
-					  </p:selectManyButton>
+						    <h:form>
+						        
 						    </h:form>
 						</div>
+						<p:commandButton value="Descargar pdf" actionListener="#{reporteInventarioBean.exportarPdf}" process="@this"/>  
+						<p:commandButton value="Descargar excel" actionListener="#{reporteInventarioBean.exportarExcel}" process="@this"/>  
 						</p:fieldset>
 						
 						
