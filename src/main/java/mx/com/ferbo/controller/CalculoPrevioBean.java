@@ -16,32 +16,35 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.New;
-import javax.faces.annotation.ManagedProperty;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
-import javax.faces.bean.RequestScoped;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.primefaces.PrimeFaces;
 
+import com.ferbo.facturama.business.CfdiBL;
+import com.ferbo.facturama.request.CFDIInfo;
+import com.ferbo.facturama.request.IssuerBindingModel;
+import com.ferbo.facturama.request.ItemFullBindingModel;
+import com.ferbo.facturama.request.ReceiverBindingModel;
+import com.ferbo.facturama.request.Tax;
+import com.ferbo.facturama.response.CfdiInfoModel;
+import com.ferbo.facturama.tools.FacturamaException;
+
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
+import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.DomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
-import mx.com.ferbo.dao.FacturacionDepositosDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
+import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
@@ -50,6 +53,7 @@ import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.FacturaMedioPago;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
@@ -92,6 +96,7 @@ public class CalculoPrevioBean implements Serializable {
 	private AsentamientoHumandoDAO asentamientoDAO;
 	private DomiciliosDAO domiciliosDAO;
 	private FacturaDAO facturaDAO;
+	private ClaveUnidadDAO claveDAO;
 	//private FacturacionDepositosDAO facturacionConstanciasDAO;
 
 	private Cliente clienteSelect;
@@ -117,6 +122,8 @@ public class CalculoPrevioBean implements Serializable {
 	private BigDecimal ivaTotal;
 	private BigDecimal total;
 	private String montoLetra;
+	private String moneda;
+	private String observaciones;
 
 	public CalculoPrevioBean() {
 
@@ -139,6 +146,7 @@ public class CalculoPrevioBean implements Serializable {
 		asentamientoDAO = new AsentamientoHumandoDAO();
 		domiciliosDAO = new DomiciliosDAO();
 		facturaDAO = new FacturaDAO();
+		claveDAO = new ClaveUnidadDAO();
 		//facturacionConstanciasDAO = new FacturacionDepositosDAO();
 
 	}
@@ -170,19 +178,9 @@ public class CalculoPrevioBean implements Serializable {
 			metodoPago = (MetodoPago) session.getAttribute("metodoPago");
 			domicilioSelect = (Domicilios) session.getAttribute("domicilioSelect");
 			serieFacturaSelect = (SerieFactura) session.getAttribute("serieFacturaSelect");
+			moneda = (String) session.getAttribute("moneda");
+			observaciones = (String) session.getAttribute("Observaciones");
 			
-			/*listaEntradas = facturacionBean.getSelectedEntradas();
-			listaVigencias = facturacionBean.getSelectedVigencias();
-			listaServicios = facturacionBean.getSelectedServicios();
-			clienteSelect = facturacionBean.getClienteSelect();
-			plantaSelect = facturacionBean.getPlantaSelect();
-			factura = facturacionBean.getFactura();
-			fechaEmision = facturacionBean.getFechaCorte();
-			iva = facturacionBean.getIva();
-			medioPago = facturacionBean.getMedioPagoSelect();
-			metodoPago = facturacionBean.getMetodoPagoSelect();
-			domicilioSelect = facturacionBean.getDomicilioSelect();
-			serieFacturaSelect = facturacionBean.getSerieFacturaSelect();*/
 
 			if (listaEntradas.isEmpty()) {
 				listaEntradas = new ArrayList<>();
@@ -523,6 +521,7 @@ public class CalculoPrevioBean implements Serializable {
 			ConstanciaDeDeposito cdd = cf.getFolio();
 			// listaServiciosConstancias = new ArrayList<>();
 			Aviso aviso = cdd.getAvisoCve();
+			Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
 			String tipoFacturacion = aviso.getAvisoTpFacturacion();
 			cf.setServicioConstanciaList(new ArrayList<>());
 
@@ -584,13 +583,12 @@ public class CalculoPrevioBean implements Serializable {
 				sc.setPlantaAbrev(plantaSelect.getPlantaAbrev());
 				sc.setPlantaCod(plantaSelect.getPlantaCod());
 
-				Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
+				
 				sc.setCamaraCve(camara.getCamaraCve());
 				sc.setCamaraDs(camara.getCamaraDs());
 				sc.setCamaraAbrev(camara.getCamaraAbrev());
-
-				sc.setCodigo(null);
-
+				sc.setCodigo(precioServicio.getServicio().getServicioCod());
+				sc.setCdUnidad(precioServicio.getServicio().getCdUnidad());
 				/*
 				 * listaServiciosConstancias.add(sc);
 				 * cf.setServicioConstanciaList(listaServiciosConstancias);
@@ -601,8 +599,16 @@ public class CalculoPrevioBean implements Serializable {
 
 			}
 			
+			//Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
 			
 			cf.setFactura(factura);
+			cf.setPlantaCve(plantaSelect.getPlantaCve());
+			cf.setPlantaDs(plantaSelect.getPlantaDs());
+			cf.setPlantaAbrev(plantaSelect.getPlantaAbrev());
+			cf.setCamaraCve(camara.getCamaraCve());
+			cf.setCamaraDs(camara.getCamaraDs());
+			cf.setCamaraAbrev(camara.getCamaraAbrev());
+			
 			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2);
 			subTotalEntrada = subTotalEntrada.add(sumTmp);
 			
@@ -646,6 +652,7 @@ public class CalculoPrevioBean implements Serializable {
 			ConstanciaDeDeposito cdd = cf.getFolio();
 			// listaServiciosConstancias = new ArrayList<>();
 			Aviso aviso = cdd.getAvisoCve();
+			Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
 			String tipoFacturacion = aviso.getAvisoTpFacturacion();
 			cf.setServicioConstanciaList(new ArrayList<>());
 
@@ -699,12 +706,12 @@ public class CalculoPrevioBean implements Serializable {
 				sc.setPlantaAbrev(plantaSelect.getPlantaAbrev());
 				sc.setPlantaCod(plantaSelect.getPlantaCod());
 
-				Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
+				
 				sc.setCamaraCve(camara.getCamaraCve());
 				sc.setCamaraDs(camara.getCamaraDs());
-				sc.setCamaraAbrev(camara.getCamaraAbrev());
-				
-				sc.setCodigo(null);
+				sc.setCamaraAbrev(camara.getCamaraAbrev());				
+				sc.setCodigo(precioServicio.getServicio().getServicioCod());
+				sc.setCdUnidad(precioServicio.getServicio().getCdUnidad());
 
 				if (tipoCobro.getId() == 4) {
 					cf.getServicioConstanciaList().add(sc);					
@@ -718,7 +725,17 @@ public class CalculoPrevioBean implements Serializable {
 				
 			}
 			
+			//Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
+			
 			cf.setFactura(factura);
+			cf.setFactura(factura);
+			cf.setPlantaCve(plantaSelect.getPlantaCve());
+			cf.setPlantaDs(plantaSelect.getPlantaDs());
+			cf.setPlantaAbrev(plantaSelect.getPlantaAbrev());
+			cf.setCamaraCve(camara.getCamaraCve());
+			cf.setCamaraDs(camara.getCamaraDs());
+			cf.setCamaraAbrev(camara.getCamaraAbrev());
+			
 			cdd.setConstanciaFacturaList(new ArrayList<>());
 			cdd.getConstanciaFacturaList().addAll(listaEntradas);
 			cdd.getConstanciaFacturaList().addAll(listaVigencias);
@@ -1033,6 +1050,121 @@ public class CalculoPrevioBean implements Serializable {
 		
 	}
 	
-	
+	public void timbrado() throws InventarioException {
+		String message = null;
+		Severity severity = null;
+		CFDIInfo cfdi = new CFDIInfo();
+		CfdiBL cfdiBL = new CfdiBL();
+		try {
+			// Datos de emisor
+			IssuerBindingModel is = new IssuerBindingModel();
+			is.setName(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
+			is.setFiscalRegime(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
+			is.setRfc(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
+			cfdi.setIssuer(is);
+
+			// Datos de receptor
+			ReceiverBindingModel receptor = new ReceiverBindingModel();
+			receptor.setRfc(factura.getRfc());
+			receptor.setCfdiUse(factura.getCdUsoCfdi());
+			receptor.setName(factura.getNombreCliente());
+			receptor.setFiscalRegime(factura.getCdRegimen());
+			receptor.setTaxZipCode(factura.getCp());
+			cfdi.setReceiver(receptor);
+			
+			// Datos generales de la factura
+			cfdi.setDate(factura.getFecha());
+			cfdi.setFolio(factura.getNumero());
+			cfdi.setSerie(factura.getNomSerie());
+			cfdi.setCurrency(moneda);
+			cfdi.setCfdiType("I");
+			FacturaMedioPago facturaMedioPago = factura.getFacturaMedioPagoList().get(0);
+			cfdi.setPaymentForm(facturaMedioPago.getMpId().getFormaPago());
+			cfdi.setExpeditionPlace(plantaSelect.getCodigopostal().toString());
+			cfdi.setPaymentMethod(factura.getMetodoPago());
+			cfdi.setObservations(observaciones);
+			
+			// servicios a facturar (Constancias de ENTRADA y VIGENCIA)
+			List<ItemFullBindingModel> listaItems = new ArrayList<ItemFullBindingModel>();
+			for(ConstanciaFactura cf: factura.getConstanciaFacturaList()) {
+				for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
+					ItemFullBindingModel item = new ItemFullBindingModel();
+					
+					item.setProductCode(sc.getCodigo());
+					item.setDescription(sc.getDescripcion());
+					ClaveUnidad claveUnidad = claveDAO.buscarPorId(sc.getCdUnidad());
+					item.setUnit(claveUnidad.getNbUnidad());
+					item.setUnitCode(sc.getCdUnidad());
+					item.setUnitPrice(sc.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
+					item.setQuantity(sc.getBaseCargo());
+					item.setSubtotal(sc.getCosto());
+					item.setTaxObject("02");
+					
+					Tax tx = new Tax();
+					
+					BigDecimal ivaTotal = sc.getCosto().multiply(new BigDecimal(iva.getValor()));
+					tx.setTotal(ivaTotal);
+					tx.setName("IVA");
+					tx.setBase(sc.getCosto());
+					tx.setRate(new BigDecimal(iva.getValor()));
+					tx.setIsRetention(false);
+					item.setTaxes(new ArrayList<Tax>());
+					item.setTotal(sc.getCosto().add(ivaTotal));
+					item.getTaxes().add(tx);
+					listaItems.add(item);
+				}
+			}
+			
+			
+			//servicios a facturar de ConstanciaServicioDs
+			for(ConstanciaFacturaDs cf: factura.getConstanciaFacturaDsList()) {
+				for(ServicioConstanciaDs sc: cf.getServicioConstanciaDsList()) {
+					ItemFullBindingModel item = new ItemFullBindingModel();
+					
+					item.setProductCode(sc.getCodigo());
+					item.setDescription(sc.getDescripcion());
+					ClaveUnidad claveUnidad = claveDAO.buscarPorId(sc.getCdUnidad());
+					item.setUnit(claveUnidad.getNbUnidad());
+					item.setUnitCode(sc.getCdUnidad());
+					item.setUnitPrice(sc.getTarifa());
+					item.setQuantity(sc.getCantidad());
+					item.setSubtotal(sc.getCosto());
+					item.setTaxObject("02");
+					
+					Tax tx = new Tax();
+					
+					BigDecimal ivaTotal = sc.getCosto().multiply(new BigDecimal(iva.getValor()));
+					tx.setTotal(ivaTotal);
+					tx.setName("IVA");
+					tx.setBase(sc.getCosto());
+					tx.setRate(new BigDecimal(iva.getValor()));
+					tx.setIsRetention(false);
+					item.setTaxes(new ArrayList<Tax>());
+					item.setTotal(sc.getCosto().add(ivaTotal));
+					item.getTaxes().add(tx);
+					listaItems.add(item);
+				}
+			}
+			
+			cfdi.setItems(listaItems);
+			CfdiInfoModel registra = cfdiBL.registra(cfdi);
+			this.factura.setUuid(registra.getId());
+			facturaDAO.actualizar(factura);
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			message = "El timbrado se genero correctamente";
+		} catch (FacturamaException e) {
+			e.printStackTrace();
+		}catch (Exception ex) {
+			//log.error("Problema para obtener los servicios del cliente.", ex);
+			ex.printStackTrace();
+			message = "Problema con la información de servicios.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado exitoso", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
+	}
 	
 }

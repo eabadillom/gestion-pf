@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
@@ -23,6 +25,15 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
+
+import com.ferbo.facturama.business.CfdiBL;
+import com.ferbo.facturama.request.CFDIInfo;
+import com.ferbo.facturama.request.IssuerBindingModel;
+import com.ferbo.facturama.request.ItemFullBindingModel;
+import com.ferbo.facturama.request.ReceiverBindingModel;
+import com.ferbo.facturama.request.Tax;
+import com.ferbo.facturama.response.CfdiInfoModel;
+import com.ferbo.facturama.tools.FacturamaException;
 
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
@@ -41,6 +52,7 @@ import mx.com.ferbo.dao.TipoFacturacionDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaFactura;
@@ -54,10 +66,12 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieFactura;
+import mx.com.ferbo.model.ServicioFactura;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 
 
 @Named
@@ -160,7 +174,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		valorDeclarado = new BigDecimal(0);
 		resRetencion = new BigDecimal(0);
 		resIva = new BigDecimal(0);
-		moneda = "MX$";
+		moneda = "MXN";
 
 		
 		
@@ -181,10 +195,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		fechaFactura = new Date();
 		
 		log.info("Entrando al init");
-		
-		faceContext = FacesContext.getCurrentInstance();
-        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        session = request.getSession(false);
         
         //variables a inicializar en null al regreso de la pantalla
 
@@ -200,6 +210,10 @@ public class FacturacionConstanciasBean implements Serializable{
 			PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios");
 		}
 		
+		
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        session = request.getSession(false);
 		
 		
 	}
@@ -703,6 +717,8 @@ public class FacturacionConstanciasBean implements Serializable{
 			session.setAttribute("metodoPago", metodoPagoSelect);
 			session.setAttribute("domicilioSelect",domicilioSelect);
 			session.setAttribute("serieFacturaSelect",serieFacturaSelect);
+			session.setAttribute("moneda", moneda);
+			session.setAttribute("Observaciones", observacion);
 			
 			
 		}catch(Exception e) {
@@ -712,6 +728,9 @@ public class FacturacionConstanciasBean implements Serializable{
 		return "calculoPrevio.xhtml?faces-redirect=true";
 		
 	}
+	
+	
+	
 	
 	
 }
