@@ -608,7 +608,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
 		
-		
 		if(listaServicios.isEmpty()) {
 			listaServicios = new ArrayList<>();
 		}

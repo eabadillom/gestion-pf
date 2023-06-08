@@ -1,8 +1,13 @@
 package mx.com.ferbo.dao;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -96,6 +101,7 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				vigencia = cdd.getAvisoCve().getAvisoVigencia();
 				vigenciaInicio = cdd.getFechaIngreso();
 				vigenciaFin = DateUtil.fechaVencimiento(vigenciaInicio, vigencia, false);
+				
 				
 				cf = new ConstanciaFactura();
 				
