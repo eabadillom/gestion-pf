@@ -52,8 +52,9 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			query = em.createNamedQuery("Cliente.findByCteCve", Cliente.class)
 			.setParameter("cteCve", id);
 			cliente = (Cliente) query.getSingleResult();
-			
+			log.info(cliente.getMetodoPago());
 			if(isFullInfo == false)
+				
 				return cliente;
 			
 			if(cliente.getCandadoSalida() != null)
@@ -63,6 +64,9 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			RegimenFiscal regimen = cliente.getRegimenFiscal();
 			log.info(cliente.getRegimenFiscal().getCd_regimen());
 			String usoCfdi = cliente.getUsoCfdi().getUsoCfdi();
+			MetodoPago metodo = cliente.getMetodoPago();
+			log.info(cliente.getMetodoPago().getNbMetodoPago());
+			
 			
 			for(ClienteContacto clienteContacto : clienteContactoList) {
 				

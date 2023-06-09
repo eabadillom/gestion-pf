@@ -149,9 +149,9 @@
 										<p:selectOneMenu id="metodoPago" autoWidth="false"
 											converter="entityConverter"
 											value="#{facturacionConstanciasBean.metodoPagoSelect}"
-											required="true" requiredMessage="Ingresa un Metodo de Pago">
-											<f:selectItem itemLabel="---Seleccione---"
-												noSelectionOption="true" />
+											required="true" requiredMessage="Ingresa un Metodo de Pago" >
+											<f:selectItem itemLabel="#{facturacionConstanciasBean.clienteSelect.metodoPago.cdMetodoPago}-#{facturacionConstanciasBean.clienteSelect.metodoPago.nbMetodoPago}"
+												 itemValue="#{facturacionConstanciasBean.clienteSelect.metodoPago}" />
 											<f:selectItems
 												value="#{facturacionConstanciasBean.listaMetodoPago}"
 												var="metodoP"
@@ -164,8 +164,8 @@
 											converter="entityConverter"
 											value="#{facturacionConstanciasBean.medioPagoSelect}"
 											required="true" requiredMessage="Ingresa una Forma de Pago">
-											<f:selectItem itemLabel="---Seleccione---"
-												noSelectionOption="true" />
+											<f:selectItem itemLabel="#{facturacionConstanciasBean.formaPagoCliente.mpId}-#{facturacionConstanciasBean.formaPagoCliente.mpDescripcion}"
+												itemValue="#{facturacionConstanciasBean.formaPagoCliente}" />
 											<f:selectItems
 												value="#{facturacionConstanciasBean.listaMedioPago}"
 												var="medioP"

@@ -1041,7 +1041,6 @@ public class CalculoPrevioBean implements Serializable {
 		session.removeAttribute("metodoPago");
 		session.removeAttribute("domicilioSelect");
 		session.removeAttribute("serieFacturaSelect");
-
 		
 		if(factura.getId()!=null) {
 			facturacionBean.init();
@@ -1153,9 +1152,10 @@ public class CalculoPrevioBean implements Serializable {
 			}
 			
 			cfdi.setItems(listaItems);
+			
 			CfdiInfoModel registra = cfdiBL.registra(cfdi);
 			this.factura.setUuid(registra.getId());
-			facturaDAO.actualizar(factura);
+			facturaDAO.actualizar(this.factura);
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se genero correctamente";

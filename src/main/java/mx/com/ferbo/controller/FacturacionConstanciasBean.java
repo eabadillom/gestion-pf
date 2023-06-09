@@ -12,28 +12,15 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.application.FacesMessage.Severity;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
-
-import com.ferbo.facturama.business.CfdiBL;
-import com.ferbo.facturama.request.CFDIInfo;
-import com.ferbo.facturama.request.IssuerBindingModel;
-import com.ferbo.facturama.request.ItemFullBindingModel;
-import com.ferbo.facturama.request.ReceiverBindingModel;
-import com.ferbo.facturama.request.Tax;
-import com.ferbo.facturama.response.CfdiInfoModel;
-import com.ferbo.facturama.tools.FacturamaException;
 
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
@@ -50,9 +37,7 @@ import mx.com.ferbo.dao.SerieFacturaDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoFacturacionDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
-import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaFactura;
@@ -66,12 +51,10 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieFactura;
-import mx.com.ferbo.model.ServicioFactura;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.InventarioException;
 
 
 @Named
@@ -90,6 +73,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private MedioPago medioPagoSelect;
 	private Parametro iva,retencion;
 	private Factura factura;
+	private MedioPago formaPagoCliente;
 	
 	private ClienteDAO clienteDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
@@ -201,15 +185,19 @@ public class FacturacionConstanciasBean implements Serializable{
         selectedEntradas = new ArrayList<>();
 		selectedVigencias = new ArrayList<>();
 		selectedServicios = new ArrayList<>();
+		clienteSelect = new Cliente();
+		formaPagoCliente = new MedioPago();
+		medioPagoSelect = new MedioPago();
 		
 		if((clienteSelect!=null)&&(plantaSelect!=null)) {
 			facturacionEntradas();
 			facturacionServicios();
 			facturacionVigencias();
 			
-			PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios");
+			
 		}
 		
+		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios","form:medioPago");
 		
 		faceContext = FacesContext.getCurrentInstance();
         request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
@@ -466,9 +454,18 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.iva = iva;
 	}
 
+	public MedioPago getFormaPagoCliente() {
+		return formaPagoCliente;
+	}
+
+	public void setFormaPagoCliente(MedioPago formaPagoCliente) {
+		this.formaPagoCliente = formaPagoCliente;
+	}
+
 	public void domicilioAvisoPorCliente() {
 		
 		clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), false);
+		formaPagoCliente = medioPagoDAO.buscarPorFormaPago(clienteSelect.getFormaPago()); 
 		
 		iva = parametroDAO.buscarPorNombre("IVA");//
 		resIva = new BigDecimal(iva.getValor()); 
@@ -485,7 +482,7 @@ public class FacturacionConstanciasBean implements Serializable{
 								.collect(Collectors.toList());
 		if(listaClienteDomicilio.size()>0) {
 			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
-			
+		
 		}
 		
 		//llenado de select plazo de pago
@@ -493,6 +490,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		//carga de constancias si existe un cambio de cliente
 		cargarConstancias();
+		
+		PrimeFaces.current().ajax().update("form:medioPago");
 	}
 	
 	public void AvisoCliente() {
@@ -564,55 +563,72 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionEntradas(){
 		
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		EntityTransaction trans = em.getTransaction();
-		trans.begin();
-		facturacionConstanciasDAO.setEm(em);
+		EntityManager em = null;
 		
-		listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
-		
-		if(listaEntradas.isEmpty()){
-			listaEntradas = new ArrayList<>();
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			EntityTransaction trans = em.getTransaction();
+			trans.begin();
+			facturacionConstanciasDAO.setEm(em);
+			
+			listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
+			
+			if(listaEntradas.isEmpty()){
+				listaEntradas = new ArrayList<>();
+			}
+		} finally {
+			em.close();
 		}
 		
-		em.close();
 		
 	}
 	
 	public void facturacionVigencias(){
 		
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		EntityTransaction t = em.getTransaction();
-		t.begin();
-		facturacionVigenciasDAO.setEm(em);
+		EntityManager em = null;
+		try {
 		
-		System.out.println(fechaFactura);
-		DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
-		
-		listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
-		
-		if(listaVigencias.isEmpty()){
-			listaVigencias = new ArrayList<>();
+			em = EntityManagerUtil.getEntityManager();
+			EntityTransaction t = em.getTransaction();
+			t.begin();
+			facturacionVigenciasDAO.setEm(em);
+			
+			System.out.println(fechaFactura);
+			DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
+			
+			listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
+			
+			if(listaVigencias.isEmpty()){
+				listaVigencias = new ArrayList<>();
+			}
+		} finally {
+			em.close();
 		}
 		
-		em.close();
 		
 	}
 	
 	public void facturacionServicios(){
 		
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		EntityTransaction trans = em.getTransaction();
-		trans.begin();
-		facturacionServiciosDAO.setEm(em);
+		EntityManager em = null; 
 		
-		listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
-		
-		if(listaServicios.isEmpty()) {
-			listaServicios = new ArrayList<>();
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			EntityTransaction trans = em.getTransaction();
+			trans.begin();
+			facturacionServiciosDAO.setEm(em);
+			
+			listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
+			
+			if(listaServicios.isEmpty()) {
+				listaServicios = new ArrayList<>();
+			}
+		} finally {
+			em.close();//agregado
 		}
-		
-		em.close();//agregado 
+		 
 		
 	}
 	
