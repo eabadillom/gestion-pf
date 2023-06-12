@@ -42,6 +42,7 @@ import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.DomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
+import mx.com.ferbo.dao.SerieFacturaDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
@@ -965,7 +966,17 @@ public class CalculoPrevioBean implements Serializable {
 		try {
 			
 			if(factura.getId()==null) {
+				
+				
+				SerieFacturaDAO serieDAO = new SerieFacturaDAO();
+				
+				this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
+				
 				facturaDAO.guardar(factura);
+				
+				serieDAO.update(this.serieFacturaSelect);
+				
+				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
 				PrimeFaces.current().ajax().update("form:messages");
 			}
@@ -1154,8 +1165,12 @@ public class CalculoPrevioBean implements Serializable {
 			cfdi.setItems(listaItems);
 			
 			CfdiInfoModel registra = cfdiBL.registra(cfdi);
-			this.factura.setUuid(registra.getId());
-			facturaDAO.actualizar(this.factura);
+			
+			Factura factura = new Factura();
+			factura = facturaDAO.buscarPorId(this.factura.getId());
+			
+			factura.setUuid(registra.getId());
+			facturaDAO.actualizar(factura);
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se genero correctamente";
