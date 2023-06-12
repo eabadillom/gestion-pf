@@ -37,6 +37,15 @@ import com.ferbo.facturama.request.Tax;
 import com.ferbo.facturama.response.CfdiInfoModel;
 import com.ferbo.facturama.tools.FacturamaException;
 
+/*import com.ferbo.facturama.business.CfdiBL;
+import com.ferbo.facturama.request.CFDIInfo;
+import com.ferbo.facturama.request.IssuerBindingModel;
+import com.ferbo.facturama.request.ItemFullBindingModel;
+import com.ferbo.facturama.request.ReceiverBindingModel;
+import com.ferbo.facturama.request.Tax;
+import com.ferbo.facturama.response.CfdiInfoModel;
+import com.ferbo.facturama.tools.FacturamaException;*/
+
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
@@ -294,12 +303,12 @@ public class FacturaServiciosBean implements Serializable {
 	}
 
 	public void constancias() {
-		this.facturacionEntradas();
+		//this.facturacionEntradas();
 		this.facturacionVigencias();
 		PrimeFaces.current().ajax().update("form:dt-constanciasE", "form:dt-vigencias", "form:dt-servicios");
 	}
 
-	public void facturacionEntradas() {
+	/*public void facturacionEntradas() {
 
 		if (clienteSelect == null) {
 			return;
@@ -314,7 +323,7 @@ public class FacturaServiciosBean implements Serializable {
 			listaEntradas = new ArrayList<>();
 		}
 
-	}
+	}*/
 
 	public void facturacionVigencias() {
 		if (clienteSelect == null) {

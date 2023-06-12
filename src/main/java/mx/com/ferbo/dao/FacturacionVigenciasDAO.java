@@ -1,5 +1,7 @@
 package mx.com.ferbo.dao;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +15,9 @@ import org.apache.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
+import mx.com.ferbo.model.ConstanciaSalida;
+import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -20,6 +25,8 @@ import mx.com.ferbo.util.InventarioException;
 public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer> {
 	
 	private static Logger log = Logger.getLogger(FacturacionVigenciasDAO.class);
+	
+	EntityManager em = null;
 
 	@Override
 	public ConstanciaFactura buscarPorId(Integer id) {
@@ -46,11 +53,11 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 		List<ConstanciaDeDeposito> listaConstancias = null;
 		List<ConstanciaFactura> lConstanciaFactura = null;
 		ConstanciaFactura cf = null;
-		EntityManager em = null;
+		//EntityManager em = null;
 		String sql = null;
 		
 		try {
-			em = EntityManagerUtil.getEntityManager();
+			//em = EntityManagerUtil.getEntityManager();
 			list = new ArrayList<>();
 			sql = "SELECT "
 					+ "     folio, "
@@ -112,12 +119,11 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					+ ") s ON p.partida_cve = s.partida_cve "
 					+ "    WHERE "
 					+ "        cdd.aviso_cve IS NOT NULL "
-					+ "        AND peso > 0.0 "
-					+ "        AND cantidad > 0 "
 					+ "        AND cdd.cte_cve = :cteCve "
 					+ "        AND cdd.fecha_ingreso <= :fechaCorte "
 					+ "        AND plt.PLANTA_CVE = :plantaCve "
 					+ "        ) T "
+					+"         WHERE T.cantidad > 0 "
 					+ "GROUP BY "
 					+ "    folio, "
 					+ "    folio_cliente, "
@@ -152,8 +158,61 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				if(lConstanciaFactura.size() > 0)
 					continue;
 				
+				//constancia.getPartidaList();
+				
 				cf = this.getConstanciaFactura(constancia, fechaCorte);
 				list.add(cf);
+				
+				for(Partida p: constancia.getPartidaList()) {
+					BigDecimal cantidadT = new BigDecimal(p.getCantidadTotal());
+					BigDecimal pesoTotal = p.getPesoTotal();
+					BigDecimal cajasTarima = null;//cajas x Tarima
+					BigDecimal noTarimas = new BigDecimal(0);//noTarimas
+					BigDecimal tarimas = p.getNoTarimas();//cantidad_total
+					BigDecimal salidaCantidad = new BigDecimal(0),salidaPeso = new BigDecimal(0);
+					
+					cajasTarima = cantidadT.divide(tarimas).setScale(2);
+					
+					System.out.println("caja x tarima "+cajasTarima);
+					
+					for(DetalleConstanciaSalida dcs: p.getDetalleConstanciaSalidaList()) {
+						
+						ConstanciaSalida constanciaSalida = new ConstanciaSalida();
+						constanciaSalida = dcs.getConstanciaCve();//OBTENGO OBJETO SIMPLE
+						
+						if(constanciaSalida.getStatus().getId()==2)
+							continue;
+						
+						if(constanciaSalida.getFecha().after(cf.getVigenciaInicio()))
+							continue;
+						
+						BigDecimal cantidad = new BigDecimal(dcs.getCantidad());
+						BigDecimal peso = dcs.getPeso();
+						
+						salidaCantidad = salidaCantidad.add(cantidad);//suma total de cantidad salida
+						salidaPeso = salidaPeso.add(peso);//suma total de peso salida 
+						
+						System.out.println("Fecha "+constanciaSalida.getFecha());
+						
+					}
+					
+					cantidadT = cantidadT.subtract(salidaCantidad);
+					pesoTotal = pesoTotal.subtract(salidaPeso);
+					noTarimas = cantidadT.divide(cajasTarima,0,RoundingMode.UP);
+					
+					//seteo en partida
+					p.setCantidadTotal(cantidadT.intValue());
+					p.setPesoTotal(pesoTotal);
+					p.setNoTarimas(noTarimas);
+					
+					
+					System.out.println("La cantidad restante es: "+cantidadT + " El peso Total es: "+pesoTotal +" TarimaPre: "+noTarimas);
+					
+				}
+				
+				constancia.setConstanciaFacturaList(new ArrayList<>());
+				constancia.setConstanciaFacturaList(list);
+				
 			}
 			
 		} catch(Exception ex) {
@@ -201,6 +260,14 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 		cf.setVigenciaFin(vigenciaFin);
 		
 		return cf;
+	}
+	
+	public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
 	}
 
 	@Override

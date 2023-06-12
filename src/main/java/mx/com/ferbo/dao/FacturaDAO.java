@@ -62,13 +62,14 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 	@Override
 	public String actualizar(Factura f) {
 		try {
-			EntityManager entity = getEntityManager();
+			EntityManager entity = EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
-			entity.merge(f);
+			entity.merge(f);//posible error 
 			entity.getTransaction().commit();
 			entity.close();
 		}catch (Exception e){
 			System.out.println("Error al timbrar " + e.getMessage());
+			System.out.println("Error al timbrar " + e.getStackTrace());
 			return "Failed!!";
 		}
 		return null;
@@ -83,7 +84,9 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Factura" + e.getMessage());
+			System.out.println("ERROR guardando Factura" + e.getStackTrace());
+			System.out.println("ERROR guardando Factura" + e.getLocalizedMessage());
+			
 			return "ERROR";
 		}
 		return null;

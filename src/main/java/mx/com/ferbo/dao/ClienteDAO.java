@@ -15,7 +15,11 @@ import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.Telefono;
+import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
@@ -48,14 +52,21 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			query = em.createNamedQuery("Cliente.findByCteCve", Cliente.class)
 			.setParameter("cteCve", id);
 			cliente = (Cliente) query.getSingleResult();
-			
+			log.info(cliente.getMetodoPago());
 			if(isFullInfo == false)
+				
 				return cliente;
 			
 			if(cliente.getCandadoSalida() != null)
 				cliente.getCandadoSalida().getId();
 			
 			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
+			RegimenFiscal regimen = cliente.getRegimenFiscal();
+			log.info(cliente.getRegimenFiscal().getCd_regimen());
+			String usoCfdi = cliente.getUsoCfdi().getUsoCfdi();
+			MetodoPago metodo = cliente.getMetodoPago();
+			log.info(cliente.getMetodoPago().getNbMetodoPago());
+			
 			
 			for(ClienteContacto clienteContacto : clienteContactoList) {
 				

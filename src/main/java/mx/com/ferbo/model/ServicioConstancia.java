@@ -8,6 +8,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -90,6 +91,9 @@ public class ServicioConstancia implements Serializable {
     @Size(max = 10)
     @Column(name = "planta_cod")
     private String plantaCod;
+    @Size(max = 5)
+    @Column(name = "cd_unidad")
+    private String cdUnidad;
     @JoinColumn(name = "constancia", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private ConstanciaFactura constancia;
@@ -227,7 +231,15 @@ public class ServicioConstancia implements Serializable {
         this.plantaCod = plantaCod;
     }
 
-    @Override
+    public String getCdUnidad() {
+		return cdUnidad;
+	}
+
+	public void setCdUnidad(String cdUnidad) {
+		this.cdUnidad = cdUnidad;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

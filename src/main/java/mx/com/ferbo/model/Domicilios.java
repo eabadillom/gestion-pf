@@ -39,7 +39,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Domicilios.findByDomicilioCp", query = "SELECT d FROM Domicilios d WHERE d.domicilioCp = :domicilioCp"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel1", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel1 = :domicilioTel1"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel2", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel2 = :domicilioTel2"),
-    @NamedQuery(name = "Domicilios.findByDomicilioFax", query = "SELECT d FROM Domicilios d WHERE d.domicilioFax = :domicilioFax")})
+    @NamedQuery(name = "Domicilios.findByDomicilioFax", query = "SELECT d FROM Domicilios d WHERE d.domicilioFax = :domicilioFax"),
+    @NamedQuery(name = "Domicilios.findByAsentamiento", query = "SELECT d FROM Domicilios d WHERE d.ciudades.municipios.estados.paises.paisCve = :paisCve AND d.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve AND d.ciudades.municipios.municipiosPK.municipioCve = :municipioCve AND d.ciudades.ciudadesPK.ciudadCve = :ciudadCve AND d.domicilioColonia = :domicilioColonia" )})
 public class Domicilios implements Serializable {
 
     private static final long serialVersionUID = 1L;

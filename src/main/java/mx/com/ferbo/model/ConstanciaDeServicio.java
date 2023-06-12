@@ -98,7 +98,6 @@ public class ConstanciaDeServicio implements Serializable {
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
 
     
-    
     public ConstanciaDeServicio() {
     }
 

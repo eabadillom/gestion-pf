@@ -13,12 +13,16 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
+import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integer> {
 	
 	private static Logger log = Logger.getLogger(FacturacionServiciosDAO.class);
-
+	 
+	public EntityManager em = null;
+	
 	@Override
 	public ConstanciaFacturaDs buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -44,11 +48,11 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 		List<ConstanciaDeServicio> listaConstancias = null;
 		List<ConstanciaFacturaDs> lConstanciaFactura = null;
 		ConstanciaFacturaDs cf = null;
-		EntityManager em = null;
+		//EntityManager em = null;
 		String sql = null;
 		
 		try {
-			em = EntityManagerUtil.getEntityManager();
+			//em = EntityManagerUtil.getEntityManager();
 			list = new ArrayList<>();
 			sql = "SELECT "
 					+ " cs.FOLIO, "
@@ -85,6 +89,7 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 			listaConstancias = query.getResultList();
 			
 			for(ConstanciaDeServicio constancia : listaConstancias) {
+				List<ConstanciaServicioDetalle> allConstanciaServicioDetalle = constancia.getConstanciaServicioDetalleList();//recuperando constancias de servicio detalle de servicio ds
 				listaTmpConstancias = constancia.getConstanciaFacturaDsList();
 				lConstanciaFactura = listaTmpConstancias.stream()
 						.filter(c ->
@@ -101,8 +106,16 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 				cf.setConstanciaDeServicio(constancia);
 				cf.setFolioCliente(constancia.getFolioCliente());
 				
-				
+				// FALTA RELACION DE CONSTANCIA FACTURA DS CON LA CONSTANCIA DE SERVICIO constancia.setConstanciaFacturaDsList(null);
 				list.add(cf);
+				constancia.setConstanciaFacturaDsList(new ArrayList<>());
+				constancia.setConstanciaFacturaDsList(list);
+				//modificacion
+				for(ConstanciaServicioDetalle csd: allConstanciaServicioDetalle) {
+					List<PrecioServicio> allPrecioServicio = csd.getServicioCve().getPrecioServicioList();
+					System.out.println(allPrecioServicio.size());
+				}
+				
 			}
 			
 			
@@ -137,6 +150,14 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 	public String eliminarListado(List<ConstanciaFacturaDs> listado) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
 	}
 
 	
