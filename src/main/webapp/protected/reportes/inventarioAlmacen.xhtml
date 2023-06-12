@@ -26,11 +26,12 @@
                         	<p:toolbar>
 							<p:toolbarGroup>
                        			 <span class="ui-float-label ui-input-icon-left">
-									<p:selectOneMenu id="Cliente" autoWidth="true" value="#{reporteInventarioBean.idCliente}" filterMatchMode="startsWith">
-									<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
-									<f:selectItems var="cte" value="#{reporteInventarioBean.listaClientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
+									<p:selectOneMenu id="Cliente" value="#{reporteInventarioBean.clienteSelect}" converter="entityConverter" >
+									<f:selectItem itemLabel="" itemValue=""  />
+									<f:selectItems value="#{reporteInventarioBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+									<p:ajax process ="@this" />
 									</p:selectOneMenu>
-								<p:outputLabel for="@previous" value="Cliente" />
+								<p:outputLabel for="Cliente" value="Cliente" />
 							</span>
 							</p:toolbarGroup>
 							</p:toolbar>
@@ -47,7 +48,7 @@
 								</span>
 								
 								<span class="ui-float-label ui-input-icon-left"> 
-									<p:selectOneMenu id="so-camara" value="#{reporteInventarioBean.camaraSelect}" style="width:130px;">
+									<p:selectOneMenu id="so-camara" value="#{reporteInventarioBean.camaraSelect}" converter="entityConverter" style="width:130px;">
 										<f:selectItem itemLabel="" itemValue="" />
 										<f:selectItems value="#{reporteInventarioBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}"  itemValue="#{c}"/>
 										<p:ajax process ="@this" />
@@ -65,8 +66,8 @@
 						        
 						    </h:form>
 						</div>
-						<p:commandButton value="Descargar pdf" actionListener="#{reporteInventarioBean.exportarPdf}" process="@this"/>  
-						<p:commandButton value="Descargar excel" actionListener="#{reporteInventarioBean.exportarExcel}" process="@this"/>  
+						<p:commandButton value="Descargar pdf" actionListener="#{reporteInventarioBean.exportarPdf}" process="@this" ajax="false"/>  
+						<p:commandButton value="Descargar excel" actionListener="#{reporteInventarioBean.exportarExcel}" process="@this" ajax="false"/>  
 						</p:fieldset>
 						
 						
