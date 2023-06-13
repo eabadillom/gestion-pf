@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -55,29 +56,29 @@ public class ReporteInventarioBean implements Serializable {
 	private static Logger log = Logger.getLogger(ReporteInventarioBean.class);
 
 	private Date fecha;
-	
+
 	private Planta plantaSelect;
 	private Camara camaraSelect;
 	private Cliente clienteSelect;
-	
+
 	private List<Cliente> listaClientes;
 	private List<Planta> listaPlanta;
 	private List<Camara> listaCamara;
-	
+
 	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
-	
+
 	public ReporteInventarioBean() {
 		fecha = new Date();
+
 		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
-		
+
 		listaClientes = new ArrayList<Cliente>();
 		listaPlanta = new ArrayList<Planta>();
 		listaCamara = new ArrayList<Camara>();
-		
 
 	}
 	@PostConstruct
@@ -89,6 +90,7 @@ public class ReporteInventarioBean implements Serializable {
 		listaClientes = clienteDAO.buscarHabilitados(true);
 		listaPlanta = plantaDAO.buscarTodos();
 		listaCamara = camaraDAO.buscarTodos();
+		
 		
 	}
 	
@@ -145,6 +147,10 @@ public class ReporteInventarioBean implements Serializable {
 			}
 
 		}
+	
+	public void sleep() throws InterruptedException {
+        TimeUnit.SECONDS.sleep(5);
+    }
 	public void exportarExcel() throws JRException, IOException, SQLException{
 		System.out.println("Exportando a excel.....");
 			String jasperPath = "/jasper/InventarioAlmacen.jrxml";

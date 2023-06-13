@@ -23,8 +23,6 @@
 						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteInventarioBean.fecha}" />
 						
                         <p:fieldset legend="Datos del emisor/receptor">
-                        	<p:toolbar>
-							<p:toolbarGroup>
                        			 <span class="ui-float-label ui-input-icon-left">
 									<p:selectOneMenu id="Cliente" value="#{reporteInventarioBean.clienteSelect}" converter="entityConverter" >
 									<f:selectItem itemLabel="" itemValue=""  />
@@ -33,11 +31,7 @@
 									</p:selectOneMenu>
 								<p:outputLabel for="Cliente" value="Cliente" />
 							</span>
-							</p:toolbarGroup>
-							</p:toolbar>
 							
-						<p:outputPanel id="op-datosInventario">
-						
 								<span class="ui-float-label ui-input-icon-left"> 
 									<p:selectOneMenu id="so-planta" value="#{reporteInventarioBean.plantaSelect}" converter="entityConverter"  style="width:220px;">
 										<f:selectItem itemLabel="" itemValue="" />
@@ -56,18 +50,28 @@
 								<p:outputLabel for="so-camara" value="Camara " />
 								</span>
 								
-							</p:outputPanel>
-							
 					</p:fieldset>
 					
-					  <p:fieldset legend="Opciones de descarga" styleClass="p-mt-2">
-					<div class="card">
-						    <h:form>
-						        
-						    </h:form>
-						</div>
-						<p:commandButton value="Descargar pdf" actionListener="#{reporteInventarioBean.exportarPdf}" process="@this" ajax="false"/>  
-						<p:commandButton value="Descargar excel" actionListener="#{reporteInventarioBean.exportarExcel}" process="@this" ajax="false"/>  
+					  <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+					  <p:toolbar>
+				<p:toolbarGroup>
+					   <div class="col-5 flex align-items-center justify-content-center">
+						<p:commandButton value=".pdf" actionListener="#{reporteInventarioBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+						 </div>
+							         <div class="col-2">
+							            <p:divider layout="vertical">
+							                <b>OR</b>
+							            </p:divider>
+							        </div>
+							        
+										 <div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value=".xlsx"  actionListener="#{reporteInventarioBean.exportarExcel}" action="#{reporteInventarioBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+							     </div>
+							        </p:toolbarGroup>
+
+							        </p:toolbar>
+							        
+
 						</p:fieldset>
 						
 						
