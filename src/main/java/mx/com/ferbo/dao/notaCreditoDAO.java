@@ -21,5 +21,18 @@ public class notaCreditoDAO {
 		return notaCredito;
 	}
 	
+	public void guardar(NotaCredito notaCredito) {
+		try {
+			
+			entity.getTransaction().begin();
+			entity.persist(notaCredito);
+			entity.getTransaction().commit();
+			entity.close();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+	}
+	
 	 
 }

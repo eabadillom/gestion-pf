@@ -45,9 +45,16 @@
 						<p:outputLabel value="Con letra:" styleClass="p-ml-4 p-mr-2"/>
 						<b><p:outputLabel id="montoLetra" value="#{altaNotasCredito.montoLetra}"/></b>
 						
+						
+						<p:selectOneMenu id="serieNota" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.serieNotaSelect}"  >
+						 	<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
+						 	<f:selectItems value="#{altaNotasCredito.listaSerieNota}" var="serieNota" itemLabel="#{serieNota}" itemValue="#{serieNota}" />
+						</p:selectOneMenu>					
+						
+						
 					</p:outputPanel>		
 				
-				
+					
 				
 			
 				<p:divider></p:divider>
@@ -178,7 +185,7 @@
 					
 					<f:facet name="footer">
 						<p:commandButton value="Enviar" action="#{altaNotasCredito.facturasSeleccionadas()}" process="factura-mod @this"  update="form:t-cantidad form:factura-mod form:montoLetra" onclick="PF('dlgFactura').hide()"/>
-						<p:commandButton value="Cancelar" onclick="PF('dlgFactura').hide();" class="ui-button-secondary" icon="pi pi-times" />
+						<p:commandButton value="Cancelar" onclick="PF('dlgFactura').hide();" class="ui-button-secondary" icon="pi pi-times" process="@this"/>
 					</f:facet>
 					
 				</p:dialog>

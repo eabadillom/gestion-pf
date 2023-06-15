@@ -4,13 +4,15 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-//@Entity
+@Entity
 @Table(name = "NOTA_X_FACTURAS")
 @NamedQueries({
 	
@@ -25,6 +27,7 @@ public class NotaPorFactura implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
+	@Id
 	@JoinColumn(name = "NOTA", referencedColumnName = "ID")
     @ManyToOne
 	private NotaCredito nota;
@@ -35,6 +38,8 @@ public class NotaPorFactura implements Serializable{
 	
 	@Column(name = "CANTIDAD")
 	private BigDecimal cantidad;
+	
+	
 	
 	public NotaPorFactura(){
 		

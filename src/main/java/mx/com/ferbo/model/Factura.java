@@ -251,6 +251,8 @@ public class Factura implements Serializable {
     private List<ConstanciaFactura> constanciaFacturaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
     private List<ConstanciaFacturaCmp> constanciaFacturaCmpList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
+    private List<NotaPorFactura> notaFacturaList;
 
     public Factura() {
     }
@@ -709,7 +711,15 @@ public class Factura implements Serializable {
         this.constanciaFacturaCmpList = constanciaFacturaCmpList;
     }
 
-    @Override
+    public List<NotaPorFactura> getNotaFacturaList() {
+		return notaFacturaList;
+	}
+
+	public void setNotaFacturaList(List<NotaPorFactura> notaFacturaList) {
+		this.notaFacturaList = notaFacturaList;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

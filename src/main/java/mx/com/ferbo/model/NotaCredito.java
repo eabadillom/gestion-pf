@@ -115,6 +115,8 @@ public class NotaCredito implements Serializable {
     private String cajero;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nota")
     private List<CancelaNotaCredito> cancelaNotaCreditoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nota")
+    private List<NotaPorFactura> notaFacturaList;
     @JoinColumn(name = "STATUS", referencedColumnName = "ID")
     @ManyToOne(optional = false)
     private StatusNotaCredito status;
@@ -280,7 +282,15 @@ public class NotaCredito implements Serializable {
         this.status = status;
     }
 
-    @Override
+    public List<NotaPorFactura> getNotaFacturaList() {
+		return notaFacturaList;
+	}
+
+	public void setNotaFacturaList(List<NotaPorFactura> notaFacturaList) {
+		this.notaFacturaList = notaFacturaList;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

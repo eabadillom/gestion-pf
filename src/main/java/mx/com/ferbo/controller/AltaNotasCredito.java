@@ -3,7 +3,6 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +19,9 @@ import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
+import mx.com.ferbo.dao.NotaPorFacturaDAO;
+import mx.com.ferbo.dao.SerieNotaDAO;
+import mx.com.ferbo.dao.notaCreditoDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
@@ -27,6 +29,7 @@ import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.NotaCredito;
 import mx.com.ferbo.model.NotaPorFactura;
+import mx.com.ferbo.model.SerieNota;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.StatusNotaCredito;
 import mx.com.ferbo.util.FormatUtil;
@@ -43,11 +46,15 @@ public class AltaNotasCredito implements Serializable{
 	private List<ClienteDomicilios> listaClienteDom;
 	private List<ClienteDomicilios> listaClienteDomicilio;
 	private List<NotaPorFactura> listaNotaXFactura;
+	private List<SerieNota> listaSerieNota;
 	
 	private ClienteDAO clienteDAO;
 	private FacturaDAO facturaDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
 	private AsentamientoHumandoDAO asentamientoHumanoDAO;
+	private notaCreditoDAO notaCreditoDAO;
+	private SerieNotaDAO serieNotaDAO;
+	//private NotaPorFacturaDAO notaFactDAO;
 	
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
@@ -55,6 +62,7 @@ public class AltaNotasCredito implements Serializable{
 	private NotaPorFactura notaPorFactura;
 	private AsentamientoHumano asentamientoCliente;
 	private NotaCredito notaCredito;
+	private SerieNota serieNotaSelect;
 	
 	private Boolean pagoParcial;
 	private Boolean porCobrar;
@@ -74,17 +82,23 @@ public class AltaNotasCredito implements Serializable{
 		listaClienteDom = new ArrayList<ClienteDomicilios>();
 		listaClienteDomicilio = new ArrayList<ClienteDomicilios>();
 		listaNotaXFactura = new ArrayList<NotaPorFactura>();
+		listaSerieNota = new ArrayList<SerieNota>();
 		
 		clienteDAO = new ClienteDAO();
 		facturaDAO = new FacturaDAO();
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		asentamientoHumanoDAO = new AsentamientoHumandoDAO();
+		notaCreditoDAO = new notaCreditoDAO();
+		serieNotaDAO = new SerieNotaDAO();
+		//notaFactDAO = new NotaPorFacturaDAO();
 		
 		clienteSelect = new Cliente();
 		domicilioSelect = new Domicilios();
 		facturaSelect = new Factura();
+		serieNotaSelect = new SerieNota();
 		notaPorFactura = new NotaPorFactura();
 		notaCredito = new NotaCredito();
+		
 		
 		
 	}
@@ -94,6 +108,7 @@ public class AltaNotasCredito implements Serializable{
 		
 		listaClientes = clienteDAO.buscarTodos();
 		listaClienteDom = clienteDomicilioDAO.buscarTodos();
+		listaSerieNota = serieNotaDAO.findAll();
 		
 		porCobrar = false;
 		pagada = false;
@@ -252,6 +267,22 @@ public class AltaNotasCredito implements Serializable{
 		this.total = total;
 	}
 
+	public List<SerieNota> getListaSerieNota() {
+		return listaSerieNota;
+	}
+
+	public void setListaSerieNota(List<SerieNota> listaSerieNota) {
+		this.listaSerieNota = listaSerieNota;
+	}
+
+	public SerieNota getSerieNotaSelect() {
+		return serieNotaSelect;
+	}
+
+	public void setSerieNotaSelect(SerieNota serieNotaSelect) {
+		this.serieNotaSelect = serieNotaSelect;
+	}
+
 	public void filtroFactura() {
 		
 		String message = null;
@@ -328,8 +359,7 @@ public class AltaNotasCredito implements Serializable{
 		notaPorFactura.setFactura(facturaSelect);
 		notaPorFactura.setCantidad(cantidad);
 		
-		listaNotaXFactura.add(notaPorFactura);
-		
+		listaNotaXFactura.add(notaPorFactura);		
 		
 		FormatUtil formato = new FormatUtil();
 		
@@ -348,22 +378,61 @@ public class AltaNotasCredito implements Serializable{
 		asentamientoCliente = asentamientoHumanoDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(), domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve() , domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(), domicilioSelect.getDomicilioColonia());
 		String domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
 		
-		notaCredito.setNumero(null);//DUDA
-		notaCredito.setIdcliente(clienteSelect.getCteCve());
-		notaCredito.setCliente(clienteSelect.getCteNombre());
-		notaCredito.setDomicilio(domicilio);
-		notaCredito.setRfc(clienteSelect.getCteRfc());
-		notaCredito.setSubtotal(sumaSubtotal);//duda
-		notaCredito.setIva(ivaSubtotal);//duda
-		notaCredito.setTotal(total);//duda
-		notaCredito.setTotalLetra(montoLetra);
-		
 		StatusNotaCredito statusNotaCredito = new StatusNotaCredito();
 		statusNotaCredito.setId(1);
 		
-		notaCredito.setStatus(statusNotaCredito);
-		
+		try {
+			notaCredito.setNumero(null);//DUDA
+			notaCredito.setIdcliente(clienteSelect.getCteCve());
+			notaCredito.setCliente(clienteSelect.getCteNombre());
+			notaCredito.setDomicilio(domicilio);
+			notaCredito.setRfc(clienteSelect.getCteRfc());
+			notaCredito.setSubtotal(sumaSubtotal);
+			notaCredito.setIva(ivaSubtotal);
+			notaCredito.setTotal(total);
+			notaCredito.setTotalLetra(montoLetra);
+			notaCredito.setStatus(statusNotaCredito);
+			notaCredito.setNotaFacturaList(new ArrayList<NotaPorFactura>());
+			notaCredito.getNotaFacturaList().addAll(listaNotaXFactura);
+			
+			for(NotaPorFactura ntf: listaNotaXFactura) {
+				ntf.setNota(notaCredito);
+				
+				//Actualizacion de factura
+				StatusFactura statusF = new StatusFactura();
+				
+				//si cantidad es igual a total de factura
+				if((ntf.getCantidad().compareTo(ntf.getFactura().getTotal())==0)) {
+					statusF.setId(3);
+				}
+				
+				
+				//si cantidad es menor que el total de factura
+				if((ntf.getCantidad().compareTo(ntf.getFactura().getTotal())==-1)) {
+					statusF.setId(4);
+				}
+				
+				ntf.getFactura().setStatus(statusF);
+				
+				facturaDAO.actualizar(ntf.getFactura());
+				
+				
+			}
+			
+			notaCreditoDAO.guardar(notaCredito);
+			
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+			
 	}
+	
+	/*public void serieNota() {
+		
+		serieNotaSelect = listaSerieNota.get(0);
+		
+	}*/
 	
 	
 
