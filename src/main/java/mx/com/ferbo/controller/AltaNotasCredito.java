@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,9 +16,11 @@ import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
+import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Domicilios;
@@ -25,6 +28,7 @@ import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.NotaCredito;
 import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.model.StatusFactura;
+import mx.com.ferbo.model.StatusNotaCredito;
 import mx.com.ferbo.util.FormatUtil;
 
 @Named
@@ -43,11 +47,14 @@ public class AltaNotasCredito implements Serializable{
 	private ClienteDAO clienteDAO;
 	private FacturaDAO facturaDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
+	private AsentamientoHumandoDAO asentamientoHumanoDAO;
 	
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
 	private Factura facturaSelect;
 	private NotaPorFactura notaPorFactura;
+	private AsentamientoHumano asentamientoCliente;
+	private NotaCredito notaCredito;
 	
 	private Boolean pagoParcial;
 	private Boolean porCobrar;
@@ -55,6 +62,8 @@ public class AltaNotasCredito implements Serializable{
 	private BigDecimal cantidad;
 	private BigDecimal totalCantidad;
 	private String montoLetra;
+	private BigDecimal sumaSubtotal,ivaSubtotal,total;
+	
 	
 	
 	
@@ -69,11 +78,13 @@ public class AltaNotasCredito implements Serializable{
 		clienteDAO = new ClienteDAO();
 		facturaDAO = new FacturaDAO();
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
+		asentamientoHumanoDAO = new AsentamientoHumandoDAO();
 		
 		clienteSelect = new Cliente();
 		domicilioSelect = new Domicilios();
 		facturaSelect = new Factura();
 		notaPorFactura = new NotaPorFactura();
+		notaCredito = new NotaCredito();
 		
 		
 	}
@@ -89,6 +100,9 @@ public class AltaNotasCredito implements Serializable{
 		pagoParcial = false;
 		cantidad = new BigDecimal(0).setScale(2);
 		totalCantidad = new BigDecimal(0).setScale(2);
+		sumaSubtotal = new BigDecimal(0).setScale(2);
+		ivaSubtotal = new BigDecimal(0).setScale(2);
+		total = new BigDecimal(0).setScale(2);
 		
 	}
 	
@@ -198,6 +212,46 @@ public class AltaNotasCredito implements Serializable{
 		this.montoLetra = montoLetra;
 	}
 
+	public AsentamientoHumano getAsentamientoCliente() {
+		return asentamientoCliente;
+	}
+
+	public void setAsentamientoCliente(AsentamientoHumano asentamientoCliente) {
+		this.asentamientoCliente = asentamientoCliente;
+	}
+	
+	public NotaCredito getNotaCredito() {
+		return notaCredito;
+	}
+
+	public void setNotaCredito(NotaCredito notaCredito) {
+		this.notaCredito = notaCredito;
+	}
+
+	public BigDecimal getSumaSubtotal() {
+		return sumaSubtotal;
+	}
+
+	public void setSumaSubtotal(BigDecimal sumaSubtotal) {
+		this.sumaSubtotal = sumaSubtotal;
+	}
+
+	public BigDecimal getIvaSubtotal() {
+		return ivaSubtotal;
+	}
+
+	public void setIvaSubtotal(BigDecimal ivaSubtotal) {
+		this.ivaSubtotal = ivaSubtotal;
+	}
+
+	public BigDecimal getTotal() {
+		return total;
+	}
+
+	public void setTotal(BigDecimal total) {
+		this.total = total;
+	}
+
 	public void filtroFactura() {
 		
 		String message = null;
@@ -259,9 +313,16 @@ public class AltaNotasCredito implements Serializable{
 		}
 	}
 	
-	public void facturasSeleccionadas() {
+	public void facturasSeleccionadas() {//AQUI VAN LAS SUMAS 
 		
-		totalCantidad = totalCantidad.add(cantidad);
+		//SUMAS GENERALES
+		BigDecimal iva = new BigDecimal(.16).setScale(2,BigDecimal.ROUND_HALF_UP);
+		
+		sumaSubtotal = sumaSubtotal.add(facturaSelect.getSubtotal()).setScale(2,BigDecimal.ROUND_HALF_UP);
+		ivaSubtotal = sumaSubtotal.multiply(iva).setScale(2,BigDecimal.ROUND_HALF_UP);
+		total = sumaSubtotal.add(ivaSubtotal);
+		
+		totalCantidad = totalCantidad.add(cantidad).setScale(2,BigDecimal.ROUND_HALF_UP);
 		
 		notaPorFactura = new NotaPorFactura();
 		notaPorFactura.setFactura(facturaSelect);
@@ -277,6 +338,30 @@ public class AltaNotasCredito implements Serializable{
 		cantidad = new BigDecimal(0).setScale(2);
 		
 		PrimeFaces.current().ajax().update("form:dt-NotasPorFactura","form:cantidad","form:montoLetra");
+		
+	}
+	
+	
+	
+	public void save() {
+		
+		asentamientoCliente = asentamientoHumanoDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(), domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve() , domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(), domicilioSelect.getDomicilioColonia());
+		String domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
+		
+		notaCredito.setNumero(null);//DUDA
+		notaCredito.setIdcliente(clienteSelect.getCteCve());
+		notaCredito.setCliente(clienteSelect.getCteNombre());
+		notaCredito.setDomicilio(domicilio);
+		notaCredito.setRfc(clienteSelect.getCteRfc());
+		notaCredito.setSubtotal(sumaSubtotal);//duda
+		notaCredito.setIva(ivaSubtotal);//duda
+		notaCredito.setTotal(total);//duda
+		notaCredito.setTotalLetra(montoLetra);
+		
+		StatusNotaCredito statusNotaCredito = new StatusNotaCredito();
+		statusNotaCredito.setId(1);
+		
+		notaCredito.setStatus(statusNotaCredito);
 		
 	}
 	

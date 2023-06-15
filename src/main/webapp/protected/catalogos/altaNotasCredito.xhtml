@@ -22,7 +22,6 @@
 		
 		<p:toolbar>	
 			<p:toolbarGroup>
-							
 					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.clienteSelect}" >
 						<f:selectItem itemLabel="---Seleccione un cliente ---" noSelectionOption="true" />
 						<f:selectItems value="#{altaNotasCredito.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
@@ -47,7 +46,8 @@
 						<b><p:outputLabel id="montoLetra" value="#{altaNotasCredito.montoLetra}"/></b>
 						
 					</p:outputPanel>		
-							
+				
+				
 				
 			
 				<p:divider></p:divider>
@@ -65,6 +65,43 @@
 				<p:selectBooleanCheckbox itemLabel="Pagada" value="#{altaNotasCredito.pagada}">
 					<p:ajax listener="#{altaNotasCredito.filtroFactura()}" />
 				</p:selectBooleanCheckbox>
+				
+				<div style="margin-top: 10px" >
+					<p:fieldset legend="Datos Generales">
+						<p:outputPanel id="notaCredito" >
+							<p:panelGrid layout="flex" columns="6"
+												columnClasses="col-12 md:col-3 xl:col-2, 
+																			col-12 md:col-9 xl:col-4, 
+																			col-12 md:col-3 xl:col-2, 
+																			col-12 md:col-9 xl:col-4,
+																			col-12 md:col-3 xl:col-2, 
+																			col-12 md:col-9 xl:col-4"
+												contentStyleClass="ui-fluid" styleClass="customPanelGrid">
+							
+							
+								<p:outputLabel value="Fecha:" />
+								<p:datePicker showIcon="true" value="#{altaNotasCredito.notaCredito.fecha}" /> 
+													
+								<p:outputLabel value="Por los Servicios:" />
+								<p:inputText value="#{altaNotasCredito.notaCredito.servicios}" />
+								
+								<p:outputLabel value="Segun C.D. No:" />
+								<p:inputText value="#{altaNotasCredito.notaCredito.constancia}" />
+								
+								<p:outputLabel value="Periodo:" />
+								<p:inputText value="#{altaNotasCredito.notaCredito.periodo}" />
+								
+								<p:outputLabel value="Observaciones:" />
+								<p:inputTextarea value="#{altaNotasCredito.notaCredito.observaciones}" />
+								
+								<p:outputLabel value="Cajero:" />
+								<p:inputText value="#{altaNotasCredito.notaCredito.cajero}" />
+							
+							
+							</p:panelGrid>
+						</p:outputPanel>
+					</p:fieldset>
+				</div>
 		
 			</p:toolbarGroup>
 		</p:toolbar>
@@ -74,7 +111,7 @@
 				<div class="card">
 				
 				<p:dataTable id="dt-factura" value="#{altaNotasCredito.listaFactura}" var="factura" paginator="true" paginatorPosition="bottom"
-							reflow="true" rowKey="#{factura.id}" >
+							reflow="true" rowKey="#{factura.id}" rows="5">
 				
 					<f:facet name="header">
 						<div>
@@ -83,7 +120,7 @@
 					</f:facet>
 					
 					<p:column headerText="ID">
-						<h:outputText value="#{factura.id}"  />
+						<h:outputText value="#{factura.nomSerie}-#{factura.numero}"  />
 					</p:column>
 					
 					<p:column headerText="Fecha">
@@ -94,7 +131,7 @@
 						<h:outputText value="#{factura.subtotal}" />
 					</p:column>
 					
-					<p:column headerText="Iva">
+					<p:column headerText="IVA">
 						<h:outputText value="#{factura.iva}" />
 					</p:column>
 					
@@ -156,10 +193,16 @@
 				<div class="card">
 				
 					<p:dataTable id="dt-NotasPorFactura" reflow="true" value="#{altaNotasCredito.listaNotaXFactura}" var="notaFac" rowKey="#{notaFac.factura.id}" 
-								paginator="true" paginatorPosition="bottom">
+								paginator="true" paginatorPosition="bottom" rows="5">
+								
+						<f:facet name="header">
+							<div>
+								<span>Notas Por Factura</span>
+							</div>
+						</f:facet>
 					
 						<p:column headerText="Factura">
-							<h:outputText value="#{notaFac.factura.id}" />
+							<h:outputText value="#{notaFac.factura.nomSerie}-#{notaFac.factura.numero}" />
 						</p:column>
 						
 						<p:column headerText="Fecha">
@@ -170,7 +213,7 @@
 							<h:outputText value="#{notaFac.factura.subtotal}" />
 						</p:column>
 						
-						<p:column headerText="Iva">
+						<p:column headerText="IVA">
 							<h:outputText value="#{notaFac.factura.iva}" />
 						</p:column>
 						
@@ -182,7 +225,24 @@
 							<h:outputText value="#{notaFac.cantidad}" />
 						</p:column>
 					
+						<f:facet name="footer">
+							<div>
+								<p:outputLabel value="Bueno por $"><p:outputLabel id="subTotal" value="#{altaNotasCredito.sumaSubtotal}" /></p:outputLabel>
+							</div>
+							<div>
+								<p:outputLabel value="I.V.A. $"><p:outputLabel id="iva" value="#{altaNotasCredito.ivaSubtotal}" /></p:outputLabel>
+							</div>			
+							<div>
+								<p:outputLabel value="A Pagar $"><p:outputLabel id="total" value="#{altaNotasCredito.total}" /></p:outputLabel>
+							</div>
+						</f:facet>
+					
 					</p:dataTable>
+					
+					<div style="margin-top: 10px;">
+						<p:commandButton value="Guardar" actionListener="#{altaNotasCredito.save()}" update="notaCredito" process="notaCredito @this" >
+						</p:commandButton>
+					</div>
 				
 				</div>
 			</div>
