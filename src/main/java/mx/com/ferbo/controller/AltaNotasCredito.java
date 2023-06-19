@@ -29,6 +29,7 @@ import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.NotaCredito;
 import mx.com.ferbo.model.NotaPorFactura;
+import mx.com.ferbo.model.NotaPorFacturaPK;
 import mx.com.ferbo.model.SerieNota;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.StatusNotaCredito;
@@ -289,6 +290,7 @@ public class AltaNotasCredito implements Serializable{
 		Severity severity = null;
 		StatusFactura sf = new StatusFactura();
 		listaFactura.clear();
+		listaNotaXFactura.clear();
 		
 		try {
 			
@@ -381,8 +383,12 @@ public class AltaNotasCredito implements Serializable{
 		StatusNotaCredito statusNotaCredito = new StatusNotaCredito();
 		statusNotaCredito.setId(1);
 		
+		
 		try {
-			notaCredito.setNumero(null);//DUDA
+			
+			serieNotaSelect.setNumeroActual(serieNotaSelect.getNumeroActual()+1);
+			serieNotaDAO.update(serieNotaSelect);
+			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual()));//DUDA
 			notaCredito.setIdcliente(clienteSelect.getCteCve());
 			notaCredito.setCliente(clienteSelect.getCteNombre());
 			notaCredito.setDomicilio(domicilio);
@@ -396,6 +402,12 @@ public class AltaNotasCredito implements Serializable{
 			notaCredito.getNotaFacturaList().addAll(listaNotaXFactura);
 			
 			for(NotaPorFactura ntf: listaNotaXFactura) {
+				
+				NotaPorFacturaPK notaFacturaPK = new NotaPorFacturaPK();
+				notaFacturaPK.setNota(notaCredito);
+				notaFacturaPK.setFactura(ntf.getFactura());
+				
+				ntf.setNotaPorFacturaPK(notaFacturaPK);
 				ntf.setNota(notaCredito);
 				
 				//Actualizacion de factura
@@ -413,6 +425,8 @@ public class AltaNotasCredito implements Serializable{
 				}
 				
 				ntf.getFactura().setStatus(statusF);
+				ntf.getFactura().setNotaFacturaList(new ArrayList<>());
+				ntf.getFactura().getNotaFacturaList().add(ntf);
 				
 				facturaDAO.actualizar(ntf.getFactura());
 				
@@ -421,6 +435,11 @@ public class AltaNotasCredito implements Serializable{
 			
 			notaCreditoDAO.guardar(notaCredito);
 			
+			//notaCredito = new NotaCredito();
+			//-----Actualizar Tablas---
+			filtroFactura();
+			notaCredito = new NotaCredito();
+			PrimeFaces.current().ajax().update("form:dt-factura","form:dt-NotasPorFactura");
 			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JPAEntity;
 import mx.com.ferbo.model.NotaCredito;
 
@@ -23,13 +24,14 @@ public class notaCreditoDAO {
 	
 	public void guardar(NotaCredito notaCredito) {
 		try {
-			
-			entity.getTransaction().begin();
-			entity.persist(notaCredito);
-			entity.getTransaction().commit();
-			entity.close();
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(notaCredito);
+			em.getTransaction().commit();
+			em.close();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 	}

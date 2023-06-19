@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -16,24 +17,24 @@ import javax.persistence.Table;
 @Table(name = "NOTA_X_FACTURAS")
 @NamedQueries({
 	
-	@NamedQuery(name = "NotaPorFactura.findByAll", query = "SELECT nf FROM NotaPorFactura nf"),
-	@NamedQuery(name = "NotaPorFactura.findByNotaCredito", query = "SELECT nf FROM NotaPorFactura nf WHERE nf.nota = :nota"),
-	@NamedQuery(name = "NotaPorFactura.findByFactura", query = "SELECT nf FROM NotaPorFactura nf WHERE nf.factura = :factura"),
+	@NamedQuery(name = "NotaPorFactura.findByAll", query = "SELECT nf FROM NotaPorFactura nf")
 	
 })
 
 
-public class NotaPorFactura implements Serializable{
+public class NotaPorFactura implements Serializable, Cloneable{
 
 	private static final long serialVersionUID = 1L;
 	
-	@Id
-	@JoinColumn(name = "NOTA", referencedColumnName = "ID")
-    @ManyToOne
+	@EmbeddedId
+	private NotaPorFacturaPK notaPorFacturaPK;
+	
+	@JoinColumn(name = "NOTA", referencedColumnName = "ID",insertable = false, updatable = false)
+    @ManyToOne(optional = false)
 	private NotaCredito nota;
 	
-	@JoinColumn(name = "FACTURA", referencedColumnName = "id")
-    @ManyToOne
+	@JoinColumn(name = "FACTURA", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
     private Factura factura;
 	
 	@Column(name = "CANTIDAD")
@@ -43,6 +44,15 @@ public class NotaPorFactura implements Serializable{
 	
 	public NotaPorFactura(){
 		
+	}
+	
+
+	public NotaPorFacturaPK getNotaPorFacturaPK() {
+		return notaPorFacturaPK;
+	}
+
+	public void setNotaPorFacturaPK(NotaPorFacturaPK notaPorFacturaPK) {
+		this.notaPorFacturaPK = notaPorFacturaPK;
 	}
 
 	public NotaCredito getNota() {
@@ -69,12 +79,13 @@ public class NotaPorFactura implements Serializable{
 		this.cantidad = cantidad;
 	}
 
+
 	@Override
 	public String toString() {
-		return "NotaPorFactura [nota=" + nota + ", factura=" + factura + ", cantidad=" + cantidad + "]";
+		return "NotaPorFactura [notaPorFacturaPK=" + notaPorFacturaPK + ", nota=" + nota + ", factura=" + factura
+				+ ", cantidad=" + cantidad + "]";
 	}
-	
-	
+
 	
 	
 }

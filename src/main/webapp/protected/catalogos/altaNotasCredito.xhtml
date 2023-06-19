@@ -46,9 +46,10 @@
 						<b><p:outputLabel id="montoLetra" value="#{altaNotasCredito.montoLetra}"/></b>
 						
 						
+						<p:outputLabel value="Serie Nota:" styleClass="p-ml-4 p-mr-2"/>
 						<p:selectOneMenu id="serieNota" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.serieNotaSelect}"  >
 						 	<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
-						 	<f:selectItems value="#{altaNotasCredito.listaSerieNota}" var="serieNota" itemLabel="#{serieNota}" itemValue="#{serieNota}" />
+						 	<f:selectItems value="#{altaNotasCredito.listaSerieNota}" var="serieNota" itemLabel="#{serieNota.numeroActual+1}-#{serieNota.statusSerie.descripcion} " itemValue="#{serieNota}" />
 						</p:selectOneMenu>					
 						
 						
@@ -247,7 +248,7 @@
 					</p:dataTable>
 					
 					<div style="margin-top: 10px;">
-						<p:commandButton value="Guardar" actionListener="#{altaNotasCredito.save()}" update="notaCredito" process="notaCredito @this" >
+						<p:commandButton value="Guardar" actionListener="#{altaNotasCredito.save()}" update="notaCredito emisor" process="emisor notaCredito @this" >
 						</p:commandButton>
 					</div>
 				
