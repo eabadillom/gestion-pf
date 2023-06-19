@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,9 +10,11 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.primefaces.PrimeFaces;
 
@@ -425,8 +428,8 @@ public class AltaNotasCredito implements Serializable{
 				}
 				
 				ntf.getFactura().setStatus(statusF);
-				ntf.getFactura().setNotaFacturaList(new ArrayList<>());
-				ntf.getFactura().getNotaFacturaList().add(ntf);
+				//ntf.getFactura().setNotaFacturaList(new ArrayList<>());
+				//ntf.getFactura().getNotaFacturaList().add(ntf);
 				
 				facturaDAO.actualizar(ntf.getFactura());
 				
@@ -434,12 +437,10 @@ public class AltaNotasCredito implements Serializable{
 			}
 			
 			notaCreditoDAO.guardar(notaCredito);
-			
-			//notaCredito = new NotaCredito();
 			//-----Actualizar Tablas---
 			filtroFactura();
-			notaCredito = new NotaCredito();
-			PrimeFaces.current().ajax().update("form:dt-factura","form:dt-NotasPorFactura");
+			
+			
 			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -447,11 +448,13 @@ public class AltaNotasCredito implements Serializable{
 			
 	}
 	
-	/*public void serieNota() {
+	public void reload() throws IOException {
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 		
-		serieNotaSelect = listaSerieNota.get(0);
-		
-	}*/
+	}
+
+	
 	
 	
 

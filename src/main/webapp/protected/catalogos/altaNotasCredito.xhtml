@@ -47,7 +47,7 @@
 						
 						
 						<p:outputLabel value="Serie Nota:" styleClass="p-ml-4 p-mr-2"/>
-						<p:selectOneMenu id="serieNota" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.serieNotaSelect}"  >
+						<p:selectOneMenu id="serieNota" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.serieNotaSelect}"  required="true" >
 						 	<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
 						 	<f:selectItems value="#{altaNotasCredito.listaSerieNota}" var="serieNota" itemLabel="#{serieNota.numeroActual+1}-#{serieNota.statusSerie.descripcion} " itemValue="#{serieNota}" />
 						</p:selectOneMenu>					
@@ -234,13 +234,13 @@
 						</p:column>
 					
 						<f:facet name="footer">
-							<div>
+							<div style="text-align: right;">
 								<p:outputLabel value="Bueno por $"><p:outputLabel id="subTotal" value="#{altaNotasCredito.sumaSubtotal}" /></p:outputLabel>
 							</div>
-							<div>
+							<div style="text-align: right;">
 								<p:outputLabel value="I.V.A. $"><p:outputLabel id="iva" value="#{altaNotasCredito.ivaSubtotal}" /></p:outputLabel>
 							</div>			
-							<div>
+							<div style="text-align: right;">
 								<p:outputLabel value="A Pagar $"><p:outputLabel id="total" value="#{altaNotasCredito.total}" /></p:outputLabel>
 							</div>
 						</f:facet>
@@ -248,7 +248,7 @@
 					</p:dataTable>
 					
 					<div style="margin-top: 10px;">
-						<p:commandButton value="Guardar" actionListener="#{altaNotasCredito.save()}" update="notaCredito emisor" process="emisor notaCredito @this" >
+						<p:commandButton value="Guardar" actionListener="#{altaNotasCredito.save()}" action="#{altaNotasCredito.reload}" update="notaCredito emisor" process="emisor notaCredito @this" >
 						</p:commandButton>
 					</div>
 				

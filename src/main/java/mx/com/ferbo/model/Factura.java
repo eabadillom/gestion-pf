@@ -158,12 +158,12 @@ public class Factura implements Serializable {
     private String numExt;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 10)
+    @Size(min = 0, max = 10)
     @Column(name = "num_int")
     private String numInt;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 10)
+    @Size(min = 0, max = 10)
     @Column(name = "telefono")
     private String telefono;
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
