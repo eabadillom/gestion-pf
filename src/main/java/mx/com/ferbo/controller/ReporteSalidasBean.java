@@ -203,6 +203,7 @@ public class ReporteSalidasBean implements Serializable {
 				}else {
 					clienteCve = clienteSelect.getCteCve();
 				}
+				
 				Integer camaraCve = null;
 				if(camaraSelect == null) {
 					camaraCve = null; 
@@ -216,14 +217,15 @@ public class ReporteSalidasBean implements Serializable {
 				}else {
 					plantaCve = plantaSelect.getPlantaCve();
 				}
+				
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
 				parameters.put("idCliente",clienteCve );
-				parameters.put("camara", camaraCve);
-				parameters.put("planta", plantaCve);
-				parameters.put("fechaIni",fecha_ini);
+				parameters.put("fechaInicio",fecha_ini);
 				parameters.put("fechaFin", fecha_fin);
 				parameters.put("imagen", imgfile.getPath());
+				parameters.put("planta", plantaCve);
+				parameters.put("camara", camaraCve);
 				log.info("Parametros: " + parameters.toString());
 				jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
 			} catch (Exception ex) {
