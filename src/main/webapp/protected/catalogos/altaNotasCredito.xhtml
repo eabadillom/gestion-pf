@@ -1,0 +1,262 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Alta Notas De Credito</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+		
+		<p:breadCrumb>
+			<p:menuitem value="Home" outcome="/dashboard" />
+			<p:menuitem value="Facturacion" />
+			<p:menuitem value="Notas De Credito" />
+			<p:menuitem value="Alta"
+				outcome="/protected/catalogos/altaNotasCredito" />
+		</p:breadCrumb>
+		
+		<p:growl id="messages" showDetail="true" />
+		
+		<p:toolbar>	
+			<p:toolbarGroup>
+					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.clienteSelect}" >
+						<f:selectItem itemLabel="---Seleccione un cliente ---" noSelectionOption="true" />
+						<f:selectItems value="#{altaNotasCredito.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+						<p:ajax listener="#{altaNotasCredito.filtroFactura()}" process="@this" update="emisor" />
+					</p:selectOneMenu>	
+					
+					<p:outputPanel id="emisor" >
+						<p:outputLabel value="R.F.C.:" styleClass="p-ml-4 p-mr-2"/>
+						<p:inputText value="#{altaNotasCredito.clienteSelect.cteRfc}" />
+						
+						<p:outputLabel value="Domicilio:" styleClass="p-ml-4 p-mr-2" />
+						<p:selectOneMenu id="domicilio" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.domicilioSelect}">
+							<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
+							<f:selectItems value="#{altaNotasCredito.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" 
+							itemValue="#{domicilio.domicilios}"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="La cantidad de: " styleClass="p-ml-4 p-mr-2"/>
+						<b><p:outputLabel id="t-cantidad" value="#{altaNotasCredito.totalCantidad}"/></b>
+						
+						<p:outputLabel value="Con letra:" styleClass="p-ml-4 p-mr-2"/>
+						<b><p:outputLabel id="montoLetra" value="#{altaNotasCredito.montoLetra}"/></b>
+						
+						
+						<p:outputLabel value="Serie Nota:" styleClass="p-ml-4 p-mr-2"/>
+						<p:selectOneMenu id="serieNota" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.serieNotaSelect}"  required="true" >
+						 	<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
+						 	<f:selectItems value="#{altaNotasCredito.listaSerieNota}" var="serieNota" itemLabel="#{serieNota.numeroActual+1}-#{serieNota.statusSerie.descripcion} " itemValue="#{serieNota}" />
+						</p:selectOneMenu>					
+						
+						
+					</p:outputPanel>		
+				
+					
+				
+			
+				<p:divider></p:divider>
+				
+				
+				
+				<p:selectBooleanCheckbox itemLabel="Por Cobrar" value="#{altaNotasCredito.porCobrar}">
+					<p:ajax listener="#{altaNotasCredito.filtroFactura()}"/>
+				</p:selectBooleanCheckbox>
+				
+				<p:selectBooleanCheckbox itemLabel="Pago Parcial" value="#{altaNotasCredito.pagoParcial}">
+					<p:ajax listener="#{altaNotasCredito.filtroFactura()}"/>
+				</p:selectBooleanCheckbox>	
+					
+				<p:selectBooleanCheckbox itemLabel="Pagada" value="#{altaNotasCredito.pagada}">
+					<p:ajax listener="#{altaNotasCredito.filtroFactura()}" />
+				</p:selectBooleanCheckbox>
+				
+				<div style="margin-top: 10px" >
+					<p:fieldset legend="Datos Generales">
+						<p:outputPanel id="notaCredito" >
+							<p:panelGrid layout="flex" columns="6"
+												columnClasses="col-12 md:col-3 xl:col-2, 
+																			col-12 md:col-9 xl:col-4, 
+																			col-12 md:col-3 xl:col-2, 
+																			col-12 md:col-9 xl:col-4,
+																			col-12 md:col-3 xl:col-2, 
+																			col-12 md:col-9 xl:col-4"
+												contentStyleClass="ui-fluid" styleClass="customPanelGrid">
+							
+							
+								<p:outputLabel value="Fecha:" />
+								<p:datePicker showIcon="true" value="#{altaNotasCredito.notaCredito.fecha}" /> 
+													
+								<p:outputLabel value="Por los Servicios:" />
+								<p:inputText value="#{altaNotasCredito.notaCredito.servicios}" />
+								
+								<p:outputLabel value="Segun C.D. No:" />
+								<p:inputText value="#{altaNotasCredito.notaCredito.constancia}" />
+								
+								<p:outputLabel value="Periodo:" />
+								<p:inputText value="#{altaNotasCredito.notaCredito.periodo}" />
+								
+								<p:outputLabel value="Observaciones:" />
+								<p:inputTextarea value="#{altaNotasCredito.notaCredito.observaciones}" />
+								
+								<p:outputLabel value="Cajero:" />
+								<p:inputText value="#{altaNotasCredito.notaCredito.cajero}" />
+							
+							
+							</p:panelGrid>
+						</p:outputPanel>
+					</p:fieldset>
+				</div>
+		
+			</p:toolbarGroup>
+		</p:toolbar>
+				
+		<div class="p-grid crud-demo" style="margin-top: 10px">
+			<div class="p-col-12">
+				<div class="card">
+				
+				<p:dataTable id="dt-factura" value="#{altaNotasCredito.listaFactura}" var="factura" paginator="true" paginatorPosition="bottom"
+							reflow="true" rowKey="#{factura.id}" rows="5">
+				
+					<f:facet name="header">
+						<div>
+							<span>Facturas</span>
+						</div>
+					</f:facet>
+					
+					<p:column headerText="ID">
+						<h:outputText value="#{factura.nomSerie}-#{factura.numero}"  />
+					</p:column>
+					
+					<p:column headerText="Fecha">
+						<h:outputText value="#{factura.fecha}" />
+					</p:column>
+					
+					<p:column headerText="SubTotal">
+						<h:outputText value="#{factura.subtotal}" />
+					</p:column>
+					
+					<p:column headerText="IVA">
+						<h:outputText value="#{factura.iva}" />
+					</p:column>
+					
+					<p:column headerText="Total">
+						<h:outputText value="#{factura.total}" />
+					</p:column>
+					
+					<p:column headerText="Status">
+						<h:outputText value="#{factura.status.nombre}" />
+					</p:column>
+				
+					<p:column headerText="Accion">
+						<p:commandButton value="Añadir" oncomplete="PF('dlgFactura').show()" update="form:dialogo-Factura" process="@this">
+							<f:setPropertyActionListener value="#{factura}" target="#{altaNotasCredito.facturaSelect}"></f:setPropertyActionListener>
+						</p:commandButton>
+					</p:column>
+				
+				</p:dataTable>
+				
+				<p:dialog id="dialogo-Factura" header="Editar Factura" widgetVar="dlgFactura" showEffect="fade" modal="true" responsive="true" width="300" height="270">
+					<p:outputPanel id="factura-mod" class="ui-fluid">
+						<p:outputPanel rendered="#{not empty altaNotasCredito.facturaSelect}" >
+							
+							<p:outputLabel value="ID: " />
+							<p:inputText value="#{altaNotasCredito.facturaSelect.id}" disabled="true"/>
+							
+							<p:outputLabel value="Fecha: " />
+							<p:datePicker value="#{altaNotasCredito.facturaSelect.fecha}" showIcon="true" disabled="true"/>
+							
+							<p:outputLabel value="subTotal: "/>
+							<p:inputNumber value="#{altaNotasCredito.facturaSelect.subtotal}" />
+							
+							<p:outputLabel value="Iva: "/>
+							<p:inputNumber value="#{altaNotasCredito.facturaSelect.iva}"/>
+							
+							<p:outputLabel value="Total: "/>
+							<p:inputNumber value="#{altaNotasCredito.facturaSelect.total}"/>		
+							
+							<p:outputLabel value="Cantidad: " />
+							<p:inputNumber id="cantidad" value="#{altaNotasCredito.cantidad}" />			
+					
+						</p:outputPanel>					
+					</p:outputPanel>
+					
+					<f:facet name="footer">
+						<p:commandButton value="Enviar" action="#{altaNotasCredito.facturasSeleccionadas()}" process="factura-mod @this"  update="form:t-cantidad form:factura-mod form:montoLetra" onclick="PF('dlgFactura').hide()"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgFactura').hide();" class="ui-button-secondary" icon="pi pi-times" process="@this"/>
+					</f:facet>
+					
+				</p:dialog>
+				
+				</div>
+			</div>
+		</div>
+		
+		
+		<div class="p-grid crud-demo" style="margin-top: 10px">
+			<div class="p-col-12">
+				<div class="card">
+				
+					<p:dataTable id="dt-NotasPorFactura" reflow="true" value="#{altaNotasCredito.listaNotaXFactura}" var="notaFac" rowKey="#{notaFac.factura.id}" 
+								paginator="true" paginatorPosition="bottom" rows="5">
+								
+						<f:facet name="header">
+							<div>
+								<span>Notas Por Factura</span>
+							</div>
+						</f:facet>
+					
+						<p:column headerText="Factura">
+							<h:outputText value="#{notaFac.factura.nomSerie}-#{notaFac.factura.numero}" />
+						</p:column>
+						
+						<p:column headerText="Fecha">
+							<h:outputText value="#{notaFac.factura.fecha}" />
+						</p:column>
+						
+						<p:column headerText="SubTotal">
+							<h:outputText value="#{notaFac.factura.subtotal}" />
+						</p:column>
+						
+						<p:column headerText="IVA">
+							<h:outputText value="#{notaFac.factura.iva}" />
+						</p:column>
+						
+						<p:column headerText="Total">
+							<h:outputText value="#{notaFac.factura.total}" />
+						</p:column>
+						
+						<p:column headerText="Cantidad">
+							<h:outputText value="#{notaFac.cantidad}" />
+						</p:column>
+					
+						<f:facet name="footer">
+							<div style="text-align: right;">
+								<p:outputLabel value="Bueno por $"><p:outputLabel id="subTotal" value="#{altaNotasCredito.sumaSubtotal}" /></p:outputLabel>
+							</div>
+							<div style="text-align: right;">
+								<p:outputLabel value="I.V.A. $"><p:outputLabel id="iva" value="#{altaNotasCredito.ivaSubtotal}" /></p:outputLabel>
+							</div>			
+							<div style="text-align: right;">
+								<p:outputLabel value="A Pagar $"><p:outputLabel id="total" value="#{altaNotasCredito.total}" /></p:outputLabel>
+							</div>
+						</f:facet>
+					
+					</p:dataTable>
+					
+					<div style="margin-top: 10px;">
+						<p:commandButton value="Guardar" actionListener="#{altaNotasCredito.save()}" action="#{altaNotasCredito.reload}" update="notaCredito emisor" process="emisor notaCredito @this" >
+						</p:commandButton>
+					</div>
+				
+				</div>
+			</div>
+		</div>
+		
+		
+		</h:form>
+	</ui:define>
+</ui:composition>

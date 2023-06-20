@@ -158,12 +158,12 @@ public class Factura implements Serializable {
     private String numExt;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 10)
+    @Size(min = 0, max = 10)
     @Column(name = "num_int")
     private String numInt;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 10)
+    @Size(min = 0, max = 10)
     @Column(name = "telefono")
     private String telefono;
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
@@ -251,6 +251,8 @@ public class Factura implements Serializable {
     private List<ConstanciaFactura> constanciaFacturaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
     private List<ConstanciaFacturaCmp> constanciaFacturaCmpList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
+    private List<NotaPorFactura> notaFacturaList;
 
     public Factura() {
     }
@@ -709,7 +711,15 @@ public class Factura implements Serializable {
         this.constanciaFacturaCmpList = constanciaFacturaCmpList;
     }
 
-    @Override
+    public List<NotaPorFactura> getNotaFacturaList() {
+		return notaFacturaList;
+	}
+
+	public void setNotaFacturaList(List<NotaPorFactura> notaFacturaList) {
+		this.notaFacturaList = notaFacturaList;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
