@@ -13,6 +13,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -115,7 +116,7 @@ public class NotaCredito implements Serializable {
     private String cajero;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nota")
     private List<CancelaNotaCredito> cancelaNotaCreditoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nota")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nota",fetch = FetchType.LAZY)
     private List<NotaPorFactura> notaFacturaList;
     @JoinColumn(name = "STATUS", referencedColumnName = "ID")
     @ManyToOne(optional = false)
