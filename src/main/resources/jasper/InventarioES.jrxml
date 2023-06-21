@@ -334,7 +334,7 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 				<text><![CDATA[Peso entra]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="388" y="0" width="61" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="70db7f85-b0f2-43ee-b062-8fb7660d11a9">
+				<reportElement key="" mode="Opaque" x="388" y="0" width="60" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="70db7f85-b0f2-43ee-b062-8fb7660d11a9">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -399,7 +399,7 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="4" isBold="true"/>
+					<font fontName="SansSerif" size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Cantidad Sale]]></text>
 			</staticText>
@@ -548,7 +548,7 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 				<text><![CDATA[Tp. Mov]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="1" y="11" width="1208" height="28" forecolor="#2196F3" uuid="632755c1-1ecb-40bf-9ab0-1b324f1503b5"/>
+				<reportElement x="0" y="11" width="1210" height="28" forecolor="#2196F3" uuid="632755c1-1ecb-40bf-9ab0-1b324f1503b5"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -702,7 +702,7 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 	<pageFooter>
 		<band height="8" splitType="Stretch">
 			<textField>
-				<reportElement x="140" y="0" width="1068" height="8" uuid="8ae9ad9e-15e0-4816-8cdd-548e9d6aecfa"/>
+				<reportElement x="140" y="0" width="1070" height="8" uuid="8ae9ad9e-15e0-4816-8cdd-548e9d6aecfa"/>
 				<textElement textAlignment="Right">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
@@ -721,7 +721,7 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 		<band height="70">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement x="1" y="50" width="1209" height="20" uuid="8091c8a3-5fbd-40be-b5c7-7bbdb9a0ab19">
+				<reportElement x="0" y="50" width="1210" height="20" uuid="8091c8a3-5fbd-40be-b5c7-7bbdb9a0ab19">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
