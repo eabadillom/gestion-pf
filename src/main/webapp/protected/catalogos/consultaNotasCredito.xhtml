@@ -73,7 +73,7 @@
 							<h:outputText value="#{notaCredito.iva}" />
 						</p:column>
 						
-						<p:column headerText="Total">
+						<p:column headerText="Total" >
 							<h:outputText value="#{notaCredito.total}" />
 						</p:column>
 						
@@ -82,12 +82,12 @@
 						</p:column>
 						
 						<p:column>
-							<p:commandButton value="Detalle" oncomplete="PF('dlg-General').show()" update="form:dlg-notaCredito" process="@this">
+							<p:commandButton value="Detalle" oncomplete="PF('dlg-General').show()" update="form:dlg-notaCredito" process="@this" >
 								<f:setPropertyActionListener value="#{notaCredito}" target="#{consultaNotasCreditoBean.notaCreditoSelect}"></f:setPropertyActionListener>
 							</p:commandButton>
 						</p:column>
 						
-						<p:column >
+						<p:column>
 							<p:commandButton value="Facturas" oncomplete="PF('dlg-factura').show()" update="form:dlg-facturaNota" process="@this"> 
 								<f:setPropertyActionListener value="#{notaCredito}" target="#{consultaNotasCreditoBean.notaCreditoSelect}"></f:setPropertyActionListener>
 							</p:commandButton>
@@ -98,7 +98,7 @@
 				</div>
 			</div>			
 			
-			<p:dialog id="dlg-notaCredito" widgetVar="dlg-General" header="Informacion General" width="25%">
+			<p:dialog id="dlg-notaCredito" widgetVar="dlg-General" header="Informacion General" width="25em" height="40em">
 				<p:outputPanel id="notaCredito" class="ui-fluid">
 					<p:outputPanel rendered="#{not empty consultaNotasCreditoBean.notaCreditoSelect}">
 					
@@ -120,8 +120,23 @@
 						<p:outputLabel value="IVA:" />
 						<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.iva}" />
 						
-						<p:outputLabel value="Subtotal:" />
+						<p:outputLabel value="Total:" />
 						<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.total}" />
+						
+						<p:outputLabel value="Servicios:" />
+						<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.servicios}" />
+						
+						<p:outputLabel value="Constancia:" />
+						<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.constancia}" />
+						
+						<p:outputLabel  value="Periodo:" />
+						<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.periodo}" />
+						
+						<p:outputLabel value="Observaciones" />
+						<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.observaciones}" />
+						
+						<p:outputLabel value="Cajero" />
+						<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.cajero}" />
 					
 					</p:outputPanel>				
 				</p:outputPanel>
