@@ -702,14 +702,14 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 	<pageFooter>
 		<band height="8" splitType="Stretch">
 			<textField>
-				<reportElement x="140" y="0" width="1070" height="8" uuid="8ae9ad9e-15e0-4816-8cdd-548e9d6aecfa"/>
+				<reportElement x="131" y="0" width="1079" height="8" uuid="8ae9ad9e-15e0-4816-8cdd-548e9d6aecfa"/>
 				<textElement textAlignment="Right">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER} + " de  "  + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement x="0" y="0" width="140" height="8" uuid="7e30462f-a9d5-4cc4-a4e5-49918a3473f7"/>
+				<reportElement x="0" y="0" width="131" height="8" uuid="7e30462f-a9d5-4cc4-a4e5-49918a3473f7"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
