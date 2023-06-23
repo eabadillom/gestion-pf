@@ -28,8 +28,8 @@
 				</div>
 				<div class="menu">
 					<po:menu widgetVar="OmegaMenuWidget">
-						<p:menuitem id="om_dashboard" value="Dashboard" icon="pi pi-fw pi-home" outcome="/dashboard" />
-						<p:submenu id="om_components" label="UI Kit" icon="pi pi-fw pi-star" badge="2">
+						<p:menuitem id="om_dashboard" value="Dashboard" icon="pi pi-fw pi-home" outcome="/dashboard" rendered="false"/>
+						<p:submenu id="om_components" label="UI Kit" icon="pi pi-fw pi-star" badge="2" rendered="false">
 							<p:menuitem id="om_formlayout" value="Form Layout" icon="pi pi-fw pi-id-card" outcome="/formlayout" />
 							<p:menuitem id="om_input" value="Input" icon="pi pi-fw pi-check-square" outcome="/input" />
 							<p:menuitem id="om_floatlabel" value="Float Label" icon="pi pi-fw pi-bookmark" outcome="/floatlabel" />
@@ -48,7 +48,7 @@
 							<p:menuitem id="om_misc" value="Misc" icon="pi pi-fw pi-circle-off" outcome="/misc" />
 						</p:submenu>
 						
-						<p:submenu id="om_utils" label="Utilities"	icon="pi pi-fw pi-compass">
+						<p:submenu id="om_utils" label="Utilities"	icon="pi pi-fw pi-compass" rendered="false">
 							<p:menuitem id="om_display" value="Display" icon="pi pi-fw pi-desktop" outcome="/display" />
 							<p:menuitem id="om_elevation" value="Elevation" icon="pi pi-fw pi-external-link" outcome="/elevation" />
 							<p:menuitem id="om_flexbox" value="FlexBox" icon="pi pi-fw pi-directions" outcome="/flexbox" />
@@ -59,7 +59,7 @@
 							<p:menuitem id="om_spacing" value="Spacing" icon="pi pi-fw pi-arrow-right" outcome="/spacing" />
 							<p:menuitem id="om_typography" value="Typography" icon="pi pi-fw pi-align-center" outcome="/typography" />
 						</p:submenu>
-						<p:submenu id="om_default" label="Pages" icon="pi pi-fw pi-briefcase" badge="8">
+						<p:submenu id="om_default" label="Pages" icon="pi pi-fw pi-briefcase" badge="8" rendered="false">
 							<p:menuitem id="om_crud" value="Crud" icon="pi pi-fw pi-pencil" outcome="/crud" />
 							<p:menuitem id="om_calendar" value="Calendar" icon="pi pi-fw pi-calendar-plus" outcome="/calendar" />
 							<p:menuitem id="om_chronoline" value="Chronoline" icon="pi pi-fw pi-calendar" outcome="/chronoline" />
@@ -72,7 +72,7 @@
 							<p:menuitem id="om_access" value="Access Denied" icon="pi pi-fw pi-lock" outcome="/access" />
 							<p:menuitem id="om_empty" value="Empty" icon="pi pi-fw pi-circle-off" outcome="/empty" />
 						</p:submenu>
-						<p:submenu id="om_hierarchy" label="Hierarchy" icon="pi pi-fw pi-align-left">
+						<p:submenu id="om_hierarchy" label="Hierarchy" icon="pi pi-fw pi-align-left" rendered="false">
 							<p:submenu id="om_sm1" label="Submenu 1" icon="pi pi-fw pi-align-left">
 								<p:submenu id="om_sm110" label="Submenu 1.1" icon="pi pi-fw pi-align-left">
 									<p:menuitem id="om_lnk111" value="Link 1.1.1" icon="pi pi-fw pi-align-left" url="#" />
@@ -94,13 +94,13 @@
 							</p:submenu>
 						</p:submenu>
 						
-				<p:menuitem id="om_buy" value="Buy Now" icon="pi pi-fw pi-shopping-cart" url="https://www.primefaces.org/store" />
-				<p:menuitem id="om_doc" value="Documentation" icon="pi pi-fw pi-info-circle" outcome="/documentation" />
+				<p:menuitem id="om_buy" value="Buy Now" icon="pi pi-fw pi-shopping-cart" url="https://www.primefaces.org/store" rendered="false"/>
+				<p:menuitem id="om_doc" value="Documentation" icon="pi pi-fw pi-info-circle" outcome="/documentation" rendered="false" />
 				<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
 				<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
 				<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
 				<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" url="#" />
-				<p:menuitem id="frb_inventarios_sm133" value="Modificar"	icon="pi pi-fw pi-desktop" url="#" />
+				<p:menuitem id="frb_inventarios_sm133" value="Modificar"	icon="pi pi-fw pi-desktop" url="#" rendered="false"/>
 							</p:submenu>
 						
 							<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
@@ -114,7 +114,7 @@
 								<p:menuitem id="frb_inventarios_sm120" value="Consultar"
 									icon="pi pi-fw pi-search" outcome="/inventarios/consultarConstanciaDeDeposito" />
 								<p:menuitem id="frb_inventarios_sm13" value="Ordenes de salida"
-									icon="pi pi-fw pi-desktop" url="#" />
+									icon="pi pi-fw pi-desktop" url="#" rendered="false"/>
 							</p:submenu>
 							<p:submenu id="frb_inventarios_sm2" label="Servicios"
 								icon="fa fa-fw fa-edit">
@@ -133,7 +133,7 @@
 							<p:menuitem id="frb_kardex" value="Kardex" icon="pi pi-fw pi-shopping-bag" outcome="/protected/catalogos/kardex" />
 						</p:submenu>
 						
-						<p:submenu id="frb_facturacion" label="Facturación" icon="pi pi-fw pi-wallet">
+						<p:submenu id="frb_facturacion" label="Facturación" icon="pi pi-fw pi-wallet" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 
 						<p:menuitem value="Facturacion Constancias" icon="pi pi-user-edit" outcome="/protected/catalogos/facturacionConstancias" />
 						<p:menuitem value="Facturacion Servicios" icon="pi pi-briefcase" outcome="/protected/catalogos/facturacionServicios" />
@@ -198,12 +198,12 @@
 						
 						
 						<p:submenu id="frb_comercial" label="Comercial"
-							icon="pi pi-fw pi-dollar">
+							icon="pi pi-fw pi-dollar" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem value="Avisos" icon="pi pi-exclamation-triangle"
 								outcome="/protected/catalogos/avisosComercial" />
 						</p:submenu>
 						
-						<p:submenu label="Usuarios" icon="pi pi-fw pi-book">
+						<p:submenu label="Usuarios" icon="pi pi-fw pi-book" rendered="#{(sideBarBean.usuario.perfil == 3)}">
 								<p:menuitem value="Mantenimiento de usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit"  />
 							</p:submenu>							
 
