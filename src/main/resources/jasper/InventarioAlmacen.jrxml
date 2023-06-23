@@ -92,7 +92,7 @@
 		AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
 ) I
 WHERE I.cantidad > 0
-ORDER BY cliente,numero_cte, producto;]]>
+ORDER BY cliente,numero_cte, producto]]>
 	</queryString>
 	<field name="folio" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="folio"/>
@@ -213,10 +213,10 @@ ORDER BY cliente,numero_cte, producto;]]>
 		<property name="com.jaspersoft.studio.field.label" value="cod_posicion"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="posicion"/>
 	</field>
-	<variable name="SumaTarimas" class="java.lang.Double" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
+	<variable name="SumaTarimas" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{tarima}]]></variableExpression>
 	</variable>
-	<variable name="SumaCantidadProducto" class="java.lang.Integer" resetType="Group" resetGroup="GroupProducto" incrementGroup="GroupProducto" calculation="Sum">
+	<variable name="SumaCantidadProducto" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{cantidad}]]></variableExpression>
 		<initialValueExpression><![CDATA[new Integer (0)]]></initialValueExpression>
 	</variable>
@@ -226,7 +226,7 @@ ORDER BY cliente,numero_cte, producto;]]>
 	<variable name="TotalGeneral" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{valor}]]></variableExpression>
 	</variable>
-	<variable name="SumaProductoPorCliente" class="java.lang.Integer" resetType="Group" resetGroup="GroupCliente" calculation="Count">
+	<variable name="SumaProductoPorCliente" class="java.lang.String" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
 		<variableExpression><![CDATA[$F{producto}]]></variableExpression>
 	</variable>
 	<variable name="SumaTarimasPorCte" class="java.lang.Double" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
@@ -241,7 +241,7 @@ ORDER BY cliente,numero_cte, producto;]]>
 	<variable name="TotalImporteParcial" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
 		<variableExpression><![CDATA[$F{valor}]]></variableExpression>
 	</variable>
-	<variable name="SumaGlobalCantidad" class="java.lang.Integer" calculation="Sum">
+	<variable name="SumaGlobalCantidad" class="java.math.BigDecimal" calculation="Sum">
 		<initialValueExpression><![CDATA[$F{cantidad}]]></initialValueExpression>
 	</variable>
 	<variable name="SumaGLobalPeso" class="java.math.BigDecimal" calculation="Sum">
@@ -253,7 +253,7 @@ ORDER BY cliente,numero_cte, producto;]]>
 	<variable name="ImporteTotalGlobal" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$V{TotalImporteParcial}]]></variableExpression>
 	</variable>
-	<variable name="SumaGlobalProducto" class="java.lang.Integer" calculation="Count">
+	<variable name="SumaGlobalProducto" class="java.lang.String" calculation="Count">
 		<variableExpression><![CDATA[$F{producto}]]></variableExpression>
 	</variable>
 	<group name="GroupCliente">
@@ -781,91 +781,91 @@ ORDER BY cliente,numero_cte, producto;]]>
 		<band height="11" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField isBlankWhenNull="true">
-				<reportElement x="69" y="0" width="44" height="10" uuid="45d9fb36-0c93-4a5e-b668-47f03c3ec218"/>
+				<reportElement x="69" y="0" width="44" height="11" uuid="45d9fb36-0c93-4a5e-b668-47f03c3ec218"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{folio}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="113" y="0" width="72" height="10" uuid="3e0fee03-9021-483c-ad8b-eb7725ad94be"/>
+				<reportElement x="113" y="0" width="72" height="11" uuid="3e0fee03-9021-483c-ad8b-eb7725ad94be"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{caducidad}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="69" height="10" uuid="4a97605b-e4d1-4794-9216-4f3bfa2d1699"/>
+				<reportElement x="0" y="0" width="69" height="11" uuid="4a97605b-e4d1-4794-9216-4f3bfa2d1699"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{ingreso}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="185" y="0" width="80" height="10" uuid="e9689509-481f-4b66-8365-331c00d75bac"/>
+				<reportElement x="185" y="0" width="80" height="11" uuid="e9689509-481f-4b66-8365-331c00d75bac"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="265" y="0" width="80" height="10" uuid="0a11637b-997b-44f3-9fdc-c1c097953c21"/>
+				<reportElement x="265" y="0" width="80" height="11" uuid="0a11637b-997b-44f3-9fdc-c1c097953c21"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{lote}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="533" y="0" width="50" height="10" uuid="b7084290-6272-4fa8-8d66-c1c0187aca0b"/>
+				<reportElement x="533" y="0" width="50" height="11" uuid="b7084290-6272-4fa8-8d66-c1c0187aca0b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{unidad_cobro}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="643" y="0" width="40" height="10" uuid="5d1b1837-19e6-4b22-85f8-c994a91e6d98"/>
+				<reportElement x="643" y="0" width="40" height="11" uuid="5d1b1837-19e6-4b22-85f8-c994a91e6d98"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{planta}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="422" y="0" width="50" height="10" uuid="ad0fed5e-bfb8-48d3-a8f7-2f25e317135d"/>
+				<reportElement x="422" y="0" width="50" height="11" uuid="ad0fed5e-bfb8-48d3-a8f7-2f25e317135d"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{tarima}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="472" y="0" width="61" height="10" uuid="e3bf0f2a-8f21-4065-b14f-143265a02adf"/>
+				<reportElement x="472" y="0" width="61" height="11" uuid="e3bf0f2a-8f21-4065-b14f-143265a02adf"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="683" y="0" width="32" height="10" uuid="49103f7c-4421-4a17-9092-dc4bc23aef47"/>
+				<reportElement x="683" y="0" width="32" height="11" uuid="49103f7c-4421-4a17-9092-dc4bc23aef47"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{camara}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="583" y="0" width="60" height="10" uuid="f890be89-77ec-49f6-9037-7d04f0e264de"/>
+				<reportElement x="583" y="0" width="60" height="11" uuid="f890be89-77ec-49f6-9037-7d04f0e264de"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{peso}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="715" y="0" width="46" height="10" uuid="cb905c9a-5705-4905-be98-978a114792ba"/>
+				<reportElement x="715" y="0" width="46" height="11" uuid="cb905c9a-5705-4905-be98-978a114792ba"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{valor}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="345" y="0" width="77" height="10" uuid="c7015a6f-556b-4448-a403-e3f0de97724f"/>
+				<reportElement x="345" y="0" width="77" height="11" uuid="c7015a6f-556b-4448-a403-e3f0de97724f"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
@@ -1061,7 +1061,7 @@ ORDER BY cliente,numero_cte, producto;]]>
 		</band>
 	</lastPageFooter>
 	<noData>
-		<band height="165">
+		<band height="100">
 			<image>
 				<reportElement x="0" y="0" width="119" height="71" uuid="d6a3c3f0-061c-4833-b073-dde5b4e4d8d9"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>

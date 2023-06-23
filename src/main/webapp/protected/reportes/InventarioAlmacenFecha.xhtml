@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Inventario de Almacen por Fecha</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+        <p:breadCrumb>
+            <p:menuitem value="Home" outcome="/dashboard"/>
+            <p:menuitem value="Reportes"/>
+            <p:menuitem value="Inventarios"/>
+            <p:menuitem value="Almacen" outcome="/protected/reportes/InventarioAlmacenFecha"/>
+        </p:breadCrumb>
+            <div class="p-grid crud-demo">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+                        
+                         
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteAlmacenFechaBean.fecha}" />
+					
+						
+						<p:fieldset legend="Rango">
+						 <span class="ui-float-label ui-input-icon-left">
+			                <p:datePicker id="minmax" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteAlmacenFechaBean.date11}"  maxdate="#{reporteAlmacenFechaBean.maxDate}" readonlyInput="true"/>
+			                <p:outputLabel for="minmax" value="Fecha "/>
+						</span>
+            	</p:fieldset>
+            
+                        <p:fieldset legend="Datos del emisor/receptor">
+                       			 <span class="ui-float-label ui-input-icon-left">
+									<p:selectOneMenu id="Cliente" value="#{reporteAlmacenFechaBean.clienteSelect}" converter="entityConverter" >
+									<f:selectItem itemLabel="Todos los clientes"  itemValue=""  />
+									<f:selectItems value="#{reporteAlmacenFechaBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+									<p:ajax process ="@this" />
+									</p:selectOneMenu>
+								<p:outputLabel for="Cliente" value="Cliente" />
+							</span>
+							
+								<span class="ui-float-label ui-input-icon-left"> 
+									<p:selectOneMenu id="so-planta" value="#{reporteAlmacenFechaBean.plantaSelect}" converter="entityConverter"  >
+										<f:selectItem itemLabel="Todos las plantas"  itemValue="" />
+										<f:selectItems value="#{reporteAlmacenFechaBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
+										 <p:ajax listener="#{reporteAlmacenFechaBean.filtradoCamara()}" process=" @this" update=":form:so-camara"/>
+									</p:selectOneMenu>
+								<p:outputLabel  for="so-planta" value="Planta" />
+								</span>
+								
+								<span class="ui-float-label ui-input-icon-left"> 
+									<p:selectOneMenu id="so-camara" value="#{reporteAlmacenFechaBean.camaraSelect}" converter="entityConverter" >
+										<f:selectItem itemLabel="Todas las camaras"  itemValue="" />
+										<f:selectItems value="#{reporteAlmacenFechaBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}"  itemValue="#{c}"/>
+										<p:ajax process ="@this" />
+									</p:selectOneMenu>
+								<p:outputLabel for="so-camara" value="Camara " />
+								</span>
+								
+					</p:fieldset>
+					
+					  <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+					  <p:toolbar>
+				<p:toolbarGroup>
+					   <div class="col-5 flex align-items-center justify-content-center">
+						<p:commandButton value=".pdf" actionListener="#{reporteAlmacenFechaBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+						 </div>
+							         <div class="col-2">
+							            <p:divider layout="vertical">
+							            </p:divider>
+							        </div>
+							        
+										 <div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value=".xlsx"  actionListener="#{reporteAlmacenFechaBean.exportarExcel}" action="#{reporteAlmacenFechaBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+							     </div>
+							        </p:toolbarGroup>
+
+							        </p:toolbar>
+							        
+
+						</p:fieldset>
+						
+						
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
