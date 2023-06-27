@@ -34,7 +34,7 @@
 							
 								<span class="ui-float-label ui-input-icon-left"> 
 									<p:selectOneMenu id="so-planta" value="#{reporteInventarioBean.plantaSelect}" converter="entityConverter"  style="width:220px;">
-										<f:selectItem itemLabel="" itemValue="" />
+										<f:selectItem itemLabel="Seleccione planta" itemValue="" />
 										<f:selectItems value="#{reporteInventarioBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
 										 <p:ajax listener="#{reporteInventarioBean.filtradoCamara()}" process=" @this" update=":form:so-camara"/>
 									</p:selectOneMenu>
