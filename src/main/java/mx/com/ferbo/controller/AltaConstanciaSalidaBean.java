@@ -19,6 +19,7 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.primefaces.PrimeFaces;
 
@@ -46,6 +47,7 @@ import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -102,6 +104,10 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private int cantidadTotal;
 	private BigDecimal pesoTotal;
 	
+	private Usuario usuario;
+	private FacesContext faceContext;
+	private HttpServletRequest httpServletRequest;
+	
 	public AltaConstanciaSalidaBean() {
 		constanciaDeServicio = new ConstanciaDeServicio();
 		constanciaServicioDAO = new ConstanciaServicioDAO();
@@ -139,12 +145,25 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	@PostConstruct
 	public void init() {
 		
+		faceContext = FacesContext.getCurrentInstance();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		
 		listadoClientes = clienteDAO.buscarTodos();
-		listadoPlantas = plantaDAO.findall();
+		
+		if((usuario.getPerfil() == 1)||(usuario.getPerfil() == 4)) {
+			listadoPlantas.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
+		}else {
+			listadoPlantas = plantaDAO.findall();
+		}
+		
+		
 		listadoConstanciasSalidas = constanciaSalidaDAO.buscarTodos();
 		listadoPrecioServicios = preciosServicioDAO.buscarTodos();
 		
 		plantaSelect = listadoPlantas.get(0);
+		
+		fechaSalida = new Date();
 	}
 
 	public List<Cliente> getListadoClientes() {
@@ -401,6 +420,14 @@ public class AltaConstanciaSalidaBean implements Serializable{
 
 	public void setInventarioDAO(InventarioDAO inventarioDAO) {
 		this.inventarioDAO = inventarioDAO;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public void validar() {

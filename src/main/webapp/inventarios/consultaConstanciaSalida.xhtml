@@ -184,8 +184,9 @@
 				</p:outputPanel>		
 				
 				<f:facet name="footer">
-					<p:commandButton value="Cancelar Constancia" actionListener="#{consultarConstanciaSalidaBean.cancelarConstancia()}" onclick="PF('dlgdetalleConstancia').hide()"></p:commandButton>
+					<p:commandButton value="Cancelar Constancia" actionListener="#{consultarConstanciaSalidaBean.cancelarConstancia()}" onclick="PF('dlgdetalleConstancia').hide()" disabled="#{(consultarConstanciaSalidaBean.usuario.perfil == 1) or (consultarConstanciaSalidaBean.usuario.perfil == 4)}"></p:commandButton>
 					<p:commandButton value="Reimprimir" actionListener="#{consultarConstanciaSalidaBean.imprimirTicket()}" ajax="false" process="this"></p:commandButton>
+					<p:commandButton value="Cerrar" onclick="PF('dlgdetalleConstancia').hide()" process="@this"/>
 				</f:facet>
 					
 			</p:dialog>
