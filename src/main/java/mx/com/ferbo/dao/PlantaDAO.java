@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
@@ -136,8 +137,17 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 
 	@Override
 	public List<Planta> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Planta> listado = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Planta.findAll", Planta.class).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de cámaras...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return listado;
 	}
 
 	@Override
