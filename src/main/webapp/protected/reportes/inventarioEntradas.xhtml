@@ -48,7 +48,7 @@
 							
 								<span class="ui-float-label ui-input-icon-left"> 
 									<p:selectOneMenu id="so-planta" value="#{reporteEntradasBean.plantaSelect}" converter="entityConverter"  style="width:220px;">
-										<f:selectItem itemLabel="" itemValue="" />
+										<f:selectItem itemLabel="Todas las plantas" itemValue="" />
 										<f:selectItems value="#{reporteEntradasBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
 										 <p:ajax listener="#{reporteEntradasBean.filtradoCamara()}" process=" @this" update=":form:so-camara"/>
 									</p:selectOneMenu>
@@ -56,8 +56,8 @@
 								</span>
 								
 								<span class="ui-float-label ui-input-icon-left"> 
-									<p:selectOneMenu id="so-camara" value="#{reporteEntradasBean.camaraSelect}" converter="entityConverter" style="width:130px;">
-										<f:selectItem itemLabel="" itemValue="" />
+									<p:selectOneMenu id="so-camara" value="#{reporteEntradasBean.camaraSelect}" converter="entityConverter" autoWidth="true">
+										<f:selectItem itemLabel="Todas las camaras" itemValue="" />
 										<f:selectItems value="#{reporteEntradasBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}"  itemValue="#{c}"/>
 										<p:ajax process ="@this" />
 									</p:selectOneMenu>

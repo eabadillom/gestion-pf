@@ -14,7 +14,7 @@
 				<p:menuitem value="Alta" outcome="/inventarios/altaTraspaso" />
 			</p:breadCrumb>
 			<p:growl id="messages" showDetail="true" />
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altaTraspasoBean.fecha}" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaTraspasoBean.fecha}" disabled="#{(altaTraspasoBean.usuario.perfil == 1) or (altaTraspasoBean.usuario.perfil == 4)}" value="#{altaTraspasoBean.fecha}" />
 							<p:inputText id="txtFolio" value="#{altaTraspasoBean.numero}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>

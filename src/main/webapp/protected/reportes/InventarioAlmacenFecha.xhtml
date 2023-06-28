@@ -22,7 +22,7 @@
                         
                          
 						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteAlmacenFechaBean.fecha}" />
-					
+						
 						
 						<p:fieldset legend="Rango">
 						 <span class="ui-float-label ui-input-icon-left">
@@ -43,7 +43,7 @@
 							
 								<span class="ui-float-label ui-input-icon-left"> 
 									<p:selectOneMenu id="so-planta" value="#{reporteAlmacenFechaBean.plantaSelect}" converter="entityConverter"  >
-										<f:selectItem itemLabel="Todos las plantas"  itemValue="" />
+										<f:selectItem itemLabel="Todas las plantas"  itemValue="" />
 										<f:selectItems value="#{reporteAlmacenFechaBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
 										 <p:ajax listener="#{reporteAlmacenFechaBean.filtradoCamara()}" process=" @this" update=":form:so-camara"/>
 									</p:selectOneMenu>

@@ -2,7 +2,6 @@ package mx.com.ferbo.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
@@ -20,7 +19,7 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
@@ -31,22 +30,11 @@ import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
-import mx.com.ferbo.utils.IOUtil;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import net.sf.jasperreports.export.OutputStreamExporterOutput;
-import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
-import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 
 @Named
 @ViewScoped
@@ -68,6 +56,10 @@ public class ReporteInventarioBean implements Serializable {
 	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
+	
+	private FacesContext faceContext;
+	private HttpServletRequest httpServletRequest;
+	private Usuario usuario;
 
 	public ReporteInventarioBean() {
 		fecha = new Date();
@@ -83,14 +75,28 @@ public class ReporteInventarioBean implements Serializable {
 	}
 	@PostConstruct
 	public void init() {
+		
+		faceContext = FacesContext.getCurrentInstance();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		
 		plantaSelect = new Planta();
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
 		
 		listaClientes = clienteDAO.buscarHabilitados(true);
-		listaPlanta = plantaDAO.buscarTodos();
-		listaCamara = camaraDAO.buscarTodos();
 		
+		if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
+			listaPlanta.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
+		}else {
+			listaPlanta = plantaDAO.buscarTodos();
+		}
+		
+		plantaSelect = listaPlanta.get(0);
+		filtradoCamara();
+		//listaCamara = camaraDAO.buscarTodos();
+		
+		//PrimeFaces.current().ajax().update("form:so-camara");
 		
 	}
 	
@@ -202,6 +208,12 @@ public class ReporteInventarioBean implements Serializable {
 	
 		
 	
+	public Usuario getUsuario() {
+		return usuario;
+	}
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
 	public Date getFecha() {
 		return fecha;
 	}

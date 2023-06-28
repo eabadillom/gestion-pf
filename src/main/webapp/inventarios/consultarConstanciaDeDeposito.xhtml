@@ -88,7 +88,7 @@
 			</div>
 			
 			<p:dialog id="constanciaD" widgetVar="dlgProductos" header="Productos" responsive="true" resizable="true" style="max-width:100em !important;" 
-					  	hideEffect="fade" showEffect="fade"	modal="true" >
+					  	hideEffect="fade" showEffect="fade"	modal="true">
 					  	<p:ajax event="open" update="dt-partida dt-ConstanciaDepositoDetalle precioServicio" listener="#{consultarConstanciaDeDepositoBean.cargaDeDatos()}" />
 				<p:outputPanel id="dlg-constancia" class="ui-fluid"> 
 					<p:outputPanel rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD}" >
@@ -204,7 +204,7 @@
 							</p:column>
 							
 							<p:column>
-								<p:commandButton value="Modificar" styleClass="edit-button ui-button-success" icon="pi pi-pencil" oncomplete="PF('dlgModificarPartida').show()">
+								<p:commandButton value="Modificar" styleClass="edit-button ui-button-success" icon="pi pi-pencil" oncomplete="PF('dlgModificarPartida').show()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}">
 									<f:setPropertyActionListener value="#{partida}" target="#{consultarConstanciaDeDepositoBean.partidaSelect}"></f:setPropertyActionListener>
 								</p:commandButton>	
 							</p:column>
@@ -238,13 +238,13 @@
 							</p:column>
 							
 							<p:column>
-								<p:commandButton value="Modificar" oncomplete="PF('dlgModificarServicio').show()" styleClass="edit-button ui-button-success" icon="pi pi-pencil">
+								<p:commandButton value="Modificar" oncomplete="PF('dlgModificarServicio').show()" styleClass="edit-button ui-button-success" icon="pi pi-pencil" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" >
 									<f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
 								</p:commandButton>
 							</p:column>
 							
 							<p:column>
-								<p:commandButton value="Eliminar" oncomplete="PF('dlgEliminarServicio').show()" styleClass="ui-button-danger" icon="pi pi-trash">
+								<p:commandButton value="Eliminar" oncomplete="PF('dlgEliminarServicio').show()" styleClass="ui-button-danger" icon="pi pi-trash" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}">
 									<f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
 								</p:commandButton>
 							</p:column>
@@ -301,7 +301,7 @@
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:splitButton value="Modificar Datos Generales" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura" styleClass="edit-button ui-button-success p-mr-2" >
+					<p:splitButton value="Modificar Datos Generales" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura" styleClass="edit-button ui-button-success p-mr-2" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" >
 						<p:menuitem value="Reimprimir Ticket" icon="pi pi-print" actionListener="#{consultarConstanciaDeDepositoBean.imprimir()}" ajax="false" process="@this"></p:menuitem>
 					</p:splitButton>
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgProductos').hide()"></p:commandButton>
@@ -355,7 +355,7 @@
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Modificar" styleClass="edit-button ui-button-success" actionListener="#{consultarConstanciaDeDepositoBean.updateDetallePartida()}" onclick="PF('dlgDetalleP').hide()"></p:commandButton>
+					<p:commandButton value="Modificar" styleClass="edit-button ui-button-success" actionListener="#{consultarConstanciaDeDepositoBean.updateDetallePartida()}" onclick="PF('dlgDetalleP').hide()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" ></p:commandButton>
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgDetalleP').hide()"></p:commandButton>
 				</f:facet>
 			</p:dialog>

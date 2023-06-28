@@ -32,7 +32,7 @@
 										<p:ajax update="datos-generales dt-inventario" listener="#{altaConstanciaSalidaBean.servicioCliente}"/>
 									</p:selectOneMenu>
 								<p:outputLabel value="Fecha:" styleClass="p-ml-4 p-mr-2" />
-									<p:datePicker id="fechaSalida" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Salida" value="#{altaConstanciaSalidaBean.fechaSalida}">
+									<p:datePicker id="fechaSalida" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaConstanciaSalidaBean.fechaSalida}" value="#{altaConstanciaSalidaBean.fechaSalida}" disabled="#{(altaConstanciaSalidaBean.usuario.perfil == 4) or (altaConstanciaSalidaBean.usuario.perfil == 1)}">
 										<p:ajax update="datos-generales"/>
 									</p:datePicker>
 								<p:outputLabel value="Folio:" styleClass="p-ml-4 p-mr-2"/>

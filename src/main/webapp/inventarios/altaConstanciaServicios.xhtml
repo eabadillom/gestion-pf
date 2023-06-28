@@ -15,7 +15,7 @@
 					outcome="/inventarios/constanciaServicios" />
 			</p:breadCrumb>
 			<p:growl id="messages" showDetail="true" />
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altaConstanciaServicioBean.fecha}" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="#{(altaConstanciaServicioBean.usuario.perfil == 1) or (altaConstanciaServicioBean.usuario.perfil == 4)}" value="#{altaConstanciaServicioBean.fecha}" />
 							<p:inputText id="txtFolio" value="#{altaConstanciaServicioBean.folio}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>

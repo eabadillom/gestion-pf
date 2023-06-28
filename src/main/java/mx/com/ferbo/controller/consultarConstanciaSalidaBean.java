@@ -19,6 +19,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.http.HttpServletRequest;
 
 import org.primefaces.PrimeFaces;
 
@@ -30,7 +31,7 @@ import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.Partida;
-import mx.com.ferbo.model.StatusConstanciaSalida;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -58,6 +59,10 @@ public class consultarConstanciaSalidaBean implements Serializable{
 	
 	private ConstanciaSalida constanciaSelect;
 	
+	private FacesContext faceContext;
+	private HttpServletRequest httpServletRequest;
+	private Usuario usuario;
+	
 	public consultarConstanciaSalidaBean() {
 		constanciaSalidaDAO = new ConstanciaSalidaDAO();
 		listadoConstanciaSalida = new ArrayList<>();
@@ -73,6 +78,10 @@ public class consultarConstanciaSalidaBean implements Serializable{
 	
 	@PostConstruct
 	public void init() {
+		
+		faceContext = FacesContext.getCurrentInstance();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
 		listadoClientes = clienteDAO.buscarTodos();
 		
@@ -245,6 +254,16 @@ public class consultarConstanciaSalidaBean implements Serializable{
 
 	public void setConstanciaSelect(ConstanciaSalida constanciaSelect) {
 		this.constanciaSelect = constanciaSelect;
+	}
+
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 	
 	
