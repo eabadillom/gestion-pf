@@ -462,11 +462,33 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	public void updateDatosGenerales() {
 		
-		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Constancia De Deposito Actualizada"));
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			
+			if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
+				throw new Exception("No esta autorizado para modificar");
+			}
+			
+			constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD);
+				
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Se modificaron los datos generales correctamente";
+			
+		}catch (Exception e) {
+			
+			mensaje = "No esta autorizado para modificar";
+			severity = FacesMessage.SEVERITY_WARN;
+		}finally {
+			
+			message = new FacesMessage(severity,"Modificacion" , mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages");
+			
 		}
 		
-		PrimeFaces.current().ajax().update("form:messages");
 	}
 	
 	public void imprimir() {
