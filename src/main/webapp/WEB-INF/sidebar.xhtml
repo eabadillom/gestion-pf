@@ -200,6 +200,9 @@
 								<p:menuitem value="Facturas por Mes" icon="pi pi-file" outcome="/protected/reportes/FacturasPorMes" />
 								<p:menuitem value="Facturas por Plantas" icon="pi pi-file" outcome="/protected/reportes/FacturasPorPlantas" />
 							</p:submenu>
+								<p:submenu id="frb_inventario_reporteCtes" label="Clientes" icon="pi pi-fw pi-table" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+								<p:menuitem value="Domicilio por Cliente" icon="pi pi-file" outcome="/protected/reportes/DomicilioPorCliente" />
+							</p:submenu>
 						</p:submenu>
 						
 						
