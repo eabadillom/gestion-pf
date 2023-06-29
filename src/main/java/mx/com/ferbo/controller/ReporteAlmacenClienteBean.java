@@ -48,10 +48,10 @@ import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 
 @Named
 @ViewScoped
-public class ReporteFacturacionPorMesBean implements Serializable {
+public class ReporteAlmacenClienteBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(ReporteFacturacionPorMesBean.class);
+	private static Logger log = Logger.getLogger(ReporteAlmacenClienteBean.class);
 
 	private Date fecha;
 	private Date maxDate;
@@ -64,7 +64,7 @@ public class ReporteFacturacionPorMesBean implements Serializable {
 
 	private ClienteDAO clienteDAO;
 
-	public ReporteFacturacionPorMesBean() {
+	public ReporteAlmacenClienteBean() {
 		fecha = new Date();
 		clienteDAO = new ClienteDAO();
 		listaClientes = new ArrayList<Cliente>();
@@ -82,8 +82,8 @@ public class ReporteFacturacionPorMesBean implements Serializable {
 	
 	public void exportarPdf() throws JRException, IOException, SQLException{
 		System.out.println("Exportando a pdf.....");
-			String jasperPath = "/jasper/ReporteFacturacionPorMes.jrxml";
-			String filename = "ReporteFacturacionPorMes"+fecha+".pdf";
+			String jasperPath = "/jasper/reporteClienteAlmacen.jrxml";
+			String filename = "reporteClienteAlmacen"+fecha+".pdf";
 			String images = "/images/logo.jpeg";
 			String message = null;
 			Severity severity = null;
@@ -124,7 +124,7 @@ public class ReporteFacturacionPorMesBean implements Serializable {
 				message = String.format("No se pudo imprimir el reporte");
 				severity = FacesMessage.SEVERITY_INFO;
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-ClienteAlmacen");
+				PrimeFaces.current().ajax().update("form:messages", "form:dt-inventarioEntradas");
 			} finally {
 				conexion.close((Connection) connection);
 			}
@@ -133,8 +133,8 @@ public class ReporteFacturacionPorMesBean implements Serializable {
 	
 	public void exportarExcel() throws JRException, IOException, SQLException{
 		System.out.println("Exportando a excel.....");
-			String jasperPath = "/jasper/ReporteFacturacionPorMes.jrxml";
-			String filename = "ReporteFacturacionPorMes" +fecha+".xlsx";
+			String jasperPath = "/jasper/reporteClienteAlmacen.jrxml";
+			String filename = "reporteClienteAlmacen" +fecha+".xlsx";
 			String images = "/images/logo.jpeg";
 			String message = null;
 			Severity severity = null;
@@ -174,7 +174,7 @@ public class ReporteFacturacionPorMesBean implements Serializable {
 				message = String.format("No se pudo imprimir el reporte");
 				severity = FacesMessage.SEVERITY_INFO;
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-ClienteAlmacen");
+				PrimeFaces.current().ajax().update("form:messages", "form:dt-inventarioEntradas");
 			} finally {
 				conexion.close((Connection) connection);
 			}
