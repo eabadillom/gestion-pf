@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Domicilio por cliente </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+        <p:breadCrumb>
+            <p:menuitem value="Home" outcome="/dashboard"/>
+            <p:menuitem value="Reportes"/>
+            <p:menuitem value="Clientes"/>
+            <p:menuitem value="Domicilio por Cliente" outcome="/protected/reportes/DomicilioPorCliente"/>
+        </p:breadCrumb>
+            <div class="p-grid crud-demo">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteDomClienteBean.fecha}" />
+						
+					  <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+					  <p:toolbar>
+				<p:toolbarGroup>
+					   <div class="col-5 flex align-items-center justify-content-center">
+						<p:commandButton value=".pdf" actionListener="#{reporteDomClienteBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+						 </div>
+							         <div class="col-2">
+							            <p:divider layout="vertical">
+							           </p:divider>
+							        </div>
+							        
+								 <div class="col-5 flex align-items-center justify-content-center">
+									<p:commandButton value=".xlsx"  actionListener="#{reporteDomClienteBean.exportarExcel}"  process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+							     </div>
+					</p:toolbarGroup>
+
+							        </p:toolbar>
+						</p:fieldset>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
