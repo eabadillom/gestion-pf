@@ -240,7 +240,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{numero_cliente}+"</style>"]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="120" y="0" width="496" height="17" uuid="ba49f127-bed4-4e0e-aeb5-f4166ebf0532">
+					<reportElement x="120" y="0" width="498" height="17" uuid="ba49f127-bed4-4e0e-aeb5-f4166ebf0532">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4a8b2202-70fe-4fe2-b238-1264c85d0121"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
@@ -252,7 +252,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="17">
+			<band height="18">
 				<staticText>
 					<reportElement x="0" y="0" width="197" height="17" uuid="7db96550-abdc-4eee-bba1-dcd7ee9e6578">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -270,28 +270,28 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{totalClientes}+"</style>"]]></textFieldExpression>
 				</textField>
 				<line>
-					<reportElement x="80" y="16" width="536" height="1" forecolor="#2199F6" uuid="ee315132-9eaa-4392-aadc-b59b91c379c6"/>
+					<reportElement x="0" y="17" width="618" height="1" forecolor="#2199F6" uuid="ee315132-9eaa-4392-aadc-b59b91c379c6"/>
 				</line>
-				<textField>
+				<textField pattern="¤#,##0.##;¤-##0.##">
 					<reportElement x="361" y="0" width="85" height="17" uuid="c4015c4d-8a29-432d-b9f0-347dfc866aa6"/>
-					<textElement markup="styled">
+					<textElement textAlignment="Right" markup="styled">
 						<font size="10" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$V{sumaSubtotal}+"</style>"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[ $V{sumaSubtotal}]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField pattern="¤#,##0.##;¤-##0.##">
 					<reportElement x="446" y="0" width="84" height="17" uuid="957717ed-ce10-4df4-972a-b07a603ab629"/>
-					<textElement textAlignment="Center" markup="styled">
+					<textElement textAlignment="Right" markup="styled">
 						<font isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$V{I.V.A.}+"</style>"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{I.V.A.}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="530" y="0" width="86" height="17" uuid="8e1b6291-5cdc-4f73-9bf7-4bb3b57cc7cd"/>
-					<textElement textAlignment="Center" markup="styled">
+				<textField pattern="¤#,##0.##;¤-##0.##">
+					<reportElement x="530" y="0" width="88" height="17" uuid="8e1b6291-5cdc-4f73-9bf7-4bb3b57cc7cd"/>
+					<textElement textAlignment="Right" markup="styled">
 						<font isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$V{Saldo}+"</style>"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{Saldo}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
@@ -300,25 +300,30 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="94" splitType="Stretch">
+		<band height="54" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="616" height="40" forecolor="#2199F6" uuid="5393f713-d160-44f6-8ce5-7fca4a27fb9d"/>
-				<textElement textAlignment="Center">
+				<reportElement x="0" y="0" width="618" height="40" forecolor="#2199F6" uuid="5393f713-d160-44f6-8ce5-7fca4a27fb9d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[CARTERA DE CLIENTES DESGLOSADA]]></text>
 			</staticText>
 			<image hAlign="Center">
-				<reportElement x="0" y="54" width="120" height="40" uuid="e948a3c6-f443-41c7-b2ba-20760e81c937"/>
+				<reportElement x="0" y="0" width="120" height="54" uuid="e948a3c6-f443-41c7-b2ba-20760e81c937"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="0" y="40" width="288" height="14" uuid="ce38face-adc1-4dc0-9a83-e07939d43c8b"/>
 				<textElement textAlignment="Right"/>
-				<text><![CDATA[al]]></text>
+				<text><![CDATA[Al]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="288" y="40" width="329" height="14" uuid="ab22ba53-0ef1-43de-bbe5-5e65ed72a1e4"/>
+			<textField pattern="dd/MMM/yyyy">
+				<reportElement x="288" y="40" width="330" height="14" uuid="ab22ba53-0ef1-43de-bbe5-5e65ed72a1e4">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement>
+					<paragraph leftIndent="3"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
 			</textField>
 		</band>
@@ -402,7 +407,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 				<text><![CDATA[I.V.A.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="531" y="0" width="86" height="12" forecolor="#FFFFFF" backcolor="#2199F6" uuid="c62c9dcf-12b2-4068-b089-537b936df5ef">
+				<reportElement mode="Opaque" x="531" y="0" width="87" height="12" forecolor="#FFFFFF" backcolor="#2199F6" uuid="c62c9dcf-12b2-4068-b089-537b936df5ef">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<box>
@@ -426,37 +431,37 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 				<textFieldExpression><![CDATA[$F{nom_serie}+"-"+$F{numero}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="300" y="0" width="60" height="16" uuid="31d25e15-b181-42b1-b465-b64cfff32b16">
+				<reportElement x="300" y="0" width="61" height="16" uuid="31d25e15-b181-42b1-b465-b64cfff32b16">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="46c79d66-1b89-4f41-ad0e-60711c892d10"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{f_status}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
 				<reportElement x="361" y="0" width="85" height="16" uuid="c58f2924-2447-47d0-8d33-cb57700e3e52">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c7eb5b4c-94cd-475a-b0ea-6dda48f37fd1"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center"/>
+				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
 				<reportElement x="446" y="0" width="84" height="16" uuid="d135cd3d-ab86-4790-9537-1d6fc691ccfa">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ab6772b0-564d-4879-82f4-b5bc4787edf3"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center"/>
+				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{iva}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="530" y="0" width="86" height="16" uuid="0c04c33a-e1d2-47af-bd59-49add6c3e6c7">
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
+				<reportElement x="530" y="0" width="88" height="16" uuid="0c04c33a-e1d2-47af-bd59-49add6c3e6c7">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8d1c893a-97d0-47fd-9336-a980ed5ee8da"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center"/>
+				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{aPagar}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="dd/MMM/yyyy">
 				<reportElement x="0" y="0" width="250" height="16" uuid="fb5c49ce-5b84-4240-80e5-af13ced5d784">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3d104b41-bc19-4d7b-a155-cd8bd350911d"/>
 				</reportElement>
@@ -475,7 +480,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="300" y="0" width="316" height="23" uuid="64623631-1e13-4ced-8f04-4c7cd0c3fe18"/>
+				<reportElement x="300" y="0" width="318" height="23" uuid="64623631-1e13-4ced-8f04-4c7cd0c3fe18"/>
 				<textElement textAlignment="Left">
 					<font size="10"/>
 				</textElement>
@@ -508,32 +513,32 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{totalGeneral}+"</style>"]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
 				<reportElement mode="Opaque" x="360" y="0" width="86" height="20" forecolor="#FFFFFF" backcolor="#2199F6" uuid="dc64e684-ccc7-4441-aeaf-506b42e3c833"/>
 				<box>
 					<pen lineColor="#FFFFFF"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
-				<textElement textAlignment="Center" markup="styled">
-					<font size="10" isBold="true"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{subTotal}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[ $V{subTotal}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
 				<reportElement mode="Opaque" x="446" y="0" width="84" height="20" forecolor="#FFFFFF" backcolor="#2199F6" uuid="4e59bac9-f8b2-42f5-88e6-b1a2525858e7"/>
 				<box>
 					<pen lineColor="#FFFFFF"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
-				<textElement textAlignment="Center" markup="styled">
-					<font size="10" isBold="true"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{totalI.V.A.}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{totalI.V.A.}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement mode="Opaque" x="530" y="0" width="87" height="20" forecolor="#FFFFFF" backcolor="#2199F6" uuid="4f5f8038-f5d2-4ddd-ba36-24e27a40879a">
+			<textField pattern="¤#,##0.##;¤-#,##0.##">
+				<reportElement mode="Opaque" x="530" y="0" width="88" height="20" forecolor="#FFFFFF" backcolor="#2199F6" uuid="4f5f8038-f5d2-4ddd-ba36-24e27a40879a">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
@@ -542,10 +547,10 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
-				<textElement textAlignment="Center" markup="styled">
-					<font size="10" isBold="true"/>
+				<textElement textAlignment="Right" markup="styled">
+					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{totalSaldo}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{totalSaldo}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement mode="Opaque" x="250" y="0" width="110" height="20" forecolor="#FFFFFF" backcolor="#2199F6" uuid="1efd62b2-bd86-424b-af69-4bd6d8c52739"/>
