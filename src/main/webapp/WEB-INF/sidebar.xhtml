@@ -200,6 +200,8 @@
 								<p:menuitem value="Facturas por Mes" icon="pi pi-file" outcome="/protected/reportes/FacturasPorMes" />
 								<p:menuitem value="Facturas por Plantas" icon="pi pi-file" outcome="/protected/reportes/FacturasPorPlantas" />
 								<p:menuitem value="Antiguedad de Saldos" icon="pi pi-file" outcome="/protected/reportes/FacturasAntiguedadSaldos" />
+								<p:menuitem value="Cartera Clientes" icon="pi pi-file" outcome="/protected/reportes/CarteraCliente" />
+
 							</p:submenu>
 								<p:submenu id="frb_inventario_reporteCtes" label="Clientes" icon="pi pi-fw pi-table" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 								<p:menuitem value="Domicilio por Cliente" icon="pi pi-file" outcome="/protected/reportes/DomicilioPorCliente" />
