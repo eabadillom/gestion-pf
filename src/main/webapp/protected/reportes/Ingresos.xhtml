@@ -22,7 +22,10 @@
                 <div class="p-col-12">
 	                <div class="card">
 	             		
-	             		<p:fieldset legend="Periodo De Pago">
+	             		<p:outputLabel value="Fecha Actual:" styleClass="p-ml-2"/>
+	             		<p:datePicker id="fechActual" value="#{reporteIngresosBean.fechaActual}" showIcon="true" disabled="true"  styleClass="p-ml-2 p-mr-4"/>
+	             		
+	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
 	             		
 	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4"/>
 	             			
@@ -31,6 +34,12 @@
 	             		</p:fieldset>
 	             		
 	             		
+	             		<p:fieldset legend="Banco" styleClass="p-mt-4">
+		             		<p:selectOneMenu id="select-banco" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.bancoSelect}">
+		             			<f:selectItem itemLabel="Todos Los Bancos" Itemvalue="" />
+		             			<f:selectItems value="#{reporteIngresosBean.listBanco}" var="banco" itemLabel="#{banco.nombre}" itemValue="#{banco}" />
+		             		</p:selectOneMenu>
+	             		</p:fieldset>
 	             		
 	             		<p:fieldset legend="Cliente" styleClass="p-mt-4">
 		             		<p:selectOneMenu id="select-cte" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.clienteSelect}">
