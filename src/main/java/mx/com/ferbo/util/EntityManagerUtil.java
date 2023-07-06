@@ -55,4 +55,14 @@ public class EntityManagerUtil {
 		em = null;
 		return;
 	}
+	
+	public static void rollback(EntityManager em) {
+		if(em == null)
+			return;
+		
+		if(em.isOpen() == false)
+			return;
+		
+		em.getTransaction().rollback();
+	}
 }

@@ -4,23 +4,45 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class UnidadDeManejoDAO extends IBaseDAO<UnidadDeManejo, Integer> {
+	private static Logger log = Logger.getLogger(UnidadDeManejoDAO.class);
 
 	@Override
 	public UnidadDeManejo buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		UnidadDeManejo unidad = null;;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			unidad = em.find(UnidadDeManejo.class, id);
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la unidad de manejo...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return unidad;
 	}
 
 	@Override
 	public List<UnidadDeManejo> buscarTodos() {
 		List<UnidadDeManejo> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class).getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de unidades de manejo...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listado;
 	}
 

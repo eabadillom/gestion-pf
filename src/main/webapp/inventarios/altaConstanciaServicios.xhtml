@@ -15,7 +15,7 @@
 					outcome="/inventarios/constanciaServicios" />
 			</p:breadCrumb>
 			<p:growl id="messages" showDetail="true" />
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altaConstanciaServicioBean.fecha}" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="#{(altaConstanciaServicioBean.usuario.perfil == 1) or (altaConstanciaServicioBean.usuario.perfil == 4)}" value="#{altaConstanciaServicioBean.fecha}" />
 							<p:inputText id="txtFolio" value="#{altaConstanciaServicioBean.folio}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>
@@ -56,12 +56,11 @@
 	 <h5></h5>
 	 
         <p:fieldset legend="Servicios">
-
 			<p:panel>	
 				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaConstanciaServicioBean.idPrecioServicio}" filterMatchMode="startsWith">
 					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
-					<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}"
-						itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
+					<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" 
+						itemValue="#{selectedPrecioServicio.id}" />
 				</p:selectOneMenu>
 				<p:column><p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/></p:column>
 				<p:column>

@@ -20,6 +20,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.primefaces.PrimeFaces;
 
@@ -39,6 +41,7 @@ import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeProducto;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -85,6 +88,10 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private String otro,pedimento,contenedor,lote,tarima;
 	
+	private FacesContext faceContext;
+	private HttpServletRequest httpServletRequest;
+	private Usuario usuario;
+	
 	public ConsultarConstanciaDeDepositoBean() {
 		
 		constanciaDeDepositoDAO = new ConstanciaDeDepositoDAO();
@@ -108,6 +115,10 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 
 	@PostConstruct
 	public void init() {
+		
+		faceContext = FacesContext.getCurrentInstance();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
 		listadoClientes = clienteDAO.buscarTodos();
 		
@@ -311,6 +322,14 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		this.fechaIngreso = fechaIngreso;
 	}
 
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
 	public void buscarConstanciaDD() {
 		
 		EntityManager em = EntityManagerUtil.getEntityManager();
@@ -443,11 +462,33 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	public void updateDatosGenerales() {
 		
-		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Constancia De Deposito Actualizada"));
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			
+			if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
+				throw new Exception("No esta autorizado para modificar");
+			}
+			
+			constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD);
+				
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Se modificaron los datos generales correctamente";
+			
+		}catch (Exception e) {
+			
+			mensaje = "No esta autorizado para modificar";
+			severity = FacesMessage.SEVERITY_WARN;
+		}finally {
+			
+			message = new FacesMessage(severity,"Modificacion" , mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages");
+			
 		}
 		
-		PrimeFaces.current().ajax().update("form:messages");
 	}
 	
 	public void imprimir() {

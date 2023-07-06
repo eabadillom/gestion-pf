@@ -1,0 +1,444 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Calculo Previo</ui:define>
+
+	<ui:define name="content">
+	
+		<h:form id="form">
+
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Facturacion Constancias"
+					outcome="facturacionConstancias" />
+				<p:menuitem value="calculo Previo" outcome="calculoPrevio" />
+			</p:breadCrumb>
+
+			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
+
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+							
+						<div style="margin-top: 10px;">
+							<p:commandButton value="Atras" 
+								action="#{calculoPrevioBean.paginaFactura}"
+							 icon="pi pi-arrow-circle-left" />
+							 
+						</div>
+						
+						<div style="margin-top: 10px">
+							<p:fieldset legend="Datos De Emisor">
+								<div style="text-align: center;">
+									<p:outputLabel value="Planta:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.plantaSelect.plantaDs}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="Razo Social:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.plantaSelect.idEmisoresCFDIS.nb_emisor}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="RFC:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.plantaSelect.idEmisoresCFDIS.nb_rfc}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="Factura:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.serieFacturaSelect.nomSerie} - #{calculoPrevioBean.serieFacturaSelect.numeroActual + 1}"
+											styleClass="p-ml2- pmr-6" /></b>
+								</div>
+
+								<div style="text-align: center; margin-top: 10px">
+
+									<p:outputLabel value="Domicilio:" styleClass="p-mr-4" />
+
+									<b> <p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.paisCved.paisDesc}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.ciudades.municipios.estados.estadoDesc}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.ciudades.municipios.municipioDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.ciudades.ciudadDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.asentamientoPlanta.asentamientoDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.domicilioCalle}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.domicilioCp}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.domicilioNumExt}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioPlanta.domicilioNumInt}" />
+									</b>
+
+								</div>
+
+							</p:fieldset>
+						</div>
+
+						<div style="margin-top: 10px">
+							<p:fieldset legend="Datos De Receptor (Cliente)">
+
+								<div style="text-align: center;">
+									<p:outputLabel value="Cliente:" style="p-mr-2"></p:outputLabel>
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteNombre}" /></b>
+								</div>
+
+								<div style="text-align: center; margin-top: 4px">
+									<p:outputLabel value="Numero:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.numeroCte}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="Razon Social:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteNombre}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="RFC:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.cteRfc}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+
+									<p:outputLabel value="Domicilio"></p:outputLabel>
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioCalle}"
+											styleClass="p-ml-2 p-mr-6" /></b>
+								</div>
+
+								<div style="text-align: center; margin-top: 10px;">
+
+									<p:outputLabel value="Domicilio:" styleClass="p-mr-4" />
+
+									<b> <p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.paisCved.paisDesc}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.ciudades.municipios.estados.estadoDesc}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.ciudades.municipios.municipioDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.ciudades.ciudadDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.asentamientoCliente.asentamientoDs}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioCalle}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioCp}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioNumExt}, " />
+										<p:outputLabel
+											value="#{calculoPrevioBean.domicilioSelect.domicilioNumInt}" />
+									</b>
+
+								</div>
+
+								<div style="text-align: center; margin-top: 10px;">
+
+									<p:outputLabel value="UsoCfdi:" />
+									<b><p:outputLabel
+											value="#{calculoPrevioBean.clienteSelect.usoCfdi.cdUsoCfdi} - #{calculoPrevioBean.clienteSelect.usoCfdi.usoCfdi}"
+											styleClass="p-ml-2 p-mr-4" /></b>
+
+								</div>
+
+							</p:fieldset>
+						</div>
+
+
+						<p:dataTable id="dt-selectedEntradas"
+							value="#{calculoPrevioBean.listaEntradas}" var="entrada"
+							rowKey="#{entrada.folio.folio}" rows="5" reflow="true"
+							paginator="true" paginatorPosition="bottom">
+
+							<f:facet name="header">
+								<div>
+									<span>Constancias De Entrada</span>
+								</div>
+							</f:facet>
+
+							<p:column exportable="false" width="3%">
+								<p:rowToggler />
+							</p:column>
+
+							<p:column headerText="Folio Cliente">
+								<h:outputText value="#{entrada.folio.folioCliente}" />
+							</p:column>
+
+							<p:column headerText="Fecha Ingreso">
+								<h:outputText value="#{entrada.folio.fechaIngreso}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Vigencia Fin">
+								<h:outputText value="#{entrada.vigenciaFin}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:rowExpansion>
+								<p:dataTable id="dt-serviciosEntrada"
+									value="#{entrada.servicioConstanciaList}"
+									var="servicioConstancia">
+
+									<p:column headerText="Servicio">
+										<h:outputText value="#{servicioConstancia.descripcion}" />
+									</p:column>
+
+									<p:column headerText="Cantidad">
+										<h:outputText value="#{servicioConstancia.baseCargo}" />
+
+									</p:column>
+
+									<p:column headerText="Precio Unitario">
+										<h:outputText value="#{servicioConstancia.tarifa}" />
+									</p:column>
+
+									<p:column headerText="Importe">
+										<h:outputText value="#{servicioConstancia.costo}" />
+									</p:column>
+
+									<p:column headerText="Acción">
+										<p:commandButton value="Eliminar"
+											action="#{calculoPrevioBean.eliminarServicioEntrada()}"
+											update="form:dt-selectedEntradas form:subTotalGeneral form:iva form:total form:montoLetra"
+											icon="pi pi-times" styleClass="ui-button-danger">
+											<f:setPropertyActionListener value="#{servicioConstancia}"
+												target="#{calculoPrevioBean.selectServicioE}"></f:setPropertyActionListener>
+										</p:commandButton>
+									</p:column>
+
+								</p:dataTable>
+
+							</p:rowExpansion>
+
+							<f:facet name="footer">
+								<span> Subtotal Entradas: <h:outputText
+										value="#{calculoPrevioBean.subTotalEntrada}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText>
+								</span>
+							</f:facet>
+
+						</p:dataTable>
+
+						<p:dataTable id="dt-selectVigencias"
+							value="#{calculoPrevioBean.listaVigencias}" var="vigencia"
+							rowKey="#{vigencia.folio.folio}" rows="5" reflow="true"
+							paginator="true" paginatorPosition="bottom">
+
+							<f:facet name="header">
+								<div>
+									<span>Constancias De Vigencias</span>
+								</div>
+							</f:facet>
+
+							<p:column exportable="true" width="3%">
+								<p:rowToggler />
+							</p:column>
+
+							<p:column headerText="Folio Cliente">
+								<h:outputText value="#{vigencia.folioCliente}" />
+							</p:column>
+
+							<p:column headerText="Vigencia Inicio">
+								<h:outputText value="#{vigencia.vigenciaInicio}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Vigencia Fin">
+								<h:outputText value="#{vigencia.vigenciaFin}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:rowExpansion>
+								<p:dataTable id="dt-serviciosVigencia"
+									value="#{vigencia.servicioConstanciaList}"
+									var="servicioConstancia">
+
+									<p:column headerText="Servicio">
+										<h:outputText value="#{servicioConstancia.descripcion}" />
+									</p:column>
+
+									<p:column headerText="Cantidad">
+										<h:outputText value="#{servicioConstancia.baseCargo}" />
+									</p:column>
+
+									<p:column headerText="Precio Unitario">
+										<h:outputText value="#{servicioConstancia.tarifa}" />
+									</p:column>
+
+									<p:column headerText="Importe">
+										<h:outputText value="#{servicioConstancia.costo}" />
+									</p:column>
+
+									<p:column headerText="Acción">
+										<p:commandButton value="Eliminar"
+											action="#{calculoPrevioBean.eliminarServicioVigencia()}"
+											update="form:dt-selectVigencias form:subTotalGeneral form:iva form:total form:montoLetra"
+											icon="pi pi-times" styleClass="ui-button-danger">
+											<f:setPropertyActionListener value="#{servicioConstancia}"
+												target="#{calculoPrevioBean.selectServicioV}"></f:setPropertyActionListener>
+										</p:commandButton>
+									</p:column>
+
+								</p:dataTable>
+
+							</p:rowExpansion>
+
+							<f:facet name="footer">
+								<span> Subtotal Vigencias:<h:outputText
+										value="#{calculoPrevioBean.subTotalVigencias}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText>
+								</span>
+							</f:facet>
+
+						</p:dataTable>
+
+
+						<p:dataTable id="dt-constanciaFacturaDs"
+							value="#{calculoPrevioBean.listaServicios}"
+							var="constanciaFacturaDs"
+							rowKey="#{constanciaFacturaDs.constanciaDeServicio.folio}"
+							reflow="true" rows="5" paginatorPosition="bottom"
+							paginator="true">
+
+							<f:facet name="header">
+								<div>
+									<span>Constancias De Servicios</span>
+								</div>
+							</f:facet>
+
+							<p:column exportable="false" width="3%">
+								<p:rowToggler />
+							</p:column>
+
+							<p:column headerText="Folio">
+								<h:outputText
+									value="#{constanciaFacturaDs.constanciaDeServicio.folioCliente}" />
+							</p:column>
+
+							<p:column headerText="Fecha de Emisión">
+								<h:outputText value="#{calculoPrevioBean.fechaEmision}">
+									<f:convertDateTime pattern="dd/MMM/YYYY" />
+								</h:outputText>
+							</p:column>
+
+							<p:rowExpansion>
+								<p:dataTable id="dt-serviciosDs"
+									value="#{constanciaFacturaDs.servicioConstanciaDsList}"
+									var="servicioConstancia" rowIndexVar="row">
+
+									<p:column headerText="Servicio">
+										<h:outputText value="#{servicioConstancia.descripcion}" />
+									</p:column>
+
+									<p:column headerText="Cantidad">
+										<h:outputText value="#{servicioConstancia.cantidad}"></h:outputText>
+									</p:column>
+
+									<p:column headerText="Precio Unitario">
+										<h:outputText value="#{servicioConstancia.tarifa}" />
+									</p:column>
+
+									<p:column headerText="Importe">
+										<h:outputText value="#{servicioConstancia.costo}" />
+									</p:column>
+
+									<p:column headerText="Acción">
+										<p:commandButton value="Eliminar"
+											action="#{calculoPrevioBean.eliminarServicioDs()}"
+											update="form:dt-constanciaFacturaDs form:subTotalGeneral form:iva form:total form:montoLetra"
+											icon="pi pi-times" styleClass="ui-button-danger">
+											<f:setPropertyActionListener value="#{servicioConstancia}"
+												target="#{calculoPrevioBean.selectServicioDs}"></f:setPropertyActionListener>
+										</p:commandButton>
+									</p:column>
+
+								</p:dataTable>
+
+							</p:rowExpansion>
+
+							<f:facet name="footer">
+								<span> Subtotal Servicios: <h:outputText
+										id="subServiciosDs"
+										value="#{calculoPrevioBean.subTotalServicios}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText>
+								</span>
+							</f:facet>
+
+						</p:dataTable>
+
+						<p:fieldset legend="Totales" styleClass="p-mt-2">
+
+							<div>
+								<p:outputLabel value="Metodo de Pago:" styleClass="p-mr-2" />
+								<b><p:outputLabel
+										value="#{calculoPrevioBean.metodoPago.cdMetodoPago} - #{calculoPrevioBean.metodoPago.nbMetodoPago}" /></b>
+							</div>
+
+							<div>
+								<p:outputLabel value="Forma de Pago:" styleClass="p-mr-2" />
+								<b><p:outputLabel
+										value="#{calculoPrevioBean.medioPago.formaPago} - #{calculoPrevioBean.medioPago.mpDescripcion}" /></b>
+							</div>
+
+							<div style="text-align: right">
+								<p:outputLabel>Subtotal:</p:outputLabel>
+								<b><h:outputText id="subTotalGeneral"
+										value="#{calculoPrevioBean.subTotalGeneral}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText></b>
+							</div>
+
+							<div style="text-align: right">
+								<p:outputLabel>Iva:</p:outputLabel>
+								<b><h:outputText id="iva"
+										value="#{calculoPrevioBean.ivaTotal}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText> </b>
+							</div>
+
+							<div style="float: left;">
+								<p:outputLabel>Monto en letra:</p:outputLabel>
+								<b><h:outputText id="montoLetra"
+										value="#{calculoPrevioBean.montoLetra}"></h:outputText></b>
+							</div>
+
+							<div style="text-align: right">
+								<p:outputLabel>Total:</p:outputLabel>
+								<b><h:outputText id="total"
+										value="#{calculoPrevioBean.total}">
+										<f:convertNumber pattern=" $ ###,###,###.##" />
+									</h:outputText> </b>
+							</div>
+
+						</p:fieldset>
+						
+						<div style="margin-top: 10px;">
+							<p:splitButton value="Guardar" actionListener="#{calculoPrevioBean.saveFactura}" icon="pi pi-save">
+					            <p:menuitem value="Imprimir reporte" actionListener="#{calculoPrevioBean.jasper}"  icon="pi pi-file-pdf" ajax="false" process="@this"/>					 
+					            <p:menuitem value="Timbrar" action="#{calculoPrevioBean.timbrado}" icon="pi pi-file-pdf" ajax="false" process="@this"/> 
+					        </p:splitButton>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>

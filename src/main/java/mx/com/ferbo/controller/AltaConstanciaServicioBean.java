@@ -49,6 +49,7 @@ import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -98,6 +99,10 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 	private List<EstadoConstancia> estados = null;
+	
+	private Usuario usuario;
+	private FacesContext faceContext;
+	private HttpServletRequest httpServletRequest;
 
 	public AltaConstanciaServicioBean() {
 		log.info("Entrando al constructor del controller...");
@@ -119,8 +124,13 @@ public class AltaConstanciaServicioBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		log.info("Entrando a Init...");
-		clientes = clienteDAO.buscarTodos();
+		
+		faceContext = FacesContext.getCurrentInstance();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		
 		fecha = new Date();
+		clientes = clienteDAO.buscarTodos();
 		alUnidades = udmDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
@@ -128,7 +138,6 @@ public class AltaConstanciaServicioBean implements Serializable {
 	}
 
 	public void filtrarCliente() {
-
 		String message = null;
 		Severity severity = null;
 		EntityManager manager = null;
@@ -613,6 +622,14 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 	public void setEstados(List<EstadoConstancia> estados) {
 		this.estados = estados;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 }

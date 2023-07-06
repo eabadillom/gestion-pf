@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -21,6 +22,14 @@ public class MetodoPagoDAO extends IBaseDAO<MetodoPago,String>{
 		return null;
 	}
 
+	
+
+	public MetodoPago buscarPorMetodoPago(String metodoPago) {
+		 EntityManager entity = EntityManagerUtil.getEntityManager();
+		 MetodoPago metodoP = entity.createNamedQuery("MetodoPago.findByCdMetodoPago", MetodoPago.class).setParameter("cdMetodoPago",metodoPago).getSingleResult();
+			return metodoP;
+	}
+	
 	@Override
 	public List<MetodoPago> buscarTodos() {
 		// TODO Auto-generated method stub

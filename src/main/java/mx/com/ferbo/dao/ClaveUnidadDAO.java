@@ -6,14 +6,16 @@ import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ClaveUnidad;
+import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClaveUnidadDAO extends IBaseDAO<ClaveUnidad,String>{
 
 	@Override
-	public ClaveUnidad buscarPorId(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public ClaveUnidad buscarPorId(String cdUnidad) {
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("ClaveUnidad.findByCdUnidad", ClaveUnidad.class).
+				setParameter("cdUnidad", cdUnidad).getSingleResult();		
 	}
 
 	@Override

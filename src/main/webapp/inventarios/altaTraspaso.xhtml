@@ -14,7 +14,7 @@
 				<p:menuitem value="Alta" outcome="/inventarios/altaTraspaso" />
 			</p:breadCrumb>
 			<p:growl id="messages" showDetail="true" />
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{altaTraspasoBean.fecha}" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaTraspasoBean.fecha}" disabled="#{(altaTraspasoBean.usuario.perfil == 1) or (altaTraspasoBean.usuario.perfil == 4)}" value="#{altaTraspasoBean.fecha}" />
 							<p:inputText id="txtFolio" value="#{altaTraspasoBean.numero}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>
@@ -42,7 +42,8 @@
             <div class="p-grid ui-fluid">
     
 				<div class="p-field p-col-2 p-md-2" align="center">
-					<p:outputLabel for="@next" styleClass="block" value="Código" /><p:inputText value="#{inventario.codigo}" readonly="true" styleClass="block" />
+					<p:outputLabel for="@next" styleClass="block" value="Código" />
+					<p:inputText value="#{inventario.codigo}" readonly="true" styleClass="block" />
 				</div>
 				
 				<div class="p-field p-col-2 p-md-2" align="center">
@@ -142,8 +143,8 @@
 							<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaposicion}" var="posiciondestino" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
 							<p:ajax /></p:selectOneMenu>
 		                </div>
-	                </p:panel>
-            					</p:panelGrid>
+	              		  </p:panel>
+            			</p:panelGrid>
 		            </div>
 		        </div>
 			</div>

@@ -5,665 +5,419 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.RowEditEvent;
+import org.primefaces.event.UnselectEvent;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.MatchMode;
+import org.primefaces.omega.domain.CustomerStatus;
 
+import ch.qos.logback.core.status.Status;
 import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.PagoDAO;
-import mx.com.ferbo.dao.ProductoClienteDAO;
-import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoPagoDAO;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
-import mx.com.ferbo.model.Producto;
-import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoPago;
+import mx.com.ferbo.util.EntityManagerUtil;
 
 @Named
 @ViewScoped
 public class IngresosCrudBean implements Serializable {
 
-	/**
-	 * @author Juan_Cervantes
-	 */
-
 	private static final long serialVersionUID = -626048119540963939L;
+	private static Logger log = Logger.getLogger(IngresosCrudBean.class);
 
-	/**
-	 * Objetos para clientes
-	 */
-	private List<Cliente> lstClientes;
-	private Cliente clienteSelected;
-	private ClienteDAO clienteDAO;
+		private Integer idCte;
+		private BigDecimal totalSaldo;
+		private boolean porCobrar;
+		private boolean pagoParcial;
+		private BigDecimal cantidadApagar;
+		private String referencia;
+		private BigDecimal sumaTotal;
+		private BigDecimal restaTotal;
+		private Date fecha;
+		private Integer bancoCve;
+		private Integer tipoP;
+		
+		private Cliente cteSelect;
+		private Factura facturaSelect;
+		private Pago pagofactSelect;
+		private Bancos bancoSelect;
+		private TipoPago tipoPago;
+		private StatusFactura sfpagoParcial;
+		private StatusFactura sfporCobrar;
+		private StatusFactura sfPagada;
+		
+		
+		private List<Cliente> listaCtes;
+		private List<Factura> listaFactura;
+		private List<Factura> listaFacturaPago;
+		private List<Pago> listaPago;
+		private List<Bancos> listaBancos;
+		private List<TipoPago> listatipoPago;
+		
+		private ClienteDAO cteDAO;
+		private FacturaDAO facturaDAO;
+		private PagoDAO pagofactDAO;
+		private BancoDAO bancoDAO;
+		private TipoPagoDAO tipoPagoDAO;
+		private StatusFacturaDAO statusFacturaDAO;
+		
+		public IngresosCrudBean() {
+			cteDAO = new ClienteDAO();
+			facturaDAO = new FacturaDAO();
+			pagofactDAO = new PagoDAO();
+			bancoDAO = new BancoDAO();
+			tipoPagoDAO = new TipoPagoDAO();
+			statusFacturaDAO = new StatusFacturaDAO();
 
-	/**
-	 * Objetos para bancos
-	 */
-	private List<Bancos> lstBancos;
-	private Bancos bancosSelected;
-	private BancoDAO bancosDAO;
+			listaCtes = new ArrayList<Cliente>();
+			listaFactura = new ArrayList<Factura>();
+			listaPago = new ArrayList<Pago>();
+			listaBancos = new ArrayList<Bancos>();
+			listatipoPago = new ArrayList<TipoPago>();
+			listaFacturaPago = new ArrayList<Factura>();
 
-	/**
-	 * Objetos para facturas
-	 */
-	private List<Factura> lstFactura;
-	private List<Factura> lstFacturaFiltered;
-	private List<Factura> lstFacturaSelected;
-	private List<Factura> lstFacturaAux;
-	private Factura facturaSelected;
-	private FacturaDAO facturaDAO;
+			cteSelect = new Cliente();
+			facturaSelect = new Factura();
+			pagofactSelect = new Pago();
+			bancoSelect = new Bancos();
 
-	/**
-	 * Objetos para statusFacturas
-	 */
-	private List<StatusFactura> lstStatusFactura;
-	private StatusFactura statusFacturaSelected;
-	private StatusFacturaDAO statusFacturaDAO;
-
-	/**
-	 * Objetos para Pagos
-	 */
-	private List<Pago> lstPago;
-	private List<Pago> lstPagoFiltered;
-	private Pago pagoSelected;
-	private PagoDAO pagoDAO;
-
-	/**
-	 * Objetos para tipo Pagos
-	 */
-	private List<TipoPago> lstTipoPago;
-	private TipoPago tipoPagoSelected;
-	private TipoPagoDAO tipoPagoDAO;
-
-	/**
-	 * Objetos auxiliares
-	 */
-	private Date customDate;
-	private Date startDate;
-	private Date endDate;
-	private BigDecimal pagosTotales;
-	private BigDecimal montoPago;
-	private boolean disabledPagar;
-
-	/**
-	 * Objetos para Productos
-	 */
-	private List<Producto> listProducto;
-	private Producto productoSelected;
-	private ProductoDAO productoDAO;
-
-	/**
-	 * Constructores
-	 */
-
-	public IngresosCrudBean() {
-		clienteDAO = new ClienteDAO();
-		bancosDAO = new BancoDAO();
-		facturaDAO = new FacturaDAO();
-		statusFacturaDAO = new StatusFacturaDAO();
-		pagoDAO = new PagoDAO();
-		tipoPagoDAO = new TipoPagoDAO();
-		lstClientes = new ArrayList<>();
-		lstBancos = new ArrayList<>();
-		lstStatusFactura = new ArrayList<>();
-		lstFactura = new ArrayList<>();
-		lstPago = new ArrayList<>();
-		lstFacturaFiltered = new ArrayList<>();
-		lstFacturaSelected = new ArrayList<>();
-		lstFacturaAux = new ArrayList<>();
-		lstTipoPago = new ArrayList<>();
-		pagoSelected = new Pago();
-
-	}
-
-	@PostConstruct
-	public void init() {
-		lstClientes = clienteDAO.buscarTodos();
-		lstBancos = bancosDAO.buscarTodos();
-		lstFactura = facturaDAO.buscarTodos();
-		lstStatusFactura = statusFacturaDAO.buscarTodos();
-		lstPago = pagoDAO.buscarTodos();
-		lstTipoPago = tipoPagoDAO.buscarTodos();
-	}
-
-	/**
-	 * Metodos de filtrado
-	 */
-	public void filtraListadoClientes() {
-		if (lstFacturaFiltered.isEmpty() || lstFacturaFiltered == null) {
-			lstFacturaFiltered = lstFactura;
 		}
-		lstFacturaFiltered = lstFactura.stream()
-				.filter(ps -> clienteSelected != null
-						? (ps.getCliente().getCteCve().intValue() == clienteSelected.getCteCve().intValue())
-						: false)
-				.collect(Collectors.toList());
-	}
-
-	public void filtraListadoBancos() {
-		if (bancosSelected != null) {
-			if (lstFacturaFiltered.isEmpty() || lstFacturaFiltered == null) {
-				lstFacturaFiltered = lstFactura;
-			}
-			List<Factura> lstFacturaAux = new ArrayList<>();
-			for (Factura f : lstFacturaFiltered) {
-				boolean borraFactura = true;
-				if (!f.getPagoList().isEmpty() && f.getPagoList() != null) {
-					for (Pago p : f.getPagoList()) {
-						if (p.getBanco() != null && p.getBanco().getClave() == bancosSelected.getClave()) {
-							borraFactura = false;
-						}
-					}
+		
+		@PostConstruct
+		public void init() {
+			fecha = new Date();
+			listaCtes = cteDAO.buscarTodos();
+			//listaFactura = facturaDAO.buscarTodos();
+			//listaPago = pagofactDAO.buscarTodos();
+			listaBancos = bancoDAO.buscarTodos();
+			listatipoPago = tipoPagoDAO.buscarTodos();
+			sfPagada = statusFacturaDAO.buscarPorId(3);
+			sfpagoParcial = statusFacturaDAO.buscarPorId(4);
+			sfporCobrar = statusFacturaDAO.buscarPorId(1);
+		}
+		
+		public void filtroCte() {
+			listaFactura = facturaDAO.buscarTodos();
+			String message = null;
+			Severity severity = null;
+			EntityManager manager = null;
+			Cliente cte = null;
+			StatusFactura sf = new StatusFactura();
+			this.cteSelect = cteDAO.buscarPorId(idCte);
+			listaFactura.clear();
+			log.info("Entrando a filtrar cliente...");
+			try {
+				if(pagoParcial == true) {
+					StatusFactura sfpagoParcial = new StatusFactura();
+					sfpagoParcial.setId(4);
+					listaFactura.addAll(facturaDAO.buscarPorCteStatus(sfpagoParcial, cteSelect));
 				}
-				if (borraFactura) {
-					lstFacturaAux.add(f);
+				if(porCobrar == true) {
+					StatusFactura sfporCobrar = new StatusFactura();
+					sfporCobrar.setId(1);
+					listaFactura.addAll(facturaDAO.buscarPorCteStatus(sfporCobrar, cteSelect));
 				}
-			}
-			lstFacturaFiltered.removeAll(lstFacturaAux);
-		}
-	}
-
-	public void filtraListadoStatus() {
-		if (statusFacturaSelected != null) {
-			if (lstFacturaFiltered.isEmpty() || lstFacturaFiltered == null) {
-				lstFacturaFiltered = lstFactura;
-			}
-			lstFacturaFiltered = lstFacturaFiltered.stream()
-					.filter(ps -> statusFacturaSelected != null
-							? (ps.getStatus().getId().intValue() == statusFacturaSelected.getId().intValue())
-							: false)
-					.collect(Collectors.toList());
-		}
-	}
-
-	public void filtraListadoFecha() {
-		if (lstFacturaFiltered.isEmpty() || lstFacturaFiltered == null) {
-			lstFacturaFiltered = lstFactura;
-		}
-		List<Factura> lstFacturaAux = new ArrayList<>();
-		if (customDate != null) {
-			for (Factura f : lstFacturaFiltered) {
-				if (f.getFecha().compareTo(customDate) != 0) {
-					System.out.println(f.getFecha());
-					System.out.println(customDate);
-					lstFacturaAux.add(f);
-				}
-			}
-			lstFacturaFiltered.removeAll(lstFacturaAux);
-		} /*
-			 * Date fechaSelected = generaFecha(customDate); lstFacturaFiltered =
-			 * lstFacturaFiltered.stream() .filter(ps -> customDate != null ? (ps.getFecha()
-			 * == customDate) : false) .collect(Collectors.toList());
-			 */
-	}
-
-	public void filtraSaldos() {
-		for (int i = 0; i < lstFacturaFiltered.size(); i++) {
-			BigDecimal totalAux = lstFacturaFiltered.get(i).getTotal()
-					.subtract(calculaSaldoTotal(lstFacturaFiltered.get(i)));
-			if (totalAux.compareTo(BigDecimal.ZERO) == 0) {
-				StatusFactura statusAux = new StatusFactura();
-				statusAux.setId(3);
-				lstFacturaFiltered.get(i).setStatus(statusAux);
-				facturaDAO.actualizaStatus(lstFacturaFiltered.get(i));
+						message = "Seleccione el tipo de pago.";
+						severity = FacesMessage.SEVERITY_INFO;
+					
+			}catch(Exception ex) {
+				log.error("Problema para recuperar los datos del cliente.", ex);
+				message = ex.getMessage();
+				severity = FacesMessage.SEVERITY_ERROR;
+			}finally {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
+				PrimeFaces.current().ajax().update("form:messages", "form:dt-Factura");
 			}
 		}
-		filtraFacturas();
-	}
 
-	public void filtraFacturas() {
-		filtraListadoClientes();
-		filtraListadoStatus();
-		filtraListadoFecha();
-		PrimeFaces.current().ajax().update("form:dt-facturas");
-	}
-
-	public void limpiaFiltro() {
-		clienteSelected = null;
-		bancosSelected = null;
-		statusFacturaSelected = null;
-		customDate = null;
-		lstFacturaSelected = null;
-		PrimeFaces.current().ajax().update("form:dt-facturas");
-
-	}
-
-	public void calculaPago() {
-		BigDecimal pagoTotAux = new BigDecimal(0);
-		for (Factura f : lstFacturaFiltered) {
-			for (Pago p : f.getPagoList()) {
-				pagoTotAux = pagoTotAux.add(p.getMonto());
-
+		public void calculoFactura() {
+			System.out.println("Factura: " + facturaSelect);
+			List<Pago> listaPagos = new ArrayList<>();
+			listaPagos = pagofactDAO.buscarPorFactura(facturaSelect.getId());
+			BigDecimal sumaTotal = new BigDecimal(0);
+			for(Pago p: listaPagos) {
+				sumaTotal = sumaTotal.add(p.getMonto());
+				System.out.println("Suma total de pagos: " + sumaTotal);
 			}
-		}
-		pagosTotales = pagoTotAux;
-	}
+			BigDecimal totalFactura = facturaSelect.getTotal();
+			restaTotal = totalFactura.subtract(sumaTotal); 
 
-	/**
-	 * Métodos para procesar el pago
-	 */
-	public void procesaPago() {
-		List<String> errores = new ArrayList<>();
-		for (Pago p : lstPago) {
-			// Se elimina dato de saldo de la factura
-			p.getFactura().setObservacion("");
-			p.setFecha(new Date());
-			errores.add(pagoDAO.guardar(p));
 		}
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pago Procesado"));
-		for (String e : errores) {
-			if (e != null) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error al guardar el Pago"));
+		
+	
+		public void agregaPagoFactura() {
+			BigDecimal saldo = BigDecimal.ZERO;
+			System.out.println(this.pagofactSelect);			
+			Pago pg = new Pago();
+			
+			bancoSelect = bancoDAO.buscarPorId(bancoCve);
+			tipoPago = tipoPagoDAO.buscarPorId(tipoP);
+			pg.setBanco(bancoSelect);
+			pg.setMonto(cantidadApagar);
+			pg.setFactura(facturaSelect);
+			pg.setTipo(tipoPago);
+			pg.setReferencia(referencia);
+			pg.setFecha(fecha);
+			facturaSelect.getPagoList().add(pg);
+			int indexPago = facturaSelect.getPagoList().size() -1;
+			Pago getListaPago = facturaSelect.getPagoList().get(indexPago);
+			listaPago.add(getListaPago);	
+			//listaFacturaPago.add(facturaSelect);
+
+			saldo = facturaSelect.getTotal();
+			for(Pago p : facturaSelect.getPagoList()) {
+				saldo = saldo.subtract(p.getMonto());
 			}
+			
+			if(saldo.compareTo(BigDecimal.ZERO) > 0) //Quiere decir que el saldo es mayor que cero
+				facturaSelect.setStatus(sfpagoParcial);
+			if(saldo.compareTo(BigDecimal.ZERO) <= 0) //Quere decir que el saldo es igual a 0, es decir, que ya se liquidó la factura. También considera que el pago sea mayor al monto de la factura, por lo que el cliente tendría un saldo a favor.
+				facturaSelect.setStatus(sfPagada);
+			
+			bancoCve = null;
+			tipoP = null;
+			referencia = null;
+			cantidadApagar = null;
 		}
-		filtraSaldos();
-		PrimeFaces.current().ajax().update("form:messages form:dt-facturas form:panel-pago");
-	}
-
-	/**
-	 * Métodos de control
-	 */
-	public boolean hasFacturaSelected() {
-		return this.lstFacturaSelected != null && !this.lstFacturaSelected.isEmpty();
-	}
-
-	public String getBotonPagoMessage() {
-		if (hasFacturaSelected()) {
-			int size = this.lstFacturaSelected.size();
-			return size > 1 ? "Pagar " + size + " Facturas" : "Pagar 1 Factura";
-		}
-		return "Pago";
-	}
-
-	public void actualizaBoton() {
-		lstPago = new ArrayList<>();
-		lstFacturaAux = lstFacturaSelected;
-		for (Factura f : lstFacturaSelected) {
-			Pago pagoAux = new Pago();
-			this.calculaSaldo();
-			pagoAux.setFactura(f);
-			BigDecimal saldoAux = calculaSaldoTotal(f);
-			if (saldoAux == new BigDecimal(0)) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						"Error","Error al guardar el Pago"));
+		
+		public void savePago() {
+			String message = null;
+			Severity severity = null;
+			try {
+				facturaDAO.actualizar(facturaSelect);
+				severity = FacesMessage.SEVERITY_INFO;
+				message = "El pago se genero correctamente";
+			} catch (Exception e) {
+				log.error("Problema para generar el pago.", e);
+				e.printStackTrace();
+				message = "Se genero un problema al generar pago.";
+				severity = FacesMessage.SEVERITY_ERROR;
+			} finally {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage(severity, "Informacion de Pago", message));
+				PrimeFaces.current().ajax().update("form:messages", "form:dt-ingAlta", "form:dt-Factura");
+				
 			}
-			lstPago.add(pagoAux);
+	}
+
+		public Integer getIdCte() {
+			return idCte;
 		}
-		PrimeFaces.current().ajax().update("form:messages","form:panel-pago");
-	}
-	
-	public void refrescaTabla() {
-		lstFacturaSelected = lstFacturaAux;
-		PrimeFaces.current().ajax().update("form:messages","form:panel-pago", "form:dt-facturas", "form:botonPagar");
-	}
-	
-
-	/**
-	 * Método para calcular saldo Se utiliza un campo de Factura que no es enviado a
-	 * base de datos para poder mostrarlo en el campo de Saldo sin necesidad de
-	 * agregar campos al objeto Factura
-	 */
-	public void calculaSaldo() {
-		if (!lstFacturaSelected.isEmpty() && lstFacturaSelected != null) {
-			for (Factura f : lstFacturaSelected) {
-				BigDecimal saldo = calculaSaldoTotal(f);
-				// Se usa el campo Observación para mostrar el saldo
-				saldo = f.getTotal().subtract(saldo);
-				f.setObservacion(saldo.toString());
-			}
+		
+		public void setIdCte(Integer idCte) {
+			this.idCte = idCte;
 		}
-	}
 
-	// List<Pago> pagoFactura = pagoDAO.buscaPorFactura(f);
-
-	private BigDecimal calculaSaldoTotal(Factura f) {
-		BigDecimal saldo = new BigDecimal(0);
-		List<Pago> pagoFactura = pagoDAO.buscaPorFactura(f);
-		for (Pago p : pagoFactura) {
-			saldo = saldo.add(p.getMonto());
+		
+		public List<Cliente> getListaCtes() {
+			return listaCtes;
 		}
-		return saldo;
-	}
-
-	/**
-	 * Método para actualizar monto a pagar total
-	 */
-
-	public void actualizaMontoPago() {
-		disabledPagar = false;
-		montoPago = new BigDecimal(0);
-		//for(Factura f : lstFacturaAux) {
-		for (Pago p : lstPago) {
-			if (p.getMonto() != null) {
-				montoPago = montoPago.add(p.getMonto());
-				if (p.getMonto().compareTo(p.getFactura().getTotal().subtract(calculaSaldoTotal(p.getFactura()))) > 0) {
-					disabledPagar = true;
-					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error", "El monto a pagar no debe ser mayor al Saldo"));
-				}
-			//}
-		}}
-		//if(disabledPagar) {
-			//FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-		//			"Error", "El monto a pagar no debe ser mayor al Saldo"));
-		//}
-		PrimeFaces.current().ajax().update("form:montoPago", "form:panel-pago","form:botonProcesaPago","form:messages");
-		montoPago = new BigDecimal(0);
-	}
-	
-	/**
-	 * Métodos para actualización de Pago
-	 */
-	/**
-	 * Método para filtrado
-	 */
-public void filtraPagos() {
-	lstPagoFiltered = pagoDAO.buscaPorClienteFechas(clienteSelected, startDate, endDate);
-	PrimeFaces.current().ajax().update("form:dt-pagos");
-
-	
-	
-	
-}
-public void filtraListadoClientesPago() {
-	if (lstPagoFiltered.isEmpty() || lstPagoFiltered == null) {
-		lstPagoFiltered = lstPago;
-	}
-	lstPagoFiltered = lstPago.stream()
-			.filter(ps -> clienteSelected != null
-					? (ps.getFactura().getCliente().getCteCve().intValue() == clienteSelected.getCteCve().intValue())
-					: false)
-			.collect(Collectors.toList());
-	
-	
-}
-
-public void actualizaPago() {
-	if(pagoDAO.actualizar(pagoSelected)!=null) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-				"Error", "Error al actualizar el pago"));
-	}else {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pago Actualizado"));
-	}
-	PrimeFaces.current().ajax().update("form:panel-actualizaPago", "form:dt-pagos");
-}
-
-public void eliminaPago() {
-	if(pagoDAO.eliminar(pagoSelected)!=null) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-				"Error", "Error al eliminar el pago"));
-	}else {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pago Eliminado"));
-	}
-	filtraPagos();
-	PrimeFaces.current().ajax().update("form:panel-actualizaPago", "form:dt-pagos");
-}
-
-
-	/**
-	 * Getters y Setters
-	 */
-	public List<Cliente> getLstClientes() {
-		return lstClientes;
-	}
-
-	public void setLstClientes(List<Cliente> lstClientes) {
-		this.lstClientes = lstClientes;
-	}
-
-	public Cliente getClienteSelected() {
-		return clienteSelected;
-	}
-
-	public void setClienteSelected(Cliente clienteSelected) {
-		this.clienteSelected = clienteSelected;
-	}
-
-	public ClienteDAO getClienteDAO() {
-		return clienteDAO;
-	}
-
-	public void setClienteDAO(ClienteDAO clienteDAO) {
-		this.clienteDAO = clienteDAO;
-	}
 
-	public List<Bancos> getLstBancos() {
-		return lstBancos;
-	}
+		public void setListaCtes(List<Cliente> listaCtes) {
+			this.listaCtes = listaCtes;
+		}
 
-	public void setLstBancos(List<Bancos> lstBancos) {
-		this.lstBancos = lstBancos;
-	}
+		public Cliente getCteSelect() {
+			return cteSelect;
+		}
 
-	public Bancos getBancosSelected() {
-		return bancosSelected;
-	}
+		public void setCteSelect(Cliente cteSelect) {
+			this.cteSelect = cteSelect;
+		}
 
-	public void setBancosSelected(Bancos bancosSelected) {
-		this.bancosSelected = bancosSelected;
-	}
+		public List<Factura> getListaFactura() {
+			return listaFactura;
+		}
 
-	public BancoDAO getBancosDAO() {
-		return bancosDAO;
-	}
+		public void setListaFactura(List<Factura> listaFactura) {
+			this.listaFactura = listaFactura;
+		}
 
-	public void setBancosDAO(BancoDAO bancosDAO) {
-		this.bancosDAO = bancosDAO;
-	}
+		public Factura getFacturaSelect() {
+			return facturaSelect;
+		}
 
-	public List<Factura> getLstFactura() {
-		return lstFactura;
-	}
+		public void setFacturaSelect(Factura facturaSelect) {
+			this.facturaSelect = facturaSelect;
+		}
 
-	public void setLstFactura(List<Factura> lstFactura) {
-		this.lstFactura = lstFactura;
-	}
+		public boolean isPorCobrar() {
+			return porCobrar;
+		}
 
-	public Factura getFacturaSelected() {
-		return facturaSelected;
-	}
+		public void setPorCobrar(boolean porCobrar) {
+			this.porCobrar = porCobrar;
+		}
 
-	public void setFacturaSelected(Factura facturaSelected) {
-		this.facturaSelected = facturaSelected;
-	}
+		public boolean isPagoParcial() {
+			return pagoParcial;
+		}
 
-	public FacturaDAO getFacturaDAO() {
-		return facturaDAO;
-	}
+		public void setPagoParcial(boolean pagoParcial) {
+			this.pagoParcial = pagoParcial;
+		}
 
-	public void setFacturaDAO(FacturaDAO facturaDAO) {
-		this.facturaDAO = facturaDAO;
-	}
+		public Pago getPagofactSelect() {
+			return pagofactSelect;
+		}
 
-	public Date getStartDate() {
-		return startDate;
-	}
+		public void setPagofactSelect(Pago pagofactSelect) {
+			this.pagofactSelect = pagofactSelect;
+		}
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
+		public List<Pago> getListaPago() {
+			return listaPago;
+		}
 
-	public Date getEndDate() {
-		return endDate;
-	}
+		public void setListaPago(List<Pago> listaPago) {
+			this.listaPago = listaPago;
+		}
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
 
-	public List<Producto> getListProducto() {
-		return listProducto;
-	}
+		public BigDecimal getCantidadApagar() {
+			return cantidadApagar;
+		}
 
-	public void setListProducto(List<Producto> listProducto) {
-		this.listProducto = listProducto;
-	}
+		public void setCantidadApagar(BigDecimal cantidadApagar) {
+			this.cantidadApagar = cantidadApagar;
+		}
 
-	public Producto getProductoSelected() {
-		return productoSelected;
-	}
+		public Bancos getBancoSelect() {
+			return bancoSelect;
+		}
 
-	public void setProductoSelected(Producto productoSelected) {
-		this.productoSelected = productoSelected;
-	}
+		public void setBancoSelect(Bancos bancoSelect) {
+			this.bancoSelect = bancoSelect;
+		}
 
-	public ProductoDAO getProductoDAO() {
-		return productoDAO;
-	}
+		public List<Bancos> getListaBancos() {
+			return listaBancos;
+		}
 
-	public void setProductoDAO(ProductoDAO productoDAO) {
-		this.productoDAO = productoDAO;
-	}
+		public void setListaBancos(List<Bancos> listaBancos) {
+			this.listaBancos = listaBancos;
+		}
 
-	public Date getCustomDate() {
-		return customDate;
-	}
+		public BigDecimal getTotalSaldo() {
+			return totalSaldo;
+		}
 
-	public void setCustomDate(Date customDate) {
-		this.customDate = customDate;
-	}
+		public void setTotalSaldo(BigDecimal totalSaldo) {
+			this.totalSaldo = totalSaldo;
+		}
 
-	public List<StatusFactura> getLstStatusFactura() {
-		return lstStatusFactura;
-	}
+		public String getReferencia() {
+			return referencia;
+		}
 
-	public void setLstStatusFactura(List<StatusFactura> lstStatusFactura) {
-		this.lstStatusFactura = lstStatusFactura;
-	}
+		public void setReferencia(String referencia) {
+			this.referencia = referencia;
+		}
 
-	public StatusFactura getStatusFacturaSelected() {
-		return statusFacturaSelected;
-	}
+		public BigDecimal getSumaTotal() {
+			return sumaTotal;
+		}
 
-	public void setStatusFacturaSelected(StatusFactura statusFacturaSelected) {
-		this.statusFacturaSelected = statusFacturaSelected;
-	}
+		public void setSumaTotal(BigDecimal sumaTotal) {
+			this.sumaTotal = sumaTotal;
+		}
 
-	public StatusFacturaDAO getStatusFacturaDAO() {
-		return statusFacturaDAO;
-	}
+		public BigDecimal getRestaTotal() {
+			return restaTotal;
+		}
 
-	public void setStatusFacturaDAO(StatusFacturaDAO statusFacturaDAO) {
-		this.statusFacturaDAO = statusFacturaDAO;
-	}
+		public void setRestaTotal(BigDecimal restaTotal) {
+			this.restaTotal = restaTotal;
+		}
 
-	public List<Pago> getLstPago() {
-		return lstPago;
-	}
+		public TipoPago getTipoPago() {
+			return tipoPago;
+		}
 
-	public void setLstPago(List<Pago> lstPago) {
-		this.lstPago = lstPago;
-	}
+		public void setTipoPago(TipoPago tipoPago) {
+			this.tipoPago = tipoPago;
+		}
 
-	public Pago getPagoSelected() {
-		return pagoSelected;
-	}
+		public List<TipoPago> getListatipoPago() {
+			return listatipoPago;
+		}
 
-	public void setPagoSelected(Pago pagoSelected) {
-		this.pagoSelected = pagoSelected;
-	}
+		public void setListatipoPago(List<TipoPago> listatipoPago) {
+			this.listatipoPago = listatipoPago;
+		}
 
-	public PagoDAO getPagoDAO() {
-		return pagoDAO;
-	}
+		public List<Factura> getListaFacturaPago() {
+			return listaFacturaPago;
+		}
 
-	public void setPagoDAO(PagoDAO pagoDAO) {
-		this.pagoDAO = pagoDAO;
-	}
+		public void setListaFacturaPago(List<Factura> listaFacturaPago) {
+			this.listaFacturaPago = listaFacturaPago;
+		}
 
-	public List<TipoPago> getLstTipoPago() {
-		return lstTipoPago;
-	}
+		public Date getFecha() {
+			return fecha;
+		}
 
-	public void setLstTipoPago(List<TipoPago> lstTipoPago) {
-		this.lstTipoPago = lstTipoPago;
-	}
+		public void setFecha(Date fecha) {
+			this.fecha = fecha;
+		}
 
-	public TipoPago getTipoPagoSelected() {
-		return tipoPagoSelected;
-	}
+		public StatusFactura getSfpagoParcial() {
+			return sfpagoParcial;
+		}
 
-	public void setTipoPagoSelected(TipoPago tipoPagoSelected) {
-		this.tipoPagoSelected = tipoPagoSelected;
-	}
+		public void setSfpagoParcial(StatusFactura sfpagoParcial) {
+			this.sfpagoParcial = sfpagoParcial;
+		}
 
-	public TipoPagoDAO getTipoPagoDAO() {
-		return tipoPagoDAO;
-	}
+		public StatusFactura getSfporCobrar() {
+			return sfporCobrar;
+		}
 
-	public void setTipoPagoDAO(TipoPagoDAO tipoPagoDAO) {
-		this.tipoPagoDAO = tipoPagoDAO;
-	}
+		public void setSfporCobrar(StatusFactura sfporCobrar) {
+			this.sfporCobrar = sfporCobrar;
+		}
 
-	public BigDecimal getPagosTotales() {
-		return pagosTotales;
-	}
+		public Integer getBancoCve() {
+			return bancoCve;
+		}
 
-	public void setPagosTotales(BigDecimal pagosTotales) {
-		this.pagosTotales = pagosTotales;
-	}
+		public void setBancoCve(Integer bancoCve) {
+			this.bancoCve = bancoCve;
+		}
 
-	public List<Factura> getLstFacturaFiltered() {
-		return lstFacturaFiltered;
-	}
+		public Integer getTipoP() {
+			return tipoP;
+		}
 
-	public void setLstFacturaFiltered(List<Factura> lstFacturaFiltered) {
-		this.lstFacturaFiltered = lstFacturaFiltered;
-	}
+		public void setTipoP(Integer tipoP) {
+			this.tipoP = tipoP;
+		}
 
-	public List<Factura> getLstFacturaSelected() {
-		return lstFacturaSelected;
-	}
 
-	public void setLstFacturaSelected(List<Factura> lstFacturaSelected) {
-		this.lstFacturaSelected = lstFacturaSelected;
-	}
-
-	public BigDecimal getMontoPago() {
-		return montoPago;
-	}
-
-	public void setMontoPago(BigDecimal montoPago) {
-		this.montoPago = montoPago;
-	}
-
-	public boolean isDisabledPagar() {
-		return disabledPagar;
-	}
-
-	public void setDisabledPagar(boolean disabledPagar) {
-		this.disabledPagar = disabledPagar;
-	}
-
-	public List<Factura> getLstFacturaAux() {
-		return lstFacturaAux;
-	}
-
-	public void setLstFacturaAux(List<Factura> lstFacturaAux) {
-		this.lstFacturaAux = lstFacturaAux;
-	}
-
-	public List<Pago> getLstPagoFiltered() {
-		return lstPagoFiltered;
-	}
-
-	public void setLstPagoFiltered(List<Pago> lstPagoFiltered) {
-		this.lstPagoFiltered = lstPagoFiltered;
-	}
 
 }

@@ -39,7 +39,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Cliente.findByCteRfc", query = "SELECT c FROM Cliente c WHERE c.cteRfc = :cteRfc"),
     @NamedQuery(name = "Cliente.findByNumeroCte", query = "SELECT c FROM Cliente c WHERE c.numeroCte = :numeroCte"),
     @NamedQuery(name = "Cliente.findByCteMail", query = "SELECT c FROM Cliente c WHERE c.cteMail = :cteMail"),
-    @NamedQuery(name = "Cliente.findByHabilitado", query = "SELECT c FROM Cliente c WHERE c.habilitado = :habilitado"),
+    @NamedQuery(name = "Cliente.findByHabilitado", query = "SELECT c FROM Cliente c WHERE c.habilitado = :habilitado ORDER BY c.cteNombre"),
     @NamedQuery(name = "Cliente.findByCodUnico", query = "SELECT c FROM Cliente c WHERE c.codUnico = :codUnico")})
 public class Cliente implements Serializable {
 
@@ -82,15 +82,15 @@ public class Cliente implements Serializable {
     @Column(name = "tp_persona")
     private String tipoPersona;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
     private RegimenFiscal  regimenFiscal;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "cd_uso_cfdi", referencedColumnName = "cd_uso_cfdi")
     private UsoCfdi usoCfdi;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "cd_metodo_pago", referencedColumnName = "cd_metodo_pago")
     private MetodoPago metodoPago;
     
@@ -105,46 +105,46 @@ public class Cliente implements Serializable {
     @Column(name = "uuid")
     private String uuid;
     
-    @OneToMany(mappedBy = "clienteCve")
+    @OneToMany(mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaServicios> constanciaServiciosList;
     
-    @OneToMany(mappedBy = "cliente")
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<Factura> facturaList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ProductoPorCliente> productoPorClienteList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ClienteDomicilios> clienteDomiciliosList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<DetalleFacturacion> detalleFacturacionList;
     
-    @OneToMany(mappedBy = "cteCve")
+    @OneToMany(mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<Aviso> avisoList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<CuotaMensualServicio> cuotaMensualServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<PrecioServicio> precioServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ClienteContacto> clienteContactoList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ConstanciaDeServicio> constanciaDeServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ConstanciaDeDeposito> constanciaDeDepositoList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clienteCve")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaSalida> constanciaSalidaList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<CuotaMinima> cuotaMinimaList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<ConstanciaTraspaso> constanciaTraspasoList;
     
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY, orphanRemoval = true)
@@ -350,7 +350,8 @@ public class Cliente implements Serializable {
         this.constanciaTraspasoList = constanciaTraspasoList;
     }
 
-    @Override
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (cteCve != null ? cteCve.hashCode() : 0);

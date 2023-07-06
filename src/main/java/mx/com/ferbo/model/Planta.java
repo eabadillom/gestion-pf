@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,34 +35,40 @@ import javax.validation.constraints.Size;
 public class Planta implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta")
-	private List<Posicion> posicionList;
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "PLANTA_CVE")
 	private Integer plantaCve;
+	
 	@Size(max = 80)
 	@Column(name = "PLANTA_DS")
 	private String plantaDs;
+	
 	@Size(max = 6)
 	@Column(name = "planta_abrev")
 	private String plantaAbrev;
+	
 	@Size(max = 6)
 	@Column(name = "planta_sufijo")
 	private String plantaSufijo;
+	
 	@Size(max = 10)
 	@Column(name = "PLANTA_COD")
 	private String plantaCod;
+	
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id")
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Usuario idUsuario;
-	@OneToMany(mappedBy = "plantaCve")
+	
+	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Camara> camaraList;
-	@OneToMany(mappedBy = "plantaCve")
+	
+	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Aviso> avisoList;
-	@OneToMany(mappedBy = "planta")
+	
+	@OneToMany(mappedBy = "planta", fetch = FetchType.LAZY)
     private List<Factura> facturaList;
 	
 	@Column(name = " id_pais")
@@ -86,7 +93,7 @@ public class Planta implements Serializable {
 	private Integer tipoasentamiento;
 	
 	@Column(name ="nb_cp")
-	private Integer codigopostal;
+	private String codigopostal;
 	
 	@Size (max = 20)
 	@Column(name ="nb_calle")
@@ -102,7 +109,8 @@ public class Planta implements Serializable {
 	@ManyToOne
 	private EmisoresCFDIS idEmisoresCFDIS;//agregado
 	
-	
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta")
+	private List<Posicion> posicionList;
 	
 	public Planta() {
 
@@ -172,11 +180,11 @@ public class Planta implements Serializable {
 		this.calle = calle;
 	}
 
-	public Integer getCodigopostal() {
+	public String getCodigopostal() {
 		return codigopostal;
 	}
 
-	public void setCodigopostal(Integer codigopostal) {
+	public void setCodigopostal(String codigopostal) {
 		this.codigopostal = codigopostal;
 	}
 
@@ -290,7 +298,6 @@ public class Planta implements Serializable {
 
 	@Override
 	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
 		if (!(object instanceof Planta)) {
 			return false;
 		}
@@ -306,6 +313,14 @@ public class Planta implements Serializable {
 	@Override
 	public String toString() {
 		return "mx.com.ferbo.model.Planta[ plantaCve=" + plantaCve + " ]";
+	}
+
+	public List<Posicion> getPosicionList() {
+		return posicionList;
+	}
+
+	public void setPosicionList(List<Posicion> posicionList) {
+		this.posicionList = posicionList;
 	}
 
 }

@@ -187,7 +187,7 @@
 									class="ui-button-danger"
 									actionListener="#{constanciaServicioBean.cancelar}"
 									update="constanciaDetalle"
-									process="constanciaDetalle @this" />
+									process="constanciaDetalle @this" rendered="#{(constanciaServicioBean.usuario.perfil != 4) and (constanciaServicioBean.usuario.perfil != 1)}"/>
 								<p:commandButton value="Cerrar" icon="pi pi-times"
 									oncomplete="PF('dlg-constancia').hide()" />
 							</f:facet>

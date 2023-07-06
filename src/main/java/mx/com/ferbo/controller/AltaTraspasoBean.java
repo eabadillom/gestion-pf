@@ -63,6 +63,7 @@ import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.model.TraspasoServicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -132,6 +133,10 @@ public class AltaTraspasoBean implements Serializable {
 	private ProductoDAO prDAO;
 	private partidasAfectadasDAO partidasAfectadasDAO;
 	
+	private Usuario usuario;
+	private FacesContext faceContext;
+	private HttpServletRequest httpServletRequest;
+	
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
@@ -175,6 +180,11 @@ public class AltaTraspasoBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		log.info("Entrando a Init...");
+		
+		faceContext = FacesContext.getCurrentInstance();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		
 		clientes = clienteDAO.buscarTodos();
 		fecha = new Date();
 		alUnidades = udmDAO.buscarTodos();
@@ -456,6 +466,14 @@ public class AltaTraspasoBean implements Serializable {
 	public void reload() throws IOException {
 		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public String getUnidadcobro() {

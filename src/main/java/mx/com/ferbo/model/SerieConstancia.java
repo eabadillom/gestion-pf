@@ -29,8 +29,10 @@ import javax.validation.constraints.NotNull;
 public class SerieConstancia implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
     protected SerieConstanciaPK serieConstanciaPK;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "nu_serie")

@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -20,14 +21,17 @@ public class MedioPagoDAO extends IBaseDAO<MedioPago,Integer>{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	 public MedioPago buscarPorFormaPago(String formaPago) {
+		 EntityManager entity = EntityManagerUtil.getEntityManager();
+		 MedioPago mp = entity.createNamedQuery("MedioPago.findBympformaPago", MedioPago.class).setParameter("mpformaPago",formaPago).getSingleResult();
+			return mp;
+	 }
 	@Override
 	public List<MedioPago> buscarTodos() {
 		// TODO Auto-generated method stub
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		List<MedioPago> lista = null;
 		lista = em.createNamedQuery("MedioPago.findAll",MedioPago.class).getResultList();
-		
 		return lista;
 	}
 

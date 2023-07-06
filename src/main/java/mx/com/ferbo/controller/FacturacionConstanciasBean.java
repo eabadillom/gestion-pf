@@ -1,6 +1,8 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -9,11 +11,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.faces.view.ViewScoped;
+import javax.enterprise.context.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
@@ -25,26 +34,36 @@ import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.SerieFacturaDAO;
+import mx.com.ferbo.dao.StatusFacturaDAO;
+import mx.com.ferbo.dao.TipoFacturacionDAO;
+import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.Domicilios;
+import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.FacturaMedioPago;
+import mx.com.ferbo.model.FacturaMedioPagoPK;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieFactura;
+import mx.com.ferbo.model.StatusFactura;
+import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.EntityManagerUtil;
 
 
 @Named
-@ViewScoped
+@SessionScoped
 public class FacturacionConstanciasBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
+	
+	private static Logger log = Logger.getLogger(FacturacionConstanciasBean.class);
 	
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
@@ -53,6 +72,8 @@ public class FacturacionConstanciasBean implements Serializable{
 	private MetodoPago metodoPagoSelect;
 	private MedioPago medioPagoSelect;
 	private Parametro iva,retencion;
+	private Factura factura;
+	private MedioPago formaPagoCliente;
 	
 	private ClienteDAO clienteDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
@@ -65,6 +86,9 @@ public class FacturacionConstanciasBean implements Serializable{
 	private FacturacionDepositosDAO facturacionConstanciasDAO;
 	private FacturacionVigenciasDAO facturacionVigenciasDAO;
 	private FacturacionServiciosDAO facturacionServiciosDAO;
+	private StatusFacturaDAO statusFacturaDAO;
+	private TipoFacturacionDAO tipoFacturacionDAO;
+	
 	
 	private List<Cliente> listaCliente;
 	private List<ClienteDomicilios> listaClienteDom;//recupera datos de la tabla cliente-domicilio
@@ -76,18 +100,27 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<Aviso> listaAviso;
 	private List<MetodoPago> listaMetodoPago;
 	private List<MedioPago> listaMedioPago;
-	private List<ConstanciaDeDeposito> listaEntradas;
+	private List<ConstanciaFactura> listaEntradas;
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
 	
+	private List<ConstanciaFactura> selectedEntradas;
 	private List<ConstanciaFactura> selectedVigencias;
+	private List<ConstanciaFacturaDs> selectedServicios;
 	
 	private Date fechaFactura;
 	private Date fechaCorte;
 	
-	private String moneda = "MX$";
+	private String moneda, observacion;
+	private String referencia;
 	private int plazoSelect;
-
+	private BigDecimal resIva;
+	private BigDecimal resRetencion, valorDeclarado;
+	
+    private FacesContext faceContext;
+    private HttpServletRequest request;
+    private HttpSession session;
+	
 	
 	public FacturacionConstanciasBean() {
 		
@@ -102,6 +135,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		facturacionConstanciasDAO = new FacturacionDepositosDAO();
 		facturacionVigenciasDAO = new FacturacionVigenciasDAO();
 		facturacionServiciosDAO = new FacturacionServiciosDAO();
+		statusFacturaDAO = new StatusFacturaDAO();
+		tipoFacturacionDAO = new TipoFacturacionDAO();
 		
 		listaCliente = new ArrayList<>();
 		listaClienteDom = new ArrayList<>();
@@ -116,12 +151,21 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaEntradas = new ArrayList<>();
 		listaVigencias = new ArrayList<>();
 		listaServicios = new ArrayList<>();
+		selectedEntradas = new ArrayList<>();
 		selectedVigencias = new ArrayList<>();
+		selectedServicios = new ArrayList<>();
+		
+		valorDeclarado = new BigDecimal(0);
+		resRetencion = new BigDecimal(0);
+		resIva = new BigDecimal(0);
+		moneda = "MXN";
+
+		
 		
 	}
 	
 	@PostConstruct
-	public void init() {
+	public void init(){
 		
 		listaCliente = clienteDAO.buscarTodos();
 		listaClienteDom = clienteDomicilioDAO.buscarTodos();
@@ -131,12 +175,34 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
 		listaMedioPago = medioPagoDAO.buscarTodos();
 		
-		
-		//iva = parametroDAO.buscarPorNombre("IVA");
-		//retencion = parametroDAO.buscarPorNombre("RETENCION");
-		
-		fechaFactura = new Date();
 		fechaCorte = new Date();
+		fechaFactura = new Date();
+		
+		log.info("Entrando al init");
+        
+        //variables a inicializar en null al regreso de la pantalla
+
+        selectedEntradas = new ArrayList<>();
+		selectedVigencias = new ArrayList<>();
+		selectedServicios = new ArrayList<>();
+		clienteSelect = new Cliente();
+		formaPagoCliente = new MedioPago();
+		medioPagoSelect = new MedioPago();
+		
+		if((clienteSelect!=null)&&(plantaSelect!=null)) {
+			facturacionEntradas();
+			facturacionServicios();
+			facturacionVigencias();
+			
+			
+		}
+		
+		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios","form:medioPago");
+		
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        session = request.getSession(false);
+		
 		
 	}
 
@@ -260,6 +326,14 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.listaMetodoPago = listaMetodoPago;
 	}
 
+	public List<ConstanciaFactura> getListaEntradas() {
+		return listaEntradas;
+	}
+
+	public void setListaEntradas(List<ConstanciaFactura> listaEntradas) {
+		this.listaEntradas = listaEntradas;
+	}
+
 	public MedioPago getMedioPagoSelect() {
 		return medioPagoSelect;
 	}
@@ -274,30 +348,6 @@ public class FacturacionConstanciasBean implements Serializable{
 
 	public void setListaMedioPago(List<MedioPago> listaMedioPago) {
 		this.listaMedioPago = listaMedioPago;
-	}
-	
-	public Parametro getRetencion() {
-		return retencion;
-	}
-
-	public void setRetencion(Parametro retencion) {
-		this.retencion = retencion;
-	}
-	
-	public Parametro getIva() {
-		return iva;
-	}
-
-	public void setIva(Parametro iva) {
-		this.iva = iva;
-	}	
-
-	public List<ConstanciaDeDeposito> getListaEntradas() {
-		return listaEntradas;
-	}
-
-	public void setListaEntradas(List<ConstanciaDeDeposito> listaEntradas) {
-		this.listaEntradas = listaEntradas;
 	}	
 
 	public Date getFechaCorte() {
@@ -332,10 +382,97 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.selectedVigencias = selectedVigencias;
 	}
 
+	public List<ConstanciaFactura> getSelectedEntradas() {
+		return selectedEntradas;
+	}
+
+	public void setSelectedEntradas(List<ConstanciaFactura> selectedEntradas) {
+		this.selectedEntradas = selectedEntradas;
+	}
+
+	public List<ConstanciaFacturaDs> getSelectedServicios() {
+		return selectedServicios;
+	}
+
+	public void setSelectedServicios(List<ConstanciaFacturaDs> selectedServicios) {
+		this.selectedServicios = selectedServicios;
+	}
+
+	public BigDecimal getResIva() {
+		return resIva;
+	}
+
+	public void setResIva(BigDecimal resIva) {
+		this.resIva = resIva;
+	}
+
+	public BigDecimal getResRetencion() {
+		return resRetencion;
+	}
+
+	public void setResRetencion(BigDecimal resRetencion) {
+		this.resRetencion = resRetencion;
+	}
+
+	public Factura getFactura() {
+		return factura;
+	}
+
+	public void setFactura(Factura factura) {
+		this.factura = factura;
+	}
+
+	public String getObservacion() {
+		return observacion;
+	}
+
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+
+	public BigDecimal getValorDeclarado() {
+		return valorDeclarado;
+	}
+
+	public void setValorDeclarado(BigDecimal valorDeclarado) {
+		this.valorDeclarado = valorDeclarado;
+	}
+
+	public String getReferencia() {
+		return referencia;
+	}
+
+	public void setReferencia(String referencia) {
+		this.referencia = referencia;
+	}
+
+	public Parametro getIva() {
+		return iva;
+	}
+
+	public void setIva(Parametro iva) {
+		this.iva = iva;
+	}
+
+	public MedioPago getFormaPagoCliente() {
+		return formaPagoCliente;
+	}
+
+	public void setFormaPagoCliente(MedioPago formaPagoCliente) {
+		this.formaPagoCliente = formaPagoCliente;
+	}
+
 	public void domicilioAvisoPorCliente() {
 		
+		clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), false);
+		formaPagoCliente = medioPagoDAO.buscarPorFormaPago(clienteSelect.getFormaPago()); 
+		
 		iva = parametroDAO.buscarPorNombre("IVA");//
+		resIva = new BigDecimal(iva.getValor()); 
+		resIva = resIva.multiply(new BigDecimal(100));//necesario ya que manda error al multiplicar desde el fron-end+++
 		retencion = parametroDAO.buscarPorNombre("RETENCION");//***
+		resRetencion = new BigDecimal(retencion.getValor());
+		resRetencion = resRetencion.multiply(new BigDecimal(100));//+++
 		//Domicilio
 		listaClienteDomicilio.clear();
 		listaClienteDomicilio = listaClienteDom.stream()
@@ -345,7 +482,7 @@ public class FacturacionConstanciasBean implements Serializable{
 								.collect(Collectors.toList());
 		if(listaClienteDomicilio.size()>0) {
 			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
-			
+		
 		}
 		
 		//llenado de select plazo de pago
@@ -353,6 +490,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		//carga de constancias si existe un cambio de cliente
 		cargarConstancias();
+		
+		PrimeFaces.current().ajax().update("form:medioPago");
 	}
 	
 	public void AvisoCliente() {
@@ -405,6 +544,15 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 
 	public void cargarConstancias(){
+		
+		if(clienteSelect == null){
+			return;
+		}
+		
+		if(plantaSelect == null){
+			return;
+		}
+		
 		this.facturacionEntradas();
 		this.facturacionVigencias();
 		this.facturacionServicios();
@@ -414,67 +562,190 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 	
 	public void facturacionEntradas(){
-	
-		if(clienteSelect == null){
-			return;
+		
+		EntityManager em = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			EntityTransaction trans = em.getTransaction();
+			trans.begin();
+			facturacionConstanciasDAO.setEm(em);
+			
+			listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
+			
+			if(listaEntradas.isEmpty()){
+				listaEntradas = new ArrayList<>();
+			}
+		} finally {
+			em.close();
 		}
 		
-		if(plantaSelect == null){
-			return;
-		}
-		
-		listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
-		
-		if(listaEntradas.isEmpty()){
-			listaEntradas = new ArrayList<>();
-		}
 		
 	}
 	
 	public void facturacionVigencias(){
 		
-		if(clienteSelect == null){
-			return;			
+		EntityManager em = null;
+		try {
+		
+			em = EntityManagerUtil.getEntityManager();
+			EntityTransaction t = em.getTransaction();
+			t.begin();
+			facturacionVigenciasDAO.setEm(em);
+			
+			System.out.println(fechaFactura);
+			DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
+			
+			listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
+			
+			if(listaVigencias.isEmpty()){
+				listaVigencias = new ArrayList<>();
+			}
+		} finally {
+			em.close();
 		}
 		
-		if(plantaSelect == null){
-			return;			
-		}
-		
-		System.out.println("fecha corte antes:" + fechaCorte);
-		
-		DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
-		
-		System.out.println("fecha corte despues:" + fechaCorte);
-		
-		listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
-		
-		if(listaVigencias.isEmpty()){
-			listaVigencias = new ArrayList<>();
-		}
 		
 	}
 	
 	public void facturacionServicios(){
 		
-		if(clienteSelect == null) {
-			return;
+		EntityManager em = null; 
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			EntityTransaction trans = em.getTransaction();
+			trans.begin();
+			facturacionServiciosDAO.setEm(em);
+			
+			listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
+			
+			if(listaServicios.isEmpty()) {
+				listaServicios = new ArrayList<>();
+			}
+		} finally {
+			em.close();//agregado
+		}
+		 
+		
+	}
+	
+	public String paginaCalculoPrevio() throws IOException {
+		
+		if(clienteSelect!=null & plantaSelect!=null) {
+			return "calculoPrevio.xhtml?faces-redirect=true";
+		} 
+		
+		return "";
+		
+	}
+	
+	public String inyeccionBean(){
+		clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
+		factura = new Factura();
+		
+		factura.setCliente(clienteSelect);
+		factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
+		factura.setMoneda(moneda);
+		factura.setRfc(clienteSelect.getCteRfc());
+		factura.setNombreCliente(clienteSelect.getCteNombre());
+		factura.setFecha(fechaCorte);
+		factura.setObservacion(observacion);
+		factura.setSubtotal(null);//duda*
+		factura.setIva(null);//duda*
+		factura.setTotal(null);//duda*
+		factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
+		factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
+		factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
+		factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
+		
+		AsentamientoHumandoDAO asentamientoDAO = new AsentamientoHumandoDAO();
+		
+		AsentamientoHumano asentamiento = asentamientoDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
+				domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
+				domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+				domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
+				domicilioSelect.getDomicilioColonia());
+		
+		factura.setColonia(asentamiento.getAsentamientoDs());
+		factura.setCp(domicilioSelect.getDomicilioCp());
+		factura.setCalle(domicilioSelect.getDomicilioCalle());
+		factura.setNumExt(domicilioSelect.getDomicilioNumExt());
+		factura.setNumInt(domicilioSelect.getDomicilioNumInt());
+		factura.setTelefono(domicilioSelect.getDomicilioTel1());
+		//factura.setFax(null);//duda*
+		factura.setPorcentajeIva(resIva);
+		factura.setNumeroCliente(clienteSelect.getNumeroCte());
+		factura.setValorDeclarado(valorDeclarado);
+		factura.setInicioServicios(fechaCorte);
+		factura.setFinServicios(fechaCorte);
+		factura.setMontoLetra(null);//duda*
+		//verificar- ------------
+		factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
+		FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();
+		facturaPK.setFacturaId(factura);
+		facturaPK.setFmpId(0);
+		FacturaMedioPago fmp = new FacturaMedioPago();
+		fmp.setFacturaMedioPagoPK(facturaPK);
+		MedioPago medioP = medioPagoDAO.buscarPorFormaPago(medioPagoSelect.getFormaPago());
+		fmp.setMpId(medioP);
+		fmp.setFactura(factura);
+		fmp.setFmpPorcentaje(100);
+		fmp.setMpDescripcion(medioP.getMpDescripcion());
+		fmp.setFmpReferencia(referencia);
+		factura.getFacturaMedioPagoList().add(fmp);
+		//---------------------
+		StatusFactura statusF = statusFacturaDAO.buscarPorId(1);
+		
+		factura.setStatus(statusF);//duda*			
+		
+		TipoFacturacion tipoFacturacion = tipoFacturacionDAO.buscarPorId(1);
+		
+		factura.setTipoFacturacion(tipoFacturacion);//1
+		factura.setPlanta(plantaSelect);
+		factura.setPlazo(plazoSelect);
+		factura.setRetencion(BigDecimal.ZERO);
+		factura.setNomSerie(serieFacturaSelect.getNomSerie());//duda*nombre de serie_factura ya tengo un objeto serieFactura
+		factura.setMetodoPago(metodoPagoSelect.getCdMetodoPago());
+		factura.setTipoPersona(clienteSelect.getTipoPersona());
+		factura.setCdRegimen(clienteSelect.getRegimenFiscal().getCd_regimen());
+		factura.setCdUsoCfdi(clienteSelect.getUsoCfdi().getCdUsoCfdi());
+		factura.setUuid(null);//se coloca al timbrar
+		factura.setEmisorNombre(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
+		factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
+		factura.setEmisorCdRegimen(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
+		
+		
+		try {
+			
+			session.setAttribute("entradas", selectedEntradas);
+			session.setAttribute("vigencias",selectedVigencias);
+			session.setAttribute("servicios", selectedServicios);
+			session.setAttribute("cliente", clienteSelect);
+			session.setAttribute("plantaSelect", plantaSelect);
+			session.setAttribute("factura", factura);
+			session.setAttribute("fechaEmision", fechaCorte);
+			session.setAttribute("iva", iva);
+			session.setAttribute("medioPago", medioPagoSelect);
+			session.setAttribute("metodoPago", metodoPagoSelect);
+			session.setAttribute("domicilioSelect",domicilioSelect);
+			session.setAttribute("serieFacturaSelect",serieFacturaSelect);
+			session.setAttribute("moneda", moneda);
+			session.setAttribute("Observaciones", observacion);
+			
+			
+		}catch(Exception e) {
+			System.out.println("ERROR:" + e.getMessage());
 		}
 		
-		if(plantaSelect == null) {
-			return;
-		}
-		
-		listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
-		
+		return "calculoPrevio.xhtml?faces-redirect=true";
 		
 	}
 	
 	
-	/* funcion para comprobacion
-	public void verVigencias() {
-		System.out.println("vigencias" + selectedVigencias.get(0));
-	}
-	*/
-
+	
+	
+	
 }

@@ -14,6 +14,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.http.HttpServletRequest;
 
 import org.primefaces.PrimeFaces;
 
@@ -28,6 +29,7 @@ import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.ControlFacturaConstanciaDS;
 import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.PartidaServicio;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -48,6 +50,10 @@ public class ConstanciaServicioBean implements Serializable{
 	private EstadoConstanciaDAO ecDAO;
 	//TODO agregar DAO para PARTIDA_SERVICIO y CONSTANCIA_SERVICIO_DETALLE.
 	
+	private Usuario usuario;
+	private FacesContext faceContext;
+	private HttpServletRequest httpServletRequest;
+	
 	private int idCliente;
 	private Date fechaInicio;
 	private Date fechaFinal;
@@ -67,6 +73,11 @@ public class ConstanciaServicioBean implements Serializable{
 	
 	@PostConstruct
 	public void init() {
+		
+		faceContext = FacesContext.getCurrentInstance();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		
 		listaClientes = clienteDao.buscarTodos();
 		listaEstadosConstancias = ecDAO.buscarTodos();
 		idCliente = 0;
@@ -251,6 +262,14 @@ public class ConstanciaServicioBean implements Serializable{
 
 	public void setSeleccion(ConstanciaDeServicio seleccion) {
 		this.seleccion = seleccion;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 }
