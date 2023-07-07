@@ -214,6 +214,10 @@
 								<p:menuitem value="Estado de cuenta" icon="pi pi-file" outcome="/protected/reportes/ClienteEstadoCuenta" />
 								<p:menuitem value="Servicio por cliente" icon="pi pi-file" outcome="/protected/reportes/ServicioPorCliente" />
 							</p:submenu>
+							
+							<p:submenu id="frb_inventario_reporteIngresos" label="Ingresos" icon="pi pi-fw pi-table" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+								<p:menuitem value="Ventas e ingresos" icon="pi pi-file" outcome="/protected/reportes/VentasIngresos" />
+							</p:submenu>
 						</p:submenu>
 						
 						
