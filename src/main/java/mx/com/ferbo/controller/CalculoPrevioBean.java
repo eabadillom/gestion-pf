@@ -156,8 +156,6 @@ public class CalculoPrevioBean implements Serializable {
 		domiciliosDAO = new DomiciliosDAO();
 		facturaDAO = new FacturaDAO();
 		claveDAO = new ClaveUnidadDAO();
-		//facturacionConstanciasDAO = new FacturacionDepositosDAO();
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1188,7 +1186,6 @@ public class CalculoPrevioBean implements Serializable {
 			factura.setUuid(registra.getId());
 			facturaDAO.actualizar(factura);
 			
-//			sendMailBO = new SendMailFacturaBL();
 			alAdjuntos = new ArrayList<Adjunto>();
 			
 			FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", factura.getUuid());
