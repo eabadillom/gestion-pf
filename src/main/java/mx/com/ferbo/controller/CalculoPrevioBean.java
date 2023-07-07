@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +36,11 @@ import com.ferbo.facturama.request.ItemFullBindingModel;
 import com.ferbo.facturama.request.ReceiverBindingModel;
 import com.ferbo.facturama.request.Tax;
 import com.ferbo.facturama.response.CfdiInfoModel;
+import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
+import com.ferbo.mail.beans.Adjunto;
 
+import mx.com.ferbo.business.SendMailFacturaBL;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.DomiciliosDAO;
@@ -69,6 +73,7 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.ServicioConstancia;
 import mx.com.ferbo.model.ServicioConstanciaDs;
 import mx.com.ferbo.model.TipoCobro;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.FormatUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -126,6 +131,8 @@ public class CalculoPrevioBean implements Serializable {
 	private String montoLetra;
 	private String moneda;
 	private String observaciones;
+	
+	private Usuario usuario;
 
 	public CalculoPrevioBean() {
 
@@ -182,6 +189,7 @@ public class CalculoPrevioBean implements Serializable {
 			serieFacturaSelect = (SerieFactura) session.getAttribute("serieFacturaSelect");
 			moneda = (String) session.getAttribute("moneda");
 			observaciones = (String) session.getAttribute("Observaciones");
+			this.usuario = (Usuario) session.getAttribute("usuario");
 			
 
 			if (listaEntradas.isEmpty()) {
@@ -1066,6 +1074,14 @@ public class CalculoPrevioBean implements Serializable {
 		Severity severity = null;
 		CFDIInfo cfdi = new CFDIInfo();
 		CfdiBL cfdiBL = new CfdiBL();
+		
+		SendMailFacturaBL sendMailBO = null;
+        String sContent = null;
+        byte[] content = null;
+        
+        Adjunto adjunto = null;
+        List<Adjunto> alAdjuntos = null;
+        
 		try {
 			// Datos de emisor
 			IssuerBindingModel is = new IssuerBindingModel();
@@ -1171,6 +1187,28 @@ public class CalculoPrevioBean implements Serializable {
 			
 			factura.setUuid(registra.getId());
 			facturaDAO.actualizar(factura);
+			
+//			sendMailBO = new SendMailFacturaBL();
+			alAdjuntos = new ArrayList<Adjunto>();
+			
+			FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", factura.getUuid());
+			sContent = fileXML.getContent();
+            content = Base64.getDecoder().decode(sContent);
+            adjunto = new Adjunto("Factura_" + factura.getNomSerie() + "-" + factura.getNumero() + ".xml", Adjunto.TP_ARCHIVO_XML, content);
+            alAdjuntos.add(adjunto);
+            
+            FileViewModel filePDF = cfdiBL.getFile("pdf", "issuedLite", factura.getUuid());
+            sContent = filePDF.getContent();
+            content = Base64.getDecoder().decode(sContent);
+            adjunto = new Adjunto("Factura_" + factura.getNomSerie()+ "-" + factura.getNumero() + ".pdf", Adjunto.TP_ARCHIVO_PDF, content);
+            alAdjuntos.add(adjunto);
+            
+            sendMailBO = new SendMailFacturaBL(factura.getCliente().getCteCve());
+            sendMailBO.setSerie(factura.getNomSerie());
+            sendMailBO.setFolio(factura.getNumero());
+            sendMailBO.setAlFiles(alAdjuntos);
+            sendMailBO.setLoggedUser(usuario);
+            sendMailBO.send();
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se genero correctamente";

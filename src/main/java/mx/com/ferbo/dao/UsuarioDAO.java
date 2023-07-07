@@ -7,6 +7,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Perfil;
 import mx.com.ferbo.model.Planta;
@@ -14,6 +17,8 @@ import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class UsuarioDAO extends IBaseDAO<Usuario, Integer>{
+	
+	private static Logger log = LogManager.getLogger(UsuarioDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Usuario> findall() {
@@ -121,6 +126,25 @@ public class UsuarioDAO extends IBaseDAO<Usuario, Integer>{
 	public String eliminarListado(List<Usuario> listado) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public List<Usuario> buscarPorPerfil(Integer idPerfil) {
+		List<Usuario> usuarios = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			usuarios = em.createNamedQuery("Usuario.findByPerfil", Usuario.class)
+			.setParameter("perfil", idPerfil)
+			.getResultList()
+			;
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de usuarios del perfil " + idPerfil, ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return usuarios;
 	}
 
 }
