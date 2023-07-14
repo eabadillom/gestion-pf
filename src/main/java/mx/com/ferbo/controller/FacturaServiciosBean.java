@@ -243,7 +243,7 @@ public class FacturaServiciosBean implements Serializable {
 				domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
 			}
 			
-			//this.clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);;
+			this.clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 			
 			precioServicioList = psDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
 			Integer idAviso = new Integer(-1);
@@ -530,7 +530,7 @@ public class FacturaServiciosBean implements Serializable {
 
 	public void jasper() throws JRException, IOException, SQLException {
 		String jasperPath = "/jasper/Factura.jrxml";
-		String filename = "Factura " + fechaFactura + ".pdf";
+		String filename = String.format("Factura_Folio_%s-%s.pdf", this.factura.getNomSerie(), this.factura.getNumero());
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
@@ -675,10 +675,10 @@ public class FacturaServiciosBean implements Serializable {
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se genero correctamente";
 		} catch (FacturamaException e) {
-			e.printStackTrace();
+			message = String.format("Mensaje de Facturama: %s", e.getMessage());
+			severity = FacesMessage.SEVERITY_ERROR;
 		}catch (Exception ex) {
 			log.error("Problema para obtener los servicios del cliente.", ex);
-			ex.printStackTrace();
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
