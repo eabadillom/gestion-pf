@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,6 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -66,6 +68,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Factura.findByCliente", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente"),
     @NamedQuery(name = "Factura.findByClienteStatusFactura", query = "SELECT f FROM Factura f WHERE f.cliente.cteCve = :clienteCve and f.status.id = :status"),
     @NamedQuery(name = "Factura.findByRetencion", query = "SELECT f FROM Factura f WHERE f.retencion = :retencion"),
+    @NamedQuery(name = "Factura.findByPeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
+    @NamedQuery(name = "Factura.findByClientePeriodo", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente AND f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
     @NamedQuery(name = "Factura.findByNomSerie", query = "SELECT f FROM Factura f WHERE f.nomSerie = :nomSerie")})
 public class Factura implements Serializable {
 
@@ -235,6 +239,10 @@ public class Factura implements Serializable {
     @Size(max = 5)
     @Column(name = "emi_cd_regimen")
     private String emisorCdRegimen;
+    
+    @OneToOne(mappedBy = "factura", cascade = CascadeType.ALL)
+    private CancelaFactura cancelaFactura;
+    
     @OneToMany(mappedBy = "facturaId")
     private List<ChequeDevuelto> chequeDevueltoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
@@ -243,8 +251,6 @@ public class Factura implements Serializable {
     private List<FacturaMedioPago> facturaMedioPagoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
     private List<ServicioFactura> servicioFacturaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
-    private List<CancelaFactura> cancelaFacturaList;
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "factura")//MODIFIQUE 1 JUNIO
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "factura")//MODIFIQUE 1 JUNIO
@@ -679,14 +685,6 @@ public class Factura implements Serializable {
         this.servicioFacturaList = servicioFacturaList;
     }
 
-    public List<CancelaFactura> getCancelaFacturaList() {
-        return cancelaFacturaList;
-    }
-
-    public void setCancelaFacturaList(List<CancelaFactura> cancelaFacturaList) {
-        this.cancelaFacturaList = cancelaFacturaList;
-    }
-
     public List<ConstanciaFacturaDs> getConstanciaFacturaDsList() {
         return constanciaFacturaDsList;
     }
@@ -718,7 +716,7 @@ public class Factura implements Serializable {
 	public void setNotaFacturaList(List<NotaPorFactura> notaFacturaList) {
 		this.notaFacturaList = notaFacturaList;
 	}
-
+	
 	@Override
     public int hashCode() {
         int hash = 0;
@@ -743,5 +741,12 @@ public class Factura implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
     }
-    
+
+	public CancelaFactura getCancelaFactura() {
+		return cancelaFactura;
+	}
+
+	public void setCancelaFactura(CancelaFactura cancelaFactura) {
+		this.cancelaFactura = cancelaFactura;
+	}
 }

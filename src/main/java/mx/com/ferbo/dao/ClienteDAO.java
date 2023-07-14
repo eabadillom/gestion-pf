@@ -15,11 +15,7 @@ import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
-import mx.com.ferbo.model.MedioPago;
-import mx.com.ferbo.model.MetodoPago;
-import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.Telefono;
-import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
@@ -54,19 +50,15 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			cliente = (Cliente) query.getSingleResult();
 			log.info(cliente.getMetodoPago());
 			if(isFullInfo == false)
-				
 				return cliente;
 			
 			if(cliente.getCandadoSalida() != null)
 				cliente.getCandadoSalida().getId();
 			
 			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
-			RegimenFiscal regimen = cliente.getRegimenFiscal();
-			log.info(cliente.getRegimenFiscal().getCd_regimen());
-			String usoCfdi = cliente.getUsoCfdi().getUsoCfdi();
-			MetodoPago metodo = cliente.getMetodoPago();
+			log.debug(cliente.getRegimenFiscal().getCd_regimen());
+			log.debug(cliente.getUsoCfdi().getUsoCfdi());
 			log.info(cliente.getMetodoPago().getNbMetodoPago());
-			
 			
 			for(ClienteContacto clienteContacto : clienteContactoList) {
 				
@@ -141,6 +133,57 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		}
 		return lista;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Cliente> buscarHabilitados(boolean isHabilitado, boolean isFullInfo) {
+		List<Cliente> lista = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("Cliente.findByHabilitado", Cliente.class)
+					.setParameter("habilitado", isHabilitado)
+					;
+			lista = query.getResultList();
+			
+			if(isFullInfo == false)
+				return lista;
+			
+			for(Cliente cliente : lista) {
+				if(cliente.getCandadoSalida() != null)
+					cliente.getCandadoSalida().getId();
+				
+				List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
+				log.debug(cliente.getRegimenFiscal().getCd_regimen());
+				log.debug(cliente.getUsoCfdi().getUsoCfdi());
+				log.debug(cliente.getMetodoPago().getNbMetodoPago());
+				
+				for(ClienteContacto clienteContacto : clienteContactoList) {
+					
+					Contacto contacto = clienteContacto.getIdContacto();
+					List<MedioCnt> medioCntList = contacto.getMedioCntList();
+					
+					for(MedioCnt medioContacto : medioCntList) {
+						
+						Mail idMail = medioContacto.getIdMail();
+						Telefono idTelefono = medioContacto.getIdTelefono();
+						
+						if(idMail != null)
+							log.debug(idMail.getTpMail().getNbTipo());
+						
+						if(idTelefono != null)
+							log.debug(idTelefono.getTpTelefono().getNbTelefono());
+					}
+				}
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de clientes...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return lista;
+	}
 
 	@Override
 	public String actualizar(Cliente cliente) {
@@ -150,7 +193,6 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.getTransaction().begin();
 			em.merge(cliente);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			log.error("Problema en la actualización del cliente: " + cliente.getCteCve(), e);
 			return "ERROR";
