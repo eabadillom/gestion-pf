@@ -109,7 +109,7 @@ public class ClientesBean implements Serializable {
 	}
 
 	private void consultaClientes() {
-		lstClientes = clienteDAO.buscarTodos();
+		lstClientes = clienteDAO.buscarTodos(true);
 	}
 
 	private void consultaCatalogos() {

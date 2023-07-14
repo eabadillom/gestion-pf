@@ -144,6 +144,7 @@
 							<p:submenu id="frb_facturacion_sm1" label="Catálogos" icon="pi pi-fw pi-th-large">
                 				<p:menuitem value="Plantas" outcome="/protected/catalogos/plantas" icon="pi pi-building" />
 								<p:menuitem id="frb_facturacion_sm122" value="Emisores CFDI" icon="pi pi-building " outcome="/protected/catalogos/EmisoresCFDIS" />							
+								<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" icon="pi pi-fw pi-user" />
 								<p:menuitem id="frb_facturacion_sm113" value="Banco" icon="pi pi-fw pi-money-bill" outcome="/protected/catalogos/bancos" />
 								<p:submenu id="frb_facturacionsm2" label="Domicilios" icon="pi pi-fw pi-building">
 									<p:menuitem id="frb_facturacion_domicilioCliente" value="Domicilios por Cliente" icon="pi pi-fw pi-home" outcome="/protected/catalogos/domicilios" />
@@ -166,8 +167,6 @@
 								<p:menuitem id="frb_facturacion_sm121" value="Ud de Medida" icon="pi pi-fw pi-tags" outcome="/protected/catalogos/unidadManejo" />
 								<p:menuitem value="Servicios" outcome="/protected/catalogos/servicios" icon="pi pi-fw pi-list" />
 								<p:menuitem value="Servicios por cliente" outcome="/protected/catalogos/serviciosPorCliente" icon="pi pi-fw pi-user-edit" />
-								<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" icon="pi pi-fw pi-user" />
-								<p:menuitem value="posiciones en cámara" outcome="/protected/catalogos/posicionesCamara" icon="pi pi-fw pi-user-edit" />
 								<p:menuitem id="frb_facturacion_sm243" value="Actualizar cheques devueltos" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/chequesDevueltos" />
 								<p:menuitem id="frb_facturacion_sm244" value="Mantenimiento" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/mantenimiento" />
 								<p:menuitem value="Candado Salida" outcome="/protected/catalogos/candadoSalida" icon="pi pi-lock" />
@@ -180,12 +179,12 @@
 						</p:submenu>
 						<p:submenu id="frb_reportes" label="Reportes" icon="pi pi-fw pi-file-o">
 							<p:submenu id="frb_inventario_reporte" label="Inventarios" icon="pi pi-fw pi-table">
-								<p:menuitem value="Almacen" icon="pi pi-file" outcome="/protected/reportes/inventarioAlmacen" />
 								<p:menuitem value="Entradas" icon="pi pi-file" outcome="/protected/reportes/inventarioEntradas" />
 								<p:menuitem value="Salidas" icon="pi pi-file" outcome="/protected/reportes/inventarioSalidas" />
 								<p:menuitem value="Entrada vs Salidas" icon="pi pi-file" outcome="/protected/reportes/InventarioEntradaySalida" />
 								<p:menuitem value="Traspasos" icon="pi pi-file" outcome="/protected/reportes/InventarioTraspasos" />
 								<p:menuitem value="Servicios" icon="pi pi-file" outcome="/protected/reportes/InventarioServicios" />
+								<p:menuitem value="Almacen" icon="pi pi-file" outcome="/protected/reportes/inventarioAlmacen" />
 								<p:menuitem value="Almacen Fecha" icon="pi pi-file" outcome="/protected/reportes/InventarioAlmacenFecha" />
 							</p:submenu>
 							<p:submenu id="frb_inventario_reporteFact" label="Facturacion" icon="pi pi-fw pi-table" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
