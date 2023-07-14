@@ -6,7 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.CandadoSalida;
@@ -19,7 +20,7 @@ import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
-	Logger log = Logger.getLogger(ClienteDAO.class);
+	private static Logger log = LogManager.getLogger(ClienteDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Cliente> findall() {
@@ -106,6 +107,57 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		}
 		
 		return listado;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Cliente> buscarTodos(boolean isFullInfo) {
+		List<Cliente> lista = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("Cliente.findAll", Cliente.class)
+					;
+			lista = query.getResultList();
+			
+			if(isFullInfo == false)
+				return lista;
+			
+			for(Cliente cliente : lista) {
+				if(cliente.getCandadoSalida() != null)
+					cliente.getCandadoSalida().getId();
+				
+				List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
+				log.debug("ClienteContactoList: {}", clienteContactoList.size());
+				log.debug(cliente.getRegimenFiscal().getCd_regimen());
+				log.debug(cliente.getUsoCfdi().getUsoCfdi());
+				log.debug(cliente.getMetodoPago().getNbMetodoPago());
+				
+				for(ClienteContacto clienteContacto : clienteContactoList) {
+					
+					Contacto contacto = clienteContacto.getIdContacto();
+					List<MedioCnt> medioCntList = contacto.getMedioCntList();
+					
+					for(MedioCnt medioContacto : medioCntList) {
+						
+						Mail idMail = medioContacto.getIdMail();
+						Telefono idTelefono = medioContacto.getIdTelefono();
+						
+						if(idMail != null)
+							log.debug(idMail.getTpMail().getNbTipo());
+						
+						if(idTelefono != null)
+							log.debug(idTelefono.getTpTelefono().getNbTelefono());
+					}
+				}
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de clientes...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return lista;
 	}
 
 	@Override
