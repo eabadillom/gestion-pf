@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+                
+	<ui:define name="title">Inventario de Almacen por Fecha</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+        <p:breadCrumb>
+            <p:menuitem value="Home" outcome="/dashboard"/>
+            <p:menuitem value="Reportes"/>
+            <p:menuitem value="Facturacion"/>
+            <p:menuitem value="Cartera De Cliente" outcome="/protected/reportes/CarteraCliente"/>
+        </p:breadCrumb>
+        
+        <p:growl id="messages" showDetail="true" />
+        
+            <div class="p-grid crud-demo">
+                <div class="p-col-12">
+	                <div class="card">
+	             		
+	             		<p:outputLabel value="Fecha Actual:" styleClass="p-ml-2"/>
+	             		<p:datePicker id="fechActual" value="#{reporteIngresosBean.fechaActual}" showIcon="true" disabled="true"  styleClass="p-ml-2 p-mr-4"/>
+	             		
+	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
+	             		
+	             			<p:outputLabel value="De:" styleClass="p-mr-2"></p:outputLabel>
+	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4"/>
+	             			
+	             			<p:outputLabel value="A:" styleClass="p-mr-2"></p:outputLabel>
+	             			<p:datePicker id="fechaFin" value="#{reporteIngresosBean.fechaFin}" showIcon="true" />
+	             		
+	             		</p:fieldset>
+	             		
+	             		
+	             		<p:fieldset legend="Banco" styleClass="p-mt-4">
+		             		<p:selectOneMenu id="select-banco" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.bancoSelect}">
+		             			<f:selectItem itemLabel="Todos Los Bancos" Itemvalue="" />
+		             			<f:selectItems value="#{reporteIngresosBean.listBanco}" var="banco" itemLabel="#{banco.nombre}" itemValue="#{banco}" />
+		             		</p:selectOneMenu>
+	             		</p:fieldset>
+	             		
+	             		<p:fieldset legend="Cliente" styleClass="p-mt-4">
+		             		<p:selectOneMenu id="select-cte" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.clienteSelect}">
+		             			<f:selectItem itemLabel="Todos Los Clientes" Itemvalue="" />
+		             			<f:selectItems value="#{reporteIngresosBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+		             		</p:selectOneMenu>
+	             		</p:fieldset>
+	             		
+	             		<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+					 	 <p:toolbar>
+							<p:toolbarGroup>
+					  		 <div class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton value=".pdf" actionListener="#{reporteIngresosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+						 	 </div>
+							         
+					         <div class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+							        
+							 <div class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton value=".xlsx"  actionListener="#{reporteIngresosBean.exportarExcel}" action="#{reporteIngresosBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+				     		 </div>
+							</p:toolbarGroup>
+
+						 </p:toolbar>
+						</p:fieldset>
+	             		   
+	                </div>
+                </div>
+            </div>
+            
+        </h:form>
+   </ui:define>
+</ui:composition>   
