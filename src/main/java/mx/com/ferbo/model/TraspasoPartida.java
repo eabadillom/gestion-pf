@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -76,8 +78,8 @@ public class TraspasoPartida implements Serializable {
     @ManyToOne(optional = false)
     private ConstanciaTraspaso traspaso;
 
-    @JoinColumn(name = "partida", referencedColumnName = "PARTIDA_CVE")
-    @ManyToOne(optional = false)
+    @JoinColumn(name = "partida")
+    @ManyToOne(optional = false, cascade = {CascadeType.ALL})
     private Partida partida;
 
     public TraspasoPartida() {

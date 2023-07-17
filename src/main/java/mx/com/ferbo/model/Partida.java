@@ -14,6 +14,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -82,12 +83,15 @@ public class Partida implements Serializable, Cloneable {
     @JoinColumn(name = "unidad_de_cobro", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
     @ManyToOne
     private UnidadDeManejo unidadDeCobro;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "partidaCve")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "partidaCve", fetch = FetchType.LAZY)
     private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
 
     @JoinColumn(name = "UNIDAD_DE_PRODUCTO_CVE", referencedColumnName = "UNIDAD_DE_PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private UnidadDeProducto unidadDeProductoCve;
+    
+    @OneToMany(mappedBy = "partida", cascade = CascadeType.ALL)
+    private List<TraspasoPartida> traspasoPartidaList;
     
     public Partida clone() throws CloneNotSupportedException{  
     	return (Partida) super.clone();  
@@ -255,5 +259,15 @@ public class Partida implements Serializable, Cloneable {
     public String toString() {
         return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + " ]";
     }
+
+	public List<TraspasoPartida> getTraspasoPartidaList() {
+		return traspasoPartidaList;
+	}
+
+	public void setTraspasoPartidaList(List<TraspasoPartida> traspasoPartidaList) {
+		this.traspasoPartidaList = traspasoPartidaList;
+	}
+
+	
 
 }

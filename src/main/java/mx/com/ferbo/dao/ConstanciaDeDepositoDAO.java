@@ -10,15 +10,20 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
+import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
-	private static Logger log = Logger.getLogger(ConstanciaDeDepositoDAO.class);
+	private static Logger log = LogManager.getLogger(ConstanciaDeDepositoDAO.class);
 
 	public EntityManager em = null;
 	
@@ -160,6 +165,59 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		}
 			
 		return lstAux;
+	}
+	
+	public ConstanciaDeDeposito buscarPorFolioCliente(String folioCliente, boolean isFullInfo) {
+		ConstanciaDeDeposito constancia = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			
+			constancia = em.createNamedQuery("ConstanciaDeDeposito.findByFolioCliente",ConstanciaDeDeposito.class)
+					.setParameter("folioCliente", folioCliente)
+					.getSingleResult();
+			
+			if(isFullInfo == false)
+				return constancia;
+			
+			Cliente cliente = constancia.getCteCve();
+			log.info("Cliente: {}",cliente.getCteCve());
+			
+			List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList = constancia.getConstanciaDepositoDetalleList();
+			log.debug("constancia deposito detalle lista: {}",  constanciaDepositoDetalleList.size());
+			for(ConstanciaDepositoDetalle cdet : constanciaDepositoDetalleList) {
+				log.debug("Servicio: {}", cdet.getServicioCve().getServicioCod());
+			}
+			
+			List<Partida> partidaList = constancia.getPartidaList();
+			for(Partida partida : partidaList) {
+				log.debug("Partida: {}",  partida.getPartidaCve());
+				log.debug("Planta: {}", partida.getCamaraCve().getPlantaCve().getPlantaCve());
+				log.debug("Producto: {}",partida.getUnidadDeProductoCve().getProductoCve().getProductoCve());
+				log.debug("Unidad de Manejo: {}",partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
+				log.debug("Unidad de cobro: {}",  partida.getUnidadDeCobro().getUnidadDeManejoCve());
+				List<DetalleConstanciaSalida> detalleConstanciaSalidaList = partida.getDetalleConstanciaSalidaList();
+				log.debug("detalleConstanciaSalidaList.size(): {}",  detalleConstanciaSalidaList.size());
+				for(DetalleConstanciaSalida dcs : detalleConstanciaSalidaList) {
+					log.debug("Detalle constancia salida: {}",dcs.getId());
+					log.debug("Constancia salida: {}", dcs.getConstanciaCve().getId());
+				}
+				List<TraspasoPartida> traspasoPartidaList = partida.getTraspasoPartidaList();
+				log.debug("Traspaso partida: {}",  partida.getTraspasoPartidaList().size());
+				for(TraspasoPartida traspaso : traspasoPartidaList) {
+					log.info("Traspaso partida: {}",traspaso.getId());
+					log.info("Constancia traspaso: {}", traspaso.getTraspaso().getId());
+				}
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la constancia de depósito...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return constancia;
 	}
 	
 	public ConstanciaDeDeposito buscarPorFolioCliente(String folio) {
