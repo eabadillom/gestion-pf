@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -86,7 +87,7 @@ public class DetalleConstanciaSalida implements Serializable {
     @ManyToOne(optional = false)
     private DetallePartida detallePartida;
     @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Partida partidaCve;
 
     public DetalleConstanciaSalida() {
