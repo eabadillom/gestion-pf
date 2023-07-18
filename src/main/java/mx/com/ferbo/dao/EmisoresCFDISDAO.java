@@ -28,7 +28,7 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 	public EmisoresCFDIS buscarPorId(Integer cd_emisor) {
 		EmisoresCFDIS emi = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		emi = em.createNamedQuery("findBycdEmisor", EmisoresCFDIS.class).getSingleResult();
+		emi = em.createNamedQuery("EmisoresCFDIS.findBycdEmisor", EmisoresCFDIS.class).setParameter("cd_emisor", cd_emisor).getSingleResult();
 		return emi;
 	}
 
