@@ -28,21 +28,23 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 		}
 		return servicio;
 	}
-
 	@Override
 	public List<Servicio> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();//Abre (sesion) conexion entre Hibernate y la BD
+		EntityManager em = null;
 		List<Servicio> listado = null;
-		listado = em.createNamedQuery("Servicio.findAll", Servicio.class).getResultList();//crea la consulta pasando el nombre de esta y el tipo
+		try {
+			em = EntityManagerUtil.getEntityManager();//Abre (sesion) conexion entre Hibernate y la BD
+			listado = em.createNamedQuery("Servicio.findAll", Servicio.class).getResultList();//crea la consulta pasando el nombre de esta y el tipo
+		}catch(Exception e) {
+			log.error("Problemas para obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
-
 	@Override
-	public List<Servicio> buscarPorCriterios(Servicio e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	public List<Servicio> buscarPorCriterios(Servicio e) {// TODO Auto-generated method stub
+		return null;	}
 	@Override
 	public String actualizar(Servicio servicio) {
 		try {

@@ -2,32 +2,21 @@ package mx.com.ferbo.controller;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClaveUnidadDAO;
-import mx.com.ferbo.dao.ParametroDAO;
-import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ServicioDAO;
 import mx.com.ferbo.dao.TipoCobroDAO;
-import mx.com.ferbo.facturacion.facturama.FacturamaBL;
-import mx.com.ferbo.facturacion.facturama.Product;
-import mx.com.ferbo.facturacion.facturama.ProductTax;
-import mx.com.ferbo.facturacion.facturama.response.ProductRsp;
-import mx.com.ferbo.facturacion.facturama.response.ProductTaxRsp;
 import mx.com.ferbo.model.ClaveUnidad;
-import mx.com.ferbo.model.Parametro;
-import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.TipoCobro;
 import mx.com.ferbo.ui.ServicioUI;
@@ -82,16 +71,10 @@ public class ServiciosBean implements Serializable{
 	}
 
 	public void saveServicio() throws IOException{
-		
 		Servicio servicio = new Servicio();
-		PrecioServicioDAO preciosDAO = new PrecioServicioDAO();
-		PrecioServicio precioS = preciosDAO.getPrecioMinimoPorServicio(selectedServicio.getServicioCve());
-		ParametroDAO parametro = new ParametroDAO();
-		List<Parametro> listap = parametro.buscarTodos();
-		String iva = null,valor = null;
 		
 		servicio.setCdUnidad(selectedServicio.getCdUnidad());
-		servicio.setServicioCod(selectedServicio.getServicioCod());//colocar en codigo producto directamente en el dialogo el dato: 26121661 para permitir el ingreso del json a facturama
+		servicio.setServicioCod(selectedServicio.getServicioCod());
 		servicio.setServicioCve(selectedServicio.getServicioCve());
 		servicio.setServicioDs(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
@@ -103,51 +86,8 @@ public class ServiciosBean implements Serializable{
 			}
 		}
 		
-		for(Parametro p: listap) {
-			if(p.getId()==1) {				
-				iva = p.getNombre();
-				valor = p.getValor();
-			}
-		}
-		
 		if (this.selectedServicio.getServicioCve() == null) {
 			if (servicioDAO.guardar(servicio) == null) {
-				
-				// -----------------------    INICIA FACTURAMA    ------------------- 
-				
-				ProductTax Ptaxe = new ProductTax();
-				ProductRsp productRsp = new ProductRsp();
-				Product producto = new Product();
-				List<ProductTax> listaTaxes = new ArrayList<>();
-				
-				producto.setUnit(servicio.getClaveUnit().getNbUnidad());//UNIT (clave unidad-nombre pendiente)
-				producto.setUnitCode(servicio.getCdUnidad());//uni_code (cdUnidad)
-				producto.setIdentificationNumber("");//identificador
-				producto.setName(servicio.getServicioDs());//Nombre (servicioDS)
-				producto.setDescription(servicio.getServicioDs());//Descripcion (servicioDS)
-				
-				if(precioS == null) {
-					producto.setPrice(new BigDecimal("1").setScale(2));
-				}else {
-					producto.setPrice(precioS.getPrecio());
-				}
-				producto.setCodeProdServ(servicio.getServicioCod());//Codigo Producto (servicioCod)
-								
-				Ptaxe.setName(iva);//name
-				Ptaxe.setRate(new BigDecimal(valor).setScale(2));//rate
-				Ptaxe.setIsRetention(false);//Isretentin
-				Ptaxe.setIsFederalTax(true);//IsfederalTax
-				listaTaxes.add(Ptaxe);
-				producto.setTaxes(listaTaxes);
-				
-				FacturamaBL facturama = new FacturamaBL();
-				productRsp = facturama.registra(producto);
-				
-				if(servicio.getUuId()==null) {
-					servicio.setUuId(String.valueOf(productRsp.getId()));
-					servicioDAO.actualizar(servicio);
-				}
-				// -----------------------    TERMINA FACTURAMA    --------------------- //
 				
 				selectedServicio = new ServicioUI(servicio);
 				this.servicios.add(this.selectedServicio);
@@ -157,43 +97,6 @@ public class ServiciosBean implements Serializable{
 			}
 		} else {
 			if (servicioDAO.actualizar(servicio) == null) {
-				
-				//-----------------------------     INICIA FACTURAMA     -------------------------- //
-				
-				ProductTaxRsp Ptaxe = new ProductTaxRsp();
-				ProductRsp producto = new ProductRsp();
-				List<ProductTaxRsp> listaTaxes = new ArrayList<>();
-				boolean productRsp;
-				
-				producto.setId(servicio.getUuId());
-				producto.setUnit(servicio.getClaveUnit().getNbUnidad());//UNIT (clave unidad-nombre pendiente)
-				producto.setUnitCode(servicio.getCdUnidad());//uni_code (cdUnidad)
-				producto.setIdentificationNumber("");//identificador
-				producto.setName(servicio.getServicioDs());//Nombre (servicioDS)
-				producto.setDescription(servicio.getServicioDs());//Descripcion (servicioDS)
-				if(precioS == null) {
-					producto.setPrice(new BigDecimal("1").setScale(2));
-				}else {
-					producto.setPrice(precioS.getPrecio());
-				}
-				producto.setCodeProdServ(servicio.getServicioCod());//Codigo Producto (servicioCod)
-				
-				
-				Ptaxe.setName(iva);//name (parametro nombre)
-				Ptaxe.setRate(new BigDecimal(valor).setScale(2));//rate (parametro value)
-				Ptaxe.setIsRetention(false);//Isretentin
-				Ptaxe.setIsFederalTax(true);//IsfederalTax
-				listaTaxes.add(Ptaxe);
-				producto.setTaxes(listaTaxes);
-				producto.setCuentaPredial(null);
-				
-				FacturamaBL facturama = new FacturamaBL();
-				productRsp = facturama.updateProducto(producto, servicio.getUuId());
-				
-				System.out.println("El producto modificado es:\n" + productRsp);
-				
-				// ---------------------------     TERMINA FACTURAMA     ------------------------------ //
-				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Actualizado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Ocurrió un error al intentar actualizar el Servicio"));
@@ -204,8 +107,7 @@ public class ServiciosBean implements Serializable{
 	}
 
 	public void deleteServicio() {
-		Servicio servicio = new Servicio();
-		
+		Servicio servicio = new Servicio();		
 		servicio.setCdUnidad(selectedServicio.getCdUnidad());
 		servicio.setServicioCod(selectedServicio.getServicioCod());
 		servicio.setServicioCve(selectedServicio.getServicioCve());
@@ -213,8 +115,8 @@ public class ServiciosBean implements Serializable{
 		servicio.setUuId(selectedServicio.getUuId());
 		servicio.setCobro(selectedServicio.getCobro());
 		
-		if (servicioDAO.eliminar(servicio) == null) {
-			this.servicios.remove(this.selectedServicio);
+		if (servicioDAO.eliminar(servicio) == null || servicioDAO.eliminar(servicio) != null ) {
+			this.servicios.remove(selectedServicio);
 			this.selectedServicio = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Eliminado"));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-servicios");
@@ -222,19 +124,6 @@ public class ServiciosBean implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error" ,"Ocurrió un error al intentar eliminar el Servicio"));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
-	}
-
-	public String getDeleteButtonMessage() {
-		if (hasSelectedServicios()) {
-			int size = this.selectedServicios.size();
-			return size > 1 ? size + " servicios seleccionados" : "1 servicio seleccionado";
-		}
-
-		return "Eliminar";
-	}
-
-	public boolean hasSelectedServicios() {
-		return this.selectedServicios != null && !this.selectedServicios.isEmpty();
 	}
 
 	public void deleteSelectedServicios() {
