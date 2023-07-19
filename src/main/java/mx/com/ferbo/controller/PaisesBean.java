@@ -55,6 +55,10 @@ public class PaisesBean implements Serializable {
 			paisSelect.setPaisCve(tamanioListaPaises);
 			if (paisesDao.guardar(paisSelect) == null) {
 				this.listaPaises.add(this.paisSelect);
+				String p = paisSelect.getPaisDesc();
+				String ab = paisSelect.getPaisDsCorta();
+				p.trim();
+				ab.trim();
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("País Agregado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
