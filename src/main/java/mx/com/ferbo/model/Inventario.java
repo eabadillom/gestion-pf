@@ -2,13 +2,10 @@ package mx.com.ferbo.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.faces.application.FacesMessage.Severity;
 
 public class Inventario {
 	protected Integer folio;
+	protected Date fechaIngreso;
 	protected Producto producto;
 	protected Cliente cliente;
 	protected Integer cantidad;
@@ -38,6 +35,7 @@ public class Inventario {
 	protected String descripcion;
 	protected ConstanciaDeDeposito constanciaDeDeposito;
 	protected Servicio srv;
+	protected BigDecimal numeroTarimas;
 	public Inventario() {
 
 	}
@@ -350,6 +348,18 @@ public class Inventario {
 				+ detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento=" + pedimento + ", tarimas="
 				+ tarimas + ", folioCliente=" + folioCliente + ", Observaciones=" + Observaciones + ", descripcion="
 				+ descripcion + ", constanciaDeDeposito=" + constanciaDeDeposito + ", srv=" + srv + "]";
+	}
+	public Date getFechaIngreso() {
+		return fechaIngreso;
+	}
+	public void setFechaIngreso(Date fechaIngreso) {
+		this.fechaIngreso = fechaIngreso;
+	}
+	public BigDecimal getNumeroTarimas() {
+		return numeroTarimas;
+	}
+	public void setNumeroTarimas(BigDecimal numeroTarimas) {
+		this.numeroTarimas = numeroTarimas;
 	}
 }
 
