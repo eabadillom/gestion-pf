@@ -80,12 +80,15 @@ public class EmisoresCFDISBean implements Serializable {
 		regimenFiscalDAO = new RegimenFiscalDAO();
 		certificadoDAO = new CertificadoDAO();
 		
-		listaRegimenFiscal = regimenFiscalDAO.findAll();
-		listaEmisor = emisoresDAO.findall();
+		emisor = new EmisoresCFDIS();
+		
+		
 	}
 
 @PostConstruct
 public void init() {
+	listaRegimenFiscal = regimenFiscalDAO.findAll();
+	listaEmisor = emisoresDAO.findall();
 }
 
 	public void newEmisor() {
@@ -106,37 +109,44 @@ public void init() {
 	};
 
 	public void guardarCertificado() {
-		this.certificado = new Certificado();
-		byte[] contenidoCertificado = null;
-		byte[] contenidollavePrivada = null;;
-		String nombreLPrivada = llavePrivadaFile.getFileName();
-		try {
-			contenidoCertificado = IOUtil.read(certificadoFile.getInputStream());
-			contenidollavePrivada = IOUtil.read(llavePrivadaFile.getInputStream());
-			certificado.setLlavePrivada(nombreLPrivada);
-			certificado.setDt_llavePrivada(contenidollavePrivada);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		String nombreCertificado = certificadoFile.getFileName();
-		certificado.setCertificado(contenidoCertificado);
-		certificado.setNombreCertificado(nombreCertificado);
-		System.out.println("Guardando certificado");
-		System.out.println(certificado);
-		certificado.setFechaAlta(new Date());
-		certificado.setPassword(password);
-		certificado.setEmisor(emisor);
-		String certi = certificadoDAO.guardar(certificado);
-		if(certi == null) {
-			listaCertificado.clear();
-			listaCertificado = certificadoDAO.findAll();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Certificado agregado con exito" + certificado.getCdCertificado(), null));
-			PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
-			}else{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error, verificar datos" + certificado.getCdCertificado(), certi));
+		
+		/*if(certificadoFile==null||llavePrivadaFile==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Certificado .cer o .key", "Ambos archivos deben estar cargados"));
 			PrimeFaces.current().ajax().update("form:messages");
+		}else {*/
+		
+			this.certificado = new Certificado();
+			byte[] contenidoCertificado = null;
+			byte[] contenidollavePrivada = null;;
+			String nombreLPrivada = llavePrivadaFile.getFileName();
+			try {
+				contenidoCertificado = IOUtil.read(certificadoFile.getInputStream());
+				contenidollavePrivada = IOUtil.read(llavePrivadaFile.getInputStream());
+				certificado.setLlavePrivada(nombreLPrivada);
+				certificado.setDt_llavePrivada(contenidollavePrivada);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		this.certificado = new Certificado();
+			String nombreCertificado = certificadoFile.getFileName();
+			certificado.setCertificado(contenidoCertificado);
+			certificado.setNombreCertificado(nombreCertificado);
+			System.out.println("Guardando certificado");
+			System.out.println(certificado);
+			certificado.setFechaAlta(new Date());
+			certificado.setPassword(password);
+			certificado.setEmisor(emisor);
+			String certi = certificadoDAO.guardar(certificado);
+			if(certi == null) {
+				listaCertificado.clear();
+				listaCertificado = certificadoDAO.findAll();
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Certificado agregado con exito" + certificado.getCdCertificado(), null));
+				PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
+				}else{
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error, verificar datos" + certificado.getCdCertificado(), certi));
+				PrimeFaces.current().ajax().update("form:messages");
+				}
+			this.certificado = new Certificado();
+		
 	}
 	
 		public void actualizarEmisor() {
@@ -161,10 +171,10 @@ public void init() {
 			if(em == null) {
 			listaEmisor.clear();
 			listaEmisor = emisoresDAO.findall();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Emisor agregado con exito" + emisor.getCd_emisor(), null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Emisor modificado con exito" + emisor.getCd_emisor(), null));
 			PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
 			}else{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al agregar el emisor" + emisor.getCd_emisor(), em));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al modificar emisor" + emisor.getCd_emisor(), em));
 			PrimeFaces.current().ajax().update("form:messages");
 			}
 		}
@@ -209,13 +219,18 @@ public void init() {
 			}
 	
 	public void cargaDeArchivos() {
-		System.out.println("Emisor: "+ emisor);
+		
 		listaCertificado = certificadoDAO.buscarporcdEmisor(emisor.getCd_emisor());
-		Integer size = listaCertificado.size()-1;
-		this.certificado = listaCertificado.get(size);
-		Date fechaAltaMax = certificado.getFechaAlta();
-	
-		System.out.println("Fecha maxima" + fechaAltaMax);
+		
+		if(listaCertificado.isEmpty()) {
+			certificado = new Certificado();
+		}else {
+		
+			Integer size = listaCertificado.size()-1;
+			this.certificado = listaCertificado.get(size);
+			Date fechaAltaMax = certificado.getFechaAlta();
+		
+			System.out.println("Fecha maxima" + fechaAltaMax);
 			InputStream inputCertificado= new ByteArrayInputStream(certificado.getCertificado());
 			fileDownloadCer = DefaultStreamedContent.builder()
 	                .name(certificado.getNombreCertificado())
@@ -229,7 +244,11 @@ public void init() {
 	                .contentType("aplication/x-x509-user-cert")
 	                .stream(() -> inputLlavePrivada)
 	                .build();
-	        }
+
+		}	
+	}
+	
+	
 	public boolean validacion(String tipoPersona, String rfc) {
 		boolean esRfcValido = false;
 		if("F".equals(tipoPersona)) {
@@ -256,7 +275,10 @@ public void init() {
 				listaRegimenFiscal = regimenFiscalDAO.buscarPorPersonaFisica();
 			}
 			if(validacion(tipoPersona, rfc) == false ) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"El RFC es incorrecto",null));
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"El RFC es incorrecto",null));
+				PrimeFaces.current().ajax().update("form:messages");
+			}else {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"El RFC es correcto",null));
 				PrimeFaces.current().ajax().update("form:messages");
 			}
 			
