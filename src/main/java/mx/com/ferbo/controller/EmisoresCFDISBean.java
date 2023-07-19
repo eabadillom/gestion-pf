@@ -116,6 +116,7 @@ public void init() {
 		}else {*/
 		
 			this.certificado = new Certificado();
+			
 			byte[] contenidoCertificado = null;
 			byte[] contenidollavePrivada = null;;
 			String nombreLPrivada = llavePrivadaFile.getFileName();
@@ -146,6 +147,7 @@ public void init() {
 				PrimeFaces.current().ajax().update("form:messages");
 				}
 			this.certificado = new Certificado();
+			this.password = null;
 		
 	}
 	
