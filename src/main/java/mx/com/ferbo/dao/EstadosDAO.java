@@ -32,13 +32,24 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	}
 	@Override
 	public Estados buscarPorId(Integer idEstado) {
-		// TODO Auto-generated method stub
 		
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;		
 		Estados estado = null;
-		Query sql = entity.createNamedQuery("Estados.findByEstadoCve",Estados.class)
-				.setParameter("estadoCve", idEstado);
-		estado = (Estados) sql.getSingleResult();
+		Query sql = null;
+		
+		try {
+			
+			entity = getEntityManager();			
+			sql = entity.createNamedQuery("Estados.findByEstadoCve",Estados.class)
+					.setParameter("estadoCve", idEstado);
+			estado = (Estados) sql.getSingleResult();
+			
+		} catch (Exception ex) {
+			log.error("Problema al buscar el Estado", ex);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		
 		return estado;
 	}
