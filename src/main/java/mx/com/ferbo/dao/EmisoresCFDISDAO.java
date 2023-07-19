@@ -7,12 +7,16 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
+	
+	private static Logger log = Logger.getLogger(EmisoresCFDISDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<EmisoresCFDIS> findall() {
@@ -26,9 +30,23 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 	
 	@Override
 	public EmisoresCFDIS buscarPorId(Integer cd_emisor) {
-		EmisoresCFDIS emi = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		emi = em.createNamedQuery("findBycdEmisor", EmisoresCFDIS.class).getSingleResult();
+		
+		EntityManager em = null;
+		EmisoresCFDIS emi = null;		
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			emi = em.createNamedQuery("EmisoresCFDIS.findBycdEmisor", EmisoresCFDIS.class).setParameter("cd_emisor", cd_emisor).getSingleResult();
+			
+		} catch (Exception e) {
+			
+			log.error("Problema para buscar el emisor",e);
+			
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return emi;
 	}
 

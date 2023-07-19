@@ -47,8 +47,9 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 				return plantas;
 			
 			for(Planta p : plantas) {
-				log.debug(p.getIdUsuario().getUsuario());
-				log.debug(p.getIdEmisoresCFDIS().getCd_emisor());
+				log.debug(p.getIdUsuario().getUsuario());//ERROR lazy 
+				
+				log.debug(p.getIdEmisoresCFDIS().getCd_emisor()); //no tienen notacion lazy
 			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de Plantas...", ex);
@@ -60,20 +61,43 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Usuario> getUsuarios() {
-		EntityManager entity = getEntityManager();
+	public List<Usuario> getUsuarios() { //MODIFICADO	
+		EntityManager entity = null;
 		List<Usuario> usuarios = null;
-		Query sql = entity.createQuery("SELECT u FROM Usuario u WHERE u.perfil IN (1, 4)");
-		usuarios = sql.getResultList();
-		return usuarios;
+		
+		try {
+		
+			entity = getEntityManager();
+			Query sql = entity.createQuery("SELECT u FROM Usuario u WHERE u.perfil IN (1, 4)");
+			usuarios = sql.getResultList();			
+			
+		}catch (Exception e) {
+			log.error("Problema al obtener a los usuarios", e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		return usuarios;		
+		
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<EmisoresCFDIS> getEmisor() {
-		EntityManager entity = getEntityManager();
+	public List<EmisoresCFDIS> getEmisor() { //MODIFICADO	
+		
+		EntityManager entity = null;
 		List<EmisoresCFDIS> emisor = null;
-		Query sql = entity.createQuery("SELECT e FROM EmisoresCFDIS e ");
-		emisor = sql.getResultList();
+		
+		try {
+			
+			entity = getEntityManager();
+			Query sql = entity.createQuery("SELECT e FROM EmisoresCFDIS e ");
+			emisor = sql.getResultList();
+			
+		} catch (Exception e) {
+			log.error("Problema al obtener a los emisores",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		return emisor;
 	}
 	
