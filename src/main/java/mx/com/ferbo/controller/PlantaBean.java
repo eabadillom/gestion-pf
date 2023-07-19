@@ -108,6 +108,8 @@ public class PlantaBean implements Serializable {
 		asentamientoHumandoDao = new AsentamientoHumandoDAO();
 		emisoresDAO = new EmisoresCFDISDAO();
 		
+		listaEmisores = new ArrayList<EmisoresCFDIS>();
+		
 		planta = new Planta();
 		seleccion = new Planta();
 	};
@@ -144,17 +146,6 @@ public class PlantaBean implements Serializable {
 		filtroAsentamiento();
 		tipoAsentamiento();
 		
-	}
-	
-	public void nombreEmisor() {//PENDIENTE
-		
-		EmisoresCFDIS emisor=null;
-		
-		emisor = emisoresDAO.buscarPorId(planta.getIdEmisoresCFDIS().getCd_emisor());
-		
-		idEmisoresCFDIS = emisor;
-		
-		PrimeFaces.current().ajax().update("form:razonSocial");
 	}
 	
 	public int filtroPais() {
@@ -330,7 +321,7 @@ public class PlantaBean implements Serializable {
 			this.idTipoAsentamiento = ah.getTipoAsentamiento().getTipoasntmntoCve();
 			this.codigopostalSelected = ah.getCp();
 			
-			nombreEmisor();
+			//nombreEmisor();
 			
 			
 		}
@@ -450,6 +441,7 @@ public class PlantaBean implements Serializable {
 		planta.setIdCiudad(idCiudad);
 		planta.setIdAsentamiento(idAsentamiento);
 		planta.setTipoasentamiento(idTipoAsentamiento);
+		planta.setCodigopostal(codigopostalSelected);
 		planta.setIdEmisoresCFDIS(planta.getIdEmisoresCFDIS());
 		
 		//String message = daoPlanta.update(planta);

@@ -314,7 +314,7 @@ public class Planta implements Serializable {
 	public String toString() {
 		return "mx.com.ferbo.model.Planta[ plantaCve=" + plantaCve + " ]";
 	}
-
+	
 	public List<Posicion> getPosicionList() {
 		return posicionList;
 	}

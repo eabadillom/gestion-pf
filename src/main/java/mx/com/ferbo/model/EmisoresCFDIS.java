@@ -86,7 +86,7 @@ private static final long serialVersionUID = 1L;
 		
 		public EmisoresCFDIS() {
 		}
-		
+
 		public Integer getCd_emisor() {
 		return cd_emisor;
 		}
@@ -179,27 +179,21 @@ private static final long serialVersionUID = 1L;
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(cd_emisor, cd_regimen, fh_inicio_op, fh_ult_cambio, listaCertificado, nb_emisor,
-					nb_regimen_capital, nb_rfc, st_padron, tp_persona, uuid);
+			int hash = 0;
+	        hash += (cd_emisor != null ? cd_emisor.hashCode() : 0);
+	        return hash;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			EmisoresCFDIS other = (EmisoresCFDIS) obj;
-			return Objects.equals(cd_emisor, other.cd_emisor) && Objects.equals(cd_regimen, other.cd_regimen)
-					&& Objects.equals(fh_inicio_op, other.fh_inicio_op)
-					&& Objects.equals(fh_ult_cambio, other.fh_ult_cambio)
-					&& Objects.equals(listaCertificado, other.listaCertificado)
-					&& Objects.equals(nb_emisor, other.nb_emisor)
-					&& Objects.equals(nb_regimen_capital, other.nb_regimen_capital)
-					&& Objects.equals(nb_rfc, other.nb_rfc) && Objects.equals(st_padron, other.st_padron)
-					&& Objects.equals(tp_persona, other.tp_persona) && Objects.equals(uuid, other.uuid);
+			if (!(obj instanceof EmisoresCFDIS)) {
+	            return false;
+	        }
+	        EmisoresCFDIS other = (EmisoresCFDIS) obj;
+	        if ((this.cd_emisor == null && other.cd_emisor != null) || (this.cd_emisor != null && !this.cd_emisor.equals(other.cd_emisor))) {
+	            return false;
+	        }
+	        return true;
 		}
 
 		@Override

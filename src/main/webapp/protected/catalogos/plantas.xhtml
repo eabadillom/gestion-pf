@@ -22,7 +22,7 @@
 									actionListener="#{plantaBean.openNew()}"
 									update="frm-agrega"
 									oncomplete="PF('dg-agrega').show()" 
-									styleClass="ui-button-info p-mr-2 p-mb-2" process="@this" action="#{plantaBean.datosPlanta()}"/>
+									styleClass="ui-button-info p-mr-2 p-mb-2" process="@this"/>
 							</p:toolbarGroup>
 						</p:toolbar>
 					 </div>
@@ -101,7 +101,7 @@
 		</p:selectOneMenu>
 		
 		<p:outputLabel for="razonSocial" value="Razon Social:" />
-		<p:selectOneMenu id="razonSocial" value="#{plantaBean.planta.idEmisoresCFDIS}" converter="entityConverter" >
+		<p:selectOneMenu id="razonSocial" autoWidth="false" value="#{plantaBean.planta.idEmisoresCFDIS}" converter="entityConverter" >
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 			<f:selectItems value="#{plantaBean.listaEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"></f:selectItems>
 		</p:selectOneMenu>
@@ -136,7 +136,7 @@
 
 		<p:outputLabel for="asentamiento" value="Asentamiento:" />
 		<p:selectOneMenu id="asentamiento"  autoWidth="false" value="#{plantaBean.asentamientoHumanoSelect}" converter="entityConverter">
-			<f:selectItem itemLabel="---Seleccione---" itemValue="0"/>
+			<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 			<f:selectItems var="selectedAsn" value="#{plantaBean.asentamientoHumanoList}" itemLabel="#{selectedAsn.asentamientoDs}" itemValue="#{selectedAsn}" />
 			<p:ajax listener="#{plantaBean.tipoAsentamiento}" process="@this" update="Tasn-new codigopostal-new" />
 		</p:selectOneMenu>

@@ -89,7 +89,7 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 		try {
 			
 			entity = getEntityManager();
-			Query sql = entity.createQuery("SELECT e FROM EmisoresCFDIS e ",EmisoresCFDIS.class);
+			Query sql = entity.createQuery("SELECT e FROM EmisoresCFDIS e ");
 			emisor = sql.getResultList();
 			
 		} catch (Exception e) {
