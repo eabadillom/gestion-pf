@@ -38,7 +38,7 @@
 							paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
-									<span style="font-weight: bold">Tipo de Asentamiento</span> <span
+									<span style="font-weight: bold"></span> <span
 										class="ui-input-icon-left filter-container"> <i
 										class="pi pi-search" /> <p:inputText id="globalFilter"
 											onkeyup="PF('dtTipoAsentamiento').filter()" placeholder="Búsqueda" />
@@ -46,22 +46,16 @@
 								</div>
 							</f:facet>
 
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-
-							<p:column selectionMode="multiple" />
-
 							<p:column headerText="Tipo de Asentamiento" sortBy="#{tipoAsentamiento.tipoasntmntoDs}"
 								filterBy="#{tipoAsentamiento.tipoasntmntoDs}" style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
 									value="#{tipoAsentamiento.tipoasntmntoDs}" />
+							</p:column>
+							
+								<p:column headerText="Tipo de Asentamiento" sortBy="#{tipoAsentamiento.tipoasntmntoDsCorta}"
+								filterBy="#{tipoAsentamiento.tipoasntmntoDsCorta}" style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem"
+									value="#{tipoAsentamiento.tipoasntmntoDsCorta}" />
 							</p:column>
 							<p:column headerText="Acción" style="text-align:center">
 								<p:commandButton icon="pi pi-pencil"
