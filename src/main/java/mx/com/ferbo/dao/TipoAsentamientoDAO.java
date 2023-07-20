@@ -7,36 +7,63 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.model.TipoAsentamiento;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoAsentamientoDAO extends IBaseDAO<TipoAsentamiento, Integer> {
-
+	Logger log = Logger.getLogger(TipoAsentamientoDAO.class);
+	
 	@SuppressWarnings("unchecked")
 	public List<TipoAsentamiento> findall() {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		List<TipoAsentamiento> TipoAs= null;
-		Query sql = entity.createNamedQuery("TipoAsentamiento.findAll", TipoAsentamiento.class);
-		TipoAs = sql.getResultList();
+		try {
+			 entity = EntityManagerUtil.getEntityManager();
+			 Query sql = entity.createNamedQuery("TipoAsentamiento.findAll", TipoAsentamiento.class);
+			 TipoAs = sql.getResultList();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
 		return TipoAs;
 	}
 	@Override
 	public TipoAsentamiento buscarPorId(Integer id) {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		TipoAsentamiento Tasn = null;
-		Query sql = entity.createNamedQuery("TipoAsentamiento.findByTipoasntmntoCve",TipoAsentamiento.class)
-				.setParameter("tipoasntmntoCve",id.shortValue());
-		Tasn = (TipoAsentamiento) sql.getSingleResult();
+		try {
+			entity =EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("TipoAsentamiento.findByTipoasntmntoCve",TipoAsentamiento.class)
+					.setParameter("tipoasntmntoCve",id.shortValue());
+			Tasn = (TipoAsentamiento) sql.getSingleResult();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
 		return Tasn;
 	}
+	
 
 	@Override
 	public List<TipoAsentamiento> buscarTodos() {
 		List<TipoAsentamiento> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("TipoAsentamiento.findAll", TipoAsentamiento.class).getResultList();
+		EntityManager em = null;
+		try {
+			 em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("TipoAsentamiento.findAll", TipoAsentamiento.class).getResultList();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listado;
 	}
 
@@ -48,45 +75,51 @@ public class TipoAsentamientoDAO extends IBaseDAO<TipoAsentamiento, Integer> {
 
 	@Override
 	public String actualizar(TipoAsentamiento tipoAsentamiento) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(tipoAsentamiento);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR actualizando Tipo de Asentamiento" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(TipoAsentamiento tipoAsentamiento) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			 em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(tipoAsentamiento);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR guardando Tipo de Asentamiento" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(TipoAsentamiento tipoAsentamiento) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			 em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(tipoAsentamiento));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
