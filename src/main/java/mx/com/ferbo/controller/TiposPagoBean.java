@@ -64,7 +64,7 @@ public class TiposPagoBean implements Serializable {
 					"Error al editar: " + nuevo.getMpDescripcion(), message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
-		this.seleccion = null;
+		this.seleccion = new MedioPago();
 	};
 
 	public List<MedioPago> getPrincipal() {

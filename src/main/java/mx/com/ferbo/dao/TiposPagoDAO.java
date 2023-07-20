@@ -31,27 +31,35 @@ public class TiposPagoDAO {
 	}
 
 	public String save(MedioPago mp) {
+		
+		EntityManager entity = null;
+		
 		try {
-			EntityManager entity = getEntityManager();
+			entity = getEntityManager();
 			entity.getTransaction().begin();
 			entity.persist(mp);
 			entity.getTransaction().commit();
-			entity.close();
 		} catch (Exception e) {
-			return "Failed!! " + e.getMessage();
+			Log.error("Problema al guardar medio pago", e);
+		}finally {
+			EntityManagerUtil.close(entity);
 		}
 		return null;
 	}
 
 	public String update(MedioPago mp) {
+		
+		EntityManager entity = null;
+		
 		try {
-			EntityManager entity = getEntityManager();
+			entity = getEntityManager();
 			entity.getTransaction().begin();
 			entity.merge(mp);
 			entity.getTransaction().commit();
-			entity.close();
 		} catch (Exception e) {
-			return "Failed!! " + e.getMessage();
+			Log.error("Problema para actualizar", e);
+		}finally {
+			EntityManagerUtil.close(entity);
 		}
 		return null;
 	}
