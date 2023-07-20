@@ -55,10 +55,9 @@
 							<!-- 							<p:ajax event="toggleSelect" -->
 							<!-- 								update=":form:delete-manejo-button" /> -->
 
-							<p:column selectionMode="multiple" />
 
 							<p:column headerText="Nombre" sortBy="#{manejo.unidadDeManejoDs}"
-								filterBy="#{manejo.nombre}" style="text-align:center">
+								filterBy="#{manejo.unidadDeManejoDs}" style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
 									value="#{manejo.unidadDeManejoDs}" />
 							</p:column>
@@ -91,14 +90,14 @@
 								value="Nombre de la Unidad de Manejo" />
 							<p:inputText id="nombre-new"
 								value="#{unidadDeManejoBean.unidadManejoSelected.unidadDeManejoDs}"
-								required="true" />
+								required="true" requiredMessage="Ingresa nombre de la unidad de manejo"/>
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-plus"
 						actionListener="#{unidadDeManejoBean.guardarUnidadManejo()}"
-						update=":form:manage-unit-content-new" styleClass="p-mr-2 p-mb-2" />
+						update=":form:manage-unit-content-new messages" styleClass="p-mr-2 p-mb-2" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
 						onclick="PF('nuevaUnidadManejoDialog').hide()"
 						class="ui-button-secondary" />
