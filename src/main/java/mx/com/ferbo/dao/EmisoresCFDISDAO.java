@@ -20,13 +20,51 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 
 	@SuppressWarnings("unchecked")
 	public List<EmisoresCFDIS> findall() {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		List<EmisoresCFDIS> emisores= null;
-		Query sql = entity.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class);
-		emisores = sql.getResultList();
+		
+		try {
+		
+			entity = getEntityManager();		
+			Query sql = entity.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class);
+			emisores = sql.getResultList();
+			
+		} catch (Exception e) {
+			log.error("Problema al retornar lista emisores",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		return emisores;
 	}
 
+	public List<EmisoresCFDIS> findall(Boolean isFullInfo){ 
+		
+		EntityManager em = null;
+		List<EmisoresCFDIS> lista = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("EmisoresCFDIS.findAll",EmisoresCFDIS.class).getResultList();
+			
+			if(isFullInfo == false)
+				return lista;
+			
+			for(EmisoresCFDIS e: lista) {
+				log.debug(e.getCd_regimen().getNb_regimen());
+				log.debug(e.getListaCertificado().size());
+				
+			}
+						
+		}catch (Exception e) {
+			log.error("Problema para recuperar lista emisores",e);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return lista;
+	}
 	
 	@Override
 	public EmisoresCFDIS buscarPorId(Integer cd_emisor) {
@@ -52,17 +90,40 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 
 	@Override
 	public List<EmisoresCFDIS> buscarTodos() {
+		
+		
 		List<EmisoresCFDIS> listaEmisores = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listaEmisores = em.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class).getResultList();
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listaEmisores = em.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class).getResultList();
+		} catch (Exception e) {
+			log.error("Probelma al recuperar lista emisoresCFDIS", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listaEmisores;
 	}
 
 	@Override
 	public List<EmisoresCFDIS> buscarPorCriterios(EmisoresCFDIS e) {
+		
+		EntityManager em = null;
 		List<EmisoresCFDIS> listaEmisores =null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
 			listaEmisores = em.createNamedQuery("EmisoresCFDIS.findByregimenFiscal", EmisoresCFDIS.class).setParameter("cd_regimen", e.getCd_regimen()).getResultList();
+			
+		} catch (Exception ex) {
+			log.error("Problema para buscar emisor por criterio",ex);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listaEmisores;
 	}
 
@@ -82,36 +143,49 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 
 	@Override
 	public String guardar(EmisoresCFDIS emi) {
+		
+		EntityManager ent = null;
+		
 		try {
-			EntityManager ent = getEntityManager();
+			ent = getEntityManager();
 			ent.getTransaction().begin();
 			ent.persist(emi);
 			ent.getTransaction().commit();
-			ent.close();
+			
 		}catch(Exception e){
  			return "Failed" + e.getMessage();
+		}finally {
+			EntityManagerUtil.close(ent);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(EmisoresCFDIS emi) {
+		
+		EntityManager ent = null;
+		
 		try {
-			EntityManager ent = getEntityManager();
+			ent = getEntityManager();
 			ent.getTransaction().begin();
 			ent.remove(ent.merge(emi));
 			ent.getTransaction().commit();
-			ent.close();
 		}catch(Exception e) {
 			return "Failed!"+e.getMessage();
+		}finally {
+			ent.close();
 		}
+		
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<EmisoresCFDIS> listado) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			for(EmisoresCFDIS emisores : listado) {
 				em.remove(em.merge(emisores));
@@ -119,7 +193,10 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 			em.getTransaction().commit();
 		}catch(Exception e){
 			System.out.println("Error" + e.getMessage());
+		}finally {
+			EntityManagerUtil.close(em);
 		}
+		
 		return null;
 	}
 
