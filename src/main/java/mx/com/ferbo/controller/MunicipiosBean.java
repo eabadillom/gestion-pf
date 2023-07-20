@@ -107,8 +107,8 @@ public class MunicipiosBean implements Serializable {
 						"Error", "Ocurrió un error al intentar actualizar el Municipio / Alcaldía"));
 			}
 		} 
+		listaMunicipios = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
 		PrimeFaces.current().executeScript("PF('nuevoMunicipioDialog').hide()");
-		PrimeFaces.current().ajax().update("form");
 	}
 
 	public void eliminandoMunicipio() {
@@ -119,12 +119,11 @@ public class MunicipiosBean implements Serializable {
 		municipioPkSelect.setEstadoCve(idEstado);
 		municipioPkSelect.setMunicipioCve(idMunicipio);
 		municipioSelect.setMunicipiosPK(municipioPkSelect);
-		if (municipiosDao.eliminar(municipioSelect) == null) {
+		if (municipiosDao.eliminar(municipioSelect) == null ) {
 			this.listaMunicipios.remove(this.municipioSelect);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Municipio Eliminado"));
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ocurrió un error al intentar eliminar el Municipio"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error","Ocurrió un error al intentar eliminar el Municipio"));
 		}
 		PrimeFaces.current().executeScript("PF('deleteMunicipioDialog').hide()");
 		PrimeFaces.current().ajax().update("form");
