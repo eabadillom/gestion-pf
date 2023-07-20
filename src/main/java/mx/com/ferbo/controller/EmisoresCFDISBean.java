@@ -88,7 +88,7 @@ public class EmisoresCFDISBean implements Serializable {
 @PostConstruct
 public void init() {
 	listaRegimenFiscal = regimenFiscalDAO.findAll();
-	listaEmisor = emisoresDAO.findall();
+	listaEmisor = emisoresDAO.findall(true);
 }
 
 	public void newEmisor() {
@@ -172,7 +172,7 @@ public void init() {
 			String em = emisoresDAO.actualizar(emisor);
 			if(em == null) {
 			listaEmisor.clear();
-			listaEmisor = emisoresDAO.findall();
+			listaEmisor = emisoresDAO.findall(true);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Emisor modificado con exito" + emisor.getCd_emisor(), null));
 			PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
 			}else{
@@ -185,6 +185,7 @@ public void init() {
 
 		public void guardarEmisor() {
 			this.emisor = new EmisoresCFDIS();
+			
 			emisor.setNb_emisor(this.nombreEmisor);
 			emisor.setTp_persona(this.tipoPersona);
 			emisor.setNb_regimen_capital(this.regimenCapital);
@@ -202,7 +203,7 @@ public void init() {
 			String em = emisoresDAO.guardar(emisor);
 			if(em == null) {
 				listaEmisor.clear();
-				listaEmisor = emisoresDAO.findall();
+				listaEmisor = emisoresDAO.findall(true);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Emisor agregado con exito" + emisor.getCd_emisor(), null));
 				PrimeFaces.current().ajax().update("form:messages","form:dt-emisor");
 				}
@@ -210,6 +211,16 @@ public void init() {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Error al agregar el emisor" + emisor.getCd_emisor(), em));
 				PrimeFaces.current().ajax().update("form:messages");
 				}
+			
+			nombreEmisor = null;
+			tipoPersona = null;
+			regimenCapital = null;
+			rfc = null;
+			iniOperacion = new Date();
+			ultSAT = new Date();
+			padron = null;
+			regimenFiscal = null;
+			
 		}
 		
 		
@@ -277,6 +288,26 @@ public void init() {
 				listaRegimenFiscal = regimenFiscalDAO.buscarPorPersonaFisica();
 			}
 			if(validacion(tipoPersona, rfc) == false ) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"El RFC es incorrecto",null));
+				PrimeFaces.current().ajax().update("form:messages");
+			}else {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"El RFC es correcto",null));
+				PrimeFaces.current().ajax().update("form:messages");
+			}
+			
+		}
+		
+		public void RegimenSelectModificar() {
+			System.out.println("Tipo de persona: " + this.emisor.getNb_rfc());
+			if("M".equals(emisor.getTp_persona())) {	
+				estado = false;
+ 				listaRegimenFiscal = regimenFiscalDAO.buscarPorPersonaMoral();
+ 				
+			}else if("F".equals(emisor.getTp_persona())) {
+				estado = true;
+				listaRegimenFiscal = regimenFiscalDAO.buscarPorPersonaFisica();
+			}
+			if(validacion(emisor.getTp_persona(), emisor.getNb_rfc()) == false ) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"El RFC es incorrecto",null));
 				PrimeFaces.current().ajax().update("form:messages");
 			}else {

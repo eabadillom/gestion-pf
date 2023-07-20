@@ -151,7 +151,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 			</p:panel>
 
 			<f:facet name="footer">
-			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardarEmisor}" process="@this pnlEmisor" update="pnlEmisor messages"  />
+			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardarEmisor}" process="@this pnlEmisor" update="pnlEmisor messages statusPadron" />
 			<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogEmisor').hide()" process="@this" immediate="true" />
 			</f:facet>
 </p:dialog>
@@ -165,7 +165,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 					
 					<div class="p-col-12 p-md-6 p-lg-4">
 					<span class="ui-float-label">
-						<p:inputText value="#{emisoresCFDISBean.emisor.nb_rfc}" required="true" />
+						<p:inputText id="RFC-e" value="#{emisoresCFDISBean.emisor.nb_rfc}" required="true" />
 						<p:outputLabel for="@next" value="RFC" styleClass="ml-4" />
 						</span>
 					</div>
@@ -174,7 +174,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 					  <p:selectOneRadio id="tipoP" value="#{emisoresCFDISBean.emisor.tp_persona}" layout="grid" columns="3" styleClass="grid-radio" >
 					    <f:selectItem itemLabel="Persona Moral" itemValue="M"/>
            				<f:selectItem itemLabel="Persona Fisica" itemValue="F"/>
-				        <p:ajax listener="#{emisoresCFDISBean.RegimenSelect}" process="@this" update="regFiscal"/>
+				        <p:ajax listener="#{emisoresCFDISBean.RegimenSelectModificar}" process="@this RFC-e" update="regFiscal"/>
 				        </p:selectOneRadio>
 					</div>
 
@@ -212,7 +212,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 				</p:outputPanel>	
 		</p:outputPanel>
 			<f:facet name="footer">
-			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.actualizarEmisor}" process="@this pnlEditarEmisor" update="pnlEditarEmisor messages" />
+			<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.actualizarEmisor}" process="@this pnlEditarEmisor" update="pnlEditarEmisor messages" oncomplete="PF('dialogEditarEmisor').hide()" />
 			<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogEditarEmisor').hide()" process="@this"/>
 			</f:facet>
 </p:dialog>

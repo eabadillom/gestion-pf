@@ -20,10 +20,21 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 
 	@SuppressWarnings("unchecked")
 	public List<EmisoresCFDIS> findall() {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		List<EmisoresCFDIS> emisores= null;
-		Query sql = entity.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class);
-		emisores = sql.getResultList();
+		
+		try {
+		
+			entity = getEntityManager();		
+			Query sql = entity.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class);
+			emisores = sql.getResultList();
+			
+		} catch (Exception e) {
+			log.error("Problema al retornar lista emisores",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		return emisores;
 	}
 
@@ -42,6 +53,8 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 			
 			for(EmisoresCFDIS e: lista) {
 				log.debug(e.getCd_regimen().getNb_regimen());
+				log.debug(e.getListaCertificado().size());
+				
 			}
 						
 		}catch (Exception e) {
