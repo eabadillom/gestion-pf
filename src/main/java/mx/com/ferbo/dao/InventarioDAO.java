@@ -47,7 +47,7 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 		String sql = null;
 		EntityManager entity = null;
 		try {
-			sql = "SELECT FOLIO, CTE_CVE, FECHA_INGRESO, NOMBRE_TRANSPORTISTA, PLACAS_TRANSPORTE, OBSERVACIONES, folio_cliente, valor_declarado, status, aviso_cve, temperatura\n"
+			sql = "SELECT DISTINCT FOLIO, CTE_CVE, FECHA_INGRESO, NOMBRE_TRANSPORTISTA, PLACAS_TRANSPORTE, OBSERVACIONES, folio_cliente, valor_declarado, status, aviso_cve, temperatura\n"
 					+ "FROM (\n"
 					+ "	SELECT\n"
 					+ "		cdd.FOLIO, cdd.CTE_CVE, cdd.FECHA_INGRESO, cdd.NOMBRE_TRANSPORTISTA, cdd.PLACAS_TRANSPORTE, cdd.OBSERVACIONES, cdd.folio_cliente, cdd.valor_declarado, cdd.status, cdd.aviso_cve, cdd.temperatura,\n"
@@ -99,6 +99,9 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					BigDecimal pesoRestante = pesoInicial.subtract(pesoSalidas);
 					DetallePartida dp = detallePartidaList.get(detallePartidaList.size()- 1);
 					
+					if(cantidadRestante <= 0)
+						continue;
+					
 					inventario = new Inventario(); 
 					inventario.setFolioCliente(c.getFolioCliente());
 					inventario.setFechaIngreso(c.getFechaIngreso());
@@ -121,6 +124,7 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					inventario.setPo(dp.getDtpPO());
 					inventario.setCliente(c.getCteCve());
 					inventarioList.add(inventario);
+					log.debug("Inventario agregado: folio: {}, folioCliente: {}, partidaCve: {}", inventario.getFolio(), inventario.getFolioCliente(), inventario.getPartidaCve());
 				}
 			}
 			

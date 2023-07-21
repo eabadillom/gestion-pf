@@ -40,16 +40,18 @@ public class DetallePartidaDAO extends IBaseDAO<DetallePartida, Integer> {
 
 	@Override
 	public String guardar(DetallePartida detallePartida) {
-		
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(detallePartida);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
+			log.error("Problema para guardar en Detalle Partida...",  e);
 			System.out.println("ERROR" + e.getCause());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 		

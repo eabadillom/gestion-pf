@@ -1,10 +1,13 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
+import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+@Embeddable
 public class NotaPorFacturaPK implements Serializable, Cloneable{
 	
 	private static final long serialVersionUID = 1L;
@@ -46,6 +49,23 @@ public class NotaPorFacturaPK implements Serializable, Cloneable{
 	@Override
 	public String toString() {
 		return "NotaPorFacturaPK [nota=" + nota + ", factura=" + factura + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(factura, nota);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NotaPorFacturaPK other = (NotaPorFacturaPK) obj;
+		return Objects.equals(factura, other.factura) && Objects.equals(nota, other.nota);
 	}
 	
 	

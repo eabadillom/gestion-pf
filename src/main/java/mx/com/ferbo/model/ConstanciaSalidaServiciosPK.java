@@ -1,6 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
@@ -49,11 +50,22 @@ public class ConstanciaSalidaServiciosPK implements Serializable{
 		return "ConstanciaSalidaServiciosPK [constanciaSalidaCve=" + constanciaSalidaCve + ", servicioCve="
 				+ servicioCve + "]";
 	}
-	
-	
-	
-	
-	//FALTA METODO HASHCODE Y EQUALS
-	
-	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(constanciaSalidaCve, servicioCve);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConstanciaSalidaServiciosPK other = (ConstanciaSalidaServiciosPK) obj;
+		return Objects.equals(constanciaSalidaCve, other.constanciaSalidaCve)
+				&& Objects.equals(servicioCve, other.servicioCve);
+	}
 }
