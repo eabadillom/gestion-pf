@@ -11,6 +11,7 @@ import org.jfree.util.Log;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.EntidadPostal;
 import mx.com.ferbo.model.TipoAsentamiento;
 import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -86,6 +87,26 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 			EntityManagerUtil.close(em);
 		}
 		return listado;
+	}
+	
+	public List<AsentamientoHumano> buscarPorEntidadPostal(EntidadPostal e){
+		
+		EntityManager em = null;
+		List<AsentamientoHumano> lista = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("AsentamientoHumano.findByEntidadpostalCve",AsentamientoHumano.class)
+					.setParameter("entidadpostalCve", e.getEntidadpostalCve() ).getResultList();
+			
+		} catch (Exception ex) {
+			log.error("Problema al encontrar registros asentamiento",ex);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return lista;
 	}
 	
 	public AsentamientoHumano buscar(AsentamientoHumano a) {		
