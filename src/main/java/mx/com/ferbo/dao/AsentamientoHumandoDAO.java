@@ -1,11 +1,13 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
 
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
@@ -14,94 +16,136 @@ import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer> {
-
+	Logger log = Logger.getLogger(AsentamientoHumandoDAO.class);
+	
 	@SuppressWarnings("unchecked")
 	public List<AsentamientoHumano> findall() {
-		EntityManager entity = getEntityManager();
-		List<AsentamientoHumano> AsH= null;
-		Query sql = entity.createNamedQuery("AsentamientoHumano.findAll", AsentamientoHumano.class);
-		AsH = sql.getResultList();
-		return AsH;
+		EntityManager entity = null;
+		List<AsentamientoHumano> asnHumano= null;
+		try {
+			entity =EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("AsentamientoHumano.findAll", AsentamientoHumano.class);
+			asnHumano = sql.getResultList();
+		}catch(Exception e) {
+			log.error("Problemas para obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(entity);	
+		}
+		return asnHumano;
 	}
 	public AsentamientoHumano buscarPorAsentamiento(Integer paisCve, Integer estadoCve, Integer municipioCve, Integer ciudadCve, Integer asentamientoCve) {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		AsentamientoHumano asn = entity.createNamedQuery("AsentamientoHumano.findAsentamiento", AsentamientoHumano.class)
-				.setParameter("paisCve",paisCve)
-				.setParameter("estadoCve",estadoCve)
-				.setParameter("municipioCve",municipioCve)
-				.setParameter("ciudadCve",ciudadCve)
-				.setParameter("asentamientoCve",asentamientoCve)
-				.getSingleResult();
+		EntityManager entity = null;
+		AsentamientoHumano asn = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			asn = entity.createNamedQuery("AsentamientoHumano.findAsentamiento", AsentamientoHumano.class)
+					.setParameter("paisCve",paisCve)
+					.setParameter("estadoCve",estadoCve)
+					.setParameter("municipioCve",municipioCve)
+					.setParameter("ciudadCve",ciudadCve)
+					.setParameter("asentamientoCve",asentamientoCve)
+					.getSingleResult();
+		}catch(Exception e) {
+			log.error("Problemas para obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
 		return asn;
 	}
 
 	@Override
 	public List<AsentamientoHumano> buscarTodos() {
 		List<AsentamientoHumano> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em =null;
+		try {
+		em = EntityManagerUtil.getEntityManager();
 		listado = em.createNamedQuery("AsentamientoHumano.findAll", AsentamientoHumano.class).getResultList();
+		}catch(Exception e) {
+			log.error("Problemas para obtener informacion", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 
 	@Override
-	public List<AsentamientoHumano> buscarPorCriterios(AsentamientoHumano e) {		
+	public List<AsentamientoHumano> buscarPorCriterios(AsentamientoHumano a) {		
 		List<AsentamientoHumano> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("AsentamientoHumano.findByDomicilio", AsentamientoHumano.class)
-				.setParameter("paisCve", e.getAsentamientoHumanoPK().getPaisCve())
-				.setParameter("estadoCve", e.getAsentamientoHumanoPK().getEstadoCve())
-				.setParameter("municipioCve", e.getAsentamientoHumanoPK().getMunicipioCve())
-				.setParameter("ciudadCve", e.getAsentamientoHumanoPK().getCiudadCve())
-				.getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("AsentamientoHumano.findByDomicilio", AsentamientoHumano.class)
+					.setParameter("paisCve", a.getAsentamientoHumanoPK().getPaisCve())
+					.setParameter("estadoCve", a.getAsentamientoHumanoPK().getEstadoCve())
+					.setParameter("municipioCve", a.getAsentamientoHumanoPK().getMunicipioCve())
+					.setParameter("ciudadCve", a.getAsentamientoHumanoPK().getCiudadCve())
+					.getResultList();
+		}catch(Exception e) {
+			log.error("Problemas para obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 	
-	public AsentamientoHumano buscar(AsentamientoHumano e) {		
+	public AsentamientoHumano buscar(AsentamientoHumano a) {		
 		AsentamientoHumano listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("AsentamientoHumano.findAsentamiento", AsentamientoHumano.class)
-				.setParameter("paisCve", e.getAsentamientoHumanoPK().getPaisCve())
-				.setParameter("estadoCve", e.getAsentamientoHumanoPK().getEstadoCve())
-				.setParameter("municipioCve", e.getAsentamientoHumanoPK().getMunicipioCve())
-				.setParameter("ciudadCve", e.getAsentamientoHumanoPK().getCiudadCve())
-				.setParameter("asentamientoCve", e.getAsentamientoHumanoPK().getAsentamientoCve())
-				.getSingleResult();
+		EntityManager em = null;
+		
+		try {
+			 em = EntityManagerUtil.getEntityManager();
+			 listado = em.createNamedQuery("AsentamientoHumano.findAsentamiento", AsentamientoHumano.class)
+					 .setParameter("paisCve", a.getAsentamientoHumanoPK().getPaisCve())
+					 .setParameter("estadoCve", a.getAsentamientoHumanoPK().getEstadoCve())
+					 .setParameter("municipioCve", a.getAsentamientoHumanoPK().getMunicipioCve())
+					 .setParameter("ciudadCve", a.getAsentamientoHumanoPK().getCiudadCve())
+					 .setParameter("asentamientoCve", a.getAsentamientoHumanoPK().getAsentamientoCve())
+					 .getSingleResult();
+		}catch(Exception e) {
+			log.error("Problemas para obtener informacion", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 	@Override
 	public String actualizar(AsentamientoHumano asentamientoHumano) {
+		EntityManager em =null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(asentamientoHumano);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Asentamiento Humano" + e.getMessage());
-			return "ERROR";
+			log.error("problema al actualizar",e);
+		}finally {
+			EntityManagerUtil.close(em);	
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(AsentamientoHumano asentamientoHumano) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(asentamientoHumano);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR guardando Asentamiento Humano" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(AsentamientoHumano asentamientoHumano) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			 em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 //			em.remove(em.merge(asentamientoHumano));
 			em.createQuery("DELETE FROM AsentamientoHumano ah WHERE ah.asentamientoHumanoPK.paisCve =:paisCve and ah.asentamientoHumanoPK.estadoCve =:estadoCve and ah.asentamientoHumanoPK.municipioCve =:municipioCve and ah.asentamientoHumanoPK.ciudadCve =:ciudadCve and ah.asentamientoHumanoPK.tipoasntmntoCve =:tipoasntmntoCve and ah.asentamientoHumanoPK.entidadpostalCve =:entidadpostalCve and ah.asentamientoHumanoPK.asentamientoCve =:asentamientoCve")
@@ -117,6 +161,8 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		}finally{
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
