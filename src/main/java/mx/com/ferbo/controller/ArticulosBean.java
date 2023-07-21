@@ -92,7 +92,7 @@ public class ArticulosBean implements Serializable {
 	}
 
 	public void deleteSelectedProductos() {
-		if (productoDAO.eliminarListado(productos) == null) {
+		if (productoDAO.eliminarListado(selectedProductos) == null) {
 			this.productos.removeAll(this.selectedProductos);
 			this.selectedProductos = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Artículos Eliminados"));
