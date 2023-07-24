@@ -604,6 +604,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		}
 	}
 	
+	public void resetCantidadServicio() {
+		this.cantidadServicio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		log.debug("Reiniciando el valor de cantidad total (servicio)");
+	}
+	
 	public void saveConstanciaSalida() {
 		FacesMessage message = null;
 		Severity severity = null;

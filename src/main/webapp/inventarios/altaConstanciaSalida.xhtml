@@ -6,7 +6,6 @@
 	template="/WEB-INF/template.xhtml">
 	<script>
 	    //<![CDATA[
-	    
 	        PF('statusDialog').show();
 	
 	        PF('statusDialog').hide();
@@ -64,10 +63,6 @@
 					<f:facet name="header">
 						<div class="products-table-header">
 							<span style="font-weight: bold">INVENTARIO</span>
-							<!-- <span class="filter-container ui-input-icon-left">
-								<i class="pi pi-search"></i>
-								<p:inputText id="globalFilter" onkeyup="PF('dt-inventario').filter()" placeholder="Buscar por folio producto, entrada, caducidad, lote, etc." />
-							</span> -->
 						</div>
 					</f:facet>
 					<p:column width="1rem">
@@ -97,7 +92,7 @@
 						<h:outputText value="#{inventario.numeroTarimas}"/>
 					</p:column>
 					<p:rowExpansion>
-						<div class="p-grid">
+						<div class="p-grid ui-fluid p-col-12">
 							<div class="p-col">
 								<p:outputLabel value="Código"></p:outputLabel>
 								<p:inputText value="#{inventario.codigo}" disabled="true" placeholder="--"/>
@@ -165,12 +160,6 @@
 			<div style="padding-top: 1rem;">
 				<p:panel header="SUS PRODUCTOS">
 					<p:dataTable id="dt-salidas" value="#{altaConstanciaSalidaBean.listadoTemp}" var="salida">
-						<!-- <f:facet name="header">
-							<div style="text-align: center;">
-								<span>SUS PRODUCTOS</span>
-							</div>
-						</f:facet> -->
-						
 						<p:column headerText="Entrada" width="3rem">
 							<h:outputText value="#{salida.folioEntrada}" />
 						</p:column>
@@ -209,10 +198,10 @@
 								<f:selectItem itemLabel="Selecciona Servicio" itemValue="" noSelectionOption="true"/>
 								<f:selectItems value="#{altaConstanciaSalidaBean.serviciosCliente}" var="servicioC"
 									itemLabel="#{servicioC.servicio.servicioDs} (Cobro por #{servicioC.unidad.unidadDeManejoDs})"
-									itemValue="#{servicioC}"/>
-								<p:ajax update="@this" />
+									itemValue="#{servicioC}" update="cantidad-servicio"/>
+								<p:ajax update="@this" listener="#{altaConstanciaSalidaBean.resetCantidadServicio()}"/>
 							</p:selectOneMenu>
-							<p:inputNumber styleClass="p-ml-4" value="#{altaConstanciaSalidaBean.cantidadServicio}" placeholder="Cantidad">
+							<p:inputNumber id="cantidad-servicio" styleClass="p-ml-4" value="#{altaConstanciaSalidaBean.cantidadServicio}" placeholder="Cantidad">
 								<p:ajax update="@this" />
 							</p:inputNumber>
 							<p:commandButton value="Agregar Servicio" icon="pi pi-plus" styleClass="p-ml-4"
@@ -226,12 +215,6 @@
 				<p:panel header="SUS SERVICIOS">
 					<p:dataTable id="dt-servicio" value="#{altaConstanciaSalidaBean.listadoConstanciaSalidaServicios}"
 						var="constanciaServicios" >
-						<!-- <f:facet name="header">
-							<div style="text-align: center;">
-								<span>SUS SERVICIOS</span>
-							</div>
-						</f:facet> -->
-					
 						<p:column headerText="Servicio" >
 							<h:outputText value="#{constanciaServicios.constanciaSalidaServiciosPK.servicioCve.servicioDs}" />
 						</p:column>
