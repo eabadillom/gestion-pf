@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.jfree.util.Log;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.model.TraspasoPartida;
@@ -19,10 +21,22 @@ public class TraspasoServicioDAO extends IBaseDAO<TraspasoServicioDAO, Integer>{
 	}
 	public List<TraspasoServicio> buscarPorConstancia(ConstanciaTraspaso ct) {
 		// TODO Auto-generated method stub
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("TraspasoServicio.findByTraspaso", TraspasoServicio.class).
-				setParameter("traspaso", ct.getId()).
-				getResultList();
+		
+		EntityManager em = null;
+		List<TraspasoServicio> lista = null; 
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("TraspasoServicio.findByTraspaso", TraspasoServicio.class).
+			setParameter("traspaso", ct.getId()).
+			getResultList();
+		} catch (Exception e) {
+			Log.error("Problema al buscar por contsancia traspaso servicio", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		return lista;
 	}
 	@Override
 	public List<TraspasoServicioDAO> buscarTodos() {
