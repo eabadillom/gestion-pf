@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
@@ -88,7 +87,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private ConstanciaSalidaDAO constanciaSalidaDAO;
 	
 	private List<ConstanciaDeDeposito> listadoConstanciaDD;
-	private ConstanciaDeDepositoDAO constanciaDDDAO;
 	
 	private List<PrecioServicio> listadoPrecioServicios;
 	private PrecioServicioDAO preciosServicioDAO;
@@ -159,8 +157,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		listadoConstanciasSalidas = new ArrayList<>();
 		
 		listadoConstanciaDD = new ArrayList<>();
-		constanciaDDDAO = new ConstanciaDeDepositoDAO();
-		
 		listadoPrecioServicios = new ArrayList<>();
 		serviciosCliente = new ArrayList<>();
 		preciosServicioDAO = new PrecioServicioDAO();
@@ -190,7 +186,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-		listadoClientes = clienteDAO.buscarTodos(false);
+		listadoClientes = clienteDAO.buscarHabilitados(true, false);
 		status = statusDAO.buscarPorId(1);//Por defecto, el catálogo de status constancia salida tiene el valor 1 para una constancia vigente.
 		tpMovimientoSalida = tipoMovimientoDAO.buscarPorId(2);
 		edoInventarioActual = estadoInventarioDAO.buscarPorId(1);
@@ -203,6 +199,9 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		}
 		plantaSelect = listadoPlantas.get(0);
 		fechaSalida = new Date();
+		
+		this.cantidadTotal = 0;
+		this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
 	}
 	
 	public void validar() {
@@ -339,7 +338,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		String titulo = null;
+		String titulo = "Agregar producto";
 		
 		Partida partida = null;
 		List<DetallePartida> detallePartidaList = null;
@@ -476,6 +475,14 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			
 			listadoTemp.add(this.detalleSalida);
 			
+			
+			this.cantidadTotal = 0;
+			this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+			for(DetalleConstanciaSalida dcs : listadoTemp ) {
+				this.cantidadTotal += dcs.getCantidad();
+				this.pesoTotal = this.pesoTotal.add(dcs.getPeso());
+			}
+			
 			PrimeFaces.current().executeScript("PF('dg-cantidad-producto').hide()");
 			mensaje = "El producto se registró correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
@@ -543,6 +550,14 @@ public class AltaConstanciaSalidaBean implements Serializable{
 				throw new InventarioException("Debe indicar un producto.");
 			
 			this.listadoTemp.remove(detalleSalida);
+			
+			this.cantidadTotal = 0;
+			this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+			for(DetalleConstanciaSalida dcs : listadoTemp ) {
+				this.cantidadTotal += dcs.getCantidad();
+				this.pesoTotal = this.pesoTotal.add(dcs.getPeso());
+			}
+			
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -790,14 +805,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		this.listadoClientes = listadoClientes;
 	}
 
-	public ClienteDAO getClienteDAO() {
-		return clienteDAO;
-	}
-
-	public void setClienteDAO(ClienteDAO clienteDAO) {
-		this.clienteDAO = clienteDAO;
-	}
-
 	public Cliente getClienteSelect() {
 		return clienteSelect;
 	}
@@ -854,28 +861,12 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		this.listadoConstanciasSalidas = listadoConstanciasSalidas;
 	}
 
-	public ConstanciaSalidaDAO getConstanciaSalidaDAO() {
-		return constanciaSalidaDAO;
-	}
-
-	public void setConstanciaSalidaDAO(ConstanciaSalidaDAO constanciaSalidaDAO) {
-		this.constanciaSalidaDAO = constanciaSalidaDAO;
-	}
-	
 	public List<ConstanciaDeDeposito> getListadoConstanciaDD() {
 		return listadoConstanciaDD;
 	}
 
 	public void setListadoConstanciaDD(List<ConstanciaDeDeposito> listadoConstanciaDD) {
 		this.listadoConstanciaDD = listadoConstanciaDD;
-	}
-
-	public ConstanciaDeDepositoDAO getConstanciaDDDAO() {
-		return constanciaDDDAO;
-	}
-
-	public void setConstanciaDDDAO(ConstanciaDeDepositoDAO constanciaDDDAO) {
-		this.constanciaDDDAO = constanciaDDDAO;
 	}
 
 	public List<PrecioServicio> getListadoPrecioServicios() {
