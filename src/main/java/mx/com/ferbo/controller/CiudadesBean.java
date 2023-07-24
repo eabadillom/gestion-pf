@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -98,6 +99,20 @@ public class CiudadesBean implements Serializable {
 			int tamanioListaCiudadMunicipioEstadoPais = listaCiudadMunicipioEstadoPais.size() + 1;
 			ciudadPKSelect.setCiudadCve(tamanioListaCiudadMunicipioEstadoPais);
 			ciudadSelect.setCiudadesPK(ciudadPKSelect);
+			
+			this.municipioPkSelect.setPaisCve(idPais);
+			this.municipioPkSelect.setEstadoCve(idEstado);
+			this.municipioSelect.setMunicipiosPK(municipioPkSelect);			
+			List<Municipios> listaMunicipiosTmp = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
+			
+			List<Municipios> municipioTmp = listaMunicipiosTmp.stream().filter(m ->m.getMunicipiosPK().getMunicipioCve()==idMunicipio)
+					.collect(Collectors.toList());
+			
+			Municipios municipio = municipioTmp.get(0);
+			
+			ciudadSelect.setMunicipios(municipio);
+			
+			
 			if(ciudadesDao.guardar(ciudadSelect) == null) {
 				this.listaCiudades.add(this.ciudadSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Ciudad Agregada"));
@@ -114,8 +129,10 @@ public class CiudadesBean implements Serializable {
 						"Error", "Ocurrió un error al intentar actualizar la Ciudad"));
 			}
 		} 
+		
+		
 		PrimeFaces.current().executeScript("PF('nuevaCiudadDialog').hide()");
-		PrimeFaces.current().ajax().update("form");
+		PrimeFaces.current().ajax().update("form:dt-Ciudades");
 	}
 
 	public void eliminandoCiudad() {

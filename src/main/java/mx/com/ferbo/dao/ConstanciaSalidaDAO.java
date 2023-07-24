@@ -32,9 +32,16 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
 	@Override
 	public List<ConstanciaSalida> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
 		List<ConstanciaSalida> lista = null;
-		lista = em.createNamedQuery("ConstanciaSalida.findAll",ConstanciaSalida.class).getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("ConstanciaSalida.findAll",ConstanciaSalida.class).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de constancias de salida...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		
 		return lista;
 	}
@@ -47,9 +54,6 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	
 	@SuppressWarnings("unchecked")
 	public List<ConstanciaSalida> buscarPorCriterios(String folioCliente, Date fechaInico, Date fechaFin, int idCliente) {
-
-		// TODO Auto-generated method stub
-		
 		Cliente cliente = new Cliente();
 		Map<String, Object> paramaterMap = new HashMap<String, Object>();
 		List<String> whereCause = new ArrayList<String>();
@@ -121,11 +125,11 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 			actualizar.setParameter("id", constanciaSalida.getId());
 			actualizar.executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("ERROR "+e.getMessage());
+			log.error("Problema para actualizar el status de la constancia de salida...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		
 		return null;

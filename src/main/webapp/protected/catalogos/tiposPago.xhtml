@@ -80,10 +80,11 @@
 				modal="true" showEffect="fade" responsive="true">
 
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
+				<p:outputPanel rendered="#{not empty tiposPagoBean.nuevo}"></p:outputPanel>
 					<div class="p-field">
 						<p:outputLabel for="@next">Nombre:</p:outputLabel>
 						<p:inputText value="#{tiposPagoBean.nuevo.mpDescripcion}"
-							required="true" />
+							required="true" requiredMessage="Ingresa nombre de la forma de pago" />
 					</div>
 
 					<div class="p-field">
@@ -95,10 +96,10 @@
 
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-check"
-						actionListener="#{tiposPagoBean.save()}" update="frm-agrega"
+						actionListener="#{tiposPagoBean.save()}" update="frm-agrega messages"
 						process="frm-agrega @this" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()" />
+						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()" process="@this" immediate="true"/>
 				</f:facet>
 
 			</p:dialog>
@@ -107,6 +108,7 @@
 				modal="true" showEffect="fade" responsive="true">
 
 				<p:outputPanel id="frm-modifica" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty tiposPagoBean.seleccion}">
 					<div class="p-field">
 						<p:outputLabel for="@next">Nombre:</p:outputLabel>
 						<p:inputText 
@@ -118,7 +120,7 @@
 						<p:selectBooleanCheckbox 
 							value="#{tiposPagoBean.seleccion.mpReqReferencia}" />
 					</div>
-
+					</p:outputPanel>
 				</p:outputPanel>
 
 				<f:facet name="footer">
@@ -126,7 +128,7 @@
 						actionListener="#{tiposPagoBean.updateTipo()}"
 						update="frm-modifica" process="frm-modifica @this" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" />
+						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" process="@this" immediate="true"/>
 				</f:facet>
 
 			</p:dialog>

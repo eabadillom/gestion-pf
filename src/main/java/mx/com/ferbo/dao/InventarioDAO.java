@@ -1,6 +1,4 @@
 package mx.com.ferbo.dao;
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -22,17 +20,23 @@ import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-
 public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 	private static Logger log = LogManager.getLogger(InventarioDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<ConstanciaDeDeposito> findall() {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		List<ConstanciaDeDeposito> cdd = null;
-		Query sql = entity.createNamedQuery("ConstanciaDeDeposito.findAll", ConstanciaDeDeposito.class);
-		cdd = sql.getResultList();
-		return cdd;
+		List<ConstanciaDeDeposito> list = null;
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("ConstanciaDeDeposito.findAll", ConstanciaDeDeposito.class);
+			list = sql.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de constancias de depósito...",ex);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
+		return list;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -137,73 +141,74 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 		return inventarioList;
 	}
 	
-	
 	public List<Inventario> buscarPorCliente(Cliente cliente) {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		List<ConstanciaDeDeposito> constancia = new ArrayList<>();
 		List<Inventario> listaInventario = new ArrayList<>();
-		constancia = entity.createNamedQuery("ConstanciaDeDeposito.findByCteCve", ConstanciaDeDeposito.class)
-				.setParameter("cteCve", cliente.getCteCve()).getResultList();
-
-
-		for (ConstanciaDeDeposito c : constancia) {
-			List<Partida> partidaList = c.getPartidaList();
-			for (Partida p : partidaList) {
-				Inventario inventario = new Inventario(); 
-				inventario.setFolioCliente(c.getFolioCliente());
-				p.getUnidadDeProductoCve();
-				inventario.setProducto(p.getUnidadDeProductoCve().getProductoCve());
-				inventario.setUnidadManejo(p.getUnidadDeProductoCve().getUnidadDeManejoCve());
-				inventario.setPartidaCve(p.getPartidaCve());
-				inventario.setPlanta(p.getCamaraCve().getPlantaCve());
-				inventario.setCamara(p.getCamaraCve());
-				inventario.setPosicion(null);
-				Integer cantidadInicial = p.getCantidadTotal(); //Obtenemos la cantidad inicial de la partida
-				BigDecimal pesoInicial = p.getPesoTotal(); 
-				inventario.setCantidad(cantidadInicial);
-				inventario.setPeso(pesoInicial);
-				List<DetalleConstanciaSalida> detalleConstanciaSalidaList = p.getDetalleConstanciaSalidaList();
-				List<DetallePartida> detallePartidaList = p.getDetallePartidaList();
-				p.getCamaraCve().getPlantaCve();
-
-				
-				Integer suma=0;
-				BigDecimal sumaPeso = new BigDecimal(0).setScale(3,RoundingMode.HALF_UP);
-				
-				for (DetalleConstanciaSalida dcs : detalleConstanciaSalidaList) { //Por cada partida, obtenemos su detalle de salidas.  
-					sumaPeso = sumaPeso.add(dcs.getPeso()); 
-					suma = suma + dcs.getCantidad();
-				}
-				Integer cantidadRestante = cantidadInicial - suma;
-				BigDecimal pesoRestante = pesoInicial.subtract(sumaPeso);
-				inventario.setCantidad(cantidadRestante);
-				inventario.setPeso(pesoRestante);
-
-				for (DetallePartida dp : detallePartidaList) {
-					inventario.setCaducidad(dp.getDtpCaducidad());
-					inventario.setSap(dp.getDtpSAP());
-					inventario.setCodigo(dp.getDtpCodigo());
-					inventario.setFolio(null);
-					inventario.setLote(dp.getDtpLote());
-					inventario.setMp(dp.getDtpMP());
-					inventario.setPedimento(dp.getDtpPedimento());
-					inventario.setPo(dp.getDtpPO());
+		List<ConstanciaDeDeposito> constancia = new ArrayList<>();
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			constancia = entity.createNamedQuery("ConstanciaDeDeposito.findByCteCve", ConstanciaDeDeposito.class)
+					.setParameter("cteCve", cliente.getCteCve()).getResultList();
+			
+			for (ConstanciaDeDeposito c : constancia) {
+				List<Partida> partidaList = c.getPartidaList();
+				for (Partida p : partidaList) {
+					Inventario inventario = new Inventario(); 
+					inventario.setFolioCliente(c.getFolioCliente());
+					p.getUnidadDeProductoCve();
+					inventario.setProducto(p.getUnidadDeProductoCve().getProductoCve());
+					inventario.setUnidadManejo(p.getUnidadDeProductoCve().getUnidadDeManejoCve());
+					inventario.setPartidaCve(p.getPartidaCve());
+					inventario.setPlanta(p.getCamaraCve().getPlantaCve());
+					inventario.setCamara(p.getCamaraCve());
+					inventario.setPosicion(null);
+					Integer cantidadInicial = p.getCantidadTotal(); //Obtenemos la cantidad inicial de la partida
+					BigDecimal pesoInicial = p.getPesoTotal(); 
+					inventario.setCantidad(cantidadInicial);
+					inventario.setPeso(pesoInicial);
+					List<DetalleConstanciaSalida> detalleConstanciaSalidaList = p.getDetalleConstanciaSalidaList();
+					List<DetallePartida> detallePartidaList = p.getDetallePartidaList();
+					p.getCamaraCve().getPlantaCve();
 					
-					break;
+					
+					Integer suma=0;
+					BigDecimal sumaPeso = new BigDecimal(0).setScale(3,RoundingMode.HALF_UP);
+					
+					for (DetalleConstanciaSalida dcs : detalleConstanciaSalidaList) { //Por cada partida, obtenemos su detalle de salidas.  
+						sumaPeso = sumaPeso.add(dcs.getPeso()); 
+						suma = suma + dcs.getCantidad();
+					}
+					Integer cantidadRestante = cantidadInicial - suma;
+					BigDecimal pesoRestante = pesoInicial.subtract(sumaPeso);
+					inventario.setCantidad(cantidadRestante);
+					inventario.setPeso(pesoRestante);
+					
+					for (DetallePartida dp : detallePartidaList) {
+						inventario.setCaducidad(dp.getDtpCaducidad());
+						inventario.setSap(dp.getDtpSAP());
+						inventario.setCodigo(dp.getDtpCodigo());
+						inventario.setFolio(null);
+						inventario.setLote(dp.getDtpLote());
+						inventario.setMp(dp.getDtpMP());
+						inventario.setPedimento(dp.getDtpPedimento());
+						inventario.setPo(dp.getDtpPO());
+						
+						break;
+					}
+					inventario.setCliente(c.getCteCve());
+					listaInventario.add(inventario);
 				}
-				inventario.setCliente(c.getCteCve());
-				listaInventario.add(inventario);
 			}
-			
-			//nventario.setConstanciaDeDeposito(c);
-			//listaInventario.add(inventario);
-			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de inventario...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
-		entity.close();
+		
 		return listaInventario;
 	}
 	
-
+	@Deprecated
 	public List<Inventario> buscarPorCliente(Cliente cliente,Planta planta) {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
 		List<ConstanciaDeDeposito> constancia = new ArrayList<>();
@@ -268,55 +273,40 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 
 	@Override
 	public String actualizar(Inventario e) {
-		try {
-			EntityManager entity = getEntityManager();
-			entity.getTransaction().begin();
-			entity.merge(e);
-			entity.getTransaction().commit();
-			entity.close();
-			}catch(Exception a) {
-		return "Filed!" + a.getMessage();
-		}return null;
+		return null;
 }
 
 	@Override
 	public String guardar(ConstanciaDeDeposito e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminar(ConstanciaDeDeposito e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<ConstanciaDeDeposito> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public String actualizar(ConstanciaDeDeposito e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public ConstanciaDeDeposito buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<ConstanciaDeDeposito> buscarTodos() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<ConstanciaDeDeposito> buscarPorCriterios(ConstanciaDeDeposito e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

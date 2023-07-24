@@ -24,19 +24,35 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Cliente> findall() {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
 		List<Cliente> cliente = null;
-		Query sql = entity.createNamedQuery("Cliente.findAll", Cliente.class);
-		cliente = sql.getResultList();
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("Cliente.findAll", Cliente.class);
+			cliente = sql.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de clientes...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
 		return cliente;
 	}	
 	@Override
 	public Cliente buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		EntityManager em = EntityManagerUtil.getEntityManager();		
-		return em.createNamedQuery("Cliente.findByCteCve", Cliente.class).
-				setParameter("cteCve", id)
-				.getSingleResult();
+		Cliente cliente = null;
+		EntityManager  em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();		
+			cliente = em.createNamedQuery("Cliente.findByCteCve", Cliente.class).
+					setParameter("cteCve", id)
+					.getSingleResult();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el cliente: " + id, ex );
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return cliente;
 	}
 	
 	public Cliente buscarPorId(Integer id, boolean isFullInfo) {

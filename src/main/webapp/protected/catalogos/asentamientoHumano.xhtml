@@ -20,53 +20,44 @@
 				<div class="p-col-12">
 					<div class="card">
 						<p:commandButton value="Agregar" icon="pi pi-plus"
-							actionListener="#{asentamientoHumanoBean.nuevoAsentamientoHumano}"
-							update="manage-cologne-content-new form:manage-cologne-content-new"
-							oncomplete="PF('nuevoAsentemientoHumanoDialog').show()"
+							actionListener="#{asentamientoHumanoBean.nuevoAsentamientoHumano}" update=":form:manage-cologne-content-new" oncomplete="PF('nuevoAsentemientoHumanoDialog').show()"
 							styleClass="p-mr-2 p-mb-2" process="@this" />
 					</div>
+					  <p:fieldset legend="Filtro de busqueda">
 					<div class="card">
-						<p:outputLabel for="countries-som" value="Paises:" />
-						<p:selectOneMenu id="countries-som" autoWidth="false"
-							value="#{asentamientoHumanoBean.idPais}">
-							<f:selectItem itemLabel="Selecione Pais" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedCountriesOne"
-								value="#{asentamientoHumanoBean.listaPaises}"
-								itemLabel="#{selectedCountriesOne.paisDesc}"
+					<span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="countries-som" autoWidth="false" style="width: 250px; height: 33px" value="#{asentamientoHumanoBean.idPais}" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="" itemValue=""  />
+							<f:selectItems var="selectedCountriesOne" value="#{asentamientoHumanoBean.listaPaises}" itemLabel="#{selectedCountriesOne.paisDesc}"
 								itemValue="#{selectedCountriesOne.paisCve}" />
-							<p:ajax listener="#{asentamientoHumanoBean.handleContrySelect()}"
-								update="states-som" />
+							<p:ajax listener="#{asentamientoHumanoBean.handleContrySelect()}" update="states-som" />
 						</p:selectOneMenu>
-						<p:outputLabel for="states-som" value="Estados:" />
-						<p:selectOneMenu id="states-som" autoWidth="false"
-							value="#{asentamientoHumanoBean.idEstado}">
-							<f:selectItem itemLabel="Selecione Estado" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedStatesOne"
-								value="#{asentamientoHumanoBean.listaEstados}"
-								itemLabel="#{selectedStatesOne.estadoDesc}"
-								itemValue="#{selectedStatesOne.estadosPK.estadoCve}" />
-							<p:ajax listener="#{asentamientoHumanoBean.handleStateSelect()}"
-								update="municipalities-som" />
+						<p:outputLabel for="countries-som" value="Pais" />
+						</span>
+						
+						<span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="states-som"  style="width: 250px; height: 33px"  value="#{asentamientoHumanoBean.idEstado}" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="" itemValue=""  />
+							<f:selectItems var="selectedStatesOne" value="#{asentamientoHumanoBean.listaEstados}" itemLabel="#{selectedStatesOne.estadoDesc}" 
+											itemValue="#{selectedStatesOne.estadosPK.estadoCve}" />
+							<p:ajax listener="#{asentamientoHumanoBean.handleStateSelect()}" update="municipalities-som" />
 						</p:selectOneMenu>
-						<p:outputLabel for="municipalities-som" value="Municipios:" />
-						<p:selectOneMenu id="municipalities-som" autoWidth="false"
-							value="#{asentamientoHumanoBean.idMunicipio}">
-							<f:selectItem itemLabel="Selecione Municipio" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedMunicipalitiesOne"
-								value="#{asentamientoHumanoBean.listaMunicipios}"
-								itemLabel="#{selectedMunicipalitiesOne.municipioDs}"
+						<p:outputLabel for="states-som" value="Estado" />
+						</span>
+						
+						<span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="municipalities-som" style="width: 250px; height: 33px" value="#{asentamientoHumanoBean.idMunicipio}" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems var="selectedMunicipalitiesOne" value="#{asentamientoHumanoBean.listaMunicipios}" itemLabel="#{selectedMunicipalitiesOne.municipioDs}"
 								itemValue="#{selectedMunicipalitiesOne.municipiosPK.municipioCve}" />
-							<p:ajax listener="#{asentamientoHumanoBean.handleMunicipalitySelect()}"
-								update="cities-som" />
-						</p:selectOneMenu>
-						<p:outputLabel for="cities-som" value="Ciudades:" />
-						<p:selectOneMenu id="cities-som" autoWidth="false"
-							value="#{asentamientoHumanoBean.idCiudad}">
-							<f:selectItem itemLabel="Selecione Ciudad" itemValue=""
-								noSelectionOption="true" />
+							<p:ajax listener="#{asentamientoHumanoBean.handleMunicipalitySelect()}" update="cities-som" />
+						</p:selectOneMenu>						
+						<p:outputLabel for="municipalities-som" value="Municipio" />
+						</span>
+						
+						<span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="cities-som" style="width: 270px; height: 33px" value="#{asentamientoHumanoBean.idCiudad}" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
 							<f:selectItems var="selectedCitiesOne"
 								value="#{asentamientoHumanoBean.listaCiudades}"
 								itemLabel="#{selectedCitiesOne.ciudadDs}"
@@ -74,7 +65,11 @@
 							<p:ajax listener="#{asentamientoHumanoBean.handleCitySelect()}"
 								update="dt-AsentamientoHumano" />
 						</p:selectOneMenu>
+						<p:outputLabel for="cities-som" value="Ciudad" />
+						</span>
 					</div>
+					</p:fieldset>
+					
 				</div>
 			</div>
 
@@ -88,7 +83,7 @@
 							paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
-									<span style="font-weight: bold">Asentamiento Humano</span> <span
+									<span style="font-weight: bold"></span> <span
 										class="ui-input-icon-left filter-container"> <i
 										class="pi pi-search" /> <p:inputText id="globalFilter"
 											onkeyup="PF('dtAsentamientoHumano').filter()" placeholder="Búsqueda" />
@@ -96,37 +91,6 @@
 								</div>
 							</f:facet>
 
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-Ciudads-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-Ciudads-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-Ciudads-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-Ciudads-button" /> -->
-
-							<!-- <p:column selectionMode="multiple" />
-							<p:column headerText="Pais" sortBy="#{asentamientoHumano.asentamientoHumanoPK.paisCve}"
-								filterBy="#{asentamientoHumano.asentamientoHumanoPK.paisCve}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
-									value="#{asentamientoHumano.asentamientoHumanoPK.paisCve}" />
-							</p:column>
-							<p:column headerText="Estado" sortBy="#{asentamientoHumano.asentamientoHumanoPK.estadoCve}"
-								filterBy="#{asentamientoHumano.asentamientoHumanoPK.estadoCve}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{asentamientoHumano.asentamientoHumanoPK.estadoCve}" />
-							</p:column>
-							<p:column headerText="Municipio" sortBy="#{asentamientoHumano.asentamientoHumanoPK.municipioCve}"
-								filterBy="#{asentamientoHumano.asentamientoHumanoPK.municipioCve}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{asentamientoHumano.asentamientoHumanoPK.municipioCve}" />
-							</p:column>
-							<p:column headerText="Ciudad" sortBy="#{asentamientoHumano.asentamientoHumanoPK.ciudadCve}"
-								filterBy="#{asentamientoHumano.asentamientoHumanoPK.ciudadCve}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{asentamientoHumano.asentamientoHumanoPK.ciudadCve}" />
-							</p:column> -->
 							<p:column headerText="Tipo de Asentamiento" sortBy="#{asentamientoHumano.tipoAsentamiento.tipoasntmntoDs}"
 								filterBy="#{asentamientoHumano.tipoAsentamiento.tipoasntmntoDs}" style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
@@ -148,31 +112,24 @@
 									value="#{asentamientoHumano.cp}" />
 							</p:column>
 							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil"
-									update=":form:manage-cologne-content-new" value="Modificar"
-									oncomplete="PF('nuevoAsentemientoHumanoDialog').show()"
-									styleClass="p-mr-2 p-mb-2" process="@this">
-									<f:setPropertyActionListener value="#{asentamientoHumano}"
-										target="#{asentamientoHumanoBean.asentamientoHumanoSelect}" />
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-cologne-content-new" value="Modificar" oncomplete="PF('nuevoAsentemientoHumanoDialog').show()" 
+											styleClass="p-mr-2 p-mb-2" process="@this">
+									<f:setPropertyActionListener value="#{asentamientoHumano}" target="#{asentamientoHumanoBean.asentamientoHumanoSelect}" />
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('deleteAsentamientoHumanoDialog').show()">
-									<f:setPropertyActionListener value="#{asentamientoHumano}"
-										target="#{asentamientoHumanoBean.asentamientoHumanoSelect}" />
+								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2" icon="pi pi-trash" process="@this" oncomplete="PF('deleteAsentamientoHumanoDialog').show()">
+									<f:setPropertyActionListener value="#{asentamientoHumano}" target="#{asentamientoHumanoBean.asentamientoHumanoSelect}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>
 					</div>
 				</div>
 			</div>
-			<p:dialog header="Agregar/Editar un Ciudad" showEffect="fade"
-				modal="true" widgetVar="nuevoAsentemientoHumanoDialog" responsive="true">
+			<p:dialog header="Agregar/Editar un Ciudad" showEffect="fade" modal="true" widgetVar="nuevoAsentemientoHumanoDialog" responsive="true">
 				<p:outputPanel id="manage-cologne-content-new" class="ui-fluid">
-					<p:outputPanel rendered="#{not empty asentamientoHumanoBean.asentamientoHumanoSelect}">
+					<p:outputPanel rendered="#{not empty asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK}">
 						<div class="p-field">
 						<p:outputLabel for="towns" value="Paises:"/>
-						<p:selectOneMenu id="towns" autoWidth="false" value="#{asentamientoHumanoBean.idPais}">
+						<p:selectOneMenu id="towns"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.paisCve}">
 							<f:selectItem itemLabel="Selecione Pais" itemValue="" noSelectionOption="true"/>
 							<f:selectItems var="selectedTowns"  value="#{asentamientoHumanoBean.listaPaises}" itemLabel="#{selectedTowns.paisDesc}" itemValue="#{selectedTowns.paisCve}"/>
 							<p:ajax listener="#{asentamientoHumanoBean.handleContrySelect}" process="@this" update=":form:manage-cologne-content-new"/>
@@ -180,7 +137,7 @@
 						</div>
 						<div class="p-field">
 						<p:outputLabel for="states" value="Estado:"/>
-						<p:selectOneMenu id="states" autoWidth="false" value="#{asentamientoHumanoBean.idEstado}">
+						<p:selectOneMenu id="states" value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.estadoCve}">
 							<f:selectItem itemLabel="Selecione Estado" itemValue="" noSelectionOption="true"/>
 							<f:selectItems var="selectedStates"  value="#{asentamientoHumanoBean.listaEstados}" itemLabel="#{selectedStates.estadoDesc}" itemValue="#{selectedStates.estadosPK.estadoCve}"/>
 							<p:ajax listener="#{asentamientoHumanoBean.handleStateSelect}" process="@this" update=":form:manage-cologne-content-new"/>
@@ -188,7 +145,7 @@
 						</div>
 						<div class="p-field">
 						<p:outputLabel for="municipality" value="Municipio:"/>
-						<p:selectOneMenu id="municipality" autoWidth="false" value="#{asentamientoHumanoBean.idMunicipio}">
+						<p:selectOneMenu id="municipality"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.municipioCve}">
 							<f:selectItem itemLabel="Selecione Municipio" itemValue="" noSelectionOption="true"/>
 							<f:selectItems var="selectedmunicipality"  value="#{asentamientoHumanoBean.listaMunicipios}" itemLabel="#{selectedmunicipality.municipioDs}" itemValue="#{selectedmunicipality.municipiosPK.municipioCve}"/>
 							<p:ajax listener="#{asentamientoHumanoBean.handleMunicipalitySelect}" process="@this" update=":form:manage-cologne-content-new"/>
@@ -196,80 +153,49 @@
 						</div>
 						<div class="p-field">
 							<p:outputLabel for="cities" value="Ciudades:" />
-						<p:selectOneMenu id="cities" autoWidth="false"
-							value="#{asentamientoHumanoBean.idCiudad}">
-							<f:selectItem itemLabel="Selecione Ciudad" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedCitiesOne"
-								value="#{asentamientoHumanoBean.listaCiudades}"
-								itemLabel="#{selectedCitiesOne.ciudadDs}"
-								itemValue="#{selectedCitiesOne.ciudadesPK.ciudadCve}" />
+						<p:selectOneMenu id="cities"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.ciudadCve}">
+							<f:selectItem itemLabel="Selecione Ciudad" itemValue="" noSelectionOption="true" />
+							<f:selectItems var="selectedCitiesOne" value="#{asentamientoHumanoBean.listaCiudades}" itemLabel="#{selectedCitiesOne.ciudadDs}" itemValue="#{selectedCitiesOne.ciudadesPK.ciudadCve}" />
 							<p:ajax listener="#{asentamientoHumanoBean.handleCitySelect}" process="@this"/>
 						</p:selectOneMenu>
 						</div>
 						<div class="p-field">
 							<p:outputLabel for="settlementType" value="Tipo de Asentamiento:" />
-						<p:selectOneMenu id="settlementType" autoWidth="false"
-							value="#{asentamientoHumanoBean.idTipoAsentamiento}">
-							<f:selectItem itemLabel="Selecione Tipo de Asentamiento" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedSettlementTypeOne"
-								value="#{asentamientoHumanoBean.listaTipoAsentamiento}"
-								itemLabel="#{selectedSettlementTypeOne.tipoasntmntoDs}"
-								itemValue="#{selectedSettlementTypeOne.tipoasntmntoCve}" />
+						<p:selectOneMenu id="settlementType"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.tipoasntmntoCve}">
+							<f:selectItem itemLabel="Selecione Tipo de Asentamiento" itemValue=""  />
+							<f:selectItems var="selectedSettlementTypeOne" value="#{asentamientoHumanoBean.listaTipoAsentamiento}" itemLabel="#{selectedSettlementTypeOne.tipoasntmntoDs}" itemValue="#{selectedSettlementTypeOne.tipoasntmntoCve}" />
 						</p:selectOneMenu>
 						</div>
 						<div class="p-field">
 							<p:outputLabel for="postalEntity" value="Entidad Postal:" />
-						<p:selectOneMenu id="postalEntity" autoWidth="false"
-							value="#{asentamientoHumanoBean.idEntidadPostal}">
-							<f:selectItem itemLabel="Selecione Entidad Postal" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedPostalEntityOne"
-								value="#{asentamientoHumanoBean.listaEntidadPostal}"
-								itemLabel="#{selectedPostalEntityOne.entidadpostalDs}"
-								itemValue="#{selectedPostalEntityOne.entidadpostalCve}" />
+						<p:selectOneMenu id="postalEntity"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.entidadpostalCve}">
+							<f:selectItem itemLabel="Selecione Entidad Postal" itemValue=""  />
+							<f:selectItems var="selectedPostalEntityOne" value="#{asentamientoHumanoBean.listaEntidadPostal}" itemLabel="#{selectedPostalEntityOne.entidadpostalDs}" itemValue="#{selectedPostalEntityOne.entidadpostalCve}" />
 						</p:selectOneMenu>
 						</div>
+						
 						<div class="p-field">
-							<p:outputLabel for="colonia-new" value="Colonia:" />
-							<p:inputText id="colonia-new"
-								value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoDs}" required="true" />
+							<p:inputText id="colonia-new" value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoDs}" required="true"  placeholder="Colonia"/>
 						</div>
+						
 						<div class="p-field">
-							<p:outputLabel for="cp-new" value="Código Postal" />
-							<p:inputText id="cp-new"
-								value="#{asentamientoHumanoBean.asentamientoHumanoSelect.cp}" required="true" />
+							<p:inputText id="cp-new" value="#{asentamientoHumanoBean.asentamientoHumanoSelect.cp}" required="true"  placeholder="Código Postal" />
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Guardar" icon="pi pi-plus"
-						actionListener="#{asentamientoHumanoBean.guardarAsentamientoHumano()}"
-						update=":form:manage-cologne-content-new"
-						styleClass="p-mr-2 p-mb-2" />
-					<p:commandButton value="Cancelar" icon="pi pi-times"
-						onclick="PF('nuevoAsentemientoHumanoDialog').hide()"
-						class="ui-button-secondary" />
+					<p:commandButton value="Guardar" icon="pi pi-plus" process="manage-cologne-content-new @this " actionListener="#{asentamientoHumanoBean.guardarAsentamientoHumano()}"
+						update=":form:manage-cologne-content-new dt-AsentamientoHumano" oncomplete="PF('nuevoAsentemientoHumanoDialog').hide()" styleClass="p-mr-2 p-mb-2" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('nuevoAsentemientoHumanoDialog').hide()" class="ui-button-secondary"  process="@this postalEntity settlementType" immediate="true" />
 				</f:facet>
 			</p:dialog>
-			<p:confirmDialog widgetVar="deleteAsentamientoHumanoDialog" showEffect="fade"
-				width="400" message="Desea eliminar la Colonia?" header="Eliminar"
-				severity="warn">
-				<p:commandButton value="Sí" icon="pi pi-check"
-					actionListener="#{asentamientoHumanoBean.eliminandoAsentamientoHumano()}" process="@this"
-					oncomplete="PF('deleteCiudadDialog').hide()" />
-				<p:commandButton value="No" type="button"
-					styleClass="ui-button-secondary" icon="pi pi-times"
-					onclick="PF('deleteAsentamientoHumanoDialog').hide()" />
+			<p:confirmDialog widgetVar="deleteAsentamientoHumanoDialog" showEffect="fade" width="400" message="Desea eliminar la Colonia?" header="Eliminar" severity="warn">
+				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{asentamientoHumanoBean.eliminandoAsentamientoHumano()}" process="@this " oncomplete="PF('deleteAsentamientoHumanoDialog').hide()" />
+				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteAsentamientoHumanoDialog').hide()" />
 			</p:confirmDialog>
-			<p:confirmDialog global="true" showEffect="fade" width="400"
-				header="Eliminar">
-				<p:commandButton value="Sí" type="button"
-					styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-				<p:commandButton value="No" type="button"
-					styleClass="ui-confirmdialog-no ui-button-secondary"
-					icon="pi pi-times" />
+			<p:confirmDialog global="true" showEffect="fade" width="400" header="Eliminar">
+				<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
 			</p:confirmDialog>
 		</h:form>
 	</ui:define>

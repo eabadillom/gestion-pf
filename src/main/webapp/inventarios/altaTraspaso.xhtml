@@ -116,7 +116,7 @@
                 <p:panel id="planta">
                 <div class="field">
                         <p:outputLabel for="planta" value="Planta destino" />
-                       <p:selectOneMenu id="txtplantadestino" value="#{altaTraspasoBean.selectedInventario.plantaDestino}" converter="entityConverter" >
+                       <p:selectOneMenu id="txtplantadestino" value="#{altaTraspasoBean.selectedInventario.plantaDestino}" converter="entityConverter" required="true" requiredMessage="Ingresa planta destino">
 						<f:selectItem itemLabel="--Planta--" itemValue=""  />
 						<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaplanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
 						<p:ajax listener="#{altaTraspasoBean.plantaselect}" process="@this" update=":form:camaradestino"/>						
@@ -127,7 +127,7 @@
                 <p:panel id="Camara">
                 <div class="field">
                         <p:outputLabel for="camaradestino" value="Camara destino" />
-				<p:selectOneMenu id="camaradestino" value="#{altaTraspasoBean.selectedInventario.camaraDestino}" converter="entityConverter" >
+				<p:selectOneMenu id="camaradestino" value="#{altaTraspasoBean.selectedInventario.camaraDestino}" converter="entityConverter" required="true" requiredMessage="Ingresa camara destino">
 				<f:selectItem itemLabel="--Camara--" itemValue=""  />
 				<f:selectItems value="#{altaTraspasoBean.selectedInventario.listacamara}" var="camaradestino" itemLabel="#{camaradestino.camaraDs}" itemValue="#{camaradestino}" />
 				<p:ajax listener="#{altaTraspasoBean.camaraselect}" process="@this" update=":form:posiciondestino"/>						
@@ -138,7 +138,7 @@
 	                <p:panel id="Posicion">
 		                <div class="field">
 			                <p:outputLabel for="posiciondestino" value="Posicion destino" />
-			                <p:selectOneMenu id="posiciondestino" value="#{altaTraspasoBean.selectedInventario.posicionDestino}" converter="entityConverter" >
+			                <p:selectOneMenu id="posiciondestino" value="#{altaTraspasoBean.selectedInventario.posicionDestino}" converter="entityConverter" required="true" requiredMessage="Ingresa posicion destino">
 							<f:selectItem itemLabel="--Posicion--" itemValue=""  />
 							<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaposicion}" var="posiciondestino" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
 							<p:ajax /></p:selectOneMenu>
@@ -151,7 +151,7 @@
 							</p:outputPanel>
 							</p:outputPanel>
 						<f:facet name="footer">
-				<p:commandButton value="Añadir" icon="pi pi-check" actionListener="#{altaTraspasoBean.agrega()}" update="destino" oncomplete="PF('dialogCliente').hide()"/>
+				<p:commandButton value="Añadir" icon="pi pi-check" actionListener="#{altaTraspasoBean.agrega()}" update="destino messages" />
 				<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" ></p:commandButton>
 					</f:facet>
 						</p:dialog>

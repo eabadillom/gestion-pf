@@ -20,15 +20,26 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 	private static Logger log = LogManager.getLogger(PartidaDAO.class);
 	@SuppressWarnings("unchecked")
 	public List<Partida> findall() {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
+		
+		EntityManager entity = null;
 		List<Partida> partida= null;
-		Query sql = entity.createNamedQuery("Partida.findAll", Partida.class);
-		partida = sql.getResultList();
+		
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("Partida.findAll", Partida.class);
+			partida = sql.getResultList();
+		} catch (Exception e) {
+			log.error("Problema para traer list de partida", e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		return partida;
 	}
 	
 	@Override
 	public Partida buscarPorId(Integer partidaClave) {
+
 		EntityManager em = null;
 		Partida p = null;
 		try {
@@ -62,9 +73,7 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 			log.debug("Lista detallePartida: {}", detallePartidaList.size());
 			for(DetallePartida detallePartida : detallePartidaList) {
 				log.debug("DetallePartida: {}, {}", detallePartida.getDetallePartidaPK().getPartidaCve(), detallePartida.getDetallePartidaPK().getDetPartCve());
-//				log.debug("Estado Inventario: {}", detallePartida.getEdoInvCve().getEdoInvCve());
 				log.debug("Unidad de Medida: {}", detallePartida.getUMedidaCve());
-//				log.debug("DetalleconstanciaSalidaList: {}", detallePartida.getDetalleConstanciaSalida().getId());
 			}
 			
 		} catch(Exception ex) {
@@ -77,8 +86,20 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 
 	@Override
 	public List<Partida> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Partida.findAll", Partida.class).getResultList();
+		List<Partida> list = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			list = em.createNamedQuery("Partida.findAll", Partida.class)
+					.getResultList()
+			;
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de partidas...",  ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return list;
 	}
 
 	@Override
@@ -89,30 +110,34 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 
 	@Override
 	public String actualizar(Partida partida) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(partida);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para actualizar la partida: " + partida, e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(Partida partida) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(partida);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para guardar la partida: " + partida,  e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -130,10 +155,20 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 	}
 	
 	public List<Partida> buscarPorConstanciaDeposito(ConstanciaDeDeposito cons){
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		
+		EntityManager em = null;
 		List<Partida> buscaPartidas = new ArrayList<>();
-		buscaPartidas=em.createNamedQuery("Partida.findByConstanciaDeDeposito",Partida.class)
-				.setParameter("folioCliente", cons.getFolioCliente()).getResultList();
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();		
+			buscaPartidas=em.createNamedQuery("Partida.findByConstanciaDeDeposito",Partida.class)
+					.setParameter("folioCliente", cons.getFolioCliente()).getResultList();
+		} catch (Exception e) {
+			log.error("Problema al buscar constancias de deposito", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return buscaPartidas;
 
 		

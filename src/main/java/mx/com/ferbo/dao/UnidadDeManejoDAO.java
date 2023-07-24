@@ -54,45 +54,54 @@ public class UnidadDeManejoDAO extends IBaseDAO<UnidadDeManejo, Integer> {
 
 	@Override
 	public String actualizar(UnidadDeManejo unidadManejo) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(unidadManejo);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR actualizando Banco" + e.getMessage());
-			return "ERROR";
+			log.error("Problema al actualizar la unidad de manejo",e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(UnidadDeManejo unidadManejo) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(unidadManejo);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Banco" + e.getMessage());
-			return "ERROR";
+			log.error("Problema para guardar unidad de manejo",e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(UnidadDeManejo unidadManejo) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(unidadManejo));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return "ERROR";
+			log.error("Problema para eliminar unidad de manejo",e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

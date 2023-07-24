@@ -10,6 +10,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
@@ -17,6 +19,7 @@ import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Integer> {
+	private static Logger log = LogManager.getLogger(ConstanciaServicioDAO.class);
 	
 	public EntityManager em = null;
 	
@@ -35,21 +38,20 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 	
 	public List<ConstanciaDeServicio> buscarPorFolioCliente(String folioCliente) {
 		List<ConstanciaDeServicio> alConstancias = null;
-		EntityManager manager = null;
+		EntityManager em = null;
 		
 		try {
-			manager = EntityManagerUtil.getEntityManager();
-			manager.getTransaction().begin();
-			alConstancias = manager.createNamedQuery("ConstanciaDeServicio.findByFolioCliente", ConstanciaDeServicio.class)
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			alConstancias = em.createNamedQuery("ConstanciaDeServicio.findByFolioCliente", ConstanciaDeServicio.class)
 					.setParameter("folioCliente", folioCliente)
 					.getResultList();
 			
-			manager.getTransaction().commit();
+			em.getTransaction().commit();
 		} catch(Exception ex) {
-			manager.getTransaction().rollback();
+			EntityManagerUtil.rollback(em);
 		} finally {
-			if(manager != null)
-				manager.close();
+			EntityManagerUtil.close(em);
 		}
 		
 		return alConstancias;
@@ -112,36 +114,34 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 	
 	@Override
 	public String actualizar(ConstanciaDeServicio e) {
-		EntityManager entity = null;
+		EntityManager em = null;
 		try {
-			entity = EntityManagerUtil.getEntityManager();
-			entity.getTransaction().begin();
-			entity.merge(e);
-			entity.getTransaction().commit();
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(e);
+			em.getTransaction().commit();
 		} catch(Exception ex) {
-			entity.getTransaction().rollback();
-			ex.printStackTrace();
+			EntityManagerUtil.rollback(em);
+			log.error("Problema al actualizar la constancia de servicio...", ex);
 		}finally {
-			entity.close();
+			EntityManagerUtil.close(em);
 		}
-	
 		return null;
 	}
 
 	@Override
 	public String guardar(ConstanciaDeServicio e) {
-		EntityManager entity = null;
+		EntityManager em = null;
 		try {
-			entity = EntityManagerUtil.getEntityManager();
-			entity.getTransaction().begin();
-			entity.persist(e);
-			entity.getTransaction().commit();
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(e);
+			em.getTransaction().commit();
 		} catch(Exception ex) {
-			entity.getTransaction().rollback();
+			EntityManagerUtil.rollback(em);
 			ex.printStackTrace();
 		} finally {
-			if(entity != null)
-				entity.close();
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

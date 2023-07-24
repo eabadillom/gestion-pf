@@ -23,11 +23,7 @@
                         <p:toolbar styleClass="p-mb-4">
                             <p:toolbarGroup>
                                 <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{camarasBean.nuevaCamara}" update="manage-camara-content form:manage-camara-content" oncomplete="PF('camaraDialog').show()" 
-                                    styleClass="ui-button-success" style="margin-right: .5rem" />
-                                <p:commandButton id="delete-camaras-button" value="#{camarasBean.consultaMensajeBtn}" icon="pi pi-trash" actionListener="#{camarasBean.eliminarCamarasSeleccionadas()}" 
-                                    styleClass="ui-button-danger" disabled="#{!camarasBean.camaraSeleccionada()}" update="@this">
-                                    <p:confirm header="Eliminar" message="Desea eliminar las cámaras seleccionadas?" icon="pi pi-exclamation-triangle" />
-                                </p:commandButton>
+                                    styleClass="ui-button-raised" style="margin-right: .5rem" />
                             </p:toolbarGroup>
                             <p:toolbarGroup align="right">
                                 <p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-secondary" ajax="false">
@@ -39,9 +35,7 @@
                         <p:dataTable id="dt-camaras" widgetVar="dtCamaras" var="camara" value="#{camarasBean.lstCamaras}" reflow="true"
                                     selection="#{camarasBean.lstCamarasSelected}" rowKey="#{camara.camaraCve}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
                              <f:facet name="header">
-                                <div class="products-table-header">
-                                    <span style="font-weight: bold">Catálogo de Cámaras</span>
-                                
+                                <div class="products-table-header">                                
                                     <span class="filter-container ui-input-icon-left">
                                         <i class="pi pi-search"></i>
                                         <p:inputText id="globalFilter" onkeyup="PF('dtCamaras').filter()" placeholder="Buscar" />
@@ -49,31 +43,23 @@
                                 </div>
                             </f:facet>
 
-                            <p:ajax event="rowSelect" update=":form:delete-camaras-button" />
-                            <p:ajax event="rowUnselect" update=":form:delete-camaras-button" />
-                            <p:ajax event="rowSelectCheckbox" update=":form:delete-camaras-button" />
-                            <p:ajax event="rowUnselectCheckbox" update=":form:delete-camaras-button" />
-                            <p:ajax event="toggleSelect" update=":form:delete-camaras-button" />
-
-                            <p:column selectionMode="multiple" exportable="false"></p:column>
-                            
-                            <p:column headerText="Descripción" sortBy="#{camara.camaraDs}" filterBy="#{camara.camaraDs}" width="25%">
+                            <p:column headerText="Descripción" sortBy="#{camara.camaraDs}" filterBy="#{camara.camaraDs}" width="25%" style="text-align:center">
                                 <h:outputText value="#{camara.camaraDs}" />
                             </p:column>
                             
-                            <p:column headerText="Abreviación" sortBy="#{camara.camaraAbrev}" filterBy="#{camara.camaraAbrev}" width="20%">
+                            <p:column headerText="Abreviación" sortBy="#{camara.camaraAbrev}" filterBy="#{camara.camaraAbrev}" width="20%" style="text-align:center">
                                 <h:outputText value="#{camara.camaraAbrev}" />
                             </p:column>
 
-							<p:column headerText="Planta" width="25%" sortBy="#{camara.plantaCve.plantaDs}" filterBy="#{camara.plantaCve.plantaDs}">
+							<p:column headerText="Planta" width="25%" sortBy="#{camara.plantaCve.plantaDs}" filterBy="#{camara.plantaCve.plantaDs}" style="text-align:center">
 								<h:outputText value="#{camara.plantaCve.plantaDs}" />
 							</p:column>
 							<p:column exportable="false" width="30%" style="text-align:center" >
                                 <p:commandButton icon="pi pi-pencil" update=":form:manage-camara-content" value="Modificar" oncomplete="PF('camaraDialog').show()" 
-                                    styleClass="edit-button ui-button-success" process="@this">
+                                    styleClass="edit-button ui-button-raised" process="@this" style="text-align:center">
                                     <f:setPropertyActionListener value="#{camara}" target="#{camarasBean.camaraSelect}" />
                                 </p:commandButton>
-                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" process="@this" oncomplete="PF('eliminaCamaraDialog').show()" >
+                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" styleClass="ui-button-raised ui-button-danger" value="Eliminar" process="@this" oncomplete="PF('eliminaCamaraDialog').show()" >
                                     <f:setPropertyActionListener value="#{camara}" target="#{camarasBean.camaraSelect}" />
                                 </p:commandButton>
                             </p:column>

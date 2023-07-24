@@ -25,10 +25,20 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 	
 	@SuppressWarnings("unchecked")
 	public List<Bancos> findall() {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
+		
+		EntityManager entity = null;
 		List<Bancos> b = null;
-		Query sql = entity.createNamedQuery("Bancos.findAll", Bancos.class);
-		b = sql.getResultList();
+		
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("Bancos.findAll", Bancos.class);
+			b = sql.getResultList();
+		} catch (Exception e) {
+			log.error("Problema al encontrar bancos",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		return b;
 	}	 
 	@Override
@@ -49,9 +59,19 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 
 	@Override
 	public List<Bancos> buscarTodos() {
+		
+		EntityManager em = null;		
 		List<Bancos> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Bancos.findAll", Bancos.class).getResultList();
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Bancos.findAll", Bancos.class).getResultList();
+		} catch (Exception e) {
+			log.error("Problema para buscar Todos los bancos", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listado;
 	}
 
@@ -63,45 +83,54 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 
 	@Override
 	public String actualizar(Bancos bancos) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(bancos);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR actualizando Banco" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(Bancos bancos) {
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(bancos);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Banco" + e.getMessage());
-			return "ERROR";
+			log.error("Problema al guardar banco",e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(Bancos bancos) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(bancos));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return "ERROR";
+			log.error("Problema al eliminar banco", e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

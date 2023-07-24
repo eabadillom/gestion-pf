@@ -55,7 +55,6 @@
 							<!-- 							<p:ajax event="toggleSelect" -->
 							<!-- 								update=":form:delete-bancos-button" /> -->
 
-							<p:column selectionMode="multiple" />
 
 							<p:column headerText="Clave" sortBy="#{bancos.clave}"
 								filterBy="#{bancos.clave}" style="text-align:center">
@@ -91,18 +90,18 @@
 				
 						<div class="p-field">
 							<p:outputLabel for="clave-new" value="Clave" />
-							<p:inputText id="clave-new" value="#{bancosBean.bancoSelect.clave}" required="true" />
+							<p:inputText id="clave-new" value="#{bancosBean.bancoSelect.clave}" required="true" requiredMessage="Ingresa clave del banco"/>
 						</div>
 				
 						<div class="p-field">
 							<p:outputLabel for="nombre-new" value="Nombre del Banco" />
-							<p:inputText id="nombre-new" value="#{bancosBean.bancoSelect.nombre}" required="true" />
+							<p:inputText id="nombre-new" value="#{bancosBean.bancoSelect.nombre}" required="true" requiredMessage="Ingresa nombre del banco"/>
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-plus"
-						actionListener="#{bancosBean.guardarBanco()}" update=":form:manage-bank-content-new" styleClass="p-mr-2 p-mb-2" />
+						actionListener="#{bancosBean.guardarBanco()}" update=":form:manage-bank-content-new messages" styleClass="p-mr-2 p-mb-2" />
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('nuevoBancoDialog').hide()" class="ui-button-secondary" />
 				</f:facet>
 			</p:dialog>
