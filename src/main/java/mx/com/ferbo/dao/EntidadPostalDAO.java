@@ -4,10 +4,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.jfree.util.Log;
-
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.EntidadPostal;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -35,18 +32,15 @@ public class EntidadPostalDAO extends IBaseDAO<EntidadPostal, Integer> {
 
 	@Override
 	public String actualizar(EntidadPostal entidadPostal) {
-		
-		EntityManager em = null;
-		
 		try {
-			em = EntityManagerUtil.getEntityManager();
+			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(entidadPostal);
 			em.getTransaction().commit();
+			em.close();
 		} catch (Exception e) {
-			Log.error("Problema al actualizar entidad postal",e);
-		}finally {
-			EntityManagerUtil.close(em);
+			System.out.println("ERROR actualizando Entidad Postal" + e.getMessage());
+			return "ERROR";
 		}
 		return null;
 	}

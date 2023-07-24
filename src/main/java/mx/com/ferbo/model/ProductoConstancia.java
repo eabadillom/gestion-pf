@@ -13,8 +13,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -31,6 +29,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ProductoConstancia.findAll", query = "SELECT p FROM ProductoConstancia p"),
     @NamedQuery(name = "ProductoConstancia.findById", query = "SELECT p FROM ProductoConstancia p WHERE p.id = :id"),
     @NamedQuery(name = "ProductoConstancia.findByDescripcion", query = "SELECT p FROM ProductoConstancia p WHERE p.descripcion = :descripcion"),
+    @NamedQuery(name = "ProductoConstancia.findByConstancia", query = "SELECT p FROM ProductoConstancia p WHERE p.constancia = :constancia"),
     @NamedQuery(name = "ProductoConstancia.findByCatidadCobro", query = "SELECT p FROM ProductoConstancia p WHERE p.catidadCobro = :catidadCobro"),
     @NamedQuery(name = "ProductoConstancia.findByUnidadCobro", query = "SELECT p FROM ProductoConstancia p WHERE p.unidadCobro = :unidadCobro"),
     @NamedQuery(name = "ProductoConstancia.findByCantidadManejo", query = "SELECT p FROM ProductoConstancia p WHERE p.cantidadManejo = :cantidadManejo"),
@@ -54,6 +53,10 @@ public class ProductoConstancia implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "descripcion")
     private String descripcion;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "constancia")
+    private int constancia;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
@@ -84,10 +87,7 @@ public class ProductoConstancia implements Serializable {
     private String camaraDs;
     @Size(max = 6)
     @Column(name = "camara_abrev")
-    private String camaraAbrev;    
-    @JoinColumn(name = "constancia", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private ConstanciaFactura constanciaFactura;
+    private String camaraAbrev;
 
     public ProductoConstancia() {
     }
@@ -99,6 +99,7 @@ public class ProductoConstancia implements Serializable {
     public ProductoConstancia(Integer id, String descripcion, int constancia, BigDecimal catidadCobro, String unidadCobro) {
         this.id = id;
         this.descripcion = descripcion;
+        this.constancia = constancia;
         this.catidadCobro = catidadCobro;
         this.unidadCobro = unidadCobro;
     }
@@ -117,6 +118,14 @@ public class ProductoConstancia implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public int getConstancia() {
+        return constancia;
+    }
+
+    public void setConstancia(int constancia) {
+        this.constancia = constancia;
     }
 
     public BigDecimal getCatidadCobro() {
@@ -198,16 +207,8 @@ public class ProductoConstancia implements Serializable {
     public void setCamaraAbrev(String camaraAbrev) {
         this.camaraAbrev = camaraAbrev;
     }
-    
-    public ConstanciaFactura getConstanciaFactura() {
-		return constanciaFactura;
-	}
 
-	public void setConstanciaFactura(ConstanciaFactura constanciaFactura) {
-		this.constanciaFactura = constanciaFactura;
-	}
-
-	@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

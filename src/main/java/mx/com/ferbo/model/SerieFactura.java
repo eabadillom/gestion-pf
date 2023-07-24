@@ -75,9 +75,6 @@ public class SerieFactura implements Serializable {
     @JoinColumn(name = "status_serie", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private StatusSerie statusSerie;
-    @JoinColumn(name = "id_planta", referencedColumnName = "PLANTA_CVE")
-    @ManyToOne(optional = false)
-    private Planta idPlanta;
 
     public SerieFactura() {
     }
@@ -159,16 +156,8 @@ public class SerieFactura implements Serializable {
     public void setStatusSerie(StatusSerie statusSerie) {
         this.statusSerie = statusSerie;
     }
-    
-    public Planta getIdPlanta() {
-		return idPlanta;
-	}
 
-	public void setIdPlanta(Planta idPlanta) {
-		this.idPlanta = idPlanta;
-	}
-
-	@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

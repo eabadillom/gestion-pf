@@ -33,7 +33,6 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "CONSTANCIA_SALIDA")
 @NamedQueries({
-
     @NamedQuery(name = "ConstanciaSalida.findAll", query = "SELECT c FROM ConstanciaSalida c"),
     @NamedQuery(name = "ConstanciaSalida.findById", query = "SELECT c FROM ConstanciaSalida c WHERE c.id = :id"),
     @NamedQuery(name = "ConstanciaSalida.findByFecha", query = "SELECT c FROM ConstanciaSalida c WHERE c.fecha = :fecha"),
@@ -41,7 +40,6 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaSalida.findByNombreCte", query = "SELECT c FROM ConstanciaSalida c WHERE c.nombreCte = :nombreCte"),
     @NamedQuery(name = "ConstanciaSalida.findByStatus", query = "SELECT c FROM ConstanciaSalida c WHERE c.status = :status"),
     @NamedQuery(name = "ConstanciaSalida.findByObservaciones", query = "SELECT c FROM ConstanciaSalida c WHERE c.observaciones = :observaciones")})
-
 public class ConstanciaSalida implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -63,24 +61,13 @@ public class ConstanciaSalida implements Serializable {
     @Size(max = 150)
     @Column(name = "NOMBRE_CTE")
     private String nombreCte;
-    @JoinColumn(name = "STATUS", referencedColumnName = "ID")
-    @ManyToOne
-    private StatusConstanciaSalida status;
+    @Column(name = "STATUS")
+    private Integer status;
     @Size(max = 75)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
-    @NotNull
-    @Size(max = 100)
-    @Column(name = "nombre_transportista")
-    private String nombreTransportista;
-    @NotNull
-    @Size(max = 10)
-    @Column(name = "placas_transporte")
-    private  String placasTransporte;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaCve")
     private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idConstancia")
-    private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
     @JoinColumn(name = "CLIENTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente clienteCve;
@@ -130,11 +117,11 @@ public class ConstanciaSalida implements Serializable {
         this.nombreCte = nombreCte;
     }
 
-    public StatusConstanciaSalida getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(StatusConstanciaSalida status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -145,24 +132,8 @@ public class ConstanciaSalida implements Serializable {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
-    
-    public String getNombreTransportista() {
-		return nombreTransportista;
-	}
 
-	public void setNombreTransportista(String nombreTransportista) {
-		this.nombreTransportista = nombreTransportista;
-	}
-
-	public String getPlacasTransporte() {
-		return placasTransporte;
-	}
-
-	public void setPlacasTransporte(String placasTransporte) {
-		this.placasTransporte = placasTransporte;
-	}
-
-	public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
+    public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
         return detalleConstanciaSalidaList;
     }
 
@@ -170,15 +141,7 @@ public class ConstanciaSalida implements Serializable {
         this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
     }
 
-    public List<ConstanciaSalidaServicios> getConstanciaSalidaServiciosList() {
-		return constanciaSalidaServiciosList;
-	}
-
-	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
-		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
-	}
-
-	public Cliente getClienteCve() {
+    public Cliente getClienteCve() {
         return clienteCve;
     }
 
@@ -210,5 +173,5 @@ public class ConstanciaSalida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.ConstanciaSalida[ id=" + id + " ]";
     }
-
+    
 }

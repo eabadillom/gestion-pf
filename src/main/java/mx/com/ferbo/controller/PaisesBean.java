@@ -51,14 +51,10 @@ public class PaisesBean implements Serializable {
 	
 	public void guardarPais() {
 		if (this.paisSelect.getPaisCve() == null) {
-			int tamanioListaPaises = listaPaises.size()+1;
+			int tamanioListaPaises = listaPaises.size();
 			paisSelect.setPaisCve(tamanioListaPaises);
 			if (paisesDao.guardar(paisSelect) == null) {
 				this.listaPaises.add(this.paisSelect);
-				String p = paisSelect.getPaisDesc();
-				String ab = paisSelect.getPaisDsCorta();
-				p.trim();
-				ab.trim();
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("País Agregado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -80,12 +76,13 @@ public class PaisesBean implements Serializable {
 		if (paisesDao.eliminar(paisSelect) == null) {
 			this.listaPaises.remove(this.paisSelect);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Pais Eliminado"));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-Paises");
 		} else {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
 					"Ocurrió un error al intentar eliminar el Pais"));
 		}
 		PrimeFaces.current().executeScript("PF('deletePaiesDialog').hide()");
-		PrimeFaces.current().ajax().update("form");
+		PrimeFaces.current().ajax().update("form:messages");
 	}
 
 	public List<Paises> getListaPaises() {
@@ -119,4 +116,5 @@ public class PaisesBean implements Serializable {
 	public void setPaisesDao(PaisesDAO paisesDao) {
 		this.paisesDao = paisesDao;
 	}
+	
 }

@@ -31,6 +31,7 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "ConstanciaFacturaDs.findAll", query = "SELECT c FROM ConstanciaFacturaDs c"),
     @NamedQuery(name = "ConstanciaFacturaDs.findById", query = "SELECT c FROM ConstanciaFacturaDs c WHERE c.id = :id"),
+    @NamedQuery(name = "ConstanciaFacturaDs.findByFolio", query = "SELECT c FROM ConstanciaFacturaDs c WHERE c.folio = :folio"),
     @NamedQuery(name = "ConstanciaFacturaDs.findByFolioCliente", query = "SELECT c FROM ConstanciaFacturaDs c WHERE c.folioCliente = :folioCliente")})
 public class ConstanciaFacturaDs implements Serializable {
 
@@ -40,19 +41,18 @@ public class ConstanciaFacturaDs implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID")
     private Integer id;
+    @Column(name = "FOLIO")
+    private Integer folio;
     @Size(max = 30)
     @Column(name = "FOLIO_CLIENTE")
     private String folioCliente;
-    @OneToMany(mappedBy = "constancia", cascade = CascadeType.ALL)//MODIFICADO 1 JUNIO
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "constancia")
     private List<ServicioConstanciaDs> servicioConstanciaDsList;
-    @OneToMany(mappedBy = "constancia", cascade = CascadeType.ALL)//MODIFICADO 1 JUNIO
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "constancia")
     private List<ProductoConstanciaDs> productoConstanciaDsList;
     @JoinColumn(name = "FACTURA", referencedColumnName = "id")
     @ManyToOne
     private Factura factura;
-    @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    @ManyToOne
-    private ConstanciaDeServicio constanciaDeServicio;
 
     public ConstanciaFacturaDs() {
     }
@@ -69,12 +69,12 @@ public class ConstanciaFacturaDs implements Serializable {
         this.id = id;
     }
 
-    public ConstanciaDeServicio getConstanciaDeServicio() {
-        return constanciaDeServicio;
+    public Integer getFolio() {
+        return folio;
     }
 
-    public void setConstanciaDeServicio(ConstanciaDeServicio constanciaDeServicio) {
-        this.constanciaDeServicio = constanciaDeServicio;
+    public void setFolio(Integer folio) {
+        this.folio = folio;
     }
 
     public String getFolioCliente() {

@@ -56,7 +56,7 @@
 							<!-- 							<p:ajax event="toggleSelect" -->
 							<!-- 								update=":form:delete-Paiss-button" /> -->
 
-						
+							<p:column selectionMode="multiple" />
 
 							<p:column headerText="Entidad Postal" sortBy="#{entidadPostal.entidadpostalDs}"
 								filterBy="#{entidadPostal.entidadpostalDs}" style="text-align:center">
@@ -89,14 +89,14 @@
 						<div class="p-field">
 							<p:outputLabel for="entidadPostal-new" value="Entidad Postal" />
 							<p:inputText id="entidadPostal-new"
-								value="#{entidadPostalBean.entidadPostalSelect.entidadpostalDs}" required="true" requiredMessage="Ingresa la entidad postal"/>
+								value="#{entidadPostalBean.entidadPostalSelect.entidadpostalDs}" required="true" />
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-plus"
 						actionListener="#{entidadPostalBean.guardarEntidadPostal()}"
-						update=":form:manage-postalEntity-content-new messages"
+						update=":form:manage-postalEntity-content-new"
 						styleClass="p-mr-2 p-mb-2" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
 						onclick="PF('nuevoEntidadPostalDialog').hide()" class="ui-button-secondary" />

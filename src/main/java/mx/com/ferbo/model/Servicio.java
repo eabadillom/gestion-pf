@@ -22,8 +22,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
-
-
 /**
  *
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
@@ -34,9 +32,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Servicio.findAll", query = "SELECT s FROM Servicio s"),
     @NamedQuery(name = "Servicio.findByServicioCve", query = "SELECT s FROM Servicio s WHERE s.servicioCve = :servicioCve"),
     @NamedQuery(name = "Servicio.findByServicioDs", query = "SELECT s FROM Servicio s WHERE s.servicioDs = :servicioDs"),
-    @NamedQuery(name = "Servicio.findByServicioCod", query = "SELECT s FROM Servicio s WHERE s.servicioCod = :servicioCod"),
-    @NamedQuery(name = "Servicio.findByCdUnidad", query = "SELECT s FROM Servicio s WHERE s.cdUnidad = :cdUnidad"),//cd unidad paso a ser clave foranea
-    @NamedQuery(name = "Servicio.findByUuId", query = "SELECT s FROM Servicio s WHERE s.uuId = :uuId")})
+    @NamedQuery(name = "Servicio.findByServicioCod", query = "SELECT s FROM Servicio s WHERE s.servicioCod = :servicioCod")})
 public class Servicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,25 +47,11 @@ public class Servicio implements Serializable {
     @Size(max = 20)
     @Column(name = "SERVICIO_COD")
     private String servicioCod;
-    @Size(max = 5)
-    @Column(name = "cd_unidad")
-    private String cdUnidad;
-    @Size(max=50)
-    @Column(name = "uuid")
-    private String uuId;
     @OneToMany(mappedBy = "servicioCve")
     private List<DetalleConstanciaServicios> detalleConstanciaServiciosList;
-    @OneToMany(mappedBy = "servicioCve")
-    private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
-    
     @JoinColumn(name = "COBRO", referencedColumnName = "id")
     @ManyToOne
     private TipoCobro cobro;
-    
-    @JoinColumn(name = "cd_unidad", referencedColumnName = "cd_unidad", insertable=false,updatable=false)
-    @ManyToOne
-    private ClaveUnidad claveUnit; //(AQUI HAY UN ERROR) 
-    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicioCve")
     private List<CuotaMensualServicio> cuotaMensualServicioList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicio")
@@ -78,9 +60,8 @@ public class Servicio implements Serializable {
     private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicioCve")
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
-    
 
-	public Servicio() {
+    public Servicio() {
     }
 
     public Servicio(Integer servicioCve) {
@@ -111,23 +92,7 @@ public class Servicio implements Serializable {
         this.servicioCod = servicioCod;
     }
 
-    public String getCdUnidad() {
-		return cdUnidad;
-	}
-
-	public void setCdUnidad(String cdUnidad) {
-		this.cdUnidad = cdUnidad;
-	}
-
-	public String getUuId() {
-		return uuId;
-	}
-
-	public void setUuId(String uuId) {
-		this.uuId = uuId;
-	}
-
-	public List<DetalleConstanciaServicios> getDetalleConstanciaServiciosList() {
+    public List<DetalleConstanciaServicios> getDetalleConstanciaServiciosList() {
         return detalleConstanciaServiciosList;
     }
 
@@ -143,15 +108,7 @@ public class Servicio implements Serializable {
         this.cobro = cobro;
     }
 
-	public ClaveUnidad getClaveUnit() {
-		return claveUnit;
-	}
-
-	public void setClaveUnit(ClaveUnidad claveUnit) {
-		this.claveUnit = claveUnit;
-	}
-
-	public List<CuotaMensualServicio> getCuotaMensualServicioList() {
+    public List<CuotaMensualServicio> getCuotaMensualServicioList() {
         return cuotaMensualServicioList;
     }
 
@@ -183,15 +140,7 @@ public class Servicio implements Serializable {
         this.constanciaServicioDetalleList = constanciaServicioDetalleList;
     }
 
-    public List<ConstanciaSalidaServicios> getConstanciaSalidaServiciosList() {
-		return constanciaSalidaServiciosList;
-	}
-
-	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
-		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
-	}
-
-	@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (servicioCve != null ? servicioCve.hashCode() : 0);

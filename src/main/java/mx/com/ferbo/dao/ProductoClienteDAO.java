@@ -4,16 +4,13 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
-
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
-	private EntityManager manager = null;
-	private static Logger log = Logger.getLogger(ProductoClienteDAO.class);
 
 	@Override
 	public ProductoPorCliente buscarPorId(Integer id) {
@@ -31,69 +28,13 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 
 	@Override
 	public List<ProductoPorCliente> buscarPorCriterios(ProductoPorCliente e) {
-		List<ProductoPorCliente> listado = null;
-		EntityManager em = null;
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			listado = em.createNamedQuery("ProductoPorCliente.findByCteCve",ProductoPorCliente.class).setParameter("cteCve", e.getCteCve().getCteCve()).getResultList();
-		} catch(Exception ex) {
-			log.error("Problema para obtener el listado de productos por cliente...", ex);
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-		
-		return listado;
-	}
-	
-	
-	public List<ProductoPorCliente> buscarPorCliente(Integer cteCve, boolean isFullInfo) {
-		List<ProductoPorCliente> listado = null;
-		EntityManager em = null;
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			listado = em.createNamedQuery("ProductoPorCliente.findByCteCve",ProductoPorCliente.class)
-					.setParameter("cteCve", cteCve)
-					.getResultList();
-			
-			if(isFullInfo == false)
-				return listado;
-			
-			for(ProductoPorCliente p : listado) {
-				p.getProductoCve().getProductoCve();
-			}
-			
-		} catch(Exception ex) {
-			log.error("Problema para obtener el listado de productos por cliente...", ex);
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-		
-		return listado;
-	}
-	
-	public List<ProductoPorCliente> buscarPorCteCve(Cliente cliente) {
-		List<ProductoPorCliente> alProductos = null;
-		boolean entityManagerInternal = false;
-		EntityManager em = null;
-		try {
-			if(em == null) {
-				entityManagerInternal = true;
-				em = EntityManagerUtil.getEntityManager();
-			}
-			alProductos = em.createNamedQuery("ProductoPorCliente.findByCteCve", ProductoPorCliente.class)
-					.setParameter("cteCve", cliente)
-					.getResultList();
-		} finally {
-			if(entityManagerInternal) {
-				EntityManagerUtil.close(em);
-			}
-		}
-		
-		return alProductos;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public String actualizar(ProductoPorCliente productoCliente) {
+		// TODO Auto-generated method stub
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -129,6 +70,7 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 
 	@Override
 	public String eliminar(ProductoPorCliente prodCliente) {
+		// TODO Auto-generated method stub
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -150,14 +92,6 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 	public String eliminarListado(List<ProductoPorCliente> listado) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	public EntityManager getEntityManager() {
-		return manager;
-	}
-
-	public void setEntityManager(EntityManager manager) {
-		this.manager = manager;
 	}
 
 }

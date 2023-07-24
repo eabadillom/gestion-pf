@@ -22,6 +22,7 @@ public class TipoAsentamientoBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private List<TipoAsentamiento> listaTipoAsentamiento;
+
 	private List<TipoAsentamiento> listaTipoAsentamientoSelected;
 
 	private TipoAsentamiento tipoAsentamientoSelect;
@@ -56,8 +57,6 @@ public class TipoAsentamientoBean implements Serializable {
 			tipoAsentamientoSelect.setTipoasntmntoCve((short)tamanioListaTipoAsentamiento);
 			if (tipoAsentamientoDAO.guardar(tipoAsentamientoSelect) == null) {
 				this.listaTipoAsentamiento.add(this.tipoAsentamientoSelect);
-				String ab = tipoAsentamientoSelect.getTipoasntmntoDsCorta();
-				ab.trim();
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Tipo de Asentamiento Agregado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,

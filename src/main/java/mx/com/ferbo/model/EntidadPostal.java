@@ -40,7 +40,7 @@ public class EntidadPostal implements Serializable {
     @Size(max = 100)
     @Column(name = "entidadpostal_ds")
     private String entidadpostalDs;
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "entidadPostal")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "entidadPostal")
     private List<AsentamientoHumano> asentamientoHumanoList;
 
     public EntidadPostal() {

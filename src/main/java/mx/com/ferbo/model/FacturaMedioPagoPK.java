@@ -6,14 +6,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.Objects;
-
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -23,12 +18,11 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class FacturaMedioPagoPK implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @ManyToOne(optional = false,cascade = CascadeType.ALL)//MODIFIQUE JUNIO 1
-    @JoinColumn(name = "factura_id")
-    private Factura facturaId;
-	
-	@Basic(optional = false)
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "factura_id")
+    private int facturaId;
+    @Basic(optional = false)
     @NotNull
     @Column(name = "fmp_id")
     private int fmpId;
@@ -36,16 +30,16 @@ public class FacturaMedioPagoPK implements Serializable {
     public FacturaMedioPagoPK() {
     }
 
-    public FacturaMedioPagoPK(Factura facturaId, int fmpId) {
+    public FacturaMedioPagoPK(int facturaId, int fmpId) {
         this.facturaId = facturaId;
         this.fmpId = fmpId;
     }
 
-    public Factura getFacturaId() {
+    public int getFacturaId() {
         return facturaId;
     }
 
-    public void setFacturaId(Factura facturaId) {
+    public void setFacturaId(int facturaId) {
         this.facturaId = facturaId;
     }
 
@@ -57,29 +51,33 @@ public class FacturaMedioPagoPK implements Serializable {
         this.fmpId = fmpId;
     }
 
-  
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (int) facturaId;
+        hash += (int) fmpId;
+        return hash;
+    }
 
     @Override
-	public int hashCode() {
-		return Objects.hash(facturaId, fmpId);
-	}
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof FacturaMedioPagoPK)) {
+            return false;
+        }
+        FacturaMedioPagoPK other = (FacturaMedioPagoPK) object;
+        if (this.facturaId != other.facturaId) {
+            return false;
+        }
+        if (this.fmpId != other.fmpId) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FacturaMedioPagoPK other = (FacturaMedioPagoPK) obj;
-		return facturaId == other.facturaId && fmpId == other.fmpId;
-	}
-
-	@Override
-	public String toString() {
-		return "FacturaMedioPagoPK [facturaId=" + facturaId + ", fmpId=" + fmpId + "]";
-	}
-
-	
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.FacturaMedioPagoPK[ facturaId=" + facturaId + ", fmpId=" + fmpId + " ]";
+    }
+    
 }

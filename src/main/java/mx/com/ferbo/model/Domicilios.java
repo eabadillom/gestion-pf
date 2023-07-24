@@ -39,8 +39,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Domicilios.findByDomicilioCp", query = "SELECT d FROM Domicilios d WHERE d.domicilioCp = :domicilioCp"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel1", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel1 = :domicilioTel1"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel2", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel2 = :domicilioTel2"),
-    @NamedQuery(name = "Domicilios.findByDomicilioFax", query = "SELECT d FROM Domicilios d WHERE d.domicilioFax = :domicilioFax"),
-    @NamedQuery(name = "Domicilios.findByAsentamiento", query = "SELECT d FROM Domicilios d WHERE d.ciudades.municipios.estados.paises.paisCve = :paisCve AND d.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve AND d.ciudades.municipios.municipiosPK.municipioCve = :municipioCve AND d.ciudades.ciudadesPK.ciudadCve = :ciudadCve AND d.domicilioColonia = :domicilioColonia" )})
+    @NamedQuery(name = "Domicilios.findByDomicilioFax", query = "SELECT d FROM Domicilios d WHERE d.domicilioFax = :domicilioFax")})
 public class Domicilios implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,13 +48,13 @@ public class Domicilios implements Serializable {
     @Basic(optional = false)
     @Column(name = "dom_cve")
     private Integer domCve;
-    @Size(max = 100)
+    @Size(max = 75)
     @Column(name = "domicilio_calle")
     private String domicilioCalle;
-    @Size(max = 50)
+    @Size(max = 10)
     @Column(name = "domicilio_num_ext")
     private String domicilioNumExt;
-    @Size(max = 50)
+    @Size(max = 10)
     @Column(name = "domicilio_num_int")
     private String domicilioNumInt;
     @Column(name = "domicilio_colonia")

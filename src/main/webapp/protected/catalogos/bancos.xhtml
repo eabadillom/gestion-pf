@@ -23,7 +23,6 @@
 							oncomplete="PF('nuevoBancoDialog').show()"
 							styleClass="p-mr-2 p-mb-2" process="@this" />
 					</div>
-					
 				</div>
 			</div>
 
@@ -55,6 +54,7 @@
 							<!-- 							<p:ajax event="toggleSelect" -->
 							<!-- 								update=":form:delete-bancos-button" /> -->
 
+							<p:column selectionMode="multiple" />
 
 							<p:column headerText="Clave" sortBy="#{bancos.clave}"
 								filterBy="#{bancos.clave}" style="text-align:center">
@@ -66,9 +66,12 @@
 									value="#{bancos.nombre}" />
 							</p:column>
 							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil" update=":form:manage-bank-content-new" value="Modificar"
-												oncomplete="PF('nuevoBancoDialog').show()" styleClass="p-mr-2 p-mb-2" process="@this">
-									<f:setPropertyActionListener value="#{bancos}" target="#{bancosBean.bancoSelect}" />
+								<p:commandButton icon="pi pi-pencil"
+									update=":form:manage-bank-content-new" value="Modificar"
+									oncomplete="PF('nuevoBancoDialog').show()"
+									styleClass="p-mr-2 p-mb-2" process="@this">
+									<f:setPropertyActionListener value="#{bancos}"
+										target="#{bancosBean.bancoSelect}" />
 								</p:commandButton>
 								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
 									icon="pi pi-trash" process="@this"
@@ -83,29 +86,31 @@
 			</div>
 			<p:dialog header="Agregar/Editar un Banco" showEffect="fade"
 				modal="true" widgetVar="nuevoBancoDialog" responsive="true">
-				
 				<p:outputPanel id="manage-bank-content-new" class="ui-fluid">
-				
 					<p:outputPanel rendered="#{not empty bancosBean.bancoSelect}">
-				
 						<div class="p-field">
 							<p:outputLabel for="clave-new" value="Clave" />
-							<p:inputText id="clave-new" value="#{bancosBean.bancoSelect.clave}" required="true" requiredMessage="Ingresa clave del banco"/>
+							<p:inputText id="clave-new"
+								value="#{bancosBean.bancoSelect.clave}" required="true" />
 						</div>
-				
 						<div class="p-field">
 							<p:outputLabel for="nombre-new" value="Nombre del Banco" />
-							<p:inputText id="nombre-new" value="#{bancosBean.bancoSelect.nombre}" required="true" requiredMessage="Ingresa nombre del banco"/>
+							<p:inputText id="nombre-new"
+								value="#{bancosBean.bancoSelect.nombre}" required="true" />
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-plus"
-						actionListener="#{bancosBean.guardarBanco()}" update=":form:manage-bank-content-new messages" styleClass="p-mr-2 p-mb-2" />
-					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('nuevoBancoDialog').hide()" class="ui-button-secondary" />
+						actionListener="#{bancosBean.guardarBanco()}"
+						update=":form:manage-bank-content-new" styleClass="p-mr-2 p-mb-2" />
+					<p:commandButton value="Cancelar" icon="pi pi-times"
+						onclick="PF('nuevoBancoDialog').hide()"
+						class="ui-button-secondary" />
 				</f:facet>
 			</p:dialog>
-			<p:confirmDialog widgetVar="deleteBancosDialog" showEffect="fade" width="400" message="Desea eliminar el Banco?" header="Eliminar"
+			<p:confirmDialog widgetVar="deleteBancosDialog" showEffect="fade"
+				width="400" message="Desea eliminar el Banco?" header="Eliminar"
 				severity="warn">
 				<p:commandButton value="Sí" icon="pi pi-check"
 					actionListener="#{bancosBean.eliminandoBanco()}" process="@this"

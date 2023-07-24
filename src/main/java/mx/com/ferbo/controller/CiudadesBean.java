@@ -3,7 +3,6 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -35,7 +34,9 @@ public class CiudadesBean implements Serializable {
 
 	private List<Paises> listaPaises;
 	private List<Estados> listaEstados;
+	private List<Estados> listaTmpEstados;
 	private List<Municipios> listaMunicipios;
+	private List<Municipios> listaTmpMunicipios;
 	private List<Ciudades> listaCiudades;
 
 	private List<Ciudades> listaCiudadesSelect;
@@ -71,6 +72,9 @@ public class CiudadesBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		listaPaises = paisesDao.buscarTodos();
+//		listaEstados = estadosDao.buscarTodos();
+//		listaMunicipios = municipiosDao.buscarTodos();
+//		listaCiudades = ciudadesDao.buscarTodos();
 		this.paisSelect = new Paises();
 		this.estadoSelect = new Estados();
 		this.estadoPkSelect = new EstadosPK();
@@ -95,24 +99,10 @@ public class CiudadesBean implements Serializable {
 	
 	public void guardarCiudad() {
 		if (this.ciudadSelect.getCiudadesPK().getCiudadCve() == 0) {
-			List<Ciudades> listaCiudadMunicipioEstadoPais = ciudadesDao.buscarPorCriteriosCiudades(ciudadSelect);
+			List<Ciudades> listaCiudadMunicipioEstadoPais = ciudadesDao.buscarPorCriterios(ciudadSelect);
 			int tamanioListaCiudadMunicipioEstadoPais = listaCiudadMunicipioEstadoPais.size() + 1;
 			ciudadPKSelect.setCiudadCve(tamanioListaCiudadMunicipioEstadoPais);
 			ciudadSelect.setCiudadesPK(ciudadPKSelect);
-			
-			this.municipioPkSelect.setPaisCve(idPais);
-			this.municipioPkSelect.setEstadoCve(idEstado);
-			this.municipioSelect.setMunicipiosPK(municipioPkSelect);			
-			List<Municipios> listaMunicipiosTmp = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
-			
-			List<Municipios> municipioTmp = listaMunicipiosTmp.stream().filter(m ->m.getMunicipiosPK().getMunicipioCve()==idMunicipio)
-					.collect(Collectors.toList());
-			
-			Municipios municipio = municipioTmp.get(0);
-			
-			ciudadSelect.setMunicipios(municipio);
-			
-			
 			if(ciudadesDao.guardar(ciudadSelect) == null) {
 				this.listaCiudades.add(this.ciudadSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Ciudad Agregada"));
@@ -122,17 +112,15 @@ public class CiudadesBean implements Serializable {
 			}
 		} else {
 			if(ciudadesDao.actualizar(ciudadSelect) == null) {
-//				this.listaCiudades.add(this.ciudadSelect);
+				this.listaCiudades.add(this.ciudadSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Ciudad Actualizada"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", "Ocurrió un error al intentar actualizar la Ciudad"));
 			}
 		} 
-		
-		
 		PrimeFaces.current().executeScript("PF('nuevaCiudadDialog').hide()");
-		PrimeFaces.current().ajax().update("form:dt-Ciudades");
+		PrimeFaces.current().ajax().update("form");
 	}
 
 	public void eliminandoCiudad() {
@@ -150,9 +138,10 @@ public class CiudadesBean implements Serializable {
 
 	public void handleContrySelect() {
 		if (this.idPais != -1) {
-			this.estadoPkSelect.setPaisCve(idPais);
-			this.estadoSelect.setEstadosPK(estadoPkSelect);
+			this.paisSelect.setPaisCve(idPais);
+			estadoSelect.setPaises(paisSelect);
 			listaEstados = estadosDao.buscarPorCriteriosEstados(estadoSelect);
+//			PrimeFaces.current().ajax().update("form:dtEstados");
 		}
 	}
 	
@@ -191,6 +180,14 @@ public class CiudadesBean implements Serializable {
 		this.listaEstados = listaEstados;
 	}
 
+	public List<Estados> getListaTmpEstados() {
+		return listaTmpEstados;
+	}
+
+	public void setListaTmpEstados(List<Estados> listaTmpEstados) {
+		this.listaTmpEstados = listaTmpEstados;
+	}
+
 	public List<Municipios> getListaMunicipios() {
 		return listaMunicipios;
 	}
@@ -198,7 +195,15 @@ public class CiudadesBean implements Serializable {
 	public void setListaMunicipios(List<Municipios> listaMunicipios) {
 		this.listaMunicipios = listaMunicipios;
 	}
-	
+
+	public List<Municipios> getListaTmpMunicipios() {
+		return listaTmpMunicipios;
+	}
+
+	public void setListaTmpMunicipios(List<Municipios> listaTmpMunicipios) {
+		this.listaTmpMunicipios = listaTmpMunicipios;
+	}
+
 	public List<Ciudades> getListaCiudades() {
 		return listaCiudades;
 	}
