@@ -1,29 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Embeddable
 public class DetallePartidaPK implements Serializable, Cloneable {
 
@@ -33,16 +20,16 @@ public class DetallePartidaPK implements Serializable, Cloneable {
     @NotNull
     @Column(name = "DET_PART_CVE")
     private int detPartCve;
-    //@Basic(optional = false)
-    //@NotNull
-    //@Column(name = "PARTIDA_CVE")
-	@ManyToOne(optional = false)
+	
+	@ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "PARTIDA_CVE")
-    //@JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    //@ManyToOne(optional = false)
     private Partida partidaCve;
 
     public DetallePartidaPK() {
+    }
+    
+    public DetallePartidaPK clone() throws CloneNotSupportedException {
+    	return (DetallePartidaPK) super.clone();
     }
 
 	public DetallePartidaPK(@NotNull int detPartCve, Partida partidaCve) {

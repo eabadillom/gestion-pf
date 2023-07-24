@@ -10,15 +10,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
-import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
+	
+	private static Logger log = LogManager.getLogger(ConstanciaSalidaDAO.class);
 
 	public EntityManager em = null;
 	
@@ -30,9 +32,16 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
 	@Override
 	public List<ConstanciaSalida> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
 		List<ConstanciaSalida> lista = null;
-		lista = em.createNamedQuery("ConstanciaSalida.findAll",ConstanciaSalida.class).getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("ConstanciaSalida.findAll",ConstanciaSalida.class).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de constancias de salida...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		
 		return lista;
 	}
@@ -45,9 +54,6 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	
 	@SuppressWarnings("unchecked")
 	public List<ConstanciaSalida> buscarPorCriterios(String folioCliente, Date fechaInico, Date fechaFin, int idCliente) {
-
-		// TODO Auto-generated method stub
-		
 		Cliente cliente = new Cliente();
 		Map<String, Object> paramaterMap = new HashMap<String, Object>();
 		List<String> whereCause = new ArrayList<String>();
@@ -93,24 +99,37 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
 	@Override
 	public String actualizar(ConstanciaSalida constanciaSalida) {
-		// TODO Auto-generated method stub
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(constanciaSalida);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			log.error("Problema para guardar la constancia de salida...", e); 
+			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return null;
 	}
 	
 	public String actualizarStatus(ConstanciaSalida constanciaSalida) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			Query actualizar = em.createNativeQuery(" UPDATE CONSTANCIA_SALIDA SET STATUS  = :status WHERE ID = :id ") ;
 			actualizar.setParameter("status",(constanciaSalida.getStatus()==null) ? 1:2);//si constancia de salida status es null colocar 1 en otro caso colocar 2
 			actualizar.setParameter("id", constanciaSalida.getId());
 			actualizar.executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("ERROR "+e.getMessage());
+			log.error("Problema para actualizar el status de la constancia de salida...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		
 		return null;
@@ -118,16 +137,17 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
 	@Override
 	public String guardar(ConstanciaSalida constanciaSalida) {
-		// TODO Auto-generated method stub
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(constanciaSalida);//guarda el servicio dado (NO es gestionado)
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para guardar la constancia de salida...", e); 
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		
 		return null;

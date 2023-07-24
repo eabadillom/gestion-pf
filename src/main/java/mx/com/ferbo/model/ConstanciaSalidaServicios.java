@@ -2,9 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -12,7 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -89,7 +86,4 @@ public class ConstanciaSalidaServicios implements Serializable{
 		return "ConstanciaSalidaServicios [constanciaSalidaServiciosPK=" + constanciaSalidaServiciosPK
 				+ ", numCantidad=" + numCantidad + "]";
 	}
-	
-	
-	
 }

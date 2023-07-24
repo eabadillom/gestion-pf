@@ -7,7 +7,9 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,6 +21,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -79,15 +82,21 @@ public class DetalleConstanciaSalida implements Serializable {
     @Column(name = "TEMPERATURA")
     private String temperatura;
     @JoinColumn(name = "CONSTANCIA_CVE", referencedColumnName = "ID")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private ConstanciaSalida constanciaCve;
-    @JoinColumns({
-        @JoinColumn(name = "DET_PART_CVE", referencedColumnName = "DET_PART_CVE"),
-        @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")})
-    @ManyToOne(optional = false)
-    private DetallePartida detallePartida;
-    @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE", insertable = false, updatable = false)
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    
+//    @JoinColumns({
+//        @JoinColumn(name = "DET_PART_CVE", referencedColumnName = "DET_PART_CVE"),
+//        @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")}
+//    )
+//    @OneToOne(optional = false, cascade = CascadeType.ALL)
+//    private DetallePartida detallePartida;
+    
+    @Column(name = "DET_PART_CVE")
+    private int detPartCve;
+    
+    @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Partida partidaCve;
 
     public DetalleConstanciaSalida() {
@@ -183,13 +192,14 @@ public class DetalleConstanciaSalida implements Serializable {
         this.constanciaCve = constanciaCve;
     }
 
-    public DetallePartida getDetallePartida() {
-        return detallePartida;
-    }
-
-    public void setDetallePartida(DetallePartida detallePartida) {
-        this.detallePartida = detallePartida;
-    }
+//    public DetallePartida getDetallePartida() {
+//        return detallePartida;
+//    }
+//
+//    public void setDetallePartida(DetallePartida detallePartida) {
+//        this.detallePartida = detallePartida;
+//    }
+    
 
     public Partida getPartidaCve() {
         return partidaCve;
@@ -223,5 +233,21 @@ public class DetalleConstanciaSalida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.DetalleConstanciaSalida[ id=" + id + " ]";
     }
+
+	public int getDetPartCve() {
+		return detPartCve;
+	}
+
+	public void setDetPartCve(int detPartCve) {
+		this.detPartCve = detPartCve;
+	}
+
+//	public DetallePartida getDetallePartida() {
+//		return detallePartida;
+//	}
+//
+//	public void setDetallePartida(DetallePartida detallePartida) {
+//		this.detallePartida = detallePartida;
+//	}
 
 }
