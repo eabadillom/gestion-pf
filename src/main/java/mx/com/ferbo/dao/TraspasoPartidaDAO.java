@@ -7,6 +7,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.jfree.util.Log;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.ConstanciaTraspaso;
@@ -18,10 +20,21 @@ public class TraspasoPartidaDAO extends IBaseDAO<TraspasoPartida, Integer>{
 	
 	@SuppressWarnings("unchecked")
 	public List<TraspasoPartida> findall() {
-		EntityManager entity = getEntityManager();
+		
+		EntityManager entity = null;
 		List<TraspasoPartida> tp = null;
-		Query sql = entity.createNamedQuery("TraspasoPartida.findAll", TraspasoPartida.class);
-		tp = sql.getResultList();
+		
+		try {
+			entity = getEntityManager();
+			
+			Query sql = entity.createNamedQuery("TraspasoPartida.findAll", TraspasoPartida.class);
+			tp = sql.getResultList();
+		} catch (Exception e) {
+			Log.error("problema al obtener listado de traspasos partidas", e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		return tp;
 	}
 	
@@ -40,10 +53,22 @@ public class TraspasoPartidaDAO extends IBaseDAO<TraspasoPartida, Integer>{
 	@Override
 	public List<TraspasoPartida> buscarPorCriterios(TraspasoPartida e) {
 		// TODO Auto-generated method stub
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("TraspasoPartida.findByPartida", TraspasoPartida.class).
-				setParameter("partidaCve", e.getPartida().getPartidaCve()).
-				getResultList();
+		
+		EntityManager em = null;
+		List<TraspasoPartida> lista = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("TraspasoPartida.findByPartida", TraspasoPartida.class).
+					setParameter("partidaCve", e.getPartida().getPartidaCve()).
+					getResultList();
+		} catch (Exception e2) {
+			Log.error("problema al buscar por criterios", e2);
+		}finally {
+			EntityManagerUtil.close(em);
+		}		
+		
+		return lista;
 	}
 
 	public List<TraspasoPartida> buscarPorConstancia(ConstanciaTraspaso ct) {

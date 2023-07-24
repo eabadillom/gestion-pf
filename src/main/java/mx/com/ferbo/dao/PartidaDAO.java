@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.jfree.util.Log;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.Partida;
@@ -16,17 +18,39 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 	@SuppressWarnings("unchecked")
 	public List<Partida> findall() {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
+		
+		EntityManager entity = null;
 		List<Partida> partida= null;
-		Query sql = entity.createNamedQuery("Partida.findAll", Partida.class);
-		partida = sql.getResultList();
+		
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("Partida.findAll", Partida.class);
+			partida = sql.getResultList();
+		} catch (Exception e) {
+			Log.error("Problema para traer list de partida", e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
+		
 		return partida;
 	}
 	
 	@Override
 	public Partida buscarPorId(Integer partidaClave) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		Partida p = em.createNamedQuery("Partida.findByPartidaCve", Partida.class).setParameter("partidaCve", partidaClave).getSingleResult();
+		
+		EntityManager em = null;
+		Partida p = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			p = em.createNamedQuery("Partida.findByPartidaCve", Partida.class).setParameter("partidaCve", partidaClave).getSingleResult();
+		} catch (Exception e) {
+			EntityManagerUtil.close(em);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return p;
 	}
 
@@ -85,10 +109,20 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 	}
 	
 	public List<Partida> buscarPorConstanciaDeposito(ConstanciaDeDeposito cons){
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		
+		EntityManager em = null;
 		List<Partida> buscaPartidas = new ArrayList<>();
-		buscaPartidas=em.createNamedQuery("Partida.findByConstanciaDeDeposito",Partida.class)
-				.setParameter("folioCliente", cons.getFolioCliente()).getResultList();
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();		
+			buscaPartidas=em.createNamedQuery("Partida.findByConstanciaDeDeposito",Partida.class)
+					.setParameter("folioCliente", cons.getFolioCliente()).getResultList();
+		} catch (Exception e) {
+			Log.error("Problema al buscar constancias de deposito", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return buscaPartidas;
 
 		

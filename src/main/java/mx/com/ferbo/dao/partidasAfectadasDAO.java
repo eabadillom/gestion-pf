@@ -3,25 +3,50 @@ package mx.com.ferbo.dao;
 import java.util.List;
 import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
 import javax.persistence.EntityManager;
+
+import org.apache.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.model.PartidasAfectadas;
 
 public class partidasAfectadasDAO extends IBaseDAO<PartidasAfectadas, Integer>{
 
+	private static Logger log = Logger.getLogger(partidasAfectadasDAO.class);
+	
 	@Override
 	public PartidasAfectadas buscarPorId(Integer id) {
+		
+		EntityManager em = null;
 		PartidasAfectadas pa = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		pa = em.createNamedQuery("findByID", PartidasAfectadas.class).getSingleResult();
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			pa = em.createNamedQuery("findByID", PartidasAfectadas.class).getSingleResult();
+		} catch (Exception e) {
+			log.error("Problema al buscar por id", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return pa;
 	}
 
 	@Override
 	public List<PartidasAfectadas> buscarTodos() {
+		
+		EntityManager em = null;
 		List<PartidasAfectadas> listapa = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listapa = em.createNamedQuery("",PartidasAfectadas.class).getResultList();
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listapa = em.createNamedQuery("",PartidasAfectadas.class).getResultList();
+		} catch (Exception e) {
+			log.error("Problema al obtener list de partidas afectadas",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listapa;
 	}
 

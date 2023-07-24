@@ -21,10 +21,20 @@ public class PartidaServicioDAO extends IBaseDAO<PartidaServicio, Integer>{
 	
 	@SuppressWarnings("unchecked")
 	public List<PartidaServicio> findall() {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
+		
+		EntityManager entity = null;
 		List<PartidaServicio> partidaservicio = null;
-		Query sql = entity.createNamedQuery("PartidaServicio.findAll", PartidaServicio.class);
-		partidaservicio = sql.getResultList();
+		
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("PartidaServicio.findAll", PartidaServicio.class);
+			partidaservicio = sql.getResultList();
+		} catch (Exception e) {
+			log.error("Problema para obtener list de partida servicio", e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
 		return partidaservicio;
 	}
 	public PartidaServicioDAO() {
