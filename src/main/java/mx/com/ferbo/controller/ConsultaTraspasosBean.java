@@ -162,6 +162,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		}
 		tr.commit();
 		em.close();
+		numero = "";
 	}
 	public void carga() {
 		listaTraspasoPartida = tpDAO.buscarPorConstancia(selectedconstancia);
@@ -189,6 +190,7 @@ public class ConsultaTraspasosBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:destino");
 		}
+		
 		log.info("Servicios del cliente filtrados.");
 	}
 		
