@@ -7,16 +7,19 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -41,52 +44,85 @@ import javax.validation.constraints.NotNull;
         @NamedQuery(name = "Partida.findByValorMercancia", query = "SELECT p FROM Partida p WHERE p.valorMercancia = :valorMercancia"),
         @NamedQuery(name = "Partida.findByRendimiento", query = "SELECT p FROM Partida p WHERE p.rendimiento = :rendimiento"),
         @NamedQuery(name = "Partida.findByNoTarimas", query = "SELECT p FROM Partida p WHERE p.noTarimas = :noTarimas"),
-        @NamedQuery(name = "Partida.findByConstanciaDeDeposito", query = "SELECT p FROM Partida p WHERE p.folio.folio = :folio") })
-public class Partida implements Serializable {
+        @NamedQuery(name = "Partida.findByConstanciaDeDeposito", query = "SELECT p FROM Partida p WHERE p.folio.folioCliente = :folioCliente") })
+public class Partida implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "PARTIDA_CVE")
     private Integer partidaCve;
-    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
-    // consider using these annotations to enforce field validation
+    
     @Column(name = "PESO_TOTAL")
     private BigDecimal pesoTotal;
+    
     @Column(name = "CANTIDAD_TOTAL")
     private Integer cantidadTotal;
-    // @Column(name = "UNIDAD_DE_PRODUCTO_CVE")
-    // private Integer unidadDeProductoCve;
+    
     @Column(name = "cantidad_de_cobro")
     private BigDecimal cantidadDeCobro;
+    
     @Column(name = "partida_seq")
     private Integer partidaSeq;
+    
     @Column(name = "valorMercancia")
     private BigDecimal valorMercancia;
+    
     @Column(name = "rendimiento")
     private BigDecimal rendimiento;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "no_tarimas")
     private BigDecimal noTarimas;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "partida")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "detallePartidaPK.partidaCve")
     private List<DetallePartida> detallePartidaList;
+    
     @JoinColumn(name = "CAMARA_CVE", referencedColumnName = "CAMARA_CVE")
     @ManyToOne
     private Camara camaraCve;
+    
     @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
     @ManyToOne(optional = false)
     private ConstanciaDeDeposito folio;
+    
     @JoinColumn(name = "unidad_de_cobro", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
     @ManyToOne
     private UnidadDeManejo unidadDeCobro;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "partidaCve")
+    
+    @OneToMany(mappedBy = "partidaCve", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
 
     @JoinColumn(name = "UNIDAD_DE_PRODUCTO_CVE", referencedColumnName = "UNIDAD_DE_PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private UnidadDeProducto unidadDeProductoCve;
+    
+    @OneToMany(mappedBy = "partida", cascade = CascadeType.ALL)
+    private List<TraspasoPartida> traspasoPartidaList;
+    
+    public Partida clone() throws CloneNotSupportedException{  
+    	return (Partida) super.clone();  
+	} 
+    
+    public void add(DetallePartida detalle) {
+    	if(this.detallePartidaList == null)
+    		this.detallePartidaList = new ArrayList<DetallePartida>();
+    	
+    	if(detalle.getDetallePartidaPK() == null)
+    		detalle.setDetallePartidaPK(new DetallePartidaPK(detallePartidaList.size(), this));
+    	
+    	this.detallePartidaList.add(detalle);
+    }
+    
+    public void add(DetalleConstanciaSalida detalleConstanciaSalida) {
+    	if(this.detalleConstanciaSalidaList == null)
+    		this.detalleConstanciaSalidaList = new ArrayList<DetalleConstanciaSalida>();
+    	
+    	this.detalleConstanciaSalidaList.add(detalleConstanciaSalida);
+    }
 
     public void setUnidadDeProductoCve(UnidadDeProducto unidadDeProductoCve) {
         this.unidadDeProductoCve = unidadDeProductoCve;
@@ -174,6 +210,9 @@ public class Partida implements Serializable {
 
     public void setDetallePartidaList(List<DetallePartida> detallePartidaList) {
         this.detallePartidaList = detallePartidaList;
+        for(DetallePartida dp : detallePartidaList) {
+        	dp.getDetallePartidaPK().setPartidaCve(this);
+        }
     }
 
     public Camara getCamaraCve() {
@@ -237,5 +276,15 @@ public class Partida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + " ]";
     }
+
+	public List<TraspasoPartida> getTraspasoPartidaList() {
+		return traspasoPartidaList;
+	}
+
+	public void setTraspasoPartidaList(List<TraspasoPartida> traspasoPartidaList) {
+		this.traspasoPartidaList = traspasoPartidaList;
+	}
+
+	
 
 }

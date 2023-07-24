@@ -9,9 +9,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -39,45 +43,61 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaDeServicio.findByObservaciones", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.observaciones = :observaciones"),
     @NamedQuery(name = "ConstanciaDeServicio.findByFolioCliente", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.folioCliente = :folioCliente"),
     @NamedQuery(name = "ConstanciaDeServicio.findByValorDeclarado", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.valorDeclarado = :valorDeclarado")})
+
 public class ConstanciaDeServicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
     @Column(name = "FOLIO")
     private Integer folio;
+    
     @Column(name = "FECHA")
     @Temporal(TemporalType.DATE)
     private Date fecha;
+    
     @Size(max = 100)
     @Column(name = "NOMBRE_TRANSPORTISTA")
     private String nombreTransportista;
+    
     @Size(max = 6)
     @Column(name = "PLACAS_TRANSPORTE")
     private String placasTransporte;
+    
     @Size(max = 200)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 8)
     @Column(name = "FOLIO_CLIENTE")
     private String folioCliente;
+    
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "VALOR_DECLARADO")
     private BigDecimal valorDeclarado;
-    @OneToMany(mappedBy = "folio")
+    
+    @OneToMany(mappedBy = "folio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartidaServicio> partidaServicioList;
+    
     @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente cteCve;
+    
     @JoinColumn(name = "STATUS", referencedColumnName = "edo_cve")
     @ManyToOne
     private EstadoConstancia status;
-    @OneToMany(mappedBy = "folio")
+    
+    @OneToMany(mappedBy = "folio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
+    
+    @OneToMany(mappedBy = "constanciaDeServicio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConstanciaFacturaDs> constanciaFacturaDsList;
 
+    
     public ConstanciaDeServicio() {
     }
 
@@ -176,6 +196,14 @@ public class ConstanciaDeServicio implements Serializable {
 
     public void setConstanciaServicioDetalleList(List<ConstanciaServicioDetalle> constanciaServicioDetalleList) {
         this.constanciaServicioDetalleList = constanciaServicioDetalleList;
+    }
+    
+    public List<ConstanciaFacturaDs> getConstanciaFacturaDsList() {
+        return constanciaFacturaDsList;
+    }
+
+    public void setConstanciaFacturaDsList(List<ConstanciaFacturaDs> constanciaFacturaDsList) {
+        this.constanciaFacturaDsList = constanciaFacturaDsList;
     }
 
     @Override

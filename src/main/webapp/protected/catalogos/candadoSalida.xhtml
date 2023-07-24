@@ -35,10 +35,10 @@
 						</f:facet>
 
 						<p:column headerText="No. Cliente">
-							<h:outputText value="#{lista.cteCve}" />
+							<h:outputText value="#{lista.cliente.cteCve}" />
 						</p:column>
 						<p:column headerText="Nombre">
-							<h:outputText />
+							<h:outputText value="#{lista.cliente.cteNombre}" />
 						</p:column>
 						<p:column headerText="Permitir Salida (1 dia)">
 							<h:outputText value="#{lista.habilitado ? 'Si' : 'No'}" />
@@ -48,7 +48,7 @@
 						</p:column>
 						<p:column class="p-text-center">
 							<p:commandButton value="Modificar" icon="pi pi-pencil"
-								styleClass="ui-button-warning p-mr-2 p-mb-2"
+								styleClass="ui-button-info p-mr-2 p-mb-2"
 								update="form:frm-modifica" process="@this"
 								oncomplete="PF('dg-modifica').show()">
 								<f:setPropertyActionListener value="#{lista}"
@@ -65,12 +65,14 @@
 				<p:outputPanel id="frm-modifica" class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel for="@next" value="Numero Cliente:" />
-						<p:inputText value="#{candadoSalidaBean.seleccion.cteCve}"
+						<p:inputText value="#{candadoSalidaBean.seleccion.cliente.cteCve}"
 							required="true" disabled="true" />
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next" value="Nombre Cliente:" />
-						<p:inputText disabled="true" />
+						<p:inputText
+							value="#{candadoSalidaBean.seleccion.cliente.cteNombre}"
+							required="true" disabled="true" />
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next" value="Permitir Salida (1 dia):" />

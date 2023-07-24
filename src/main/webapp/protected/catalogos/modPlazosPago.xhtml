@@ -1,0 +1,111 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Modificar Plazos Pago</ui:define>
+
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Facturación" />
+				<p:menuitem value="Facturación" />
+				<p:menuitem value="Modififcar Plazso Pago"
+					outcome="/protected/catalogos/modPlazosPago" />
+			</p:breadCrumb>
+
+			<div class="p-col-12">
+				<div class="card">
+
+					<p:growl id="messages" showDetail="true" />
+
+					<p:toolbar styleClass="p-mb-4">
+						<p:toolbarGroup>
+							<p:outputLabel value="De:" styleClass="p-mr-2" />
+							<p:datePicker value="#{modPlazosPagoBean.de}"
+								monthNavigator="true" yearNavigator="true" showWeek="true"
+								required="true" maxdate="#{modPlazosPagoBean.actual}">
+								<p:ajax />
+							</p:datePicker>
+							<p:outputLabel value="A:" styleClass="p-ml-6 p-mr-2" />
+							<p:datePicker value="#{modPlazosPagoBean.hasta}"
+								monthNavigator="true" yearNavigator="true" showWeek="true"
+								required="true" maxdate="#{modPlazosPagoBean.actual}">
+								<p:ajax />
+							</p:datePicker>
+							<p:outputLabel for="@next" value="Clientes:"
+								styleClass="p-ml-6 p-mr-2" />
+							<p:selectOneMenu value="#{modPlazosPagoBean.clienteSelect}"
+								converter="entityConverter" filter="true"
+								filterMatchMode="startsWith">
+								<f:selectItem itemLabel="--Selecciona--" />
+								<f:selectItems value="#{modPlazosPagoBean.listClientes}"
+									var="client" itemLabel="#{client.cteNombre}"
+									itemValue="#{client}" />
+								<p:ajax update="form:bottomConsulta" />
+							</p:selectOneMenu>
+							<p:commandButton id="bottomConsulta" value="Consultar"
+								styleClass="ui-button-info p-ml-6" icon="pi pi-search"
+								actionListener="#{modPlazosPagoBean.findFacture()}"
+								update="dtSerieFac" process="@this"
+								disabled="#{!modPlazosPagoBean.hasClient()}" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista"
+						value="#{modPlazosPagoBean.listFac}" rowKey="#{lista.id}"
+						reflow="true" selection="#{modPlazosPagoBean.facSelect}"
+						rowSelectMode="add" paginator="true" rows="10"
+						paginatorPosition="bottom">
+
+						<f:facet name="header">
+							<div class="products-table-header">
+								<span style="font-weight: bold">Facturas</span>
+							</div>
+						</f:facet>
+
+						<p:ajax event="rowSelect" update=":form:button" />
+						<p:ajax event="rowUnselect" update=":form:button" />
+						<p:ajax event="rowSelectCheckbox" update=":form:button" />
+						<p:ajax event="rowUnselectCheckbox" update=":form:button" />
+						<p:ajax event="toggleSelect" update=":form:button" />
+
+						<p:column selectionMode="multiple" exportable="false"></p:column>
+
+						<p:column headerText="Factura">
+							<h:outputText value="#{lista.numero}" />
+							<span>.- </span>
+							<h:outputText value="#{lista.fecha}" />
+							<span>- plazos de pago: </span>
+							<h:outputText value="#{lista.plazo}" />
+							<span> dias(s)</span>
+						</p:column>
+					</p:dataTable>
+
+					<div style="margin-top: 20px;" align="center">
+						<h:outputText
+							value="Por favor indique el nuevo plazo de pago para las constancias seleccionadas" />
+						<p:inputNumber styleClass="p-ml-2 p-mr-2" decimalPlaces="0"
+							value="#{modPlazosPagoBean.modNumber}">
+							<p:ajax />
+						</p:inputNumber>
+						<h:outputText value="dias." />
+					</div>
+
+					<div style="margin-top: 15px;" align="center">
+						<p:commandButton id="button" value="#{modPlazosPagoBean.modBoton}"
+							actionListener="#{modPlazosPagoBean.update()}"
+							icon="pi pi-pencil" styleClass="ui-button-info" update="@this"
+							process="@this" disabled="#{!modPlazosPagoBean.hasSelected()}" />
+					</div>
+
+				</div>
+			</div>
+
+		</h:form>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,411 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Consultar Constancia De Deposito</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Inventarios" />
+				<p:menuitem value="Entradas" />
+				<p:menuitem value="Consultar" outcome="/inventarios/consultarConstanciaDeDeposito" />
+			</p:breadCrumb>
+			
+			<p:growl id="messages" showDetail="true" />
+			
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+				<!-- Por Fechas -->
+					<p:outputLabel value="Por Rango de Fechas:" styleClass="p-mr-2"/>
+					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" 
+					value="#{consultarConstanciaDeDepositoBean.fechaInicial}" >
+					</p:datePicker>
+					
+					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" 
+					value="#{consultarConstanciaDeDepositoBean.fechaFinal}">
+					</p:datePicker>
+					
+				<!-- Por Folio -->
+				
+					<p:outputLabel value="Folio:" />
+					<p:inputText value="#{consultarConstanciaDeDepositoBean.folio}" styleClass="p-ml-2 p-mr-4" />
+					
+				<!-- Por Cliente -->
+				
+					<p:outputLabel value="Por Cliente:" />
+					<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.cliente}" styleClass="p-ml-2 p-mr-4">
+						<f:selectItem itemLabel="Seleccione un Cliente" itemValue="" noSelectionOption="true"/>
+						<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" />
+					</p:selectOneMenu>
+					
+					<p:commandButton value="Consultar" icon="pi pi-search" update="@widgetVar(dtconstanciaDD)" actionListener="#{consultarConstanciaDeDepositoBean.buscarConstanciaDD}"/>
+			
+					</div>
+				</div>
+			</div>
+			
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+			
+					<p:dataTable id="dt-constanciaDeDeposito" widgetVar="dtconstanciaDD" value="#{consultarConstanciaDeDepositoBean.listadoConstanciaDeDepositos}" 
+								rowKey="#{constanciaDD.folio}"	var="constanciaDD" rows="10" paginator="true" paginatorPosition="bottom">
+								
+						<f:facet name="header">
+							<div>
+								<span>Constancia De Deposito</span>
+							</div>
+						</f:facet>
+						
+								
+						<p:column headerText="Folio">
+							<h:outputText value="#{constanciaDD.folio}" />
+						</p:column>
+						
+						<p:column headerText="Cliente">
+							<h:outputText value="#{constanciaDD.cteCve.cteNombre}" />
+						</p:column>
+						
+						<p:column headerText="Fecha De Ingreso">
+							<h:outputText value="#{constanciaDD.fechaIngreso}" />
+						</p:column>
+						
+						<p:column>
+							<p:commandButton value="Ver Detalle" icon="pi pi-search" oncomplete="PF('dlgDatosG').show()" update="form:dlg-constancia">
+								<f:setPropertyActionListener value="#{constanciaDD}" target="#{consultarConstanciaDeDepositoBean.selectConstanciaDD}"></f:setPropertyActionListener>								
+							</p:commandButton>
+						</p:column>
+						
+						<p:column>
+							<p:commandButton value="Ver Partidas" icon="pi pi-search" oncomplete="PF('dlgProductos').show()" update="form:dlg-partidas">
+								<f:setPropertyActionListener value="#{constanciaDD}" target="#{consultarConstanciaDeDepositoBean.selectConstanciaDD}"></f:setPropertyActionListener>		
+							</p:commandButton>
+						</p:column>
+						
+						<p:column>
+							<p:commandButton value="Ver Servicios" icon="pi pi-search" oncomplete="PF('dlgServicios').show()" update="form:dlg-servicios" action="#{consultarConstanciaDeDepositoBean.cargaDeDatos()}">
+								<f:setPropertyActionListener value="#{constanciaDD}" target="#{consultarConstanciaDeDepositoBean.selectConstanciaDD}"></f:setPropertyActionListener>
+							</p:commandButton>
+						</p:column>
+						
+					</p:dataTable>
+					
+					</div>
+				</div>
+			</div>
+			
+			<p:dialog id="servicios" widgetVar="dlgServicios" header="Servicios">
+				<p:outputPanel id="dlg-servicios" class="ui-fluid">
+					<p:dataTable id="dt-ConstanciaDepositoDetalle" widgetVar="constanciaDD" value="#{consultarConstanciaDeDepositoBean.listadoConstanciaDepositoDetalle}" var="constanciaDepositoDetalle" 
+									editable="true" editMode="cell" style="max-width:60em !important;margin: auto;" styleClass="p-mt-2">
+							
+							<f:facet name="header">
+								<div>
+									<span>SERVICIOS</span>
+								</div>
+							</f:facet>
+						
+							<p:column headerText="Servicio">
+								<h:outputText value="#{constanciaDepositoDetalle.servicioCve.servicioDs}" />
+							</p:column>
+							
+							<p:column headerText="Cantidad">
+							<p:cellEditor>
+								<f:facet name="output">									
+									<h:outputText value="#{constanciaDepositoDetalle.servicioCantidad}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{consultarConstanciaDeDepositoBean.servicioCantidad}" ></p:inputNumber>
+								</f:facet>
+							</p:cellEditor>								
+							</p:column>
+							
+							<p:column>
+								<p:commandButton value="Modificar" oncomplete="PF('dlgModificarServicio').show()" styleClass="edit-button ui-button-success" icon="pi pi-pencil" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" >
+									<f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
+								</p:commandButton>
+							</p:column>
+							
+							<p:column>
+								<p:commandButton value="Eliminar" oncomplete="PF('dlgEliminarServicio').show()" styleClass="ui-button-danger" icon="pi pi-trash" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}">
+									<f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
+								</p:commandButton>
+							</p:column>
+							
+						</p:dataTable>
+						
+						<div class="p-grid p-mt-2">
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
+								<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.servicioSelected}">
+									<f:selectItem itemLabel="Selecciona un servicio" itemValue="" noSelectionOption="true"/>
+									<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoPrecioServicio}" var="pServicio" itemValue="#{pServicio.servicio}" itemLabel="#{pServicio.servicio.servicioDs}" />
+								</p:selectOneMenu>
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
+								<p:inputNumber value="#{consultarConstanciaDeDepositoBean.cantidadServicio}" />
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em">
+								<p:commandButton value="Agregar" actionListener="#{consultarConstanciaDeDepositoBean.saveServicio()}" update="dt-ConstanciaDepositoDetalle" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}"></p:commandButton>
+							</div>
+						</div>
+				</p:outputPanel>
+				
+				<f:facet name="footer">
+					<p:commandButton value="Cerrar" onclick="PF('dlgServicios').hide()" process="@this" />
+				</f:facet>
+								
+			</p:dialog>
+			
+			<p:dialog id="productos" widgetVar="dlgProductos" header="Productos">
+				<p:outputPanel id="dlg-partidas" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD}" >
+					
+						<p:dataTable id="dt-partida" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}"
+									rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList}" editable="true" editMode="cell" style="max-width:100em !important;">
+							<f:facet name="header">
+								<div>
+									<span >MERCANCIA</span>
+								</div>							
+							</f:facet>													
+							
+							<p:column headerText="# de Tarimas">
+								
+							<p:cellEditor>
+			                    <f:facet name="output">
+			                        <h:outputText value="#{partida.noTarimas}"/>
+			                    </f:facet>
+			                    <f:facet name="input">
+			                        <p:inputText id="noTarimas" value="#{partida.noTarimas}" style="width:100%"/>
+			                    </f:facet>
+			                </p:cellEditor>
+								
+							</p:column> 
+							
+							<p:column headerText="Piezas por Tarima">
+								#{partida.cantidadTotal / partida.noTarimas}							
+							</p:column>							
+							
+							<p:column headerText="Piezas" >
+							<p:cellEditor>
+			                    <f:facet name="output">
+			                        <h:outputText value="#{partida.cantidadTotal}"/>
+			                    </f:facet>
+			                    <f:facet name="input">
+			                        <p:inputText id="cantidadTotal" value="#{partida.cantidadTotal}" style="width:100%"/>
+			                    </f:facet>
+			                </p:cellEditor>
+							</p:column>
+							
+							<p:column headerText="Unidades">
+								<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
+							</p:column> 
+							
+							<p:column headerText="Producto" >
+							<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText id="productoDs" value="#{partida.unidadDeProductoCve.productoCve.numeroProd}|#{partida.unidadDeProductoCve.productoCve.productoDs}" disabled="true"/>
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu id="s-producto" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.productoSelect}">
+									<f:selectItem itemLabel="Seleccione un producto" itemValue="" noSelectionOption="true"/>
+									<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoProductoPorCliente}" var="producto" itemValue="#{producto.productoCve}" itemLabel="#{producto.productoCve.productoDs}" />
+									
+								</p:selectOneMenu>
+							</f:facet>
+							</p:cellEditor>
+							</p:column> 							
+							
+							<p:column headerText="Peso(Kg)" >
+							<p:cellEditor>
+			                    <f:facet name="output">
+			                        <h:outputText value="#{partida.pesoTotal}"/>
+			                    </f:facet>
+			                    <f:facet name="input">
+			                        <p:inputText id="pesoTotal" value="#{partida.pesoTotal}" style="width:100%"/>
+			                    </f:facet>
+			                </p:cellEditor>
+							</p:column>
+							
+							<p:column headerText="Camara">								
+								<h:outputText value="#{partida.camaraCve.camaraAbrev}" />
+							</p:column>
+							
+							<p:column headerText="Planta">								
+								<h:outputText value="#{partida.camaraCve.plantaCve.plantaDs}" />
+							</p:column>
+							
+							<p:column headerText="Valor De Mercancia">								
+								<h:outputText value="#{partida.valorMercancia}" />
+							</p:column>
+							
+							<p:column>
+								<p:commandButton value="Ver Detalle" icon="pi pi-search" oncomplete="PF('dlgDetalleP').show()" update="form:detalleP" >
+									<f:setPropertyActionListener value="#{partida}" target="#{consultarConstanciaDeDepositoBean.partidaSelect}"></f:setPropertyActionListener>
+								</p:commandButton>
+							</p:column>
+							
+							<p:column>
+								<p:commandButton value="Modificar" styleClass="edit-button ui-button-success" icon="pi pi-pencil" oncomplete="PF('dlgModificarPartida').show()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}">
+									<f:setPropertyActionListener value="#{partida}" target="#{consultarConstanciaDeDepositoBean.partidaSelect}"></f:setPropertyActionListener>
+								</p:commandButton>	
+							</p:column>
+							
+						</p:dataTable> 
+					
+					</p:outputPanel>				
+				</p:outputPanel>
+				
+				<f:facet name="footer">
+					<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dlgProductos').hide()"></p:commandButton>
+				</f:facet>
+							
+			</p:dialog>
+			
+			<p:dialog id="constanciaD" widgetVar="dlgDatosG" header="Datos Generales" responsive="true" resizable="true" style="max-width:100em !important;" 
+					  	hideEffect="fade" showEffect="fade"	modal="true">
+				<p:outputPanel id="dlg-constancia" class="ui-fluid"> 
+					<p:outputPanel rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD}" >
+						
+						
+						<div class="p-grid">
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel for="@next" value="Aviso:" />
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.avisoCve.avisoObservaciones}" disabled="true"/>
+							</div>
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Fecha Ingreso:"/>
+								<p:datePicker value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.fechaIngreso}" showIcon="true" placeholder="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.fechaIngreso}">
+								
+								</p:datePicker>
+							</div>
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Folio:" />
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.folio}" disabled="true" styleClass="p-ml-2"/>
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 31em">
+								<p:outputLabel value="Recibimos de:" />
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.cteCve.cteNombre}" disabled="true"/>
+							</div>
+							
+						</div>
+						
+						
+						
+						<div class="p-grid">
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
+								<p:outputLabel value="Temperatura:" />
+								<p:inputText id="temperatura" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.temperatura}" placeholder="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.temperatura}"/>								
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
+								<p:outputLabel>m<sup>2</sup> Por Camara:</p:outputLabel>
+								<p:inputText disabled="true" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList.get(0).rendimiento}" />								
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
+								<p:outputLabel value="Nombre del Transportista:" />
+								<p:inputText disabled="true" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.nombreTransportista}" />								
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
+								<p:outputLabel value="Placas del Vehiculo:" />
+								<p:inputText disabled="true" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.placasTransporte}" />								
+							</div>
+							
+						</div>
+						
+						<div class="p-grid">
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em;margin: auto;">
+								<p:outputLabel value="Observaciones:" />
+								<p:inputTextarea id="observacion" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.observaciones}" placeholder="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.observaciones}" />								
+							</div>
+						</div>
+						
+					</p:outputPanel>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:splitButton value="Modificar Datos Generales" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura" styleClass="edit-button ui-button-success p-mr-2" >
+						<p:menuitem value="Reimprimir Ticket" icon="pi pi-print" actionListener="#{consultarConstanciaDeDepositoBean.imprimir()}" ajax="false" process="@this"></p:menuitem>
+					</p:splitButton>
+					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgDatosG').hide()"></p:commandButton>
+				</f:facet>	
+				
+			</p:dialog>
+			
+			<p:dialog widgetVar="dlgDetalleP" header="Detalle Partida" style="max-width:80em !important;">
+				<p:outputPanel id="detalleP" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty consultarConstanciaDeDepositoBean.partidaSelect}">
+						
+						<div class="p-col-12 p-md-6 p-lg-4" style="width: 40em;">
+							<p:outputLabel value="Producto:" />
+							<p:inputText disabled="true" value="#{consultarConstanciaDeDepositoBean.partidaSelect.unidadDeProductoCve.productoCve.numeroProd}|#{consultarConstanciaDeDepositoBean.partidaSelect.unidadDeProductoCve.productoCve.productoDs}" />
+						</div>
+						
+						<div class="p-grid">
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="PO:" />
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.otro}" ></p:inputText>														
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Pedimento:" />												
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.pedimento}"></p:inputText>
+								
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Contenedor:" />													
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.contenedor}"></p:inputText>
+							</div>		
+											
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Lote:" />							
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.lote}"></p:inputText>
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Tarima:" />							
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.tarima}" ></p:inputText>
+							</div>
+							
+							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+								<p:outputLabel value="Caducidad:" />
+								<p:datePicker id="fechaCaducidad" showIcon="true" value="#{consultarConstanciaDeDepositoBean.fechaCaducidad}"></p:datePicker>
+							</div>		
+											
+							
+						</div>
+					</p:outputPanel>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Modificar" styleClass="edit-button ui-button-success" actionListener="#{consultarConstanciaDeDepositoBean.updateDetallePartida()}" onclick="PF('dlgDetalleP').hide()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" ></p:commandButton>
+					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgDetalleP').hide()"></p:commandButton>
+				</f:facet>
+			</p:dialog>
+			
+			<p:confirmDialog widgetVar="dlgModificarPartida" showEffect="fade" width="400" message="Desea modificar la partida?" header="Modificar" severity="warn">
+                 <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.updateConstanciaDD()}" process="@this" oncomplete="PF('dlgModificarPartida').hide()"/>
+                 <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgModificarPartida').hide()" />
+            </p:confirmDialog>
+			
+			<p:confirmDialog widgetVar="dlgModificarServicio" showEffect="fade" width="400" message="Desea modificar el servicio?" header="Modificar" severity="warn">
+                 <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.updateServicio()}" process="@this" oncomplete="PF('dlgModificarServicio').hide()"/>
+                 <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgModificarServicio').hide()" />
+            </p:confirmDialog>
+            
+            <p:confirmDialog widgetVar="dlgEliminarServicio" showEffect="fade" width="400" message="Desea eliminar el servicio?" header="Eliminar" severity="warn">
+                 <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.deleteServicio()}" process="@this" oncomplete="PF('dlgEliminarServicio').hide()"/>
+                 <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarServicio').hide()" />
+            </p:confirmDialog>
+			
+		</h:form>
+	</ui:define>
+</ui:composition>
+	

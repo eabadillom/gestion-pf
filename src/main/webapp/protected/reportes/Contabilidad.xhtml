@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Contabilidad</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+        <p:breadCrumb>
+            <p:menuitem value="Home" outcome="/dashboard"/>
+            <p:menuitem value="Reportes"/>
+            <p:menuitem value="Contabilidad"/>
+            <p:menuitem value="Contabilidad" outcome="/protected/reportes/Contabilidad"/>
+        </p:breadCrumb>
+            <div class="p-grid crud-demo">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+                        
+                         
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteContabilidadBean.fecha}" />
+					
+						
+						 <p:fieldset legend="Rangos de fechas">
+			              
+			               <span class="ui-float-label ui-input-icon-left">
+			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteContabilidadBean.fecha_ini}"  maxdate="#{reporteContabilidadBean.maxDate}" readonlyInput="true"/>
+			                <p:outputLabel for="minmax1" value="Fecha de inicio "/>
+						</span>
+						
+						 <span class="ui-float-label ui-input-icon-left">
+			                <p:datePicker id="minmax2" styleClass="p-mr-4 p-mb-2" value="#{reporteContabilidadBean.fecha_fin}"  maxdate="#{reporteContabilidadBean.maxDate}" readonlyInput="true"/>
+			                <p:outputLabel for="minmax2" value="Fecha  final "/>
+						</span>
+           				 
+
+							</p:fieldset>
+            
+                        <p:fieldset legend="Elección de cliente">
+                       			 <span class="ui-float-label ui-input-icon-left">
+									<p:selectOneMenu id="Cliente" value="#{reporteContabilidadBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith">
+									<f:selectItem itemLabel="Todos los clientes"  itemValue=""  />
+									<f:selectItems value="#{reporteContabilidadBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+									<p:ajax process ="@this" />
+									</p:selectOneMenu>
+								<p:outputLabel for="Cliente" value="Cliente" />
+							</span>
+								
+					</p:fieldset>
+			<p:fieldset legend="Filtros de descarga" styleClass="p-mt-2">
+						 <p:toolbar>
+				<p:toolbarGroup>
+					   <div class="col-5 flex align-items-center justify-content-center">
+							<p:outputLabel for="@next">Conciliacion</p:outputLabel>
+       							<p:selectBooleanCheckbox  value="#{reporteContabilidadBean.conciliacionSelect}" />
+       						 </div>
+							         <div class="col-2">
+							            <p:divider layout="vertical">
+							            </p:divider>
+							        </div>
+										 <div class="col-5 flex align-items-center justify-content-center">
+										  <p:outputLabel for="@next">Auxiliar de clientes</p:outputLabel>
+												<p:selectBooleanCheckbox  value="#{reporteContabilidadBean.auxClienteSelect}" />
+							     </div>
+							        </p:toolbarGroup>
+							        </p:toolbar>
+
+        </p:fieldset>
+					  <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+					  <p:toolbar>
+				<p:toolbarGroup>
+					   <div class="col-5 flex align-items-center justify-content-center">
+						<p:commandButton value=".pdf" actionListener="#{reporteContabilidadBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+						 </div>
+							         <div class="col-2">
+							            <p:divider layout="vertical">
+							            </p:divider>
+							        </div>
+										 <div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value=".xlsx"  actionListener="#{reporteContabilidadBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+							     </div>
+							        </p:toolbarGroup>
+							        </p:toolbar>
+						</p:fieldset>
+						
+						
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

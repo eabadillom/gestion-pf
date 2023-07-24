@@ -12,6 +12,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -27,7 +28,6 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "FacturaMedioPago.findAll", query = "SELECT f FROM FacturaMedioPago f"),
     @NamedQuery(name = "FacturaMedioPago.findByFacturaId", query = "SELECT f FROM FacturaMedioPago f WHERE f.facturaMedioPagoPK.facturaId = :facturaId"),
-    @NamedQuery(name = "FacturaMedioPago.findByFmpId", query = "SELECT f FROM FacturaMedioPago f WHERE f.facturaMedioPagoPK.fmpId = :fmpId"),
     @NamedQuery(name = "FacturaMedioPago.findByMpId", query = "SELECT f FROM FacturaMedioPago f WHERE f.mpId = :mpId"),
     @NamedQuery(name = "FacturaMedioPago.findByMpDescripcion", query = "SELECT f FROM FacturaMedioPago f WHERE f.mpDescripcion = :mpDescripcion"),
     @NamedQuery(name = "FacturaMedioPago.findByFmpPorcentaje", query = "SELECT f FROM FacturaMedioPago f WHERE f.fmpPorcentaje = :fmpPorcentaje"),
@@ -37,22 +37,25 @@ public class FacturaMedioPago implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacturaMedioPagoPK facturaMedioPagoPK;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "mp_id")
-    private int mpId;
+    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id")
+    @ManyToOne(optional = false)
+    private MedioPago mpId;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "mp_descripcion")
     private String mpDescripcion;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fmp_porcentaje")
     private int fmpPorcentaje;
+    
     @Size(max = 50)
     @Column(name = "fmp_referencia")
     private String fmpReferencia;
+    
     @JoinColumn(name = "factura_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Factura factura;
@@ -64,14 +67,13 @@ public class FacturaMedioPago implements Serializable {
         this.facturaMedioPagoPK = facturaMedioPagoPK;
     }
 
-    public FacturaMedioPago(FacturaMedioPagoPK facturaMedioPagoPK, int mpId, String mpDescripcion, int fmpPorcentaje) {
+    public FacturaMedioPago(FacturaMedioPagoPK facturaMedioPagoPK, String mpDescripcion, int fmpPorcentaje) {
         this.facturaMedioPagoPK = facturaMedioPagoPK;
-        this.mpId = mpId;
         this.mpDescripcion = mpDescripcion;
         this.fmpPorcentaje = fmpPorcentaje;
     }
 
-    public FacturaMedioPago(int facturaId, int fmpId) {
+    public FacturaMedioPago(Factura facturaId, int fmpId) {
         this.facturaMedioPagoPK = new FacturaMedioPagoPK(facturaId, fmpId);
     }
 
@@ -83,11 +85,11 @@ public class FacturaMedioPago implements Serializable {
         this.facturaMedioPagoPK = facturaMedioPagoPK;
     }
 
-    public int getMpId() {
+    public MedioPago getMpId() {
         return mpId;
     }
 
-    public void setMpId(int mpId) {
+    public void setMpId(MedioPago mpId) {
         this.mpId = mpId;
     }
 

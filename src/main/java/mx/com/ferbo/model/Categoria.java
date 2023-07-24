@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "categoria")
 @NamedQueries({
-    @NamedQuery(name = "Categoria.findAll", query = "SELECT c FROM Categoria c"),
+    @NamedQuery(name = "Categoria.findAll", query = "SELECT c FROM Categoria c ORDER BY c.categoriaDs"),
     @NamedQuery(name = "Categoria.findByCategoriaCve", query = "SELECT c FROM Categoria c WHERE c.categoriaCve = :categoriaCve"),
     @NamedQuery(name = "Categoria.findByCategoriaDs", query = "SELECT c FROM Categoria c WHERE c.categoriaDs = :categoriaDs")})
 public class Categoria implements Serializable {

@@ -1,8 +1,14 @@
 /bin/
 /target/
+/.vscode/
+.vscode/
 
 .classpath
+.project
 
 .tern-project
 
 .settings/
+
+/src/main/resources/META-INF/persistence.xml
+

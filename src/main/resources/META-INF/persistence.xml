@@ -99,12 +99,18 @@
 		<class>mx.com.ferbo.model.Estados</class>
 		<class>mx.com.ferbo.model.ConstanciaFacturaCmp</class>
 		<class>mx.com.ferbo.model.ClienteDomicilios</class>
-		<properties>
+		<!--  <class>mx.com.ferbo.model.ControlFacturaConstanciaDS</class>-->
+		<class>mx.com.ferbo.model.ClaveUnidad</class>
+		<class>mx.com.ferbo.model.PartidasAfectadas</class>
+		<class>mx.com.ferbo.model.EmisoresCFDIS</class>
+		<class>mx.com.ferbo.model.RegimenFiscal</class>
+		<class>mx.com.ferbo.model.UsoCfdi</class>
+		 <properties>
 			<property name="javax.persistence.jdbc.url"
-				value="jdbc:mysql://ferbo.dynalias.com:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
+				value="jdbc:mysql://192.168.1.15:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
 			<property name="javax.persistence.jdbc.user" value="gestion" />
 			<property name="javax.persistence.jdbc.password"
-				value="d3vE1o0erferbO" />
+				value="D3s4rR0l1adoR315aQ" />
 			<property name="javax.persistence.jdbc.driver"
 				value="com.mysql.cj.jdbc.Driver" />
 			<property name="hibernate.show_sql" value="true" />
@@ -113,7 +119,14 @@
 			<!-- Estas dos lineas se comentan <property name="eclipselink.logging.level.sql" 
 				value="FINE" /> <property name="eclipselink.loggin.parameters" value="true" 
 				/> -->
-		</properties>
+	</properties>
+		
+		<!--	 <properties> <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"/> 
+			<property name="javax.persistence.jdbc.user" value="JuanZassu"/> <property 
+			name="javax.persistence.jdbc.password" value="123456789"/> <property name="javax.persistence.jdbc.driver" 
+			value="com.mysql.cj.jdbc.Driver"/> <property name="hibernate.show_sql" value="true"/> 
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/> 
+			</properties> -->
 
 	</persistence-unit>
 </persistence>

@@ -16,10 +16,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "perfil")
 @NamedQueries({
@@ -35,11 +31,13 @@ public class Perfil implements Serializable {
     @NotNull
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "nombre")
     private String nombre;
+    
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;

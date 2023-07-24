@@ -44,14 +44,7 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			if(em.isOpen()) {
-				try {
-					em.close();
-				}catch (Exception e) {
-					System.out.println("ERROR" + e.getMessage());
-					return "ERROR";
-				}
-			}
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -74,14 +67,7 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			if(em.isOpen()) {
-				try {
-					em.close();
-				}catch (Exception e) {
-					System.out.println("ERROR" + e.getMessage());
-					return "ERROR";
-				}
-			}
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

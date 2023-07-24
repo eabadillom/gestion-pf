@@ -1,0 +1,264 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Alta Traspaso de Servicio</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Traspasos" />
+				<p:menuitem value="Alta" />
+				<p:menuitem value="Alta" outcome="/inventarios/altaTraspaso" />
+			</p:breadCrumb>
+			<p:growl id="messages" showDetail="true" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaTraspasoBean.fecha}" disabled="#{(altaTraspasoBean.usuario.perfil == 1) or (altaTraspasoBean.usuario.perfil == 4)}" value="#{altaTraspasoBean.fecha}" />
+							<p:inputText id="txtFolio" value="#{altaTraspasoBean.numero}" placeholder="Folio" />
+			<p:toolbar>
+				<p:toolbarGroup>
+						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{altaTraspasoBean.idCliente}" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="Seleccione Cliente" itemValue="" noSelectionOption="true" />
+							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
+							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:traspaso :form:selServicio"/>
+						</p:selectOneMenu>
+				</p:toolbarGroup>
+			</p:toolbar>
+	<h5></h5>
+         <div class="card">
+		<p:dataTable id="traspaso" var="inventario" value="#{altaTraspasoBean.inventario}" reflow="true" rowKey="#{inventario.folioCliente}"
+			paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" selectionMode="single">           
+            <p:column style="width:2rem"><p:rowToggler/></p:column>
+            <p:column headerText="Folio" sortBy="#{inventario.constanciaDepo.folio}" ><h:outputText value="#{inventario.folioCliente}" /></p:column>
+            <p:column headerText="Producto" sortBy="#{inventario.producto.productoDs}" ><h:outputText value="#{inventario.producto.productoDs}" /></p:column>
+            <p:column headerText="Cantidad" ><h:outputText value="#{inventario.cantidad}" /></p:column>
+            <p:column headerText="Camara" ><h:outputText value="#{inventario.camara.camaraDs}" /></p:column>
+            <p:column headerText="Unidad de Manejo" ><h:outputText value="#{inventario.unidadManejo.unidadDeManejoDs}" /></p:column>
+            <p:column headerText="Planta origen" ><h:outputText value="#{inventario.planta.plantaDs}" /></p:column>						   
+	<!-- Comienza lista desplegable -->
+	
+            <p:rowExpansion>
+            <div class="p-grid ui-fluid">
+    
+				<div class="p-field p-col-2 p-md-2" align="center">
+					<p:outputLabel for="@next" styleClass="block" value="Código" />
+					<p:inputText value="#{inventario.codigo}" readonly="true" styleClass="block" />
+				</div>
+				
+				<div class="p-field p-col-2 p-md-2" align="center">
+					<p:outputLabel for="@next" styleClass="block" value="Caducidad"/><p:inputText value="#{inventario.caducidad}" readonly="true" styleClass="block"/>
+				</div>
+				
+				<div class="p-field p-col-2 p-md-2" align="center" >
+					<p:outputLabel for="@next" styleClass="block"  value="Lote"/><p:inputText value="#{inventario.lote}" readonly="true" styleClass="block"/>
+				</div>
+				
+					<div class="p-field p-col-2 p-md-2" align="center">
+					<p:outputLabel for="@next" value="SAP"/><p:inputText value="#{inventario.sap}" readonly="true" />
+				</div>
+				
+				<div class="p-field p-col-2 p-md-2" align="center">
+					<p:outputLabel for="@next" value="Peso"/><p:inputText value="#{inventario.peso}" readonly="true" />
+				</div>
+				
+				<div class="col-2"><p:divider layout="vertical"/></div>
+					
+					<div class="field" align="center">
+					<H6>-</H6>
+				   <p:commandButton icon="pi pi-sign-out" update=":form:pnlCliente" value="Traspasar" oncomplete="PF('dialogCliente').show();" style="width:100px;height:30px" align="left" styleClass="ui-button-raised" process="@this" >
+				   <f:setPropertyActionListener value="#{inventario}" target="#{altaTraspasoBean.selectedInventario}" />
+				   </p:commandButton>
+					</div>
+					</div>    
+			</p:rowExpansion>
+         </p:dataTable>
+         </div>
+         
+         
+ 	<p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogCliente" responsive="true">
+			<p:outputPanel id="pnlCliente" class="ui-fluid" >
+			<p:outputPanel rendered="#{not empty altaTraspasoBean.inventario}">                  
+                 
+                 <div class="card" style="width: 100%">
+			        <div class="grid ui-fluid mt-3 floatlabel-demo">
+			            <div class="col-12 md:col-6">
+			             <p:panelGrid columns="3" >
+			             
+			             <p:panel id="Nombre">
+			                <div class="field">              
+			                    <p:outputLabel for="@next" value="Cliente" />
+			                    <p:inputText value="#{altaTraspasoBean.selectedInventario.cliente.cteNombre}" readonly="true" />
+			                </div>
+			            </p:panel>
+			            
+            			<p:panel id="Cantidad">
+			                <div class="field">              
+			                    <p:outputLabel for="cantidad-new" value="Cantidad" />
+			                    <p:inputText widgetVar="cantidad-new" id="cantidad-new" value="#{altaTraspasoBean.selectedInventario.cantidad}" readonly="true" />
+			                </div>
+			            </p:panel>
+                
+              			<p:panel id="unidadM">
+			                <div class="field">              
+			                    <p:outputLabel for="unidadM" value="Unidad de Manejo" />
+			                    <p:inputText widgetVar="unidadM-new" id="unidadM-new" value="#{altaTraspasoBean.selectedInventario.unidadManejo.unidadDeManejoDs}" readonly="true" />
+			                </div>
+			            </p:panel>
+                
+                 		<p:panel id="Peso">
+			                <div class="field">              
+			                    <p:outputLabel for="peso-new" value="Peso" />
+			                    <p:inputText widgetVar="peso-new" id="peso-new" value="#{altaTraspasoBean.selectedInventario.peso}" readonly="true" />
+			                </div>
+			            </p:panel>
+                  
+                <p:panel id="planta">
+                <div class="field">
+                        <p:outputLabel for="planta" value="Planta destino" />
+                       <p:selectOneMenu id="txtplantadestino" value="#{altaTraspasoBean.selectedInventario.plantaDestino}" converter="entityConverter" required="true" requiredMessage="Ingresa planta destino">
+						<f:selectItem itemLabel="--Planta--" itemValue=""  />
+						<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaplanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						<p:ajax listener="#{altaTraspasoBean.plantaselect}" process="@this" update=":form:camaradestino"/>						
+						</p:selectOneMenu>
+                </div>
+                </p:panel>
+                
+                <p:panel id="Camara">
+                <div class="field">
+                        <p:outputLabel for="camaradestino" value="Camara destino" />
+				<p:selectOneMenu id="camaradestino" value="#{altaTraspasoBean.selectedInventario.camaraDestino}" converter="entityConverter" required="true" requiredMessage="Ingresa camara destino">
+				<f:selectItem itemLabel="--Camara--" itemValue=""  />
+				<f:selectItems value="#{altaTraspasoBean.selectedInventario.listacamara}" var="camaradestino" itemLabel="#{camaradestino.camaraDs}" itemValue="#{camaradestino}" />
+				<p:ajax listener="#{altaTraspasoBean.camaraselect}" process="@this" update=":form:posiciondestino"/>						
+				</p:selectOneMenu>
+                </div>
+                </p:panel>
+                
+	                <p:panel id="Posicion">
+		                <div class="field">
+			                <p:outputLabel for="posiciondestino" value="Posicion destino" />
+			                <p:selectOneMenu id="posiciondestino" value="#{altaTraspasoBean.selectedInventario.posicionDestino}" converter="entityConverter" required="true" requiredMessage="Ingresa posicion destino">
+							<f:selectItem itemLabel="--Posicion--" itemValue=""  />
+							<f:selectItems value="#{altaTraspasoBean.selectedInventario.listaposicion}" var="posiciondestino" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
+							<p:ajax /></p:selectOneMenu>
+		                </div>
+	              		  </p:panel>
+            			</p:panelGrid>
+		            </div>
+		        </div>
+			</div>
+							</p:outputPanel>
+							</p:outputPanel>
+						<f:facet name="footer">
+				<p:commandButton value="Añadir" icon="pi pi-check" actionListener="#{altaTraspasoBean.agrega()}" update="destino messages" />
+				<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" ></p:commandButton>
+					</f:facet>
+						</p:dialog>
+         <p:divider align="left"><div class="inline-flex align-items-center"><i class="pi pi-shopping-cart"/>
+			<b>Destino</b>
+		 </div></p:divider>
+        <p:toolbar>
+            <p:toolbarGroup>
+
+			
+            <p:dataTable id="destino" var="partida" value="#{altaTraspasoBean.destino}" reflow="true" rowKey="#{altaTraspasoBean.selectedInventario}"  scrollable="true" scrollHeight="9em" scrollRows="4" >
+				   <p:column style="width:32px;text-align: center"><p:commandButton styleClass="ui-button-flat" type="button" icon="pi pi-search" onclick="PF('dlg1').show()"/></p:column>
+				<!--<p:column headerText="Folio" width="8em"><h:outputText value="#{partida.folioCliente}"/></p:column>-->
+				<!--  <p:column headerText="En existencia" width="10em"><h:outputText value="#{partida.cantidad}" /></p:column>-->
+				<!--  <p:column headerText="Unidad de Manejo" width="8em"><h:outputText value="#{partida.unidadManejo.unidadDeManejoDs}"/></p:column>-->
+				<!--  <p:column headerText="Kilos" width="10em"><h:outputText value="#{partida.peso}"/></p:column>-->
+				<p:column headerText="Producto" width="8em"><h:outputText value="#{partida.producto.productoDs}"/></p:column>
+				<p:column headerText="Camara Origen" width="10em"><h:outputText value="#{partida.camara.camaraDs}"/></p:column>
+				<p:column headerText="Camara destinada" width="10em"><h:outputText value="#{partida.camara.camaraDs}"/></p:column>
+				<p:column headerText="Planta origen" width="8em"><h:outputText value="#{partida.planta.plantaDs}"/></p:column>
+				<p:column headerText="Planta destinada" width="10em"><h:outputText value="#{partida.planta.plantaDs}"/></p:column>
+				<p:column headerText="Posicion Origen" width="10em"><h:outputText value="#{partida.posicion.idPosicion}"/></p:column>
+				<p:column headerText="Posicion destinada" width="10em"><h:outputText value="#{partida.posicionDestino.idPosicion}"/></p:column>
+				<p:fieldset legend="Header" toggleable="true" toggleSpeed="500">
+            <p:ajax event="toggle" listener="#{fieldsetView.handleToggle}"/>
+        </p:fieldset>
+				<p:column width="8em">
+				<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deletePartida(partida)}" update="destino" />
+				</p:column>
+			</p:dataTable>
+
+        
+			
+        <p:overlayPanel widgetVar="dlg1" dismissable="false" showCloseIcon="true" dynamic="true">
+		<p:outputPanel rendered="#{not empty altaTraspasoBean.inventario}">
+			<p:panel id="folioC">
+	              <div class="field">
+	                  <span class="ui-float-label ui-input-icon-right">
+	                      <p:inputText widgetVar="folioC-new" id="folioC-new" value="#{altaTraspasoBean.selectedInventario.folio}" readonly="true"/>
+	                      <p:outputLabel for="folioC-new" value="Folio" styleClass="ml-4" />
+	                      <i class="pi pi-user" />
+	                  </span>
+	              </div>
+	          </p:panel>
+
+		<p:panel id="cantidad">
+              <div class="field">
+                  <span class="ui-float-label ui-input-icon-right">
+                      <p:inputText widgetVar="Cantidad-new" id="Cantidad-new" value="#{altaTraspasoBean.selectedInventario.cantidad}" readonly="true"/>
+                      <p:outputLabel for="Cantidad-new" value="En existencia" styleClass="ml-4" />
+                      <i class="pi pi-user" />
+                  </span>
+              </div>
+          </p:panel>
+
+					<p:panel id="Kgs">
+			              <div class="field">
+			                  <span class="ui-float-label ui-input-icon-right">
+			                      <p:inputText widgetVar="kg-new" id="kg-new" value="#{altaTraspasoBean.selectedInventario.peso}" readonly="true"/>
+			                      <p:outputLabel for="kg-new" value="Kilogramos" styleClass="ml-4" />
+			                      <i class="pi pi-user" />
+			                  </span>
+			              </div>
+			          </p:panel>
+			</p:outputPanel>
+	        </p:overlayPanel>
+            </p:toolbarGroup>
+		</p:toolbar>		
+			
+		<p:fieldset legend="Tipo de Servicio">
+		<p:panel>	
+				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaTraspasoBean.idPrecioServicio}" filterMatchMode="startsWith">
+					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
+					<f:selectItems var="selectedPrecioServicio" value="#{altaTraspasoBean.alServicios}"
+						itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
+				</p:selectOneMenu>
+				<p:column><p:inputNumber id="txtCantidadSrv" value="#{altaTraspasoBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/></p:column>
+				<p:column>
+				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.agregarServicio}" update="dtServicios"/>
+				</p:column>
+		</p:panel>
+				
+			<p:dataTable id="dtServicios"	var="servicio" selection="#{altaTraspasoBean.selServicio}" value="#{altaTraspasoBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" 
+							scrollRows="2" reflow="true">	
+				<p:column headerText="Servicio seleccionado" width="8em"><h:outputText value="#{servicio.servicio}" /></p:column>
+				<p:column headerText="Cantidad" width="10em"><h:outputText value="#{servicio.cantidad}" /></p:column>
+				<p:column width="8em">
+					<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deleteServicio(servicio)}" update="dtServicios"/>
+				</p:column>
+			</p:dataTable>
+			
+			<p:panel id="Descripcion">
+					<div class="field col-12 md:col-4">
+						<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaTraspasoBean.observaciones}" placeholder="Descripcion corta.." style="width: 30em;"/>
+					</div>
+				</p:panel>
+		</p:fieldset>				
+		
+		<div>
+			
+        <p:splitButton value="Confirmar Traspaso" actionListener="#{altaTraspasoBean.guardar}" icon="pi pi-save">
+            <p:menuitem value="Generar reporte" actionListener="#{altaTraspasoBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+            <p:menuitem value="Limpiar" action="#{altaTraspasoBean.reload}" update="messages" icon="pi pi-times"/>
+        </p:splitButton>
+		</div>
+ 
+
+		</h:form>
+	</ui:define>
+</ui:composition>

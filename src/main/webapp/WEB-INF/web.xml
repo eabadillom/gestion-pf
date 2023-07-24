@@ -5,6 +5,9 @@
 	<welcome-file-list>
 		<welcome-file>login.xhtml</welcome-file>
 	</welcome-file-list>
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
 	<context-param>
 		<param-name>javax.faces.STATE_SAVING_METHOD</param-name>
 		<param-value>server</param-value>
@@ -28,13 +31,29 @@
 	<context-param>
 		<param-name>javax.faces.FACELETS_SKIP_COMMENTS'</param-name>
 		<param-value>true</param-value>
-	</context-param>
+	</context-param>	
 	<listener>
 		<listener-class>org.apache.webbeans.servlet.WebBeansConfigurationListener</listener-class>
 	</listener>
 	<listener>
 		<listener-class>com.sun.faces.config.ConfigureListener</listener-class>
 	</listener>
+	<filter>
+		<filter-name>SessionFilter</filter-name>
+		<filter-class>mx.com.ferbo.filter.SessionFilter</filter-class>
+		<init-param>
+			<param-name>exception-pages</param-name>
+			<param-value>/login.xhtml .png.xhtml .png .css.xhtml .css .js.xhtml .js .gif.xhtml .gif .jpg.xhtml .jpg .bmp.xhtml .bmp .svg.xhtml .svg .jpeg.xhtml .jpeg .ico.xhtml .ico .xml.xhtml .xml .htm .html .tif.xhtml .tif .txt.xhtml .txt .woff.xhtml .woff</param-value>
+		</init-param>
+		<init-param>
+			<param-name>enabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>SessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 	<filter>
 		<filter-name>Character Encoding Filter</filter-name>
 		<filter-class>org.primefaces.omega.filter.CharacterEncodingFilter</filter-class>
@@ -102,10 +121,4 @@
 		<res-type>javax.mail.Session</res-type>
 		<res-auth>Container</res-auth>
 	</resource-ref>
-	<env-entry>
-		<description>Cuenta de correo electronico notificaciones de eventos.</description>
-		<env-entry-name>MailNOTIFICACIONES</env-entry-name>
-		<env-entry-value>mail/notificaciones</env-entry-value>
-		<env-entry-type>java.lang.String</env-entry-type>
-	</env-entry>
 </web-app>

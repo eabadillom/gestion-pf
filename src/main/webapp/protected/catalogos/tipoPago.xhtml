@@ -33,7 +33,7 @@
 						<p:growl id="messages" showDetail="true" />
 						<p:dataTable id="dt-tipoPago" widgetVar="dtTipoPago" var="tipoPago"
 							value="#{tipoPagoBean.listaTipoPago}" reflow="true"
-							rowKey="#{tipoPago.id}" paginator="true" rows="10"
+							rowKey="#{tipoPago.id}" paginator="true" rows="15"
 							paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
@@ -44,18 +44,6 @@
 									</span>
 								</div>
 							</f:facet>
-
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-tipoPago-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-tipoPago-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-tipoPago-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-tipoPago-button" /> -->
-
-							<p:column selectionMode="multiple" />
 
 							<p:column headerText="Nombre" sortBy="#{tipoPago.nombre}"
 								filterBy="#{tipoPago.nombre}" style="text-align:center">

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pageflow:Pageflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pageflow="http://www.sybase.com/suade/pageflow" id="pf16568136430120" configfile="/Gestion/src/main/webapp/WEB-INF/faces-config.xml">
+  <nodes xsi:type="pageflow:PFPage" name="facturacionConstancias.xhtml" x="122" y="178" id="pf168210079863518" referenceLink="//@navigationRule.0/@fromViewId|" outlinks="pf168210079863519" path="/facturacionConstancias.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="calculoPrevio.xhtml" x="338" y="178" id="pf168210079863520" referenceLink="//@navigationRule.0/@navigationCase.0/@toViewId|" inlinks="pf168210079863519" path="/calculoPrevio.xhtml"/>
+  <links id="pf168210079863519" target="pf168210079863520" source="pf168210079863518" outcome="calculo" redirect="true"/>
+</pageflow:Pageflow>
