@@ -73,10 +73,22 @@ public class TraspasoPartidaDAO extends IBaseDAO<TraspasoPartida, Integer>{
 
 	public List<TraspasoPartida> buscarPorConstancia(ConstanciaTraspaso ct) {
 		// TODO Auto-generated method stub
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("TraspasoPartida.findByTraspaso", TraspasoPartida.class).
-				setParameter("traspaso", ct.getId()).
-				getResultList();
+		
+		EntityManager em = null;
+		List<TraspasoPartida> lista = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("TraspasoPartida.findByTraspaso", TraspasoPartida.class).
+			setParameter("traspaso", ct.getId()).
+			getResultList();
+		} catch (Exception e) {
+			Log.error("Problema al buscar por constancia traspaso", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return lista;
 	}
 	@Override
 	public String actualizar(TraspasoPartida e) {
