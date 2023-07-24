@@ -75,7 +75,7 @@
 									<div class="p-field">
 										<p:outputLabel>Servicio</p:outputLabel>
 										<p:selectOneMenu value="#{serviciosClienteBean.precioServicioSelected.servicio}" filter="true" filterMatchMode="contains"
-											converter="entityConverter" required="true" requiredMessage="Seleccione servicio"
+											converter="entityConverter" required="true" requiredMessage="Campo requerido"
 											disabled="#{serviciosClienteBean.precioServicioSelected.id ne null}">
 											<f:selectItem itemLabel="--Selecciona--" />
 											<f:selectItems value="#{serviciosClienteBean.lstServicio}" var="serv" itemLabel="#{serv.servicioDs}" />
@@ -84,7 +84,7 @@
 									<div class="p-field">
 										<p:outputLabel>Unidad</p:outputLabel>
 										<p:selectOneMenu value="#{serviciosClienteBean.precioServicioSelected.unidad}" filter="true" filterMatchMode="contains"
-											converter="entityConverter" required="true" requiredMessage="Seleccione unidad"
+											converter="entityConverter" required="true" requiredMessage="Campo requerido"
 											disabled="#{serviciosClienteBean.precioServicioSelected.id ne null}">
 											<f:selectItem itemLabel="--Selecciona--" />
 											<f:selectItems value="#{serviciosClienteBean.lstUnidadManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
@@ -99,7 +99,7 @@
 							</p:outputPanel>
 
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{serviciosClienteBean.guardarPrecioServicio()}" update="panel-servicio messages" process="panel-servicio @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{serviciosClienteBean.guardarPrecioServicio()}" update="panel-servicio" process="panel-servicio @this" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('servicioClienteDialog').hide()" class="ui-button-secondary"
 									update="panel-servicio" resetValues="true" />
 							</f:facet>

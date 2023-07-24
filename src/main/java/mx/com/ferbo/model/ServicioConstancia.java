@@ -8,14 +8,11 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -32,6 +29,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ServicioConstancia.findAll", query = "SELECT s FROM ServicioConstancia s"),
     @NamedQuery(name = "ServicioConstancia.findById", query = "SELECT s FROM ServicioConstancia s WHERE s.id = :id"),
     @NamedQuery(name = "ServicioConstancia.findByDescripcion", query = "SELECT s FROM ServicioConstancia s WHERE s.descripcion = :descripcion"),
+    @NamedQuery(name = "ServicioConstancia.findByConstancia", query = "SELECT s FROM ServicioConstancia s WHERE s.constancia = :constancia"),
     @NamedQuery(name = "ServicioConstancia.findByCosto", query = "SELECT s FROM ServicioConstancia s WHERE s.costo = :costo"),
     @NamedQuery(name = "ServicioConstancia.findByTarifa", query = "SELECT s FROM ServicioConstancia s WHERE s.tarifa = :tarifa"),
     @NamedQuery(name = "ServicioConstancia.findByBaseCargo", query = "SELECT s FROM ServicioConstancia s WHERE s.baseCargo = :baseCargo"),
@@ -57,6 +55,10 @@ public class ServicioConstancia implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "descripcion")
     private String descripcion;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "constancia")
+    private int constancia;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
@@ -91,12 +93,6 @@ public class ServicioConstancia implements Serializable {
     @Size(max = 10)
     @Column(name = "planta_cod")
     private String plantaCod;
-    @Size(max = 5)
-    @Column(name = "cd_unidad")
-    private String cdUnidad;
-    @JoinColumn(name = "constancia", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private ConstanciaFactura constancia;
 
     public ServicioConstancia() {
     }
@@ -105,9 +101,10 @@ public class ServicioConstancia implements Serializable {
         this.id = id;
     }
 
-    public ServicioConstancia(Integer id, String descripcion, BigDecimal costo) {
+    public ServicioConstancia(Integer id, String descripcion, int constancia, BigDecimal costo) {
         this.id = id;
         this.descripcion = descripcion;
+        this.constancia = constancia;
         this.costo = costo;
     }
 
@@ -127,11 +124,11 @@ public class ServicioConstancia implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public ConstanciaFactura getConstancia() {
+    public int getConstancia() {
         return constancia;
     }
 
-    public void setConstancia(ConstanciaFactura constancia) {
+    public void setConstancia(int constancia) {
         this.constancia = constancia;
     }
 
@@ -231,15 +228,7 @@ public class ServicioConstancia implements Serializable {
         this.plantaCod = plantaCod;
     }
 
-    public String getCdUnidad() {
-		return cdUnidad;
-	}
-
-	public void setCdUnidad(String cdUnidad) {
-		this.cdUnidad = cdUnidad;
-	}
-
-	@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

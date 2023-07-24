@@ -28,7 +28,6 @@ import javax.validation.constraints.NotNull;
 @NamedQueries({
         @NamedQuery(name = "UnidadDeProducto.findAll", query = "SELECT u FROM UnidadDeProducto u"),
         @NamedQuery(name = "UnidadDeProducto.findByUnidadDeProductoCve", query = "SELECT u FROM UnidadDeProducto u WHERE u.unidadDeProductoCve = :unidadDeProductoCve"),
-        @NamedQuery(name = "UnidadDeProducto.findByProductoCveUnidadDeProductoCve", query = "SELECT u FROM UnidadDeProducto u WHERE u.productoCve.productoCve = :productoCve AND u.unidadDeManejoCve.unidadDeManejoCve = :unidadDeManejoCve"),
         @NamedQuery(name = "UnidadDeProducto.findByProductoCve", query = "SELECT u FROM UnidadDeProducto u WHERE u.productoCve = :productoCve") })
 public class UnidadDeProducto implements Serializable {
 

@@ -6,7 +6,6 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -28,10 +28,7 @@ import javax.persistence.Table;
 @NamedQueries({
     @NamedQuery(name = "ProductoPorCliente.findAll", query = "SELECT p FROM ProductoPorCliente p"),
     @NamedQuery(name = "ProductoPorCliente.findByProdXCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.prodXCteCve = :prodXCteCve"),
-    @NamedQuery(name = "ProductoPorCliente.findByProductoCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.productoCve = :productoCve"),
-    @NamedQuery(name = "ProductoPorCliente.findByCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve.cteCve = :cteCve"),
-    @NamedQuery(name = "ProductoPorCliente.findByCliente", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve = :cteCve")})
-
+    @NamedQuery(name = "ProductoPorCliente.findByProductoCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.productoCve = :productoCve")})
 public class ProductoPorCliente implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -46,16 +43,14 @@ public class ProductoPorCliente implements Serializable {
     @JoinColumn(name = "PRODUCTO_CVE", referencedColumnName = "PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private Producto productoCve;
+    
+    
 
     public ProductoPorCliente() {
     }
 
     public ProductoPorCliente(Integer prodXCteCve) {
         this.prodXCteCve = prodXCteCve;
-    }
-    
-    public ProductoPorCliente(Cliente cliente) {//nuevo
-    	this.cteCve = cliente;
     }
 
     public Integer getProdXCteCve() {

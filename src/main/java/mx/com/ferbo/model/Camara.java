@@ -31,7 +31,6 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "Camara.findAll", query = "SELECT c FROM Camara c"),
     @NamedQuery(name = "Camara.findByCamaraCve", query = "SELECT c FROM Camara c WHERE c.camaraCve = :camaraCve"),
-    @NamedQuery(name = "Camara.findByPlantaCve", query = "SELECT c FROM Camara c WHERE c.plantaCve.plantaCve = :plantaCve"),
     @NamedQuery(name = "Camara.findByCamaraDs", query = "SELECT c FROM Camara c WHERE c.camaraDs = :camaraDs"),
     @NamedQuery(name = "Camara.findByCamaraAbrev", query = "SELECT c FROM Camara c WHERE c.camaraAbrev = :camaraAbrev")})
 public class Camara implements Serializable {
@@ -39,8 +38,7 @@ public class Camara implements Serializable {
     private static final long serialVersionUID = 1L;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "camara")
     private List<Posicion> posicionList;
-   
-  
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -57,12 +55,11 @@ public class Camara implements Serializable {
     private Planta plantaCve;
     @OneToMany(mappedBy = "camaraCve")
     private List<Partida> partidaList;
-    
-    
+
     public Camara() {
     }
 
-	public Camara(Integer camaraCve) {
+    public Camara(Integer camaraCve) {
         this.camaraCve = camaraCve;
     }
 

@@ -10,9 +10,6 @@ import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -31,14 +28,13 @@ import javax.validation.constraints.NotNull;
     @NamedQuery(name = "PartidaServicio.findAll", query = "SELECT p FROM PartidaServicio p"),
     @NamedQuery(name = "PartidaServicio.findByPartidaCve", query = "SELECT p FROM PartidaServicio p WHERE p.partidaCve = :partidaCve"),
     @NamedQuery(name = "PartidaServicio.findByCantidadDeCobro", query = "SELECT p FROM PartidaServicio p WHERE p.cantidadDeCobro = :cantidadDeCobro"),
-    @NamedQuery(name = "PartidaServicio.findByCantidadTotal", query = "SELECT p FROM PartidaServicio p WHERE p.cantidadTotal = :cantidadTotal"),
-    @NamedQuery(name = "PartidaServicio.findByFolio", query = "SELECT p FROM PartidaServicio p WHERE p.folio = :folio")})
+    @NamedQuery(name = "PartidaServicio.findByCantidadTotal", query = "SELECT p FROM PartidaServicio p WHERE p.cantidadTotal = :cantidadTotal")})
 public class PartidaServicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
+    @NotNull
     @Column(name = "PARTIDA_CVE")
     private Integer partidaCve;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -47,7 +43,7 @@ public class PartidaServicio implements Serializable {
     @Column(name = "CANTIDAD_TOTAL")
     private Integer cantidadTotal;
     @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private ConstanciaDeServicio folio;
     @JoinColumn(name = "PRODUCTO_CVE", referencedColumnName = "PRODUCTO_CVE")
     @ManyToOne

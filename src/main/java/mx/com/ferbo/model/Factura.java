@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,7 +21,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -64,12 +62,10 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Factura.findByInicioServicios", query = "SELECT f FROM Factura f WHERE f.inicioServicios = :inicioServicios"),
     @NamedQuery(name = "Factura.findByFinServicios", query = "SELECT f FROM Factura f WHERE f.finServicios = :finServicios"),
     @NamedQuery(name = "Factura.findByMontoLetra", query = "SELECT f FROM Factura f WHERE f.montoLetra = :montoLetra"),
+    @NamedQuery(name = "Factura.findByTipoFacturacion", query = "SELECT f FROM Factura f WHERE f.tipoFacturacion = :tipoFacturacion"),
+    @NamedQuery(name = "Factura.findByPlanta", query = "SELECT f FROM Factura f WHERE f.planta = :planta"),
     @NamedQuery(name = "Factura.findByPlazo", query = "SELECT f FROM Factura f WHERE f.plazo = :plazo"),
-    @NamedQuery(name = "Factura.findByCliente", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente"),
-    @NamedQuery(name = "Factura.findByClienteStatusFactura", query = "SELECT f FROM Factura f WHERE f.cliente.cteCve = :clienteCve and f.status.id = :status"),
     @NamedQuery(name = "Factura.findByRetencion", query = "SELECT f FROM Factura f WHERE f.retencion = :retencion"),
-    @NamedQuery(name = "Factura.findByPeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
-    @NamedQuery(name = "Factura.findByClientePeriodo", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente AND f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
     @NamedQuery(name = "Factura.findByNomSerie", query = "SELECT f FROM Factura f WHERE f.nomSerie = :nomSerie")})
 public class Factura implements Serializable {
 
@@ -105,6 +101,8 @@ public class Factura implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date fecha;
     @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
     @Column(name = "observacion")
     private String observacion;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -162,12 +160,12 @@ public class Factura implements Serializable {
     private String numExt;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 0, max = 10)
+    @Size(min = 1, max = 10)
     @Column(name = "num_int")
     private String numInt;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 0, max = 10)
+    @Size(min = 1, max = 10)
     @Column(name = "telefono")
     private String telefono;
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
@@ -192,12 +190,10 @@ public class Factura implements Serializable {
     @Size(max = 255)
     @Column(name = "monto_letra")
     private String montoLetra;
-    @JoinColumn(name = "tipo_facturacion", referencedColumnName = "ID")
-    @ManyToOne
-    private TipoFacturacion tipoFacturacion;
-    @JoinColumn(name = "planta", referencedColumnName = "PLANTA_CVE")
-    @ManyToOne
-    private Planta planta;
+    @Column(name = "tipo_facturacion")
+    private Integer tipoFacturacion;
+    @Column(name = "planta")
+    private Integer planta;
     @Basic(optional = false)
     @NotNull
     @Column(name = "plazo")
@@ -215,34 +211,6 @@ public class Factura implements Serializable {
     @JoinColumn(name = "status", referencedColumnName = "id")
     @ManyToOne
     private StatusFactura status;
-    @Size(max = 5)
-    @Column(name = "metodo_pago")
-    private String metodoPago;
-    @Size(max = 1)
-    @Column(name = "tp_persona")
-    private String tipoPersona;    
-    @Size(max = 5)
-    @Column(name = "cd_regimen")
-    private String cdRegimen;
-    @Size(max = 5)
-    @Column(name = "cd_uso_cfdi")
-    private String cdUsoCfdi;
-    @Size(max = 50)
-    @Column(name = "uuid")
-    private String uuid;
-    @Size(max = 80)
-    @Column(name = "emi_nombre")
-    private String emisorNombre;
-    @Size(max = 14)
-    @Column(name = "emi_rfc")
-    private String emisorRFC;
-    @Size(max = 5)
-    @Column(name = "emi_cd_regimen")
-    private String emisorCdRegimen;
-    
-    @OneToOne(mappedBy = "factura", cascade = CascadeType.ALL)
-    private CancelaFactura cancelaFactura;
-    
     @OneToMany(mappedBy = "facturaId")
     private List<ChequeDevuelto> chequeDevueltoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
@@ -251,14 +219,14 @@ public class Factura implements Serializable {
     private List<FacturaMedioPago> facturaMedioPagoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
     private List<ServicioFactura> servicioFacturaList;
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "factura")//MODIFIQUE 1 JUNIO
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
+    private List<CancelaFactura> cancelaFacturaList;
+    @OneToMany(mappedBy = "factura")
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "factura")//MODIFIQUE 1 JUNIO
+    @OneToMany(mappedBy = "factura")
     private List<ConstanciaFactura> constanciaFacturaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
     private List<ConstanciaFacturaCmp> constanciaFacturaCmpList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "factura")
-    private List<NotaPorFactura> notaFacturaList;
 
     public Factura() {
     }
@@ -267,57 +235,33 @@ public class Factura implements Serializable {
         this.id = id;
     }
 
-    
-    public Factura(Integer id, String numero,String moneda, String rfc, String nombreCliente, Date fecha, String observacion, BigDecimal subtotal, BigDecimal iva, BigDecimal total, String pais, String estado,
-    		String municipio, String ciudad, String colonia, String cp,String calle, String numExt,String numInt, String telefono,String fax, BigDecimal porcentajeIva, String numeroCliente, BigDecimal valorDeclarado, 
-    		Date inicioServicios, Date finServicios, String montoLetra,TipoFacturacion tipoFacturacion, Planta planta, int plazo, BigDecimal retencion,String nomSerie, Cliente cliente, 
-    		StatusFactura status,	String metodoPago, String tipoPersona, String cdRegimen, String cdUsoCfdi, String uuid, String emisorNombre, String emisorRFC,String emisorCdRegimen) {
-		this.id = id;
-		this.numero = numero;
-		this.moneda = moneda;
-		this.rfc = rfc;
-		this.nombreCliente = nombreCliente;
-		this.fecha = fecha;
-		this.observacion = observacion;
-		this.subtotal = subtotal;
-		this.iva = iva;
-		this.total = total;
-		this.pais = pais;
-		this.estado = estado;
-		this.municipio = municipio;
-		this.ciudad = ciudad;
-		this.colonia = colonia;
-		this.cp = cp;
-		this.calle = calle;
-		this.numExt = numExt;
-		this.numInt = numInt;
-		this.telefono = telefono;
-		this.fax = fax;
-		this.porcentajeIva = porcentajeIva;
-		this.numeroCliente = numeroCliente;
-		this.valorDeclarado = valorDeclarado;
-		this.inicioServicios = inicioServicios;
-		this.finServicios = finServicios;
-		this.montoLetra = montoLetra;
-		this.tipoFacturacion = tipoFacturacion;
-		this.planta = planta;
-		this.plazo = plazo;
-		this.retencion = retencion;
-		this.nomSerie = nomSerie;
-		this.cliente = cliente;
-		this.status = status;
-		this.metodoPago = metodoPago;
-		this.tipoPersona = tipoPersona;
-		this.cdRegimen = cdRegimen;
-		this.cdUsoCfdi = cdUsoCfdi;
-		this.uuid = uuid;
-		this.emisorNombre = emisorNombre;
-		this.emisorRFC = emisorRFC;
-		this.emisorCdRegimen = emisorCdRegimen;
+    public Factura(Integer id, String numero, String moneda, String rfc, String nombreCliente, Date fecha, String observacion, BigDecimal subtotal, BigDecimal iva, BigDecimal total, String pais, String estado, String municipio, String ciudad, String colonia, String cp, String calle, String numExt, String numInt, String telefono, BigDecimal porcentajeIva, int plazo, String nomSerie) {
+        this.id = id;
+        this.numero = numero;
+        this.moneda = moneda;
+        this.rfc = rfc;
+        this.nombreCliente = nombreCliente;
+        this.fecha = fecha;
+        this.observacion = observacion;
+        this.subtotal = subtotal;
+        this.iva = iva;
+        this.total = total;
+        this.pais = pais;
+        this.estado = estado;
+        this.municipio = municipio;
+        this.ciudad = ciudad;
+        this.colonia = colonia;
+        this.cp = cp;
+        this.calle = calle;
+        this.numExt = numExt;
+        this.numInt = numInt;
+        this.telefono = telefono;
+        this.porcentajeIva = porcentajeIva;
+        this.plazo = plazo;
+        this.nomSerie = nomSerie;
+    }
 
-	}
-
-	public Integer getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -533,19 +477,19 @@ public class Factura implements Serializable {
         this.montoLetra = montoLetra;
     }
 
-    public TipoFacturacion getTipoFacturacion() {
+    public Integer getTipoFacturacion() {
         return tipoFacturacion;
     }
 
-    public void setTipoFacturacion(TipoFacturacion tipoFacturacion) {
+    public void setTipoFacturacion(Integer tipoFacturacion) {
         this.tipoFacturacion = tipoFacturacion;
     }
 
-    public Planta getPlanta() {
+    public Integer getPlanta() {
         return planta;
     }
 
-    public void setPlanta(Planta planta) {
+    public void setPlanta(Integer planta) {
         this.planta = planta;
     }
 
@@ -597,71 +541,7 @@ public class Factura implements Serializable {
         this.chequeDevueltoList = chequeDevueltoList;
     }
 
-    public String getMetodoPago() {
-		return metodoPago;
-	}
-
-	public void setMetodoPago(String metodoPago) {
-		this.metodoPago = metodoPago;
-	}
-
-	public String getTipoPersona() {
-		return tipoPersona;
-	}
-
-	public void setTipoPersona(String tipoPersona) {
-		this.tipoPersona = tipoPersona;
-	}
-
-	public String getCdRegimen() {
-		return cdRegimen;
-	}
-
-	public void setCdRegimen(String cdRegimen) {
-		this.cdRegimen = cdRegimen;
-	}
-
-	public String getCdUsoCfdi() {
-		return cdUsoCfdi;
-	}
-
-	public void setCdUsoCfdi(String cdUsoCfdi) {
-		this.cdUsoCfdi = cdUsoCfdi;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public String getEmisorNombre() {
-		return emisorNombre;
-	}
-
-	public void setEmisorNombre(String emisorNombre) {
-		this.emisorNombre = emisorNombre;
-	}
-
-	public String getEmisorRFC() {
-		return emisorRFC;
-	}
-
-	public void setEmisorRFC(String emisorRFC) {
-		this.emisorRFC = emisorRFC;
-	}
-
-	public String getEmisorCdRegimen() {
-		return emisorCdRegimen;
-	}
-
-	public void setEmisorCdRegimen(String emisorCdRegimen) {
-		this.emisorCdRegimen = emisorCdRegimen;
-	}
-
-	public List<Pago> getPagoList() {
+    public List<Pago> getPagoList() {
         return pagoList;
     }
 
@@ -683,6 +563,14 @@ public class Factura implements Serializable {
 
     public void setServicioFacturaList(List<ServicioFactura> servicioFacturaList) {
         this.servicioFacturaList = servicioFacturaList;
+    }
+
+    public List<CancelaFactura> getCancelaFacturaList() {
+        return cancelaFacturaList;
+    }
+
+    public void setCancelaFacturaList(List<CancelaFactura> cancelaFacturaList) {
+        this.cancelaFacturaList = cancelaFacturaList;
     }
 
     public List<ConstanciaFacturaDs> getConstanciaFacturaDsList() {
@@ -709,15 +597,7 @@ public class Factura implements Serializable {
         this.constanciaFacturaCmpList = constanciaFacturaCmpList;
     }
 
-    public List<NotaPorFactura> getNotaFacturaList() {
-		return notaFacturaList;
-	}
-
-	public void setNotaFacturaList(List<NotaPorFactura> notaFacturaList) {
-		this.notaFacturaList = notaFacturaList;
-	}
-	
-	@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -741,12 +621,5 @@ public class Factura implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
     }
-
-	public CancelaFactura getCancelaFactura() {
-		return cancelaFactura;
-	}
-
-	public void setCancelaFactura(CancelaFactura cancelaFactura) {
-		this.cancelaFactura = cancelaFactura;
-	}
+    
 }

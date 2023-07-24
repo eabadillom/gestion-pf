@@ -4,11 +4,13 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JPAEntity;
 
-
+/**
+ *
+ * @author Gabriel Moreno <gabrielmos0309@gmail.com>
+ */
 public abstract class IBaseDAO<E, ID> {
     
     public abstract E buscarPorId(ID id);
@@ -24,11 +26,5 @@ public abstract class IBaseDAO<E, ID> {
     public abstract String eliminar(E e);
     
     public abstract String eliminarListado(List<E> listado);
-
-	public String actualizar(Inventario e) {
-
-		
-		return null;
-	}
 
 }

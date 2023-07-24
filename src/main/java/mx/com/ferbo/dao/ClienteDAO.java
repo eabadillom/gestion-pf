@@ -3,254 +3,36 @@ package mx.com.ferbo.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
-import mx.com.ferbo.model.Contacto;
-import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
-import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
-	private static Logger log = LogManager.getLogger(ClienteDAO.class);
 
-	@SuppressWarnings("unchecked")
-	public List<Cliente> findall() {
-		List<Cliente> cliente = null;
-		EntityManager entity = null;
-		try {
-			entity = EntityManagerUtil.getEntityManager();
-			Query sql = entity.createNamedQuery("Cliente.findAll", Cliente.class);
-			cliente = sql.getResultList();
-		} catch(Exception ex) {
-			log.error("Problema para obtener el listado de clientes...", ex);
-		} finally {
-			EntityManagerUtil.close(entity);
-		}
-		return cliente;
-	}	
 	@Override
 	public Cliente buscarPorId(Integer id) {
-		Cliente cliente = null;
-		EntityManager  em = null;
-		try {
-			em = EntityManagerUtil.getEntityManager();		
-			cliente = em.createNamedQuery("Cliente.findByCteCve", Cliente.class).
-					setParameter("cteCve", id)
-					.getSingleResult();
-		} catch(Exception ex) {
-			log.error("Problema para obtener el cliente: " + id, ex );
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-		
-		return cliente;
-	}
-	
-	public Cliente buscarPorId(Integer id, boolean isFullInfo) {
-		Cliente cliente = null;
-		EntityManager em = null;
-		Query query = null;
-		
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("Cliente.findByCteCve", Cliente.class)
-			.setParameter("cteCve", id);
-			cliente = (Cliente) query.getSingleResult();
-			log.info(cliente.getMetodoPago());
-			if(isFullInfo == false)
-				return cliente;
-			
-			if(cliente.getCandadoSalida() != null)
-				cliente.getCandadoSalida().getId();
-			
-			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
-			log.debug(cliente.getRegimenFiscal().getCd_regimen());
-			log.debug(cliente.getUsoCfdi().getUsoCfdi());
-			log.info(cliente.getMetodoPago().getNbMetodoPago());
-			
-			for(ClienteContacto clienteContacto : clienteContactoList) {
-				
-				Contacto contacto = clienteContacto.getIdContacto();
-				
-				List<MedioCnt> medioCntList = contacto.getMedioCntList();
-				
-				for(MedioCnt medioContacto : medioCntList) {
-					
-					Mail idMail = medioContacto.getIdMail();
-					Telefono idTelefono = medioContacto.getIdTelefono();
-					
-					if(idMail != null)
-						idMail.getTpMail().getNbTipo();
-					
-					if(idTelefono != null)
-						idTelefono.getTpTelefono().getNbTelefono();
-					
-				}
-			}
-		} catch(NoResultException ex){
-			log.error("Problema para obtener la información completa del cliente...", ex);
-		} catch(Exception ex) {
-			log.error("Problema para obtener la información completa del cliente...", ex);
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-				
-		return cliente;
+		// TODO Auto-generated method stub
+		EntityManager em = EntityManagerUtil.getEntityManager();		
+		return em.createNamedQuery("Cliente.findByCteCve", Cliente.class).
+				setParameter("cteCve", id)
+				.getSingleResult();
 	}
 
 	@Override
 	public List<Cliente> buscarTodos() {
-		EntityManager em = null;
+		EntityManager em = EntityManagerUtil.getEntityManager();
 		List<Cliente> listado = null;
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			listado = em.createNamedQuery("Cliente.findAll", Cliente.class)
-					.getResultList()
-					;
-		} catch(Exception ex) {
-			log.error("Problema para obtener el listado de clientes...", ex);
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-		
+		listado = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();
 		return listado;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<Cliente> buscarTodos(boolean isFullInfo) {
-		List<Cliente> lista = null;
-		EntityManager em = null;
-		Query query = null;
-		
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("Cliente.findAll", Cliente.class)
-					;
-			lista = query.getResultList();
-			
-			if(isFullInfo == false)
-				return lista;
-			
-			for(Cliente cliente : lista) {
-				if(cliente.getCandadoSalida() != null)
-					cliente.getCandadoSalida().getId();
-				
-				List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
-				log.debug("ClienteContactoList: {}", clienteContactoList.size());
-				log.debug(cliente.getRegimenFiscal().getCd_regimen());
-				log.debug(cliente.getUsoCfdi().getUsoCfdi());
-				log.debug(cliente.getMetodoPago().getNbMetodoPago());
-				
-				for(ClienteContacto clienteContacto : clienteContactoList) {
-					
-					Contacto contacto = clienteContacto.getIdContacto();
-					List<MedioCnt> medioCntList = contacto.getMedioCntList();
-					
-					for(MedioCnt medioContacto : medioCntList) {
-						
-						Mail idMail = medioContacto.getIdMail();
-						Telefono idTelefono = medioContacto.getIdTelefono();
-						
-						if(idMail != null)
-							log.debug(idMail.getTpMail().getNbTipo());
-						
-						if(idTelefono != null)
-							log.debug(idTelefono.getTpTelefono().getNbTelefono());
-					}
-				}
-			}
-		} catch(Exception ex) {
-			log.error("Problema para obtener el listado de clientes...", ex);
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-		return lista;
 	}
 
 	@Override
 	public List<Cliente> buscarPorCriterios(Cliente e) {
-		
+		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<Cliente> buscarHabilitados(boolean isHabilitado) {
-		List<Cliente> lista = null;
-		EntityManager em = null;
-		Query query = null;
-		
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("Cliente.findByHabilitado", Cliente.class)
-					.setParameter("habilitado", isHabilitado)
-					;
-			lista = query.getResultList();
-		} catch(Exception ex) {
-			log.error("Problema para obtener el listado de clientes...", ex);
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-		return lista;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<Cliente> buscarHabilitados(boolean isHabilitado, boolean isFullInfo) {
-		List<Cliente> lista = null;
-		EntityManager em = null;
-		Query query = null;
-		
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("Cliente.findByHabilitado", Cliente.class)
-					.setParameter("habilitado", isHabilitado)
-					;
-			lista = query.getResultList();
-			
-			if(isFullInfo == false)
-				return lista;
-			
-			for(Cliente cliente : lista) {
-				if(cliente.getCandadoSalida() != null)
-					cliente.getCandadoSalida().getId();
-				
-				List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
-				log.debug(cliente.getRegimenFiscal().getCd_regimen());
-				log.debug(cliente.getUsoCfdi().getUsoCfdi());
-				log.debug(cliente.getMetodoPago().getNbMetodoPago());
-				
-				for(ClienteContacto clienteContacto : clienteContactoList) {
-					
-					Contacto contacto = clienteContacto.getIdContacto();
-					List<MedioCnt> medioCntList = contacto.getMedioCntList();
-					
-					for(MedioCnt medioContacto : medioCntList) {
-						
-						Mail idMail = medioContacto.getIdMail();
-						Telefono idTelefono = medioContacto.getIdTelefono();
-						
-						if(idMail != null)
-							log.debug(idMail.getTpMail().getNbTipo());
-						
-						if(idTelefono != null)
-							log.debug(idTelefono.getTpTelefono().getNbTelefono());
-					}
-				}
-			}
-		} catch(Exception ex) {
-			log.error("Problema para obtener el listado de clientes...", ex);
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-		return lista;
 	}
 
 	@Override
@@ -261,11 +43,19 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.getTransaction().begin();
 			em.merge(cliente);
 			em.getTransaction().commit();
+			em.close();
 		} catch (Exception e) {
-			log.error("Problema en la actualización del cliente: " + cliente.getCteCve(), e);
+			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			EntityManagerUtil.close(em);
+			if(em.isOpen()) {
+				try {
+					em.close();
+				}catch (Exception e) {
+					System.out.println("ERROR" + e.getMessage());
+					return "ERROR";
+				}
+			}
 		}
 		return null;
 	}
@@ -278,11 +68,19 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.getTransaction().begin();
 			em.persist(cliente);
 			em.getTransaction().commit();
+			em.close();
 		} catch (Exception e) {
-			log.error("Problema al guardar el cliente: " + cliente.getCteCve(), e);
+			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			EntityManagerUtil.close(em);
+			if(em.isOpen()) {
+				try {
+					em.close();
+				}catch (Exception e) {
+					System.out.println("ERROR" + e.getMessage());
+					return "ERROR";
+				}
+			}
 		}
 		return null;
 	}
@@ -292,7 +90,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
+			em.getTransaction().begin();			
 			
 			for (ClienteContacto ct : cliente.getClienteContactoList()) {
 				for (MedioCnt medio : ct.getIdContacto().getMedioCntList()) {
@@ -322,49 +120,17 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			.setParameter("idCliente", cliente.getCteCve()).executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			log.error("Problema para eliminar el cliente: " + cliente.getCteCve(), e);
+			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			EntityManagerUtil.close(em);
-		}
-		return null;
-	}
-	
-	public String eliminar(Integer cteCve) {
-		EntityManager em = null;
-		Cliente cliente = null;
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			cliente = em.createNamedQuery("Cliente.findByCteCve", Cliente.class).
-			setParameter("cteCve", cteCve)
-			.getSingleResult();
-			CandadoSalida candadoSalida = cliente.getCandadoSalida();
-			if(candadoSalida != null) {
-				log.debug(cliente.getCandadoSalida().getId());
-				cliente.remove(candadoSalida);
-				em.merge(cliente);
-			}
-			
-			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
-			
-			for (ClienteContacto ct : clienteContactoList) {
-				Contacto contacto = ct.getIdContacto();
-				List<MedioCnt> medioCntList = ct.getIdContacto().getMedioCntList();
-				
-				for (MedioCnt medio : medioCntList) {
-					Telefono telefono = medio.getIdTelefono();
-					Mail mail = medio.getIdMail();
+			if(em.isOpen()) {
+				try {
+					em.close();
+				}catch (Exception e) {
+					System.out.println("ERROR" + e.getMessage());
+					return "ERROR";
 				}
 			}
-			em.createQuery("DELETE FROM Cliente cte WHERE cte.cteCve = :idCliente")
-			.setParameter("idCliente", cliente.getCteCve()).executeUpdate();
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			log.error("Problema al eliminar al cliente: " + cliente, e);
-			return "ERROR";
-		}finally {
-			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -381,10 +147,17 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			log.error("Problema para eliminar el listado de clientes: " + listado, e);
+			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}finally {
-			EntityManagerUtil.close(em);
+			if(em.isOpen()) {
+				try {
+					em.close();
+				}catch (Exception e) {
+					System.out.println("ERROR" + e.getMessage());
+					return "ERROR";
+				}
+			}
 		}
 		return null;
 	}

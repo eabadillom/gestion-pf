@@ -21,7 +21,10 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-
+/**
+ *
+ * @author Gabriel Moreno <gabrielmos0309@gmail.com>
+ */
 @Entity
 @Table(name = "usuario")
 @NamedQueries({
@@ -46,48 +49,46 @@ public class Usuario implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    
+    @Basic(optional = false)
+    @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "usuario")
     private String usuario;
-    
-    @Size(min = 0, max = 15)
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 15)
     @Column(name = "password")
     private String password;
-    
     @Size(max = 30)
     @Column(name = "nombre")
     private String nombre;
-    
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "perfil")
     private int perfil;
-    
     @Size(max = 50)
     @Column(name = "apellido_1")
     private String apellido1;
-    
     @Size(max = 50)
     @Column(name = "apellido_2")
     private String apellido2;
-    
     @Size(max = 100)
     @Column(name = "mail")
     private String mail;
-    
     @Column(name = "id_planta")
     private Integer idPlanta;
-    
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "st_ntf_srv_ext")
     private boolean stNtfSrvExt;
-    
+    @Basic(optional = false)
+    @NotNull
     @Size(min = 1, max = 1)
     @Column(name = "st_usuario")
     private String stUsuario;
-    
     @OneToMany(mappedBy = "idUsuario")
     private List<Planta> plantaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
@@ -96,28 +97,25 @@ public class Usuario implements Serializable {
     public Usuario() {
     }
 
-    public Integer getId() {
-		return id;
-	}
-
-	public Usuario(Integer idUsuario) {
-        this.id = idUsuario;
+    public Usuario(Integer id) {
+        this.id = id;
     }
 
-    public Usuario(Integer idUsuario, String usuario, String password, int perfil, String stUsuario) {
-        this.id = idUsuario;
+    public Usuario(Integer id, String usuario, String password, int perfil, boolean stNtfSrvExt, String stUsuario) {
+        this.id = id;
         this.usuario = usuario;
         this.password = password;
-        this.perfil = perfil;        
+        this.perfil = perfil;
+        this.stNtfSrvExt = stNtfSrvExt;
         this.stUsuario = stUsuario;
-    }	
+    }
 
-    public Integer getidUsuario() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Integer idUsuario) {
-        this.id = idUsuario;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getUsuario() {
@@ -190,6 +188,14 @@ public class Usuario implements Serializable {
 
     public void setIdPlanta(Integer idPlanta) {
         this.idPlanta = idPlanta;
+    }
+
+    public boolean getStNtfSrvExt() {
+        return stNtfSrvExt;
+    }
+
+    public void setStNtfSrvExt(boolean stNtfSrvExt) {
+        this.stNtfSrvExt = stNtfSrvExt;
     }
 
     public String getStUsuario() {
