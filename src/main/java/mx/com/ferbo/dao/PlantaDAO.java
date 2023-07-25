@@ -10,7 +10,6 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
@@ -102,43 +101,50 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 	}
 	
 	public String save(Planta p) {
+		EntityManager entity = null;
 		try {
-			EntityManager entity = getEntityManager();
+			entity = getEntityManager();
 			entity.getTransaction().begin();
 			entity.persist(p);
 			entity.getTransaction().commit();
-			entity.close();
 		} catch (Exception e) {
+			log.error("Problema para guardar la planta...", e);
 			return "Failed!! " + e.getMessage();
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
 		return null;
 	}
 	
 
 	public String update(Planta p) {
-		//String consulta = "SELECT * FROM PLANTA WHERE planta_ds = ?";
-		//Planta planta;
+		EntityManager entity = null;
 		try {
-			EntityManager entity = getEntityManager();
+			entity = getEntityManager();
 			entity.getTransaction().begin();
 			entity.merge(p);
 			entity.getTransaction().commit();
-			entity.close();
-		   } catch (Exception e) {
+		} catch (Exception e) {
+			log.error("Problema para actualizar la planta...", e);
 			return "Failed!!" + e.getMessage();
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
 		return null;
 	}
 
 	public String delete(Planta p) {
+		EntityManager entity = null;
 		try {
-			EntityManager entity = getEntityManager();
+			entity = getEntityManager();
 			entity.getTransaction().begin();
 			entity.remove(entity.merge(p));
 			entity.getTransaction().commit();
-			entity.close();
 		} catch (Exception e) {
+			log.error("Problema para eliminar la planta...", e);
 			return "Failed!! " + e.getMessage();
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
 		return null;
 	}

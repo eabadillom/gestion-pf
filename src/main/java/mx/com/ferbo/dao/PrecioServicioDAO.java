@@ -75,28 +75,34 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	
 	public List<PrecioServicio> buscarPorAviso(Aviso aviso, Cliente cliente){
 		List<PrecioServicio> listaPrecioServicio = new ArrayList<>();
+		EntityManager entity = null;
 		try {
-			EntityManager entity = EntityManagerUtil.getEntityManager();
+			entity = EntityManagerUtil.getEntityManager();
 			listaPrecioServicio = entity.createNamedQuery("PrecioServicio.findByAvisoAndCliente", PrecioServicio.class)
 					.setParameter("cteCve", cliente.getCteCve())
 					.setParameter("avisoCve", aviso.getAvisoCve()).getResultList();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-		} 
+			log.error("Problema para obtener el PrecioServicio...", e);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
 		return listaPrecioServicio;
 	}
 	
 
 	public PrecioServicio busquedaServicio(Integer avisoCve, Integer clienteCve, Integer servicioCve) {
 		PrecioServicio precioServicio = null;
+		EntityManager entity = null;
 		try {
-			EntityManager entity = EntityManagerUtil.getEntityManager();
+			entity = EntityManagerUtil.getEntityManager();
 			precioServicio = entity.createNamedQuery("PrecioServicio.findByServicioAndAvisoAndCliente", PrecioServicio.class)
 					.setParameter("cteCve", clienteCve)
 					.setParameter("avisoCve", avisoCve)
 					.setParameter("servicioCve", servicioCve).getSingleResult();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para obtener el precio servicio...", e);
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
 		return precioServicio;
 	}
@@ -119,7 +125,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 					;
 			lista = query.getResultList();
 		} catch(Exception ex) {
-			log.error("", ex);
+			log.error("Problema para obtener el precio servicio...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -128,29 +134,34 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 
 	@Override
 	public String actualizar(PrecioServicio precioServicio) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(precioServicio);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para actualizar el precio servicio...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(PrecioServicio precioServicio) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(precioServicio);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
- 			System.out.println("ERROR" + e.getMessage());
+ 			log.error("Problema para guadar el precio servicio...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -171,6 +182,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			em.getTransaction().commit();
 			
 		} catch (Exception e) {
+			log.error("Problema para eliminar el precio servicio...", e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -180,7 +192,6 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 
 	@Override
 	public String eliminarListado(List<PrecioServicio> listado) {
-		// TODO Auto-generated method stub
 		String val = "";
 		for(PrecioServicio ps:listado) {
 			val=this.eliminar(ps);
@@ -210,9 +221,9 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			bean.setServicio(servicio);
 			em.getTransaction().commit();
 		} catch(PersistenceException ex) {
-			ex.printStackTrace();
+			log.error("Problema para obtener el precio servicio...", ex);
 		} catch(Exception ex) {
-			ex.printStackTrace();
+			log.error("Problema para obtener el precio servicio...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -245,38 +256,69 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	}
 
 	private List<PrecioServicio> buscarPorCliente(PrecioServicio e) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
-				.setParameter("cteCve", e.getCliente().getCteCve()).getResultList();
+		List<PrecioServicio> list = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			list = em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
+					.setParameter("cteCve", e.getCliente().getCteCve()).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de precio servicio...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return list;
 	}
 	
 	private List<PrecioServicio> buscarPorClienteServicio(PrecioServicio e){
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("PrecioServicio.findByClienteServicio", PrecioServicio.class)
-				.setParameter("cteCve", e.getCliente().getCteCve())
-				.setParameter("servicioCve", e.getServicio())
-				.getResultList();
+		List<PrecioServicio> lista = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("PrecioServicio.findByClienteServicio", PrecioServicio.class)
+					.setParameter("cteCve", e.getCliente().getCteCve())
+					.setParameter("servicioCve", e.getServicio())
+					.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de precio servicio...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return lista;
 	}
 	
 	private List<PrecioServicio> buscarPorClienteAviso(PrecioServicio e){
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("PrecioServicio.findByClienteAviso", PrecioServicio.class)
-				.setParameter("cteCve", e.getCliente().getCteCve())
-				.setParameter("avisoCve", e.getAvisoCve().getAvisoCve())
-				.getResultList();
+		List<PrecioServicio> lista = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("PrecioServicio.findByClienteAviso", PrecioServicio.class)
+					.setParameter("cteCve", e.getCliente().getCteCve())
+					.setParameter("avisoCve", e.getAvisoCve().getAvisoCve())
+					.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de precio servicio...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return lista;
 	}	
 	
 	public int obtenFinal() {
 		int valorFinal=0;
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			valorFinal=(int) em.createNativeQuery("Select max(id) from precio_servicio").getSingleResult();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception ex) {
 			System.out.println("ERROR" + ex.getMessage());
 			return 0;
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return valorFinal;
 	}

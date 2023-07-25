@@ -8,7 +8,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -18,7 +18,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -97,24 +96,17 @@ public class DetallePartida implements Serializable, Cloneable {
     @Column(name = "dtp_tarimas")
     private String dtpTarimas;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "detallePartida")
-    private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
-    
-    @OneToMany(mappedBy = "detallePartida")
-    private List<DetallePartida> detallePartidaList;
+//    @OneToOne(cascade = CascadeType.ALL, mappedBy = "detallePartida")
+//    private DetalleConstanciaSalida detalleConstanciaSalida;
     
     @JoinColumns({
         @JoinColumn(name = "det_anterior", referencedColumnName = "DET_PART_CVE"),
         @JoinColumn(name = "det_part_anterior", referencedColumnName = "PARTIDA_CVE")})
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private DetallePartida detallePartida;
     
-    @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private Partida partida;
-    
     @JoinColumn(name = "tipo_mov_cve", referencedColumnName = "CLAVE")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private TipoMovimiento tipoMovCve;
     
     @JoinColumn(name = "u_medida_cve", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
@@ -122,7 +114,7 @@ public class DetallePartida implements Serializable, Cloneable {
     private UnidadDeManejo uMedidaCve;
     
     @JoinColumn(name = "edo_inv_cve", referencedColumnName = "edo_inv_cve")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private EstadoInventario edoInvCve;
     
     public DetallePartida clone() throws CloneNotSupportedException {
@@ -244,21 +236,13 @@ public class DetallePartida implements Serializable, Cloneable {
         this.dtpTarimas = dtpTarimas;
     }
 
-    public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
-        return detalleConstanciaSalidaList;
-    }
-
-    public void setDetalleConstanciaSalidaList(List<DetalleConstanciaSalida> detalleConstanciaSalidaList) {
-        this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
-    }
-
-    public List<DetallePartida> getDetallePartidaList() {
-        return detallePartidaList;
-    }
-
-    public void setDetallePartidaList(List<DetallePartida> detallePartidaList) {
-        this.detallePartidaList = detallePartidaList;
-    }
+//    public DetalleConstanciaSalida getDetalleConstanciaSalida() {
+//        return detalleConstanciaSalida;
+//    }
+//
+//    public void setDetalleConstanciaSalida(DetalleConstanciaSalida detalleConstanciaSalida) {
+//        this.detalleConstanciaSalida = detalleConstanciaSalida;
+//    }
 
     public DetallePartida getDetallePartida() {
         return detallePartida;
@@ -266,14 +250,6 @@ public class DetallePartida implements Serializable, Cloneable {
 
     public void setDetallePartida(DetallePartida detallePartida) {
         this.detallePartida = detallePartida;
-    }
-
-    public Partida getPartida() {
-        return partida;
-    }
-
-    public void setPartida(Partida partida) {
-        this.partida = partida;
     }
 
     public TipoMovimiento getTipoMovCve() {
@@ -309,7 +285,6 @@ public class DetallePartida implements Serializable, Cloneable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof DetallePartida)) {
             return false;
         }

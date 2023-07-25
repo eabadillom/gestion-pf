@@ -1,9 +1,9 @@
 package mx.com.ferbo.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -16,21 +16,28 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
+import mx.com.ferbo.dao.EstadoInventarioDAO;
 import mx.com.ferbo.dao.InventarioDAO;
+import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
+import mx.com.ferbo.dao.SerieConstanciaDAO;
+import mx.com.ferbo.dao.StatusConstanciaSalidaDAO;
+import mx.com.ferbo.dao.TipoMovimientoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
@@ -42,13 +49,20 @@ import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.DetallePartidaPK;
 import mx.com.ferbo.model.EstadoConstancia;
+import mx.com.ferbo.model.EstadoInventario;
 import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.SerieConstancia;
+import mx.com.ferbo.model.SerieConstanciaPK;
+import mx.com.ferbo.model.Servicio;
+import mx.com.ferbo.model.StatusConstanciaSalida;
+import mx.com.ferbo.model.TipoMovimiento;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 
@@ -58,6 +72,8 @@ import mx.com.ferbo.util.conexion;
 public class AltaConstanciaSalidaBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
+	
+	private static Logger log = LogManager.getLogger(AltaConstanciaSalidaBean.class);
 	
 	private List<Cliente> listadoClientes;
 	private ClienteDAO clienteDAO;
@@ -71,7 +87,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private ConstanciaSalidaDAO constanciaSalidaDAO;
 	
 	private List<ConstanciaDeDeposito> listadoConstanciaDD;
-	private ConstanciaDeDepositoDAO constanciaDDDAO;
 	
 	private List<PrecioServicio> listadoPrecioServicios;
 	private PrecioServicioDAO preciosServicioDAO;
@@ -82,7 +97,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	
 	private Partida partidaSelect;
 	private List<Partida> listadoPartida;
-	private List<Partida> listaAuxPartida;
 	
 	private List<DetalleConstanciaSalida> listadoDetalleConstanciaSalida;
 	private List<DetalleConstanciaSalida> listadoTemp;
@@ -94,6 +108,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	
 	private List<Inventario> listaInventario;
 	private InventarioDAO inventarioDAO;
+	private Inventario inventarioSelected;
 	
 	private ConstanciaDeServicio constanciaDeServicio;
 	private ConstanciaServicioDAO constanciaServicioDAO;
@@ -103,6 +118,26 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private Date fechaSalida;
 	private int cantidadTotal;
 	private BigDecimal pesoTotal;
+	
+	private DetalleConstanciaSalida detalleSalida;
+	private int tmpIdDetalleSalida = 0;
+	private ConstanciaSalidaServicios constanciaSalidaServicio;
+	private SerieConstanciaDAO serieConstanciaDAO;
+	private SerieConstancia serie;
+	
+	private StatusConstanciaSalida status;
+	private StatusConstanciaSalidaDAO statusDAO;
+	private PartidaDAO partidaDAO;
+	
+	private TipoMovimientoDAO tipoMovimientoDAO;
+	private TipoMovimiento tpMovimientoSalida;
+	
+	private EstadoInventarioDAO estadoInventarioDAO;
+	private EstadoInventario edoInventarioActual;
+	private EstadoInventario edoInventarioHistorico;
+	private List<Partida> partidaList;
+	
+	private boolean saved = false;
 	
 	private Usuario usuario;
 	private FacesContext faceContext;
@@ -122,8 +157,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		listadoConstanciasSalidas = new ArrayList<>();
 		
 		listadoConstanciaDD = new ArrayList<>();
-		constanciaDDDAO = new ConstanciaDeDepositoDAO();
-		
 		listadoPrecioServicios = new ArrayList<>();
 		serviciosCliente = new ArrayList<>();
 		preciosServicioDAO = new PrecioServicioDAO();
@@ -132,6 +165,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		listaInventario = new ArrayList<Inventario>();
 		
 		detallePartidaDAO = new DetallePartidaDAO();
+		serieConstanciaDAO = new SerieConstanciaDAO();
+		statusDAO = new StatusConstanciaSalidaDAO();
+		partidaDAO = new PartidaDAO();
+		tipoMovimientoDAO = new TipoMovimientoDAO();
+		estadoInventarioDAO = new EstadoInventarioDAO();
 		
 		listadoConstanciaSalidaServicios = new ArrayList<>();
 
@@ -139,7 +177,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		listadoDetalleConstanciaSalida = new ArrayList<>();
 		listadoTemp = new ArrayList<>();
 		detallePartidaLista = new ArrayList<>();
-		listaAuxPartida = new ArrayList<>();
 	}
 	
 	@PostConstruct
@@ -149,21 +186,620 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-		listadoClientes = clienteDAO.buscarTodos();
+		listadoClientes = clienteDAO.buscarHabilitados(true, false);
+		status = statusDAO.buscarPorId(1);//Por defecto, el catálogo de status constancia salida tiene el valor 1 para una constancia vigente.
+		tpMovimientoSalida = tipoMovimientoDAO.buscarPorId(2);
+		edoInventarioActual = estadoInventarioDAO.buscarPorId(1);
+		edoInventarioHistorico = estadoInventarioDAO.buscarPorId(2);
 		
 		if((usuario.getPerfil() == 1)||(usuario.getPerfil() == 4)) {
 			listadoPlantas.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
 		}else {
-			listadoPlantas = plantaDAO.findall();
+			listadoPlantas = plantaDAO.findall(false);
+		}
+		plantaSelect = listadoPlantas.get(0);
+		fechaSalida = new Date();
+		
+		this.cantidadTotal = 0;
+		this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+	}
+	
+	public void validar() {
+		
+		int contador = 0;
+		for(ConstanciaSalida cs: listadoConstanciasSalidas) {
+			if(cs.getNumero().equals(numFolio)){
+				FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR,"ERROR FOLIO","El folio no esta disponible"));
+				this.numFolio = null;
+				PrimeFaces.current().ajax().update("form:folio");
+				break;
+			}
+			contador = contador + 1;
+			if(contador == listadoConstanciasSalidas.size()) {
+				FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO,"FOLIO DISPONIBLE","El folio esta disponible"));
+			}
+		}
+		PrimeFaces.current().ajax().update("form:messages");
+		
+	}
+	
+	public void cargaInfoCliente() {
+		try {
+			this.generaFolioSalida();
+			serviciosCliente = preciosServicioDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
+			listaInventario = inventarioDAO.buscar(clienteSelect, plantaSelect);
+			listadoTemp = new ArrayList<DetalleConstanciaSalida>();
+			listadoConstanciaSalidaServicios = new ArrayList<ConstanciaSalidaServicios>();
+			partidaList = new ArrayList<Partida>();
+		} catch(Exception ex) {
+			log.error("Problema para cargar la información del cliente...", ex);
+		}
+	}
+	
+	public void generaFolioSalida() {
+		SerieConstanciaPK seriePK = null;
+		SerieConstancia serie = null;
+
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Folio";
+
+		try {
+			if (this.clienteSelect == null)
+				throw new InventarioException("Debe seleccionar un cliente");
+
+			if (this.plantaSelect == null)
+				throw new InventarioException("Debe seleccionar una planta");
+			
+			seriePK = new SerieConstanciaPK();
+			seriePK.setIdCliente(this.clienteSelect.getCteCve());
+			seriePK.setTpSerie("O");
+			serie = serieConstanciaDAO.buscarPorId(seriePK);
+
+			if (serie == null) {
+				this.numFolio = "";
+				throw new InventarioException(
+						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
+			}
+
+			this.numFolio = String.format("%s%s%s%d", seriePK.getTpSerie(), plantaSelect.getPlantaSufijo(),
+					clienteSelect.getCodUnico(), serie.getNuSerie());
+			
+			this.serie = serie;
+
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (Exception ex) {
+			log.error("Problema para generar el folio de entrada...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update(":form:messages", ":form:folio");
+		}
+	}
+	
+	public void agregaServicio() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Servicio";
+		
+		ConstanciaSalidaServicios constanciaSalidaServicios = null;
+		ConstanciaSalidaServiciosPK constanciaSalidaServiciosPK = null;
+		
+		try {
+			constanciaSalidaServicios = new ConstanciaSalidaServicios();
+			constanciaSalidaServiciosPK = new ConstanciaSalidaServiciosPK();
+			
+			if(servicioClienteSelect == null)
+				throw new InventarioException("Debe indicar un servicio.");
+			
+			if(cantidadServicio == null)
+				throw new InventarioException("Debe indicar la cantidad del servicio solicitado.");
+			
+			if(cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
+				throw new InventarioException("La cantidad del servicio indicada es incorrecta.");
+			
+			constanciaSalidaServiciosPK.setServicioCve(servicioClienteSelect.getServicio());
+			constanciaSalidaServicios.setConstanciaSalidaServiciosPK(constanciaSalidaServiciosPK);
+			constanciaSalidaServicios.setNumCantidad(cantidadServicio);
+			
+			listadoConstanciaSalidaServicios.add(constanciaSalidaServicios);
+			log.debug(listadoConstanciaSalidaServicios);
+			
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (Exception ex) {
+			log.error("Problema para generar el folio de entrada...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update(":form:messages");
+		}
+		
+	}
+	
+	public void newDetalleSalida(Inventario inventario){
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Agregar producto";
+		
+		Partida partida = null;
+		List<DetallePartida> detallePartidaList = null;
+		DetallePartida detallePartidaAnterior = null;
+		DetallePartidaPK dpPK = null;
+		DetallePartida detallePartida = null;
+		Integer detPartCve = null;
+		
+		try {
+			this.inventarioSelected = inventario;
+			List<DetalleConstanciaSalida> lstDcsRegistrada = this.listadoTemp.stream()
+					.filter(d -> d.getPartidaCve().getPartidaCve() == inventario.getPartidaCve())
+					.collect(Collectors.toList())
+					;
+			DetalleConstanciaSalida dcsRegistrada = null;
+			if(lstDcsRegistrada != null && lstDcsRegistrada.size() > 0)
+				dcsRegistrada = lstDcsRegistrada.get(0);
+			
+			if(dcsRegistrada != null)
+				throw new InventarioException("El producto seleccionado ya está registrado.");
+			
+			partida = partidaDAO.buscarPorId(inventario.getPartidaCve(), true);
+			detallePartidaList = partida.getDetallePartidaList();
+			detallePartidaAnterior = detallePartidaList.get(detallePartidaList.size() - 1);
+			detPartCve = detallePartidaAnterior.getDetallePartidaPK().getDetPartCve() + 1;
+
+			detallePartida = detallePartidaAnterior.clone();
+			detallePartidaAnterior.setEdoInvCve(edoInventarioHistorico);
+			
+			dpPK = detallePartidaAnterior.getDetallePartidaPK().clone();
+			dpPK.setDetPartCve(detPartCve);
+			detallePartida.setDetallePartidaPK(dpPK);
+			detallePartida.getDetallePartidaPK().setDetPartCve(detPartCve);
+			detallePartida.setDetallePartida(detallePartidaAnterior);
+			detallePartida.setTipoMovCve(tpMovimientoSalida);
+			detallePartida.setEdoInvCve(edoInventarioActual);
+			
+			partida.add(detallePartida);
+			
+			this.detalleSalida = new DetalleConstanciaSalida();
+			this.detalleSalida.setPartidaCve(partida);
+			this.detalleSalida.setDetPartCve(detallePartida.getDetallePartidaPK().getDetPartCve());
+			//this.detalleSalida.setDetallePartida(detallePartida);
+			this.detalleSalida.setCantidad(inventario.getCantidad());
+			this.detalleSalida.setPeso(inventario.getPeso());
+			this.detalleSalida.setUnidad(inventario.getUnidadManejo().getUnidadDeManejoDs());
+			this.detalleSalida.setCamaraCve(inventario.getCamara().getCamaraCve());
+			this.detalleSalida.setProducto(inventario.getProducto().getProductoDs());
+			this.detalleSalida.setFolioEntrada(inventario.getFolioCliente());
+			this.detalleSalida.setCamaraCadena(inventario.getCamara().getCamaraDs());
+			this.detalleSalida.setId(this.tmpIdDetalleSalida++);
+			partida.add(detalleSalida);
+			
+			this.partidaList.add(partida);
+			mensaje = "Indique la cantidad y temperatura.";
+			severity = FacesMessage.SEVERITY_INFO;
+			
+		} catch (InventarioException ex) {
+			
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			PrimeFaces.current().executeScript("PF('dg-cantidad-producto').hide()");
+		} catch (Exception ex) {
+			log.error("Problema para generar el folio de entrada...", ex);
+			
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			PrimeFaces.current().executeScript("PF('dg-cantidad-producto').hide()");
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			
+			PrimeFaces.current().ajax().update("form:messages", "form:pnl-cantidad-producto", "form:det-cantidad", "form:det-peso", "form:-det-temperatura");
+		}
+	}
+	
+	public void cancelaDetalleSalida() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Producto";
+		
+		try {
+			log.debug("Cancela la captura del detalle de salida.");
+			this.detalleSalida = new DetalleConstanciaSalida();
+			this.detalleSalida.setCantidad(0);
+			this.detalleSalida.setPeso(BigDecimal.ZERO);
+			
+			PrimeFaces.current().executeScript("PF('dg-cantidad-producto').hide()");
+		} catch (Exception ex) {
+			log.error("Problema para generar el folio de entrada...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			
+			severity = FacesMessage.SEVERITY_ERROR;
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
+	}
+	
+	public void addDetalleSalida() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Producto";
+		List<DetalleConstanciaSalida> lista = null;
+		
+		
+		try {
+			if(this.detalleSalida.getTemperatura() == null)
+				throw new InventarioException("Debe indicar una temperatura.");
+			
+			if("".equalsIgnoreCase(this.detalleSalida.getTemperatura()))
+				throw new InventarioException("Debe indicar una temperatura.");
+			
+			if(this.detalleSalida.getCantidad() <= 0)
+				throw new InventarioException("Debe indicar una cantidad correcta.");
+			
+			if(this.detalleSalida.getCantidad() > this.inventarioSelected.getCantidad())
+				throw new InventarioException("La cantidad indicada es mayor al inventario disponible.");
+			
+			if(listadoTemp == null)
+				this.listadoTemp = new ArrayList<DetalleConstanciaSalida>();
+			
+			lista = listadoTemp.stream().filter(d -> d.getPartidaCve().getPartidaCve() == detalleSalida.getPartidaCve().getPartidaCve())
+					.collect(Collectors.toList());
+			
+			if(lista.size() > 0)
+				throw new InventarioException("El producto seleccionado ya está registrado");
+			
+			listadoTemp.add(this.detalleSalida);
+			
+			
+			this.cantidadTotal = 0;
+			this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+			for(DetalleConstanciaSalida dcs : listadoTemp ) {
+				this.cantidadTotal += dcs.getCantidad();
+				this.pesoTotal = this.pesoTotal.add(dcs.getPeso());
+			}
+			
+			PrimeFaces.current().executeScript("PF('dg-cantidad-producto').hide()");
+			mensaje = "El producto se registró correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception ex) {
+			log.error("Problema para generar el folio de entrada...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages","form:dt-salidas");
+		}
+	}
+	
+	
+	public void calculoPesoSalida() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		BigDecimal peso = null;
+		BigDecimal cantidad = null;
+		BigDecimal pesoUnitario = null;
+		BigDecimal pesoSalida = null;
+		
+		try {
+			if(this.detalleSalida.getCantidad() > this.inventarioSelected.getCantidad())
+				throw new InventarioException("La cantidad indicada es mayor a la disponible en inventario.");
+			
+			log.debug("Calculando peso...");
+			peso = this.inventarioSelected.getPeso();
+			
+			cantidad = new BigDecimal(this.inventarioSelected.getCantidad()).setScale(3, BigDecimal.ROUND_HALF_UP);
+			pesoUnitario = peso.divide(cantidad, BigDecimal.ROUND_HALF_UP);
+			pesoSalida = pesoUnitario
+					.multiply(new BigDecimal(this.detalleSalida.getCantidad()).setScale(3, BigDecimal.ROUND_HALF_UP))
+					.setScale(3, BigDecimal.ROUND_HALF_UP);
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, "Aviso", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch(Exception ex) {
+			pesoSalida = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+		} finally {
+			log.debug("Peso calculado: {}", pesoSalida);
+			if(this.detalleSalida != null)
+				this.detalleSalida.setPeso(pesoSalida);
+			PrimeFaces.current().ajax().update("form:det-peso", ":form:messages");
+		}
+	}
+	
+	public void deleteDetalleConstanciaSalida(DetalleConstanciaSalida detalle) {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			if(this.detalleSalida == null)
+				throw new InventarioException("Debe indicar un producto.");
+			
+			this.listadoTemp.remove(detalleSalida);
+			
+			this.cantidadTotal = 0;
+			this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+			for(DetalleConstanciaSalida dcs : listadoTemp ) {
+				this.cantidadTotal += dcs.getCantidad();
+				this.pesoTotal = this.pesoTotal.add(dcs.getPeso());
+			}
+			
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, "Productos", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (Exception ex) {
+			log.error("Problema para eliminar el producto de la salida...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, "Productos", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages","form:dt-salidas");
+		}
+	}
+	
+	public void deleteConstanciaSalidaServicio(ConstanciaSalidaServicios csServicio) {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			if(this.detalleSalida == null)
+				throw new InventarioException("Debe indicar un servicio.");
+			
+			this.listadoConstanciaSalidaServicios.remove(csServicio);
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, "Servicio", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (Exception ex) {
+			log.error("Problema para eliminar el servicio de la salida...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, "Productos", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages","form:dt-salidas");
+		}
+	}
+	
+	public void resetCantidadServicio() {
+		this.cantidadServicio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		log.debug("Reiniciando el valor de cantidad total (servicio)");
+	}
+	
+	public void saveConstanciaSalida() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Guardar constancia";
+		
+		ConstanciaSalida constancia = new ConstanciaSalida();
+		
+		try {
+			
+			if(saved)
+				throw new InventarioException("La constancia ya está registrada.");
+			constancia.setFecha(fechaSalida);
+			constancia.setNumero(numFolio);
+			constancia.setClienteCve(clienteSelect);
+			constancia.setNombreCte(clienteSelect.getCteNombre());
+			constancia.setStatus(status);
+			constancia.setObservaciones(observaciones);
+			constancia.setNombreTransportista(nombreTransportista);
+			constancia.setPlacasTransporte(placas);
+			constancia.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
+			constancia.setDetalleConstanciaSalidaList(listadoTemp);
+			
+	 		for(ConstanciaSalidaServicios c: listadoConstanciaSalidaServicios) {
+	 			Servicio servicioCve = c.getConstanciaSalidaServiciosPK().getServicioCve();
+	 			c.getConstanciaSalidaServiciosPK().setConstanciaSalidaCve(constancia);
+	 			c.setIdConstancia(constancia);
+	 			c.setServicioCve(servicioCve);
+	 			log.debug("ConstanciaSalidaServicio: {}", c);
+			}
+	 		
+	 		for(DetalleConstanciaSalida d: listadoTemp) {
+	 			log.debug("Partida: {}", d.getPartidaCve());
+	 		}
+	 		
+	 		for(DetalleConstanciaSalida d: listadoTemp) {
+	 			d.setId(null);
+	 			d.setConstanciaCve(constancia);
+	 			List<DetallePartida> detallePartidaList = d.getPartidaCve().getDetallePartidaList();
+	 			DetallePartida detallePartida = detallePartidaList.get(detallePartidaList.size() - 1);
+	 			detallePartidaDAO.guardar(detallePartida);
+	 		}
+	 		constanciaSalidaDAO.guardar(constancia); //REGISTRO LA CONTSANCIA SALIDA
+	 		Integer numeroSerie = this.serie.getNuSerie() + 1;
+			this.serie.setNuSerie(numeroSerie);
+			serieConstanciaDAO.actualizar(this.serie);
+	 		
+	 		if(!(constancia.getConstanciaSalidaServiciosList().isEmpty())) {
+	 			
+	 			EstadoConstancia estadoConstancia = new EstadoConstancia();
+	 			estadoConstancia.setEdoCve(1);
+	 			estadoConstancia.setDescripcion("NUEVA");
+	 			
+	 			constanciaDeServicio.setCteCve(clienteSelect);
+	 			constanciaDeServicio.setFecha(fechaSalida);
+	 			constanciaDeServicio.setNombreTransportista(nombreTransportista);
+	 			constanciaDeServicio.setPlacasTransporte(placas);
+	 			constanciaDeServicio.setObservaciones(String.format("Salida %s - %s",this.numFolio , observaciones));
+	 			constanciaDeServicio.setFolioCliente("S"+constancia.getNumero());
+	 			constanciaDeServicio.setValorDeclarado(new BigDecimal(1));
+	 			constanciaDeServicio.setStatus(estadoConstancia);
+	 			
+	 			List<ConstanciaServicioDetalle> constanciaServicioDetalles = new ArrayList<ConstanciaServicioDetalle>(); 
+	 			List<PartidaServicio> partidaServicios = new ArrayList<PartidaServicio>(); 
+	 			
+	 			for(ConstanciaSalidaServicios css:listadoConstanciaSalidaServicios) {
+	 				ConstanciaServicioDetalle constanciaServicioDetalle = new ConstanciaServicioDetalle();
+	 				constanciaServicioDetalle.setServicioCve(css.getConstanciaSalidaServiciosPK().getServicioCve());
+	 				constanciaServicioDetalle.setFolio(constanciaDeServicio);
+	 				constanciaServicioDetalle.setServicioCantidad(css.getNumCantidad());
+	 				constanciaServicioDetalles.add(constanciaServicioDetalle);
+	 			}
+	 			constanciaDeServicio.setConstanciaServicioDetalleList(new ArrayList<>());
+	 			constanciaDeServicio.setConstanciaServicioDetalleList(constanciaServicioDetalles);
+	 			
+	 			for(DetalleConstanciaSalida dcs: listadoTemp) {
+	 				
+	 				PartidaServicio partidaS = new PartidaServicio();
+	 				partidaS.setFolio(constanciaDeServicio);
+	 				partidaS.setCantidadDeCobro(dcs.getPeso());
+	 				partidaS.setCantidadTotal(dcs.getCantidad());
+	 				partidaS.setProductoCve(dcs.getPartidaCve().getUnidadDeProductoCve().getProductoCve());
+	 				partidaS.setUnidadDeManejoCve(dcs.getPartidaCve().getUnidadDeProductoCve().getUnidadDeManejoCve());
+	 				partidaS.setUnidadDeCobro(dcs.getPartidaCve().getUnidadDeProductoCve().getUnidadDeManejoCve());
+	 				partidaServicios.add(partidaS);
+	 			}
+	 			
+	 			constanciaDeServicio.setPartidaServicioList(new ArrayList<>());
+	 			constanciaDeServicio.setPartidaServicioList(partidaServicios);
+	 			
+	 			if(constanciaServicioDAO.guardar(constanciaDeServicio)==null) {
+	 				System.out.println("se guardo correctamente la constancia de servicio");
+	 			}
+	 			
+	 		}
+	 		saved = true;
+	 		
+	 		mensaje = "La constancia de salida se guardó correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception ex) {
+			log.error("Problema para eliminar el servicio de la salida...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+	}
+	
+	public void nuevoRegistro() {
+		
+//		clienteSelect = new Cliente();
+//		plantaSelect = listadoPlantas.get(0);
+//		partidaSelect = new Partida();
+//		fechaSalida = new Date();
+//		numFolio = "";
+//		detallePartida = new DetallePartida();
+//		listadoDetalleConstanciaSalida = new ArrayList<DetalleConstanciaSalida>();
+//		detallePartidaLista = new ArrayList<DetallePartida>();
+//		
+//		listaInventario = new ArrayList<>();
+//		listadoTemp = new ArrayList<>();
+//		listadoPartida = new ArrayList<>();
+//		listadoConstanciaSalidaServicios = new ArrayList<>();
+//		
+//		servicioClienteSelect = new PrecioServicio();
+//		cantidadServicio = new BigDecimal(0);
+//		nombreTransportista = "";
+//		placas = "";
+//		observaciones = "";
+//		
+//		
+//		PrimeFaces.current().ajax().update("form:dt-inventario","form:dt-servicio");
+		
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+	    try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		} catch (IOException e) {
+			log.error("Problema para crear una nueva constancia de salida...",  e);
+		}
+		
+	}
+	
+	public void imprimirTicket() throws Exception{
+		
+		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
+		String filename = "ticket.pdf";
+		String images = "/images/logoF.png";
+		String message = null;
+		Severity severity = null;
+		ConstanciaSalida constancia = null;
+		File reportFile = new File(jasperPath);
+		File imgFile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			
+			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
+			URL resourceimg = getClass().getResource(images); 
+			String file = resource.getFile();//retorna la ubicacion del archivo
+			String img = resourceimg.getFile();
+			reportFile = new File(file);//crea un archivo
+			imgFile = new File(img);
+			constancia = new ConstanciaSalida();
+			constancia.setNumero(this.numFolio);
+			numFolio = String.valueOf(getNumFolio());
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("NUMERO", numFolio);
+			parameters.put("LogoPath", imgFile.getPath());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			   
+		} catch (Exception e) {
+			e.printStackTrace();
+			message = String.format("No se pudo imprimir el folio %s", this.numFolio);
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
+			PrimeFaces.current().ajax().update("form:messages");
+			
+		}finally {
+			conexion.close((Connection) connection);
 		}
 		
 		
-		listadoConstanciasSalidas = constanciaSalidaDAO.buscarTodos();
-		listadoPrecioServicios = preciosServicioDAO.buscarTodos();
-		
-		plantaSelect = listadoPlantas.get(0);
-		
-		fechaSalida = new Date();
 	}
 
 	public List<Cliente> getListadoClientes() {
@@ -172,14 +808,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 
 	public void setListadoClientes(List<Cliente> listadoClientes) {
 		this.listadoClientes = listadoClientes;
-	}
-
-	public ClienteDAO getClienteDAO() {
-		return clienteDAO;
-	}
-
-	public void setClienteDAO(ClienteDAO clienteDAO) {
-		this.clienteDAO = clienteDAO;
 	}
 
 	public Cliente getClienteSelect() {
@@ -238,28 +866,12 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		this.listadoConstanciasSalidas = listadoConstanciasSalidas;
 	}
 
-	public ConstanciaSalidaDAO getConstanciaSalidaDAO() {
-		return constanciaSalidaDAO;
-	}
-
-	public void setConstanciaSalidaDAO(ConstanciaSalidaDAO constanciaSalidaDAO) {
-		this.constanciaSalidaDAO = constanciaSalidaDAO;
-	}
-	
 	public List<ConstanciaDeDeposito> getListadoConstanciaDD() {
 		return listadoConstanciaDD;
 	}
 
 	public void setListadoConstanciaDD(List<ConstanciaDeDeposito> listadoConstanciaDD) {
 		this.listadoConstanciaDD = listadoConstanciaDD;
-	}
-
-	public ConstanciaDeDepositoDAO getConstanciaDDDAO() {
-		return constanciaDDDAO;
-	}
-
-	public void setConstanciaDDDAO(ConstanciaDeDepositoDAO constanciaDDDAO) {
-		this.constanciaDDDAO = constanciaDDDAO;
 	}
 
 	public List<PrecioServicio> getListadoPrecioServicios() {
@@ -430,358 +1042,38 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		this.usuario = usuario;
 	}
 
-	public void validar() {
-		
-		//System.out.println(listadoConstanciasSalidas);
-		int contador = 0;
-		for(ConstanciaSalida cs: listadoConstanciasSalidas) {
-			if(cs.getNumero().equals(numFolio)){
-				FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR,"ERROR FOLIO","El folio no esta disponible"));
-				this.numFolio = null;
-				PrimeFaces.current().ajax().update("form:folio");
-				break;
-			}
-			contador = contador + 1;
-			if(contador == listadoConstanciasSalidas.size()) {
-				FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO,"FOLIO DISPONIBLE","El folio esta disponible"));
-			}
-		}
-		PrimeFaces.current().ajax().update("form:messages");
-		
+	public DetalleConstanciaSalida getDetalleSalida() {
+		return detalleSalida;
 	}
-	
-	public void servicioCliente() {
-		
-		serviciosCliente.clear();
-		listaInventario.clear();
-		serviciosCliente = listadoPrecioServicios.stream()
-								.filter(s -> clienteSelect != null
-								?(s.getCliente().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
-								:false)
-								.collect(Collectors.toList());
-		
-		listaInventario = inventarioDAO.buscarPorCliente(getClienteSelect(),getPlantaSelect());
-		
+
+	public void setDetalleSalida(DetalleConstanciaSalida detalleSalida) {
+		this.detalleSalida = detalleSalida;
 	}
-	
-	public void saveServicio() {
-		
-		//CONSTANCIA_SALIDA_SRV
-		ConstanciaSalidaServicios constanciaSalidaServicios = new ConstanciaSalidaServicios();
-		ConstanciaSalidaServiciosPK constanciaSalidaServiciosPK = new ConstanciaSalidaServiciosPK();
-		
-		//constanciaSalidaServiciosPK.setConstanciaSalidaCve();
-		constanciaSalidaServiciosPK.setServicioCve(servicioClienteSelect.getServicio());
-		
-		constanciaSalidaServicios.setConstanciaSalidaServiciosPK(constanciaSalidaServiciosPK);
-		constanciaSalidaServicios.setNumCantidad(cantidadServicio);
-		
-		listadoConstanciaSalidaServicios.add(constanciaSalidaServicios);
-		System.out.println(listadoConstanciaSalidaServicios);
-		
-		
+
+	public Inventario getInventarioSelected() {
+		return inventarioSelected;
 	}
-	
-	public void saveDetalleConstanciaS(){
-		
-		if(partidaSelect==null) {
-			
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error de Producto","Seleccione un Producto/Partida"));
-			
-		}
-		else{
-			listadoPartida.clear();
-			DetalleConstanciaSalida detalleConstanciaSalida = new DetalleConstanciaSalida();
-			
-			detalleConstanciaSalida.setPartidaCve(partidaSelect);
-			
-			listadoDetalleConstanciaSalida.add(detalleConstanciaSalida);
-			listadoPartida.add(partidaSelect);
-			listaAuxPartida.add(partidaSelect);
-			
-			//OBTENCION DEL ULTIMO DETALLEPARTIDA DE LA PARTIDA
-			
-			for(DetallePartida dp: partidaSelect.getDetallePartidaList()) {
-				detallePartida = dp;
-			}
-			
-			//detallePartida = partidaSelect.getDetallePartidaList().get(0);
-			detallePartidaLista.add(detallePartida);//detallepartida de cada partidaSelect
-			this.partidaSelect = null;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,"Modificar registro agregado","Modifica piezas a salir antes de agregar otro producto"));
-		}
-		
-		PrimeFaces.current().ajax().update("form:messages","form:dt-detalleConstanciaSalida");
-		
+
+	public void setInventarioSelected(Inventario inventarioSelected) {
+		this.inventarioSelected = inventarioSelected;
 	}
-	
-	
-	public void calculoPesoSalida() {
-		BigDecimal totalP,cantidad,peso,calculo,mul;
-		
-		/*for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
-			totalP = new BigDecimal(d.getPartidaCve().getCantidadTotal());
-			peso = d.getPartidaCve().getPesoTotal();
-			cantidad = new BigDecimal(d.getCantidad());
-			mul = cantidad.multiply(peso);
-			calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);
-			d.setPeso(calculo);
-			metodo para probra mañana como lo tenia en una sola dataTable 
-		}*/
-		
-		DetalleConstanciaSalida detalleT = new DetalleConstanciaSalida();
-		
-		for(Partida p: listadoPartida) {
-			
-			totalP = new BigDecimal(p.getCantidadTotal());//piezas totales
-			peso = p.getPesoTotal();//peso total de todas las piezas 
-			//List<DetalleConstanciaSalida> detalleConstanciaSalidas = new ArrayList<DetalleConstanciaSalida>();
-			
-			for(DetalleConstanciaSalida d: listadoDetalleConstanciaSalida) {
-				cantidad = new BigDecimal(d.getCantidad());//numero de piezas a salir
-				
-				mul = cantidad.multiply(peso);
-				calculo = mul.divide(totalP,0,RoundingMode.HALF_UP);
-				d.setPeso(calculo);
-				listadoTemp.add(d);
-				detalleT = d;
-			}
-			
-		}
-		
-		listadoDetalleConstanciaSalida.remove(detalleT);
-		
-		System.out.println(listadoDetalleConstanciaSalida);
-		PrimeFaces.current().ajax().update("form:dt-detalleConstanciaSalida","form:dt-salidas");
-		
-		
+
+	public ConstanciaSalidaServicios getConstanciaSalidaServicio() {
+		return constanciaSalidaServicio;
 	}
-	
-	
-	
-	public void saveConstanciaSalida() {
-		
-		//GUARDO CONSTANCIA SALIDA
-		ConstanciaSalida constanciaSalida = new ConstanciaSalida();
-		
-		constanciaSalida.setFecha(fechaSalida);
-		constanciaSalida.setNumero(numFolio);
-		constanciaSalida.setClienteCve(clienteSelect);
-		constanciaSalida.setNombreCte(clienteSelect.getCteNombre());		
+
+	public void setConstanciaSalidaServicio(ConstanciaSalidaServicios constanciaSalidaServicio) {
+		this.constanciaSalidaServicio = constanciaSalidaServicio;
 	}
-	
-	public void saveDetalleConstanciaSalida() {
-		//METODO PARA GUARDAR INFORMACION EN LA BASE DE DATOS
-		
-		ConstanciaSalida cs = new ConstanciaSalida();
-		
-		//StatusConstanciaSalida status = new StatusConstanciaSalida();
-		cs.setFecha(fechaSalida);
-		cs.setNumero(numFolio);
-		cs.setClienteCve(clienteSelect);
-		cs.setNombreCte(clienteSelect.getCteNombre());
-		cs.setStatus(null);
-		cs.setObservaciones(observaciones);
-		cs.setNombreTransportista(nombreTransportista);
-		cs.setPlacasTransporte(placas);
-		cs.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
-		cs.setDetalleConstanciaSalidaList(listadoTemp);
-		
- 		for(ConstanciaSalidaServicios c: listadoConstanciaSalidaServicios) {
- 			c.getConstanciaSalidaServiciosPK().setConstanciaSalidaCve(cs);
-			
- 			c.setIdConstancia(cs);
- 			c.setServicioCve(c.getConstanciaSalidaServiciosPK().getServicioCve());
-			
-		}
- 		
- 		for(DetalleConstanciaSalida d: listadoTemp) {
- 			for(Partida p: listaAuxPartida) {
- 				
- 				if(d.getPartidaCve().equals(p)) {
- 					
-		 			d.setConstanciaCve(cs);
-		 			d.setCamaraCve(p.getCamaraCve().getCamaraCve());
-		 			d.setUnidad(p.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoDs());
-		 			d.setProducto(p.getUnidadDeProductoCve().getProductoCve().getProductoDs());
-		 			d.setFolioEntrada(p.getFolio().getFolioCliente());
-		 			d.setCamaraCadena(p.getCamaraCve().getCamaraDs());
-		 			
-		 			
-		 			int size = p.getDetallePartidaList().size();
-		 			System.out.println(size);
-	 				d.setDetallePartida(p.getDetallePartidaList().get(size-1));
-		 			
-		 			for(DetallePartida dp: detallePartidaLista) {
-		 				
-		 				if(d.getDetallePartida().equals(dp)) {
-		 					int detalleNuevo = dp.getDetallePartidaPK().getDetPartCve() + 1;
-		 					int cantidadRestante;
-		 					BigDecimal pesoRestante;
-		 					
-		 					cantidadRestante = dp.getCantidadUManejo() - d.getCantidad();
-		 					pesoRestante = dp.getCantidadUMedida().subtract(d.getPeso());
-		 					
-		 					DetallePartidaPK detallePartidaPK = new DetallePartidaPK();
-		 					detallePartidaPK.setDetPartCve(detalleNuevo);
-		 					detallePartidaPK.setPartidaCve(p);
-		 					
-		 					DetallePartida detalle = new DetallePartida();
-		 					detalle.setDetallePartidaPK(detallePartidaPK);
-		 					detalle.setDetallePartida(dp);
-		 					detalle.setDtpPedimento(dp.getDtpPedimento());
-		 					detalle.setDtpSAP(dp.getDtpSAP());
-		 					detalle.setDtpLote(dp.getDtpLote());
-		 					detalle.setDtpMP(dp.getDtpMP());
-		 					detalle.setDtpPO(dp.getDtpPO());      
-		 					detalle.setCantidadUManejo(cantidadRestante);
-		 					detalle.setUMedidaCve(dp.getUMedidaCve());
-		 					detalle.setCantidadUMedida(pesoRestante);
-		 					detalle.setDtpCaducidad(dp.getDtpCaducidad());
-		 					detalle.setPartida(p);		 
-		 					
-		 					d.setDetallePartida(detalle);
-		 					
-		 					if(detallePartidaDAO.guardar(d.getDetallePartida())==null) {
-			 					System.out.println("registro correcto detalle partida");
-			 				}
-		 					
-		 				}
-		 			}
-		 			break;
- 				}
- 				
- 			}
- 		}
-		
- 		constanciaSalidaDAO.guardar(cs); //REGISTRO LA CONTSANCIA SALIDA
- 		
- 		if(!(cs.getConstanciaSalidaServiciosList().isEmpty())) {
- 			
- 			EstadoConstancia estadoConstancia = new EstadoConstancia();
- 			estadoConstancia.setEdoCve(1);
- 			estadoConstancia.setDescripcion("NUEVA");
- 			
- 			constanciaDeServicio.setCteCve(clienteSelect);
- 			constanciaDeServicio.setFecha(fechaSalida);
- 			constanciaDeServicio.setNombreTransportista(nombreTransportista);
- 			constanciaDeServicio.setPlacasTransporte(placas);
- 			constanciaDeServicio.setObservaciones(observaciones);
- 			constanciaDeServicio.setFolioCliente("S"+cs.getNumero());
- 			constanciaDeServicio.setValorDeclarado(new BigDecimal(1));
- 			constanciaDeServicio.setStatus(estadoConstancia);
- 			
- 			List<ConstanciaServicioDetalle> constanciaServicioDetalles = new ArrayList<ConstanciaServicioDetalle>(); 
- 			List<PartidaServicio> partidaServicios = new ArrayList<PartidaServicio>(); 
- 			
- 			for(ConstanciaSalidaServicios css:listadoConstanciaSalidaServicios) {
- 				ConstanciaServicioDetalle constanciaServicioDetalle = new ConstanciaServicioDetalle();
- 				constanciaServicioDetalle.setServicioCve(css.getServicioCve());
- 				constanciaServicioDetalle.setFolio(constanciaDeServicio);
- 				constanciaServicioDetalle.setServicioCantidad(css.getNumCantidad());
- 				constanciaServicioDetalles.add(constanciaServicioDetalle);
- 			}
- 			constanciaDeServicio.setConstanciaServicioDetalleList(new ArrayList<>());
- 			constanciaDeServicio.setConstanciaServicioDetalleList(constanciaServicioDetalles);
- 			
- 			for(DetalleConstanciaSalida dcs: listadoTemp) {
- 				
- 				PartidaServicio partidaS = new PartidaServicio();
- 				partidaS.setFolio(constanciaDeServicio);
- 				partidaS.setCantidadDeCobro(dcs.getPeso());
- 				partidaS.setCantidadTotal(dcs.getCantidad());
- 				partidaS.setProductoCve(dcs.getPartidaCve().getUnidadDeProductoCve().getProductoCve());
- 				partidaS.setUnidadDeManejoCve(dcs.getPartidaCve().getUnidadDeProductoCve().getUnidadDeManejoCve());
- 				partidaS.setUnidadDeCobro(dcs.getPartidaCve().getUnidadDeProductoCve().getUnidadDeManejoCve());
- 				partidaServicios.add(partidaS);
- 			}
- 			
- 			constanciaDeServicio.setPartidaServicioList(new ArrayList<>());
- 			constanciaDeServicio.setPartidaServicioList(partidaServicios);
- 			
- 			if(constanciaServicioDAO.guardar(constanciaDeServicio)==null) {
- 				System.out.println("se guardo correctamente la constancia de servicio");
- 			}
- 			
- 		}
- 		
- 		
- 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"CONSTANCIA DE SALIDA", "Se registro de forma correcta"));
- 		PrimeFaces.current().ajax().update("form:messages");
-		
+
+	public boolean isSaved() {
+		return saved;
 	}
-	
-	public void nuevoRegistro() {
-		
-		clienteSelect = new Cliente();
-		plantaSelect = listadoPlantas.get(0);
-		partidaSelect = new Partida();
-		fechaSalida = new Date();
-		numFolio = "";
-		detallePartida = new DetallePartida();
-		listadoDetalleConstanciaSalida = new ArrayList<DetalleConstanciaSalida>();
-		detallePartidaLista = new ArrayList<DetallePartida>();
-		
-		listaInventario = new ArrayList<>();
-		listadoTemp = new ArrayList<>();
-		listadoPartida = new ArrayList<>();
-		listadoConstanciaSalidaServicios = new ArrayList<>();
-		listaAuxPartida = new ArrayList<Partida>();
-		
-		servicioClienteSelect = new PrecioServicio();
-		cantidadServicio = new BigDecimal(0);
-		nombreTransportista = "";
-		placas = "";
-		observaciones = "";
-		
-		
-		PrimeFaces.current().ajax().update("form:dt-inventario","form:dt-servicio");
-		
+
+	public void setSaved(boolean saved) {
+		this.saved = saved;
 	}
+
 	
-	public void imprimirTicket() throws Exception{
-		
-		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-		String filename = "ticket.pdf";
-		String images = "/images/logoF.png";
-		String message = null;
-		Severity severity = null;
-		ConstanciaSalida constancia = null;
-		File reportFile = new File(jasperPath);
-		File imgFile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		Connection connection = null;
-		parameters = new HashMap<String, Object>();
-		try {
-			
-			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
-			URL resourceimg = getClass().getResource(images); 
-			String file = resource.getFile();//retorna la ubicacion del archivo
-			String img = resourceimg.getFile();
-			reportFile = new File(file);//crea un archivo
-			imgFile = new File(img);
-			constancia = new ConstanciaSalida();
-			constancia.setNumero(this.numFolio);
-			numFolio = String.valueOf(getNumFolio());
-			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("NUMERO", numFolio);
-			parameters.put("LogoPath", imgFile.getPath());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			   
-		} catch (Exception e) {
-			e.printStackTrace();
-			message = String.format("No se pudo imprimir el folio %s", this.numFolio);
-			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
-			PrimeFaces.current().ajax().update("form:messages");
-			
-		}finally {
-			conexion.close((Connection) connection);
-		}
-		
-		
-	}
 	
 }

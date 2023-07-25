@@ -6,7 +6,6 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -14,7 +13,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -44,8 +42,6 @@ public class StatusConstanciaSalida implements Serializable {
     @Size(max = 75)
     @Column(name = "DESCRIPCION")
     private String descripcion;
-    @OneToMany(mappedBy = "status")
-    private List<ConstanciaSalida> constanciaSalidaList;
 
     public StatusConstanciaSalida() {
     }
@@ -78,14 +74,6 @@ public class StatusConstanciaSalida implements Serializable {
         this.descripcion = descripcion;
     }
     
-    public List<ConstanciaSalida> getConstanciaSalidaList() {
-        return constanciaSalidaList;
-    }
-
-    public void setConstanciaSalidaList(List<ConstanciaSalida> constanciaSalidaList) {
-        this.constanciaSalidaList = constanciaSalidaList;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;

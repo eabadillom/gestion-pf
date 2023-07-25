@@ -70,7 +70,6 @@ public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
 			EntityManagerUtil.close(em);
 		}
 	return listaP;
-	
 	}
 	@Override
 	public List<Posicion> buscarTodos() {

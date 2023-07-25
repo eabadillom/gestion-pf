@@ -22,7 +22,6 @@ import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
-import mx.com.ferbo.dao.NotaPorFacturaDAO;
 import mx.com.ferbo.dao.SerieNotaDAO;
 import mx.com.ferbo.dao.notaCreditoDAO;
 import mx.com.ferbo.model.AsentamientoHumano;

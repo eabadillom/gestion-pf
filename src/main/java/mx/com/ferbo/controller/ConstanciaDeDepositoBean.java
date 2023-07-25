@@ -524,7 +524,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			for(int i = 0; i < this.numTarimas; i++) {
 				p = (Partida) partida.clone();
 				dp = (DetallePartida) detalle.clone();
-				dp.setPartida(p);
 				
 				DetallePartidaPK detallePk = new DetallePartidaPK();
 				detallePk.setDetPartCve(1);

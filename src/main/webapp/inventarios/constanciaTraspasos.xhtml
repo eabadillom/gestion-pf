@@ -26,8 +26,8 @@
 						<p:datePicker id="fechaFinal" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha Final" value="#{consultaTraspasosBean.fecha_final}" />
 						
 						<p:outputLabel for="folio" value="Por Folio:" />
-						<p:inputText id="folio" value="#{consultaTraspasosBean.numero}"/>
-						<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2" icon="pi pi-fw pi-search" actionListener="#{consultaTraspasosBean.buscarConstancia}" update="@widgetVar(dtConstanciaTraspaso) "/>
+						<p:inputText id="folio" value="#{consultaTraspasosBean.numero}" required="true" requiredMessage="Ingresa el folio" />
+						<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2" icon="pi pi-fw pi-search" actionListener="#{consultaTraspasosBean.buscarConstancia}" update="@widgetVar(dtConstanciaTraspaso) messages"/>
 						
 						<p:outputLabel for="cliente-som" value="Por Clientes:" />
 						<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{consultaTraspasosBean.idCliente}">
@@ -63,7 +63,7 @@
 						</p:dataTable>
 						
 						<p:dialog header="Consulta de traspaso" showEffect="fade" var="consulta" modal="true" widgetVar="dlg-constancia" responsive="true" style="max-width:80em !important;" resizable="true">
-							<p:ajax event="open" listener="#{consultaTraspasosBean.carga}"/>
+							<p:ajax event="open" listener="#{consultaTraspasosBean.carga}" update="dt-detalleConstancia dt-Servicios"/>
 							<p:outputPanel id="constanciaDetalle" class="ui-fluid">
 								<p:outputPanel rendered="#{not empty consultaTraspasosBean.selectedconstancia}">
 									<div class="p-grid">
