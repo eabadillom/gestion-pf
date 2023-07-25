@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 
+import groovy.xml.Entity;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ProductoPorCliente;
@@ -23,9 +24,16 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 
 	@Override
 	public List<ProductoPorCliente> buscarTodos() {
-		List<ProductoPorCliente> listado;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("ProductoPorCliente.findAll", ProductoPorCliente.class).getResultList();
+		List<ProductoPorCliente> listado = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("ProductoPorCliente.findAll", ProductoPorCliente.class).getResultList();			
+		}catch(Exception e) {
+			log.error("Problemas para obtener informacion", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 
@@ -94,8 +102,9 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 
 	@Override
 	public String actualizar(ProductoPorCliente productoCliente) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createQuery("UPDATE ProductoPorCliente as pc set pc.productoCve.productoCve = :prdCve where pc.prodXCteCve = :pxc AND pc.cteCve.cteCve = :cteCve")
 			.setParameter("prdCve", productoCliente.getProductoCve().getProductoCve())
@@ -103,34 +112,37 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 			.setParameter("cteCve", productoCliente.getCteCve().getCteCve())
 			.executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(ProductoPorCliente prodCliente) {
-		// TODO Auto-generated method stub
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			 em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(prodCliente);
 			em.getTransaction().commit();
-		//	em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(ProductoPorCliente prodCliente) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			 em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createQuery("DELETE from ProductoPorCliente as pc where pc.prodXCteCve = :pxc AND pc.cteCve.cteCve = :cteCve and pc.productoCve.productoCve = :prdCve")
 			.setParameter("prdCve", prodCliente.getProductoCve().getProductoCve())
@@ -138,10 +150,11 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 			.setParameter("cteCve", prodCliente.getCteCve().getCteCve())
 			.executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);	
 		}
 		return null;
 	}
