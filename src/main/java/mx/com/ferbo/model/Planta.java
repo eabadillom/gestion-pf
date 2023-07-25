@@ -106,10 +106,10 @@ public class Planta implements Serializable {
 	private String numinterior;
 	
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private EmisoresCFDIS idEmisoresCFDIS;//agregado
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta", fetch = FetchType.LAZY)
 	private List<Posicion> posicionList;
 	
 	public Planta() {

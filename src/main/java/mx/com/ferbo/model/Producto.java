@@ -11,6 +11,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -55,7 +56,7 @@ public class Producto implements Serializable {
     private int categoria;
     @OneToMany(mappedBy = "productoCve")
     private List<PartidaServicio> partidaServicioList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoCve")
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "productoCve", fetch = FetchType.LAZY)
     private List<ProductoPorCliente> productoPorClienteList;
 
     public Producto() {

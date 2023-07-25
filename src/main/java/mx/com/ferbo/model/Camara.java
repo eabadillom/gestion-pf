@@ -11,6 +11,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,9 +54,9 @@ public class Camara implements Serializable {
     @Column(name = "CAMARA_ABREV")
     private String camaraAbrev;
     @JoinColumn(name = "PLANTA_CVE", referencedColumnName = "PLANTA_CVE")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Planta plantaCve;
-    @OneToMany(mappedBy = "camaraCve")
+    @OneToMany(mappedBy = "camaraCve", fetch = FetchType.LAZY)
     private List<Partida> partidaList;
     
     

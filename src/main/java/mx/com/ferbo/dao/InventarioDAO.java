@@ -87,6 +87,9 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 			for (ConstanciaDeDeposito c : constancias) {
 				partidaList = c.getPartidaList();
 				for (Partida p : partidaList) {
+					log.debug("Partida.plantaCve: {}", p.getCamaraCve().getPlantaCve().getPlantaCve());
+					if(p.getCamaraCve().getPlantaCve().getPlantaCve() != planta.getPlantaCve())
+						continue;
 					Integer cantidadInicial = p.getCantidadTotal();
 					BigDecimal pesoInicial = p.getPesoTotal(); 
 					detalleConstanciaSalidaList = p.getDetalleConstanciaSalidaList();
@@ -109,12 +112,15 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					inventario = new Inventario(); 
 					inventario.setFolioCliente(c.getFolioCliente());
 					inventario.setFechaIngreso(c.getFechaIngreso());
+					log.debug("ProductoCve: {}", p.getUnidadDeProductoCve().getProductoCve());
 					inventario.setProducto(p.getUnidadDeProductoCve().getProductoCve());
 					inventario.setCantidad(cantidadRestante);
+					log.debug("UnidadDeManejoCve: {}", p.getUnidadDeProductoCve().getUnidadDeManejoCve());
 					inventario.setUnidadManejo(p.getUnidadDeProductoCve().getUnidadDeManejoCve());
 					inventario.setPeso(pesoRestante);
 					inventario.setNumeroTarimas(p.getNoTarimas());
 					inventario.setPartidaCve(p.getPartidaCve());
+					log.debug("PlantaCve: {}", p.getCamaraCve().getPlantaCve());
 					inventario.setPlanta(p.getCamaraCve().getPlantaCve());
 					inventario.setCamara(p.getCamaraCve());
 					inventario.setPosicion(null);

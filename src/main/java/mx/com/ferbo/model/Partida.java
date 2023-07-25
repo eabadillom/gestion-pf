@@ -19,7 +19,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -78,19 +77,19 @@ public class Partida implements Serializable, Cloneable {
     @Column(name = "no_tarimas")
     private BigDecimal noTarimas;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "detallePartidaPK.partidaCve")
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "detallePartidaPK.partidaCve")
     private List<DetallePartida> detallePartidaList;
     
     @JoinColumn(name = "CAMARA_CVE", referencedColumnName = "CAMARA_CVE")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Camara camaraCve;
     
     @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private ConstanciaDeDeposito folio;
     
     @JoinColumn(name = "unidad_de_cobro", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private UnidadDeManejo unidadDeCobro;
     
     @OneToMany(mappedBy = "partidaCve", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
@@ -100,7 +99,7 @@ public class Partida implements Serializable, Cloneable {
     @ManyToOne(optional = false)
     private UnidadDeProducto unidadDeProductoCve;
     
-    @OneToMany(mappedBy = "partida", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "partida", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     private List<TraspasoPartida> traspasoPartidaList;
     
     public Partida clone() throws CloneNotSupportedException{  

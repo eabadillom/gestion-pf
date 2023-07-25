@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -46,41 +47,46 @@ public class TraspasoPartida implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 10)
     @Column(name = "constancia")
     private String constancia;
-    // @Basic(optional = false)
-    // @NotNull
-    // @Column(name = "partida")
-    // private int partida;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "descripcion")
     private String descripcion;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "cantidad")
     private long cantidad;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 150)
     @Column(name = "origen")
     private String origen;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 150)
     @Column(name = "destino")
     private String destino;
+    
     @JoinColumn(name = "traspaso", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private ConstanciaTraspaso traspaso;
 
     @JoinColumn(name = "partida")
-    @ManyToOne(optional = false, cascade = {CascadeType.ALL})
+    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
     private Partida partida;
+    
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "partidatraspaso")
+    private PartidasAfectadas partidasAfectadas;
 
     public TraspasoPartida() {
     }
@@ -88,7 +94,7 @@ public class TraspasoPartida implements Serializable {
     public TraspasoPartida(Integer id) {
         this.id = id;
     }
-
+    
     public TraspasoPartida(Integer id, String constancia, Partida partida, String descripcion, long cantidad,
             String origen,
             String destino) {
@@ -198,5 +204,13 @@ public class TraspasoPartida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.TraspasoPartida[ id=" + id + " ]";
     }
+
+	public PartidasAfectadas getPartidasAfectadas() {
+		return partidasAfectadas;
+	}
+
+	public void setPartidasAfectadas(PartidasAfectadas partidasAfectadas) {
+		this.partidasAfectadas = partidasAfectadas;
+	}
 
 }
