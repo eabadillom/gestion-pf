@@ -60,10 +60,12 @@ public class IngresosCrudBean implements Serializable {
 		private Date fecha;
 		private Integer bancoCve;
 		private Integer tipoP;
+		private Date startDate;
+		private Date endDate;
 		
 		private Cliente cteSelect;
 		private Factura facturaSelect;
-		private Pago pagofactSelect;
+		private Pago pagoSelected;
 		private Bancos bancoSelect;
 		private TipoPago tipoPago;
 		private StatusFactura sfpagoParcial;
@@ -102,7 +104,7 @@ public class IngresosCrudBean implements Serializable {
 
 			cteSelect = new Cliente();
 			facturaSelect = new Factura();
-			pagofactSelect = new Pago();
+			pagoSelected = new Pago();
 			bancoSelect = new Bancos();
 
 		}
@@ -171,7 +173,7 @@ public class IngresosCrudBean implements Serializable {
 	
 		public void agregaPagoFactura() {
 			BigDecimal saldo = BigDecimal.ZERO;
-			System.out.println(this.pagofactSelect);			
+			System.out.println(this.pagoSelected);			
 			Pago pg = new Pago();
 			
 			bancoSelect = bancoDAO.buscarPorId(bancoCve);
@@ -223,6 +225,59 @@ public class IngresosCrudBean implements Serializable {
 				
 			}
 	}
+		
+		public void updatePago() {
+			
+			System.out.println(pagoSelected);
+			
+			String messages = null;
+			Severity severity = null;		
+			
+			try {
+				
+				if(pagofactDAO.actualizar(pagoSelected)==null) {
+					severity = FacesMessage.SEVERITY_INFO;
+					messages = "El pago fue actualizado";
+				}
+				
+			} catch (Exception e) {
+				severity = FacesMessage.SEVERITY_ERROR;
+				messages = "Error al actualizar pago";
+				log.error(e.getMessage());
+			}
+			
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Actualización", messages));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
+		public void deletePago() {
+			
+			String mensaje = null;
+			Severity severity = null;
+			
+			try {
+				
+				if(pagofactDAO.eliminar(pagoSelected)==null) {
+					mensaje = "El pago fue eliminado correctamente";
+					severity = FacesMessage.SEVERITY_INFO;
+					filtraPagos();
+				}
+				
+			} catch (Exception e) {
+				mensaje = "Ocurrio un error al querer eliminar el pago";
+				severity = FacesMessage.SEVERITY_ERROR;
+				log.error(e.getMessage());
+			}
+			
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Eliminar", mensaje));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
+		public void filtraPagos() {
+			
+			listaPago = pagofactDAO.buscaPorClienteFechas(cteSelect, startDate, endDate);
+			
+		}
 
 		public Integer getIdCte() {
 			return idCte;
@@ -282,11 +337,11 @@ public class IngresosCrudBean implements Serializable {
 		}
 
 		public Pago getPagofactSelect() {
-			return pagofactSelect;
+			return pagoSelected;
 		}
 
 		public void setPagofactSelect(Pago pagofactSelect) {
-			this.pagofactSelect = pagofactSelect;
+			this.pagoSelected = pagofactSelect;
 		}
 
 		public List<Pago> getListaPago() {
@@ -416,6 +471,30 @@ public class IngresosCrudBean implements Serializable {
 
 		public void setTipoP(Integer tipoP) {
 			this.tipoP = tipoP;
+		}
+
+		public Date getStartDate() {
+			return startDate;
+		}
+
+		public void setStartDate(Date startDate) {
+			this.startDate = startDate;
+		}
+
+		public Date getEndDate() {
+			return endDate;
+		}
+
+		public void setEndDate(Date endDate) {
+			this.endDate = endDate;
+		}
+
+		public Pago getPagoSelected() {
+			return pagoSelected;
+		}
+
+		public void setPagoSelected(Pago pagoSelected) {
+			this.pagoSelected = pagoSelected;
 		}
 
 

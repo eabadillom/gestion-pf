@@ -25,10 +25,10 @@
 									<div class="p-field p-col-12 p-md-5">
 										<p:outputLabel for="soClientes" value="Clientes" />
 										<p:selectOneMenu id="soClientes" converter="entityConverter"
-											value="#{ingresosCrudBean.clienteSelected}" filter="true"
+											value="#{ingresosCrudBean.cteSelect}" filter="true"
 											filterMatchMode="contains">
 											<f:selectItem itemLabel="--Seleccione--" />
-											<f:selectItems value="#{ingresosCrudBean.lstClientes}"
+											<f:selectItems value="#{ingresosCrudBean.listaCtes}"
 												var="cliente" itemLabel="#{cliente.cteNombre}"
 												itemValue="#{cliente}" />
 											<p:ajax
@@ -41,7 +41,7 @@
 										<div class="p-field p-col-8 p-md-7">
 											<p:outputLabel for="startDateSelected" value="Fecha Inicio" />
 											<p:datePicker id="startDateSelected" for="@previous"
-												disabled="#{ingresosCrudBean.clienteSelected eq null and ingresosCrudBean.clienteSelected eq null}"
+												disabled="#{ingresosCrudBean.cteSelect eq null and ingresosCrudBean.cteSelect eq null}"
 												showIcon="true" value="#{ingresosCrudBean.startDate}">
 												<p:ajax
 													update="form:dt-pagos form:endDateSelected form:startDateSelected" />
@@ -72,9 +72,9 @@
 
 
 						<p:dataTable id="dt-pagos" widgetVar="dtPagos" var="pPago"
-							value="#{ingresosCrudBean.lstPagoFiltered}" reflow="true"
+							value="#{ingresosCrudBean.listaPago}" reflow="true"
 							styleClass="pagos-table" selectionMode="single"
-							selection="#{ingresosCrudBean.pagoSelected}" rowKey="#{pPago.id}"
+							 rowKey="#{pPago.id}"
 							paginator="true" rows="10" rowSelectMode="add"
 							paginatorPosition="bottom" lazy="true">
 							<p:column headerText="Factura">
@@ -120,14 +120,14 @@
 						</p:dataTable>
 
 						<p:dialog header="Actualizar Pago" showEffect="fade" modal="true"
-							widgetVar="informacionPagoDialogAct" responsive="true">
+							widgetVar="informacionPagoDialogAct" responsive="true"  style="max-width:40em !important;">
 							<p:outputPanel id="panel-actualizaPago" class="ui-fluid">
 								<p:outputPanel>
 									<div class="pagos-act-header">
 										<p:toolbar styleClass="p-mb-4">
 											<p:toolbarGroup align="left">
 												<h:outputText
-													value="#{ingresosCrudBean.clienteSelected.cteNombre}" />
+													value="#{ingresosCrudBean.cteSelect.cteNombre}" />
 											</p:toolbarGroup>
 										</p:toolbar>
 									</div>
@@ -148,7 +148,7 @@
 												value="#{ingresosCrudBean.pagoSelected.tipo}" filter="true"
 												filterMatchMode="contains">
 												<f:selectItem itemLabel="--Seleccione--" />
-												<f:selectItems value="#{ingresosCrudBean.lstTipoPago}"
+												<f:selectItems value="#{ingresosCrudBean.listatipoPago}"
 													var="tipoPago" itemLabel="#{tipoPago.nombre}"
 													itemValue="#{tipoPago}" />
 											</p:selectOneMenu>
@@ -170,7 +170,7 @@
 												value="#{ingresosCrudBean.pagoSelected.banco}"
 												filter="true" filterMatchMode="contains">
 												<f:selectItem itemLabel="--Seleccione--" />
-												<f:selectItems value="#{ingresosCrudBean.lstBancos}"
+												<f:selectItems value="#{ingresosCrudBean.listaBancos}"
 													var="banco" itemLabel="#{banco.nombre}"
 													itemValue="#{banco}" />
 											</p:selectOneMenu>
@@ -186,9 +186,9 @@
 							<f:facet name="footer">
 								<p:commandButton id="botonProcesaPago" value="Actualizar Pago"
 									icon="pi pi-money-bill"
-									actionListener="#{ingresosCrudBean.actualizaPago()}"
+									actionListener="#{ingresosCrudBean.updatePago()}"
 									onclick="PF('informacionPagoDialogAct').hide()"
-									disabled="#{ingresosCrudBean.disabledPagar}"
+									
 									update="panel-actualizaPago dt-pagos"
 									process="@this panel-actualizaPago" />
 								<p:commandButton value="Cancelar" icon="pi pi-times"
@@ -203,7 +203,7 @@
 							message="¿Desea eliminar este pago?" header="Eliminar"
 							severity="warn">
 							<p:commandButton value="Sí" icon="pi pi-check" process="@this"
-								actionListener="#{ingresosCrudBean.eliminaPago()}"
+								actionListener="#{ingresosCrudBean.deletePago()}"
 								update="panel-actualizaPago dt-pagos"
 								oncomplete="PF('informacionPagoDialogActDelete').hide()" />
 							<p:commandButton value="No" type="button"
