@@ -70,10 +70,17 @@ public class UsuarioDAO extends IBaseDAO<Usuario, Integer>{
 	
 	public Usuario buscarPorUsuario(String username) {
 		Usuario usuario = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		usuario = em.createNamedQuery("Usuario.findByUsuario", Usuario.class)
-				.setParameter("usuario", username)
-				.getSingleResult();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			usuario = em.createNamedQuery("Usuario.findByUsuario", Usuario.class)
+					.setParameter("usuario", username)
+					.getSingleResult();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el usuario: " + username, ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return usuario;
 	}
 

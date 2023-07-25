@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,11 +49,11 @@ public class Posicion implements Serializable {
     private Integer idPosicion;
     
     @JoinColumn(name = "id_planta", referencedColumnName = "PLANTA_CVE")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Planta planta;
     
     @JoinColumn(name = "id_camara", referencedColumnName = "CAMARA_CVE")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Camara camara;
     
     @Basic(optional = false)

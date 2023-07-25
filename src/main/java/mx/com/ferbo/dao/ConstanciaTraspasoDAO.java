@@ -10,28 +10,50 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>{
+	private static Logger log = LogManager.getLogger(ConstanciaTraspasoDAO.class);
 
 	public EntityManager em = null;
 	@Override
 	public ConstanciaTraspaso buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("ConstanciaTraspaso.findById", ConstanciaTraspaso.class).
-				setParameter("id", id).getSingleResult();		
+		EntityManager em = null;
+		ConstanciaTraspaso constancia = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			constancia = em.createNamedQuery("ConstanciaTraspaso.findById", ConstanciaTraspaso.class).
+					setParameter("id", id).getSingleResult();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la constancia de traspaso id: " + id,  ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return constancia;
 	}
 
 	public List<ConstanciaTraspaso> buscarporNumero(String numero){
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("ConstanciaTraspaso.findByNumero", ConstanciaTraspaso.class).
-				setParameter("numero", numero).getResultList();
+		EntityManager em = null;
+		List<ConstanciaTraspaso> lista = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("ConstanciaTraspaso.findByNumero", ConstanciaTraspaso.class).
+					setParameter("numero", numero).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de constancias de traspaso Numero: " + numero, ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return lista; 
 	}
 	@Override
 	public List<ConstanciaTraspaso> buscarTodos() {
@@ -40,6 +62,7 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	public List<ConstanciaTraspaso> buscarPorCriterios(String numero, Date fechaInico, Date fechaFin, int idCliente) {
 		EntityManager em = EntityManagerUtil.getEntityManager();	
 		Cliente cliente = new Cliente();
@@ -85,17 +108,18 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 
 	@Override
 	public String actualizar(ConstanciaTraspaso constancia) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.persist(constancia);
+			em.merge(constancia);
 			em.getTransaction().commit();
-			em.close();
+			
 		}catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			e.printStackTrace();
-			e.getCause();
+			log.error("Problema para actualizar la constancia de traspaso: " + constancia, e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		
 		return null;
@@ -103,17 +127,18 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 
 	@Override
 	public String guardar(ConstanciaTraspaso constancia) {
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(constancia);
 			em.getTransaction().commit();
-			em.close();
 		}catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			e.printStackTrace();
-			e.getCause();
+			log.error("Problema para guardar la constancia de traspaso: " + constancia,  e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		
 		return null;

@@ -11,6 +11,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,20 +42,27 @@ public class UnidadDeManejo implements Serializable {
     @Basic(optional = false)
     @Column(name = "UNIDAD_DE_MANEJO_CVE")
     private Integer unidadDeManejoCve;
+    
     @Size(max = 100)
     @Column(name = "UNIDAD_DE_MANEJO_DS")
     private String unidadDeManejoDs;
+    
     @OneToMany(mappedBy = "uMedidaCve")
     private Collection<DetallePartida> detallePartidaCollection;
+    
     @OneToMany(mappedBy = "unidadDeCobro")
     private Collection<Partida> partidaCollection;
+    
     @OneToMany(mappedBy = "unidadDeManejoCve")
     private Collection<PartidaServicio> partidaServicioCollection;
+    
     @OneToMany(mappedBy = "unidadDeCobro")
     private Collection<PartidaServicio> partidaServicioCollection1;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "unidad")
+    
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "unidad", fetch = FetchType.LAZY)
     private Collection<PrecioServicio> precioServicioCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "unidadDeManejoCve")
+    
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "unidadDeManejoCve", fetch = FetchType.LAZY)
     private Collection<UnidadDeProducto> unidadDeProductoCollection;
 
     public UnidadDeManejo() {

@@ -41,8 +41,7 @@ public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
 			alEstados = entity.createNamedQuery("EstadoConstancia.findAll", EstadoConstancia.class)
 					.getResultList();
 		} finally {
-			if(entity != null)
-				entity.close();
+			EntityManagerUtil.close(entity);
 		}
 		return alEstados;
 	}

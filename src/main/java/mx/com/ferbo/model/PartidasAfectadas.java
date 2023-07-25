@@ -1,5 +1,6 @@
 package mx.com.ferbo.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -12,9 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
 @Entity
@@ -26,7 +26,7 @@ import javax.validation.constraints.Null;
 		@NamedQuery(name = "PartidasAfectadas.findByPartida", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.partida = :partida"),
 		@NamedQuery(name = "PartidasAfectadas.findByPartidaTraspaso", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.partidatraspaso = :partidatraspaso")})
 		
-public class PartidasAfectadas {
+public class PartidasAfectadas implements Serializable{
 private static final long serialVersionUID = 1L;
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +44,7 @@ private Integer id;
 @JoinColumn(name = "partida", referencedColumnName = "PARTIDA_CVE")
 private Partida partida;
 
-@ManyToOne (optional = false)
+@OneToOne (optional = false)
 @JoinColumn(name = "PARTIDA_TRASPASO", referencedColumnName = "id")
 private TraspasoPartida partidatraspaso;
 

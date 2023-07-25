@@ -16,6 +16,8 @@ import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -388,5 +390,33 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		}
 		return null;
 	}
-
+	
+	public Cliente buscarProductosServicios(Integer idCliente) {
+		Cliente cliente = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			cliente = em.find(Cliente.class, idCliente);
+			
+			log.debug("Productos del cliente: " + cliente.getProductoPorClienteList().size());
+			for(ProductoPorCliente ppc : cliente.getProductoPorClienteList()) {
+				log.debug("Producto por cliente: {}", ppc.getProdXCteCve());
+			}
+			
+			log.debug("Servicios del cliente: ", cliente.getPrecioServicioList());
+			for(PrecioServicio ps : cliente.getPrecioServicioList()) {
+				log.debug("Precio Servicio por cliente: {}", ps.getId());
+				log.debug("Aviso: ", ps.getAvisoCve().getAvisoCve());
+			}
+			
+			
+		} catch(Exception ex) {
+			
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return cliente;
+	}
 }
