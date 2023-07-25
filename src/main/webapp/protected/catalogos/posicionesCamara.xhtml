@@ -25,154 +25,54 @@ button.ui-button {
 
 
 
-			<div class="p-grid">
-				<div class="">
-					<div class="card">
+ <p:fieldset legend="Filtro de busqueda">
 						<p:growl id="messages" showDetail="true" />
-						<div class="">
-							<div class="">
-								<span style="font-weight: bold">CONSULTA DE POSICIONES</span>
-							</div>
-
-
-							<p:toolbar styleClass="" id="busqueda">
-								<div class="card">
-									<div class="">
-
-										<p:toolbarGroup>
-
-											<div>
-
-												<p:outputLabel for="@next" value="PLANTA: " />
-												<p:selectOneMenu id="planta" converter="entityConverter"
-													value="#{posicionCamaraBean.plantaSelect}">
-													<f:selectItem
-														itemLabel="TODAS LAS PLANTAS (Seleccione una planta)" />
-													<f:selectItems value="#{posicionCamaraBean.plantas}"
-														var="plantas" itemLabel="#{plantas.plantaDs}"
-														itemValue="#{plantas}" />
-													<p:ajax listener="#{posicionCamaraBean.filtraListado()}"
-														update="form:busqueda" />
+										<span class="ui-float-label ui-input-icon-left">
+												<p:selectOneMenu id="planta" converter="entityConverter" value="#{posicionCamaraBean.plantaSelect}">
+													<f:selectItem itemLabel="Todas las plantas" />
+													<f:selectItems value="#{posicionCamaraBean.plantas}" var="plantas" itemLabel="#{plantas.plantaDs}" itemValue="#{plantas}" />
+													<p:ajax listener="#{posicionCamaraBean.filtraListado()}"  update="camara"/>
 												</p:selectOneMenu>
+												<p:outputLabel for="@next" value="Planta" />
+												</span>
 
-											</div>
-										</p:toolbarGroup>
-										<p:toolbarGroup>
-											<div class="">
+					<span class="ui-float-label ui-input-icon-left">							
+					<p:selectOneMenu id="camara" converter="entityConverter" value="#{posicionCamaraBean.camaraSelect}" style="width: 250px; height: 33px" >
+						<f:selectItem itemLabel="" />
+						<f:selectItems value="#{posicionCamaraBean.camaraPorPlanta}" var="camaraPlanta" itemLabel="#{camaraPlanta.camaraDs}" itemValue="#{camaraPlanta}" />
+						<p:ajax listener="#{posicionCamaraBean.filtrarPosiciones()}" />
+					</p:selectOneMenu>
+					<p:outputLabel for="@next" value="Camara" />
+					</span>
+					
+					<p:commandButton  process="@this" styleClass="ui-button-raised  " value="Consultar Posiciones" update="dt-posiciones" />
+					<h5> </h5>
+					<p:commandButton value="Agregar nueva posicion" icon="pi pi-plus" styleClass="ui-button-raised ui-button-secondary" actionListener="#{posicionCamaraBean.openNew()}" 
+								oncomplete="PF('dg-agrega').show();" update="frm-agrega" process="@this" />
+					</p:fieldset>
 
-												<p:outputLabel for="@next" value="CAMARA: " />
-												<p:selectOneMenu id="camara" converter="entityConverter"
-													value="#{posicionCamaraBean.camaraSelect}">
-													<f:selectItem itemLabel="" />
-													<f:selectItems
-														value="#{posicionCamaraBean.camaraPorPlanta}"
-														var="camaraPlanta" itemLabel="#{camaraPlanta.camaraDs}"
-														itemValue="#{camaraPlanta}" />
-													<p:ajax
-														listener="#{posicionCamaraBean.filtrarPosiciones()}" />
-												</p:selectOneMenu>
-
-											</div>
-										</p:toolbarGroup>
-										<p:toolbarGroup align="right ">
-											<div class="">
-
-												<p:commandButton icon="pi pi-search" process="@this"
-													styleClass="ui-button-raised ui-button-primary ui-button-flat "
-													value="Buscar Posiciones" update="dt-posiciones" />
-
-												<p:commandButton value="Agregar" icon="pi pi-plus"
-													styleClass="ui-button-success"
-													actionListener="#{posicionCamaraBean.openNew()}"
-													oncomplete="PF('dg-agrega').show();" update="frm-agrega"
-													process="@this" />
-
-											</div>
-										</p:toolbarGroup>
-									</div>
-								</div>
-							</p:toolbar>
-
-						</div>
-						<p:dataTable id="dt-posiciones" widgetVar="dtposiciones"
-							value="#{posicionCamaraBean.listaPosiciones}" var="posiciones"
-							reflow="true" lazy="true" paginator="true" rows="10"
-							selection="#{posicionCamaraBean.checkHabilitado}"
-							rowSelectMode="single" paginatorPosition="bottom">
-
-							<f:facet name="header">
-								<div class="posicionCamara-table-header"></div>
-							</f:facet>
-
-							<p:column headerText="Planta">
-								<h:outputText value="#{posiciones.planta.plantaCve}" />
-							</p:column>
-							<p:column headerText="Camara">
-								<h:outputText value="#{posiciones.camara.camaraCve}" />
-							</p:column>
-							<p:column headerText="Clave Posicion">
-								<h:outputText value="#{posiciones.codPosicion}" />
-							</p:column>
-							<p:column headerText="Descripción">
-								<h:outputText value="#{posiciones.descPosicion}" />
-							</p:column>
-							<p:column headerText="Temp. Min.°C">
-								<h:outputText value="#{posiciones.tempIni}" />
-							</p:column>
-							<p:column headerText="Temp. Max.°C">
-								<h:outputText value="#{posiciones.tempFin}" />
-							</p:column>
-							<p:column headerText="Status">
-								<p:selectBooleanCheckbox value="#{posiciones.habilitada}">
-								</p:selectBooleanCheckbox>
-							</p:column>
-							<p:column headerText="habilitar">
-								<p:commandButton value="Actualizar" icon="pi pi-check"
-									actionListener="#{posicionCamaraBean.check()}" process="@this">
-									<f:setPropertyActionListener value="#{posiciones.habilitada}"
-										target="#{posicionCamaraBean.checkHabilitado}" />
-								</p:commandButton>
-							</p:column>
-						</p:dataTable>
-					</div>
-				</div>
-
-			</div>
-
-			<p:dialog header="Agregar una posicion a una cámara"
-				widgetVar="dg-agrega" modal="true" showEffect="fade"
-				responsive="true">
-
+		<p:dialog id="dialogAgregaPosc" header="Agregar una posicion a una cámara" widgetVar="dg-agrega" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
-
 					<div class="p-field">
 						<p:outputLabel for="@next" value="PLANTA: " />
-						<p:selectOneMenu id="plantaAgregar" converter="entityConverter"
-							value="#{posicionCamaraBean.nuevaPosicion.planta}">
+						<p:selectOneMenu id="plantaAgregar" converter="entityConverter" value="#{posicionCamaraBean.nuevaPosicion.planta}">
 							<f:selectItem itemLabel="" />
-							<f:selectItems value="#{posicionCamaraBean.plantas}"
-								var="plantas" itemLabel="#{plantas.plantaDs}"
-								itemValue="#{plantas}" />
-							<p:ajax listener="#{posicionCamaraBean.filtrarAgregar()}"
-								update="frm-agrega" />
+							<f:selectItems value="#{posicionCamaraBean.plantas}" var="plantas" itemLabel="#{plantas.plantaDs}" itemValue="#{plantas}" />
+							<p:ajax listener="#{posicionCamaraBean.filtrarAgregar()}" update="frm-agrega" />
 						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next" value="CAMARA: " />
-						<p:selectOneMenu id="camaraAgregar" converter="entityConverter"
-							value="#{posicionCamaraBean.nuevaPosicion.camara}">
+						<p:selectOneMenu id="camaraAgregar" converter="entityConverter" value="#{posicionCamaraBean.nuevaPosicion.camara}">
 							<f:selectItem itemLabel="" />
-							<f:selectItems
-								value="#{posicionCamaraBean.camaraPorPlantaAgregar}"
-								var="camaraPlanta" itemLabel="#{camaraPlanta.camaraDs}"
+							<f:selectItems value="#{posicionCamaraBean.camaraPorPlantaAgregar}" var="camaraPlanta" itemLabel="#{camaraPlanta.camaraDs}"
 								itemValue="#{camaraPlanta}" />
 						</p:selectOneMenu>
 					</div>
 
 					<div class="p-field">
 						<p:outputLabel for="@next">Clave:</p:outputLabel>
-						<p:inputText
-							value="#{posicionCamaraBean.nuevaPosicion.codPosicion}"></p:inputText>
+						<p:inputText value="#{posicionCamaraBean.nuevaPosicion.codPosicion}"></p:inputText>
 					</div>
 
 
@@ -182,8 +82,7 @@ button.ui-button {
 							value="#{posicionCamaraBean.nuevaPosicion.descPosicion}"></p:inputText>
 					</div>
 
-					<div class="p-text-left p-mb-2 p-text-bold">Rango de
-						Temperaturas</div>
+					<div class="p-text-left p-mb-2 p-text-bold">Rango de Temperaturas</div>
 
 					<div class="p-field">
 						<p:outputLabel for="@next">°C (min):</p:outputLabel>
@@ -195,22 +94,50 @@ button.ui-button {
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next">habilitado:</p:outputLabel>
-						<p:selectBooleanCheckbox
-							value="#{posicionCamaraBean.nuevaPosicion.habilitada}"></p:selectBooleanCheckbox>
+						<p:selectBooleanCheckbox value="#{posicionCamaraBean.nuevaPosicion.habilitada}"></p:selectBooleanCheckbox>
 					</div>
-
-
 				</p:outputPanel>
 
 				<f:facet name="footer">
-					<p:commandButton value="Agregar" icon="pi pi-check"
-						actionListener="#{posicionCamaraBean.save()}"
-						update="dt-posiciones" process="frm-agrega @this" />
-					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-secondary" oncomplete="PF('dg-agrega').hide()" />
+					<p:commandButton value="Agregar" icon="pi pi-check" action="#{posicionCamaraBean.save()}" update="dt-posiciones" process="frm-agrega @this" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" oncomplete="PF('dg-agrega').hide()" />
 				</f:facet>
-
 			</p:dialog>
+
+		<p:dataTable id="dt-posiciones" widgetVar="dtposiciones" value="#{posicionCamaraBean.listaPosiciones}" var="posiciones" reflow="true" lazy="true"  paginator="true" rows="10"  
+							rowSelectMode="single" paginatorPosition="bottom">
+							<f:facet name="header">
+								<div class="posicionCamara-table-header"></div>
+							</f:facet>
+							<p:column headerText="Planta" style="text-align:center">
+								<h:outputText value="#{posiciones.planta.plantaAbrev}" />
+							</p:column>
+							<p:column headerText="Camara" style="text-align:center">
+								<h:outputText value="#{posiciones.camara.camaraAbrev}" />
+							</p:column>
+							<p:column headerText="Clave Posicion" style="text-align:center">
+								<h:outputText value="#{posiciones.codPosicion}" />
+							</p:column>
+							<p:column headerText="Descripción" style="text-align:center">
+								<h:outputText value="#{posiciones.descPosicion}" />
+							</p:column>
+							<p:column headerText="Temp. Min.°C" style="text-align:center">
+								<h:outputText value="#{posiciones.tempIni}" />
+							</p:column>
+							<p:column headerText="Temp. Max.°C" style="text-align:center">
+								<h:outputText value="#{posiciones.tempFin}" />
+							</p:column>
+							<p:column headerText="Status" style="text-align:center">
+								<p:selectBooleanCheckbox value="#{posiciones.habilitada}"/>
+							</p:column>
+							<p:column headerText="Habilitar" style="text-align:center">
+								<p:commandButton value="Actualizar" icon="pi pi-check" action="#{posicionCamaraBean.check()}"  process="@this" styleClass="ui-button-raised ">
+									<f:setPropertyActionListener value="#{posiciones}" target="#{posicionCamaraBean.checkHabilitado}" />
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+
+	
 
 
 
