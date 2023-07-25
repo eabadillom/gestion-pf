@@ -84,7 +84,7 @@ public class ConstanciaDeServicio implements Serializable {
     private List<PartidaServicio> partidaServicioList;
     
     @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Cliente cteCve;
     
     @JoinColumn(name = "STATUS", referencedColumnName = "edo_cve")
