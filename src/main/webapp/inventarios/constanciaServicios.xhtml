@@ -116,34 +116,34 @@
 									<div class="p-grid">
 										<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 											<p:outputLabel for="@next">Folio:</p:outputLabel>
-											<p:inputText value="#{constanciaServicioBean.seleccion.folioCliente}"/>
+											<p:inputText value="#{constanciaServicioBean.seleccion.folioCliente}" disabled="true"/>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 											<p:outputLabel>Fecha:</p:outputLabel>
-											<p:datePicker id="fechaServicio" showIcon="true" 
+											<p:datePicker id="fechaServicio" showIcon="true" disabled="true"
 												styleClass="p-mr-4 p-mb-2" value="#{constanciaServicioBean.seleccion.fecha}"/>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4" style="width: 40em;">
 											<p:outputLabel for="@next">Cliente</p:outputLabel>
-											<p:inputText value="#{constanciaServicioBean.seleccion.cteCve.cteNombre}"  />
+											<p:inputText value="#{constanciaServicioBean.seleccion.cteCve.cteNombre}" disabled="true" />
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 											<p:outputLabel>Estado</p:outputLabel>
-											<p:inputText value="#{constanciaServicioBean.seleccion.status.descripcion}"></p:inputText>
+											<p:inputText value="#{constanciaServicioBean.seleccion.status.descripcion}" disabled="true"></p:inputText>
 										</div>
 									</div>
 									<div class="p-grid">
 										<div class="p-col-12 p-md-6 p-lg-4" style="width: 15em;">
 											<p:outputLabel for="@next">Nombre del transportista</p:outputLabel>
-											<p:inputText value="#{constanciaServicioBean.seleccion.nombreTransportista}"/>
+											<p:inputText value="#{constanciaServicioBean.seleccion.nombreTransportista}" disabled="true"/>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 											<p:outputLabel for="@next">Placas del vehiculo</p:outputLabel>
-											<p:inputText value="#{constanciaServicioBean.seleccion.placasTransporte}"/>
+											<p:inputText value="#{constanciaServicioBean.seleccion.placasTransporte}" disabled="true"/>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4" style="width: 40em;">
 											<p:outputLabel>Observaciones</p:outputLabel>
-											<p:inputText value="#{constanciaServicioBean.seleccion.observaciones}" />
+											<p:inputText value="#{constanciaServicioBean.seleccion.observaciones}" disabled="true" />
 										</div>
 									</div>
 									<p:dataTable

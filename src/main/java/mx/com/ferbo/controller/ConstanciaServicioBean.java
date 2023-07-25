@@ -141,7 +141,7 @@ public class ConstanciaServicioBean implements Serializable{
 					.get(0);
 			
 			manager.getTransaction().begin();
-			manager.merge(constancia);
+			//manager.merge(constancia);
 			
 			List<PartidaServicio> partidas = constancia.getPartidaServicioList();
 			

@@ -3,30 +3,36 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-//@Entity
+@Entity
 
 @Table(name="CONTROL_FACTURA_CONSTANCIA_DS")
 @NamedQueries({
-	@NamedQuery(name = "ControlFacturaConstanciaDS.findByConstancia", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.constancia = :constancia"),
+	@NamedQuery(name = "ControlFacturaConstanciaDS.findByConstancia", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.constanciaDeServicio.folio = :constancia"),
 	@NamedQuery(name = "ControlFacturaConstanciaDS.findByFactura", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.factura = :factura")
 })
 public class ControlFacturaConstanciaDS implements Serializable {
 
 	private static final long serialVersionUID = 5847560075881311313L;
 	
-	@Id
-	@Column(name="CONSTANCIA")
-	private Integer constancia;
+	@EmbeddedId
+	private ControlFacturaConstanciaDsPK controlFactConstDsPK;
 	
-	@Id
-	@Column(name="FACTURA")
-	private Integer factura;
+	@JoinColumn(name = "CONSTANCIA", referencedColumnName = "FOLIO",insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+	private ConstanciaDeServicio constanciaDeServicio; 
+	
+	@JoinColumn(name = "FACTURA", referencedColumnName = "id",insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+	private Factura factura;
 	
 	@Column(name="STATUS")
 	private Integer status;
@@ -42,19 +48,27 @@ public class ControlFacturaConstanciaDS implements Serializable {
 	public ControlFacturaConstanciaDS() {
 	}
 
-	public Integer getConstancia() {
-		return constancia;
+	public ControlFacturaConstanciaDsPK getControlFactConstDsPK() {
+		return controlFactConstDsPK;
 	}
 
-	public void setConstancia(Integer constancia) {
-		this.constancia = constancia;
+	public void setControlFactConstDsPK(ControlFacturaConstanciaDsPK controlFactConstDsPK) {
+		this.controlFactConstDsPK = controlFactConstDsPK;
 	}
 
-	public Integer getFactura() {
+	public ConstanciaDeServicio getConstanciaDeServicio() {
+		return constanciaDeServicio;
+	}
+
+	public void setConstanciaDeServicio(ConstanciaDeServicio constanciaDeServicio) {
+		this.constanciaDeServicio = constanciaDeServicio;
+	}
+
+	public Factura getFactura() {
 		return factura;
 	}
 
-	public void setFactura(Integer factura) {
+	public void setFactura(Factura factura) {
 		this.factura = factura;
 	}
 
@@ -66,8 +80,8 @@ public class ControlFacturaConstanciaDS implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((constancia == null) ? 0 : constancia.hashCode());
-		result = prime * result + ((factura == null) ? 0 : factura.hashCode());
+		result = prime * result + ((constanciaDeServicio.getFolio() == null) ? 0 : constanciaDeServicio.getFolio().hashCode());
+		result = prime * result + ((factura.getId() == null) ? 0 : factura.getId().hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		return result;
 	}
@@ -81,10 +95,10 @@ public class ControlFacturaConstanciaDS implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ControlFacturaConstanciaDS other = (ControlFacturaConstanciaDS) obj;
-		if (constancia == null) {
-			if (other.constancia != null)
+		if (constanciaDeServicio.getFolio() == null) {
+			if (other.constanciaDeServicio.getFolio() != null)
 				return false;
-		} else if (!constancia.equals(other.constancia))
+		} else if (!constanciaDeServicio.getFolio().equals(other.constanciaDeServicio.getFolio()))
 			return false;
 		if (factura == null) {
 			if (other.factura != null)
@@ -101,9 +115,11 @@ public class ControlFacturaConstanciaDS implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ControlFacturaConstanciaDS [constancia=" + constancia + ", factura=" + factura + ", status=" + status
-				+ "]";
+		return "ControlFacturaConstanciaDS [controlFactConstDsPK=" + controlFactConstDsPK + ", constanciaDeServicio="
+				+ constanciaDeServicio + ", factura=" + factura + ", status=" + status + "]";
 	}
+
+	
 
 	
 	

@@ -4,53 +4,59 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Embeddable
 public class ControlFacturaConstanciaDsPK implements Serializable {
 	
-	private static final long serialVersionUID = -7338582315367180517L;
+	private static final long serialVersionUID = 1L;
 	
-	@Column(name="CONSTANCIA")
-	protected Integer constancia;
+	@JoinColumn(name = "CONSTANCIA")
+    @ManyToOne(optional = false)
+	private ConstanciaDeServicio constanciaDeServicio; 
 	
-	@Column(name="FACTURA")
-	protected Integer factura;
+	@JoinColumn(name = "FACTURA")
+    @ManyToOne(optional = false)
+	private Factura factura;
 	
 	public ControlFacturaConstanciaDsPK() {
-	}
+	}		
 
-	public ControlFacturaConstanciaDsPK(Integer constancia, Integer factura) {
-		this.constancia = constancia;
+	public ControlFacturaConstanciaDsPK(ConstanciaDeServicio constanciaDeServicio, Factura factura) {
+		super();
+		this.constanciaDeServicio = constanciaDeServicio;
 		this.factura = factura;
 	}
 
-	public Integer getConstancia() {
-		return constancia;
+	public ConstanciaDeServicio getConstanciaDeServicio() {
+		return constanciaDeServicio;
 	}
 
-	public void setConstancia(Integer constancia) {
-		this.constancia = constancia;
+	public void setConstanciaDeServicio(ConstanciaDeServicio constanciaDeServicio) {
+		this.constanciaDeServicio = constanciaDeServicio;
 	}
 
-	public Integer getFactura() {
+	public Factura getFactura() {
 		return factura;
 	}
 
-	public void setFactura(Integer factura) {
+	public void setFactura(Factura factura) {
 		this.factura = factura;
-	}
+	}	
 
 	@Override
 	public String toString() {
-		return "ControlFacturaConstanciaDsPK [constancia=" + constancia + ", factura=" + factura + "]";
+		return "ControlFacturaConstanciaDsPK [constanciaDeServicio=" + constanciaDeServicio + ", factura=" + factura
+				+ "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((constancia == null) ? 0 : constancia.hashCode());
-		result = prime * result + ((factura == null) ? 0 : factura.hashCode());
+		result = prime * result + ((constanciaDeServicio.getFolio() == null) ? 0 : constanciaDeServicio.getFolio().hashCode());
+		result = prime * result + ((factura.getId() == null) ? 0 : factura.getId().hashCode());
 		return result;
 	}
 
@@ -63,15 +69,15 @@ public class ControlFacturaConstanciaDsPK implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ControlFacturaConstanciaDsPK other = (ControlFacturaConstanciaDsPK) obj;
-		if (constancia == null) {
-			if (other.constancia != null)
+		if (constanciaDeServicio.getFolio() == null) {
+			if (other.constanciaDeServicio.getFolio() != null)
 				return false;
-		} else if (!constancia.equals(other.constancia))
+		} else if (!constanciaDeServicio.getFolio().equals(other.constanciaDeServicio.getFolio()))
 			return false;
-		if (factura == null) {
-			if (other.factura != null)
+		if (factura.getId() == null) {
+			if (other.factura.getId() != null)
 				return false;
-		} else if (!factura.equals(other.factura))
+		} else if (!factura.getId().equals(other.factura.getId()))
 			return false;
 		return true;
 	}
