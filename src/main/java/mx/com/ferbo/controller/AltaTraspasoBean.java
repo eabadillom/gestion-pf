@@ -375,10 +375,10 @@ public class AltaTraspasoBean implements Serializable {
 			servicio.setPrecio(precioServicio.getPrecio());
 			servicio.setSubtotal(precioServicio.getPrecio());
 			alServiciosDetalle.add(servicio);
-			message = "Producto agregado correctamente.";
+			message = "Servicio agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
-			log.error("Problema para obtener la información de los productos...", ex);
+			log.error("Problema para obtener la información de los servicios...", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 		} catch (Exception ex) {
