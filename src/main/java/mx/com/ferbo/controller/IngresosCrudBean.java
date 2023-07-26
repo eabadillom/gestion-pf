@@ -61,9 +61,10 @@ public class IngresosCrudBean implements Serializable {
 		private Integer bancoCve;
 		private Integer tipoP;
 		
+		
 		private Cliente cteSelect;
 		private Factura facturaSelect;
-		private Pago pagofactSelect;
+		private Pago pagoSelected;
 		private Bancos bancoSelect;
 		private TipoPago tipoPago;
 		private StatusFactura sfpagoParcial;
@@ -102,7 +103,7 @@ public class IngresosCrudBean implements Serializable {
 
 			cteSelect = new Cliente();
 			facturaSelect = new Factura();
-			pagofactSelect = new Pago();
+			pagoSelected = new Pago();
 			bancoSelect = new Bancos();
 
 		}
@@ -171,7 +172,7 @@ public class IngresosCrudBean implements Serializable {
 	
 		public void agregaPagoFactura() {
 			BigDecimal saldo = BigDecimal.ZERO;
-			System.out.println(this.pagofactSelect);			
+			System.out.println(this.pagoSelected);			
 			Pago pg = new Pago();
 			
 			bancoSelect = bancoDAO.buscarPorId(bancoCve);
@@ -208,7 +209,13 @@ public class IngresosCrudBean implements Serializable {
 			String message = null;
 			Severity severity = null;
 			try {
-				facturaDAO.actualizar(facturaSelect);
+				
+				if(!listaPago.isEmpty()) {//DUDA SOLO SE GUARDAN DATOS EN PAGO????
+					for(Pago p: listaPago) {					
+						pagofactDAO.guardar(p);					
+					}
+				}
+				//facturaDAO.actualizar(facturaSelect);//ERROR GUARDA LA ULTIMA FACTURA SELECCIONADA Y NO TODOS LOS REGISTROS
 				severity = FacesMessage.SEVERITY_INFO;
 				message = "El pago se genero correctamente";
 			} catch (Exception e) {
@@ -222,7 +229,7 @@ public class IngresosCrudBean implements Serializable {
 				PrimeFaces.current().ajax().update("form:messages", "form:dt-ingAlta", "form:dt-Factura");
 				
 			}
-	}
+	}		
 
 		public Integer getIdCte() {
 			return idCte;
@@ -282,11 +289,11 @@ public class IngresosCrudBean implements Serializable {
 		}
 
 		public Pago getPagofactSelect() {
-			return pagofactSelect;
+			return pagoSelected;
 		}
 
 		public void setPagofactSelect(Pago pagofactSelect) {
-			this.pagofactSelect = pagofactSelect;
+			this.pagoSelected = pagofactSelect;
 		}
 
 		public List<Pago> getListaPago() {
@@ -416,6 +423,14 @@ public class IngresosCrudBean implements Serializable {
 
 		public void setTipoP(Integer tipoP) {
 			this.tipoP = tipoP;
+		}		
+
+		public Pago getPagoSelected() {
+			return pagoSelected;
+		}
+
+		public void setPagoSelected(Pago pagoSelected) {
+			this.pagoSelected = pagoSelected;
 		}
 
 
