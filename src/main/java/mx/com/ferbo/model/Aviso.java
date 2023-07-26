@@ -146,7 +146,7 @@ public class Aviso implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve")
     private List<CuotaMensualServicio> cuotaMensualServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "avisoCve", orphanRemoval = true)
     private List<PrecioServicio> precioServicioList;
     
     @OneToMany(mappedBy = "avisoCve")

@@ -37,36 +37,27 @@
 							</div>
 						</div>
 
-						<p:dataTable id="dt-avisos" widgetVar="dtAvisos" var="pAviso"
-							value="#{avisosComercialBean.lstAvisos}" reflow="true"
-							styleClass="avisos-table" rowKey="#{pAviso.avisoCve}"
-							paginator="true" rows="10" rowSelectMode="add" responsive="true"
+						<p:dataTable id="dt-avisos" widgetVar="dtAvisos" var="pAviso" value="#{avisosComercialBean.lstAvisos}" reflow="true"
+							styleClass="avisos-table" rowKey="#{pAviso.avisoCve}" paginator="true" rows="10" rowSelectMode="add" responsive="true"
 							paginatorPosition="bottom" lazy="true">
 							<f:facet name="header">
 								<div class="avisos-table-header">
-									<span style="font-weight: bold">Avisos</span> <span
-										class="filter-container ui-input-icon-left"> </span>
-									<p:commandButton process="@this" icon="pi pi-plus"
-										rendered="#{avisosComercialBean.renderAvisosTable}"
-										styleClass="edit-button ui-button-primary"
-										actionListener="#{avisosComercialBean.nuevoAviso()}"
-										oncomplete="PF('addAvisoDialog').show()"
-										update="form:dt-avisos form:panel-addAviso">
+									<span style="font-weight: bold">Avisos</span> <span class="filter-container ui-input-icon-left"> </span>
+									<p:commandButton process="@this" icon="pi pi-plus" rendered="#{avisosComercialBean.renderAvisosTable}"
+										styleClass="edit-button ui-button-primary" actionListener="#{avisosComercialBean.nuevoAviso()}"
+										oncomplete="PF('addAvisoDialog').show()" update="form:dt-avisos form:panel-addAviso">
 									</p:commandButton>
 								</div>
 							</f:facet>
 							<p:column headerText="Clave">
 								<h:outputText value="#{pAviso.avisoCve}" />
-								<h:outputText
-									value="#{('-').concat(pAviso.categoriaCve.categoriaDs).concat('-').concat(pAviso.avisoVigencia)}" />
-
+								<h:outputText value="#{('-').concat(pAviso.categoriaCve.categoriaDs).concat('-').concat(pAviso.avisoVigencia)}" />
 							</p:column>
 							<p:column headerText="P.O.">
 								<h:outputText value="#{pAviso.avisoPo eq true ? 'Si':'No'}" />
 							</p:column>
 							<p:column headerText="Pedimento">
-								<h:outputText
-									value="#{pAviso.avisoPedimento eq true ? 'Si':'No'}" />
+								<h:outputText value="#{pAviso.avisoPedimento eq true ? 'Si':'No'}" />
 							</p:column>
 							<p:column headerText="S.A.P.">
 								<h:outputText value="#{pAviso.avisoSap eq true ? 'Si':'No'}" />
@@ -75,8 +66,7 @@
 								<h:outputText value="#{pAviso.avisoLote eq true ? 'Si':'No'}" />
 							</p:column>
 							<p:column headerText="C.A.D.">
-								<h:outputText
-									value="#{pAviso.avisoCaducidad eq true ? 'Si':'No'}" />
+								<h:outputText value="#{pAviso.avisoCaducidad eq true ? 'Si':'No'}" />
 							</p:column>
 							<p:column headerText="Tarima">
 								<h:outputText value="#{pAviso.avisoTarima eq true ? 'Si':'No'}" />
@@ -88,16 +78,12 @@
 								<h:outputText value="#{pAviso.avisoPlazo}" />
 							</p:column>
 							<p:column width="10%">
-								<p:commandButton icon="pi pi-pencil" process="@this"
-									styleClass="edit-button ui-button-primary"
-									actionListener="#{avisosComercialBean.buscaPrecioServicioAviso(pAviso)}"
-									oncomplete="PF('actAvisoDialog').show()"
-									update="dt-avisos form:panel-actAviso form:soPlantaAct">
+								<p:commandButton icon="pi pi-pencil" update=":form:panel-actAviso :form:soPlantaAct " oncomplete="PF('actAvisoDialog').show()"
+								styleClass="edit-button ui-button-primary"  process="@this"  actionListener="#{avisosComercialBean.buscaPrecioServicioAviso(pAviso)}" >
+								<f:setPropertyActionListener value="#{pAviso}" target="#{avisosComercialBean.avisoSelected}" />
 								</p:commandButton>
-								<p:commandButton class="ui-button-danger" icon="pi pi-trash"
-									process="@this" oncomplete="PF('avisoDialogDelete').show()">
-									<f:setPropertyActionListener value="#{pAviso}"
-										target="#{avisosComercialBean.avisoSelected}" />
+								<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('avisoDialogDelete').show()">
+									<f:setPropertyActionListener value="#{pAviso}" target="#{avisosComercialBean.avisoSelected}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>
@@ -164,10 +150,9 @@
 							</f:facet>
 						</p:dialog>
 
-						<p:dialog header="Actualizar Aviso" showEffect="fade" modal="true"
-							widgetVar="actAvisoDialog" responsive="true" width="900px">
+						<p:dialog id="dialogActualiza" header="Actualizar Aviso" showEffect="fade" modal="true" widgetVar="actAvisoDialog" responsive="true" width="900px">
 							<p:outputPanel id="panel-actAviso" class="ui-fluid">
-								<p:outputPanel>
+								<p:outputPanel rendered="#{not empty avisosComercialBean.avisoSelected}">
 									<div class="p-formgrid p-grid">
 										<div class="p-field p-col-12 p-md-12">
 											<p:selectBooleanCheckbox id="aviso-po-m" itemLabel="P.O." value="#{avisosComercialBean.avisoSelected.avisoPo}"/>
@@ -200,7 +185,7 @@
 											</p:selectOneMenu>
 											<p:outputLabel for="@next" value="Categoria" />
 											<p:selectOneMenu id="soCategoriaAct" converter="entityConverter" disabled="true" value="#{avisosComercialBean.categoriaSelected}" filter="true" filterMatchMode="contains">
-												<f:selectItem itemLabel="--Seleccione--" />
+												<f:selectItem itemLabel="--Seleccione--"  />
 												<f:selectItems value="#{avisosComercialBean.lstCategoria}" var="categoria" itemLabel="#{categoria.categoriaDs}" itemValue="#{categoria}" />
 											</p:selectOneMenu>
 											<p:outputLabel for="@next" value="Vigencia en días" />
@@ -210,35 +195,20 @@
 										</div>
 										<div class="p-field p-col-12 p-md-6">
 											<p:outputLabel for="@next" value="Servicios disponibles" />
-											<p:dataTable id="dt-servicioSinAviso" scrollable="true"
-												scrollHeight="150"
-												styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines"
-												widgetVar="dtServicioSinAviso" var="pServicioSinAviso"
-												value="#{avisosComercialBean.lstPrecioServicio}"
-												reflow="true"
-												selection="#{avisosComercialBean.lstPrecioServicioSelected}"
-												rowKey="#{pServicioSinAviso.id}" rowSelectMode="add"
-												lazy="true">
-												<p:column width="5%" selectionMode="multiple"
-													exportable="false" />
+											<p:dataTable id="dt-servicioSinAviso" scrollable="true" scrollHeight="150" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines"
+												widgetVar="dtServicioSinAviso" var="pServicioSinAviso" value="#{avisosComercialBean.lstPrecioServicio}" reflow="true" 
+												selection="#{avisosComercialBean.lstPrecioServicioSelected}" rowKey="#{pServicioSinAviso.id}" rowSelectMode="add" lazy="true">
+												<p:column width="5%" selectionMode="multiple" exportable="false" />
 												<p:column headerText="Servicio">
-													<h:outputText
-														value="#{pServicioSinAviso.servicio.servicioDs}" />
+													<h:outputText value="#{pServicioSinAviso.servicio.servicioDs}" />
 												</p:column>
 											</p:dataTable>
-											<p:commandButton id="botonColocaAviso" value="Agregar servicios"
-												actionListener="#{avisosComercialBean.agregaServicio()}"
-												update="panel-actAviso dt-avisos"
-												process="@this dt-servicioSinAviso" />
+											<p:commandButton id="botonColocaAviso" value="Agregar servicios" actionListener="#{avisosComercialBean.agregaServicio()}" update="panel-actAviso dt-avisos" process="dt-servicioSinAviso @this" />
 										</div>
 										<div class="p-field p-col-12 p-md-6">
 											<p:outputLabel for="@next" value="Servicios con este aviso" />
-											<p:dataTable id="dt-servicioAviso" scrollable="true"
-												scrollHeight="150"
-												styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines"
-												widgetVar="dtServicioAviso" var="pServicioAviso"
-												value="#{avisosComercialBean.lstPrecioServicioAviso}"
-												reflow="true" rowKey="#{pServicioAviso.id}" lazy="true">
+											<p:dataTable id="dt-servicioAviso" scrollable="true" scrollHeight="150" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines"
+												widgetVar="dtServicioAviso" var="pServicioAviso" value="#{avisosComercialBean.lstPrecioServicioAviso}" reflow="true"  rowKey="#{pServicioAviso.id}" lazy="true">
 												<p:column headerText="Servicio">
 													<h:outputText value="#{pServicioAviso.servicio.servicioDs}" />
 												</p:column>
@@ -249,11 +219,9 @@
 													<h:outputText value="#{pServicioAviso.unidad.unidadDeManejoDs}" />
 												</p:column>
 												<p:column width="10%">
-													<p:commandButton id="botonQuitaAviso"
-														class="ui-button-danger" icon="pi pi-trash"
-														actionListener="#{avisosComercialBean.eliminaServicio(pServicioAviso)}"
-														update="form:panel-actAviso form:dt-avisos"
-														process="@this dt-servicioAviso" />
+													<p:commandButton id="botonQuitaAviso" class="ui-button-danger" icon="pi pi-trash" 
+													actionListener="#{avisosComercialBean.eliminaServicio(pServicioAviso)}" update="form:panel-actAviso form:dt-avisos" 
+													process="@this dt-servicioAviso" />
 												</p:column>
 											</p:dataTable>
 										</div>
@@ -262,15 +230,10 @@
 							</p:outputPanel>
 
 							<f:facet name="footer">
-								<p:commandButton id="botonActualizaAviso"
-									value="Actualiza Aviso"
-									actionListener="#{avisosComercialBean.actualizaAviso()}"
-									onclick="PF('actAvisoDialog').hide()"
-									update="panel-actAviso dt-avisos"
-									process="@this panel-actAviso" />
-								<p:commandButton value="Cancelar" icon="pi pi-times"
-									onclick="PF('actAvisoDialog').hide()" actionListener="#{avisosComercialBean.resetSelectedItems()}"
-									class="ui-button-secondary" resetValues="true" />
+								<p:commandButton id="botonActualizaAviso" value="Actualiza Aviso" action="#{avisosComercialBean.actualizaAviso()}" update="panel-actAviso dt-avisos soPlantaAct" process="panel-actAviso @this"
+								onclick="PF('actAvisoDialog').hide()"   />
+								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('actAvisoDialog').hide()" actionListener="#{avisosComercialBean.resetSelectedItems()}"
+									class="ui-button-secondary" resetValues="true"  process="@this" immediate="true"/>
 							</f:facet>
 						</p:dialog>
 
