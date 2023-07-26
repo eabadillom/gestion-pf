@@ -60,8 +60,7 @@ public class IngresosCrudBean implements Serializable {
 		private Date fecha;
 		private Integer bancoCve;
 		private Integer tipoP;
-		private Date startDate;
-		private Date endDate;
+		
 		
 		private Cliente cteSelect;
 		private Factura facturaSelect;
@@ -210,7 +209,13 @@ public class IngresosCrudBean implements Serializable {
 			String message = null;
 			Severity severity = null;
 			try {
-				facturaDAO.actualizar(facturaSelect);
+				
+				if(!listaPago.isEmpty()) {//DUDA SOLO SE GUARDAN DATOS EN PAGO????
+					for(Pago p: listaPago) {					
+						pagofactDAO.guardar(p);					
+					}
+				}
+				//facturaDAO.actualizar(facturaSelect);//ERROR GUARDA LA ULTIMA FACTURA SELECCIONADA Y NO TODOS LOS REGISTROS
 				severity = FacesMessage.SEVERITY_INFO;
 				message = "El pago se genero correctamente";
 			} catch (Exception e) {
@@ -224,60 +229,7 @@ public class IngresosCrudBean implements Serializable {
 				PrimeFaces.current().ajax().update("form:messages", "form:dt-ingAlta", "form:dt-Factura");
 				
 			}
-	}
-		
-		public void updatePago() {
-			
-			System.out.println(pagoSelected);
-			
-			String messages = null;
-			Severity severity = null;		
-			
-			try {
-				
-				if(pagofactDAO.actualizar(pagoSelected)==null) {
-					severity = FacesMessage.SEVERITY_INFO;
-					messages = "El pago fue actualizado";
-				}
-				
-			} catch (Exception e) {
-				severity = FacesMessage.SEVERITY_ERROR;
-				messages = "Error al actualizar pago";
-				log.error(e.getMessage());
-			}
-			
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Actualización", messages));
-			PrimeFaces.current().ajax().update("form:messages");
-		}
-		
-		public void deletePago() {
-			
-			String mensaje = null;
-			Severity severity = null;
-			
-			try {
-				
-				if(pagofactDAO.eliminar(pagoSelected)==null) {
-					mensaje = "El pago fue eliminado correctamente";
-					severity = FacesMessage.SEVERITY_INFO;
-					filtraPagos();
-				}
-				
-			} catch (Exception e) {
-				mensaje = "Ocurrio un error al querer eliminar el pago";
-				severity = FacesMessage.SEVERITY_ERROR;
-				log.error(e.getMessage());
-			}
-			
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Eliminar", mensaje));
-			PrimeFaces.current().ajax().update("form:messages");
-		}
-		
-		public void filtraPagos() {
-			
-			listaPago = pagofactDAO.buscaPorClienteFechas(cteSelect, startDate, endDate);
-			
-		}
+	}		
 
 		public Integer getIdCte() {
 			return idCte;
@@ -471,23 +423,7 @@ public class IngresosCrudBean implements Serializable {
 
 		public void setTipoP(Integer tipoP) {
 			this.tipoP = tipoP;
-		}
-
-		public Date getStartDate() {
-			return startDate;
-		}
-
-		public void setStartDate(Date startDate) {
-			this.startDate = startDate;
-		}
-
-		public Date getEndDate() {
-			return endDate;
-		}
-
-		public void setEndDate(Date endDate) {
-			this.endDate = endDate;
-		}
+		}		
 
 		public Pago getPagoSelected() {
 			return pagoSelected;
