@@ -3,7 +3,6 @@ package mx.com.ferbo.controller;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -20,9 +19,9 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jfree.util.Log;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
@@ -31,6 +30,7 @@ import mx.com.ferbo.dao.ConstanciaDepositoDetalleDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
+import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
@@ -56,6 +56,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private Date fechaFinal;
 	private Date fechaCaducidad;
 	private Date fechaIngreso;
+	private Date maxDate;
 	
 	private String folio;
 	
@@ -126,6 +127,10 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		fechaFinal = new Date();
 		fechaCaducidad = new Date();
 		folio = "";
+		
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+		maxDate = new Date(today.getTime() );
 		
 		
 	}
@@ -330,6 +335,14 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		this.usuario = usuario;
 	}
 
+	public Date getMaxDate() {
+		return maxDate;
+	}
+
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
+	}
+
 	public void buscarConstanciaDD() {
 		
 		EntityManager em = EntityManagerUtil.getEntityManager();
@@ -348,6 +361,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			List<ConstanciaDepositoDetalle> alConstanciaDD = constanciaDeDeposito.getConstanciaDepositoDetalleList();
 			alConstanciaDD.size();
 			for(Partida p: alPartidas) {
+				String camara = p.getCamaraCve().getCamaraAbrev();
+				p.getCamaraCve().getPlantaCve().getPlantaDs();
 				List<DetallePartida> listadoDetallePartida = p.getDetallePartidaList();
 				listadoDetallePartida.size();
 			}
@@ -417,7 +432,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		for(ConstanciaDepositoDetalle c: selectConstanciaDD.getConstanciaDepositoDetalleList()) {
 			
-			if(c.getConstanciaDepositoDetalleCve()==constanciaSelect.getConstanciaDepositoDetalleCve()) {
+			if(c.getConstanciaDepositoDetalleCve().equals(constanciaSelect.getConstanciaDepositoDetalleCve())) {
 				c.setServicioCantidad(servicioCantidad);
 			}
 			
@@ -425,9 +440,10 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Servicio Actualizado"));
+			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
 		}
 		
-		PrimeFaces.current().ajax().update("form:messages");
+		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
 	}
 	
 	public void saveServicio() {

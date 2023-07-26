@@ -22,11 +22,11 @@
 				<!-- Por Fechas -->
 					<p:outputLabel value="Por Rango de Fechas:" styleClass="p-mr-2"/>
 					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" 
-					value="#{consultarConstanciaDeDepositoBean.fechaInicial}" >
+					value="#{consultarConstanciaDeDepositoBean.fechaInicial}" maxdate="#{consultarConstanciaDeDepositoBean.maxDate}">
 					</p:datePicker>
 					
 					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" 
-					value="#{consultarConstanciaDeDepositoBean.fechaFinal}">
+					value="#{consultarConstanciaDeDepositoBean.fechaFinal}" maxdate="#{consultarConstanciaDeDepositoBean.maxDate}">
 					</p:datePicker>
 					
 				<!-- Por Folio -->
@@ -125,7 +125,7 @@
 							</p:column>
 							
 							<p:column>
-								<p:commandButton value="Modificar" oncomplete="PF('dlgModificarServicio').show()" styleClass="edit-button ui-button-success" icon="pi pi-pencil" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" >
+								<p:commandButton value="Modificar" oncomplete="PF('dlgModificarServicio').show()" icon="pi pi-pencil" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" >
 									<f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
 								</p:commandButton>
 							</p:column>
@@ -331,7 +331,7 @@
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:splitButton value="Modificar Datos Generales" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura" styleClass="edit-button ui-button-success p-mr-2" >
+					<p:splitButton value="Modificar Datos Generales" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura" styleClass="p-mr-2" >
 						<p:menuitem value="Reimprimir Ticket" icon="pi pi-print" actionListener="#{consultarConstanciaDeDepositoBean.imprimir()}" ajax="false" process="@this"></p:menuitem>
 					</p:splitButton>
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgDatosG').hide()"></p:commandButton>
