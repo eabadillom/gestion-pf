@@ -70,8 +70,10 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		StringBuilder queryBuilder = new StringBuilder();//?? guardar strings para la query
 		
 		try {
+			
 			Query q = null;
 			queryBuilder.append("SELECT cdd FROM ConstanciaDeDeposito cdd");
+
 			if (fechaInico != null && fechaFin != null) {//si ambos parametros son diferente de null entra 
 				whereCause.add("(cdd.fechaIngreso BETWEEN :fechaInicio AND :fechaFinal)");//añade a la lista de String que representa los where
 				paramaterMap.put("fechaInicio", fechaInico);//seteamos los parametros* 
@@ -86,24 +88,27 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				whereCause.add("cdd.cteCve = :idCliente");//comparamos el cliente de constanciadeservicio con lo que se seteo al :idCliente
 				paramaterMap.put("idCliente", cliente);//seteamos idCliente el objeto cliente instanciado
 			}
+
 			queryBuilder.append(" WHERE " + StringUtils.join(whereCause, " AND "));//al query le añadimos los wherecause dependiendo en que condiciones entre
+
 			q = em.createQuery(queryBuilder.toString());//a la sesion le pasamos el query creado que se encuentra en queryBuilder y se lo pasamos como String
+
 			for (String key : paramaterMap.keySet()) {//recorremos las llaves que contiene parameterMap
 				q.setParameter(key, paramaterMap.get(key));//por cada key le seteamos a q (query) los parametros con la llave (key=string) y con .get el objeto de la key
 			}
+
 			List<ConstanciaDeDeposito> listado = (List<ConstanciaDeDeposito>) q.getResultList();//creamos tipo de lista que se retornara y casteamos el resultado de la query
+			
+			
 			return listado;
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return null;
-		}finally {
-			
 		}
 	}
 
 	@Override
 	public String actualizar(ConstanciaDeDeposito constanciaDeDeposito) {
-
 		// TODO Auto-generated method stub
 		
 		EntityManager em = null;
@@ -121,6 +126,8 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		}finally {
 			EntityManagerUtil.close(em);
 		}
+		
+		
 		return null;
 	}
 
@@ -161,14 +168,17 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
+			
 			lstAux = em.createNamedQuery("ConstanciaDeDeposito.findByFolioCliente",ConstanciaDeDeposito.class)
 					.setParameter("folioCliente",cons.getFolioCliente())
 					.getResultList();
+			
 		} catch(Exception ex) {
 			log.error("Problema para obtener la constancia de depósito...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
+			
 		return lstAux;
 	}
 	
@@ -178,6 +188,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
+			
 			constancia = em.createNamedQuery("ConstanciaDeDeposito.findByFolioCliente",ConstanciaDeDeposito.class)
 					.setParameter("folioCliente", folioCliente)
 					.getSingleResult();
@@ -227,16 +238,20 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public ConstanciaDeDeposito buscarPorFolioCliente(String folio) {
 		ConstanciaDeDeposito constancia = null;
 		EntityManager em = null;
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
+			
 			constancia = em.createNamedQuery("ConstanciaDeDeposito.findByFolioCliente",ConstanciaDeDeposito.class)
 					.setParameter("folioCliente", folio)
 					.getSingleResult();
+			
 		} catch(Exception ex) {
 			log.error("Problema para obtener la constancia de depósito...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
+			
 		return constancia;
 	}
 
@@ -254,4 +269,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		this.em = em;
 	}
 
+	
+	
+	
 }

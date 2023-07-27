@@ -643,9 +643,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-partidas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto");
 		}
 	}
-public void deleteServicio() {
-	this.listadoConstanciaDepositoDetalle.remove(selectedConstanciasDD);
-}
+
 	public void deleteSelectedPartidas() {
 
 		for (Partida p : listadoPartida) {

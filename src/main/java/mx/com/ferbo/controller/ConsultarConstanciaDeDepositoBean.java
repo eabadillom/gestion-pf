@@ -21,16 +21,15 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 
-import org.jfree.util.Log;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaDepositoDetalleDAO;
+import mx.com.ferbo.dao.DetallePartidaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
-import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
@@ -83,6 +82,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private ConstanciaDepositoDetalleDAO constanciaDepositoDetalleDAO;
 	private ConstanciaDepositoDetalle constanciaSelect;
 	
+	private DetallePartidaDAO detallePartidaDAO;
+	
 	private Servicio servicioSelected;
 	
 	private BigDecimal servicioCantidad,cantidadServicio;
@@ -112,6 +113,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		listadoConstanciaDepositoDetalle = new ArrayList<ConstanciaDepositoDetalle>();
 		constanciaDepositoDetalleDAO = new ConstanciaDepositoDetalleDAO();
 		
+		detallePartidaDAO = new DetallePartidaDAO();
 	}
 
 	@PostConstruct
@@ -420,11 +422,34 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		//detallePartida.setDtpPO(null);//otro
 		//detallePartida.setDtpTarimas(tarima);//duda ¿?
 		
-		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
+		if(detallePartidaDAO.actualizar(detallePartida) == null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Detalle de Partida Actualizada"));
 		}
 		
+		otro = "";
+		pedimento = "";
+		contenedor = "";
+		lote = "";
+		fechaCaducidad = new Date();
+		tarima = "";
+		
 		PrimeFaces.current().ajax().update("form:messages");
+		
+	}
+	
+	public void verDetallePartida() {
+		
+		List<DetallePartida> listaDetalleP = partidaSelect.getDetallePartidaList();
+		
+		int tam = listaDetalleP.size()-1;
+		
+		DetallePartida detalleP = listaDetalleP.get(tam);
+		
+		otro = detalleP.getDtpPO();
+		pedimento = detalleP.getDtpPedimento();
+		contenedor = detalleP.getDtpSAP();
+		lote = detalleP.getDtpLote();
+		fechaCaducidad = detalleP.getDtpCaducidad();
 		
 	}
 	

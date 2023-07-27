@@ -33,8 +33,27 @@ public class DetallePartidaDAO extends IBaseDAO<DetallePartida, Integer> {
 	}
 
 	@Override
-	public String actualizar(DetallePartida e) {
-		// TODO Auto-generated method stub
+	public String actualizar(DetallePartida detallePartida) {
+		
+		EntityManager em = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(detallePartida);
+			em.getTransaction().commit();
+			
+		} catch (Exception e2) {
+			log.error("Problema al actualizar detallePartida",e2);
+			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		
+		
 		return null;
 	}
 

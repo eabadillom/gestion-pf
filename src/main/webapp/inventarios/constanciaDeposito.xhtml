@@ -255,7 +255,7 @@
 						<h:outputText value="#{constanciaDD.servicioCantidad}"/>
 					</p:column>
 					<p:column exportable="false" style="text-align:center">
-					    <p:commandButton class="ui-button-danger" icon="pi pi-times" action="#{constanciaDeDepositoBean.deleteServicio()}" rendered="#{not constanciaDeDepositoBean.saved}" update="dt-constanciaDD">
+					    <p:commandButton class="ui-button-danger" icon="pi pi-times" action="#{constanciaDeDepositoBean.deleteConstanciaDD}" rendered="#{not constanciaDeDepositoBean.saved}">
 					        <f:setPropertyActionListener value="#{constanciaDD}" target="#{constanciaDeDepositoBean.selectedConstanciasDD}" />
 					    </p:commandButton>
 					</p:column>
