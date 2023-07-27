@@ -13,10 +13,8 @@
 					
 			<p:toolbar styleClass="p-mb-4">
 				<p:toolbarGroup>
-					<p:commandButton value="Agregar" icon="pi pi-plus" 
-						actionListener="#{usuariosBean.openNew()}" update="pnlCliente" 
-						oncomplete="PF('dialogCliente').show();" styleClass="ui-button-info p-mr-2 p-mb-2"
-						 style="margin-right: .5rem" process="@this" />
+					<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{usuariosBean.openNew()}" update="pnlCliente" 
+						oncomplete="PF('dialogCliente').show();" styleClass="ui-button-info p-mr-2 p-mb-2" style="margin-right: .5rem" process="@this" />
 				</p:toolbarGroup>
 			</p:toolbar>
 				<div class="p-grid crud-demo">
@@ -24,31 +22,27 @@
 					<div class="card">
 						<p:growl id="messages" showDetail="true" />
 						
-						<p:dataTable id="dt-usuario" lazy="true" widgetVar="dtUser" var="userdt"
-							value="#{usuariosBean.usuarios}" reflow="true"
-							rowKey="#{userdt.id}" paginator="true" rows="10"
-							paginatorPosition="bottom" rowSelectMode="add">
+						<p:dataTable id="dt-usuario" lazy="true" widgetVar="dtUser" var="userdt" value="#{usuariosBean.usuarios}" reflow="true"
+							rowKey="#{userdt.id}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
 							
-							<p:column headerText="Nombre">
+							<p:column headerText="Nombre" style="text-align:center">
 								<h:outputText value="#{userdt.nombre}" />
 							</p:column>
 
-							<p:column headerText="Apellido Paterno">
+							<p:column headerText="Apellido Paterno" style="text-align:center">
 								<h:outputText value="#{userdt.apellido1}" />
 							</p:column>
 
-							<p:column headerText="Apellido Materno">
+							<p:column headerText="Apellido Materno" style="text-align:center">
 								<h:outputText value="#{userdt.apellido2}" />
 							</p:column>
 
-							<p:column headerText="Perfil">
+							<p:column headerText="Perfil" style="text-align:center">
 								<h:outputText value="#{userdt.perfil}" />
 							</p:column>
 
 					<p:column headerText="Acción" style="text-align:center">
-					
-					<p:commandButton icon="pi pi-pencil" update=":form:pnlCliente" value="Modificar" 
-									oncomplete="PF('dialogCliente').show();" styleClass="edit-button" process="@this" >
+					<p:commandButton icon="pi pi-pencil" update="form:pnlCliente :form:password" value="Modificar"  oncomplete="PF('dialogCliente').show();" styleClass="edit-button" process="@this"  >
 					<f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.usuario}" />
 					</p:commandButton>
 					<p:commandButton value="Eliminar" class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteClienteDialog').show()">
@@ -60,12 +54,10 @@
 				</div>
 			</div>
 	
-			<p:dialog header="Agregar usuario" showEffect="fade"
-				modal="true" widgetVar="dialogCliente" responsive="true">
+			<p:dialog header="Agregar/Modificar usuario" showEffect="fade" modal="true" widgetVar="dialogCliente" responsive="true">
 				
 			<p:outputPanel id="pnlCliente" class="ui-fluid">
-					<p:outputPanel rendered="#{not empty usuariosBean.usuarios}">
-                  
+					<p:outputPanel rendered="#{not empty usuariosBean.usuario}">
                  <div class="card" style="width: 100%">
 			        <div class="grid ui-fluid mt-3 floatlabel-demo">
 			            <div class="col-12 md:col-6">
@@ -75,8 +67,8 @@
 			             <p:panel id="Nombre">
 			                <div class="field">
 			                    <span class="ui-float-label ui-input-icon-right">
-			                        <p:inputText widgetVar="nombre-new" id="nombre-new" value="#{usuariosBean.usuario.nombre}" required="true"/>
-			                        <p:outputLabel for="nombre-new" value="Nombre" styleClass="ml-4" />
+			                        <p:inputText  id="nombre-new" value="#{usuariosBean.usuario.nombre}" required="true"/>
+			                        <p:outputLabel value="Nombre" styleClass="ml-4" />
 			                        <i class="pi pi-user" />
 			                    </span>
 			                </div>
@@ -102,7 +94,7 @@
                 </div>
                 </p:panel>
                 
-                 <p:panel id="email">
+                 <p:panel id="correo">
                 <div class="field">
                     <span class="ui-float-label ui-input-icon-right">
                         <p:inputText widgetVar="email-new" id="email-new" value="#{usuariosBean.usuario.mail}" required="true"/>
@@ -117,6 +109,16 @@
                     <span class="ui-float-label ui-input-icon-right">
                         <p:inputText widgetVar="login-new" id="login-new" value="#{usuariosBean.usuario.usuario}" required="true"/>
                         <p:outputLabel for="login-new" value="Login" />
+                        <i class="pi pi-id-card" />
+                    </span>
+                </div>
+                </p:panel>
+                
+                <p:panel id="pass">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="psw-new" id="password" value="#{usuariosBean.usuario.password}" required="true" />
+                        <p:outputLabel for="password" value="Password" />
                         <i class="pi pi-id-card" />
                     </span>
                 </div>
@@ -179,11 +181,8 @@
 							</p:outputPanel>
 						<f:facet name="footer">
 							<p:commandButton value="Resetear password" icon="pi pi-key" process="@this pnlCliente" actionListener="#{usuariosBean.resetpassword()}" />
-							
-								<p:commandButton value="Guardar" icon="pi pi-check" onclick="PF('dialogCliente').hide()" 
-										actionListener="#{usuariosBean.guardar()}" process="pnlCliente @this" update="pnlCliente" target="#{usuariosBean.usuario}" 
-										oncomplete="PF('dialogCliente').hide()"/>
-								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" >
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{usuariosBean.guardar()}" process="pnlCliente @this" update="pnlCliente" target="#{usuariosBean.usuario}" oncomplete="PF('dialogCliente').hide()"/>
+								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" process="@this" update="pnlCliente">
 								</p:commandButton>
 							</f:facet>
 						</p:dialog>
