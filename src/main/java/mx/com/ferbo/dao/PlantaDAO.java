@@ -36,9 +36,10 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 	
 	@SuppressWarnings("unchecked")
 	public List<Planta> findall(boolean isFullInfo) {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		List<Planta> plantas = null;
 		try {
+			entity = getEntityManager();
 			Query sql = entity.createNamedQuery("Planta.findAll", Planta.class);
 			plantas = sql.getResultList();
 			
@@ -48,7 +49,9 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 			for(Planta p : plantas) {
 				log.debug(p.getIdUsuario().getUsuario());//ERROR lazy 
 				
-				log.debug(p.getIdEmisoresCFDIS().getCd_emisor()); //no tienen notacion lazy
+				log.debug(p.getIdEmisoresCFDIS().getNb_emisor()); //no tienen notacion lazy
+				log.debug(p.getIdEmisoresCFDIS().getNb_rfc());
+				log.debug(p.getIdEmisoresCFDIS().getNb_emisor());
 			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de Plantas...", ex);

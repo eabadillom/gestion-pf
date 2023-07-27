@@ -169,7 +169,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		listaCliente = clienteDAO.buscarTodos();
 		listaClienteDom = clienteDomicilioDAO.buscarTodos();
-		listaPlanta = plantaDAO.findall();
+		listaPlanta = plantaDAO.findall(true);
 		listaSerieF = serieFacturaDAO.findAll();
 		listaA = avisoDAO.buscarTodos();
 		listaMetodoPago = metodoPagoDAO.buscarTodos();

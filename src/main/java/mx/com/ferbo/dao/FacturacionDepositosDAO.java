@@ -1,13 +1,8 @@
 package mx.com.ferbo.dao;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -15,6 +10,7 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.Partida;
@@ -41,8 +37,10 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public List<ConstanciaFactura> buscarNoFacturados(Integer idCliente, Integer idPlanta) {
 		List<ConstanciaDeDeposito> listaConstancias = null;
 		List<ConstanciaFactura> listaConstanciaFactura = null;
+		List<Partida> allPartida = null;
 		
 		ConstanciaFactura cf = null;
+		Camara camara = null;
 		Date vigenciaInicio = null;
 		Date vigenciaFin = null;
 		int vigencia = 0;
@@ -114,9 +112,19 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				cdd.setConstanciaFacturaList(new ArrayList<>());
 				cdd.setConstanciaFacturaList(listaConstanciaFactura);
 				
-				List<Partida> allPartida = cdd.getPartidaList();
-				
+				allPartida = cdd.getPartidaList();
 				System.out.println(allPartida.size());
+				
+				/*for(Partida p: allPartida) {
+					camara = new Camara();
+					
+					camara = p.getCamaraCve();
+					log.info(camara.getCamaraAbrev());
+					log.info(camara.getCamaraCve());
+					log.info(camara.getCamaraDs());
+					
+				}*/
+				
 				
 				
 			}
