@@ -77,7 +77,7 @@ public class Partida implements Serializable, Cloneable {
     @Column(name = "no_tarimas")
     private BigDecimal noTarimas;
     
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "detallePartidaPK.partidaCve")
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "detallePartidaPK.partidaCve")//PENDIENTE NO MNODIFICA EL DETALLE PARTIDA DE LA PARTIDA SELECCIONADA detallePartidaPK.partidaCve
     private List<DetallePartida> detallePartidaList;
     
     @JoinColumn(name = "CAMARA_CVE", referencedColumnName = "CAMARA_CVE")
