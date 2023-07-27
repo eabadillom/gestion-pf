@@ -35,25 +35,35 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 
 	@Override
 	public List<ConstanciaDeDeposito> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("ConstanciaDeDeposito.findAll", ConstanciaDeDeposito.class)
-				.getResultList();
+		EntityManager em =null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			return em.createNamedQuery("ConstanciaDeDeposito.findAll", ConstanciaDeDeposito.class)
+					.getResultList();			
+		}catch(Exception e) {
+				log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return null;
 	}
 
 	public List<ConstanciaDeDeposito> buscarPorCliente(Integer cteCve){
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
 		List<ConstanciaDeDeposito> listado = null;
-		listado = em.createNamedQuery("ConstanciaDeDeposito.findByCteCve",ConstanciaDeDeposito.class).setParameter("cteCve", cteCve).getResultList();
+		try {
+			 em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("ConstanciaDeDeposito.findByCteCve",ConstanciaDeDeposito.class).setParameter("cteCve", cteCve).getResultList();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ConstanciaDeDeposito> buscarPorCriterios(String folioCliente, Date fechaInico, Date fechaFin, int idCliente) {
-
-		// TODO Auto-generated method stub
-		
-		
-		
+	public List<ConstanciaDeDeposito> buscarPorCriterios(String folioCliente, Date fechaInico, Date fechaFin, int idCliente) {		
 		Cliente cliente = new Cliente();//creamos un objeto Cliente
 		Map<String, Object> paramaterMap = new HashMap<String, Object>();
 		List<String> whereCause = new ArrayList<String>();
@@ -123,8 +133,9 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 
 	@Override
 	public String guardar(ConstanciaDeDeposito constanciaDeDeposito) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			 em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(constanciaDeDeposito);
 			em.getTransaction().commit();
