@@ -44,28 +44,28 @@
 							</div>
 						</f:facet>
 
-						<p:column headerText="ID" width="3%">
+						<p:column headerText="ID" width="3%" style="text-align:center">
 							<h:outputText value="#{lista.id}" />
 						</p:column>
-						<p:column headerText="Serie" width="5%">
+						<p:column headerText="Serie" width="5%" style="text-align:center">
 							<h:outputText value="#{lista.nomSerie}" />
 						</p:column>
-						<p:column headerText="Fecha Inicio" width="13%">
+						<p:column headerText="Fecha Inicio" width="13%" style="text-align:center">
 							<h:outputText value="#{lista.fechaInicio}" />
 						</p:column>
-						<p:column headerText="No. Inicial" width="5%">
+						<p:column headerText="No. Inicial" width="5%" style="text-align:center">
 							<h:outputText value="#{lista.numeroInicial}" />
 						</p:column>
-						<p:column headerText="No. Actual" width="5%">
+						<p:column headerText="No. Actual" width="5%" style="text-align:center">
 							<h:outputText value="#{lista.numeroActual}" />
 						</p:column>
-						<p:column headerText="No. Final" width="5%">
+						<p:column headerText="No. Final" width="5%" style="text-align:center">
 							<h:outputText value="#{lista.numeroFinal}" />
 						</p:column>
-						<p:column headerText="Status" width="13%">
+						<p:column headerText="Status" width="13%" style="text-align:center">
 							<h:outputText value="#{lista.statusSerie.descripcion}" />
 						</p:column>
-						<p:column headerText="Acción" class="p-text-center">
+						<p:column headerText="Acción" class="p-text-center" >
 							<p:commandButton value="Modificar" icon="pi pi-pencil"
 								styleClass="ui-button-info p-mr-2 p-mb-2"
 								update="form:frm-modifica" process="@this"
@@ -91,12 +91,11 @@
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel for="@next">Serie:</p:outputLabel>
-						<p:inputText value="#{serieFacturaBean.nuevo.nomSerie}"
-							required="true" />
+						<p:inputText value="#{serieFacturaBean.nuevo.nomSerie}" required="true" placeholder="maximo 5 caracteres"/>
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="(SUCURSAL) PLANTA:" />
-						<p:selectOneMenu value="#{serieFacturaBean.nuevo.idPlanta}" converter="entityConverter">
+						<p:selectOneMenu value="#{serieFacturaBean.nuevo.idPlanta}" converter="entityConverter" required="true"> 
 							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
 						</p:selectOneMenu>
@@ -153,11 +152,11 @@
 					<div class="p-field">
 						<p:outputLabel for="@next">Serie:</p:outputLabel>
 						<p:inputText value="#{serieFacturaBean.seleccion.nomSerie}"
-							required="true" />
+							required="true" placeholder="maximo 5 caracteres"/>
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="(SUCURSAL) PLANTA:" />
-						<p:selectOneMenu value="#{serieFacturaBean.seleccion.idPlanta}" converter="entityConverter">
+						<p:selectOneMenu value="#{serieFacturaBean.seleccion.idPlanta}" converter="entityConverter" required="true">
 							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
 						</p:selectOneMenu>
