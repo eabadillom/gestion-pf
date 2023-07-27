@@ -17,54 +17,99 @@ import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class UsuarioDAO extends IBaseDAO<Usuario, Integer>{
-	
 	private static Logger log = LogManager.getLogger(UsuarioDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Usuario> findall() {
-		EntityManager entity = getEntityManager();
+		EntityManager entity=null;
 		List<Usuario> usuarios = null;
-		Query sql = entity.createNamedQuery("Usuario.findAll", Usuario.class);
-		usuarios = sql.getResultList();
+		try {
+			 entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("Usuario.findAll", Usuario.class);
+			usuarios = sql.getResultList();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion", e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
 		return usuarios;
 	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Planta> getPlanta() {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		List<Planta> planta = null;
+	try {
+		entity = EntityManagerUtil.getEntityManager();
 		Query sql = entity.createQuery("SELECT u FROM Usuario ");
 		planta = sql.getResultList();
+			
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
 		return planta;
 	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Usuario> getUsuarios() {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		List<Usuario> usuarios = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
 		Query sql = entity.createQuery("SELECT u FROM Usuario u");
 		usuarios = sql.getResultList();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
 		return usuarios;
 	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Perfil> getPerfil() {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		List<Perfil> perfil = null;
+		try {
+		 entity = EntityManagerUtil.getEntityManager();
 		Query sql = entity.createQuery("SELECT u FROM Perfil u ");
 		perfil = sql.getResultList();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
 		return perfil;
 	}
 	@Override
 	public Usuario buscarPorId(Integer id) {
 		Usuario usuario = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		usuario = em.createNamedQuery("findById", Usuario.class).getSingleResult();
+		EntityManager em = null;
+	try {
+		 em = EntityManagerUtil.getEntityManager();
+		 usuario = em.createNamedQuery("findById", Usuario.class).getSingleResult();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		return usuario;
 	}
 
 	@Override
 	public List<Usuario> buscarTodos() {
 		List<Usuario> usuarios = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		usuarios = em.createNamedQuery("", Usuario.class).getResultList();
+		EntityManager em = null;
+	try {
+		 em = EntityManagerUtil.getEntityManager();
+		 usuarios = em.createNamedQuery("", Usuario.class).getResultList();
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		return usuarios;
 	}
 	
@@ -91,40 +136,48 @@ public class UsuarioDAO extends IBaseDAO<Usuario, Integer>{
 	}
 	@Override
 	public String guardar(Usuario u) {
+		EntityManager entity = null;
 		try {
-			EntityManager entity = getEntityManager();
+			 entity =EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
 			entity.persist(u);
 			entity.getTransaction().commit();
 			entity.close();
 		} catch (Exception e) {
 			return "Failed!! " + e.getMessage();
-		}return null;
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		return null;
 	}
 
 	@Override
 	public String actualizar(Usuario u) {
+		EntityManager entity = null;
 		try {
-			EntityManager entity = getEntityManager();
+			 entity =EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
 			entity.merge(u);
 			entity.getTransaction().commit();
-			entity.close();
 		   } catch (Exception e) {
 			return "Failed!!" + e.getMessage();
+		}finally {
+			EntityManagerUtil.close(entity);
 		}
 			return null;
 	}
 	@Override
 	public String eliminar(Usuario u) {
+		EntityManager entity = null;
 		try {
-			EntityManager entity = getEntityManager();
+			 entity =EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
 			entity.remove(entity.merge(u));
 			entity.getTransaction().commit();
-			entity.close();
 		} catch (Exception e) {
 			return "Failed!! " + e.getMessage();
+		}finally {
+			EntityManagerUtil.close(entity);
 		}
 		return null;
 	}
