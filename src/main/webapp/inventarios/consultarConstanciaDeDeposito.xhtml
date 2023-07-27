@@ -245,7 +245,7 @@
 							</p:column>
 							
 							<p:column>
-								<p:commandButton value="Ver Detalle" icon="pi pi-search" oncomplete="PF('dlgDetalleP').show()" update="form:detalleP" >
+								<p:commandButton value="Ver Detalle" icon="pi pi-search" oncomplete="PF('dlgDetalleP').show()" update="form:detalleP" action="#{consultarConstanciaDeDepositoBean.verDetallePartida()}">
 									<f:setPropertyActionListener value="#{partida}" target="#{consultarConstanciaDeDepositoBean.partidaSelect}"></f:setPropertyActionListener>
 								</p:commandButton>
 							</p:column>
@@ -385,7 +385,7 @@
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Modificar" styleClass="edit-button ui-button-success" actionListener="#{consultarConstanciaDeDepositoBean.updateDetallePartida()}" onclick="PF('dlgDetalleP').hide()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" ></p:commandButton>
+					<p:commandButton value="Modificar" styleClass="edit-button ui-button-success" actionListener="#{consultarConstanciaDeDepositoBean.updateDetallePartida()}" onclick="PF('dlgDetalleP').hide()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" update="detalleP @this"></p:commandButton>
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgDetalleP').hide()"></p:commandButton>
 				</f:facet>
 			</p:dialog>
