@@ -81,7 +81,7 @@ public class Partida implements Serializable, Cloneable {
     private List<DetallePartida> detallePartidaList;
     
     @JoinColumn(name = "CAMARA_CVE", referencedColumnName = "CAMARA_CVE")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Camara camaraCve;
     
     @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
