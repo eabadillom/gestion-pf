@@ -1,6 +1,5 @@
 package mx.com.ferbo.controller;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -19,24 +18,21 @@ import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
-import javax.faces.application.ViewHandler;
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Application;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import com.lowagie.text.Document;
-
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
+import mx.com.ferbo.dao.PlantaDAO;
+import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
@@ -45,9 +41,12 @@ import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.PartidaServicio;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.model.SerieConstancia;
+import mx.com.ferbo.model.SerieConstanciaPK;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -92,6 +91,9 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private UnidadDeManejoDAO udmDAO;
 	private ConstanciaServicioDAO csDAO;
 	private EstadoConstanciaDAO edoDAO;
+	private PlantaDAO plantaDAO;
+	private SerieConstanciaDAO serieConstanciaDAO;
+	private SerieConstancia serie;
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
 	private ConstanciaDeDeposito constanciadep;
@@ -116,6 +118,8 @@ public class AltaConstanciaServicioBean implements Serializable {
 		csDAO = new ConstanciaServicioDAO();
 		alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		edoDAO = new EstadoConstanciaDAO();
+		plantaDAO = new PlantaDAO();
+		serieConstanciaDAO = new SerieConstanciaDAO();
 		selCliente = new Cliente();
 		constanciadep = new ConstanciaDeDeposito();
 		aviso = new Aviso();
@@ -147,7 +151,9 @@ public class AltaConstanciaServicioBean implements Serializable {
 		selCliente.setCteCve(this.idCliente);
 		try {
 			log.info("Entrando a filtrar cliente...");
-			// selCliente = clientes.stream()
+			
+			this.generaFolioServicio();
+			
 			manager = EntityManagerUtil.getEntityManager();
 			cliente = manager.createNamedQuery("Cliente.findByCteCve", Cliente.class)
 					.setParameter("cteCve", this.idCliente).getSingleResult();
@@ -190,6 +196,60 @@ public class AltaConstanciaServicioBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-partidas");
 		}
 		log.info("Productos y/o servicios del cliente filtrados.");
+	}
+	
+	public void generaFolioServicio() {
+		SerieConstanciaPK seriePK = null;
+		SerieConstancia serie = null;
+
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		Planta plantaSelect = null;
+
+		try {
+			this.selCliente = clienteDAO.buscarPorId(this.selCliente.getCteCve());
+			if (this.selCliente == null)
+				throw new InventarioException("Debe seleccionar un cliente");
+			
+			plantaSelect = plantaDAO.buscarPorId(usuario.getIdPlanta());
+
+			if (plantaSelect == null)
+				throw new InventarioException("Debe seleccionar una planta");
+			
+			seriePK = new SerieConstanciaPK();
+			seriePK.setIdCliente(this.selCliente.getCteCve());
+			seriePK.setTpSerie("S");
+			serie = serieConstanciaDAO.buscarPorId(seriePK);
+
+			if (serie == null) {
+				this.folio = "";
+				throw new InventarioException(
+						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
+			}
+
+			this.folio = String.format("%s%s%s%d", seriePK.getTpSerie(), plantaSelect.getPlantaSufijo(),
+					selCliente.getCodUnico(), serie.getNuSerie());
+			
+			this.serie = serie;
+
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, "Aviso", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (Exception ex) {
+			log.error("Problema para generar el folio de entrada...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, "Aviso", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update(":form:messages", ":form:numeroC");
+		}
 	}
 
 	public void agregarProducto() {
@@ -334,6 +394,11 @@ public class AltaConstanciaServicioBean implements Serializable {
 				servicio.setFolio(constancia);
 			}
 			csDAO.actualizar(constancia);
+			
+			Integer numeroSerie = this.serie.getNuSerie() + 1;
+			this.serie.setNuSerie(numeroSerie);
+			serieConstanciaDAO.actualizar(this.serie);
+			
 			this.isSaved = true;
 			this.habilitareporte = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.folio);

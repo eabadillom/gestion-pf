@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -37,6 +40,7 @@ import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
+import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.KardexTotalsBean;
 
 @Named
@@ -173,15 +177,44 @@ public class KardexBean implements Serializable {
 	}
 
 	public void buscaDatos() {
-		if (this.folioClienteSelected == null || this.folioClienteSelected != "") {
-			// Kardex Entradas
-			//manejaEntradas();
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Folio";
+		
+		try {
+			if(this.folioClienteSelected == null)
+				throw new InventarioException("Debe indicar un folio de entrada.");
+			
+			if("".equalsIgnoreCase(this.folioClienteSelected.trim()))
+				throw new InventarioException("Debe indicar un folio de entrada.");
+			
 			this.entrada = constanciaDeDepositoDAO.buscarPorFolioCliente(folioClienteSelected, true);
+			
+			if(this.entrada == null)
+				throw new InventarioException("El folio indicado no existe.");
+			
 			this.imprimeConstancia(entrada);
-			//log.info(constanciaDepositoSelected.getFolioCliente());
-			PrimeFaces.current().ajax().update("form:dt-entradasKardex", "form:dt-salidasKardex", "form:dt-traspasos",
-					"form:button-traspasos");
+			
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (Exception ex) {
+			log.error("Problema para obtener el folio de entrada...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update(":form:messages", "form:dt-entradasKardex", "form:dt-salidasKardex",
+					"form:dt-traspasos", "form:button-traspasos");
 		}
+		
+		
 	}
 	
 	public void getSaldo(Partida partida) {

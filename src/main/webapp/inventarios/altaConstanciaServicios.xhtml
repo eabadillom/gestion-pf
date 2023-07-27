@@ -22,7 +22,7 @@
 						<p:selectOneMenu id="cliente-som" autoWidth="true" value="#{altaConstanciaServicioBean.idCliente}" filterMatchMode="startsWith">
 							<f:selectItem itemLabel="Selecione Cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems var="cte" value="#{altaConstanciaServicioBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
-							<p:ajax listener="#{altaConstanciaServicioBean.filtrarCliente}" process="@this" update=":form:selProducto :form:selServicio"/>
+							<p:ajax listener="#{altaConstanciaServicioBean.filtrarCliente}" process="@this" update=":form:selProducto :form:selServicio :form:txtFolio"/>
 						</p:selectOneMenu>
 				</p:toolbarGroup>
 			</p:toolbar>
@@ -91,7 +91,7 @@
 				
 <div>
         <p:splitButton value="Guardar" actionListener="#{altaConstanciaServicioBean.guardar}" icon="pi pi-save">
-            <p:menuitem value="Generar reporte" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+            <p:menuitem value="Imprimir" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
             <p:menuitem value="Limpiar" action="#{altaConstanciaServicioBean.reload}" update="messages" icon="pi pi-times"/>
         </p:splitButton>
 </div>
