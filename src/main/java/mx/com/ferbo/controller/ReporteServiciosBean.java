@@ -56,7 +56,7 @@ public class ReporteServiciosBean implements Serializable {
 	private Date fecha;
 	private Date fecha_ini;
 	private Date fecha_fin;
-
+	private Date maxDate;
 	private Cliente clienteSelect;
 
 	private List<Cliente> listaClientes;
@@ -74,6 +74,9 @@ public class ReporteServiciosBean implements Serializable {
 	public void init() {
 		clienteSelect = new Cliente();
 		listaClientes = clienteDAO.buscarHabilitados(true);
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+		setMaxDate(new Date(today.getTime() ));
 		
 	}
 	
@@ -213,6 +216,12 @@ public class ReporteServiciosBean implements Serializable {
 	}
 	public void setFecha_fin(Date fecha_fin) {
 		this.fecha_fin = fecha_fin;
+	}
+	public Date getMaxDate() {
+		return maxDate;
+	}
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
 	}
 
 

@@ -25,12 +25,12 @@
 						<p:fieldset legend="Rangos de fechas">
 		         	   
 		         	       <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="ol-fechaIni" value="#{reporteInventarioTraspasosBean.fecha_ini}" />
+			                <p:datePicker id="ol-fechaIni" value="#{reporteInventarioTraspasosBean.fecha_ini}" maxdate="#{reporteInventarioTraspasosBean.maxDate}" />
 			                <p:outputLabel for="ol-fechaIni" value="Fecha de inicio"/>
 			               </span>
            				 
 				              <span class="ui-float-label ui-input-icon-left">
-				                <p:datePicker id="ol-fechafin" value="#{reporteInventarioTraspasosBean.fecha_fin}" />
+				                <p:datePicker id="ol-fechafin" value="#{reporteInventarioTraspasosBean.fecha_fin}" maxdate="#{reporteInventarioTraspasosBean.maxDate}"/>
 				                <p:outputLabel for="ol-fechafin" value="Fecha final"/>
 				              </span>
 				                

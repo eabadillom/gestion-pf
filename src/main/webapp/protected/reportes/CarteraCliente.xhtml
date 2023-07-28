@@ -5,7 +5,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
-    <ui:define name="title">Inventario de Almacen por Fecha</ui:define>
+    <ui:define name="title">Cartera de clientes</ui:define>
 
     <ui:define name="content">
         <h:form id="form">
@@ -37,7 +37,7 @@
                         <p:fieldset legend="Periodo" styleClass="p-mt-4">
                         
                         	<span class="ui-float-label ui-input-icon-left">
-	                       		<p:datePicker id="fecha" showIcon="true" value="#{reporteCarteraClienteBean.fecha}" />                       	
+	                       		<p:datePicker id="fecha" showIcon="true" value="#{reporteCarteraClienteBean.fecha}"  maxdate="#{reporteCarteraClienteBean.maxDate}"/>                       	
 	                       		<p:outputLabel for="fecha" value="Al Dia" />
 	                       	</span>
 	                       	

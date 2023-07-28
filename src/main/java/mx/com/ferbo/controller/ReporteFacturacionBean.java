@@ -56,6 +56,7 @@ public class ReporteFacturacionBean implements Serializable {
 	private Date fecha;
 	private Date fecha_ini;
 	private Date fecha_fin;
+	private Date maxDate;
 
 	private Cliente clienteSelect;
 	private StatusFactura statusFacturaSelect;
@@ -83,6 +84,10 @@ public class ReporteFacturacionBean implements Serializable {
 		statusFacturaSelect  = new StatusFactura();
 		listaClientes = clienteDAO.buscarHabilitados(true);
 		listaStatusFactura = statusFacturaDAO.buscarTodos();
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+		maxDate = new Date(today.getTime() );
+		
 	}
 	
 
@@ -252,6 +257,12 @@ public class ReporteFacturacionBean implements Serializable {
 	}
 	public void setListaStatusFactura(List<StatusFactura> listaStatusFactura) {
 		this.listaStatusFactura = listaStatusFactura;
+	}
+	public Date getMaxDate() {
+		return maxDate;
+	}
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
 	}
 
 

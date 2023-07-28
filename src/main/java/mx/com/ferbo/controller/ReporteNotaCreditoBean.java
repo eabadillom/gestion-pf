@@ -42,6 +42,7 @@ public class ReporteNotaCreditoBean implements Serializable{
 	private Date fechaInicio;
 	private Date fechaFin;
 	private Date fechaActual;
+	private Date maxDate;
 	
 	public ReporteNotaCreditoBean(){
 		listCliente = new ArrayList<Cliente>();
@@ -57,7 +58,10 @@ public class ReporteNotaCreditoBean implements Serializable{
 		fechaInicio = new Date();
 		fechaFin = new Date();
 		fechaActual = new Date();
-		
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+
+		maxDate = new Date(today.getTime() );
 	}
 
 	public Cliente getClienteSelect() {
@@ -208,6 +212,14 @@ public class ReporteNotaCreditoBean implements Serializable{
 			conexion.close((Connection) connection);
 		}
 		
+	}
+
+	public Date getMaxDate() {
+		return maxDate;
+	}
+
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
 	}
 	
 	
