@@ -208,7 +208,7 @@
 		
 		<div>
         <p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.saveFactura}" icon="pi pi-save">
-            <p:menuitem value="Imprimir" actionListener="#{facturaServiciosBean.jasper}" action="#{facturaServiciosBean.reload}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
+            <p:menuitem value="Imprimir" actionListener="#{facturaServiciosBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
             <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-key" ajax="false" process="@this"/> 
             <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-file"/>
         </p:splitButton>
