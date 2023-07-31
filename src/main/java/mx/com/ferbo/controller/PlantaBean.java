@@ -14,10 +14,13 @@ import javax.inject.Named;
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import com.google.protobuf.Message;
+
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.EstadosDAO;
+import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.MunicipiosDAO;
 import mx.com.ferbo.dao.PaisesDAO;
 import mx.com.ferbo.dao.PlantaDAO;
@@ -33,6 +36,7 @@ import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.EstadosPK;
+import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Municipios;
 import mx.com.ferbo.model.MunicipiosPK;
 import mx.com.ferbo.model.Paises;
@@ -582,16 +586,23 @@ public class PlantaBean implements Serializable {
 	}	
 	public void delete() {
 		PrimeFaces.current().executeScript("PF('dg-delete').hide()");
+		
 		String message = daoPlanta.delete(planta);
-
-		if (message == null) {
-			list.remove(this.planta);
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Eliminado " + planta.getPlantaDs(), null));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al eliminar " + planta.getPlantaDs(), message));
-			PrimeFaces.current().ajax().update("form:messages");
-		}
+	
+			if (message == null) {
+				
+				list.remove(this.planta);
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Eliminado " + planta.getPlantaDs(), null));
+				PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
+			}else{
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al eliminar " + planta.getPlantaDs(), message));
+				PrimeFaces.current().ajax().update("form:messages");
+			}
+		
+		
+		
+		
+		
 	}
 	public void muestraplanta(){
 		System.out.println("Planta" + planta);
