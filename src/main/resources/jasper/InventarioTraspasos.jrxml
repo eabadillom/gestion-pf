@@ -159,11 +159,7 @@ ORDER BY
 	</group>
 	<group name="Producto">
 		<groupHeader>
-			<band height="14">
-				<line>
-					<reportElement x="0" y="10" width="739" height="1" forecolor="#2196F3" backcolor="#2196F3" uuid="00652d62-a493-4201-9e12-22c88d155262"/>
-				</line>
-			</band>
+			<band height="14"/>
 		</groupHeader>
 	</group>
 	<background>
@@ -383,10 +379,10 @@ ORDER BY
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="22" splitType="Stretch">
+		<band height="26" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
-				<reportElement x="137" y="0" width="66" height="11" uuid="eba7d4f5-9c9e-4446-94a7-d66956a4da80">
+				<reportElement x="136" y="0" width="67" height="11" uuid="eba7d4f5-9c9e-4446-94a7-d66956a4da80">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ab30e000-32e5-48fc-ba9a-ea7ac72dc138"/>
 				</reportElement>
 				<textElement textAlignment="Center">
@@ -457,9 +453,6 @@ ORDER BY
 				</textElement>
 				<textFieldExpression><![CDATA[$F{folio}]]></textFieldExpression>
 			</textField>
-			<line>
-				<reportElement x="0" y="21" width="739" height="1" forecolor="#2196F3" backcolor="#2196F3" uuid="e405eebe-9e64-4a8d-abe6-3682f1d8d04d"/>
-			</line>
 			<textField textAdjust="StretchHeight">
 				<reportElement x="0" y="0" width="136" height="11" uuid="3fed48a3-d409-4a4c-b5ce-3fdbb7b549fd"/>
 				<textElement textAlignment="Center">

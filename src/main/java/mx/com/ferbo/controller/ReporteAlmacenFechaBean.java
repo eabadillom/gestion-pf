@@ -94,7 +94,7 @@ public class ReporteAlmacenFechaBean implements Serializable {
 			listaPlanta = plantaDAO.buscarTodos();
 		}
 		
-		plantaSelect = listaPlanta.get(0);
+		//plantaSelect = listaPlanta.get(0);
 		
 		filtradoCamara();
 		

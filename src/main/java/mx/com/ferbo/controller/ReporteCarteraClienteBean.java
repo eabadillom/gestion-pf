@@ -40,6 +40,7 @@ public class ReporteCarteraClienteBean implements Serializable{
 	private ClienteDAO clienteDAO;
 	
 	private Date fecha;
+	private Date maxDate;
 	private String consulta = null;
 	
 	public ReporteCarteraClienteBean() {
@@ -56,6 +57,10 @@ public class ReporteCarteraClienteBean implements Serializable{
 		listCliente = clienteDAO.buscarTodos();
 		
 		fecha = new Date();
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+
+		maxDate = new Date(today.getTime() );
 	}
 
 	public Date getFecha() {
@@ -323,6 +328,14 @@ public class ReporteCarteraClienteBean implements Serializable{
 			
 			
 		}
+
+	public Date getMaxDate() {
+		return maxDate;
+	}
+
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
+	}
 	
 	
 }

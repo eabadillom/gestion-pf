@@ -45,6 +45,7 @@ public class ReporteSalidasBean implements Serializable {
 	private Date fecha;
 	private Date fecha_ini;
 	private Date fecha_fin;
+	private Date maxDate;;
 	private Integer plantaN = null; 
 	private Integer camaraN = null;
 	private Integer clienteN = null;
@@ -96,10 +97,13 @@ public class ReporteSalidasBean implements Serializable {
 			listaPlanta = plantaDAO.buscarTodos();
 		}
 		
-		plantaSelect = listaPlanta.get(0);
+		//plantaSelect = listaPlanta.get(0);
 		filtradoCamara();
 		//listaCamara = camaraDAO.buscarTodos();
-		
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+
+		maxDate = new Date(today.getTime() );
 	}
 	
 	public void filtradoCamara() {
@@ -321,6 +325,12 @@ public class ReporteSalidasBean implements Serializable {
 	}
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
+	}
+	public Date getMaxDate() {
+		return maxDate;
+	}
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
 	}
 
 

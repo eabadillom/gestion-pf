@@ -92,7 +92,7 @@ public class ReporteInventarioBean implements Serializable {
 			listaPlanta = plantaDAO.buscarTodos();
 		}
 		
-		plantaSelect = listaPlanta.get(0);
+		//plantaSelect = listaPlanta.get(0);
 		filtradoCamara();
 		//listaCamara = camaraDAO.buscarTodos();
 		
@@ -129,9 +129,26 @@ public class ReporteInventarioBean implements Serializable {
 				imgfile = new File(img);
 				log.info(reportFile.getPath());
 			
-				Integer clienteCve = clienteSelect.getCteCve();
-				Integer camaraCve = camaraSelect.getCamaraCve();
-				Integer plantaCve = plantaSelect.getPlantaCve();
+				Integer clienteCve = null;
+				if(clienteSelect == null) {
+					clienteCve = null;
+				}else {
+					clienteCve = clienteSelect.getCteCve();
+			}
+				
+				Integer camaraCve = null;
+				if(camaraSelect == null) {
+					camaraCve= null;
+				}else {
+					camaraCve= camaraSelect.getCamaraCve();
+				}
+			
+				Integer plantaCve = null;
+				if(plantaSelect == null) {
+				plantaCve = null;
+				}else {
+					plantaCve = plantaSelect.getPlantaCve();
+				}
 			
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
@@ -151,8 +168,9 @@ public class ReporteInventarioBean implements Serializable {
 			} finally {
 				conexion.close((Connection) connection);
 			}
+			}
 
-		}
+		
 	
 	public void sleep() throws InterruptedException {
         TimeUnit.SECONDS.sleep(5);

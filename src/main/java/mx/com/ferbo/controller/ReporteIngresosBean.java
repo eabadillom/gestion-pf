@@ -48,6 +48,7 @@ public class ReporteIngresosBean implements Serializable {
 	private Date fechaInicio;
 	private Date fechaFin;
 	private Date fechaActual;
+	private Date maxDate;
 	
 	public ReporteIngresosBean() {
 		
@@ -71,7 +72,10 @@ public class ReporteIngresosBean implements Serializable {
 		
 		listCliente = clienteDAO.buscarTodos();
 		listBanco = bancoDAO.findall();
-		
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+
+		maxDate = new Date(today.getTime() );
 	}
 
 	public Date getFechaInicio() {
@@ -254,6 +258,14 @@ public class ReporteIngresosBean implements Serializable {
 			conexion.close((Connection) connection);
 		}
 		
+	}
+
+	public Date getMaxDate() {
+		return maxDate;
+	}
+
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
 	}
 
 	

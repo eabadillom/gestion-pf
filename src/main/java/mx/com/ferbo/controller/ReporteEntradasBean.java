@@ -46,6 +46,7 @@ public class ReporteEntradasBean implements Serializable {
 	private Date fecha;
 	private Date fecha_ini;
 	private Date fecha_fin;
+	private Date maxDate;
 
 	private Planta plantaSelect;
 	private Camara camaraSelect;
@@ -94,10 +95,14 @@ public class ReporteEntradasBean implements Serializable {
 			listaPlanta = plantaDAO.buscarTodos();
 		}
 		
-		plantaSelect = listaPlanta.get(0);
+		//plantaSelect = listaPlanta.get(0);
 		filtradoCamara();
 		
 		//listaCamara = camaraDAO.buscarTodos();
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+
+		maxDate = new Date(today.getTime() );
 		
 		
 	}
@@ -109,7 +114,7 @@ public class ReporteEntradasBean implements Serializable {
 	
 	public void exportarPdf() throws JRException, IOException, SQLException{
 		System.out.println("Exportando a pdf.....");
-			String jasperPath = "/jasper/InventarioEntradas.jrxml";
+			String jasperPath = "/jasper/ReporteInventarioEntradas.jrxml";
 			String filename = "InventarioEntradas"+fecha+".pdf";
 			String images = "/images/logo.jpeg";
 			String message = null;
@@ -131,13 +136,30 @@ public class ReporteEntradasBean implements Serializable {
 				imgfile = new File(img);
 				log.info(reportFile.getPath());
 			
-				Integer clienteCve = clienteSelect.getCteCve();
-				Integer camaraCve = camaraSelect.getCamaraCve();
-				Integer plantaCve = plantaSelect.getPlantaCve();
+				Integer clienteCve = null;
+				if(clienteSelect == null) {
+					clienteCve = null;
+				}else {
+					clienteCve =clienteSelect.getCteCve();
+				}
+				
+				Integer camaraCve = null;
+				if(camaraSelect == null) {
+					camaraCve = null;
+				}else {
+					camaraCve= camaraSelect.getCamaraCve();
+				}
+				
+				Integer plantaCve = null;
+						if(plantaSelect == null) {
+							plantaCve = null;
+						}else {
+							plantaCve= plantaSelect.getPlantaCve();
+						}
 			
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
-				parameters.put("idCliente",clienteCve );
+				parameters.put("idCliente",clienteCve);
 				parameters.put("Camara", camaraCve);
 				parameters.put("Planta", plantaCve);
 				parameters.put("FechaIni", fecha_ini);
@@ -162,7 +184,7 @@ public class ReporteEntradasBean implements Serializable {
     }
 	public void exportarExcel() throws JRException, IOException, SQLException{
 		System.out.println("Exportando a excel.....");
-			String jasperPath = "/jasper/InventarioEntradas.jrxml";
+			String jasperPath = "/jasper/ReporteInventarioEntradas.jrxml";
 			String filename = "InventarioEntradas" +fecha+".xlsx";
 			String images = "/images/logo.jpeg";
 			String message = null;
@@ -184,9 +206,26 @@ public class ReporteEntradasBean implements Serializable {
 				imgfile = new File(img);
 				log.info(reportFile.getPath());
 			
-				Integer clienteCve = clienteSelect.getCteCve();
-				Integer camaraCve = camaraSelect.getCamaraCve();
-				Integer plantaCve = plantaSelect.getPlantaCve();
+				Integer clienteCve = null;
+				if(clienteSelect == null) {
+					clienteCve = null;
+				}else {
+					clienteCve =clienteSelect.getCteCve();
+				}
+				
+				Integer camaraCve = null;
+				if(camaraSelect == null) {
+					camaraCve = null;
+				}else {
+					camaraCve= camaraSelect.getCamaraCve();
+				}
+				
+				Integer plantaCve = null;
+						if(plantaSelect == null) {
+							plantaCve = null;
+						}else {
+							plantaCve= plantaSelect.getPlantaCve();
+						}
 			
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
@@ -271,6 +310,12 @@ public class ReporteEntradasBean implements Serializable {
 	}
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
+	}
+	public Date getMaxDate() {
+		return maxDate;
+	}
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
 	}
 
 

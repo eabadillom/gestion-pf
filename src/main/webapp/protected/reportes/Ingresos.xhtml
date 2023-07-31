@@ -5,15 +5,15 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
                 
-	<ui:define name="title">Inventario de Almacen por Fecha</ui:define>
+	<ui:define name="title">Ingresos de Factura</ui:define>
 
     <ui:define name="content">
         <h:form id="form">
         <p:breadCrumb>
             <p:menuitem value="Home" outcome="/dashboard"/>
             <p:menuitem value="Reportes"/>
-            <p:menuitem value="Facturacion"/>
-            <p:menuitem value="Cartera De Cliente" outcome="/protected/reportes/CarteraCliente"/>
+            <p:menuitem value="Ingresos"/>
+            <p:menuitem value="Ingresos" outcome="/protected/reportes/Ingresos"/>
         </p:breadCrumb>
         
         <p:growl id="messages" showDetail="true" />
@@ -28,11 +28,10 @@
 	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
 	             		
 	             			<p:outputLabel value="De:" styleClass="p-mr-2"></p:outputLabel>
-	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4"/>
+	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4" maxdate="#{reporteIngresosBean.maxDate}"/>
 	             			
 	             			<p:outputLabel value="A:" styleClass="p-mr-2"></p:outputLabel>
-	             			<p:datePicker id="fechaFin" value="#{reporteIngresosBean.fechaFin}" showIcon="true" />
-	             		
+	             			<p:datePicker id="fechaFin" value="#{reporteIngresosBean.fechaFin}" showIcon="true" maxdate="#{reporteIngresosBean.maxDate}"/>
 	             		</p:fieldset>
 	             		
 	             		

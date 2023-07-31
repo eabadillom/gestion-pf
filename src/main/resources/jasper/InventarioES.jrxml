@@ -256,9 +256,24 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 			<band/>
 		</groupHeader>
 	</group>
-	<group name="Producto">
+	<group name="Producto"/>
+	<group name="Clientes">
+		<groupExpression><![CDATA[$F{CTE_NOMBRE}]]></groupExpression>
 		<groupHeader>
-			<band height="24"/>
+			<band height="54">
+				<textField>
+					<reportElement x="0" y="0" width="1210" height="24" forecolor="#2196F3" uuid="b55191ea-74bc-4e98-9dcc-faacdfe1bd7a">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CTE_NOMBRE}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="5" y="35" width="1210" height="1" forecolor="#2196F3" backcolor="#2196F3" uuid="9dab98c2-bc91-4b7c-843a-7f7ebfcb5cbc"/>
+				</line>
+			</band>
 		</groupHeader>
 	</group>
 	<background>
@@ -313,7 +328,7 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="39" splitType="Stretch">
+		<band height="11" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
 				<reportElement key="" mode="Opaque" x="680" y="0" width="105" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="a74676bc-d956-4e10-ba82-ed3e4e323ef0">
@@ -547,13 +562,6 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 				</textElement>
 				<text><![CDATA[Tp. Mov]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="0" y="11" width="1210" height="28" forecolor="#2196F3" uuid="632755c1-1ecb-40bf-9ab0-1b324f1503b5"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{numero_cte} +""+$F{CTE_NOMBRE}]]></textFieldExpression>
-			</textField>
 		</band>
 	</pageHeader>
 	<detail>
