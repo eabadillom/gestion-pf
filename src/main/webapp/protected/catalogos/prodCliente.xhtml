@@ -49,23 +49,24 @@
 									</span>
 								</div>
 							</f:facet>
-							<p:column headerText="Código" sortBy="#{pProducto.productoCve.productoCve}" width="25%">
+							<p:column headerText="Código" sortBy="#{pProducto.productoCve.productoCve}" width="5rem" style="text-align:center">
 								<h:outputText value="#{pProducto.productoCve.productoCve}" />
 							</p:column>
-							<p:column headerText="Descripción" sortBy="#{pProducto.productoCve.productoDs}" width="20%" style="text-align:center">
+							<p:column headerText="Descripción" sortBy="#{pProducto.productoCve.productoDs}" style="text-align:center">
 								<h:outputText value="#{pProducto.productoCve.productoDs}" />
 							</p:column>
-							<p:column headerText="Categoría" sortBy="#{pProducto.productoCve.categoria}" width="25%" style="text-align:center">
+							<p:column headerText="Categoría" sortBy="#{pProducto.productoCve.categoria}" width="5rem" style="text-align:center">
 								<h:outputText value="#{pProducto.productoCve.categoria}">
 								</h:outputText>
 							</p:column>
-							<p:column  exportable="false" width="30%" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil"  update="form:panel-producto-act" value="Modificar" process="@this" 	oncomplete="PF('productoClienteActDialog').show()"  
+							<p:column exportable="false" style="text-align:center" width="2rem">
+								<p:commandButton icon="pi pi-pencil"  update="form:panel-producto-act" process="@this" oncomplete="PF('productoClienteActDialog').show()"  
 								styleClass="edit-button ui-button-primary"  actionListener="#{prodClienteBean.nuevoProductoCliente()}" style="text-align:center">
 									<f:setPropertyActionListener value="#{pProducto}" target="#{prodClienteBean.prodClienteSelected}" />
 								</p:commandButton>
-								
-								<p:commandButton class="ui-button-danger" icon="pi pi-trash" value="Eliminar" process="@this" oncomplete="PF('deleteProductoClienteDialog').show()">
+							</p:column>
+							<p:column exportable="false" style="text-align:center" width="2rem">
+								<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteProductoClienteDialog').show()">
 									<f:setPropertyActionListener value="#{pProducto}" target="#{prodClienteBean.prodClienteSelected}" />
 								</p:commandButton>
 							</p:column>

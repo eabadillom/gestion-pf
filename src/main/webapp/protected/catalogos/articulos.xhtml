@@ -23,9 +23,9 @@
                         <p:toolbar styleClass="p-mb-4">
                             <p:toolbarGroup>
                                 <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{articulosBean.openNew}" update="manage-product-content form:manage-product-content" oncomplete="PF('manageProductDialog').show()" 
-                                    styleClass="ui-button-success" style="margin-right: .5rem" />
-                                <p:commandButton id="delete-productos-button" value="#{articulosBean.deleteButtonMessage}" icon="pi pi-trash" actionListener="#{articulosBean.deleteSelectedProductos}" 
-                                    styleClass="ui-button-danger" disabled="#{!articulosBean.hasSelectedProductos()}" update="@this">
+                                    style="margin-right: .5rem" />
+                                <p:commandButton id="delete-productos-button" value="#{articulosBean.deleteButtonMessage}" icon="pi pi-trash" actionListener="#{articulosBean.deleteSelectedProductos}"
+                                	class="ui-button-danger" disabled="#{!articulosBean.hasSelectedProductos()}" update="@this">
                                     <p:confirm header="Eliminar" message="Desea eliminar los artículos seleccionados?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                             </p:toolbarGroup>
@@ -54,21 +54,21 @@
                             <p:ajax event="rowSelectCheckbox" update=":form:delete-productos-button" />
                             <p:ajax event="rowUnselectCheckbox" update=":form:delete-productos-button" />
                             <p:ajax event="toggleSelect" update=":form:delete-productos-button" />
-
-                            <p:column selectionMode="multiple" exportable="false" width="5%"></p:column>
-                            <p:column headerText="Nombre" sortBy="#{product.productoDs}" filterBy="#{product.productoDs}" width="25%">
+                            <p:column selectionMode="multiple" exportable="false" width="1rem">
+                            </p:column>
+                            <p:column headerText="Nombre" sortBy="#{product.productoDs}" filterBy="#{product.productoDs}" style="text-align:center">
                                 <h:outputText value="#{product.productoDs}" />
                             </p:column>
-                            
-                            <p:column headerText="Número de producto" sortBy="#{product.numeroProd}" filterBy="#{product.numeroProd}" width="25%">
+                            <p:column headerText="Número de producto" sortBy="#{product.numeroProd}" filterBy="#{product.numeroProd}" style="text-align:center">
                                 <h:outputText value="#{product.numeroProd}" />
                             </p:column>
-                            <p:column exportable="false" width="15%" style="text-align:center">
-                                <p:commandButton icon="pi pi-pencil" update=":form:manage-product-content" value="Modificar" oncomplete="PF('manageProductDialog').show()" 
-                                    styleClass="edit-button ui-button-success" process="@this">
+                            <p:column exportable="false" style="text-align:center" width="2rem">
+                                <p:commandButton icon="pi pi-pencil" update=":form:manage-product-content" oncomplete="PF('manageProductDialog').show()" process="@this">
                                     <f:setPropertyActionListener value="#{product}" target="#{articulosBean.selectedProducto}" />
                                 </p:commandButton>
-                                <p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" process="@this" oncomplete="PF('deleteProductDialog').show()"  width="45%">
+                            </p:column>
+                            <p:column exportable="false" style="text-align:center" width="2rem">
+                                <p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" oncomplete="PF('deleteProductDialog').show()"  width="45%">
                                     <f:setPropertyActionListener value="#{product}" target="#{articulosBean.selectedProducto}" />
                                 </p:commandButton>
                             </p:column>
