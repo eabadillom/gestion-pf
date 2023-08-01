@@ -38,10 +38,26 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 		return null;
 	}
 
-	@Override
-	public List<SerieConstancia> buscarPorCriterios(SerieConstancia e) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	
+	public List<SerieConstancia> buscarPorIdCliente(SerieConstanciaPK serie) {
+		
+		EntityManager em = null;
+		List<SerieConstancia> lista = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("SerieConstancia.findByIdCliente",SerieConstancia.class).setParameter("idCliente", serie.getIdCliente()).getResultList();
+			
+		} catch (Exception e2) {
+			log.error("Problema no encuentra registros por criterios",e2);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		return lista;
 	}
 
 	@Override
@@ -64,19 +80,52 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 	}
 
 	@Override
-	public String guardar(SerieConstancia e) {
-		// TODO Auto-generated method stub
+	public String guardar(SerieConstancia serieConstancia) {
+		
+		EntityManager em = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(serieConstancia);
+			em.getTransaction().commit();
+		} catch (Exception e2) {
+			log.error("Problema al guardar serie constancia", e2);
+		}finally {
+			EntityManagerUtil.close(em);
+		}		
+		
 		return null;
 	}
 
 	@Override
-	public String eliminar(SerieConstancia e) {
-		// TODO Auto-generated method stub
+	public String eliminar(SerieConstancia serieConstancia) {
+		
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.remove(em.merge(serieConstancia));
+			em.getTransaction().commit();
+		} catch (Exception e2) {
+			log.error("Problema al eliminar serie constancia");
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<SerieConstancia> listado) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<SerieConstancia> buscarPorCriterios(SerieConstancia e) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
@@ -18,6 +17,8 @@ import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.model.SerieConstancia;
+import mx.com.ferbo.model.SerieConstanciaPK;
 import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -147,11 +148,16 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 					cliente.getCandadoSalida().getId();
 				
 				List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
+				System.out.println(clienteContactoList.size());
 				log.debug("ClienteContactoList: {}", clienteContactoList.size());
 				log.debug(cliente.getRegimenFiscal().getCd_regimen());
-				log.debug(cliente.getUsoCfdi().getUsoCfdi());
-				log.debug(cliente.getMetodoPago().getNbMetodoPago());
+				//log.debug(cliente.getUsoCfdi().getUsoCfdi());
 				
+				if(cliente.getMetodoPago()!=null) {				
+					log.debug(cliente.getMetodoPago().getNbMetodoPago());
+					log.debug(cliente.getMetodoPago().getCdMetodoPago());
+				}
+				 
 				for(ClienteContacto clienteContacto : clienteContactoList) {
 					
 					Contacto contacto = clienteContacto.getIdContacto();
@@ -341,11 +347,26 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			cliente = em.createNamedQuery("Cliente.findByCteCve", Cliente.class).
 			setParameter("cteCve", cteCve)
 			.getSingleResult();
-			CandadoSalida candadoSalida = cliente.getCandadoSalida();
-			if(candadoSalida != null) {
+			/*if(candadoSalida != null) {
 				log.debug(cliente.getCandadoSalida().getId());
 				cliente.remove(candadoSalida);
 				em.merge(cliente);
+			}*/
+			
+			em.createQuery("DELETE FROM CandadoSalida cs WHERE cs.cliente.cteCve = :idCliente").setParameter("idCliente", cliente.getCteCve()).executeUpdate();
+			
+			SerieConstanciaDAO serieDAO = new SerieConstanciaDAO();
+			SerieConstanciaPK seriePK = new SerieConstanciaPK();
+			seriePK.setIdCliente(cliente.getCteCve());
+			
+			List<SerieConstancia> lstSerieConstancia = serieDAO.buscarPorIdCliente(seriePK);
+			
+			if(lstSerieConstancia.size()>0) {
+				
+				for(SerieConstancia sc: lstSerieConstancia) {					
+					serieDAO.eliminar(sc);					
+				}
+				
 			}
 			
 			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();

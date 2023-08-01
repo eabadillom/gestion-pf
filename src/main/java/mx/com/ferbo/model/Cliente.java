@@ -82,15 +82,15 @@ public class Cliente implements Serializable {
     @Column(name = "tp_persona")
     private String tipoPersona;
     
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, optional = false)
     @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
     private RegimenFiscal  regimenFiscal;
     
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE,optional = false)
     @JoinColumn(name = "cd_uso_cfdi", referencedColumnName = "cd_uso_cfdi")
     private UsoCfdi usoCfdi;
     
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE,optional = false)
     @JoinColumn(name = "cd_metodo_pago", referencedColumnName = "cd_metodo_pago")
     private MetodoPago metodoPago;
     
@@ -149,7 +149,7 @@ public class Cliente implements Serializable {
     
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY, orphanRemoval = true)
     private CandadoSalida candadoSalida;
-
+    
     public Cliente() {
     }
 
