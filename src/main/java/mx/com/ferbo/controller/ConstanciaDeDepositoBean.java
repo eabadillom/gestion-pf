@@ -158,6 +158,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	private Date fechaCaducidad;
 	private Date fechaIngreso;
+	private Date maxDate;
 	private SerieConstancia serie;
 	private Usuario usuario;
 	
@@ -246,7 +247,10 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		showSAP = false;
 		
 		saved = false;
-		
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+
+		maxDate = new Date(today.getTime() );
 		PrimeFaces.current().ajax().update(":form:planta", ":form:numeroC", ":form:cmdCambiarFolio");
 	}
 	
@@ -643,7 +647,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-partidas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto");
 		}
 	}
-
+public void deleteConstanciaDD() {
+	this.listadoConstanciaDepositoDetalle.remove(0);
+	this.selectedConstanciaDD = null;
+	FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado", "Se elimino el registro correctamente"));
+	PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaDD");
+}
 	public void deleteSelectedPartidas() {
 
 		for (Partida p : listadoPartida) {
@@ -1373,5 +1382,13 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	public void setSaved(Boolean saved) {
 		this.saved = saved;
+	}
+
+	public Date getMaxDate() {
+		return maxDate;
+	}
+
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
 	}
 }

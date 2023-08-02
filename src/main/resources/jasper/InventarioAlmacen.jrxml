@@ -512,14 +512,14 @@ ORDER BY cliente,numero_cte, producto]]>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="0" y="32" width="358" height="12" uuid="78eb317b-93ff-4fe2-ab33-46533534b497"/>
+				<reportElement x="113" y="32" width="237" height="12" uuid="78eb317b-93ff-4fe2-ab33-46533534b497"/>
 				<textElement textAlignment="Right">
 					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
-				<text><![CDATA[al día]]></text>
+				<text><![CDATA[al día  ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="21" width="761" height="11" uuid="1dde4035-249c-47d2-9053-29218ba48fb3">
+				<reportElement x="0" y="21" width="739" height="11" uuid="1dde4035-249c-47d2-9053-29218ba48fb3">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -530,10 +530,16 @@ ORDER BY cliente,numero_cte, producto]]>
 				</textElement>
 				<text><![CDATA[INDUSTRIAS DE REFRIGERACIÓN KELANGAN S. A. DE C. V.]]></text>
 			</staticText>
-			<textField>
+			<textField pattern="dd/MM/yyyy">
 				<reportElement x="358" y="32" width="403" height="12" uuid="94348fda-af14-4356-ac60-49af12db7961"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{Fecha}]]></textFieldExpression>
 			</textField>
+			<rectangle>
+				<reportElement x="350" y="32" width="8" height="12" forecolor="#F7F0F0" uuid="a36f4b9e-a678-419a-b31c-6b6c8d6c770d"/>
+			</rectangle>
 		</band>
 	</title>
 	<pageHeader>
@@ -787,14 +793,14 @@ ORDER BY cliente,numero_cte, producto]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{folio}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="113" y="0" width="72" height="11" uuid="3e0fee03-9021-483c-ad8b-eb7725ad94be"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{caducidad}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="69" height="11" uuid="4a97605b-e4d1-4794-9216-4f3bfa2d1699"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>

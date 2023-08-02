@@ -146,7 +146,7 @@ public class FacturaServiciosBean implements Serializable {
 
 	private int plazoSelect;
 	private Integer idPrecioServicio;
-	private Integer idFactura;
+	private Integer  idFactura;
 	private Date fechaFactura;
 	private Date fechaCorte;
 	private String moneda = "MXN";
@@ -183,6 +183,7 @@ public class FacturaServiciosBean implements Serializable {
 		total = new BigDecimal(0);
 		fechaFactura = new Date();
 		clienteSelect = new Cliente();
+		domicilioSelect = new Domicilios();
 		metodoPagoSelect = null;
 		medioPagoSelect = null;
 		
@@ -414,6 +415,7 @@ public class FacturaServiciosBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		Cliente cliente = null;
+		
 		try {
 			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
 				throw new InventarioException("Debe traspasar almenos un producto");
@@ -422,6 +424,7 @@ public class FacturaServiciosBean implements Serializable {
 			
 			factura = new Factura();
 			List<Factura> alFacturas = new ArrayList<>();
+			factura.setId(idFactura);
 			alFacturas.add(factura);
 			cliente.setFacturaList(alFacturas);
 			factura.setCliente(cliente);
@@ -434,6 +437,7 @@ public class FacturaServiciosBean implements Serializable {
 			factura.setSubtotal(subtotal);
 			factura.setIva(bdIva);
 			factura.setTotal(total);
+			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
 			factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
 			factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
 			factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
@@ -488,17 +492,18 @@ public class FacturaServiciosBean implements Serializable {
 			factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
 			factura.setEmisorCdRegimen(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
 			factura.setServicioFacturaList(alServiciosDetalle);
+			
 			for (ServicioFactura sef : alServiciosDetalle) {
 				sef.setFactura(factura);
 			}
-			String resultado = facturaDAO.guardar(factura);
-			if(resultado != null)
-				throw new InventarioException("Ocurrió un problema al guardar la factura.");
-			int serie = this.serieFacturaSelect.getNumeroActual() + 1;
+			int serie = (serieFacturaSelect.getNumeroActual()+1);
 			serieFacturaSelect.setNumeroActual(serie);
 			String resultadoSerie = seriefacturaDAO.update(serieFacturaSelect);
 			if(resultadoSerie != null)
 				throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
+			String resultado = facturaDAO.guardar(factura);
+			if(resultado != null)
+				throw new InventarioException("Ocurrió un problema al guardar la factura.");
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "La factura se guardo correctamente";
 		} catch (InventarioException ex) {
@@ -511,7 +516,8 @@ public class FacturaServiciosBean implements Serializable {
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Factura guardada", message));
+			
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Factura" , message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
 		}
 	}
@@ -1000,12 +1006,18 @@ public class FacturaServiciosBean implements Serializable {
 		this.precioServicio = precioServicio;
 	}
 
-	public Integer getIdFactura() {
-		return idFactura;
-	}
 
 	public void setIdFactura(Integer idFactura) {
 		this.idFactura = idFactura;
+	}
+
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public BigDecimal getTasaIva() {
@@ -1039,5 +1051,6 @@ public class FacturaServiciosBean implements Serializable {
 	public void setListaFacturaMedioPago(List<FacturaMedioPago> listaFacturaMedioPago) {
 		this.listaFacturaMedioPago = listaFacturaMedioPago;
 	}
+
 
 }

@@ -35,9 +35,9 @@
 							var="pServicio" selection="#{serviciosClienteBean.precioServicioSelected}" reflow="true" lazy="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
 							<f:facet name="header">
 								<div class="products-table-header">
-									<span style="font-weight: bold">Servicios por cliente</span> <span class="filter-container ui-input-icon-left"> <p:commandButton
-											id="btnAdd" icon="pi pi-plus" value="Agregar" actionListener="#{serviciosClienteBean.nuevoServicioCliente()}" process="@this"
-											styleClass="ui-button-success" style="margin-right: .5rem" update="form:panel-servicio" oncomplete="PF('servicioClienteDialog').show()"
+									<span style="font-weight: bold">Servicios por cliente</span> <span class="filter-container ui-input-icon-left"> 
+									<p:commandButton id="btnAdd" icon="pi pi-plus" value="Agregar nuevo servicio" actionListener="#{serviciosClienteBean.nuevoServicioCliente()}" process="@this"
+											styleClass="ui-button-raised" style="margin-right: .5rem" update="form:panel-servicio" oncomplete="PF('servicioClienteDialog').show()"
 											disabled="#{serviciosClienteBean.clienteSelected eq null and serviciosClienteBean.clienteSelected.cteCve eq null}"/>
 									</span>
 								</div>
@@ -54,11 +54,11 @@
 								</h:outputText>
 							</p:column>
 							<p:column width="20%">
-								<p:commandButton icon="pi pi-pencil" value="Modificar" process="@this" styleClass="edit-button ui-button-success"
+								<p:commandButton icon="pi pi-pencil" value="Modificar" process="@this" styleClass="edit-button ui-button-raised"
 									oncomplete="PF('servicioClienteDialog').show()" update="form:panel-servicio">
 									<f:setPropertyActionListener value="#{pServicio}" target="#{serviciosClienteBean.precioServicioSelected}" />
 								</p:commandButton>
-								<p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" process="@this" oncomplete="PF('deleteServicioDialog').show()">
+								<p:commandButton class="ui-button-danger" icon="pi pi-trash" value="Eliminar" process="@this" oncomplete="PF('deleteServicioDialog').show()">
 									<f:setPropertyActionListener value="#{pServicio}" target="#{serviciosClienteBean.precioServicioSelected}" />
 								</p:commandButton>
 							</p:column>

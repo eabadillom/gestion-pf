@@ -340,8 +340,7 @@ public class DomiciliosBean implements Serializable {
 				.getDomicilioTipoCve()).collect(Collectors.toList());
 		
 		if(domicilioFiscal != null && domicilioFiscal.size() > 0) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ya existe un domicilio fiscal registrado para el cliente."));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ya existe un domicilio fiscal registrado para el cliente."));
 			nuevoClienteDomicilio();
 			return;
 		}
@@ -352,8 +351,7 @@ public class DomiciliosBean implements Serializable {
 			lstClienteDomicilios.add(clienteDomicilioSelected);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Domicilio Agregado"));
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ocurrió un error al intentar guardar el Domicilio"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ocurrió un error al intentar guardar el Domicilio"));
 		}
 		clienteDomicilioSelected = new ClienteDomicilios();
 		domicilioNuevo = new Domicilios();
