@@ -44,7 +44,7 @@ public class CamarasBean implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		lstCamaras = camaraDAO.buscarTodos();
+		lstCamaras = camaraDAO.findall(true);
 		lstPlantas = plantaDAO.findall();
 	}
 
