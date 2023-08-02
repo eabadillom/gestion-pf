@@ -33,6 +33,29 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 		}
 		return camara;
 	}
+	
+	public List<Camara> findall(Boolean isFullInfo) {
+		List<Camara> camara = null;
+		EntityManager entity = null;
+		try {
+			entity = getEntityManager();
+			camara = entity.createNamedQuery("Camara.findAll", Camara.class).getResultList();
+			
+			if(isFullInfo==false)
+				return camara;
+			
+			for(Camara c: camara) {
+				log.debug(c.getPlantaCve().getPlantaDs());
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de cámaras...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
+		return camara;
+	}
+	
 	@Override
 	public Camara buscarPorId(Integer id) {
 		Camara camara = null;
