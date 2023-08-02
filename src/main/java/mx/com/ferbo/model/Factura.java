@@ -157,12 +157,12 @@ public class Factura implements Serializable {
     private String calle;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 10)
+    @Size(min = 1, max = 50)
     @Column(name = "num_ext")
     private String numExt;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 0, max = 10)
+    @Size(min = 0, max = 50)
     @Column(name = "num_int")
     private String numInt;
     @Basic(optional = false)

@@ -244,19 +244,10 @@
 							</p:outputPanel>
 
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check"
-									actionListener="#{domiciliosBean.guardaClienteDomicilio()}"
-									onclick="PF('clienteDireccionesAddDialog').hide()"
-									update="panel-addClienteDireccion"
-									process="panel-addClienteDireccion @this" />
-								<p:commandButton value="Cancelar" icon="pi pi-times"
-									onclick="PF('clienteDireccionesAddDialog').hide()"
-									class="ui-button-secondary" update="panel-addClienteDireccion"
-									/>
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{domiciliosBean.guardaClienteDomicilio()}" onclick="PF('clienteDireccionesAddDialog').hide()" update="panel-addClienteDireccion" process="panel-addClienteDireccion @this" />
+								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('clienteDireccionesAddDialog').hide()" class="ui-button-secondary" update="panel-addClienteDireccion" />
 							</f:facet>
 						</p:dialog>
-
-
 
 						<p:dialog header="Actualizar Dirección" showEffect="fade"
 							modal="true" widgetVar="clienteDireccionesActDialog"

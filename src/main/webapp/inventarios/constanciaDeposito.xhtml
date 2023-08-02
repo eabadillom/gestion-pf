@@ -41,7 +41,7 @@
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-2 p-md-2">
-						<p:datePicker id="fechaIngreso" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Ingreso" value="#{constanciaDeDepositoBean.fechaIngreso}" disabled="#{constanciaDeDepositoBean.restricted}">
+						<p:datePicker id="fechaIngreso" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Ingreso" value="#{constanciaDeDepositoBean.fechaIngreso}" maxdate="#{constanciaDeDepositoBean.maxDate}" disabled="#{constanciaDeDepositoBean.restricted}">
 							<p:ajax update="@this" process="@this"/>
 						</p:datePicker>
 					</div>
@@ -138,14 +138,7 @@
 			<p:panel header="SUS PRODUCTOS">
 				<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="false"
 							  rowSelectMode="add" rows="10" rowKey="#{partida.pesoTotal}" reflow="true" selection="#{constanciaDeDepositoBean.selectedPartidas}" tableStyle="table-layout: auto;">
-					<p:ajax event="rowSelect" />
-                          <p:ajax event="rowUnselect" />
-                          <p:ajax event="rowSelectCheckbox"/>
-                          <p:ajax event="rowUnselectCheckbox" />
-                          <p:ajax event="toggleSelect" />
-
-                          <p:column selectionMode="multiple" exportable="false"></p:column>
-					
+			
 					<p:column exportable="false" width="3%">
 						<p:rowToggler />
 					</p:column>							
@@ -242,12 +235,7 @@
 				</div>
 				<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" value="#{constanciaDeDepositoBean.listadoConstanciaDepositoDetalle}"
 							rowSelectMode="add"	rowKey="#{constanciaDD}" var="constanciaDD" reflow="true" selection="#{constanciaDeDepositoBean.selectedConstanciaDD}" tableStyle="table-layout: auto;">
-					<p:ajax event="rowSelect"/>
-                          <p:ajax event="rowUnselect"/>
-                          <p:ajax event="rowSelectCheckbox"/>
-                          <p:ajax event="rowUnselectCheckbox"/>
-                          <p:ajax event="toggleSelect"/>
-					<p:column selectionMode="multiple" exportable="false"></p:column>
+
 					<p:column headerText="Servicio">
 						<h:outputText value="#{constanciaDD.servicioCve.servicioDs}" />
 					</p:column>
@@ -255,8 +243,8 @@
 						<h:outputText value="#{constanciaDD.servicioCantidad}"/>
 					</p:column>
 					<p:column exportable="false" style="text-align:center">
-					    <p:commandButton class="ui-button-danger" icon="pi pi-times" action="#{constanciaDeDepositoBean.deleteConstanciaDD}" rendered="#{not constanciaDeDepositoBean.saved}">
-					        <f:setPropertyActionListener value="#{constanciaDD}" target="#{constanciaDeDepositoBean.selectedConstanciasDD}" />
+					    <p:commandButton class="ui-button-danger" icon="pi pi-times" actionListener="#{constanciaDeDepositoBean.deleteConstanciaDD()}" rendered="#{not constanciaDeDepositoBean.saved}">
+					      
 					    </p:commandButton>
 					</p:column>
 				</p:dataTable>
