@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaSalida;
+import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
@@ -89,6 +90,13 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 
 			List<ConstanciaSalida> listado = (List<ConstanciaSalida>) q.getResultList();
 			
+			for(ConstanciaSalida cs: listado) {
+				List<DetalleConstanciaSalida> listaDetalle = cs.getDetalleConstanciaSalidaList();
+				listaDetalle.size();
+				for(DetalleConstanciaSalida dcs: listaDetalle) {
+					log.debug(dcs.getPartidaCve());
+				}
+			}
 			
 			return listado;
 		} catch (Exception e) {
