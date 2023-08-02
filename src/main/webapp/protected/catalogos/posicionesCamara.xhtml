@@ -38,7 +38,7 @@ button.ui-button {
 
 					<span class="ui-float-label ui-input-icon-left">							
 					<p:selectOneMenu id="camara" converter="entityConverter" value="#{posicionCamaraBean.camaraSelect}" style="width: 250px; height: 33px" >
-						<f:selectItem itemLabel="" />
+						<f:selectItem itemLabel="Todas las camaras" />
 						<f:selectItems value="#{posicionCamaraBean.camaraPorPlanta}" var="camaraPlanta" itemLabel="#{camaraPlanta.camaraDs}" itemValue="#{camaraPlanta}" />
 						<p:ajax listener="#{posicionCamaraBean.filtrarPosiciones()}" />
 					</p:selectOneMenu>

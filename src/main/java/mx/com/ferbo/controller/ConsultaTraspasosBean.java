@@ -76,6 +76,8 @@ public class ConsultaTraspasosBean implements Serializable {
 	
 	private Date fecha_ini;
 	private Date fecha_final;
+	private Date maxDate;
+	
 	private String numero;
 	private Integer cantidad;
 	private Integer idUnidadManejo;
@@ -144,6 +146,12 @@ public class ConsultaTraspasosBean implements Serializable {
 		estados = edoDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
+		
+		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
+
+		setMaxDate(new Date(today.getTime() ));
+		
 	}
 	public void buscarConstancia() {
 		EntityManager em = EntityManagerUtil.getEntityManager();
@@ -156,9 +164,9 @@ public class ConsultaTraspasosBean implements Serializable {
 		for(ConstanciaTraspaso constanciaT : listaTraspasos) {
 			List<TraspasoPartida> listaPartidas =constanciaT.getTraspasoPartidaList();
 			List<TraspasoServicio> listaServicios = constanciaT.getTraspasoServicioList();
-			System.out.println(constanciaT);
-			System.out.println(listaPartidas);
-			System.out.println(listaServicios);
+			//System.out.println(listaPartidas);
+			//System.out.println(listaServicios);
+			//System.out.println(listaServicios);
 		}
 		tr.commit();
 		em.close();
@@ -488,6 +496,14 @@ public class ConsultaTraspasosBean implements Serializable {
 
 	public void setIdCliente(Integer idCliente) {
 		this.idCliente = idCliente;
+	}
+
+	public Date getMaxDate() {
+		return maxDate;
+	}
+
+	public void setMaxDate(Date maxDate) {
+		this.maxDate = maxDate;
 	}
 
 

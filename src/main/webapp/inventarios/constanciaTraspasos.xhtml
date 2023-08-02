@@ -20,21 +20,42 @@
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
+					<p:fieldset legend="Filtro de busqueda">
+					
+					 <p:divider align="left">
+					        <div class="inline-flex align-items-center">
+					            <i class="pi pi-user mr-2"/>
+					            <b>Por rango de fechas</b>
+					        </div>
+					    </p:divider>
+						<span class="ui-float-label ui-input-icon-left">
+			                <p:datePicker id="min" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultaTraspasosBean.fecha_ini}"  maxdate="#{consultaTraspasosBean.maxDate}" readonlyInput="true"/>
+			                <p:outputLabel for="min" value="Fecha "/>
+						</span>		
 						
-						<p:outputLabel value="Por Rango de Fechas:" />
-						<p:datePicker id="fechaInicial" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Inicio" value="#{consultaTraspasosBean.fecha_ini}" />
-						<p:datePicker id="fechaFinal" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha Final" value="#{consultaTraspasosBean.fecha_final}" />
+						<span class="ui-float-label ui-input-icon-left">
+			                <p:datePicker id="max" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultaTraspasosBean.fecha_final}"  maxdate="#{consultaTraspasosBean.maxDate}" readonlyInput="true"/>
+						<p:outputLabel for="max" value="Fecha "/>
+						</span>	
 						
 						<p:outputLabel for="folio" value="Por Folio:" />
 						<p:inputText id="folio" value="#{consultaTraspasosBean.numero}" required="true" requiredMessage="Ingresa el folio" />
 						<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2" icon="pi pi-fw pi-search" actionListener="#{consultaTraspasosBean.buscarConstancia}" update="@widgetVar(dtConstanciaTraspaso) messages"/>
-						
+							 <p:divider align="left">
+							        <div class="inline-flex align-items-center">
+							            <i class="pi pi-user mr-2"/>
+							            <b>Por Cliente</b>
+							        </div>
+							    </p:divider>
 						<p:outputLabel for="cliente-som" value="Por Clientes:" />
 						<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{consultaTraspasosBean.idCliente}">
 							<f:selectItem itemLabel="Selecione Cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems var="cte" value="#{consultaTraspasosBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
 							<p:ajax listener="#{consultaTraspasosBean.filtrarCliente}" process="@this" update=":form:dt-traspaso "/>
 						</p:selectOneMenu>
+						
+						</p:fieldset>
+						
 					</div>
 				</div>
 			</div>

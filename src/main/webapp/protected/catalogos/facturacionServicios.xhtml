@@ -58,7 +58,7 @@
 										<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4" converter="entityConverter" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filterMatchMode="startsWith">
 											<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" itemValue="" noSelectionOption="true" />
 											<f:selectItems var="cte" value="#{facturaServiciosBean.listaCliente}" itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
-											<p:ajax listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago"   />
+											<p:ajax listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago domicilio"   />
 										</p:selectOneMenu>
 										</p:toolbarGroup>	
 									</p:toolbar>
@@ -78,15 +78,12 @@
 										<p:inputText value="#{facturaServiciosBean.clienteSelect.cteRfc}" styleClass="p-ml-2 p-mr-4" readonly="true" /> 
 										<p:outputLabel value="RFC" styleClass="p-mr-2 p-mr-4" />
 										</span>
-										
-										<span class="ui-float-label ui-input-icon-left">
-										<p:selectOneMenu id="domicilio" autoWidth="false" value="#{facturaServiciosBean.domicilioSelect}" style="width:300px;" disabled="true">
-											<f:selectItem itemLabel="" itemValue="" />
-											<f:selectItems value="#{facturaServiciosBean.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios}" />
+
+										<p:outputLabel value="Domicilio" />
+										<p:selectOneMenu id="domicilio" autoWidth="false" value="#{facturaServiciosBean.domicilioSelect}" style="width:300px;" >
+										<f:selectItem itemLabel="#{facturaServiciosBean.domicilioSelect.paisCved.paisDesc}" />
+												<f:selectItems value="#{facturaServiciosBean.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.paisCved.paisDesc}" itemValue="#{domicilio.domicilios.paisCved}" />
 										</p:selectOneMenu>
-										<p:outputLabel for="@previous" value="Domicilio" />
-										</span>
-										
 									</div>
 								</p:outputPanel>
 							</div>
