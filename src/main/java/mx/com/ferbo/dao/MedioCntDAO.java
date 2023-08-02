@@ -5,6 +5,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.jfree.util.Log;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -33,14 +35,27 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 
 	@Override
 	public List<MedioCnt> buscarTodos() {
-		// TODO Auto-generated method stub
 		return null;
+		
 	}
 
 	@Override
 	public List<MedioCnt> buscarPorCriterios(MedioCnt e) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		EntityManager em = null;
+		List<MedioCnt> lista = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("MedioCnt.findByIdContacto", MedioCnt.class)
+					.setParameter("idContacto", e.getIdContacto().getIdContacto()).getResultList();
+		} catch (Exception e2) {
+			Log.error("Problema al encontrar registros", e2);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return lista;
 	}
 
 	@Override

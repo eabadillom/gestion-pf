@@ -106,7 +106,7 @@ public class Planta implements Serializable {
 	private String numinterior;
 	
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
-	@ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.DETACH, optional = false)
 	private EmisoresCFDIS idEmisoresCFDIS;//agregado
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta", fetch = FetchType.LAZY)

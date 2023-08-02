@@ -23,6 +23,25 @@ public class CandadoSalidaDAO {
 		
 		return list;
 	};
+	
+	public String save(CandadoSalida candado) {
+		
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(candado);
+			em.getTransaction().commit();
+			
+		} catch (Exception e) {
+			return "Error" + e.getMessage();
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return null;
+	}
 
 	public String update(CandadoSalida cS) {
 		try {

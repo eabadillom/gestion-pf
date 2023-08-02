@@ -16,6 +16,7 @@ import javax.inject.Named;
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.CandadoSalidaDAO;
 import mx.com.ferbo.dao.ClienteContactoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ContactoDAO;
@@ -23,9 +24,11 @@ import mx.com.ferbo.dao.MedioCntDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
+import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.TipoMailDAO;
 import mx.com.ferbo.dao.TipoTelefonoDAO;
 import mx.com.ferbo.dao.UsoCfdiDAO;
+import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
@@ -34,6 +37,8 @@ import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
+import mx.com.ferbo.model.SerieConstancia;
+import mx.com.ferbo.model.SerieConstanciaPK;
 import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.model.TipoTelefono;
@@ -79,12 +84,15 @@ public class ClientesBean implements Serializable {
 	private MedioPagoDAO medioPagoDAO;
 	private ClienteContactoDAO clienteContactoDAO;
 	private MedioCntDAO medioCntDAO;
+	private SerieConstanciaDAO serieDAO;
 	
 	SecurityUtil util;
 
 	public ClientesBean() {
 		lstClienteContactoSelected = new ArrayList<>();
 		lstClientesSelected = new ArrayList<>();
+		lstMetodoPago = new ArrayList<>();
+		
 		clienteDAO = new ClienteDAO();
 		contactoDAO = new ContactoDAO();
 		tipoMailDAO = new TipoMailDAO();
@@ -100,6 +108,7 @@ public class ClientesBean implements Serializable {
 		medioPagoDAO = new MedioPagoDAO();
 		clienteContactoDAO = new ClienteContactoDAO();
 		medioCntDAO = new MedioCntDAO();
+		serieDAO = new SerieConstanciaDAO();
 	}
 
 	@PostConstruct
@@ -234,8 +243,53 @@ public class ClientesBean implements Serializable {
 		}
 		
 		if (clienteSelected.getCteCve() == null) {
+			
+			//CANDADO SALIDA
+			
+			CandadoSalida candadoSalida = new CandadoSalida();
+			candadoSalida.setHabilitado(true);
+			candadoSalida.setCliente(clienteSelected);
+			candadoSalida.setNumSalidas(1);
+			
+			clienteSelected.setCandadoSalida(candadoSalida);
+			
 			if (clienteDAO.guardar(clienteSelected) == null) {
-				lstClientes.add(clienteSelected);
+				
+				
+				//SERIE CONSTANCIA 4 registros por cliente
+				
+				for(int i=0;i<4;i++) {
+					
+					SerieConstanciaPK serieConstanciaPK = new SerieConstanciaPK();
+					serieConstanciaPK.setIdCliente(clienteSelected.getCteCve());
+					switch (i) {
+					case 0:
+						serieConstanciaPK.setTpSerie("I");
+						break;
+					case 1:
+						serieConstanciaPK.setTpSerie("O");
+						break;
+						
+					case 2:
+						serieConstanciaPK.setTpSerie("S");
+						break;
+						
+					case 3:
+						serieConstanciaPK.setTpSerie("T");
+						break;
+						
+					default:
+						break;
+					}
+					
+					
+					SerieConstancia serieConstancia = new SerieConstancia();
+					serieConstancia.setSerieConstanciaPK(serieConstanciaPK);
+					serieConstancia.setNuSerie(1);
+					
+					serieDAO.guardar(serieConstancia);
+				}
+				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Agregado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -390,12 +444,28 @@ public class ClientesBean implements Serializable {
 				throw new InventarioException("No hay un contacto seleccionado.");
 			
 			int indexOf = cliente.getClienteContactoList().indexOf(this.clienteContactoSelected);
-			if(indexOf < 0)
+			if(indexOf < 0) {
 				cliente.add(clienteContactoSelected);
-			
-			clienteDAO.actualizar(cliente);
-			
-			this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
+				clienteDAO.actualizar(cliente);
+				this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
+			}else {
+				
+				for(ClienteContacto clienteContacto: cliente.getClienteContactoList()) {
+				
+					if(clienteContactoSelected.equals(clienteContacto)) {
+											
+						clienteContacto.setIdContacto(clienteContactoSelected.getIdContacto());
+						clienteContacto.setNbUsuario(clienteContactoSelected.getNbUsuario());
+						clienteContacto.setNbPassword(clienteContactoSelected.getNbPassword());
+						clienteContacto.setStUsuario(clienteContactoSelected.getStUsuario());
+						clienteContacto.setStHabilitado(clienteContactoSelected.getStHabilitado());
+						clienteContacto.setRecibeFacturacion(clienteContactoSelected.getRecibeFacturacion());
+						clienteContacto.setRecibeInventario(clienteContactoSelected.getRecibeInventario());
+						
+						clienteDAO.actualizar(cliente);
+					}
+				}
+			}
 			this.consultaClientes();
 			PrimeFaces.current().executeScript("PF('dialogAddContacto').hide()");
 			PrimeFaces.current().executeScript("PF('dialogEditContacto').hide()");
@@ -477,12 +547,17 @@ public class ClientesBean implements Serializable {
 			
 			if("T".equalsIgnoreCase(medioContactoSelected.getTpMedio()))
 				this.medioContactoSelected.getIdTelefono().setMedioCntList(medioCntList);
-			else if("M".equalsIgnoreCase(medioContactoSelected.getTpMedio()))
+			if("M".equalsIgnoreCase(medioContactoSelected.getTpMedio()))
 				this.medioContactoSelected.getIdMail().setMedioCntList(medioCntList);
 			
 			Contacto contacto = this.clienteContactoSelected.getIdContacto();
 			medioContactoSelected.setIdContacto(contacto);
-			medioCntDAO.actualizar(medioContactoSelected);
+			medioContactoSelected.setIdMedio(null);
+			medioCntDAO.actualizar(medioContactoSelected);//cambie por guardar el metodo actualizar
+			
+			medioCntList = medioCntDAO.buscarPorCriterios(medioContactoSelected);
+			
+			this.clienteContactoSelected.getIdContacto().setMedioCntList(medioCntList);
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Medio de contacto registrado correctamente.";
@@ -509,8 +584,14 @@ public class ClientesBean implements Serializable {
 			if( this.medioContactoSelected == null )
 				throw new InventarioException("No hay un medio de contacto seleccionado.");
 			
-			List<MedioCnt> medioCntList = this.clienteContactoSelected.getIdContacto().getMedioCntList();
-			medioCntList.remove(this.medioContactoSelected);
+			/*List<MedioCnt> medioCntList = this.clienteContactoSelected.getIdContacto().getMedioCntList();
+			medioCntList.remove(this.medioContactoSelected);*/
+			
+			List<MedioCnt> medioCntList = medioCntDAO.buscarPorCriterios(medioContactoSelected);
+			
+			medioCntList.remove(medioContactoSelected);
+			
+			this.clienteContactoSelected.getIdContacto().setMedioCntList(medioCntList);
 			
 			String actualizar = clienteContactoDAO.actualizar(this.clienteContactoSelected);
 			

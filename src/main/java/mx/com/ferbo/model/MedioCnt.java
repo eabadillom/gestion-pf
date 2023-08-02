@@ -32,7 +32,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "MedioCnt.findAll", query = "SELECT m FROM MedioCnt m"),
     @NamedQuery(name = "MedioCnt.findByIdMedio", query = "SELECT m FROM MedioCnt m WHERE m.idMedio = :idMedio"),
     @NamedQuery(name = "MedioCnt.findByTpMedio", query = "SELECT m FROM MedioCnt m WHERE m.tpMedio = :tpMedio"),
-    @NamedQuery(name = "MedioCnt.findByStMedio", query = "SELECT m FROM MedioCnt m WHERE m.stMedio = :stMedio")})
+    @NamedQuery(name = "MedioCnt.findByStMedio", query = "SELECT m FROM MedioCnt m WHERE m.stMedio = :stMedio"),
+    @NamedQuery(name = "MedioCnt.findByIdContacto", query = "SELECT m FROM MedioCnt m WHERE m.idContacto.idContacto = :idContacto")})
 public class MedioCnt implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -55,7 +56,7 @@ public class MedioCnt implements Serializable {
     private boolean stMedio;
     
     @JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false, cascade = CascadeType.DETACH)//Cambie por ALL
     private Contacto idContacto;
     
     @JoinColumn(name = "id_mail", referencedColumnName = "id_mail")

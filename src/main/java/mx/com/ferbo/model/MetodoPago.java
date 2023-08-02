@@ -87,6 +87,12 @@ public class MetodoPago implements Serializable{
 	public void setFechaFinal(Date fechaFinal) {
 		this.fechaFinal = fechaFinal;
 	}
+
+	@Override
+	public String toString() {
+		return "MetodoPago [cdMetodoPago=" + cdMetodoPago + ", nbMetodoPago=" + nbMetodoPago + ", fechaInicio="
+				+ fechaInicio + ", fechaFinal=" + fechaFinal + "]";
+	}
 	
 	
 	

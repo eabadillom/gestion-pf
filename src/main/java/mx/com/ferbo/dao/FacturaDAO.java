@@ -15,6 +15,7 @@ import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturaMedioPago;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.ProductoConstancia;
 import mx.com.ferbo.model.ProductoConstanciaDs;
 import mx.com.ferbo.model.ServicioConstancia;
@@ -164,7 +165,7 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public String eliminar(Factura e) {
 		// TODO Auto-generated method stub
