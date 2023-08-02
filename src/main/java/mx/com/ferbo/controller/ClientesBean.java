@@ -444,12 +444,28 @@ public class ClientesBean implements Serializable {
 				throw new InventarioException("No hay un contacto seleccionado.");
 			
 			int indexOf = cliente.getClienteContactoList().indexOf(this.clienteContactoSelected);
-			if(indexOf < 0)
+			if(indexOf < 0) {
 				cliente.add(clienteContactoSelected);
-			
-			clienteDAO.actualizar(cliente);
-			
-			this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
+				clienteDAO.actualizar(cliente);
+				this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
+			}else {
+				
+				for(ClienteContacto clienteContacto: cliente.getClienteContactoList()) {
+				
+					if(clienteContactoSelected.equals(clienteContacto)) {
+											
+						clienteContacto.setIdContacto(clienteContactoSelected.getIdContacto());
+						clienteContacto.setNbUsuario(clienteContactoSelected.getNbUsuario());
+						clienteContacto.setNbPassword(clienteContactoSelected.getNbPassword());
+						clienteContacto.setStUsuario(clienteContactoSelected.getStUsuario());
+						clienteContacto.setStHabilitado(clienteContactoSelected.getStHabilitado());
+						clienteContacto.setRecibeFacturacion(clienteContactoSelected.getRecibeFacturacion());
+						clienteContacto.setRecibeInventario(clienteContactoSelected.getRecibeInventario());
+						
+						clienteDAO.actualizar(cliente);
+					}
+				}
+			}
 			this.consultaClientes();
 			PrimeFaces.current().executeScript("PF('dialogAddContacto').hide()");
 			PrimeFaces.current().executeScript("PF('dialogEditContacto').hide()");
@@ -568,11 +584,16 @@ public class ClientesBean implements Serializable {
 			if( this.medioContactoSelected == null )
 				throw new InventarioException("No hay un medio de contacto seleccionado.");
 			
-			List<MedioCnt> medioCntList = this.clienteContactoSelected.getIdContacto().getMedioCntList();
-			medioCntList.remove(this.medioContactoSelected);
+			/*List<MedioCnt> medioCntList = this.clienteContactoSelected.getIdContacto().getMedioCntList();
+			medioCntList.remove(this.medioContactoSelected);*/
+			
+			List<MedioCnt> medioCntList = medioCntDAO.buscarPorCriterios(medioContactoSelected);
+			
+			medioCntList.remove(medioContactoSelected);
+			
+			this.clienteContactoSelected.getIdContacto().setMedioCntList(medioCntList);
 			
 			String actualizar = clienteContactoDAO.actualizar(this.clienteContactoSelected);
-			medioContactoSelected = new MedioCnt();
 			
 			
 			severity = FacesMessage.SEVERITY_INFO;
