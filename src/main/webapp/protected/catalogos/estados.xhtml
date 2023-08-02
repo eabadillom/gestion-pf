@@ -27,15 +27,11 @@
 					</div>
 					<div class="card">
 						<p:outputLabel for="countries-som" value="Paises:" />
-							<p:selectOneMenu id="countries-som" autoWidth="false"
-								value="#{estadosBean.idPais}">
-								<f:selectItem itemLabel="Selecione Pais" itemValue=""
-									noSelectionOption="true" />
-								<f:selectItems var="selectedCountriesOne"
-									value="#{estadosBean.listaPaises}"
-									itemLabel="#{selectedCountriesOne.paisDesc}"
-									itemValue="#{selectedCountriesOne.paisCve}" />
-									<p:ajax listener="#{estadosBean.handleContrySelect()}" update="dt-Estados"/>
+							<p:selectOneMenu id="countries-som" autoWidth="false" value="#{estadosBean.idPais}">
+								<f:selectItem itemLabel="Selecione Pais" itemValue="" noSelectionOption="true" />
+								<f:selectItems var="selectedCountriesOne" value="#{estadosBean.listaPaises}"
+									itemLabel="#{selectedCountriesOne.paisDesc}" itemValue="#{selectedCountriesOne.paisCve}" />
+									<p:ajax update="dt-Estados"/>
 							</p:selectOneMenu>
 							
 					</div>
@@ -52,25 +48,13 @@
 							paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
-									<span style="font-weight: bold">Estados</span> <span
-										class="ui-input-icon-left filter-container"> <i
-										class="pi pi-search" /> <p:inputText id="globalFilter"
-											onkeyup="PF('dtEstados').filter()" placeholder="Búsqueda" />
+								 <span class="ui-input-icon-left filter-container"> <i class="pi pi-search" /> <p:inputText id="globalFilter"
+								 onkeyup="PF('dtEstados').filter()" placeholder="Búsqueda" />
 									</span>
 								</div>
 							</f:facet>
 
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-Estados-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-Estados-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-Estados-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-Estados-button" /> -->
 
-							<p:column selectionMode="multiple" />
 							<p:column headerText="Pais" sortBy="#{estados.paises.paisDesc}"
 								filterBy="#{estados.paises.paisDesc}" style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
@@ -106,16 +90,11 @@
 					<p:outputPanel rendered="#{not empty estadosBean.estadoSelect}">
 						<div class="p-field">
 							<p:outputLabel for="states" value="Paises:" />
-							<p:selectOneMenu id="states" autoWidth="false"
-								value="#{estadosBean.idPais}">
-								<f:selectItem itemLabel="Selecione Pais" itemValue=""
-									noSelectionOption="true" />
-								<f:selectItems var="selectedStates"
-									value="#{estadosBean.listaPaises}"
-									itemLabel="#{selectedStates.paisDesc}"
+							<p:selectOneMenu id="states" value="#{estadosBean.idPais}">
+								<f:selectItem itemLabel="Selecione Pais" itemValue="" noSelectionOption="true" />
+								<f:selectItems var="selectedStates" value="#{estadosBean.listaPaises}" itemLabel="#{selectedStates.paisDesc}"
 									itemValue="#{selectedStates.paisCve}" />
-								<p:ajax listener="#{estadosBean.handleContrySelect}"
-									process="@this" />
+								<p:ajax process="@this" />
 							</p:selectOneMenu>
 						</div>
 						<div class="p-field">
