@@ -216,6 +216,8 @@ public class IngresosCrudBean implements Serializable {
 					}
 				}
 				//facturaDAO.actualizar(facturaSelect);//ERROR GUARDA LA ULTIMA FACTURA SELECCIONADA Y NO TODOS LOS REGISTROS
+				
+				listaPago.clear();
 				severity = FacesMessage.SEVERITY_INFO;
 				message = "El pago se genero correctamente";
 			} catch (Exception e) {
@@ -226,7 +228,7 @@ public class IngresosCrudBean implements Serializable {
 			} finally {
 				FacesContext.getCurrentInstance().addMessage(null,
 						new FacesMessage(severity, "Informacion de Pago", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-ingAlta", "form:dt-Factura");
+				PrimeFaces.current().ajax().update("form:messages", "form:dt-ingAlta", "form:dt-Factura","form:detallesFacturacion");
 				
 			}
 	}		
