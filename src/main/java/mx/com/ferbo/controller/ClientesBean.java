@@ -317,8 +317,7 @@ public class ClientesBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Eliminado"));
 			PrimeFaces.current().ajax().update("form:dt-clientes");
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ocurrió un error al intentar eliminar el Cliente"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error","Favor de eliminar contacto(s) del cliente a eliminar"));
 		}
 		PrimeFaces.current().ajax().update("form:messages");
 	}
