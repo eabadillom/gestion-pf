@@ -29,9 +29,8 @@
 						<p:outputLabel for="countries-som" value="Paises:" />
 							<p:selectOneMenu id="countries-som" autoWidth="false" value="#{estadosBean.idPais}">
 								<f:selectItem itemLabel="Selecione Pais" itemValue="" noSelectionOption="true" />
-								<f:selectItems var="selectedCountriesOne" value="#{estadosBean.listaPaises}"
-									itemLabel="#{selectedCountriesOne.paisDesc}" itemValue="#{selectedCountriesOne.paisCve}" />
-									<p:ajax update="dt-Estados"/>
+								<f:selectItems var="selectedCountriesOne" value="#{estadosBean.listaPaises}" itemLabel="#{selectedCountriesOne.paisDesc}" itemValue="#{selectedCountriesOne.paisCve}" />
+									<p:ajax update="dt-Estados" process="@this" listener="#{estadosBean.handleContrySelect()}"/>
 							</p:selectOneMenu>
 							
 					</div>
