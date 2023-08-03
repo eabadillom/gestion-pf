@@ -19,50 +19,44 @@
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
 					<div class="card">
-						<p:commandButton value="Agregar" icon="pi pi-plus"
+						<p:commandButton value="Agregar ciudad" icon="pi pi-plus"
 							actionListener="#{ciudadesBean.nuevaCiudad}"
 							update="manage-city-content-new form:manage-city-content-new"
 							oncomplete="PF('nuevaCiudadDialog').show()"
 							styleClass="p-mr-2 p-mb-2" process="@this" />
 					</div>
+					<p:fieldset legend="Filtro de busqueda">
 					<div class="card">
-						<p:outputLabel for="countries-som" value="Paises:" />
-						<p:selectOneMenu id="countries-som" autoWidth="false"
-							value="#{ciudadesBean.idPais}">
-							<f:selectItem itemLabel="Selecione Pais" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedCountriesOne"
-								value="#{ciudadesBean.listaPaises}"
-								itemLabel="#{selectedCountriesOne.paisDesc}"
-								itemValue="#{selectedCountriesOne.paisCve}" />
-							<p:ajax listener="#{ciudadesBean.handleContrySelect()}"
-								update="states-som" />
+					
+					 <span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="countries-som" autoWidth="false" value="#{ciudadesBean.idPais}" style="width: 250px; height: 33px">
+							<f:selectItem itemLabel="" itemValue="" noSelectionOption="true"  />
+							<f:selectItems var="selectedCountriesOne" value="#{ciudadesBean.listaPaises}" itemLabel="#{selectedCountriesOne.paisDesc}" itemValue="#{selectedCountriesOne.paisCve}" />
+							<p:ajax listener="#{ciudadesBean.handleContrySelect()}" update="states-som" />
 						</p:selectOneMenu>
-						<p:outputLabel for="states-som" value="Estados:" />
-						<p:selectOneMenu id="states-som" autoWidth="false"
-							value="#{ciudadesBean.idEstado}">
-							<f:selectItem itemLabel="Selecione Estado" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedStatesOne"
-								value="#{ciudadesBean.listaEstados}"
-								itemLabel="#{selectedStatesOne.estadoDesc}"
+						<p:outputLabel for="countries-som" value="Pais" />
+						</span>
+						
+						<span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="states-som" autoWidth="false" value="#{ciudadesBean.idEstado}" style="width: 250px; height: 33px">
+							<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+							<f:selectItems var="selectedStatesOne" value="#{ciudadesBean.listaEstados}" itemLabel="#{selectedStatesOne.estadoDesc}"
 								itemValue="#{selectedStatesOne.estadosPK.estadoCve}" />
-							<p:ajax listener="#{ciudadesBean.handleStateSelect()}"
-								update="municipalities-som" />
+							<p:ajax listener="#{ciudadesBean.handleStateSelect()}" update="municipalities-som" />
 						</p:selectOneMenu>
-						<p:outputLabel for="municipalities-som" value="Municipios:" />
-						<p:selectOneMenu id="municipalities-som" autoWidth="false"
-							value="#{ciudadesBean.idMunicipio}">
-							<f:selectItem itemLabel="Selecione Municipio" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedMunicipalitiesOne"
-								value="#{ciudadesBean.listaMunicipios}"
-								itemLabel="#{selectedMunicipalitiesOne.municipioDs}"
-								itemValue="#{selectedMunicipalitiesOne.municipiosPK.municipioCve}" />
-							<p:ajax listener="#{ciudadesBean.handleMunicipalitySelect()}"
-								update="dt-Ciudades" />
+						<p:outputLabel for="states-som" value="Estados" />
+						</span>
+
+						<span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="municipalities-som" autoWidth="false" value="#{ciudadesBean.idMunicipio}" style="width: 250px; height: 33px">
+							<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+							<f:selectItems var="selectedMunicipalitiesOne" value="#{ciudadesBean.listaMunicipios}" itemLabel="#{selectedMunicipalitiesOne.municipioDs}" itemValue="#{selectedMunicipalitiesOne.municipiosPK.municipioCve}" />
+							<p:ajax listener="#{ciudadesBean.handleMunicipalitySelect()}" update="dt-Ciudades" />
 						</p:selectOneMenu>
+						<p:outputLabel for="municipalities-som" value="Municipios" />
+						</span>
 					</div>
+					</p:fieldset>
 				</div>
 			</div>
 
@@ -76,7 +70,7 @@
 							paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
-									<span style="font-weight: bold">Ciudades</span> <span
+									<span
 										class="ui-input-icon-left filter-container"> <i
 										class="pi pi-search" /> <p:inputText id="globalFilter"
 											onkeyup="PF('dtCiudades').filter()" placeholder="Búsqueda" />
@@ -84,17 +78,6 @@
 								</div>
 							</f:facet>
 
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-Ciudads-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-Ciudads-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-Ciudads-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-Ciudads-button" /> -->
-
-							
 							<p:column headerText="Pais" sortBy="#{ciudades.municipios.estados.paises.paisDesc}"
 								filterBy="#{ciudades.municipios.estados.paises.paisDesc}" style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
