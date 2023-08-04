@@ -21,6 +21,7 @@ import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CategoriaDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
+import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.CuotaMinimaDAO;
 import mx.com.ferbo.dao.DomiciliosDAO;
 import mx.com.ferbo.dao.PlantaDAO;
@@ -32,6 +33,8 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
+import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.CuotaMensualServicio;
 import mx.com.ferbo.model.CuotaMinima;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Planta;
@@ -54,6 +57,7 @@ public class AvisosComercialBean implements Serializable {
 	private List<Cliente> lstClientes;
 	private Cliente clienteSelected;
 	private ClienteDAO clienteDAO;
+	
 
 	/**
 	 * Objetos para avisos
@@ -304,14 +308,26 @@ public class AvisosComercialBean implements Serializable {
 	}
 
 	public void eliminaAviso() {
-		PrecioServicio nPs = new PrecioServicio();
-		nPs.setCliente(clienteSelected);
-		nPs.setAvisoCve(avisoSelected);
-		nPs.setServicio(servicioSelected);
-		precioServicioDAO.eliminar(nPs);
-		avisoDAO.eliminar(avisoSelected);
-		lstAvisos.remove(avisoSelected);
-		PrimeFaces.current().ajax().update("form:dt-avisos");
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;		
+		int countCDD = 0, countPS=0;
+		countCDD = avisoDAO.conteoConstanciaDeDeposito(avisoSelected);
+		countPS = avisoDAO.conteoPrecioServicio(avisoSelected);
+		
+		if( (countCDD==0)&&(countPS == 0)) {
+			avisoDAO.eliminar(avisoSelected);
+			lstAvisos.remove(avisoSelected);
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "El aviso se elimino correctamente";
+		}else {
+			severity = FacesMessage.SEVERITY_ERROR;
+			mensaje = "El aviso no puede ser eliminado....";
+		}
+		
+		message = new FacesMessage(severity, "Avisos", mensaje);
+        FacesContext.getCurrentInstance().addMessage(null, message);
+		PrimeFaces.current().ajax().update("form:dt-avisos","form:messages");
 	}
 	
 	public void eliminaServicio(PrecioServicio ps) {
@@ -681,5 +697,6 @@ public class AvisosComercialBean implements Serializable {
 	public void setAviso(Aviso aviso) {
 		this.aviso = aviso;
 	}
+
 
 }

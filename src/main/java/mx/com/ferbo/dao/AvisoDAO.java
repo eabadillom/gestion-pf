@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -9,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -237,4 +239,49 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 		return lista;
 	}
 
+	public int conteoConstanciaDeDeposito(Aviso aviso) {
+		
+		EntityManager em = null;
+		int count = 0;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			query =  em.createNativeQuery("SELECT COUNT(cdd.aviso_cve) FROM CONSTANCIA_DE_DEPOSITO cdd WHERE cdd.aviso_cve = :avisoCve");
+			query.setParameter("avisoCve", aviso.getAvisoCve());	
+			count =  Integer.parseInt(query.getSingleResult().toString());
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			log.error("Problema al contar registros",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return count;
+	}
+	
+    public int conteoPrecioServicio(Aviso aviso) {
+		
+		EntityManager em = null;
+		Query query = null;
+		int count = 0;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			query =  em.createNativeQuery("SELECT COUNT(ps.aviso_cve) FROM precio_servicio ps  WHERE ps.aviso_cve = :avisoCve");
+			query.setParameter("avisoCve", aviso.getAvisoCve());	
+			count =  Integer.parseInt(query.getSingleResult().toString());
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			log.error("Problema al contar registros");
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return count;
+	}
+
+
+	
 }
