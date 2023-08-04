@@ -563,22 +563,24 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionEntradas(){
 		
-		EntityManager em = null;
+		//EntityManager em = null;
 		
 		try {
 			
-			em = EntityManagerUtil.getEntityManager();
+			/*em = EntityManagerUtil.getEntityManager();
 			EntityTransaction trans = em.getTransaction();
 			trans.begin();
-			facturacionConstanciasDAO.setEm(em);
+			facturacionConstanciasDAO.setEm(em);*/
 			
 			listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
 			
 			if(listaEntradas.isEmpty()){
 				listaEntradas = new ArrayList<>();
 			}
-		} finally {
-			em.close();
+			
+			
+		}catch (Exception e) {
+			log.error(e);
 		}
 		
 		
@@ -586,24 +588,26 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionVigencias(){
 		
-		EntityManager em = null;
+		//EntityManager em = null;
 		try {
 		
-			em = EntityManagerUtil.getEntityManager();
+			/*em = EntityManagerUtil.getEntityManager();
 			EntityTransaction t = em.getTransaction();
 			t.begin();
-			facturacionVigenciasDAO.setEm(em);
+			facturacionVigenciasDAO.setEm(em);*/
 			
 			System.out.println(fechaFactura);
 			DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
 			
-			listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());
+			listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());//Marca error cuando devuelve la lista vacia
 			
 			if(listaVigencias.isEmpty()){
 				listaVigencias = new ArrayList<>();
 			}
-		} finally {
-			em.close();
+			
+			
+		}catch (Exception e) {
+			log.error(e);
 		}
 		
 		
@@ -611,22 +615,24 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionServicios(){
 		
-		EntityManager em = null; 
+		//EntityManager em = null; 
 		
 		try {
 			
-			em = EntityManagerUtil.getEntityManager();
+			/*em = EntityManagerUtil.getEntityManager();
 			EntityTransaction trans = em.getTransaction();
 			trans.begin();
-			facturacionServiciosDAO.setEm(em);
+			facturacionServiciosDAO.setEm(em);*/
 			
 			listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
 			
 			if(listaServicios.isEmpty()) {
 				listaServicios = new ArrayList<>();
 			}
-		} finally {
-			em.close();//agregado
+		
+			
+		} catch (Exception e) {
+			log.error(e);
 		}
 		 
 		

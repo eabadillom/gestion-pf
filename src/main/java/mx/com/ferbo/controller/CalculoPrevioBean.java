@@ -1177,17 +1177,12 @@ public class CalculoPrevioBean implements Serializable {
 			}
 			
 			cfdi.setItems(listaItems);
-			
 			CfdiInfoModel registra = cfdiBL.registra(cfdi);
-			
 			Factura factura = new Factura();
 			factura = facturaDAO.buscarPorId(this.factura.getId());
-			
 			factura.setUuid(registra.getId());
 			facturaDAO.actualizar(factura);
-			
 			alAdjuntos = new ArrayList<Adjunto>();
-			
 			FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", factura.getUuid());
 			sContent = fileXML.getContent();
             content = Base64.getDecoder().decode(sContent);
@@ -1222,5 +1217,4 @@ public class CalculoPrevioBean implements Serializable {
 		}
 		
 	}
-	
 }

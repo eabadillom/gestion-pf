@@ -656,9 +656,7 @@ public class FacturaServiciosBean implements Serializable {
 			CfdiInfoModel registra = cfdiBL.registra(cfdi);
 			this.factura.setUuid(registra.getId());
 			facturaDAO.actualizar(factura);
-			
 			alAdjuntos = new ArrayList<Adjunto>();
-			
 			FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", factura.getUuid());
 			sContent = fileXML.getContent();
             content = Base64.getDecoder().decode(sContent);
