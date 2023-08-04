@@ -82,7 +82,7 @@
 								styleClass="edit-button ui-button-primary"  process="@this"  actionListener="#{avisosComercialBean.buscaPrecioServicioAviso(pAviso)}" >
 								<f:setPropertyActionListener value="#{pAviso}" target="#{avisosComercialBean.avisoSelected}" />
 								</p:commandButton>
-								<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('avisoDialogDelete').show()">
+								<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('avisoDialogDelete').show()" >
 									<f:setPropertyActionListener value="#{pAviso}" target="#{avisosComercialBean.avisoSelected}" />
 								</p:commandButton>
 							</p:column>

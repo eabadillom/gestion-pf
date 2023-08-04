@@ -257,7 +257,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 
 	@Override
 	public List<ConstanciaDeDeposito> buscarPorCriterios(ConstanciaDeDeposito e) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
