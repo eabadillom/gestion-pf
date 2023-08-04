@@ -484,6 +484,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		if(constanciaDepositoDetalleDAO.guardar(conDepositoDetalle)== null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Servicio Agregado"));
 			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+			selectConstanciaDD.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
+			
 		}
 		
 		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
