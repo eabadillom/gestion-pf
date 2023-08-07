@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
@@ -148,6 +149,8 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 			
 			for(ConstanciaDeDeposito constancia : listaConstancias) {
 				listaTmpConstancias = constancia.getConstanciaFacturaList();
+				List<ConstanciaDepositoDetalle> allConstanciaDepositoDetalle = constancia.getConstanciaDepositoDetalleList();
+				System.out.print(allConstanciaDepositoDetalle.size());
 				lConstanciaFactura = listaTmpConstancias.stream()
 						.filter(c -> 
 							(c.getFactura().getStatus().getId() == 1) //Status Por cobrar

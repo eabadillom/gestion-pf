@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -745,12 +746,10 @@ public class FacturacionConstanciasBean implements Serializable{
 		}catch(Exception e) {
 			System.out.println("ERROR:" + e.getMessage());
 		}
-		
 		return "calculoPrevio.xhtml?faces-redirect=true";
 		
 	}
-	
-	
+
 	
 	
 	
