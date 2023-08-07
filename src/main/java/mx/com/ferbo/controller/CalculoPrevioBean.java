@@ -215,6 +215,18 @@ public class CalculoPrevioBean implements Serializable {
 		}
 
 	}
+	public void NuevaConstancia() {
+		FacesMessage message = null;
+			try {
+				ExternalContext externalContext = FacesContext.getCurrentInstance()
+					    .getExternalContext();
+				externalContext.redirect(externalContext.getRequestContextPath() + "/protected/catalogos/facturacionConstancias.xhtml");
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
 
 	public FacturacionConstanciasBean getFacturacionBean() {
 		return facturacionBean;

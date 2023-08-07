@@ -187,6 +187,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		selectedVigencias = new ArrayList<>();
 		selectedServicios = new ArrayList<>();
 		clienteSelect = new Cliente();
+		plantaSelect = new Planta();
 		formaPagoCliente = new MedioPago();
 		medioPagoSelect = new MedioPago();
 		
@@ -462,7 +463,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	public void setFormaPagoCliente(MedioPago formaPagoCliente) {
 		this.formaPagoCliente = formaPagoCliente;
 	}
-
+	
 	public void domicilioAvisoPorCliente() {
 		
 		clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), false);
