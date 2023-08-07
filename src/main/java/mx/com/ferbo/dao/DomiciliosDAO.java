@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.jfree.util.Log;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -32,14 +34,21 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 	
 	public Domicilios buscarPorAsentamiento(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idCiudad, Integer idAsentamiento) {
 		Domicilios domicilio = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		
-		domicilio = em.createNamedQuery("Domicilios.findByAsentamiento", Domicilios.class)
-				.setParameter("paisCve", idPais)
-				.setParameter("estadoCve", idEstado)
-				.setParameter("municipioCve", idMunicipio)
-				.setParameter("ciudadCve", idCiudad)
-				.setParameter("domicilioColonia", idAsentamiento).getSingleResult();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			domicilio = em.createNamedQuery("Domicilios.findByAsentamiento", Domicilios.class)
+					.setParameter("paisCve", idPais)
+					.setParameter("estadoCve", idEstado)
+					.setParameter("municipioCve", idMunicipio)
+					.setParameter("ciudadCve", idCiudad)
+					.setParameter("domicilioColonia", idAsentamiento).getSingleResult();
+			
+		} catch (Exception e) {
+			Log.error("Problema al encontrar domicilio", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		
 		return domicilio;
 	}

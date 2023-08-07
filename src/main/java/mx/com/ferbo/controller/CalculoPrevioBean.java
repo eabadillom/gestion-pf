@@ -1163,8 +1163,9 @@ public class CalculoPrevioBean implements Serializable {
 					
 					Tax tx = new Tax();
 					
-					BigDecimal ivaTotal = sc.getCosto().multiply(new BigDecimal(iva.getValor()));
-					tx.setTotal(ivaTotal);
+					BigDecimal costo = sc.getCosto().setScale(2,BigDecimal.ROUND_HALF_UP);
+					BigDecimal ivaTotal = costo.multiply(new BigDecimal(iva.getValor()).setScale(2,BigDecimal.ROUND_HALF_UP));
+					tx.setTotal(ivaTotal.setScale(2,BigDecimal.ROUND_HALF_UP));
 					tx.setName("IVA");
 					tx.setBase(sc.getCosto());
 					tx.setRate(new BigDecimal(iva.getValor()));
@@ -1177,17 +1178,12 @@ public class CalculoPrevioBean implements Serializable {
 			}
 			
 			cfdi.setItems(listaItems);
-			
 			CfdiInfoModel registra = cfdiBL.registra(cfdi);
-			
 			Factura factura = new Factura();
 			factura = facturaDAO.buscarPorId(this.factura.getId());
-			
 			factura.setUuid(registra.getId());
 			facturaDAO.actualizar(factura);
-			
 			alAdjuntos = new ArrayList<Adjunto>();
-			
 			FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", factura.getUuid());
 			sContent = fileXML.getContent();
             content = Base64.getDecoder().decode(sContent);
@@ -1222,5 +1218,4 @@ public class CalculoPrevioBean implements Serializable {
 		}
 		
 	}
-	
 }

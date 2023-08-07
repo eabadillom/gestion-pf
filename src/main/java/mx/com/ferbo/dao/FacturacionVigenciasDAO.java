@@ -53,11 +53,11 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 		List<ConstanciaDeDeposito> listaConstancias = null;
 		List<ConstanciaFactura> lConstanciaFactura = null;
 		ConstanciaFactura cf = null;
-		//EntityManager em = null;
+		EntityManager em = null;
 		String sql = null;
 		
 		try {
-			//em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			list = new ArrayList<>();
 			sql = "SELECT "
 					+ "     folio, "

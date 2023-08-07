@@ -14,6 +14,7 @@ import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -48,11 +49,11 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 		List<ConstanciaDeServicio> listaConstancias = null;
 		List<ConstanciaFacturaDs> lConstanciaFactura = null;
 		ConstanciaFacturaDs cf = null;
-		//EntityManager em = null;
+		EntityManager em = null;
 		String sql = null;
 		
 		try {
-			//em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			list = new ArrayList<>();
 			sql = "SELECT "
 					+ " cs.FOLIO, "
@@ -90,6 +91,8 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 			
 			for(ConstanciaDeServicio constancia : listaConstancias) {
 				List<ConstanciaServicioDetalle> allConstanciaServicioDetalle = constancia.getConstanciaServicioDetalleList();//recuperando constancias de servicio detalle de servicio ds
+				List<PartidaServicio> allPartidaServicio = constancia.getPartidaServicioList();
+				System.out.println(allPartidaServicio.size());
 				listaTmpConstancias = constancia.getConstanciaFacturaDsList();
 				lConstanciaFactura = listaTmpConstancias.stream()
 						.filter(c ->
