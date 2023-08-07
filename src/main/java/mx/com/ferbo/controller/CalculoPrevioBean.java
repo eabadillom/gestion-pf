@@ -1174,7 +1174,7 @@ public class CalculoPrevioBean implements Serializable {
 					item.setTotal(sc.getCosto().add(ivaTotal));
 					item.getTaxes().add(tx);
 					listaItems.add(item);
-				}
+				} 
 			}
 			
 			cfdi.setItems(listaItems);
