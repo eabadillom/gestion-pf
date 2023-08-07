@@ -1163,8 +1163,9 @@ public class CalculoPrevioBean implements Serializable {
 					
 					Tax tx = new Tax();
 					
-					BigDecimal ivaTotal = sc.getCosto().multiply(new BigDecimal(iva.getValor()));
-					tx.setTotal(ivaTotal);
+					BigDecimal costo = sc.getCosto().setScale(2,BigDecimal.ROUND_HALF_UP);
+					BigDecimal ivaTotal = costo.multiply(new BigDecimal(iva.getValor()).setScale(2,BigDecimal.ROUND_HALF_UP));
+					tx.setTotal(ivaTotal.setScale(2,BigDecimal.ROUND_HALF_UP));
 					tx.setName("IVA");
 					tx.setBase(sc.getCosto());
 					tx.setRate(new BigDecimal(iva.getValor()));
