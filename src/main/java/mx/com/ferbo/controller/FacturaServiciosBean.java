@@ -661,7 +661,8 @@ public class FacturaServiciosBean implements Serializable {
 			sContent = fileXML.getContent();
             content = Base64.getDecoder().decode(sContent);
             adjunto = new Adjunto("Factura_" + factura.getNomSerie() + "-" + factura.getNumero() + ".xml", Adjunto.TP_ARCHIVO_XML, content);
-            alAdjuntos.add(adjunto);
+            alAdjuntos.add(adjunto);  
+            
             
             FileViewModel filePDF = cfdiBL.getFile("pdf", "issuedLite", factura.getUuid());
             sContent = filePDF.getContent();
