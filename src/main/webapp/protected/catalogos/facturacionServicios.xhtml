@@ -3,10 +3,22 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
-
+<script>
+	    //<![CDATA[
+	        PF('statusDialog').show();
+	
+	        PF('statusDialog').hide();
+	    //]]>
+	</script>
+	
 	<ui:define name="title">Facturacion Servicios</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
+		<p:dialog modal="true" widgetVar="statusDialog" header="Generando timbrado..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
 			<p:breadCrumb>
 				<p:menuitem value="Home" outcome="/dashboard" />
 				<p:menuitem value="Facturación" />
@@ -204,14 +216,14 @@
 		<div>
         <p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.saveFactura}" icon="pi pi-save">
             <p:menuitem value="Imprimir" actionListener="#{facturaServiciosBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-            <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-key" ajax="false" process="@this"/> 
+            <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-key" ajax="false" process="@this" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/> 
             <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-file"/>
         </p:splitButton>
 		</div>
 					</div>
 				</div>
 			</div>
-
+	
 
 
 		</h:form>
