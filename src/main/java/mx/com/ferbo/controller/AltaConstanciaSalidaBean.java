@@ -204,9 +204,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
 	}
 	
-	public void validar() {
+	public void validar() throws InventarioException {
 		
 		int contador = 0;
+		SerieConstancia serie = new SerieConstancia();
+		listadoConstanciasSalidas = constanciaSalidaDAO.buscarTodos();
 		for(ConstanciaSalida cs: listadoConstanciasSalidas) {
 			if(cs.getNumero().equals(numFolio)){
 				FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR,"ERROR FOLIO","El folio no esta disponible"));
@@ -216,6 +218,17 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			}
 			contador = contador + 1;
 			if(contador == listadoConstanciasSalidas.size()) {
+				SerieConstanciaPK seriePK = new SerieConstanciaPK();
+				
+				seriePK.setIdCliente(this.clienteSelect.getCteCve());
+				seriePK.setTpSerie("O");
+				serie = serieConstanciaDAO.buscarPorId(seriePK);
+
+				if (serie == null) {
+					this.numFolio = "";
+					throw new InventarioException("No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
+				}
+				this.serie = serie;
 				FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO,"FOLIO DISPONIBLE","El folio esta disponible"));
 			}
 		}
