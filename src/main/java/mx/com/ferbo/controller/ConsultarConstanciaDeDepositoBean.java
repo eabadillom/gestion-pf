@@ -420,7 +420,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		detallePartida.setDtpLote(lote);
 		detallePartida.setDtpCaducidad(fechaCaducidad);
 		//detallePartida.setDtpPO(null);//otro
-		//detallePartida.setDtpTarimas(tarima);//duda ¿?
+		detallePartida.setDtpTarimas(tarima);
 		
 		if(detallePartidaDAO.actualizar(detallePartida) == null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Detalle de Partida Actualizada"));
