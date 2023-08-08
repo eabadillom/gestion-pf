@@ -90,15 +90,15 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	}
 	
 
-	public PrecioServicio busquedaServicio(Integer avisoCve, Integer clienteCve, Integer servicioCve) {
-		PrecioServicio precioServicio = null;
+	public List<PrecioServicio> busquedaServicio(Integer avisoCve, Integer clienteCve, Integer servicioCve) {
+		List<PrecioServicio> precioServicio = null;
 		EntityManager entity = null;
 		try {
 			entity = EntityManagerUtil.getEntityManager();
 			precioServicio = entity.createNamedQuery("PrecioServicio.findByServicioAndAvisoAndCliente", PrecioServicio.class)
 					.setParameter("cteCve", clienteCve)
 					.setParameter("avisoCve", avisoCve)
-					.setParameter("servicioCve", servicioCve).getSingleResult();
+					.setParameter("servicioCve", servicioCve).getResultList();
 		} catch (Exception e) {
 			log.error("Problema para obtener el precio servicio...", e);
 		} finally {

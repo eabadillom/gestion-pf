@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -213,6 +214,18 @@ public class CalculoPrevioBean implements Serializable {
 			System.out.println("ERROR Aqui" + e.getLocalizedMessage());
 		}
 
+	}
+	public void NuevaConstancia() {
+		FacesMessage message = null;
+			try {
+				ExternalContext externalContext = FacesContext.getCurrentInstance()
+					    .getExternalContext();
+				externalContext.redirect(externalContext.getRequestContextPath() + "/protected/catalogos/facturacionConstancias.xhtml");
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
 	public FacturacionConstanciasBean getFacturacionBean() {
@@ -543,9 +556,14 @@ public class CalculoPrevioBean implements Serializable {
 				BigDecimal importe = new BigDecimal(0);
 				BigDecimal cantidad = null;
 
-				PrecioServicio precioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
+				/*PrecioServicio precioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
+						clienteSelect.getCteCve(), servicio.getServicioCve());*/
+				List <PrecioServicio> listaPrecioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
 						clienteSelect.getCteCve(), servicio.getServicioCve());
-
+				PrecioServicio precioServicio = null;
+				if(!listaPrecioServicio.isEmpty()) {
+				precioServicio = listaPrecioServicio.get(0);
+				
 				switch (tipoCobro.getId()) {
 
 				case 1:
@@ -606,7 +624,7 @@ public class CalculoPrevioBean implements Serializable {
 				id++;
 
 			}
-			
+			}
 			//Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
 			
 			cf.setFactura(factura);
@@ -673,9 +691,12 @@ public class CalculoPrevioBean implements Serializable {
 
 				BigDecimal cantidad = null;
 
-				PrecioServicio precioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
+				List<PrecioServicio> listaPrecioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
 						clienteSelect.getCteCve(), servicio.getServicioCve());
-
+				
+				if(!listaPrecioServicio.isEmpty()) {
+				PrecioServicio precioServicio = listaPrecioServicio.get(0);
+				
 				switch (tipoCobro.getId()) {
 
 				case 1:
@@ -730,7 +751,7 @@ public class CalculoPrevioBean implements Serializable {
 				 * cf.setServicioConstanciaList(listaServiciosConstancias);//datos a mostrar row
 				 * ex--
 				 */
-				
+				}
 			}
 			
 			//Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
@@ -924,6 +945,10 @@ public class CalculoPrevioBean implements Serializable {
 			
 	}
 	
+	public void reload() throws IOException {
+	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+	}
 	public void cargaDomicilio() {
 		
 		asentamientoCliente = asentamientoDAO.buscarPorAsentamiento(domicilioSelect.getCiudades().getCiudadesPK().getPaisCve(),
@@ -1171,7 +1196,8 @@ public class CalculoPrevioBean implements Serializable {
 					tx.setRate(new BigDecimal(iva.getValor()));
 					tx.setIsRetention(false);
 					item.setTaxes(new ArrayList<Tax>());
-					item.setTotal(sc.getCosto().add(ivaTotal));
+					BigDecimal total = costo.add(ivaTotal.setScale(2,BigDecimal.ROUND_HALF_UP));
+					item.setTotal(total.setScale(2,BigDecimal.ROUND_HALF_UP));
 					item.getTaxes().add(tx);
 					listaItems.add(item);
 				} 
@@ -1196,16 +1222,19 @@ public class CalculoPrevioBean implements Serializable {
             adjunto = new Adjunto("Factura_" + factura.getNomSerie()+ "-" + factura.getNumero() + ".pdf", Adjunto.TP_ARCHIVO_PDF, content);
             alAdjuntos.add(adjunto);
             
-            sendMailBO = new SendMailFacturaBL(factura.getCliente().getCteCve());
+          /*  sendMailBO = new SendMailFacturaBL(factura.getCliente().getCteCve());
             sendMailBO.setSerie(factura.getNomSerie());
             sendMailBO.setFolio(factura.getNumero());
             sendMailBO.setAlFiles(alAdjuntos);
             sendMailBO.setLoggedUser(usuario);
-            sendMailBO.send();
+            sendMailBO.send();*/
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se genero correctamente";
+			
 		} catch (FacturamaException e) {
+			severity = FacesMessage.SEVERITY_ERROR;
+			message = e.getMessage();
 			e.printStackTrace();
 		}catch (Exception ex) {
 			//log.error("Problema para obtener los servicios del cliente.", ex);
@@ -1213,6 +1242,8 @@ public class CalculoPrevioBean implements Serializable {
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
+			
+			
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado exitoso", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
