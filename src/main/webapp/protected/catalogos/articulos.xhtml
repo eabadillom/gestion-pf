@@ -24,10 +24,6 @@
                             <p:toolbarGroup>
                                 <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{articulosBean.openNew}" update="manage-product-content form:manage-product-content" oncomplete="PF('manageProductDialog').show()" 
                                     style="margin-right: .5rem" />
-                                <p:commandButton id="delete-productos-button" value="#{articulosBean.deleteButtonMessage}" icon="pi pi-trash" actionListener="#{articulosBean.deleteSelectedProductos}"
-                                	class="ui-button-danger" disabled="#{!articulosBean.hasSelectedProductos()}" update="@this">
-                                    <p:confirm header="Eliminar" message="Desea eliminar los artículos seleccionados?" icon="pi pi-exclamation-triangle" />
-                                </p:commandButton>
                             </p:toolbarGroup>
                             <p:toolbarGroup align="right">
                                 <p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-secondary" ajax="false">
@@ -49,13 +45,6 @@
                                 </div>
                             </f:facet>
 
-                            <p:ajax event="rowSelect" update=":form:delete-productos-button" />
-                            <p:ajax event="rowUnselect" update=":form:delete-productos-button" />
-                            <p:ajax event="rowSelectCheckbox" update=":form:delete-productos-button" />
-                            <p:ajax event="rowUnselectCheckbox" update=":form:delete-productos-button" />
-                            <p:ajax event="toggleSelect" update=":form:delete-productos-button" />
-                            <p:column selectionMode="multiple" exportable="false" width="1rem">
-                            </p:column>
                             <p:column headerText="Nombre" sortBy="#{product.productoDs}" filterBy="#{product.productoDs}" style="text-align:center">
                                 <h:outputText value="#{product.productoDs}" />
                             </p:column>
