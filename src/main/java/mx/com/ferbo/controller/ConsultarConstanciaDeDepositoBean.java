@@ -383,10 +383,15 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	public void cargaDeDatos() {
 			
-			
-			listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
+		
+		
+			if(selectConstanciaDD.getAvisoCve()!=null) {
+				listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
+			}else {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso","No contiene aviso la contancia de deposito"));
+			}
 			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
-			
+			PrimeFaces.current().ajax().update("form:messages");
 	}
 	
 	public void updateConstanciaDD() {
@@ -497,6 +502,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		if(constanciaDepositoDetalleDAO.eliminar(this.constanciaSelect)== null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado","Servicio Eliminado"));
 			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+			selectConstanciaDD.getConstanciaDepositoDetalleList().remove(constanciaSelect);
+			constanciaSelect = new ConstanciaDepositoDetalle();
 		}
 		
 		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
