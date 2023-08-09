@@ -248,9 +248,12 @@
 					</p:dataTable>
 					
 					<div style="margin-top: 10px;">
-						<p:commandButton value="Guardar" actionListener="#{altaNotasCredito.save()}" action="#{altaNotasCredito.reload}" update="notaCredito emisor" process="emisor notaCredito @this" >
+						<p:commandButton value="Guardar" actionListener="#{altaNotasCredito.save()}"  update="notaCredito emisor" process="emisor notaCredito @this" >
 						</p:commandButton>
-					</div>
+						<p:commandButton style="margin-left: 10px;" value="Generar nueva nota" actionListener="#{altaNotasCredito.reload()}"  process="@this" >
+						</p:commandButton>
+						</div>
+
 				
 				</div>
 			</div>

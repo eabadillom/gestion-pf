@@ -378,7 +378,9 @@ public class AltaNotasCredito implements Serializable{
 	
 	
 	public void save() {
-		
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
 		asentamientoCliente = asentamientoHumanoDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(), domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve() , domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(), domicilioSelect.getDomicilioColonia());
 		String domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
 		
@@ -437,12 +439,17 @@ public class AltaNotasCredito implements Serializable{
 			
 			notaCreditoDAO.guardar(notaCredito);
 			//-----Actualizar Tablas---
-			filtroFactura();
-			
+			//filtroFactura();
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Nota agregada correctamente";
 			
 			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+		}finally {
+			message = new FacesMessage(severity, "Nota de Credito", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages");
 		}
 			
 	}
