@@ -235,7 +235,7 @@ public class ReporteEntradasBean implements Serializable {
 				parameters.put("FechaIni",fecha_ini);
 				parameters.put("FechaFin", fecha_fin);
 				parameters.put("imagen", imgfile.getPath());
-				log.info("Parametros: " + parameters.toString());
+				log.info("Parametros: " + parameters.toString()); 
 				jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
 			} catch (Exception ex) {
 				log.error("Problema general...", ex);
