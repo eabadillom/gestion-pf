@@ -218,7 +218,6 @@ ORDER BY cliente,numero_cte, producto]]>
 	</variable>
 	<variable name="SumaCantidadProducto" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{cantidad}]]></variableExpression>
-		<initialValueExpression><![CDATA[new Integer (0)]]></initialValueExpression>
 	</variable>
 	<variable name="SumaPesoProducto" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{peso}]]></variableExpression>
@@ -229,7 +228,7 @@ ORDER BY cliente,numero_cte, producto]]>
 	<variable name="SumaProductoPorCliente" class="java.lang.String" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
 		<variableExpression><![CDATA[$F{producto}]]></variableExpression>
 	</variable>
-	<variable name="SumaTarimasPorCte" class="java.lang.Double" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
+	<variable name="SumaTarimasPorCte" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
 		<variableExpression><![CDATA[$F{tarima}]]></variableExpression>
 	</variable>
 	<variable name="SumaCantidadPorCte" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
