@@ -72,23 +72,19 @@ public class ServiciosBean implements Serializable{
 
 	public void saveServicio() throws IOException{
 		Servicio servicio = new Servicio();
-		
 		servicio.setCdUnidad(selectedServicio.getCdUnidad());
 		servicio.setServicioCod(selectedServicio.getServicioCod());
 		servicio.setServicioCve(selectedServicio.getServicioCve());
 		servicio.setServicioDs(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
 		servicio.setCobro(selectedServicio.getCobro());
-		
 		for(ClaveUnidad cn: listadoUnidades) {
 			if(cn.getcdUnidad().equals(selectedServicio.getCdUnidad())) {
 				servicio.setClaveUnit(cn);
 			}
 		}
-		
 		if (this.selectedServicio.getServicioCve() == null) {
 			if (servicioDAO.guardar(servicio) == null) {
-				
 				selectedServicio = new ServicioUI(servicio);
 				this.servicios.add(this.selectedServicio);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Agregado"));

@@ -62,15 +62,18 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 
 	@Override
 	public String guardar(Servicio servicio) {
+		EntityManager em = null;
+
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(servicio);//guarda el servicio dado (NO es gestionado)
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al obtener informacion",e);
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
