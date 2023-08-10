@@ -26,11 +26,13 @@ import mx.com.ferbo.dao.TiposDomicilioDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Ciudades;
+import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.Municipios;
+import mx.com.ferbo.model.MunicipiosPK;
 import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.model.TiposDomicilio;
@@ -95,7 +97,7 @@ public class DomiciliosBean implements Serializable {
 	 * Objetos para País
 	 */
 	private PaisDAO paisDAO;
-	private Pais paisComplet;
+	private Paises paisComplet;
 
 	/**
 	 * Objetos para Estados
@@ -220,7 +222,7 @@ public class DomiciliosBean implements Serializable {
 	/**
 	 * Método para filtrar del listado original de estados por paisCve
 	 */
-	public void filtraListadoEstados() {
+	public void filtraListadoEstados() { //ACTUALIZA LISTA ESTADOS 
 		estadoSelected.setPaises(paisSelected);
 		lstEstadosFiltered.clear();
 		Estados estadoAux = new Estados();
@@ -239,12 +241,16 @@ public class DomiciliosBean implements Serializable {
 	/**
 	 * Método para filtrar del listado original de municipios por estadoCve
 	 */
-	public void filtraListadoMunicipios() {
+	public void filtraListadoMunicipios() { //ACTUALIZA LISTA MUNICIPIOS
 		municipioSelected.setEstados(estadoSelected);
 		lstMunicipiosFiltered.clear();
 		Municipios municipioAux = new Municipios();
-		municipioAux.setEstados(estadoSelected);
-		lstMunicipios = municipiosDAO.buscarPorCriterios(municipioAux);
+		MunicipiosPK municipiosPK = new MunicipiosPK();
+		
+		municipiosPK.setEstadoCve(estadoSelected.getEstadosPK().getEstadoCve());
+		municipiosPK.setPaisCve(paisSelected.getPaisCve());
+		municipioAux.setMunicipiosPK(municipiosPK);
+		lstMunicipios = municipiosDAO.buscarPorCriteriosMunicipios(municipioAux);//ERROR BUSCA SOLO POR ESTADO Y NO POR PAIS
 		lstMunicipiosFiltered = lstMunicipios;
 		System.out.println("Municipios Filtrados:" + lstMunicipiosFiltered.toString());
 
@@ -255,13 +261,19 @@ public class DomiciliosBean implements Serializable {
 	/**
 	 * Método para filtrar del listado original de ciudades por municipioCve
 	 */
-	public void filtraListadoCiudades() {
+	public void filtraListadoCiudades() { //ACTUALIZA LISTA CIUDADES 
 
 		ciudadSelected.setMunicipios(municipioSelected);
 		lstCiudadesFiltered.clear();
 		Ciudades ciudadAux = new Ciudades();
-		ciudadAux.setMunicipios(municipioSelected);
-		lstCiudades = ciudadesDAO.buscarPorCriterios(ciudadAux);
+		CiudadesPK ciudadesPK = new CiudadesPK();
+		
+		ciudadesPK.setPaisCve(paisSelected.getPaisCve());
+		ciudadesPK.setEstadoCve(estadoSelected.getEstadosPK().getEstadoCve());
+		ciudadesPK.setMunicipioCve(municipioSelected.getMunicipiosPK().getMunicipioCve());
+		
+		ciudadAux.setCiudadesPK(ciudadesPK);
+		lstCiudades = ciudadesDAO.buscarPorCriteriosCiudades(ciudadAux);
 		lstCiudadesFiltered = lstCiudades;
 		System.out.println("Ciudades Filtrados:" + lstCiudadesFiltered.toString());
 
@@ -273,7 +285,7 @@ public class DomiciliosBean implements Serializable {
 	 * Método para filtrar del listado original de asentamientos Humanos por
 	 * ciudadCve
 	 */
-	public void filtraListadoAsentamientoHumano() {
+	public void filtraListadoAsentamientoHumano() { //ACTUALIZA LISTA ASENATMIENTOS 
 		Domicilios domicilioAux = new Domicilios();
 		domicilioAux.setCiudades(ciudadSelected);
 
@@ -290,7 +302,7 @@ public class DomiciliosBean implements Serializable {
 		System.out.println("Colonia Filtrados:" + lstAsentamientoHumanoFiltered.toString());
 		actualizaCodigoPostal();
 
-		PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion");
+		//PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion");
 
 	}
 
@@ -324,7 +336,7 @@ public class DomiciliosBean implements Serializable {
 		paisSelected = new Paises();
 		estadoSelected = new Estados();
 		municipioSelected = new Municipios();
-		paisComplet = new Pais();
+		paisComplet = new Paises();
 		domicilioNvoCalle = "";
 		domicilioNvoFax = "";
 		domicilioNvoNumExt = "";
@@ -341,6 +353,7 @@ public class DomiciliosBean implements Serializable {
 		
 		if(domicilioFiscal != null && domicilioFiscal.size() > 0) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ya existe un domicilio fiscal registrado para el cliente."));
+			PrimeFaces.current().ajax().update("form:messages");
 			nuevoClienteDomicilio();
 			return;
 		}
@@ -358,6 +371,13 @@ public class DomiciliosBean implements Serializable {
 		limpiaClienteDomicilio();
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-domiciliosCliente", "form:addDireccionCliente");
 	}
+	
+	public void cargaDatos() {
+		
+		this.paisSelected = clienteDomicilioSelected.getDomicilios().getPaisCved();
+		
+		
+	}
 
 	public void nuevoDomicilio() {
 		
@@ -367,7 +387,7 @@ public class DomiciliosBean implements Serializable {
 			return;
 		}
 		domicilioNuevo = new Domicilios();
-		paisComplet = new Pais();
+		paisComplet = new Paises();
 		paisComplet.setPaisCve(ciudadSelected.getMunicipios().getEstados().getPaises().getPaisCve());
 		domicilioNuevo.setPaisCved(paisComplet);
 		domicilioNuevo.setCiudades(ciudadSelected);
@@ -390,7 +410,7 @@ public class DomiciliosBean implements Serializable {
 
 	public void actualizaDomicilio() {
 		domicilioNuevo = new Domicilios();
-		paisComplet = new Pais();
+		paisComplet = new Paises();
 		paisComplet.setPaisCve(ciudadSelected.getMunicipios().getEstados().getPaises().getPaisCve());
 		domicilioNuevo.setPaisCved(paisComplet);
 		domicilioNuevo.setCiudades(ciudadSelected);
@@ -460,28 +480,34 @@ public class DomiciliosBean implements Serializable {
 		this.actualizaEstado();
 		this.actualizaMunicipio();
 		this.actualizaCiudad();
-
-		PrimeFaces.current().ajax().update("form:actDireccionCliente");
+		
+		
+		PrimeFaces.current().ajax().update("form:panel-actClienteDireccion");
 
 	}
 
 	public void actualizaCiudad() {
 		ciudadSelected = ciudadesDAO.buscaPorAsentamiento(asentamientoHumanoSelected).get(0);
+		filtraListadoDomicilio();
+		filtraListadoAsentamientoHumano();
 		PrimeFaces.current().ajax().update("form:coloniaAct");
 	}
 
 	public void actualizaMunicipio() {
 		municipioSelected = municipiosDAO.buscaPorAsentamiento(asentamientoHumanoSelected).get(0);
+		filtraListadoCiudades();
 		PrimeFaces.current().ajax().update("form:ciudadAct");
 	}
 
 	public void actualizaEstado() {
 		estadoSelected = estadosDAO.buscaPorAsentamiento(asentamientoHumanoSelected).get(0);
+		filtraListadoMunicipios();
 		PrimeFaces.current().ajax().update("form:municipioAct");
 	}
 
 	public void actualizaPais() {
 		paisSelected = paisesDAO.buscarPorId(asentamientoHumanoSelected.getAsentamientoHumanoPK().getPaisCve());
+		filtraListadoEstados();
 		PrimeFaces.current().ajax().update("form:estadoAct");
 	}
 
@@ -768,11 +794,11 @@ public class DomiciliosBean implements Serializable {
 		this.paisDAO = paisDAO;
 	}
 
-	public Pais getPaisComplet() {
+	public Paises getPaisComplet() {
 		return paisComplet;
 	}
 
-	public void setPaisComplet(Pais paisComplet) {
+	public void setPaisComplet(Paises paisComplet) {
 		this.paisComplet = paisComplet;
 	}
 
