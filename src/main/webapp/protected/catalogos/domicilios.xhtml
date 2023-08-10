@@ -115,7 +115,7 @@
 								<p:commandButton icon="pi pi-pencil" process="@this"
 									styleClass="edit-button ui-button-primary"
 									oncomplete="PF('clienteDireccionesActDialog').show()"
-									update="form:panel-actClienteDireccion">
+									update="form:panel-actClienteDireccion"  action="#{domiciliosBean.pintaActualiza}">
 									<f:setPropertyActionListener value="#{pClienteDomicilios}"
 										target="#{domiciliosBean.clienteDomicilioSelected}" />
 								</p:commandButton>
@@ -245,7 +245,7 @@
 
 							<f:facet name="footer">
 								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{domiciliosBean.guardaClienteDomicilio()}" onclick="PF('clienteDireccionesAddDialog').hide()" update="panel-addClienteDireccion" process="panel-addClienteDireccion @this" />
-								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('clienteDireccionesAddDialog').hide()" class="ui-button-secondary" update="panel-addClienteDireccion" />
+								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('clienteDireccionesAddDialog').hide()" class="ui-button-secondary" update="panel-addClienteDireccion"  immediate="true" process="@this"/>
 							</f:facet>
 						</p:dialog>
 
@@ -266,8 +266,7 @@
 													var="pais" itemLabel="#{pais.paisDesc}" />
 												<p:ajax listener="#{domiciliosBean.filtraListadoEstados()}"
 													update="estadoAct" />
-												<p:ajax event="blur"
-													listener="#{domiciliosBean.pintaActualiza()}"/>
+												
 											</p:selectOneMenu>
 										</div>
 										<div class="p-field p-col">
@@ -310,7 +309,7 @@
 													var="ciudad" itemLabel="#{ciudad.ciudadDs}" />
 												<p:ajax
 													listener="#{domiciliosBean.filtraListadoAsentamientoHumano()}"
-													update="coloniaAct" />
+													update="coloniaAct form:panel-addClienteDireccion form:panel-actClienteDireccion " />
 											</p:selectOneMenu>
 										</div>
 										<div class="p-field p-col">
@@ -378,12 +377,12 @@
 								<p:commandButton value="Guardar" icon="pi pi-check"
 									actionListener="#{domiciliosBean.actualizaDomicilio()}"
 									onclick="PF('clienteDireccionesActDialog').hide()"
-									update="panel-actClienteDireccion"
-									process="panel-actClienteDireccion @this" />
+									update="panel-actClienteDireccion ciudadAct"
+									process="panel-actClienteDireccion @this ciudadAct" />
 								<p:commandButton value="Cancelar" icon="pi pi-times"
 									onclick="PF('clienteDireccionesActDialog').hide()"
 									class="ui-button-secondary" update="panel-actClienteDireccion"
-									resetValues="true" />
+									resetValues="true"  immediate="true" process="@this"/>
 							</f:facet>
 						</p:dialog>
 

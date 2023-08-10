@@ -76,7 +76,7 @@ public class Domicilios implements Serializable {
     private List<ClienteDomicilios> clienteDomiciliosList;
     @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false)
     @ManyToOne
-    private Pais paisCved;
+    private Paises paisCved;
     @JoinColumns({
         @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve"),
         @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve"),
@@ -175,11 +175,11 @@ public class Domicilios implements Serializable {
         this.clienteDomiciliosList = clienteDomiciliosList;
     }
 
-    public Pais getPaisCved() {
+    public Paises getPaisCved() {
         return paisCved;
     }
 
-    public void setPaisCved(Pais paisCved) {
+    public void setPaisCved(Paises paisCved) {
         this.paisCved = paisCved;
     }
 

@@ -90,15 +90,18 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 
 	@Override
 	public String guardar(Domicilios dom) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(dom);
 			em.getTransaction().commit();
-			em.close();
+			
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
