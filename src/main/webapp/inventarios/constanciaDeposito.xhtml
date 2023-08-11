@@ -281,7 +281,7 @@
 			</p:panel>
 			<p:panel>
 				<div align="center">
-					<p:splitButton value="Guardar" styleClass="edit-button" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" icon="pi pi-save" process="@this">
+					<p:splitButton value="Guardar" styleClass="edit-button" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" icon="pi pi-save" process="@this numeroC">
 			            <p:menuitem value="Imprimir" actionListener="#{constanciaDeDepositoBean.imprimir()}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
 			        </p:splitButton>								
 			        <p:commandButton value="Nueva constancia" styleClass="edit-button" actionListener="#{constanciaDeDepositoBean.reload()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales dt-constanciaDD dt-partidas"/>
