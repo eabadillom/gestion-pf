@@ -355,7 +355,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		UnidadDeProducto udp = null;
 
 		partida = new Partida();
-		partida.setCantidadTotal(0);
+		partida.setCantidadTotal(1);
 		partida.setPesoTotal(new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP));
 		partida.setNoTarimas(new BigDecimal("0").setScale(1, BigDecimal.ROUND_HALF_UP));
 		udp = new UnidadDeProducto();
