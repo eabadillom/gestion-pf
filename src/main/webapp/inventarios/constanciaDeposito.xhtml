@@ -73,7 +73,7 @@
 					</div>
 					<div class="p-col-2 p-md-2">
 						<p:outputLabel value="Cantidad"/>
-						<p:inputNumber id="cantidad" value="#{constanciaDeDepositoBean.partida.cantidadTotal}" minValue="1" maxValue="100000" emptyValue="empty" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" symbol="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" symbolPosition="s">
+						<p:inputNumber id="cantidad" value="#{constanciaDeDepositoBean.partida.cantidadTotal}" minValue="1" maxValue="100000" emptyValue="empty" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" symbol="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" symbolPosition="s" required="true">
 							<p:ajax process="@this"></p:ajax>
 						</p:inputNumber>
 					</div>
