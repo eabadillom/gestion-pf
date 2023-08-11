@@ -24,7 +24,6 @@
 					
 					 <p:divider align="left">
 					        <div class="inline-flex align-items-center">
-					            <i class="pi pi-user mr-2"/>
 					            <b>Por rango de fechas</b>
 					        </div>
 					    </p:divider>
@@ -39,7 +38,7 @@
 						</span>	
 						
 						<p:outputLabel for="folio" value="Por Folio:" />
-						<p:inputText id="folio" value="#{consultaTraspasosBean.numero}" required="true" requiredMessage="Ingresa el folio" />
+						<p:inputText id="folio" value="#{consultaTraspasosBean.numero}" />
 						<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2" icon="pi pi-fw pi-search" actionListener="#{consultaTraspasosBean.buscarConstancia}" update="@widgetVar(dtConstanciaTraspaso) messages"/>
 							 <p:divider align="left">
 							        <div class="inline-flex align-items-center">
