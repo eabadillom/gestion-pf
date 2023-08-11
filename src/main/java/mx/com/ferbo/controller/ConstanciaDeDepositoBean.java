@@ -685,6 +685,7 @@ public void deleteConstanciaDD() {
 		constancia = constanciaDAO.buscarPorFolioCliente(constanciaE);
 
 		if (constancia == null) {
+			constanciaDeDeposito.setFolioCliente(constanciaE);
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Folio correcto", "Capture sus productos."));
 			PrimeFaces.current().ajax().update("form:messages", "form:numeroC");
