@@ -667,13 +667,13 @@ public class PlantaBean implements Serializable {
 		}
 		
 		this.planta = new Planta();
-		/*this.paisSelect = new Paises();
+		this.paisSelect = new Paises();
 		this.estadoSelect = new Estados();
 		this.municipioSelect = new Municipios();
 		this.ciudadSelect = new Ciudades();
 		this.asentamientoHumanoSelect = new AsentamientoHumano();
 		this.tipoAsentamientoSelected = "";
-		this.codigopostalSelected = "";*/
+		this.codigopostalSelected = "";
 	};
 
 	public void CJSON() {
