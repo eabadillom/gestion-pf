@@ -88,7 +88,7 @@
 						<div class="p-field">
 							<p:outputLabel for="abreviacion-new" value="Abreviación" />
 							<p:inputText id="abreviacion-new"
-								value="#{tipoAsentamientoBean.tipoAsentamientoSelect.tipoasntmntoDsCorta}" required="true" maxlength="4"/>
+								value="#{tipoAsentamientoBean.tipoAsentamientoSelect.tipoasntmntoDsCorta}" required="true" />
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
@@ -96,9 +96,9 @@
 					<p:commandButton value="Guardar" icon="pi pi-plus"
 						actionListener="#{tipoAsentamientoBean.guardarTipoAsentamiento()}"
 						update=":form:manage-settlementType-content-new"
-						styleClass="p-mr-2 p-mb-2"/>
+						styleClass="p-mr-2 p-mb-2" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						onclick="PF('nuevoTipoAsentamientoDialog').hide()" class="ui-button-secondary" process="@this"/>
+						onclick="PF('nuevoTipoAsentamientoDialog').hide()" class="ui-button-secondary" />
 				</f:facet>
 			</p:dialog>
 			<p:confirmDialog widgetVar="deleteTipoAsentamientoDialog" showEffect="fade"
