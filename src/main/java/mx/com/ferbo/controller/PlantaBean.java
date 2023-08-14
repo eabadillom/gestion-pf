@@ -305,16 +305,19 @@ public class PlantaBean implements Serializable {
 						
 			listaCiudades = ciudadesDao.buscarPorCriteriosCiudades(ciudadSelect);
 			
+			ciudadSelect = new Ciudades();
+			
 			if(listaCiudades.isEmpty()) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay ciudades para el municipio seleccionado"));
-				listaCiudades.clear();
-				asentamientoHumanoList.clear();
-				tipoAsentamientoSelected = "";
-				codigopostalSelected = "";
+				
 			}
 			
+			asentamientoHumanoList.clear();
+			tipoAsentamientoSelected = "";
+			codigopostalSelected = "";
 			
-			PrimeFaces.current().ajax().update("form:messages","form:codigopostal-new","form:Tasn-new");
+			
+			PrimeFaces.current().ajax().update("form:messages","form:codigopostal-new","form:Tasn-new","form:city");
 			return 0;			
 		}else if(paisSelect!=null&&estadoSelect!=null&&municipioSelect!=null) {
 			
@@ -331,10 +334,11 @@ public class PlantaBean implements Serializable {
 				
 			}else {
 				asentamientoHumanoList.clear(); //Limpiar asentamientos MODIFICAR
+				ciudadSelect = new Ciudades();
 			}
 		}
 		
-		PrimeFaces.current().ajax().update("form:messages");
+		PrimeFaces.current().ajax().update("form:messages","form:city");
 		
 		return 0;
 		
@@ -655,6 +659,13 @@ public class PlantaBean implements Serializable {
 		}
 		
 		this.planta = new Planta();
+		this.paisSelect = new Paises();
+		this.estadoSelect = new Estados();
+		this.municipioSelect = new Municipios();
+		this.ciudadSelect = new Ciudades();
+		this.asentamientoHumanoSelect = new AsentamientoHumano();
+		this.tipoAsentamientoSelected = "";
+		this.codigopostalSelected = "";
 	};
 
 	public void CJSON() {
