@@ -402,6 +402,7 @@ public class PlantaBean implements Serializable {
 			this.asentamientoHumanoPKSelect.setMunicipioCve(municipioSelect.getMunicipiosPK().getMunicipioCve());
 			this.asentamientoHumanoPKSelect.setCiudadCve(ciudadSelect.getCiudadesPK().getCiudadCve());
 			this.asentamientoHumanoPKSelect.setAsentamientoCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getAsentamientoCve());
+			asentamientoHumanoSelect = new AsentamientoHumano();
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			asentamientoHumanoPKSelect = new AsentamientoHumanoPK();
 		  ah = asentamientoHumandoDao.buscar(asentamientoHumanoSelect);
@@ -413,7 +414,7 @@ public class PlantaBean implements Serializable {
 			  FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No tiene asentamiento humano existente"));
 		  }
 			//nombreEmisor();
-			
+		
 		 PrimeFaces.current().ajax().update("form:messages");
 			
 		}
@@ -492,6 +493,13 @@ public class PlantaBean implements Serializable {
 
 	public void openNew() {
 		this.planta = new Planta();
+		this.paisSelect = new Paises();
+		this.estadoSelect = new Estados();
+		this.municipioSelect = new Municipios();
+		this.ciudadSelect = new Ciudades();
+		this.asentamientoHumanoSelect = new AsentamientoHumano();
+		this.tipoAsentamientoSelected = "";
+		this.codigopostalSelected = "";
 	};
 	/*public void save() {
 		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
@@ -624,7 +632,7 @@ public class PlantaBean implements Serializable {
 			direccion.setMunicipality(buscaMunicipiofor.getMunicipioDs());
 			//direccion.setMunicipality(buscaMunicipio.getMunicipioDs());
 			direccion.setLocality(buscaCiudadfor.getCiudadDs());
-			direccion.setZipCode(this.getCodigopostalSelected());
+			direccion.setZipCode(this.codigopostalSelected);//modificado por getcodigopostal
 			direccion.setNeighborhood(buscaAsentamientofor.getAsentamientoDs());
 			direccion.setInteriorNumber(this.planta.getNuminterior());
 			direccion.setExteriorNumber(this.planta.getNumexterior());
