@@ -671,7 +671,7 @@ public class PlantaBean implements Serializable {
 		this.estadoSelect = new Estados();
 		this.municipioSelect = new Municipios();
 		this.ciudadSelect = new Ciudades();
-		this.asentamientoHumanoSelect = new AsentamientoHumano();
+		//this.asentamientoHumanoSelect = new AsentamientoHumano();
 		this.tipoAsentamientoSelected = "";
 		this.codigopostalSelected = "";
 	};
