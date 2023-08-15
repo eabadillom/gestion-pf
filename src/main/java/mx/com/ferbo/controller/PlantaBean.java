@@ -553,7 +553,7 @@ public class PlantaBean implements Serializable {
 			daoPlanta.save(this.planta);
 			
 			//Empieza el llenado de facturama
-			Paises buscaPais = daoPaises.buscarPorId(idPais);
+		/*	Paises buscaPais = daoPaises.buscarPorId(idPais);
 			Estados estado = new Estados();
 			estado.setPaises(buscaPais);
 			List<Estados> buscarPorCriterios = daoEstados.buscarPorCriterios(estado);
@@ -644,7 +644,7 @@ public class PlantaBean implements Serializable {
 			BranchOfficeViewModel registra = solicitud.registra(sucursal);
 			this.planta.setUuid(registra.getId());
 			String registro =  daoPlanta.update(planta);
-			//Termina llenado de facturama
+			//Termina llenado de facturama*/
 			
 			//list.add(planta);
 			list = daoPlanta.findall(true);

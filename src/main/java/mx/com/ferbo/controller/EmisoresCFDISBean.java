@@ -4,16 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -24,15 +22,17 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.file.UploadedFile;
 
+import com.ferbo.facturama.business.CertificadosBL;
+import com.ferbo.facturama.request.Csd;
+import com.ferbo.facturama.response.CsdRsp;
+import com.ferbo.facturama.tools.FacturamaException;
+
 import mx.com.ferbo.dao.CertificadoDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
 import mx.com.ferbo.model.Certificado;
 import mx.com.ferbo.model.EmisoresCFDIS;
-import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.RegimenFiscal;
-import mx.com.ferbo.model.TraspasoServicio;
-import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.utils.IOUtil;
 
 @Named
@@ -137,6 +137,39 @@ public void init() {
 			certificado.setPassword(password);
 			certificado.setEmisor(emisor);
 			String certi = certificadoDAO.guardar(certificado);
+			
+			CertificadosBL facturamaBo = new CertificadosBL();
+			
+			String sCertificado = new String(Base64.getEncoder().encode(certificado.getCertificado()));
+            String sLlavePrivada = new String(Base64.getEncoder().encode(certificado.getDt_llavePrivada()));
+			
+			Csd csd = new Csd();
+			csd.setRfc(emisor.getNb_rfc());
+            csd.setCertificate(sCertificado);
+            csd.setPrivateKey(sLlavePrivada);
+            csd.setPrivateKeyPassword(certificado.getPassword());
+			
+			try {
+				List<CsdRsp> certificados = facturamaBo.get();
+				CsdRsp csdTmp;
+				log.info(certificados);
+				List<CsdRsp> collectedCsds = certificados.stream().filter(c -> c.getRfc().equals(certificado.getEmisor().getNb_rfc()))
+			            .collect(Collectors.toList());
+				for(CsdRsp csdR : certificados) {
+					if(csdR.getRfc().equals(certificado.getEmisor().getNb_rfc())){
+			                facturamaBo.elimina(csdR.getRfc());
+					}
+				}
+				facturamaBo.registra(csd);
+				emisor.setUuid("OK");
+				emisoresDAO.actualizar(emisor);
+				
+
+			} catch (IOException | FacturamaException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			if(certi == null) {
 				listaCertificado.clear();
 				listaCertificado = certificadoDAO.findAll();
