@@ -402,7 +402,7 @@ public class PlantaBean implements Serializable {
 			this.asentamientoHumanoPKSelect.setMunicipioCve(municipioSelect.getMunicipiosPK().getMunicipioCve());
 			this.asentamientoHumanoPKSelect.setCiudadCve(ciudadSelect.getCiudadesPK().getCiudadCve());
 			this.asentamientoHumanoPKSelect.setAsentamientoCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getAsentamientoCve());
-			asentamientoHumanoSelect = new AsentamientoHumano();
+			//asentamientoHumanoSelect = new AsentamientoHumano();
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			asentamientoHumanoPKSelect = new AsentamientoHumanoPK();
 		  ah = asentamientoHumandoDao.buscar(asentamientoHumanoSelect);
