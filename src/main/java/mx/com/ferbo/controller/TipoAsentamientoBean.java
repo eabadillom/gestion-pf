@@ -51,8 +51,8 @@ public class TipoAsentamientoBean implements Serializable {
 	public void guardarTipoAsentamiento() {
 		if (this.tipoAsentamientoSelect.getTipoasntmntoCve() == null) {
 			List<TipoAsentamiento> listaTmpTipoAsentamiento = tipoAsentamientoDAO.buscarTodos();
-			listaTmpTipoAsentamiento.remove(listaTmpTipoAsentamiento.size()-2);
-			int tamanioListaTipoAsentamiento = listaTmpTipoAsentamiento.size();
+			//listaTmpTipoAsentamiento.remove(listaTmpTipoAsentamiento.size()-2);
+			int tamanioListaTipoAsentamiento = listaTmpTipoAsentamiento.size()+1;
 			tipoAsentamientoSelect.setTipoasntmntoCve((short)tamanioListaTipoAsentamiento);
 			if (tipoAsentamientoDAO.guardar(tipoAsentamientoSelect) == null) {
 				this.listaTipoAsentamiento.add(this.tipoAsentamientoSelect);
