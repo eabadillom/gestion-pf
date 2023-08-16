@@ -214,8 +214,8 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 				}
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
-				parameters.put("idCliente",clienteCve );
-				parameters.put("fechaInicio", fecha_ini);
+				parameters.put("idCliente",clienteCve);
+				parameters.put("fecha", fecha_ini);
 				parameters.put("imagen", imgfile.getPath());
 				log.info("Parametros: " + parameters.toString());
 				jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
@@ -231,7 +231,7 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 		}else 
 			if(condensadoSelect == true || concentradoSelect == false){
 				String jasperPath = "/jasper/AntiguedadSaldosDesglosado.jrxml";
-				String filename = "ReporteFacturacionPorMes" +fecha+".xlsx";
+				String filename = "AntiguedadSaldosDesglosado" +fecha+".xlsx";
 				String images = "/images/logo.jpeg";
 				String message = null;
 				Severity severity = null;
