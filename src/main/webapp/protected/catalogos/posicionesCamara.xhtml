@@ -29,7 +29,7 @@ button.ui-button {
 						<p:growl id="messages" showDetail="true" />
 										<span class="ui-float-label ui-input-icon-left">
 												<p:selectOneMenu id="planta" converter="entityConverter" value="#{posicionCamaraBean.plantaSelect}">
-													<f:selectItem itemLabel="Todas las plantas" />
+													<f:selectItem itemLabel="Todas las plantas" itemValue=""/>
 													<f:selectItems value="#{posicionCamaraBean.plantas}" var="plantas" itemLabel="#{plantas.plantaDs}" itemValue="#{plantas}" />
 													<p:ajax listener="#{posicionCamaraBean.filtraListado()}"  update="camara"/>
 												</p:selectOneMenu>
@@ -38,14 +38,14 @@ button.ui-button {
 
 					<span class="ui-float-label ui-input-icon-left">							
 					<p:selectOneMenu id="camara" converter="entityConverter" value="#{posicionCamaraBean.camaraSelect}" style="width: 250px; height: 33px" >
-						<f:selectItem itemLabel="Todas las camaras" />
+						<f:selectItem itemLabel="Todas las camaras" itemValue=""/>
 						<f:selectItems value="#{posicionCamaraBean.camaraPorPlanta}" var="camaraPlanta" itemLabel="#{camaraPlanta.camaraDs}" itemValue="#{camaraPlanta}" />
 						<p:ajax listener="#{posicionCamaraBean.filtrarPosiciones()}" />
 					</p:selectOneMenu>
 					<p:outputLabel for="@next" value="Camara" />
 					</span>
 					
-					<p:commandButton  process="@this" styleClass="ui-button-raised  " value="Consultar Posiciones" update="dt-posiciones" />
+					<p:commandButton  process="@this" styleClass="ui-button-raised  " value="Consultar Posiciones" update="dt-posiciones" action="#{posicionCamaraBean.validar}"/>
 					<h5> </h5>
 					<p:commandButton value="Agregar nueva posicion" icon="pi pi-plus" styleClass="ui-button-raised ui-button-secondary" actionListener="#{posicionCamaraBean.openNew()}" 
 								oncomplete="PF('dg-agrega').show();" update="frm-agrega" process="@this" />
