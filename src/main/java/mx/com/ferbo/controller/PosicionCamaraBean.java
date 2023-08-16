@@ -56,7 +56,13 @@ public class PosicionCamaraBean implements Serializable {
 		listaPosiciones = posiciones;
 		checkHabilitado = new Posicion();
 	}
-
+public void validar() {
+	if(plantaSelect == null ) {
+		this.posiciones = result.findAll();
+		listaPosiciones = posiciones;
+	}
+	PrimeFaces.current().ajax().update("form:dt-posiciones");
+}
 	public void filtraListado() {
 		camaraPorPlanta.clear();
 		camaraPorPlanta = camaras.stream()
