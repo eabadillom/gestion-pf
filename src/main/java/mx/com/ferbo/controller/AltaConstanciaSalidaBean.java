@@ -238,7 +238,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	
 	public void cargaInfoCliente() {
 		try {
-			this.generaFolioSalida();
+			this.generaFolioSalida();//si el folio existe no ejecutar lo demas y mandar a llamar a validar 
 			serviciosCliente = preciosServicioDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
 			listaInventario = inventarioDAO.buscar(clienteSelect, plantaSelect);
 			listadoTemp = new ArrayList<DetalleConstanciaSalida>();
@@ -278,6 +278,13 @@ public class AltaConstanciaSalidaBean implements Serializable{
 
 			this.numFolio = String.format("%s%s%s%d", seriePK.getTpSerie(), plantaSelect.getPlantaSufijo(),
 					clienteSelect.getCodUnico(), serie.getNuSerie());
+			
+			String folio = constanciaSalidaDAO.buscarPorNumero(numFolio);
+			
+			if(numFolio.equalsIgnoreCase(folio)) {
+								
+				throw new InventarioException("El folio ya existe");
+			}
 			
 			this.serie = serie;
 
@@ -391,7 +398,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			
 			partida.add(detallePartida);
 			
-			this.detalleSalida = new DetalleConstanciaSalida();
+			this.detalleSalida = new DetalleConstanciaSalida();                                                                                 
 			this.detalleSalida.setPartidaCve(partida);
 			this.detalleSalida.setDetPartCve(detallePartida.getDetallePartidaPK().getDetPartCve());
 			//this.detalleSalida.setDetallePartida(detallePartida);

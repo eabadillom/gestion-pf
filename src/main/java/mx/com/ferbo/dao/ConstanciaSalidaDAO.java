@@ -161,6 +161,28 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 		return null;
 	}
 	
+	public String buscarPorNumero(String numFolio) {
+		EntityManager em = null;
+		ConstanciaSalida constanciaSalida;
+		String folio = "";
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			constanciaSalida = em.createNamedQuery("ConstanciaSalida.findByNumero", ConstanciaSalida.class).setParameter("numero", numFolio).getSingleResult();
+			if(constanciaSalida!=null) {
+				folio = constanciaSalida.getNumero();
+			}			
+			
+		} catch (Exception e) {
+			log.error("Error al buscar por numero constancia salida", e.getMessage());
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return folio;
+	}
+	
 	public EntityManager getEm() {
 		return em;
 	}
