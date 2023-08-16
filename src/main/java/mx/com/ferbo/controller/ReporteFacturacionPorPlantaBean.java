@@ -157,7 +157,7 @@ public class ReporteFacturacionPorPlantaBean implements Serializable {
 
 	public void exportarExcel() throws JRException, IOException, SQLException{
 		System.out.println("Exportando a excel.....");
-			String jasperPath = "/jasper/InventarioEntradas.jrxml";
+			String jasperPath = "/jasper/ReporteFacturacionPorPlanta.jrxml";
 			String filename = "InventarioEntradas" +fecha+".xlsx";
 			String images = "/images/logo.jpeg";
 			String message = null;
