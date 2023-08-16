@@ -100,8 +100,8 @@ public class FacturaServiciosBean implements Serializable {
 	HttpSession session;
 
 	private List<Cliente> clientes;
-	private List<ClienteDomicilios> listaClienteDom;
-	private List<ClienteDomicilios> listaClienteDomicilio;
+	private List<ClienteDomicilios> listaClienteDom;    
+	private List<ClienteDomicilios> listaClienteDomicilio;   
 	private List<Planta> listaPlanta;
 	private List<Aviso> listaA;
 	private List<Aviso> listaAviso;
