@@ -107,7 +107,7 @@ public void resetpassword() {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario Eliminado " + usuario.getUsuario(), null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-usuario");
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al eliminar " + usuario.getUsuario(), user));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al eliminar " , "El usuario no puede ser eliminado por dependecia con una planta"));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
