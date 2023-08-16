@@ -52,7 +52,7 @@
 						</p:inputText>
 					</div>
 				 	<div class="p-card p-col-3 p-md-3">
-						<p:commandButton value="Asignar folio" action="#{altaConstanciaSalidaBean.validar}" icon="pi pi-plus"/>
+						<p:commandButton value="Asignar folio" actionListener="#{altaConstanciaSalidaBean.validar()}" icon="pi pi-plus"/>
 					</div>
 				</div>
 			</p:panel>
@@ -133,6 +133,7 @@
 			</div>
 			<p:dialog widgetVar="dg-cantidad-producto" header="Indique cantidad y peso" showEffect="hide" modal="true">
 				<p:panel id="pnl-cantidad-producto">
+				<p:outputPanel rendered="#{not empty altaConstanciaSalidaBean.detalleSalida}">
 					<div class="card">
 						<div class="ui-fluid">
 							<div class="field">
@@ -151,7 +152,11 @@
 							</div>
 						</div>
 					</div>
+					</p:outputPanel>
 				</p:panel>
+				
+				
+				
 				<f:facet name="footer">
 					<p:commandButton value="Agregar" actionListener="#{altaConstanciaSalidaBean.addDetalleSalida()}"/>
 					<p:commandButton value="Cancelar" class="ui-button-danger" icon="pi pi-times" actionListener="#{altaConstanciaSalidaBean.cancelaDetalleSalida()}"/>
