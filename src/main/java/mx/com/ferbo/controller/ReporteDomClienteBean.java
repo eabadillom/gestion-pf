@@ -119,7 +119,7 @@ public class ReporteDomClienteBean implements Serializable {
 			
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
-				parameters.put("imagen", imgfile.getPath());
+				parameters.put("imagen", imgfile.getPath());  
 				log.info("Parametros: " + parameters.toString());
 				jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
 			} catch (Exception ex) {
