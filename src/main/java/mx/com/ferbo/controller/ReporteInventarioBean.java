@@ -199,9 +199,26 @@ public class ReporteInventarioBean implements Serializable {
 				imgfile = new File(img);
 				log.info(reportFile.getPath());
 			
-				Integer clienteCve = clienteSelect.getCteCve();
-				Integer camaraCve = camaraSelect.getCamaraCve();
-				Integer plantaCve = plantaSelect.getPlantaCve();
+				Integer clienteCve = null;
+				if(clienteSelect == null) {
+					clienteCve = null;
+				}else {
+					clienteCve = clienteSelect.getCteCve();
+			}
+				
+				Integer camaraCve = null;
+				if(camaraSelect == null) {
+					camaraCve= null;
+				}else {
+					camaraCve= camaraSelect.getCamaraCve();
+				}
+			
+				Integer plantaCve = null;
+				if(plantaSelect == null) {
+				plantaCve = null;
+				}else {
+					plantaCve = plantaSelect.getPlantaCve();
+				}	
 			
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
