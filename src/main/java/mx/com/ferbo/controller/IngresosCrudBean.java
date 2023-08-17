@@ -220,6 +220,7 @@ public class IngresosCrudBean implements Serializable {
 				
 				severity = FacesMessage.SEVERITY_INFO;
 				message = "El pago se genero correctamente";
+				listaPago.clear();
 			} catch (Exception e) {
 				log.error("Problema para generar el pago.", e);
 				e.printStackTrace();

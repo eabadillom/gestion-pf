@@ -174,7 +174,7 @@
 						</p:column>
 						</p:dataTable>
 
-			    <p:commandButton value="Generar pago" styleClass="ui-button-raised ui-button-secondary" actionListener="#{ingresosCrudBean.savePago()}" />
+			    <p:commandButton value="Generar pago" styleClass="ui-button-raised ui-button-secondary" actionListener="#{ingresosCrudBean.savePago()}"  update="form:detallesFacturacion"/>
 		</h:form>
 	</ui:define>
 </ui:composition>
