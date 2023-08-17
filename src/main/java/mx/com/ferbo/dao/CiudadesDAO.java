@@ -97,7 +97,8 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 				consEstados.setParameter("municipioCve", e.getMunicipios().getMunicipiosPK().getMunicipioCve())
 						.setParameter("estadoCve", e.getMunicipios().getEstados().getEstadosPK().getEstadoCve());
 				listado = consEstados.getResultList();
-			} else if (e.getCiudadesPK().getPaisCve() != -1 && e.getCiudadesPK().getEstadoCve() != -1 && e.getCiudadesPK().getMunicipioCve() != -1){
+			}
+			if (e.getCiudadesPK().getPaisCve() != -1 && e.getCiudadesPK().getEstadoCve() != -1 && e.getCiudadesPK().getMunicipioCve() != -1){
 				listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class).setParameter("paisCve", e.getCiudadesPK().getPaisCve()).setParameter("estadoCve", e.getCiudadesPK().getEstadoCve()).setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve())
 						.getResultList();
 			} 
