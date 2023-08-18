@@ -42,6 +42,9 @@
 						<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" />
 					</p:selectOneMenu>
 					
+					
+					
+					
 					<p:commandButton value="Consultar" icon="pi pi-search" update="@widgetVar(dtconstanciaDD)" actionListener="#{consultarConstanciaDeDepositoBean.buscarConstanciaDD}"/>
 			
 					</div>

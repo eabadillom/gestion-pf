@@ -62,7 +62,10 @@ public class ReporteClienteEstadoCuentaBean implements Serializable {
 	private List<Cliente> listaClientes;
 
 	private ClienteDAO clienteDAO;
-
+   
+	
+	
+	
 	public ReporteClienteEstadoCuentaBean() {
 		fecha = new Date();
 		clienteDAO = new ClienteDAO();
