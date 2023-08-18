@@ -55,7 +55,7 @@ public class ReporteClienteEstadoCuentaBean implements Serializable {
 
 	private Date fecha;
 	private Date maxDate;
-	private Date fecha_ini;
+	private Date fecha_ini;  
 
 	private Cliente clienteSelect;
 
