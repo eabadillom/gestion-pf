@@ -19,16 +19,10 @@
 			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
-					<div class="card">
-						<p:commandButton value="Agregar" icon="pi pi-plus"
-							actionListener="#{municipiosBean.nuevoMunicipio}"
-							update="manage-town-content-new form:manage-town-content-new"
-							oncomplete="PF('nuevoMunicipioDialog').show()"
-							styleClass="p-mr-2 p-mb-2" process="@this" />
-					</div>
+						
 					<div class="card">
 					 <span class="ui-float-label ui-input-icon-left">
-						<p:selectOneMenu id="countries-som" value="#{municipiosBean.idPais}" filter="true" filterMatchMode="startsWith">
+						<p:selectOneMenu id="countries-som" value="#{municipiosBean.idPais}" filter="true" filterMatchMode="startsWith" >
 							<f:selectItem  itemLabel=""   itemValue=""  />
 							<f:selectItems var="selectedCountriesOne" value="#{municipiosBean.listaPaises}" itemLabel="#{selectedCountriesOne.paisDesc}" itemValue="#{selectedCountriesOne.paisCve}" />
 							<p:ajax listener="#{municipiosBean.handleContrySelect()}" update="states-som" />
@@ -37,13 +31,20 @@
 						</span>
 						
 						 <span class="ui-float-label ui-input-icon-left">
-						<p:selectOneMenu id="states-som" value="#{municipiosBean.idEstado}" filter="true" filterMatchMode="startsWith">
+						<p:selectOneMenu id="states-som" value="#{municipiosBean.idEstado}" filter="true" filterMatchMode="startsWith" >
 							<f:selectItem itemLabel=""  itemValue="" />
 							<f:selectItems var="selectedStatesOne" value="#{municipiosBean.listaEstados}" itemLabel="#{selectedStatesOne.estadoDesc}" itemValue="#{selectedStatesOne.estadosPK.estadoCve}" />
 							<p:ajax listener="#{municipiosBean.handleStateSelect()}" update="dt-Municipios" />
 						</p:selectOneMenu>
 						<p:outputLabel for="states-som" value="Estado" />
 						</span>
+						
+						<p:commandButton value="Agregar" icon="pi pi-plus"
+							actionListener="#{municipiosBean.nuevoMunicipio}"
+							update="manage-town-content-new form:manage-town-content-new"
+							oncomplete="PF('nuevoMunicipioDialog').show()"
+							styleClass="p-mr-2 p-mb-2" process="@this" />
+							
 					</div>
 				</div>
 			</div>
@@ -110,7 +111,7 @@
 					
 						<div class="p-field">
 						 <span class="ui-float-label ui-input-icon-left">
-							<p:selectOneMenu id="towns" value="#{municipiosBean.idPais}" filter="true" filterMatchMode="startsWith">
+							<p:selectOneMenu id="towns" value="#{municipiosBean.idPais}" filter="true" filterMatchMode="startsWith" disabled="true">
 								<f:selectItem  itemValue="" />
 								<f:selectItems var="selectedTowns" value="#{municipiosBean.listaPaises}" itemLabel="#{selectedTowns.paisDesc}" itemValue="#{selectedTowns.paisCve}" />
 								<p:ajax listener="#{municipiosBean.handleContrySelect}" process="@this" update=":form:manage-town-content-new" />
@@ -121,7 +122,7 @@
 						
 						<div class="p-field">
 						 <span class="ui-float-label ui-input-icon-left">
-							<p:selectOneMenu id="states" value="#{municipiosBean.idEstado}" filter="true" filterMatchMode="startsWith">
+							<p:selectOneMenu id="states" value="#{municipiosBean.idEstado}" filter="true" filterMatchMode="startsWith" disabled="true">
 								<f:selectItem itemValue=""  />
 								<f:selectItems var="selectedStates" value="#{municipiosBean.listaEstados}" itemLabel="#{selectedStates.estadoDesc}" itemValue="#{selectedStates.estadosPK.estadoCve}" />
 								<p:ajax listener="#{municipiosBean.handleStateSelect}" process="@this" />

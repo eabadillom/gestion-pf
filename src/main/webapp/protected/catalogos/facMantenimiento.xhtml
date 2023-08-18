@@ -101,9 +101,8 @@
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-file" class="ui-button-info" process="@this"
-						actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar"
-						onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();">
+					<p:commandButton icon="pi pi-file" class="ui-button-info" process="@this" actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false">
+						
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem">
@@ -125,6 +124,7 @@
 			<p:dialog header="Cancelar Factura" widgetVar="dg-delete"
 				modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-cancel" class="ui-fluid">
+				<p:outputPanel rendered="#{not empty facMantenimentoBean.cancelaFactura}">
 					<div class="p-field">
 						<p:outputLabel>¿Desea cancelar la factura?</p:outputLabel>
 					</div>
@@ -132,6 +132,7 @@
 						<p:outputLabel value="Motivo de la cancelación:" />
 						<p:inputTextarea value="#{facMantenimentoBean.cancelaFactura.descripcion}" required="true" requiredMessage="Debe indicar un motivo para la cancelación."/>
 					</div>
+					</p:outputPanel>
 				</p:outputPanel>
 
 				<f:facet name="footer">
