@@ -18,13 +18,7 @@
 			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
-					<div class="card">
-						<p:commandButton value="Agregar" icon="pi pi-plus"
-							actionListener="#{estadosBean.nuevoEstado}"
-							update="manage-state-content-new form:manage-state-content-new"
-							oncomplete="PF('nuevoEstadoDialog').show()"
-							styleClass="p-mr-2 p-mb-2" process="@this" />
-					</div>
+					
 					<div class="card">
 						<p:outputLabel for="countries-som" value="Paises:" />
 							<p:selectOneMenu id="countries-som" autoWidth="false" value="#{estadosBean.idPais}">
@@ -32,7 +26,11 @@
 								<f:selectItems var="selectedCountriesOne" value="#{estadosBean.listaPaises}" itemLabel="#{selectedCountriesOne.paisDesc}" itemValue="#{selectedCountriesOne.paisCve}" />
 									<p:ajax update="dt-Estados" process="@this" listener="#{estadosBean.handleContrySelect()}"/>
 							</p:selectOneMenu>
-							
+						<p:commandButton value="Agregar" icon="pi pi-plus"
+							actionListener="#{estadosBean.nuevoEstado}"
+							update="manage-state-content-new form:manage-state-content-new"
+							oncomplete="PF('nuevoEstadoDialog').show()"
+							styleClass="p-mr-2 p-mb-2" process="@this" />
 					</div>
 				</div>
 			</div>
@@ -89,10 +87,10 @@
 					<p:outputPanel rendered="#{not empty estadosBean.estadoSelect}">
 						<div class="p-field">
 							<p:outputLabel for="states" value="Paises:" />
-							<p:selectOneMenu id="states" value="#{estadosBean.idPais}">
+							<p:selectOneMenu id="states" value="#{estadosBean.idPais}" disabled="true">
 								<f:selectItem itemLabel="Selecione Pais" itemValue="" noSelectionOption="true" />
 								<f:selectItems var="selectedStates" value="#{estadosBean.listaPaises}" itemLabel="#{selectedStates.paisDesc}"
-									itemValue="#{selectedStates.paisCve}" />
+									itemValue="#{selectedStates.paisCve}"  />
 								<p:ajax process="@this" />
 							</p:selectOneMenu>
 						</div>
