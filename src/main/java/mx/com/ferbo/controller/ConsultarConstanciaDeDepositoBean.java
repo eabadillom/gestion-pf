@@ -52,9 +52,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private static final long serialVersionUID = -3109002730694247052L;
 	
 	
-	
-	
-	
 	private Date fechaInicial;
 	private Date fechaFinal;
 	private Date fechaCaducidad;
@@ -462,7 +459,14 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 	}
 	
+	public void newServicio() {
+		constanciaSelect = new ConstanciaDepositoDetalle();
+	}
+	
 	public void updateServicio() {
+		
+		listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+		selectConstanciaDD.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
 		
 		for(ConstanciaDepositoDetalle c: selectConstanciaDD.getConstanciaDepositoDetalleList()) {
 			
