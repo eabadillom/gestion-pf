@@ -52,7 +52,7 @@ public class ReporteFacturacionBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private static Logger log = Logger.getLogger(ReporteFacturacionBean.class);
-
+   
 	private Date fecha;
 	private Date fecha_ini;
 	private Date fecha_fin;
