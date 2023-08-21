@@ -147,19 +147,19 @@ public class FacturamaBL {
 				item.setUnitCode(sc.getCdUnidad());
 				item.setUnitPrice(sc.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
 				item.setQuantity(sc.getBaseCargo());
-				item.setSubtotal(sc.getCosto());
+				item.setSubtotal(sc.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
 				item.setTaxObject("02");
 				
 				Tax tx = new Tax();
 				
 				BigDecimal ivaTotal = sc.getCosto().multiply(tasaIva);
-				tx.setTotal(ivaTotal);
+				tx.setTotal(ivaTotal.setScale(2, BigDecimal.ROUND_HALF_UP));
 				tx.setName("IVA");
-				tx.setBase(sc.getCosto());
+				tx.setBase(sc.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
 				tx.setRate(tasaIva);
 				tx.setIsRetention(false);
 				item.setTaxes(new ArrayList<Tax>());
-				item.setTotal(sc.getCosto().add(ivaTotal));
+				item.setTotal(sc.getCosto().add(ivaTotal).setScale(2, BigDecimal.ROUND_HALF_UP));
 				item.getTaxes().add(tx);
 				listaItems.add(item);
 			}
@@ -176,19 +176,20 @@ public class FacturamaBL {
 				item.setUnitCode(sc.getCdUnidad());
 				item.setUnitPrice(sc.getTarifa());
 				item.setQuantity(sc.getCantidad());
-				item.setSubtotal(sc.getCosto());
+				item.setSubtotal(sc.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
 				item.setTaxObject("02");
 				
 				Tax tx = new Tax();
 				
 				BigDecimal ivaTotal = sc.getCosto().multiply(tasaIva);
-				tx.setTotal(ivaTotal);
+				tx.setTotal(ivaTotal.setScale(2, BigDecimal.ROUND_HALF_UP));
 				tx.setName("IVA");
-				tx.setBase(sc.getCosto());
-				tx.setRate(tasaIva);
+				tx.setBase(sc.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
+				tx.setRate(tasaIva.setScale(2, BigDecimal.ROUND_HALF_UP));
 				tx.setIsRetention(false);
 				item.setTaxes(new ArrayList<Tax>());
-				item.setTotal(sc.getCosto().add(ivaTotal));
+				BigDecimal bdTotalItem = sc.getCosto().add(ivaTotal);
+				item.setTotal(bdTotalItem.setScale(2, BigDecimal.ROUND_HALF_UP));
 				item.getTaxes().add(tx);
 				listaItems.add(item);
 			}
