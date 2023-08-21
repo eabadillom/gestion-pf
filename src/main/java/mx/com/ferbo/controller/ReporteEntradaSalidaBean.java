@@ -65,7 +65,7 @@ public class ReporteEntradaSalidaBean implements Serializable {
 	private Cliente clienteSelect;
 
 	private List<Cliente> listaClientes;
-
+  
 	private ClienteDAO clienteDAO;
 
 	public ReporteEntradaSalidaBean() {
