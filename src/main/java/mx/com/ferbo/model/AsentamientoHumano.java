@@ -38,6 +38,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "AsentamientoHumano.findByAsentamientoDs", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoDs = :asentamientoDs"),
     @NamedQuery(name = "AsentamientoHumano.findByCp", query = "SELECT a FROM AsentamientoHumano a WHERE a.cp = :cp"),
     @NamedQuery(name = "AsentamientoHumano.findByDomicilio", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.paisCve = :paisCve and a.asentamientoHumanoPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudadCve = :ciudadCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByDomicilioCompleto", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.paisCve = :paisCve and a.asentamientoHumanoPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudadCve = :ciudadCve and a.asentamientoHumanoPK.tipoasntmntoCve = :tipoasntmntoCve and a.asentamientoHumanoPK.entidadpostalCve = :entidadpostalCve"),
 	@NamedQuery(name = "AsentamientoHumano.findAsentamiento", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.paisCve = :paisCve and a.asentamientoHumanoPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudadCve = :ciudadCve and a.asentamientoHumanoPK.asentamientoCve =:asentamientoCve")}
 		)
 

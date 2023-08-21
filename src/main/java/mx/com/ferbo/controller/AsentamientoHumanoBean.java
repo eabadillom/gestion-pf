@@ -72,6 +72,8 @@ public class AsentamientoHumanoBean implements Serializable {
 	private int idEstado;
 	private int idMunicipio;
 	private int idCiudad;
+	private int tipoasntmntoCve;
+	private int entidadpostalCve;
 	private short idTipoAsentamiento;
 	private int idEntidadPostal;
 
@@ -107,9 +109,8 @@ public class AsentamientoHumanoBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		listaPaises = paisesDao.buscarTodos();
-		listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
-		listaEntidadPostal = entidadPostalDao.buscarTodos();
-		
+		//listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
+		//listaEntidadPostal = entidadPostalDao.buscarTodos();
 		
 	}
 
@@ -119,6 +120,7 @@ public class AsentamientoHumanoBean implements Serializable {
 		idCiudad = 0 ;
 		idEntidadPostal = 0;
 		idEstado = 0 ;
+		tipoasntmntoCve = 0;
 		asentamientoHumanoSelect.setAsentamientoDs(null);
 		asentamientoHumanoSelect.setCp(null);
 		asentamientoHumanoSelect.getCp();
@@ -132,7 +134,7 @@ public class AsentamientoHumanoBean implements Serializable {
 		this.ciudadSelect = new Ciudades();
 		this.ciudadPKSelect = new CiudadesPK();
 		ciudadSelect.setCiudadesPK(ciudadPKSelect);
-		this.asentamientoHumanoPKSelect = new AsentamientoHumanoPK();
+		//this.asentamientoHumanoPKSelect = new AsentamientoHumanoPK();
 		asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 	}
 	
@@ -188,7 +190,8 @@ public class AsentamientoHumanoBean implements Serializable {
 			idEstado =  this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getEstadoCve();
 			idMunicipio =  this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getMunicipioCve();
 			idCiudad = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getCiudadCve();
-			
+			//tipoasntmntoCve = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getTipoasntmntoCve();
+			//entidadpostalCve = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getEntidadpostalCve();
 		}
 	}
 	public void handleContrySelect() {
@@ -228,8 +231,39 @@ public class AsentamientoHumanoBean implements Serializable {
 			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
 			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
 			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
-			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
+			//this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
+			listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
+			
+		}
+	}
+	
+	public void handletypeAsn() {
+		filtroAsentamientoHumano();
+		if(this.tipoasntmntoCve != -1) {
+			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
+			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
+			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);	
+			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
+			this.asentamientoHumanoPKSelect.setTipoasntmntoCve((short) tipoasntmntoCve);
+			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
+			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterioEspecial(asentamientoHumanoSelect);	
+			
+			listaEntidadPostal = entidadPostalDao.buscarTodos();
+		}
+	}
+	
+	public void handleEntidadPostal() {
+		filtroAsentamientoHumano();
+		if(this.entidadpostalCve != -1) {
+			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
+			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
+			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
+			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
+			this.asentamientoHumanoPKSelect.setTipoasntmntoCve((short) tipoasntmntoCve);
+			this.asentamientoHumanoPKSelect.setEntidadpostalCve(entidadpostalCve);
+			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
+			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterioEspecial(asentamientoHumanoSelect);
 		}
 	}
 
@@ -487,6 +521,22 @@ public class AsentamientoHumanoBean implements Serializable {
 
 	public void setIdEntidadPostal(int idEntidadPostal) {
 		this.idEntidadPostal = idEntidadPostal;
+	}
+
+	public int getTipoasntmntoCve() {
+		return tipoasntmntoCve;
+	}
+
+	public void setTipoasntmntoCve(int tipoasntmntoCve) {
+		this.tipoasntmntoCve = tipoasntmntoCve;
+	}
+
+	public int getEntidadpostalCve() {
+		return entidadpostalCve;
+	}
+
+	public void setEntidadpostalCve(int entidadpostalCve) {
+		this.entidadpostalCve = entidadpostalCve;
 	}
 
 	

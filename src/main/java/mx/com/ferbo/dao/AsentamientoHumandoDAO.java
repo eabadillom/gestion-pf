@@ -88,6 +88,26 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 		}
 		return listado;
 	}
+	public List<AsentamientoHumano> buscarPorCriterioEspecial(AsentamientoHumano a) {		
+		List<AsentamientoHumano> listado = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery( "AsentamientoHumano.findByDomicilioCompleto", AsentamientoHumano.class)
+					.setParameter("paisCve", a.getAsentamientoHumanoPK().getPaisCve())
+					.setParameter("estadoCve", a.getAsentamientoHumanoPK().getEstadoCve())
+					.setParameter("municipioCve", a.getAsentamientoHumanoPK().getMunicipioCve())
+					.setParameter("ciudadCve", a.getAsentamientoHumanoPK().getCiudadCve())
+					.setParameter("tipoasntmntoCve", a.getAsentamientoHumanoPK().getTipoasntmntoCve())
+					.setParameter("entidadpostalCve", a.getAsentamientoHumanoPK().getEntidadpostalCve())
+					.getResultList();
+		}catch(Exception e) {
+			log.error("Problemas para obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return listado;
+	}
 	
 	public List<AsentamientoHumano> buscarPorEntidadPostal(EntidadPostal e){
 		

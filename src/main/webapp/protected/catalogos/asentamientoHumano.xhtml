@@ -53,20 +53,37 @@
 						
 						<span class="ui-float-label ui-input-icon-left">
 						<p:selectOneMenu id="cities-som" style="width: 270px; height: 33px" value="#{asentamientoHumanoBean.idCiudad}" filter="true" filterMatchMode="startsWith">
-							<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="selectedCitiesOne"
-								value="#{asentamientoHumanoBean.listaCiudades}"
-								itemLabel="#{selectedCitiesOne.ciudadDs}"
-								itemValue="#{selectedCitiesOne.ciudadesPK.ciudadCve}" />
-							<p:ajax listener="#{asentamientoHumanoBean.handleCitySelect()}"
-								update="dt-AsentamientoHumano" />
+							<f:selectItem itemLabel="" itemValue=""  />
+							<f:selectItems var="selectedCitiesOne" value="#{asentamientoHumanoBean.listaCiudades}" itemLabel="#{selectedCitiesOne.ciudadDs}" itemValue="#{selectedCitiesOne.ciudadesPK.ciudadCve}" />
+							<p:ajax listener="#{asentamientoHumanoBean.handleCitySelect()}" update="dt-AsentamientoHumano settlementType2" />
 						</p:selectOneMenu>
 						<p:outputLabel for="cities-som" value="Ciudad" />
 						</span>
+						
+						<span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="settlementType2"  value="#{asentamientoHumanoBean.tipoasntmntoCve}" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="" itemValue=""  />
+							<f:selectItems var="selectedSettlementTypeOne" value="#{asentamientoHumanoBean.listaTipoAsentamiento}" itemLabel="#{selectedSettlementTypeOne.tipoasntmntoDs}" itemValue="#{selectedSettlementTypeOne.tipoasntmntoCve}" />
+						<p:ajax listener="#{asentamientoHumanoBean.handletypeAsn()}" update=" dt-AsentamientoHumano postalEntity2" />
+						</p:selectOneMenu>
+							<p:outputLabel for="settlementType2" value="Tipo de Asentamiento:" />
+							</span>
+						
+						<span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="postalEntity2"  value="#{asentamientoHumanoBean.entidadpostalCve}" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="" itemValue=""  noSelectionOption="true"/>
+							<f:selectItems var="selectedPostalEntityOne" value="#{asentamientoHumanoBean.listaEntidadPostal}" itemLabel="#{selectedPostalEntityOne.entidadpostalDs}" itemValue="#{selectedPostalEntityOne.entidadpostalCve}" />
+						<p:ajax listener="#{asentamientoHumanoBean.handleEntidadPostal()}" update="dt-AsentamientoHumano" />
+						</p:selectOneMenu>
+							<p:outputLabel for="postalEntity2" value="Entidad Postal:" />
+						</span>
+						
 							<p:commandButton value="Agregar" icon="pi pi-plus"
 							actionListener="#{asentamientoHumanoBean.nuevoAsentamientoHumano}" update=":form:manage-cologne-content-new" oncomplete="PF('nuevoAsentemientoHumanoDialog').show()"
 							styleClass="p-mr-2 p-mb-2" process="@this" />
 					</div>
+					
+						
 					</p:fieldset>
 					
 				</div>
@@ -160,14 +177,14 @@
 						</div>
 						<div class="p-field">
 							<p:outputLabel for="settlementType" value="Tipo de Asentamiento:" />
-						<p:selectOneMenu id="settlementType"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.tipoasntmntoCve}" >
+						<p:selectOneMenu id="settlementType"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.tipoasntmntoCve}" disabled="true">
 							<f:selectItem itemLabel="Selecione Tipo de Asentamiento" itemValue=""  />
 							<f:selectItems var="selectedSettlementTypeOne" value="#{asentamientoHumanoBean.listaTipoAsentamiento}" itemLabel="#{selectedSettlementTypeOne.tipoasntmntoDs}" itemValue="#{selectedSettlementTypeOne.tipoasntmntoCve}" />
 						</p:selectOneMenu>
-						</div>
+						</div> 
 						<div class="p-field">
 							<p:outputLabel for="postalEntity" value="Entidad Postal:" />
-						<p:selectOneMenu id="postalEntity"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.entidadpostalCve}">
+						<p:selectOneMenu id="postalEntity"  value="#{asentamientoHumanoBean.asentamientoHumanoSelect.asentamientoHumanoPK.entidadpostalCve}" disabled="true">
 							<f:selectItem itemLabel="Selecione Entidad Postal" itemValue=""  />
 							<f:selectItems var="selectedPostalEntityOne" value="#{asentamientoHumanoBean.listaEntidadPostal}" itemLabel="#{selectedPostalEntityOne.entidadpostalDs}" itemValue="#{selectedPostalEntityOne.entidadpostalCve}" />
 						</p:selectOneMenu>
