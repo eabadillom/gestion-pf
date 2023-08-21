@@ -128,13 +128,13 @@
 							</p:column>
 							
 							<p:column>
-								<p:commandButton value="Modificar" oncomplete="PF('dlgModificarServicio').show()" icon="pi pi-pencil" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" >
+								<p:commandButton value="Modificar" oncomplete="PF('dlgModificarServicio').show()" icon="pi pi-pencil"  disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" >
 									<f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
 								</p:commandButton>
 							</p:column>
 							
 							<p:column>
-								<p:commandButton value="Eliminar" oncomplete="PF('dlgEliminarServicio').show()" styleClass="ui-button-danger" icon="pi pi-trash" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}">
+								<p:commandButton value="Eliminar" oncomplete="PF('dlgEliminarServicio').show()" styleClass="ui-button-danger" icon="pi pi-trash" actionListener="#{consultarConstanciaDeDepositoBean.newServicio()}" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}">
 									<f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
 								</p:commandButton>
 							</p:column>
