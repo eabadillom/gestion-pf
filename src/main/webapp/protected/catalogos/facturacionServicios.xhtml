@@ -184,7 +184,7 @@
 				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{facturaServiciosBean.agregarServicio}" update="dt-servicios subtotal iva total"/>
 				</p:column>
 			</p:outputPanel>
-				
+				   
 			<p:dataTable id="dt-servicios"	var="servicio" lazy="true" selection="#{facturaServiciosBean.selServicio}" value="#{facturaServiciosBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" scrollRows="2" reflow="true">	
 				<p:column headerText="Servicio seleccionado" width="8em"><h:outputText value="#{servicio.descripcion}" /></p:column>
 				<p:column headerText="Unidad" width="10em"><h:outputText value="#{servicio.unidad}" /></p:column>
