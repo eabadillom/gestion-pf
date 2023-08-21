@@ -18,13 +18,7 @@
 			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
-					<div class="card">
-						<p:commandButton value="Agregar ciudad" icon="pi pi-plus"
-							actionListener="#{ciudadesBean.nuevaCiudad}"
-							update="manage-city-content-new form:manage-city-content-new"
-							oncomplete="PF('nuevaCiudadDialog').show()"
-							styleClass="p-mr-2 p-mb-2" process="@this" />
-					</div>
+					
 					<p:fieldset legend="Filtro de busqueda">
 					<div class="card">
 					
@@ -55,8 +49,16 @@
 						</p:selectOneMenu>
 						<p:outputLabel for="municipalities-som" value="Municipios" />
 						</span>
+						<p:commandButton value="Agregar ciudad" icon="pi pi-plus"
+							actionListener="#{ciudadesBean.nuevaCiudad}"
+							update="manage-city-content-new form:manage-city-content-new"
+							oncomplete="PF('nuevaCiudadDialog').show()"
+							styleClass="p-mr-2 p-mb-2" process="@this" />
+					
+					
 					</div>
 					</p:fieldset>
+					
 				</div>
 			</div>
 
