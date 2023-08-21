@@ -32,6 +32,9 @@ import mx.com.ferbo.util.conexion;
 
 public class ReporteNotaCreditoBean implements Serializable{
 	
+	
+	
+	
 	private static final long serialVersionUID = 1L;
 	private static Logger log = Logger.getLogger(ReporteNotaCreditoBean.class);
 	
