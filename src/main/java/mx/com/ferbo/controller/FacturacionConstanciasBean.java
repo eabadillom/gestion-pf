@@ -724,7 +724,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setEmisorNombre(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
 		factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
 		factura.setEmisorCdRegimen(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
-		
+		    
 		
 		try {
 			
