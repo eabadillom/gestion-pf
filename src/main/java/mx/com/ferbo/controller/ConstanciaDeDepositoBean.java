@@ -140,7 +140,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private BigDecimal valorMercancia;
 	private String pedimento, contenedor, lote, otro;
 	private Boolean isCongelacion, isConservacion, isRefrigeracion, isManiobras;
-	private int congelacion = 2, conservacion = 32, refrigeracion = 33, maniobras = 34;
+	private int congelacion = 619, conservacion = 620, refrigeracion = 621, maniobras = ;
 	private boolean showPedimento;
 	private boolean showSAP;
 	private boolean showLote;
@@ -437,26 +437,26 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		
 		listaServicioUnidad.removeAll(precioServicioTemp);
 		
-		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 2)
+		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 619)
 		.collect(Collectors.toList());
 		if(l.size() > 0) {
 			this.isCongelacion = true;
 		}
 			
 		
-		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 32)
+		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 620)
 				.collect(Collectors.toList());
 		if(l.size() > 0) {
 			this.isConservacion = true;
 		}
 		
-		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 33)
+		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 621)
 				.collect(Collectors.toList());
 		if(l.size() > 0) {
 			this.isRefrigeracion = true;
 		}
 		
-		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 34)
+		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 622)
 				.collect(Collectors.toList());
 		if(l.size() > 0) {
 			this.isManiobras = true;
