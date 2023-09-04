@@ -140,7 +140,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private BigDecimal valorMercancia;
 	private String pedimento, contenedor, lote, otro;
 	private Boolean isCongelacion, isConservacion, isRefrigeracion, isManiobras;
-	private int congelacion = 619, conservacion = 620, refrigeracion = 621, maniobras = ;
+	private int congelacion = 619, conservacion = 620, refrigeracion = 621, maniobras = 622 ;
 	private boolean showPedimento;
 	private boolean showSAP;
 	private boolean showLote;
@@ -575,7 +575,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				throw new InventarioException(String.format("La constancia %s ya se encuentra registrada", folioCliente));
 			
 			if(this.isCongelacion) { //servicio_cve: 2
-				Servicio congelacion = servicioDAO.buscarPorId(2);
+				Servicio congelacion = servicioDAO.buscarPorId(619);
 				ConstanciaDepositoDetalle srvCongelacion = new ConstanciaDepositoDetalle();
 				srvCongelacion.setServicioCve(congelacion);
 				srvCongelacion.setServicioCantidad(new BigDecimal("1.00").setScale(0, BigDecimal.ROUND_HALF_UP));
@@ -584,7 +584,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			}
 			
 			if(this.isConservacion) { //servicio_cve: 32
-				Servicio conservacion = servicioDAO.buscarPorId(32);
+				Servicio conservacion = servicioDAO.buscarPorId(620);
 				ConstanciaDepositoDetalle srvConservacion = new ConstanciaDepositoDetalle();
 				srvConservacion.setServicioCve(conservacion);
 				srvConservacion.setServicioCantidad(new BigDecimal("1.00").setScale(0, BigDecimal.ROUND_HALF_UP));
@@ -593,7 +593,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			}
 			
 			if(this.isRefrigeracion) { //servicio_cve: 33
-				Servicio refrigeracion = servicioDAO.buscarPorId(33);
+				Servicio refrigeracion = servicioDAO.buscarPorId(621);
 				ConstanciaDepositoDetalle srvRefrigeracion = new ConstanciaDepositoDetalle();
 				srvRefrigeracion.setServicioCve(refrigeracion);
 				srvRefrigeracion.setServicioCantidad(new BigDecimal("1.00").setScale(0, BigDecimal.ROUND_HALF_UP));
@@ -602,7 +602,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			}
 			
 			if(this.isManiobras) { //servicio_cve: 34
-				Servicio maniobras = servicioDAO.buscarPorId(34);
+				Servicio maniobras = servicioDAO.buscarPorId(622);
 				ConstanciaDepositoDetalle srvManiobras = new ConstanciaDepositoDetalle();
 				srvManiobras.setServicioCve(maniobras);
 				srvManiobras.setServicioCantidad(new BigDecimal("1.00").setScale(0, BigDecimal.ROUND_HALF_UP));
