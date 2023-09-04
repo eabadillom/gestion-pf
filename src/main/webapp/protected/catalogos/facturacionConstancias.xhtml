@@ -82,13 +82,9 @@
 									value="#{facturacionConstanciasBean.plantaSelect}"
 									styleClass="p-ml-2 p-mr-4" required="true"
 									requiredMessage="Selecciona una Planta">
-									<f:selectItem itemLabel="---Seleccione---"
-										noSelectionOption="true" />
-									<f:selectItems
-										value="#{facturacionConstanciasBean.listaPlanta}" var="planta"
-										itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-									<p:ajax update="emisor messages dt-vigencias"
-										listener="#{facturacionConstanciasBean.serieFactura}" />
+									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
+									<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+									<p:ajax update="emisor messages dt-vigencias serieFactura planta" listener="#{facturacionConstanciasBean.serieFactura}" process="@this"/>
 								</p:selectOneMenu>
 							</p:outputLabel>
 
