@@ -62,6 +62,7 @@ import mx.com.ferbo.model.TraspasoServicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -175,6 +176,7 @@ public class AltaTraspasoBean implements Serializable {
 		log.debug("Buscando lista de clientes...");
 		clientes = clienteDAO.buscarHabilitados(true, false);
 		fecha = new Date();
+		
 		log.debug("Buscando lista de unidades de medida");
 		alUnidades = udmDAO.buscarTodos();
 		if (alProductosFiltered == null)
@@ -373,7 +375,7 @@ public class AltaTraspasoBean implements Serializable {
 			servicio.setCantidad(this.cantidadServicio);
 			servicio.setServicio(precioServicio.getServicio().getServicioDs());
 			servicio.setPrecio(precioServicio.getPrecio());
-			servicio.setSubtotal(precioServicio.getPrecio());
+			servicio.setSubtotal(this.cantidadServicio.multiply(precioServicio.getPrecio()));
 			alServiciosDetalle.add(servicio);
 			message = "Servicio agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
@@ -427,10 +429,12 @@ public class AltaTraspasoBean implements Serializable {
 			estado = estados.stream().filter(e -> e.getEdoCve() == 1).collect(Collectors.toList()).get(0);
 			constancia = new ConstanciaTraspaso();
 			constancia.setFecha(this.fecha);
+			
 			constancia.setNumero(this.numero);
 			constancia.setCliente(this.selCliente);
 			constancia.setObservacion(this.observaciones);
 			constancia.setNombreCliente(this.selCliente.getCteNombre());
+			constancia.setFechaCadena(DateUtil.getString(this.fecha, DateUtil.FORMATO_FECHA_CADENA));
 			List<TraspasoPartida> listaTraspasoPartida = new ArrayList<TraspasoPartida>();
 			
 			for(InventarioDetalle i : destino ) {
@@ -874,4 +878,5 @@ public class AltaTraspasoBean implements Serializable {
 	public void setListadoPlantas(List<Planta> listadoPlantas) {
 		this.listadoPlantas = listadoPlantas;
 	}
+
 }

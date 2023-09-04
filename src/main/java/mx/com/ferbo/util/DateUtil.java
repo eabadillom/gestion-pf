@@ -20,7 +20,8 @@ public class DateUtil {
 	public static final String FORMATO_YYYY_MM_DD          = "yyyy-MM-dd";
 	public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss.SSS";
 	public static final String FORMATO_DD_MM_YYYY_FULL     = "dd MMMM yyyy";
-	
+	public static final String FORMATO_FECHA_CADENA 		= "dd 'de' MMMM 'de' yyyy";
+
 	public static final int ENERO      = Calendar.JANUARY;
 	public static final int FEBRERO    = Calendar.FEBRUARY;
 	public static final int MARZO      = Calendar.MARCH;
