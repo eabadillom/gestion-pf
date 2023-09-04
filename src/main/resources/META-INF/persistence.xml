@@ -107,10 +107,10 @@
 		<class>mx.com.ferbo.model.UsoCfdi</class>
 		 <properties>
 			<property name="javax.persistence.jdbc.url"
-				value="jdbc:mysql://192.168.1.15:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
+				value="jdbc:mysql://192.168.1.14:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
 			<property name="javax.persistence.jdbc.user" value="gestion" />
 			<property name="javax.persistence.jdbc.password"
-				value="D3s4rR0l1adoR315aQ" />
+				value="db2629*J" />
 			<property name="javax.persistence.jdbc.driver"
 				value="com.mysql.cj.jdbc.Driver" />
 			<property name="hibernate.show_sql" value="true" />
