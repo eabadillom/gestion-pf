@@ -110,7 +110,7 @@
 						class="ui-button-danger" update="form:frm-cancel"
 						oncomplete="PF('dg-delete').show()"
 						actionListener="#{facMantenimentoBean.preparaCancelacion}"
-						disabled="#{lista.status.id eq 1 or lista.status.id eq 3}">
+						disabled="#{lista.status.id eq 0 or lista.status.id eq 2}">
 						<f:setPropertyActionListener value="#{lista}"
 							target="#{facMantenimentoBean.seleccion}" />
 					</p:commandButton>
