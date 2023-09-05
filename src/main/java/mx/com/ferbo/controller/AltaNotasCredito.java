@@ -76,7 +76,7 @@ public class AltaNotasCredito implements Serializable{
 	private BigDecimal sumaSubtotal,ivaSubtotal,total;
 	
 	
-	
+	 
 	
 	public AltaNotasCredito() {
 		
