@@ -709,7 +709,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		fmp.setFmpReferencia(referencia);
 		factura.getFacturaMedioPagoList().add(fmp);
 		//---------------------
-		StatusFactura statusF = statusFacturaDAO.buscarPorId(2);
+		StatusFactura statusF = statusFacturaDAO.buscarPorId(1);
 		
 		factura.setStatus(statusF);//duda*			
 		

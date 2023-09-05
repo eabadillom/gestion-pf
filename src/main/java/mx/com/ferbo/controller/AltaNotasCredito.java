@@ -76,7 +76,7 @@ public class AltaNotasCredito implements Serializable{
 	private BigDecimal sumaSubtotal,ivaSubtotal,total;
 	
 	
-	 
+	
 	
 	public AltaNotasCredito() {
 		
@@ -297,18 +297,18 @@ public class AltaNotasCredito implements Serializable{
 		try {
 			
 			if(porCobrar==true) {
-				sf.setId(2);
+				sf.setId(1);
 				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
 				
 			}
 			
 			if(pagada==true) {				
-				sf.setId(4);
+				sf.setId(3);
 				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
 			}
 			
 			if(pagoParcial==true) {
-				sf.setId(5);
+				sf.setId(4);
 				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
 			}
 			
