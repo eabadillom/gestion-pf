@@ -539,7 +539,7 @@ public class FacturacionConstanciasBean implements Serializable{
 					continue;
 				listaSerieFactura.add(sf);
 			}
-		}
+		}	
 		
 		if(listaSerieFactura.size()>0) {
 			serieFacturaSelect = listaSerieFactura.get(0);
