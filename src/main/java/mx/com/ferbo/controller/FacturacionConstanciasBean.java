@@ -532,13 +532,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		listaSerieFactura.clear();
 		if(plantaSelect != null) {
-		
-			/*listaSerieFactura = listaSerieF.stream()
-						.filter(s -> plantaSelect != null
-						?(s.getIdPlanta().getPlantaCve().intValue() == plantaSelect.getPlantaCve())
-						:false).collect(Collectors.toList());*/
-						
-		  
 			for(SerieFactura sf : listaSerieF) {
 				if(sf.getIdPlanta() == null)
 					continue;
