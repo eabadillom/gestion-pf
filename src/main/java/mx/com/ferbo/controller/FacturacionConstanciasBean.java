@@ -539,7 +539,7 @@ public class FacturacionConstanciasBean implements Serializable{
 					continue;
 				listaSerieFactura.add(sf);
 			}
-		}
+		}	
 		
 		if(listaSerieFactura.size()>0) {
 			serieFacturaSelect = listaSerieFactura.get(0);
@@ -709,7 +709,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		fmp.setFmpReferencia(referencia);
 		factura.getFacturaMedioPagoList().add(fmp);
 		//---------------------
-		StatusFactura statusF = statusFacturaDAO.buscarPorId(1);
+		StatusFactura statusF = statusFacturaDAO.buscarPorId(2);
 		
 		factura.setStatus(statusF);//duda*			
 		

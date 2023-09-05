@@ -125,7 +125,7 @@ public class FacMantenimentoBean implements Serializable {
 		
 		try {
 			StatusFacturaDAO statusDAO = new StatusFacturaDAO();
-			StatusFactura statusCancelada = statusDAO.buscarPorId(2);
+			StatusFactura statusCancelada = statusDAO.buscarPorId(3);
 			this.seleccion.setStatus(statusCancelada);
 			this.cancelaFactura.setFactura(seleccion);
 			this.seleccion.setCancelaFactura(cancelaFactura);
@@ -232,7 +232,7 @@ public class FacMantenimentoBean implements Serializable {
 		try {
 			log.info("Timbrando factura: {}...", factura);
 			facturamaBO.timbrar();
-			facturamaBO.sendMail();
+			//facturamaBO.sendMail();
 			log.info("Timbrado completado correctamente.");
 			
 			severity = FacesMessage.SEVERITY_INFO;

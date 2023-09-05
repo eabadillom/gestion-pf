@@ -64,7 +64,7 @@ public class FacturamaBL {
 		if(factura == null)
 			throw new InventarioException("No se encontró la factura: " + idFactura);
 		
-		if(factura.getStatus().getId() == 2) 
+		if(factura.getStatus().getId() == 3) 
 			throw new InventarioException("La factura ya se encuentra cancelada, no es posible timbrar.");
 		
 		if(factura.getUuid() != null && factura.getUuid().trim().length() > 0) {
