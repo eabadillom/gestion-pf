@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GestionReport" pageWidth="231" pageHeight="714" columnWidth="211" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" isIgnorePagination="true" uuid="82a8d04f-ed2a-4c9c-8260-6be8175ff3a5">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDB"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
@@ -310,8 +310,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{folio_cliente}+"</style>"
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{folio_cliente}+"</style>"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="30" width="50" height="12" uuid="b7f83c49-e9cc-4ea3-883d-251c26b9aa7b">
@@ -327,9 +326,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{CTE_NOMBRE}+"</style>"
-
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{CTE_NOMBRE}+"</style>"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="50" width="50" height="12" uuid="92f02d1b-5cb5-4c00-aa5e-280a66e5ec55">
@@ -351,8 +348,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PLANTA_DS}+"</style>"
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PLANTA_DS}+"</style>"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="60" y="70" width="148" height="12" uuid="1ef10fdb-a2ca-4b38-a564-524442a825f2">
@@ -362,8 +358,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{FECHA_INGRESO}+"</style>"
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{FECHA_INGRESO}+"</style>"]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="3" y="87" width="208" height="1" uuid="196c9cff-72b5-4463-b565-4ecbb2302621"/>
@@ -384,8 +379,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{CTE_NOMBRE}+"</style>"
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PRODUCTO_DS}+"</style>" ]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="40" y="30" width="50" height="12" uuid="46b48a69-055d-4d2c-86d1-a9422b351bd8">
@@ -401,8 +395,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$F{CANTIDAD_TOTAL} +"</style>"
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$F{CANTIDAD_TOTAL} +"</style>"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="150" y="30" width="59" height="12" forecolor="#000000" uuid="bf860db5-a0fb-480d-8b6d-8b72003057a1">
@@ -510,8 +503,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$V{CantidadTotal}+"</style>"
-]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$V{CantidadTotal}+"</style>"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="130" y="19" width="60" height="14" uuid="5a2bf181-7352-4e85-b0ad-b4b77fdd40b2"/>
