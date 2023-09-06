@@ -40,6 +40,7 @@ import net.sf.jasperreports.engine.JRException;
 @ViewScoped
 public class ReporteServClienteBean implements Serializable {
 
+	
 	private static final long serialVersionUID = 1L;
 	private static Logger log = Logger.getLogger(ReporteServClienteBean.class);
 
