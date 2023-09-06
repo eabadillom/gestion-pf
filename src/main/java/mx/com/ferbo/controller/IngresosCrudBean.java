@@ -136,20 +136,29 @@ public class IngresosCrudBean implements Serializable {
 					StatusFactura sfpagoParcial = new StatusFactura();
 					sfpagoParcial.setId(4);
 					listaFactura.addAll(facturaDAO.buscarPorCteStatus(sfpagoParcial, cteSelect));
+					message = "Pago Parcial";
+					severity = FacesMessage.SEVERITY_INFO;
 				}
 				if(porCobrar == true) {
 					StatusFactura sfporCobrar = new StatusFactura();
 					sfporCobrar.setId(1);
 					listaFactura.addAll(facturaDAO.buscarPorCteStatus(sfporCobrar, cteSelect));
+					message = "Por Cobrar.";
+					severity = FacesMessage.SEVERITY_INFO;
 				}
-						message = "Seleccione el tipo de pago.";
-						severity = FacesMessage.SEVERITY_INFO;
+						
 					
 			}catch(Exception ex) {
 				log.error("Problema para recuperar los datos del cliente.", ex);
 				message = ex.getMessage();
 				severity = FacesMessage.SEVERITY_ERROR;
 			}finally {
+				
+				if(porCobrar == false && pagoParcial == false) {
+					message = "Seleccione el tipo de pago.";
+					severity = FacesMessage.SEVERITY_INFO;
+				}
+				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
 				PrimeFaces.current().ajax().update("form:messages", "form:dt-Factura");
 			}
