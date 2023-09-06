@@ -63,7 +63,8 @@ public class ReporteFacturacionPorMesBean implements Serializable {
 	private List<Cliente> listaClientes;
 
 	private ClienteDAO clienteDAO;
-
+   
+	
 	public ReporteFacturacionPorMesBean() {
 		fecha = new Date();
 		clienteDAO = new ClienteDAO();
