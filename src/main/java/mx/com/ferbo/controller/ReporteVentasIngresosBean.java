@@ -53,6 +53,7 @@ public class ReporteVentasIngresosBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static Logger log = Logger.getLogger(ReporteVentasIngresosBean.class);
 
+	
 	private Date fecha;
 	private Date maxDate;
 	private Date fecha_ini;
