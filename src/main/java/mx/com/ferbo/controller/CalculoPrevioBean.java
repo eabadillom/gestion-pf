@@ -94,7 +94,7 @@ public class CalculoPrevioBean implements Serializable {
 	private FacesContext context;
 	private HttpServletRequest request;
 	HttpSession session;
-
+ 
 	private List<ConstanciaFactura> listaEntradas;
 	private List<ConstanciaFactura> listaVigencias;
 	private List<ConstanciaFacturaDs> listaServicios;
