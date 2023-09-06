@@ -707,10 +707,10 @@ public class FacturacionConstanciasBean implements Serializable{
 		fmp.setFmpPorcentaje(100);
 		fmp.setMpDescripcion(medioP.getMpDescripcion());
 		fmp.setFmpReferencia(referencia);
-		factura.getFacturaMedioPagoList().add(fmp);
+		factura.getFacturaMedioPagoList().add(fmp); 
 		//---------------------
 		StatusFactura statusF = statusFacturaDAO.buscarPorId(1);
-		
+		   
 		factura.setStatus(statusF);//duda*			
 		
 		TipoFacturacion tipoFacturacion = tipoFacturacionDAO.buscarPorId(1);
