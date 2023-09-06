@@ -58,7 +58,7 @@ public class ReporteServiciosBean implements Serializable {
 	private Date fecha_fin;
 	private Date maxDate;
 	private Cliente clienteSelect;
-
+   
 	private List<Cliente> listaClientes;
 
 	private ClienteDAO clienteDAO;
