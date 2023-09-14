@@ -158,15 +158,13 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 							|| (c.getFactura().getStatus().getId() == 4)) //Status Pago parcial
 						.collect(Collectors.toList());
 				
-				if(lConstanciaFactura.size() > 0)
+				if(lConstanciaFactura.size() <= 0)
 					continue;
-				
-				//constancia.getPartidaList();
 				
 				cf = this.getConstanciaFactura(constancia, fechaCorte);
 				list.add(cf);
 				
-				for(Partida p: constancia.getPartidaList()) {
+				for(Partida p : constancia.getPartidaList()) {
 					BigDecimal cantidadT = new BigDecimal(p.getCantidadTotal());
 					BigDecimal pesoTotal = p.getPesoTotal();
 					BigDecimal cajasTarima = null;//cajas x Tarima
@@ -200,7 +198,10 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					}
 					
 					cantidadT = cantidadT.subtract(salidaCantidad);
-					pesoTotal = pesoTotal.subtract(salidaPeso);
+//					if(cantidadT.compareTo(BigDecimal.ZERO) == 0)
+//						pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+//					else
+						pesoTotal = pesoTotal.subtract(salidaPeso);
 					noTarimas = cantidadT.divide(cajasTarima,0,RoundingMode.UP);
 					
 					//seteo en partida
