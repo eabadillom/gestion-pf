@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
@@ -25,7 +26,7 @@ import mx.com.ferbo.util.InventarioException;
 
 public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer> {
 	
-	private static Logger log = Logger.getLogger(FacturacionVigenciasDAO.class);
+	private static Logger log = LogManager.getLogger(FacturacionVigenciasDAO.class);
 	
 	EntityManager em = null;
 
@@ -148,6 +149,7 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 			listaConstancias = query.getResultList();
 			
 			for(ConstanciaDeDeposito constancia : listaConstancias) {
+				log.debug("Constancia de deposito: {}",constancia.getFolioCliente());
 				listaTmpConstancias = constancia.getConstanciaFacturaList();
 				List<ConstanciaDepositoDetalle> allConstanciaDepositoDetalle = constancia.getConstanciaDepositoDetalleList();
 				System.out.print(allConstanciaDepositoDetalle.size());
@@ -162,6 +164,19 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					continue;
 				
 				cf = this.getConstanciaFactura(constancia, fechaCorte);
+				final Date vigenciaIni = cf.getVigenciaInicio();
+				final Date vigenciaFin = cf.getVigenciaFin();
+				
+				log.debug("folio: {}, vigencia ini: {}, vigencia fin: {}", cf.getFolioCliente(), cf.getVigenciaInicio(), cf.getVigenciaFin());
+				
+				List<ConstanciaFactura> lCFFacturadas = lConstanciaFactura.stream()
+						.filter(c -> (c.getVigenciaInicio().equals(vigenciaIni) || c.getVigenciaFin().equals(vigenciaFin)))
+						.collect(Collectors.toList());
+				
+				log.debug("Constancias facturadas: {}", lCFFacturadas.size());
+				if(lCFFacturadas.size() > 0)
+					continue;
+				
 				list.add(cf);
 				
 				for(Partida p : constancia.getPartidaList()) {
@@ -172,9 +187,9 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					BigDecimal tarimas = p.getNoTarimas();//cantidad_total
 					BigDecimal salidaCantidad = new BigDecimal(0),salidaPeso = new BigDecimal(0);
 					
-					cajasTarima = cantidadT.divide(tarimas).setScale(2);
+					cajasTarima = cantidadT.divide(tarimas, 2, BigDecimal.ROUND_HALF_UP);
 					
-					System.out.println("caja x tarima "+cajasTarima);
+					log.debug("caja x tarima "+cajasTarima);
 					
 					for(DetalleConstanciaSalida dcs: p.getDetalleConstanciaSalidaList()) {
 						
@@ -193,25 +208,18 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 						salidaCantidad = salidaCantidad.add(cantidad);//suma total de cantidad salida
 						salidaPeso = salidaPeso.add(peso);//suma total de peso salida 
 						
-						System.out.println("Fecha "+constanciaSalida.getFecha());
-						
+						log.debug("Fecha: "+constanciaSalida.getFecha());
 					}
 					
 					cantidadT = cantidadT.subtract(salidaCantidad);
-//					if(cantidadT.compareTo(BigDecimal.ZERO) == 0)
-//						pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
-//					else
-						pesoTotal = pesoTotal.subtract(salidaPeso);
+					pesoTotal = pesoTotal.subtract(salidaPeso);
 					noTarimas = cantidadT.divide(cajasTarima,0,RoundingMode.UP);
 					
-					//seteo en partida
 					p.setCantidadTotal(cantidadT.intValue());
 					p.setPesoTotal(pesoTotal);
 					p.setNoTarimas(noTarimas);
 					
-					
-					System.out.println("La cantidad restante es: "+cantidadT + " El peso Total es: "+pesoTotal +" TarimaPre: "+noTarimas);
-					
+					log.debug("Folio: {}, Saldo: cantidad = {}, peso = {}, tarimas = {}", constancia.getFolioCliente(), cantidadT, pesoTotal, noTarimas);
 				}
 				
 				constancia.setConstanciaFacturaList(new ArrayList<>());
