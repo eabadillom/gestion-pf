@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,7 +19,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 
@@ -51,7 +51,7 @@ public class Usuario implements Serializable {
     @Column(name = "usuario")
     private String usuario;
     
-    @Size(min = 0, max = 15)
+    @Size(min = 0, max = 1024)
     @Column(name = "password")
     private String password;
     
@@ -84,7 +84,15 @@ public class Usuario implements Serializable {
     @Column(name = "st_ntf_srv_ext")
     private boolean stNtfSrvExt;
     
-    @Size(min = 1, max = 1)
+    public boolean isStNtfSrvExt() {
+		return stNtfSrvExt;
+	}
+
+	public void setStNtfSrvExt(boolean stNtfSrvExt) {
+		this.stNtfSrvExt = stNtfSrvExt;
+	}
+
+	@Size(min = 1, max = 1)
     @Column(name = "st_usuario")
     private String stUsuario;
     

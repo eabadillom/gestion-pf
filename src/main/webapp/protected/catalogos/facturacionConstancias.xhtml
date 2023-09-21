@@ -24,52 +24,54 @@
 				<div class="p-col-12">
 					<div class="card">
 						<p:fieldset legend="Datos del Receptor (Cliente)">
-							<p:outputPanel id="receptor">
-								<div style="text-align: center; margin-bottom: 10px">
-									<p:outputLabel value="Cliente:" styleClass="p-ml-2"></p:outputLabel>
-									<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4"
-										converter="entityConverter" autoWidth="false"
-										value="#{facturacionConstanciasBean.clienteSelect}"
-										required="true" requiredMessage="Seleccione un Cliente">
+							<div style="width: 100%;">
+								<p:outputPanel id="receptor">
+									<div style="text-align: center; margin-bottom: 10px">
+										<p:outputLabel value="Cliente:" styleClass="p-ml-2"></p:outputLabel>
+										<p:selectOneMenu id="cliente" styleClass="p-ml-2 p-mr-4"
+											converter="entityConverter" autoWidth="false"
+											value="#{facturacionConstanciasBean.clienteSelect}"
+											required="true" requiredMessage="Seleccione un Cliente">
+											<f:selectItem itemLabel="---Seleccione---"
+												noSelectionOption="true"></f:selectItem>
+											<f:selectItems
+												value="#{facturacionConstanciasBean.listaCliente}"
+												var="cliente" itemLabel="#{cliente.cteNombre}"
+												itemValue="#{cliente}" />
+											<p:ajax update="receptor factura messages"
+												listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>
+										</p:selectOneMenu>
+									</div>
+	
+									<p:outputLabel value="Numero:" styleClass="p-mr-2" />
+									<p:inputNumber
+										value="#{facturacionConstanciasBean.clienteSelect.numeroCte}"
+										decimalPlaces="0" />
+	
+									<p:outputLabel value="Razon Social:" styleClass="p-ml-4 p-mr-2" />
+									<p:inputText
+										value="#{facturacionConstanciasBean.clienteSelect.cteNombre}"
+										style="width: 22%;" />
+	
+									<p:outputLabel value="RFC:" styleClass="p-ml-4 p-mr-2" />
+									<p:inputText
+										value="#{facturacionConstanciasBean.clienteSelect.cteRfc}" />
+	
+									<p:outputLabel value="Domicilio:" styleClass="p-ml-4 p-mr-2" />
+									<p:selectOneMenu id="domicilio" autoWidth="flase"
+										converter="entityConverter"
+										value="#{facturacionConstanciasBean.domicilioSelect}">
 										<f:selectItem itemLabel="---Seleccione---"
-											noSelectionOption="true"></f:selectItem>
+											noSelectionOption="true" />
 										<f:selectItems
-											value="#{facturacionConstanciasBean.listaCliente}"
-											var="cliente" itemLabel="#{cliente.cteNombre}"
-											itemValue="#{cliente}" />
-										<p:ajax update="receptor factura messages"
-											listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}"></p:ajax>
-									</p:selectOneMenu>
-								</div>
-
-								<p:outputLabel value="Numero:" styleClass="p-mr-2" />
-								<p:inputNumber
-									value="#{facturacionConstanciasBean.clienteSelect.numeroCte}"
-									decimalPlaces="0" />
-
-								<p:outputLabel value="Razon Social:" styleClass="p-ml-4 p-mr-2" />
-								<p:inputText
-									value="#{facturacionConstanciasBean.clienteSelect.cteNombre}"
-									style="width: 22%;" />
-
-								<p:outputLabel value="RFC:" styleClass="p-ml-4 p-mr-2" />
-								<p:inputText
-									value="#{facturacionConstanciasBean.clienteSelect.cteRfc}" />
-
-								<p:outputLabel value="Domicilio:" styleClass="p-ml-4 p-mr-2" />
-								<p:selectOneMenu id="domicilio" autoWidth="flase"
-									converter="entityConverter"
-									value="#{facturacionConstanciasBean.domicilioSelect}">
-									<f:selectItem itemLabel="---Seleccione---"
-										noSelectionOption="true" />
-									<f:selectItems
-										value="#{facturacionConstanciasBean.listaClienteDomicilio}"
-										var="domicilio"
-										itemLabel="#{domicilio.domicilios.domicilioCalle}"
-										itemValue="#{domicilio.domicilios}" />
-  							</p:selectOneMenu>
-
-							</p:outputPanel>
+											value="#{facturacionConstanciasBean.listaClienteDomicilio}"
+											var="domicilio"
+											itemLabel="#{domicilio.domicilios.domicilioCalle}"
+											itemValue="#{domicilio.domicilios}" />
+	  							</p:selectOneMenu>
+	
+								</p:outputPanel>
+							</div>
 						</p:fieldset>
    
 						<p:fieldset legend="Datos del Emisor" styleClass="p-mt-2">
