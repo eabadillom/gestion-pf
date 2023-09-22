@@ -74,7 +74,7 @@ public class UsuariosBean implements Serializable {
 	};
 	
 	public void cargaUsuario() {
-		log.debug("Usuario: {}, Status: {}, StNtfSrvExt: {}", this.usuario, this.usuario.getStUsuario(), this.usuario.isStNtfSrvExt());
+		log.debug("Usuario: {}, Status: {}, StNtfSrvExt: {}", this.usuario.getUsuario(), this.usuario.getStUsuario(), this.usuario.isStNtfSrvExt());
 	}
 
 	public void guardar() {

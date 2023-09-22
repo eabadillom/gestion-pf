@@ -45,7 +45,8 @@
 								<p:commandButton icon="pi pi-pencil" update="form:pnlCliente"
 									process="@this" oncomplete="PF('dialogCliente').show();"
 									actionListener="#{usuariosBean.cargaUsuario}" styleClass="edit-button">
-									<f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.usuario}"></f:setPropertyActionListener>
+									<f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.usuario}"/>
+									<p:ajax listener="#{usuariosBean.cargaUsuario}" />
 								</p:commandButton>
 							</p:column>
 							<p:column style="text-align:center" width="3rem">
