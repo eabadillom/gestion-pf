@@ -9,7 +9,7 @@
 			<div class="sidebar-scroll-content">
 				<div class="logo">
 					<p:link outcome="/dashboard">
-						<p:graphicImage name="images/logo.jpeg" library="omega-layout"
+						<p:graphicImage name="images/logo.png" library="omega-layout"
 							width="113" />
 					</p:link>
 				</div>
@@ -19,16 +19,12 @@
 							<p:outputLabel value="#{sideBarBean.usuario.nombre}"/><h:outputText value="&#160;" />
 							<p:outputLabel value="#{sideBarBean.usuario.apellido1}"/><h:outputText value="&#160;" />
 							<p:outputLabel value="#{sideBarBean.usuario.apellido2}"/>
-						</span> <i class="pi pi-fw pi-cog" />
+						</span>
 					</a>
-					<ul>
-						<li><a href="${application.contextPath}/login.xhtml"> <i class="pi pi-fw pi-sign-out" /><span>Cerrar sesión</span>
-						</a></li>
-					</ul>
 				</div>
 				<div class="menu">
 					<po:menu widgetVar="OmegaMenuWidget">
-						<p:menuitem id="om_dashboard" value="Dashboard" icon="pi pi-fw pi-home" outcome="/dashboard" rendered="false"/>
+						<!-- <p:menuitem id="om_dashboard" value="Dashboard" icon="pi pi-fw pi-home" outcome="/dashboard" rendered="false"/>
 						<p:submenu id="om_components" label="UI Kit" icon="pi pi-fw pi-star" badge="2" rendered="false">
 							<p:menuitem id="om_formlayout" value="Form Layout" icon="pi pi-fw pi-id-card" outcome="/formlayout" />
 							<p:menuitem id="om_input" value="Input" icon="pi pi-fw pi-check-square" outcome="/input" />
@@ -94,55 +90,46 @@
 							</p:submenu>
 						</p:submenu>
 						
-				<p:menuitem id="om_buy" value="Buy Now" icon="pi pi-fw pi-shopping-cart" url="https://www.primefaces.org/store" rendered="false"/>
-				<p:menuitem id="om_doc" value="Documentation" icon="pi pi-fw pi-info-circle" outcome="/documentation" rendered="false" />
-				<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
-					<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
-						<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
-						<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/consultarConstanciaDeDeposito"/>
-						<p:menuitem id="frb_inventarios_sm133" value="Modificar"	icon="pi pi-fw pi-desktop" url="#" rendered="false"/>
-					</p:submenu>
+						<p:menuitem id="om_buy" value="Buy Now" icon="pi pi-fw pi-shopping-cart" url="https://www.primefaces.org/store" rendered="false"/>
+						<p:menuitem id="om_doc" value="Documentation" icon="pi pi-fw pi-info-circle" outcome="/documentation" rendered="false" /> -->
 						
-					<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
-						<p:menuitem id="frb_inventariossm31" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaTraspaso" />
-						<p:menuitem id="frb_inventariossm32" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/constanciaTraspasos" />
-					</p:submenu>
-					<p:submenu id="frb_inventarios_sm3" label="Salidas" icon="pi pi-fw pi-plus">
-						<p:menuitem id="frb_inventarios_sm110" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaConstanciaSalida" />
-						<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/consultaConstanciaSalida" />
-						<p:menuitem id="frb_inventarios_sm13" value="Ordenes de salida" icon="pi pi-fw pi-desktop" url="#" rendered="false"/>
-					</p:submenu>
-					<p:submenu id="frb_inventarios_sm2" label="Servicios" icon="fa fa-fw fa-edit">
-						<p:menuitem id="frb_inventarios_sm21" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaConstanciaServicios" />
-						<p:menuitem id="frb_inventarios_sm22" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/constanciaServicios" />
-					</p:submenu>
-							
-					<p:submenu label="Catálogos" icon="pi pi-fw pi-book">
-						<p:menuitem value="Productos" outcome="/protected/catalogos/articulos" icon="pi pi-fw pi-box" />
-						<p:menuitem value="Productos por Cliente" outcome="/protected/catalogos/prodCliente" icon="pi pi-fw pi-shopping-bag" />
-						<p:menuitem value="Cámaras" outcome="/protected/catalogos/camaras" icon="pi pi-fw pi-inbox" />
-						<p:menuitem value="Posiciones en cámara" outcome="/protected/catalogos/posicionesCamara" icon="pi pi-fw pi-th-large" />
-					</p:submenu>
-					<p:menuitem id="frb_kardex" value="Kardex" icon="pi pi-fw pi-shopping-bag" outcome="/protected/catalogos/kardex" />
-				</p:submenu>
+						<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
+							<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
+								<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/constanciaDeposito" />
+								<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/consultarConstanciaDeDeposito"/>
+								<p:menuitem id="frb_inventarios_sm133" value="Modificar"	icon="pi pi-fw pi-desktop" url="#" rendered="false"/>
+							</p:submenu>
+								
+							<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
+								<p:menuitem id="frb_inventariossm31" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaTraspaso" />
+								<p:menuitem id="frb_inventariossm32" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/constanciaTraspasos" />
+							</p:submenu>
+							<p:submenu id="frb_inventarios_sm3" label="Salidas" icon="pi pi-fw pi-plus">
+								<p:menuitem id="frb_inventarios_sm110" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaConstanciaSalida" />
+								<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/consultaConstanciaSalida" />
+								<p:menuitem id="frb_inventarios_sm13" value="Ordenes de salida" icon="pi pi-fw pi-desktop" url="#" rendered="false"/>
+							</p:submenu>
+							<p:submenu id="frb_inventarios_sm2" label="Servicios" icon="fa fa-fw fa-edit">
+								<p:menuitem id="frb_inventarios_sm21" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaConstanciaServicios" />
+								<p:menuitem id="frb_inventarios_sm22" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/constanciaServicios" />
+							</p:submenu>
+									
+							<p:submenu label="Catálogos" icon="pi pi-fw pi-book">
+								<p:menuitem value="Productos" outcome="/protected/catalogos/articulos" icon="pi pi-fw pi-box" />
+								<p:menuitem value="Productos por Cliente" outcome="/protected/catalogos/prodCliente" icon="pi pi-fw pi-shopping-bag" />
+								<p:menuitem value="Cámaras" outcome="/protected/catalogos/camaras" icon="pi pi-fw pi-inbox" />
+								<p:menuitem value="Posiciones en cámara" outcome="/protected/catalogos/posicionesCamara" icon="pi pi-fw pi-th-large" />
+							</p:submenu>
+							<p:menuitem id="frb_kardex" value="Kardex" icon="pi pi-fw pi-shopping-bag" outcome="/protected/catalogos/kardex" />
+						</p:submenu>
 						
-				<p:submenu id="frb_facturacion" label="Facturación" icon="pi pi-fw pi-wallet" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
-					<p:menuitem value="Facturacion Constancias" icon="pi pi-user-edit" outcome="/protected/catalogos/facturacionConstancias" />
-					<p:menuitem value="Facturacion Servicios" icon="pi pi-briefcase" outcome="/protected/catalogos/facturacionServicios" />
-					<p:submenu label="Notas de Credito" icon="pi pi-file-o">
-						<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />
-						<p:menuitem value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/consultaNotasCredito"></p:menuitem>
-					</p:submenu>
-					<p:submenu label="Facturación" icon="pi pi-file-o">
-						<p:menuitem value="Mantenimiento" icon="pi pi-user-edit" outcome="/protected/catalogos/facMantenimiento" />
-						<p:menuitem value="Modificar Plazos de Pago" icon="pi pi-pencil" outcome="/protected/catalogos/modPlazosPago" />
-					</p:submenu>
-					<p:submenu id="frb_facturacion_ingresos" label="Ingresos" icon="pi pi-fw pi-wallet">
-						<p:menuitem id="frb_facturacion_ingresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/ingAlta" />
-						<p:menuitem id="frb_facturacion_ingresos_actualizar" value="Actualizar" icon="pi pi-fw pi-pencil" outcome="/protected/catalogos/ingAct" />
-					</p:submenu>
+						<p:submenu id="frb_facturacion" label="Facturación" icon="pi pi-fw pi-wallet" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+							<p:menuitem value="Facturar Constancias" icon="pi pi-user-edit" outcome="/protected/catalogos/facturacionConstancias" />
+							<p:menuitem value="Facturar Servicios" icon="pi pi-briefcase" outcome="/protected/catalogos/facturacionServicios" />
+							<p:menuitem value="Consultar" icon="pi pi-user-edit" outcome="/protected/catalogos/facMantenimiento" />
+							<p:menuitem value="Modificar Plazos de Pago" icon="pi pi-pencil" outcome="/protected/catalogos/modPlazosPago" />
 							<p:submenu id="frb_facturacion_sm1" label="Catálogos" icon="pi pi-fw pi-th-large">
-                				<p:menuitem value="Plantas" outcome="/protected/catalogos/plantas" icon="pi pi-building" />
+		              				<p:menuitem value="Plantas" outcome="/protected/catalogos/plantas" icon="pi pi-building" />
 								<p:menuitem id="frb_facturacion_sm122" value="Emisores CFDI" icon="pi pi-building " outcome="/protected/catalogos/EmisoresCFDIS" />							
 								<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" icon="pi pi-fw pi-user" />
 								<p:menuitem id="frb_facturacion_sm113" value="Banco" icon="pi pi-fw pi-money-bill" outcome="/protected/catalogos/bancos" />
@@ -170,6 +157,14 @@
 								<p:menuitem id="frb_facturacion_sm244" value="Mantenimiento" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/mantenimiento" />
 								<p:menuitem value="Candado Salida" outcome="/protected/catalogos/candadoSalida" icon="pi pi-lock" />
 							</p:submenu>
+						</p:submenu>
+						<p:submenu id="frb_facturacion_ingresos" label="Ingresos" icon="pi pi-fw pi-wallet" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+							<p:menuitem id="frb_facturacion_ingresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/ingAlta" />
+							<p:menuitem id="frb_facturacion_ingresos_actualizar" value="Actualizar" icon="pi pi-fw pi-pencil" outcome="/protected/catalogos/ingAct" />
+						</p:submenu>
+						<p:submenu label="Notas de Credito" icon="pi pi-file-o" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />
+							<p:menuitem value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/consultaNotasCredito"></p:menuitem>
 						</p:submenu>
 						<p:submenu id="frb_comercial" label="Comercial"
 							icon="pi pi-fw pi-dollar" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
@@ -209,9 +204,9 @@
 								<p:menuitem value="Servicio por cliente" icon="pi pi-file" outcome="/protected/reportes/ServicioPorCliente" />						
 							</p:submenu>
 						</p:submenu>
-						<p:submenu label="Usuarios" icon="pi pi-fw pi-book" rendered="#{(sideBarBean.usuario.perfil == 3)}">
-							<p:menuitem value="Mantenimiento de usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit"  />
-						</p:submenu>	
+						<p:menuitem value="Usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
+						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
+						<p:menuitem value="Salir" outcome="/login" action="#{sideBarBean.logout()}" icon="pi pi-sign-out" />
 					</po:menu>
 				</div>
 			</div>

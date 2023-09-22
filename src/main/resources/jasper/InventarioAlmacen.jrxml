@@ -790,7 +790,7 @@ ORDER BY cliente,numero_cte, producto]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{folio}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{folio_cliente}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="113" y="0" width="72" height="11" uuid="3e0fee03-9021-483c-ad8b-eb7725ad94be"/>

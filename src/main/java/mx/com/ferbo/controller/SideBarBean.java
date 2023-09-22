@@ -7,6 +7,10 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.Usuario;
 
@@ -15,10 +19,12 @@ import mx.com.ferbo.model.Usuario;
 public class SideBarBean implements Serializable {
 
 	private static final long serialVersionUID = 8802717839932668484L;
+	private static Logger log = LogManager.getLogger(SideBarBean.class);
 	private Usuario usuario;
 	
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
+    private HttpSession session;
 	
 	public Usuario getUsuario() {
 		return usuario;
@@ -31,6 +37,20 @@ public class SideBarBean implements Serializable {
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        session = httpServletRequest.getSession(false);
         this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");    
+	}
+	
+	public void logout() {
+		try {
+    		this.usuario = (Usuario)session.getAttribute("usuario");
+    		log.info("El usuario intenta finalizar su sesión: " + this.usuario.getUsuario());
+    		session.setAttribute("usuario", null);
+    		session.setAttribute("idCliente", null);
+    		session.invalidate();
+    		faceContext.getExternalContext().redirect("login.xhtml");
+    	} catch(Exception ex) {
+    		log.error("Problema en el cierre de sesión del usuario...", ex);
+    	}
 	}
 }

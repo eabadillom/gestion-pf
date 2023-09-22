@@ -408,15 +408,15 @@
 								<p:outputLabel>Subtotal:</p:outputLabel>
 								<b><h:outputText id="subTotalGeneral"
 										value="#{calculoPrevioBean.subTotalGeneral}">
-										<f:convertNumber pattern=" $ ###,###,###.##" />
+										<f:convertNumber pattern=" $ ###,###,###.00" />
 									</h:outputText></b>
 							</div>
 
 							<div style="text-align: right">
-								<p:outputLabel>Iva:</p:outputLabel>
+								<p:outputLabel>IVA:</p:outputLabel>
 								<b><h:outputText id="iva"
 										value="#{calculoPrevioBean.ivaTotal}">
-										<f:convertNumber pattern=" $ ###,###,###.##" />
+										<f:convertNumber pattern=" $ ###,###,###.00" />
 									</h:outputText> </b>
 							</div>
 
@@ -430,7 +430,7 @@
 								<p:outputLabel>Total:</p:outputLabel>
 								<b><h:outputText id="total"
 										value="#{calculoPrevioBean.total}">
-										<f:convertNumber pattern=" $ ###,###,###.##" />
+										<f:convertNumber pattern=" $ ###,###,###.00" />
 									</h:outputText> </b>
 							</div>
 
