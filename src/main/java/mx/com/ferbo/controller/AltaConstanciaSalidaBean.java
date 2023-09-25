@@ -107,6 +107,10 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private DetallePartidaDAO detallePartidaDAO;
 	
 	private List<Inventario> listaInventario;
+	private List<Inventario> filteredInventario;
+	private List<String> listaEntradas;
+	private List<Date> listaIngresos;
+
 	private InventarioDAO inventarioDAO;
 	private Inventario inventarioSelected;
 	
@@ -244,6 +248,24 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			listadoTemp = new ArrayList<DetalleConstanciaSalida>();
 			listadoConstanciaSalidaServicios = new ArrayList<ConstanciaSalidaServicios>();
 			partidaList = new ArrayList<Partida>();
+			
+			
+			listaEntradas = new ArrayList<String>();
+			for(Inventario i : listaInventario) {
+				if(listaEntradas.contains(i.getFolioCliente()))
+					continue;
+				listaEntradas.add(i.getFolioCliente());
+			}
+			log.debug("Lista entradas: {}",listaEntradas);
+			
+			listaIngresos = new ArrayList<Date>();
+			for(Inventario i : listaInventario) {
+				if(listaIngresos.contains(i.getFechaIngreso()))
+					continue;
+				listaIngresos.add(i.getFechaIngreso());
+			}
+			log.debug("Lista fechas de ingreso: {}", listaIngresos);
+			
 		} catch(Exception ex) {
 			log.error("Problema para cargar la información del cliente...", ex);
 		}
@@ -744,30 +766,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	}
 	
 	public void nuevoRegistro() {
-		
-//		clienteSelect = new Cliente();
-//		plantaSelect = listadoPlantas.get(0);
-//		partidaSelect = new Partida();
-//		fechaSalida = new Date();
-//		numFolio = "";
-//		detallePartida = new DetallePartida();
-//		listadoDetalleConstanciaSalida = new ArrayList<DetalleConstanciaSalida>();
-//		detallePartidaLista = new ArrayList<DetallePartida>();
-//		
-//		listaInventario = new ArrayList<>();
-//		listadoTemp = new ArrayList<>();
-//		listadoPartida = new ArrayList<>();
-//		listadoConstanciaSalidaServicios = new ArrayList<>();
-//		
-//		servicioClienteSelect = new PrecioServicio();
-//		cantidadServicio = new BigDecimal(0);
-//		nombreTransportista = "";
-//		placas = "";
-//		observaciones = "";
-//		
-//		
-//		PrimeFaces.current().ajax().update("form:dt-inventario","form:dt-servicio");
-		
 		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 	    try {
 			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
@@ -1094,6 +1092,28 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		this.saved = saved;
 	}
 
-	
+	public List<Inventario> getFilteredInventario() {
+		return filteredInventario;
+	}
+
+	public void setFilteredInventario(List<Inventario> filteredInventario) {
+		this.filteredInventario = filteredInventario;
+	}
+
+	public List<String> getListaEntradas() {
+		return listaEntradas;
+	}
+
+	public void setListaEntradas(List<String> listaEntradas) {
+		this.listaEntradas = listaEntradas;
+	}
+
+	public List<Date> getListaIngresos() {
+		return listaIngresos;
+	}
+
+	public void setListaIngresos(List<Date> listaIngresos) {
+		this.listaIngresos = listaIngresos;
+	}
 	
 }
