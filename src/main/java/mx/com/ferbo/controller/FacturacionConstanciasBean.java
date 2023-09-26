@@ -615,8 +615,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		}catch (Exception e) {
 			log.error(e);
 		}
-		
-		
 	}
 	
 	public void facturacionServicios(){

@@ -148,8 +148,6 @@ public class ConsultaTraspasosBean implements Serializable {
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		
 		Date today = new Date();
-		long oneDay = 24 * 60 * 60 * 1000;
-
 		setMaxDate(new Date(today.getTime() ));
 		
 	}
@@ -162,12 +160,10 @@ public class ConsultaTraspasosBean implements Serializable {
 		System.out.print(idCliente + " " + fecha_ini + " "+ fecha_final+ " "  + numero);
 		 listaTraspasos = constanciatraspasoDAO.buscarporNumero(numero);
 		for(ConstanciaTraspaso constanciaT : listaTraspasos) {
-			List<TraspasoPartida> listaPartidas =constanciaT.getTraspasoPartidaList();
+			List<TraspasoPartida> listaPartidas = constanciaT.getTraspasoPartidaList();
 			List<TraspasoServicio> listaServicios = constanciaT.getTraspasoServicioList();
-			//System.out.println(listaPartidas);
-			//System.out.println(listaServicios);
-			//System.out.println(listaServicios);
 		}
+		
 		tr.commit();
 		em.close();
 		numero = "";
@@ -181,22 +177,20 @@ public class ConsultaTraspasosBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		EntityManager manager = null;
-		this.selCliente = clienteDAO.buscarPorId(idCliente);
-		listaTraspasos = constanciatraspasoDAO.buscarPorCriterios(numero,fecha_ini,fecha_final, idCliente);
-	try {
+		try {
+			log.debug("Filtrando información del cliente...");
+			this.selCliente = clienteDAO.buscarPorId(idCliente);
+			listaTraspasos = constanciatraspasoDAO.buscarPorCriterios(numero,fecha_ini,fecha_final, idCliente);
 			
-			log.info("Entrando a filtrar cliente...");
-			message = "Agregue los servicios requeridos.";
-			severity = FacesMessage.SEVERITY_INFO;
 		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
-		} finally {
-			if (manager != null)
-				manager.close();
+			
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:destino");
+		} finally {
+			EntityManagerUtil.close(manager);
 		}
 		
 		log.info("Servicios del cliente filtrados.");
