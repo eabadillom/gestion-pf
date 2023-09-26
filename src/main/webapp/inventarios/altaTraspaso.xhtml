@@ -42,67 +42,76 @@
 		    			<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaTraspasoBean.fecha}" disabled="#{(altaTraspasoBean.usuario.perfil == 1) or (altaTraspasoBean.usuario.perfil == 4)}" value="#{altaTraspasoBean.fecha}" />
 		    		</div>
 		    		<div class="p-card p-col-2 p-md-2">
-			    		<p:inputText id="txtFolio" value="#{altaTraspasoBean.numero}" placeholder="Folio" />
+			    		<p:inputText id="txtFolio" value="#{altaTraspasoBean.numero}" placeholder="Folio" readonly="true"/>
 		    		</div>
 		    	</div>
 		    </p:panel>
 		    <div style="padding-top: 1rem;">
-				<p:panel header="INVENTARIO">
-					<p:dataTable id="traspaso" var="inventario" value="#{altaTraspasoBean.inventario}" reflow="true" rowKey="#{inventario.folioCliente}"
-						paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" selectionMode="single">           
-			            <p:column style="width:1rem">
-			            	<p:rowToggler/>
-		            	</p:column>
-			            <p:column headerText="Folio" sortBy="#{inventario.constanciaDepo.folio}" width="4rem">
-			            	<h:outputText value="#{inventario.folioCliente}" />
-		            	</p:column>
-			            <p:column headerText="Producto" sortBy="#{inventario.producto.productoDs}" >
-			            	<h:outputText value="#{inventario.producto.productoDs}" />
-		            	</p:column>
-			            <p:column headerText="Cantidad" width="4rem">
-			            	<h:outputText value="#{inventario.cantidad}" />
-			            </p:column>
-			            <p:column headerText="Unidad" width="4rem">
-			            	<h:outputText value="#{inventario.unidadManejo.unidadDeManejoDs}" />
-			           	</p:column>
-			           	<p:column headerText="Peso (kg)" width="5rem">
-			            	<h:outputText value="#{inventario.peso}" />
-			           	</p:column>
-			            <p:column headerText="Planta" width="3rem">
-			            	<h:outputText value="#{inventario.planta.plantaAbrev}" />
-			           	</p:column>						   
-			            <p:column headerText="Camara" width="10rem">
-			            	<h:outputText value="#{inventario.camara.camaraDs}" />
-			           	</p:column>
-			            <p:rowExpansion>
-			            <div class="p-grid ui-fluid">
+			    <p:dataTable id="traspaso" widgetVar="dt-traspaso" var="inventario" value="#{altaTraspasoBean.inventario}" reflow="true" rowKey="#{inventario.folioCliente}"
+					paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" selectionMode="single">
+					<f:facet name="header">
+						<div class="products-table-header">
+							<span style="font-weight: bold">INVENTARIO</span>
+						</div>
+					</f:facet>
+		            <p:column style="width:1rem">
+		            	<p:rowToggler/>
+	            	</p:column>
+		            <p:column filterBy="#{inventario.folioCliente}" filterMatchMode="contains" width="5rem">
+		            	<f:facet name="filter">
+							<p:selectOneMenu onchange="PF('dt-traspaso').filter()">
+								<f:selectItem itemLabel="Folio" itemValue="#{null}" noSelectionOption="true"/>
+	                   			<f:selectItems value="#{altaTraspasoBean.listaEntradas}" />
+							</p:selectOneMenu>
+						</f:facet>
+		            	<h:outputText value="#{inventario.folioCliente}" />
+	            	</p:column>
+		            <p:column headerText="Producto" sortBy="#{inventario.producto.productoDs}" >
+		            	<h:outputText value="#{inventario.producto.productoDs}" />
+	            	</p:column>
+		            <p:column headerText="Cantidad" width="4rem">
+		            	<h:outputText value="#{inventario.cantidad}" />
+		            </p:column>
+		            <p:column headerText="Unidad" width="4rem">
+		            	<h:outputText value="#{inventario.unidadManejo.unidadDeManejoDs}" />
+		           	</p:column>
+		           	<p:column headerText="Peso (kg)" width="5rem">
+		            	<h:outputText value="#{inventario.peso}" />
+		           	</p:column>
+		            <p:column headerText="Planta" width="3rem">
+		            	<h:outputText value="#{inventario.planta.plantaAbrev}" />
+		           	</p:column>						   
+		            <p:column headerText="Camara" width="10rem">
+		            	<h:outputText value="#{inventario.camara.camaraDs}" />
+		           	</p:column>
+		            <p:rowExpansion>
+		            <div class="p-grid ui-fluid">
+						<div class="p-field p-col-2 p-md-2" align="center">
+							<p:outputLabel for="@next" styleClass="block" value="Código" />
+							<p:inputText value="#{inventario.codigo}" readonly="true" styleClass="block" />
+						</div>
+						<div class="p-field p-col-2 p-md-2" align="center">
+							<p:outputLabel for="@next" styleClass="block" value="Caducidad"/><p:inputText value="#{inventario.caducidad}" readonly="true" styleClass="block"/>
+						</div>
+						<div class="p-field p-col-2 p-md-2" align="center" >
+							<p:outputLabel for="@next" styleClass="block"  value="Lote"/><p:inputText value="#{inventario.lote}" readonly="true" styleClass="block"/>
+						</div>
 							<div class="p-field p-col-2 p-md-2" align="center">
-								<p:outputLabel for="@next" styleClass="block" value="Código" />
-								<p:inputText value="#{inventario.codigo}" readonly="true" styleClass="block" />
+							<p:outputLabel for="@next" value="SAP"/><p:inputText value="#{inventario.sap}" readonly="true" />
+						</div>
+						<div class="p-field p-col-2 p-md-2" align="center">
+							<p:outputLabel for="@next" value="Peso"/><p:inputText value="#{inventario.peso}" readonly="true" />
+						</div>
+						<div class="col-2"><p:divider layout="vertical"/></div>
+							<div class="field" align="center">
+								<H6>-</H6>
+								<p:commandButton icon="pi pi-sign-out" update=":form:pnlCliente" value="Traspasar" oncomplete="PF('dialogCliente').show();" style="width:100px;height:30px" align="left" styleClass="ui-button-raised" process="@this" >
+									<f:setPropertyActionListener value="#{inventario}" target="#{altaTraspasoBean.selectedInventario}" />
+								</p:commandButton>
 							</div>
-							<div class="p-field p-col-2 p-md-2" align="center">
-								<p:outputLabel for="@next" styleClass="block" value="Caducidad"/><p:inputText value="#{inventario.caducidad}" readonly="true" styleClass="block"/>
-							</div>
-							<div class="p-field p-col-2 p-md-2" align="center" >
-								<p:outputLabel for="@next" styleClass="block"  value="Lote"/><p:inputText value="#{inventario.lote}" readonly="true" styleClass="block"/>
-							</div>
-								<div class="p-field p-col-2 p-md-2" align="center">
-								<p:outputLabel for="@next" value="SAP"/><p:inputText value="#{inventario.sap}" readonly="true" />
-							</div>
-							<div class="p-field p-col-2 p-md-2" align="center">
-								<p:outputLabel for="@next" value="Peso"/><p:inputText value="#{inventario.peso}" readonly="true" />
-							</div>
-							<div class="col-2"><p:divider layout="vertical"/></div>
-								<div class="field" align="center">
-									<H6>-</H6>
-									<p:commandButton icon="pi pi-sign-out" update=":form:pnlCliente" value="Traspasar" oncomplete="PF('dialogCliente').show();" style="width:100px;height:30px" align="left" styleClass="ui-button-raised" process="@this" >
-										<f:setPropertyActionListener value="#{inventario}" target="#{altaTraspasoBean.selectedInventario}" />
-									</p:commandButton>
-								</div>
-							</div>    
-						</p:rowExpansion>
-					</p:dataTable>
-				</p:panel>
+						</div>    
+					</p:rowExpansion>
+				</p:dataTable>
 			</div>
 		 	<p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogCliente" responsive="true">
 				<p:outputPanel id="pnlCliente" class="ui-fluid" >
