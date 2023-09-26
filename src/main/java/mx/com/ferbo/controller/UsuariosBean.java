@@ -83,23 +83,20 @@ public class UsuariosBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		String titulo = "Actualizar contraseña";
+		String titulo = "Usuario";
 		
 		try {
 			securityBO = new SecurityUtil();
 			
 			if(usuario.getId() == null) {
-				sha512Password = securityBO.getSHA512("temporal");
+				//Por seguridad, se salan las contraseñas.
+				sha512Password = securityBO.getSHA512("temporal" + usuario.getUsuario());
 				usuario.setPassword(sha512Password);
 				usuario.setStUsuario("R");
-			} else {
-				usuario.setStUsuario(this.idstatus);
 			}
 			
 			log.debug("Usuario: {}", usuario);
 			usuario.setIdPlanta(this.idplanta);
-			usuario.setPerfil(this.perfil.getId());
-			
 			String user = usuarioDAO.actualizar(usuario);
 			
 			if(user != null)
@@ -110,7 +107,7 @@ public class UsuariosBean implements Serializable {
 			this.showPassword = false;
 			this.usuario = new Usuario();
 			
-			mensaje = "La contraseña se actualizó correctamente.";
+			mensaje = "El usuario se registró correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
 		} catch (InventarioException ex) {
@@ -150,7 +147,9 @@ public class UsuariosBean implements Serializable {
 		try {
 			securityBO = new SecurityUtil();
 			securityBO.checkPassword(this.newPassword);
-			sha512Password = securityBO.getSHA512(this.newPassword);
+			
+			//Por seguridad, se salan las contraseñas.
+			sha512Password = securityBO.getSHA512(this.newPassword + usuario.getUsuario());
 			this.usuario.setPassword(sha512Password);
 			
 			String user = this.usuarioDAO.actualizar(usuario);
@@ -163,7 +162,7 @@ public class UsuariosBean implements Serializable {
 			this.usuario = new Usuario();
 			mensaje = "La contraseña se actualizó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-			PrimeFaces.current().executeScript("PF('dialog-password').hide()");
+			PrimeFaces.current().executeScript("PF('dialogPassword').hide()");
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
