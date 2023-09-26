@@ -677,12 +677,12 @@ public class FacturaServiciosBean implements Serializable {
             adjunto = new Adjunto("Factura_" + factura.getNomSerie()+ "-" + factura.getNumero() + ".pdf", Adjunto.TP_ARCHIVO_PDF, content);
             alAdjuntos.add(adjunto);
             
-            /*sendMailBO = new SendMailFacturaBL(factura.getCliente().getCteCve());
+            sendMailBO = new SendMailFacturaBL(factura.getCliente().getCteCve());
             sendMailBO.setSerie(factura.getNomSerie());
             sendMailBO.setFolio(factura.getNumero());
             sendMailBO.setAlFiles(alAdjuntos);
             sendMailBO.setLoggedUser(usuario);
-            sendMailBO.send();*/
+            sendMailBO.send();
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se genero correctamente";
