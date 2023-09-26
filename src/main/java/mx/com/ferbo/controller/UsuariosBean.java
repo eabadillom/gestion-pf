@@ -89,7 +89,8 @@ public class UsuariosBean implements Serializable {
 			securityBO = new SecurityUtil();
 			
 			if(usuario.getId() == null) {
-				sha512Password = securityBO.getSHA512("temporal");
+				//Por seguridad, se salan las contraseñas.
+				sha512Password = securityBO.getSHA512("temporal" + usuario.getUsuario());
 				usuario.setPassword(sha512Password);
 				usuario.setStUsuario("R");
 			}
@@ -146,7 +147,9 @@ public class UsuariosBean implements Serializable {
 		try {
 			securityBO = new SecurityUtil();
 			securityBO.checkPassword(this.newPassword);
-			sha512Password = securityBO.getSHA512(this.newPassword);
+			
+			//Por seguridad, se salan las contraseñas.
+			sha512Password = securityBO.getSHA512(this.newPassword + usuario.getUsuario());
 			this.usuario.setPassword(sha512Password);
 			
 			String user = this.usuarioDAO.actualizar(usuario);
@@ -159,7 +162,7 @@ public class UsuariosBean implements Serializable {
 			this.usuario = new Usuario();
 			mensaje = "La contraseña se actualizó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-			PrimeFaces.current().executeScript("PF('dialog-password').hide()");
+			PrimeFaces.current().executeScript("PF('dialogPassword').hide()");
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;

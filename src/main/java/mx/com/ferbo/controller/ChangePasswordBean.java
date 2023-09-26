@@ -101,7 +101,8 @@ public class ChangePasswordBean implements Serializable {
 			if(this.currentPassword == null || "".equalsIgnoreCase(this.currentPassword.trim()))
 				throw new InventarioException("Debe indicar su contraseña actual.");
 			
-			currentPasswordSHA512 = security.getSHA512(this.currentPassword);
+			//Por seguridad, se salan las contraseñas.
+			currentPasswordSHA512 = security.getSHA512(this.currentPassword + usuario.getUsuario());
 			if(usuario.getPassword().equals(currentPasswordSHA512) == false)
 				throw new InventarioException("La contraseña actual indicada es incorrecta.");
 			
@@ -113,7 +114,8 @@ public class ChangePasswordBean implements Serializable {
 			
 			security.checkPassword(this.newPassword);
 			
-			newPasswordSHA512 = security.getSHA512(this.newPassword);
+			//Por seguridad, se salan las contraseñas.
+			newPasswordSHA512 = security.getSHA512(this.newPassword + usuario.getUsuario());
 			
 			usuario.setPassword(newPasswordSHA512);
 			usuario.setStUsuario("A");

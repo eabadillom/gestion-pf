@@ -106,7 +106,7 @@
 										<p:panel id="login">
 											<div class="field">
 												<span class="ui-float-label ui-input-icon-right">
-													<p:inputText widgetVar="login-new" id="login-new" value="#{usuariosBean.usuario.usuario}" required="true"/>
+													<p:inputText widgetVar="login-new" id="login-new" value="#{usuariosBean.usuario.usuario}" required="true" readonly="#{usuariosBean.usuario.id >= 0}"/>
 													<p:outputLabel for="login-new" value="Login" />
 													<i class="pi pi-id-card" />
 												</span>
