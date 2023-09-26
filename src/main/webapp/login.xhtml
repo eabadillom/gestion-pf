@@ -13,11 +13,23 @@
             <meta name="apple-mobile-web-app-capable" content="yes" />
         </f:facet>
         <title>Login</title>
+        <script>
+		    //<![CDATA[
+		        PF('statusDialog').show();
+		
+		        PF('statusDialog').hide();
+		    //]]>
+		</script>
     </h:head>
 
     <h:body styleClass="login-body">
     	<h:form id="login_form">
 	    	<p:growl id="growl" life="5000" />
+	    	<p:dialog modal="true" widgetVar="statusDialog" header="Verificando usuario..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
 	        <div id="login-wrapper">
 	            <p:graphicImage name="images/login.png" library="omega-layout" style="width:100%"/>
 	            
@@ -35,7 +47,7 @@
 	                    </div>
 	                    <div class="p-col-12">
 	                        <p:commandButton value="Iniciar sesión" icon="pi pi-user"
-							action="#{loginBean.login}" process="@this login_form"
+							action="#{loginBean.login}" process="@this login_form" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
 							update="login_form" />
 	                    </div>
 	                </div>
