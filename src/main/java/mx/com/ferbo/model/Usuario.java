@@ -19,6 +19,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 
@@ -100,6 +101,11 @@ public class Usuario implements Serializable {
     @Size(max = 10)
     @Column(name = "numEmpleado")
     private String numEmpleado;
+    
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "huella")
+    private boolean huella;
     
     @OneToMany(mappedBy = "idUsuario")
     private List<Planta> plantaList;
@@ -238,7 +244,15 @@ public class Usuario implements Serializable {
         this.logSeguridadList = logSeguridadList;
     }
 
-    @Override
+	public boolean getHuella() {
+		return huella;
+	}
+
+	public void setHuella(boolean huella) {
+		this.huella = huella;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
