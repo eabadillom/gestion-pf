@@ -84,8 +84,9 @@ public class UsuariosBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		String titulo = "Actualizar usuario";
-		
+
+		String titulo = "Usuario";
+
 		try {
 			securityBO = new SecurityUtil();
 			
@@ -93,15 +94,14 @@ public class UsuariosBean implements Serializable {
 				sha512Password = securityBO.getSHA512("temporal");
 				usuario.setPassword(sha512Password);
 				usuario.setStUsuario("R");
-			} else {
-				usuario.setStUsuario(this.getUsuario().getStUsuario());
+				mensaje = "El usuario se agrego correctamente";
+			}else {
+				mensaje = "El usuario se actualizo correctamente";
 			}
 			
 			log.debug("Usuario: {}", usuario);
 			usuario.setIdPlanta(this.idplanta);
-			//usuario.setPerfil(this.perfil.getId());
-			usuario.setNumEmpleado(this.numEmpleado);
-			usuario.setStUsuario(this.getUsuario().getStUsuario());
+			//usuario.setPerfil(this.perfil);
 			String user = usuarioDAO.actualizar(usuario);
 			
 			if(user != null)
@@ -111,7 +111,7 @@ public class UsuariosBean implements Serializable {
 			usuarios = usuarioDAO.findall();
 			this.showPassword = false;
 			this.usuario = new Usuario();
-			
+
 			mensaje = "El usuario se registro correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");

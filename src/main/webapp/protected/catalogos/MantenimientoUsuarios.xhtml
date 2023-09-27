@@ -147,7 +147,7 @@
 										<p:panel id="puser">
 											<div class="field">
 												<span class="ui-float-label ui-input-icon-right">
-													<p:selectOneMenu id="perfiluser" value="#{usuariosBean.usuario.perfil}" converter="entityConverter" >
+													<p:selectOneMenu id="perfiluser" value="#{usuariosBean.usuario.perfil}" converter="entityConverter">
 														<f:selectItems value="#{usuariosBean.lstPerfil}" var="perfiluser" itemLabel="#{perfiluser.nombre}" itemValue="#{perfiluser.id}" />
 													</p:selectOneMenu>
 													<p:outputLabel for="puser" value="Perfil" />
@@ -180,6 +180,14 @@
 												<p:selectBooleanCheckbox id="checkbox" itemLabel="No" value="#{usuariosBean.usuario.stNtfSrvExt}"/>
 											</p:column>
 										</p:row>
+										
+										<p:row>
+											<p:column styleClass="ui-grid-col-12">   
+												<p:outputLabel for="checkbox2" value=" ¿ REQUIERE DE HUELLA ?"/>
+												<p:selectBooleanCheckbox id="checkbox2" itemLabel="No" value="#{usuariosBean.usuario.huella}"/>
+											</p:column>
+										</p:row>
+										
 									</p:panelGrid>
 								</div>
 							</div>

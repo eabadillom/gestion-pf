@@ -120,9 +120,9 @@
 							url : "http://localhost:23106",
 							success : function(jsonObj) {
 								if (jsonObj.VerifyBiometricData == true) {
-									window.location.href = "http://192.168.1.70:8080/gestion/dashboard.xhtml";
+									window.location.href = "http://192.168.1.120:8080/gestion/dashboard.xhtml";
 								} else {
-									window.location.href = "http://192.168.1.70:8080/gestion/logout";
+									window.location.href = "http://192.168.1.120:8080/gestion/logout";
 								}
 							},
 							error : function(jsonObj) {

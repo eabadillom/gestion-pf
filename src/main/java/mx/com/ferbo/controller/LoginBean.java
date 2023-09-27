@@ -152,7 +152,7 @@ public class LoginBean implements Serializable  {
 			log.info("Su primer bio es: " + bean.getHuella());
 
 			log.info("json:\n" + bean);
-
+				
 			faceContext = FacesContext.getCurrentInstance();
 			httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 			httpServletRequest.getSession(true).setAttribute("usuario", usr);
@@ -165,8 +165,16 @@ public class LoginBean implements Serializable  {
 	        if( "R".equals(usuario.getStUsuario()) )
 	        	nextPage = "changePassword.xhtml";
 	        else {
-	        	nextPage = "ValidacionHuella.jsp";
+	        	
+	        	if(usuario.getHuella()==true) {
+	        		nextPage = "ValidacionHuella.jsp";
+	        	}else {
+	        		nextPage = "dashboard.xhtml";
+	        	}
+	        	
+	        	
 	        }
+	        
 			faceContext.getExternalContext().redirect(nextPage);
 
 		} catch (IOException ex) {
