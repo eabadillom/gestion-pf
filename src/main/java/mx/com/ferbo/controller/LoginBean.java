@@ -3,9 +3,8 @@ package mx.com.ferbo.controller;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -18,8 +17,8 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.log4j.Logger;
-import org.primefaces.model.ResponsiveOption;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,13 +27,15 @@ import com.google.gson.reflect.TypeToken;
 import mx.com.ferbo.dao.UsuarioDAO;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.response.DetBiometricoResponse;
+import mx.com.ferbo.util.SecurityUtil;
+
 
 @Named
 @ViewScoped
 public class LoginBean implements Serializable  {
 
 	private static final long serialVersionUID = 491768169161736335L;
-	private static final Logger log = Logger.getLogger(LoginBean.class);
+	private static final Logger log = LogManager.getLogger(LoginBean.class);
 	
 	private String username;
 	private String password;
@@ -43,8 +44,15 @@ public class LoginBean implements Serializable  {
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
 
+    private SecurityUtil securityUtil = null;
+	
 	public LoginBean() {
 		usuarioDAO = new UsuarioDAO();
+	}
+	
+	@PostConstruct
+	public void init() {
+		securityUtil = new SecurityUtil();
 
 	}
 	
@@ -63,6 +71,9 @@ public class LoginBean implements Serializable  {
 		        String resultContent;
 		        Gson prettyJson = null;
 		        Type type = null;
+
+		String shaPassword = null;
+		String nextPage = null;
 		
 		try {
 			if(this.username == null) {
@@ -93,7 +104,9 @@ public class LoginBean implements Serializable  {
 				return;
 			}
 			
-			if(usr.getPassword().equals(this.password) == false) {
+			shaPassword = securityUtil.getSHA512(this.password);
+			
+			if(usr.getPassword().equals(shaPassword) == false) {
 				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
 				log.warn("Inicio de sesión incorrecto (contraseña incorrecta).");
 				FacesContext.getCurrentInstance().addMessage("login_form:growl", message);
@@ -141,26 +154,32 @@ public class LoginBean implements Serializable  {
 			log.info("json:\n" + bean);
 
 			faceContext = FacesContext.getCurrentInstance();
-			       httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-			       httpServletRequest.getSession(true).setAttribute("usuario", usr);
-			       httpServletRequest.getSession(true).setAttribute("json", bean);
+			httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+			httpServletRequest.getSession(true).setAttribute("usuario", usr);
+			httpServletRequest.getSession(true).setAttribute("json", bean);
 			       
 			       this.setUsuario(usr);
 			       message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Acceso correcto", null);
 			       FacesContext.getCurrentInstance().addMessage(null, message);
-			faceContext.getExternalContext().redirect("ValidacionHuella.jsp");
-
+			
+	        if( "R".equals(usuario.getStUsuario()) )
+	        	nextPage = "changePassword.xhtml";
+	        else {
+	        	nextPage = "ValidacionHuella.jsp";
+	        }
+			faceContext.getExternalContext().redirect(nextPage);
 
 		} catch (IOException ex) {
-			ex.printStackTrace();
-			//log.error("Problema en la autenticación del usuario...", ex);
+			log.error("Problema en la autenticación del usuario...", ex);
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			//log.error("Problema en la autenticación del usuario...", ex);
+			log.error("Problema en la autenticación del usuario...", ex);
+		} finally {
+			this.username = null;
+			this.password = null;
 		}
 	}
 	
-	
+
 	public String getUsername() {
 		return username;
 	}
@@ -184,5 +203,4 @@ public class LoginBean implements Serializable  {
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
 	}
-
 }

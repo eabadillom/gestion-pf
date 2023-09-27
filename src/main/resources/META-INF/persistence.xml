@@ -3,10 +3,9 @@
 	xmlns="http://xmlns.jcp.org/xml/ns/persistence"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-	<persistence-unit name="gestionPU"
-		transaction-type="RESOURCE_LOCAL">
-		<!--<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider> -->
-		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+	<persistence-unit name="gestionPU" transaction-type="JTA">
+		<jta-data-source>java:comp/env/jdbc/gestion</jta-data-source>
+		<!-- <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider> -->
 		<class>mx.com.ferbo.model.Producto</class>
 		<class>mx.com.ferbo.model.TipoCobro</class>
 		<class>mx.com.ferbo.model.Servicio</class>
@@ -99,34 +98,24 @@
 		<class>mx.com.ferbo.model.Estados</class>
 		<class>mx.com.ferbo.model.ConstanciaFacturaCmp</class>
 		<class>mx.com.ferbo.model.ClienteDomicilios</class>
-		<!--  <class>mx.com.ferbo.model.ControlFacturaConstanciaDS</class>-->
 		<class>mx.com.ferbo.model.ClaveUnidad</class>
 		<class>mx.com.ferbo.model.PartidasAfectadas</class>
 		<class>mx.com.ferbo.model.EmisoresCFDIS</class>
 		<class>mx.com.ferbo.model.RegimenFiscal</class>
 		<class>mx.com.ferbo.model.UsoCfdi</class>
-		 <properties>
-			<property name="javax.persistence.jdbc.url"
-				value="jdbc:mysql://192.168.1.14:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
-			<property name="javax.persistence.jdbc.user" value="gestion" />
-			<property name="javax.persistence.jdbc.password"
-				value="db2629*J" />
-			<property name="javax.persistence.jdbc.driver"
-				value="com.mysql.cj.jdbc.Driver" />
+		<properties>
+			<!-- <property name="javax.persistence.jdbc.url"
+				value="jdbc:mysql://localhost:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" /> -->
+			<!-- <property name="javax.persistence.jdbc.user" value="gestion" /> -->
+			<!-- <property name="javax.persistence.jdbc.password" value="pruebas123" /> -->
+			<!-- <property name="javax.persistence.jdbc.driver"
+				value="com.mysql.cj.jdbc.Driver" /> -->
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.dialect"
 				value="org.hibernate.dialect.MySQLDialect" />
 			<!-- Estas dos lineas se comentan <property name="eclipselink.logging.level.sql" 
 				value="FINE" /> <property name="eclipselink.loggin.parameters" value="true" 
 				/> -->
-	</properties>
-		
-		<!--	 <properties> <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/gestiondb?useSSL=false&amp;useTimezone=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"/> 
-			<property name="javax.persistence.jdbc.user" value="JuanZassu"/> <property 
-			name="javax.persistence.jdbc.password" value="123456789"/> <property name="javax.persistence.jdbc.driver" 
-			value="com.mysql.cj.jdbc.Driver"/> <property name="hibernate.show_sql" value="true"/> 
-			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/> 
-			</properties> -->
-
+		</properties>
 	</persistence-unit>
 </persistence>

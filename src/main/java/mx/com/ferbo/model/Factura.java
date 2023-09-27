@@ -133,17 +133,17 @@ public class Factura implements Serializable {
     private String estado;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 30)
+    @Size(min = 0, max = 30)
     @Column(name = "municipio")
     private String municipio;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 30)
+    @Size(min = 0, max = 30)
     @Column(name = "ciudad")
     private String ciudad;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 30)
+    @Size(min = 0, max = 30)
     @Column(name = "colonia")
     private String colonia;
     @Basic(optional = false)

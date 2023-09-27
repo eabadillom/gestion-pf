@@ -28,6 +28,8 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import com.ferbo.facturama.business.CfdiBL;
@@ -87,6 +89,7 @@ import net.sf.jasperreports.engine.JRException;
 public class CalculoPrevioBean implements Serializable {
 
 	private static final long serialVersionUID = -1785488265380235016L;
+	private static Logger log = LogManager.getLogger(CalculoPrevioBean.class);
 
 	@Inject
 	private FacturacionConstanciasBean facturacionBean;
@@ -647,7 +650,7 @@ public class CalculoPrevioBean implements Serializable {
 
 	public BigDecimal getCantidadPartidas(List<Partida> listaPartidas, String tipoFacturacion) {
 
-		BigDecimal cantidad = new BigDecimal(0);
+		BigDecimal cantidad = new BigDecimal(0).setScale(3, BigDecimal.ROUND_HALF_UP);
 
 		for (Partida p : listaPartidas) {
 
@@ -656,7 +659,8 @@ public class CalculoPrevioBean implements Serializable {
 				// cantidad = p.getNoTarimas();
 			} else {
 				cantidad = cantidad.add(p.getPesoTotal());
-				// cantidad = p.getPesoTotal();
+				log.info("Peso total: {}" + p.getPesoTotal());
+				log.info("Cantidad: " + cantidad);
 			}
 
 		}
@@ -706,9 +710,10 @@ public class CalculoPrevioBean implements Serializable {
 				case 4:
 
 					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
-					importe = cantidad.multiply(precioServicio.getPrecio());
-					sc.setCosto(importe.setScale(2));
-					System.out.println("El tipo de cobro es 3 o 4 y su importe es: " + importe);
+					importe = cantidad.multiply(precioServicio.getPrecio()).setScale(2, BigDecimal.ROUND_HALF_UP);
+					log.debug("El tipo de cobro es 3 o 4 y su importe es: " + importe);
+					sc.setCosto(importe);
+					
 
 					if (aviso.getAvisoTpFacturacion().equals("T")) {
 						sc.setUnidadMedida("TRM");
