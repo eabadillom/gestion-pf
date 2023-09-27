@@ -48,6 +48,7 @@ public class UsuariosBean implements Serializable {
 	private String mail;
 	private String descripcion;
 	private String login;
+	private String numEmpleado;
 	private boolean showPassword = false;
 	private String newPassword = null;
 	
@@ -83,7 +84,7 @@ public class UsuariosBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		String titulo = "Actualizar contraseña";
+		String titulo = "Actualizar usuario";
 		
 		try {
 			securityBO = new SecurityUtil();
@@ -93,13 +94,14 @@ public class UsuariosBean implements Serializable {
 				usuario.setPassword(sha512Password);
 				usuario.setStUsuario("R");
 			} else {
-				usuario.setStUsuario(this.idstatus);
+				usuario.setStUsuario(this.getUsuario().getStUsuario());
 			}
 			
 			log.debug("Usuario: {}", usuario);
 			usuario.setIdPlanta(this.idplanta);
-			usuario.setPerfil(this.perfil.getId());
-			
+			//usuario.setPerfil(this.perfil.getId());
+			usuario.setNumEmpleado(this.numEmpleado);
+			usuario.setStUsuario(this.getUsuario().getStUsuario());
 			String user = usuarioDAO.actualizar(usuario);
 			
 			if(user != null)
@@ -110,7 +112,7 @@ public class UsuariosBean implements Serializable {
 			this.showPassword = false;
 			this.usuario = new Usuario();
 			
-			mensaje = "La contraseña se actualizó correctamente.";
+			mensaje = "El usuario se registro correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
 		} catch (InventarioException ex) {
@@ -317,6 +319,14 @@ public class UsuariosBean implements Serializable {
 
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
+	}
+
+	public String getNumEmpleado() {
+		return numEmpleado;
+	}
+
+	public void setNumEmpleado(String numEmpleado) {
+		this.numEmpleado = numEmpleado;
 	}
 
 }
