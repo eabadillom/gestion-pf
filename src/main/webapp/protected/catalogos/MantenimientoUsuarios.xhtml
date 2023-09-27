@@ -147,10 +147,10 @@
 										<p:panel id="puser">
 											<div class="field">
 												<span class="ui-float-label ui-input-icon-right">
-													<p:selectOneMenu id="perfiluser" value="#{usuariosBean.perfil}" converter="entityConverter">
-														<f:selectItems value="#{usuariosBean.lstPerfil}" var="perfiluser" itemLabel="#{perfiluser.nombre}" itemValue="#{perfiluser}" />
+													<p:selectOneMenu id="perfiluser" value="#{usuariosBean.usuario.perfil}" converter="entityConverter" >
+														<f:selectItems value="#{usuariosBean.lstPerfil}" var="perfiluser" itemLabel="#{perfiluser.nombre}" itemValue="#{perfiluser.id}" />
 													</p:selectOneMenu>
-													<p:outputLabel for="perfiluser" value="Perfil" />
+													<p:outputLabel for="puser" value="Perfil" />
 												</span>
 											</div>
 										</p:panel>
@@ -167,7 +167,7 @@
 										<p:panel id="NoEmpleado">
 											<div class="field">
 												<span class="ui-float-label ui-input-icon-right">
-													<p:inputText widgetVar="noEmpleado-new" id="noEmpleado-new" value="#{usuariosBean.numEmpleado}" required="true"/>
+													<p:inputText widgetVar="noEmpleado-new" id="noEmpleado-new" value="#{usuariosBean.usuario.numEmpleado}" required="true"/>
 													<p:outputLabel for="noEmpleado-new" value="Numero de empleado" />
 													<i class="pi pi-hashtag" />
 												</span>

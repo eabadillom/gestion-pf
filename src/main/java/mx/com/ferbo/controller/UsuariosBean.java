@@ -84,7 +84,7 @@ public class UsuariosBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		String titulo = "Actualizar contraseña";
+		String titulo = "Actualizar usuario";
 		
 		try {
 			securityBO = new SecurityUtil();
@@ -94,13 +94,14 @@ public class UsuariosBean implements Serializable {
 				usuario.setPassword(sha512Password);
 				usuario.setStUsuario("R");
 			} else {
-				usuario.setStUsuario(this.idstatus);
+				usuario.setStUsuario(this.getUsuario().getStUsuario());
 			}
 			
 			log.debug("Usuario: {}", usuario);
 			usuario.setIdPlanta(this.idplanta);
-			usuario.setPerfil(this.perfil.getId());
+			//usuario.setPerfil(this.perfil.getId());
 			usuario.setNumEmpleado(this.numEmpleado);
+			usuario.setStUsuario(this.getUsuario().getStUsuario());
 			String user = usuarioDAO.actualizar(usuario);
 			
 			if(user != null)
