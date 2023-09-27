@@ -37,7 +37,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Usuario.findByMail", query = "SELECT u FROM Usuario u WHERE u.mail = :mail"),
     @NamedQuery(name = "Usuario.findByIdPlanta", query = "SELECT u FROM Usuario u WHERE u.idPlanta = :idPlanta"),
     @NamedQuery(name = "Usuario.findByStNtfSrvExt", query = "SELECT u FROM Usuario u WHERE u.stNtfSrvExt = :stNtfSrvExt"),
-    @NamedQuery(name = "Usuario.findByStUsuario", query = "SELECT u FROM Usuario u WHERE u.stUsuario = :stUsuario")})
+    @NamedQuery(name = "Usuario.findByStUsuario", query = "SELECT u FROM Usuario u WHERE u.stUsuario = :stUsuario"),
+@NamedQuery(name = "Usuario.findBynumEmpleado", query = "SELECT u FROM Usuario u WHERE u.numEmpleado = :numEmpleado")})
 public class Usuario implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -88,6 +89,10 @@ public class Usuario implements Serializable {
     @Column(name = "st_usuario")
     private String stUsuario;
     
+    @Size(max = 10)
+    @Column(name = "numEmpleado")
+    private String numEmpleado;
+    
     @OneToMany(mappedBy = "idUsuario")
     private List<Planta> plantaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
@@ -104,12 +109,13 @@ public class Usuario implements Serializable {
         this.id = idUsuario;
     }
 
-    public Usuario(Integer idUsuario, String usuario, String password, int perfil, String stUsuario) {
+    public Usuario(Integer idUsuario, String usuario, String password, int perfil, String stUsuario, String numEmpleado) {
         this.id = idUsuario;
         this.usuario = usuario;
         this.password = password;
         this.perfil = perfil;        
         this.stUsuario = stUsuario;
+        this.numEmpleado = numEmpleado;
     }	
 
     public Integer getidUsuario() {
@@ -196,7 +202,15 @@ public class Usuario implements Serializable {
         return stUsuario;
     }
 
-    public void setStUsuario(String stUsuario) {
+    public String getNumEmpleado() {
+		return numEmpleado;
+	}
+
+	public void setNumEmpleado(String numEmpleado) {
+		this.numEmpleado = numEmpleado;
+	}
+
+	public void setStUsuario(String stUsuario) {
         this.stUsuario = stUsuario;
     }
 
