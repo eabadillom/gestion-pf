@@ -101,6 +101,9 @@ public class Usuario implements Serializable {
     @Column(name = "numEmpleado")
     private String numEmpleado;
     
+    @Column(name = "huella")
+    private boolean huella;
+    
     @OneToMany(mappedBy = "idUsuario")
     private List<Planta> plantaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
@@ -109,7 +112,15 @@ public class Usuario implements Serializable {
     public Usuario() {
     }
 
-    public Integer getId() {
+    public boolean isHuella() {
+		return huella;
+	}
+
+	public void setHuella(boolean huella) {
+		this.huella = huella;
+	}
+
+	public Integer getId() {
 		return id;
 	}
 
