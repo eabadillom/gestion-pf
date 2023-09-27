@@ -17,13 +17,13 @@
 
     <h:body styleClass="login-body">
     	<h:form id="login_form">
-	    	<p:growl id="growl" life="5000" />
+	    	<p:growl id="growl" life="5000" />                    
 	        <div id="login-wrapper">
 	            <p:graphicImage name="images/login.png" library="omega-layout" style="width:100%"/>
 	            
 	            <div id="login-container">
 	                <span class="title">Iniciar sesión</span>
-	
+
 	                <div class="p-grid ui-fluid">
 	                    <div class="p-col-12">
 	                        <p:inputText placeholder="Usuario" id="usuario" required="true" requiredMessage="Usuario requerido." value="#{loginBean.username}"/>
@@ -32,15 +32,13 @@
 	                    <div class="p-col-12">
 	                        <p:password placeholder="Contraseña" id="contraseña" required="true" feedback="false" value="#{loginBean.password}" requiredMessage="Contraseña requerida." />
 	                        <p:message for="contraseña" />
-	                    </div>
-	                    <div class="p-col-12">
-	                        <p:commandButton value="Iniciar sesión" icon="pi pi-user"
-							action="#{loginBean.login}" process="@this login_form"
-							update="login_form" />
-	                    </div>
+	                    
+						</div>
+	           			<p:commandButton value="Iniciar sesion" icon="pi pi-user" action="#{loginBean.login}" process="@this login_form" update="login_form" />
 	                </div>
+	 
 	            </div>
-	        </div>
+        </div>
     	</h:form>
 
         <h:outputStylesheet name="css/primeicons.css" library="omega-layout"/>
