@@ -232,7 +232,7 @@ public class FacMantenimentoBean implements Serializable {
 		try {
 			log.info("Timbrando factura: {}...", factura);
 			facturamaBO.timbrar();
-			//facturamaBO.sendMail();
+			facturamaBO.sendMail();
 			log.info("Timbrado completado correctamente.");
 			
 			severity = FacesMessage.SEVERITY_INFO;

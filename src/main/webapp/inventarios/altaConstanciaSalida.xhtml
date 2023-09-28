@@ -48,7 +48,7 @@
 					</div>
 					
 					<div class="p-card p-col-2 p-md-2">
-						<p:inputText id="folio" placeholder="Ingresa Folio" value="#{altaConstanciaSalidaBean.numFolio}">
+						<p:inputText id="folio" placeholder="Ingresa Folio" value="#{altaConstanciaSalidaBean.numFolio}" readonly="true">
 						</p:inputText>
 					</div>
 				 	<div class="p-card p-col-3 p-md-3">
@@ -59,19 +59,36 @@
 			<div style="padding-top: 1rem;">
 				<p:dataTable id="dt-inventario" widgetVar="dt-inventario" value="#{altaConstanciaSalidaBean.listaInventario}"
 							var="inventario" reflow="true" rows="10"
+							emptyMessage="No se encontró información con el criterio solicitado" filteredValue="#{altaConstanciaSalidaBean.filteredInventario}"
 							rowKey="#{inventario.constanciaDeDeposito.folio}" paginator="true" paginatorPosition="bottom">
 					<f:facet name="header">
 						<div class="products-table-header">
 							<span style="font-weight: bold">INVENTARIO</span>
+							<!-- <span>
+								<p:inputText id="globalFilter" onkeyup="PF('dt-inventario').filter()" style="width:150px" placeholder="Buscar por folio, fecha, pedimento, contenedor, etc..."/>
+							</span> -->
 						</div>
 					</f:facet>
 					<p:column width="1rem">
 						<p:rowToggler/>
 					</p:column>
-					<p:column headerText="Folio" width="3rem">
+					<p:column filterBy="#{inventario.folioCliente}" width="5rem" filterMatchMode="contains">
+						<f:facet name="filter">
+							<p:selectOneMenu onchange="PF('dt-inventario').filter()">
+								<f:selectItem itemLabel="Folio" itemValue="#{null}" noSelectionOption="true"/>
+                    			<f:selectItems value="#{altaConstanciaSalidaBean.listaEntradas}" />
+							</p:selectOneMenu>
+						</f:facet>
 						<h:outputText value="#{inventario.folioCliente}" />
 					</p:column>
-					<p:column headerText="Ingreso" width="4rem">
+					<p:column filterBy="#{inventario.fechaIngreso}" width="5rem" filterMatchMode="exact">
+						<f:facet name="filter">
+							<p:selectOneMenu onchange="PF('dt-inventario').filter()">
+								<f:selectItem itemLabel="Ingreso" itemValue="#{null}" noSelectionOption="true" />
+								<f:selectItems value="#{altaConstanciaSalidaBean.listaIngresos}">
+								</f:selectItems>
+							</p:selectOneMenu>
+						</f:facet>
 						<h:outputText value="#{inventario.fechaIngreso}">
 							<f:convertDateTime pattern="dd/MM/yyyy" />
 						</h:outputText>
