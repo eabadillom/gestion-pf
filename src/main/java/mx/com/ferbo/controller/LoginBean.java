@@ -96,6 +96,7 @@ public class LoginBean implements Serializable {
 				return;
 			}
 			
+			
 			//Por seguridad, se salan las contraseñas.
 			shaPassword = securityUtil.getSHA512(this.password + usr.getUsuario());
 			
