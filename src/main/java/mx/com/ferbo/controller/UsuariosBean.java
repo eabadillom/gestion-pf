@@ -112,7 +112,6 @@ public class UsuariosBean implements Serializable {
 			this.showPassword = false;
 			this.usuario = new Usuario();
 
-			mensaje = "El usuario se registro correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
 		} catch (InventarioException ex) {
