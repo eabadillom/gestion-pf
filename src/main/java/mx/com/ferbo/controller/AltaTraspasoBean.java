@@ -37,7 +37,6 @@ import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PosicionCamaraDAO;
 import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
-import mx.com.ferbo.dao.partidasAfectadasDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
@@ -87,6 +86,7 @@ public class AltaTraspasoBean implements Serializable {
 	private List<Partida> partida;
 	private List<DetallePartida> ldpartida;
 	private List<InventarioDetalle> inventario;
+	private List<String> listaEntradas;
 	private List<InventarioDetalle> destino;
 	private List<Planta> listaplanta;
 	private List<Camara> listacamara;
@@ -123,7 +123,7 @@ public class AltaTraspasoBean implements Serializable {
 	private CamaraDAO camaraDAO;
 	private PosicionCamaraDAO posicionDAO;
 	private ConstanciaTraspasoDAO constanciaTDAO;
-	private partidasAfectadasDAO partidasAfectadasDAO;
+//	private partidasAfectadasDAO partidasAfectadasDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
 	private Planta plantaSelect;
 	private List<Planta> listadoPlantas;
@@ -147,7 +147,7 @@ public class AltaTraspasoBean implements Serializable {
 		camaraDAO = new CamaraDAO();
 		constanciaTDAO = new ConstanciaTraspasoDAO();
 		posicionDAO = new PosicionCamaraDAO();
-		partidasAfectadasDAO = new partidasAfectadasDAO();
+//		partidasAfectadasDAO = new partidasAfectadasDAO();
 		serieConstanciaDAO = new SerieConstanciaDAO();
 		
 		partida = new ArrayList<Partida>();
@@ -203,6 +203,8 @@ public class AltaTraspasoBean implements Serializable {
 		List<PrecioServicio> precioServicioList = null;
 		
 		try {
+			log.debug("Entrando a filtrar cliente...");
+			
 			this.selCliente = clienteDAO.buscarPorId(idCliente, false);
 			inventarioList = inventarioDAO.buscar(selCliente, plantaSelect);
 			this.inventario.clear();
@@ -216,7 +218,13 @@ public class AltaTraspasoBean implements Serializable {
 				inventario.add(invdet);
 			}
 			
-			log.debug("Entrando a filtrar cliente...");
+			listaEntradas = new ArrayList<String>();
+			for(InventarioDetalle i : inventario) {
+				if(listaEntradas.contains(i.getFolioCliente()))
+					continue;
+				listaEntradas.add(i.getFolioCliente());
+			}
+			log.debug("Lista entradas: {}", listaEntradas);
 			
 			cliente = clienteDAO.buscarProductosServicios(this.idCliente);
 			alProductosFiltered = cliente.getProductoPorClienteList();
@@ -877,6 +885,14 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void setListadoPlantas(List<Planta> listadoPlantas) {
 		this.listadoPlantas = listadoPlantas;
+	}
+
+	public List<String> getListaEntradas() {
+		return listaEntradas;
+	}
+
+	public void setListaEntradas(List<String> listaEntradas) {
+		this.listaEntradas = listaEntradas;
 	}
 
 }

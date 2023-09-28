@@ -106,7 +106,7 @@
 										<p:panel id="login">
 											<div class="field">
 												<span class="ui-float-label ui-input-icon-right">
-													<p:inputText widgetVar="login-new" id="login-new" value="#{usuariosBean.usuario.usuario}" required="true"/>
+													<p:inputText widgetVar="login-new" id="login-new" value="#{usuariosBean.usuario.usuario}" required="true" readonly="#{usuariosBean.usuario.id >= 0}"/>
 													<p:outputLabel for="login-new" value="Login" />
 													<i class="pi pi-id-card" />
 												</span>
@@ -135,10 +135,10 @@
 											<div class="field">
 												<span class="ui-float-label ui-input-icon-right">
 													<p:selectOneMenu id="statusUsuario" value="#{usuariosBean.usuario.stUsuario}">
-														<f:selectItem itemLabel="Activo" itemValue="A" />
-														<f:selectItem itemLabel="Baja" itemValue="B" />
-														<f:selectItem itemLabel="Bloqueado" itemValue="L" />
-														<f:selectItem itemLabel="Reiniciar contraseña" itemValue="R" />
+														<f:selectItem itemValue="A" itemLabel="Activo"/>
+														<f:selectItem itemValue="B" itemLabel="Baja"/>
+														<f:selectItem itemValue="L" itemLabel="Bloqueado"/>
+														<f:selectItem itemValue="R" itemLabel="Reiniciar contraseña"/>
 													</p:selectOneMenu>
 													<p:outputLabel for="status" value="Status" />                       
 												</span>

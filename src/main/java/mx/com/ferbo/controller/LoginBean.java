@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -17,8 +18,8 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -80,12 +81,14 @@ public class LoginBean implements Serializable  {
 				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
 				log.warn("Inicio de sesión incorrecto (usuario incorrecto).");
 				FacesContext.getCurrentInstance().addMessage(null, message);
+				this.espera();
 				return;
 			}
 			if(this.password == null) {
 				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
 				log.warn("Inicio de sesión incorrecto (contraseña incorrecta).");
 				FacesContext.getCurrentInstance().addMessage(null, message);
+				this.espera();
 				return;
 			}
 				
@@ -94,22 +97,43 @@ public class LoginBean implements Serializable  {
 				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
 				log.warn("Inicio de sesión incorrecto (usuario/contraseña no encontrado).");
 				FacesContext.getCurrentInstance().addMessage(null, message);
+				this.espera();
 				return;
 			}
 			
 			if(usr.getUsuario().equals(this.username) == false) {
 				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
-				log.warn("Inicio de sesión incorrecto (usuario incorrecto).");
+				log.warn("Inicio de sesión incorrecto (usuario con status BAJA {}).", usr.getUsuario());
 				FacesContext.getCurrentInstance().addMessage(null, message);
+				this.espera();
 				return;
 			}
 			
-			shaPassword = securityUtil.getSHA512(this.password);
+			if("B".equalsIgnoreCase(usr.getStUsuario())) {
+				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
+				log.warn("Inicio de sesión incorrecto (usuario bloqueado).");
+				FacesContext.getCurrentInstance().addMessage(null, message);
+				this.espera();
+				return;
+			}
+			
+			if("L".equalsIgnoreCase(usr.getStUsuario())) {
+				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
+				log.warn("Inicio de sesión incorrecto (usuario con status BLOQUEADO: {}).", usr.getUsuario());
+				FacesContext.getCurrentInstance().addMessage(null, message);
+				this.espera();
+				return;
+			}
+			
+			
+			//Por seguridad, se salan las contraseñas.
+			shaPassword = securityUtil.getSHA512(this.password + usr.getUsuario());
 			
 			if(usr.getPassword().equals(shaPassword) == false) {
 				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
 				log.warn("Inicio de sesión incorrecto (contraseña incorrecta).");
 				FacesContext.getCurrentInstance().addMessage("login_form:growl", message);
+				this.espera();
 				return;
 			}
 	
@@ -187,7 +211,10 @@ public class LoginBean implements Serializable  {
 		}
 	}
 	
-
+	public void espera() throws InterruptedException {
+		TimeUnit.SECONDS.sleep(3);
+	}
+	
 	public String getUsername() {
 		return username;
 	}
