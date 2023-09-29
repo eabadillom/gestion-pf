@@ -1,7 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="mx.com.ferbo.model.Usuario"%>
+<%@ page import="java.util.Properties"%>
+<%@ page import="java.io.InputStream"%>
 <% Usuario usr = (Usuario) session.getAttribute("usuario"); %>
+
+<% 
+
+Properties prop = new Properties();
+InputStream in = getClass().getResourceAsStream("/config/gestion.properties");
+prop.load(in);
+
+String ipSgp = prop.getProperty("sgp.url");
+String ipGestion = prop.getProperty("gestion.url");
+%>
 
 <!DOCTYPE html>
 <html>
@@ -79,7 +91,7 @@
 				$.ajax({
 					type : "GET",
 					dataType : "json",
-					url : "http://192.168.1.120:8090/detEmpleado/empleadoBio?numEmp="+num,
+					url : "<%=ipSgp%>"+"/detEmpleado/empleadoBio?numEmp="+num,
 					success : function(jsonObj) {
 						var respuesta = jsonObj;
 						console.log("Solicitando peticion al microservicio biometrico...");
@@ -120,9 +132,9 @@
 							url : "http://localhost:23106",
 							success : function(jsonObj) {
 								if (jsonObj.VerifyBiometricData == true) {
-									window.location.href = "http://192.168.1.120:8080/gestion/dashboard.xhtml";
+									window.location.href = "<%=ipGestion%>"+"/gestion/dashboard.xhtml";
 								} else {
-									window.location.href = "http://192.168.1.120:8080/gestion/logout";
+									window.location.href = "<%=ipGestion%>"+"/gestion/logout";
 								}
 							},
 							error : function(jsonObj) {

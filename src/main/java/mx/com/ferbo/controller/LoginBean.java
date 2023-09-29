@@ -1,9 +1,11 @@
 package mx.com.ferbo.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -140,8 +142,14 @@ public class LoginBean implements Serializable  {
 			//---- PETICION GET ----- para mi Microservicio Biometrico
 			String numeroEmpleado = usr.getNumEmpleado();
 
+			Properties prop = new Properties();
+			InputStream in = getClass().getResourceAsStream("/config/gestion.properties");
+			prop.load(in);
+			log.info(prop.get("sgp.url"));
+			String ip = prop.getProperty("sgp.url");
+			
 			//le mandamos la url de nuestro microservicio
-			url = "http://192.168.1.120:8090/detEmpleado/empleadoBio?numEmp="+numeroEmpleado;
+			url = ip+"/detEmpleado/empleadoBio?numEmp="+numeroEmpleado;
 			url = String.format(url);
 			log.info("Realizando la peticion GET al microServicio: "+url);
 
