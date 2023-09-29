@@ -84,6 +84,7 @@ public class UsuariosBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
+
 		String titulo = "Usuario";
 		
 		try {
