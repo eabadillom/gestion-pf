@@ -5,14 +5,15 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
-	Logger log = Logger.getLogger(ServicioDAO.class);
+	Logger log = LogManager.getLogger(ServicioDAO.class);
 	
 	@Override
 	public Servicio buscarPorId(Integer id) {

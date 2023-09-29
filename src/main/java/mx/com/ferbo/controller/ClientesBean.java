@@ -13,7 +13,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.CandadoSalidaDAO;
@@ -52,7 +53,7 @@ import mx.com.ferbo.util.SecurityUtil;
 public class ClientesBean implements Serializable {
 
 	private static final long serialVersionUID = 8438449261015571241L;
-	private static Logger log = Logger.getLogger(ClientesBean.class);
+	private static Logger log = LogManager.getLogger(ClientesBean.class);
 
 	private List<Cliente> lstClientes;
 	private List<Cliente> lstClientesSelected;

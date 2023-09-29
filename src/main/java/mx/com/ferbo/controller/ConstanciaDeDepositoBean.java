@@ -23,7 +23,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AvisoDAO;
@@ -74,7 +75,7 @@ import mx.com.ferbo.util.conexion;
 public class ConstanciaDeDepositoBean implements Serializable {
 
 	private static final long serialVersionUID = -1785488265380235016L;
-	private static Logger log = Logger.getLogger(ConstanciaDeDepositoBean.class);
+	private static Logger log = LogManager.getLogger(ConstanciaDeDepositoBean.class);
 
 	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;

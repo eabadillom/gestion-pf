@@ -7,7 +7,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
@@ -15,7 +16,7 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class CamaraDAO extends IBaseDAO<Camara, Integer> {
-	private static Logger log = Logger.getLogger(CamaraDAO.class);
+	private static Logger log = LogManager.getLogger(CamaraDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<Camara> findall() {

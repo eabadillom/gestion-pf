@@ -8,7 +8,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Aviso;
@@ -18,7 +19,7 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
-	private static Logger log = Logger.getLogger(PrecioServicioDAO.class);
+	private static Logger log = LogManager.getLogger(PrecioServicioDAO.class);
 
 	@Override
 	public PrecioServicio buscarPorId(Integer id) {

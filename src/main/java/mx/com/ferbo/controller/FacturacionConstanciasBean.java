@@ -12,15 +12,13 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
@@ -55,7 +53,6 @@ import mx.com.ferbo.model.SerieFactura;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.EntityManagerUtil;
 
 
 @Named
@@ -64,7 +61,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
 	
-	private static Logger log = Logger.getLogger(FacturacionConstanciasBean.class);
+	private static Logger log = LogManager.getLogger(FacturacionConstanciasBean.class);
 	
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;

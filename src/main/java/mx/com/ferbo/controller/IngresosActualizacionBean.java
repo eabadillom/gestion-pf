@@ -12,7 +12,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.BancoDAO;
@@ -30,7 +31,7 @@ import mx.com.ferbo.model.TipoPago;
 public class IngresosActualizacionBean implements Serializable{
 
 	private static final long serialVersionUID = -626048119540963939L;
-	private static Logger log = Logger.getLogger(IngresosActualizacionBean.class);
+	private static Logger log = LogManager.getLogger(IngresosActualizacionBean.class);
 	
 	private Date startDate;
 	private Date endDate;	

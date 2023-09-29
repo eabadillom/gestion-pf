@@ -25,7 +25,8 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
@@ -62,7 +63,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 	private static final long serialVersionUID = -3109002730694247052L;
 
-	private static Logger log = Logger.getLogger(AltaConstanciaServicioBean.class);
+	private static Logger log = LogManager.getLogger(AltaConstanciaServicioBean.class);
 
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;

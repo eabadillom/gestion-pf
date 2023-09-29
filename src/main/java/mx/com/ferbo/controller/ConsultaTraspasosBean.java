@@ -23,7 +23,8 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
 
 
@@ -59,7 +60,7 @@ import net.sf.jasperreports.engine.JRException;
 public class ConsultaTraspasosBean implements Serializable {
 
 	private static final long serialVersionUID = -3109002730694247052L;
-	private static Logger log = Logger.getLogger(AltaConstanciaServicioBean.class);
+	private static Logger log = LogManager.getLogger(AltaConstanciaServicioBean.class);
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;
 	private List<TraspasoServicio> alServiciosDetalle;

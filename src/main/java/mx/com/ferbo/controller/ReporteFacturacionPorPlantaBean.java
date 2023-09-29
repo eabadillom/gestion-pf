@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -19,9 +18,9 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.CamaraDAO;
@@ -30,7 +29,6 @@ import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Planta;
-import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -41,7 +39,7 @@ import net.sf.jasperreports.engine.JRException;
 public class ReporteFacturacionPorPlantaBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(ReporteFacturacionPorPlantaBean.class);
+	private static Logger log = LogManager.getLogger(ReporteFacturacionPorPlantaBean.class);
 
 	private Date fecha;
 	private Date maxDate;

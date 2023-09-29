@@ -12,11 +12,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class DataSourceManager {
 
-	protected static Logger log = Logger.getLogger(DataSourceManager.class);
+	protected static Logger log = LogManager.getLogger(DataSourceManager.class);
 	protected static DataSource ds = null;
 	protected static DataSourceManager dsm = null;
 	protected String jniName = null;

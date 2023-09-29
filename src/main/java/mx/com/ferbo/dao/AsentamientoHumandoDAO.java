@@ -6,18 +6,16 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.EntidadPostal;
-import mx.com.ferbo.model.TipoAsentamiento;
-import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer> {
-	Logger log = Logger.getLogger(AsentamientoHumandoDAO.class);
+	Logger log = LogManager.getLogger(AsentamientoHumandoDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<AsentamientoHumano> findall() {

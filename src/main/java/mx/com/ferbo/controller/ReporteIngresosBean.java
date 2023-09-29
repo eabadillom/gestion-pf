@@ -18,7 +18,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.BancoDAO;
@@ -34,7 +35,7 @@ import mx.com.ferbo.util.conexion;
 public class ReporteIngresosBean implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(ReporteAlmacenFechaBean.class);
+	private static Logger log = LogManager.getLogger(ReporteAlmacenFechaBean.class);
 	
 	private List<Cliente> listCliente;
 	private List<Bancos> listBanco;

@@ -7,8 +7,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
@@ -16,7 +16,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 	
-	private static Logger log = Logger.getLogger(EmisoresCFDISDAO.class);
+	private static Logger log = LogManager.getLogger(EmisoresCFDISDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<EmisoresCFDIS> findall() {
