@@ -18,7 +18,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
@@ -36,7 +37,7 @@ public class ReporteNotaCreditoBean implements Serializable{
 	
 	
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(ReporteNotaCreditoBean.class);
+	private static Logger log = LogManager.getLogger(ReporteNotaCreditoBean.class);
 	
 	private Cliente clienteSelect;
 	private ClienteDAO clienteDAO;

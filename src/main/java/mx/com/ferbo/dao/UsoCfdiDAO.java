@@ -5,7 +5,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UsoCfdi;
@@ -13,7 +14,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class UsoCfdiDAO extends IBaseDAO<UsoCfdi, String> {
 	
-	Logger log = Logger.getLogger(UsoCfdiDAO.class);
+	Logger log = LogManager.getLogger(UsoCfdiDAO.class);
 
 	@Override
 	public UsoCfdi buscarPorId(String id) {

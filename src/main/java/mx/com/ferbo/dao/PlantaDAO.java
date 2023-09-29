@@ -7,7 +7,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
@@ -16,7 +17,7 @@ import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PlantaDAO extends IBaseDAO<Planta, Integer>{
-	private static Logger log = Logger.getLogger(PlantaDAO.class);
+	private static Logger log = LogManager.getLogger(PlantaDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Planta> findall() {

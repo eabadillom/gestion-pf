@@ -5,15 +5,15 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.SerieNota;
 import mx.com.ferbo.model.StatusSerie;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class SerieNotaDAO {
-	private static Logger log = Logger.getLogger(PosicionCamaraDAO.class);
+	private static Logger log = LogManager.getLogger(PosicionCamaraDAO.class);
 
 	public List<SerieNota> findAll() {		
 		EntityManager entity = null;

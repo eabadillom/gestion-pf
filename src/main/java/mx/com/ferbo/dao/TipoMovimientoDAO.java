@@ -5,7 +5,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.TipoMovimiento;
@@ -13,7 +14,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoMovimientoDAO extends IBaseDAO<TipoMovimiento, Integer> {
 	
-	private static Logger log = Logger.getLogger(TipoMovimientoDAO.class);
+	private static Logger log = LogManager.getLogger(TipoMovimientoDAO.class);
 
 	@Override
 	public TipoMovimiento buscarPorId(Integer id) {

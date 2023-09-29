@@ -1,22 +1,19 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.model.TipoAsentamiento;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoAsentamientoDAO extends IBaseDAO<TipoAsentamiento, Integer> {
-	Logger log = Logger.getLogger(TipoAsentamientoDAO.class);
+	Logger log = LogManager.getLogger(TipoAsentamientoDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<TipoAsentamiento> findall() {

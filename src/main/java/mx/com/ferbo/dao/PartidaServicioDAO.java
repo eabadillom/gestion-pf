@@ -1,23 +1,20 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.PartidaServicio;
-import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PartidaServicioDAO extends IBaseDAO<PartidaServicio, Integer>{
 	EntityManager em = null;
-	private static Logger log = Logger.getLogger(PartidaServicioDAO.class);
+	private static Logger log = LogManager.getLogger(PartidaServicioDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<PartidaServicio> findall() {

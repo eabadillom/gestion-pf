@@ -6,7 +6,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaFactura;
@@ -14,7 +15,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaFacturaDAO extends IBaseDAO<ConstanciaFactura, Integer> {
 	
-	private static Logger log = Logger.getLogger(ConstanciaFacturaDAO.class);
+	private static Logger log = LogManager.getLogger(ConstanciaFacturaDAO.class);
 
 	@Override
 	public ConstanciaFactura buscarPorId(Integer id) {

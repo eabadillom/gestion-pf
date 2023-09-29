@@ -11,24 +11,17 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
-
-import com.google.protobuf.Message;
 
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
-import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.EstadosDAO;
-import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.MunicipiosDAO;
 import mx.com.ferbo.dao.PaisesDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.TipoAsentamientoDAO;
-import mx.com.ferbo.facturacion.facturama.BranchOffice;
-import mx.com.ferbo.facturacion.facturama.FacturamaBL;
-import mx.com.ferbo.facturacion.facturama.TaxAddress;
-import mx.com.ferbo.facturacion.facturama.response.BranchOfficeViewModel;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Ciudades;
@@ -36,7 +29,6 @@ import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.EstadosPK;
-import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Municipios;
 import mx.com.ferbo.model.MunicipiosPK;
 import mx.com.ferbo.model.Paises;
@@ -47,7 +39,7 @@ import mx.com.ferbo.model.Usuario;
 @Named
 @ViewScoped
 public class PlantaBean implements Serializable {
-	private static Logger log = Logger.getLogger(PlantaBean.class);
+	private static Logger log = LogManager.getLogger(PlantaBean.class);
 	private static final long serialVersionUID = 1L;
 	private PlantaDAO daoPlanta;
 	private PaisesDAO daoPaises;

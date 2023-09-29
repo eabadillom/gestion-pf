@@ -21,7 +21,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.CamaraDAO;
@@ -41,7 +42,7 @@ import net.sf.jasperreports.engine.JRException;
 public class ReporteInventarioBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(ReporteInventarioBean.class);
+	private static Logger log = LogManager.getLogger(ReporteInventarioBean.class);
 
 	private Date fecha;
 

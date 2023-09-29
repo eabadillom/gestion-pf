@@ -8,8 +8,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**Esta clase maneja la carga de archivos con extensión .properties. Sus métodos se
  * pueden heredar para que otras clases también tengan la capacidad de invocación
@@ -23,7 +23,7 @@ public abstract class LoadProperties{
 	
 	private static final String LOG_NAME = "com.bancomer.scrittura.Default";
 	
-	private static Logger log = Logger.getLogger(LoadProperties.class);
+	private static Logger log = LogManager.getLogger(LoadProperties.class);
 	
 	/**Carga el archivo de propiedades filename
 	 * @param filename Nombre del archivo de configuracion
@@ -81,25 +81,4 @@ public abstract class LoadProperties{
 
 		return map;
 	}
-	  
-	  /**Devuelve el Logger configurado
-	   * @return {@link Logger}
-	   */
-	  public static Logger logger() {
-	    if (log == null) {
-	      Properties prop = new Properties();
-	      prop.put("log4j.rootLogger", "debug, console");
-	      prop.put("log4j.appender.console", "org.apache.log4j.ConsoleAppender");
-	      prop.put("log4j.appender.console.layout", "org.apache.log4j.SimpleLayout");
-
-	      log = inicializaLogger(prop, LOG_NAME);
-	    }
-
-	    return log;
-	  }
-	  
-	  private static Logger inicializaLogger(Properties config, String name) {
-		    PropertyConfigurator.configure(config);
-		    return Logger.getLogger(name);
-		  }
 }

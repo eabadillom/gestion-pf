@@ -4,15 +4,15 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoPagoDAO extends IBaseDAO<TipoPago, Integer> {
-	private static Logger log = Logger.getLogger(TipoPagoDAO.class);
+	private static Logger log = LogManager.getLogger(TipoPagoDAO.class);
 	@Override
 	public TipoPago buscarPorId(Integer id) {
 		TipoPago tp = null;
