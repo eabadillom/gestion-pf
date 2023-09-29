@@ -42,13 +42,18 @@ public class SideBarBean implements Serializable {
 	}
 	
 	public void logout() {
+		String contextPath = null;
+		String fullPath = null;
 		try {
+			contextPath = faceContext.getExternalContext().getApplicationContextPath();
+			fullPath = contextPath + "/login.xhtml";
     		this.usuario = (Usuario)session.getAttribute("usuario");
     		log.info("El usuario intenta finalizar su sesión: " + this.usuario.getUsuario());
     		session.setAttribute("usuario", null);
     		session.setAttribute("idCliente", null);
+    		log.info("Redirigiendo al usuario a {}", fullPath);
+    		faceContext.getExternalContext().redirect(fullPath);
     		session.invalidate();
-    		faceContext.getExternalContext().redirect("login.xhtml");
     	} catch(Exception ex) {
     		log.error("Problema en el cierre de sesión del usuario...", ex);
     	}

@@ -4,9 +4,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import groovy.xml.Entity;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ProductoPorCliente;
@@ -14,7 +14,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 	private EntityManager manager = null;
-	private static Logger log = Logger.getLogger(ProductoClienteDAO.class);
+	private static Logger log = LogManager.getLogger(ProductoClienteDAO.class);
 
 	@Override
 	public ProductoPorCliente buscarPorId(Integer id) {
@@ -57,9 +57,15 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 	public List<ProductoPorCliente> buscarPorCliente(Integer cteCve, boolean isFullInfo) {
 		List<ProductoPorCliente> listado = null;
 		EntityManager em = null;
+		String namedQuery = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			listado = em.createNamedQuery("ProductoPorCliente.findByCteCve",ProductoPorCliente.class)
+			if(isFullInfo)
+				namedQuery = "ProductoPorCliente.findByCteCveOrderByProductoDs";
+			else
+				namedQuery = "ProductoPorCliente.findByCteCve";
+			
+			listado = em.createNamedQuery(namedQuery,ProductoPorCliente.class)
 					.setParameter("cteCve", cteCve)
 					.getResultList();
 			
@@ -68,6 +74,7 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 			
 			for(ProductoPorCliente p : listado) {
 				p.getProductoCve().getProductoCve();
+				log.debug("Producto por cliente list size: {}", p.getProductoCve().getProductoPorClienteList().size());
 			}
 			
 		} catch(Exception ex) {

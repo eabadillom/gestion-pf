@@ -45,8 +45,7 @@
 							</p:submenu>
 									
 							<p:submenu label="Catálogos" icon="pi pi-fw pi-book">
-								<p:menuitem value="Productos" outcome="/protected/catalogos/articulos" icon="pi pi-fw pi-box" />
-								<p:menuitem value="Productos por Cliente" outcome="/protected/catalogos/prodCliente" icon="pi pi-fw pi-shopping-bag" />
+								<p:menuitem value="Productos" outcome="/protected/catalogos/prodCliente" icon="pi pi-fw pi-shopping-bag" />
 								<p:menuitem value="Cámaras" outcome="/protected/catalogos/camaras" icon="pi pi-fw pi-inbox" />
 								<p:menuitem value="Posiciones en cámara" outcome="/protected/catalogos/posicionesCamara" icon="pi pi-fw pi-th-large" />
 							</p:submenu>
@@ -135,7 +134,7 @@
 						</p:submenu>
 						<p:menuitem value="Usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
-						<p:menuitem value="Salir" icon="pi pi-sign-out" action="#{sideBarBean.logout()}"/>
+						<p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
 					</po:menu>
 				</div>
 			</div>
