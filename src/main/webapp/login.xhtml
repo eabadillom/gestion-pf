@@ -35,7 +35,7 @@
 	            
 	            <div id="login-container">
 	                <span class="title">Iniciar sesión</span>
-	
+
 	                <div class="p-grid ui-fluid">
 	                    <div class="p-col-12">
 	                        <p:inputText placeholder="Usuario" id="usuario" required="true" requiredMessage="Usuario requerido." value="#{loginBean.username}"/>
@@ -46,13 +46,11 @@
 	                        <p:message for="contraseña" />
 	                    </div>
 	                    <div class="p-col-12">
-	                        <p:commandButton value="Iniciar sesión" icon="pi pi-user"
-							action="#{loginBean.login}" process="@this login_form" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"
-							update="login_form" />
+	                        <p:commandButton value="Iniciar sesión" icon="pi pi-user" action="#{loginBean.login}" process="@this login_form" update="login_form" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
 	                    </div>
 	                </div>
 	            </div>
-	        </div>
+        </div>
     	</h:form>
 
         <h:outputStylesheet name="css/primeicons.css" library="omega-layout"/>

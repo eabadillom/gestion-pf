@@ -147,10 +147,10 @@
 										<p:panel id="puser">
 											<div class="field">
 												<span class="ui-float-label ui-input-icon-right">
-													<p:selectOneMenu id="perfiluser" value="#{usuariosBean.usuario.perfil}">
+													<p:selectOneMenu id="perfiluser" value="#{usuariosBean.usuario.perfil}" converter="entityConverter">
 														<f:selectItems value="#{usuariosBean.lstPerfil}" var="perfiluser" itemLabel="#{perfiluser.nombre}" itemValue="#{perfiluser.id}" />
 													</p:selectOneMenu>
-													<p:outputLabel for="perfiluser" value="Perfil" />
+													<p:outputLabel for="puser" value="Perfil" />
 												</span>
 											</div>
 										</p:panel>
@@ -163,12 +163,31 @@
 												</span>
 											</div>
 										</p:panel>
+										
+										<p:panel id="NoEmpleado">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:inputText widgetVar="noEmpleado-new" id="noEmpleado-new" value="#{usuariosBean.usuario.numEmpleado}" required="true"/>
+													<p:outputLabel for="noEmpleado-new" value="Numero de empleado" />
+													<i class="pi pi-hashtag" />
+												</span>
+											</div>
+										</p:panel>
+										
 										<p:row>
 											<p:column styleClass="ui-grid-col-12">   
 												<p:outputLabel for="checkbox" value=" ¿RECIBIR NOTIFICACIONES DE ALMACEN? "/>
 												<p:selectBooleanCheckbox id="checkbox" itemLabel="No" value="#{usuariosBean.usuario.stNtfSrvExt}"/>
 											</p:column>
 										</p:row>
+										
+										<p:row>
+											<p:column styleClass="ui-grid-col-12">   
+												<p:outputLabel for="checkbox2" value=" ¿ REQUIERE DE HUELLA ?"/>
+												<p:selectBooleanCheckbox id="checkbox2" itemLabel="No" value="#{usuariosBean.usuario.huella}"/>
+											</p:column>
+										</p:row>
+										
 									</p:panelGrid>
 								</div>
 							</div>
