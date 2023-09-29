@@ -8,6 +8,7 @@
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":" + request.getServerPort() + path;
+response.setHeader("Access-Control-Allow-Origin", "http://localhost");
 
 Properties prop = new Properties();
 InputStream in = getClass().getResourceAsStream("/config/gestion.properties");
@@ -131,6 +132,7 @@ String ipSgp = prop.getProperty("sgp.url");
 							dataType : 'json',
 							data : jsonString,
 							url : "http://localhost:23106",
+							timeout: 60000,
 							success : function(jsonObj) {
 								if (jsonObj.VerifyBiometricData == true) {
 									window.location.href = "<%=basePath%>"+"/dashboard.xhtml";
