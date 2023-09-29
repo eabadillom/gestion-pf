@@ -115,14 +115,6 @@ public class Usuario implements Serializable {
     public Usuario() {
     }
 
-    public boolean isHuella() {
-		return huella;
-	}
-
-	public void setHuella(boolean huella) {
-		this.huella = huella;
-	}
-
 	public Integer getId() {
 		return id;
 	}
