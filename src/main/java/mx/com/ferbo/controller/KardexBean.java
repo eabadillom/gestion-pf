@@ -1,10 +1,15 @@
 
 package mx.com.ferbo.controller;
 
+import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -16,6 +21,7 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
@@ -40,17 +46,16 @@ import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
+import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.KardexTotalsBean;
+import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
 public class KardexBean implements Serializable {
 	private static Logger log = LogManager.getLogger(KardexBean.class);
-
-	/**
-	 * @author Juan_Cervantes
-	 */
 	private static final long serialVersionUID = -4400856556349650679L;
 
 	/**
@@ -85,7 +90,6 @@ public class KardexBean implements Serializable {
 	/**
 	 * Objetos para Constancia de deposito
 	 */
-	private ConstanciaDeDeposito constanciaDepositoSelected;
 	private ConstanciaDeDepositoDAO constanciaDeDepositoDAO;
 	private List<ConstanciaDeDeposito> listConstanciaDepositoFiltered;
 
@@ -147,6 +151,9 @@ public class KardexBean implements Serializable {
 	private boolean pintaTraspaso;
 	
 	private ConstanciaDeDeposito entrada;
+	
+	private StreamedContent scKardexPDF = null;
+	private StreamedContent scKardexExcel = null;
 
 	/**
 	 * Constructores
@@ -195,6 +202,8 @@ public class KardexBean implements Serializable {
 				throw new InventarioException("El folio indicado no existe.");
 			
 			this.imprimeConstancia(entrada);
+//			this.exportToPDF();
+//			this.exportToExcel();
 			
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
@@ -211,7 +220,7 @@ public class KardexBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
 			PrimeFaces.current().ajax().update(":form:messages", "form:dt-entradasKardex", "form:dt-salidasKardex",
-					"form:dt-traspasos", "form:button-traspasos");
+					"form:dt-traspasos", "form:button-traspasos", "form:cmd-pdf", "form:cmd-xlsx");
 		}
 		
 		
@@ -242,18 +251,94 @@ public class KardexBean implements Serializable {
 		}
 		
 	}
-
-	public void buscaTraspaso(Partida p) {
-		List<TraspasoPartida> trspPartida = new ArrayList<>();
-		traspasoPartidaSelected = new TraspasoPartida();
-		traspasoPartidaSelected.setPartida(p);
-		trspPartida = traspasoPartidaDAO.buscarPorCriterios(traspasoPartidaSelected);
-		if (!trspPartida.isEmpty()) {
-			constanciaTraspasoSelected = constanciaTraspasoDAO.buscarPorId(trspPartida.get(0).getId());
-
-			for (TraspasoPartida trsAux : trspPartida) {
-				listTraspasoPartida.add(trsAux);
-			}
+	
+	public void exportToPDF() {
+		String jasperPath = null;
+		String filename = null;
+		String images = null;
+		String message = null;
+		Severity severity = null;
+		File reportFile = null;
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		
+		try {
+			jasperPath = "/jasper/kardex.jrxml";
+			images = "/images/logoF.png";
+			
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			
+			reportFile = new File(file);
+			imgfile = new File(img);
+			log.info(reportFile.getPath());
+			filename = String.format("kardex_%s.pdf", this.entrada.getFolioCliente());
+			
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("folio", this.entrada.getFolioCliente() );
+			parameters.put("imagen", imgfile.getPath());
+			log.info("Parametros: " + parameters.toString());
+			scKardexPDF = jasperReportUtil.getPdf(filename, parameters, reportFile.getPath());
+			log.info("Kardex exportado.");
+		} catch (Exception ex) {
+			log.error("Problema general...", ex);
+			message = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-inventarioEntradas");
+		} finally {
+			conexion.close((Connection) connection);
+		}
+	}
+	
+	public void exportToExcel() {
+		String jasperPath = null;
+		String filename = null;
+		String images = null;
+		String message = null;
+		Severity severity = null;
+		File reportFile = null;
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		
+		try {
+			jasperPath = "/jasper/kardex.jrxml";
+			images = "/images/logoF.png";
+			
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			
+			reportFile = new File(file);
+			imgfile = new File(img);
+			log.info(reportFile.getPath());
+			filename = String.format("kardex_%s.xlsx", this.entrada.getFolioCliente());
+			
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("folio", this.entrada.getFolioCliente() );
+			parameters.put("imagen", imgfile.getPath());
+			log.info("Parametros: " + parameters.toString());
+			scKardexExcel = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
+			log.info("Kardex exportado.");
+		} catch (Exception ex) {
+			log.error("Problema general...", ex);
+			message = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+		} finally {
+			conexion.close((Connection) connection);
+			PrimeFaces.current().ajax().update("form:messages", "form:cmd-xlsx");
 		}
 	}
 
@@ -355,14 +440,6 @@ public class KardexBean implements Serializable {
 
 	public void setCamaraDAO(CamaraDAO camaraDAO) {
 		this.camaraDAO = camaraDAO;
-	}
-
-	public ConstanciaDeDeposito getConstanciaDepositoSelected() {
-		return constanciaDepositoSelected;
-	}
-
-	public void setConstanciaDepositoSelected(ConstanciaDeDeposito constanciaDepositoSelected) {
-		this.constanciaDepositoSelected = constanciaDepositoSelected;
 	}
 
 	public ConstanciaDeDepositoDAO getConstanciaDeDepositoDAO() {
@@ -588,5 +665,25 @@ public class KardexBean implements Serializable {
 	public void setEntrada(ConstanciaDeDeposito entrada) {
 		this.entrada = entrada;
 	}
+
+	public StreamedContent getScKardexPDF() {
+		return scKardexPDF;
+	}
+
+	public void setScKardexPDF(StreamedContent scKardexPDF) {
+		this.scKardexPDF = scKardexPDF;
+	}
+
+	public StreamedContent getScKardexExcel() {
+		return scKardexExcel;
+	}
+
+	public void setScKardexExcel(StreamedContent scKardexExcel) {
+		this.scKardexExcel = scKardexExcel;
+	}
+
+	
+
+	
 
 }
