@@ -25,17 +25,17 @@
 	             		
 	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
 	             		
-                <p:outputLabel for="yearMonth" value="Month Picker (java.time.YearMonth)"/>
-                <p:datePicker id="yearMonth" view="month" value="#{reporteEstadoResultadosBean.mesActual}"pattern="MM/yyyy" yearNavigator="true" yearRange="2000:2030" maxdate="#{reporteIngresosBean.maxDate}"/>
+                <p:outputLabel for="yearMonth" value="Periodo "/>
+                <p:datePicker id="yearMonth" view="month" value="#{reporteEstadoResultadosBean.mesActual}" pattern="MM/yyyy" yearNavigator="true" yearRange="2000:2030" maxdate="#{reporteIngresosBean.maxDate}"/>
 	             		
 	             			
 	             		</p:fieldset>
+
 	             		
-	             		
-	             		<p:fieldset legend="Cliente" styleClass="p-mt-4">
-		             		<p:selectOneMenu id="select-cte" autoWidth="true" converter="entityConverter" value="#{reporteEstadoResultadosBean.clienteSelect}">
-		             			<f:selectItem itemLabel="Todos Los Clientes" Itemvalue="" />
-		             			<f:selectItems value="#{reporteEstadoResultadosBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+	             		<p:fieldset legend="Razon social" styleClass="p-mt-4">
+		             		<p:selectOneMenu id="select-emi" autoWidth="true" converter="entityConverter" value="#{reporteEstadoResultadosBean.emisor}">
+		             			<f:selectItem itemLabel="Todos Los emisores" Itemvalue="" />
+		             			<f:selectItems value="#{reporteEstadoResultadosBean.listaEmisores}" var="emi" itemLabel="#{emi.nb_emisor}" itemValue="#{emi}" />
 		             		</p:selectOneMenu>
 	             		</p:fieldset>
 	             		

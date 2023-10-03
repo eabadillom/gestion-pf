@@ -23,8 +23,10 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
+import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -37,22 +39,28 @@ public class ReporteEstadoResultadosBean implements Serializable {
 	private static Logger log = Logger.getLogger(ReporteAlmacenFechaBean.class);
 	
 	private List<Cliente> listCliente;
+	private List<EmisoresCFDIS> listaEmisores;
 	
 	private Cliente clienteSelect;
+	private EmisoresCFDIS emisor;
 	
 	private ClienteDAO clienteDAO;
+	private EmisoresCFDISDAO emisorDAO;
 	
 	private Date fechaInicio;
 	private Date fechaFin;
 	private Date maxDate;
 	private Date mesActual;
+	
 	public ReporteEstadoResultadosBean() {
 		
 		listCliente = new ArrayList<Cliente>();
+		listaEmisores = new ArrayList<EmisoresCFDIS>();
 		
 		clienteDAO = new ClienteDAO();
-		
+		emisorDAO = new EmisoresCFDISDAO();
 		clienteSelect = new Cliente();
+		emisor = new EmisoresCFDIS();
 		
 	}
 	
@@ -64,6 +72,8 @@ public class ReporteEstadoResultadosBean implements Serializable {
 		mesActual = new Date();
 		
 		listCliente = clienteDAO.buscarTodos();
+		listaEmisores =emisorDAO.buscarTodos();
+		
 		Date today = new Date();
 		long oneDay = 24 * 60 * 60 * 1000;
 
@@ -231,6 +241,30 @@ public class ReporteEstadoResultadosBean implements Serializable {
 
 	public void setClienteSelect(Cliente clienteSelect) {
 		this.clienteSelect = clienteSelect;
+	}
+
+	public EmisoresCFDIS getEmisor() {
+		return emisor;
+	}
+
+	public void setEmisor(EmisoresCFDIS emisor) {
+		this.emisor = emisor;
+	}
+
+	public EmisoresCFDISDAO getEmisorDAO() {
+		return emisorDAO;
+	}
+
+	public void setEmisorDAO(EmisoresCFDISDAO emisorDAO) {
+		this.emisorDAO = emisorDAO;
+	}
+
+	public List<EmisoresCFDIS> getListaEmisores() {
+		return listaEmisores;
+	}
+
+	public void setListaEmisores(List<EmisoresCFDIS> listaEmisores) {
+		this.listaEmisores = listaEmisores;
 	}
 	
 }
