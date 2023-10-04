@@ -202,8 +202,6 @@ public class KardexBean implements Serializable {
 				throw new InventarioException("El folio indicado no existe.");
 			
 			this.imprimeConstancia(entrada);
-//			this.exportToPDF();
-//			this.exportToExcel();
 			
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
