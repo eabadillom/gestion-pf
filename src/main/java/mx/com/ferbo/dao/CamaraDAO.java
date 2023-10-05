@@ -2,6 +2,7 @@ package mx.com.ferbo.dao;
 
 import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
 
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -186,5 +187,7 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 		}
 		return null;
 	}
+	
+	
 
 }
