@@ -158,5 +158,4 @@ public class RepEntradas {
 				+ "\", \"nombrePlanta\":\"" + nombrePlanta + "\", \"idCamara\":\"" + idCamara
 				+ "\", \"nombreCamara\":\"" + nombreCamara + "\"}";
 	}
-	
 }

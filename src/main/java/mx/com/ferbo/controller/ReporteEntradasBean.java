@@ -288,7 +288,7 @@ public class ReporteEntradasBean implements Serializable {
 			log.debug("Registros del reporte: {}", reporte.size());
 		
 		} catch(InventarioException ex) {
-			log.error("Problema para consultar el reporte de entras...", ex);
+			log.error("Problema para consultar el reporte de entradas...", ex);
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 			
