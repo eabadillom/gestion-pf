@@ -11,7 +11,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
 	<parameter name="idCliente" class="java.lang.Integer"/>
 	<parameter name="fechaInicio" class="java.util.Date"/>
 	<parameter name="fechaFin" class="java.util.Date"/>
@@ -19,52 +19,41 @@
 	<parameter name="planta" class="java.lang.Integer"/>
 	<parameter name="camara" class="java.lang.Integer"/>
 	<queryString language="SQL">
-		<![CDATA[SELECT CONSTANCIA_SALIDA.fecha,
-	CONSTANCIA_DE_DEPOSITO.folio_cliente,
-	CONSTANCIA_SALIDA.numero,
-	DETALLE_CONSTANCIA_SALIDA.producto,
-	DETALLE_CONSTANCIA_SALIDA.unidad,
-	DETALLE_CONSTANCIA_SALIDA.cantidad,
-	DETALLE_CONSTANCIA_SALIDA.peso,
-	CLIENTE.numero_cte,
-	CLIENTE.cte_nombre,
-	CONSTANCIA_DE_DEPOSITO.fecha_ingreso,
-	PARTIDA.partida_cve,
-	PARTIDA.cantidad_total,
-	PARTIDA.peso_total,
-	CAMARA.camara_cve,
-	CAMARA.camara_abrev AS camara,
-	PLANTA.planta_cve,
-	PLANTA.planta_abrev AS planta
-FROM CONSTANCIA_SALIDA,
-	DETALLE_CONSTANCIA_SALIDA,
-	CONSTANCIA_DE_DEPOSITO,
-	PARTIDA,
-	CLIENTE,
-	CAMARA,
-	PLANTA
-WHERE 
-	  ( CONSTANCIA_SALIDA.status <> 2) 
-	 AND ( DETALLE_CONSTANCIA_SALIDA.constancia_cve = CONSTANCIA_SALIDA.id) 
-	 AND ( PARTIDA.folio = CONSTANCIA_DE_DEPOSITO.folio) 
-	 AND ( PARTIDA.PARTIDA_CVE = DETALLE_CONSTANCIA_SALIDA.partida_cve) 
-	 AND ( CLIENTE.CTE_CVE = CONSTANCIA_DE_DEPOSITO.cte_cve) 
-	 AND ( CLIENTE.CTE_CVE = CONSTANCIA_SALIDA.cliente_cve) 
-	 AND ( CAMARA.camara_cve = DETALLE_CONSTANCIA_SALIDA.camara_cve) 
-	 AND ( PLANTA.planta_cve = CAMARA.planta_cve) 
-	 AND ( 
-	  ( CONSTANCIA_SALIDA.fecha >= $P{fechaInicio}) 
-	 AND ( CONSTANCIA_SALIDA.fecha <= $P{fechaFin}) 
-	 AND ( CONSTANCIA_DE_DEPOSITO.cte_cve = $P{idCliente} 
-	 OR $P{idCliente} IS NULL ) 
-	 AND ( PLANTA.planta_cve = $P{planta} 
-	 OR $P{planta} IS NULL ) 
-	 AND ( CAMARA.camara_cve = $P{camara} 
-	 OR $P{camara} IS NULL )) 
-ORDER BY CLIENTE.cte_nombre ASC,
-	PARTIDA.PARTIDA_CVE ASC,
-	CONSTANCIA_DE_DEPOSITO.folio_cliente ASC,
-	CONSTANCIA_SALIDA.fecha ASC]]>
+		<![CDATA[SELECT
+	cs.fecha,
+	cdd.folio_cliente,
+	cs.numero,
+	dcs.producto,
+	dcs.unidad,
+	dcs.cantidad,
+	dcs.peso,
+	c.numero_cte,
+	c.cte_nombre,
+	cdd.fecha_ingreso,
+	p.partida_cve,
+	p.cantidad_total,
+	p.peso_total,
+	cam.camara_cve,
+	cam.camara_abrev AS camara,
+	plt.planta_cve,
+	plt.planta_abrev AS planta
+FROM CONSTANCIA_SALIDA cs
+INNER JOIN DETALLE_CONSTANCIA_SALIDA dcs ON dcs.constancia_cve = cs.id  
+INNER JOIN PARTIDA p ON p.PARTIDA_CVE = dcs.partida_cve
+INNER JOIN CONSTANCIA_DE_DEPOSITO cdd ON p.folio = cdd.folio
+INNER JOIN CLIENTE c ON c.CTE_CVE = cdd.cte_cve 
+INNER JOIN CAMARA cam ON cam.camara_cve = dcs.camara_cve 
+INNER JOIN PLANTA plt ON plt.planta_cve = cam.planta_cve
+WHERE cs.status NOT IN (2)
+	AND cs.FECHA BETWEEN $P{fechaInicio} AND $P{fechaFin}
+	AND (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL) 
+	AND (plt.planta_cve = $P{planta} OR $P{planta} IS NULL)
+	AND (cam.camara_cve = $P{camara} OR $P{camara} IS NULL)
+ORDER BY
+	c.cte_nombre ASC,
+	p.PARTIDA_CVE ASC,
+	cdd.folio_cliente ASC,
+	cs.fecha ASC]]>
 	</queryString>
 	<field name="fecha" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="FECHA"/>
