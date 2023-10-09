@@ -24,7 +24,6 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.RepSalidasDAO;
 import mx.com.ferbo.dao.RepTraspasosDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.ui.RepTraspasos;
@@ -178,13 +177,11 @@ public class ReporteInventarioTraspasosBean implements Serializable {
 	public void generaReporte() {
 		RepTraspasosDAO reporteDAO = null;
 		Integer clienteCve = null;
-		Integer plantaCve = null;
-		Integer camaraCve = null;
 		
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		String titulo = "Reporte salidas";
+		String titulo = "Reporte Traspasos";
 		
 		try {
 			
