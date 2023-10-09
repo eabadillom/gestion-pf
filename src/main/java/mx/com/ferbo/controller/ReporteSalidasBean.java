@@ -27,7 +27,6 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.PlantaDAO;
-import mx.com.ferbo.dao.RepEntradasDAO;
 import mx.com.ferbo.dao.RepSalidasDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
