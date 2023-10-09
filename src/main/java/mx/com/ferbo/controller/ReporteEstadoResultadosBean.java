@@ -38,10 +38,8 @@ public class ReporteEstadoResultadosBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static Logger log = Logger.getLogger(ReporteAlmacenFechaBean.class);
 	
-	private List<Cliente> listCliente;
 	private List<EmisoresCFDIS> listaEmisores;
 	
-	private Cliente clienteSelect;
 	private EmisoresCFDIS emisor;
 	
 	private ClienteDAO clienteDAO;
@@ -54,12 +52,10 @@ public class ReporteEstadoResultadosBean implements Serializable {
 	
 	public ReporteEstadoResultadosBean() {
 		
-		listCliente = new ArrayList<Cliente>();
 		listaEmisores = new ArrayList<EmisoresCFDIS>();
 		
 		clienteDAO = new ClienteDAO();
 		emisorDAO = new EmisoresCFDISDAO();
-		clienteSelect = new Cliente();
 		emisor = new EmisoresCFDIS();
 		
 	}
@@ -71,7 +67,6 @@ public class ReporteEstadoResultadosBean implements Serializable {
 		fechaFin = new Date();
 		mesActual = new Date();
 		
-		listCliente = clienteDAO.buscarTodos();
 		listaEmisores =emisorDAO.buscarTodos();
 		
 		Date today = new Date();
@@ -85,7 +80,7 @@ public class ReporteEstadoResultadosBean implements Serializable {
 		
 		log.info("exṕrtando a PDF");
 		String jasperPath = "/jasper/Ingresos.jrxml";
-		String filename = "reporteIngresos"+mesActual+".pdf";
+		String filename = "reporteEstadoCuenta"+mesActual+".pdf";
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
@@ -106,21 +101,19 @@ public class ReporteEstadoResultadosBean implements Serializable {
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
 		
-			Integer clienteCve = null;
-			Integer idBanco = null;
-			if(clienteSelect == null) {
-				clienteCve = null;
+			String emi = null;
+			if(emisor.getNb_emisor() == null) {
+				emi = null;
 			}else {
-				clienteCve = clienteSelect.getCteCve();
+				emi = emisor.getNb_emisor();
 			}
 		
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("idCliente",clienteCve );
-			parameters.put("idBanco", idBanco);
+			parameters.put("emisor",emisor.getNb_emisor());
 			parameters.put("fechaInicio", fechaInicio);
 			parameters.put("fechaFin", fechaFin);
-			parameters.put("Imagen", imgfile.getPath());
+			parameters.put("imagen", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 		} catch (Exception ex) {
@@ -137,9 +130,6 @@ public class ReporteEstadoResultadosBean implements Serializable {
 		
 	}
 	
-	public void sleep() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(5);
-    }
 	
 	public void exportarExcel() {
 		
@@ -166,19 +156,17 @@ public class ReporteEstadoResultadosBean implements Serializable {
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
 		
-			Integer clienteCve = null;
-			Integer idBanco = null;
-			if(clienteSelect == null) {
-				clienteCve = null;
+			String emi = null;
+			if(emisor.getNb_emisor() == null) {
+				emi = null;
 			}else {
-				clienteCve = clienteSelect.getCteCve();
+				emi = emisor.getNb_emisor();
 			}
 			
 		
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("idCliente",clienteCve );
-			parameters.put("idBanco", idBanco);
+			parameters.put("emisor",emisor.getNb_emisor());
 			parameters.put("fechaInicio", fechaInicio);
 			parameters.put("fechaFin", fechaFin);
 			parameters.put("Imagen", imgfile.getPath());
@@ -225,22 +213,6 @@ public class ReporteEstadoResultadosBean implements Serializable {
 
 	public void setFechaFin(Date fechaFin) {
 		this.fechaFin = fechaFin;
-	}
-
-	public List<Cliente> getListCliente() {
-		return listCliente;
-	}
-
-	public void setListCliente(List<Cliente> listCliente) {
-		this.listCliente = listCliente;
-	}
-
-	public Cliente getClienteSelect() {
-		return clienteSelect;
-	}
-
-	public void setClienteSelect(Cliente clienteSelect) {
-		this.clienteSelect = clienteSelect;
 	}
 
 	public EmisoresCFDIS getEmisor() {
