@@ -6,14 +6,13 @@
 	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
 	template="/WEB-INF/template.xhtml">
 	<ui:define name="title">Kardex</ui:define>
-
 	<ui:define name="content">
-		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Inventarios" />
-				<p:menuitem value="Kardex" outcome="/protected/catalogos/kardex" />
-			</p:breadCrumb>
+		<h:form id="form" enctype="multipart/form-data">
+			<p:dialog modal="true" widgetVar="statusDialog" header="Generando kardex..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
 			<p:growl id="messages" showDetail="true" />
 			<p:panel>
 				<div class="p-grid ui-fluid p-col-12">
@@ -23,108 +22,125 @@
 					<div class="p-col-2 p-md-2">
 						<p:commandButton id="buscarFolio" actionListener="#{kardexBean.buscaDatos()}"
 								icon="pi pi-search" process="@this folioSelected" styleClass="edit-button ui-button-primary" value="Buscar"
-								update="form:dt-entradasKardex form:folioCliente form:nombreCliente form:fechaIngreso" />
+								update="form:dt-entradasKardex form:folioCliente form:nombreCliente form:fechaIngreso" onclick="PF('statusDialog').show()" oncomplete="PF('statusDialog').hide()" />
+					</div>
+					<div class="p-col-2 p-md-2">
+						<p:commandButton id="cmd-pdf" value="PDF" icon="pi pi-file-pdf" styleClass="mr-2 mb-2" actionListener="#{kardexBean.exportToPDF}" ajax="false" disabled="#{empty kardexBean.entrada.partidaList}">
+							<p:fileDownload value="#{kardexBean.scKardexPDF}"></p:fileDownload>
+						</p:commandButton>
+					</div>
+					<div class="p-col-2 p-md-2">
+						<p:commandButton id="cmd-xlsx" value="Excel" icon="pi pi-file-excel" styleClass="mr-2 mb-2" actionListener="#{kardexBean.exportToExcel}" ajax="false" disabled="#{empty kardexBean.entrada.partidaList}">
+							<p:fileDownload value="#{kardexBean.scKardexExcel}"></p:fileDownload>
+						</p:commandButton>
 					</div>
 				</div>
 			</p:panel>
 			<p:panel>
-				<div class="p-grid ui-fluid p-col-12">
+				<div class="p-grid ui-fluid">
 					<div class="p-col-6 p-md-6">
 						<p:outputLabel for="@next" value="Cliente" />
-						<p:inputText id="nombreCliente" value="#{kardexBean.entrada.cteCve.cteNombre}" disabled="true"/>
+						<p:inputText id="nombreCliente" value="#{kardexBean.entrada.cteCve.cteNombre}" readonly="true"/>
 					</div>
 					<div class="p-col-2 p-md-2">
 						<p:outputLabel for="@next" value="Folio"/>
-						<p:inputText id="folioCliente" disabled="true" value="#{kardexBean.entrada.folioCliente}"/>
+						<p:inputText id="folioCliente" readonly="true" value="#{kardexBean.entrada.folioCliente}"/>
 					</div>
 					<div class="p-col-2 p-md-2">
-						<p:outputLabel for="@next" value="Fecha ingreso" />
-						<p:datePicker id="fechaIngreso" value="#{kardexBean.entrada.fechaIngreso}" disabled="true" >
+						<p:outputLabel for="@next" value="Ingreso" />
+						<p:datePicker id="fechaIngreso" value="#{kardexBean.entrada.fechaIngreso}" readonly="true" >
 							<f:convertDateTime pattern="dd/MM/yyyy" />
 						</p:datePicker>
 					</div>
 				</div>
-				<p:dataTable id="dt-entradasKardex" widgetVar="dtEntradasKardex"
-					value="#{kardexBean.entrada.partidaList}" var="partida" lazy="false"
-					rowKey="#{partida.partidaCve}">
-					<p:ajax event="rowToggle" listener="#{kardexBean.getSaldo(partida)}" />
-					<p:column width="1rem">
-						<p:rowToggler />
-					</p:column>
-					<p:column headerText="Producto" width="auto">
-						<h:outputText
-							value="#{partida.unidadDeProductoCve.productoCve.productoDs}" />
-					</p:column>
-					<p:column headerText="Planta" width="3rem">
-						<h:outputText value="#{partida.camaraCve.plantaCve.plantaAbrev}" />
-					</p:column>
-					<p:column headerText="Cámara" width="10rem">
-						<h:outputText value="#{partida.camaraCve.camaraDs}" />
-					</p:column>
-					<p:column headerText="Cantidad" width="4rem">
-						<h:outputText value="#{partida.cantidadTotal}" />
-					</p:column>
-					<p:column headerText="Unidad" width="5rem">
-						<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
-					</p:column>
-					<p:column headerText="Peso (kg)" width="5rem">
-						<h:outputText value="#{partida.pesoTotal}" />
-					</p:column>
-						<p:rowExpansion>
-						<p:dataTable id="dt-salidasKardex"
-							value="#{partida.detalleConstanciaSalidaList}"
-							var="detSalida" lazy="false">
-							<p:column headerText="Salida" width="4rem">
-								<h:outputText value="#{detSalida.constanciaCve.numero}" />
-							</p:column>
-							<p:column headerText="Fecha" width="5rem">
-								<h:outputText value="#{detSalida.constanciaCve.fecha}">
-									<f:convertDateTime pattern="dd/MM/yyyy" />
-								</h:outputText>
-							</p:column>
-							<p:column headerText="Producto" width="auto">
-								<h:outputText value="#{detSalida.producto}" />
-							</p:column>
-							<p:column headerText="Cantidad" width="4rem">
-								<h:outputText value="#{detSalida.cantidad}" />
-							</p:column>
-							<p:column headerText="Unidad" width="5rem">
-								<h:outputText value="#{detSalida.unidad}" />
-							</p:column>
-							<p:column headerText="Peso (kg)" width="5rem">
-								<h:outputText value="#{detSalida.peso}" />
-							</p:column>
-							<!-- <f:facet name="footer">
-					            <span class="font-bold">Cantidad salidas: #{sum}</span>
-					        </f:facet> -->
-						</p:dataTable>
-						<p:dataTable id="dt-traspasos" rendered="#{not empty partida.traspasoPartidaList}"
-							value="#{partida.traspasoPartidaList}"
-							var="traspaso" lazy="false" >
-							<p:column headerText="Traspaso" width="4rem">
-								<h:outputText value="#{traspaso.traspaso.numero}"/>
-							</p:column>
-							<p:column headerText="Fecha" width="5rem">
-								<h:outputText value="#{traspaso.traspaso.fecha}">
-									<f:convertDateTime pattern="dd/MM/yyyy" />
-								</h:outputText>
-							</p:column>
-							<p:column headerText="Origen" width="10rem">
-								<h:outputText value="#{traspaso.origen}"/>
-							</p:column>
-							<p:column headerText="Destino" width="10rem">
-								<h:outputText value="#{traspaso.destino}"/>
-							</p:column>
-							<p:column headerText="Cantidad" width="10rem">
-								<h:outputText value="#{traspaso.cantidad}"/>
-							</p:column>
-						</p:dataTable>
-					</p:rowExpansion>
-					<!-- <f:facet name="footer">
-			            <span class="font-bold">Cantidad: #{fn:length(kardexBean.entrada.partidaList)} tarimas.</span>
-			        </f:facet> -->
-				</p:dataTable>
 			</p:panel>
+			
+			<div style="padding-top: 1rem;">
+				<p:outputPanel>
+					<p:dataTable id="dt-entradasKardex" widgetVar="dtEntradasKardex" expandedRow="#{true}"
+						value="#{kardexBean.entrada.partidaList}" var="partida" lazy="false"
+						rowKey="#{partida.partidaCve}">
+						<p:ajax event="rowToggle" listener="#{kardexBean.getSaldo(partida)}" />
+						<!-- <p:column width="1rem">
+							<p:rowToggler />
+						</p:column> -->
+						<p:column headerText="Producto" width="auto">
+							<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
+						</p:column>
+						<p:column headerText="Planta" width="3rem">
+							<h:outputText value="#{partida.camaraCve.plantaCve.plantaAbrev}" />
+						</p:column>
+						<p:column headerText="Cámara" width="10rem">
+							<h:outputText value="#{partida.camaraCve.camaraDs}" />
+						</p:column>
+						<p:column headerText="Cantidad" width="4rem" style="text-align: right;">
+							<h:outputText value="#{partida.cantidadTotal}" />
+						</p:column>
+						<p:column headerText="Unidad" width="5rem">
+							<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
+						</p:column>
+						<p:column headerText="Peso (kg)" width="5rem" style="text-align: right;">
+							<h:outputText value="#{partida.pesoTotal}" />
+						</p:column>
+						<p:rowExpansion>
+							<div style="padding-left: 2rem;">
+								<p:dataTable id="dt-salidasKardex"
+									value="#{partida.detalleConstanciaSalidaList}"
+									var="detSalida" lazy="false">
+									<p:column headerText="Salida" width="4rem">
+										<h:outputText value="#{detSalida.constanciaCve.numero}" />
+									</p:column>
+									<p:column headerText="Fecha" width="5rem">
+										<h:outputText value="#{detSalida.constanciaCve.fecha}">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</h:outputText>
+									</p:column>
+									<p:column headerText="" width="auto">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Cantidad" width="4rem">
+										<div align="right">
+											<h:outputText value="#{detSalida.cantidad}" />
+										</div>
+									</p:column>
+									<p:column headerText="Unidad" width="5rem">
+										<h:outputText value="#{detSalida.unidad}" />
+									</p:column>
+									<p:column headerText="Peso (kg)" width="5rem" style="text-align: right;">
+										<h:outputText value="#{detSalida.peso}" />
+									</p:column>
+									<f:facet name="footer">
+										<div align="right">
+											Quedan: #{partida.cantidadTotal - partida.detalleConstanciaSalidaList.stream().map(item->item.cantidad).sum()} [#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}] con #{partida.pesoTotal - partida.detalleConstanciaSalidaList.stream().map(item->item.peso).sum()} [kg] 
+										</div>
+									</f:facet>
+								</p:dataTable>
+								<p:dataTable id="dt-traspasos" rendered="#{not empty partida.traspasoPartidaList}"
+									value="#{partida.traspasoPartidaList}"
+									var="traspaso" lazy="false" >
+									<p:column headerText="Traspaso" width="4rem">
+										<h:outputText value="#{traspaso.traspaso.numero}"/>
+									</p:column>
+									<p:column headerText="Fecha" width="5rem">
+										<h:outputText value="#{traspaso.traspaso.fecha}">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</h:outputText>
+									</p:column>
+									<p:column headerText="Origen" width="10rem">
+										<h:outputText value="#{traspaso.origen}"/>
+									</p:column>
+									<p:column headerText="Destino" width="10rem">
+										<h:outputText value="#{traspaso.destino}"/>
+									</p:column>
+									<p:column headerText="Cantidad" width="10rem">
+										<h:outputText value="#{traspaso.cantidad}"/>
+									</p:column>
+								</p:dataTable>
+							</div>
+						</p:rowExpansion>
+					</p:dataTable>
+				</p:outputPanel>
+			</div>
 		</h:form>
 	</ui:define>
 </ui:composition>

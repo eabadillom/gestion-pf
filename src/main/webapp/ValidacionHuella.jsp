@@ -4,15 +4,15 @@
 <%@ page import="java.util.Properties"%>
 <%@ page import="java.io.InputStream"%>
 <% Usuario usr = (Usuario) session.getAttribute("usuario"); %>
-
-<% 
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":" + request.getServerPort() + path;
+response.setHeader("Access-Control-Allow-Origin", "http://localhost");
 
 Properties prop = new Properties();
 InputStream in = getClass().getResourceAsStream("/config/gestion.properties");
 prop.load(in);
-
 String ipSgp = prop.getProperty("sgp.url");
-String ipGestion = prop.getProperty("gestion.url");
 %>
 
 <!DOCTYPE html>
@@ -130,11 +130,12 @@ String ipGestion = prop.getProperty("gestion.url");
 							dataType : 'json',
 							data : jsonString,
 							url : "http://localhost:23106",
+							timeout: 60000,
 							success : function(jsonObj) {
 								if (jsonObj.VerifyBiometricData == true) {
-									window.location.href = "<%=ipGestion%>"+"/gestion/dashboard.xhtml";
+									window.location.href = "<%=basePath%>"+"/dashboard.xhtml";
 								} else {
-									window.location.href = "<%=ipGestion%>"+"/gestion/logout";
+									window.location.href = "<%=basePath%>"+"/logout";
 								}
 							},
 							error : function(jsonObj) {

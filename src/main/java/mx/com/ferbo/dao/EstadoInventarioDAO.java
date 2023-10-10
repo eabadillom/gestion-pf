@@ -5,7 +5,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EstadoInventario;
@@ -13,7 +14,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class EstadoInventarioDAO extends IBaseDAO<EstadoInventario, Integer> {
 	
-	private static Logger log = Logger.getLogger(EstadoInventarioDAO.class);
+	private static Logger log = LogManager.getLogger(EstadoInventarioDAO.class);
 
 	@Override
 	public EstadoInventario buscarPorId(Integer id) {

@@ -77,6 +77,7 @@ public class JasperReportUtil {
 			
 			context.responseComplete();
 			FacesContext.getCurrentInstance().responseComplete();
+			log.info("Exportacion de JASPER completa.");
 		} catch (JRException ex) {
 			ex.printStackTrace();
 		}finally {
@@ -99,7 +100,51 @@ public class JasperReportUtil {
 			respuesta = DefaultStreamedContent
 					.builder()
 					.contentType("application/pdf")
-					.name("Actor_List")
+					.name(fileName)
+					.stream(() -> new ByteArrayInputStream(buffer))
+					.build();
+		} catch (JRException ex) {
+			ex.printStackTrace();
+		}
+		
+		return respuesta;
+	}
+	
+	public StreamedContent getXls(String fileName, Map<String, Object> parameters, String path) throws IOException {
+		StreamedContent respuesta = null;
+		ByteArrayOutputStream output = null;
+		JasperDesign design = null;
+		JasperReport report = null;
+		JasperPrint jasperPrint = null;
+		JRXlsxExporter exporter = null;
+		SimpleXlsxReportConfiguration configuration = null;
+		OutputStreamExporterOutput outputExporter = null;
+		
+		
+		try {
+			output = new ByteArrayOutputStream();
+			design = JRXmlLoader.load(path);
+			report = JasperCompileManager.compileReport(design);
+			jasperPrint = JasperFillManager.fillReport(report, parameters);
+			outputExporter = new SimpleOutputStreamExporterOutput(output);
+			exporter = new JRXlsxExporter();
+			exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+			exporter.setExporterOutput(outputExporter);
+			configuration = new SimpleXlsxReportConfiguration();
+			configuration.setRemoveEmptySpaceBetweenColumns(true);
+			configuration.setRemoveEmptySpaceBetweenRows(true);
+			configuration.setDetectCellType(true);
+			configuration.setIgnoreGraphics(true);
+			configuration.setIgnorePageMargins(true);
+			configuration.setIgnoreCellBorder(true);
+			configuration.setWhitePageBackground(false);
+			exporter.setConfiguration(configuration);
+			exporter.exportReport();
+			byte[] buffer = output.toByteArray();
+			respuesta = DefaultStreamedContent
+					.builder()
+					.contentType("application/vnd.ms-excel")
+					.name(fileName)
 					.stream(() -> new ByteArrayInputStream(buffer))
 					.build();
 		} catch (JRException ex) {

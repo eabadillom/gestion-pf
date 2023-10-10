@@ -7,129 +7,181 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.CategoriaDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.ProductoDAO;
+import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
 public class ProdClienteBean implements Serializable {
 
-	/**
-	 * @author Juan_Cervantes
-	 */
-
 	private static final long serialVersionUID = -626048119540963939L;
+	private static Logger log = LogManager.getLogger(ProdClienteBean.class);
 
-	/**
-	 * Objetos para clientes
-	 */
 	private List<Cliente> lstClientes;
 	private Cliente clienteSelected;
 	private ClienteDAO clienteDAO;
 
-	/**
-	 * Objetos para Productos
-	 */
 	private List<Producto> listProducto;
 	private Producto productoSelected;
 	private ProductoDAO productoDAO;
 
-	/**
-	 * Objetos para Productos por Cliente
-	 */
 	private List<ProductoPorCliente> lstProductosClienteFiltered;
 	private List<ProductoPorCliente> lstProductosCliente;
-	private ProductoPorCliente prodClienteSelected;
+	private ProductoPorCliente ppcSelected;
 	private ProductoClienteDAO productoPorClienteDAO;
-
-	/**
-	 * Constructores
-	 */
+	private List<Categoria> categoriaList;
+	private Categoria categoria;
+	private CategoriaDAO categoriaDAO;
 
 	public ProdClienteBean() {
 		clienteDAO = new ClienteDAO();
-		productoDAO = new ProductoDAO();
 		productoPorClienteDAO = new ProductoClienteDAO();
+		productoDAO = new ProductoDAO();
 		lstProductosClienteFiltered = new ArrayList<>();
 		lstProductosCliente = new ArrayList<>();
+		categoriaDAO = new CategoriaDAO();
 	}
 
 	@PostConstruct
 	public void init() {
 		lstClientes = clienteDAO.buscarTodos();
-		lstProductosCliente = productoPorClienteDAO.buscarTodos();
-		listProducto = productoDAO.buscarTodos();
+		categoriaList = categoriaDAO.buscarTodos();
+		try {
+			categoria = categoriaList.stream().filter(c -> c.getCategoriaCve() == 1)
+			.collect(Collectors.toList())
+			.get(0);
+		} catch (Exception e) {
+		}
+			
 	}
 
-	/**
-	 * Método para filtrar del listado original por clave de cliente
-	 */
 	public void filtraListado() {
 		lstProductosClienteFiltered.clear();
-		lstProductosClienteFiltered = lstProductosCliente.stream()
-				.filter(ps -> clienteSelected != null
-						? (ps.getCteCve().getCteCve().intValue() == clienteSelected.getCteCve().intValue())
-						: false)
-				.collect(Collectors.toList());
-		System.out.println("Productos Cliente Filtrados:" + lstProductosClienteFiltered.toString());
+		lstProductosClienteFiltered = productoPorClienteDAO.buscarPorCliente(clienteSelected.getCteCve(), true);
+		
+		if(listProducto == null)
+			listProducto = new ArrayList<Producto>();
+		
+		if(listProducto.isEmpty() == false)
+			listProducto.clear();
+		
+		for(ProductoPorCliente ppc : lstProductosClienteFiltered) {
+			listProducto.add(ppc.getProductoCve());
+		}
+		
+		log.debug("Productos por cliente filtrados: {}",lstProductosClienteFiltered);
 	}
 
-	/**
-	 * Métodos para guardar objeto tipo ProductoCliente
-	 */
 	public void nuevoProductoCliente() {
-		prodClienteSelected = new ProductoPorCliente();
-		prodClienteSelected.setCteCve(clienteSelected);
-		prodClienteSelected.setProductoCve(new Producto());
+		
+		productoSelected = new Producto();
+		
+		ppcSelected = new ProductoPorCliente();
+		ppcSelected.setCteCve(clienteSelected);
+		ppcSelected.setProductoCve(productoSelected);
+	}
+	
+	public void cargaProductoCliente() {
+		log.info("Cargando el producto {} para modificación.", ppcSelected.getProductoCve().getProductoDs());
+		this.productoSelected = ppcSelected.getProductoCve();
 	}
 
 	public void guardaProductoCliente() {
-		prodClienteSelected.setProdXCteCve(null);
-		prodClienteSelected.setProductoCve(productoSelected);
-		if (productoPorClienteDAO.guardar(prodClienteSelected) == null) {
-			lstProductosClienteFiltered.add(prodClienteSelected);
-			lstProductosCliente.add(prodClienteSelected);
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto Agregado"));
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Producto";
+		
+		String resultado = null;
+		
+		try {
+			ppcSelected.setProductoCve(productoSelected);
+			
+			if(productoSelected.getProductoPorClienteList() == null)
+				productoSelected.setProductoPorClienteList(new ArrayList<>());
+			
+			productoSelected.getProductoPorClienteList().add(ppcSelected);
+			
+			if(ppcSelected.getProdXCteCve() == null)
+				resultado = productoDAO.guardar(productoSelected);
+			else
+				resultado = productoDAO.actualizar(productoSelected);
+			
+			if(resultado != null) {
+				throw new InventarioException("Problema al guardar el producto del cliente.");
+			}
+			
+			filtraListado();
+			ppcSelected = new ProductoPorCliente();
+			
+			mensaje = "El producto se registró correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('productoClienteDialog').hide()");
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception ex) {
+			log.error("Problema para actualizar el usuario...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-productosCliente");
-
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ocurrió un error al intentar guardar el Producto"));
 		}
-
-		prodClienteSelected = new ProductoPorCliente();
-		PrimeFaces.current().executeScript("PF('productoClienteDialog').hide()");
-		PrimeFaces.current().ajax().update("form:messages", "form:dt-productosCliente");
-
 	}
 
 	/**
 	 * Método para actualizar objeto tipo ProductoCliente
 	 */
 	public void actualizaProductoCliente() {
-		prodClienteSelected.setCteCve(clienteSelected);
-		prodClienteSelected.setProductoCve(productoSelected);
-		System.out.println(prodClienteSelected.toString());
-
-		if (productoPorClienteDAO.actualizar(prodClienteSelected) == null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto Actualizado"));
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ocurrió un error al intentar actualizar el Producto"));
+		
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Producto";
+		
+		try {
+			
+			ppcSelected.setCteCve(clienteSelected);
+			ppcSelected.setProductoCve(productoSelected);
+			
+			if(productoDAO.actualizar(productoSelected) != null)
+				throw new InventarioException("Problema al actualizar el producto del cliente.");
+			
+			mensaje = "El producto se actualizó correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('productoClienteDialog').hide()");
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception ex) {
+			log.error("Problema para actualizar el usuario...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-productosCliente");
 		}
 
-		PrimeFaces.current().executeScript("PF('productoClienteActDialog').hide()");
-		PrimeFaces.current().ajax().update("form:messages", "form:dt-productosCliente");
+		
 	}
 
 	/**
@@ -137,10 +189,10 @@ public class ProdClienteBean implements Serializable {
 	 */
 
 	public void eliminarProductoCliente() {
-		if (productoPorClienteDAO.eliminar(prodClienteSelected) == null) {
-			lstProductosClienteFiltered.remove(this.prodClienteSelected);
-			lstProductosCliente.remove(prodClienteSelected);
-			prodClienteSelected = null;
+		if (productoPorClienteDAO.eliminar(ppcSelected) == null) {
+			lstProductosClienteFiltered.remove(this.ppcSelected);
+			lstProductosCliente.remove(ppcSelected);
+			ppcSelected = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto Eliminado"));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-productosCliente");
 		} else {
@@ -194,14 +246,6 @@ public class ProdClienteBean implements Serializable {
 		this.productoSelected = productoSelected;
 	}
 
-	public ProductoDAO getProductoDAO() {
-		return productoDAO;
-	}
-
-	public void setProductoDAO(ProductoDAO productoDAO) {
-		this.productoDAO = productoDAO;
-	}
-
 	public List<ProductoPorCliente> getLstProductosClienteFiltered() {
 		return lstProductosClienteFiltered;
 	}
@@ -218,12 +262,12 @@ public class ProdClienteBean implements Serializable {
 		this.lstProductosCliente = lstProductosCliente;
 	}
 
-	public ProductoPorCliente getProdClienteSelected() {
-		return prodClienteSelected;
+	public ProductoPorCliente getPpcSelected() {
+		return ppcSelected;
 	}
 
-	public void setProdClienteSelected(ProductoPorCliente prodClienteSelected) {
-		this.prodClienteSelected = prodClienteSelected;
+	public void setPpcSelected(ProductoPorCliente prodClienteSelected) {
+		this.ppcSelected = prodClienteSelected;
 	}
 
 	public ProductoClienteDAO getProductoPorClienteDAO() {

@@ -2,15 +2,10 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
@@ -19,15 +14,10 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
-import org.primefaces.event.RowEditEvent;
-import org.primefaces.event.UnselectEvent;
-import org.primefaces.model.FilterMeta;
-import org.primefaces.model.MatchMode;
-import org.primefaces.omega.domain.CustomerStatus;
 
-import ch.qos.logback.core.status.Status;
 import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.FacturaDAO;
@@ -40,14 +30,13 @@ import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoPago;
-import mx.com.ferbo.util.EntityManagerUtil;
 
 @Named
 @ViewScoped
 public class IngresosCrudBean implements Serializable {
 
 	private static final long serialVersionUID = -626048119540963939L;
-	private static Logger log = Logger.getLogger(IngresosCrudBean.class);
+	private static Logger log = LogManager.getLogger(IngresosCrudBean.class);
 
 		private Integer idCte;
 		private BigDecimal totalSaldo;

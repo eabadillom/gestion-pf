@@ -208,7 +208,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			List<Partida> partidaList = constancia.getPartidaList();
 			for(Partida partida : partidaList) {
 				log.debug("Partida: {}",  partida.getPartidaCve());
-				log.debug("Planta: {}", partida.getCamaraCve().getPlantaCve().getPlantaCve());
+				log.debug("Planta: {}", partida.getCamaraCve().getPlantaCve().getPlantaAbrev());
 				log.debug("Producto: {}",partida.getUnidadDeProductoCve().getProductoCve().getProductoCve());
 				log.debug("Unidad de Manejo: {}",partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
 				log.debug("Unidad de cobro: {}",  partida.getUnidadDeCobro().getUnidadDeManejoCve());
