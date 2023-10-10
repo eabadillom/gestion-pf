@@ -7,14 +7,15 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.ui.OcupacionCamara;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class RepOcupacionCamaraDAO {
 	
-	private static Logger log = Logger.getLogger(RepOcupacionCamaraDAO.class);
+	private static Logger log = LogManager.getLogger(RepOcupacionCamaraDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<OcupacionCamara> ocupacionCamara(Date fecha, Integer idCliente, Integer idPlanta, Integer idCamara){
