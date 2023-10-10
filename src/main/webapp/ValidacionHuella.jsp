@@ -4,7 +4,6 @@
 <%@ page import="java.util.Properties"%>
 <%@ page import="java.io.InputStream"%>
 <% Usuario usr = (Usuario) session.getAttribute("usuario"); %>
-
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":" + request.getServerPort() + path;
@@ -14,7 +13,6 @@ Properties prop = new Properties();
 InputStream in = getClass().getResourceAsStream("/config/gestion.properties");
 prop.load(in);
 String ipSgp = prop.getProperty("sgp.url");
-
 %>
 
 <!DOCTYPE html>

@@ -32,9 +32,10 @@ import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.response.DetBiometricoResponse;
 import mx.com.ferbo.util.SecurityUtil;
 
+
 @Named
 @ViewScoped
-public class LoginBean implements Serializable {
+public class LoginBean implements Serializable  {
 
 	private static final long serialVersionUID = 491768169161736335L;
 	private static final Logger log = LogManager.getLogger(LoginBean.class);
@@ -45,7 +46,7 @@ public class LoginBean implements Serializable {
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
-
+  
 	private SecurityUtil securityUtil = null;
 
 	public LoginBean() {
@@ -59,7 +60,6 @@ public class LoginBean implements Serializable {
 	}
 
 	public void login() {
-
 		FacesMessage message = null;
 		DetBiometricoResponse bean = null;
 		HttpGet request = null;
