@@ -1,17 +1,14 @@
 package mx.com.ferbo.ui;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.math.BigDecimal;
 
-@Entity
 public class OcupacionCamara {
 
-	@Id
 	private Integer camara_cve;
 	private String camara_abrev;
 	private String camara_ds;
 	private String planta_ds;
-	private Integer tarima;
+	private BigDecimal tarima;
 	
 	public OcupacionCamara() {
 		
@@ -49,11 +46,11 @@ public class OcupacionCamara {
 		this.planta_ds = planta_ds;
 	}
 
-	public Integer getTarima() {
+	public BigDecimal getTarima() {
 		return tarima;
 	}
 
-	public void setTarima(Integer tarima) {
+	public void setTarima(BigDecimal tarima) {
 		this.tarima = tarima;
 	}
 
