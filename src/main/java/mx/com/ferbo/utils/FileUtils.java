@@ -1,19 +1,20 @@
 package mx.com.ferbo.utils;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FileUtils {
 	
-	private static Logger log = Logger.getLogger(FileUtils.class);
+	private static Logger log = LogManager.getLogger(FileUtils.class);
 	
 	public static synchronized byte[] getBinContent(String fileName){
 		byte[]                contenido = null;

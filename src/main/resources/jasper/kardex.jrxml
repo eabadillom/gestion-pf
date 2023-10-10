@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardex" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="425b1dc8-4308-471e-971a-1434e451f548">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
+	<parameter name="folio" class="java.lang.String"/>
+	<parameter name="imagen" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	p.PARTIDA_CVE,
+	c.CTE_NOMBRE,
+	c.CTE_RFC,
+	cdd.folio_cliente,
+	cdd.FECHA_INGRESO,
+	cdd.NOMBRE_TRANSPORTISTA,
+	cdd.PLACAS_TRANSPORTE,
+	plt.PLANTA_DS,
+	cam.CAMARA_DS,
+	prd.PRODUCTO_DS,
+	p.CANTIDAD_TOTAL,
+	udm.UNIDAD_DE_MANEJO_DS,
+	p.PESO_TOTAL,
+	sal.MOVIMIENTO,
+	sal.NUMERO,
+	sal.FECHA,
+	COALESCE(sal.CANTIDAD, 0) AS CANTIDAD,
+	COALESCE(sal.PESO, 0) AS PESO,
+	sal.origen,
+	sal.destino
+FROM CONSTANCIA_DE_DEPOSITO cdd
+INNER JOIN CLIENTE c ON cdd.CTE_CVE = c.CTE_CVE
+INNER JOIN PARTIDA p ON cdd.FOLIO = p.FOLIO
+INNER JOIN UNIDAD_DE_PRODUCTO udp ON p.UNIDAD_DE_PRODUCTO_CVE = udp.UNIDAD_DE_PRODUCTO_CVE
+INNER JOIN UNIDAD_DE_MANEJO udm ON udp.UNIDAD_DE_MANEJO_CVE = udm.UNIDAD_DE_MANEJO_CVE
+INNER JOIN PRODUCTO prd ON udp.PRODUCTO_CVE = prd.PRODUCTO_CVE
+INNER JOIN CAMARA cam ON p.CAMARA_CVE = cam.CAMARA_CVE
+INNER JOIN PLANTA plt ON cam.PLANTA_CVE = plt.PLANTA_CVE
+LEFT OUTER JOIN (
+	SELECT
+		dcs.PARTIDA_CVE,
+		cs.NUMERO,
+		'Salida' as MOVIMIENTO,
+		cs.FECHA,
+		dcs.CANTIDAD,
+		dcs.PESO,
+		null as ORIGEN,
+		null as DESTINO
+	FROM DETALLE_CONSTANCIA_SALIDA dcs
+	INNER JOIN CONSTANCIA_SALIDA cs ON cs.ID = dcs.CONSTANCIA_CVE
+	WHERE cs.STATUS IN (1) AND dcs.FOLIO_ENTRADA = $P{folio}
+	UNION ALL
+	select
+		tp.partida AS PARTIDA_CVE,
+		ct.numero,
+		'Traspaso' as MOVIMIENTO,
+		ct.fecha as FECHA,
+		NULL AS CANTIDAD,
+		tp.cantidad AS PESO,
+		tp.origen,
+		tp.destino
+	from
+		CONSTANCIA_TRASPASO ct
+	INNER JOIN traspaso_partida tp ON ct.id = tp.traspaso
+	WHERE tp.constancia = $P{folio}
+	
+) sal ON p.PARTIDA_CVE = sal.PARTIDA_CVE
+WHERE cdd.folio_cliente = $P{folio}
+ORDER BY partida_cve, fecha_ingreso, movimiento, fecha
+
+
+
+
+]]>
+	</queryString>
+	<field name="PARTIDA_CVE" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="PARTIDA_CVE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PARTIDA_CVE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
+	</field>
+	<field name="CTE_NOMBRE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CTE_NOMBRE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+	</field>
+	<field name="CTE_RFC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CTE_RFC"/>
+		<property name="com.jaspersoft.studio.field.label" value="CTE_RFC"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+	</field>
+	<field name="folio_cliente" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="folio_cliente"/>
+		<property name="com.jaspersoft.studio.field.label" value="folio_cliente"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+	</field>
+	<field name="FECHA_INGRESO" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="FECHA_INGRESO"/>
+		<property name="com.jaspersoft.studio.field.label" value="FECHA_INGRESO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+	</field>
+	<field name="NOMBRE_TRANSPORTISTA" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NOMBRE_TRANSPORTISTA"/>
+		<property name="com.jaspersoft.studio.field.label" value="NOMBRE_TRANSPORTISTA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+	</field>
+	<field name="PLACAS_TRANSPORTE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PLACAS_TRANSPORTE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PLACAS_TRANSPORTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+	</field>
+	<field name="PLANTA_DS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PLANTA_DS"/>
+		<property name="com.jaspersoft.studio.field.label" value="PLANTA_DS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PLANTA"/>
+	</field>
+	<field name="CAMARA_DS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CAMARA_DS"/>
+		<property name="com.jaspersoft.studio.field.label" value="CAMARA_DS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="CAMARA"/>
+	</field>
+	<field name="PRODUCTO_DS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PRODUCTO_DS"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRODUCTO_DS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PRODUCTO"/>
+	</field>
+	<field name="CANTIDAD_TOTAL" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD_TOTAL"/>
+		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD_TOTAL"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
+	</field>
+	<field name="UNIDAD_DE_MANEJO_DS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UNIDAD_DE_MANEJO_DS"/>
+		<property name="com.jaspersoft.studio.field.label" value="UNIDAD_DE_MANEJO_DS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
+	</field>
+	<field name="PESO_TOTAL" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PESO_TOTAL"/>
+		<property name="com.jaspersoft.studio.field.label" value="PESO_TOTAL"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
+	</field>
+	<field name="MOVIMIENTO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="MOVIMIENTO"/>
+		<property name="com.jaspersoft.studio.field.label" value="MOVIMIENTO"/>
+	</field>
+	<field name="NUMERO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NUMERO"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUMERO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cs"/>
+	</field>
+	<field name="FECHA" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="FECHA"/>
+		<property name="com.jaspersoft.studio.field.label" value="FECHA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cs"/>
+	</field>
+	<field name="CANTIDAD" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD"/>
+		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD"/>
+	</field>
+	<field name="PESO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PESO"/>
+		<property name="com.jaspersoft.studio.field.label" value="PESO"/>
+	</field>
+	<field name="origen" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORIGEN"/>
+		<property name="com.jaspersoft.studio.field.label" value="origen"/>
+	</field>
+	<field name="destino" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESTINO"/>
+		<property name="com.jaspersoft.studio.field.label" value="destino"/>
+	</field>
+	<variable name="cantidadPartida" class="java.lang.Integer" resetType="Group" resetGroup="Partida" calculation="Sum">
+		<variableExpression><![CDATA[$F{CANTIDAD}]]></variableExpression>
+	</variable>
+	<variable name="pesoPartida" class="java.math.BigDecimal" resetType="Group" resetGroup="Partida" calculation="Sum">
+		<variableExpression><![CDATA[new Boolean("Salida".equalsIgnoreCase($F{MOVIMIENTO})) ? $F{PESO} : BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<group name="Partida">
+		<groupExpression><![CDATA[$F{PARTIDA_CVE}]]></groupExpression>
+		<groupHeader>
+			<band height="34">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="570" height="12" forecolor="#FFFFFF" backcolor="#2196F3" uuid="50c30003-8ab0-4409-a8aa-94f6b305ffaf">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PRODUCTO_DS}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="80" y="12" width="299" height="12" uuid="35576201-303a-4988-8559-ab2b777e4890">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PLANTA_DS}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="379" y="12" width="191" height="12" uuid="160dfa55-a5f0-4bb9-a01e-0984211898d5">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CAMARA_DS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement x="331" y="24" width="49" height="10" uuid="abb4f187-5bd4-4b2b-80c2-2d2428a22aa3"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CANTIDAD_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="380" y="24" width="50" height="10" uuid="6778b7ad-298b-4bd4-b412-e599a33d26dd">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $F{UNIDAD_DE_MANEJO_DS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.###;-#,##0.###">
+					<reportElement x="479" y="24" width="70" height="10" uuid="78563881-e519-4c0c-8afc-bdcde5ad7b94">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PESO_TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="268" y="24" width="63" height="10" uuid="424520b3-803a-4453-a72d-1b6a00d66d19"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Cantidad: "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="430" y="24" width="49" height="10" uuid="25bbc9f2-7bd7-4be2-af89-3b039fb66a78">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Peso: "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="549" y="24" width="21" height="10" uuid="14c4a30e-0270-4c0f-a920-2e8b7816d066">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" kg"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="34">
+				<textField>
+					<reportElement mode="Opaque" x="268" y="0" width="63" height="10" forecolor="#FFFFFF" backcolor="#2196F3" uuid="dcc72849-0060-4c06-9f47-6ba7d8c0d17f"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Quedan: "]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="331" y="0" width="49" height="10" forecolor="#FFFFFF" backcolor="#2196F3" uuid="2f4230d9-43b0-464f-9253-fbe03e1d80f9">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d69eaf4e-eea0-4f38-8af9-81d44af78a98"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CANTIDAD_TOTAL} - $V{cantidadPartida}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="380" y="0" width="50" height="10" forecolor="#FFFFFF" backcolor="#2196F3" uuid="2e0964d5-e77e-41cb-bd52-3003e2000b8a">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $F{UNIDAD_DE_MANEJO_DS}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.###;-#,##0.###">
+					<reportElement mode="Opaque" x="479" y="0" width="70" height="10" forecolor="#FFFFFF" backcolor="#2196F3" uuid="7147263b-52d5-4deb-96b9-c06ac3f8b38f">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cf725089-99ca-4efd-b9a7-4646a96a84d5"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PESO_TOTAL}.subtract($V{pesoPartida})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="549" y="0" width="21" height="10" forecolor="#FFFFFF" backcolor="#2196F3" uuid="087d231a-2bb4-4c72-b2d7-f4bb3cc234e7">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" kg"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="430" y="0" width="49" height="10" forecolor="#FFFFFF" backcolor="#2196F3" uuid="b5d4547d-bb76-4fdc-9c91-1141116a299e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[""]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="83" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="143" height="42" uuid="bc179739-a626-4441-852c-e0b3ae37909c"/>
+				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="0" width="570" height="21" forecolor="#2196F3" uuid="2957681b-5b16-4ccd-9014-4075a9ad0efa">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[KARDEX]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="21" width="570" height="14" forecolor="#8F0503" uuid="399b89f4-d58a-48c0-a02e-f5367f3814cd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FOLIO INGRESO " + $F{folio_cliente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="35" width="570" height="14" uuid="0da18f18-7aec-414b-84c7-4bef80c9dcb3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Cliente: " + $F{CTE_NOMBRE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="56" y="49" width="78" height="16" uuid="72f09b3a-5761-465c-a975-ab48b98013c1"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FECHA_INGRESO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="49" width="56" height="16" uuid="23803da5-1a34-4000-b0be-670d7515708f"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Ingreso: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="134" y="49" width="76" height="16" uuid="1ba5bc29-aa53-456c-ad6c-465415188728"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Transportista: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="430" y="49" width="93" height="16" uuid="fcd3aaf2-ec3d-48b3-877b-6e4419762fd1"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Placas transporte: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="210" y="49" width="220" height="16" uuid="b98cd534-8401-473f-b8d4-2c802034d3eb"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOMBRE_TRANSPORTISTA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="523" y="49" width="47" height="16" uuid="c2207f5f-a31e-4e6e-9882-95066d6d0462"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PLACAS_TRANSPORTE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<printWhenExpression><![CDATA[$F{NUMERO} != null]]></printWhenExpression>
+			<textField pattern="#,##0.###;-#,##0.###">
+				<reportElement x="479" y="1" width="70" height="10" printWhenGroupChanges="Partida" uuid="254338b6-c715-46f0-b6aa-661f7978c355">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cf725089-99ca-4efd-b9a7-4646a96a84d5"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PESO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="331" y="1" width="49" height="10" printWhenGroupChanges="Partida" uuid="47aded84-4590-4700-9d69-20c78bfaa0fc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d69eaf4e-eea0-4f38-8af9-81d44af78a98"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean("Salida".equalsIgnoreCase($F{MOVIMIENTO}))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CANTIDAD}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="80" y="1" width="54" height="10" printWhenGroupChanges="Partida" uuid="e8b67b77-24e9-4fef-8585-d1ce6ea46439"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOVIMIENTO} + ": "]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="190" y="1" width="51" height="10" printWhenGroupChanges="Partida" uuid="063a7be4-9dce-434c-9d0b-9edcf64d4bc6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6f3cefe1-646e-4560-96c8-b8477d753741"/>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FECHA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="549" y="1" width="21" height="10" printWhenGroupChanges="Partida" uuid="04b73bf4-dd1c-4079-b247-8226c81b0588">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" kg"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="134" y="1" width="56" height="10" printWhenGroupChanges="Partida" uuid="1a5c3bc0-3bf8-45f1-ad26-740b7e661d8a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMERO}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="570" height="1" forecolor="#2196F3" uuid="23f0afa9-b92e-4d5b-aefc-658e3fb0618a"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="241" y="1" width="90" height="10" printWhenGroupChanges="Partida" uuid="171c3f14-725d-4674-b808-a2f23bcfd466">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean("Traspaso".equalsIgnoreCase($F{MOVIMIENTO}))]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" De " + $F{origen}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="385" y="1" width="94" height="10" printWhenGroupChanges="Partida" uuid="033be9e4-4e4d-4d43-8c4c-e87849b2f9bb">
+					<printWhenExpression><![CDATA[new Boolean("Traspaso".equalsIgnoreCase($F{MOVIMIENTO}))]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" A " + $F{destino}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>

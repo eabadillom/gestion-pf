@@ -4,17 +4,17 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaTraspaso;
-import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.model.TraspasoServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TraspasoServicioDAO extends IBaseDAO<TraspasoServicioDAO, Integer>{
 	
-	private static Logger log = Logger.getLogger(TraspasoServicioDAO.class);
+	private static Logger log = LogManager.getLogger(TraspasoServicioDAO.class);
 
 	@Override
 	public TraspasoServicioDAO buscarPorId(Integer id) {

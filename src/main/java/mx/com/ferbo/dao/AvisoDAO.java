@@ -1,22 +1,21 @@
 package mx.com.ferbo.dao;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 	
-	private Logger log = Logger.getLogger(AvisoDAO.class);
+	private Logger log = LogManager.getLogger(AvisoDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Aviso> findall() {

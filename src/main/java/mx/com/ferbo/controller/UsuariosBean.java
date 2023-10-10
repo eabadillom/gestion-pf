@@ -48,6 +48,7 @@ public class UsuariosBean implements Serializable {
 	private String mail;
 	private String descripcion;
 	private String login;
+	private String numEmpleado;
 	private boolean showPassword = false;
 	private String newPassword = null;
 	
@@ -83,6 +84,7 @@ public class UsuariosBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
+
 		String titulo = "Usuario";
 		
 		try {
@@ -93,10 +95,14 @@ public class UsuariosBean implements Serializable {
 				sha512Password = securityBO.getSHA512("temporal" + usuario.getUsuario());
 				usuario.setPassword(sha512Password);
 				usuario.setStUsuario("R");
+				mensaje = "El usuario se agrego correctamente";
+			}else {
+				mensaje = "El usuario se actualizo correctamente";
 			}
 			
 			log.debug("Usuario: {}", usuario);
 			usuario.setIdPlanta(this.idplanta);
+			//usuario.setPerfil(this.perfil);
 			String user = usuarioDAO.actualizar(usuario);
 			
 			if(user != null)
@@ -106,8 +112,7 @@ public class UsuariosBean implements Serializable {
 			usuarios = usuarioDAO.findall();
 			this.showPassword = false;
 			this.usuario = new Usuario();
-			
-			mensaje = "El usuario se registró correctamente.";
+      
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
 		} catch (InventarioException ex) {
@@ -316,6 +321,14 @@ public class UsuariosBean implements Serializable {
 
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
+	}
+
+	public String getNumEmpleado() {
+		return numEmpleado;
+	}
+
+	public void setNumEmpleado(String numEmpleado) {
+		this.numEmpleado = numEmpleado;
 	}
 
 }

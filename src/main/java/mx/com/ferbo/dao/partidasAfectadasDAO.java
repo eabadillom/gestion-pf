@@ -1,18 +1,21 @@
 package mx.com.ferbo.dao;
 
-import java.util.List;
 import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
+import java.util.List;
+
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.model.PartidasAfectadas;
+import mx.com.ferbo.util.EntityManagerUtil;
 
 public class partidasAfectadasDAO extends IBaseDAO<PartidasAfectadas, Integer>{
 
-	private static Logger log = Logger.getLogger(partidasAfectadasDAO.class);
+	private static Logger log = LogManager.getLogger(partidasAfectadasDAO.class);
 	
 	@Override
 	public PartidasAfectadas buscarPorId(Integer id) {

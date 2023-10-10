@@ -16,7 +16,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -39,7 +40,7 @@ import mx.com.ferbo.utils.IOUtil;
 @ViewScoped
 public class EmisoresCFDISBean implements Serializable {
 		private static final long serialVersionUID = 1L;
-		private static Logger log = Logger.getLogger(EmisoresCFDISBean.class);
+		private static Logger log = LogManager.getLogger(EmisoresCFDISBean.class);
 		private UploadedFile certificadoFile;
 		private UploadedFile llavePrivadaFile;
 		private String pmoral;

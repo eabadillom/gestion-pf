@@ -1,27 +1,19 @@
 package mx.com.ferbo.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
-
-//import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Bancos;
-import mx.com.ferbo.model.Pago;
-import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class BancoDAO extends IBaseDAO<Bancos, Integer> {
-	private static Logger log = Logger.getLogger(BancoDAO.class);
+	private static Logger log = LogManager.getLogger(BancoDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<Bancos> findall() {

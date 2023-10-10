@@ -4,14 +4,15 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class UnidadDeManejoDAO extends IBaseDAO<UnidadDeManejo, Integer> {
-	private static Logger log = Logger.getLogger(UnidadDeManejoDAO.class);
+	private static Logger log = LogManager.getLogger(UnidadDeManejoDAO.class);
 
 	@Override
 	public UnidadDeManejo buscarPorId(Integer id) {

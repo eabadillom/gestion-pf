@@ -6,7 +6,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
@@ -15,7 +16,7 @@ import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PagoDAO extends IBaseDAO<Pago, Integer> {
-	private static Logger log = Logger.getLogger(PagoDAO.class);
+	private static Logger log = LogManager.getLogger(PagoDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<Pago> findall() {

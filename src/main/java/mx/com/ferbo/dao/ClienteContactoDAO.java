@@ -5,17 +5,17 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.InventarioException;
 
 public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 	
-	private static Logger log = Logger.getLogger(ClienteContactoDAO.class);
+	private static Logger log = LogManager.getLogger(ClienteContactoDAO.class);
 
 	@Override
 	public ClienteContacto buscarPorId(Integer id) {

@@ -6,14 +6,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.ResourceBundle;
+
 import javax.activation.DataSource;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import org.apache.log4j.Logger;
-import ch.qos.logback.core.Context;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class conexion {
-	private static Logger logger = Logger.getLogger(conexion.class);
+	private static Logger logger = LogManager.getLogger(conexion.class);
 
 	public static synchronized Connection dsConexion() throws SQLException {
 		Connection conn = null;
