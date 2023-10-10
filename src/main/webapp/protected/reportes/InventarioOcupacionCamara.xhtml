@@ -48,10 +48,40 @@
 									<p:selectOneMenu id="so-camara" value="#{reporteInventarioOcupacionCamaraBean.camaraSelect}" converter="entityConverter" autoWidth="true">
 										<f:selectItem itemLabel="Todas las camaras" itemValue="" />
 										<f:selectItems value="#{reporteInventarioOcupacionCamaraBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}"  itemValue="#{c}"/>
-										<p:ajax process ="@this" update="dt-OcupacionCamara" listener="#{reporteInventarioOcupacionCamaraBean.ocupacionCamara}" />
+										<p:ajax process ="@this" />
 									</p:selectOneMenu>
 								<p:outputLabel for="so-camara" value="Camara " />
 								</span>
+					</p:fieldset>
+					
+					<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+					  <p:toolbar>
+						<p:toolbarGroup>
+					   		<div class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton value=".pdf" actionListener="#{reporteInventarioOcupacionCamaraBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+					 		</div>
+						         <div class="col-2">
+						            <p:divider layout="vertical">
+						                <b>OR</b>
+						            </p:divider>
+						        </div>
+							        
+								 <div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value=".xlsx"  actionListener="#{reporteInventarioOcupacionCamaraBean.exportarExcel}" action="#{reporteInventarioOcupacionCamaraBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+							     </div>
+							     
+							     <div class="col-2">
+						            <p:divider layout="vertical">
+						                <b>OR</b>
+						            </p:divider>
+						        </div>
+						        
+						        <div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value="Consultar"  styleClass="ui-button-raised ui-button-secondary" actionListener="#{reporteInventarioOcupacionCamaraBean.ocupacionCamara()}" />  
+							    </div>
+							     
+			        	 </p:toolbarGroup>
+			        	</p:toolbar>
 					</p:fieldset>
 					
 					
@@ -83,32 +113,6 @@
 					
 					</p:dataTable>
 					
-					
-					<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
-					  <p:toolbar>
-				<p:toolbarGroup>
-					   <div class="col-5 flex align-items-center justify-content-center">
-						<p:commandButton value=".pdf" actionListener="#{reporteInventarioOcupacionCamaraBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
-						 </div>
-							         <div class="col-2">
-							            <p:divider layout="vertical">
-							                <b>OR</b>
-							            </p:divider>
-							        </div>
-							        
-										 <div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".xlsx"  actionListener="#{reporteInventarioOcupacionCamaraBean.exportarExcel}" action="#{reporteInventarioOcupacionCamaraBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
-							     </div>
-							        </p:toolbarGroup>
-
-							        </p:toolbar>
-							        
-
-						</p:fieldset>
-					
-						
-						
-						
 						
 						<p:dialog header="Grafica-Ocupación De Cámaras" modal="true" widgetVar="dlg-grafica" responsive="true" showEffect="fade" style="max-width:900px !important;max-height: 750px;">
 						
