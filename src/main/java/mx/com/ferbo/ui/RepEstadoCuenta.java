@@ -1,5 +1,6 @@
 package mx.com.ferbo.ui;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -9,9 +10,9 @@ import javax.persistence.Id;
 public class RepEstadoCuenta {
 		@Id
 		private Date fecha;
-		private String ventas;
-		private String pagos;
-		private String saldoInicial;
+		private BigDecimal ventas;
+		private BigDecimal pagos;
+		private BigDecimal saldoInicial;
 		private String emisor;
 		
 		public RepEstadoCuenta() {
@@ -26,27 +27,27 @@ public class RepEstadoCuenta {
 			this.fecha = fecha;
 		}
 
-		public String getVentas() {
+		public BigDecimal getVentas() {
 			return ventas;
 		}
 
-		public void setVentas(String ventas) {
+		public void setVentas(BigDecimal ventas) {
 			this.ventas = ventas;
 		}
 
-		public String getPagos() {
+		public BigDecimal getPagos() {
 			return pagos;
 		}
 
-		public void setPagos(String pagos) {
+		public void setPagos(BigDecimal pagos) {
 			this.pagos = pagos;
 		}
 
-		public String getSaldoInicial() {
+		public BigDecimal getSaldoInicial() {
 			return saldoInicial;
 		}
 
-		public void setSaldoInicial(String saldoInicial) {
+		public void setSaldoInicial(BigDecimal saldoInicial) {
 			this.saldoInicial = saldoInicial;
 		}
 
