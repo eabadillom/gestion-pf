@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+                
+	<ui:define name="title">Estado de resultados</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+        <p:breadCrumb>
+            <p:menuitem value="Home" outcome="/dashboard"/>
+            <p:menuitem value="Reportes"/>
+            <p:menuitem value="EstadoResultados"/>
+            <p:menuitem value="EStado de resultados" outcome="/protected/reportes/EstadoResultados"/>
+        </p:breadCrumb>
+        
+        <p:growl id="messages" showDetail="true" />
+        
+            <div class="p-grid crud-demo">
+                <div class="p-col-12">
+	                <div class="card">
+	             		
+	             		
+	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
+	             		
+                <p:outputLabel for="yearMonth" value="Periodo "/>
+                <p:datePicker id="yearMonth" view="month" value="#{reporteEstadoResultadosBean.mesActual}" pattern="MM/yyyy" yearNavigator="true" yearRange="2000:2030" maxdate="#{reporteIngresosBean.maxDate}"/>
+	             		
+	             			
+	             		</p:fieldset>
+
+	             		
+	             		<p:fieldset legend="Razon social" styleClass="p-mt-4">
+		             		<p:selectOneMenu id="select-emi" autoWidth="true" converter="entityConverter" value="#{reporteEstadoResultadosBean.emisor}">
+		             			<f:selectItem itemLabel="Todos Los emisores" Itemvalue="" />
+		             			<f:selectItems value="#{reporteEstadoResultadosBean.listaEmisores}" var="emi" itemLabel="#{emi.nb_emisor}" itemValue="#{emi}" />
+		             		</p:selectOneMenu>
+	             		</p:fieldset>
+	             		
+	             		<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+					 	 <p:toolbar>
+							<p:toolbarGroup>
+					  		 <div class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton value=".pdf" actionListener="#{reporteEstadoResultadosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+						 	 </div>
+							         
+					         <div class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+							        
+							 <div class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton value=".xlsx"  actionListener="#{reporteEstadoResultadosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+				     		 </div>
+							</p:toolbarGroup>
+
+						 </p:toolbar>
+						</p:fieldset>
+	             		   
+	                </div>
+                </div>
+            </div>
+            
+        </h:form>
+   </ui:define>
+</ui:composition>   
