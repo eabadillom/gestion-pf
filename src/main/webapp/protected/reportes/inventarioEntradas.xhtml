@@ -8,7 +8,7 @@
     <ui:define name="title">Reporte de Entradas</ui:define>
     <ui:define name="content">
         <h:form id="form">
-        	<p:dialog modal="true" widgetVar="statusDialog" header="Generando kardex..." draggable="false" closable="false" resizable="false">
+        	<p:dialog modal="true" widgetVar="statusDialog" header="Generando reporte..." draggable="false" closable="false" resizable="false">
 				<div align="center">
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
@@ -77,7 +77,7 @@
 										</p:divider>
 									</div>
 									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value="Consultar" actionListener="#{reporteEntradasBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" />
+										<p:commandButton value="Consultar" actionListener="#{reporteEntradasBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
 									</div>
 								</p:toolbarGroup>
 							</p:toolbar>
