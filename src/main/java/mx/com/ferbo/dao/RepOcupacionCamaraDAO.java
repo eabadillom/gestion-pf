@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,14 +8,15 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.ui.OcupacionCamara;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class RepOcupacionCamaraDAO {
 	
-	private static Logger log = Logger.getLogger(RepOcupacionCamaraDAO.class);
+	private static Logger log = LogManager.getLogger(RepOcupacionCamaraDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<OcupacionCamara> ocupacionCamara(Date fecha, Integer idCliente, Integer idPlanta, Integer idCamara){
@@ -35,7 +37,6 @@ public class RepOcupacionCamaraDAO {
 					+ "	cam.CAMARA_CVE AS camara_cve,"
 					+ "	cam.CAMARA_ABREV AS camara_abrev,"
 					+ "	cam.CAMARA_DS AS camara_ds,"
-					+ " plt.planta_cve AS planta_cve,"
 					+ "	plt.PLANTA_DS AS planta_ds,"
 					+ "	SUM(CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL )) as tarima"
 					+ "	from PARTIDA parEnt"
@@ -69,19 +70,35 @@ public class RepOcupacionCamaraDAO {
 					+ "	cddEnt.status <> 4"
 					+ "	AND (cam.camara_cve = :idCamara OR :idCamara IS NULL )"
 					+ "	AND (plt.planta_cve  = :idPlanta OR :idPlanta IS NULL )"
-					+ "	GROUP BY camara_cve,camara_ds, camara_abrev,planta_ds,planta_cve"
+					+ "	GROUP BY camara_cve,camara_ds, camara_abrev,planta_ds"
 					+ "	ORDER BY planta_ds"
 					+ ") I"
 					+ " WHERE tarima > 0"
-					+ " GROUP BY I.camara_cve, I.camara_ds, I.camara_abrev ,I.planta_ds,I.planta_cve";
+					+ " GROUP BY I.camara_cve, I.camara_ds, I.camara_abrev ,I.planta_ds";
 			
-			Query query = em.createNativeQuery(sql, OcupacionCamara.class)
+			Query query = em.createNativeQuery(sql)
 					.setParameter("Fecha", fecha)
 					.setParameter("idCliente", idCliente)
 					.setParameter("idCamara", idCamara)
 					.setParameter("idPlanta", idPlanta);
 			
-			listaOcupacionCamara = query.getResultList();
+			List<Object[]> listaObjetos = query.getResultList();
+						
+			
+			for(Object[] o: listaObjetos) {
+				
+				OcupacionCamara oc = new OcupacionCamara();
+				int id = 0;
+				
+				oc.setCamara_cve((Integer) o[id++]);
+				oc.setCamara_abrev((String) o[id++]);
+				oc.setCamara_ds((String) o[id++]);
+				oc.setPlanta_ds((String) o[id++]);
+				oc.setTarima((BigDecimal)o[id++]);
+				
+				listaOcupacionCamara.add(oc);
+				
+			}
 			
 			
 		} catch (Exception e) {
