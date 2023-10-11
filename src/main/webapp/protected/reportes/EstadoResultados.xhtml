@@ -33,9 +33,9 @@
 
 	             		
 	             		<p:fieldset legend="Razon social" styleClass="p-mt-4">
-		             		<p:selectOneMenu id="select-emi" autoWidth="true" converter="entityConverter" value="#{reporteEstadoResultadosBean.emisor}">
+		             		<p:selectOneMenu id="select-emi" autoWidth="true" converter="entityConverter" value="#{reporteEstadoResultadosBean.emisor.nb_emisor}">
 		             			<f:selectItem itemLabel="Todos Los emisores" Itemvalue="" />
-		             			<f:selectItems value="#{reporteEstadoResultadosBean.listaEmisores}" var="emi" itemLabel="#{emi.nb_emisor}" itemValue="#{emi}" />
+		             			<f:selectItems value="#{reporteEstadoResultadosBean.listaEmisores}" var="emi" itemLabel="#{emi.nb_emisor}" itemValue="#{emi.nb_emisor}" />
 		             		</p:selectOneMenu>
 	             		</p:fieldset>
 	             		

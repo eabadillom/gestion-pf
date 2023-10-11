@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.time.Month;
+import java.time.MonthDay;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,16 +31,18 @@ import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.EmisoresCFDIS;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
+import java.time.LocalDate;
 
 @Named
 @ViewScoped
 public class ReporteEstadoResultadosBean implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(ReporteAlmacenFechaBean.class);
+	private static Logger log = Logger.getLogger(ReporteEstadoResultadosBean.class);
 	
 	private List<EmisoresCFDIS> listaEmisores;
 	
@@ -49,6 +55,8 @@ public class ReporteEstadoResultadosBean implements Serializable {
 	private Date fechaFin;
 	private Date maxDate;
 	private Date mesActual;
+	private Month fechaMes;
+	Calendar calendar = Calendar.getInstance();
 	
 	public ReporteEstadoResultadosBean() {
 		
@@ -60,32 +68,36 @@ public class ReporteEstadoResultadosBean implements Serializable {
 		
 	}
 	
+	@SuppressWarnings("deprecation")
 	@PostConstruct
 	public void init() {
-		
-		fechaInicio = new Date();
-		fechaFin = new Date();
+
+		fechaInicio = new Date(Calendar.MONTH);
+		fechaFin = new Date(Calendar.MONTH);
 		mesActual = new Date();
-		
+
 		listaEmisores =emisorDAO.buscarTodos();
 		
 		Date today = new Date();
 		long oneDay = 24 * 60 * 60 * 1000;
 
 		maxDate = new Date(today.getTime() );
+		
 	}
 
-
+	
+	
+	@SuppressWarnings("deprecation")
 	public void exportarPdf() {
-		
-		log.info("exṕrtando a PDF");
-		String jasperPath = "/jasper/Ingresos.jrxml";
+		log.info("exportando a PDF");
+		String jasperPath = "/jasper/RepEstadoCuenta.jrxml";
 		String filename = "reporteEstadoCuenta"+mesActual+".pdf";
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
 		File reportFile = new File(jasperPath);
 		File imgfile = null;
+		Date finMes;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
@@ -107,12 +119,12 @@ public class ReporteEstadoResultadosBean implements Serializable {
 			}else {
 				emi = emisor.getNb_emisor();
 			}
-		
+			finMes = DateUtil.getLastDayOfMonth(mesActual);
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("emisor",emisor.getNb_emisor());
-			parameters.put("fechaInicio", fechaInicio);
-			parameters.put("fechaFin", fechaFin);
+			parameters.put("emisorN",emisor.getNb_emisor());
+			parameters.put("fechaIni", mesActual);
+			parameters.put("fechaFin", finMes);
 			parameters.put("imagen", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
@@ -133,8 +145,8 @@ public class ReporteEstadoResultadosBean implements Serializable {
 	
 	public void exportarExcel() {
 		
-		log.info("exṕrtando a PDF");
-		String jasperPath = "/jasper/Ingresos.jrxml";
+		log.info("exṕrtando a excel");
+		String jasperPath = "/jasper/RepEstadoCuenta.jrxml";
 		String filename = "reporteIngresos"+mesActual+".xlsx";
 		String images = "/images/logo.jpeg";
 		String message = null;
