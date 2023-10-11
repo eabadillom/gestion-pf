@@ -30,7 +30,7 @@
 	    parEnt.PARTIDA_CVE,
 	    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
 	    udm.unidad_de_manejo_ds as unidad_cobro,
-	    CEILING(cantidad * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL ) as tarima,
+	    CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL ) as tarima,
 	    (parEnt.peso_total - COALESCE(salidas.peso, 0)) as peso,
 	    prd.producto_cve        as producto_cve,
 	    prd.producto_ds         as producto, 
@@ -264,7 +264,7 @@ ORDER BY cliente,numero_cte, producto]]>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{numero_cte} + " " + $F{cliente}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{cliente}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>

@@ -22,7 +22,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.charts.ChartData;
 import org.primefaces.model.charts.pie.PieChartDataSet;
@@ -47,7 +48,7 @@ import net.sf.jasperreports.engine.JRException;
 public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(ReporteInventarioOcupacionCamaraBean.class);
+	private static Logger log = LogManager.getLogger(ReporteInventarioOcupacionCamaraBean.class);
 
 	Integer idCliente = null;
 	Integer idPlanta = null;

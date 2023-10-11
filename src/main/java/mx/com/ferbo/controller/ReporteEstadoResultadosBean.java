@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -22,14 +21,12 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
-import mx.com.ferbo.model.Bancos;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -42,7 +39,9 @@ import java.time.LocalDate;
 public class ReporteEstadoResultadosBean implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(ReporteEstadoResultadosBean.class);
+
+	private static Logger log = LogManager.getLogger(ReporteEstadoResultadosBean.class);
+
 	
 	private List<EmisoresCFDIS> listaEmisores;
 	
