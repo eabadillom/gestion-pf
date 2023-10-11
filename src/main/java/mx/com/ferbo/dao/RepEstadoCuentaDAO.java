@@ -113,19 +113,14 @@ private static Logger log = LogManager.getLogger(RepEstadoCuentaDAO.class);
 						rec.setPagos((BigDecimal) o[idx++]);
 						rec.setSaldoInicial((BigDecimal) o[idx++]);
 						rec.setEmisor((String) o[idx++]);
-						
 					listaEstadoCuenta.add(rec);
-					
 					}
 		} catch (Exception e) {
-			
+			log.error("Problemas para obtener el estado de resultados", e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
-		
-		
 		return listaEstadoCuenta;
-		/*em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			listaEstadoCuenta = new ArrayList<RepEstadoCuenta>();*/
 	}
 
 	@Override
