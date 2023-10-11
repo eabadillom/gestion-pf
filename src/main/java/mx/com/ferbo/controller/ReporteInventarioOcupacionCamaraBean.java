@@ -39,6 +39,7 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.ui.OcupacionCamara;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 import net.sf.jasperreports.engine.JRException;
@@ -126,30 +127,61 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 			plantaSelect.setCamaraList(listaCamara);
 		}
 		
-		ocupacionCamara();
+		//ocupacionCamara();
 		
 	}
 	
-	public void ocupacionCamara(){
+	public void ocupacionCamara() throws InventarioException{
 		
 		idCliente = null;
 		idPlanta = null;
 		idCamara = null;
 		
-		if(clienteSelect!=null) {
-			idCliente = clienteSelect.getCteCve();
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Reporte entradas";
+		
+		try {
+			
+			if(clienteSelect!=null) {
+				idCliente = clienteSelect.getCteCve();
+			}else {
+				throw new InventarioException("Debe seleccionar un cliente");
+			}
+			
+			if(plantaSelect!=null) {
+				idPlanta = plantaSelect.getPlantaCve();
+			}else {
+				throw new InventarioException("Debe seleccionar una planta");
+			}
+			
+			if(camaraSelect!=null) {
+				idCamara = camaraSelect.getCamaraCve();
+			}else {
+				throw new InventarioException("Debe seleccionar una camara");
+			}
+			
+			
+			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, idPlanta, idCamara);
+			
+		}catch(InventarioException ex) {
+			mensaje = ex.getMessage();
+			
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		}catch(Exception e) {
+			mensaje = e.getMessage();
+			
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);			
+		}finally {	
+			PrimeFaces.current().ajax().update("form:dt-OcupacionCamara", "form:messages");
 		}
-		
-		if(plantaSelect!=null) {
-			idPlanta = plantaSelect.getPlantaCve();
-		}
-		
-		if(camaraSelect!=null) {
-			idCamara = camaraSelect.getCamaraCve();
-		}
-		
-		
-		listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, idPlanta, idCamara);
 		
 		//createPieModel();
 		//System.out.println(listaOcupacionCamara.get(0).getTarima());
@@ -357,7 +389,6 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
         
     }
 
-	
 	
 
 	public Date getFecha() {
