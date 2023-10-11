@@ -7,7 +7,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
@@ -19,7 +20,7 @@ import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
-	private static Logger log = Logger.getLogger(FacturacionDepositosDAO.class);
+	private static Logger log = LogManager.getLogger(FacturacionDepositosDAO.class);
 	
 	EntityManager em = null;
 	

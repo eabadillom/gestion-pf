@@ -8,18 +8,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
-import mx.com.ferbo.model.Estados;
-import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.model.Ciudades;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 
-	private static Logger log = Logger.getLogger(CiudadesDAO.class);
+	private static Logger log = LogManager.getLogger(CiudadesDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Ciudades> findall() {

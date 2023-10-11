@@ -1,25 +1,21 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
-//import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.Municipios;
-import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
-	Logger log = Logger.getLogger(MunicipiosDAO.class);
+	Logger log = LogManager.getLogger(MunicipiosDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<Municipios> findall() {

@@ -1,25 +1,21 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.StatusFactura;
-import mx.com.ferbo.model.TipoAsentamiento;
-import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class StatusFacturaDAO extends IBaseDAO<StatusFactura, Integer>{
-	private static Logger log = Logger.getLogger(StatusFacturaDAO.class);
+	private static Logger log = LogManager.getLogger(StatusFacturaDAO.class);
 	@Override
 	public StatusFactura buscarPorId(Integer id) {
 		EntityManager entity = null;

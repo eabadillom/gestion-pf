@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteInventarioEntradas" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b1d23060-936c-4bd9-a427-94b0e5decc5d">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="173"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="820"/>
 	<parameter name="FechaIni" class="java.util.Date"/>
@@ -20,73 +20,44 @@
 		<parameterDescription><![CDATA[]]></parameterDescription>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT `CONSTANCIA_DE_DEPOSITO`.folio_cliente,
-	`CONSTANCIA_DE_DEPOSITO`.fecha_ingreso,
-	`CLIENTE`.numero_cte,
-	`CLIENTE`.cte_nombre,
-	`PARTIDA`.`PESO_TOTAL`,
-	`PARTIDA`.`CANTIDAD_TOTAL`,
-		`PARTIDA`.`valorMercancia`,
-	`DETALLE_PARTIDA`.dtp_codigo,
-	`DETALLE_PARTIDA`.dtp_SAP,
-	`PRODUCTO`.producto_ds,
-	`DETALLE_PARTIDA`.dtp_lote,
-	`DETALLE_PARTIDA`.dtp_po,
-	`DETALLE_PARTIDA`.dtp_caducidad,
-	`DETALLE_PARTIDA`.dtp_tarimas,
-	`DETALLE_PARTIDA`.cantidad_u_manejo,
-	`UNIDAD_DE_MANEJO`.unidad_de_manejo_ds,
-	`PLANTA`.planta_cve,
-	`PLANTA`.planta_abrev AS planta,
-	`CAMARA`.camara_cve,
-	`CAMARA`.camara_abrev AS camara
-FROM `PARTIDA`,
-	`CONSTANCIA_DE_DEPOSITO`,
-	`CLIENTE`,
-	`DETALLE_PARTIDA`,
-	`UNIDAD_DE_MANEJO`,
-	`UNIDAD_DE_PRODUCTO`,
-	`PRODUCTO`,
-	`PLANTA`,
-	`CAMARA`
-WHERE 
-	  ( 
-	 `CONSTANCIA_DE_DEPOSITO`.folio = `PARTIDA`.folio) 
-	 AND ( 
-	 `CLIENTE`.cte_cve = `CONSTANCIA_DE_DEPOSITO`.cte_cve) 
-	 AND ( 
-	 `DETALLE_PARTIDA`.partida_cve = `PARTIDA`.partida_cve) 
-	 AND ( 
-	 `UNIDAD_DE_MANEJO`.unidad_de_manejo_cve = `PARTIDA`.unidad_de_cobro) 
-	 AND ( 
-	 `UNIDAD_DE_PRODUCTO`.unidad_de_producto_cve = `PARTIDA`.unidad_de_producto_cve) 
-	 AND ( 
-	 `PRODUCTO`.producto_cve = `UNIDAD_DE_PRODUCTO`.producto_cve) 
-	 AND ( 
-	 `CAMARA`.planta_cve = `PLANTA`.planta_cve) 
-	 AND ( 
-	 `CAMARA`.camara_cve = `PARTIDA`.camara_cve) 
-	 AND ( 
-	  ( 
-	 `DETALLE_PARTIDA`.`DET_PART_CVE` = 1)) 
-	 AND ( 
-	  ( 
-	 `CONSTANCIA_DE_DEPOSITO`.fecha_ingreso >= $P{FechaIni}) 
-	 AND ( 
-	 `CONSTANCIA_DE_DEPOSITO`.fecha_ingreso <= $P{FechaFin}) 
-	 AND ( 
-	 `CONSTANCIA_DE_DEPOSITO`.cte_cve = $P{idCliente} 
-	 OR $P{idCliente} IS NULL ) 
-	 AND ( 
-	 `CAMARA`.camara_cve = $P{Camara} 
-	 OR $P{Camara} IS NULL ) 
-	 AND ( 
-	 `PLANTA`.planta_cve = $P{Planta} 
-	 OR $P{Planta} IS NULL )) 
-ORDER BY `CLIENTE`.cte_nombre DESC,
-	`CLIENTE`.numero_cte DESC,
-	`PRODUCTO`.producto_ds DESC,
-	`CONSTANCIA_DE_DEPOSITO`.fecha_ingreso DESC]]>
+		<![CDATA[SELECT
+	cdd.folio_cliente,
+	cdd.fecha_ingreso,
+	c.numero_cte,
+	c.cte_nombre,
+	p.PESO_TOTAL,
+	p.CANTIDAD_TOTAL,
+		p.valorMercancia,
+	dp.dtp_codigo,
+	dp.dtp_SAP,
+	prd.producto_ds,
+	dp.dtp_lote,
+	dp.dtp_po,
+	dp.dtp_caducidad,
+	dp.dtp_tarimas,
+	dp.cantidad_u_manejo,
+	udm.unidad_de_manejo_ds,
+	plt.planta_cve,
+	plt.planta_abrev AS planta,
+	cam.camara_cve,
+	cam.camara_abrev AS camara
+FROM PARTIDA p INNER JOIN CONSTANCIA_DE_DEPOSITO cdd ON cdd.folio = p.folio
+INNER JOIN CLIENTE c ON c.cte_cve = cdd.cte_cve
+INNER JOIN DETALLE_PARTIDA dp ON dp.partida_cve = p.partida_cve AND dp.DET_PART_CVE = 1
+INNER JOIN UNIDAD_DE_PRODUCTO udp ON udp.unidad_de_producto_cve = p.unidad_de_producto_cve
+INNER JOIN UNIDAD_DE_MANEJO udm ON udm.unidad_de_manejo_cve = udp.UNIDAD_DE_MANEJO_CVE
+INNER JOIN PRODUCTO prd ON prd.producto_cve = udp.producto_cve
+INNER JOIN CAMARA cam ON cam.camara_cve = p.camara_cve
+INNER JOIN PLANTA plt ON cam.planta_cve = plt.planta_cve
+WHERE cdd.FECHA_INGRESO BETWEEN $P{FechaIni} AND $P{FechaFin}
+	AND (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
+	AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL)
+	AND (plt.planta_cve = $P{Planta} OR $P{Planta} IS NULL)
+ORDER BY
+	c.cte_nombre DESC,
+	c.numero_cte DESC,
+	prd.producto_ds DESC,
+	cdd.fecha_ingreso DESC]]>
 	</queryString>
 	<field name="folio_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="folio_cliente"/>
@@ -244,7 +215,7 @@ ORDER BY `CLIENTE`.cte_nombre DESC,
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{numero_cte} +""+$F{cte_nombre}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{cte_nombre}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -491,7 +462,7 @@ ORDER BY `CLIENTE`.cte_nombre DESC,
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="103" splitType="Stretch">
+		<band height="42" splitType="Stretch">
 			<staticText>
 				<reportElement x="163" y="21" width="162" height="12" uuid="1ab9f0f8-9ac3-48bd-951e-d09e6af1cc28"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -513,9 +484,9 @@ ORDER BY `CLIENTE`.cte_nombre DESC,
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center">
-					<font fontName="SansSerif" size="14" isBold="false"/>
+					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[REPORTE DE INVENTARIO]]></text>
+				<text><![CDATA[REPORTE DE ENTRADAS]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="390" y="21" width="32" height="12" uuid="44edc836-bc87-49fb-8069-4fc33ba22c59"/>
@@ -532,7 +503,10 @@ ORDER BY `CLIENTE`.cte_nombre DESC,
 				<textFieldExpression><![CDATA[$P{FechaIni}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement x="3" y="21" width="160" height="82" uuid="5809c7d3-af46-4f8c-a303-b0a7678f3560"/>
+				<reportElement x="0" y="0" width="143" height="42" uuid="5809c7d3-af46-4f8c-a303-b0a7678f3560">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 		</band>
@@ -1051,17 +1025,6 @@ ORDER BY `CLIENTE`.cte_nombre DESC,
 	<noData>
 		<band height="79">
 			<staticText>
-				<reportElement x="0" y="0" width="780" height="21" forecolor="#2196F3" uuid="1e43d9e6-0da4-457a-9b8b-2239b9c24b14">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font fontName="SansSerif" size="14" isBold="false"/>
-				</textElement>
-				<text><![CDATA[REPORTE DE INVENTARIO]]></text>
-			</staticText>
-			<staticText>
 				<reportElement x="0" y="50" width="780" height="29" uuid="3609846d-3c22-42c0-9057-b72da6742647">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -1071,10 +1034,24 @@ ORDER BY `CLIENTE`.cte_nombre DESC,
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[NO SE ENCONTRO INFORMACION DEL INVENTARIO]]></text>
+				<text><![CDATA[NO SE ENCONTRO INFORMACIÓN DE ENTRADAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="780" height="21" forecolor="#2196F3" uuid="1152751d-36a7-4a0c-bcb9-1ae04b0a7753">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE DE ENTRADAS]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="2" width="119" height="77" uuid="b8da3171-a3f9-4075-abf4-77b5e3986b3e"/>
+				<reportElement x="0" y="0" width="143" height="42" uuid="c3d54154-945d-4f86-b213-581a37650ee2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 		</band>

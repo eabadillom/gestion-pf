@@ -2,7 +2,6 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,14 +13,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CategoriaDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
-import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.CuotaMinimaDAO;
 import mx.com.ferbo.dao.DomiciliosDAO;
 import mx.com.ferbo.dao.PlantaDAO;
@@ -33,8 +32,6 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
-import mx.com.ferbo.model.CuotaMensualServicio;
 import mx.com.ferbo.model.CuotaMinima;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Planta;
@@ -49,7 +46,7 @@ import mx.com.ferbo.util.InventarioException;
 public class AvisosComercialBean implements Serializable {
 
 	private static final long serialVersionUID = -626048119540963939L;
-	private static Logger log = Logger.getLogger(AvisosComercialBean.class);
+	private static Logger log = LogManager.getLogger(AvisosComercialBean.class);
 
 	/**
 	 * Objetos para clientes

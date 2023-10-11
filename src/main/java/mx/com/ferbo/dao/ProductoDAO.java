@@ -4,7 +4,8 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Producto;
@@ -14,7 +15,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 public class ProductoDAO extends IBaseDAO<Producto, Integer> {
-	private static Logger log = Logger.getLogger(ProductoDAO.class);
+	private static Logger log = LogManager.getLogger(ProductoDAO.class);
 
 	@Override
 	public Producto buscarPorId(Integer id) {

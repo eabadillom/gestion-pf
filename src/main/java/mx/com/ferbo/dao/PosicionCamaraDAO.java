@@ -6,9 +6,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import groovy.xml.Entity;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Posicion;
@@ -17,7 +17,7 @@ import mx.com.ferbo.util.JPAEntity;
 
 public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
 	EntityManager entity = JPAEntity.getEntity().createEntityManager();
-	private static Logger log = Logger.getLogger(PosicionCamaraDAO.class);
+	private static Logger log = LogManager.getLogger(PosicionCamaraDAO.class);
 	
 	@SuppressWarnings("unchecked")
 	public List<Posicion> findAll(){

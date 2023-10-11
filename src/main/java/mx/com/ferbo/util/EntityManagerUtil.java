@@ -7,7 +7,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
 
@@ -16,7 +17,7 @@ import org.hibernate.internal.SessionImpl;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 public class EntityManagerUtil {
-	private static Logger log = Logger.getLogger(EntityManagerUtil.class);
+	private static Logger log = LogManager.getLogger(EntityManagerUtil.class);
 
 	protected static String PERSIST_UNIT = "gestionPU";
     protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);

@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.Usuario;
 
@@ -25,7 +26,7 @@ import mx.com.ferbo.model.Usuario;
  */
 public class SessionFilter implements Filter {
 	
-	private static Logger log = Logger.getLogger(SessionFilter.class);
+	private static Logger log = LogManager.getLogger(SessionFilter.class);
 	
 	private FilterConfig filterConfig   = null;
 	private List<String> exceptionPages = null;

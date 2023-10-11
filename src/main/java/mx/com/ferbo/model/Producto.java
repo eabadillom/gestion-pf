@@ -56,7 +56,7 @@ public class Producto implements Serializable {
     private int categoria;
     @OneToMany(mappedBy = "productoCve")
     private List<PartidaServicio> partidaServicioList;
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "productoCve", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST}, mappedBy = "productoCve", fetch = FetchType.LAZY)
     private List<ProductoPorCliente> productoPorClienteList;
 
     public Producto() {
