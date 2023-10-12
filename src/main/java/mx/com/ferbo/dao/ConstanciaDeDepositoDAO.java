@@ -14,10 +14,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -105,6 +107,26 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			System.out.println("ERROR" + e.getMessage());
 			return null;
 		}
+	}
+	
+	public List<ConstanciaDeDeposito> buscarPor(String folioCliente, Integer idCliente, Date fechaInicio, Date fechaFin) {
+		EntityManager em = null;
+		List<ConstanciaDeDeposito> listado = null;
+		try {
+			 em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("ConstanciaDeDeposito.findByFolioClientePeriodo",ConstanciaDeDeposito.class)
+					.setParameter("idCliente", idCliente)
+					.setParameter("folioCliente", folioCliente)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.getResultList()
+			;
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return listado;
 	}
 
 	@Override
@@ -205,6 +227,9 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				log.debug("Servicio: {}", cdet.getServicioCve().getServicioCod());
 			}
 			
+			Aviso aviso = constancia.getAvisoCve();
+			log.info("Aviso: {}", aviso.getAvisoCve());
+			
 			List<Partida> partidaList = constancia.getPartidaList();
 			for(Partida partida : partidaList) {
 				log.debug("Partida: {}",  partida.getPartidaCve());
@@ -223,6 +248,10 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				for(TraspasoPartida traspaso : traspasoPartidaList) {
 					log.info("Traspaso partida: {}",traspaso.getId());
 					log.info("Constancia traspaso: {}", traspaso.getTraspaso().getId());
+				}
+				List<DetallePartida> detallePartidaList = partida.getDetallePartidaList();
+				for(DetallePartida dp : detallePartidaList) {
+					log.info("Detalle Partida: {} - {}", dp.getDetallePartidaPK().getPartidaCve(), dp.getDetallePartidaPK().getDetPartCve());
 				}
 			}
 			
