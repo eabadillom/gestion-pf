@@ -36,7 +36,7 @@ private static Logger log = LogManager.getLogger(RepEstadoCuentaDAO.class);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<RepEstadoCuenta> listaEstadoCuenta( Date fecha, BigDecimal ventas, BigDecimal pagos, BigDecimal saldoInicial, String emisor){
+	public List<RepEstadoCuenta> listaEstadoCuenta( Date fecha, String emisor, Date fechaFin){
 		List<RepEstadoCuenta> listaEstadoCuenta = null;
 		EntityManager em = null;
 		String sql = null;
@@ -46,62 +46,58 @@ private static Logger log = LogManager.getLogger(RepEstadoCuentaDAO.class);
 									+"sum(ventas) as ventas, "
 									+" sum(pagos) as pagos, "
 									+" saldo_inicial,"
-									+" estadoCuenta."
-									+" emisor"
+									+" estadoCuenta.emisor "
 									+" FROM "
 									+" (SELECT "
 									+" f.fecha, "
 									+" 'factura' as Tipo,"
 									+" f.total as ventas,"
-									+" 0 as pagos,"
-									+" FROM factura f"
-									+" WHERE f.fecha BETWEEN $P{fechaIni} AND $P{fechaFin} AND emi_nombre =  $P{emisorN} OR $P{emisorN} IS NULL"
-									+" UNION ALL"
+									+" 0 as pagos "
+									+" FROM factura f "
+									+" WHERE f.fecha BETWEEN :fechaIni AND :fechaFin AND emi_nombre =  :emisorN OR :emisorN IS NULL"
+									+" UNION ALL "
 									+"SELECT "
 									+"p.fecha, "
 									+"'pago' as Tipo,"
 									+"0 as ventas,"
-									+"p.monto as pagos, "
-									+"FROM pago p"
-									+"RIGHT JOIN factura f ON p.factura = f.id"
-									+"WHERE p.fecha BETWEEN $P{fechaIni} "
-									+ "AND $P{fechaFin} "
-									+ "AND (f.emi_nombre = $P{emisorN}   OR $P{emisorN} IS NULL )"
+									+"p.monto as pagos "
+									+"FROM pago p "
+									+"RIGHT JOIN factura f ON p.factura = f.id "
+									+" WHERE p.fecha BETWEEN :fechaIni "
+									+ "AND :fechaFin "
+									+ "AND (f.emi_nombre = :emisorN   OR :emisorN IS NULL )"
 									+") b "
-									+"JOIN ( SELECT SUM(saldo) as saldo_inicial, emisor"
+									+"JOIN ( SELECT SUM(saldo) as saldo_inicial, emisor "
 									+"FROM ( "
-									+ "SELECT "
-									+"(factura.total - COALESCE(pago.monto, 0)) as saldo, "
-									+"factura.emi_nombre as emisor, "
-									+"FROM factura "
+									+ " SELECT "
+									+" (factura.total - COALESCE(pago.monto, 0)) as saldo, "
+									+" factura.emi_nombre as emisor "
+									+" FROM factura "
 									+" LEFT JOIN pago ON factura.id  = pago.factura "
 									+"WHERE status IN ('1', '3', '4') "
 									+"AND emi_rfc IS NOT NULL "
-									+"AND (factura.emi_nombre = $P{emisorN} OR $P{emisorN} IS NULL )"
-									+"AND factura.fecha < $P{fechaIni} "
+									+"AND (factura.emi_nombre =  :emisorN  OR :emisorN IS NULL )"
+									+"AND factura.fecha < :fechaIni "
 									+"GROUP BY  "
 									+"emisor,"
-									+"saldo, "
-									+"ORDER BY "
+									+"saldo "
+									+" ORDER BY "
 									+ "emisor"
 									+ ")saldoInicial "
 									+ "GROUP by "
 									+ "emisor"
-									+ ")estadoCuenta"
-									+ "GROUP BY "
-									+ "fecha,saldo_inicial,"
-									+ "emisor "
+									+ ")estadoCuenta "
+									+ " GROUP BY "
+									+ " fecha,saldo_inicial, "
+									+ " emisor "
 									+ "ORDER BY "
-									+ "estadoCuenta."
 									+ "emisor, "
 									+ "b.fecha ";
 					em = EntityManagerUtil.getEntityManager();
 				    List<Object[]> results = em.createNativeQuery(sql)
-				    		.setParameter("fecha", fecha)
-							.setParameter("ventas", ventas)
-							.setParameter("pagos", pagos)
-							.setParameter("saldoInicial", saldoInicial)
-							.setParameter("emisor", emisor)
+				    		.setParameter("fechaIni", fecha)
+							.setParameter("emisorN", emisor)
+							.setParameter("fechaFin", fechaFin)
 							.getResultList()
 							;
 				    listaEstadoCuenta = new ArrayList<RepEstadoCuenta>();
@@ -146,5 +142,5 @@ private static Logger log = LogManager.getLogger(RepEstadoCuentaDAO.class);
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }
