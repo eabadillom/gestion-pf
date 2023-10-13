@@ -1,5 +1,9 @@
 package mx.com.ferbo.dao;
 
+import java.math.BigDecimal;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,11 +14,17 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.OrdenSalida;
+import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.ui.RepEstadoCuenta;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 	private static Logger log = LogManager.getLogger(OrdenSalidaDAO.class);
+	
+	public EntityManager em = null;
 
 	@SuppressWarnings("unchecked")
 	public List<OrdenSalida> findall() {
@@ -66,7 +76,75 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		
 		return listadoSalidas;
 	}
-
+	
+	public List<OrdenSalida> buscarPorstatusFecha(Date fecha) {
+		List<OrdenSalida> listaStatusFecha = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			listaStatusFecha = em.createNamedQuery("OrdenSalida.findByfechaSalida", OrdenSalida.class)
+					.setParameter("fechaSalida", fecha)
+					.getResultList();
+			
+			em.getTransaction().commit();
+		} catch(Exception ex) {
+			EntityManagerUtil.rollback(em);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return listaStatusFecha;
+	}
+	public List<OrdenSalida> buscarFolioPorCliente(Cliente cliente, Date fecha) {
+		 List<OrdenSalida> listaOrdenSalida = null;
+		 EntityManager em = null;
+		 String sql = null;
+		 try {
+			 sql= "SELECT "
+					 +"distinct  "
+					 +"cd_folio_salida, " 
+					 +"fh_salida, "
+					 +"tm_salida, "
+					 +"nb_placa_tte, "
+					 +"nb_operador_tte "
+					 +"FROM "
+					 +"pre_salida ps "
+					 +"INNER JOIN "
+					 +"PARTIDA p "
+					 +"ON "
+					 +"ps.partida_cve = p.PARTIDA_CVE "
+					 +"INNER JOIN "
+					 +"CONSTANCIA_DE_DEPOSITO cdd ON p.FOLIO = cdd.FOLIO "
+					 +"WHERE ps.st_estado = 'A' AND ps.fh_salida = :fecha AND cdd.CTE_CVE = :idCliente";
+				em = EntityManagerUtil.getEntityManager();
+			    @SuppressWarnings("unchecked")
+				List<Object[]> results = em.createNativeQuery(sql)
+			    		.setParameter("idCliente", cliente.getCteCve())
+			    		.setParameter("fecha", fecha)
+						.getResultList()
+						;
+			    listaOrdenSalida = new ArrayList<OrdenSalida>();
+				for(Object[] o : results) {
+					 OrdenSalida os = new OrdenSalida();
+					int idx = 0 ;
+					os.setFechaSalida((Date) o[idx++]);
+					os.setFolioSalida((String) o[idx++]);
+					os.setTmSalida((Time) o[idx++]);
+					os.setNombrePlacas(	(String) o[idx++]);
+					os.setNombreOperador((String) o[idx++]);
+					listaOrdenSalida.add(os);
+				}
+		 }catch(Exception e) {
+			 
+		 }finally {
+			 
+		 }
+		return null;
+		
+	}
+	
 	@Override
 	public List<OrdenSalida> buscarPorCriterios(OrdenSalida e) {
 		// TODO Auto-generated method stub
@@ -108,7 +186,12 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	public EntityManager getEntityManager() {
+		return em;
+	}
+	public void setEntityManager(EntityManager em) {
+		this.em = em;
+	}
 
 
 }

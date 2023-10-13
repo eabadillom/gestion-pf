@@ -23,11 +23,19 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "OrdenSalida.findAll", query = "SELECT os FROM OrdenSalida os ORDER BY os.idPreSalida"),
     @NamedQuery(name = "OrdenSalida.findByidPreSalida",  query = "SELECT os FROM OrdenSalida os WHERE os.idPreSalida = :idPreSalida"),
     @NamedQuery(name = "OrdenSalida.findByFolioSalida", query = "SELECT os FROM OrdenSalida  os  WHERE os.FolioSalida = :FolioSalida"),
-    @NamedQuery(name = "OrdenSalida.findByfechaSalida",query = "SELECT os FROM OrdenSalida  os  WHERE os.fechaSalida = :fechaSalida"),
+    @NamedQuery(name = "OrdenSalida.findByfechaSalida",query = "SELECT os FROM OrdenSalida  os  WHERE os.fechaSalida = :fechaSalida AND os.stEstado ='A' "),
     @NamedQuery(name = "OrdenSalida.findBynombrePlacas",query = "SELECT os FROM OrdenSalida  os  WHERE os.nombrePlacas = :nombrePlacas"),
     @NamedQuery(name = "OrdenSalida.findBynombreOperador", query = "SELECT os FROM OrdenSalida  os  WHERE os.nombreOperador = :nombreOperador"),
     @NamedQuery(name = "OrdenSalida.findBypartidaClave", query = "SELECT os FROM OrdenSalida  os  WHERE os.partidaClave = :partidaClave "),
+    @NamedQuery(name = "OrdenSalida.findByCliente", query = "SELECT os FROM OrdenSalida  os  WHERE os.partidaClave = :partidaClave "),
     @NamedQuery(name = "OrdenSalida.findByfolio", query = "SELECT os FROM OrdenSalida  os  WHERE os.folio = :folio")})
+
+/* SELECT
+distinct cd_folio_salida, fh_salida, tm_salida, nb_placa_tte, nb_operador_tte
+FROM pre_salida ps
+INNER JOIN PARTIDA p ON ps.partida_cve = p.PARTIDA_CVE
+INNER JOIN CONSTANCIA_DE_DEPOSITO cdd ON p.FOLIO = cdd.FOLIO
+WHERE ps.st_estado = 'A' AND ps.fh_salida = $P{fecha} AND cdd.CTE_CVE = $P{idCliente} */
 public class OrdenSalida implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -52,7 +60,7 @@ public class OrdenSalida implements Serializable {
 	
 	@Size(max = 23)
 	@Column(name ="tm_salida")
-	private Time tmSalida;
+	private Time horaSalida;
 	
 	@Size(max = 8)
 	@Column(name ="nb_placa_tte")
@@ -82,14 +90,14 @@ public class OrdenSalida implements Serializable {
 
 	}
 
-	public OrdenSalida(Integer idPreSalida, String folioSalida, String stEstado,Date fechaSalida,  Time tmSalida, String nombrePlacas,
+	public OrdenSalida(Integer idPreSalida, String folioSalida, String stEstado,Date fechaSalida,  Time horaSalida, String nombrePlacas,
 			String nombreOperador, Integer partidaClave, Integer folio, Integer cantidad, Integer idContacto) {
 		super();
 		this.idPreSalida = idPreSalida;
 		FolioSalida = folioSalida;
 		this.stEstado = stEstado;
 		this.fechaSalida = fechaSalida;
-		this.tmSalida = tmSalida;
+		this.horaSalida = horaSalida;
 		this.nombrePlacas = nombrePlacas;
 		this.nombreOperador = nombreOperador;
 		this.partidaClave = partidaClave;
@@ -131,11 +139,11 @@ public class OrdenSalida implements Serializable {
 	}
 
 	public Time getTmSalida() {
-		return tmSalida;
+		return horaSalida;
 	}
 
-	public void setTmSalida(Time tmSalida) {
-		this.tmSalida = tmSalida;
+	public void setTmSalida(Time horaSalida) {
+		this.horaSalida = horaSalida;
 	}
 
 	public String getNombrePlacas() {
@@ -208,7 +216,7 @@ public class OrdenSalida implements Serializable {
 	@Override
 	public String toString() {
 		return "OrdenSalida [idPreSalida=" + idPreSalida + ", FolioSalida=" + FolioSalida + ", stEstado=" + stEstado
-				+ ", fechaSalida=" + fechaSalida + ", tmSalida=" + tmSalida + ", nombrePlacas=" + nombrePlacas
+				+ ", fechaSalida=" + fechaSalida + ", horaSalida=" + horaSalida + ", nombrePlacas=" + nombrePlacas
 				+ ", nombreOperador=" + nombreOperador + ", partidaClave=" + partidaClave + ", folio=" + folio
 				+ ", cantidad=" + cantidad + ", idContacto=" + idContacto + "]";
 	}

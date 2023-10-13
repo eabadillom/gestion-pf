@@ -17,14 +17,15 @@
 						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}" converter="entityConverter" >
 							<f:selectItem itemLabel="Cliente..." itemValue="" noSelectionOption="true"/>
 							<f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
+							<p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:selServicio :form:folio-som"/>
 						</p:selectOneMenu>
 					</div>
 					
 					<div class="p-col-6 p-md-6">
-						<p:selectOneMenu id="folio-som" autoWidth="false"  value="#{ordenSalidaBean.ordensalida}" converter="entityConverter" style="width:250px; heigth:1px">
+						<p:selectOneMenu id="folio-som" widgetVar="somFolios" autoWidth="false"  value="#{ordenSalidaBean.ordensalida}" converter="entityConverter" style="width:250px; heigth:1px">
 							<f:selectItem itemLabel="Ordenes confirmadas para hoy.." itemValue="" noSelectionOption="true"/>
 							<f:selectItems value="#{ordenSalidaBean.listaOrdenSalida}" var="folio" itemLabel="#{folio.folioSalida}" itemValue="#{folio.folioSalida}"></f:selectItems>
-						<p:ajax process ="@this" update="txtfecha"/>
+						<p:ajax process ="@this" />
 						</p:selectOneMenu>
 					</div>
 					
@@ -43,13 +44,13 @@
 					         </div>
 					         
 					      <div class="col-5 flex align-items-center justify-content-center">
-			    		<p:inputText id="txtHora" value="#{ordenSalidaBean.ordensalida.tmSalida}" placeholder="Hora" readonly="true" style="width:150px; heigth:1px"/>
+			    		<p:inputText id="txtHora"  placeholder="Hora" readonly="true" style="width:150px; heigth:1px"/>
 		    			</div>
 		    			
 		    			<p:divider />
 		    			
 		    			<div class="col-5 flex align-items-center justify-content-center">
-			    		<p:inputText id="txtnomOperador" value="#{ordenSalidaBean.ordensalida.nombreOperador}" placeholder="Nombre del operador" style="width:450px; heigth:1px"/>
+			    		<p:inputText id="txtnomOperador" placeholder="Nombre del operador" style="width:450px; heigth:1px"/>
 		    			</div>
 		    			
 		    			<div class="col-2">
@@ -58,11 +59,11 @@
 					         </div>
 					         
 		    			<div class="p-col-6 p-md-6">
-			    		<p:inputText id="txtplacas" value="#{ordenSalidaBean.ordensalida.nombrePlacas}" placeholder="Placas"  style="width:150px; heigth:1px"/>
+			    		<p:inputText id="txtplacas"  placeholder="Placas"  style="width:150px; heigth:1px"/>
 		    			</div>
 		    			
 		    			<div class="col-5 flex align-items-center justify-content-center">
-			    		<p:inputText id="txtObservaciones" value="#{ordenSalidaBean.ordensalida.nombrePlacas}" placeholder="Observaciones"  style="width:650px; heigth:1px"/>
+			    		<p:inputText id="txtObservaciones"  placeholder="Observaciones"  style="width:650px; heigth:1px"/>
 		    			</div>
 		    		</p:toolbarGroup>
 						 </p:toolbar>
@@ -111,26 +112,34 @@
 					</p:column>
 		</p:dataTable>
 			</p:panel>
-						<p:fieldset legend="Servicios Requeridos" styleClass="p-mt-4">
-                		<p:dataTable id="dt-serviciosReq" widgetVar="dtServiciosReq" value="#{constanciaDeDepositoBean.listadoPartida}" var="servicios" paginator="false"
-							  rowSelectMode="add" rows="10" rowKey="#{servicios.pesoTotal}" reflow="true" selection="#{constanciaDeDepositoBean.selectedPartidas}" tableStyle="table-layout: auto;">
-					<p:column exportable="false" width="3%">
-						<p:rowToggler />
-					</p:column>							
-					<p:column headerText="Servicio">
-						<h:outputText value="#{servicios.camaraCve.camaraAbrev}"/>
-					</p:column>
-					<p:column headerText="Cantidad">
-						<h:outputText value="#{servicios.pesoTotal}"/>
-					</p:column>
-					<p:column headerText="Unidad">
-						<h:outputText value="#{servicios.cantidadTotal}"/>
-					</p:column>
-					<p:column headerText="Observación">
-						<h:outputText value="#{servicios.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}"/>
-					</p:column>
-		</p:dataTable>
-		</p:fieldset>
+			
+					 <p:fieldset legend="Servicios">
+			<p:panel>	
+				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.idServicio}" filterMatchMode="startsWith">
+					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
+					<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" 
+						itemValue="#{ps.id}" />
+				</p:selectOneMenu>
+				<p:column><p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/></p:column>
+				<p:column>
+				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.agregaServicios}" update="dt-servicios"/>
+				</p:column>
+				</p:panel>
+
+			
+			
+			<p:dataTable id="dt-servicios"	var="servicio" selection="#{ordenSalidaBean.selServicio}" value="#{ordenSalidaBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" 
+							scrollRows="2" reflow="true">	
+				<p:column headerText="Servicio " width="8em"><h:outputText value="#{servicio.servicioCve.servicioDs}" /></p:column>
+				<p:column headerText="Cantidad" width="10em"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
+				<p:column headerText="Unidad" width="10em"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
+				<p:column headerText="Observacion" width="10em"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
+				
+				<p:column width="8em">
+					<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.deleteServicio(servicio)}" update="dt-servicios"/>
+				</p:column>
+			</p:dataTable>
+	    </p:fieldset>
 		
 		 <h5 class="mt-0">Basic</h5>
         <p:splitButton value="Guardar" action="#{ordenSalidaBean.guardar}" update="messages" icon="pi pi-save">
