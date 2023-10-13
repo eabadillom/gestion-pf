@@ -25,26 +25,32 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaDepositoDetalleDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
+import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
+import mx.com.ferbo.dao.StatusConstanciaSalidaDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
+import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
+import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
+import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 
@@ -94,9 +100,15 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private String otro,pedimento,contenedor,lote,tarima;
 	
+	private List<Aviso> listaAvisos;
+	private AvisoDAO avisoDAO;
+	
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
 	private Usuario usuario;
+	
+	private EstadoConstancia statusCancelada;
+	private EstadoConstanciaDAO statusDAO;
 	
 	public ConsultarConstanciaDeDepositoBean() {
 		
@@ -118,6 +130,9 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		constanciaDepositoDetalleDAO = new ConstanciaDepositoDetalleDAO();
 		
 		detallePartidaDAO = new DetallePartidaDAO();
+		
+		avisoDAO = new AvisoDAO();
+		statusDAO = new EstadoConstanciaDAO();
 	}
 
 	@PostConstruct
@@ -137,14 +152,18 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		Date today = new Date();
 		maxDate = new Date(today.getTime() );
 		
+		this.selectConstanciaDD = new ConstanciaDeDeposito();
+		this.selectConstanciaDD.setAvisoCve(new Aviso());
 		
+		this.statusCancelada = statusDAO.buscarPorId(2);
 	}
+	
 	@PreDestroy
 	public void destroy() {
 		log.info("Lanzando evento Pre-destroy...");
 	}
 	
-	public void buscarConstanciaDD() {
+	public void buscarConstancias() {
 		Integer idCliente = null;
 		EntityManager em = null;
 		try {
@@ -158,58 +177,51 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			log.info( getFechaInicial() + "" + getFechaFinal());
 			log.info( fechaFinal + "" + fechaInicial);//si trae las fechas dadas por el usuario
 			
-			//listadoConstanciaDeDepositos = constanciaDeDepositoDAO.buscarPorCriterios(folio,fechaInicial, fechaFinal, cliente.getCteCve());
 			listadoConstanciaDeDepositos = constanciaDeDepositoDAO.buscarPor(folio, idCliente, fechaInicial, fechaFinal);
 			
-			for (ConstanciaDeDeposito constanciaDeDeposito : listadoConstanciaDeDepositos) {
-				List<Partida> alPartidas = constanciaDeDeposito.getPartidaList();
-				alPartidas.size();//permite recuperar la lista de partidas de la Constancia de Deposito
-				List<ConstanciaDepositoDetalle> alConstanciaDD = constanciaDeDeposito.getConstanciaDepositoDetalleList();
-				alConstanciaDD.size();
-				for(Partida p: alPartidas) {
-					String camara = p.getCamaraCve().getCamaraAbrev();
-					p.getCamaraCve().getPlantaCve().getPlantaDs();
-					List<DetallePartida> listadoDetallePartida = p.getDetallePartidaList();
-					listadoDetallePartida.size();
-				}
-			}
-
 		} catch(Exception ex) {
-			
+			log.error("Problema en la búsqueda de constancias de depósito...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
 	}
 	
 	public void cargaDetalle() {
-		log.info("Constancia de deposito: {}",this.selectConstanciaDD);
-		this.selectConstanciaDD = constanciaDeDepositoDAO.buscarPorFolioCliente(this.selectConstanciaDD.getFolioCliente(), true);
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Carga de información...";		
 		
-		listadoProductoPorCliente.clear();
-		ProductoPorCliente productoPorCliente = new ProductoPorCliente();
-		productoPorCliente.setCteCve(this.selectConstanciaDD.getCteCve());
-		this.listadoProductoPorCliente = pdtoPorCliDAO.buscarPorCriterios(productoPorCliente);
-		this.listadoConstanciaDepositoDetalle = this.selectConstanciaDD.getConstanciaDepositoDetalleList();
-		log.info("Constancia de deposito: {}", this.selectConstanciaDD);
-		log.info("Partida: {}", this.selectConstanciaDD.getPartidaList().size());
-		this.productoSelect = null;
-		
-		if(selectConstanciaDD.getAvisoCve()!=null) {
-			listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
-		}
-	}
-	
-	public void cargaDeDatos() {
+		try {
+			log.info("Constancia de deposito: {}",this.selectConstanciaDD);
+			this.selectConstanciaDD = constanciaDeDepositoDAO.buscarPorFolioCliente(this.selectConstanciaDD.getFolioCliente(), true);
 			
-		
-		
+			listadoProductoPorCliente.clear();
+			ProductoPorCliente productoPorCliente = new ProductoPorCliente();
+			productoPorCliente.setCteCve(this.selectConstanciaDD.getCteCve());
+			this.listadoProductoPorCliente = pdtoPorCliDAO.buscarPorCriterios(productoPorCliente);
+			this.listadoConstanciaDepositoDetalle = this.selectConstanciaDD.getConstanciaDepositoDetalleList();
+			log.info("Constancia de deposito: {}", this.selectConstanciaDD);
+			log.info("Partida: {}", this.selectConstanciaDD.getPartidaList().size());
+			this.productoSelect = null;
+			
 			if(selectConstanciaDD.getAvisoCve()!=null) {
 				listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
-			}else {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso","No contiene aviso la contancia de deposito"));
 			}
-			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
-			PrimeFaces.current().ajax().update("form:messages");
+			
+			listaAvisos = avisoDAO.buscarPorCliente(this.selectConstanciaDD.getCteCve().getCteCve());
+			
+		} catch (Exception ex) {
+			log.error("Problema para cargar la información de la constancia...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages","form:dlg-constancia", "form:dlg-partidas", "form:dlg-servicios");
+			
+		}
 	}
 	
 	public void updateConstanciaDD() {
@@ -334,19 +346,16 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	public void saveServicio() {
 		
-		List<ConstanciaDepositoDetalle> lisConstanciaDepositoDetalles = selectConstanciaDD.getConstanciaDepositoDetalleList();
-		
+//		List<ConstanciaDepositoDetalle> lisConstanciaDepositoDetalles = selectConstanciaDD.getConstanciaDepositoDetalleList();
 		ConstanciaDepositoDetalle conDepositoDetalle = new ConstanciaDepositoDetalle();
 		conDepositoDetalle.setFolio(selectConstanciaDD);
 		conDepositoDetalle.setServicioCantidad(cantidadServicio);
 		conDepositoDetalle.setServicioCve(servicioSelected);
 		
-		
 		if(constanciaDepositoDetalleDAO.guardar(conDepositoDetalle)== null) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Servicio Agregado"));
 			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
 			selectConstanciaDD.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
-			
 		}
 		
 		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
@@ -375,25 +384,58 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		try {
 			
 			if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
-				throw new Exception("No esta autorizado para modificar");
+				throw new Exception("No esta autorizado para modificar esta información.");
 			}
-			
 			constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD);
 				
 			severity = FacesMessage.SEVERITY_INFO;
-			mensaje = "Se modificaron los datos generales correctamente";
-			
+			mensaje = "La información se guardó correctamente.";
 		}catch (Exception e) {
-			
 			mensaje = "No esta autorizado para modificar";
 			severity = FacesMessage.SEVERITY_WARN;
 		}finally {
-			
-			message = new FacesMessage(severity,"Modificacion" , mensaje);
+			message = new FacesMessage(severity,"Corrección de información." , mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages");
-			
 		}
+		
+	}
+	
+	public void cancelarConstancia() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Producto";
+		
+		UnidadDeProducto unidadDeProducto = null;
+		
+		try {
+			log.info("Cancelando constancia {}", this.selectConstanciaDD.getFolioCliente());
+			this.selectConstanciaDD.setStatus(statusCancelada);
+			this.selectConstanciaDD.setObservaciones("CONSTANCIA CANCELADA EL DIA " + DateUtil.getString(this.selectConstanciaDD.getFechaIngreso(), DateUtil.FORMATO_DD_MM_YYYY));
+			constanciaDeDepositoDAO.actualizar(selectConstanciaDD);
+			
+			mensaje = "Constancia cancelada correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('cancelDialog').hide()");
+//		} catch (InventarioException ex) {
+//			mensaje = ex.getMessage();
+//			severity = FacesMessage.SEVERITY_WARN;
+//			
+//			message = new FacesMessage(severity, titulo, mensaje);
+//			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (Exception ex) {
+			log.error("Problema para actualizar el producto...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages","form:dt-constanciaDeDeposito");
+		}
+		
+		
+		
 		
 	}
 	
@@ -642,5 +684,13 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
+	}
+
+	public List<Aviso> getListaAvisos() {
+		return listaAvisos;
+	}
+
+	public void setListaAvisos(List<Aviso> listaAvisos) {
+		this.listaAvisos = listaAvisos;
 	}
 }
