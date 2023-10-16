@@ -212,6 +212,9 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			
 			listaAvisos = avisoDAO.buscarPorCliente(this.selectConstanciaDD.getCteCve().getCteCve());
 			
+			servicioSelected = new Servicio();
+			this.cantidadServicio = null;
+			
 		} catch (Exception ex) {
 			log.error("Problema para cargar la información de la constancia...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
@@ -255,12 +258,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			mensaje = "Producto actualizado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			
-//		} catch (InventarioException ex) {
-//			mensaje = ex.getMessage();
-//			severity = FacesMessage.SEVERITY_WARN;
-//			
-//			message = new FacesMessage(severity, titulo, mensaje);
-//			FacesContext.getCurrentInstance().addMessage(null, message);
 		} catch (Exception ex) {
 			log.error("Problema para actualizar el producto...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
@@ -346,20 +343,55 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	}
 	
 	public void saveServicio() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
 		
-//		List<ConstanciaDepositoDetalle> lisConstanciaDepositoDetalles = selectConstanciaDD.getConstanciaDepositoDetalleList();
-		ConstanciaDepositoDetalle conDepositoDetalle = new ConstanciaDepositoDetalle();
-		conDepositoDetalle.setFolio(selectConstanciaDD);
-		conDepositoDetalle.setServicioCantidad(cantidadServicio);
-		conDepositoDetalle.setServicioCve(servicioSelected);
+		ConstanciaDepositoDetalle conDepositoDetalle = null;
 		
-		if(constanciaDepositoDetalleDAO.guardar(conDepositoDetalle)== null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Servicio Agregado"));
+		try {
+			if(servicioSelected == null)
+				throw new InventarioException("Debe seleccionar un servicio.");
+			
+			if(cantidadServicio == null)
+				throw new InventarioException("Debe indicar una cantidad para el servicio.");
+			
+			if(cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
+				throw new InventarioException("Debe indicar una cantidad correcta para el servicio.");
+			
+			conDepositoDetalle = new ConstanciaDepositoDetalle();
+			conDepositoDetalle.setFolio(selectConstanciaDD);
+			conDepositoDetalle.setServicioCantidad(cantidadServicio);
+			conDepositoDetalle.setServicioCve(servicioSelected);
+			
+			if(constanciaDepositoDetalleDAO.guardar(conDepositoDetalle) != null) {
+				throw new InventarioException("Ocurrió un problema al guardar el servicio.");
+			}
+			
 			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
 			selectConstanciaDD.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
+			
+			servicioSelected = new Servicio();
+			this.cantidadServicio = null;
+			
+			mensaje = "Servicio agregado correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception e) {
+			mensaje = "Problema al agregar el servicio.";
+			severity = FacesMessage.SEVERITY_WARN;
+		} finally {
+			message = new FacesMessage(severity,"Servicio" , mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle", "form:precioServicio", "form:cantidadServicio");
 		}
 		
-		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
+		
+		
+		
+		
 		
 	}
 	
