@@ -3,7 +3,13 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
-
+	<style type="text/css">
+    .canceled {
+        background-color: #fca752 !important;
+        background-image: none !important;
+        color: #000000 !important;
+    }
+	</style>
 	<ui:define name="title">Consultar Entradas</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
@@ -44,7 +50,7 @@
 			</div>
 			<p:dataTable id="dt-constanciaDeDeposito" widgetVar="dtconstanciaDD" value="#{consultarConstanciaDeDepositoBean.listadoConstanciaDeDepositos}" rowKey="#{constanciaDD.folio}"	var="constanciaDD" rows="10" paginator="true" paginatorPosition="bottom">
 				<p:column headerText="Folio" style="text-align: center" width="5rem">
-					<h:outputText value="#{constanciaDD.folioCliente}" />
+					<h:outputText value="#{constanciaDD.folioCliente}" class="#{constanciaDD.status.edoCve == 2 ? 'product-badge status-outofstock' : null}"/>
 				</p:column>
 				<p:column headerText="Cliente">
 					<h:outputText value="#{constanciaDD.cteCve.cteNombre}" />
@@ -70,7 +76,7 @@
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem" style="text-align: center;">
-					<p:commandButton icon="pi pi-times" class="ui-button-danger" onclick="PF('cancelDialog').show();" update="form:dt-constanciaDeDeposito" action="#{consultarConstanciaDeDepositoBean.cargaDetalle}">
+					<p:commandButton icon="pi pi-times" class="ui-button-danger" onclick="PF('cancelDialog').show();" update="form:dt-constanciaDeDeposito" action="#{consultarConstanciaDeDepositoBean.cargaDetalle}" disabled="#{constanciaDD.status.edoCve == 2}">
 						<f:setPropertyActionListener value="#{constanciaDD}" target="#{consultarConstanciaDeDepositoBean.selectConstanciaDD}"></f:setPropertyActionListener>
 					</p:commandButton>
 				</p:column>
