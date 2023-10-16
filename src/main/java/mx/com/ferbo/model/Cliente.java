@@ -34,13 +34,13 @@ import javax.validation.constraints.Size;
 @Table(name = "CLIENTE")
 @NamedQueries({
     @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c ORDER BY c.cteNombre"),
-    @NamedQuery(name = "Cliente.findByCteCve", query = "SELECT c FROM Cliente c WHERE c.cteCve = :cteCve"),
-    @NamedQuery(name = "Cliente.findByCteNombre", query = "SELECT c FROM Cliente c WHERE c.cteNombre = :cteNombre"),
-    @NamedQuery(name = "Cliente.findByCteRfc", query = "SELECT c FROM Cliente c WHERE c.cteRfc = :cteRfc"),
-    @NamedQuery(name = "Cliente.findByNumeroCte", query = "SELECT c FROM Cliente c WHERE c.numeroCte = :numeroCte"),
-    @NamedQuery(name = "Cliente.findByCteMail", query = "SELECT c FROM Cliente c WHERE c.cteMail = :cteMail"),
-    @NamedQuery(name = "Cliente.findByHabilitado", query = "SELECT c FROM Cliente c WHERE c.habilitado = :habilitado ORDER BY c.cteNombre"),
-    @NamedQuery(name = "Cliente.findByCodUnico", query = "SELECT c FROM Cliente c WHERE c.codUnico = :codUnico")})
+    @NamedQuery(name = "Cliente.findByCteCve",  query = "SELECT c FROM Cliente c WHERE c.cteCve = :cteCve"),
+    @NamedQuery(name = "Cliente.findByCteNombre",  query = "SELECT c FROM Cliente c WHERE c.cteNombre = :cteNombre"),
+    @NamedQuery(name = "Cliente.findByCteRfc",  query = "SELECT c FROM Cliente c  WHERE c.cteRfc = :cteRfc"),
+    @NamedQuery(name = "Cliente.findByNumeroCte",  query = "SELECT c FROM Cliente c  WHERE c.numeroCte = :numeroCte"),
+    @NamedQuery(name = "Cliente.findByCteMail",  query = "SELECT c FROM Cliente c WHERE c.cteMail = :cteMail"),
+    @NamedQuery(name = "Cliente.findByHabilitado",  query = "SELECT c FROM Cliente c  WHERE c.habilitado = :habilitado ORDER BY c.cteNombre"),
+    @NamedQuery(name = "Cliente.findByCodUnico",  query = "SELECT c FROM Cliente c WHERE c.codUnico = :codUnico")})
 public class Cliente implements Serializable {
 
     private static final long serialVersionUID = 1L;

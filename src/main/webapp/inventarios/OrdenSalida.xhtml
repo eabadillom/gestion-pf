@@ -1,0 +1,153 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Ordenes de salida</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="2000"/>
+			<p:panel header="DATOS GENERALES">
+				<div class="p-grid ui-fluid p-col-12">
+				
+					<div class="p-col-6 p-md-6">
+						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}" converter="entityConverter" >
+							<f:selectItem itemLabel="Cliente..." itemValue="" noSelectionOption="true"/>
+							<f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
+							<p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:selServicio :form:folio-som"/>
+						</p:selectOneMenu>
+					</div>
+					
+					<div class="p-col-6 p-md-6">
+						<p:selectOneMenu id="folio-som" widgetVar="somFolios" autoWidth="false"  value="#{ordenSalidaBean.ordensalida}" converter="entityConverter" style="width:250px; heigth:1px">
+							<f:selectItem itemLabel="Ordenes confirmadas para hoy.." itemValue="" noSelectionOption="true"/>
+							<f:selectItems value="#{ordenSalidaBean.listaOrdenSalida}" var="folio" itemLabel="#{folio.folioSalida}" itemValue="#{folio.folioSalida}"></f:selectItems>
+						<p:ajax process ="@this" />
+						</p:selectOneMenu>
+					</div>
+					
+					
+					</div>
+					<p:toolbar>
+							<p:toolbarGroup>
+							
+	             			<div class="col-5 flex align-items-center justify-content-center">
+			    			<p:inputText id="txtfecha" value="#{ordenSalidaBean.ordensalida.fechaSalida}" placeholder="Fecha" readonly="true" style="width:150px; heigth:1px" />
+		   					</div>
+		   					
+		   					 <div class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+					         
+					      <div class="col-5 flex align-items-center justify-content-center">
+			    		<p:inputText id="txtHora"  placeholder="Hora" readonly="true" style="width:150px; heigth:1px"/>
+		    			</div>
+		    			
+		    			<p:divider />
+		    			
+		    			<div class="col-5 flex align-items-center justify-content-center">
+			    		<p:inputText id="txtnomOperador" placeholder="Nombre del operador" style="width:450px; heigth:1px"/>
+		    			</div>
+		    			
+		    			<div class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+					         
+		    			<div class="p-col-6 p-md-6">
+			    		<p:inputText id="txtplacas"  placeholder="Placas"  style="width:150px; heigth:1px"/>
+		    			</div>
+		    			
+		    			<div class="col-5 flex align-items-center justify-content-center">
+			    		<p:inputText id="txtObservaciones"  placeholder="Observaciones"  style="width:650px; heigth:1px"/>
+		    			</div>
+		    		</p:toolbarGroup>
+						 </p:toolbar>
+</p:panel>
+			<p:panel >
+				<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="false"
+							  rowSelectMode="add" rows="10" rowKey="#{partida.pesoTotal}" reflow="true" selection="#{constanciaDeDepositoBean.selectedPartidas}" tableStyle="table-layout: auto;">
+					<p:column exportable="false" width="3%">
+						<p:rowToggler />
+					</p:column>							
+					<p:column headerText="Confirmar">
+        				<p:selectBooleanCheckbox value="#{ordenSalidaBean.confirmacion}" itemLabel="Basic"/>
+					</p:column>
+					<p:column headerText="Planta">
+						<h:outputText value="#{partida.pesoTotal}"/>
+					</p:column>
+					<p:column headerText="Cod. Prod.">
+						<h:outputText value="#{partida.cantidadTotal}"/>
+					</p:column>
+					<p:column headerText="Codigo">
+						<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}"/>
+					</p:column>
+					<p:column headerText="Lote">
+						<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
+					</p:column>
+					<p:column headerText="Caducidad">
+						<h:outputText value="#{partida.valorMercancia}"/>
+					</p:column>
+					<p:column headerText="Pedimento">
+						<h:outputText value="#{partida.noTarimas}"/>
+					</p:column>
+					<p:column headerText="SAP">
+						<h:outputText value="#{partida.noTarimas}"/>
+					</p:column>
+					<p:column headerText="Cant. Requerida">
+						<h:outputText value="#{partida.noTarimas}"/>
+					</p:column>
+					<p:column headerText="Unidad">
+						<h:outputText value="#{partida.noTarimas}"/>
+					</p:column>
+					<p:column headerText="Peso aprox. (kg)">
+						<h:outputText value="#{partida.noTarimas}"/>
+					</p:column>
+					<p:column headerText="Temperatura °C">
+						<h:outputText value="#{partida.noTarimas}"/>
+					</p:column>
+		</p:dataTable>
+			</p:panel>
+			
+					 <p:fieldset legend="Servicios">
+			<p:panel>	
+				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.idServicio}" filterMatchMode="startsWith">
+					<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
+					<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" 
+						itemValue="#{ps.id}" />
+				</p:selectOneMenu>
+				<p:column><p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/></p:column>
+				<p:column>
+				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.agregaServicios}" update="dt-servicios"/>
+				</p:column>
+				</p:panel>
+
+			
+			
+			<p:dataTable id="dt-servicios"	var="servicio" selection="#{ordenSalidaBean.selServicio}" value="#{ordenSalidaBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" 
+							scrollRows="2" reflow="true">	
+				<p:column headerText="Servicio " width="8em"><h:outputText value="#{servicio.servicioCve.servicioDs}" /></p:column>
+				<p:column headerText="Cantidad" width="10em"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
+				<p:column headerText="Unidad" width="10em"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
+				<p:column headerText="Observacion" width="10em"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
+				
+				<p:column width="8em">
+					<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.deleteServicio(servicio)}" update="dt-servicios"/>
+				</p:column>
+			</p:dataTable>
+	    </p:fieldset>
+		
+		 <h5 class="mt-0">Basic</h5>
+        <p:splitButton value="Guardar" action="#{ordenSalidaBean.guardar}" update="messages" icon="pi pi-save">
+            <p:menuitem value="Nueva orden de salida" action="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh"/>
+            <p:divider />
+            <p:menuitem value="Homepage" url="http://localhost:8080/gestion/dashboard.xhtml" icon="pi pi-home"/>
+        </p:splitButton>
+		
+		</h:form>
+	</ui:define>
+</ui:composition>
