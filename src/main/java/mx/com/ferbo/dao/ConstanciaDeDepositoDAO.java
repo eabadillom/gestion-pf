@@ -267,7 +267,6 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public ConstanciaDeDeposito buscarPorFolioCliente(String folio) {
 		ConstanciaDeDeposito constancia = null;
 		EntityManager em = null;
-		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			
@@ -283,6 +282,85 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			
 		return constancia;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean tieneSalidas(Integer folio) {
+		boolean respuesta = false;
+		EntityManager em = null;
+		String sql = null;
+		List<Object[]> results = null;
+		
+		try {
+			sql = "select cdd.FOLIO, dcs.ID "
+					+ "from CONSTANCIA_DE_DEPOSITO cdd "
+					+ "inner join PARTIDA p ON cdd.FOLIO = p.FOLIO "
+					+ "left outer join DETALLE_CONSTANCIA_SALIDA dcs ON dcs.PARTIDA_CVE = p.PARTIDA_CVE "
+					+ "where cdd.FOLIO = :folio "
+					+ "GROUP BY cdd.FOLIO, dcs.ID "
+					;
+			
+			em = EntityManagerUtil.getEntityManager();
+			results = em.createNativeQuery(sql)
+					.setParameter("folio", folio)
+					.getResultList()
+					;
+			
+			for(Object[] result : results) {
+					
+				if(result[1] != null) {
+					respuesta = true;
+					return respuesta;
+				}
+			}
+			
+			respuesta = false;
+		} catch(Exception ex) {
+			log.error("Problema para ejecutar la consulta...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return respuesta;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public boolean tieneFacturas(Integer folio) {
+		boolean respuesta = false;
+		EntityManager em = null;
+		List<Object[]> results = null;
+		String sql = null;
+		
+		try {
+			sql = "select cdd.FOLIO, cf.id "
+					+ "from CONSTANCIA_DE_DEPOSITO cdd "
+					+ "left outer join constancia_factura cf ON cf.folio = cdd.FOLIO "
+					+ "where cdd.FOLIO = :folio "
+					+ "GROUP BY cdd.FOLIO, cf.id "
+					;
+			
+			em = EntityManagerUtil.getEntityManager();
+			results = em.createNativeQuery(sql)
+					.setParameter("folio", folio)
+					.getResultList()
+					;
+			
+			for(Object[] result : results) {
+				if(result[1] != null) {
+					respuesta = true;
+					return respuesta;
+				}
+			}
+			
+			respuesta = false;
+		} catch(Exception ex) {
+			log.error("Problema para ejecutar la consulta...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return respuesta;
+	}
 
 	@Override
 	public List<ConstanciaDeDeposito> buscarPorCriterios(ConstanciaDeDeposito e) {
@@ -297,8 +375,4 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public void setEm(EntityManager em) {
 		this.em = em;
 	}
-
-	
-	
-	
 }

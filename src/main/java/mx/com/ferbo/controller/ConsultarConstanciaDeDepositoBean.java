@@ -51,6 +51,7 @@ import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 
@@ -407,9 +408,17 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		String mensaje = null;
 		String titulo = "Producto";
 		
-		UnidadDeProducto unidadDeProducto = null;
-		
 		try {
+			
+			if(this.selectConstanciaDD.getStatus().getEdoCve() == 2)
+				throw new InventarioException("La constancia solicitada ya está cancelada.");
+			
+			if(constanciaDeDepositoDAO.tieneSalidas(this.selectConstanciaDD.getFolio()))
+				throw new InventarioException("La entrada solicitada ya tiene movimientos de salida. No es posible cancelarla.");
+			
+			if(constanciaDeDepositoDAO.tieneFacturas(this.selectConstanciaDD.getFolio()))
+				throw new InventarioException("La entrada solicitada ya tiene movimientos de facturación. No es posible cancelarla.");
+			
 			log.info("Cancelando constancia {}", this.selectConstanciaDD.getFolioCliente());
 			this.selectConstanciaDD.setStatus(statusCancelada);
 			this.selectConstanciaDD.setObservaciones("CONSTANCIA CANCELADA EL DIA " + DateUtil.getString(this.selectConstanciaDD.getFechaIngreso(), DateUtil.FORMATO_DD_MM_YYYY));
@@ -418,14 +427,12 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			mensaje = "Constancia cancelada correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('cancelDialog').hide()");
-//		} catch (InventarioException ex) {
-//			mensaje = ex.getMessage();
-//			severity = FacesMessage.SEVERITY_WARN;
-//			
-//			message = new FacesMessage(severity, titulo, mensaje);
-//			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (InventarioException ex) {
+			log.error("Problema para cancelar la entrada...", ex);
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception ex) {
-			log.error("Problema para actualizar el producto...", ex);
+			log.error("Problema para cancelar la entrada...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
