@@ -31,7 +31,11 @@
 	<context-param>
 		<param-name>javax.faces.FACELETS_SKIP_COMMENTS'</param-name>
 		<param-value>true</param-value>
-	</context-param>	
+	</context-param>
+	<context-param>
+		<param-name>timezone</param-name>
+		<param-value>GMT-6:00</param-value>
+	</context-param>
 	<listener>
 		<listener-class>org.apache.webbeans.servlet.WebBeansConfigurationListener</listener-class>
 	</listener>

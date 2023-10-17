@@ -8,13 +8,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIInput;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -32,10 +36,13 @@ import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.OrdenSalida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.ui.OrdenDeSalidas;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 
@@ -52,6 +59,7 @@ public class OrdenSalidaBean implements Serializable {
 	private PrecioServicioDAO precioServicioDAO;
 	private List<Cliente> listaClientes;
 	private List<OrdenSalida> listaOrdenSalida;
+	private List<OrdenDeSalidas> listaSalidasporPlantas;
 	private List<PrecioServicio> listaServicios;
 	private List<ConstanciaServicioDetalle> alServiciosDetalle;
 
@@ -61,12 +69,13 @@ public class OrdenSalidaBean implements Serializable {
 	private Cliente clienteSelect;
 	private OrdenSalida ordensalida;
 	private ConstanciaServicioDetalle selServicio;
-
+	private DetallePartida dp;
+	private DetalleConstanciaSalida dcs;
+	private OrdenDeSalidas ordenDeSalidas;
+	private PrecioServicio ps;
 	
 	private Date fecha;
-	private String folio;
-	private String status;
-	private Integer idServicio;
+	private PrecioServicio idServicio;
 	private BigDecimal cantidadServicio;
 
 	
@@ -79,6 +88,7 @@ public class OrdenSalidaBean implements Serializable {
 		listaClientes = new ArrayList<Cliente>();
 		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
 		listaServicios = new ArrayList<PrecioServicio>();
+		listaSalidasporPlantas = new ArrayList<OrdenDeSalidas>();
 	}
 	@PostConstruct
 	public void init() {
@@ -88,25 +98,70 @@ public class OrdenSalidaBean implements Serializable {
 		
 	}
 	
+	
+	public void addMessage(AjaxBehaviorEvent event) {
+        UIComponent component = event.getComponent();
+        if (component instanceof UIInput) {
+            //UIInput inputComponent = (UIInput) component;
+            //Boolean value = (Boolean) inputComponent.getValue();
+            String summary = confirmacion ? "Checked" : "Unchecked";
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(summary));
+            }
+        }
 	public void guardar() {
-		
+		String message = null;
+		Severity severity = null;		
+		List<OrdenSalida> listaSalidas = null;
+		OrdenSalida os=null;
+		try {			
+			if(confirmacion != true) 
+				throw new InventarioException("Favor de confirmar almenos una orden de salida.");
+			listaSalidas = ordenSalidaDAO.buscarFolioPorCliente(clienteSelect, fecha);
+			os = new OrdenSalida();
+			os.setFolioSalida(ordensalida.getFolioSalida());
+			os.setStEstado("C");
+			os.setFechaSalida(fecha);
+			os.setTmSalida(ordensalida.getTmSalida());
+			os.setNombrePlacas(ordensalida.getNombrePlacas());
+			os.setNombreOperador(ordensalida.getNombreOperador());
+			//os.setPartidaClave(ordensalida.getPartidaClave());
+			//os.setFolio(ordensalida.getFolio());
+			//os.setCantidad(ordensalida.getCantidad());
+			//os.setIdContacto(ordensalida.getIdContacto());
+			ordenSalidaDAO.actualizar(os);
+			
+		} catch (InventarioException ex) {
+			log.error("Problema para obtener la información...", ex);
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de la orden.", ex);
+			ex.printStackTrace();
+			message = "Problema con la información de servicios.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Orden en proceso", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+	}
+	
+	public void deleteServicio(ConstanciaServicioDetalle servicio) {
+		this.alServiciosDetalle.remove(servicio);
+		this.listaServicios.remove(servicio);
 	}
 	
 	public void buscarFoliosporFecha() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		EntityTransaction transaction = em.getTransaction();
-		transaction.begin();
-		ordenSalidaDAO.setEntityManager(em);
 		listaOrdenSalida = ordenSalidaDAO.buscarFolioPorCliente(clienteSelect, fecha);
-		
-		transaction.commit();
-		em.close();
 	}
+	
 	public void reload() throws IOException {
 	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
 	
+	public void filtroPorPlanta() {
+		listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(ordensalida.getFolioSalida(), fecha);
+	}
 	public void filtrarCliente() {
 		String message = null;
 		Severity severity = null;
@@ -118,8 +173,8 @@ public class OrdenSalidaBean implements Serializable {
 			manager = EntityManagerUtil.getEntityManager();
 			
 			listaServicios = precioServicioDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
-			listaOrdenSalida = ordenSalidaDAO.buscarFolioPorCliente(clienteSelect, fecha);
 			
+			buscarFoliosporFecha();
 			message = "Seleccione el folio.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (Exception ex) {
@@ -137,7 +192,6 @@ public class OrdenSalidaBean implements Serializable {
 	
 	public void agregaServicios() {
 		String message = null;
-		PrecioServicio precioServicio = null;
 		Severity severity = null;
 		ConstanciaServicioDetalle servicio = null;
 
@@ -149,15 +203,12 @@ public class OrdenSalidaBean implements Serializable {
 			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
 				throw new InventarioException("Debe indicar la cantidad de servicios.");
 			
-			precioServicio = this.listaServicios.stream().filter(ps -> this.idServicio.equals(ps.getId()))
-					.collect(Collectors.toList()).get(0);
-			
 			if (alServiciosDetalle == null)
 				alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
 			
 			servicio = new ConstanciaServicioDetalle();
 			servicio.setServicioCantidad(this.cantidadServicio);
-			servicio.setServicioCve(precioServicio.getServicio());
+			servicio.setServicioCve(idServicio.getServicio());
 			alServiciosDetalle.add(servicio);
 			message = "Producto agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
@@ -168,7 +219,7 @@ public class OrdenSalidaBean implements Serializable {
 			
 		}finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregar servicio", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-dt-servicios");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-servicios");
 	
 		}
 	}
@@ -220,10 +271,11 @@ public class OrdenSalidaBean implements Serializable {
 	public void setSelServicio(ConstanciaServicioDetalle selServicio) {
 		this.selServicio = selServicio;
 	}
-	public Integer getIdServicio() {
+
+	public PrecioServicio getIdServicio() {
 		return idServicio;
 	}
-	public void setIdServicio(Integer idServicio) {
+	public void setIdServicio(PrecioServicio idServicio) {
 		this.idServicio = idServicio;
 	}
 	public List<ConstanciaServicioDetalle> getAlServiciosDetalle() {
@@ -238,5 +290,30 @@ public class OrdenSalidaBean implements Serializable {
 	public void setCantidadServicio(BigDecimal cantidadServicio) {
 		this.cantidadServicio = cantidadServicio;
 	}
+	public List<OrdenDeSalidas> getListaSalidasporPlantas() {
+		return listaSalidasporPlantas;
+	}
+	public void setListaSalidasporPlantas(List<OrdenDeSalidas> listaSalidasporPlantas) {
+		this.listaSalidasporPlantas = listaSalidasporPlantas;
+	}
+	public DetallePartida getDp() {
+		return dp;
+	}
+	public void setDp(DetallePartida dp) {
+		this.dp = dp;
+	}
+	public DetalleConstanciaSalida getDcs() {
+		return dcs;
+	}
+	public void setDcs(DetalleConstanciaSalida dcs) {
+		this.dcs = dcs;
+	}
+	public OrdenDeSalidas getOrdenDeSalidas() {
+		return ordenDeSalidas;
+	}
+	public void setOrdenDeSalidas(OrdenDeSalidas ordenDeSalidas) {
+		this.ordenDeSalidas = ordenDeSalidas;
+	}
+	
 	
 }
