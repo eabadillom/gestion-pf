@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaSalida;
+import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -29,6 +30,37 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	public ConstanciaSalida buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public ConstanciaSalida buscarPorId(Integer id, boolean isFullInfo) {
+		ConstanciaSalida constancia = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			constancia = em.find(ConstanciaSalida.class, id);
+			
+			if(isFullInfo == false)
+				return constancia;
+			
+			List<DetalleConstanciaSalida> dcsList = constancia.getDetalleConstanciaSalidaList();
+			for(DetalleConstanciaSalida dcs : dcsList) {
+				log.debug("DCS: {}", dcs.getId());
+				log.debug("PartidaCve: {}", dcs.getPartidaCve().getPartidaCve());
+				log.debug("Partida cajas: {}", dcs.getPartidaCve().getCantidadTotal());
+			}
+			
+			List<ConstanciaSalidaServicios> cssrvList = constancia.getConstanciaSalidaServiciosList();
+			for(ConstanciaSalidaServicios cssrv : cssrvList) {
+				log.debug("CSSrv: {}", cssrv);
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la constancia de salida...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return constancia;
 	}
 
 	@Override
@@ -104,6 +136,28 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 			return null;
 		}
 	}
+	
+	public List<ConstanciaSalida> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
+		List<ConstanciaSalida> resultList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			resultList = em.createNamedQuery("ConstanciaSalida.findByPeriodoClienteFolio", ConstanciaSalida.class)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.setParameter("idCliente", idCliente)
+					.setParameter("folioCliente", folioCliente)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para consultar las constancias de salida...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return resultList;
+	}
 
 	@Override
 	public String actualizar(ConstanciaSalida constanciaSalida) {
@@ -128,9 +182,10 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			Query actualizar = em.createNativeQuery(" UPDATE CONSTANCIA_SALIDA SET STATUS  = :status WHERE ID = :id ") ;
+			Query actualizar = em.createNativeQuery(" UPDATE CONSTANCIA_SALIDA SET STATUS = :status, OBSERVACIONES = :observaciones WHERE ID = :id ") ;
 			actualizar.setParameter("status",(constanciaSalida.getStatus()==null) ? 1:2);//si constancia de salida status es null colocar 1 en otro caso colocar 2
 			actualizar.setParameter("id", constanciaSalida.getId());
+			actualizar.setParameter("observaciones", constanciaSalida.getObservaciones());
 			actualizar.executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -142,7 +197,7 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 		
 		return null;
 	}
-
+	
 	@Override
 	public String guardar(ConstanciaSalida constanciaSalida) {
 		EntityManager em = null;
