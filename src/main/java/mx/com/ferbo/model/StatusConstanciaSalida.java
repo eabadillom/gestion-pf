@@ -30,6 +30,9 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "StatusConstanciaSalida.findByDescripcion", query = "SELECT s FROM StatusConstanciaSalida s WHERE s.descripcion = :descripcion")})
 public class StatusConstanciaSalida implements Serializable {
 
+	public static final Integer STATUS_NUEVA = 1;
+	public static final Integer STATUS_CANCELADA = 2;
+	
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)

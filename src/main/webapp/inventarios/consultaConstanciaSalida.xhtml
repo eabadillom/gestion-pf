@@ -3,195 +3,173 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
-
+	<style type="text/css">
+    .canceled {
+        background-color: #fca752 !important;
+        background-image: none !important;
+        color: #000000 !important;
+    }
+    </style>
 	<ui:define name="title">Consultar Constancia Salida</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Inventarios" />
-				<p:menuitem value="Entradas" />
-				<p:menuitem value="Consultar" outcome="/inventarios/consultaConstanciaSalida" />
-			</p:breadCrumb>
-			
 			<p:growl id="messages" showDetail="true" />
-			
-			<div class="p-grid crud-demo">
-				<div class="p-col-12">
-					<div class="card">
-				<!-- Por Fechas -->
-					<p:outputLabel value="Por Rango de Fechas:" styleClass="p-mr-2"/>
-					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" 
-					value="#{consultarConstanciaSalidaBean.fechaInicial}" >
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+			<div class="p-grid ui-fluid">
+				<div class="p-field p-col-3 p-md-3">
+					<p:outputLabel value="Del" styleClass="p-mr-2"/>
+					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaSalidaBean.fechaInicial}">
+						<p:ajax process="@this" />
 					</p:datePicker>
-					
-					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" 
-					value="#{consultarConstanciaSalidaBean.fechaFinal}">
+				</div>
+				<div class="p-field p-col-3 p-md-3">
+					<p:outputLabel value="al" styleClass="p-mr-2"/>
+					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaSalidaBean.fechaFinal}">
+						<p:ajax process="@this" />
 					</p:datePicker>
-					
-				<!-- Por Folio -->
-				
-					<p:outputLabel value="Folio:" />
+				</div>
+				<div class="p-field p-col-2 p-md-2">
+					<p:outputLabel value="Folio" />
 					<p:inputText value="#{consultarConstanciaSalidaBean.folio}" styleClass="p-ml-2 p-mr-4" />
-					
-				<!-- Por Cliente -->
-				
-					<p:outputLabel value="Por Cliente:" />
+				</div>
+			</div>
+			<div class="p-grid ui-fluid">	
+				<div class="p-field p-col-6 p-md-6">
 					<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaSalidaBean.cliente}" styleClass="p-ml-2 p-mr-4">
-						<f:selectItem itemLabel="Seleccione un Cliente" itemValue="" noSelectionOption="true"/>
-						<f:selectItems value="#{consultarConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
+						<f:selectItem itemLabel="Seleccione un Cliente" itemValue="" noSelectionOption="true" />
+						<f:selectItems value="#{consultarConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 					</p:selectOneMenu>
-					
-					<p:commandButton value="Consultar" icon="pi pi-search" update="@widgetVar(dtConstanciaS)" actionListener="#{consultarConstanciaSalidaBean.buscarConstanciaSalida()}"/>
-			
-					</div>
+				</div>
+				<div class="p-field p-col-2 p-md-2">
+					<p:commandButton value="Consultar" icon="pi pi-search" update="@widgetVar(dtConstanciaS)" actionListener="#{consultarConstanciaSalidaBean.buscarConstanciaSalida()}" />
 				</div>
 			</div>
 			
-			<div class="p-grid crud-demo">
-				<div class="p-col-12">
-					<div class="card">						
-						<p:dataTable id="dt-ConstanciaSalida" widgetVar="dtConstanciaS" value="#{consultarConstanciaSalidaBean.listadoConstanciaSalida}" var="constanciaSalida" 
-						rows="10" paginator="true" paginatorPosition="bottom">
-						
-						<f:facet name="header">
-							<div>
-								<span>Constancias De Salida</span>
-							</div>
-						</f:facet>
-						
-						<p:column headerText="Folio">
-							<h:outputText value="#{constanciaSalida.numero}" />
-						</p:column>
-						
-						<p:column headerText="Cliente">
-							<h:outputText value="#{constanciaSalida.clienteCve.cteNombre}" />
-						</p:column>
-						
-						<p:column headerText="Fecha Ingreso">
-							<h:outputText value="#{constanciaSalida.fecha}" />						
-						</p:column>
-						
-						<p:column>
-							<p:commandButton value="Ver Detalle" oncomplete="PF('dlgdetalleConstancia').show()" update="form:detalleCS" >
-								<f:setPropertyActionListener value="#{constanciaSalida}" target="#{consultarConstanciaSalidaBean.constanciaSelect}"></f:setPropertyActionListener>
-							</p:commandButton>
-						</p:column>
-						
-						</p:dataTable>										
-					</div>
-				</div>
-			</div>
 			
-			<p:dialog header="Detalle Constancia Salida" widgetVar="dlgdetalleConstancia" modal="true" hideEffect="fade" style="max-width:80em !important;">
+			<p:dataTable id="dt-ConstanciaSalida" widgetVar="dtConstanciaS" value="#{consultarConstanciaSalidaBean.listadoConstanciaSalida}" var="constanciaSalida" rows="10" paginator="true" paginatorPosition="bottom">
+				<p:column headerText="Folio" style="text-align: center" width="5rem">
+					<h:outputText value="#{constanciaSalida.numero}" class="#{constanciaSalida.status.id == 2 ? 'product-badge status-outofstock' : null}" />
+				</p:column>
+				<p:column headerText="Cliente">
+					<h:outputText value="#{constanciaSalida.clienteCve.cteNombre}" />
+				</p:column>
+				<p:column headerText="Ingreso" width="6rem" style="text-align: center;">
+					<h:outputText value="#{constanciaSalida.fecha}" />
+				</p:column>
+				<p:column width="7rem" style="text-align: center;">
+					<p:commandButton value="Detalle" icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgdetalleConstancia').show();" update="form:detalleCS" action="#{consultarConstanciaSalidaBean.cargaDetalle}">
+						<f:setPropertyActionListener value="#{constanciaSalida}" target="#{consultarConstanciaSalidaBean.constanciaSelect}" />
+					</p:commandButton>
+				</p:column>
+				<p:column width="7rem" style="text-align: center;">
+					<p:commandButton value="Productos" icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgProductos').show();" update="form:dlg-partidas" action="#{consultarConstanciaSalidaBean.cargaDetalle}">
+						<f:setPropertyActionListener value="#{constanciaSalida}" target="#{consultarConstanciaSalidaBean.constanciaSelect}" />
+					</p:commandButton>
+				</p:column>
+				<p:column width="7rem" style="text-align: center;">
+					<p:commandButton value="Servicios" icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgServicios').show();" update="form:detalleCS" action="#{consultarConstanciaSalidaBean.cargaDetalle}">
+						<f:setPropertyActionListener value="#{constanciaSalida}" target="#{consultarConstanciaSalidaBean.constanciaSelect}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			
+			
+			
+			<p:dialog header="Detalle" widgetVar="dlgdetalleConstancia" modal="true" hideEffect="fade" style="max-width:80em !important;">
 				<p:outputPanel id="detalleCS" class="ui-fluid">
-					<p:outputPanel rendered="#{not empty consultarConstanciaSalidaBean.constanciaSelect}">
-						<div class="p-grid">
-						
-							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
+					<p:outputPanel rendered="#{consultarConstanciaSalidaBean.constanciaSelect != null}">
+						<div class="p-grid p-col-12">
+							<div class="p-md-3 p-lg-3">
 								<p:outputLabel for="@next" value="Fecha:" />
-								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.fecha}" disabled="true"/>
+								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.fecha}" disabled="true" >
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:inputText>
 							</div>
-							
-							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
-								<p:outputLabel  value="Folio:" />
-								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.numero}" disabled="true"/>
+							<div class="p-md-3 p-lg-3">
+								<p:outputLabel value="Folio" />
+								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.numero}" disabled="true" />
 							</div>
-						
-						</div>	
-						
-						<div class="p-grid">
-						
-							<div class="p-col-12 p-md-6 p-lg-4" style="width: 30em;" >
-								<p:outputLabel value="Recibimos de: " />
+							<div class="p-md-6 p-lg-6">
+								<p:outputLabel value="Cliente"/>
 								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.clienteCve.cteNombre}" disabled="true" />
 							</div>
-						
 						</div>
-						
-						<p:dataTable value="#{consultarConstanciaSalidaBean.constanciaSelect.detalleConstanciaSalidaList}" var="detalleConstanciaSalida">
-						
-						<f:facet name="header">
-							<div>
-								<span>Mercancia</span>
+						<div class="p-grid p-col-12">
+							<div class="p-md-6 p-lg-6">
+								<p:outputLabel value="Transportista" />
+								<p:inputText
+									value="#{consultarConstanciaSalidaBean.constanciaSelect.nombreTransportista}"
+									disabled="true" />
 							</div>
-						</f:facet>
-						
-						<p:column headerText="Folio Entrada">
-							<h:outputText value="#{detalleConstanciaSalida.folioEntrada}" />
-						</p:column>
-						
-						<p:column headerText="Son">
-							<h:outputText value="#{detalleConstanciaSalida.cantidad}" />
-						</p:column>
-						
-						<p:column headerText="Unidades">
-							<h:outputText value="#{detalleConstanciaSalida.unidad}" />
-						</p:column>
-						
-						<p:column headerText="Producto">
-							<h:outputText value="#{detalleConstanciaSalida.producto}" />
-						</p:column>
-						
-						<p:column headerText="Peso">
-							<h:outputText value="#{detalleConstanciaSalida.peso}" />
-						</p:column>
-						
-						<p:column headerText="Camara">
-							<h:outputText value="#{detalleConstanciaSalida.camaraCve}" />
-						</p:column>
-						
-						</p:dataTable>
-						
-						<p:dataTable value="#{consultarConstanciaSalidaBean.constanciaSelect.constanciaSalidaServiciosList}" var="constanciaServicio">
-						
-						<f:facet name="header">
-							<div>
-								<span>SERVICIOS</span>
-							</div>
-						</f:facet>
-						
-							<p:column headerText="Nombre del Servicio">
-								<h:outputText value="#{constanciaServicio.servicioCve.servicioDs}" />
-							</p:column>
-						
-							<p:column headerText="Cantidad">
-								<h:outputText value="#{constanciaServicio.numCantidad}" />
-							</p:column>
-						
-						</p:dataTable>
-							
-						<div class="p-grid">
-							
-							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em;" >
-								<p:outputLabel value="Observaciones: " />
-								<p:inputTextarea value="#{consultarConstanciaSalidaBean.constanciaSelect.observaciones}" disabled="true" />
-							</div>
-							
-							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em;" >
-								<p:outputLabel value="Nombre del Transportista: " />
-								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.nombreTransportista}" disabled="true" />
-							</div>
-							
-							<div class="p-col-12 p-md-6 p-lg-4" style="width: 20em;" >
-								<p:outputLabel value="Observaciones: " />
+							<div class="p-md-3 p-lg-3">
+								<p:outputLabel value="Placas transporte" />
 								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.placasTransporte}" disabled="true" />
 							</div>
+						</div>
+						<div class="p-grid p-col-12">
+							<div class="p-md-12 p-lg-12">
+								<p:outputLabel value="Observaciones: " />
+								<p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.observaciones}" disabled="true" />
+							</div>
 							
 						</div>
-																
-					</p:outputPanel>				
-				</p:outputPanel>		
-				
+					</p:outputPanel>
+				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Cancelar Constancia" actionListener="#{consultarConstanciaSalidaBean.cancelarConstancia()}" onclick="PF('dlgdetalleConstancia').hide()" disabled="#{(consultarConstanciaSalidaBean.usuario.perfil == 1) or (consultarConstanciaSalidaBean.usuario.perfil == 4)}"></p:commandButton>
-					<p:commandButton value="Reimprimir" actionListener="#{consultarConstanciaSalidaBean.imprimirTicket()}" ajax="false" process="this"></p:commandButton>
-					<p:commandButton value="Cerrar" onclick="PF('dlgdetalleConstancia').hide()" process="@this"/>
+					<p:commandButton value="Cancelar Constancia" actionListener="#{consultarConstanciaSalidaBean.cancelarConstancia()}" onclick="PF('dlgdetalleConstancia').hide()" disabled="#{(consultarConstanciaSalidaBean.usuario.perfil == 1) or (consultarConstanciaSalidaBean.usuario.perfil == 4)}">
+					</p:commandButton>
+					<p:commandButton value="Reimprimir" actionListener="#{consultarConstanciaSalidaBean.imprimirTicket()}" ajax="false" process="this">
+					</p:commandButton>
+					<p:commandButton value="Cerrar" onclick="PF('dlgdetalleConstancia').hide()" process="@this" />
 				</f:facet>
-					
+			</p:dialog>
+			
+			
+			<p:dialog id="productos" widgetVar="dlgProductos" header="Productos" width="auto">
+				<p:outputPanel id="dlg-partidas" class="ui-fluid">
+					<p:dataTable value="#{consultarConstanciaSalidaBean.constanciaSelect.detalleConstanciaSalidaList}" var="detalleConstanciaSalida"
+						paginator="true" rows="5" paginatorPosition="bottom">
+						<p:column headerText="Ingreso" width="6rem" style="text-align: center;">
+							<h:outputText value="#{detalleConstanciaSalida.folioEntrada}" />
+						</p:column>
+						<p:column headerText="Son" width="4rem" style="text-align: center;">
+							<h:outputText value="#{detalleConstanciaSalida.cantidad}" />
+						</p:column>
+						<p:column headerText="Unidad" style="text-align: center;" width="5rem">
+							<h:outputText value="#{detalleConstanciaSalida.unidad}" />
+						</p:column>
+						<p:column headerText="Producto" style="text-align: left;" width="auto">
+							<h:outputText value="#{detalleConstanciaSalida.producto}" />
+						</p:column>
+						<p:column headerText="Peso(Kg)" style="text-align: right;" width="5rem">
+							<h:outputText value="#{detalleConstanciaSalida.peso}" />
+						</p:column>
+						<p:column headerText="Camara" style="text-align: center;" width="6rem">
+							<h:outputText value="#{detalleConstanciaSalida.camaraCadena}" />
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+			
+			
+			<p:dialog id="servicios" widgetVar="dlgServicios" header="Servicios" width="auto">
+				<p:outputPanel id="dlg-servicios" class="ui-fluid" rendered="#{consultarConstanciaSalidaBean.constanciaSelect != null}">
+					<p:dataTable value="#{consultarConstanciaSalidaBean.constanciaSelect.constanciaSalidaServiciosList}" var="constanciaServicio"
+						paginator="true" rows="3" paginatorPosition="bottom">
+						<p:column headerText="Servicio">
+							<h:outputText value="#{constanciaServicio.servicioCve.servicioDs}" />
+						</p:column>
+						<p:column headerText="Cantidad">
+							<h:outputText value="#{constanciaServicio.numCantidad}" />
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
 			</p:dialog>
 			
 		</h:form>
 	</ui:define>
 </ui:composition>
-			
