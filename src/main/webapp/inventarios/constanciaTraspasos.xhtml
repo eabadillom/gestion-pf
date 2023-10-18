@@ -5,195 +5,143 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:pe="http://primefaces.org/ui/extensions"
 	template="/WEB-INF/template.xhtml">
-
 	<ui:define name="title">Constancia de Traspasos</ui:define>
-
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Inventarios" />
-				<p:menuitem value="Servicios" />
-				<p:menuitem value="Consultar"
-					outcome="/inventarios/constanciaTraspasos" />
-			</p:breadCrumb>
-			<div class="p-grid crud-demo">
-				<div class="p-col-12">
-					<div class="card">
-					<p:fieldset legend="Filtro de busqueda">
-					
-					 <p:divider align="left">
-					        <div class="inline-flex align-items-center">
-					            <b>Por rango de fechas</b>
-					        </div>
-					    </p:divider>
-						<span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="min" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultaTraspasosBean.fecha_ini}"  maxdate="#{consultaTraspasosBean.maxDate}" readonlyInput="true"/>
-			                <p:outputLabel for="min" value="Fecha "/>
-						</span>		
-						
-						<span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="max" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultaTraspasosBean.fecha_final}"  maxdate="#{consultaTraspasosBean.maxDate}" readonlyInput="true"/>
-						<p:outputLabel for="max" value="Fecha "/>
-						</span>	
-						
-						<p:outputLabel for="folio" value="Por Folio:" />
-						<p:inputText id="folio" value="#{consultaTraspasosBean.numero}" />
-						<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2" icon="pi pi-fw pi-search" actionListener="#{consultaTraspasosBean.buscarConstancia}" update="@widgetVar(dtConstanciaTraspaso) messages"/>
-							 <p:divider align="left">
-							        <div class="inline-flex align-items-center">
-							            <i class="pi pi-user mr-2"/>
-							            <b>Por Cliente</b>
-							        </div>
-							    </p:divider>
-						<p:outputLabel for="cliente-som" value="Por Clientes:" />
-						<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{consultaTraspasosBean.idCliente}">
-							<f:selectItem itemLabel="Selecione Cliente" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="cte" value="#{consultaTraspasosBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
-							<p:ajax listener="#{consultaTraspasosBean.filtrarCliente}" process="@this" update=":form:dt-traspaso "/>
-						</p:selectOneMenu>
-						
-						</p:fieldset>
-						
-					</div>
+			<p:growl id="messages" showDetail="true" />
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+			<div class="p-grid ui-fluid">
+				<div class="p-field p-col-3 p-md-3">
+					<p:outputLabel for="min" value="Del" />
+					<p:datePicker id="min" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultaTraspasosBean.fecha_ini}" maxdate="#{consultaTraspasosBean.maxDate}" readonlyInput="true">
+						<p:ajax process="@this"/>
+					</p:datePicker>
+				</div>
+				<div class="p-field p-col-3 p-md-3">
+					<p:outputLabel for="max" value="al" />
+					<p:datePicker id="max" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultaTraspasosBean.fecha_final}" maxdate="#{consultaTraspasosBean.maxDate}" readonlyInput="true">
+						<p:ajax process="@this"/>
+					</p:datePicker>
+				</div>
+				<div class="p-field p-col-3 p-md-3">
+					<p:outputLabel for="folio" value="Folio" />
+					<p:inputText id="folio" value="#{consultaTraspasosBean.numero}">
+						<p:ajax process="@this"/>
+					</p:inputText>
 				</div>
 			</div>
-
-			<div class="p-grid crud-demo">
-				<div class="p-col-12">
-					<div class="card">
-						<p:growl id="messages" showDetail="true" />
-						<p:dataTable id="dt-traspaso" widgetVar="dtConstanciaTraspaso" var="trasp" value="#{consultaTraspasosBean.listaTraspasos}" reflow="true" 
-						rowKey="#{trasp.id}" paginator="true" rows="10" rowSelectMode="add" selectionMode="single" paginatorPosition="bottom">
-				
-							<p:column headerText="Folio" sortBy="#{trasp.numero}" filterBy="#{trasp.numero}" width="5rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.numero}" />
-							</p:column>
-							<p:column headerText="Cliente" sortBy="#{trasp.cliente.cteNombre}" filterBy="#{trasp.cliente.cteNombre}">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.cliente.cteNombre}" />
-							</p:column>
-							<p:column headerText="Fecha" sortBy="#{trasp.fecha}" filterBy="#{trasp.fecha}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.fecha}" />
-							</p:column>
-							<p:column width="10rem">
-								<p:commandButton icon="pi pi-search" update=":form:constanciaDetalle " value="Ver detalle" oncomplete="PF('dlg-constancia').show()" styleClass="edit-button ui-button-info" process="@this">
-									<f:setPropertyActionListener value="#{trasp}" target="#{consultaTraspasosBean.selectedconstancia}" />
-								</p:commandButton>
-							</p:column>
-						</p:dataTable>
-						
-						<p:dialog header="Consulta de traspaso" showEffect="fade" var="consulta" modal="true" widgetVar="dlg-constancia" responsive="true" style="max-width:80em !important;" resizable="true">
-							<p:ajax event="open" listener="#{consultaTraspasosBean.carga}" update="dt-detalleConstancia dt-Servicios"/>
-							<p:outputPanel id="constanciaDetalle" class="ui-fluid">
-								<p:outputPanel rendered="#{not empty consultaTraspasosBean.selectedconstancia}">
-									<div class="p-grid">
-									
-									<p:panel id="Cliente">
-					                <div class="field">
-					                        <h:outputLabel for="cliente-new" value="Cliente" styleClass="ml-4" />
-					                        <p:inputText widgetVar="cliente-new" id="cliente-new" value="#{consultaTraspasosBean.selectedconstancia.cliente.cteNombre}" readonly="true" />
-					                </div>
-					            </p:panel>
-					            
-									<p:panel id="Folio">
-					                <div class="field">
-					                        <h:outputLabel for="folio-new" value="Folio" styleClass="ml-4" />
-					                        <p:inputText widgetVar="Folio-n" id="folio-new" value="#{consultaTraspasosBean.selectedconstancia.numero}" readonly="true" />
-					                </div>
-					            </p:panel>
-					            
-								<p:panel id="Fecha">
-					                <div class="field">
-					                        <h:outputLabel for="fecha-new" value="Fecha" styleClass="ml-4" />
-					                        <p:inputText widgetVar="fecha-new" id="fecha-new" value="#{consultaTraspasosBean.selectedconstancia.fecha}" readonly="true"/>
-					                </div>
-					            </p:panel>
-								<p:panel id="Observacion">
-					                <div class="field">
-					                        <h:outputLabel for="observacion-new" value="Observaciones" styleClass="ml-4" />
-					                        <p:inputText widgetVar="observacion-new" id="observacion-new" value="#{consultaTraspasosBean.selectedconstancia.observacion}" readonly="true"/>
-					                </div>
-					            </p:panel>
-					           </div>
-					           <p:divider align="left">
-        <div class="inline-flex align-items-center">
-            <i class="pi pi-list mr-2"/>
-            <b>Detalles de partida</b>
-        </div>
-    </p:divider>
-						<p:dataTable id="dt-detalleConstancia" widgetVar="dtConstanciaTraspaso2" var="detallecons" value="#{consultaTraspasosBean.listaTraspasoPartida}" reflow="true" 
-								paginator="true" rows="10" rowKey="#{detallecons.traspaso}" rowSelectMode="add" selectionMode="single" paginatorPosition="bottom">
-				
-							<p:column headerText="Traspaso" sortBy="#{detallecons.traspaso.id}" filterBy="#{detallecons.traspaso.id}" width="5rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{detallecons.traspaso.id}" />
-							</p:column>
-							
-							<p:column headerText="Constancia" sortBy="#{detallecons.constancia}" filterBy="#{detallecons.constancia}">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{detallecons.constancia}" />
-							</p:column>
-							
-							<p:column headerText="Partida" sortBy="#{detallecons.partida.partidaCve}" filterBy="#{detallecons.partida.partidaCve}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{detallecons.partida.partidaCve}" />
-							</p:column>
-							
-							<p:column headerText="Descripcion" sortBy="#{detallecons.descripcion}" filterBy="#{detallecons.descripcion}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{detallecons.descripcion}" />
-							</p:column>
-							
-							<p:column headerText="Cantidad" sortBy="#{detallecons.cantidad}" filterBy="#{detallecons.cantidad}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{detallecons.cantidad}" />
-							</p:column>
-							
-							<p:column headerText="Origen" sortBy="#{detallecons.origen}" filterBy="#{detallecons.origen}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{detallecons.origen}" />
-							</p:column>
-							
-							<p:column headerText="Destino" sortBy="#{detallecons.destino}" filterBy="#{detallecons.destino}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{detallecons.destino}" />
-							</p:column>
-							
-						</p:dataTable>
-	    <p:divider align="left">
-        <div class="inline-flex align-items-center">
-            <i class="pi pi-check-square mr-2"/>
-            <b>Servicios designados</b>
-        </div>
-    </p:divider>
-    		<p:dataTable id="dt-Servicios" widgetVar="dtServicios" var="servicios" value="#{consultaTraspasosBean.listaServicios}" reflow="true" 
-								paginator="true" rows="10" rowKey="#{detallecons.traspaso}" rowSelectMode="add" selectionMode="single" paginatorPosition="bottom">
-				
-							<p:column headerText="Traspaso" sortBy="#{servicios.traspaso.id}" filterBy="#{servicios.traspaso.id}" width="5rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.traspaso.id}" />
-							</p:column>
-
-							<p:column headerText="Servicio" sortBy="#{servicios.servicio}" filterBy="#{servicios.servicio}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.servicio}" />
-							</p:column>
-							
-							<p:column headerText="Cantidad" sortBy="#{servicios.cantidad}" filterBy="#{servicios.cantidad}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.cantidad}" />
-							</p:column>
-							
-							<p:column headerText="Precio" sortBy="#{servicios.precio}" filterBy="#{servicios.precio}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.precio}"/>
-							</p:column>
-							
-							<p:column headerText="Subtotal" sortBy="#{servicios.subtotal}" filterBy="#{servicios.subtotal}" width="7rem">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.subtotal}"/> 
-							</p:column>
-						</p:dataTable>
-    					
-				</p:outputPanel>
-				</p:outputPanel>
-							<f:facet name="footer">
-								<p:commandButton value="Generar constancia" icon="pi pi-file-pdf" styleClass="ui-button-raised ui-button-secondary" actionListener="#{consultaTraspasosBean.jasper}" update="documento" ajax="false"/>
-								<p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('dlg-constancia').hide()" />
-							</f:facet>
-						</p:dialog>
-					</div>
+			<div class="p-grid ui-fluid">
+				<div class="p-field p-col-6 p-md-6">
+					<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{consultaTraspasosBean.idCliente}" filter="true" filterMatchMode="contains" filterNormalize="true">
+						<f:selectItem itemLabel="Selecione Cliente" itemValue="" noSelectionOption="true" />
+						<f:selectItems var="cte" value="#{consultaTraspasosBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
+						<p:ajax process="@this"/>
+					</p:selectOneMenu>
+				</div>
+				<div class="p-field p-col-2 p-md-2">
+					<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2" icon="pi pi-fw pi-search" actionListener="#{consultaTraspasosBean.buscarConstancia}" update="@widgetVar(dtConstanciaTraspaso) messages form:dt-traspaso" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
 				</div>
 			</div>
+			<p:dataTable id="dt-traspaso" widgetVar="dtConstanciaTraspaso" var="trasp" value="#{consultaTraspasosBean.listaTraspasos}" reflow="true" rowKey="#{trasp.id}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+				<p:column headerText="Folio" width="5rem">
+					<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.numero}" />
+				</p:column>
+				<p:column headerText="Cliente">
+					<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.cliente.cteNombre}" />
+				</p:column>
+				<p:column headerText="Fecha" width="7rem">
+					<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.fecha}" />
+				</p:column>
+				<p:column width="7rem" style="text-align: center;">
+					<p:commandButton icon="pi pi-bars" update=":form:constanciaDetalle" value="Detalle" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlg-constancia').show()" styleClass="edit-button ui-button-info" process="@this" action="#{consultaTraspasosBean.cargaDetalle}">
+						<f:setPropertyActionListener value="#{trasp}" target="#{consultaTraspasosBean.selectedconstancia}" />
+					</p:commandButton>
+				</p:column>
+				<p:column width="7rem" style="text-align: center;">
+					<p:commandButton icon="pi pi-bars" update=":form:dt-detalleConstancia" value="Productos" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgProductos').show()" styleClass="edit-button ui-button-info" process="@this" action="#{consultaTraspasosBean.cargaDetalle}">
+						<f:setPropertyActionListener value="#{trasp}" target="#{consultaTraspasosBean.selectedconstancia}" />
+					</p:commandButton>
+				</p:column>
+				<p:column width="7rem" style="text-align: center;">
+					<p:commandButton icon="pi pi-bars" update=":form:dt-Servicios" value="Servicios" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgServicios').show()" styleClass="edit-button ui-button-info" process="@this" action="#{consultaTraspasosBean.cargaDetalle}">
+						<f:setPropertyActionListener value="#{trasp}" target="#{consultaTraspasosBean.selectedconstancia}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			
+			<p:dialog header="Consulta de traspaso" showEffect="fade" var="consulta" modal="true" widgetVar="dlg-constancia" responsive="true" style="max-width:80em !important;" resizable="true">
+				<p:outputPanel id="constanciaDetalle" class="ui-fluid">
+					<div class="p-grid p-col-12">
+						<div class="p-md-6 p-lg-6">
+							<h:outputLabel for="cliente-new" value="Cliente" styleClass="ml-4" />
+							<p:inputText widgetVar="cliente-new" id="cliente-new" value="#{consultaTraspasosBean.selectedconstancia.cliente.cteNombre}" readonly="true" />
+						</div>
+						<div class="p-md-3 p-lg-3">
+							<h:outputLabel for="folio-new" value="Folio" styleClass="ml-4" />
+							<p:inputText widgetVar="Folio-n" id="folio-new" value="#{consultaTraspasosBean.selectedconstancia.numero}" readonly="true" />
+						</div>
+						<div class="p-md-3 p-lg-3">
+							<h:outputLabel for="fecha-new" value="Fecha" styleClass="ml-4" />
+							<p:inputText widgetVar="fecha-new" id="fecha-new" value="#{consultaTraspasosBean.selectedconstancia.fecha}" readonly="true" />
+						</div>
+						<div class="p-md-6 p-lg-6">
+							<h:outputLabel for="observacion-new" value="Observaciones" styleClass="ml-4" />
+							<p:inputText widgetVar="observacion-new" id="observacion-new" value="#{consultaTraspasosBean.selectedconstancia.observacion}" readonly="true" />
+						</div>
+					</div>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Imprimir" icon="pi pi-file-pdf" styleClass="ui-button-raised ui-button-secondary" actionListener="#{consultaTraspasosBean.jasper}" update="documento" ajax="false" />
+					<p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('dlg-constancia').hide()" />
+				</f:facet>
+			</p:dialog>
+			
+			<p:dialog id="productos" widgetVar="dlgProductos" header="Productos" width="auto">
+				<p:outputPanel id="dlg-partidas" class="ui-fluid">
+					<p:dataTable id="dt-detalleConstancia" widgetVar="dtConstanciaTraspaso2" var="detallecons" value="#{consultaTraspasosBean.listaTraspasoPartida}" reflow="true" paginator="true" rows="5" rowKey="#{detallecons.traspaso}" rowSelectMode="add" selectionMode="single" paginatorPosition="bottom">
+						<p:column headerText="Traspaso" width="6rem" style="text-align: center;">
+							<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{detallecons.traspaso.id}" />
+						</p:column>
+						<p:column headerText="Constancia" width="6rem" style="text-align: center;">
+							<h:outputText value="#{detallecons.constancia}" />
+						</p:column>
+						<p:column headerText="Descripcion">
+							<h:outputText value="#{detallecons.descripcion}" />
+						</p:column>
+						<p:column headerText="Peso(Kg)" style="text-align: right;" width="5rem">
+							<h:outputText value="#{detallecons.cantidad}" />
+						</p:column>
+						<p:column headerText="Origen" style="text-align: center;" width="10rem">
+							<h:outputText value="#{detallecons.origen}" />
+						</p:column>
+						<p:column headerText="Destino" style="text-align: center;" width="10rem">
+							<h:outputText value="#{detallecons.destino}" />
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+			<p:dialog id="servicios" widgetVar="dlgServicios" header="Servicios" width="auto">
+				<p:outputPanel id="dlg-servicios" class="ui-fluid">
+					<p:dataTable id="dt-Servicios" widgetVar="dtServicios" var="servicios" value="#{consultaTraspasosBean.listaServicios}" reflow="true" paginator="true" rows="3" rowKey="#{detallecons.traspaso}" rowSelectMode="add" selectionMode="single" paginatorPosition="bottom">
+						<p:column headerText="Servicio" width="7rem">
+							<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.servicio}" />
+						</p:column>
+						<p:column headerText="Cantidad" width="7rem">
+							<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.cantidad}" />
+						</p:column>
+						<p:column headerText="Precio" width="7rem">
+							<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.precio}" />
+						</p:column>
+						<p:column headerText="Subtotal" width="7rem">
+							<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{servicios.subtotal}" />
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
 		</h:form>
 	</ui:define>
-
 </ui:composition>
