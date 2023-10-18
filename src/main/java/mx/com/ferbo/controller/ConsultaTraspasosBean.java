@@ -21,20 +21,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.ConstanciaTraspasoDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
-import mx.com.ferbo.dao.InventarioDAO;
-import mx.com.ferbo.dao.PartidaDAO;
-import mx.com.ferbo.dao.PartidaServicioDAO;
 import mx.com.ferbo.dao.TraspasoPartidaDAO;
 import mx.com.ferbo.dao.TraspasoServicioDAO;
 import mx.com.ferbo.model.Cliente;
@@ -98,29 +92,19 @@ public class ConsultaTraspasosBean implements Serializable {
 	
 	private EstadoConstanciaDAO edoDAO;
 	private ClienteDAO clienteDAO;
-	private PartidaServicioDAO partidaservicioDAO;
-	private PartidaDAO partidaDAO;
-	private InventarioDAO inventarioDAO;
 	private TraspasoPartidaDAO tpDAO;
-	private ConstanciaTraspasoDAO constanciaTDAO;
-	private ConstanciaTraspasoDAO constanciatraspasoDAO;
+	private ConstanciaTraspasoDAO constanciaTraspasoDAO;
 	private TraspasoServicioDAO traspasoServicioDAO;
-	private ConstanciaServicioDAO constanciaServicioDAO;
 	
-	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
 	public ConsultaTraspasosBean() {
 		log.info("Entrando al constructor del controller...");
-		partidaservicioDAO = new PartidaServicioDAO();
 		clienteDAO = new ClienteDAO();
 		edoDAO = new EstadoConstanciaDAO();
-		partidaDAO = new PartidaDAO();
-		inventarioDAO = new InventarioDAO();
-		constanciatraspasoDAO = new ConstanciaTraspasoDAO();
+		constanciaTraspasoDAO = new ConstanciaTraspasoDAO();
 		tpDAO = new TraspasoPartidaDAO();
 		traspasoServicioDAO = new TraspasoServicioDAO();
-		constanciaServicioDAO= new ConstanciaServicioDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
@@ -133,9 +117,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		selCliente = new Cliente();
 		selectedconstancia = new ConstanciaTraspaso();
 		tp = new TraspasoPartida();
-		alPartidas = partidaservicioDAO.findall();
 		clientes = clienteDAO.findall();
-		partida = partidaDAO.findall();
 	}
 
 	@PostConstruct
@@ -151,52 +133,43 @@ public class ConsultaTraspasosBean implements Serializable {
 		Date today = new Date();
 		setMaxDate(new Date(today.getTime() ));
 		
+		this.selectedconstancia = new ConstanciaTraspaso();
+		
 	}
 	public void buscarConstancia() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		EntityTransaction tr = em.getTransaction();
-		tr.begin();
-		constanciatraspasoDAO.setEm(em);
-		System.out.println(getIdCliente() + " " + getFecha_ini() +" "+ getFecha_final() + " " + getNumero());
-		System.out.print(idCliente + " " + fecha_ini + " "+ fecha_final+ " "  + numero);
-		 listaTraspasos = constanciatraspasoDAO.buscarporNumero(numero);
-		for(ConstanciaTraspaso constanciaT : listaTraspasos) {
-			List<TraspasoPartida> listaPartidas = constanciaT.getTraspasoPartidaList();
-			List<TraspasoServicio> listaServicios = constanciaT.getTraspasoServicioList();
-		}
+		if(numero != null && "".equalsIgnoreCase(numero.trim()))
+			this.numero = null;
 		
-		tr.commit();
-		em.close();
-		numero = "";
+		if("".equalsIgnoreCase(this.numero))
+			this.numero = null;
+		
+		listaTraspasos = constanciaTraspasoDAO.buscar(fecha_ini, fecha_final, idCliente, numero);
+		log.debug("Lista constancias de traspaso: {}", listaTraspasos.size());
 	}
-	public void carga() {
-		listaTraspasoPartida = tpDAO.buscarPorConstancia(selectedconstancia);
-		listaServicios = traspasoServicioDAO.buscarPorConstancia(selectedconstancia);
-	}
-
-	public void filtrarCliente() {
+	
+	public void cargaDetalle() {
 		String message = null;
 		Severity severity = null;
 		EntityManager manager = null;
 		try {
-			log.debug("Filtrando información del cliente...");
-			this.selCliente = clienteDAO.buscarPorId(idCliente);
-			listaTraspasos = constanciatraspasoDAO.buscarPorCriterios(numero,fecha_ini,fecha_final, idCliente);
+			log.info("Cargando constancia de traspaso: {}", this.selectedconstancia);
+			this.selectedconstancia = constanciaTraspasoDAO.buscarPorId(this.selectedconstancia.getId(), true);
 			
+			log.debug("TraspasoPartida (size): {}", selectedconstancia.getTraspasoPartidaList().size());
+			listaTraspasoPartida = selectedconstancia.getTraspasoPartidaList();
+			listaServicios = selectedconstancia.getTraspasoServicioList();
 		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 			
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:destino");
+			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
 			EntityManagerUtil.close(manager);
 		}
-		
-		log.info("Servicios del cliente filtrados.");
 	}
-		
+	
 	public void jasper() throws JRException, IOException, SQLException {
 		String jasperPath = "/jasper/ReporteTraspaso.jrxml";
 		String filename = "Constancia_de_traspaso.pdf";
@@ -223,7 +196,6 @@ public class ConsultaTraspasosBean implements Serializable {
 			parameters.put("LogoPath", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());			
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			//reporte = jasperReportUtil.getPdf(filename, parameters, path);
 		} catch (Exception ex) {
 			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
@@ -237,13 +209,13 @@ public class ConsultaTraspasosBean implements Serializable {
 		}
 	}
 
-
-		public void deleteServicio(TraspasoServicio servicio) {
+	public void deleteServicio(TraspasoServicio servicio) {
 		this.alServiciosDetalle.remove(servicio);
 	}
-		public void deletePartida(InventarioDetalle partida) {
-			this.destino.remove(partida);
-		}
+
+	public void deletePartida(InventarioDetalle partida) {
+		this.destino.remove(partida);
+	}
 
 	public Cliente getSelCliente() {
 		return selCliente;
@@ -260,9 +232,7 @@ public class ConsultaTraspasosBean implements Serializable {
 	public void setNumero(String numero) {
 		this.numero = numero;
 	}
-
-
-
+	
 	public String getObservaciones() {
 		return observaciones;
 	}

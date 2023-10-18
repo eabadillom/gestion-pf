@@ -16,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaTraspaso;
+import mx.com.ferbo.model.TraspasoPartida;
+import mx.com.ferbo.model.TraspasoServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>{
@@ -31,6 +33,38 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 			em = EntityManagerUtil.getEntityManager();
 			constancia = em.createNamedQuery("ConstanciaTraspaso.findById", ConstanciaTraspaso.class).
 					setParameter("id", id).getSingleResult();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la constancia de traspaso id: " + id,  ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return constancia;
+	}
+	
+	public ConstanciaTraspaso buscarPorId(Integer id, boolean isFullInfo) {
+		EntityManager em = null;
+		ConstanciaTraspaso constancia = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			constancia = em.createNamedQuery("ConstanciaTraspaso.findById", ConstanciaTraspaso.class).
+					setParameter("id", id).getSingleResult();
+			if(isFullInfo == false)
+				return constancia;
+			
+			log.debug("Cliente: {}", constancia.getCliente().getCteCve());
+			
+			List<TraspasoPartida> tpList = constancia.getTraspasoPartidaList();
+			for(TraspasoPartida tp : tpList) {
+				log.debug("TraspasoPartida: {}", tp.getId());
+			}
+			
+			List<TraspasoServicio> tsList = constancia.getTraspasoServicioList();
+			for(TraspasoServicio ts : tsList) {
+				log.debug("TraspasoServicio: {}", ts.getId());
+			}
+			
 		} catch(Exception ex) {
 			log.error("Problema para obtener la constancia de traspaso id: " + id,  ex);
 		} finally {
@@ -104,6 +138,29 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 				System.out.println("ERROR" + e.getMessage());
 				return null;
 			}
+	}
+	
+	public List<ConstanciaTraspaso> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
+		List<ConstanciaTraspaso> resultList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			resultList = em.createNamedQuery("ConstanciaTraspaso.findByPeriodoClienteNumero", ConstanciaTraspaso.class)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.setParameter("idCliente", idCliente)
+					.setParameter("folioCliente", folioCliente)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para consultar las constancias de salida...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		return resultList;
 	}
 
 	@Override
