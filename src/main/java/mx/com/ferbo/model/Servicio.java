@@ -70,13 +70,13 @@ public class Servicio implements Serializable {
     @ManyToOne
     private ClaveUnidad claveUnit; //(AQUI HAY UN ERROR) 
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicioCve")
+    @OneToMany(mappedBy = "servicioCve")
     private List<CuotaMensualServicio> cuotaMensualServicioList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicio")
+    @OneToMany(mappedBy = "servicio")
     private List<PrecioServicio> precioServicioList;
     @OneToMany(mappedBy = "servicioCve")
     private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "servicioCve")
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "servicioCve")
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
     
 

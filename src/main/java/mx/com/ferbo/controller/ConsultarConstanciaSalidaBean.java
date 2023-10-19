@@ -17,8 +17,6 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,7 +30,6 @@ import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.StatusConstanciaSalidaDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaSalida;
-import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.StatusConstanciaSalida;

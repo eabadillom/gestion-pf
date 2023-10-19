@@ -8,6 +8,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -49,7 +50,7 @@ public class ConstanciaServicioDetalle implements Serializable {
     @JoinColumn(name = "SERVICIO_CVE", referencedColumnName = "SERVICIO_CVE")
     @ManyToOne(optional = false)
     private Servicio servicioCve;
-
+    
     public ConstanciaServicioDetalle() {
     }
 
