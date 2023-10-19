@@ -16,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeServicio;
+import mx.com.ferbo.model.ConstanciaServicioDetalle;
+import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Integer> {
@@ -32,8 +34,54 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 
 	@Override
 	public ConstanciaDeServicio buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = null;
+		ConstanciaDeServicio constancia = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			constancia = em.find(ConstanciaDeServicio.class, id);
+			
+		} catch(Exception ex) {
+			log.error("Problema para consultar la constancia...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return constancia;
+	}
+	
+	public ConstanciaDeServicio buscarPorId(Integer id, boolean isFullInfo) {
+		EntityManager em = null;
+		ConstanciaDeServicio constancia = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			constancia = em.find(ConstanciaDeServicio.class, id);
+			
+			if(isFullInfo == false)
+				return constancia;
+			
+			log.debug("Estado constancia: {}", constancia.getStatus().getEdoCve());
+			
+			List<PartidaServicio> psList = constancia.getPartidaServicioList();
+			log.debug("Partidas Servicio: {}",psList.size());
+			for(PartidaServicio ps : psList) {
+				log.debug("Partida Servicio Id: {}", ps.getPartidaCve());
+			}
+			
+			List<ConstanciaServicioDetalle> csdList = constancia.getConstanciaServicioDetalleList();
+			log.debug("Constancia Servicio Detalle: {}", csdList.size());
+			for(ConstanciaServicioDetalle csd : csdList) {
+				log.debug("Constancia Servicio Detalle: {}", csd.getConstanciaServicioDetalleCve());
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para consultar la constancia...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return constancia;
 	}
 	
 	public List<ConstanciaDeServicio> buscarPorFolioCliente(String folioCliente) {
@@ -110,6 +158,30 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 	public List<ConstanciaDeServicio> buscarPorCriterios(ConstanciaDeServicio constanciaDeServicio) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public List<ConstanciaDeServicio> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
+		List<ConstanciaDeServicio> resultList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			
+			resultList = em.createNamedQuery("ConstanciaDeServicio.findByPeriodoClienteFolioCliente", ConstanciaDeServicio.class)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.setParameter("idCliente", idCliente)
+					.setParameter("folioCliente", folioCliente)
+					.getResultList()
+					;
+			
+		} catch(Exception ex) {
+			log.error("Problema para consultar las constancias...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return resultList;
 	}
 	
 	@Override
