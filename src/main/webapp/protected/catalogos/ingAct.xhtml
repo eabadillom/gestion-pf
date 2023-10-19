@@ -7,14 +7,6 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Inventarios" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Ingresos" />
-				<p:menuitem value="Actualizar" outcome="/protected/catalogos/ingAct" />
-			</p:breadCrumb>
-
 			<div class="p-grid productosClientes">
 				<div class="p-col-12">
 					<div class="card">
@@ -85,24 +77,26 @@
 								<h:outputText value="#{pPago.factura.status.nombre}" />
 							</p:column>
 							<p:column headerText="Fecha">
-								<h:outputText value="#{pPago.fecha}" />
+								<h:outputText value="#{pPago.fecha}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputText>
 							</p:column>
 							<p:column headerText="Tipo de Pago">
 								<h:outputText value="#{pPago.tipo.nombre}" />
 							</p:column>
-							<p:column headerText="Cheque">
+							<!-- <p:column headerText="Cheque">
 								<h:outputText value="#{pPago.cheque}" />
-							</p:column>
-							<p:column headerText="Cheque devuelto">
+							</p:column> -->
+							<!-- <p:column headerText="Cheque devuelto">
 								<h:outputText value="#{pPago.chequeDevuelto}" />
-							</p:column>
+							</p:column> -->
 							<p:column headerText="Banco">
 								<h:outputText value="#{pPago.banco.nombre}" />
 							</p:column>
 							<p:column headerText="Monto">
 								<h:outputText value="#{pPago.monto}" />
 							</p:column>
-							<p:column width="20%">
+							<p:column width="2rem">
 								<p:commandButton icon="pi pi-pencil" process="@this"
 									styleClass="edit-button ui-button-primary"
 									oncomplete="PF('informacionPagoDialogAct').show()"
@@ -110,8 +104,10 @@
 									<f:setPropertyActionListener value="#{pPago}"
 										target="#{ingresosActualizacionBean.pagoSelected}" />
 								</p:commandButton>
-								<p:commandButton class="ui-button-danger" icon="pi pi-trash"
-									value="Eliminar" process="@this"
+							</p:column>
+							<p:column width="2rem">
+								<p:commandButton class="ui-button-danger" icon="pi pi-times"
+									process="@this"
 									oncomplete="PF('informacionPagoDialogActDelete').show()">
 									<f:setPropertyActionListener value="#{pPago}"
 										target="#{ingresosActualizacionBean.pagoSelected}" />

@@ -12,7 +12,6 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +29,8 @@ import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoPago;
+import mx.com.ferbo.ui.PagoUI;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
@@ -64,7 +65,7 @@ public class IngresosCrudBean implements Serializable {
 		private List<Cliente> listaCtes;
 		private List<Factura> listaFactura;
 		private List<Factura> listaFacturaPago;
-		private List<Pago> listaPago;
+		private List<PagoUI> listaPago;
 		private List<Bancos> listaBancos;
 		private List<TipoPago> listatipoPago;
 		
@@ -85,7 +86,7 @@ public class IngresosCrudBean implements Serializable {
 
 			listaCtes = new ArrayList<Cliente>();
 			listaFactura = new ArrayList<Factura>();
-			listaPago = new ArrayList<Pago>();
+			listaPago = new ArrayList<PagoUI>();
 			listaBancos = new ArrayList<Bancos>();
 			listatipoPago = new ArrayList<TipoPago>();
 			listaFacturaPago = new ArrayList<Factura>();
@@ -111,16 +112,17 @@ public class IngresosCrudBean implements Serializable {
 		}
 		
 		public void filtroCte() {
-			listaFactura = facturaDAO.buscarTodos();
 			String message = null;
 			Severity severity = null;
-			EntityManager manager = null;
-			Cliente cte = null;
-			StatusFactura sf = new StatusFactura();
-			this.cteSelect = cteDAO.buscarPorId(idCte);
-			listaFactura.clear();
-			log.info("Entrando a filtrar cliente...");
+			
 			try {
+				log.info("Entrando a filtrar cliente {}", this.idCte);
+				this.cteSelect = cteDAO.buscarPorId(idCte);
+				if(this.cteSelect == null)
+					throw new InventarioException("Seleccione un cliente.");
+				
+				this.listaFactura.clear();
+				
 				if(pagoParcial == true) {
 					StatusFactura sfpagoParcial = new StatusFactura();
 					sfpagoParcial.setId(4);
@@ -136,19 +138,20 @@ public class IngresosCrudBean implements Serializable {
 					severity = FacesMessage.SEVERITY_INFO;
 				}
 						
-					
-			}catch(Exception ex) {
-				log.error("Problema para recuperar los datos del cliente.", ex);
-				message = ex.getMessage();
-				severity = FacesMessage.SEVERITY_ERROR;
-			}finally {
-				
-				if(porCobrar == false && pagoParcial == false) {
+				if(listaFactura.size() > 0) {
 					message = "Seleccione el tipo de pago.";
 					severity = FacesMessage.SEVERITY_INFO;
 				}
-				
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
+			} catch(InventarioException ex){
+				message = ex.getMessage();
+				severity = FacesMessage.SEVERITY_WARN;
+			} catch(Exception ex) {
+				log.error("Problema para recuperar los datos del cliente.", ex);
+				message = "Ocurrió un problema para consultar las facturas del cliente.";
+				severity = FacesMessage.SEVERITY_ERROR;
+			}finally {
+				if(severity != null && message != null)
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
 				PrimeFaces.current().ajax().update("form:messages", "form:dt-Factura");
 			}
 		}
@@ -170,8 +173,10 @@ public class IngresosCrudBean implements Serializable {
 	
 		public void agregaPagoFactura() {
 			BigDecimal saldo = BigDecimal.ZERO;
-			System.out.println(this.pagoSelected);			
+			log.debug("Factura: {}", this.facturaSelect);
+			log.debug(this.pagoSelected);
 			Pago pg = new Pago();
+			PagoUI pagoUI = null;
 			
 			bancoSelect = bancoDAO.buscarPorId(bancoCve);
 			tipoPago = tipoPagoDAO.buscarPorId(tipoP);
@@ -183,8 +188,10 @@ public class IngresosCrudBean implements Serializable {
 			pg.setFecha(fecha);
 			facturaSelect.getPagoList().add(pg);
 			int indexPago = facturaSelect.getPagoList().size() -1;
-			Pago getListaPago = facturaSelect.getPagoList().get(indexPago);
-			listaPago.add(getListaPago);	
+//			Pago getListaPago = facturaSelect.getPagoList().get(indexPago);
+			pagoUI = new PagoUI();
+			pagoUI.setPago(pg);
+			listaPago.add(pagoUI);
 			//listaFacturaPago.add(facturaSelect);
 
 			saldo = facturaSelect.getTotal();
@@ -197,10 +204,14 @@ public class IngresosCrudBean implements Serializable {
 			if(saldo.compareTo(BigDecimal.ZERO) <= 0) //Quere decir que el saldo es igual a 0, es decir, que ya se liquidó la factura. También considera que el pago sea mayor al monto de la factura, por lo que el cliente tendría un saldo a favor.
 				facturaSelect.setStatus(sfPagada);
 			
+			pagoUI.setSaldo(saldo);
+			
 			bancoCve = null;
 			tipoP = null;
 			referencia = null;
 			cantidadApagar = null;
+			
+			log.debug("Lista pago: {}", this.listaPago);
 		}
 		
 		public void savePago() {
@@ -209,8 +220,8 @@ public class IngresosCrudBean implements Serializable {
 			try {
 				
 				if(!listaPago.isEmpty()) {//DUDA SOLO SE GUARDAN DATOS EN PAGO????
-					for(Pago p: listaPago) {					
-						pagofactDAO.guardar(p);					
+					for(PagoUI p: listaPago) {					
+						pagofactDAO.guardar(p.getPago());					
 					}
 				}
 				//facturaDAO.actualizar(facturaSelect);//ERROR GUARDA LA ULTIMA FACTURA SELECCIONADA Y NO TODOS LOS REGISTROS
@@ -227,7 +238,7 @@ public class IngresosCrudBean implements Serializable {
 			} finally {
 				FacesContext.getCurrentInstance().addMessage(null,
 						new FacesMessage(severity, "Informacion de Pago", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-ingAlta", "form:dt-Factura");
+				PrimeFaces.current().ajax().update("form:messages", "form:dt-ingAlta", "form:dt-Factura", "form:detallesFacturacion");
 				
 			}
 	}		
@@ -297,11 +308,11 @@ public class IngresosCrudBean implements Serializable {
 			this.pagoSelected = pagofactSelect;
 		}
 
-		public List<Pago> getListaPago() {
+		public List<PagoUI> getListaPago() {
 			return listaPago;
 		}
 
-		public void setListaPago(List<Pago> listaPago) {
+		public void setListaPago(List<PagoUI> listaPago) {
 			this.listaPago = listaPago;
 		}
 

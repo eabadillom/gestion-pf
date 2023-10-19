@@ -71,6 +71,8 @@ public class IngresosActualizacionBean implements Serializable{
 		listaCtes = clienteDAO.findall();
 		listaBancos = bancoDAO.buscarTodos();
 		listatipoPago = tipoPagoDAO.buscarTodos();
+		this.startDate = new Date();
+		this.endDate = new Date();
 		
 	}
 	
