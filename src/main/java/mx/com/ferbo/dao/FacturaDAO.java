@@ -15,7 +15,7 @@ import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturaMedioPago;
-import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.ProductoConstancia;
 import mx.com.ferbo.model.ProductoConstanciaDs;
 import mx.com.ferbo.model.ServicioConstancia;
@@ -41,8 +41,7 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 	@Override
 	public Factura buscarPorId(Integer id) {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
-		Factura fact = entity.createNamedQuery("Factura.findById", Factura.class)
-				.setParameter("id",id).getSingleResult();
+		Factura fact = entity.find(Factura.class, id);
 		return fact;
 	}
 	
@@ -95,6 +94,11 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 				for(ServicioConstancia sc : servicioConstanciaList) {
 					log.debug("Servicio constancia: {}", sc.getId());
 				}
+			}
+			
+			List<Pago> pagoList = factura.getPagoList();
+			for(Pago p : pagoList) {
+				log.debug("Pago: {}", p.getId());
 			}
 			
 		} catch(Exception ex) {
