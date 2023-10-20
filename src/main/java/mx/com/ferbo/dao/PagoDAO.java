@@ -29,8 +29,44 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 	
 	@Override
 	public Pago buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = null;
+		Pago pago = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			pago = em.find(Pago.class, id);
+		} catch(Exception ex) {
+			log.error("Problema para consultar el pago...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+			
+		return pago;
+	}
+	
+	public Pago buscarPorId(Integer id, boolean isFullInfo) {
+		EntityManager em = null;
+		Pago pago = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			pago = em.find(Pago.class, id);
+			
+			if(isFullInfo == false)
+				return pago;
+			
+			log.debug("Factura: {}", pago.getFactura().getId());
+			for(Pago p : pago.getFactura().getPagoList()) {
+				log.debug("Pago: {}", p.getId());
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para consultar el pago...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+			
+		return pago;
 	}
 	
 	public List<Pago> buscarPorFactura(Integer id) {
@@ -65,19 +101,23 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 	}
 
 	@Override
-	public String actualizar(Pago e) {
-		// TODO Auto-generated method stub
+	public String actualizar(Pago pago) {
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createQuery("UPDATE Pago as p set p.tipo.id = :tipoId , p.banco.id = :bancoId where p.id = :id")
-					.setParameter("tipoId", e.getTipo().getId()).setParameter("bancoId", e.getBanco().getId())
-					.setParameter("id", e.getId()).executeUpdate();
+			em.merge(pago);
+//			em.createQuery("UPDATE Pago as p set p.tipo.id = :tipoId , p.banco.id = :bancoId where p.id = :id")
+//					.setParameter("tipoId", e.getTipo().getId()).setParameter("bancoId", e.getBanco().getId())
+//					.setParameter("id", e.getId()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception ex) {
-			System.out.println("ERROR" + ex.getMessage());
-			return "ERROR";
+			log.error("Problema para actualizar el pago...",ex);
+			return ex.getMessage();
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -129,7 +169,7 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 
 	public List<Pago> buscaPorClienteFechas(Cliente c, Date startDate, Date endDate) {
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Pago.findByClienteFechas", Pago.class).setParameter("cteCve", c.getCteCve())
+		return em.createNamedQuery("Pago.findByClienteFechas", Pago.class).setParameter("cteCve", (c == null ? null : c.getCteCve()))
 				.setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 	}
 

@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,7 +40,7 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "Pago.findByCheque", query = "SELECT p FROM Pago p WHERE p.cheque = :cheque"),
         @NamedQuery(name = "Pago.findByChequeDevuelto", query = "SELECT p FROM Pago p WHERE p.chequeDevuelto = :chequeDevuelto"),
         @NamedQuery(name = "Pago.findByFacturaId", query = "SELECT p FROM Pago p WHERE p.factura.id = :facturaId"),
-        @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE p.factura.cliente.cteCve = :cteCve AND p.fecha BETWEEN :startDate AND :endDate") })
+        @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)") })
 public class Pago implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -75,7 +76,7 @@ public class Pago implements Serializable {
     @ManyToOne(optional = false)
     private Factura factura;
     @JoinColumn(name = "tipo", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
     private TipoPago tipo;
 
     public Pago() {
