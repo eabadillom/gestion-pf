@@ -111,7 +111,7 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		 String sql = null;
 		 try {
 			sql = "SELECT "
-					+"DISTINCTROW "
+					+"DISTINCT "
 					+"cd_folio_salida, "
 					+ "st_estado, "
 					+ "fh_salida, "
@@ -180,6 +180,74 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		return listaOrdenDeSalidas;
 		
 	}
+	
+	public List<String> buscaFolios(Cliente cliente, Date fecha) {
+		List<String> listaFolios = null;
+		EntityManager em = null;
+		String sql = null;
+		try {
+			 sql = "SELECT "
+					 +"distinct "
+					 +"cd_folio_salida, " 
+					 +"fh_salida, "
+					 +"tm_salida, "
+					 +"nb_placa_tte, "
+					 +"nb_operador_tte "
+					 +"FROM "
+					 +"pre_salida ps "
+					 +"INNER JOIN "
+					 +"PARTIDA p "
+					 +"ON "
+					 +"ps.partida_cve = p.PARTIDA_CVE "
+					 +"INNER JOIN "
+					 +"CONSTANCIA_DE_DEPOSITO cdd ON p.FOLIO = cdd.FOLIO "
+					 +"WHERE ps.st_estado = 'A' AND ps.fh_salida = :fecha AND cdd.CTE_CVE = :idCliente ";
+			em = EntityManagerUtil.getEntityManager();
+			SimpleDateFormat formatoSimple = new SimpleDateFormat("yyyy-MM-dd");
+			String fech = formatoSimple.format(fecha);
+			Query query = em.createNativeQuery(sql)
+					.setParameter("fecha", fech)
+					.setParameter("idCliente", cliente.getCteCve())						
+					;
+			@SuppressWarnings("unchecked")
+			List<Object[]> results = query.getResultList();
+		    listaFolios = new ArrayList<String>();
+			for(Object[] o : results) {
+				listaFolios.add((String) o[0]);
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de folios...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		return listaFolios;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<OrdenSalida> buscaFolios(String folio) {
+		List<OrdenSalida> listaFolios = null;
+		EntityManager em = null;
+		Query query = null;
+		String sql = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("OrdenSalida.findByFolioSalida", OrdenSalida.class)
+					.setParameter("FolioSalida",folio)
+					;
+			listaFolios = query.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de folios...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		return listaFolios;
+	}
+	
 	
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public List<OrdenSalida> buscarFolioPorCliente(Cliente cliente, Date fecha) {
