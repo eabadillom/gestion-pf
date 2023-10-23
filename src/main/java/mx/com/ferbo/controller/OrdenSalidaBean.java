@@ -32,6 +32,7 @@ import mx.com.ferbo.dao.OrdenSalidaDAO;
 import mx.com.ferbo.dao.PreSalidaServicioDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
@@ -134,18 +135,21 @@ public class OrdenSalidaBean implements Serializable {
 	public void guardar() {
 		String message = null;
 		Severity severity = null;		
-		List<OrdenSalida> listaSalidas = null;
+		List<OrdenSalida> listaOrdenSalidas = null;
 		OrdenSalida os=null;
+		List<ConstanciaSalida> listaConstanciaSalidas = null;
+		
 		try {			
 			if(confirmacion != true) 
 				throw new InventarioException("Favor de confirmar almenos una orden de salida.");
-			listaSalidas = ordenSalidaDAO.buscarFolioPorCliente(clienteSelect, fecha);
+			
+			/*listaSalidas = ordenSalidaDAO.buscarFolioPorCliente(clienteSelect, fecha);
 			os = new OrdenSalida();
 			os.setFolioSalida(folioSelected);
 			os.setStEstado("C");
 			os.setFechaSalida(fecha);
 			listaSalidas.add(os);
-			ordenSalidaDAO.actualizar(os);
+			ordenSalidaDAO.actualizar(os);*/
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información...", ex);
 			message = ex.getMessage();
@@ -162,7 +166,7 @@ public class OrdenSalidaBean implements Serializable {
 	}
 	
 	@SuppressWarnings("unlikely-arg-type")
-	public void deleteServicio(ConstanciaServicioDetalle servicio) {
+	public void deleteServicio(PreSalidaServicio servicio) {
 		this.listaPreSalidaServicio.remove(servicio);
 		this.listaServicios.remove(servicio);
 	}
@@ -218,28 +222,20 @@ public class OrdenSalidaBean implements Serializable {
 			
 			int coincidencias = 0, diferentes = 0;
 				for (PreSalidaServicio srv : listaPreSalidaServicio) {	
-					count = listaPreSalidaServicio.size();
-					//if(count < 1) { }
-					if(count == 1) {
-						//ps = listaPreSalidaServicio.get(0);
-					if (srv.getIdServicio() == idServicio.getServicio()) {
-						
+					if (srv.getIdServicio().getServicioCve().equals(ps.getIdServicio().getServicioCve())) {
 						coincidencias++;
-						}
 						}else {
-						 //listaPreSalidaServicio.add(ps);
-							diferentes++;			
+						 diferentes++;			
 					}
-					
 				}
 
 				if (coincidencias == 1) {
-					System.out.println("ya existe el servicio");
-					message = "Ya existe el servicio.";
+					System.out.println("Servicio duplicado");
+					message = "Servicio duplicado, favor de modificar la cantidad y/o la unidad.";
 					severity = FacesMessage.SEVERITY_ERROR;
 				} else if (diferentes > 0) {
 					listaPreSalidaServicio.add(ps);
-					message = "Producto agregado correctamente.";
+					message = "Servicio agregado correctamente.";
 					severity = FacesMessage.SEVERITY_INFO;
 				}
 			
@@ -250,7 +246,7 @@ public class OrdenSalidaBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 			
 		}finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Servicio", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Servicios", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-servicios");
 	
 		}

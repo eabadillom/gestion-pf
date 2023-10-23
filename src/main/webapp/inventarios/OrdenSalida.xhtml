@@ -147,11 +147,6 @@
 				</p:column>
 				<p:column headerText="Unidad" width="10em">
 				<p:inplace><h:inputText value="#{servicio.idUnidadManejo.unidadDeManejoDs}"   /></p:inplace>
-            <!--  <p:selectOneMenu id="detServicio" autoWidth="true" value="#{ordenSalidaBean.idServicio}" filterMatchMode="startsWith" converter="entityConverter">
-					<f:selectItem itemLabel="#{servicio.idUnidadManejo.unidadDeManejoDs}"  itemValue=""   />
-					<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.unidad.unidadDeManejoDs}" itemValue="#{ps}" />
-				</p:selectOneMenu>-->
-
 				</p:column>
 				<p:column headerText="Observacion" width="10em"><h:outputText value="#{servicio.observacion}" /></p:column>
 				<p:column width="8em">
@@ -159,14 +154,13 @@
 				</p:column>
 			</p:dataTable>
 	    </p:fieldset>
-		
-		 <h5 class="mt-0">Basic</h5>
+	    <p:divider>
         <p:splitButton value="Guardar" action="#{ordenSalidaBean.guardar}" process="@this" update="messages" icon="pi pi-save">
             <p:menuitem value="Nueva orden de salida" action="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh"/>
             <p:divider />
             <p:menuitem value="Homepage" url="http://localhost:8080/gestion/dashboard.xhtml" icon="pi pi-home"/>
         </p:splitButton>
-		
+        </p:divider>
 		</h:form>
 	</ui:define>
 </ui:composition>
