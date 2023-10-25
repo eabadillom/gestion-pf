@@ -53,8 +53,6 @@ public class StatusFactura implements Serializable {
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    @OneToMany(mappedBy = "status")
-    private List<Factura> facturaList;
 
     public StatusFactura() {
     }
@@ -90,14 +88,6 @@ public class StatusFactura implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public List<Factura> getFacturaList() {
-        return facturaList;
-    }
-
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
     }
 
     @Override

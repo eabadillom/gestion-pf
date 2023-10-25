@@ -7,12 +7,7 @@
 	<ui:define name="title">Plantas</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Inventarios" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Plantas" outcome="/protected/catalogos/plantas"/>
-			</p:breadCrumb>
+			<p:growl id="messages" showDetail="true" />
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
 					<div class="card">
@@ -28,58 +23,35 @@
 					 </div>
 				</div>
 			</div>
-			<div class="p-grid crud-demo">
-				<div class="p-col-12">
-					<div class="card">
-						<p:growl id="messages" showDetail="true" />
-
-						
-						<p:dataTable id="dt-planta" widgetVar="dtPlanta" var="planta" value="#{plantaBean.list}" reflow="true"
-							rowKey="#{planta.plantaCve}" paginator="true" rows="5" paginatorPosition="bottom" rowSelectMode="add">
-							
-							<p:column headerText="Nombre Planta">
-								<h:outputText value="#{planta.plantaDs}" />
-							</p:column>
-							
-							<p:column headerText="Número">
-								<h:outputText value="#{planta.plantaAbrev}" />
-							</p:column>
-
-							<p:column headerText="Sufijo">
-								<h:outputText value="#{planta.plantaSufijo}" />
-							</p:column>
-
-							<p:column headerText="Responsable Planta">
-								<h:outputText value="#{planta.idUsuario.usuario}" />
-							</p:column>							
-							
-							<p:column headerText="Acción" style="text-align:center">
-							
-								<p:commandButton icon="pi pi-pencil" update=":form:frm-agrega" value="Modificar" oncomplete="PF('dg-agrega').show()" styleClass="p-mr-2 p-mb-2" process="@this" action="#{plantaBean.datosPlanta()}">
-									<f:setPropertyActionListener value="#{planta}" target="#{plantaBean.planta}" />
-								</p:commandButton>
-								
-								<p:commandButton value="Eliminar" class="ui-button-danger"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('dg-delete').show()">
-									<f:setPropertyActionListener value="#{planta}"
-										target="#{plantaBean.planta}" />
-								</p:commandButton>
-								
-							</p:column>
-						</p:dataTable>
-					</div>
-				</div>
-			</div>
+			<p:dataTable id="dt-planta" widgetVar="dtPlanta" var="planta" value="#{plantaBean.list}" reflow="true"
+				rowKey="#{planta.plantaCve}" paginator="true" rows="5" paginatorPosition="bottom" rowSelectMode="add">
+				<p:column headerText="Nombre Planta">
+					<h:outputText value="#{planta.plantaDs}" />
+				</p:column>
+				<p:column headerText="Número" width="4rem" style="text-align: center;">
+					<h:outputText value="#{planta.plantaAbrev}" />
+				</p:column>
+				<p:column headerText="Sufijo" width="4rem" style="text-align: center;">
+					<h:outputText value="#{planta.plantaSufijo}" />
+				</p:column>
+				<p:column headerText="Responsable">
+					<h:outputText value="#{planta.idUsuario.nombre} #{planta.idUsuario.apellido1} #{planta.idUsuario.apellido2}" />
+				</p:column>							
+				<p:column width="2rem" style="text-align: center;">
+					<p:commandButton icon="pi pi-pencil" update=":form:frm-agrega" oncomplete="PF('dg-agrega').show()" styleClass="p-mr-2 p-mb-2" process="@this" action="#{plantaBean.datosPlanta()}">
+						<f:setPropertyActionListener value="#{planta}" target="#{plantaBean.planta}" />
+					</p:commandButton>
+				</p:column>
+				<p:column width="2rem" style="text-align: center;">
+					<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" oncomplete="PF('dg-delete').show()">
+						<f:setPropertyActionListener value="#{planta}" target="#{plantaBean.planta}"/>
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
 			<p:dialog id="dlgAE" header="Agregar/Editar una Planta" showEffect="fade"
 				modal="true" widgetVar="dg-agrega" responsive="true"  style="max-width:150em !important;margin: auto;">
-			
-			
-			
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
-				
 					<p:outputPanel rendered="#{not empty plantaBean.planta}">
-				
 						<p:panelGrid columns="6" layout="flex" columnClasses="col-12 md:col-3 xl:col-2, 
 																	col-12 md:col-9 xl:col-4, 
 																	col-12 md:col-3 xl:col-2, 

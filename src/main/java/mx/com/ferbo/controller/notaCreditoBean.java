@@ -5,7 +5,7 @@ import javax.inject.Named;
 import java.io.Serializable;
 import java.util.List;
 import mx.com.ferbo.dao.chequesDevueltosDAO;
-import mx.com.ferbo.dao.notaCreditoDAO;
+import mx.com.ferbo.dao.NotaCreditoDAO;
 import mx.com.ferbo.model.ChequeDevuelto;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.NotaCredito;
@@ -16,7 +16,7 @@ public class notaCreditoBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private notaCreditoDAO result;
+	private NotaCreditoDAO result;
 	private List<NotaCredito> notasCredito;
 	private Cliente notaClienteSelect;
 	
@@ -24,7 +24,7 @@ public class notaCreditoBean implements Serializable {
 
 
 	public notaCreditoBean() {
-		result = new notaCreditoDAO();
+		result = new NotaCreditoDAO();
 		this.notasCredito = result.findAll();
 	}
 
@@ -34,12 +34,12 @@ public class notaCreditoBean implements Serializable {
 	}
 
 
-	public notaCreditoDAO getResult() {
+	public NotaCreditoDAO getResult() {
 		return result;
 	}
 
 
-	public void setResult(notaCreditoDAO result) {
+	public void setResult(NotaCreditoDAO result) {
 		this.result = result;
 	}
 

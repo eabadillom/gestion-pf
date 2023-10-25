@@ -8,20 +8,10 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Tipos de Pago" />
-			</p:breadCrumb>
-
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-
 						<p:growl id="messages" showDetail="true" />
-
 						<p:toolbar styleClass="p-mb-4">
 							<p:toolbarGroup>
 								<p:commandButton value="Agregar" icon="pi pi-plus"
@@ -30,13 +20,7 @@
 									actionListener="#{tiposPagoBean.openNew()}" process="@this" />
 							</p:toolbarGroup>
 						</p:toolbar>
-
-						<p:dataTable id="dt-tipos" widgetVar="dtTipos" var="tipos"
-							reflow="true" paginator="true" rows="10"
-							paginatorPosition="bottom" value="#{tiposPagoBean.principal}"
-							rowKey="#{tipos.mpId}" selection="#{tiposPagoBean.seleccion}"
-							rowSelectMode="single">
-
+						<p:dataTable id="dt-tipos" widgetVar="dtTipos" var="tipos" reflow="true" paginator="true" rows="10" paginatorPosition="bottom" value="#{tiposPagoBean.principal}" rowKey="#{tipos.mpId}" selection="#{tiposPagoBean.seleccion}" rowSelectMode="single">
 							<f:facet name="header">
 								<div class="table-header" align="center">
 									<p>Antes de agregar un nuevo tipo de pago, por favor
@@ -46,7 +30,6 @@
 										presente catálogo.</p>
 								</div>
 							</f:facet>
-
 							<p:column headerText="Descripción"
 								sortBy="#{tipos.mpDescripcion}">
 								<h:outputText value="#{tipos.mpDescripcion}" />

@@ -4,12 +4,17 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
+	
+	private static Logger log = LogManager.getLogger(ClienteDomiciliosDAO.class);
 
 	@Override
 	public ClienteDomicilios buscarPorId(Integer id) {
@@ -29,6 +34,35 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 	public List<ClienteDomicilios> buscarPorCriterios(ClienteDomicilios e) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public List<ClienteDomicilios> buscarDomicilioFiscalPorCliente(Integer idCliente, boolean isFullInfo) {
+		List<ClienteDomicilios> listado = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("ClienteDomicilios.findByClienteDomFiscal", ClienteDomicilios.class)
+					.setParameter("cteCve", idCliente)
+					.getResultList()
+					;
+			
+			if(isFullInfo == false)
+				return listado;
+			
+			for(ClienteDomicilios cd : listado) {
+				log.debug("Domicilio cve: {}", cd.getDomicilios().getDomCve());
+				log.debug("PaisCve: {}", cd.getDomicilios().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve() );
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de domicilios por cliente...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		return listado;
 	}
 
 	@Override

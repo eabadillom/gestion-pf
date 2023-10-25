@@ -10,16 +10,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.JPAEntity;
-import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.NotaCredito;
+import mx.com.ferbo.model.NotaPorFactura;
+import mx.com.ferbo.util.EntityManagerUtil;
 
-public class notaCreditoDAO {
+public class NotaCreditoDAO {
+	private static Logger log = LogManager.getLogger(NotaCreditoDAO.class);
 	
-	EntityManager entity = JPAEntity.getEntity().createEntityManager();
+	EntityManager entity = EntityManagerUtil.getEntityManager();
 	EntityManager em = null;
 	
 	@SuppressWarnings("unchecked")
@@ -47,11 +48,6 @@ public class notaCreditoDAO {
 	
 	public List<NotaCredito> buscarPorCriterios(Date fechaInico, Date fechaFin, int idCliente) {
 
-		// TODO Auto-generated method stub
-		
-		
-		
-		Cliente cliente = new Cliente();//creamos un objeto Cliente
 		Map<String, Object> paramaterMap = new HashMap<String, Object>();
 		List<String> whereCause = new ArrayList<String>();
 		StringBuilder queryBuilder = new StringBuilder();//?? guardar strings para la query
@@ -84,6 +80,7 @@ public class notaCreditoDAO {
 				q.setParameter(key, paramaterMap.get(key));//por cada key le seteamos a q (query) los parametros con la llave (key=string) y con .get el objeto de la key
 			}
 
+			@SuppressWarnings("unchecked")
 			List<NotaCredito> listado = (List<NotaCredito>) q.getResultList();//creamos tipo de lista que se retornara y casteamos el resultado de la query
 			
 			
@@ -103,7 +100,52 @@ public class notaCreditoDAO {
 	}
 	
 	
+	public List<NotaCredito> buscarPor(Date fechaInicio, Date fechaFin, Integer idCliente) {
+		List<NotaCredito> resultList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			resultList = em.createNamedQuery("NotaCredito.findByPeriodoCliente", NotaCredito.class)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.setParameter("idCliente", idCliente)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para consultar las notas de crédito...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return resultList;
+	}
 	
+	
+	public NotaCredito buscarPor(Integer idNotaCredito, boolean isFullInfo) {
+		NotaCredito nota = null;
+		EntityManager entity = null;
+		
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			nota = entity.find(NotaCredito.class, idNotaCredito);
+			
+			if(isFullInfo == false)
+				return nota;
+			
+			List<NotaPorFactura> notaFacturaList = nota.getNotaFacturaList();
+			for(NotaPorFactura nf : notaFacturaList) {
+				log.debug("Nota: {}", nf.getNotaPorFacturaPK().getNota().getId());
+				log.debug("Factura: {}", nf.getNotaPorFacturaPK().getFactura().getId());
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el detalle de la nota de credito...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
+		return nota;
+	}
 	
 	
 	 

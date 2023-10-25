@@ -69,12 +69,16 @@ public class Pago implements Serializable {
     private String cheque; 
     @Column(name = "cheque_devuelto")
     private Boolean chequeDevuelto;
+    
+    @Basic(optional = true)
     @JoinColumn(name = "banco", referencedColumnName = "id")
     @ManyToOne
     private Bancos banco;
+    
     @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Factura factura;
+    
     @JoinColumn(name = "tipo", referencedColumnName = "id")
     @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
     private TipoPago tipo;

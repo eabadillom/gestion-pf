@@ -8,14 +8,6 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Domicilios" />
-				<p:menuitem value="Cambios" />
-				<p:menuitem value="Tipo de Asentamiento" outcome="/protected/catalogos/tipoAsentamiento" />
-			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
 					<div class="card">
@@ -27,49 +19,33 @@
 					</div>
 				</div>
 			</div>
-
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
 						<p:growl id="messages" showDetail="true" />
-						<p:dataTable id="dt-TipoAsentamiento" widgetVar="dtTipoAsentamiento" var="tipoAsentamiento"
-							value="#{tipoAsentamientoBean.listaTipoAsentamiento}" reflow="true"
-							rowKey="#{tipoAsentamiento.tipoasntmntoDs}" paginator="true" rows="10"
-							paginatorPosition="bottom" rowSelectMode="add">
+						<p:dataTable id="dt-TipoAsentamiento" widgetVar="dtTipoAsentamiento" var="tipoAsentamiento" value="#{tipoAsentamientoBean.listaTipoAsentamiento}" reflow="true" rowKey="#{tipoAsentamiento.tipoasntmntoDs}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
-									<span style="font-weight: bold"></span> <span
-										class="ui-input-icon-left filter-container"> <i
-										class="pi pi-search" /> <p:inputText id="globalFilter"
-											onkeyup="PF('dtTipoAsentamiento').filter()" placeholder="Búsqueda" />
+									<span style="font-weight: bold"></span>
+									<span class="ui-input-icon-left filter-container">
+										<i class="pi pi-search" /> <p:inputText id="globalFilter" onkeyup="PF('dtTipoAsentamiento').filter()" placeholder="Búsqueda" />
 									</span>
 								</div>
 							</f:facet>
-
-							<p:column headerText="Tipo de Asentamiento" sortBy="#{tipoAsentamiento.tipoasntmntoDs}"
-								filterBy="#{tipoAsentamiento.tipoasntmntoDs}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{tipoAsentamiento.tipoasntmntoDs}" />
+							<p:column headerText="Tipo de Asentamiento" sortBy="#{tipoAsentamiento.tipoasntmntoDs}" filterBy="#{tipoAsentamiento.tipoasntmntoDs}" style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{tipoAsentamiento.tipoasntmntoDs}" />
 							</p:column>
-							
-								<p:column headerText="Tipo de Asentamiento" sortBy="#{tipoAsentamiento.tipoasntmntoDsCorta}"
-								filterBy="#{tipoAsentamiento.tipoasntmntoDsCorta}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{tipoAsentamiento.tipoasntmntoDsCorta}" />
+							<p:column headerText="Tipo de Asentamiento" sortBy="#{tipoAsentamiento.tipoasntmntoDsCorta}" filterBy="#{tipoAsentamiento.tipoasntmntoDsCorta}" style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{tipoAsentamiento.tipoasntmntoDsCorta}" />
 							</p:column>
-							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil"
-									update=":form:manage-settlementType-content-new" value="Modificar"
-									oncomplete="PF('nuevoTipoAsentamientoDialog').show()"
-									styleClass="p-mr-2 p-mb-2" process="@this">
-									<f:setPropertyActionListener value="#{tipoAsentamiento}"
-										target="#{tipoAsentamientoBean.tipoAsentamientoSelect}" />
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-settlementType-content-new" oncomplete="PF('nuevoTipoAsentamientoDialog').show()" process="@this">
+									<f:setPropertyActionListener value="#{tipoAsentamiento}" target="#{tipoAsentamientoBean.tipoAsentamientoSelect}" />
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('deleteTipoAsentamientoDialog').show()">
-									<f:setPropertyActionListener value="#{tipoAsentamiento}"
-										target="#{tipoAsentamientoBean.tipoAsentamientoSelect}" />
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteTipoAsentamientoDialog').show()">
+									<f:setPropertyActionListener value="#{tipoAsentamiento}" target="#{tipoAsentamientoBean.tipoAsentamientoSelect}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>

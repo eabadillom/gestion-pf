@@ -15,6 +15,7 @@ import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturaMedioPago;
+import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.ProductoConstancia;
 import mx.com.ferbo.model.ProductoConstanciaDs;
@@ -99,8 +100,19 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 			List<Pago> pagoList = factura.getPagoList();
 			for(Pago p : pagoList) {
 				log.debug("Pago: {}", p.getId());
+				log.debug("Tipo pago: {}", p.getTipo().getId());
+				log.debug("Factura: {}", p.getFactura().getId());
+				log.debug("Status factura: {}", p.getFactura().getStatus().getId());
 			}
 			
+			List<NotaPorFactura> notaPorFacturaList= factura.getNotaFacturaList();
+			for(NotaPorFactura nf : notaPorFacturaList) {
+				log.debug("Nota: {}", nf.getNotaPorFacturaPK().getNota().getId());
+				log.debug("Status nota: {}", nf.getNotaPorFacturaPK().getNota().getStatus().getId());
+				log.debug("Factura: {}", nf.getNotaPorFacturaPK().getFactura().getId());
+				log.debug("Status factura: {}", nf.getNotaPorFacturaPK().getFactura().getStatus().getId());
+				log.debug("Cantidad NxF: {}",nf.getCantidad());
+			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener la información de la factura id:{}", ex, id);
 		} finally {

@@ -4,13 +4,6 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" />
-			</p:breadCrumb>
-
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
@@ -32,23 +25,25 @@
 									</span>
 								</div>
 							</f:facet>
-							<p:column exportable="false" width="3%">
+							<p:column exportable="false" width="2rem" style="text-align: center;">
 								<p:rowToggler />
 							</p:column>
 							<p:column headerText="Nombre" sortBy="#{cliente.cteNombre}" filterBy="#{cliente.cteNombre}">
 								<h:outputText value="#{cliente.cteNombre}" />
 							</p:column>
-							<p:column headerText="RFC">
+							<p:column headerText="RFC" width="7rem" style="text-align: center;">
 								<h:outputText value="#{cliente.cteRfc}" />
 							</p:column>
-							<p:column headerText="Habilitado">
+							<p:column headerText="Activo" width="2rem" style="text-align: center;">
 								<h:outputText value="#{cliente.habilitado ? 'Sí' : 'No'}" />
 							</p:column>
-							<p:column >
+							<p:column width="2rem" style="text-align: center;">
 								<p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show();" process="@this" update=":form:dialogCliente :form:regimenFiscal :form:usoCFDI :form:metodoPago :form:formaPago" action="#{clientesBean.cargaInfoCliente}">
 									<f:setPropertyActionListener value="#{cliente}" target="#{clientesBean.clienteSelected}"/>
 								</p:commandButton>
-								<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteClienteDialog').show()">
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" oncomplete="PF('deleteClienteDialog').show()">
 									<f:setPropertyActionListener value="#{cliente}" target="#{clientesBean.clienteSelected}" />
 								</p:commandButton>
 							</p:column>
