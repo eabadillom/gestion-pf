@@ -65,6 +65,63 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		return os;
 	}
 
+		public OrdenSalida buscarPorFolioOrdenSalida(String folioOrden) {
+		OrdenSalida os = null;
+		EntityManager  em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();		
+			os = em.createNamedQuery("OrdenSalida.findByfolio", OrdenSalida.class).
+					setParameter("folio", folioOrden)
+					.getSingleResult();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la orden de salida: " + folioOrden, ex );
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return os;
+	}
+		
+		/*findBypartidaClave*/
+		public OrdenSalida buscarPorPartida(Integer partida) {
+			OrdenSalida os = null;
+			EntityManager  em = null;
+			try {
+				em = EntityManagerUtil.getEntityManager();		
+				os = em.createNamedQuery("OrdenSalida.partidaClave", OrdenSalida.class).
+						setParameter("partidaClave", partida)
+						.getSingleResult();
+			} catch(Exception ex) {
+				log.error("Problema para obtener la orden de salida: " + partida, ex );
+			} finally {
+				EntityManagerUtil.close(em);
+			}
+			return os;
+		}
+	
+		public List<OrdenSalida> listaPorPartida(Integer partida) {
+			List<OrdenSalida> listaPartida= null;
+			EntityManager em = null;
+			
+			try {
+				em = EntityManagerUtil.getEntityManager();
+				em.getTransaction().begin();
+				listaPartida = em.createNamedQuery("OrdenSalida.findBypartidaClave", OrdenSalida.class)
+						.setParameter("partidaClave", partida)
+						.getResultList();
+				
+				em.getTransaction().commit();
+			} catch(Exception ex) {
+				EntityManagerUtil.rollback(em);
+			} finally {
+				EntityManagerUtil.close(em);
+			}
+			
+			return listaPartida;
+		}
+			
+		
+		
+	
 	@Override
 	public List<OrdenSalida> buscarTodos() {
 		EntityManager em = null;
@@ -113,6 +170,7 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 			sql = "SELECT "
 					+"DISTINCT "
 					+"cd_folio_salida, "
+					+"ps.folio, "
 					+ "st_estado, "
 					+ "fh_salida, "
 					+ "tm_salida, "
@@ -153,6 +211,7 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 				OrdenDeSalidas ods = new OrdenDeSalidas();
 				int idx = 0 ;
 				ods.setFolioSalida((String) o[idx++]);
+				ods.setFolioOrdenSalida((Integer) o[idx++]);
 				ods.setStatus((String) o[idx++]);
 				ods.setFechaSalida((Date) o[idx++]);
 				ods.setHoraSalia((Time) o[idx++]);

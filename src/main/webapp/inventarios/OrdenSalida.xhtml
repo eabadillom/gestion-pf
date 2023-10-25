@@ -70,14 +70,14 @@
 						 </p:toolbar>
 				</p:panel>
 			<p:panel >
-				<p:dataTable id="dt-salidas" widgetVar="dtsalidas" value="#{ordenSalidaBean.listaSalidasporPlantas}" var="salidas" paginator="false"
+				<p:dataTable id="dt-salidas" widgetVar="dtsalidas" value="#{ordenSalidaBean.listaPreSalidaUI}" var="salidas" paginator="false"
 							  rowSelectMode="add" rows="10" rowKey="#{salidas.folioSalida}" reflow="true" selection="#{salidas.folioSalida}" tableStyle="table-layout: auto;">
 					<p:column exportable="false" width="3%">
 						<p:rowToggler />
 					</p:column>							
 					<p:column headerText="Confirmar">
-        				 <p:toggleSwitch value="#{ordenSalidaBean.confirmacion}" >
-        				 <p:ajax process="@this" listener="#{ordenSalidaBean.addMessage}" />
+        				 <p:toggleSwitch value="#{salidas.salidaSelected}" >
+        				 <p:ajax process="@this"  listener="#{ordenSalidaBean.validarProducto}"/>
         				 </p:toggleSwitch>
 					</p:column>
 					<p:column headerText="Planta">
