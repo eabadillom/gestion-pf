@@ -16,14 +16,14 @@
 					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.clienteSelect}" >
 						<f:selectItem itemLabel="---Seleccione un cliente ---" noSelectionOption="true" />
 						<f:selectItems value="#{altaNotasCredito.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-						<p:ajax listener="#{altaNotasCredito.filtroFactura()}" process="@this" update="emisor rfc" />
+						<p:ajax listener="#{altaNotasCredito.filtroFactura()}" process="@this" update="emisor rfc domicilio" />
 					</p:selectOneMenu>	
 				</div>
 				<div class="p-col-6 p-md-6">
 					<p:selectOneMenu id="domicilio" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.domicilioSelect}">
 						<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
-						<f:selectItems value="#{altaNotasCredito.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" 
-						itemValue="#{domicilio.domicilios}"/>
+						<f:selectItems value="#{altaNotasCredito.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios}"/>
+						<p:ajax process="@this"/>
 					</p:selectOneMenu>
 				</div>
 				<div class="p-col-3 p-md-3">
@@ -266,7 +266,7 @@
 		</div>
 		
 		<div style="padding-top: 2rem;" align="center">
-			<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{altaNotasCredito.save()}"  update="notaCredito emisor" process="@this emisor notaCredito" >
+			<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{altaNotasCredito.save()}"  update="notaCredito emisor domicilio" process="@this emisor notaCredito domicilio" >
 			</p:commandButton>
 			<p:commandButton icon="pi pi-refresh" style="margin-left: 10px;" value="Generar nueva nota" actionListener="#{altaNotasCredito.reload()}"  process="@this" >
 			</p:commandButton>

@@ -51,7 +51,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "NotaCredito.findByPeriodo", query = "SELECT n FROM NotaCredito n WHERE n.periodo = :periodo"),
     @NamedQuery(name = "NotaCredito.findByObservaciones", query = "SELECT n FROM NotaCredito n WHERE n.observaciones = :observaciones"),
     @NamedQuery(name = "NotaCredito.findByFecha", query = "SELECT n FROM NotaCredito n WHERE n.fecha = :fecha"),
-    @NamedQuery(name = "NotaCredito.findByPeriodoCliente", query = "SELECT n FROM NotaCredito n WHERE (n.fecha BETWEEN :fechaInicio AND :fechaFin) AND (n.idcliente = :idCliente OR :idCliente IS NULL)"),
+    @NamedQuery(name = "NotaCredito.findByPeriodoCliente", query = "SELECT n FROM NotaCredito n WHERE (n.fecha BETWEEN :fechaInicio AND :fechaFin) AND (n.idcliente = :idCliente OR :idCliente IS NULL) ORDER BY n.fecha ASC"),
     @NamedQuery(name = "NotaCredito.findByCajero", query = "SELECT n FROM NotaCredito n WHERE n.cajero = :cajero")})
 public class NotaCredito implements Serializable {
 

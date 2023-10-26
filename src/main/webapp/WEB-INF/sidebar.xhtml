@@ -97,13 +97,7 @@
 						<p:submenu label="Notas de Credito" icon="pi pi-file-o" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />
 							<p:menuitem value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/consultaNotasCredito"></p:menuitem>
-							<p:menuitem id="frb_facturacion_sm244" value="Mantenimiento" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/mantenimiento" />
 						</p:submenu>
-						<!-- <p:submenu id="frb_comercial" label="Comercial"
-							icon="pi pi-fw pi-dollar" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
-							<p:menuitem value="Avisos" icon="pi pi-exclamation-triangle"
-								outcome="/protected/catalogos/avisosComercial" />
-						</p:submenu> -->
 						<p:menuitem value="Comercial" outcome="/protected/catalogos/avisosComercial" icon="pi pi-fw pi-dollar" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}" />
 						<p:submenu id="frb_reportes" label="Reportes" icon="pi pi-fw pi-file-o">
 							<p:submenu id="frb_inventario_reporte" label="Inventarios" icon="pi pi-fw pi-table">

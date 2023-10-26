@@ -46,6 +46,7 @@ import mx.com.ferbo.model.StatusNotaCredito;
 import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.FormatUtil;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
@@ -185,20 +186,28 @@ public class AltaNotasCredito implements Serializable{
 				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
 			}
 			
-			if((porCobrar==false)&&(pagada==false)&&(pagoParcial==false)) {			
-				message = "Seleccione el tipo de pago.";
-				severity = FacesMessage.SEVERITY_INFO;
+			if(clienteSelect == null) {
+				throw new InventarioException("Seleccione un cliente.");
 			}
 			
-			if((porCobrar==true)||(pagada==true)||(pagoParcial==true)) {			
-				message = "Tipo Pago Seleccionado";
-				severity = FacesMessage.SEVERITY_INFO;
+			if(clienteSelect.getCteCve() == null) {
+				throw new InventarioException("Seleccione un cliente.");
 			}
 			
 			domicilioCliente(clienteSelect);
 			
-		}catch (Exception e) {
-			message = "Selecciona un cliente";
+			if((porCobrar==false)&&(pagada==false)&&(pagoParcial==false)) {			
+				throw new InventarioException("Seleccione el status de sus facturas.");
+			}
+			
+			message = "Agregue una factura a su nota de crédito.";
+			severity = FacesMessage.SEVERITY_INFO;
+			
+		} catch (InventarioException ex) {
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception e) {
+			message = "Ocurrió un problema en la consulta de notas de crédito.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		}finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Cliente", message));
@@ -213,13 +222,11 @@ public class AltaNotasCredito implements Serializable{
 		
 		listaClienteDomicilio.clear();
 		listaClienteDomicilio = listaClienteDom.stream()
-								.filter(cd -> clienteSelect != null
-								?(cd.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
-								:false)
-								.collect(Collectors.toList());
-		if(listaClienteDomicilio.size()>0) {
-			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
-		
+			.filter(cd -> clienteSelect != null ? (cd.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue()) :false)
+			.collect(Collectors.toList());
+		if(listaClienteDomicilio.size() > 0) {
+			this.domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
+			log.debug("Domicilio Selected: {}",this.domicilioSelect);
 		}
 	}
 	
@@ -278,15 +285,21 @@ public class AltaNotasCredito implements Serializable{
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		asentamientoCliente = asentamientoHumanoDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(), domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve() , domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(), domicilioSelect.getDomicilioColonia());
-		String domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
 		
 		StatusFactura statusF = null;
+		String domicilio = null;
 		
 		try {
+			domicilioCliente(clienteSelect);
 			
-			serieNotaSelect.setNumeroActual(serieNotaSelect.getNumeroActual()+1);
-			serieNotaDAO.update(serieNotaSelect);
+			asentamientoCliente = asentamientoHumanoDAO.buscarPorAsentamiento(
+					domicilioSelect.getPaisCved().getPaisCve(),
+					domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
+					domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve() ,
+					domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
+					domicilioSelect.getDomicilioColonia()
+				);
+			domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
 			
 			
 			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual()));
@@ -352,13 +365,38 @@ public class AltaNotasCredito implements Serializable{
 				pagoDAO.guardar(ntf.getNotaPorFacturaPK().getFactura().getPagoList().get(index - 1));
 			}
 			
+			for(NotaPorFactura ntf: listaNotaXFactura) {
+				
+				Factura factura = facturaDAO.buscarPorId(ntf.getNotaPorFacturaPK().getFactura().getId(), false);
+				List<Pago> pagosList = pagoDAO.buscarPorFactura(factura.getId());
+				
+				BigDecimal saldo = factura.getTotal();
+				
+				for(Pago pago : pagosList) {
+					saldo = saldo.subtract(pago.getMonto());
+				}
+				
+				if(saldo.compareTo(BigDecimal.ZERO) > 0)
+					factura.setStatus(statusFacturaPagoParcial);
+				else
+					factura.setStatus(statusFacturaPagada);
+				
+				facturaDAO.actualizaStatus(factura);
+			}
+			
+			serieNotaSelect.setNumeroActual(serieNotaSelect.getNumeroActual()+1);
+			serieNotaDAO.update(serieNotaSelect);
+			
+			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Nota agregada correctamente";
 			
 			
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}finally {
+		} catch(Exception e) {
+			log.error("Ocurrió un problema al guardar la nota de crédito...", e);
+			mensaje = "Ocurrió un problema al guardar la nota de crédito.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
 			message = new FacesMessage(severity, "Nota de Credito", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update(":form:messages");

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.model.CancelaNotaCredito;
 import mx.com.ferbo.model.NotaCredito;
 import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -112,6 +113,10 @@ public class NotaCreditoDAO {
 					.setParameter("idCliente", idCliente)
 					.getResultList()
 					;
+			for(NotaCredito nota : resultList) {
+				log.debug("Status nota: {}", nota.getStatus().getId());
+			}
+			
 		} catch(Exception ex) {
 			log.error("Problema para consultar las notas de crédito...", ex);
 		} finally {
@@ -133,10 +138,18 @@ public class NotaCreditoDAO {
 			if(isFullInfo == false)
 				return nota;
 			
+			log.debug("Status Nota Credito: {}", nota.getStatus().getDescripcion());
+			
 			List<NotaPorFactura> notaFacturaList = nota.getNotaFacturaList();
 			for(NotaPorFactura nf : notaFacturaList) {
 				log.debug("Nota: {}", nf.getNotaPorFacturaPK().getNota().getId());
 				log.debug("Factura: {}", nf.getNotaPorFacturaPK().getFactura().getId());
+			}
+			
+			List<CancelaNotaCredito> cancelaList = nota.getCancelaNotaCreditoList();
+			
+			for(CancelaNotaCredito cancela : cancelaList) {
+				log.debug("Cancela nota factura: {}", cancela.getId());
 			}
 			
 		} catch(Exception ex) {
@@ -148,5 +161,22 @@ public class NotaCreditoDAO {
 	}
 	
 	
-	 
+	public String actualizar(NotaCredito notaCredito) {
+		String resultado = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			notaCredito = em.merge(notaCredito);
+			em.getTransaction().commit();
+		} catch(Exception ex) {
+			EntityManagerUtil.rollback(em);
+			resultado = ex.getMessage();
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return resultado;
+	}
 }
