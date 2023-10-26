@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.CancelaNotaCredito;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
@@ -140,7 +141,6 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 
 	@Override
 	public String eliminar(Pago e) {
-		// TODO Auto-generated method stub
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();

@@ -31,19 +31,21 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "StatusNotaCredito.findById", query = "SELECT s FROM StatusNotaCredito s WHERE s.id = :id"),
     @NamedQuery(name = "StatusNotaCredito.findByDescripcion", query = "SELECT s FROM StatusNotaCredito s WHERE s.descripcion = :descripcion")})
 public class StatusNotaCredito implements Serializable {
-
     private static final long serialVersionUID = 1L;
+    public static final Integer STATUS_NOTA_CREDITO_ERROR = 0;
+	public static final Integer STATUS_NOTA_CREDITO_NUEVA = 1;
+	public static final Integer STATUS_NOTA_CREDITO_CANCELADA = 2;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "ID")
     private Integer id;
+    
     @Size(max = 50)
     @Column(name = "DESCRIPCION")
     private String descripcion;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "status")
-    private List<NotaCredito> notaCreditoList;
-
+    
     public StatusNotaCredito() {
     }
 
@@ -65,14 +67,6 @@ public class StatusNotaCredito implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public List<NotaCredito> getNotaCreditoList() {
-        return notaCreditoList;
-    }
-
-    public void setNotaCreditoList(List<NotaCredito> notaCreditoList) {
-        this.notaCreditoList = notaCreditoList;
     }
 
     @Override

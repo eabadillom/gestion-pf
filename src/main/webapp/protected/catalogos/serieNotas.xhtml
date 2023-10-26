@@ -9,20 +9,9 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Series" />
-				<p:menuitem value="Serie Notas"
-					outcome="/protected/catalogos/serieNotas" />
-			</p:breadCrumb>
-
+			<p:growl id="messages" showDetail="true" />
 			<div class="p-col-12">
 				<div class="card">
-
-					<p:growl id="messages" showDetail="true" />
-
 					<p:toolbar styleClass="p-mb-4">
 						<p:toolbarGroup>
 							<p:commandButton value="Agregar" icon="pi pi-plus"
@@ -32,24 +21,16 @@
 								process="@this" />
 						</p:toolbarGroup>
 					</p:toolbar>
-
-					<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista"
-						value="#{serieNotaBean.listSerie}" rowKey="#{lista.id}"
-						reflow="true" selection="#{serieNotaBean.seleccion}"
-						rowSelectMode="single" paginator="true" rows="10"
-						paginatorPosition="bottom">
-
+					<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista" value="#{serieNotaBean.listSerie}" rowKey="#{lista.id}" reflow="true" selection="#{serieNotaBean.seleccion}" rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom">
 						<f:facet name="header">
 							<div class="products-table-header">
 								<span style="font-weight: bold">Serie Notas</span>
 							</div>
 						</f:facet>
-
-						<p:column headerText="Serie" width="5%">
-							<h:outputText value="#{lista.id}" />
-						</p:column>
 						<p:column headerText="Fecha Inicio">
-							<h:outputText value="#{lista.fechaInicio}" />
+							<h:outputText value="#{lista.fechaInicio}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
 						</p:column>
 						<p:column headerText="No. Inicial">
 							<h:outputText value="#{lista.numeroInicial}" />
@@ -63,20 +44,14 @@
 						<p:column headerText="Status">
 							<h:outputText value="#{lista.statusSerie.descripcion}" />
 						</p:column>
-						<p:column headerText="Acción" class="p-text-center">
-							<p:commandButton value="Modificar" icon="pi pi-pencil"
-								styleClass="ui-button-info p-mr-2 p-mb-2"
-								update="form:frm-modifica" process="@this"
-								oncomplete="PF('dg-modifica').show()">
-								<f:setPropertyActionListener value="#{lista}"
-									target="#{serieNotaBean.seleccion}" />
+						<p:column width="2rem" style="text-align: center;">
+							<p:commandButton icon="pi pi-pencil" update="form:frm-modifica" process="@this" oncomplete="PF('dg-modifica').show()">
+								<f:setPropertyActionListener value="#{lista}" target="#{serieNotaBean.seleccion}" />
 							</p:commandButton>
-							<p:commandButton value="Eliminar" icon="pi pi-trash"
-								styleClass="ui-button-danger p-mr-2 p-mb-2" process="@this"
-								oncomplete="PF('dg-delete').show()"
-								rendered="#{lista.statusSerie.id == 3 ? false : true}">
-								<f:setPropertyActionListener value="#{lista}"
-									target="#{serieNotaBean.seleccion}" />
+						</p:column>
+						<p:column width="2rem" style="text-align: center;">
+							<p:commandButton icon="pi pi-times" class="ui-button-danger" process="@this" oncomplete="PF('dg-delete').show()" disabled="#{lista.statusSerie.id == 3 ? true : false}">
+								<f:setPropertyActionListener value="#{lista}" target="#{serieNotaBean.seleccion}" />
 							</p:commandButton>
 						</p:column>
 					</p:dataTable>

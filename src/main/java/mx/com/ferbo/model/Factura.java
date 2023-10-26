@@ -246,19 +246,26 @@ public class Factura implements Serializable {
     
     @OneToMany(mappedBy = "facturaId")
     private List<ChequeDevuelto> chequeDevueltoList;
+    
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "factura")
     private List<Pago> pagoList;
+    
     @OneToMany(mappedBy = "factura")
     private List<FacturaMedioPago> facturaMedioPagoList;
+    
     @OneToMany(cascade = {CascadeType.PERSIST}, mappedBy = "factura")
     private List<ServicioFactura> servicioFacturaList;
+    
     @OneToMany(cascade = {CascadeType.PERSIST},mappedBy = "factura")//MODIFIQUE 1 JUNIO
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
+    
     @OneToMany(cascade = {CascadeType.PERSIST},mappedBy = "factura")//MODIFIQUE 1 JUNIO
     private List<ConstanciaFactura> constanciaFacturaList;
+    
     @OneToMany(mappedBy = "factura")
     private List<ConstanciaFacturaCmp> constanciaFacturaCmpList;
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "factura")
+    
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "notaPorFacturaPK.factura")
     private List<NotaPorFactura> notaFacturaList;
 
     public Factura() {
