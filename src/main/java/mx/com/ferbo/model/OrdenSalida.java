@@ -30,12 +30,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "OrdenSalida.findByCliente", query = "SELECT os FROM OrdenSalida  os  WHERE os.partidaClave = :partidaClave "),
     @NamedQuery(name = "OrdenSalida.findByfolio", query = "SELECT os FROM OrdenSalida  os  WHERE os.folio = :folio")})
 
-/* SELECT
-distinct cd_folio_salida, fh_salida, tm_salida, nb_placa_tte, nb_operador_tte
-FROM pre_salida ps
-INNER JOIN PARTIDA p ON ps.partida_cve = p.PARTIDA_CVE
-INNER JOIN CONSTANCIA_DE_DEPOSITO cdd ON p.FOLIO = cdd.FOLIO
-WHERE ps.st_estado = 'A' AND ps.fh_salida = $P{fecha} AND cdd.CTE_CVE = $P{idCliente} */
+
 public class OrdenSalida implements Serializable {
 
 	private static final long serialVersionUID = 1L;
