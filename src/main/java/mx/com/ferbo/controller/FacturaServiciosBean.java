@@ -213,7 +213,7 @@ public class FacturaServiciosBean implements Serializable {
 		listaPlanta = plantaDAO.findall();
 		listaA = avisoDAO.buscarTodos();
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
-		listaMedioPago = medioPagoDAO.buscarTodos();
+		listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
 		listaSerieF = seriefacturaDAO.findAll();
 		
 		context = FacesContext.getCurrentInstance();
