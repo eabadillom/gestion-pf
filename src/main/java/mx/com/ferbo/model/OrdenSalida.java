@@ -24,6 +24,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "OrdenSalida.findByidPreSalida",  query = "SELECT os FROM OrdenSalida os WHERE os.idPreSalida = :idPreSalida"),
     @NamedQuery(name = "OrdenSalida.findByFolioSalida", query = "SELECT os FROM OrdenSalida  os  WHERE os.FolioSalida = :FolioSalida"),
     @NamedQuery(name = "OrdenSalida.findByfechaSalida",query = "SELECT os FROM OrdenSalida  os  WHERE os.fechaSalida = :fechaSalida AND os.stEstado ='A' "),
+    @NamedQuery(name = "OrdenSalida.findBystEstado",query = "SELECT os FROM OrdenSalida  os  WHERE os.stEstado = :stEstado "),
     @NamedQuery(name = "OrdenSalida.findBynombrePlacas",query = "SELECT os FROM OrdenSalida  os  WHERE os.nombrePlacas = :nombrePlacas"),
     @NamedQuery(name = "OrdenSalida.findBynombreOperador", query = "SELECT os FROM OrdenSalida  os  WHERE os.nombreOperador = :nombreOperador"),
     @NamedQuery(name = "OrdenSalida.findBypartidaClave", query = "SELECT os FROM OrdenSalida  os  WHERE os.partidaClave = :partidaClave "),
@@ -49,11 +50,9 @@ public class OrdenSalida implements Serializable {
 	@Column(name ="st_estado")
 	private String stEstado;
 	
-	@Size(max = 23)
 	@Column(name ="fh_salida")
 	private Date fechaSalida;
 	
-	@Size(max = 23)
 	@Column(name ="tm_salida")
 	private Time horaSalida;
 	
@@ -61,23 +60,19 @@ public class OrdenSalida implements Serializable {
 	@Column(name ="nb_placa_tte")
 	private String nombrePlacas;
 	
-	@Size(max = 10)
+	@Size(max = 100)
 	@Column(name ="nb_operador_tte")
 	private String nombreOperador;
-	
-	@Size(max = 10)
+
 	@Column(name ="partida_cve")
 	private Integer partidaClave;
 	
-	@Size(max = 10)
 	@Column(name ="folio")
 	private Integer folio;
 	
-	@Size(max = 10)
 	@Column(name ="nu_cantidad")
 	private Integer cantidad;
 	
-	@Size(max = 10)
 	@Column(name ="id_contacto")
 	private Integer idContacto;
 

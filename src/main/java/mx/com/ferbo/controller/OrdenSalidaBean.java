@@ -27,17 +27,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
+import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
+import mx.com.ferbo.dao.DetallePartidaDAO;
+import mx.com.ferbo.dao.EstadoInventarioDAO;
 import mx.com.ferbo.dao.OrdenSalidaDAO;
+import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PreSalidaServicioDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
+import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
+import mx.com.ferbo.model.EstadoInventario;
 import mx.com.ferbo.model.OrdenSalida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PreSalida;
@@ -51,14 +58,13 @@ import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 
-
 @Named
 @ViewScoped
 public class OrdenSalidaBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(OrdenSalidaBean.class);
-	
+
 	private List<Cliente> listaClientes;
 	private List<OrdenSalida> listaOrdenSalida;
 	private List<OrdenDeSalidas> listaSalidasporPlantas;
@@ -73,13 +79,18 @@ public class OrdenSalidaBean implements Serializable {
 	private OrdenSalidaDAO ordenSalidaDAO;
 	private PrecioServicioDAO precioServicioDAO;
 	private PreSalidaServicioDAO presalidaservicioDAO;
-	
+	private PartidaDAO partidaDAO;
+	private CamaraDAO camaraDAO;
+	private ConstanciaSalidaDAO constanciaDAO;
+	private DetallePartidaDAO dpDAO;
 	
 	private boolean confirmacion;
 	private String folioSelected;
 	private Date fecha;
 	private Time tmSalida;
-	
+	private String detalleAnterior;
+	private String detalleActual;
+
 	private Cliente clienteSelect;
 	private OrdenSalida ordensalida;
 	private ConstanciaServicioDetalle selServicio;
@@ -90,13 +101,22 @@ public class OrdenSalidaBean implements Serializable {
 	private Integer cantidadServicio;
 	private PreSalidaServicio pss;
 	private PreSalidaUI psu;
-	
+	private EstadoInventario estadoInventarioActual;
+	private EstadoInventario estadoInventarioHistorico;
+	private EstadoInventarioDAO estadoInventarioDAO;
+	private Integer cantidad;
+	private Integer peso;
+
 	public OrdenSalidaBean() {
 		clienteDAO = new ClienteDAO();
 		ordenSalidaDAO = new OrdenSalidaDAO();
 		presalidaservicioDAO = new PreSalidaServicioDAO();
 		precioServicioDAO = new PrecioServicioDAO();
-			
+		partidaDAO = new PartidaDAO();
+		camaraDAO = new CamaraDAO();
+		constanciaDAO = new ConstanciaSalidaDAO();
+		dpDAO = new DetallePartidaDAO();
+		estadoInventarioDAO = new EstadoInventarioDAO();
 		listaOrdenSalida = new ArrayList<OrdenSalida>();
 		listaClientes = new ArrayList<Cliente>();
 		listaPreSalidaUI = new ArrayList<>();
@@ -104,22 +124,30 @@ public class OrdenSalidaBean implements Serializable {
 		listaSalidasporPlantas = new ArrayList<OrdenDeSalidas>();
 		
 	}
+
 	@PostConstruct
 	public void init() {
 		listaClientes = clienteDAO.buscarHabilitados(true);
-		fecha= new Date();
+		fecha = new Date();
 		DateUtil.setTime(fecha, 0, 0, 0, 0);
-		
-	}
+		estadoInventarioActual = estadoInventarioDAO.buscarPorId(1);
+		estadoInventarioHistorico = estadoInventarioDAO.buscarPorId(2);
 	
+	}
+
 	public void filtrarCliente() {
-		String message = null; 
+		String message = null;
 		Severity severity = null;
 		EntityManager manager = null;
 
+		/*cantidad = ordensalida.getCantidad();
+		log.info(cantidad);
+		peso = cantidad *10;
+		log.info(peso);*/
+		
 		try {
 			log.info("Entrando a filtrar cliente...");
-			
+
 			manager = EntityManagerUtil.getEntityManager();
 			listaFolios = ordenSalidaDAO.buscaFolios(clienteSelect, fecha);
 			listaServicios = precioServicioDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
@@ -137,97 +165,89 @@ public class OrdenSalidaBean implements Serializable {
 		}
 		log.info("Informacion exitosamente filtrada.");
 	}
-	
-	
-	
+
 	public void reload() throws IOException {
-	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
-	
+
 	public void filtroPorPlanta() {
 		Integer folio = null;
 		OrdenSalida os = null;
+		
 		System.out.println("Probando agregar producto...");
 //		log.debug("Orden salida seleccionada: {}", this.folioSelected);
-	
 		listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(folioSelected, fecha);
 		listaPreSalidaUI = new ArrayList<PreSalidaUI>();
-		
 		try {
-			for(OrdenDeSalidas orden : listaSalidasporPlantas) {
-				PreSalidaUI preUI =  new PreSalidaUI(orden.getFolioSalida() ,orden.getStatus(), orden.getFechaSalida(),orden.getHoraSalida(),orden.getPartidaCve(), orden.getCantidad(), orden.getPeso(), orden.getCodigo(),
-				orden.getLote(), orden.getFechaCaducidad() ,orden.getSAP(), orden.getPedimento(), orden.getTemperatura(), orden.getUnidadManejo(), orden.getCodigoProducto(),orden.getNombreProducto(),
-				orden.getNombrePlanta() ,orden.getNombreCamara(), orden.getFolioOrdenSalida());
+			for (OrdenDeSalidas orden : listaSalidasporPlantas) {
+				PreSalidaUI preUI = new PreSalidaUI(orden.getFolioSalida(), orden.getStatus(), orden.getFechaSalida(),
+						orden.getHoraSalida(), orden.getPartidaCve(), orden.getCantidad(), orden.getPeso(),
+						orden.getCodigo(), orden.getLote(), orden.getFechaCaducidad(), orden.getSAP(),
+						orden.getPedimento(), orden.getTemperatura(), orden.getUnidadManejo(),
+						orden.getCodigoProducto(), orden.getNombreProducto(), orden.getNombrePlanta(),
+						orden.getNombreCamara(), orden.getFolioOrdenSalida());
 				preUI.setSalidaSelected(false);
+				/*Integer cantidad = ordensalida.getCantidad();
+				preUI.setCantidad(cantidad);
+				int pesoA=  cantidad * 10;
+		        BigDecimal pesoAprox = BigDecimal.valueOf(pesoA);
+				preUI.setPeso(pesoAprox);*/
 				listaPreSalidaUI.add(preUI);
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
+		}
 
 		listaSalidasporFolio = ordenSalidaDAO.buscaFolios(folioSelected);
 		listaPreSalidaServicio = presalidaservicioDAO.buscarPorFolios(folioSelected);
 		folio = listaSalidasporFolio.size();
-		if(folio != 0) {
+		if (folio != 0) {
 			ordensalida = listaSalidasporFolio.get(0);
 		}
 	}
-	
-	/*public void addMessage(AjaxBehaviorEvent event) {
-        UIComponent component = event.getComponent();
-        log.info("Agregando lista de productos");
-        if (component instanceof UIInput) {
-        	boolean validar = true;
-        	psu.setSalidaSelected(validar);
-            String summary = validar ? "Checked" : "Unchecked";
-            
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(summary));
-        	}
-            
-        }*/
-	
-	public void addMessage(AjaxBehaviorEvent event) {
-        UIComponent component = event.getComponent();
-        if (component instanceof UIInput) {
-            UIInput inputComponent = (UIInput) component;
-            boolean value = (boolean) inputComponent.getValue();
-            String summary = value ? "Checked" : "Unchecked";
-            value = psu.salidaSelected;
-            System.out.println(psu.salidaSelected);
-            log.info(psu.salidaSelected);
 
-				
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(summary));
-        }  
+
+	public void addMessage(AjaxBehaviorEvent event) {
+		UIComponent component = event.getComponent();
+		if (component instanceof UIInput) {
+			UIInput inputComponent = (UIInput) component;
+			boolean value = (boolean) inputComponent.getValue();
+			String summary = value ? "Checked" : "Unchecked";
+			value = psu.salidaSelected;
+			System.out.println(psu.salidaSelected);
+			log.info(psu.salidaSelected);
+
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(summary));
+		}
 	}
-	
+
 	public void validarProducto() {
-		String message = null; 
+		String message = null;
 		Severity severity = null;
 		EntityManager manager = null;
 		List<PreSalidaUI> listapsU = null;
 		PreSalidaUI PU = null;
 		OrdenDeSalidas ods = null;
-		//psu.salidaSelected = false;
-		
+
 		try {
 			log.info("Filtrando Producto...");
 			manager = EntityManagerUtil.getEntityManager();
-				for(PreSalidaUI ps : listaPreSalidaUI) {
-					if(ps.salidaSelected == true) {
-						listapsU = new ArrayList<>();
-						ps.getPartidaCve();
-						ps.getNombreProducto();
-						ps.getCantidad();
-						ps.getCodigoProducto();
-						ps.getCodigo();
-						listapsU.add(ps);
-					}
-						
+			for (PreSalidaUI ps : listaPreSalidaUI) {
+				if (ps.salidaSelected == true) {
+					listapsU = new ArrayList<>();
+					ps.getPartidaCve();
+					ps.getNombreProducto();
+					ps.getCantidad();
+					ps.getCodigoProducto();
+					ps.getCodigo();
+					listapsU.add(ps);
 				}
- 		
-			message = "Confirmacion exitosa";
+
+			}
+
+			message = "Agregado con exito";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
@@ -236,39 +256,145 @@ public class OrdenSalidaBean implements Serializable {
 		} finally {
 			if (manager != null)
 				manager.close();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Agregado con exito", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Producto", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:selServicio", "form:folio-som");
 		}
 		log.info("Informacion filtrada con éxito.");
 	}
+
+	public void agregaServicios() {
+		String message = null;
+		Severity severity = null;
+		PreSalidaServicio ps = null;
+		int count = 0;
+		try {
+			if (this.idServicio == null)
+				throw new InventarioException("Selecione almenos un servicio");
+			if (this.clienteSelect == null)
+				throw new InventarioException("Debe seleccionar el cliente");
+			if (this.cantidadServicio == null)
+				throw new InventarioException("Debe indicar la cantidad de servicios.");
+
+			if (listaPreSalidaServicio == null)
+				listaPreSalidaServicio = new ArrayList<>();
+			ps = new PreSalidaServicio();
+			ps.setCantidad(cantidadServicio);
+			ps.setIdServicio(idServicio.getServicio());
+			ps.setIdUnidadManejo(idServicio.getUnidad());
+			ps.setObservacion(ps.getObservacion());
+
+			int coincidencias = 0, diferentes = 0;
+			for (PreSalidaServicio srv : listaPreSalidaServicio) {
+				if (srv.getIdServicio().getServicioCve().equals(ps.getIdServicio().getServicioCve())) {
+					coincidencias++;
+				} else {
+					diferentes++;
+				}
+			}
+
+			if (coincidencias == 1) {
+				System.out.println("Servicio duplicado");
+				message = "Servicio duplicado, favor de modificar la cantidad y/o la unidad.";
+				severity = FacesMessage.SEVERITY_ERROR;
+			} else if (diferentes > 0) {
+				listaPreSalidaServicio.add(ps);
+				message = "Servicio agregado correctamente.";
+				severity = FacesMessage.SEVERITY_INFO;
+			}
+
+		} catch (Exception e) {
+			log.error("Problema para obtener el listado de servicios del cliente.", e);
+			message = "Problema con la información de servicios.";
+			severity = FacesMessage.SEVERITY_ERROR;
+
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Servicios", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-servicios");
+
+		}
+	}
 	
-		
-	@SuppressWarnings("null")
+	
 	public void guardar() {
 		String message = null;
-		Severity severity = null;		
-		List<OrdenSalida> listaordenSalidas = null;
-		List<OrdenDeSalidas> listaordenDeSalidas = null;
-		List<ConstanciaSalida> listaConstanciaSalidas = null;
-		OrdenSalida os=null;
+		Severity severity = null;
 		ConstanciaSalida constancia = new ConstanciaSalida();
 		ConstanciaSalidaServicios css = new ConstanciaSalidaServicios();
+		String status = null;
+		DetallePartida detAnterior = null;
+		DetallePartida detNUevo= null;
+		Integer cantidadManejo = null;
+		BigDecimal peso = null;
 		
 		try {
+
 			validarProducto();
 			constancia.setFecha(fecha);
 			constancia.setPlacasTransporte(ordensalida.getNombrePlacas());
 			constancia.setNombreTransportista(ordensalida.getNombreOperador());
-			listaConstanciaSalidas.add(constancia);
+			constancia.setNumero(ordensalida.getFolioSalida());
+			constancia.setClienteCve(clienteSelect);
 			
-			
-			for(PreSalidaServicio preS : listaPreSalidaServicio) {
-				Integer bd = preS.getCantidad();
-		        BigDecimal bd2 = BigDecimal.valueOf(bd);
-				css.setServicioCve(preS.getIdServicio());
-				css.setNumCantidad(bd2);
-				
+			List<DetalleConstanciaSalida> dcsList = new ArrayList<>();
+			constancia.setDetalleConstanciaSalidaList(dcsList);
+			for (PreSalidaUI preS : listaPreSalidaUI) {
+				if (preS.salidaSelected == true) {
+					DetalleConstanciaSalida dcs = new DetalleConstanciaSalida();
+					Partida p = partidaDAO.buscarPorId(preS.getPartidaCve());
+					
+					List<DetallePartida> listadp = new ArrayList<>();
+					listadp = dpDAO.buscarPorPartida(p.getPartidaCve());
+					p.setDetallePartidaList(listadp);
+					for(DetallePartida d : listadp) {
+							detAnterior = d;
+							detalleAnterior = detAnterior.toString();							
+					}
+					detNUevo = detAnterior.clone();
+					detNUevo.setDetallePartidaPK(detNUevo.getDetallePartidaPK().clone());
+					detAnterior.setEdoInvCve(estadoInventarioHistorico);
+					detalleActual= detNUevo.toString();
+					int i = detNUevo.getDetallePartidaPK().getDetPartCve() + 1;
+					detNUevo.getDetallePartidaPK().setDetPartCve(i);
+					detNUevo.setDetallePartida(detAnterior);
+					detNUevo.setEdoInvCve(estadoInventarioActual);
+					cantidadManejo = detNUevo.getCantidadUManejo();
+					peso = detNUevo.getCantidadUMedida();
+					cantidadManejo= cantidadManejo - preS.getCantidad();
+					peso = peso.subtract(preS.getPeso());
+					detNUevo.setCantidadUManejo(cantidadManejo);
+					detNUevo.setCantidadUMedida(peso);
+					listadp.add(detNUevo);
+					dpDAO.actualizar(detAnterior);
+					dpDAO.guardar(detNUevo);
+					dcs.setPartidaCve(p);
+					
+					Camara c = camaraDAO.buscarPorId(p.getCamaraCve().getCamaraCve());
+					dcs.setCamaraCve(c.getCamaraCve());
+					dcs.setCantidad(preS.getCantidad());
+					dcs.setPeso(preS.getPeso());
+					dcs.setUnidad(preS.getUnidadManejo());
+					dcs.setProducto(preS.getNombreProducto());
+					dcs.setTemperatura(preS.getTemperatura());
+					dcs.setConstanciaCve(constancia);
+					dcs.setDetPartCve(detNUevo.getDetallePartidaPK().getDetPartCve());
+					dcsList.add(dcs);
+				}
 			}
+			
+			List<ConstanciaSalidaServicios> listaConstanciaSalidaServicios = new ArrayList<>();
+			for (PreSalidaServicio pss : listaPreSalidaServicio) {
+				ConstanciaSalidaServicios constanciaSaldaServicios = new ConstanciaSalidaServicios();
+				constanciaSaldaServicios.setNumCantidad(BigDecimal.valueOf(pss.getCantidad()));
+				constanciaSaldaServicios.setServicioCve(pss.getIdServicio());
+				constanciaSaldaServicios.setIdConstancia(constancia);
+				listaConstanciaSalidaServicios.add(constanciaSaldaServicios);
+			}
+			
+			constanciaDAO.guardar(constancia);
+			ordensalida.setStEstado("C");
+			ordenSalidaDAO.actualizarStatus(ordensalida);
+			message = "Constancia guardada correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
 
 		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de la orden.", ex);
@@ -280,113 +406,75 @@ public class OrdenSalidaBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
-	
+
 	@SuppressWarnings("unlikely-arg-type")
 	public void deleteServicio(PreSalidaServicio servicio) {
 		this.listaPreSalidaServicio.remove(servicio);
 		this.listaServicios.remove(servicio);
 	}
-	
-	
 
-	
-	public void agregaServicios() {
-		String message = null;
-		Severity severity = null;
-		PreSalidaServicio ps = null;
-		int count = 0;
-		try {
-			if(this.idServicio == null) 
-					throw new InventarioException("Selecione almenos un servicio");
-			if (this.clienteSelect == null )
-				throw new InventarioException("Debe seleccionar el cliente");
-			if (this.cantidadServicio == null )
-				throw new InventarioException("Debe indicar la cantidad de servicios.");
-			
-			if (listaPreSalidaServicio == null)
-				listaPreSalidaServicio = new ArrayList<>();
- 			ps = new PreSalidaServicio();
-			ps.setCantidad(cantidadServicio);
-			ps.setIdServicio(idServicio.getServicio());
-			ps.setIdUnidadManejo(idServicio.getUnidad());
-			ps.setObservacion(ps.getObservacion());
-			
-			int coincidencias = 0, diferentes = 0;
-				for (PreSalidaServicio srv : listaPreSalidaServicio) {	
-					if (srv.getIdServicio().getServicioCve().equals(ps.getIdServicio().getServicioCve())) {
-						coincidencias++;
-						}else {
-						 diferentes++;			
-					}
-				}
 
-				if (coincidencias == 1) {
-					System.out.println("Servicio duplicado");
-					message = "Servicio duplicado, favor de modificar la cantidad y/o la unidad.";
-					severity = FacesMessage.SEVERITY_ERROR;
-				} else if (diferentes > 0) {
-					listaPreSalidaServicio.add(ps);
-					message = "Servicio agregado correctamente.";
-					severity = FacesMessage.SEVERITY_INFO;
-				}
-			
-			
-		} catch (Exception e) {
-			log.error("Problema para obtener el listado de servicios del cliente.", e);
-			message = "Problema con la información de servicios.";
-			severity = FacesMessage.SEVERITY_ERROR;
-			
-		}finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Servicios", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-servicios");
-	
-		}
-	}
+
 	public Cliente getClienteSelect() {
 		return clienteSelect;
 	}
+
 	public void setClienteSelect(Cliente clienteSelect) {
 		this.clienteSelect = clienteSelect;
 	}
+
 	public List<Cliente> getListaClientes() {
 		return listaClientes;
 	}
+
 	public void setListaClientes(List<Cliente> listaClientes) {
 		this.listaClientes = listaClientes;
 	}
+
 	public OrdenSalida getOrdensalida() {
 		return ordensalida;
 	}
+
 	public void setOrdensalida(OrdenSalida ordensalida) {
 		this.ordensalida = ordensalida;
 	}
+
 	public List<OrdenSalida> getListaOrdenSalida() {
 		return listaOrdenSalida;
 	}
+
 	public void setListaOrdenSalida(List<OrdenSalida> listaOrdenSalida) {
 		this.listaOrdenSalida = listaOrdenSalida;
 	}
+
 	public boolean isConfirmacion() {
 		return confirmacion;
 	}
+
 	public void setConfirmacion(boolean confirmacion) {
 		this.confirmacion = confirmacion;
 	}
+
 	public Date getFecha() {
 		return fecha;
 	}
+
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
+
 	public List<PrecioServicio> getListaServicios() {
 		return listaServicios;
 	}
+
 	public void setListaServicios(List<PrecioServicio> listaServicios) {
 		this.listaServicios = listaServicios;
 	}
+
 	public ConstanciaServicioDetalle getSelServicio() {
 		return selServicio;
 	}
+
 	public void setSelServicio(ConstanciaServicioDetalle selServicio) {
 		this.selServicio = selServicio;
 	}
@@ -394,88 +482,145 @@ public class OrdenSalidaBean implements Serializable {
 	public PrecioServicio getIdServicio() {
 		return idServicio;
 	}
+
 	public void setIdServicio(PrecioServicio idServicio) {
 		this.idServicio = idServicio;
 	}
+
 	public Integer getCantidadServicio() {
 		return cantidadServicio;
 	}
+
 	public void setCantidadServicio(Integer cantidadServicio) {
 		this.cantidadServicio = cantidadServicio;
 	}
+
 	public List<OrdenDeSalidas> getListaSalidasporPlantas() {
 		return listaSalidasporPlantas;
 	}
+
 	public void setListaSalidasporPlantas(List<OrdenDeSalidas> listaSalidasporPlantas) {
 		this.listaSalidasporPlantas = listaSalidasporPlantas;
 	}
+
 	public DetallePartida getDp() {
 		return dp;
 	}
+
 	public void setDp(DetallePartida dp) {
 		this.dp = dp;
 	}
+
 	public DetalleConstanciaSalida getDcs() {
 		return dcs;
 	}
+
 	public void setDcs(DetalleConstanciaSalida dcs) {
 		this.dcs = dcs;
 	}
+
 	public OrdenDeSalidas getOrdenDeSalidas() {
 		return ordenDeSalidas;
 	}
+
 	public void setOrdenDeSalidas(OrdenDeSalidas ordenDeSalidas) {
 		this.ordenDeSalidas = ordenDeSalidas;
 	}
+
 	public List<String> getListaFolios() {
 		return listaFolios;
 	}
+
 	public void setListaFolios(List<String> listaFolios) {
 		this.listaFolios = listaFolios;
 	}
+
 	public String getFolioSelected() {
 		return folioSelected;
 	}
+
 	public void setFolioSelected(String folioSelected) {
 		this.folioSelected = folioSelected;
 	}
+
 	public Time getTmSalida() {
 		return tmSalida;
 	}
+
 	public void setTmSalida(Time tmSalida) {
 		this.tmSalida = tmSalida;
 	}
+
 	public List<OrdenSalida> getListaSalidasporFolio() {
 		return listaSalidasporFolio;
 	}
+
 	public void setListaSalidasporFolio(List<OrdenSalida> listaSalidasporFolio) {
 		this.listaSalidasporFolio = listaSalidasporFolio;
 	}
+
 	public PreSalidaServicio getPss() {
 		return pss;
 	}
+
 	public void setPss(PreSalidaServicio pss) {
 		this.pss = pss;
 	}
+
 	public List<PreSalidaServicio> getListaPreSalidaServicio() {
 		return listaPreSalidaServicio;
 	}
+
 	public void setListaPreSalidaServicio(List<PreSalidaServicio> listaPreSalidaServicio) {
 		this.listaPreSalidaServicio = listaPreSalidaServicio;
 	}
+
 	public List<PreSalidaUI> getListaPreSalidaUI() {
 		return listaPreSalidaUI;
 	}
+
 	public void setListaPreSalidaUI(List<PreSalidaUI> listaPreSalidaUI) {
 		this.listaPreSalidaUI = listaPreSalidaUI;
 	}
+
 	public PreSalidaUI getPsu() {
 		return psu;
 	}
+
 	public void setPsu(PreSalidaUI psu) {
 		this.psu = psu;
 	}
 
+	public String getDetalleAnterior() {
+		return detalleAnterior;
+	}
 
+	public void setDetalleAnterior(String detalleAnterior) {
+		this.detalleAnterior = detalleAnterior;
+	}
+
+	public String getDetalleActual() {
+		return detalleActual;
+	}
+
+	public void setDetalleActual(String detalleActual) {
+		this.detalleActual = detalleActual;
+	}
+
+	public Integer getCantidad() {
+		return cantidad;
+	}
+
+	public void setCantidad(Integer cantidad) {
+		this.cantidad = cantidad;
+	}
+
+	public Integer getPeso() {
+		return peso;
+	}
+
+	public void setPeso(Integer peso) {
+		this.peso = peso;
+	}
 
 }
