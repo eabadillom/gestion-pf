@@ -104,8 +104,9 @@ public class OrdenSalidaBean implements Serializable {
 	private EstadoInventario estadoInventarioActual;
 	private EstadoInventario estadoInventarioHistorico;
 	private EstadoInventarioDAO estadoInventarioDAO;
+	
 	private Integer cantidad;
-	private Integer peso;
+	private BigDecimal peso;
 
 	public OrdenSalidaBean() {
 		clienteDAO = new ClienteDAO();
@@ -140,11 +141,9 @@ public class OrdenSalidaBean implements Serializable {
 		Severity severity = null;
 		EntityManager manager = null;
 
-		/*cantidad = ordensalida.getCantidad();
-		log.info(cantidad);
-		peso = cantidad *10;
-		log.info(peso);*/
-		
+	
+	        
+	        
 		try {
 			log.info("Entrando a filtrar cliente...");
 
@@ -174,9 +173,7 @@ public class OrdenSalidaBean implements Serializable {
 	public void filtroPorPlanta() {
 		Integer folio = null;
 		OrdenSalida os = null;
-		
 		System.out.println("Probando agregar producto...");
-//		log.debug("Orden salida seleccionada: {}", this.folioSelected);
 		listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(folioSelected, fecha);
 		listaPreSalidaUI = new ArrayList<PreSalidaUI>();
 		try {
@@ -187,12 +184,16 @@ public class OrdenSalidaBean implements Serializable {
 						orden.getPedimento(), orden.getTemperatura(), orden.getUnidadManejo(),
 						orden.getCodigoProducto(), orden.getNombreProducto(), orden.getNombrePlanta(),
 						orden.getNombreCamara(), orden.getFolioOrdenSalida());
-				preUI.setSalidaSelected(false);
-				/*Integer cantidad = ordensalida.getCantidad();
-				preUI.setCantidad(cantidad);
-				int pesoA=  cantidad * 10;
-		        BigDecimal pesoAprox = BigDecimal.valueOf(pesoA);
-				preUI.setPeso(pesoAprox);*/
+						preUI.setSalidaSelected(false);
+						Partida partida = partidaDAO.buscarPorId(preUI.getPartidaCve());
+						
+						Integer cantidadInicial = partida.getCantidadTotal();
+						BigDecimal CantidadInicial = new BigDecimal(cantidadInicial);
+						BigDecimal pesoInicial = partida.getPesoTotal();
+						BigDecimal pesoPorUnidad = pesoInicial.divide(CantidadInicial);
+						BigDecimal cantidadOrden = new BigDecimal(orden.getCantidad());
+						preUI.setPeso(pesoPorUnidad.multiply(cantidadOrden));
+
 				listaPreSalidaUI.add(preUI);
 				
 			}
@@ -242,13 +243,16 @@ public class OrdenSalidaBean implements Serializable {
 					ps.getCantidad();
 					ps.getCodigoProducto();
 					ps.getCodigo();
-					listapsU.add(ps);
+					listapsU.add(ps);					
+					message = "Agregado con exito";
+					severity = FacesMessage.SEVERITY_INFO;
+					
+				}else {
+					message = "Selecciona almenos una orden";
+					severity = FacesMessage.SEVERITY_ERROR;
 				}
 
 			}
-
-			message = "Agregado con exito";
-			severity = FacesMessage.SEVERITY_INFO;
 		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
 			message = ex.getMessage();
@@ -314,8 +318,11 @@ public class OrdenSalidaBean implements Serializable {
 		}
 	}
 	
+	public void validaTemperatura(PreSalidaUI p) {
+		log.debug("PreSalida {}",p);
+	}
 	
-	public void guardar() {
+	public void guardar() throws InventarioException {
 		String message = null;
 		Severity severity = null;
 		ConstanciaSalida constancia = new ConstanciaSalida();
@@ -338,7 +345,9 @@ public class OrdenSalidaBean implements Serializable {
 			List<DetalleConstanciaSalida> dcsList = new ArrayList<>();
 			constancia.setDetalleConstanciaSalidaList(dcsList);
 			for (PreSalidaUI preS : listaPreSalidaUI) {
-				if (preS.salidaSelected == true) {
+				if (preS.salidaSelected == false) 
+					throw new InventarioException("Debes seleccionar almenos una orden de salida");
+					
 					DetalleConstanciaSalida dcs = new DetalleConstanciaSalida();
 					Partida p = partidaDAO.buscarPorId(preS.getPartidaCve());
 					
@@ -378,8 +387,9 @@ public class OrdenSalidaBean implements Serializable {
 					dcs.setConstanciaCve(constancia);
 					dcs.setDetPartCve(detNUevo.getDetallePartidaPK().getDetPartCve());
 					dcsList.add(dcs);
+				
 				}
-			}
+			
 			
 			List<ConstanciaSalidaServicios> listaConstanciaSalidaServicios = new ArrayList<>();
 			for (PreSalidaServicio pss : listaPreSalidaServicio) {
@@ -391,8 +401,14 @@ public class OrdenSalidaBean implements Serializable {
 			}
 			
 			constanciaDAO.guardar(constancia);
-			ordensalida.setStEstado("C");
-			ordenSalidaDAO.actualizarStatus(ordensalida);
+			
+			
+			listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(folioSelected, fecha);
+			
+			 for(OrdenDeSalidas orden : listaSalidasporPlantas) {
+				orden.setStatus("C");
+				ordenSalidaDAO.actualizar(orden);
+			}
 			message = "Constancia guardada correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 
@@ -615,11 +631,11 @@ public class OrdenSalidaBean implements Serializable {
 		this.cantidad = cantidad;
 	}
 
-	public Integer getPeso() {
+	public BigDecimal getPeso() {
 		return peso;
 	}
 
-	public void setPeso(Integer peso) {
+	public void setPeso(BigDecimal peso) {
 		this.peso = peso;
 	}
 

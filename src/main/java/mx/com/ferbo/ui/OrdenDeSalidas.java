@@ -10,6 +10,7 @@ import javax.persistence.Id;
 @Entity
 public class OrdenDeSalidas implements Cloneable {
 	@Id
+	private Integer id;
 	private String folioSalida;
 	private String status;
 	private Date fechaSalida;
@@ -33,6 +34,7 @@ public class OrdenDeSalidas implements Cloneable {
 	public OrdenDeSalidas() {
 	}
 
+	
 	public OrdenDeSalidas(String folioSalida, String status, Date fechaSalida, Time horaSalida, Integer partidaCve,
 			Integer cantidad, BigDecimal peso, String codigo, String lote, Date fechaCaducidad, String sap,
 			String pedimento, String temperatura, String unidadManejo, String codigoProducto, String nombreProducto,
@@ -222,15 +224,38 @@ public class OrdenDeSalidas implements Cloneable {
 	public OrdenDeSalidas clone() throws CloneNotSupportedException {
 		return (OrdenDeSalidas) super.clone();
 	}
+	
+	
+
+	public Integer getId() {
+		return id;
+	}
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+	public String getSap() {
+		return sap;
+	}
+
+
+	public void setSap(String sap) {
+		this.sap = sap;
+	}
+
 
 	@Override
 	public String toString() {
-		return "OrdenDeSalidas [folioSalida=" + folioSalida + ", status=" + status + ", fechaSalida=" + fechaSalida
-				+ ", horaSalida=" + horaSalida + ", partidaCve=" + partidaCve + ", cantidad=" + cantidad + ", peso="
-				+ peso + ", codigo=" + codigo + ", lote=" + lote + ", fechaCaducidad=" + fechaCaducidad + ", SAP=" + sap
-				+ ", pedimento=" + pedimento + ", temperatura=" + temperatura + ", unidadManejo=" + unidadManejo
-				+ ", codigoProducto=" + codigoProducto + ", nombreProducto=" + nombreProducto + ", nombrePlanta="
-				+ nombrePlanta + ", nombreCamara=" + nombreCamara + ", folioOrdenSalida=" + folioOrdenSalida + "]";
+		return "OrdenDeSalidas [id=" + id + ", folioSalida=" + folioSalida + ", status=" + status + ", fechaSalida="
+				+ fechaSalida + ", horaSalida=" + horaSalida + ", partidaCve=" + partidaCve + ", cantidad=" + cantidad
+				+ ", peso=" + peso + ", codigo=" + codigo + ", lote=" + lote + ", fechaCaducidad=" + fechaCaducidad
+				+ ", sap=" + sap + ", pedimento=" + pedimento + ", temperatura=" + temperatura + ", unidadManejo="
+				+ unidadManejo + ", codigoProducto=" + codigoProducto + ", nombreProducto=" + nombreProducto
+				+ ", nombrePlanta=" + nombrePlanta + ", nombreCamara=" + nombreCamara + ", folioOrdenSalida="
+				+ folioOrdenSalida + "]";
 	}
-
+	
 }

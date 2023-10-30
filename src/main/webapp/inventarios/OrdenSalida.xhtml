@@ -76,8 +76,8 @@
 						<p:rowToggler />
 					</p:column>							
 					<p:column headerText="Confirmar">
-        				 <p:toggleSwitch value="#{salidas.salidaSelected}" >
-        				 <p:ajax process="@this"  listener="#{ordenSalidaBean.validarProducto}"/>
+        				 <p:toggleSwitch value="#{salidas.salidaSelected}" requiredMessage="Favor de seleccionar almenos una orden" >
+        				 <p:ajax process="@this" listener="#{ordenSalidaBean.validarProducto}"/>
         				 </p:toggleSwitch>
 					</p:column>
 					<p:column headerText="Planta">
@@ -93,10 +93,10 @@
 						<h:outputText value="#{salidas.nombreProducto}"/>
 					</p:column>
 					<p:column headerText="Cant. Requerida">
-						<h:outputText value="#{ordenSalidaBean.ordensalida.cantidad}"/>
+						<h:outputText value="#{salidas.cantidad}"/>
 					</p:column>
 					<p:column headerText="Peso aprox. (kg)">
-						<h:outputText value="#{ordenSalidaBean.ordensalida.cantidad}"/>
+						<h:outputText value="#{salidas.peso}"/>
 					</p:column>
 					
 			<p:rowExpansion>
@@ -117,9 +117,11 @@
 								<p:column headerText="SAP">
 									<h:outputText value="#{detalleSalidas.SAP}" />
 								</p:column>
-								<p:column headerText="Temperatura °C">
-						<h:outputText value="#{detalleSalidas.temperatura}"/>
-					</p:column>
+								<p:column headerText="Temperatura °C" >
+								<p:inputText value="#{detalleSalidas.temperatura}" onblur="#{ordenSalidaBean.validaTemperatura(detalleSalidas)}" requiredMessage="Ingresar el grado de temperatura" >
+								<p:ajax process="@this" />
+								</p:inputText>
+								</p:column>
 							</p:dataTable>
 						</div>
 							</p:rowExpansion>
@@ -142,10 +144,10 @@
 			
 			<p:dataTable id="dt-servicios" var="servicio" selection="#{ordenSalidaBean.pss}" value="#{ordenSalidaBean.listaPreSalidaServicio}" scrollable="true" scrollHeight="9em" scrollRows="2" reflow="true">	
 				<p:column headerText="Servicio " width="8em"><h:outputText value="#{servicio.idServicio.servicioDs}" /></p:column>
-				<p:column headerText="Cantidad" width="10em">
+				<p:column headerText="Cantidad(editable)" width="10em">
 				<p:inplace><h:inputText value="#{servicio.cantidad}" /> </p:inplace>
 				</p:column>
-				<p:column headerText="Unidad" width="10em">
+				<p:column headerText="Unidad(editable)" width="10em">
 				<p:inplace><h:inputText value="#{servicio.idUnidadManejo.unidadDeManejoDs}"   /></p:inplace>
 				</p:column>
 				<p:column headerText="Observacion" width="10em"><h:outputText value="#{servicio.observacion}" /></p:column>
