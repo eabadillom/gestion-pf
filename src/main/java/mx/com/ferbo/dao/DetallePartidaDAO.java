@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.DetallePartida;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class DetallePartidaDAO extends IBaseDAO<DetallePartida, Integer> {
@@ -91,7 +92,6 @@ public class DetallePartidaDAO extends IBaseDAO<DetallePartida, Integer> {
 	public List<DetallePartida> buscarPorPartida(Integer partidaCve) {
 		List<DetallePartida> list = null;
 		EntityManager em = null;
-		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			list = em.createNamedQuery("DetallePartida.findByPartidaCve", DetallePartida.class)
@@ -103,9 +103,6 @@ public class DetallePartidaDAO extends IBaseDAO<DetallePartida, Integer> {
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
 		return list;
-		
 	}
-
 }

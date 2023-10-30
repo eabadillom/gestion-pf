@@ -382,6 +382,22 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		return null;
 	}
 
+	public String actualizarStatus(OrdenSalida status) {
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.merge(status);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			log.error("Problema en la actualización de la orden: " + status.getStEstado(), e);
+			return "ERROR";
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return null;
+	}
+	
 	@Override
 	public String guardar(OrdenSalida os) {
 		EntityManager em = null;

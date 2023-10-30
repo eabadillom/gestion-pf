@@ -93,15 +93,15 @@
 						<h:outputText value="#{salidas.nombreProducto}"/>
 					</p:column>
 					<p:column headerText="Cant. Requerida">
-						<h:outputText value="#{salidas.cantidad}"/>
+						<h:outputText value="#{ordenSalidaBean.ordensalida.cantidad}"/>
 					</p:column>
 					<p:column headerText="Peso aprox. (kg)">
-						<h:outputText value="#{salidas.peso}"/>
+						<h:outputText value="#{ordenSalidaBean.ordensalida.cantidad}"/>
 					</p:column>
 					
 			<p:rowExpansion>
 								<div class="orders-subtable">
-							<p:dataTable id="dtDetallesSalida" widgetVar="wv-detalleSalida" var="detalleSalidas" value="#{ordenSalidaBean.listaSalidasporPlantas}" reflow="true" rowKey="#{ordenSalidaBean.ordensalida.folioSalida}" lazy="true">
+							<p:dataTable id="dtDetallesSalida" widgetVar="wv-detalleSalida" var="detalleSalidas" value="#{ordenSalidaBean.listaPreSalidaUI}" reflow="true" rowKey="#{ordenSalidaBean.ordensalida.folioSalida}" lazy="true">
 									<p:column headerText="Unidad">
 									<h:outputText value="#{detalleSalidas.unidadManejo}"/>
 									</p:column>
