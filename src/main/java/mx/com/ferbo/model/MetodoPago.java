@@ -92,8 +92,4 @@ public class MetodoPago implements Serializable{
 	public String toString() {
 		return "MetodoPago [cdMetodoPago=" + cdMetodoPago + "]";
 	}
-	
-	
-	
-
 }
