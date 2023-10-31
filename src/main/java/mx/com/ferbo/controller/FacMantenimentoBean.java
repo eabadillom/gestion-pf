@@ -123,19 +123,22 @@ public class FacMantenimentoBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		
+		String respuesta = null;
+		
 		try {
 			StatusFacturaDAO statusDAO = new StatusFacturaDAO();
-			StatusFactura statusCancelada = statusDAO.buscarPorId(3);
+			StatusFactura statusCancelada = statusDAO.buscarPorId(StatusFactura.STATUS_CANCELADA);
 			this.seleccion.setStatus(statusCancelada);
 			this.cancelaFactura.setFactura(seleccion);
-			this.seleccion.setCancelaFactura(cancelaFactura);
 			
-			//String respuesta = cancelaDAO.guardar(cancelaFactura);
-			String respuesta = daoFac.actualizar(seleccion);
-			
+			respuesta = daoFac.actualizaStatus(seleccion);
 			if(respuesta != null)
 				throw new InventarioException("Error al cancelar la factura.");
-	
+			
+			respuesta = cancelaDAO.guardar(cancelaFactura);
+			if(respuesta != null)
+				throw new InventarioException("Error al cancelar la factura.");
+			
 			if(clienteSelect == null)
 				listFac = daoFac.buscaFacturas(de, actual, true);
 			else
@@ -156,6 +159,12 @@ public class FacMantenimentoBean implements Serializable {
 			message = "Problema al cancelar la factura.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
+			
+			if(severity == null)
+				severity = FacesMessage.SEVERITY_FATAL;
+			if(message == null)
+				message = "Ocurrió un error con la actualización de la factura.";
+			
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado CFDI", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
 		}

@@ -242,8 +242,8 @@ public class Factura implements Serializable {
     @Column(name = "emi_cd_regimen")
     private String emisorCdRegimen;
     
-    @OneToOne(mappedBy = "factura", cascade = CascadeType.ALL)
-    private CancelaFactura cancelaFactura;
+//    @OneToOne(mappedBy = "factura", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+//    private CancelaFactura cancelaFactura;
     
     @OneToMany(mappedBy = "facturaId")
     private List<ChequeDevuelto> chequeDevueltoList;
@@ -751,11 +751,11 @@ public class Factura implements Serializable {
         return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
     }
 
-	public CancelaFactura getCancelaFactura() {
-		return cancelaFactura;
-	}
-
-	public void setCancelaFactura(CancelaFactura cancelaFactura) {
-		this.cancelaFactura = cancelaFactura;
-	}
+//	public CancelaFactura getCancelaFactura() {
+//		return cancelaFactura;
+//	}
+//
+//	public void setCancelaFactura(CancelaFactura cancelaFactura) {
+//		this.cancelaFactura = cancelaFactura;
+//	}
 }

@@ -199,7 +199,7 @@ public class FacturamaBL {
 		
 		CfdiInfoModel registra = cfdiBL.registra(cfdi);
 		factura.setUuid(registra.getId());
-		facturaDAO.actualizar(factura);
+		facturaDAO.actualizarUuid(factura);
 	}
 	
 	public void sendMail() throws FacturamaException {
