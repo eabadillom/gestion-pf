@@ -162,6 +162,8 @@ public class FacturaServiciosBean implements Serializable {
 	private BigDecimal tasaIva;
 	private String referencia;
 	
+	private int idServicioFacturaTmp = 0;
+	
 	private Usuario usuario;
 
 	public FacturaServiciosBean() {
@@ -213,7 +215,7 @@ public class FacturaServiciosBean implements Serializable {
 		listaPlanta = plantaDAO.findall();
 		listaA = avisoDAO.buscarTodos();
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
-		listaMedioPago = medioPagoDAO.buscarTodos();
+		listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
 		listaSerieF = seriefacturaDAO.findAll();
 		
 		context = FacesContext.getCurrentInstance();
@@ -356,6 +358,7 @@ public class FacturaServiciosBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		ServicioFactura servicio = null;
+		
 		try {
 			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
 				throw new InventarioException("Debe indicar la cantidad de servicios.");
@@ -365,6 +368,7 @@ public class FacturaServiciosBean implements Serializable {
 				alServiciosDetalle = new ArrayList<ServicioFactura>();
 
 			servicio = new ServicioFactura();
+			servicio.setId(this.idServicioFacturaTmp++);
 			servicio.setDescripcion(precioServicio.getServicio().getServicioDs());
 			servicio.setCantidad(cantidadServicio);
 			servicio.setUnidad(precioServicio.getUnidad().getUnidadDeManejoDs());
@@ -374,7 +378,6 @@ public class FacturaServiciosBean implements Serializable {
 			servicio.setUdCobro("Servicio");
 			servicio.setCodigo(precioServicio.getServicio().getServicioCod());
 			servicio.setCdUnidad(precioServicio.getServicio().getCdUnidad());
-			// alServiciosDetalle.add(servicio);
 			subtotal = BigDecimal.ZERO;
 			int coincidencias = 0, diferentes = 0;
 			if (alServiciosDetalle.size() == 0) {
@@ -390,7 +393,7 @@ public class FacturaServiciosBean implements Serializable {
 				}
 
 				if (coincidencias == 1) {
-					System.out.println("ya existe el servicio");
+					throw new InventarioException("El servicio ya se encuentra registrado en su factura.");
 				} else if (diferentes > 0) {
 					alServiciosDetalle.add(servicio);
 				}
@@ -402,6 +405,7 @@ public class FacturaServiciosBean implements Serializable {
 			total = bdIva.add(subtotal).setScale(2, BigDecimal.ROUND_HALF_UP);
 			FormatUtil format = new FormatUtil();
 			montoLetra = format.getMontoConLetra(total.floatValue());
+			this.cantidadServicio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 			message = "Servicio(s) agregado(s) correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
@@ -414,7 +418,7 @@ public class FacturaServiciosBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Servicio", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios", "form:montoLetra");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios", "form:montoLetra", "form:txtCantidadSrv");
 		}
 	}
 
@@ -422,101 +426,112 @@ public class FacturaServiciosBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		Cliente cliente = null;
+		Factura buscaFactura = null;
 		
 		try {
 			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
-				throw new InventarioException("Debe traspasar almenos un producto");
+				throw new InventarioException("Debe indicar al menos un servicio");
 			// Datos receptor
 			cliente = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 			
-			factura = new Factura();
-			List<Factura> alFacturas = new ArrayList<>();
-			factura.setId(idFactura);
-			alFacturas.add(factura);
-			cliente.setFacturaList(alFacturas);
-			factura.setCliente(cliente);
-			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()+1));
-			factura.setMoneda(this.moneda);
-			factura.setRfc(cliente.getCteRfc());
-			factura.setNombreCliente(cliente.getCteNombre());
-			factura.setFecha(this.fechaFactura);
-			factura.setObservacion(this.Obervaciones);
-			factura.setSubtotal(subtotal);
-			factura.setIva(bdIva);
-			factura.setTotal(total);
-			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
-			factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
-			factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
-			factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
-			factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
-			AsentamientoHumano asentamiento = asnDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
-					domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
-					domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
-					domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
-					domicilioSelect.getDomicilioColonia());
-			factura.setColonia(asentamiento.getAsentamientoDs());
-			factura.setCp(domicilioSelect.getDomicilioCp());
-			factura.setCalle(domicilioSelect.getDomicilioCalle());
-			factura.setNumExt(domicilioSelect.getDomicilioNumExt());
-			factura.setNumInt(domicilioSelect.getDomicilioNumInt());
-			factura.setTelefono(domicilioSelect.getDomicilioTel1());
-			factura.setFax(domicilioSelect.getDomicilioFax());
-			factura.setPorcentajeIva(tasaIva.multiply(new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP)));
-			factura.setNumeroCliente(cliente.getNumeroCte());
-			factura.setValorDeclarado(BigDecimal.ZERO);
-			factura.setInicioServicios(this.fechaFactura);
-			factura.setFinServicios(this.fechaFactura);
-			factura.setMontoLetra(FormatUtil.numeroPalabras(total.doubleValue()));
-			factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
-			FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();
-			facturaPK.setFacturaId(factura);
-			facturaPK.setFmpId(0);
-			FacturaMedioPago fmp = new FacturaMedioPago();
-			fmp.setFacturaMedioPagoPK(facturaPK);
-			MedioPago medioP = medioPagoDAO.buscarPorFormaPago(medioPagoSelect);
-			fmp.setMpId(medioP);
-			fmp.setFactura(factura);
-			fmp.setFmpPorcentaje(100);
-			fmp.setMpDescripcion(medioP.getMpDescripcion());
-			fmp.setFmpReferencia(referencia);
-			factura.getFacturaMedioPagoList().add(fmp);
-			StatusFactura status = statusDAO.buscarPorId(1);
-			factura.setStatus(status);
-			TipoFacturacion tipo = tipoDAO.buscarPorId(1);
-			factura.setTipoFacturacion(tipo);
-			// datos Emisor
-			factura.setPlanta(plantaSelect);// sucursal
-			factura.setPlazo(this.plazoSelect);
-			factura.setRetencion(BigDecimal.ZERO);
-			factura.setNomSerie(serieFacturaSelect.getNomSerie());
-			MetodoPago metodoP = metodoPagoDAO.buscarPorMetodoPago(metodoPagoSelect);
-			factura.setMetodoPago(metodoP.getCdMetodoPago());
-			factura.setTipoPersona(cliente.getTipoPersona());
-			factura.setCdRegimen(cliente.getRegimenFiscal().getCd_regimen());
-			factura.setCdUsoCfdi(cliente.getUsoCfdi().getCdUsoCfdi());
-			factura.setUuid(null);
-			factura.setEmisorNombre(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
-			factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
-			factura.setEmisorCdRegimen(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
-			factura.setServicioFacturaList(alServiciosDetalle);
+			buscaFactura = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual()+1));
 			
-			for (ServicioFactura sef : alServiciosDetalle) {
-				sef.setFactura(factura);
+			if(buscaFactura == null || buscaFactura.getId() == null) {
+				factura = new Factura();
+				List<Factura> alFacturas = new ArrayList<>();
+				factura.setId(idFactura);
+				alFacturas.add(factura);
+				cliente.setFacturaList(alFacturas);
+				factura.setCliente(cliente);
+				factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()+1));
+				factura.setMoneda(this.moneda);
+				factura.setRfc(cliente.getCteRfc());
+				factura.setNombreCliente(cliente.getCteNombre());
+				factura.setFecha(this.fechaFactura);
+				factura.setObservacion(this.Obervaciones);
+				factura.setSubtotal(subtotal);
+				factura.setIva(bdIva);
+				factura.setTotal(total);
+				domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
+				factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
+				factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
+				factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
+				factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
+				AsentamientoHumano asentamiento = asnDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
+				domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
+				domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+				domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
+				domicilioSelect.getDomicilioColonia());
+				factura.setColonia(asentamiento.getAsentamientoDs());
+				factura.setCp(domicilioSelect.getDomicilioCp());
+				factura.setCalle(domicilioSelect.getDomicilioCalle());
+				factura.setNumExt(domicilioSelect.getDomicilioNumExt());
+				factura.setNumInt(domicilioSelect.getDomicilioNumInt());
+				factura.setTelefono(domicilioSelect.getDomicilioTel1());
+				factura.setFax(domicilioSelect.getDomicilioFax());
+				factura.setPorcentajeIva(tasaIva.multiply(new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP)));
+				factura.setNumeroCliente(cliente.getNumeroCte());
+				factura.setValorDeclarado(BigDecimal.ZERO);
+				factura.setInicioServicios(this.fechaFactura);
+				factura.setFinServicios(this.fechaFactura);
+				factura.setMontoLetra(FormatUtil.numeroPalabras(total.doubleValue()));
+				factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
+				FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();
+				facturaPK.setFacturaId(factura);
+				facturaPK.setFmpId(0);
+				FacturaMedioPago fmp = new FacturaMedioPago();
+				fmp.setFacturaMedioPagoPK(facturaPK);
+				MedioPago medioP = medioPagoDAO.buscarPorFormaPago(medioPagoSelect);
+				fmp.setMpId(medioP);
+				fmp.setFactura(factura);
+				fmp.setFmpPorcentaje(100);
+				fmp.setMpDescripcion(medioP.getMpDescripcion());
+				fmp.setFmpReferencia(referencia);
+				factura.getFacturaMedioPagoList().add(fmp);
+				StatusFactura status = statusDAO.buscarPorId(1);
+				factura.setStatus(status);
+				TipoFacturacion tipo = tipoDAO.buscarPorId(1);
+				factura.setTipoFacturacion(tipo);
+				// datos Emisor
+				factura.setPlanta(plantaSelect);// sucursal
+				factura.setPlazo(this.plazoSelect);
+				factura.setRetencion(BigDecimal.ZERO);
+				factura.setNomSerie(serieFacturaSelect.getNomSerie());
+				MetodoPago metodoP = metodoPagoDAO.buscarPorMetodoPago(metodoPagoSelect);
+				factura.setMetodoPago(metodoP.getCdMetodoPago());
+				factura.setTipoPersona(cliente.getTipoPersona());
+				factura.setCdRegimen(cliente.getRegimenFiscal().getCd_regimen());
+				factura.setCdUsoCfdi(cliente.getUsoCfdi().getCdUsoCfdi());
+				factura.setUuid(null);
+				factura.setEmisorNombre(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
+				factura.setEmisorRFC(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
+				factura.setEmisorCdRegimen(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
+				factura.setServicioFacturaList(alServiciosDetalle);
+				
+				for (ServicioFactura sef : alServiciosDetalle) {
+					sef.setId(null);
+					sef.setFactura(factura);
+				}
+				int serie = (serieFacturaSelect.getNumeroActual()+1);
+				serieFacturaSelect.setNumeroActual(serie);
+				String resultadoSerie = seriefacturaDAO.update(serieFacturaSelect);
+				if(resultadoSerie != null)
+					throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
+				String resultado = facturaDAO.guardar(factura);
+				if(resultado != null)
+					throw new InventarioException("Ocurrió un problema al guardar la factura.");
 			}
-			int serie = (serieFacturaSelect.getNumeroActual()+1);
-			serieFacturaSelect.setNumeroActual(serie);
-			String resultadoSerie = seriefacturaDAO.update(serieFacturaSelect);
-			if(resultadoSerie != null)
-				throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
-			String resultado = facturaDAO.guardar(factura);
-			if(resultado != null)
-				throw new InventarioException("Ocurrió un problema al guardar la factura.");
+			
+			else {
+				throw new InventarioException("La factura ya está registrada.");
+			}
+			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "La factura se guardo correctamente";
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
-			severity = FacesMessage.SEVERITY_ERROR;
+			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception ex) {
 			log.error("Problema para obtener los servicios del cliente.", ex);
 			ex.printStackTrace();
@@ -662,6 +677,8 @@ public class FacturaServiciosBean implements Serializable {
 			cfdi.setItems(listaItems);
 			CfdiInfoModel registra = cfdiBL.registra(cfdi);
 			this.factura.setUuid(registra.getId());
+			Factura factura = facturaDAO.buscarPorId(this.factura.getId());
+			factura.setUuid(registra.getId());
 			facturaDAO.actualizar(factura);
 			alAdjuntos = new ArrayList<Adjunto>();
 			FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", factura.getUuid());

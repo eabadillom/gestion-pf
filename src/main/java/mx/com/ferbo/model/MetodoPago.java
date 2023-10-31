@@ -90,8 +90,7 @@ public class MetodoPago implements Serializable{
 
 	@Override
 	public String toString() {
-		return "MetodoPago [cdMetodoPago=" + cdMetodoPago + ", nbMetodoPago=" + nbMetodoPago + ", fechaInicio="
-				+ fechaInicio + ", fechaFinal=" + fechaFinal + "]";
+		return "MetodoPago [cdMetodoPago=" + cdMetodoPago + "]";
 	}
 	
 	
