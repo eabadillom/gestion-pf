@@ -13,11 +13,11 @@ public class PreSalidaUI extends OrdenDeSalidas{
 	public PreSalidaUI(String folioSalida, String status, Date fechaSalida, Time horaSalida, Integer partidaCve, Integer cantidad, 
 			BigDecimal peso,  String codigo, String lote, Date fechaCaducidad, String sap, String pedimento, String temperatura, 
 			String unidadManejo,  String codigoProducto, String nombreProducto, String nombrePlanta, 
-			String nombreCamara,  Integer folioOrdenSalida) {
+			String nombreCamara,  Integer folioOrdenSalida, Integer productoCve, Integer unidadManejoCve) {
 				super(folioSalida, status, fechaSalida, horaSalida, partidaCve,
 				cantidad, peso, codigo, lote, fechaCaducidad, sap,
 				pedimento, temperatura, unidadManejo, codigoProducto, nombreProducto,
-				nombrePlanta, nombreCamara, folioOrdenSalida);
+				nombrePlanta, nombreCamara, folioOrdenSalida, productoCve, unidadManejoCve);
 				this.salidaSelected = false;
 	}
 	

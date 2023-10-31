@@ -183,8 +183,10 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 					+ " dp.dtp_caducidad, "
 					+ "dp.dtp_SAP, "
 					+ "dp.dtp_pedimento, "
+					+ "udm.UNIDAD_DE_MANEJO_CVE,"
 					+ "udm.UNIDAD_DE_MANEJO_DS,"
 					+ " p2.NUMERO_PROD , "
+					+ "p2.PRODUCTO_CVE, "
 					+ "p2.PRODUCTO_DS, "
 					+ " c.CAMARA_DS, "
 					+ "p3.PLANTA_DS "
@@ -228,8 +230,10 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 				ods.setFechaCaducidad((Date) o[idx++]);
 				ods.setSAP((String) o[idx++]);
 				ods.setPedimento((String) o[idx++]);
+				ods.setUnidadManejoCve((Integer) o[idx++]);
 				ods.setUnidadManejo((String) o[idx++]);
 				ods.setCodigoProducto((String) o[idx++]);
+				ods.setProductoClave((Integer) o[idx++]);
 				ods.setNombreProducto((String) o[idx++]);
 				ods.setNombreCamara((String) o[idx++]);
 				ods.setNombrePlanta((String) o[idx++]);

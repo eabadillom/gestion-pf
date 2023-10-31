@@ -64,7 +64,7 @@
 		    			</div>
 		    			
 		    			<div class="col-5 flex align-items-center justify-content-center">
-			    		<p:inputText id="txtObservaciones"  placeholder="Observaciones"  style="width:650px; heigth:1px"/>
+			    		<p:inputText id="txtObservaciones" value="#{ordenSalidaBean.observaciones}"  placeholder="Observaciones"  style="width:650px; heigth:1px"/>
 		    			</div>
 		    		</p:toolbarGroup>
 						 </p:toolbar>
@@ -76,7 +76,7 @@
 						<p:rowToggler />
 					</p:column>							
 					<p:column headerText="Confirmar">
-        				 <p:toggleSwitch value="#{salidas.salidaSelected}" requiredMessage="Favor de seleccionar almenos una orden" >
+        				 <p:toggleSwitch value="#{salidas.salidaSelected}" required="true" requiredMessage="Selecciona almenos una orden">
         				 <p:ajax process="@this" listener="#{ordenSalidaBean.validarProducto}"/>
         				 </p:toggleSwitch>
 					</p:column>
