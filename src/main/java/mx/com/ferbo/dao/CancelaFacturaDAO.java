@@ -34,7 +34,20 @@ public class CancelaFacturaDAO extends IBaseDAO<CancelaFactura, Integer> {
 
 	@Override
 	public String actualizar(CancelaFactura e) {
-		// TODO Auto-generated method stub
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			e = em.merge(e);
+			em.getTransaction().commit();
+		} catch(Exception ex) {
+			log.error("Problema al guardar la cancelación de la factura...", ex);
+			return "Problema al guardar la cancelación de la factura.";
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return null;
 	}
 

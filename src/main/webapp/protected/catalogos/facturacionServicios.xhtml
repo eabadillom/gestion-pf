@@ -5,17 +5,22 @@
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 <script>
 	    //<![CDATA[
-	        PF('statusDialog').show();
+	        PF('statusCfdiDialog').show();
 	
-	        PF('statusDialog').hide();
+	        PF('statusCfdiDialog').hide();
 	    //]]>   
 	</script>
 	<ui:define name="title">Facturacion Servicios</ui:define> 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:dialog modal="true" widgetVar="statusDialog" header="Generando timbrado..." draggable="false" closable="false" resizable="false">
+			<p:dialog modal="true" widgetVar="statusCfdiDialog" header="Generando timbrado..." draggable="false" closable="false" resizable="false">
 				<div align="center">
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i> 
+				</div>
+		    </p:dialog>
+		    <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 		    </p:dialog>
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
@@ -23,10 +28,10 @@
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-col-6 p-md-6">
 						<p:outputLabel value="Sucursal (Planta)"/>
-						<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.plantaSelect}">
+						<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.plantaSelect}" onchange="PF('statusInfoDialog').show();">
 							<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
 							<f:selectItems value="#{facturaServiciosBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-							<p:ajax update="emisor" listener="#{facturaServiciosBean.serieFactura}"/>
+							<p:ajax update="emisor" listener="#{facturaServiciosBean.serieFactura}" oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-6 p-md-6">
@@ -51,10 +56,10 @@
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-6 p-md-6">
 							<p:outputLabel value="Cliente" />
-							<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filterMatchMode="startsWith">
+							<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filterMatchMode="startsWith" onchange="PF('statusInfoDialog').show();">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 								<f:selectItems var="cte" value="#{facturaServiciosBean.listaCliente}" itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
-								<p:ajax listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago domicilio"/>
+								<p:ajax listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago domicilio" oncomplete="PF('statusInfoDialog').hide();"/>
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-6 p-md-6">
@@ -158,7 +163,7 @@
 						<p:column headerText="Unidad" width="5rem" style="text-align: center;">
 							<h:outputText value="#{servicio.unidad}" />
 						</p:column>
-						<p:column headerText="Precio Unitario" width="5rem" style="text-align: right;">
+						<p:column headerText="Precio Unitario" width="7rem" style="text-align: right;">
 							<h:outputText value="#{servicio.tarifa}" >
 								<f:convertNumber pattern=" $ ###,###,##0.00" />
 							</h:outputText>
@@ -212,8 +217,8 @@
 			<div style="text-align: center; margin-top: 2rem;">
 				<p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.saveFactura}" icon="pi pi-save">
 		            <p:menuitem value="Imprimir" actionListener="#{facturaServiciosBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-		            <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-qrcode" ajax="false" process="@this" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/> 
-		            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-file"/>
+		            <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-qrcode" ajax="false" process="@this" onclick="PF('statusCfdiDialog').show();" oncomplete="PF('statusCfdiDialog').hide();"/> 
+		            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-refresh"/>
 		        </p:splitButton>
 			</div>
 		</h:form>

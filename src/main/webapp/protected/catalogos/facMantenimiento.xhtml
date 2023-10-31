@@ -17,45 +17,40 @@
 	<ui:define name="title">Mantenimiento</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Mantenimiento"
-					outcome="/protected/catalogos/facMantenimiento" />
-			</p:breadCrumb>
 			<p:growl id="messages" showDetail="true" />
-			<p:toolbar styleClass="p-mb-4">
-				<p:toolbarGroup>
-					<p:outputLabel value="De:" styleClass="p-mr-2" />
-					<p:datePicker value="#{facMantenimentoBean.de}"
-						monthNavigator="true" yearNavigator="true" showWeek="true"
-						required="true" maxdate="#{facMantenimentoBean.actual}">
-						<p:ajax />
-					</p:datePicker>
-					<p:outputLabel value="A:" styleClass="p-ml-6 p-mr-2" />
-					<p:datePicker value="#{facMantenimentoBean.hasta}"
-						monthNavigator="true" yearNavigator="true" showWeek="true"
-						required="true" maxdate="#{facMantenimentoBean.actual}">
-						<p:ajax />
-					</p:datePicker>
-					<p:outputLabel for="@next" value="Clientes:"
-						styleClass="p-ml-6 p-mr-2" />
-					<p:selectOneMenu value="#{facMantenimentoBean.clienteSelect}"
-						converter="entityConverter" filter="true"
-						filterMatchMode="startsWith">
-						<f:selectItem itemLabel="---TODOS LOS CLIENTES---" />
-						<f:selectItems value="#{facMantenimentoBean.listClientes}"
-							var="client" itemLabel="#{client.cteNombre}"
-							itemValue="#{client}" />
-						<p:ajax update="form:bottomConsulta" />
-					</p:selectOneMenu>
-					<p:commandButton id="bottomConsulta" value="Consultar"
-						styleClass="ui-button-info p-ml-6" icon="pi pi-search"
-						actionListener="#{facMantenimentoBean.findFacture()}"
-						update="dtSerieFac" process="@this"/>
-				</p:toolbarGroup>
-			</p:toolbar>
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+			<p:fieldset>
+				<div class="p-grid ui-fluid p-col-12">
+					<div class="p-col-6 p-md-6">
+						<p:outputLabel for="@next" value="Clientes"/>
+						<p:selectOneMenu value="#{facMantenimentoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="---TODOS LOS CLIENTES---" />
+							<f:selectItems value="#{facMantenimentoBean.listClientes}" var="client" itemLabel="#{client.cteNombre}" itemValue="#{client}" />
+							<p:ajax update="form:bottomConsulta" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-3 p-md-3">
+						<p:outputLabel value="del"/>
+						<p:datePicker value="#{facMantenimentoBean.de}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}">
+							<p:ajax process="@this"/>
+						</p:datePicker>
+					</div>
+					<div class="p-col-3 p-md-3">
+						<p:outputLabel value="al" />
+						<p:datePicker value="#{facMantenimentoBean.hasta}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}">
+							<p:ajax process="@this"/>
+						</p:datePicker>
+					</div>
+				</div>
+				<div align="center">
+					<p:commandButton id="bottomConsulta" value="Consultar" styleClass="ui-button-info" icon="pi pi-search" actionListener="#{facMantenimentoBean.findFacture()}" update="dtSerieFac" process="@this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+				</div>
+			</p:fieldset>
+			
 			<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista"
 				value="#{facMantenimentoBean.listFac}" rowKey="#{lista.id}"
 				reflow="true" selection="#{facMantenimentoBean.seleccion}"
@@ -63,7 +58,7 @@
 				paginatorPosition="bottom">
 
 				<p:column headerText="Factura" width="4rem">
-					<h:outputText value="#{lista.nomSerie}-#{lista.numero}" />
+					<h:outputText value="#{lista.nomSerie}-#{lista.numero}" class="#{lista.status.id == 2 ? 'product-badge status-outofstock' : null}"/>
 				</p:column>
 				<p:column headerText="Fecha" width="4rem">
 					<h:outputText value="#{lista.fecha}">
@@ -72,16 +67,6 @@
 				</p:column>
 				<p:column headerText="Cliente" >
 					<h:outputText value="#{lista.nombreCliente}"/>
-				</p:column>
-				<p:column headerText="Subtotal" width="4rem">
-					<h:outputText value="#{lista.subtotal}">
-						<f:convertNumber pattern="$#0.00" />
-					</h:outputText>
-				</p:column>
-				<p:column headerText="IVA" width="4rem">
-					<h:outputText value="#{lista.iva}">
-						<f:convertNumber pattern="$#0.00" />
-					</h:outputText>
 				</p:column>
 				<p:column headerText="Total" width="4rem">
 					<h:outputText value="#{lista.total}">
@@ -101,9 +86,7 @@
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-file" class="ui-button-info" process="@this" actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false">
-						
-					</p:commandButton>
+					<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false"/>
 				</p:column>
 				<p:column width="2rem">
 					<p:commandButton icon="pi pi-times" title="Cancelar factura" process="@this" 
@@ -124,14 +107,14 @@
 			<p:dialog header="Cancelar Factura" widgetVar="dg-delete"
 				modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-cancel" class="ui-fluid">
-				<p:outputPanel rendered="#{not empty facMantenimentoBean.cancelaFactura}">
-					<div class="p-field">
-						<p:outputLabel>¿Desea cancelar la factura?</p:outputLabel>
-					</div>
-					<div class="p-field">
-						<p:outputLabel value="Motivo de la cancelación:" />
-						<p:inputTextarea value="#{facMantenimentoBean.cancelaFactura.descripcion}" required="true" requiredMessage="Debe indicar un motivo para la cancelación."/>
-					</div>
+					<p:outputPanel rendered="#{not empty facMantenimentoBean.cancelaFactura}">
+						<div class="p-field">
+							<p:outputLabel>¿Desea cancelar la factura?</p:outputLabel>
+						</div>
+						<div class="p-field">
+							<p:outputLabel value="Motivo de la cancelación:" />
+							<p:inputTextarea value="#{facMantenimentoBean.cancelaFactura.descripcion}"/>
+						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 

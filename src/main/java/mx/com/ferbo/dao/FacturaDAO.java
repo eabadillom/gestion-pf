@@ -210,6 +210,22 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		return null;
 	}
 	
+	public String actualizarUuid(Factura f) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.createNativeQuery("UPDATE factura SET uuid = :uuid "
+					+ "WHERE id = :id")
+					.setParameter("uuid", f.getUuid()).setParameter("id", f.getId()).executeUpdate();
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
+		return null;
+	}
+	
 	public List<Factura> buscaFacturas(Cliente c, Date fechaInicio, Date fechaFin, boolean isFullInfo) {
 		EntityManager entity = null;
 		List<Factura> list = null;
@@ -253,8 +269,8 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 			for(Factura factura : list) {
 				log.debug("Status id: {}", factura.getStatus().getId());
 				
-				if(factura.getCancelaFactura() != null)
-					log.debug("CancelaFactura: id={}",factura.getCancelaFactura().getId());
+//				if(factura.getCancelaFactura() != null)
+//					log.debug("CancelaFactura: id={}",factura.getCancelaFactura().getId());
 			}
 			
 		} catch(Exception ex) {

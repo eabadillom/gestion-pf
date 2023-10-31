@@ -43,8 +43,8 @@ public class TipoFacturacion implements Serializable {
     @Size(max = 75)
     @Column(name = "DESCRIPCION")
     private String descripcion;
-    @OneToMany(mappedBy = "tipoFacturacion")
-    private List<Factura> facturaList;
+//    @OneToMany(mappedBy = "tipoFacturacion")
+//    private List<Factura> facturaList;
 
     public TipoFacturacion() {
     }
@@ -77,13 +77,13 @@ public class TipoFacturacion implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public List<Factura> getFacturaList() {
-        return facturaList;
-    }
-
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
-    }
+//    public List<Factura> getFacturaList() {
+//        return facturaList;
+//    }
+//
+//    public void setFacturaList(List<Factura> facturaList) {
+//        this.facturaList = facturaList;
+//    }
 
     @Override
     public int hashCode() {

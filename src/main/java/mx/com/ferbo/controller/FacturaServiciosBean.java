@@ -8,7 +8,6 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,18 +30,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import com.ferbo.facturama.business.CfdiBL;
-import com.ferbo.facturama.request.CFDIInfo;
-import com.ferbo.facturama.request.IssuerBindingModel;
-import com.ferbo.facturama.request.ItemFullBindingModel;
-import com.ferbo.facturama.request.ReceiverBindingModel;
-import com.ferbo.facturama.request.Tax;
-import com.ferbo.facturama.response.CfdiInfoModel;
-import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
-import com.ferbo.mail.beans.Adjunto;
 
-import mx.com.ferbo.business.SendMailFacturaBL;
+import mx.com.ferbo.business.FacturamaBL;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
@@ -59,7 +49,6 @@ import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoFacturacionDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
@@ -610,97 +599,13 @@ public class FacturaServiciosBean implements Serializable {
 	public void timbrado() throws InventarioException {
 		String message = null;
 		Severity severity = null;
-		CFDIInfo cfdi = new CFDIInfo();
-		CfdiBL cfdiBL = new CfdiBL();
+		FacturamaBL facturamaBO = new FacturamaBL(factura.getId(), this.usuario);
 		
-		SendMailFacturaBL sendMailBO = null;
-        String sContent = null;
-        byte[] content = null;
-        
-        Adjunto adjunto = null;
-        List<Adjunto> alAdjuntos = null;
 		try {
-			// Datos de emisor
-			IssuerBindingModel is = new IssuerBindingModel();
-			is.setName(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
-			is.setFiscalRegime(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
-			is.setRfc(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
-			cfdi.setIssuer(is);
-
-			// Datos de receptor
-			ReceiverBindingModel receptor = new ReceiverBindingModel();
-			receptor.setRfc(factura.getRfc());
-			receptor.setCfdiUse(factura.getCdUsoCfdi());
-			receptor.setName(factura.getNombreCliente());
-			receptor.setFiscalRegime(factura.getCdRegimen());
-			receptor.setTaxZipCode(factura.getCp());
-			cfdi.setReceiver(receptor);
-			// Datos generales de la factura
-			cfdi.setDate(factura.getFecha());
-			cfdi.setFolio(factura.getNumero());
-			cfdi.setSerie(factura.getNomSerie());
-			cfdi.setCurrency(moneda);
-			cfdi.setCfdiType("I");
-			FacturaMedioPago facturaMedioPago = factura.getFacturaMedioPagoList().get(0);
-			cfdi.setPaymentForm(facturaMedioPago.getMpId().getFormaPago());
-			cfdi.setExpeditionPlace(plantaSelect.getCodigopostal().toString());
-			cfdi.setPaymentMethod(factura.getMetodoPago());
-			cfdi.setObservations(Obervaciones);
-
-			// Productos/Servicios a facturar
-			List<ItemFullBindingModel> listaItems = new ArrayList<ItemFullBindingModel>();
-			for (ServicioFactura sf : alServiciosDetalle) {
-				ItemFullBindingModel item = new ItemFullBindingModel();
-				item.setProductCode(sf.getCodigo());
-				item.setDescription(sf.getDescripcion());
-				item.setUnitCode(sf.getCdUnidad());
-				ClaveUnidad claveUnidad = claveDAO.buscarPorId(sf.getCdUnidad());
-				item.setUnit(claveUnidad.getNbUnidad());
-				// item.setUnit(claveUnidad.getNombre());
-				item.setQuantity(sf.getCantidad());
-				item.setUnitPrice(sf.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
-				item.setSubtotal(sf.getCosto()); // importe
-				item.setTaxObject("02");
-
-				Tax tx = new Tax();
-				tx.setBase(sf.getCosto());
-				BigDecimal ivaServicio = sf.getCosto().multiply(tasaIva);
-				tx.setTotal(ivaServicio);
-				tx.setName("IVA");
-				tx.setRate(tasaIva);
-				tx.setIsRetention(false);
-				item.setTaxes(new ArrayList<Tax>());
-				item.setTotal(sf.getCosto().add(ivaServicio));
-				item.getTaxes().add(tx);
-				listaItems.add(item);
-			}
-			cfdi.setItems(listaItems);
-			CfdiInfoModel registra = cfdiBL.registra(cfdi);
-			this.factura.setUuid(registra.getId());
-			Factura factura = facturaDAO.buscarPorId(this.factura.getId());
-			factura.setUuid(registra.getId());
-			facturaDAO.actualizar(factura);
-			alAdjuntos = new ArrayList<Adjunto>();
-			FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", factura.getUuid());
-			sContent = fileXML.getContent();
-            content = Base64.getDecoder().decode(sContent);
-            adjunto = new Adjunto("Factura_" + factura.getNomSerie() + "-" + factura.getNumero() + ".xml", Adjunto.TP_ARCHIVO_XML, content);
-            alAdjuntos.add(adjunto);  
-            
-            
-            FileViewModel filePDF = cfdiBL.getFile("pdf", "issuedLite", factura.getUuid());
-            sContent = filePDF.getContent();
-            content = Base64.getDecoder().decode(sContent);
-            adjunto = new Adjunto("Factura_" + factura.getNomSerie()+ "-" + factura.getNumero() + ".pdf", Adjunto.TP_ARCHIVO_PDF, content);
-            alAdjuntos.add(adjunto);
-            
-            sendMailBO = new SendMailFacturaBL(factura.getCliente().getCteCve());
-            sendMailBO.setSerie(factura.getNomSerie());
-            sendMailBO.setFolio(factura.getNumero());
-            sendMailBO.setAlFiles(alAdjuntos);
-            sendMailBO.setLoggedUser(usuario);
-            sendMailBO.send();
-			
+			log.info("Timbrando factura: {}...", factura);
+			facturamaBO.timbrar();
+			facturamaBO.sendMail();
+			log.info("Timbrado completado correctamente.");
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se genero correctamente";
 		} catch (FacturamaException e) {
@@ -711,7 +616,7 @@ public class FacturaServiciosBean implements Serializable {
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado exitoso", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado CFDI", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
 		}
 		

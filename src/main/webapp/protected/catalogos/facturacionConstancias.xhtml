@@ -3,20 +3,24 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
-
 	<ui:define name="title">Facturacion Constancias</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
 			<p:fieldset legend="Emisor">
 				<p:outputPanel id="emisor">
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-6 p-md-6">
 							<p:outputLabel value="Sucursal (Planta)"/>
-							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" required="true" requiredMessage="Selecciona una Planta">
+							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" required="true" requiredMessage="Selecciona una Planta" onchange="PF('statusInfoDialog').show();">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
 								<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-								<p:ajax update="emisor messages dt-vigencias serieFactura planta" listener="#{facturacionConstanciasBean.serieFactura}" process="@this"/>
+								<p:ajax update="emisor messages dt-vigencias serieFactura planta" listener="#{facturacionConstanciasBean.serieFactura}" process="@this" oncomplete="PF('statusInfoDialog').hide();"/>
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-6 p-md-6">
@@ -44,10 +48,10 @@
 						<div class="p-grid ui-fluid p-col-12">
 							<div class="p-col-6 p-md-6">
 								<p:outputLabel value="Cliente" />
-								<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}" required="true" requiredMessage="Seleccione un Cliente">
+								<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}" required="true" requiredMessage="Seleccione un Cliente" onchange="PF('statusInfoDialog').show();">
 									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-									<p:ajax update="receptor factura messages" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}" />
+									<p:ajax update="receptor factura messages" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-6 p-md-6">
