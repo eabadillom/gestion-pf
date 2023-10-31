@@ -266,4 +266,25 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		return list;
 	}
 
+
+	public Factura buscarPorSerieNumero(String serie, String numero) {
+		Factura factura = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			factura = em.createNamedQuery("Factura.findBySerieNumero", Factura.class)
+					.setParameter("serie", serie)
+					.setParameter("numero", numero)
+					.getSingleResult()
+					;
+		} catch(Exception ex) {
+			log.debug(" ", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return factura;
+	}
+
 }

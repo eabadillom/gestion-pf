@@ -97,6 +97,7 @@
 								<p:selectOneMenu id="metodoPago" autoWidth="false" value="#{facturaServiciosBean.metodoPagoSelect}">
 									<f:selectItem itemLabel="#{facturaServiciosBean.clienteSelect.metodoPago} " noSelectionOption="true" />
 									<f:selectItems value="#{facturaServiciosBean.listaMetodoPago}" var="metodoP" itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" itemValue="#{metodoP.cdMetodoPago}" />
+									<p:ajax process="@this"/>
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-6 p-md-6">
@@ -122,7 +123,7 @@
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-3 p-md-3">
-								<p:selectBooleanCheckbox itemLabel="Retención" />
+								<p:selectBooleanCheckbox itemLabel="Retención" disabled="true" />
 								<p:inputNumber value="#{facturaServiciosBean.retencion.valor}" decimalSeparator="2" readonly="true" symbol="%" symbolPosition="s" required="true" emptyValue="empty"/>
 							</div>
 							<div class="p-col-12 p-md-12">
@@ -137,24 +138,38 @@
 					<p:outputPanel id="servicioSelect">
 						<p:selectOneMenu id="selServicio" autoWidth="true" converter="entityConverter" value="#{facturaServiciosBean.precioServicio}" filterMatchMode="startsWith">
 							<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} ($#{selectedPrecioServicio.precio} por #{selectedPrecioServicio.unidad.unidadDeManejoDs} - Aviso #{selectedPrecioServicio.avisoCve.avisoCve})" 
-								itemValue="#{selectedPrecioServicio}" />
+							<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} ($#{selectedPrecioServicio.precio} por #{selectedPrecioServicio.unidad.unidadDeManejoDs} - Aviso #{selectedPrecioServicio.avisoCve.avisoCve})" itemValue="#{selectedPrecioServicio}" />
 						</p:selectOneMenu>
 						<p:column>
-						<p:inputNumber id="txtCantidadSrv" value="#{facturaServiciosBean.cantidadServicio}" placeholder="Cantidad" decimalPlaces="0" style="width: 6em;"/></p:column>
+							<p:inputNumber id="txtCantidadSrv" value="#{facturaServiciosBean.cantidadServicio}" placeholder="Cantidad" decimalPlaces="0"/>
+						</p:column>
 						<p:column>
-						<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{facturaServiciosBean.agregarServicio}" update="dt-servicios subtotal iva total"/>
+							<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info" action="#{facturaServiciosBean.agregarServicio}" update="dt-servicios subtotal iva total"/>
 						</p:column>
 					</p:outputPanel>
 						   
-					<p:dataTable id="dt-servicios"	var="servicio" lazy="true" selection="#{facturaServiciosBean.selServicio}" value="#{facturaServiciosBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" scrollRows="2" reflow="true">	
-						<p:column headerText="Servicio seleccionado" width="8em"><h:outputText value="#{servicio.descripcion}" /></p:column>
-						<p:column headerText="Unidad" width="10em"><h:outputText value="#{servicio.unidad}" /></p:column>
-						<p:column headerText="Cantidad" width="10em"><h:outputText value="#{servicio.cantidad}" /></p:column>
-						<p:column headerText="Costo Unitario" width="10em"><h:outputText value="#{servicio.tarifa}" /></p:column>
-						<p:column headerText="Subtotal" width="10em"><h:outputText value="#{servicio.costo}" /></p:column>
-						<p:column width="8em">
-							<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{facturaServiciosBean.deleteServicio(servicio)}" update="dt-servicios"/>
+					<p:dataTable id="dt-servicios"	var="servicio" lazy="true" selection="#{facturaServiciosBean.selServicio}" value="#{facturaServiciosBean.alServiciosDetalle}" reflow="true">	
+						<p:column headerText="Servicio"><h:outputText value="#{servicio.descripcion}" /></p:column>
+						<p:column headerText="Cantidad" width="5rem" style="text-align: right;">
+							<h:outputText value="#{servicio.cantidad}">
+								<f:convertNumber pattern="#,##0.00" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Unidad" width="5rem" style="text-align: center;">
+							<h:outputText value="#{servicio.unidad}" />
+						</p:column>
+						<p:column headerText="Precio Unitario" width="5rem" style="text-align: right;">
+							<h:outputText value="#{servicio.tarifa}" >
+								<f:convertNumber pattern=" $ ###,###,##0.00" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Subtotal" width="7rem" style="text-align: right;">
+							<h:outputText value="#{servicio.costo}">
+								<f:convertNumber pattern=" $ ###,###,##0.00" />
+							</h:outputText>
+						</p:column>
+						<p:column width="2rem">
+							<p:commandButton icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{facturaServiciosBean.deleteServicio(servicio)}" update="dt-servicios"/>
 						</p:column>
 					</p:dataTable>
 				</p:fieldset>
@@ -165,16 +180,30 @@
 						<div>
 							<DIV ALIGN="right">
 							<b><p:outputLabel value="Subtotal" /></b>
-							<b><p:outputLabel id="subtotal" value="#{facturaServiciosBean.subtotal}" styleClass="p-ml-2 p-mr-4" style="width: 5%" /></b>
+							<b>
+								<p:outputLabel id="subtotal" value="#{facturaServiciosBean.subtotal}" styleClass="p-ml-2 p-mr-4" style="width: 5%">
+									<f:convertNumber pattern=" $ ###,###,##0.00" />
+								</p:outputLabel>
+							</b>
 							<DIV ALIGN="left">
 							<b><p:outputLabel value="Monto en letra" /></b>
-							<b><p:outputLabel id="montoLetra" value="#{facturaServiciosBean.montoLetra}" styleClass="p-ml-2 p-mr-4" style="width: 5%" /></b>
+							<b>
+								<p:outputLabel id="montoLetra" value="#{facturaServiciosBean.montoLetra}" styleClass="p-ml-2 p-mr-4" style="width: 5%" />
+							</b>
 							<DIV ALIGN="right">
 							<b><p:outputLabel value="IVA" /></b>
-							<b><p:outputLabel id="iva" value="#{facturaServiciosBean.bdIva}" styleClass="p-ml-2 p-mr-4" style="width: 5% "/></b>
+							<b>
+								<p:outputLabel id="iva" value="#{facturaServiciosBean.bdIva}" styleClass="p-ml-2 p-mr-4" style="width: 5% ">
+									<f:convertNumber pattern=" $ ###,###,##0.00" />
+								</p:outputLabel>
+							</b>
 							<DIV ALIGN="right">
 							<b><p:outputLabel value="TOTAL" /></b>
-							<b><p:outputLabel id="total" value="#{facturaServiciosBean.total}" styleClass="p-ml-2 p-mr-4" style="width: 5% "/></b>
+							<b>
+								<p:outputLabel id="total" value="#{facturaServiciosBean.total}" styleClass="p-ml-2 p-mr-4" style="width: 5% ">
+									<f:convertNumber pattern=" $ ###,###,##0.00" />
+								</p:outputLabel>
+							</b>
 							</DIV></DIV></DIV></DIV>
 						</div>
 					</p:outputPanel>

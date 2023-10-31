@@ -71,6 +71,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Factura.findByPeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
     @NamedQuery(name = "Factura.findByClientePeriodo", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente AND f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
     @NamedQuery(name = "Factura.findByNomSerie", query = "SELECT f FROM Factura f WHERE f.nomSerie = :nomSerie"),
+    @NamedQuery(name = "Factura.findBySerieNumero", query = "SELECT f FROM Factura f WHERE f.numero = :numero AND f.nomSerie = :serie"),
     @NamedQuery(name = "Factura.findByPlanta", query = "SELECT f FROM Factura f WHERE f.planta.plantaCve = :plantaCve")})
 public class Factura implements Serializable {
 
