@@ -168,23 +168,25 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		 String sql = null;
 		 try {
 			sql = "SELECT "
-					+"DISTINCT "
+					+"id_pre_salida, "
 					+"cd_folio_salida, "
 					+"ps.folio, "
 					+ "st_estado, "
 					+ "fh_salida, "
 					+ "tm_salida, "
 					+ " p.PARTIDA_CVE, "
-					+ "p.CANTIDAD_TOTAL, "
+					//+ "p.CANTIDAD_TOTAL, "
+					+ "ps.nu_cantidad, "
 					+ "p.PESO_TOTAL, "
 					+ " dp.dtp_codigo, "
 					+ "dp.dtp_lote, "
 					+ " dp.dtp_caducidad, "
 					+ "dp.dtp_SAP, "
 					+ "dp.dtp_pedimento, "
-					+ " dcs.TEMPERATURA, "
+					+ "udm.UNIDAD_DE_MANEJO_CVE,"
 					+ "udm.UNIDAD_DE_MANEJO_DS,"
 					+ " p2.NUMERO_PROD , "
+					+ "p2.PRODUCTO_CVE, "
 					+ "p2.PRODUCTO_DS, "
 					+ " c.CAMARA_DS, "
 					+ "p3.PLANTA_DS "
@@ -192,8 +194,12 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 					+ "INNER JOIN PARTIDA p ON ps.partida_cve = p.PARTIDA_CVE "
 					+ "INNER JOIN CAMARA c on p.CAMARA_CVE = c.CAMARA_CVE "
 					+ "INNER JOIN PLANTA p3 ON c.PLANTA_CVE = p3.PLANTA_CVE "
-					+ "INNER JOIN DETALLE_PARTIDA dp on p.PARTIDA_CVE = dp.PARTIDA_CVE "
-					+ "INNER JOIN DETALLE_CONSTANCIA_SALIDA dcs ON dcs.PARTIDA_CVE = ps.partida_cve "
+					+ "INNER JOIN ("
+					+ "SELECT dp.* FROM DETALLE_PARTIDA dp "
+					+ "INNER JOIN ( "
+					+ "	select max(DET_PART_CVE) AS DET_PART_CVE, PARTIDA_CVE from DETALLE_PARTIDA dp GROUP BY PARTIDA_CVE "
+					+ ") maxDP ON maxDP.DET_PART_CVE = dp.DET_PART_CVE and maxDP.PARTIDA_CVE = dp.PARTIDA_CVE "
+					+ ") dp on p.PARTIDA_CVE = dp.PARTIDA_CVE "
 					+ "INNER JOIN UNIDAD_DE_PRODUCTO udp ON p.UNIDAD_DE_PRODUCTO_CVE = udp.UNIDAD_DE_PRODUCTO_CVE "
 					+ "INNER JOIN UNIDAD_DE_MANEJO udm ON udp.UNIDAD_DE_MANEJO_CVE  = udm.UNIDAD_DE_MANEJO_CVE "
 					+ "INNER JOIN PRODUCTO p2 ON udp.PRODUCTO_CVE = p2.PRODUCTO_CVE "
@@ -210,6 +216,7 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 			for(Object[] o : results) {
 				OrdenDeSalidas ods = new OrdenDeSalidas();
 				int idx = 0 ;
+				ods.setId((Integer) o[idx++]);
 				ods.setFolioSalida((String) o[idx++]);
 				ods.setFolioOrdenSalida((Integer) o[idx++]);
 				ods.setStatus((String) o[idx++]);
@@ -223,9 +230,10 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 				ods.setFechaCaducidad((Date) o[idx++]);
 				ods.setSAP((String) o[idx++]);
 				ods.setPedimento((String) o[idx++]);
-				ods.setTemperatura((String) o[idx++]);
+				ods.setUnidadManejoCve((Integer) o[idx++]);
 				ods.setUnidadManejo((String) o[idx++]);
 				ods.setCodigoProducto((String) o[idx++]);
+				ods.setProductoClave((Integer) o[idx++]);
 				ods.setNombreProducto((String) o[idx++]);
 				ods.setNombreCamara((String) o[idx++]);
 				ods.setNombrePlanta((String) o[idx++]);
@@ -377,6 +385,26 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 			log.error("Problema en la actualización de la orden: " + os.getFolioSalida(), e);
 			return "ERROR";
 		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return null;
+	}
+	
+	public String actualizar(OrdenDeSalidas os) {
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			int rows = em.createNativeQuery("UPDATE gestiondb.pre_salida "
+					+ "SET st_estado = :status WHERE id_pre_salida= :idPreSalida ").setParameter("status", os.getStatus()).setParameter("idPreSalida", os.getId() )
+				.executeUpdate()
+			;
+			log.debug("Registros afectados: {}",rows);
+			em.getTransaction().commit();
+		} catch(Exception ex) {
+			EntityManagerUtil.rollback(em);
+			return ex.getMessage();
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;

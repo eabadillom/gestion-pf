@@ -10,6 +10,7 @@ import javax.persistence.Id;
 @Entity
 public class OrdenDeSalidas implements Cloneable {
 	@Id
+	private Integer id;
 	private String folioSalida;
 	private String status;
 	private Date fechaSalida;
@@ -29,14 +30,17 @@ public class OrdenDeSalidas implements Cloneable {
 	private String nombrePlanta;
 	private String nombreCamara;
 	private Integer folioOrdenSalida;
+	private Integer productoClave;
+	private Integer unidadManejoCve;
 
 	public OrdenDeSalidas() {
 	}
 
+	
 	public OrdenDeSalidas(String folioSalida, String status, Date fechaSalida, Time horaSalida, Integer partidaCve,
 			Integer cantidad, BigDecimal peso, String codigo, String lote, Date fechaCaducidad, String sap,
 			String pedimento, String temperatura, String unidadManejo, String codigoProducto, String nombreProducto,
-			String nombrePlanta, String nombreCamara, Integer folioOrdenSalida) {
+			String nombrePlanta, String nombreCamara, Integer folioOrdenSalida, Integer productoCve, Integer unidadManejoCve) {
 		this.folioSalida = folioSalida;
 		this.status = status;
 		this.fechaSalida = fechaSalida;
@@ -56,6 +60,8 @@ public class OrdenDeSalidas implements Cloneable {
 		this.nombrePlanta = nombrePlanta;
 		this.nombreCamara = nombreCamara;
 		this.folioOrdenSalida = folioOrdenSalida;
+		this.productoClave = productoCve;
+		this.unidadManejoCve = unidadManejoCve;
 	}
 
 	public String getFolioSalida() {
@@ -222,15 +228,61 @@ public class OrdenDeSalidas implements Cloneable {
 	public OrdenDeSalidas clone() throws CloneNotSupportedException {
 		return (OrdenDeSalidas) super.clone();
 	}
+	
+	
+
+	public Integer getId() {
+		return id;
+	}
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+	public String getSap() {
+		return sap;
+	}
+
+
+	public void setSap(String sap) {
+		this.sap = sap;
+	}
+
+
+	public Integer getProductoClave() {
+		return productoClave;
+	}
+
+
+	public void setProductoClave(Integer productoClave) {
+		this.productoClave = productoClave;
+	}
+
+
+	public Integer getUnidadManejoCve() {
+		return unidadManejoCve;
+	}
+
+
+	public void setUnidadManejoCve(Integer unidadManejoCve) {
+		this.unidadManejoCve = unidadManejoCve;
+	}
+
 
 	@Override
 	public String toString() {
-		return "OrdenDeSalidas [folioSalida=" + folioSalida + ", status=" + status + ", fechaSalida=" + fechaSalida
-				+ ", horaSalida=" + horaSalida + ", partidaCve=" + partidaCve + ", cantidad=" + cantidad + ", peso="
-				+ peso + ", codigo=" + codigo + ", lote=" + lote + ", fechaCaducidad=" + fechaCaducidad + ", SAP=" + sap
-				+ ", pedimento=" + pedimento + ", temperatura=" + temperatura + ", unidadManejo=" + unidadManejo
-				+ ", codigoProducto=" + codigoProducto + ", nombreProducto=" + nombreProducto + ", nombrePlanta="
-				+ nombrePlanta + ", nombreCamara=" + nombreCamara + ", folioOrdenSalida=" + folioOrdenSalida + "]";
+		return "OrdenDeSalidas [id=" + id + ", folioSalida=" + folioSalida + ", status=" + status + ", fechaSalida="
+				+ fechaSalida + ", horaSalida=" + horaSalida + ", partidaCve=" + partidaCve + ", cantidad=" + cantidad
+				+ ", peso=" + peso + ", codigo=" + codigo + ", lote=" + lote + ", fechaCaducidad=" + fechaCaducidad
+				+ ", sap=" + sap + ", pedimento=" + pedimento + ", temperatura=" + temperatura + ", unidadManejo="
+				+ unidadManejo + ", codigoProducto=" + codigoProducto + ", nombreProducto=" + nombreProducto
+				+ ", nombrePlanta=" + nombrePlanta + ", nombreCamara=" + nombreCamara + ", folioOrdenSalida="
+				+ folioOrdenSalida + ", productoClave=" + productoClave + ", unidadManejoCve=" + unidadManejoCve + "]";
 	}
 
+
+
+	
 }
