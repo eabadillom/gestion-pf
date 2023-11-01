@@ -311,17 +311,8 @@ public class FacMantenimentoBean implements Serializable {
 		return de;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void setDe(Date de) {
-		if (de.getDate() > hasta.getDate()) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-					"Fecha Invalida", "La fecha seleccionada debe ser menor a la fecha final"));
-			PrimeFaces.current().ajax().update("form:messages");
-			this.de = this.actual;
-			this.hasta = this.actual;
-		} else {
-			this.de = de;
-		}
+		this.de = de;
 	}
 
 	public Date getHasta() {
@@ -329,15 +320,7 @@ public class FacMantenimentoBean implements Serializable {
 	}
 
 	public void setHasta(Date hasta) {
-		if (de.compareTo(hasta) > 0) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-					"Fecha Invalida", "La fecha seleccionada debe ser mayor a la fecha inicial"));
-			PrimeFaces.current().ajax().update("form:messages");
-			this.de = this.actual;
-			this.hasta = this.actual;
-		} else {
-			this.hasta = hasta;
-		}
+		this.hasta = hasta;
 	}
 
 	public StreamedContent getFile() {
