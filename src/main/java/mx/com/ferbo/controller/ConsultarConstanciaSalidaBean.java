@@ -136,7 +136,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	public void imprimirTicket() {
 		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-		String filename = "ticket.pdf";
+		String filename = String.format("Salida_%s.pdf", constanciaSelect.getNumero());
 		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;

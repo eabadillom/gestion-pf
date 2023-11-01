@@ -2,7 +2,6 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GestionReport" pageWidth="231" pageHeight="714" columnWidth="211" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" isIgnorePagination="true" uuid="82a8d04f-ed2a-4c9c-8260-6be8175ff3a5">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
@@ -10,6 +9,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.concurrent.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -177,20 +177,18 @@ FROM
 	<parameter name="LogoPath" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT
-	
 	cdd.folio_cliente,
 	cdd.temperatura,
 	cdd.OBSERVACIONES,
 	cdd.FECHA_INGRESO,
 	cdd.NOMBRE_TRANSPORTISTA,
 	cdd.PLACAS_TRANSPORTE,
-	pa.PESO_TOTAL,
-	pa.CANTIDAD_TOTAL,
+	SUM(pa.PESO_TOTAL) AS PESO_TOTAL,
+	SUM(pa.CANTIDAD_TOTAL) AS CANTIDAD_TOTAL,
 	cl.CTE_NOMBRE,
 	pl.PLANTA_DS,
 	p.PRODUCTO_DS,
 	udm.UNIDAD_DE_MANEJO_DS
-	
 FROM
 	CONSTANCIA_DE_DEPOSITO cdd
 	INNER JOIN CLIENTE cl ON cdd.CTE_CVE  = cl.CTE_CVE
@@ -200,9 +198,19 @@ FROM
 	INNER JOIN UNIDAD_DE_PRODUCTO udp ON pa.UNIDAD_DE_PRODUCTO_CVE = udp.UNIDAD_DE_PRODUCTO_CVE 
 	INNER JOIN PRODUCTO p ON udp.PRODUCTO_CVE = p.PRODUCTO_CVE 
 	INNER JOIN UNIDAD_DE_MANEJO udm ON udp.UNIDAD_DE_MANEJO_CVE = udm.UNIDAD_DE_MANEJO_CVE 
-	
 	WHERE
-	folio_cliente = $P{FOLIO}]]>
+	folio_cliente = $P{FOLIO}
+GROUP BY
+	cdd.folio_cliente,
+	cdd.temperatura,
+	cdd.OBSERVACIONES,
+	cdd.FECHA_INGRESO,
+	cdd.NOMBRE_TRANSPORTISTA,
+	cdd.PLACAS_TRANSPORTE,
+	cl.CTE_NOMBRE,
+	pl.PLANTA_DS,
+	p.PRODUCTO_DS,
+	udm.UNIDAD_DE_MANEJO_DS]]>
 	</queryString>
 	<field name="folio_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="folio_cliente"/>
@@ -239,7 +247,7 @@ FROM
 		<property name="com.jaspersoft.studio.field.label" value="PESO_TOTAL"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
 	</field>
-	<field name="CANTIDAD_TOTAL" class="java.lang.Integer">
+	<field name="CANTIDAD_TOTAL" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD_TOTAL"/>
 		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD_TOTAL"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
@@ -265,7 +273,7 @@ FROM
 		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
 	</field>
 	<variable name="pesoUnitario" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[$F{PESO_TOTAL}.divide( new BigDecimal($F{CANTIDAD_TOTAL}) ,2,RoundingMode.HALF_UP)]]></variableExpression>
+		<variableExpression><![CDATA[$F{PESO_TOTAL}.divide( $F{CANTIDAD_TOTAL} ,2,RoundingMode.HALF_UP)]]></variableExpression>
 	</variable>
 	<variable name="CantidadTotal" class="java.lang.Integer" calculation="Sum">
 		<variableExpression><![CDATA[$F{CANTIDAD_TOTAL}]]></variableExpression>
@@ -379,7 +387,7 @@ KELANGAN S.A. DE C.V.]]></text>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PRODUCTO_DS}+"</style>" ]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PRODUCTO_DS}+"</style>"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="40" y="30" width="50" height="12" uuid="46b48a69-055d-4d2c-86d1-a9422b351bd8">
