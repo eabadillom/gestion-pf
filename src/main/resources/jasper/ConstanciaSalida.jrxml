@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConstanciaSalida" pageWidth="229" pageHeight="660" columnWidth="189" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="c5c48a35-06c6-47f9-8382-ea6bb2ea082e">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDB"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
@@ -75,10 +75,9 @@ WHERE
 	dcs.PRODUCTO, 
 	dcs.FOLIO_ENTRADA, 
 	dcs.TEMPERATURA, 
-	dcs.CANTIDAD, 
+	SUM(dcs.CANTIDAD) AS CANTIDAD, 
 	dcs.UNIDAD, 
-	dcs.PESO, 
-	p.PARTIDA_CVE 
+	SUM(dcs.PESO) AS PESO
 FROM
 	CONSTANCIA_SALIDA cs
 	INNER JOIN CLIENTE c ON cs.CLIENTE_CVE = c.CTE_CVE 
@@ -87,7 +86,20 @@ FROM
 	INNER JOIN CAMARA ca ON p.CAMARA_CVE = ca.CAMARA_CVE 
 	INNER JOIN PLANTA pl ON ca.PLANTA_CVE = pl.PLANTA_CVE
 WHERE
-    NUMERO = $P{NUMERO}]]>
+    NUMERO = $P{NUMERO}
+GROUP BY
+	c.CTE_NOMBRE, 
+	pl.PLANTA_DS,
+	cs.ID,
+	cs.NUMERO,
+	cs.FECHA, 
+	cs.OBSERVACIONES,
+	cs.nombre_transportista,
+	cs.placas_transporte,
+	dcs.PRODUCTO, 
+	dcs.FOLIO_ENTRADA, 
+	dcs.TEMPERATURA, 
+	dcs.UNIDAD]]>
 	</queryString>
 	<field name="CTE_NOMBRE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
@@ -144,7 +156,7 @@ WHERE
 		<property name="com.jaspersoft.studio.field.label" value="TEMPERATURA"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
 	</field>
-	<field name="CANTIDAD" class="java.lang.Integer">
+	<field name="CANTIDAD" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD"/>
 		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
@@ -159,13 +171,8 @@ WHERE
 		<property name="com.jaspersoft.studio.field.label" value="PESO"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_CONSTANCIA_SALIDA"/>
 	</field>
-	<field name="PARTIDA_CVE" class="java.lang.Integer">
-		<property name="com.jaspersoft.studio.field.name" value="PARTIDA_CVE"/>
-		<property name="com.jaspersoft.studio.field.label" value="PARTIDA_CVE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
-	</field>
 	<variable name="Peso_Unitario" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[$F{PESO}.divide(new BigDecimal($F{CANTIDAD}),2,RoundingMode.HALF_UP)]]></variableExpression>
+		<variableExpression><![CDATA[$F{PESO}.divide($F{CANTIDAD},2,RoundingMode.HALF_UP)]]></variableExpression>
 	</variable>
 	<variable name="Cantidad Total" class="java.lang.Integer" calculation="Sum">
 		<variableExpression><![CDATA[$F{CANTIDAD}]]></variableExpression>
@@ -460,15 +467,16 @@ KELANGAN S.A. DE C.V.]]></text>
 					</datasetRun>
 					<jr:column width="140" uuid="a9cd9c27-ff4b-41fd-b01f-a39649f4b32e">
 						<jr:detailCell style="Table_TD" height="30">
-							<textField>
+							<textField isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="140" height="30" uuid="6e09ef5b-0e32-4672-8e2a-367d28fe0132"/>
+								<textElement markup="rtf"/>
 								<textFieldExpression><![CDATA[$F{SERVICIO_DS}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="48" uuid="01670d52-c6a4-4a59-b2de-06bb905bcf9d">
 						<jr:detailCell style="Table_TD" height="30">
-							<textField>
+							<textField isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="48" height="30" uuid="ac10f2e3-e766-4068-9b81-85b8ba456ab0"/>
 								<textElement textAlignment="Right"/>
 								<textFieldExpression><![CDATA[$F{nu_cantidad}]]></textFieldExpression>

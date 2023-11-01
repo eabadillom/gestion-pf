@@ -701,7 +701,7 @@ public void deleteConstanciaDD() {
 	
 	public void imprimir() {
 		String jasperPath = "/jasper/GestionReport.jrxml";
-		String filename = "ticket.pdf";
+		String filename = String.format("Entrada_%s.pdf", constanciaDeDeposito.getFolioCliente());
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
