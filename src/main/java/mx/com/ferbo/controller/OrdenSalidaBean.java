@@ -1,13 +1,19 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -65,6 +71,9 @@ import mx.com.ferbo.ui.PreSalidaUI;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
+import net.sf.jasperreports.engine.JRException;
 
 @Named
 @ViewScoped
@@ -96,6 +105,8 @@ public class OrdenSalidaBean implements Serializable {
 	private	UnidadDeManejoDAO unidadDAO ;
 
 	private boolean confirmacion;
+	private boolean pdf;
+	private boolean excel;
 	private String folioSelected;
 	private Date fecha;
 	private Time tmSalida;
@@ -241,7 +252,6 @@ public class OrdenSalidaBean implements Serializable {
 		Severity severity = null;
 		EntityManager manager = null;
 		List<PreSalidaUI> listapsU = null;
-		PreSalidaUI PU = null;
 		OrdenDeSalidas ods = null;
 
 		try {
@@ -258,6 +268,7 @@ public class OrdenSalidaBean implements Serializable {
 					listapsU.add(ps);
 					message = "Agregado con exito";
 					severity = FacesMessage.SEVERITY_INFO;
+					
 					}
 				
 				}
@@ -273,6 +284,59 @@ public class OrdenSalidaBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages", "form:selServicio", "form:folio-som");
 		}
 		log.info("Informacion filtrada con éxito.");
+	}
+	
+	public void imprimirTicketPDF() throws JRException, IOException, SQLException {
+		
+		System.out.println("Exportando a pdf.....");
+		String jasperPath = "/jasper/OrdenSalida.jrxml";
+		String filename = "OrdenSalida"+fecha+".pdf";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
+		File reportFile = new File(jasperPath);
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		
+		try {
+			
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			log.info(reportFile.getPath());
+			
+			Integer clienteCve = null;
+			if(clienteSelect == null) {
+				clienteCve = null; 
+			}else {
+				clienteCve = clienteSelect.getCteCve();
+			}
+			
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("idCliente",clienteCve);
+			parameters.put("fechaInicio", fecha);
+			parameters.put("fechaFin", fecha);
+			parameters.put("imagen", imgfile.getPath());
+			log.info("Parametros: " + parameters.toString());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			
+		} catch (Exception ex) {
+			log.error("Problema general...", ex);
+			message = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-inventarioSalidas");
+		} finally {
+			conexion.close((Connection) connection);
+		}
+		
 	}
 
 	public void agregaServicios() {
@@ -336,33 +400,31 @@ public class OrdenSalidaBean implements Serializable {
 		Severity severity = null;
 		ConstanciaSalida constancia = new ConstanciaSalida();
 		ConstanciaSalidaServicios css = new ConstanciaSalidaServicios();
-		String status = null;
 		DetallePartida detAnterior = null;
 		DetallePartida detNUevo= null;
 		Integer cantidadManejo = null;
 		BigDecimal peso = null;
-		
-		try {
-
-			validarProducto();
-			constancia.setFecha(fecha);
-			constancia.setPlacasTransporte(ordensalida.getNombrePlacas());
-			constancia.setNombreTransportista(ordensalida.getNombreOperador());
-			constancia.setNumero(ordensalida.getFolioSalida());
-			constancia.setClienteCve(clienteSelect);
+		try {	
 			
-			List<DetalleConstanciaSalida> dcsList = new ArrayList<>();
-			constancia.setDetalleConstanciaSalidaList(dcsList);
 			for (PreSalidaUI preS : listaPreSalidaUI) {
+				if (preS.salidaSelected == true) {
 					DetalleConstanciaSalida dcs = new DetalleConstanciaSalida();
 					Partida p = partidaDAO.buscarPorId(preS.getPartidaCve());
+					constancia.setFecha(fecha);
+					constancia.setPlacasTransporte(ordensalida.getNombrePlacas());
+					constancia.setNombreTransportista(ordensalida.getNombreOperador());
+					constancia.setNumero(ordensalida.getFolioSalida());
+					constancia.setClienteCve(clienteSelect);
+					
+					List<DetalleConstanciaSalida> dcsList = new ArrayList<>();
+					constancia.setDetalleConstanciaSalidaList(dcsList);
 					
 					List<DetallePartida> listadp = new ArrayList<>();
 					listadp = dpDAO.buscarPorPartida(p.getPartidaCve());
 					p.setDetallePartidaList(listadp);
 					for(DetallePartida d : listadp) {
-							detAnterior = d;
-							detalleAnterior = detAnterior.toString();							
+						detAnterior = d;
+						detalleAnterior = detAnterior.toString();							
 					}
 					detNUevo = detAnterior.clone();
 					detNUevo.setDetallePartidaPK(detNUevo.getDetallePartidaPK().clone());
@@ -378,10 +440,10 @@ public class OrdenSalidaBean implements Serializable {
 					peso = peso.subtract(preS.getPeso());
 					detNUevo.setCantidadUManejo(cantidadManejo);
 					detNUevo.setCantidadUMedida(peso);
-					//	listadp.add(detNUevo);
-					//		dpDAO.actualizar(detAnterior);
-					//		dpDAO.guardar(detNUevo);
-					//	dcs.setPartidaCve(p);
+					listadp.add(detNUevo);
+					dpDAO.actualizar(detAnterior);
+					dpDAO.guardar(detNUevo);
+					dcs.setPartidaCve(p);
 					
 					Camara c = camaraDAO.buscarPorId(p.getCamaraCve().getCamaraCve());
 					dcs.setCamaraCve(c.getCamaraCve());
@@ -392,81 +454,75 @@ public class OrdenSalidaBean implements Serializable {
 					dcs.setTemperatura(preS.getTemperatura());
 					dcs.setConstanciaCve(constancia);
 					dcs.setDetPartCve(detNUevo.getDetallePartidaPK().getDetPartCve());
-					//	dcsList.add(dcs);
-				
+					dcsList.add(dcs);
 				}
-			
-			
-			List<ConstanciaSalidaServicios> listaConstanciaSalidaServicios = new ArrayList<>();
-			for (PreSalidaServicio pss : listaPreSalidaServicio) {
-				ConstanciaSalidaServicios constanciaSaldaServicios = new ConstanciaSalidaServicios();
-				constanciaSaldaServicios.setNumCantidad(BigDecimal.valueOf(pss.getCantidad()));
-				constanciaSaldaServicios.setServicioCve(pss.getIdServicio());
-				constanciaSaldaServicios.setIdConstancia(constancia);
-				//	listaConstanciaSalidaServicios.add(constanciaSaldaServicios);
 			}
-			
-			//	constanciaDAO.guardar(constancia);
-			
-			List<ConstanciaDeServicio> listaConstanciaDeServicios = new ArrayList<>();
-			if(listaPreSalidaServicio.size() > 0) {
-				ConstanciaDeServicio cds = new ConstanciaDeServicio();
-				cds.setCteCve(clienteSelect);
-				cds.setFecha(fecha);
-				cds.setNombreTransportista(ordensalida.getNombreOperador());
-				cds.setPlacasTransporte(ordensalida.getNombrePlacas());
-				cds.setObservaciones(observaciones);
-				BigDecimal valor = new BigDecimal(1);
-				cds.setValorDeclarado(valor);
-				cds.setFolioCliente("S"+ordensalida.getFolioSalida());
-				cds.setStatus(estadoConstancia);
-			//	listaConstanciaDeServicios.add(cds);
-				
-				List<PartidaServicio> listaPartidaServicio = new ArrayList<>();
-				for(OrdenDeSalidas ordenDeSalida : listaSalidasporPlantas) {
-					PartidaServicio ps = new PartidaServicio();
-					Producto p = new Producto();
-					UnidadDeManejo udm = new UnidadDeManejo();
-					PreSalidaServicio psServ = new PreSalidaServicio();
-					
-					Integer cantidad = ordenDeSalida.getCantidad();
-					BigDecimal Cantidad = new BigDecimal(cantidad);
-					BigDecimal pso = ordenDeSalida.getPeso();
-					BigDecimal psoPorProducto = pso.divide(Cantidad);
-					BigDecimal cantidadOrdenSalida = new BigDecimal(ordenDeSalida.getCantidad());
-					/*Partida partida = partidaDAO.buscarPorId(preUI.getPartidaCve());
-						
-						Integer cantidadInicial = partida.getCantidadTotal();
-						BigDecimal CantidadInicial = new BigDecimal(cantidadInicial);
-						BigDecimal pesoInicial = partida.getPesoTotal();
-						BigDecimal pesoPorUnidad = pesoInicial.divide(CantidadInicial);
-						BigDecimal cantidadOrden = new BigDecimal(orden.getCantidad());
-						preUI.setPeso(pesoPorUnidad.multiply(cantidadOrden));*/
-					
-					p = productoDAO.buscarPorId(ordenDeSalida.getProductoClave());
-					udm = unidadDAO.buscarPorId(ordenDeSalida.getUnidadManejoCve());
-					ps.setCantidadDeCobro(psoPorProducto.multiply(cantidadOrdenSalida));
-					ps.setCantidadTotal(ordenDeSalida.getCantidad());
-					ps.setFolio(cds);
-					ps.setPartidaCve(ordenDeSalida.getPartidaCve());
-					ps.setProductoCve(p);
-					ps.setUnidadDeCobro(udm);
-					ps.setUnidadDeManejoCve(udm);
-					
-					//listaPartidaServicio.add(ps);
+				List<ConstanciaSalidaServicios> listaConstanciaSalidaServicios = new ArrayList<>();
+				for (PreSalidaServicio pss : listaPreSalidaServicio) {
+					ConstanciaSalidaServicios constanciaSaldaServicios = new ConstanciaSalidaServicios();
+					constanciaSaldaServicios.setNumCantidad(BigDecimal.valueOf(pss.getCantidad()));
+					constanciaSaldaServicios.setServicioCve(pss.getIdServicio());
+					constanciaSaldaServicios.setIdConstancia(constancia);
+					listaConstanciaSalidaServicios.add(constanciaSaldaServicios);
 				}
-			//	cds.setPartidaServicioList(listaPartidaServicio);
-			}
-			
-			//listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(folioSelected, fecha);
-			//for(OrdenDeSalidas orden : listaSalidasporPlantas) {
-				//orden.setStatus("C");
-				//ordenSalidaDAO.actualizar(orden);
-			//}
-			message = "Constancia guardada correctamente.";
-			severity = FacesMessage.SEVERITY_INFO;
-			
+				
+				constanciaDAO.guardar(constancia);
+				
+				List<ConstanciaDeServicio> listaConstanciaDeServicios = new ArrayList<>();
+				if(listaPreSalidaServicio.size() > 0) {
+					ConstanciaDeServicio cds = new ConstanciaDeServicio();
+					cds.setCteCve(clienteSelect);
+					cds.setFecha(fecha);
+					cds.setNombreTransportista(ordensalida.getNombreOperador());
+					cds.setPlacasTransporte(ordensalida.getNombrePlacas());
+					cds.setObservaciones(observaciones);
+					BigDecimal valor = new BigDecimal(1);
+					cds.setValorDeclarado(valor);
+					cds.setFolioCliente("S"+ordensalida.getFolioSalida());
+					cds.setStatus(estadoConstancia);
+					listaConstanciaDeServicios.add(cds);
+					
+					List<PartidaServicio> listaPartidaServicio = new ArrayList<>();
+					for(OrdenDeSalidas ordenDeSalida : listaSalidasporPlantas) {
+						PartidaServicio ps = new PartidaServicio();
+						Producto pr = new Producto();
+						UnidadDeManejo udm = new UnidadDeManejo();
+						Integer cantidad = ordenDeSalida.getCantidad();
+						BigDecimal Cantidad = new BigDecimal(cantidad);
+						BigDecimal pso = ordenDeSalida.getPeso();
+						BigDecimal psoPorProducto = pso.divide(Cantidad);
+						BigDecimal cantidadOrdenSalida = new BigDecimal(ordenDeSalida.getCantidad());
 
+						pr = productoDAO.buscarPorId(ordenDeSalida.getProductoClave());
+						udm = unidadDAO.buscarPorId(ordenDeSalida.getUnidadManejoCve());
+						ps.setCantidadDeCobro(psoPorProducto.multiply(cantidadOrdenSalida));
+						ps.setCantidadTotal(ordenDeSalida.getCantidad());
+						ps.setFolio(cds);
+						ps.setPartidaCve(ordenDeSalida.getPartidaCve());
+						ps.setProductoCve(pr);
+						ps.setUnidadDeCobro(udm);
+						ps.setUnidadDeManejoCve(udm);
+						listaPartidaServicio.add(ps);
+					}
+					cds.setPartidaServicioList(listaPartidaServicio);
+				
+					List<ConstanciaServicioDetalle> listaConstanciaSrv = new ArrayList<>();
+					for(PreSalidaServicio preServ : listaPreSalidaServicio) {
+						ConstanciaServicioDetalle consdetalle = new ConstanciaServicioDetalle();
+						consdetalle.setFolio(null);
+						consdetalle.setServicioCantidad(BigDecimal.valueOf(preServ.getCantidad()));
+						consdetalle.setServicioCve(preServ.getIdServicio());
+						listaConstanciaSrv.add(consdetalle);
+					}
+				}	
+				listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(folioSelected, fecha);
+				for(OrdenDeSalidas orden : listaSalidasporPlantas) {
+					orden.setStatus("C");
+					ordenSalidaDAO.actualizar(orden);
+				}
+				message = "Constancia guardada correctamente.";
+				severity = FacesMessage.SEVERITY_INFO;
+			
 		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de la orden.", ex);
 			ex.printStackTrace();
@@ -478,13 +534,54 @@ public class OrdenSalidaBean implements Serializable {
 		}
 	}
 
+public void imprimirTicketSalida() throws Exception{
+		
+		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
+		String filename = "ticket.pdf";
+		String images = "/images/logoF.png";
+		String message = null;
+		Severity severity = null;
+		ConstanciaSalida constancia = null;
+		File reportFile = new File(jasperPath);
+		File imgFile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			
+			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
+			URL resourceimg = getClass().getResource(images); 
+			String file = resource.getFile();//retorna la ubicacion del archivo
+			String img = resourceimg.getFile();
+			reportFile = new File(file);//crea un archivo
+			imgFile = new File(img);
+			constancia = new ConstanciaSalida();
+			constancia.setNumero(ordensalida.getFolioSalida());
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("NUMERO", ordensalida.getFolioSalida());
+			parameters.put("LogoPath", imgFile.getPath());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			   
+		} catch (Exception e) {
+			e.printStackTrace();
+			message = String.format("No se pudo imprimir el folio %s", ordensalida.getFolioSalida());
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
+			PrimeFaces.current().ajax().update("form:messages");
+			
+		}finally {
+			conexion.close((Connection) connection);
+		}
+
+	}
+	
 	@SuppressWarnings("unlikely-arg-type")
 	public void deleteServicio(PreSalidaServicio servicio) {
 		this.listaPreSalidaServicio.remove(servicio);
 		this.listaServicios.remove(servicio);
 	}
-
-
 
 	public Cliente getClienteSelect() {
 		return clienteSelect;
@@ -724,6 +821,22 @@ public class OrdenSalidaBean implements Serializable {
 
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
+	}
+
+	public boolean isPdf() {
+		return pdf;
+	}
+
+	public void setPdf(boolean pdf) {
+		this.pdf = pdf;
+	}
+
+	public boolean isExcel() {
+		return excel;
+	}
+
+	public void setExcel(boolean excel) {
+		this.excel = excel;
 	}
 
 }

@@ -98,7 +98,11 @@
 					<p:column headerText="Peso aprox. (kg)">
 						<h:outputText value="#{salidas.peso}"/>
 					</p:column>
-					
+					<p:column headerText="Temperatura °C" >
+					<p:inputText value="#{salidas.temperatura}" onblur="#{ordenSalidaBean.validaTemperatura(salidas)}" requiredMessage="Ingresar el grado de temperatura" >
+					<p:ajax process="@this" />
+					</p:inputText>
+					</p:column>
 			<p:rowExpansion>
 								<div class="orders-subtable">
 							<p:dataTable id="dtDetallesSalida" widgetVar="wv-detalleSalida" var="detalleSalidas" value="#{ordenSalidaBean.listaPreSalidaUI}" reflow="true" rowKey="#{ordenSalidaBean.ordensalida.folioSalida}" lazy="true">
@@ -117,11 +121,7 @@
 								<p:column headerText="SAP">
 									<h:outputText value="#{detalleSalidas.SAP}" />
 								</p:column>
-								<p:column headerText="Temperatura °C" >
-								<p:inputText value="#{detalleSalidas.temperatura}" onblur="#{ordenSalidaBean.validaTemperatura(detalleSalidas)}" requiredMessage="Ingresar el grado de temperatura" >
-								<p:ajax process="@this" />
-								</p:inputText>
-								</p:column>
+								
 							</p:dataTable>
 						</div>
 							</p:rowExpansion>
@@ -156,13 +156,24 @@
 				</p:column>
 			</p:dataTable>
 	    </p:fieldset>
+	    
 	    <p:divider>
-        <p:splitButton value="Guardar" action="#{ordenSalidaBean.guardar}" process="@this" update="messages" icon="pi pi-save">
+        <p:splitButton id="btnguardar" value="Guardar" action="#{ordenSalidaBean.guardar}" process="@this" update="messages" icon="pi pi-save">
             <p:menuitem value="Nueva orden de salida" action="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh"/>
+            <p:divider />
             <p:divider />
             <p:menuitem value="Homepage" url="http://localhost:8080/gestion/dashboard.xhtml" icon="pi pi-home"/>
         </p:splitButton>
+        <p:divider/>
+        <p:splitButton id="btnImprimir" value="Salidas" update="messages" icon="pi pi-print"  >
+            <p:menuitem value=".pdf" action="#{ordenSalidaBean.imprimirTicketPDF}" update="messages"  process="@this" icon="pi pi-print"/>
+             <p:menuitem value=".xlsx" action="#{ordenSalidaBean.imprimirTicketExcel}" update="messages"  process="@this" icon="pi pi-print"/>
+     </p:splitButton>
+         <p:commandButton icon="pi pi-print" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" process="@this"/>
+         
         </p:divider>
-		</h:form>
+        
+    
+        </h:form>
 	</ui:define>
 </ui:composition>
