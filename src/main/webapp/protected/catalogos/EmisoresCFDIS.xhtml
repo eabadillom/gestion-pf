@@ -26,6 +26,9 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 	<ui:define name="content">
 		<h:form id="form">
 		<p:growl id="messages" showDetail="true" />
+		<p:panel>
+			<p:commandButton value="Agregar emisor" oncomplete="PF('dialogEmisor').show();"></p:commandButton>
+		</p:panel>
 		<p:dataTable id="dt-emisor" widgetVar="dtEmisor" var="emisordt" value="#{emisoresCFDISBean.listaEmisor}" 
 			reflow="true" rowKey="#{emisordt.emisor}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
 			<p:column headerText="Nombre">
@@ -66,7 +69,6 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 
 		<p:dialog header="Agregar emisor" showEffect="fade" modal="true" widgetVar="dialogEmisor" responsive="true">
 			<p:panel id="pnlEmisor" class="ui-fluid">
-										
 					<span class="ui-float-label">
 						<p:inputText value="#{emisoresCFDISBean.nombreEmisor}" required="true" requiredMessage="Ingresa Nombre" />
 						<p:outputLabel for="@next" value="Nombre del emisor"/>

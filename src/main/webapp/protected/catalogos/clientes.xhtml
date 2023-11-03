@@ -71,11 +71,14 @@
 										<p:column headerText="Segundo apellido" sortBy="#{contacto.idContacto.nbApellido2}">
 											<h:outputText value="#{contacto.idContacto.nbApellido2}" />
 										</p:column>
-
-										<p:column width="10%" style="text-align:right;">
-											<p:commandButton icon="pi pi-user-edit" styleClass=" p-mr-2 p-mb-2" process="@this" actionListener="#{clientesBean.consultaContactos(contacto)}" resetValues="true" update="form:pnlEditContacto">
-											</p:commandButton>
-											<p:commandButton icon="pi pi-user-minus" styleClass="ui-button-danger p-mr-2 p-mb-2" process="@this" oncomplete="PF('deleteContactoDialog').show();">
+										<p:column width="2rem;">
+											<p:commandButton icon="pi pi-key" process="@this" actionListener="#{clientesBean.setPassword(contacto)}" update="form:pnlPassword" oncomplete="PF('dlgPassword').show();"/>
+										</p:column>
+										<p:column width="2rem;">
+											<p:commandButton icon="pi pi-user-edit" process="@this" actionListener="#{clientesBean.consultaContactos(contacto)}" resetValues="true" update="form:pnlEditContacto" />
+										</p:column>
+										<p:column width="2rem;" style="text-align:right;">
+											<p:commandButton icon="pi pi-user-minus" styleClass="ui-button-danger" process="@this" oncomplete="PF('deleteContactoDialog').show();">
 												<f:setPropertyActionListener value="#{contacto}" target="#{clientesBean.clienteContactoSelected}" />
 											</p:commandButton>
 										</p:column>
@@ -83,7 +86,44 @@
 								</div>
 							</p:rowExpansion>
 						</p:dataTable>
-
+						<p:dialog id="dialogPassword" header="Establecer contraseña" widgetVar="dlgPassword" showEffect="fade" modal="true" responsive="true">
+							<p:outputPanel id="pnlPassword" class="ui-fluid">
+								<div class="p-grid p-col-12">
+									<p:panel>
+										<h5>Para cambiar su contraseña, debe considerar lo siguiente</h5>
+										<div>La contraseña debe tener entre 8 y 16 caracteres.</div>
+										<div>No debe tener espacios en blanco</div>
+										<div>Debe tener al menos una letra mayúscula</div>
+										<div>Debe tener al menos una letra minúscula</div>
+										<div>Debe tener al menos un número</div>
+										<div>Debe tener al menos un carácter especial: , . : * + - # $ % @ etc.</div>
+									</p:panel>
+								</div>
+								<div class="card" align="center">
+									<div class="field grid">
+										<p:outputLabel for="@next" value="Indique su nueva contraseña" styleClass="col-fixed"/>
+										<div class="col">
+											<p:password id="newPassword" value="#{clientesBean.newPassword}" toggleMask="true">
+												<p:ajax process="@this" event="blur" listener="#{clientesBean.validateNewPassword}"></p:ajax>
+											</p:password>
+										</div>
+									</div>
+									<div class="field grid">
+										<p:outputLabel for="@next" value="Confirme su nueva contraseña" styleClass="col-fixed"/>
+										<div class="col">
+											<p:password id="confirmPassword" value="#{clientesBean.confirmPassword}" toggleMask="true">
+												<p:ajax process="@this" event="blur" listener="#{clientesBean.validateNewPassword}"></p:ajax>
+											</p:password>
+										</div>
+									</div>
+								</div>
+								<p:panel>
+									<div class="card" align="center">
+										<p:commandButton id="change-password" value="Cambiar contraseña" icon="pi pi-check" actionListener="#{clientesBean.changePassword()}" process="@this" />
+									</div>
+								</p:panel>
+							</p:outputPanel>
+						</p:dialog>
 						<p:dialog id="dialogCliente" header="Agregar/modificar cliente"
 							widgetVar="dialogCliente" showEffect="fade" modal="true"
 							responsive="true">
@@ -194,7 +234,7 @@
 												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto." />
 											</div>
 										</div>
-										<div class="p-col-12 p-md-4 p-lg-4">
+										<!-- <div class="p-col-12 p-md-4 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Contraseña</p:outputLabel>
 												<p:panelGrid id="pgPass" columns="2" style="width:100%" styleClass="border-none">
@@ -202,7 +242,7 @@
 													<p:commandButton icon="icon-varita" actionListener="#{clientesBean.generaPassword()}" styleClass="edit-button" process="@this" update="pgPass" />
 												</p:panelGrid>
 											</div>
-										</div>
+										</div> -->
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Estatus usuario</p:outputLabel>
@@ -279,7 +319,7 @@
 												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto."/>
 											</div>
 										</div>
-										<div class="p-col-12 p-md-4 p-lg-4">
+										<!-- <div class="p-col-12 p-md-4 p-lg-4">
 											<div id="pgPassEdit" class="p-field">
 												<p:outputLabel>Contraseña</p:outputLabel>
 												<p:panelGrid id="pgPassEdit" columns="2" style="width:100%" styleClass="border-none">
@@ -287,7 +327,7 @@
 													<p:commandButton icon="icon-varita" actionListener="#{clientesBean.generaPassword()}" styleClass="edit-button" process="@this" update="pgPassEdit" />
 												</p:panelGrid>
 											</div>
-										</div>
+										</div> -->
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Estatus usuario</p:outputLabel>
