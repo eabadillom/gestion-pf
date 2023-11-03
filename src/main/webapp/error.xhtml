@@ -4,7 +4,6 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
-
     <h:head>
         <f:facet name="first">
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -14,23 +13,20 @@
         </f:facet>
         <title>PrimeFaces Omega</title>
     </h:head>
-
     <h:body styleClass="exception-body">
         <div class="exception-wrapper error">
             <p:graphicImage name="images/error.png" library="omega-layout" />
             
-            <p class="message-title">Exception Occured!</p>
-            <p class="message-summary">Please contact system administrator</p>
+            <p class="message-title">Ocurrió un error en el sistema</p>
+            <p class="message-summary">Por favor intente nuevamente. Si el problema continúa, por favor contacte a su administrador de sistemas.</p>
             
             <p:link outcome="dashboard">
                 <i class="pi pi-home"></i>
                 <span>Dashboard</span>
             </p:link>
             
-            <div class="login-footer">PrimeFaces Omega</div>
+            <div class="login-footer">FERBO Almacenes Frigoríficos</div>
         </div>
-        
         <h:outputStylesheet name="css/layout-#{guestPreferences.layout}.css" library="omega-layout"/>
     </h:body>
-
 </html>
