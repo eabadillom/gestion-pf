@@ -283,13 +283,14 @@ public class IngresosCrudBean implements Serializable {
 				if(listaPago.isEmpty())
 					throw new InventarioException("Debe registrar al menos un pago.");
 				
-				if(!listaPago.isEmpty()) {
-					for(PagoUI p: listaPago) {					
-						pagofactDAO.guardar(p.getPago());
-						f = facturaDAO.buscarPorId(p.getPago().getFactura().getId());
-						f.setStatus(p.getPago().getFactura().getStatus());
-						facturaDAO.actualizar(f);
-					}
+				for(PagoUI p: listaPago) {
+					if(p.getPago().getId() != null)
+						continue;
+					
+					pagofactDAO.guardar(p.getPago());
+					f = facturaDAO.buscarPorId(p.getPago().getFactura().getId());
+					f.setStatus(p.getPago().getFactura().getStatus());
+					facturaDAO.actualizaStatus(f);
 				}
 				
 				listaFactura.clear();
