@@ -8,14 +8,6 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Domicilios" />
-				<p:menuitem value="Cambios" />
-				<p:menuitem value="Países" outcome="/protected/catalogos/paises" />
-			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
 					<div class="card">
@@ -38,44 +30,29 @@
 							paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
-									<span style="font-weight: bold">Países</span> <span
-										class="ui-input-icon-left filter-container"> <i
-										class="pi pi-search" /> <p:inputText id="globalFilter"
-											onkeyup="PF('dtPaises').filter()" placeholder="Búsqueda" />
+									<span style="font-weight: bold"></span>
+									<span class="ui-input-icon-left filter-container">
+										<i class="pi pi-search" />
+										<p:inputText id="globalFilter" onkeyup="PF('dtPaises').filter()" placeholder="Búsqueda" />
 									</span>
 								</div>
 							</f:facet>
 
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-
-							<p:column selectionMode="multiple" />
-
-							<p:column headerText="Pais" sortBy="#{paises.paisDesc}"
-								filterBy="#{paises.paisDesc}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{paises.paisDesc}" />
+							<p:column headerText="Pais" sortBy="#{paises.paisDesc}" filterBy="#{paises.paisDesc}" style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{paises.paisDesc}" />
+							</p:column >
+							<p:column headerText="Abreviacion" sortBy="#{paises.paisDsCorta}" filterBy="#{paises.paisDsCorta}" width="6rem" style="text-align: center;">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{paises.paisDsCorta}" />
 							</p:column>
-							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil"
-									update=":form:manage-country-content-new" value="Modificar"
-									oncomplete="PF('nuevoPaisDialog').show()"
-									styleClass="p-mr-2 p-mb-2" process="@this">
-									<f:setPropertyActionListener value="#{paises}"
-										target="#{paisesBean.paisSelect}" />
+							
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-country-content-new" oncomplete="PF('nuevoPaisDialog').show()" process="@this">
+									<f:setPropertyActionListener value="#{paises}" target="#{paisesBean.paisSelect}" />
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('deletePaisDialog').show()">
-									<f:setPropertyActionListener value="#{paises}"
-										target="#{paisesBean.paisSelect}" />
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-times" process="@this" oncomplete="PF('deletePaisDialog').show()" class="ui-button-danger">
+									<f:setPropertyActionListener value="#{paises}" target="#{paisesBean.paisSelect}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>
@@ -89,7 +66,7 @@
 						<div class="p-field">
 							<p:outputLabel for="pais-new" value="País" />
 							<p:inputText id="pais-new"
-								value="#{paisesBean.paisSelect.paisDesc}" required="true" />
+								value="#{paisesBean.paisSelect.paisDesc}" required="true"  />
 						</div>
 						<div class="p-field">
 							<p:outputLabel for="abreviacion-new" value="Abreviación" />

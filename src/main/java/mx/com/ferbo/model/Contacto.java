@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -36,29 +37,35 @@ import javax.validation.constraints.Size;
 public class Contacto implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_contacto")
     private Integer idContacto;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "nb_nombre")
     private String nbNombre;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "nb_apellido_1")
     private String nbApellido1;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "nb_apellido_2")
     private String nbApellido2;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto")
     private List<ClienteContacto> clienteContactoList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto", orphanRemoval = true)//removi ophanremovel
     private List<MedioCnt> medioCntList;
 
     public Contacto() {
@@ -67,12 +74,40 @@ public class Contacto implements Serializable {
     public Contacto(Integer idContacto) {
         this.idContacto = idContacto;
     }
-
+    
     public Contacto(Integer idContacto, String nbNombre, String nbApellido1, String nbApellido2) {
         this.idContacto = idContacto;
         this.nbNombre = nbNombre;
         this.nbApellido1 = nbApellido1;
         this.nbApellido2 = nbApellido2;
+    }
+    
+    public void add(ClienteContacto clienteContacto) {
+    	if(this.clienteContactoList == null)
+    		this.clienteContactoList = new ArrayList<>();
+    	clienteContacto.setIdContacto(this);
+    	this.clienteContactoList.add(clienteContacto);
+    }
+    
+    public void remove(ClienteContacto clienteContacto) {
+    	if(this.clienteContactoList == null)
+    		return;
+    	clienteContacto.setIdCliente(null);
+    	this.clienteContactoList.remove(clienteContacto);
+    }
+    
+    public void add(MedioCnt medioCnt) {
+    	if(this.medioCntList == null)
+    		this.medioCntList = new ArrayList<MedioCnt>();
+    	medioCnt.setIdContacto(this);
+    	this.medioCntList.add(medioCnt);
+    }
+    
+    public void remove(MedioCnt medioCnt) {
+    	if(this.medioCntList == null)
+    		return;
+    	medioCnt.setIdContacto(null);
+    	this.medioCntList.remove(medioCnt);
     }
 
     public Integer getIdContacto() {

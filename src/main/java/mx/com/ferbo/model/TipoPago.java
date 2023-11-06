@@ -6,9 +6,8 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +15,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -35,21 +33,30 @@ import javax.validation.constraints.Size;
 public class TipoPago implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    public static final Integer TIPO_PAGO_CHEQUE = 1;
+    public static final Integer TIPO_PAGO_FICHA_DE_DEPOSITO = 2;
+    public static final Integer TIPO_PAGO_CHEQUE_DE_CAJA = 3;
+    public static final Integer TIPO_PAGO_DOCUMENTO_DE_TRANSFERENCIA = 4;
+    public static final Integer TIPO_PAGO_NOTA_CREDITO = 5;
+    public static final Integer TIPO_PAGO_EFECTIVO = 6;
+    public static final Integer TIPO_PAGO_DOLARES = 7;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "nombre")
     private String nombre;
+    
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tipo")
-    private List<Pago> pagoList;
 
     public TipoPago() {
     }
@@ -85,14 +92,6 @@ public class TipoPago implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public List<Pago> getPagoList() {
-        return pagoList;
-    }
-
-    public void setPagoList(List<Pago> pagoList) {
-        this.pagoList = pagoList;
     }
 
     @Override

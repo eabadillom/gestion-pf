@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -12,18 +15,37 @@ import mx.com.ferbo.util.EntityManagerUtil;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 public class ProductoDAO extends IBaseDAO<Producto, Integer> {
+	private static Logger log = LogManager.getLogger(ProductoDAO.class);
 
 	@Override
 	public Producto buscarPorId(Integer id) {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-																		// Tools | Templates.
+		Producto producto = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			producto = em.find(Producto.class, id);
+		} catch(Exception ex) {
+			log.error("Problema para obtener el producto...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return producto;
 	}
 
 	@Override
 	public List<Producto> buscarTodos() {
 		List<Producto> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Producto.findAll", Producto.class).getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Producto.findAll", Producto.class).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de productos...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 
@@ -34,58 +56,70 @@ public class ProductoDAO extends IBaseDAO<Producto, Integer> {
 
 	@Override
 	public String actualizar(Producto producto) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(producto);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para actualizar el producto: " + producto, e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
-	public String guardar(Producto persona) {
+	public String guardar(Producto producto) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.persist(persona);
+			em.persist(producto);
 			em.getTransaction().commit();
-		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+		} catch (Exception ex) {
+			log.error("Problema para guardar el producto..." + producto, ex);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
-	public String eliminar(Producto persona) {
+	public String eliminar(Producto producto) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(persona));
+			em.remove(em.merge(producto));
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para eliminar el producto...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<Producto> listado) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			for (Producto producto : listado) {
 				em.remove(em.merge(producto));
 			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema para eliminar el listado de productos: " + listado, e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

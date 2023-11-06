@@ -4,25 +4,17 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Servicios por cliente" outcome="/protected/catalogos/serviciosPorCliente" />
-			</p:breadCrumb>
-
+			<p:growl id="messages" showDetail="true" />
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-						<p:growl id="messages" showDetail="true" />
 						<div class="p-col-12">
 							<div class="card">
 								<div class="ui-fluid p-formgrid p-grid">
 									<div class="p-field p-col-12 p-md-6">
-										<p:outputLabel for="soClientes" value="Clientes" />
 										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{serviciosClienteBean.clienteSelected}" filter="true"
 											filterMatchMode="contains">
-											<f:selectItem itemLabel="--Seleccione--" />
+											<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" />
 											<f:selectItems value="#{serviciosClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 											<p:ajax listener="#{serviciosClienteBean.filtaListado()}" update="dt-servicios dt-servicios:btnAdd" />
 										</p:selectOneMenu>
@@ -35,9 +27,9 @@
 							var="pServicio" selection="#{serviciosClienteBean.precioServicioSelected}" reflow="true" lazy="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
 							<f:facet name="header">
 								<div class="products-table-header">
-									<span style="font-weight: bold">Servicios por cliente</span> <span class="filter-container ui-input-icon-left"> <p:commandButton
-											id="btnAdd" icon="pi pi-plus" value="Agregar" actionListener="#{serviciosClienteBean.nuevoServicioCliente()}" process="@this"
-											styleClass="ui-button-success" style="margin-right: .5rem" update="form:panel-servicio" oncomplete="PF('servicioClienteDialog').show()"
+									<span style="font-weight: bold">Servicios por cliente</span> <span class="filter-container ui-input-icon-left"> 
+									<p:commandButton id="btnAdd" icon="pi pi-plus" value="Agregar nuevo servicio" actionListener="#{serviciosClienteBean.nuevoServicioCliente()}" process="@this"
+											styleClass="ui-button-raised" style="margin-right: .5rem" update="form:panel-servicio" oncomplete="PF('servicioClienteDialog').show()"
 											disabled="#{serviciosClienteBean.clienteSelected eq null and serviciosClienteBean.clienteSelected.cteCve eq null}"/>
 									</span>
 								</div>
@@ -45,20 +37,21 @@
 							<p:column headerText="Servicio" sortBy="#{pServicio.servicio.servicioDs}">
 								<h:outputText value="#{pServicio.servicio.servicioDs}" />
 							</p:column>
-							<p:column headerText="Unidad" sortBy="#{pServicio.unidad.unidadDeManejoDs}">
+							<p:column headerText="Unidad" sortBy="#{pServicio.unidad.unidadDeManejoDs}" width="7rem" style="text-align: center;">
 								<h:outputText value="#{pServicio.unidad.unidadDeManejoDs}" />
 							</p:column>
-							<p:column headerText="Precio" sortBy="#{pServicio.precio}">
+							<p:column headerText="Precio" sortBy="#{pServicio.precio}" width="6rem" style="text-align: right;">
 								<h:outputText value="#{pServicio.precio}">
 									<f:convertNumber type="currency" maxFractionDigits="2" />
 								</h:outputText>
 							</p:column>
-							<p:column width="20%">
-								<p:commandButton icon="pi pi-pencil" value="Modificar" process="@this" styleClass="edit-button ui-button-success"
-									oncomplete="PF('servicioClienteDialog').show()" update="form:panel-servicio">
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button" oncomplete="PF('servicioClienteDialog').show()" update="form:panel-servicio">
 									<f:setPropertyActionListener value="#{pServicio}" target="#{serviciosClienteBean.precioServicioSelected}" />
 								</p:commandButton>
-								<p:commandButton class="ui-button-warning" icon="pi pi-trash" value="Eliminar" process="@this" oncomplete="PF('deleteServicioDialog').show()">
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" oncomplete="PF('deleteServicioDialog').show()">
 									<f:setPropertyActionListener value="#{pServicio}" target="#{serviciosClienteBean.precioServicioSelected}" />
 								</p:commandButton>
 							</p:column>
@@ -75,7 +68,7 @@
 									<div class="p-field">
 										<p:outputLabel>Servicio</p:outputLabel>
 										<p:selectOneMenu value="#{serviciosClienteBean.precioServicioSelected.servicio}" filter="true" filterMatchMode="contains"
-											converter="entityConverter" required="true" requiredMessage="Campo requerido"
+											converter="entityConverter" required="true" requiredMessage="Seleccione servicio"
 											disabled="#{serviciosClienteBean.precioServicioSelected.id ne null}">
 											<f:selectItem itemLabel="--Selecciona--" />
 											<f:selectItems value="#{serviciosClienteBean.lstServicio}" var="serv" itemLabel="#{serv.servicioDs}" />
@@ -84,7 +77,7 @@
 									<div class="p-field">
 										<p:outputLabel>Unidad</p:outputLabel>
 										<p:selectOneMenu value="#{serviciosClienteBean.precioServicioSelected.unidad}" filter="true" filterMatchMode="contains"
-											converter="entityConverter" required="true" requiredMessage="Campo requerido"
+											converter="entityConverter" required="true" requiredMessage="Seleccione unidad"
 											disabled="#{serviciosClienteBean.precioServicioSelected.id ne null}">
 											<f:selectItem itemLabel="--Selecciona--" />
 											<f:selectItems value="#{serviciosClienteBean.lstUnidadManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
@@ -99,7 +92,7 @@
 							</p:outputPanel>
 
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{serviciosClienteBean.guardarPrecioServicio()}" update="panel-servicio" process="panel-servicio @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{serviciosClienteBean.guardarPrecioServicio()}" update="panel-servicio messages" process="panel-servicio @this" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('servicioClienteDialog').hide()" class="ui-button-secondary"
 									update="panel-servicio" resetValues="true" />
 							</f:facet>

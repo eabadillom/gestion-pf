@@ -11,6 +11,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,6 +32,7 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "Camara.findAll", query = "SELECT c FROM Camara c"),
     @NamedQuery(name = "Camara.findByCamaraCve", query = "SELECT c FROM Camara c WHERE c.camaraCve = :camaraCve"),
+    @NamedQuery(name = "Camara.findByPlantaCve", query = "SELECT c FROM Camara c WHERE c.plantaCve.plantaCve = :plantaCve"),
     @NamedQuery(name = "Camara.findByCamaraDs", query = "SELECT c FROM Camara c WHERE c.camaraDs = :camaraDs"),
     @NamedQuery(name = "Camara.findByCamaraAbrev", query = "SELECT c FROM Camara c WHERE c.camaraAbrev = :camaraAbrev")})
 public class Camara implements Serializable {
@@ -38,7 +40,8 @@ public class Camara implements Serializable {
     private static final long serialVersionUID = 1L;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "camara")
     private List<Posicion> posicionList;
-    
+   
+  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -51,15 +54,16 @@ public class Camara implements Serializable {
     @Column(name = "CAMARA_ABREV")
     private String camaraAbrev;
     @JoinColumn(name = "PLANTA_CVE", referencedColumnName = "PLANTA_CVE")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Planta plantaCve;
-    @OneToMany(mappedBy = "camaraCve")
+    @OneToMany(mappedBy = "camaraCve", fetch = FetchType.LAZY)
     private List<Partida> partidaList;
-
+    
+    
     public Camara() {
     }
 
-    public Camara(Integer camaraCve) {
+	public Camara(Integer camaraCve) {
         this.camaraCve = camaraCve;
     }
 

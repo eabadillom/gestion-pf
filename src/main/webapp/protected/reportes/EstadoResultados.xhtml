@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+                
+	<ui:define name="title">Estado de resultados</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+        <p:breadCrumb>
+            <p:menuitem value="Home" outcome="/dashboard"/>
+            <p:menuitem value="Reportes"/>
+            <p:menuitem value="EstadoResultados"/>
+            <p:menuitem value="EStado de resultados" outcome="/protected/reportes/EstadoResultados"/>
+        </p:breadCrumb>
+        
+        <p:growl id="messages" showDetail="true" />
+        
+            <div class="p-grid crud-demo">
+                <div class="p-col-12">
+	                <div class="card">
+	             		
+	             		
+	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
+	             		
+                <p:outputLabel for="yearMonth" value="Periodo "/>
+                <p:datePicker id="yearMonth" view="month" value="#{reporteEstadoResultadosBean.mesActual}" pattern="MM/yyyy" yearNavigator="true" yearRange="2000:2030" maxdate="#{reporteIngresosBean.maxDate}"/>
+	             		
+	             			
+	             		</p:fieldset>
+
+	             		
+	             		<p:fieldset legend="Razon social" styleClass="p-mt-4">
+		             		<p:selectOneMenu id="select-emi" autoWidth="true" value="#{reporteEstadoResultadosBean.emisor}" converter="entityConverter" >
+		             			<f:selectItem itemLabel="Todos los emisores" Itemvalue="" />
+		             			<f:selectItems value="#{reporteEstadoResultadosBean.listaEmisores}" var="emi" itemLabel="#{emi.nb_emisor}" itemValue="#{emi}" />
+		             			<p:ajax process ="@this" />
+		             		</p:selectOneMenu>
+	             		</p:fieldset>
+	             		
+	             		<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+					 	 <p:toolbar>
+							<p:toolbarGroup>
+					  		 <div class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton value=".pdf" actionListener="#{reporteEstadoResultadosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+						 	 </div>
+							         
+					         <div class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+							        
+							 <div class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton value=".xlsx"  actionListener="#{reporteEstadoResultadosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+				     		 </div>
+				     		 
+				     		   <div class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+							        
+							 <div class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton value="Consultar"  actionListener="#{reporteEstadoResultadosBean.consultar}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+				     		 </div>
+							</p:toolbarGroup>
+
+						 </p:toolbar>
+						</p:fieldset>
+						<p:dataTable id="dt-estadoResultado" lazy="true" widgetVar="dtestadoResultado" var="resultadoDT" value="#{reporteEstadoResultadosBean.listaestadoCuenta}" reflow="true"
+							rowKey="#{resultadoDT.emisor}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
+							
+								<p:column headerText="Fecha" style="text-align:center">
+								<h:outputText value="#{resultadoDT.fecha}" />
+							</p:column>
+								<p:column headerText="Emisor" style="text-align:center">
+								<h:outputText value="#{resultadoDT.emisor}" />
+							</p:column>
+							<p:column headerText="Ventas" style="text-align:center">
+								<h:outputText value="#{resultadoDT.ventas}" />
+							</p:column>
+							<p:column headerText="Pagos" style="text-align:center">
+								<h:outputText value="#{resultadoDT.pagos}" />
+							</p:column>
+								<p:column headerText="Saldo" style="text-align:center">
+								<h:outputText value="#{resultadoDT.saldoInicial}" />
+							</p:column>
+							</p:dataTable>
+							
+							<p:fieldset legend="Grafica de resultados" styleClass="p-mt-4">
+                		<p:commandButton value="Mostrar"  oncomplete="PF('dgEstadoResultados').show()" update="@widgetVar(dgEstadoResultados)" action="#{reporteEstadoResultadosBean.consultaGrafica()}" styleClass="ui-button-outlined ui-button-secondary"/>  
+	             		</p:fieldset>
+	             		
+	             		<p:dialog modal="true" widgetVar="dgEstadoResultados" responsive="true" showEffect="fade" style="max-width:900px !important;max-height: 750px;">
+							
+							<p:outputPanel id="grafica-panel" class="ui-fluid">
+								<p:pieChart model="#{reporteEstadoResultadosBean.pieModel}" style="width:100%; height: 300px;" ></p:pieChart>
+							</p:outputPanel>
+							
+							<f:facet name="footer">
+								<p:commandButton value="Cerrar" oncomplete="PF('dgEstadoResultados').hide()" />
+							</f:facet>
+							
+						</p:dialog>
+							
+							
+							
+	                </div>
+                </div>
+            </div>
+            
+        </h:form>
+   </ui:define>
+</ui:composition>   

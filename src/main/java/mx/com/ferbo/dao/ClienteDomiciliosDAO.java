@@ -4,11 +4,17 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
+	
+	private static Logger log = LogManager.getLogger(ClienteDomiciliosDAO.class);
 
 	@Override
 	public ClienteDomicilios buscarPorId(Integer id) {
@@ -29,6 +35,35 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public List<ClienteDomicilios> buscarDomicilioFiscalPorCliente(Integer idCliente, boolean isFullInfo) {
+		List<ClienteDomicilios> listado = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("ClienteDomicilios.findByClienteDomFiscal", ClienteDomicilios.class)
+					.setParameter("cteCve", idCliente)
+					.getResultList()
+					;
+			
+			if(isFullInfo == false)
+				return listado;
+			
+			for(ClienteDomicilios cd : listado) {
+				log.debug("Domicilio cve: {}", cd.getDomicilios().getDomCve());
+				log.debug("PaisCve: {}", cd.getDomicilios().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve() );
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de domicilios por cliente...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		return listado;
+	}
 
 	@Override
 	public String actualizar(ClienteDomicilios clienteDomicilio) {
@@ -36,18 +71,20 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createNativeQuery("UPDATE cliente_domicilios SET CTE_CVE = :cteCve, domicilio_tipo_cve = :domicilioTipoCve WHERE (id = :id)")
-			.setParameter("cteCve",clienteDomicilio.getCteCve().getCteCve())
-			.setParameter("domicilioTipoCve", clienteDomicilio.getDomicilios().getDomicilioTipoCve().getDomicilioTipoCve())
-			.setParameter("domCve", clienteDomicilio.getDomicilios().getDomCve())
-			.setParameter("id",clienteDomicilio.getId())
-			.executeUpdate();
+			em.createNativeQuery(
+					"UPDATE cliente_domicilios SET CTE_CVE = :cteCve, domicilio_tipo_cve = :domicilioTipoCve WHERE (id = :id)")
+					.setParameter("cteCve", clienteDomicilio.getCteCve().getCteCve())
+					.setParameter("domicilioTipoCve",
+							clienteDomicilio.getDomicilios().getDomicilioTipoCve().getDomicilioTipoCve())
+					.setParameter("domCve", clienteDomicilio.getDomicilios().getDomCve())
+					.setParameter("id", clienteDomicilio.getId())
+					.executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		}		
+		}
 		return null;
 	}
 
@@ -88,6 +125,12 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 	public String eliminarListado(List<ClienteDomicilios> listado) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public List<ClienteDomicilios> buscaPorCliente(Cliente c) {
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		return em.createNamedQuery("ClienteDomicilios.findByCliente", ClienteDomicilios.class)
+				.setParameter("cteCve", c.getCteCve()).getResultList();
 	}
 
 }

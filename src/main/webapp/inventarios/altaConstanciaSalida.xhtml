@@ -1,0 +1,282 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+	<script>
+	    //<![CDATA[
+	        PF('statusDialog').show();
+	
+	        PF('statusDialog').hide();
+	    //]]>
+	</script>
+	<ui:define name="title">Alta Constancia Salida</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="4000"/>
+			<p:dialog modal="true" widgetVar="statusDialog" header="Consultando inventario..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+			<p:panel header="DATOS DEL CLIENTE">
+				<div class="p-grid ui-fluid p-col-12">
+					<div class="p-card p-col-6 p-md-6">
+						<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{altaConstanciaSalidaBean.clienteSelect}"
+							onchange="PF('statusDialog').show();">
+							<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
+							<f:selectItems value="#{altaConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+							<p:ajax listener="#{altaConstanciaSalidaBean.cargaInfoCliente}"
+								update="s-servicio dt-inventario s-planta dt-salidas dt-servicio"
+								oncomplete="PF('statusDialog').hide();"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="p-card p-col-4 p-md-4">
+						<p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{altaConstanciaSalidaBean.plantaSelect}"
+						onchange="PF('statusDialog').show();">
+							<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true" />
+							<f:selectItems value="#{altaConstanciaSalidaBean.listadoPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+							<p:ajax listener="#{altaConstanciaSalidaBean.cargaInfoCliente}"
+								update="dt-inventario dt-servicio"
+								oncomplete="PF('statusDialog').hide();"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="p-card p-col-2 p-md-2">
+						<p:datePicker id="fechaSalida" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaConstanciaSalidaBean.fechaSalida}" value="#{altaConstanciaSalidaBean.fechaSalida}" disabled="#{(altaConstanciaSalidaBean.usuario.perfil == 4) or (altaConstanciaSalidaBean.usuario.perfil == 1)}">
+						</p:datePicker>
+					</div>
+					
+					<div class="p-card p-col-2 p-md-2">
+						<p:inputText id="folio" placeholder="Ingresa Folio" value="#{altaConstanciaSalidaBean.numFolio}" readonly="true">
+						</p:inputText>
+					</div>
+				 	<div class="p-card p-col-3 p-md-3">
+						<p:commandButton value="Asignar folio" actionListener="#{altaConstanciaSalidaBean.validar()}" icon="pi pi-plus"/>
+					</div>
+				</div>
+			</p:panel>
+			<div style="padding-top: 1rem;">
+				<p:dataTable id="dt-inventario" widgetVar="dt-inventario" value="#{altaConstanciaSalidaBean.listaInventario}"
+							var="inventario" reflow="true" rows="10"
+							emptyMessage="No se encontró información con el criterio solicitado" filteredValue="#{altaConstanciaSalidaBean.filteredInventario}"
+							rowKey="#{inventario.constanciaDeDeposito.folio}" paginator="true" paginatorPosition="bottom">
+					<f:facet name="header">
+						<div class="products-table-header">
+							<span style="font-weight: bold">INVENTARIO</span>
+							<!-- <span>
+								<p:inputText id="globalFilter" onkeyup="PF('dt-inventario').filter()" style="width:150px" placeholder="Buscar por folio, fecha, pedimento, contenedor, etc..."/>
+							</span> -->
+						</div>
+					</f:facet>
+					<p:column width="1rem">
+						<p:rowToggler/>
+					</p:column>
+					<p:column filterBy="#{inventario.folioCliente}" width="5rem" filterMatchMode="contains">
+						<f:facet name="filter">
+							<p:selectOneMenu onchange="PF('dt-inventario').filter()">
+								<f:selectItem itemLabel="Folio" itemValue="#{null}" noSelectionOption="true"/>
+                    			<f:selectItems value="#{altaConstanciaSalidaBean.listaEntradas}" />
+							</p:selectOneMenu>
+						</f:facet>
+						<h:outputText value="#{inventario.folioCliente}" />
+					</p:column>
+					<p:column filterBy="#{inventario.fechaIngreso}" width="5rem" filterMatchMode="exact">
+						<f:facet name="filter">
+							<p:selectOneMenu onchange="PF('dt-inventario').filter()">
+								<f:selectItem itemLabel="Ingreso" itemValue="#{null}" noSelectionOption="true" />
+								<f:selectItems value="#{altaConstanciaSalidaBean.listaIngresos}">
+								</f:selectItems>
+							</p:selectOneMenu>
+						</f:facet>
+						<h:outputText value="#{inventario.fechaIngreso}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Producto">
+						<h:outputText value="#{inventario.producto.productoDs}"/>
+					</p:column>
+					<p:column headerText="Cantidad" width="4rem">
+						<h:outputText value="#{inventario.cantidad}" />
+					</p:column>
+					<p:column headerText="Unidad" width="5rem">
+						<h:outputText  value="#{inventario.unidadManejo.unidadDeManejoDs}"/>
+					</p:column>
+					<p:column headerText="Peso (kg)" width="5rem">
+						<h:outputText value="#{inventario.peso}" />
+					</p:column>
+					<p:column headerText="Tarimas" width="4rem">
+						<h:outputText value="#{inventario.numeroTarimas}"/>
+					</p:column>
+					<p:rowExpansion>
+						<div class="p-grid ui-fluid p-col-12">
+							<div class="p-col">
+								<p:outputLabel value="Código"></p:outputLabel>
+								<p:inputText value="#{inventario.codigo}" disabled="true" placeholder="--"/>
+							</div>
+							<div class="p-col">
+								<p:outputLabel value="Caducidad">
+									<p:inputText value="#{inventario.caducidad}" disabled="true" placeholder="--">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</p:inputText>
+								</p:outputLabel>
+							</div>
+							<div class="p-col">
+								<p:outputLabel value="Contenedor">
+									<p:inputText value="#{inventario.sap}" disabled="true" placeholder="--"/>
+								</p:outputLabel>
+							</div>
+							<div class="p-col">
+								<p:outputLabel value="Lote">
+									<p:inputText value="#{inventario.lote}" disabled="true" placeholder="--"/>
+								</p:outputLabel>
+							</div>
+							<div class="p-col">
+								<p:outputLabel value="Pedimento">
+									<p:inputText value="#{inventario.pedimento}" disabled="true" placeholder="--"/>
+								</p:outputLabel>
+							</div>
+						</div>
+					</p:rowExpansion>
+					<p:column width="2rem">
+						<p:commandButton icon="pi pi-plus" styleClass="edit-button ui-button-primary"
+							process="@this"  oncomplete="PF('dg-cantidad-producto').show()"
+							actionListener="#{altaConstanciaSalidaBean.newDetalleSalida(inventario)}"
+							update="form:pnl-cantidad-producto">
+							<f:setPropertyActionListener value="#{inventario}" target="#{altaConstanciaSalidaBean.inventarioSelected}"></f:setPropertyActionListener>
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</div>
+			<p:dialog widgetVar="dg-cantidad-producto" header="Indique cantidad y peso" showEffect="hide" modal="true">
+				<p:panel id="pnl-cantidad-producto">
+				<p:outputPanel rendered="#{not empty altaConstanciaSalidaBean.detalleSalida}">
+					<div class="card">
+						<div class="ui-fluid">
+							<div class="field">
+								<p:outputLabel for="@next" value="Cantidad"/>
+								<p:inputNumber id="det-cantidad" value="#{altaConstanciaSalidaBean.detalleSalida.cantidad}">
+									<p:ajax event="keyup" process="@this" listener="#{altaConstanciaSalidaBean.calculoPesoSalida()}" update="form:det-peso" />
+								</p:inputNumber>
+							</div>
+							<div class="field">
+								<p:outputLabel for="@next" value="Peso"/>
+								<p:inputNumber id="det-peso" process="@this" value="#{altaConstanciaSalidaBean.detalleSalida.peso}" disabled="true" />
+							</div>
+							<div class="field">
+								<p:outputLabel for="@next" value="Temperatura (°C)"/>
+								<p:inputNumber id="det-temperatura" value="#{altaConstanciaSalidaBean.detalleSalida.temperatura}"  />
+							</div>
+						</div>
+					</div>
+					</p:outputPanel>
+				</p:panel>
+				
+				
+				
+				<f:facet name="footer">
+					<p:commandButton value="Agregar" actionListener="#{altaConstanciaSalidaBean.addDetalleSalida()}"/>
+					<p:commandButton value="Cancelar" class="ui-button-danger" icon="pi pi-times" actionListener="#{altaConstanciaSalidaBean.cancelaDetalleSalida()}"/>
+				</f:facet>
+			</p:dialog>
+			<div style="padding-top: 1rem;">
+				<p:panel header="SUS PRODUCTOS">
+					<p:dataTable id="dt-salidas" value="#{altaConstanciaSalidaBean.listadoTemp}" var="salida">
+						<p:column headerText="Entrada" width="3rem">
+							<h:outputText value="#{salida.folioEntrada}" />
+						</p:column>
+						<p:column headerText="Producto">
+							<h:outputText value="#{salida.producto}" />
+						</p:column>
+						<p:column headerText="Cantidad" width="4rem">
+							<h:outputText value="#{salida.cantidad}" />
+						</p:column>
+						<p:column headerText="Unidad" width="5rem">
+							<h:outputText value="#{salida.unidad}" />
+						</p:column>
+						<p:column headerText="Peso (kg)" width="5rem">
+							<h:outputText value="#{salida.peso}" />
+						</p:column>
+						<p:column headerText="Temp.(°C)" width="4rem">
+							<h:outputText value="#{salida.temperatura}" />
+						</p:column>
+						<p:column>
+							<p:commandButton class="ui-button-danger" icon="pi pi-times" actionListener="#{altaConstanciaSalidaBean.deleteDetalleConstanciaSalida(salida)}">
+								<f:setPropertyActionListener value="#{salida}" target="#{altaConstanciaSalidaBean.detalleSalida}" />
+							</p:commandButton>
+						</p:column>
+						<f:facet name="footer">
+				            <span class="font-bold">En total hay #{altaConstanciaSalidaBean.cantidadTotal} unidades con #{altaConstanciaSalidaBean.pesoTotal} kg.</span>
+				        </f:facet>
+					</p:dataTable>
+				</p:panel>
+			</div>
+			<div style="padding-top: 1rem;">
+				<p:panel header="AGREGUE LOS SERVICIOS">
+					<div class="p-grid">
+						<div style="margin-top: 10px;">
+							<p:outputLabel value="Servicio:" styleClass="p-mr-2"/>
+							<p:selectOneMenu id="s-servicio" autoWidth="false" converter="entityConverter" value="#{altaConstanciaSalidaBean.servicioClienteSelect}">
+								<f:selectItem itemLabel="Selecciona Servicio" itemValue="" noSelectionOption="true"/>
+								<f:selectItems value="#{altaConstanciaSalidaBean.serviciosCliente}" var="servicioC"
+									itemLabel="#{servicioC.servicio.servicioDs} (Cobro por #{servicioC.unidad.unidadDeManejoDs})"
+									itemValue="#{servicioC}" update="cantidad-servicio"/>
+								<p:ajax update="@this" listener="#{altaConstanciaSalidaBean.resetCantidadServicio()}"/>
+							</p:selectOneMenu>
+							<p:inputNumber id="cantidad-servicio" styleClass="p-ml-4" value="#{altaConstanciaSalidaBean.cantidadServicio}" placeholder="Cantidad">
+								<p:ajax update="@this" />
+							</p:inputNumber>
+							<p:commandButton value="Agregar Servicio" icon="pi pi-plus" styleClass="p-ml-4"
+								actionListener="#{altaConstanciaSalidaBean.agregaServicio()}"
+								update="dt-servicio"/>
+						</div>
+					</div>
+				</p:panel>
+			</div>
+			<div style="padding-top: 1rem;">
+				<p:panel header="SUS SERVICIOS">
+					<p:dataTable id="dt-servicio" value="#{altaConstanciaSalidaBean.listadoConstanciaSalidaServicios}"
+						var="constanciaServicios" >
+						<p:column headerText="Servicio" >
+							<h:outputText value="#{constanciaServicios.constanciaSalidaServiciosPK.servicioCve.servicioDs}" />
+						</p:column>
+					
+						<p:column headerText="Cantidad">
+							<h:outputText value="#{constanciaServicios.numCantidad}" />
+						</p:column>
+						<p:column>
+							<p:commandButton class="ui-button-danger" icon="pi pi-times"
+								actionListener="#{altaConstanciaSalidaBean.deleteConstanciaSalidaServicio(constanciaServicios)}"
+								update="dt-servicio">
+								<f:setPropertyActionListener value="#{constanciaServicios}" target="#{altaConstanciaSalidaBean.constanciaSalidaServicio}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+			</div>
+			<div style="margin-top: 1rem; margin-bottom: 1rem;">
+				<p:panel header="DATOS DEL TRANSPORTE Y OBSERVACIONES">
+					<div class="p-grid p-col-12 ui-fluid">
+						<div class="p-card p-col-2 p-md-2">
+							<p:inputText styleClass="p-ml-2" value="#{altaConstanciaSalidaBean.placas}" placeholder="Placas transporte"/>
+						</div>
+						<div class="p-card p-col-4 p-md-4">
+							<p:inputText value="#{altaConstanciaSalidaBean.nombreTransportista}" placeholder="Nombre transportista"/>
+						</div>
+						<div class="p-card p-col-8 p-md-6">
+							<p:inputText autoResize="true" value="#{altaConstanciaSalidaBean.observaciones}" placeholder="Observaciones"/>
+						</div>
+					</div>
+				</p:panel>
+			</div>
+			<p:toolbar styleClass="p-mt-3">
+				<p:toolbarGroup>
+					<p:splitButton value="Guardar" actionListener="#{altaConstanciaSalidaBean.saveConstanciaSalida()}" icon="pi pi-save" update="@this">
+						<p:menuitem value="Ticket" icon="pi pi-print" actionListener="#{altaConstanciaSalidaBean.imprimirTicket()}" ajax="false"/>
+						<p:menuitem value="Nuevo" icon="pi pi-refresh" actionListener="#{altaConstanciaSalidaBean.nuevoRegistro()}" update="@form"/>
+					</p:splitButton>
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:form>
+	</ui:define>
+</ui:composition>

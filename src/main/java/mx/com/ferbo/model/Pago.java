@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,13 +32,15 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "pago")
 @NamedQueries({
-    @NamedQuery(name = "Pago.findAll", query = "SELECT p FROM Pago p"),
-    @NamedQuery(name = "Pago.findById", query = "SELECT p FROM Pago p WHERE p.id = :id"),
-    @NamedQuery(name = "Pago.findByMonto", query = "SELECT p FROM Pago p WHERE p.monto = :monto"),
-    @NamedQuery(name = "Pago.findByFecha", query = "SELECT p FROM Pago p WHERE p.fecha = :fecha"),
-    @NamedQuery(name = "Pago.findByReferencia", query = "SELECT p FROM Pago p WHERE p.referencia = :referencia"),
-    @NamedQuery(name = "Pago.findByCheque", query = "SELECT p FROM Pago p WHERE p.cheque = :cheque"),
-    @NamedQuery(name = "Pago.findByChequeDevuelto", query = "SELECT p FROM Pago p WHERE p.chequeDevuelto = :chequeDevuelto")})
+        @NamedQuery(name = "Pago.findAll", query = "SELECT p FROM Pago p"),
+        @NamedQuery(name = "Pago.findById", query = "SELECT p FROM Pago p WHERE p.id = :id"),
+        @NamedQuery(name = "Pago.findByMonto", query = "SELECT p FROM Pago p WHERE p.monto = :monto"),
+        @NamedQuery(name = "Pago.findByFecha", query = "SELECT p FROM Pago p WHERE p.fecha = :fecha"),
+        @NamedQuery(name = "Pago.findByReferencia", query = "SELECT p FROM Pago p WHERE p.referencia = :referencia"),
+        @NamedQuery(name = "Pago.findByCheque", query = "SELECT p FROM Pago p WHERE p.cheque = :cheque"),
+        @NamedQuery(name = "Pago.findByChequeDevuelto", query = "SELECT p FROM Pago p WHERE p.chequeDevuelto = :chequeDevuelto"),
+        @NamedQuery(name = "Pago.findByFacturaId", query = "SELECT p FROM Pago p WHERE p.factura.id = :facturaId"),
+        @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)") })
 public class Pago implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -46,7 +49,8 @@ public class Pago implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+    // consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "monto")
@@ -59,19 +63,24 @@ public class Pago implements Serializable {
     @Size(max = 20)
     @Column(name = "referencia")
     private String referencia;
+    //El campo cheque se va a mostrar como "referencia" en la pantalla de usuario.
     @Size(max = 10)
     @Column(name = "cheque")
-    private String cheque;
+    private String cheque; 
     @Column(name = "cheque_devuelto")
     private Boolean chequeDevuelto;
+    
+    @Basic(optional = true)
     @JoinColumn(name = "banco", referencedColumnName = "id")
     @ManyToOne
     private Bancos banco;
+    
     @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Factura factura;
+    
     @JoinColumn(name = "tipo", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
     private TipoPago tipo;
 
     public Pago() {
@@ -183,5 +192,5 @@ public class Pago implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Pago[ id=" + id + " ]";
     }
-    
+
 }

@@ -1,0 +1,277 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Alta Notas De Credito</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+		<p:growl id="messages" showDetail="true" />
+		<p:outputPanel id="emisor" class="p-grid">
+			<div class="p-grid ui-fluid p-col-12">
+				<div class="p-col-6 p-md-6">
+					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.clienteSelect}" >
+						<f:selectItem itemLabel="---Seleccione un cliente ---" noSelectionOption="true" />
+						<f:selectItems value="#{altaNotasCredito.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+						<p:ajax listener="#{altaNotasCredito.filtroFactura()}" process="@this" update="emisor rfc domicilio" />
+					</p:selectOneMenu>	
+				</div>
+				<div class="p-col-6 p-md-6">
+					<p:selectOneMenu id="domicilio" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.domicilioSelect}">
+						<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
+						<f:selectItems value="#{altaNotasCredito.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios}"/>
+						<p:ajax process="@this"/>
+					</p:selectOneMenu>
+				</div>
+				<div class="p-col-3 p-md-3">
+					<p:inputText id="rfc" value="#{altaNotasCredito.clienteSelect.cteRfc}" placeholder="R.F.C."/>
+				</div>
+				<div class="p-col-3 p-md-3">
+					<p:selectOneMenu id="serieNota" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.serieNotaSelect}"  required="true" >
+					 	<f:selectItem itemLabel="---Seleccione la serie---" noSelectionOption="true" />
+					 	<f:selectItems value="#{altaNotasCredito.listaSerieNota}" var="serieNota" itemLabel="#{serieNota.numeroActual+1}-#{serieNota.statusSerie.descripcion} " itemValue="#{serieNota}" />
+					</p:selectOneMenu>					
+				</div>
+			</div>
+		</p:outputPanel>
+		<p:toolbar>	
+			<p:toolbarGroup>
+				<p:outputLabel value="Buscar facturas por status: " />
+				
+				
+				<p:selectBooleanCheckbox itemLabel="Por Cobrar" value="#{altaNotasCredito.porCobrar}">
+					<p:ajax listener="#{altaNotasCredito.filtroFactura()}"/>
+				</p:selectBooleanCheckbox>
+				
+				<p:selectBooleanCheckbox itemLabel="Pago Parcial" value="#{altaNotasCredito.pagoParcial}">
+					<p:ajax listener="#{altaNotasCredito.filtroFactura()}"/>
+				</p:selectBooleanCheckbox>
+					
+				<p:selectBooleanCheckbox itemLabel="Pagada" value="#{altaNotasCredito.pagada}">
+					<p:ajax listener="#{altaNotasCredito.filtroFactura()}" />
+				</p:selectBooleanCheckbox>
+			</p:toolbarGroup>
+		</p:toolbar>
+		<div style="margin-top: 2rem;">
+			<p:fieldset legend="Datos generales">
+				<p:outputPanel id="notaCredito" >
+					<div class="p-grid ui-fluid p-col-12">
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Fecha:" />
+							<p:datePicker showIcon="true" value="#{altaNotasCredito.notaCredito.fecha}" />
+						</div>
+						<div class="p-col-6 p-md-6">
+							<p:outputLabel value="Por los servicios:" />
+							<p:inputText value="#{altaNotasCredito.notaCredito.servicios}" />
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Segun C.D. No:" />
+							<p:inputText value="#{altaNotasCredito.notaCredito.constancia}" />
+						</div>
+						<div class="p-col-6 p-md-6">
+							<p:outputLabel value="Periodo:" />
+							<p:inputText value="#{altaNotasCredito.notaCredito.periodo}" />
+						</div>
+						<div class="p-col-6 p-md-6">
+							<p:outputLabel value="Cajero:" />
+							<p:inputText value="#{altaNotasCredito.notaCredito.cajero}" />
+						</div>
+						<div class="p-col-12 p-md-12">
+							<p:outputLabel value="Observaciones:" />
+							<p:inputTextarea value="#{altaNotasCredito.notaCredito.observaciones}" />
+						</div>
+					</div>
+				
+					<p:panelGrid layout="flex" columns="6" columnClasses="col-12 md:col-3 xl:col-2, 
+																	col-12 md:col-9 xl:col-4, 
+																	col-12 md:col-3 xl:col-2, 
+																	col-12 md:col-9 xl:col-4,
+																	col-12 md:col-3 xl:col-2, 
+																	col-12 md:col-9 xl:col-4"
+										contentStyleClass="ui-fluid" styleClass="customPanelGrid">
+					</p:panelGrid>
+				</p:outputPanel>
+			</p:fieldset>
+		</div>
+		
+		
+		
+		
+		
+		
+		<div style="padding-top: 2rem;">
+			<p:dataTable id="dt-factura" value="#{altaNotasCredito.listaFactura}" var="factura" paginator="true" paginatorPosition="bottom"
+						reflow="true" rowKey="#{factura.id}" rows="5">
+			
+				<f:facet name="header">
+					<div>
+						<span>Facturas</span>
+					</div>
+				</f:facet>
+				
+				<p:column headerText="Serie" style="text-align: center;">
+					<h:outputText value="#{factura.nomSerie}-#{factura.numero}"  />
+				</p:column>
+				
+				<p:column headerText="Fecha" style="text-align: center;">
+					<h:outputText value="#{factura.fecha}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Subtotal" width="6rem" style="text-align: right;">
+					<h:outputText value="#{factura.subtotal}">
+						<f:convertNumber pattern="$#0.00" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="IVA" width="6rem" style="text-align: right;">
+					<h:outputText value="#{factura.iva}">
+						<f:convertNumber pattern="$#0.00" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Total" width="6rem" style="text-align: right;">
+					<h:outputText value="#{factura.total}">
+						<f:convertNumber pattern="$#0.00" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Status" style="text-align: center;">
+					<h:outputText value="#{factura.status.nombre}" />
+				</p:column>
+			
+				<p:column headerText="Accion">
+					<p:commandButton value="Añadir" oncomplete="PF('dlgFactura').show()" update="form:dialogo-Factura" process="@this" action="#{altaNotasCredito.agregaFactura}">
+						<f:setPropertyActionListener value="#{factura}" target="#{altaNotasCredito.facturaSelect}"></f:setPropertyActionListener>
+					</p:commandButton>
+				</p:column>
+			
+			</p:dataTable>
+		</div>
+		
+		<p:dialog id="dialogo-Factura" header="Agregar Factura" widgetVar="dlgFactura" showEffect="fade" modal="true" responsive="true" width="20rem">
+			<p:outputPanel id="factura-mod" class="ui-fluid">
+				<p:outputPanel>
+					<p:focus for="cantidad"/>
+					<p:outputLabel value="FOLIO:" />
+					<p:inputText value="#{altaNotasCredito.facturaSelect.nomSerie}-#{altaNotasCredito.facturaSelect.numero}" readonly="true"/>
+					
+					<p:outputLabel value="Fecha:" />
+					<p:datePicker value="#{altaNotasCredito.facturaSelect.fecha}" showIcon="true" readonly="true">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</p:datePicker>
+					
+					<p:outputLabel value="Subtotal"/>
+					<p:inputNumber value="#{altaNotasCredito.facturaSelect.subtotal}" decimalPlaces="2" symbol="$" readonly="true"/>
+					
+					<p:outputLabel value="I.V.A."/>
+					<p:inputNumber value="#{altaNotasCredito.facturaSelect.iva}" decimalPlaces="2" symbol="$" readonly="true"/>
+					
+					<p:outputLabel value="Total"/>
+					<p:inputNumber value="#{altaNotasCredito.facturaSelect.total}" decimalPlaces="2" symbol="$" readonly="true"/>		
+					
+					<p:outputLabel value="Debe"/>
+					<p:inputNumber id="saldo" value="#{altaNotasCredito.saldoSelected}" decimalPlaces="2" symbol="$" readonly="true">
+					</p:inputNumber>
+						
+					<p:outputLabel value="Cantidad" />
+					<p:inputNumber id="cantidad" value="#{altaNotasCredito.cantidad}" decimalPlaces="2" symbol="$"/>		
+				</p:outputPanel>					
+			</p:outputPanel>
+			
+			<f:facet name="footer">
+				<p:commandButton icon="pi pi-plus" value="Agregar" action="#{altaNotasCredito.facturasSeleccionadas()}" process="factura-mod @this"  update="form:dt-NotasPorFactura form:factura-mod" onclick="PF('dlgFactura').hide()"/>
+				<p:commandButton icon="pi pi-times" value="Cancelar" onclick="PF('dlgFactura').hide();" class="ui-button-secondary" process="@this"/>
+			</f:facet>
+			
+		</p:dialog>
+		
+		<div style="padding-top: 2rem;">
+			<p:dataTable id="dt-NotasPorFactura" reflow="true" value="#{altaNotasCredito.listaNotaXFactura}" var="notaFac" rowKey="#{notaFac.factura.id}" 
+						paginator="true" paginatorPosition="bottom" rows="5">
+						
+				<f:facet name="header">
+					<div>
+						<span>Factura de la nota de crédito</span>
+					</div>
+				</f:facet>
+			
+				<p:column headerText="Factura">
+					<h:outputText value="#{notaFac.notaPorFacturaPK.factura.nomSerie}-#{notaFac.notaPorFacturaPK.factura.numero}" />
+				</p:column>
+				
+				<p:column headerText="Fecha">
+					<h:outputText value="#{notaFac.notaPorFacturaPK.factura.fecha}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="SubTotal">
+					<h:outputText value="#{notaFac.notaPorFacturaPK.factura.subtotal}">
+						<f:convertNumber pattern="$#0.00" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="IVA">
+					<h:outputText value="#{notaFac.notaPorFacturaPK.factura.iva}">
+						<f:convertNumber pattern="$#0.00" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Total">
+					<h:outputText value="#{notaFac.notaPorFacturaPK.factura.total}">
+						<f:convertNumber pattern="$#0.00" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Cantidad">
+					<h:outputText value="#{notaFac.cantidad}">
+						<f:convertNumber pattern="$#0.00" />
+					</h:outputText>
+				</p:column>
+			
+				<f:facet name="footer">
+					<div style="text-align: right;">
+						<p:outputLabel value="Bueno por ">
+						</p:outputLabel>
+						<p:outputLabel id="subTotal" value="#{altaNotasCredito.sumaSubtotal}">
+							<f:convertNumber pattern="$#0.00" />
+						</p:outputLabel>
+					</div>
+					<div style="text-align: right;">
+						<p:outputLabel value="I.V.A. ">
+						</p:outputLabel>
+						<p:outputLabel id="iva" value="#{altaNotasCredito.ivaSubtotal}">
+							<f:convertNumber pattern="$#0.00" />
+						</p:outputLabel>
+					</div>			
+					<div style="text-align: right;">
+						<p:outputLabel value="A Pagar ">
+						</p:outputLabel>
+						<p:outputLabel id="total" value="#{altaNotasCredito.totalCantidad}">
+							<f:convertNumber pattern="$#0.00" />
+						</p:outputLabel>
+					</div>
+					<div style="text-align: left">
+						<p:outputLabel value="Importe con letra:" styleClass="p-ml-4 p-mr-2"/>
+						<p:outputLabel id="montoLetra" value="#{altaNotasCredito.montoLetra}"/>
+					</div>
+				</f:facet>
+			
+			</p:dataTable>
+		</div>
+		
+		<div style="padding-top: 2rem;" align="center">
+			<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{altaNotasCredito.save()}"  update="notaCredito emisor domicilio" process="@this emisor notaCredito domicilio" >
+			</p:commandButton>
+			<p:commandButton icon="pi pi-refresh" style="margin-left: 10px;" value="Generar nueva nota" actionListener="#{altaNotasCredito.reload()}"  process="@this" >
+			</p:commandButton>
+		</div>
+		
+		</h:form>
+	</ui:define>
+</ui:composition>

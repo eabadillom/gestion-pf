@@ -8,49 +8,33 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Domicilios" />
-				<p:menuitem value="Cambios" />
-				<p:menuitem value="Municipios / Alcaldía"
-					outcome="/protected/catalogos/municipios" />
-			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
 					<div class="card">
+					 <span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="countries-som" value="#{municipiosBean.idPais}" filter="true" filterMatchMode="startsWith" width="10rem">
+							<f:selectItem  itemLabel=""   itemValue=""  />
+							<f:selectItems var="selectedCountriesOne" value="#{municipiosBean.listaPaises}" itemLabel="#{selectedCountriesOne.paisDesc}" itemValue="#{selectedCountriesOne.paisCve}" />
+							<p:ajax listener="#{municipiosBean.handleContrySelect()}" update="states-som" />
+						</p:selectOneMenu>
+						<p:outputLabel for="countries-som" value="Pais" />
+						</span>
+						
+						 <span class="ui-float-label ui-input-icon-left">
+						<p:selectOneMenu id="states-som" value="#{municipiosBean.idEstado}" filter="true" filterMatchMode="startsWith" width="10rem">
+							<f:selectItem itemLabel=""  itemValue="" />
+							<f:selectItems var="selectedStatesOne" value="#{municipiosBean.listaEstados}" itemLabel="#{selectedStatesOne.estadoDesc}" itemValue="#{selectedStatesOne.estadosPK.estadoCve}" />
+							<p:ajax listener="#{municipiosBean.handleStateSelect()}" update="dt-Municipios" />
+						</p:selectOneMenu>
+						<p:outputLabel for="states-som" value="Estado" />
+						</span>
+						
 						<p:commandButton value="Agregar" icon="pi pi-plus"
 							actionListener="#{municipiosBean.nuevoMunicipio}"
 							update="manage-town-content-new form:manage-town-content-new"
 							oncomplete="PF('nuevoMunicipioDialog').show()"
 							styleClass="p-mr-2 p-mb-2" process="@this" />
-					</div>
-					<div class="card">
-						<p:outputLabel for="countries-som" value="Paises:" />
-						<p:selectOneMenu id="countries-som" autoWidth="false"
-							value="#{municipiosBean.idPais}">
-							<f:selectItem itemLabel="Selecione Pais" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedCountriesOne"
-								value="#{municipiosBean.listaPaises}"
-								itemLabel="#{selectedCountriesOne.paisDesc}"
-								itemValue="#{selectedCountriesOne.paisCve}" />
-							<p:ajax listener="#{municipiosBean.handleContrySelect()}"
-								update="states-som" />
-						</p:selectOneMenu>
-						<p:outputLabel for="states-som" value="Estados:" />
-						<p:selectOneMenu id="states-som" autoWidth="false"
-							value="#{municipiosBean.idEstado}">
-							<f:selectItem itemLabel="Selecione Estado" itemValue=""
-								noSelectionOption="true" />
-							<f:selectItems var="selectedStatesOne"
-								value="#{municipiosBean.listaEstados}"
-								itemLabel="#{selectedStatesOne.estadoDesc}"
-								itemValue="#{selectedStatesOne.estadosPK.estadoCve}" />
-							<p:ajax listener="#{municipiosBean.handleStateSelect()}"
-								update="dt-Municipios" />
-						</p:selectOneMenu>
+							
 					</div>
 				</div>
 			</div>
@@ -59,31 +43,14 @@
 				<div class="p-col-12">
 					<div class="card">
 						<p:growl id="messages" showDetail="true" />
-						<p:dataTable id="dt-Municipios" widgetVar="dtMunicipios"
-							var="municipios" value="#{municipiosBean.listaMunicipios}"
-							reflow="true" rowKey="#{municipios.municipioDs}" paginator="true"
-							rows="10" paginatorPosition="bottom" rowSelectMode="add">
+						<p:dataTable id="dt-Municipios" widgetVar="dtMunicipios" var="municipios" value="#{municipiosBean.listaMunicipios}" reflow="true" rowKey="#{municipios.municipioDs}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
-									<span style="font-weight: bold">Municipios / Alcaldías</span> <span
-										class="ui-input-icon-left filter-container"> <i
-										class="pi pi-search" /> <p:inputText id="globalFilter"
-											onkeyup="PF('dtMunicipios').filter()" placeholder="Búsqueda" />
+									<span style="font-weight: bold"></span> 
+									<span class="ui-input-icon-left filter-container"> <i class="pi pi-search" /> <p:inputText id="globalFilter" onkeyup="PF('dtMunicipios').filter()" placeholder="Búsqueda" />
 									</span>
 								</div>
 							</f:facet>
-
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-Municipios-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-Municipios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-Municipios-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-Municipios-button" /> -->
-
-							<p:column selectionMode="multiple" />
 							<p:column headerText="Pais"
 								sortBy="#{municipios.estados.paises.paisDesc}"
 								filterBy="#{municipios.estados.paises.paisDesc}"
@@ -104,19 +71,15 @@
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
 									value="#{municipios.municipioDs}" />
 							</p:column>
-							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil"
-									update=":form:manage-town-content-new" value="Modificar"
-									oncomplete="PF('nuevoMunicipioDialog').show()"
-									styleClass="p-mr-2 p-mb-2" process="@this">
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-town-content-new" oncomplete="PF('nuevoMunicipioDialog').show()" process="@this">
 									<f:setPropertyActionListener value="#{municipios}"
 										target="#{municipiosBean.municipioSelect}" />
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('deleteMunicipioDialog').show()">
-									<f:setPropertyActionListener value="#{municipios}"
-										target="#{municipiosBean.municipioSelect}" />
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-times" class="ui-button-danger" process="@this" oncomplete="PF('deleteMunicipioDialog').show()">
+									<f:setPropertyActionListener value="#{municipios}" target="#{municipiosBean.municipioSelect}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>
@@ -125,66 +88,48 @@
 			</div>
 			<p:dialog header="Agregar/Editar un Municipio" showEffect="fade"
 				modal="true" widgetVar="nuevoMunicipioDialog" responsive="true">
+				
 				<p:outputPanel id="manage-town-content-new" class="ui-fluid">
-					<p:outputPanel
-						rendered="#{not empty municipiosBean.municipioSelect}">
+					<p:outputPanel rendered="#{not empty municipiosBean.municipioSelect}">
+					
 						<div class="p-field">
-							<p:outputLabel for="towns" value="Paises:" />
-							<p:selectOneMenu id="towns" autoWidth="false"
-								value="#{municipiosBean.idPais}">
-								<f:selectItem itemLabel="Selecione Pais" itemValue=""
-									noSelectionOption="true" />
-								<f:selectItems var="selectedtowns"
-									value="#{municipiosBean.listaPaises}"
-									itemLabel="#{selectedtowns.paisDesc}"
-									itemValue="#{selectedtowns.paisCve}" />
-								<p:ajax listener="#{municipiosBean.handleContrySelect}"
-									process="@this" update=":form:manage-town-content-new" />
+						 <span class="ui-float-label ui-input-icon-left">
+							<p:selectOneMenu id="towns" value="#{municipiosBean.idPais}" filter="true" filterMatchMode="startsWith" disabled="true">
+								<f:selectItem  itemValue="" />
+								<f:selectItems var="selectedTowns" value="#{municipiosBean.listaPaises}" itemLabel="#{selectedTowns.paisDesc}" itemValue="#{selectedTowns.paisCve}" />
+								<p:ajax listener="#{municipiosBean.handleContrySelect}" process="@this" update=":form:manage-town-content-new" />
 							</p:selectOneMenu>
+							<p:outputLabel for="towns" value="Pais" />
+							</span>
 						</div>
+						
 						<div class="p-field">
-							<p:outputLabel for="states" value="Estado:" />
-							<p:selectOneMenu id="states" autoWidth="false"
-								value="#{municipiosBean.idEstado}">
-								<f:selectItem itemLabel="Selecione Estado" itemValue=""
-									noSelectionOption="true" />
-								<f:selectItems var="selectedStates"
-									value="#{municipiosBean.listaEstados}"
-									itemLabel="#{selectedStates.estadoDesc}"
-									itemValue="#{selectedStates.estadosPK.estadoCve}" />
-								<p:ajax listener="#{municipiosBean.handleStateSelect}"
-									process="@this" />
+						 <span class="ui-float-label ui-input-icon-left">
+							<p:selectOneMenu id="states" value="#{municipiosBean.idEstado}" filter="true" filterMatchMode="startsWith" disabled="true">
+								<f:selectItem itemValue=""  />
+								<f:selectItems var="selectedStates" value="#{municipiosBean.listaEstados}" itemLabel="#{selectedStates.estadoDesc}" itemValue="#{selectedStates.estadosPK.estadoCve}" />
+								<p:ajax listener="#{municipiosBean.handleStateSelect}" process="@this" />
 							</p:selectOneMenu>
+							<p:outputLabel for="states" value="Estado" />
+							</span>
 						</div>
+						
 						<div class="p-field">
-							<p:outputLabel for="Municipio-new" value="Municipio" />
-							<p:inputText id="Municipio-new"
-								value="#{municipiosBean.municipioSelect.municipioDs}"
-								required="true" />
+							<p:inputText id="Municipio-new" value="#{municipiosBean.municipioSelect.municipioDs}" required="true" placeholder="Municipio" />
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
+				
 				<f:facet name="footer">
-					<p:commandButton value="Guardar" icon="pi pi-plus"
-						actionListener="#{municipiosBean.guardarMunicipio()}"
-						update=":form:manage-town-content-new" styleClass="p-mr-2 p-mb-2" />
-					<p:commandButton value="Cancelar" icon="pi pi-times"
-						onclick="PF('nuevoMunicipioDialog').hide()"
-						class="ui-button-secondary" />
+					<p:commandButton value="Guardar" icon="pi pi-plus" actionListener="#{municipiosBean.guardarMunicipio()}" process="@this manage-town-content-new" update=":form:manage-town-content-new :form:dt-Municipios" styleClass="p-mr-2 p-mb-2" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('nuevoMunicipioDialog').hide()" class="ui-button-secondary" />
 				</f:facet>
 			</p:dialog>
-			<p:confirmDialog widgetVar="deleteMunicipioDialog" showEffect="fade"
-				width="400" message="Desea eliminar el Municipio?" header="Eliminar"
-				severity="warn">
-				<p:commandButton value="Sí" icon="pi pi-check"
-					actionListener="#{municipiosBean.eliminandoMunicipio()}"
-					process="@this" oncomplete="PF('deleteMunicipioDialog').hide()" />
-				<p:commandButton value="No" type="button"
-					styleClass="ui-button-secondary" icon="pi pi-times"
-					onclick="PF('deleteMunicipioDialog').hide()" />
+			<p:confirmDialog widgetVar="deleteMunicipioDialog" showEffect="fade" width="400" message="Desea eliminar el Municipio?" header="Eliminar" severity="warn">
+				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{municipiosBean.eliminandoMunicipio()}" process="@this" oncomplete="PF('deleteMunicipioDialog').hide()" />
+				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteMunicipioDialog').hide()" />
 			</p:confirmDialog>
-			<p:confirmDialog global="true" showEffect="fade" width="400"
-				header="Eliminar">
+			<p:confirmDialog global="true" showEffect="fade" width="400" header="Eliminar">
 				<p:commandButton value="Sí" type="button"
 					styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
 				<p:commandButton value="No" type="button"

@@ -1,22 +1,59 @@
 package mx.com.ferbo.dao;
 
+import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Estados;
+import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class EstadosDAO extends IBaseDAO<Estados, Integer>{
-
-	@Override
-	public Estados buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	private static Logger log = LogManager.getLogger(EstadosDAO.class);
+	
+	@SuppressWarnings("unchecked")
+	public List<Estados> findall() {
+		EntityManager entity = getEntityManager();
+		List<Estados> estados = null;
+		Query sql = entity.createNamedQuery("Estados.findAll", Estados.class);
+		estados = sql.getResultList();
+		entity.close();
+		return estados;
 	}
+	@Override
+	public Estados buscarPorId(Integer idEstado) {
+		
+		EntityManager entity = null;		
+		Estados estado = null;
+		Query sql = null;
+		
+		try {
+			
+			entity = getEntityManager();			
+			sql = entity.createNamedQuery("Estados.findByEstadoCve",Estados.class)
+					.setParameter("estadoCve", idEstado);
+			estado = (Estados) sql.getSingleResult();
+			
+		} catch (Exception ex) {
+			log.error("Problema al buscar el Estado", ex);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		
+		
+		return estado;
+	}
+	
 
 	@Override
 	public List<Estados> buscarTodos() {
@@ -29,7 +66,7 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	public List<Estados> buscarPorCriteriosEstados(Estados e) {
 		List<Estados> listado = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Estados.findByPaisCve", Estados.class).setParameter("paisCve", e.getPaises().getPaisCve()).getResultList();
+		listado = em.createNamedQuery("Estados.findByPaisCve", Estados.class).setParameter("paisCve", e.getEstadosPK().getPaisCve()).getResultList();
 		return listado;
 	}
 	
@@ -82,7 +119,9 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.remove(em.merge(estados));
+			em.createQuery("DELETE FROM Estados e WHERE e.estadosPK.paisCve =:paisCve and e.estadosPK.estadoCve =:estadoCve")
+			.setParameter("paisCve", estados.getEstadosPK().getPaisCve())
+			.setParameter("estadoCve", estados.getEstadosPK().getEstadoCve()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
@@ -109,6 +148,25 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 		return em.createNamedQuery("Estados.findByCriterios", Estados.class)
 				.setParameter("paisCve", as.getAsentamientoHumanoPK().getPaisCve())
 				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getEstadoCve()).getResultList();
+	}
+	
+	public List<Estados> buscarPorPais(Paises pais) {
+		EntityManager em = null;
+		List<Estados> list = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			list = em.createNamedQuery("Estados.findByPaisCve", Estados.class)
+			.setParameter("paisCve", pais.getPaisCve())
+			.getResultList()
+			;
+		} catch(Exception ex) {
+			log.error("Problema al obtener la información de estados del pais " + pais.getPaisCve(), ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return list;
 	}
 
 }

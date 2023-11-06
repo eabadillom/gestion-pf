@@ -8,94 +8,70 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Series" />
-				<p:menuitem value="Serie de Facturas"
-					outcome="/protected/catalogos/seriesFacturas" />
-			</p:breadCrumb>
-
 			<div class="p-col-12">
 				<div class="card">
-
 					<p:growl id="messages" showDetail="true" />
-
 					<p:toolbar styleClass="p-mb-4">
 						<p:toolbarGroup>
 							<p:commandButton value="Agregar" icon="pi pi-plus"
-								styleClass="ui-button-success p-mr-2 p-mb-2"
+								styleClass="ui-button-info p-mr-2 p-mb-2"
 								actionListener="#{serieFacturaBean.openNew()}"
 								oncomplete="PF('dg-agrega').show();" update="frm-agrega"
 								process="@this" />
 						</p:toolbarGroup>
 					</p:toolbar>
-
-					<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista"
-						value="#{serieFacturaBean.listSerie}" rowKey="#{lista.id}"
-						reflow="true" selection="#{serieFacturaBean.seleccion}"
-						rowSelectMode="single" paginator="true" rows="10"
-						paginatorPosition="bottom">
-
+					<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista" value="#{serieFacturaBean.listSerie}" rowKey="#{lista.id}" reflow="true" selection="#{serieFacturaBean.seleccion}" rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom">
 						<f:facet name="header">
 							<div class="products-table-header">
 								<span style="font-weight: bold">Serie de Facturas</span>
 							</div>
 						</f:facet>
-
-						<p:column headerText="ID" width="3%">
-							<h:outputText value="#{lista.id}" />
-						</p:column>
-						<p:column headerText="Serie" width="5%">
+						<p:column headerText="Serie" width="5rem" style="text-align:center">
 							<h:outputText value="#{lista.nomSerie}" />
 						</p:column>
-						<p:column headerText="Fecha Inicio" width="13%">
-							<h:outputText value="#{lista.fechaInicio}" />
+						<p:column headerText="Fecha Inicio" width="7rem" style="text-align:center">
+							<h:outputText value="#{lista.fechaInicio}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
 						</p:column>
-						<p:column headerText="No. Inicial" width="5%">
+						<p:column headerText="No. Inicial" width="5rem" style="text-align:center">
 							<h:outputText value="#{lista.numeroInicial}" />
 						</p:column>
-						<p:column headerText="No. Actual" width="5%">
+						<p:column headerText="No. Actual" width="5rem" style="text-align:center">
 							<h:outputText value="#{lista.numeroActual}" />
 						</p:column>
-						<p:column headerText="No. Final" width="5%">
+						<p:column headerText="No. Final" width="5rem" style="text-align:center">
 							<h:outputText value="#{lista.numeroFinal}" />
 						</p:column>
-						<p:column headerText="Status" width="13%">
+						<p:column headerText="Status" width="10rem" style="text-align:center">
 							<h:outputText value="#{lista.statusSerie.descripcion}" />
 						</p:column>
-						<p:column headerText="Default" width="3%">
-							<h:outputText value="#{lista.isDflt ? 'SI' : 'No'}" />
-						</p:column>
-						<p:column headerText="Acción" class="p-text-center">
-							<p:commandButton value="Modificar" icon="pi pi-pencil"
-								styleClass="ui-button-warning p-mr-2 p-mb-2"
-								update="form:frm-modifica" process="@this"
-								oncomplete="PF('dg-modifica').show()">
-								<f:setPropertyActionListener value="#{lista}"
-									target="#{serieFacturaBean.seleccion}" />
+						<p:column width="2rem" style="text-align: center;">
+							<p:commandButton icon="pi pi-pencil" styleClass="ui-button-info" update="form:frm-modifica" process="@this" oncomplete="PF('dg-modifica').show()">
+								<f:setPropertyActionListener value="#{lista}" target="#{serieFacturaBean.seleccion}" />
 							</p:commandButton>
-							<p:commandButton value="Eliminar" icon="pi pi-trash"
-								styleClass="ui-button-danger p-mr-2 p-mb-2" process="@this"
-								oncomplete="PF('dg-delete').show()"
-								rendered="#{lista.statusSerie.id == 3 ? false : true}">
-								<f:setPropertyActionListener value="#{lista}"
-									target="#{serieFacturaBean.seleccion}" />
+						</p:column>
+						<p:column width="2rem" style="text-align: center;">
+							<p:commandButton icon="pi pi-trash" styleClass="ui-button-danger" process="@this" oncomplete="PF('dg-delete').show()" disabled="#{lista.statusSerie.id == 3 ? true : false}">
+								<f:setPropertyActionListener value="#{lista}" target="#{serieFacturaBean.seleccion}" />
 							</p:commandButton>
 						</p:column>
 					</p:dataTable>
-
 				</div>
 			</div>
-
 			<p:dialog header="Agregar Serie Factura" widgetVar="dg-agrega"
 				modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel for="@next">Serie:</p:outputLabel>
-						<p:inputText value="#{serieFacturaBean.nuevo.nomSerie}"
-							required="true" />
+						<p:inputText value="#{serieFacturaBean.nuevo.nomSerie}" required="true" placeholder="maximo 5 caracteres"/>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="(SUCURSAL) PLANTA:" />
+						<p:selectOneMenu value="#{serieFacturaBean.nuevo.idPlanta}" converter="entityConverter" required="true"> 
+							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
+							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
@@ -138,8 +114,8 @@
 						actionListener="#{serieFacturaBean.save()}" update="frm-agrega"
 						process="frm-agrega @this" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-secondary" oncomplete="PF('dg-agrega').hide()"
-						update="frm-agrega" />
+						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()"
+						update="frm-agrega" process="@this"/>
 				</f:facet>
 			</p:dialog>
 
@@ -149,7 +125,14 @@
 					<div class="p-field">
 						<p:outputLabel for="@next">Serie:</p:outputLabel>
 						<p:inputText value="#{serieFacturaBean.seleccion.nomSerie}"
-							required="true" />
+							required="true" placeholder="maximo 5 caracteres"/>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="(SUCURSAL) PLANTA:" />
+						<p:selectOneMenu value="#{serieFacturaBean.seleccion.idPlanta}" converter="entityConverter" required="true">
+							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
+							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
@@ -193,7 +176,7 @@
 						actionListener="#{serieFacturaBean.update()}"
 						process="frm-modifica @this" update="frm-modifica" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-secondary" oncomplete="PF('dg-modifica').hide()" />
+						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" process="@this"/>
 				</f:facet>
 			</p:dialog>
 
@@ -203,7 +186,7 @@
 				<p:commandButton value="Sí" icon="pi pi-check"
 					actionListener="#{serieFacturaBean.cancelar()}" process="@this" />
 				<p:commandButton value="No" type="button"
-					styleClass="ui-button-secondary" icon="pi pi-times"
+					styleClass="ui-button-danger" icon="pi pi-times"
 					onclick="PF('dg-delete').hide()" />
 			</p:confirmDialog>
 

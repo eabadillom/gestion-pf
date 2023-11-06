@@ -47,6 +47,8 @@ public class TipoCobro implements Serializable {
     private String descripcion;
     @OneToMany(mappedBy = "cobro")
     private List<Servicio> servicioList;
+    @OneToMany(mappedBy = "tipoCobro")
+    private List<ServicioFactura> servicioFacturaList;
 
     public TipoCobro() {
     }
@@ -90,6 +92,14 @@ public class TipoCobro implements Serializable {
 
     public void setServicioList(List<Servicio> servicioList) {
         this.servicioList = servicioList;
+    }
+    
+    public List<ServicioFactura> getServicioFacturaList() {
+        return servicioFacturaList;
+    }
+
+    public void setServicioFacturaList(List<ServicioFactura> servicioFacturaList) {
+        this.servicioFacturaList = servicioFacturaList;
     }
 
     @Override

@@ -8,73 +8,39 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Unidad de Medida"
-					outcome="/protected/catalogos/unidadManejo" />
-			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
 					<div class="card">
-						<p:commandButton value="Agregar" icon="pi pi-plus"
-							actionListener="#{unidadDeManejoBean.nuevaUnidadManejo}"
-							update="manage-unit-content-new form:manage-unit-content-new"
-							oncomplete="PF('nuevaUnidadManejoDialog').show()"
-							styleClass="p-mr-2 p-mb-2" process="@this" />
+						<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{unidadDeManejoBean.nuevaUnidadManejo}" update="manage-unit-content-new form:manage-unit-content-new" oncomplete="PF('nuevaUnidadManejoDialog').show()" process="@this" />
 					</div>
 				</div>
 			</div>
-
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
 						<p:growl id="messages" showDetail="true" />
-						<p:dataTable id="dt-manejo" widgetVar="dtManejo" var="manejo"
-							value="#{unidadDeManejoBean.listaUnidadManejo}" reflow="true"
-							rowKey="#{manejo.unidadDeManejoCve}" paginator="true" rows="10"
-							paginatorPosition="bottom" rowSelectMode="add">
+						<p:dataTable id="dt-manejo" widgetVar="dtManejo" var="manejo" value="#{unidadDeManejoBean.listaUnidadManejo}" reflow="true" rowKey="#{manejo.unidadDeManejoCve}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
 							<f:facet name="header">
 								<div class="customers-table-header">
-									<span style="font-weight: bold">Unidad de Manejo</span> <span
-										class="ui-input-icon-left filter-container"> <i
-										class="pi pi-search" /> <p:inputText id="globalFilter"
-											onkeyup="PF('dtManejo').filter()" placeholder="Búsqueda" />
+									<span class="ui-input-icon-left filter-container">
+										<i class="pi pi-search" />
+										<p:inputText id="globalFilter" onkeyup="PF('dtManejo').filter()" placeholder="Búsqueda" />
 									</span>
 								</div>
 							</f:facet>
-
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-manejo-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-manejo-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-manejo-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-manejo-button" /> -->
-
-							<p:column selectionMode="multiple" />
-
 							<p:column headerText="Nombre" sortBy="#{manejo.unidadDeManejoDs}"
-								filterBy="#{manejo.nombre}" style="text-align:center">
+								filterBy="#{manejo.unidadDeManejoDs}" style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
 									value="#{manejo.unidadDeManejoDs}" />
 							</p:column>
-							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil"
-									update=":form:manage-unit-content-new" value="Modificar"
-									oncomplete="PF('nuevaUnidadManejoDialog').show()"
-									styleClass="p-mr-2 p-mb-2" process="@this">
-									<f:setPropertyActionListener value="#{manejo}"
-										target="#{unidadDeManejoBean.unidadManejoSelected}" />
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-unit-content-new" oncomplete="PF('nuevaUnidadManejoDialog').show()" process="@this">
+									<f:setPropertyActionListener value="#{manejo}" target="#{unidadDeManejoBean.unidadManejoSelected}" />
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('deleteManejoDialog').show()">
-									<f:setPropertyActionListener value="#{manejo}"
-										target="#{unidadDeManejoBean.unidadManejoSelected}" />
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-times" class="ui-button-danger" process="@this" oncomplete="PF('deleteManejoDialog').show()">
+									<f:setPropertyActionListener value="#{manejo}" target="#{unidadDeManejoBean.unidadManejoSelected}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>
@@ -91,14 +57,14 @@
 								value="Nombre de la Unidad de Manejo" />
 							<p:inputText id="nombre-new"
 								value="#{unidadDeManejoBean.unidadManejoSelected.unidadDeManejoDs}"
-								required="true" />
+								required="true" requiredMessage="Ingresa nombre de la unidad de manejo"/>
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-plus"
 						actionListener="#{unidadDeManejoBean.guardarUnidadManejo()}"
-						update=":form:manage-unit-content-new" styleClass="p-mr-2 p-mb-2" />
+						update=":form:manage-unit-content-new messages" styleClass="p-mr-2 p-mb-2" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
 						onclick="PF('nuevaUnidadManejoDialog').hide()"
 						class="ui-button-secondary" />

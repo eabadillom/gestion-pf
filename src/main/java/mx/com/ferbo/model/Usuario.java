@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,10 +22,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
+
 @Entity
 @Table(name = "usuario")
 @NamedQueries({
@@ -40,7 +38,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Usuario.findByMail", query = "SELECT u FROM Usuario u WHERE u.mail = :mail"),
     @NamedQuery(name = "Usuario.findByIdPlanta", query = "SELECT u FROM Usuario u WHERE u.idPlanta = :idPlanta"),
     @NamedQuery(name = "Usuario.findByStNtfSrvExt", query = "SELECT u FROM Usuario u WHERE u.stNtfSrvExt = :stNtfSrvExt"),
-    @NamedQuery(name = "Usuario.findByStUsuario", query = "SELECT u FROM Usuario u WHERE u.stUsuario = :stUsuario")})
+    @NamedQuery(name = "Usuario.findByStUsuario", query = "SELECT u FROM Usuario u WHERE u.stUsuario = :stUsuario"),
+@NamedQuery(name = "Usuario.findBynumEmpleado", query = "SELECT u FROM Usuario u WHERE u.numEmpleado = :numEmpleado")})
 public class Usuario implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,46 +48,65 @@ public class Usuario implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Basic(optional = false)
-    @NotNull
+    
     @Size(min = 1, max = 15)
     @Column(name = "usuario")
     private String usuario;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 15)
+    
+    @Size(min = 0, max = 1024)
     @Column(name = "password")
     private String password;
+    
     @Size(max = 30)
     @Column(name = "nombre")
     private String nombre;
+    
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    @Basic(optional = false)
-    @NotNull
+    
     @Column(name = "perfil")
     private int perfil;
+    
     @Size(max = 50)
     @Column(name = "apellido_1")
     private String apellido1;
+    
     @Size(max = 50)
     @Column(name = "apellido_2")
     private String apellido2;
+    
     @Size(max = 100)
     @Column(name = "mail")
     private String mail;
+    
     @Column(name = "id_planta")
     private Integer idPlanta;
-    @Basic(optional = false)
-    @NotNull
+    
     @Column(name = "st_ntf_srv_ext")
     private boolean stNtfSrvExt;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 1)
+    
+    public boolean isStNtfSrvExt() {
+		return stNtfSrvExt;
+	}
+
+	public void setStNtfSrvExt(boolean stNtfSrvExt) {
+		this.stNtfSrvExt = stNtfSrvExt;
+	}
+
+	@Size(min = 1, max = 1)
     @Column(name = "st_usuario")
     private String stUsuario;
+    
+    @Size(max = 10)
+    @Column(name = "numEmpleado")
+    private String numEmpleado;
+    
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "huella")
+    private boolean huella;
+    
     @OneToMany(mappedBy = "idUsuario")
     private List<Planta> plantaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
@@ -97,25 +115,29 @@ public class Usuario implements Serializable {
     public Usuario() {
     }
 
-    public Usuario(Integer id) {
-        this.id = id;
+	public Integer getId() {
+		return id;
+	}
+
+	public Usuario(Integer idUsuario) {
+        this.id = idUsuario;
     }
 
-    public Usuario(Integer id, String usuario, String password, int perfil, boolean stNtfSrvExt, String stUsuario) {
-        this.id = id;
+    public Usuario(Integer idUsuario, String usuario, String password, int perfil, String stUsuario, String numEmpleado) {
+        this.id = idUsuario;
         this.usuario = usuario;
         this.password = password;
-        this.perfil = perfil;
-        this.stNtfSrvExt = stNtfSrvExt;
+        this.perfil = perfil;        
         this.stUsuario = stUsuario;
-    }
+        this.numEmpleado = numEmpleado;
+    }	
 
-    public Integer getId() {
+    public Integer getidUsuario() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setId(Integer idUsuario) {
+        this.id = idUsuario;
     }
 
     public String getUsuario() {
@@ -190,19 +212,19 @@ public class Usuario implements Serializable {
         this.idPlanta = idPlanta;
     }
 
-    public boolean getStNtfSrvExt() {
-        return stNtfSrvExt;
-    }
-
-    public void setStNtfSrvExt(boolean stNtfSrvExt) {
-        this.stNtfSrvExt = stNtfSrvExt;
-    }
-
     public String getStUsuario() {
         return stUsuario;
     }
 
-    public void setStUsuario(String stUsuario) {
+    public String getNumEmpleado() {
+		return numEmpleado;
+	}
+
+	public void setNumEmpleado(String numEmpleado) {
+		this.numEmpleado = numEmpleado;
+	}
+
+	public void setStUsuario(String stUsuario) {
         this.stUsuario = stUsuario;
     }
 
@@ -222,7 +244,15 @@ public class Usuario implements Serializable {
         this.logSeguridadList = logSeguridadList;
     }
 
-    @Override
+	public boolean getHuella() {
+		return huella;
+	}
+
+	public void setHuella(boolean huella) {
+		this.huella = huella;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

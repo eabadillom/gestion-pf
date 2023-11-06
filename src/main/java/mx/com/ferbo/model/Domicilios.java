@@ -39,7 +39,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Domicilios.findByDomicilioCp", query = "SELECT d FROM Domicilios d WHERE d.domicilioCp = :domicilioCp"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel1", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel1 = :domicilioTel1"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel2", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel2 = :domicilioTel2"),
-    @NamedQuery(name = "Domicilios.findByDomicilioFax", query = "SELECT d FROM Domicilios d WHERE d.domicilioFax = :domicilioFax")})
+    @NamedQuery(name = "Domicilios.findByDomicilioFax", query = "SELECT d FROM Domicilios d WHERE d.domicilioFax = :domicilioFax"),
+    @NamedQuery(name = "Domicilios.findByAsentamiento", query = "SELECT d FROM Domicilios d WHERE d.ciudades.municipios.estados.paises.paisCve = :paisCve AND d.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve AND d.ciudades.municipios.municipiosPK.municipioCve = :municipioCve AND d.ciudades.ciudadesPK.ciudadCve = :ciudadCve AND d.domicilioColonia = :domicilioColonia" )})
 public class Domicilios implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -48,13 +49,13 @@ public class Domicilios implements Serializable {
     @Basic(optional = false)
     @Column(name = "dom_cve")
     private Integer domCve;
-    @Size(max = 75)
+    @Size(max = 100)
     @Column(name = "domicilio_calle")
     private String domicilioCalle;
-    @Size(max = 10)
+    @Size(max = 50)
     @Column(name = "domicilio_num_ext")
     private String domicilioNumExt;
-    @Size(max = 10)
+    @Size(max = 50)
     @Column(name = "domicilio_num_int")
     private String domicilioNumInt;
     @Column(name = "domicilio_colonia")
@@ -75,7 +76,7 @@ public class Domicilios implements Serializable {
     private List<ClienteDomicilios> clienteDomiciliosList;
     @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false)
     @ManyToOne
-    private Pais paisCved;
+    private Paises paisCved;
     @JoinColumns({
         @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve"),
         @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve"),
@@ -174,11 +175,11 @@ public class Domicilios implements Serializable {
         this.clienteDomiciliosList = clienteDomiciliosList;
     }
 
-    public Pais getPaisCved() {
+    public Paises getPaisCved() {
         return paisCved;
     }
 
-    public void setPaisCved(Pais paisCved) {
+    public void setPaisCved(Paises paisCved) {
         this.paisCved = paisCved;
     }
 

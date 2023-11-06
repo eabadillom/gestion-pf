@@ -41,13 +41,6 @@ public class PosicionCamaraBean implements Serializable {
 	private List<Posicion> listaPosiciones;
 	private Posicion checkHabilitado;
 
-	public Posicion getCheckHabilitado() {
-		return checkHabilitado;
-	}
-
-	public void setCheckHabilitado(Posicion checkHabilitado) {
-		this.checkHabilitado = checkHabilitado;
-	}
 
 	private Posicion nuevaPosicion;
 
@@ -63,7 +56,13 @@ public class PosicionCamaraBean implements Serializable {
 		listaPosiciones = posiciones;
 		checkHabilitado = new Posicion();
 	}
-
+public void validar() {
+	if(plantaSelect == null ) {
+		this.posiciones = result.findAll();
+		listaPosiciones = posiciones;
+	}
+	PrimeFaces.current().ajax().update("form:dt-posiciones");
+}
 	public void filtraListado() {
 		camaraPorPlanta.clear();
 		camaraPorPlanta = camaras.stream()
@@ -72,14 +71,13 @@ public class PosicionCamaraBean implements Serializable {
 						: false)
 				.collect(Collectors.toList());
 		System.out.println("Productos Cliente Filtrados:" + camaraPorPlanta.toString() + "---------------------------------------------------------------------------------------");
-		//PrimeFaces.current().ajax().update("form:busqueda");
 	}
 
 	public void filtrarPosiciones() {
-
 		Posicion posicion = new Posicion();
 		posicion.setPlanta(plantaSelect);
 		posicion.setCamara(camaraSelect);
+		posiciones = result.findAll();
 		listaPosiciones = result.buscarPorCriterios(posicion);
 		listaPosiciones = posiciones.stream()
 				.filter(pc -> plantaSelect != null
@@ -92,81 +90,78 @@ public class PosicionCamaraBean implements Serializable {
 						? (cs.getCamara().getCamaraCve() == camaraSelect.getCamaraCve().intValue())
 						: false)
 				.collect(Collectors.toList());
-
 		System.out.println("camaras-----------------------------------------------------------" + listaPosiciones);
-//		PrimeFaces.current().ajax().update("form:dt-posiciones");
 	}
 
 	public void openNew() {
 		nuevaPosicion = new Posicion();
 		nuevaPosicion.setPlanta(new Planta());
 		nuevaPosicion.setCamara(new Camara());
-
 		System.out.println(nuevaPosicion + "************************POSICION");
-
-	}
-
-	public void save() {
-		
-		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
-		String message = result.save(nuevaPosicion);
-
-		if (message == null) {
-			posiciones.clear();
-			posiciones = result.findAll();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "posicion nueva agregada ", null));
-			PrimeFaces.current().ajax().update("form:messages", "form:dtposiciones");
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar ", message));
-			PrimeFaces.current().ajax().update("form:messages");
-		}
-		this.nuevaPosicion = new Posicion();
-		this.nuevaPosicion.setPlanta(new Planta());
-		this.nuevaPosicion.setCamara(new Camara());
 	}
 	
 	public void filtrarAgregar() {
 		camaraPorPlantaAgregar.clear();
 		camaraPorPlantaAgregar = camaras.stream()
 				.filter(ps -> nuevaPosicion != null
-						? (ps.getPlantaCve().getPlantaCve().intValue() == nuevaPosicion.getPlanta().getPlantaCve().intValue())
+				? (ps.getPlantaCve().getPlantaCve().intValue() == nuevaPosicion.getPlanta().getPlantaCve().intValue())
 						: false)
 				.collect(Collectors.toList());
 		System.out.println("Productos Cliente Filtrados:" + camaraPorPlantaAgregar.toString() + "---------------------------------------------------------------------------------------");
-		//PrimeFaces.current().ajax().update("form:busqueda");
+	}
+
+	public void save() {
+		String message = result.save(nuevaPosicion);
+		if (message == null) {
+			listaPosiciones.clear();
+			filtrarPosiciones();
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Posicion agregada", null));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-posiciones");
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar ", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+
+		this.nuevaPosicion = new Posicion();
+		this.nuevaPosicion.setPlanta(new Planta());
+		this.nuevaPosicion.setCamara(new Camara());
+		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
+		PrimeFaces.current().ajax().update("form:messages", "dt-posiciones","dt-posicionesCamara");
 	}
 	
 	public void check() {
-		System.out.println(checkHabilitado.getHabilitada());
-		System.out.println("------------------------------------------------------------------------------");
 		if(checkHabilitado.getHabilitada() == true) {
 			checkHabilitado.setHabilitada(false);
-			System.out.println(checkHabilitado.getHabilitada() + "cambio a falso");
-		}else {
-			checkHabilitado.setHabilitada(true);
 			System.out.println(checkHabilitado.getHabilitada() + "cambio a true");
+		}else 
+			if(checkHabilitado.getHabilitada() == false){
+				checkHabilitado.setHabilitada(true);
+			System.out.println(checkHabilitado.getHabilitada() + "cambio a false");
 		}
-		
 		String message = result.actualizar(checkHabilitado);
 		if (message == null) {
-			posiciones.clear();
-			posiciones = result.findAll();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "se habilito ", null));
-			PrimeFaces.current().ajax().update("form:messages", "form:dtposiciones");
+			listaPosiciones.clear();
+			listaPosiciones = result.findAll();
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Status actualizado ", null));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-posiciones");
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "No se pudo habilitar ", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No se pudo habilitar ", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
-		this.checkHabilitado = new Posicion();
+		this.checkHabilitado = new Posicion();	
 		this.checkHabilitado.setPlanta(new Planta());
 		this.checkHabilitado.setCamara(new Camara());
+		PrimeFaces.current().ajax().update("form:messages");
 	}
 	
 	
+	public Posicion getCheckHabilitado() {
+		return checkHabilitado;
+	}
+	
+	public void setCheckHabilitado(Posicion checkHabilitado) {
+		this.checkHabilitado = checkHabilitado;
+	}
 
 	public Planta getPlantaAgregarSelect() {
 		return plantaAgregarSelect;
@@ -284,21 +279,4 @@ public class PosicionCamaraBean implements Serializable {
 		this.selectPosicion = selectPosicion;
 	}
 
-	/*
-	 * public Planta getOne(int id) { Planta p = new Planta(); p =
-	 * result.findOne(id);
-	 * 
-	 * System.out.println("---------------------------------");
-	 * System.out.println(p.getPlantaDs());
-	 * 
-	 * return p; }
-	 * 
-	 * public void deleteOne(Planta p) { result.delete(p); principal.remove(p); //
-	 * return "/protected/catalogos/plantas.xhtml"; }
-	 * 
-	 * public List<Planta> getPrincipal() { return principal; }
-	 * 
-	 * public void setPrincipal(List<Planta> principal) { this.principal =
-	 * principal; }
-	 */
 }

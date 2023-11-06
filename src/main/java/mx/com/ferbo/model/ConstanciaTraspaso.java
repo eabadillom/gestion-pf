@@ -39,6 +39,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaTraspaso.findByFecha", query = "SELECT c FROM ConstanciaTraspaso c WHERE c.fecha = :fecha"),
     @NamedQuery(name = "ConstanciaTraspaso.findByObservacion", query = "SELECT c FROM ConstanciaTraspaso c WHERE c.observacion = :observacion"),
     @NamedQuery(name = "ConstanciaTraspaso.findByNombreCliente", query = "SELECT c FROM ConstanciaTraspaso c WHERE c.nombreCliente = :nombreCliente"),
+    @NamedQuery(name = "ConstanciaTraspaso.findByPeriodoClienteNumero", query = "SELECT c FROM ConstanciaTraspaso c WHERE (c.fecha BETWEEN :fechaInicio AND :fechaFin) AND (c.cliente.cteCve = :idCliente OR :idCliente IS NULL) AND (c.numero = :folioCliente OR :folioCliente IS NULL )"),
     @NamedQuery(name = "ConstanciaTraspaso.findByFechaCadena", query = "SELECT c FROM ConstanciaTraspaso c WHERE c.fechaCadena = :fechaCadena")})
 public class ConstanciaTraspaso implements Serializable {
 
@@ -60,7 +61,7 @@ public class ConstanciaTraspaso implements Serializable {
     private Date fecha;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 500)
+    @Size(min = 0, max = 500)
     @Column(name = "observacion")
     private String observacion;
     @Basic(optional = false)

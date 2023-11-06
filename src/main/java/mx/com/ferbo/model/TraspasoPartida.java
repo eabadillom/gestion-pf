@@ -6,7 +6,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -27,14 +30,15 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "traspaso_partida")
 @NamedQueries({
-    @NamedQuery(name = "TraspasoPartida.findAll", query = "SELECT t FROM TraspasoPartida t"),
-    @NamedQuery(name = "TraspasoPartida.findById", query = "SELECT t FROM TraspasoPartida t WHERE t.id = :id"),
-    @NamedQuery(name = "TraspasoPartida.findByConstancia", query = "SELECT t FROM TraspasoPartida t WHERE t.constancia = :constancia"),
-    @NamedQuery(name = "TraspasoPartida.findByPartida", query = "SELECT t FROM TraspasoPartida t WHERE t.partida = :partida"),
-    @NamedQuery(name = "TraspasoPartida.findByDescripcion", query = "SELECT t FROM TraspasoPartida t WHERE t.descripcion = :descripcion"),
-    @NamedQuery(name = "TraspasoPartida.findByCantidad", query = "SELECT t FROM TraspasoPartida t WHERE t.cantidad = :cantidad"),
-    @NamedQuery(name = "TraspasoPartida.findByOrigen", query = "SELECT t FROM TraspasoPartida t WHERE t.origen = :origen"),
-    @NamedQuery(name = "TraspasoPartida.findByDestino", query = "SELECT t FROM TraspasoPartida t WHERE t.destino = :destino")})
+        @NamedQuery(name = "TraspasoPartida.findAll", query = "SELECT t FROM TraspasoPartida t"),
+        @NamedQuery(name = "TraspasoPartida.findById", query = "SELECT t FROM TraspasoPartida t WHERE t.id = :id"),
+        @NamedQuery(name = "TraspasoPartida.findByConstancia", query = "SELECT t FROM TraspasoPartida t WHERE t.constancia = :constancia"),
+        @NamedQuery(name = "TraspasoPartida.findByPartida", query = "SELECT t FROM TraspasoPartida t WHERE t.partida.partidaCve = :partidaCve"),
+        @NamedQuery(name = "TraspasoPartida.findByDescripcion", query = "SELECT t FROM TraspasoPartida t WHERE t.descripcion = :descripcion"),
+        @NamedQuery(name = "TraspasoPartida.findByCantidad", query = "SELECT t FROM TraspasoPartida t WHERE t.cantidad = :cantidad"),
+        @NamedQuery(name = "TraspasoPartida.findByOrigen", query = "SELECT t FROM TraspasoPartida t WHERE t.origen = :origen"),
+        @NamedQuery(name = "TraspasoPartida.findByTraspaso", query = "SELECT t FROM TraspasoPartida t WHERE t.traspaso.id = :traspaso"),
+        @NamedQuery(name = "TraspasoPartida.findByDestino", query = "SELECT t FROM TraspasoPartida t WHERE t.destino = :destino") })
 public class TraspasoPartida implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,37 +47,46 @@ public class TraspasoPartida implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 10)
     @Column(name = "constancia")
     private String constancia;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "partida")
-    private int partida;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "descripcion")
     private String descripcion;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "cantidad")
     private long cantidad;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 150)
     @Column(name = "origen")
     private String origen;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 150)
     @Column(name = "destino")
     private String destino;
+    
     @JoinColumn(name = "traspaso", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private ConstanciaTraspaso traspaso;
+
+    @JoinColumn(name = "partida")
+    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
+    private Partida partida;
+    
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "partidatraspaso")
+    private PartidasAfectadas partidasAfectadas;
 
     public TraspasoPartida() {
     }
@@ -81,8 +94,10 @@ public class TraspasoPartida implements Serializable {
     public TraspasoPartida(Integer id) {
         this.id = id;
     }
-
-    public TraspasoPartida(Integer id, String constancia, int partida, String descripcion, long cantidad, String origen, String destino) {
+    
+    public TraspasoPartida(Integer id, String constancia, Partida partida, String descripcion, long cantidad,
+            String origen,
+            String destino) {
         this.id = id;
         this.constancia = constancia;
         this.partida = partida;
@@ -108,14 +123,15 @@ public class TraspasoPartida implements Serializable {
         this.constancia = constancia;
     }
 
-    public int getPartida() {
-        return partida;
-    }
-
-    public void setPartida(int partida) {
-        this.partida = partida;
-    }
-
+    /*
+     * public int getPartida() {
+     * return partida;
+     * }
+     * 
+     * public void setPartida(int partida) {
+     * this.partida = partida;
+     * }
+     */
     public String getDescripcion() {
         return descripcion;
     }
@@ -156,6 +172,14 @@ public class TraspasoPartida implements Serializable {
         this.traspaso = traspaso;
     }
 
+    public Partida getPartida() {
+        return partida;
+    }
+
+    public void setPartida(Partida partida) {
+        this.partida = partida;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -180,5 +204,13 @@ public class TraspasoPartida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.TraspasoPartida[ id=" + id + " ]";
     }
-    
+
+	public PartidasAfectadas getPartidasAfectadas() {
+		return partidasAfectadas;
+	}
+
+	public void setPartidasAfectadas(PartidasAfectadas partidasAfectadas) {
+		this.partidasAfectadas = partidasAfectadas;
+	}
+
 }

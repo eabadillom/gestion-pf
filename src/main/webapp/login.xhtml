@@ -13,38 +13,45 @@
             <meta name="apple-mobile-web-app-capable" content="yes" />
         </f:facet>
         <title>Login</title>
+        <script>
+		    //<![CDATA[
+		        PF('statusDialog').show();
+		
+		        PF('statusDialog').hide();
+		    //]]>
+		</script>
     </h:head>
 
     <h:body styleClass="login-body">
-    
-        <div id="login-wrapper">
-            <p:graphicImage name="images/login.png" library="omega-layout" style="width:100%"/>
-            
-            <div id="login-container">
-                <span class="title">Iniciar sesión</span>
+    	<h:form id="login_form">
+	    	<p:growl id="growl" life="5000" />
+	    	<p:dialog modal="true" widgetVar="statusDialog" header="Verificando usuario..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+	        <div id="login-wrapper">
+	            <p:graphicImage name="images/login.png" library="omega-layout" style="width:100%"/>
+	            
+	            <div id="login-container">
+	                <span class="title">Iniciar sesión</span>
 
-                <div class="p-grid ui-fluid">
-                    <div class="p-col-12">
-                        <p:inputText placeholder="Usuario" />
-                    </div>
-                    <div class="p-col-12">
-                        <p:password placeholder="Constraseña" feedback="false"/>
-                    </div>
-<!--                     <div class="p-col-12 p-md-6"> -->
-<!--                         <span class="remember-me">Remember Me</span> -->
-<!--                         <p:selectBooleanCheckbox /> -->
-<!--                     </div> -->
-<!--                     <div class="p-col-12 p-md-6"> -->
-<!--                         <p:link>Forgot Password</p:link> -->
-<!--                     </div> -->
-                    <div class="p-col-12">
-                        <p:button outcome="dashboard" value="Ingresar" icon="pi pi-user" />
-                    </div>
-                </div>
-            </div>
-            
-<!--             <div class="login-footer">Ferbo</div> -->
+	                <div class="p-grid ui-fluid">
+	                    <div class="p-col-12">
+	                        <p:inputText placeholder="Usuario" id="usuario" required="true" requiredMessage="Usuario requerido." value="#{loginBean.username}"/>
+	                        <p:message for="usuario"/>
+	                    </div>
+	                    <div class="p-col-12">
+	                        <p:password placeholder="Contraseña" id="contraseña" required="true" feedback="false" value="#{loginBean.password}" requiredMessage="Contraseña requerida." />
+	                        <p:message for="contraseña" />
+	                    </div>
+	                    <div class="p-col-12">
+	                        <p:commandButton value="Iniciar sesión" icon="pi pi-user" action="#{loginBean.login}" process="@this login_form" update="login_form" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
+	                    </div>
+	                </div>
+	            </div>
         </div>
+    	</h:form>
 
         <h:outputStylesheet name="css/primeicons.css" library="omega-layout"/>
         <h:outputStylesheet name="css/primeflex.min.css" library="omega-layout"/>

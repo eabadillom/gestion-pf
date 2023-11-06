@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+	<ui:define name="title">Inventario</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:dialog modal="true" widgetVar="statusDialog" header="Generando reporte..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" />
+						<p:fieldset>
+							<span class="ui-float-label ui-input-icon-left">
+								<p:datePicker id="minmax" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteAlmacenFechaBean.fecha}" maxdate="#{reporteAlmacenFechaBean.maxDate}" readonlyInput="true">
+									<p:ajax process="@this" />
+								</p:datePicker>
+								<p:outputLabel for="minmax" value="Fecha de corte" />
+							</span>
+						</p:fieldset>
+						<p:fieldset>
+							<span class="ui-float-label ui-input-icon-left">
+								<p:selectOneMenu id="Cliente" value="#{reporteAlmacenFechaBean.clienteSelect}" converter="entityConverter">
+									<f:selectItem itemLabel="Todos los clientes" itemValue="" />
+									<f:selectItems value="#{reporteAlmacenFechaBean.listaClientes}" var="cte" itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+									<p:ajax process="@this" />
+								</p:selectOneMenu>
+								<p:outputLabel for="Cliente" value="Cliente" />
+							</span>
+							<span class="ui-float-label ui-input-icon-left">
+								<p:selectOneMenu id="so-planta" value="#{reporteAlmacenFechaBean.plantaSelect}" converter="entityConverter">
+									<f:selectItem itemLabel="Todas las plantas" itemValue="" />
+									<f:selectItems value="#{reporteAlmacenFechaBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
+									<p:ajax listener="#{reporteAlmacenFechaBean.filtradoCamara()}" process=" @this" update=":form:so-camara" />
+								</p:selectOneMenu>
+								<p:outputLabel for="so-planta" value="Planta" />
+							</span>
+							<span class="ui-float-label ui-input-icon-left">
+								<p:selectOneMenu id="so-camara" value="#{reporteAlmacenFechaBean.camaraSelect}" converter="entityConverter">
+									<f:selectItem itemLabel="Todas las camaras" itemValue="" />
+									<f:selectItems value="#{reporteAlmacenFechaBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}" itemValue="#{c}" />
+									<p:ajax process="@this" />
+								</p:selectOneMenu>
+								<p:outputLabel for="so-camara" value="Camara " />
+							</span>
+						</p:fieldset>
+						<p:fieldset styleClass="p-mt-2">
+							<p:toolbar>
+								<p:toolbarGroup>
+									<div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value=".pdf" actionListener="#{reporteAlmacenFechaBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" />
+									</div>
+									<div class="col-2">
+										<p:divider layout="vertical">
+										</p:divider>
+									</div>
+									<div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value=".xlsx" actionListener="#{reporteAlmacenFechaBean.exportarExcel}" action="#{reporteAlmacenFechaBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" />
+									</div>
+									<div class="col-2">
+										<p:divider layout="vertical">
+											<b>OR</b>
+										</p:divider>
+									</div>
+									<div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value="Consultar" actionListener="#{reporteAlmacenFechaBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
+									</div>
+								</p:toolbarGroup>
+							</p:toolbar>
+						</p:fieldset>
+					</div>
+				</div>
+			</div>
+			<p:dataTable id="dt-reporte" widgetVar="dtReporte" value="#{reporteAlmacenFechaBean.reporte}" var="r" rowKey="#{r.numeroCliente}">
+				<p:column width="1rem">
+            		<p:rowToggler/>
+            	</p:column>
+            	<p:column headerText="Entrada" style="text-align: center" width="5rem">
+            		<h:outputText value="#{r.folioCliente}"></h:outputText>
+            	</p:column>
+            	<p:column headerText="Fecha" width="6rem" style="text-align: center;">
+            		<h:outputText value="#{r.ingreso}">
+            			<f:convertDateTime pattern="dd/MM/yyyy" />
+            		</h:outputText>
+            	</p:column>
+            	<p:column headerText="Producto">
+            		<h:outputText value="#{r.productoDescripcion}" />
+            	</p:column>
+            	<p:column headerText="Cantidad" style="text-align: right;">
+            		<h:outputText value="#{r.cantidad}">
+            			<f:convertNumber pattern="#0.00" />
+            		</h:outputText>
+            	</p:column>
+            	<p:column headerText="Unidad" style="text-align: center;" width="5rem">
+            		<h:outputText value="#{r.unidadCobro}" />
+            	</p:column>
+            	<p:column headerText="Peso [kg]" style="text-align: right;" width="5rem">
+            		<h:outputText value="#{r.peso}" >
+            			<f:convertNumber pattern="#0.00" />
+            		</h:outputText>
+            	</p:column>
+            	<p:rowExpansion>
+            		<div class="p-grid ui-fluid">
+            			<div class="p-field p-col-2 p-md-2">
+							<p:outputLabel for="@next" value="Codigo" />
+							<p:inputText value="#{r.codigo}" readonly="true"/>
+						</div>
+	            		<div class="p-field p-col-2 p-md-2">
+	            			<p:outputLabel for="@next" value="Caducidad" />
+	            			<p:inputText value="#{r.caducidad}" readonly="true"/>
+	            		</div>
+						<div class="p-field p-col-2 p-md-2">
+							<p:outputLabel for="@next" value="Lote" />
+							<p:inputText value="#{r.lote}" readonly="true"/>
+						</div>
+						<div class="p-field p-col-2 p-md-2">
+							<p:outputLabel for="@next" value="Contenedor" />
+							<p:inputText value="#{r.sap}" readonly="true"/>
+						</div>
+						<div class="p-field p-col-1 p-md-1">
+							<p:outputLabel for="@next" value="Tarimas" />
+							<p:inputText value="#{r.tarima}" readonly="true"/>
+						</div>
+						<div class="p-field p-col-1 p-md-1">
+							<p:outputLabel for="@next" value="Camara" />
+							<p:inputText value="#{r.camaraDescripcion}" readonly="true"/>
+						</div>
+            		</div>
+            	</p:rowExpansion>
+			</p:dataTable>
+		</h:form>
+	</ui:define>
+</ui:composition>

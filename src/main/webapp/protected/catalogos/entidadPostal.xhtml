@@ -8,26 +8,13 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Domicilios" />
-				<p:menuitem value="Cambios" />
-				<p:menuitem value="Entidad Postal" outcome="/protected/catalogos/entidadPostal" />
-			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
 					<div class="card">
-						<p:commandButton value="Agregar" icon="pi pi-plus"
-							actionListener="#{entidadPostalBean.nuevoEntidadPostal}"
-							update="manage-postalEntity-content-new form:manage-postalEntity-content-new"
-							oncomplete="PF('nuevoEntidadPostalDialog').show()"
-							styleClass="p-mr-2 p-mb-2" process="@this" />
+						<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{entidadPostalBean.nuevoEntidadPostal}" update="manage-postalEntity-content-new form:manage-postalEntity-content-new" oncomplete="PF('nuevoEntidadPostalDialog').show()" styleClass="p-mr-2 p-mb-2" process="@this" />
 					</div>
 				</div>
 			</div>
-
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
@@ -45,37 +32,20 @@
 									</span>
 								</div>
 							</f:facet>
-
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-Paiss-button" /> -->
-
-							<p:column selectionMode="multiple" />
-
 							<p:column headerText="Entidad Postal" sortBy="#{entidadPostal.entidadpostalDs}"
 								filterBy="#{entidadPostal.entidadpostalDs}" style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
 									value="#{entidadPostal.entidadpostalDs}" />
 							</p:column>
-							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil"
-									update=":form:manage-postalEntity-content-new" value="Modificar"
-									oncomplete="PF('nuevoEntidadPostalDialog').show()"
-									styleClass="p-mr-2 p-mb-2" process="@this">
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-postalEntity-content-new" oncomplete="PF('nuevoEntidadPostalDialog').show()" process="@this">
 									<f:setPropertyActionListener value="#{entidadPostal}"
 										target="#{entidadPostalBean.entidadPostalSelect}" />
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('deleteEntidadPostalDialog').show()">
-									<f:setPropertyActionListener value="#{entidadPostal}"
-										target="#{entidadPostalBean.entidadPostalSelect}" />
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-times" class="ui-button-danger" process="@this" oncomplete="PF('deleteEntidadPostalDialog').show()">
+									<f:setPropertyActionListener value="#{entidadPostal}" target="#{entidadPostalBean.entidadPostalSelect}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>
@@ -89,14 +59,14 @@
 						<div class="p-field">
 							<p:outputLabel for="entidadPostal-new" value="Entidad Postal" />
 							<p:inputText id="entidadPostal-new"
-								value="#{entidadPostalBean.entidadPostalSelect.entidadpostalDs}" required="true" />
+								value="#{entidadPostalBean.entidadPostalSelect.entidadpostalDs}" required="true" requiredMessage="Ingresa la entidad postal"/>
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-plus"
 						actionListener="#{entidadPostalBean.guardarEntidadPostal()}"
-						update=":form:manage-postalEntity-content-new"
+						update=":form:manage-postalEntity-content-new messages"
 						styleClass="p-mr-2 p-mb-2" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
 						onclick="PF('nuevoEntidadPostalDialog').hide()" class="ui-button-secondary" />

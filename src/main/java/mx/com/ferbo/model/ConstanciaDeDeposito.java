@@ -27,21 +27,22 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "CONSTANCIA_DE_DEPOSITO")
 @NamedQueries({
     @NamedQuery(name = "ConstanciaDeDeposito.findAll", query = "SELECT c FROM ConstanciaDeDeposito c"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByFolio", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.folio = :folio"),
+    @NamedQuery(name = "ConstanciaDeDeposito.findByCteCve", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.cteCve.cteCve = :cteCve"),
+    @NamedQuery(name = "ConstanciaDeDeposito.findByCteCveAndPlanta", query = "SELECT DISTINCT (c) FROM ConstanciaDeDeposito c "
+    		+ "INNER JOIN c.partidaList p "
+    		+ "WHERE c.cteCve.cteCve = :cteCve and p.camaraCve.plantaCve.plantaCve = :plantaCve"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByFechaIngreso", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.fechaIngreso = :fechaIngreso"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByNombreTransportista", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.nombreTransportista = :nombreTransportista"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByPlacasTransporte", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.placasTransporte = :placasTransporte"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByObservaciones", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.observaciones = :observaciones"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByFolioCliente", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.folioCliente = :folioCliente"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByValorDeclarado", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.valorDeclarado = :valorDeclarado"),
+    @NamedQuery(name = "ConstanciaDeDeposito.findByFolioClientePeriodo", query = "SELECT c FROM ConstanciaDeDeposito c WHERE (c.fechaIngreso BETWEEN :fechaInicio AND :fechaFin) AND ((c.folioCliente = :folioCliente OR :folioCliente IS NULL) OR (c.cteCve.cteCve = :idCliente OR :idCliente IS NULL)\t) "),
     @NamedQuery(name = "ConstanciaDeDeposito.findByTemperatura", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.temperatura = :temperatura")})
 public class ConstanciaDeDeposito implements Serializable {
 
@@ -57,7 +58,7 @@ public class ConstanciaDeDeposito implements Serializable {
     @Size(max = 100)
     @Column(name = "NOMBRE_TRANSPORTISTA")
     private String nombreTransportista;
-    @Size(max = 5)
+    @Size(max = 10)
     @Column(name = "PLACAS_TRANSPORTE")
     private String placasTransporte;
     @Size(max = 200)
@@ -87,6 +88,9 @@ public class ConstanciaDeDeposito implements Serializable {
     @JoinColumn(name = "status", referencedColumnName = "edo_cve")
     @ManyToOne
     private EstadoConstancia status;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
+    private List<ConstanciaFactura> constanciaFacturaList;
 
     public ConstanciaDeDeposito() {
     }
@@ -168,8 +172,11 @@ public class ConstanciaDeDeposito implements Serializable {
         return partidaList;
     }
 
-    public void setPartidaList(List<Partida> partidaList) {
+    public void setPartidaList(List<Partida> partidaList) {//modificar para mappedby 
         this.partidaList = partidaList;
+        for(Partida p:partidaList) {
+        	p.setFolio(this);
+        }
     }
 
     public List<ConstanciaDepositoDetalle> getConstanciaDepositoDetalleList() {
@@ -178,6 +185,9 @@ public class ConstanciaDeDeposito implements Serializable {
 
     public void setConstanciaDepositoDetalleList(List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList) {
         this.constanciaDepositoDetalleList = constanciaDepositoDetalleList;
+        for(ConstanciaDepositoDetalle c: constanciaDepositoDetalleList) {
+        	c.setFolio(this);
+        }
     }
 
     public Cliente getCteCve() {
@@ -203,6 +213,14 @@ public class ConstanciaDeDeposito implements Serializable {
     public void setStatus(EstadoConstancia status) {
         this.status = status;
     }
+    
+    public List<ConstanciaFactura> getConstanciaFacturaList() {
+		return constanciaFacturaList;
+	}
+
+	public void setConstanciaFacturaList(List<ConstanciaFactura> constanciaFacturaList) {
+		this.constanciaFacturaList = constanciaFacturaList;
+	}
 
     @Override
     public int hashCode() {

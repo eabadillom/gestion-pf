@@ -27,11 +27,17 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "status_factura")
 @NamedQueries({
-    @NamedQuery(name = "StatusFactura.findAll", query = "SELECT s FROM StatusFactura s"),
-    @NamedQuery(name = "StatusFactura.findById", query = "SELECT s FROM StatusFactura s WHERE s.id = :id"),
-    @NamedQuery(name = "StatusFactura.findByNombre", query = "SELECT s FROM StatusFactura s WHERE s.nombre = :nombre"),
-    @NamedQuery(name = "StatusFactura.findByDescripcion", query = "SELECT s FROM StatusFactura s WHERE s.descripcion = :descripcion")})
+        @NamedQuery(name = "StatusFactura.findAll", query = "SELECT s FROM StatusFactura s"),
+        @NamedQuery(name = "StatusFactura.findById", query = "SELECT s FROM StatusFactura s WHERE s.id = :id"),
+        @NamedQuery(name = "StatusFactura.findByNombre", query = "SELECT s FROM StatusFactura s WHERE s.nombre = :nombre"),
+        @NamedQuery(name = "StatusFactura.findByDescripcion", query = "SELECT s FROM StatusFactura s WHERE s.descripcion = :descripcion") })
 public class StatusFactura implements Serializable {
+	
+	public static final int STATUS_ERROR = 0;
+	public static final int STATUS_POR_COBRAR = 1;
+	public static final int STATUS_CANCELADA = 2;
+	public static final int STATUS_PAGADA = 3;
+	public static final int STATUS_PAGO_PARCIAL = 4;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -47,8 +53,6 @@ public class StatusFactura implements Serializable {
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    @OneToMany(mappedBy = "status")
-    private List<Factura> facturaList;
 
     public StatusFactura() {
     }
@@ -86,14 +90,6 @@ public class StatusFactura implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public List<Factura> getFacturaList() {
-        return facturaList;
-    }
-
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -118,5 +114,5 @@ public class StatusFactura implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.StatusFactura[ id=" + id + " ]";
     }
-    
+
 }

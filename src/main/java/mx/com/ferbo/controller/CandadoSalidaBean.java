@@ -48,7 +48,7 @@ public class CandadoSalidaBean implements Serializable {
 		this.seleccion = new CandadoSalida();
 	};
 
-	public List<CandadoSalida> getLista() {
+	public List<?> getLista() {
 		return lista;
 	};
 

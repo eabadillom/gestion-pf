@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.jfree.util.Log;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -18,9 +20,19 @@ public class UnidadManejoDAO extends IBaseDAO<UnidadDeManejo, Integer>{
 
 	@Override
 	public List<UnidadDeManejo> buscarTodos() {
+		
+		EntityManager em = null;		
 		List<UnidadDeManejo> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class).getResultList();
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class).getResultList();
+		} catch (Exception e) {
+			Log.error("Problema al traer datos unidad de manejo", e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}		
+		
 		return listado;
 	}
 

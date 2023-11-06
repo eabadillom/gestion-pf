@@ -4,17 +4,29 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoPagoDAO extends IBaseDAO<TipoPago, Integer> {
-
+	private static Logger log = LogManager.getLogger(TipoPagoDAO.class);
 	@Override
 	public TipoPago buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		TipoPago tp = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			tp = em.find(TipoPago.class, id);
+		}catch(Exception e) {
+			log.error("Problema al buscar tipo pago...", e);
+			
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return tp;
 	}
 
 	@Override

@@ -1,0 +1,253 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<ui:define name="title">Usuarios</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:breadCrumb>
+				<p:menuitem value="Home" outcome="/dashboard" />
+				<p:menuitem value="Usuarios" />
+				<p:menuitem value="Mantenimiento de usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" />
+			</p:breadCrumb>
+
+					
+			<p:toolbar styleClass="p-mb-4">
+				<p:toolbarGroup>
+					<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{usuariosBean.openNew()}" update="pnlCliente" 
+						oncomplete="PF('dialogCliente').show();" styleClass="ui-button-info p-mr-2 p-mb-2" style="margin-right: .5rem" process="@this" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			<div class="p-grid crud-demo">
+				<div class="p-col-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" />
+						<p:dataTable id="dt-usuario" lazy="true" widgetVar="dtUser" var="userdt" value="#{usuariosBean.usuarios}" reflow="true"
+							rowKey="#{userdt.id}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
+							<p:column headerText="Nombre" style="text-align:center">
+								<h:outputText value="#{userdt.nombre}" />
+							</p:column>
+							<p:column headerText="Apellido Paterno" style="text-align:center">
+								<h:outputText value="#{userdt.apellido1}" />
+							</p:column>
+							<p:column headerText="Apellido Materno" style="text-align:center">
+								<h:outputText value="#{userdt.apellido2}" />
+							</p:column>
+							<!-- <p:column headerText="Perfil" style="text-align:center" width="6rem">
+								<h:outputText value="#{userdt.perfil.nombre}" />
+							</p:column> -->
+							<p:column style="text-align:center;" width="3rem">
+								<p:commandButton icon="pi pi-key" update="form:pnlPassword" oncomplete="PF('dialogPassword').show()" styleClass="edit-button" process="@this">
+									<f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.usuario}" />
+									<p:ajax listener="#{usuariosBean.resetPassword}" />
+								</p:commandButton>
+							</p:column>
+							<p:column style="text-align:center;" width="3rem">
+								<p:commandButton icon="pi pi-pencil" update="form:pnlCliente"
+									process="@this" oncomplete="PF('dialogCliente').show();"
+									actionListener="#{usuariosBean.cargaUsuario}" styleClass="edit-button">
+									<f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.usuario}"/>
+									<p:ajax listener="#{usuariosBean.cargaUsuario}" />
+								</p:commandButton>
+							</p:column>
+							<p:column style="text-align:center" width="3rem">
+								<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteClienteDialog').show()">
+							    <f:setPropertyActionListener value="#{userdt}" target="#{usuariosBean.usuario}" />
+								</p:commandButton>
+							</p:column>
+					</p:dataTable>
+					</div>
+				</div>
+			</div>
+	
+			<p:dialog header="Agregar/Modificar usuario" showEffect="fade" modal="true" widgetVar="dialogCliente" responsive="true">
+				<p:outputPanel id="pnlCliente" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty usuariosBean.usuario}">
+						<div class="card" style="width: 100%">
+							<div class="grid ui-fluid mt-3 floatlabel-demo">
+								<div class="col-12 md:col-6">
+									<p:panelGrid columns="3" >
+										<p:panel id="Nombre">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:inputText  id="nombre-new" value="#{usuariosBean.usuario.nombre}" required="true"/>
+													<p:outputLabel value="Nombre" styleClass="ml-4" />
+													<i class="pi pi-user" />
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="apa">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:inputText widgetVar="apellidop-new" id="apellidop-new" value="#{usuariosBean.usuario.apellido1}" required="true"/>
+													<p:outputLabel for="apellidop-new" value="Apellido Paterno" styleClass="ml-4" />
+													<i class="pi pi-user-plus" />
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="ama">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:inputText widgetVar="apellidom-new" id="apellidom-new" value="#{usuariosBean.usuario.apellido2}" required="true"/>
+													<p:outputLabel for="apellidom-new" value="Apellido Materno" styleClass="ml-4" />
+													<i class="pi pi-user-minus" />
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="correo">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:inputText widgetVar="email-new" id="email-new" value="#{usuariosBean.usuario.mail}" required="true"/>
+													<p:outputLabel for="email-new" value="E-mail" styleClass="ml-4" />
+													<i class="pi pi-envelope" />
+												</span>
+											</div>
+										</p:panel>
+				                
+										<p:panel id="login">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:inputText widgetVar="login-new" id="login-new" value="#{usuariosBean.usuario.usuario}" required="true" readonly="#{usuariosBean.usuario.id >= 0}"/>
+													<p:outputLabel for="login-new" value="Login" />
+													<i class="pi pi-id-card" />
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="pass" rendered="#{usuariosBean.showPassword}">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:password widgetVar="psw-new" id="password" value="#{usuariosBean.newPassword}" required="true" />
+													<p:outputLabel for="password" value="Password" />
+													<i class="pi pi-id-card" />
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="planta">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:selectOneMenu id="user" value="#{usuariosBean.idplanta}" converter="entityConverter">
+														<f:selectItems var="user" value="#{usuariosBean.lstPlanta}" itemLabel="#{user.plantaDs}" itemValue="#{user.plantaCve}" />
+													</p:selectOneMenu>
+													<p:outputLabel for="user" value="Planta asignada" />
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="status">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:selectOneMenu id="statusUsuario" value="#{usuariosBean.usuario.stUsuario}">
+														<f:selectItem itemValue="A" itemLabel="Activo"/>
+														<f:selectItem itemValue="B" itemLabel="Baja"/>
+														<f:selectItem itemValue="L" itemLabel="Bloqueado"/>
+														<f:selectItem itemValue="R" itemLabel="Reiniciar contraseña"/>
+													</p:selectOneMenu>
+													<p:outputLabel for="status" value="Status" />                       
+												</span>
+											</div>
+										</p:panel>
+										<p:panel id="puser">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:selectOneMenu id="perfiluser" value="#{usuariosBean.usuario.perfil}" converter="entityConverter">
+														<f:selectItems value="#{usuariosBean.lstPerfil}" var="perfiluser" itemLabel="#{perfiluser.nombre}" itemValue="#{perfiluser.id}" />
+													</p:selectOneMenu>
+													<p:outputLabel for="puser" value="Perfil" />
+												</span>
+											</div>
+										</p:panel>
+				                
+										<p:panel id="descripcion">
+											<div class="field">
+												<span class="ui-float-label">
+													<p:inputTextarea rows="3" cols="30" widgetVar="descripcion-new" id="descripcion-new" value="#{usuariosBean.usuario.descripcion}"/>
+													<p:outputLabel for="descripcion" value="Descripcion" required="true"/>
+												</span>
+											</div>
+										</p:panel>
+										
+										<p:panel id="NoEmpleado">
+											<div class="field">
+												<span class="ui-float-label ui-input-icon-right">
+													<p:inputText widgetVar="noEmpleado-new" id="noEmpleado-new" value="#{usuariosBean.usuario.numEmpleado}" required="true"/>
+													<p:outputLabel for="noEmpleado-new" value="Numero de empleado" />
+													<i class="pi pi-hashtag" />
+												</span>
+											</div>
+										</p:panel>
+										
+										<p:row>
+											<p:column styleClass="ui-grid-col-12">   
+												<p:outputLabel for="checkbox" value=" ¿RECIBIR NOTIFICACIONES DE ALMACEN? "/>
+												<p:selectBooleanCheckbox id="checkbox" itemLabel="No" value="#{usuariosBean.usuario.stNtfSrvExt}"/>
+											</p:column>
+										</p:row>
+										
+										<p:row>
+											<p:column styleClass="ui-grid-col-12">   
+												<p:outputLabel for="checkbox2" value=" ¿ REQUIERE DE HUELLA ?"/>
+												<p:selectBooleanCheckbox id="checkbox2" itemLabel="No" value="#{usuariosBean.usuario.huella}"/>
+											</p:column>
+										</p:row>
+										
+									</p:panelGrid>
+								</div>
+							</div>
+						</div>
+					</p:outputPanel>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{usuariosBean.guardar()}" process="pnlCliente @this" update="pnlCliente" target="#{usuariosBean.usuario}" oncomplete="PF('dialogCliente').hide()"/>
+					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" process="@this" update="pnlCliente" />
+				</f:facet>
+			</p:dialog>
+			<p:confirmDialog widgetVar="deleteClienteDialog" showEffect="fade" width="400" message="Desea eliminar el usuario?" header="Eliminar" severity="warn">
+				<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{usuariosBean.eliminar()}" oncomplete="PF('deleteClienteDialog').hide()" />
+				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteClienteDialog').hide()" />
+			</p:confirmDialog>
+
+			<p:confirmDialog global="true" showEffect="fade" width="400" header="Eliminar">
+				<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
+			</p:confirmDialog>
+			<p:dialog id="dialog-password" header="Establecer contraseña" showEffect="fade" modal="true" widgetVar="dialogPassword" responsive="true">
+				<p:panel>
+					<h5>Para cambiar su contraseña, debe considerar lo siguiente</h5>
+					<div>La contraseña debe tener entre 8 y 16 caracteres.</div>
+					<div>No debe tener espacios en blanco</div>
+					<div>Debe tener al menos una letra mayúscula</div>
+					<div>Debe tener al menos una letra minúscula</div>
+					<div>Debe tener al menos un número</div>
+					<div>Debe tener al menos un carácter especial: , . : * + - # $ % @ etc.</div>
+				</p:panel>
+				<p:outputPanel id="pnlPassword" class="ui-fluid">
+					<p:password value="#{usuariosBean.newPassword}" toggleMask="true" redisplay="true" placeholder="Contraseña de #{usuariosBean.usuario.usuario}"/>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{usuariosBean.guardarPassword}" process="pnlPassword @this" update="pnlPassword" target="#{usuariosBean.usuario}" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogPassword').hide();" class="ui-button-secondary" process="@this" update="pnlPassword" />
+				</f:facet>
+			</p:dialog>
+			
+			
+        
+			<style>
+			body .ui-panelgrid .ui-panelgrid-cell {
+				border: none !important;
+				padding: 0px;
+			}
+			
+			.ui-fluid .ui-password {
+				width: 90% !important;
+				display: inline-block !important;
+			}
+			
+			body .ui-input-icon-right>i:last-of-type {
+				right: 1rem;
+			}
+			
+			body .ui-input-icon-right>.ui-inputfield {
+				width: 100%;
+			}
+			</style>
+		</h:form>
+	</ui:define>
+</ui:composition>

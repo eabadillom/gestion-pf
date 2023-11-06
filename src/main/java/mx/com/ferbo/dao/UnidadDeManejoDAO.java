@@ -4,23 +4,46 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class UnidadDeManejoDAO extends IBaseDAO<UnidadDeManejo, Integer> {
+	private static Logger log = LogManager.getLogger(UnidadDeManejoDAO.class);
 
 	@Override
 	public UnidadDeManejo buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		UnidadDeManejo unidad = null;;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			unidad = em.find(UnidadDeManejo.class, id);
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la unidad de manejo...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return unidad;
 	}
 
 	@Override
 	public List<UnidadDeManejo> buscarTodos() {
 		List<UnidadDeManejo> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class).getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de unidades de manejo...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listado;
 	}
 
@@ -32,45 +55,54 @@ public class UnidadDeManejoDAO extends IBaseDAO<UnidadDeManejo, Integer> {
 
 	@Override
 	public String actualizar(UnidadDeManejo unidadManejo) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(unidadManejo);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR actualizando Banco" + e.getMessage());
-			return "ERROR";
+			log.error("Problema al actualizar la unidad de manejo",e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(UnidadDeManejo unidadManejo) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(unidadManejo);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Banco" + e.getMessage());
-			return "ERROR";
+			log.error("Problema para guardar unidad de manejo",e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(UnidadDeManejo unidadManejo) {
+		
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(unidadManejo));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return "ERROR";
+			log.error("Problema para eliminar unidad de manejo",e);
+		}finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

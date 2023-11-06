@@ -33,13 +33,16 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "CONSTANCIA_SALIDA")
 @NamedQueries({
+
     @NamedQuery(name = "ConstanciaSalida.findAll", query = "SELECT c FROM ConstanciaSalida c"),
     @NamedQuery(name = "ConstanciaSalida.findById", query = "SELECT c FROM ConstanciaSalida c WHERE c.id = :id"),
     @NamedQuery(name = "ConstanciaSalida.findByFecha", query = "SELECT c FROM ConstanciaSalida c WHERE c.fecha = :fecha"),
     @NamedQuery(name = "ConstanciaSalida.findByNumero", query = "SELECT c FROM ConstanciaSalida c WHERE c.numero = :numero"),
     @NamedQuery(name = "ConstanciaSalida.findByNombreCte", query = "SELECT c FROM ConstanciaSalida c WHERE c.nombreCte = :nombreCte"),
     @NamedQuery(name = "ConstanciaSalida.findByStatus", query = "SELECT c FROM ConstanciaSalida c WHERE c.status = :status"),
+    @NamedQuery(name = "ConstanciaSalida.findByPeriodoClienteFolio", query = "SELECT c FROM ConstanciaSalida c WHERE c.fecha BETWEEN :fechaInicio AND :fechaFin AND (c.clienteCve.cteCve = :idCliente OR :idCliente IS NULL) AND (c.numero = :folioCliente OR :folioCliente IS NULL)"),
     @NamedQuery(name = "ConstanciaSalida.findByObservaciones", query = "SELECT c FROM ConstanciaSalida c WHERE c.observaciones = :observaciones")})
+
 public class ConstanciaSalida implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -61,13 +64,24 @@ public class ConstanciaSalida implements Serializable {
     @Size(max = 150)
     @Column(name = "NOMBRE_CTE")
     private String nombreCte;
-    @Column(name = "STATUS")
-    private Integer status;
+    @JoinColumn(name = "STATUS", referencedColumnName = "ID")
+    @ManyToOne
+    private StatusConstanciaSalida status;
     @Size(max = 75)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
+    @NotNull
+    @Size(max = 100)
+    @Column(name = "nombre_transportista")
+    private String nombreTransportista;
+    @NotNull
+    @Size(max = 10)
+    @Column(name = "placas_transporte")
+    private  String placasTransporte;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaCve")
     private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idConstancia")
+    private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
     @JoinColumn(name = "CLIENTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente clienteCve;
@@ -117,11 +131,11 @@ public class ConstanciaSalida implements Serializable {
         this.nombreCte = nombreCte;
     }
 
-    public Integer getStatus() {
+    public StatusConstanciaSalida getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(StatusConstanciaSalida status) {
         this.status = status;
     }
 
@@ -132,8 +146,24 @@ public class ConstanciaSalida implements Serializable {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
+    
+    public String getNombreTransportista() {
+		return nombreTransportista;
+	}
 
-    public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
+	public void setNombreTransportista(String nombreTransportista) {
+		this.nombreTransportista = nombreTransportista;
+	}
+
+	public String getPlacasTransporte() {
+		return placasTransporte;
+	}
+
+	public void setPlacasTransporte(String placasTransporte) {
+		this.placasTransporte = placasTransporte;
+	}
+
+	public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
         return detalleConstanciaSalidaList;
     }
 
@@ -141,7 +171,15 @@ public class ConstanciaSalida implements Serializable {
         this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
     }
 
-    public Cliente getClienteCve() {
+    public List<ConstanciaSalidaServicios> getConstanciaSalidaServiciosList() {
+		return constanciaSalidaServiciosList;
+	}
+
+	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
+		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
+	}
+
+	public Cliente getClienteCve() {
         return clienteCve;
     }
 
@@ -173,5 +211,5 @@ public class ConstanciaSalida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.ConstanciaSalida[ id=" + id + " ]";
     }
-    
+
 }

@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,7 +32,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Posicion.findAll", query = "SELECT p FROM Posicion p"),
     @NamedQuery(name = "Posicion.findByIdPosicion", query = "SELECT p FROM Posicion p WHERE p.idPosicion = :idPosicion"),
 //    @NamedQuery(name = "Posicion.findByIdPlanta", query = "SELECT p FROM Posicion p WHERE p.idPlanta = :idPlanta"),
-//    @NamedQuery(name = "Posicion.findByIdCamara", query = "SELECT p FROM Posicion p WHERE p.idCamara = :idCamara"),
+    @NamedQuery(name = "Posicion.findByCamara", query = "SELECT p FROM Posicion p WHERE p.camara.camaraCve = :camaraCve"),
+    @NamedQuery(name = "Posicion.findByPlantaCamara", query = "SELECT p FROM Posicion p WHERE p.planta.plantaCve = :plantaCve AND p.camara.camaraCve = :camaraCve"),
     @NamedQuery(name = "Posicion.findByCodPosicion", query = "SELECT p FROM Posicion p WHERE p.codPosicion = :codPosicion"),
     @NamedQuery(name = "Posicion.findByDescPosicion", query = "SELECT p FROM Posicion p WHERE p.descPosicion = :descPosicion"),
     @NamedQuery(name = "Posicion.findByTempIni", query = "SELECT p FROM Posicion p WHERE p.tempIni = :tempIni"),
@@ -47,11 +49,11 @@ public class Posicion implements Serializable {
     private Integer idPosicion;
     
     @JoinColumn(name = "id_planta", referencedColumnName = "PLANTA_CVE")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Planta planta;
     
     @JoinColumn(name = "id_camara", referencedColumnName = "CAMARA_CVE")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Camara camara;
     
     @Basic(optional = false)

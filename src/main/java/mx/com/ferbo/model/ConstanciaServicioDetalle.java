@@ -8,8 +8,12 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -27,25 +31,26 @@ import javax.validation.constraints.NotNull;
 @NamedQueries({
     @NamedQuery(name = "ConstanciaServicioDetalle.findAll", query = "SELECT c FROM ConstanciaServicioDetalle c"),
     @NamedQuery(name = "ConstanciaServicioDetalle.findByConstanciaServicioDetalleCve", query = "SELECT c FROM ConstanciaServicioDetalle c WHERE c.constanciaServicioDetalleCve = :constanciaServicioDetalleCve"),
+    @NamedQuery(name = "ConstanciaServicioDetalle.findByFolio", query = "SELECT c FROM ConstanciaServicioDetalle c WHERE c.folio = :folio"),
     @NamedQuery(name = "ConstanciaServicioDetalle.findByServicioCantidad", query = "SELECT c FROM ConstanciaServicioDetalle c WHERE c.servicioCantidad = :servicioCantidad")})
 public class ConstanciaServicioDetalle implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
     @Column(name = "CONSTANCIA_SERVICIO_DETALLE_CVE")
     private Integer constanciaServicioDetalleCve;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "SERVICIO_CANTIDAD")
     private BigDecimal servicioCantidad;
     @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private ConstanciaDeServicio folio;
     @JoinColumn(name = "SERVICIO_CVE", referencedColumnName = "SERVICIO_CVE")
     @ManyToOne(optional = false)
     private Servicio servicioCve;
-
+    
     public ConstanciaServicioDetalle() {
     }
 

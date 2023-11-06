@@ -8,7 +8,8 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -32,7 +33,7 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "DetallePartida.findAll", query = "SELECT d FROM DetallePartida d"),
     @NamedQuery(name = "DetallePartida.findByDetPartCve", query = "SELECT d FROM DetallePartida d WHERE d.detallePartidaPK.detPartCve = :detPartCve"),
-    @NamedQuery(name = "DetallePartida.findByPartidaCve", query = "SELECT d FROM DetallePartida d WHERE d.detallePartidaPK.partidaCve = :partidaCve"),
+    @NamedQuery(name = "DetallePartida.findByPartidaCve", query = "SELECT d FROM DetallePartida d WHERE d.detallePartidaPK.partidaCve.partidaCve = :partidaCve"),
     @NamedQuery(name = "DetallePartida.findByDetPadre", query = "SELECT d FROM DetallePartida d WHERE d.detPadre = :detPadre"),
     @NamedQuery(name = "DetallePartida.findByDetPartPadre", query = "SELECT d FROM DetallePartida d WHERE d.detPartPadre = :detPartPadre"),
     @NamedQuery(name = "DetallePartida.findByCantidadUManejo", query = "SELECT d FROM DetallePartida d WHERE d.cantidadUManejo = :cantidadUManejo"),
@@ -45,63 +46,81 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "DetallePartida.findByDtpPedimento", query = "SELECT d FROM DetallePartida d WHERE d.dtpPedimento = :dtpPedimento"),
     @NamedQuery(name = "DetallePartida.findByDtpSAP", query = "SELECT d FROM DetallePartida d WHERE d.dtpSAP = :dtpSAP"),
     @NamedQuery(name = "DetallePartida.findByDtpTarimas", query = "SELECT d FROM DetallePartida d WHERE d.dtpTarimas = :dtpTarimas")})
-public class DetallePartida implements Serializable {
+public class DetallePartida implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
-    protected DetallePartidaPK detallePartidaPK;
+    private DetallePartidaPK detallePartidaPK;
+    
     @Column(name = "det_padre")
     private Integer detPadre;
+    
     @Column(name = "det_part_padre")
     private Integer detPartPadre;
+    
     @Column(name = "cantidad_u_manejo")
     private Integer cantidadUManejo;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    
     @Column(name = "cantidad_u_medida")
     private BigDecimal cantidadUMedida;
+    
     @Size(max = 12)
     @Column(name = "dtp_codigo")
     private String dtpCodigo;
+    
     @Size(max = 20)
     @Column(name = "dtp_lote")
     private String dtpLote;
+    
     @Column(name = "dtp_caducidad")
     @Temporal(TemporalType.DATE)
     private Date dtpCaducidad;
+    
     @Size(max = 12)
     @Column(name = "dtp_PO")
     private String dtpPO;
+    
     @Size(max = 20)
     @Column(name = "dtp_MP")
     private String dtpMP;
+    
     @Size(max = 13)
     @Column(name = "dtp_pedimento")
     private String dtpPedimento;
+    
     @Size(max = 20)
     @Column(name = "dtp_SAP")
     private String dtpSAP;
+    
     @Size(max = 15)
     @Column(name = "dtp_tarimas")
     private String dtpTarimas;
-    @OneToMany(mappedBy = "detallePartida")
-    private List<DetallePartida> detallePartidaList;
+    
+//    @OneToOne(cascade = CascadeType.ALL, mappedBy = "detallePartida")
+//    private DetalleConstanciaSalida detalleConstanciaSalida;
+    
     @JoinColumns({
         @JoinColumn(name = "det_anterior", referencedColumnName = "DET_PART_CVE"),
         @JoinColumn(name = "det_part_anterior", referencedColumnName = "PARTIDA_CVE")})
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private DetallePartida detallePartida;
-    @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private Partida partida;
+    
     @JoinColumn(name = "tipo_mov_cve", referencedColumnName = "CLAVE")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private TipoMovimiento tipoMovCve;
+    
     @JoinColumn(name = "u_medida_cve", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
     @ManyToOne
     private UnidadDeManejo uMedidaCve;
+    
     @JoinColumn(name = "edo_inv_cve", referencedColumnName = "edo_inv_cve")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private EstadoInventario edoInvCve;
+    
+    public DetallePartida clone() throws CloneNotSupportedException {
+    	return (DetallePartida) super.clone();
+    }
 
     public DetallePartida() {
     }
@@ -110,7 +129,7 @@ public class DetallePartida implements Serializable {
         this.detallePartidaPK = detallePartidaPK;
     }
 
-    public DetallePartida(int detPartCve, int partidaCve) {
+    public DetallePartida(int detPartCve, Partida partidaCve) {
         this.detallePartidaPK = new DetallePartidaPK(detPartCve, partidaCve);
     }
 
@@ -218,13 +237,13 @@ public class DetallePartida implements Serializable {
         this.dtpTarimas = dtpTarimas;
     }
 
-    public List<DetallePartida> getDetallePartidaList() {
-        return detallePartidaList;
-    }
-
-    public void setDetallePartidaList(List<DetallePartida> detallePartidaList) {
-        this.detallePartidaList = detallePartidaList;
-    }
+//    public DetalleConstanciaSalida getDetalleConstanciaSalida() {
+//        return detalleConstanciaSalida;
+//    }
+//
+//    public void setDetalleConstanciaSalida(DetalleConstanciaSalida detalleConstanciaSalida) {
+//        this.detalleConstanciaSalida = detalleConstanciaSalida;
+//    }
 
     public DetallePartida getDetallePartida() {
         return detallePartida;
@@ -232,14 +251,6 @@ public class DetallePartida implements Serializable {
 
     public void setDetallePartida(DetallePartida detallePartida) {
         this.detallePartida = detallePartida;
-    }
-
-    public Partida getPartida() {
-        return partida;
-    }
-
-    public void setPartida(Partida partida) {
-        this.partida = partida;
     }
 
     public TipoMovimiento getTipoMovCve() {
@@ -275,7 +286,6 @@ public class DetallePartida implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof DetallePartida)) {
             return false;
         }

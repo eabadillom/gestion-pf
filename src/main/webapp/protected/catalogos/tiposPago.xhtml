@@ -8,35 +8,19 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Tipos de Pago" />
-			</p:breadCrumb>
-
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-
 						<p:growl id="messages" showDetail="true" />
-
 						<p:toolbar styleClass="p-mb-4">
 							<p:toolbarGroup>
 								<p:commandButton value="Agregar" icon="pi pi-plus"
-									styleClass="ui-button-success p-mr-2 p-mb-2"
+									styleClass="ui-button-info p-mr-2 p-mb-2"
 									oncomplete="PF('dg-agrega').show();" update="frm-agrega"
 									actionListener="#{tiposPagoBean.openNew()}" process="@this" />
 							</p:toolbarGroup>
 						</p:toolbar>
-
-						<p:dataTable id="dt-tipos" widgetVar="dtTipos" var="tipos"
-							reflow="true" paginator="true" rows="10"
-							paginatorPosition="bottom" value="#{tiposPagoBean.principal}"
-							rowKey="#{tipos.mpId}" selection="#{tiposPagoBean.seleccion}"
-							rowSelectMode="single">
-
+						<p:dataTable id="dt-tipos" widgetVar="dtTipos" var="tipos" reflow="true" paginator="true" rows="10" paginatorPosition="bottom" value="#{tiposPagoBean.principal}" rowKey="#{tipos.mpId}" selection="#{tiposPagoBean.seleccion}" rowSelectMode="single">
 							<f:facet name="header">
 								<div class="table-header" align="center">
 									<p>Antes de agregar un nuevo tipo de pago, por favor
@@ -46,7 +30,6 @@
 										presente catálogo.</p>
 								</div>
 							</f:facet>
-
 							<p:column headerText="Descripción"
 								sortBy="#{tipos.mpDescripcion}">
 								<h:outputText value="#{tipos.mpDescripcion}" />
@@ -61,7 +44,7 @@
 								style="text-align:center">
 
 								<p:commandButton icon="pi pi-pencil" value="Modificar"
-									styleClass="edit-button ui-button-warning p-mr-2"
+									styleClass="edit-button ui-button-info p-mr-2"
 									oncomplete="PF('dg-modifica').show()"
 									update="form:frm-modifica" process="@this">
 									<f:setPropertyActionListener value="#{tipos}"
@@ -80,10 +63,11 @@
 				modal="true" showEffect="fade" responsive="true">
 
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
+				<p:outputPanel rendered="#{not empty tiposPagoBean.nuevo}"></p:outputPanel>
 					<div class="p-field">
 						<p:outputLabel for="@next">Nombre:</p:outputLabel>
 						<p:inputText value="#{tiposPagoBean.nuevo.mpDescripcion}"
-							required="true" />
+							required="true" requiredMessage="Ingresa nombre de la forma de pago" />
 					</div>
 
 					<div class="p-field">
@@ -95,10 +79,10 @@
 
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-check"
-						actionListener="#{tiposPagoBean.save()}" update="frm-agrega"
+						actionListener="#{tiposPagoBean.save()}" update="frm-agrega messages"
 						process="frm-agrega @this" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-secondary" oncomplete="PF('dg-agrega').hide()" />
+						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()" process="@this" immediate="true"/>
 				</f:facet>
 
 			</p:dialog>
@@ -107,6 +91,7 @@
 				modal="true" showEffect="fade" responsive="true">
 
 				<p:outputPanel id="frm-modifica" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty tiposPagoBean.seleccion}">
 					<div class="p-field">
 						<p:outputLabel for="@next">Nombre:</p:outputLabel>
 						<p:inputText 
@@ -118,7 +103,7 @@
 						<p:selectBooleanCheckbox 
 							value="#{tiposPagoBean.seleccion.mpReqReferencia}" />
 					</div>
-
+					</p:outputPanel>
 				</p:outputPanel>
 
 				<f:facet name="footer">
@@ -126,7 +111,7 @@
 						actionListener="#{tiposPagoBean.updateTipo()}"
 						update="frm-modifica" process="frm-modifica @this" />
 					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-secondary" oncomplete="PF('dg-modifica').hide()" />
+						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" process="@this" immediate="true"/>
 				</f:facet>
 
 			</p:dialog>

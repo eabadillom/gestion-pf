@@ -6,7 +6,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,32 +32,39 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "MedioCnt.findAll", query = "SELECT m FROM MedioCnt m"),
     @NamedQuery(name = "MedioCnt.findByIdMedio", query = "SELECT m FROM MedioCnt m WHERE m.idMedio = :idMedio"),
     @NamedQuery(name = "MedioCnt.findByTpMedio", query = "SELECT m FROM MedioCnt m WHERE m.tpMedio = :tpMedio"),
-    @NamedQuery(name = "MedioCnt.findByStMedio", query = "SELECT m FROM MedioCnt m WHERE m.stMedio = :stMedio")})
+    @NamedQuery(name = "MedioCnt.findByStMedio", query = "SELECT m FROM MedioCnt m WHERE m.stMedio = :stMedio"),
+    @NamedQuery(name = "MedioCnt.findByIdContacto", query = "SELECT m FROM MedioCnt m WHERE m.idContacto.idContacto = :idContacto")})
 public class MedioCnt implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_medio")
     private Integer idMedio;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 1)
     @Column(name = "tp_medio")
     private String tpMedio;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "st_medio")
     private boolean stMedio;
+    
     @JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.DETACH)//Cambie por ALL
     private Contacto idContacto;
+    
     @JoinColumn(name = "id_mail", referencedColumnName = "id_mail")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Mail idMail;
+    
     @JoinColumn(name = "id_telefono", referencedColumnName = "id_telefono")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Telefono idTelefono;
 
     public MedioCnt() {
