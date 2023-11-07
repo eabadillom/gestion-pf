@@ -422,7 +422,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 
 	public void jasper() throws JRException, IOException, SQLException {
-		String jasperPath = "/jasper/ejemplo1.jrxml";
+		String jasperPath = "/jasper/ticketServicio.jrxml";
 		String filename = "Constancia_de_servicio.pdf";
 		String images = "/images/logo.jpeg";
 		String message = null;

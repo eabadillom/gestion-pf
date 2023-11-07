@@ -75,8 +75,8 @@ public class JasperReportUtil {
 			jasperPrint = JasperFillManager.fillReport(report, parameters);
 			JasperExportManager.exportReportToPdfStream(jasperPrint, output);
 			
-			context.responseComplete();
 			FacesContext.getCurrentInstance().responseComplete();
+			context.responseComplete();
 			log.info("Exportacion de JASPER completa.");
 		} catch (JRException ex) {
 			ex.printStackTrace();
