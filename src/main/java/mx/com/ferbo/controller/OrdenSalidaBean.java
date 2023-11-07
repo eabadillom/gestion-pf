@@ -285,59 +285,6 @@ public class OrdenSalidaBean implements Serializable {
 		}
 		log.info("Informacion filtrada con éxito.");
 	}
-	
-	public void imprimirTicketPDF() throws JRException, IOException, SQLException {
-		
-		System.out.println("Exportando a pdf.....");
-		String jasperPath = "/jasper/OrdenSalida.jrxml";
-		String filename = "OrdenSalida"+fecha+".pdf";
-		String images = "/images/logo.jpeg";
-		String message = null;
-		Severity severity = null;
-		File reportFile = new File(jasperPath);
-		File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		Connection connection = null;
-		parameters = new HashMap<String, Object>();
-		
-		try {
-			
-			URL resource = getClass().getResource(jasperPath);
-			URL resourceimg = getClass().getResource(images);
-			String file = resource.getFile();
-			String img = resourceimg.getFile();
-			reportFile = new File(file);
-			imgfile = new File(img);
-			log.info(reportFile.getPath());
-			
-			Integer clienteCve = null;
-			if(clienteSelect == null) {
-				clienteCve = null; 
-			}else {
-				clienteCve = clienteSelect.getCteCve();
-			}
-			
-			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("idCliente",clienteCve);
-			parameters.put("fechaInicio", fecha);
-			parameters.put("fechaFin", fecha);
-			parameters.put("imagen", imgfile.getPath());
-			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			
-		} catch (Exception ex) {
-			log.error("Problema general...", ex);
-			message = String.format("No se pudo imprimir el reporte");
-			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-inventarioSalidas");
-		} finally {
-			conexion.close((Connection) connection);
-		}
-		
-	}
 
 	public void agregaServicios() {
 		String message = null;
@@ -533,11 +480,12 @@ public class OrdenSalidaBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
-
+	
+	
 public void imprimirTicketSalida() throws Exception{
 		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-		String filename = "ticket.pdf";
+		String filename = "ticketSalida.pdf";
 		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
@@ -545,6 +493,7 @@ public void imprimirTicketSalida() throws Exception{
 		File reportFile = new File(jasperPath);
 		File imgFile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		String folioSalida = ordensalida.getFolioSalida();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
@@ -557,16 +506,16 @@ public void imprimirTicketSalida() throws Exception{
 			reportFile = new File(file);//crea un archivo
 			imgFile = new File(img);
 			constancia = new ConstanciaSalida();
-			constancia.setNumero(ordensalida.getFolioSalida());
+			constancia.setNumero(folioSalida);
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("NUMERO", ordensalida.getFolioSalida());
+			parameters.put("NUMERO", folioSalida);
 			parameters.put("LogoPath", imgFile.getPath());
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 			   
 		} catch (Exception e) {
 			e.printStackTrace();
-			message = String.format("No se pudo imprimir el folio %s", ordensalida.getFolioSalida());
+			message = String.format("No se pudo imprimir el folio %s", folioSalida);
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
 			PrimeFaces.current().ajax().update("form:messages");
@@ -576,6 +525,52 @@ public void imprimirTicketSalida() throws Exception{
 		}
 
 	}
+
+
+public void imprimirTicketServicios() throws JRException, IOException, SQLException {
+	String jasperPath = "/jasper/ticketServicio.jrxml";
+	String filename = "Constancia_de_servicio.pdf";
+	String images = "/images/logo.jpeg";
+	String message = null;
+	Severity severity = null;
+	ConstanciaDeServicio constancia = null;
+	List<ConstanciaDeServicio> alConstancias = null;
+	//alConstancias = csDAO.buscarPorFolioCliente(this.folio);
+	 File reportFile = new File(jasperPath);
+	 File imgfile = null;
+	JasperReportUtil jasperReportUtil = new JasperReportUtil();
+	ConstanciaDeServicio cds = new ConstanciaDeServicio();
+	Map<String, Object> parameters = new HashMap<String, Object>();
+	Connection connection = null;
+	parameters = new HashMap<String, Object>();
+	try {
+		
+		URL resource = getClass().getResource(jasperPath);
+		URL resourceimg = getClass().getResource(images);
+		String file = resource.getFile();
+		String img = resourceimg.getFile();
+		reportFile = new File(file);
+		imgfile = new File(img);
+		log.info(reportFile.getPath());
+		constancia = new ConstanciaDeServicio();
+		constancia.setFolioCliente(ordensalida.getFolioSalida());
+		connection = EntityManagerUtil.getConnection();
+		parameters.put("REPORT_CONNECTION", connection);
+		parameters.put("FOLIO", ordensalida.getFolioSalida());
+		parameters.put("LogoPath",imgfile.getPath());
+		log.info("Parametros: " + parameters.toString());
+		jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());			
+	} catch (Exception ex) {
+		ex.fillInStackTrace();
+		log.error("Problema general...", ex);
+		message = String.format("No se pudo imprimir el folio %s", ordensalida.getFolioSalida());
+		severity = FacesMessage.SEVERITY_INFO;
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
+	} finally {
+		conexion.close((Connection) connection);
+	}
+}
 	
 	@SuppressWarnings("unlikely-arg-type")
 	public void deleteServicio(PreSalidaServicio servicio) {
