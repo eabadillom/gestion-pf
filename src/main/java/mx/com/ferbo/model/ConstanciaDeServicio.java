@@ -62,7 +62,7 @@ public class ConstanciaDeServicio implements Serializable {
     @Column(name = "NOMBRE_TRANSPORTISTA")
     private String nombreTransportista;
     
-    @Size(max = 6)
+    @Size(max = 8)
     @Column(name = "PLACAS_TRANSPORTE")
     private String placasTransporte;
     

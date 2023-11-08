@@ -253,9 +253,6 @@ WHERE
 				</textElement>
 				<text><![CDATA[INDUSTRIAS DE REFRIGERACION KELANGAN S. A. de C.V.]]></text>
 			</staticText>
-			<line>
-				<reportElement mode="Transparent" x="0" y="119" width="191" height="1" forecolor="#0F0F0F" backcolor="#16181A" uuid="c263645f-0513-4864-865c-2dbeaa56c71b"/>
-			</line>
 		</band>
 	</pageHeader>
 	<columnHeader>
@@ -420,9 +417,6 @@ WHERE
 					</jr:column>
 				</jr:table>
 			</componentElement>
-			<line>
-				<reportElement mode="Transparent" x="-2" y="79" width="191" height="1" forecolor="#121314" backcolor="#101112" uuid="38143daa-6b51-45f7-8b21-7d0df6e306c2"/>
-			</line>
 		</band>
 	</summary>
 </jasperReport>
