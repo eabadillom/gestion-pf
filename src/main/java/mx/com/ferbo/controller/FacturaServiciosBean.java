@@ -35,7 +35,6 @@ import com.ferbo.facturama.tools.FacturamaException;
 import mx.com.ferbo.business.FacturamaBL;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
-import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
@@ -86,7 +85,7 @@ public class FacturaServiciosBean implements Serializable {
 	
 	private FacesContext context;
 	private HttpServletRequest request;
-	HttpSession session;
+	private HttpSession session;
 
 	
 	
@@ -133,7 +132,6 @@ public class FacturaServiciosBean implements Serializable {
 	private AsentamientoHumandoDAO asnDAO;
 	private StatusFacturaDAO statusDAO;
 	private TipoFacturacionDAO tipoDAO;
-	private ClaveUnidadDAO claveDAO;
 	private PrecioServicioDAO psDAO;
 
 	private int plazoSelect;
@@ -193,7 +191,6 @@ public class FacturaServiciosBean implements Serializable {
 		statusDAO = new StatusFacturaDAO();
 		tipoDAO = new TipoFacturacionDAO();
 		facturaDAO = new FacturaDAO();
-		claveDAO = new ClaveUnidadDAO();
 		psDAO = new PrecioServicioDAO();
 	}
 
