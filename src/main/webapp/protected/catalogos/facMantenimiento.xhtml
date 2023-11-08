@@ -68,15 +68,15 @@
 				<p:column headerText="Cliente" >
 					<h:outputText value="#{lista.nombreCliente}"/>
 				</p:column>
-				<p:column headerText="Total" width="4rem">
+				<p:column headerText="Total" width="6rem" style="text-align: right;">
 					<h:outputText value="#{lista.total}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
-				<p:column headerText="Status" width="5rem">
+				<p:column headerText="Status" width="5rem" style="text-align: center;">
 					<h:outputText value="#{lista.status.nombre}"/>
 				</p:column>
-				<p:column headerText="Timbrado" width="4rem">
+				<p:column headerText="Timbrado" width="4rem" style="text-align: center;">
 					<h:outputText value="#{(empty lista.uuid) ? '--' : 'SI'}"/>
 				</p:column>
 				<p:column width="2rem">
@@ -127,6 +127,11 @@
 						onclick="PF('dg-delete').hide()" />
 				</f:facet>
 			</p:dialog>
+			<div style="padding-top: 2rem;" align="center">
+				<p:commandButton id="exportar" value="Descargar" icon="pi pi-file-excel" ajax="false" actionListener="#{facMantenimentoBean.exportar}">
+					<p:fileDownload value="#{facMantenimentoBean.file}"></p:fileDownload>
+				</p:commandButton>
+			</div>
 		</h:form>
 		<p:dialog header="Descargar de archivos" showEffect="fade" modal="true" widgetVar="dg-factura" responsive="true">
 			<h:form enctype="multipart/form-data">
@@ -136,11 +141,10 @@
 						styleClass="ui-button-outlined"
 						actionListener="#{facMantenimentoBean.jasper}"
 						ajax="false">
-						<p:fileDownload value="#{facMantenimentoBean.file}"></p:fileDownload>
+						<p:fileDownload value="#{facMantenimentoBean.file}" />
 					</p:commandButton>
 				</p:outputPanel>
 			</h:form>
 		</p:dialog>
-		
 	</ui:define>
 </ui:composition>

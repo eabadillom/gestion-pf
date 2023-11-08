@@ -262,6 +262,71 @@ public class FacMantenimentoBean implements Serializable {
 		}
 	}
 	
+	public void exportar() throws JRException, IOException, SQLException {
+		String jasperPath = null;
+		String filename = null;
+		String images = null;
+		String message = null;
+		Severity severity = null;
+		File reportFile = null;
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = null;
+		Map<String, Object> parameters = null;
+		Connection conn = null;
+		
+		Integer idCliente = null;
+		Date fechaInicio = null;
+		Date fechaFin = null;
+		
+		try {
+			idCliente = this.clienteSelect == null ? null : this.clienteSelect.getCteCve();
+			fechaInicio = this.de;
+			fechaFin = this.hasta;
+			
+			jasperPath = "/jasper/consulta_facturacion.jrxml";
+			filename = String.format("consulta_facturacion.xls");
+			images = "/images/logo.jpeg";
+			reportFile = new File(jasperPath);
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			log.debug("Ruta del reporte: {}", reportFile.getPath());
+			
+			
+			conn = EntityManagerUtil.getConnection();
+			parameters = new HashMap<String, Object>();
+			parameters.put("REPORT_CONNECTION", conn);
+			parameters.put("idCliente", idCliente);
+			parameters.put("fechaIni", fechaInicio);
+			parameters.put("fechaFin", fechaFin);
+			log.debug("Parametros: {}", parameters.toString());
+			
+			jasperReportUtil = new JasperReportUtil();
+			//jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			this.file = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
+			//InputStream input = new ByteArrayInputStream(bytes);
+//			this.file = DefaultStreamedContent.builder()
+//					.contentType("application/vnd.ms-excel")
+//					.name(filename)
+//					.stream(() -> input )
+//					.build();
+			log.info("Factura generada {}...", filename);
+		} catch (Exception ex) {
+			log.error("Problema general...", ex);
+			message = String.format("No se puede realizar la exportación de la consulta.");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
+		} finally {
+			conexion.close((Connection) conn);
+			PrimeFaces.current().ajax().update("frmFactura:file-factura");
+		}
+
+	}
+	
 	public void setFolioFactura(Factura factura) {
 		this.folio = String.format("%s-%s", factura.getNomSerie(), factura.getNumero());
 		log.info("Preparando vista previa de la factura (Folio: {})", this.folio);
