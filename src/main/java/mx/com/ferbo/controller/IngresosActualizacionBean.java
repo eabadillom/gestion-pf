@@ -156,22 +156,66 @@ public class IngresosActualizacionBean implements Serializable{
 		String mensaje = null;
 		Severity severity = null;
 		
+		
+		String respuesta = null;
+		Pago pago = null;
+		Factura factura = null;
+		Integer idFactura = null;
+		BigDecimal saldo = null;
+		
 		try {
 			
-			if(pagofactDAO.eliminar(pagoSelected)==null) {
-				mensaje = "El pago fue eliminado correctamente";
-				severity = FacesMessage.SEVERITY_INFO;
-				filtraPagos();
+			pago = pagofactDAO.buscarPorId(this.pagoSelected.getId(), true);
+			idFactura = pago.getFactura().getId();
+			
+			respuesta = pagofactDAO.eliminar(pagoSelected);
+			
+			if(respuesta != null) {
+				log.error("Problema al eliminar el pago " + respuesta);
+				throw new InventarioException("Ocurrió un problema para eliminar el pago.");
 			}
 			
-		} catch (Exception e) {
-			mensaje = "Ocurrio un error al querer eliminar el pago";
+			factura = facturaDAO.buscarPorId(idFactura, true);
+			saldo = factura.getTotal();
+			
+			for(Pago p : factura.getPagoList()) {
+				saldo = saldo.subtract(p.getMonto());
+			}
+			
+			if(saldo.compareTo(BigDecimal.ZERO) > 0 && saldo.compareTo(factura.getTotal()) < 0) {
+				factura.setStatus(statusPagoParcial);
+			} else if(saldo.compareTo(BigDecimal.ZERO) > 0 && saldo.compareTo(factura.getTotal()) == 0) {
+				factura.setStatus(statusPorCobrar);
+			} else if(saldo.compareTo(BigDecimal.ZERO) == 0) {
+				factura.setStatus(statusPagada);
+			} else {
+				String msg = String.format("La suma de todos los pagos de la factura %s-%s excede el monto total.", factura.getNomSerie(), factura.getNumero());
+				throw new InventarioException(msg);
+			}
+			
+			respuesta = facturaDAO.actualizaStatus(factura);
+			
+			if(respuesta != null) {
+				log.info("Problema al actualizar el status de la factura {}-{}: {}", factura.getNomSerie(), factura.getNumero(), respuesta);
+				throw new InventarioException("Ocurrió un problema para actualizar el status de la factura " + factura.getNomSerie() + " - " + factura.getNumero());
+			}
+			
+			filtraPagos();
+			
+			mensaje = "El pago fue eliminado correctamente";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(InventarioException ex) {
+			log.error("Ocurrió un problema al eliminar el pago...", ex);
+			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
-			log.error(e.getMessage());
+		} catch (Exception ex) {
+			log.error("Ocurrió un problema al eliminar el pago...", ex);
+			mensaje = "Ocurrio un problema al eliminar el pago.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Eliminar pago", mensaje));
+			PrimeFaces.current().ajax().update("form:messages");
 		}
-		
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Eliminar", mensaje));
-		PrimeFaces.current().ajax().update("form:messages");
 	}
 	
 	public void filtraPagos() {

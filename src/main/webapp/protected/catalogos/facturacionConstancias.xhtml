@@ -51,7 +51,7 @@
 								<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}" required="true" requiredMessage="Seleccione un Cliente" onchange="PF('statusInfoDialog').show();">
 									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-									<p:ajax update="receptor factura messages" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}" oncomplete="PF('statusInfoDialog').hide();"/>
+									<p:ajax update="receptor factura messages medioPago" listener="#{facturacionConstanciasBean.domicilioAvisoPorCliente}" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-6 p-md-6">
@@ -96,15 +96,15 @@
 							<div class="p-col-6 p-md-6">
 								<p:outputLabel value="Metodo de Pago (SAT)" />
 								<p:selectOneMenu id="metodoPago" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.metodoPagoSelect}" required="true" requiredMessage="Ingresa un Metodo de Pago" >
-									<f:selectItem itemLabel="#{facturacionConstanciasBean.clienteSelect.metodoPago.cdMetodoPago}-#{facturacionConstanciasBean.clienteSelect.metodoPago.nbMetodoPago}" itemValue="#{facturacionConstanciasBean.clienteSelect.metodoPago}" />
-									<f:selectItems value="#{facturacionConstanciasBean.listaMetodoPago}" var="metodoP" itemLabel="#{metodoP.cdMetodoPago}-#{metodoP.nbMetodoPago}" itemValue="#{metodoP}" />
+									<f:selectItem itemLabel="#{facturacionConstanciasBean.clienteSelect.metodoPago.cdMetodoPago} - #{facturacionConstanciasBean.clienteSelect.metodoPago.nbMetodoPago}" itemValue="#{facturacionConstanciasBean.clienteSelect.metodoPago}" />
+									<f:selectItems value="#{facturacionConstanciasBean.listaMetodoPago}" var="metodoP" itemLabel="#{metodoP.cdMetodoPago} - #{metodoP.nbMetodoPago}" itemValue="#{metodoP}" />
 									<p:ajax process="@this" update="messages" />
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-6 p-md-6">
 								<p:outputLabel value="Forma de pago (SAT)" />
 								<p:selectOneMenu id="medioPago" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.medioPagoSelect}" required="true" requiredMessage="Ingresa una Forma de Pago">
-									<f:selectItem itemLabel="#{facturacionConstanciasBean.formaPagoCliente.mpId}-#{facturacionConstanciasBean.formaPagoCliente.mpDescripcion}" itemValue="#{facturacionConstanciasBean.formaPagoCliente}" />
+									<f:selectItem itemLabel="#{facturacionConstanciasBean.formaPagoCliente.formaPago} - #{facturacionConstanciasBean.formaPagoCliente.mpDescripcion}" itemValue="#{facturacionConstanciasBean.formaPagoCliente}" />
 									<f:selectItems value="#{facturacionConstanciasBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.formaPago} - #{medioP.mpDescripcion}" itemValue="#{medioP}"/>
 									<p:ajax process="@this" update="messages txtReferencia" />
 								</p:selectOneMenu>

@@ -72,26 +72,18 @@
 					</h:outputText>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button ui-button-primary" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('informacionPagoDialogAct').show()" update="form:dt-pagos form:panel-actualizaPago">
+					<p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button ui-button-primary" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('informacionPagoDialogAct').show()" update="form:dt-pagos form:panel-actualizaPago" disabled="#{pPago.tipo.id == 5}">
 						<f:setPropertyActionListener value="#{pPago}" target="#{ingresosActualizacionBean.pagoSelected}" />
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('informacionPagoDialogActDelete').show()">
+					<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('informacionPagoDialogActDelete').show()" disabled="#{pPago.tipo.id == 5}">
 						<f:setPropertyActionListener value="#{pPago}" target="#{ingresosActualizacionBean.pagoSelected}" />
 					</p:commandButton>
 				</p:column>
 			</p:dataTable>
 			<p:dialog header="Actualizar Pago" showEffect="fade" modal="true" widgetVar="informacionPagoDialogAct" responsive="true">
 				<p:outputPanel id="panel-actualizaPago" class="ui-fluid">
-						<!-- <div class="pagos-act-header">
-							<p:toolbar styleClass="p-mb-4">
-								<p:toolbarGroup align="left">
-									<h:outputText
-										value="#{ingresosActualizacionBean.cteSelect.cteNombre}" />
-								</p:toolbarGroup>
-							</p:toolbar>
-						</div> -->
 					<div class="p-grid p-col-12">
 						<div class="p-md-3 p-lg-3">
 							<p:outputLabel for="@next" value="Factura" />
@@ -112,18 +104,6 @@
 									itemValue="#{tipoPago}" />
 							</p:selectOneMenu>
 						</div>
-						<!-- <div class="p-md-3 p-lg-3">
-							<p:outputLabel for="@next" value="Cheque" />
-							<p:inputText value="#{ingresosActualizacionBean.pagoSelected.cheque}" disabled="true" />
-						</div>
-						<div class="p-md-3 p-lg-3">
-							<p:outputLabel for="@next" value="Cheque devuelto" />
-							<p:inputText value="#{ingresosActualizacionBean.pagoSelected.chequeDevuelto}" disabled="true" />
-						</div> -->
-						<!-- <div class="p-md-3 p-lg-3">
-							<p:outputLabel for="@next" value="Motivo de devolución" />
-							<p:inputText value="#{ingresosActualizacionBean.pagoSelected.chequeDevuelto}" disabled="true" />
-						</div> -->
 						<div class="p-md-3 p-lg-3">
 							<p:outputLabel>Banco</p:outputLabel>
 							<p:selectOneMenu id="soBancos" converter="entityConverter" value="#{ingresosActualizacionBean.pagoSelected.banco}" filter="true" filterMatchMode="contains">
