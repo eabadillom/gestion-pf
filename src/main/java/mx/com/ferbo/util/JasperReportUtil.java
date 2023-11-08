@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
@@ -64,17 +65,18 @@ public class JasperReportUtil {
 		try {
 			context = FacesContext.getCurrentInstance();
 			response = (HttpServletResponse) context.getExternalContext().getResponse();
-			
-			String disposition = String.format("attachment; filename=\"%s\"", fileName);
 			output = response.getOutputStream();
+			String disposition = String.format("attachment; filename=\"%s\"", fileName);
 			response.setHeader("Content-Disposition", disposition);
 			response.addHeader("Content-Disposition", disposition);
 			response.setContentType("application/pdf");
+			
+
 			design = JRXmlLoader.load(path);
 			report = JasperCompileManager.compileReport(design);
 			jasperPrint = JasperFillManager.fillReport(report, parameters);
 			JasperExportManager.exportReportToPdfStream(jasperPrint, output);
-			
+			JasperExportManager.exportReportToPdfFile(fileName);
 			FacesContext.getCurrentInstance().responseComplete();
 			context.responseComplete();
 			log.info("Exportacion de JASPER completa.");

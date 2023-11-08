@@ -165,8 +165,22 @@
             <p:menuitem value="Homepage" url="http://localhost:8080/gestion/dashboard.xhtml" icon="pi pi-home"/>
         </p:splitButton>
         <p:divider/>
-         <p:commandButton value="Ticket de Salida" icon="pi pi-print" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" process="@this"/>
-          <p:commandButton value="Ticket de Servicio" icon="pi pi-print" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.imprimirTicketServicios}" process="@this"/>
+       		<p:commandButton value="Ticket de Salida"
+						icon="pi pi-arrow-down"
+						styleClass="ui-button-outlined"
+						actionListener="#{ordenSalidaBean.imprimirTicketSalida}"
+						ajax="false">
+						<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
+					</p:commandButton>
+			
+			<p:commandButton value="Ticket de Servicio"
+						icon="pi pi-arrow-down"
+						styleClass="ui-button-outlined"
+						actionListener="#{ordenSalidaBean.imprimirTicketServicios}"
+						ajax="false">
+						<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
+					</p:commandButton>
+					
         </p:divider>
         
     

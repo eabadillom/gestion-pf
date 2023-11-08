@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml" >
+	
+	<ui:define name="title">Ordenes de Entrada</ui:define>
+	
+	<ui:define name="content">
+	
+	<h:form id="form">
+		<p:growl id="messages" showDetail="true" life="2000" />
+		
+		<p:panel header="DATOS GENERALES">
+			<div class="p-grid ui-fluid p-col-12">
+				<div class="p-col-6 p-md-6">
+					<p:selectOneMenu id="cliente" value="#{ordenEntradaBean.cliente}" converter="entityConverter">
+						<f:selectItem itemLabel="Selecciona al cliente" noSelectionOption="true" />
+						<f:selectItems value="#{ordenEntradaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+						<p:ajax listener="#{ordenEntradaBean.ordenesEntrada}" process="@this" update="form:ingreso"/>
+					</p:selectOneMenu>
+				</div>
+				
+				<div class="p-col-6 p-md-2">
+					<p:selectOneMenu id="ingreso" value="#{ordenEntradaBean.ingreso}" converter="entityConverter">
+						<f:selectItem itemLabel="Ordenes confirmadas para hoy" noSelectionOption="true" />
+						<f:selectItems value="#{ordenEntradaBean.listaIngreso}" var="ingreso" itemLabel="#{ingreso.folio}" itemValue="#{ingreso}" />									
+					</p:selectOneMenu>
+				</div>
+			</div>
+		</p:panel>
+	
+	
+	</h:form>
+	</ui:define>
+</ui:composition>	
