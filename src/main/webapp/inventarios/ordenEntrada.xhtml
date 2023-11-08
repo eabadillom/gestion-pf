@@ -10,26 +10,72 @@
 	<ui:define name="content">
 	
 	<h:form id="form">
+	
+		<p:breadCrumb>
+			<p:menuitem value="Home" outcome="/dashboard" />
+			<p:menuitem value="Inventarios" />
+			<p:menuitem value="Entradas" />
+			<p:menuitem value="Orden de Entrada"
+				outcome="/inventarios/ordenEntrada" />
+		</p:breadCrumb>
+	
 		<p:growl id="messages" showDetail="true" life="2000" />
 		
 		<p:panel header="DATOS GENERALES">
-			<div class="p-grid ui-fluid p-col-12">
-				<div class="p-col-6 p-md-6">
-					<p:selectOneMenu id="cliente" value="#{ordenEntradaBean.cliente}" converter="entityConverter">
-						<f:selectItem itemLabel="Selecciona al cliente" noSelectionOption="true" />
-						<f:selectItems value="#{ordenEntradaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-						<p:ajax listener="#{ordenEntradaBean.ordenesEntrada}" process="@this" update="form:ingreso"/>
-					</p:selectOneMenu>
+			<p:panel>
+				<div class="p-grid ui-fluid p-col-12">
+					<div class="p-col-6 p-md-6">
+						<p:selectOneMenu id="cliente" value="#{ordenEntradaBean.cliente}" converter="entityConverter">
+							<f:selectItem itemLabel="Selecciona al cliente" noSelectionOption="true" />
+							<f:selectItems value="#{ordenEntradaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+							<p:ajax listener="#{ordenEntradaBean.cargaInfoCliente}" process="@this" update="form:ingreso form:productos"/>
+						</p:selectOneMenu>
+					</div>
+					
+					<div class="p-col-6 p-md-4">
+						<p:selectOneMenu id="ingreso" value="#{ordenEntradaBean.ingreso}" converter="entityConverter">
+							<f:selectItem itemLabel="Ordenes confirmadas para hoy" noSelectionOption="true" />
+							<f:selectItems value="#{ordenEntradaBean.listaIngreso}" var="ingreso" itemLabel="#{ingreso.folio}" itemValue="#{ingreso}" />
+							<p:ajax process="@this" update="form:dato-general" />									
+						</p:selectOneMenu>
+					</div>
 				</div>
+			</p:panel>
+			
+			<p:toolbar id="dato-general">
+				<p:toolbarGroup>				
+					
+					<p:datePicker id="fecha-hora" value="#{ordenEntradaBean.ingreso.fechaHora}" placeholder="Fecha-Hora" 
+					showTime="true" readonly="true"/>
 				
-				<div class="p-col-6 p-md-2">
-					<p:selectOneMenu id="ingreso" value="#{ordenEntradaBean.ingreso}" converter="entityConverter">
-						<f:selectItem itemLabel="Ordenes confirmadas para hoy" noSelectionOption="true" />
-						<f:selectItems value="#{ordenEntradaBean.listaIngreso}" var="ingreso" itemLabel="#{ingreso.folio}" itemValue="#{ingreso}" />									
-					</p:selectOneMenu>
-				</div>
-			</div>
+					<p:divider />
+					
+					<p:inputText placeholder="Transportista" value="#{ordenEntradaBean.ingreso.transportista}" readonly="true"/>
+													
+					<p:divider layout="vertical" />
+					
+					<div class="p-col-6 p-md-6">
+						<p:inputText placeholder="Placas" value="#{ordenEntradaBean.ingreso.placas}" readonly="true" />
+					</div>
+					
+					<div class="p-col-6 p-md-6">	
+						<p:inputText readonly="true" placeholder="Observaciones" value="#{ordenEntradaBean.ingreso.observaciones}" style="width:650px;"/>
+					</div>
+					
+				</p:toolbarGroup>			
+			</p:toolbar>
+											
 		</p:panel>
+		
+		<p:panel header="Producto">
+		
+			<p:selectOneMenu id="productos" value="#{ordenEntradaBean.producto}" converter="entityConverter">
+				<f:selectItem itemLabel="Selecciona producto" noSelectionOption="true" />
+				<f:selectItems value="#{ordenEntradaBean.listaProductos}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto}" />
+			</p:selectOneMenu>
+		
+		</p:panel>
+		
 	
 	
 	</h:form>
