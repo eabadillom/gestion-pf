@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -32,10 +34,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
+import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
@@ -45,12 +50,14 @@ import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PreSalidaServicioDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoDAO;
+import mx.com.ferbo.dao.StatusConstanciaSalidaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
+import mx.com.ferbo.model.ConstanciaSalidaServiciosPK;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
@@ -65,6 +72,7 @@ import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.ServicioFactura;
+import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.ui.OrdenDeSalidas;
 import mx.com.ferbo.ui.PreSalidaUI;
@@ -90,6 +98,7 @@ public class OrdenSalidaBean implements Serializable {
 	private List<String> listaFolios;
 	private List<OrdenSalida> listaSalidasporFolio;
 	private List<PreSalidaUI> listaPreSalidaUI;
+	private List<ConstanciaSalidaServicios> listadoConstanciaSalidaServicios;
 	
 	private ClienteDAO clienteDAO;
 	private OrdenSalidaDAO ordenSalidaDAO;
@@ -103,7 +112,11 @@ public class OrdenSalidaBean implements Serializable {
 	private EstadoConstanciaDAO estadoConstanciaDAO;
 	private ProductoDAO productoDAO;
 	private	UnidadDeManejoDAO unidadDAO ;
+	private StatusConstanciaSalidaDAO statusConstanciaSalidaDAO;
+	private ConstanciaServicioDAO constanciaServicioDAO;
+	private ConstanciaServicioDAO csDAO;
 
+	
 	private boolean confirmacion;
 	private boolean pdf;
 	private boolean excel;
@@ -116,6 +129,8 @@ public class OrdenSalidaBean implements Serializable {
 	private BigDecimal peso;
 	private String observaciones;
 	private Integer cantidadServicio;
+	private StreamedContent file;
+
 	
 	private Cliente clienteSelect;
 	private OrdenSalida ordensalida;
@@ -144,12 +159,17 @@ public class OrdenSalidaBean implements Serializable {
 		unidadDAO = new UnidadDeManejoDAO();
 		dpDAO = new DetallePartidaDAO();
 		estadoInventarioDAO = new EstadoInventarioDAO();
+		statusConstanciaSalidaDAO = new StatusConstanciaSalidaDAO();
+		constanciaServicioDAO = new ConstanciaServicioDAO();
+		csDAO = new ConstanciaServicioDAO();
+
+		
 		listaOrdenSalida = new ArrayList<OrdenSalida>();
 		listaClientes = new ArrayList<Cliente>();
 		listaPreSalidaUI = new ArrayList<>();
 		listaServicios = new ArrayList<PrecioServicio>();
 		listaSalidasporPlantas = new ArrayList<OrdenDeSalidas>();
-		
+		listadoConstanciaSalidaServicios = new ArrayList<>();
 	}
 
 	@PostConstruct
@@ -160,6 +180,14 @@ public class OrdenSalidaBean implements Serializable {
 		estadoInventarioActual = estadoInventarioDAO.buscarPorId(1);
 		estadoInventarioHistorico = estadoInventarioDAO.buscarPorId(2);
 	    estadoConstancia = estadoConstanciaDAO.buscarPorId(1);
+	    byte bytes[] = {};
+		this.file = DefaultStreamedContent.builder()
+				.contentType("application/pdf")
+				.contentLength(bytes.length)
+				.name("factura.pdf")
+				.stream(() -> new ByteArrayInputStream(bytes) )
+				.build();
+		
 	}
 
 	public void filtrarCliente() {
@@ -362,6 +390,11 @@ public class OrdenSalidaBean implements Serializable {
 					constancia.setNombreTransportista(ordensalida.getNombreOperador());
 					constancia.setNumero(ordensalida.getFolioSalida());
 					constancia.setClienteCve(clienteSelect);
+					constancia.setNombreCte(clienteSelect.getCteNombre());
+					StatusConstanciaSalida statusConstancia = statusConstanciaSalidaDAO.buscarPorId(1);
+					constancia.setStatus(statusConstancia);
+					constancia.setObservaciones(observaciones);
+					
 					
 					List<DetalleConstanciaSalida> dcsList = new ArrayList<>();
 					constancia.setDetalleConstanciaSalidaList(dcsList);
@@ -403,17 +436,27 @@ public class OrdenSalidaBean implements Serializable {
 					dcs.setDetPartCve(detNUevo.getDetallePartidaPK().getDetPartCve());
 					dcsList.add(dcs);
 				}
-			}
+				
 				List<ConstanciaSalidaServicios> listaConstanciaSalidaServicios = new ArrayList<>();
 				for (PreSalidaServicio pss : listaPreSalidaServicio) {
-					ConstanciaSalidaServicios constanciaSaldaServicios = new ConstanciaSalidaServicios();
-					constanciaSaldaServicios.setNumCantidad(BigDecimal.valueOf(pss.getCantidad()));
-					constanciaSaldaServicios.setServicioCve(pss.getIdServicio());
-					constanciaSaldaServicios.setIdConstancia(constancia);
-					listaConstanciaSalidaServicios.add(constanciaSaldaServicios);
+					ConstanciaSalidaServiciosPK ConstanciaSalidaServiciosPK = new ConstanciaSalidaServiciosPK();
+					ConstanciaSalidaServiciosPK.setConstanciaSalidaCve(constancia);
+					ConstanciaSalidaServiciosPK.setServicioCve(pss.getIdServicio());
+					css.setConstanciaSalidaServiciosPK(ConstanciaSalidaServiciosPK);
+					css.setIdConstancia(constancia);
+					css.setServicioCve(pss.getIdServicio());
+					css.setNumCantidad(BigDecimal.valueOf(pss.getCantidad()));
+					constancia.setConstanciaSalidaServiciosList(listaConstanciaSalidaServicios);
+					listaConstanciaSalidaServicios.add(css);
+					log.debug(listaConstanciaSalidaServicios);
+					
 				}
 				
+				
+			}
 				constanciaDAO.guardar(constancia);
+				
+			
 				
 				List<ConstanciaDeServicio> listaConstanciaDeServicios = new ArrayList<>();
 				if(listaPreSalidaServicio.size() > 0) {
@@ -423,11 +466,12 @@ public class OrdenSalidaBean implements Serializable {
 					cds.setNombreTransportista(ordensalida.getNombreOperador());
 					cds.setPlacasTransporte(ordensalida.getNombrePlacas());
 					cds.setObservaciones(observaciones);
+					cds.setFolioCliente("S"+ordensalida.getFolioSalida());
 					BigDecimal valor = new BigDecimal(1);
 					cds.setValorDeclarado(valor);
-					cds.setFolioCliente("S"+ordensalida.getFolioSalida());
 					cds.setStatus(estadoConstancia);
 					listaConstanciaDeServicios.add(cds);
+				
 					
 					List<PartidaServicio> listaPartidaServicio = new ArrayList<>();
 					for(OrdenDeSalidas ordenDeSalida : listaSalidasporPlantas) {
@@ -445,7 +489,7 @@ public class OrdenSalidaBean implements Serializable {
 						ps.setCantidadDeCobro(psoPorProducto.multiply(cantidadOrdenSalida));
 						ps.setCantidadTotal(ordenDeSalida.getCantidad());
 						ps.setFolio(cds);
-						ps.setPartidaCve(ordenDeSalida.getPartidaCve());
+						//ps.setPartidaCve(ordenDeSalida.getPartidaCve());
 						ps.setProductoCve(pr);
 						ps.setUnidadDeCobro(udm);
 						ps.setUnidadDeManejoCve(udm);
@@ -456,12 +500,16 @@ public class OrdenSalidaBean implements Serializable {
 					List<ConstanciaServicioDetalle> listaConstanciaSrv = new ArrayList<>();
 					for(PreSalidaServicio preServ : listaPreSalidaServicio) {
 						ConstanciaServicioDetalle consdetalle = new ConstanciaServicioDetalle();
-						consdetalle.setFolio(null);
+						consdetalle.setFolio(cds);
 						consdetalle.setServicioCantidad(BigDecimal.valueOf(preServ.getCantidad()));
 						consdetalle.setServicioCve(preServ.getIdServicio());
 						listaConstanciaSrv.add(consdetalle);
 					}
-				}	
+					cds.setConstanciaServicioDetalleList(listaConstanciaSrv);
+					
+					constanciaServicioDAO.guardar(cds);
+					}	
+				
 				listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(folioSelected, fecha);
 				for(OrdenDeSalidas orden : listaSalidasporPlantas) {
 					orden.setStatus("C");
@@ -481,8 +529,7 @@ public class OrdenSalidaBean implements Serializable {
 		}
 	}
 	
-	
-public void imprimirTicketSalida() throws Exception{
+	public void imprimirTicketSalida() throws Exception{
 		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
 		String filename = "ticketSalida.pdf";
@@ -490,10 +537,11 @@ public void imprimirTicketSalida() throws Exception{
 		String message = null;
 		Severity severity = null;
 		ConstanciaSalida constancia = null;
+		
 		File reportFile = new File(jasperPath);
 		File imgFile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		String folioSalida = ordensalida.getFolioSalida();
+		
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
@@ -505,14 +553,75 @@ public void imprimirTicketSalida() throws Exception{
 			String img = resourceimg.getFile();
 			reportFile = new File(file);//crea un archivo
 			imgFile = new File(img);
+			log.info(reportFile.getPath());
 			constancia = new ConstanciaSalida();
-			constancia.setNumero(folioSalida);
+			constancia.setNumero(ordensalida.getFolioSalida());
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("NUMERO", folioSalida);
+			parameters.put("NUMERO", ordensalida.getFolioSalida());
 			parameters.put("LogoPath", imgFile.getPath());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			   
+			//jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentType("application/pdf")
+					.name(filename)
+					.stream(() -> input )
+					.build();
+			log.info("Orden de salida generada {}...", filename);
+		} catch (Exception e) {
+			e.printStackTrace();
+			message = String.format("No se pudo imprimir el folio %s", ordensalida.getFolioSalida());
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
+			PrimeFaces.current().ajax().update("form:messages");
+			
+		}finally {
+			conexion.close((Connection) connection);
+		}
+
+	}
+	
+	public void imprimirTicketServicios() throws Exception{
+		String jasperPath = "/jasper/ticketServicio.jrxml";
+		String filename = "Constancia_de_servicio.pdf";
+		String images = "/images/logoF.png";
+		String message = null;
+		Severity severity = null;
+		String folioSalida = "S"+ordensalida.getFolioSalida();
+		ConstanciaDeServicio constancia = new ConstanciaDeServicio();
+		List<ConstanciaDeServicio> alConstancias = null;
+		alConstancias = csDAO.buscarPorFolioCliente(folioSalida);
+		File reportFile = new File(jasperPath);
+		File imgFile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		alConstancias.add(constancia);
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			
+			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
+			URL resourceimg = getClass().getResource(images); 
+			String file = resource.getFile();//retorna la ubicacion del archivo
+			String img = resourceimg.getFile();
+			reportFile = new File(file);//crea un archivo
+			imgFile = new File(img);
+			log.info(reportFile.getPath());
+			constancia.setFolioCliente(folioSalida);
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("FOLIO",folioSalida);
+			parameters.put("LogoPath", imgFile.getPath());
+			//jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentType("application/pdf")
+					.name(filename)
+					.stream(() -> input )
+					.build();
+			log.info("Orden de servicio generada {}...", filename);
 		} catch (Exception e) {
 			e.printStackTrace();
 			message = String.format("No se pudo imprimir el folio %s", folioSalida);
@@ -525,9 +634,9 @@ public void imprimirTicketSalida() throws Exception{
 		}
 
 	}
-
-
-public void imprimirTicketServicios() throws JRException, IOException, SQLException {
+	
+//("S"+ordensalida.getFolioSalida());
+/*public void imprimirTicketServicios() throws JRException, IOException, SQLException {
 	String jasperPath = "/jasper/ticketServicio.jrxml";
 	String filename = "Constancia_de_servicio.pdf";
 	String images = "/images/logo.jpeg";
@@ -570,7 +679,7 @@ public void imprimirTicketServicios() throws JRException, IOException, SQLExcept
 	} finally {
 		conexion.close((Connection) connection);
 	}
-}
+}*/
 	
 	@SuppressWarnings("unlikely-arg-type")
 	public void deleteServicio(PreSalidaServicio servicio) {
@@ -832,6 +941,14 @@ public void imprimirTicketServicios() throws JRException, IOException, SQLExcept
 
 	public void setExcel(boolean excel) {
 		this.excel = excel;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 
 }

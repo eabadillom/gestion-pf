@@ -3,6 +3,15 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ejemplo1" pageWidth="229" pageHeight="660" columnWidth="189" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="fcaa7500-ce1f-4ca0-9768-460b64cc8f6d">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.unit." value="cm"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="cm"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -253,9 +262,6 @@ WHERE
 				</textElement>
 				<text><![CDATA[INDUSTRIAS DE REFRIGERACION KELANGAN S. A. de C.V.]]></text>
 			</staticText>
-			<line>
-				<reportElement mode="Transparent" x="0" y="119" width="191" height="1" forecolor="#0F0F0F" backcolor="#16181A" uuid="c263645f-0513-4864-865c-2dbeaa56c71b"/>
-			</line>
 		</band>
 	</pageHeader>
 	<columnHeader>
@@ -420,9 +426,6 @@ WHERE
 					</jr:column>
 				</jr:table>
 			</componentElement>
-			<line>
-				<reportElement mode="Transparent" x="-2" y="79" width="191" height="1" forecolor="#121314" backcolor="#101112" uuid="38143daa-6b51-45f7-8b21-7d0df6e306c2"/>
-			</line>
 		</band>
 	</summary>
 </jasperReport>

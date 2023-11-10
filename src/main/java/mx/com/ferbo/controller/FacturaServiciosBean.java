@@ -35,7 +35,6 @@ import com.ferbo.facturama.tools.FacturamaException;
 import mx.com.ferbo.business.FacturamaBL;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
-import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
@@ -70,6 +69,7 @@ import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.FormatUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -86,7 +86,7 @@ public class FacturaServiciosBean implements Serializable {
 	
 	private FacesContext context;
 	private HttpServletRequest request;
-	HttpSession session;
+	private HttpSession session;
 
 	
 	
@@ -133,7 +133,6 @@ public class FacturaServiciosBean implements Serializable {
 	private AsentamientoHumandoDAO asnDAO;
 	private StatusFacturaDAO statusDAO;
 	private TipoFacturacionDAO tipoDAO;
-	private ClaveUnidadDAO claveDAO;
 	private PrecioServicioDAO psDAO;
 
 	private int plazoSelect;
@@ -193,7 +192,6 @@ public class FacturaServiciosBean implements Serializable {
 		statusDAO = new StatusFacturaDAO();
 		tipoDAO = new TipoFacturacionDAO();
 		facturaDAO = new FacturaDAO();
-		claveDAO = new ClaveUnidadDAO();
 		psDAO = new PrecioServicioDAO();
 	}
 
@@ -211,6 +209,16 @@ public class FacturaServiciosBean implements Serializable {
 		request = (HttpServletRequest) context.getExternalContext().getRequest();
 		session = request.getSession(false);
 		this.usuario = (Usuario) session.getAttribute("usuario");
+		
+		this.factura = new Factura();
+		this.factura.setInicioServicios(new Date());
+		Date fechaInicioDefault = new Date();
+		Date fechaFinDefault = new Date();
+		DateUtil.setTime(fechaInicioDefault, 0, 0, 0, 0);
+		DateUtil.setTime(fechaFinDefault, 0, 0, 0, 0);
+		
+		this.factura.setInicioServicios(fechaInicioDefault);
+		this.factura.setFinServicios(fechaFinDefault);
 	}
 
 	public void domicilioAvisoPorCliente() {
@@ -426,7 +434,7 @@ public class FacturaServiciosBean implements Serializable {
 			buscaFactura = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual()+1));
 			
 			if(buscaFactura == null || buscaFactura.getId() == null) {
-				factura = new Factura();
+				
 				List<Factura> alFacturas = new ArrayList<>();
 				factura.setId(idFactura);
 				alFacturas.add(factura);
@@ -461,8 +469,6 @@ public class FacturaServiciosBean implements Serializable {
 				factura.setPorcentajeIva(tasaIva.multiply(new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP)));
 				factura.setNumeroCliente(cliente.getNumeroCte());
 				factura.setValorDeclarado(BigDecimal.ZERO);
-				factura.setInicioServicios(this.fechaFactura);
-				factura.setFinServicios(this.fechaFactura);
 				factura.setMontoLetra(FormatUtil.numeroPalabras(total.doubleValue()));
 				factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
 				FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();

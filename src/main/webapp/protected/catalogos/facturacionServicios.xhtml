@@ -56,7 +56,7 @@
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-6 p-md-6">
 							<p:outputLabel value="Cliente" />
-							<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filterMatchMode="startsWith" onchange="PF('statusInfoDialog').show();">
+							<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filter="true" filterMatchMode="contains" onchange="PF('statusInfoDialog').show();">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 								<f:selectItems var="cte" value="#{facturaServiciosBean.listaCliente}" itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
 								<p:ajax listener="#{facturaServiciosBean.domicilioAvisoPorCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago domicilio" oncomplete="PF('statusInfoDialog').hide();"/>
@@ -91,7 +91,9 @@
 						<div class="p-grid ui-fluid p-col-12">
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="Fecha" />
-								<p:datePicker id="fechaFact" showIcon="true" value="#{facturaServiciosBean.fechaFactura}" disabled="true"/>
+								<p:datePicker id="fechaFact" showIcon="true" value="#{facturaServiciosBean.fechaFactura}">
+									<p:ajax process="@this" />
+								</p:datePicker>
 							</div>
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="Moneda" />
@@ -127,9 +129,22 @@
 									<f:selectItems value="#{facturaServiciosBean.listaAviso}" var="aviso" itemLabel="#{aviso.avisoPlazo}" itemValue="#{aviso.avisoPlazo}" />
 								</p:selectOneMenu>
 							</div>
-							<div class="p-col-3 p-md-3">
+							<!-- <div class="p-col-3 p-md-3">
 								<p:selectBooleanCheckbox itemLabel="Retención" disabled="true" />
 								<p:inputNumber value="#{facturaServiciosBean.retencion.valor}" decimalSeparator="2" readonly="true" symbol="%" symbolPosition="s" required="true" emptyValue="empty"/>
+							</div> -->
+							<div class="p-col-3 p-md-3">
+								<p:outputLabel value="InicioPeriodo" />
+								<p:datePicker id="fechaInicio" showIcon="true" value="#{facturaServiciosBean.factura.inicioServicios}">
+									<p:ajax process="@this"></p:ajax>
+								</p:datePicker>
+							</div>
+							
+							<div class="p-col-3 p-md-3">
+								<p:outputLabel value="Fin periodo" />
+								<p:datePicker id="fechaFin" showIcon="true" value="#{facturaServiciosBean.factura.finServicios}">
+									<p:ajax process="@this"></p:ajax>
+								</p:datePicker>
 							</div>
 							<div class="p-col-12 p-md-12">
 								<p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{facturaServiciosBean.obervaciones}" placeholder="Observaciones."/>
@@ -224,3 +239,4 @@
 		</h:form>
 	</ui:define>
 </ui:composition>
+

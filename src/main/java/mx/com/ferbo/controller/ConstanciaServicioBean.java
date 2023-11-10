@@ -1,10 +1,17 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
@@ -37,6 +46,8 @@ import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
@@ -69,6 +80,7 @@ public class ConstanciaServicioBean implements Serializable{
 	private PrecioServicioDAO precioServicioDAO;
 	private ConstanciaServicioDetalle selectedConstanciaServicioDetalle;
 	private ConstanciaServicioDetalleDAO csdDAO;
+	private StreamedContent file;
 	
 	public ConstanciaServicioBean() {
 		listaClientes = new ArrayList<>();
@@ -349,20 +361,75 @@ public class ConstanciaServicioBean implements Serializable{
 			
 			System.out.println("Constancia cancelada.");
 		} catch(InventarioException ex) {
-			manager.getTransaction().rollback();
+			EntityManagerUtil.rollback(manager);
 			ex.printStackTrace();
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 		} catch(Exception ex) {
-			manager.getTransaction().rollback();
+			EntityManagerUtil.rollback(manager);
 			ex.printStackTrace();
 			message = "Problema con la actualización de la constancia.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			manager.close();
+			EntityManagerUtil.close(manager);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cancelación", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		}
+	}
+	
+	public void jasper() {
+		String jasperPath = null;
+		String filename = null;
+		String images = null;
+		String message = null;
+		Severity severity = null;
+		File reportFile = null;
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = null;
+		Map<String, Object> parameters = null;
+		Connection conn = null;
+		
+		try {
+			jasperPath = "/jasper/ticketServicio.jrxml";
+			filename = String.format("ticket-servicio_%s.pdf", this.seleccion.getFolioCliente());
+			images = "/images/logoF.png";
+			reportFile = new File(jasperPath);
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			log.debug("Ruta del reporte: {}", reportFile.getPath());
+			
+			
+			conn = EntityManagerUtil.getConnection();
+			parameters = new HashMap<String, Object>();
+			parameters.put("REPORT_CONNECTION", conn);
+			parameters.put("FOLIO", this.seleccion.getFolioCliente());
+			parameters.put("LogoPath", imgfile.getPath());
+			log.debug("Parametros: {}", parameters.toString());
+			
+			jasperReportUtil = new JasperReportUtil();
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentType("application/pdf")
+					.name(filename)
+					.stream(() -> input )
+					.build();
+			log.info("Factura generada {}...", filename);
+		} catch (Exception ex) {
+			log.error("Problema general...", ex);
+			message = String.format("Problema para imprimir el folio %s", this.seleccion.getFolioCliente());
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
+		} finally {
+			conexion.close((Connection) conn);
+			PrimeFaces.current().ajax().update("frmFactura:file-factura");
+		}
+		
 	}
 	
 	public List<Cliente> getListaClientes() {
@@ -475,6 +542,14 @@ public class ConstanciaServicioBean implements Serializable{
 
 	public void setSelectedConstanciaServicioDetalle(ConstanciaServicioDetalle selectedConstanciaServicioDetalle) {
 		this.selectedConstanciaServicioDetalle = selectedConstanciaServicioDetalle;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 
 }

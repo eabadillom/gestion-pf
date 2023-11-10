@@ -287,6 +287,11 @@ public class IngresosCrudBean implements Serializable {
 					if(p.getPago().getId() != null)
 						continue;
 					
+					if(p.getPago().getTipo() == null || p.getPago().getTipo().getId() == null) {
+						String msg = String.format("El pago debe tener un tipo de pago: Facutura %s-%s", p.getPago().getFactura().getNomSerie(), p.getPago().getFactura().getNumero());
+						throw new InventarioException(msg);
+					}
+					
 					pagofactDAO.guardar(p.getPago());
 					f = facturaDAO.buscarPorId(p.getPago().getFactura().getId());
 					f.setStatus(p.getPago().getFactura().getStatus());
