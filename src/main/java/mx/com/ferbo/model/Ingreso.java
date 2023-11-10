@@ -72,6 +72,10 @@ public class Ingreso implements Serializable{
 	
 	
 	
+	public Ingreso() {
+		
+	}
+
 	public Integer getIdIngreso() {
 		return idIngreso;
 	}
