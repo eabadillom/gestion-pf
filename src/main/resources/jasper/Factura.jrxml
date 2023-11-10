@@ -403,8 +403,7 @@ inner join PLANTA plt ON tFactura.planta = plt.planta_cve
 inner join metodo_pago mp ON tFactura.metodo_pago = mp.cd_metodo_pago 
 inner join regimen_fiscal erf ON tFactura.emi_cd_regimen = erf.cd_regimen 
 inner join regimen_fiscal rrf On tFactura.cd_regimen = rrf.cd_regimen
-inner join uso_cfdi ucfdi ON tFactura.cd_uso_cfdi = ucfdi.cd_uso_cfdi
-]]>
+inner join uso_cfdi ucfdi ON tFactura.cd_uso_cfdi = ucfdi.cd_uso_cfdi]]>
 	</queryString>
 	<field name="idFactura" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="idFactura"/>
@@ -1086,7 +1085,7 @@ $F{municipio}+ " ," +$F{estado}]]></textFieldExpression>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{ingreso}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{vencimiento}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
