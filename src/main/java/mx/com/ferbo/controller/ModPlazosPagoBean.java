@@ -66,7 +66,10 @@ public class ModPlazosPagoBean implements Serializable {
 	};
 
 	public void update() {
-		String message = daoFac.update(facSelect, modNumber);
+		String message = null;
+		for(Factura factura : facSelect) {
+			message = daoFac.updatePlazo(factura, modNumber);
+		}
 
 		if (message == null) {
 			listFac.clear();
@@ -134,9 +137,8 @@ public class ModPlazosPagoBean implements Serializable {
 		return de;
 	};
 
-	@SuppressWarnings("deprecation")
 	public void setDe(Date de) {
-		if (de.getDate() > hasta.getDate()) {
+		if (de.compareTo(hasta) > 0) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 					"Fecha Invalida", "La fecha seleccionada debe ser menor a la fecha final"));
 			PrimeFaces.current().ajax().update("form:messages");
@@ -151,9 +153,8 @@ public class ModPlazosPagoBean implements Serializable {
 		return hasta;
 	};
 
-	@SuppressWarnings("deprecation")
 	public void setHasta(Date hasta) {
-		if (de.getDate() > hasta.getDate()) {
+		if (de.compareTo(hasta) > 0) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 					"Fecha Invalida", "La fecha seleccionada debe ser mayor a la fecha inicial"));
 			PrimeFaces.current().ajax().update("form:messages");

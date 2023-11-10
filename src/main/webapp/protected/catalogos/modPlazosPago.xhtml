@@ -9,53 +9,37 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Modififcar Plazso Pago"
-					outcome="/protected/catalogos/modPlazosPago" />
-			</p:breadCrumb>
-
-			<div class="p-col-12">
-				<div class="card">
-
-					<p:growl id="messages" showDetail="true" />
-
-					<p:toolbar styleClass="p-mb-4">
-						<p:toolbarGroup>
-							<p:outputLabel value="De:" styleClass="p-mr-2" />
-							<p:datePicker value="#{modPlazosPagoBean.de}"
-								monthNavigator="true" yearNavigator="true" showWeek="true"
-								required="true" maxdate="#{modPlazosPagoBean.actual}">
-								<p:ajax />
-							</p:datePicker>
-							<p:outputLabel value="A:" styleClass="p-ml-6 p-mr-2" />
-							<p:datePicker value="#{modPlazosPagoBean.hasta}"
-								monthNavigator="true" yearNavigator="true" showWeek="true"
-								required="true" maxdate="#{modPlazosPagoBean.actual}">
-								<p:ajax />
-							</p:datePicker>
-							<p:outputLabel for="@next" value="Clientes:"
-								styleClass="p-ml-6 p-mr-2" />
-							<p:selectOneMenu value="#{modPlazosPagoBean.clienteSelect}"
-								converter="entityConverter" filter="true"
-								filterMatchMode="startsWith">
-								<f:selectItem itemLabel="--Selecciona--" />
-								<f:selectItems value="#{modPlazosPagoBean.listClientes}"
-									var="client" itemLabel="#{client.cteNombre}"
-									itemValue="#{client}" />
-								<p:ajax update="form:bottomConsulta" />
-							</p:selectOneMenu>
-							<p:commandButton id="bottomConsulta" value="Consultar"
-								styleClass="ui-button-info p-ml-6" icon="pi pi-search"
-								actionListener="#{modPlazosPagoBean.findFacture()}"
-								update="dtSerieFac" process="@this"
-								disabled="#{!modPlazosPagoBean.hasClient()}" />
-						</p:toolbarGroup>
-					</p:toolbar>
-
-					<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista"
+			<p:growl id="messages" showDetail="true" />
+			<div class="p-grid ui-fluid p-col-12">
+				<div class="p-col-6 p-md-6">
+					<p:outputLabel for="@next" value="Cliente"/>
+					<p:selectOneMenu value="#{modPlazosPagoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith">
+						<f:selectItem itemLabel="--Selecciona--" />
+						<f:selectItems value="#{modPlazosPagoBean.listClientes}"
+							var="client" itemLabel="#{client.cteNombre}"
+							itemValue="#{client}" />
+						<p:ajax update="form:bottomConsulta" />
+					</p:selectOneMenu>
+				</div>
+				<div class="p-col-3 p-md-3">
+					<p:outputLabel value="De"/>
+					<p:datePicker value="#{modPlazosPagoBean.de}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{modPlazosPagoBean.actual}">
+						<p:ajax process="@this"/>
+					</p:datePicker>
+				</div>
+				<div class="p-col-3 p-md-3">
+					<p:outputLabel value="A"/>
+					<p:datePicker value="#{modPlazosPagoBean.hasta}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{modPlazosPagoBean.actual}">
+						<p:ajax process="@this"/>
+					</p:datePicker>
+				</div>
+			</div>
+			<div align="center">
+				<p:commandButton id="bottomConsulta" value="Consultar" styleClass="ui-button-info" icon="pi pi-search" actionListener="#{modPlazosPagoBean.findFacture()}" update="dtSerieFac" process="@this" disabled="#{modPlazosPagoBean.hasClient() == false}" />
+			</div>
+			
+			<div style="padding-top: 2rem;">
+				<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista"
 						value="#{modPlazosPagoBean.listFac}" rowKey="#{lista.id}"
 						reflow="true" selection="#{modPlazosPagoBean.facSelect}"
 						rowSelectMode="add" paginator="true" rows="10"
@@ -84,27 +68,19 @@
 							<span> dias(s)</span>
 						</p:column>
 					</p:dataTable>
-
-					<div style="margin-top: 20px;" align="center">
-						<h:outputText
-							value="Por favor indique el nuevo plazo de pago para las constancias seleccionadas" />
-						<p:inputNumber styleClass="p-ml-2 p-mr-2" decimalPlaces="0"
-							value="#{modPlazosPagoBean.modNumber}">
-							<p:ajax />
-						</p:inputNumber>
-						<h:outputText value="dias." />
-					</div>
-
-					<div style="margin-top: 15px;" align="center">
-						<p:commandButton id="button" value="#{modPlazosPagoBean.modBoton}"
-							actionListener="#{modPlazosPagoBean.update()}"
-							icon="pi pi-pencil" styleClass="ui-button-info" update="@this"
-							process="@this" disabled="#{!modPlazosPagoBean.hasSelected()}" />
-					</div>
-
-				</div>
 			</div>
-
+			
+			<div style="padding-top: 2rem;" align="center">
+				<h:outputText value="Por favor indique el nuevo plazo de pago para las constancias seleccionadas" />
+				<p:inputNumber styleClass="p-ml-2 p-mr-2" decimalPlaces="0" value="#{modPlazosPagoBean.modNumber}">
+					<p:ajax />
+				</p:inputNumber>
+				<h:outputText value="dias." />
+			</div>
+			
+			<div style="padding-top: 2rem;" align="center">
+				<p:commandButton id="button" value="#{modPlazosPagoBean.modBoton}" actionListener="#{modPlazosPagoBean.update()}" icon="pi pi-pencil" styleClass="ui-button-info" update="@this" process="@this" disabled="#{modPlazosPagoBean.hasSelected() == false}" />
+			</div>
 		</h:form>
 	</ui:define>
 
