@@ -7,13 +7,6 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Comercial" />
-				<p:menuitem value="Avisos"
-					outcome="/protected/catalogos/avisosComercial" />
-			</p:breadCrumb>
-
 			<div class="p-grid ingresosAlta">
 				<div class="p-col-12">
 					<div class="card">
@@ -22,11 +15,10 @@
 							<div class="card">
 								<div class="ui-fluid p-formgrid p-grid">
 									<div class="p-field p-col-12 p-md-7">
-										<p:outputLabel for="soClientes" value="Clientes" />
 										<p:selectOneMenu id="soClientes" converter="entityConverter"
 											value="#{avisosComercialBean.clienteSelected}" filter="true"
 											filterMatchMode="contains">
-											<f:selectItem itemLabel="--Seleccione--" />
+											<f:selectItem itemLabel="--Seleccione un cliente--" />
 											<f:selectItems value="#{avisosComercialBean.lstClientes}"
 												var="cliente" itemLabel="#{cliente.cteNombre}"
 												itemValue="#{cliente}" />
