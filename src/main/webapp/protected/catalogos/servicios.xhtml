@@ -49,7 +49,7 @@
 							</p:column>
 							
 							<p:column width="2rem" style="text-align: center;">
-                                <p:commandButton icon="pi pi-pencil" update=":form:manage-servicio-content" oncomplete="PF('manageServicioDialog').show()" process="@this" action="#{consultaNotasCreditoBean.cargaInfoNota}">
+                                <p:commandButton icon="pi pi-pencil" update=":form:manage-servicio-content" oncomplete="PF('manageServicioDialog').show()" process="@this">
                                     <f:setPropertyActionListener value="#{servicio}" target="#{serviciosBean.selectedServicio}" />
                                 </p:commandButton>
                             </p:column>

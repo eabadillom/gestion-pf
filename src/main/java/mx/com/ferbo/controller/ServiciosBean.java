@@ -76,13 +76,16 @@ public class ServiciosBean implements Serializable{
 		servicio.setServicioCod(selectedServicio.getServicioCod());
 		servicio.setServicioCve(selectedServicio.getServicioCve());
 		servicio.setServicioDs(selectedServicio.getServicioDs());
+		servicio.setServicioNombre(selectedServicio.getServicioDs());
 		servicio.setUuId(selectedServicio.getUuId());
 		servicio.setCobro(selectedServicio.getCobro());
+		
 		for(ClaveUnidad cn: listadoUnidades) {
 			if(cn.getcdUnidad().equals(selectedServicio.getCdUnidad())) {
 				servicio.setClaveUnit(cn);
 			}
 		}
+		
 		if (this.selectedServicio.getServicioCve() == null) {
 			if (servicioDAO.guardar(servicio) == null) {
 				selectedServicio = new ServicioUI(servicio);
