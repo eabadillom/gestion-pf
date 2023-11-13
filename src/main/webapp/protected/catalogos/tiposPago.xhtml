@@ -3,21 +3,16 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
-
-	<ui:define name="title">Tipos de Pago</ui:define>
-
+	<ui:define name="title">Formas de Pago (SAT)</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
+			<p:growl id="messages" showDetail="true" />
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-						<p:growl id="messages" showDetail="true" />
 						<p:toolbar styleClass="p-mb-4">
 							<p:toolbarGroup>
-								<p:commandButton value="Agregar" icon="pi pi-plus"
-									styleClass="ui-button-info p-mr-2 p-mb-2"
-									oncomplete="PF('dg-agrega').show();" update="frm-agrega"
-									actionListener="#{tiposPagoBean.openNew()}" process="@this" />
+								<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" oncomplete="PF('dg-agrega').show();" update="frm-agrega" actionListener="#{tiposPagoBean.openNew()}" process="@this" />
 							</p:toolbarGroup>
 						</p:toolbar>
 						<p:dataTable id="dt-tipos" widgetVar="dtTipos" var="tipos" reflow="true" paginator="true" rows="10" paginatorPosition="bottom" value="#{tiposPagoBean.principal}" rowKey="#{tipos.mpId}" selection="#{tiposPagoBean.seleccion}" rowSelectMode="single">
@@ -30,19 +25,16 @@
 										presente catálogo.</p>
 								</div>
 							</f:facet>
-							<p:column headerText="Descripción"
-								sortBy="#{tipos.mpDescripcion}">
+							<p:column headerText="Código">
+								<h:outputText value="#{tipos.formaPago}" />
+							</p:column>
+							<p:column headerText="Descripción" sortBy="#{tipos.mpDescripcion}">
 								<h:outputText value="#{tipos.mpDescripcion}" />
 							</p:column>
-
-							<p:column headerText="¿Requiere Referecia?"
-								sortBy="#{tipos.mpReqReferencia}">
+							<p:column headerText="¿Requiere Referecia?" sortBy="#{tipos.mpReqReferencia}">
 								<h:outputText value="#{tipos.mpReqReferencia ? 'SI' : 'NO'}" />
 							</p:column>
-
-							<p:column exportable="false" width="15%"
-								style="text-align:center">
-
+							<p:column exportable="false" width="15%" style="text-align:center">
 								<p:commandButton icon="pi pi-pencil" value="Modificar"
 									styleClass="edit-button ui-button-info p-mr-2"
 									oncomplete="PF('dg-modifica').show()"
@@ -59,24 +51,35 @@
 				</div>
 			</div>
 
-			<p:dialog header="Agregar Tipo de Pago" widgetVar="dg-agrega"
-				modal="true" showEffect="fade" responsive="true">
-
+			<p:dialog header="Agregar Tipo de Pago" widgetVar="dg-agrega" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
-				<p:outputPanel rendered="#{not empty tiposPagoBean.nuevo}"></p:outputPanel>
 					<div class="p-field">
-						<p:outputLabel for="@next">Nombre:</p:outputLabel>
+						<p:outputLabel for="@next" value="Código SAT:"/>
+						<p:inputText value="#{tiposPagoBean.nuevo.formaPago}" maxlength="5"/>
+					</div>
+					<div class="p-field">
+						<p:outputLabel for="@next" value="Nombre:" />
 						<p:inputText value="#{tiposPagoBean.nuevo.mpDescripcion}"
 							required="true" requiredMessage="Ingresa nombre de la forma de pago" />
 					</div>
-
 					<div class="p-field">
 						<p:outputLabel for="@next">¿Requiere captura de número de referencia?:</p:outputLabel>
 						<p:selectBooleanCheckbox 
 							value="#{tiposPagoBean.nuevo.mpReqReferencia}" />
 					</div>
+					<div class="p-field">
+						<p:outputLabel value="Inicio de vigencia" />
+						<p:datePicker value="#{tiposPagoBean.nuevo.vigenciaInicio}" monthNavigator="true" yearNavigator="true" showIcon="true">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:datePicker>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Fin de vigencia" />
+						<p:datePicker value="#{tiposPagoBean.nuevo.vigenciaFin}" monthNavigator="true" yearNavigator="true" showIcon="true">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:datePicker>
+					</div>
 				</p:outputPanel>
-
 				<f:facet name="footer">
 					<p:commandButton value="Guardar" icon="pi pi-check"
 						actionListener="#{tiposPagoBean.save()}" update="frm-agrega messages"
@@ -84,25 +87,35 @@
 					<p:commandButton value="Cancelar" icon="pi pi-times"
 						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()" process="@this" immediate="true"/>
 				</f:facet>
-
 			</p:dialog>
-
-			<p:dialog header="Modificar Tipo de Pago" widgetVar="dg-modifica"
-				modal="true" showEffect="fade" responsive="true">
-
+			<p:dialog header="Modificar Tipo de Pago" widgetVar="dg-modifica" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-modifica" class="ui-fluid">
-					<p:outputPanel rendered="#{not empty tiposPagoBean.seleccion}">
-					<div class="p-field">
-						<p:outputLabel for="@next">Nombre:</p:outputLabel>
-						<p:inputText 
-							value="#{tiposPagoBean.seleccion.mpDescripcion}" />
-					</div>
-
-					<div class="p-field">
-						<p:outputLabel for="@next">¿Requiere captura de número de referencia?:</p:outputLabel>
-						<p:selectBooleanCheckbox 
-							value="#{tiposPagoBean.seleccion.mpReqReferencia}" />
-					</div>
+					<p:outputPanel rendered="#{tiposPagoBean.seleccion != null}">
+						<div class="p-field">
+							<p:outputLabel for="@next" value="Código SAT:"/>
+							<p:inputText value="#{tiposPagoBean.seleccion.formaPago}" maxlength="5"/>
+						</div>
+						<div class="p-field">
+							<p:outputLabel for="@next">Nombre:</p:outputLabel>
+							<p:inputText value="#{tiposPagoBean.seleccion.mpDescripcion}" />
+						</div>
+						<div class="p-field">
+							<p:outputLabel for="@next">¿Requiere captura de número de referencia?:</p:outputLabel>
+							<p:selectBooleanCheckbox 
+								value="#{tiposPagoBean.seleccion.mpReqReferencia}" />
+						</div>
+						<div class="p-field">
+							<p:outputLabel value="Inicio de vigencia" />
+							<p:datePicker value="#{tiposPagoBean.seleccion.vigenciaInicio}" monthNavigator="true" yearNavigator="true" showIcon="true">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</p:datePicker>
+						</div>
+						<div class="p-field">
+							<p:outputLabel value="Fin de vigencia" />
+							<p:datePicker value="#{tiposPagoBean.seleccion.vigenciaFin}" monthNavigator="true" yearNavigator="true" showIcon="true">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</p:datePicker>
+						</div>
 					</p:outputPanel>
 				</p:outputPanel>
 

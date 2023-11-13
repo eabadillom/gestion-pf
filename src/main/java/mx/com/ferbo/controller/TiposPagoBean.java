@@ -1,5 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -9,9 +13,6 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.TiposPagoDAO;
 import mx.com.ferbo.model.MedioPago;
-
-import java.io.Serializable;
-import java.util.List;
 
 @Named
 @ViewScoped
@@ -32,6 +33,7 @@ public class TiposPagoBean implements Serializable {
 
 	public void openNew() {
 		this.nuevo = new MedioPago();
+		this.nuevo.setVigenciaInicio(new Date());
 	};
 
 	public void save() {
