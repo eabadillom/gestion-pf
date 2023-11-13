@@ -33,7 +33,6 @@ import mx.com.ferbo.dao.DetallePartidaDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
-import mx.com.ferbo.dao.StatusConstanciaSalidaDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
@@ -46,7 +45,6 @@ import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
-import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
@@ -111,6 +109,10 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private EstadoConstancia statusCancelada;
 	private EstadoConstanciaDAO statusDAO;
 	
+	private Integer cantidadTotal = null;
+	private BigDecimal pesoTotal = null;
+	private BigDecimal tarimasTotal = null;
+	
 	public ConsultarConstanciaDeDepositoBean() {
 		
 		constanciaDeDepositoDAO = new ConstanciaDeDepositoDAO();
@@ -155,7 +157,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		this.selectConstanciaDD = new ConstanciaDeDeposito();
 		this.selectConstanciaDD.setAvisoCve(new Aviso());
-		
 		this.statusCancelada = statusDAO.buscarPorId(2);
 	}
 	
@@ -209,6 +210,18 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			if(selectConstanciaDD.getAvisoCve()!=null) {
 				listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
 			}
+			
+			this.cantidadTotal = new Integer(0);
+			this.pesoTotal = new BigDecimal("0.00").setScale(3, BigDecimal.ROUND_HALF_UP);
+			this.tarimasTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+			
+			for(Partida partida : this.selectConstanciaDD.getPartidaList()) {
+				this.cantidadTotal = Integer.sum(this.cantidadTotal, partida.getCantidadTotal());
+				this.pesoTotal = this.pesoTotal.add(partida.getPesoTotal());
+				this.tarimasTotal = this.tarimasTotal.add(partida.getNoTarimas());
+			}
+			
+			log.debug("{} tarimas, {} unidades, {} kg", this.tarimasTotal, this.pesoTotal);
 			
 			listaAvisos = avisoDAO.buscarPorCliente(this.selectConstanciaDD.getCteCve().getCteCve());
 			
@@ -731,5 +744,29 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 
 	public void setListaAvisos(List<Aviso> listaAvisos) {
 		this.listaAvisos = listaAvisos;
+	}
+
+	public Integer getCantidadTotal() {
+		return cantidadTotal;
+	}
+
+	public void setCantidadTotal(Integer cantidadTotal) {
+		this.cantidadTotal = cantidadTotal;
+	}
+
+	public BigDecimal getPesoTotal() {
+		return pesoTotal;
+	}
+
+	public void setPesoTotal(BigDecimal pesoTotal) {
+		this.pesoTotal = pesoTotal;
+	}
+
+	public BigDecimal getTarimasTotal() {
+		return tarimasTotal;
+	}
+
+	public void setTarimasTotal(BigDecimal tarimasTotal) {
+		this.tarimasTotal = tarimasTotal;
 	}
 }
