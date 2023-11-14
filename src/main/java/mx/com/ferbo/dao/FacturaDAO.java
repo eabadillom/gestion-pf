@@ -131,11 +131,30 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
 		return entity.createNamedQuery("Factura.findByClienteStatusFactura", Factura.class)
 		.setParameter("clienteCve", cte.getCteCve()).setParameter("status", sf.getId()).getResultList();
+	}
+	
+	public List<Factura> buscarPorCteStatusClientePeriodo(StatusFactura sf, Cliente cte, Date fechaInicio, Date fechaFin){
+		List<Factura> lista = null;
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			lista = entity.createNamedQuery("Factura.findByStatusFacturaClientePeriodo", Factura.class)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.setParameter("idCliente", cte.getCteCve())
+					.setParameter("idStatusFactura", sf.getId())
+					.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener las facturas solicitadas...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
+		
+		return lista;
+	} 
 
 	@Override
 	public List<Factura> buscarTodos() {
-		// TODO Auto-generated method stub
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Factura.findAll", Factura.class).getResultList();
 	}

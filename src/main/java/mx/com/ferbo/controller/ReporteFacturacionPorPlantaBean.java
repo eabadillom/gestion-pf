@@ -76,10 +76,11 @@ public class ReporteFacturacionPorPlantaBean implements Serializable {
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
 		Date today = new Date();
-		long oneDay = 24 * 60 * 60 * 1000;
 		maxDate = new Date(today.getTime() );
+		this.fecha_ini = new Date();
+		this.fecha_fin = new Date();
 		listaClientes = clienteDAO.buscarHabilitados(true);
-			listaPlanta = plantaDAO.buscarTodos();
+		listaPlanta = plantaDAO.buscarTodos();
 		filtradoCamara();		
 		
 	}

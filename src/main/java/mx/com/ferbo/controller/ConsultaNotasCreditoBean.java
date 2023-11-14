@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.NotaCreditoDAO;
 import mx.com.ferbo.dao.PagoDAO;
+import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.StatusNotaCreditoDAO;
 import mx.com.ferbo.model.CancelaNotaCredito;
 import mx.com.ferbo.model.Cliente;
@@ -28,6 +30,7 @@ import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.NotaCredito;
 import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.model.Pago;
+import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.StatusNotaCredito;
 import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.util.InventarioException;
@@ -58,7 +61,10 @@ public class ConsultaNotasCreditoBean implements Serializable{
 	private PagoDAO pagoDAO;
 	private String motivoCancelacion;
 	
-	
+	private StatusFacturaDAO sfDAO;
+	private StatusFactura statusPorCobrar;
+	private StatusFactura statusPagada;
+	private StatusFactura statusPagoParcial;
 	
 	public ConsultaNotasCreditoBean() {
 		
@@ -73,9 +79,7 @@ public class ConsultaNotasCreditoBean implements Serializable{
 		pagoDAO = new PagoDAO();
 		
 		clienteSelect = new Cliente();
-		
-		
-		
+		sfDAO = new StatusFacturaDAO();
 	}	
 	
 	@PostConstruct
@@ -86,6 +90,10 @@ public class ConsultaNotasCreditoBean implements Serializable{
 	
 		fechaInicio = new Date();
 		fechaFin = new Date();
+		
+		statusPorCobrar = sfDAO.buscarPorId(StatusFactura.STATUS_POR_COBRAR);
+		statusPagada = sfDAO.buscarPorId(StatusFactura.STATUS_PAGADA);
+		statusPagoParcial = sfDAO.buscarPorId(StatusFactura.STATUS_PAGO_PARCIAL);
 		
 	}
 	
@@ -128,6 +136,8 @@ public class ConsultaNotasCreditoBean implements Serializable{
 		CancelaNotaCredito cancela = null;
 		String resultado = null;
 		
+		BigDecimal saldo = null;
+		
 		try {
 			log.debug("Cancelar nota de crédito: {}", this.notaCreditoSelect);
 			this.notaCreditoSelect = notaCreditoDAO.buscarPor(this.notaCreditoSelect.getId(), true);
@@ -153,6 +163,31 @@ public class ConsultaNotasCreditoBean implements Serializable{
 			log.debug("Resultado de la actualización de la nota de credito: {}", resultado);
 			
 			this.motivoCancelacion = null;
+			
+			for(NotaPorFactura npf : npfList) {
+				Factura factura = npf.getNotaPorFacturaPK().getFactura();
+				factura = facturaDAO.buscarPorId(factura.getId(), true);
+				saldo = factura.getTotal();
+				
+				for(Pago p : factura.getPagoList()) {
+					saldo = saldo.subtract(p.getMonto());
+				}
+				
+				if(saldo.compareTo(BigDecimal.ZERO) > 0 && saldo.compareTo(factura.getTotal()) < 0) {
+					factura.setStatus(statusPagoParcial);
+				} else if(saldo.compareTo(BigDecimal.ZERO) > 0 && saldo.compareTo(factura.getTotal()) == 0) {
+					factura.setStatus(statusPorCobrar);
+				} else if(saldo.compareTo(BigDecimal.ZERO) == 0) {
+					factura.setStatus(statusPagada);
+				} else {
+					String msg = String.format("La suma de todos los pagos de la factura %s-%s excede el monto total.", factura.getNomSerie(), factura.getNumero());
+					throw new InventarioException(msg);
+				}
+				
+				facturaDAO.actualizaStatus(factura);
+			}
+			
+			this.consultarNotaCreditoCte();
 			
 			message = "La nota de crédito se canceló correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;

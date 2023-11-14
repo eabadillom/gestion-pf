@@ -100,6 +100,9 @@ public class AltaNotasCredito implements Serializable{
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
 	
+	private Date fechaInicio;
+	private Date fechaFin;
+	
 	
 	public AltaNotasCredito() {
 		
@@ -136,7 +139,8 @@ public class AltaNotasCredito implements Serializable{
 		this.pagoDAO = new PagoDAO();
 		
 		this.listaClientes = clienteDAO.buscarTodos();
-		this.listaSerieNota = serieNotaDAO.findAll();
+		//TODO timbrado CFDI para las notas de crédito. Se prepara parámetro para indicar planta (razón social) a la que pertenece la serie.
+		this.listaSerieNota = serieNotaDAO.buscarActivas(null);
 		this.tipoPagoNotaCredito = tipoPagoDAO.buscarPorId(TipoPago.TIPO_PAGO_NOTA_CREDITO);
 		
 		
@@ -158,6 +162,9 @@ public class AltaNotasCredito implements Serializable{
 				this.usuario.getApellido2() == null ? "" : this.usuario.getApellido2()
 		);
 		this.notaCredito.setCajero(cajero);
+		
+		this.fechaInicio = new Date();
+		this.fechaFin = new Date();
 	}
 	
 	public void filtroFactura() {
@@ -172,18 +179,20 @@ public class AltaNotasCredito implements Serializable{
 			
 			if(porCobrar==true) {
 				sf.setId(1);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
-				
+//				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
+				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
 			if(pagada==true) {				
 				sf.setId(3);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
+//				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
+				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
 			if(pagoParcial==true) {
 				sf.setId(4);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
+//				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
+				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
 			if(clienteSelect == null) {
@@ -578,5 +587,21 @@ public class AltaNotasCredito implements Serializable{
 
 	public void setSaldoSelected(BigDecimal saldoSelected) {
 		this.saldoSelected = saldoSelected;
+	}
+
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public void setFechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+
+	public Date getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
 	}
 }
