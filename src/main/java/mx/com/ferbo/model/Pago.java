@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -76,11 +77,11 @@ public class Pago implements Serializable {
     private Bancos banco;
     
     @JoinColumn(name = "factura", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Factura factura;
     
     @JoinColumn(name = "tipo", referencedColumnName = "id")
-    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
+    @ManyToOne(optional = false)
     private TipoPago tipo;
 
     public Pago() {
