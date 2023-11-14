@@ -9,46 +9,28 @@
 
     <ui:define name="content">
         <h:form id="form">
-        <p:breadCrumb>
-            <p:menuitem value="Home" outcome="/dashboard"/>
-            <p:menuitem value="Reportes"/>
-            <p:menuitem value="Ingresos"/>
-            <p:menuitem value="Ingresos" outcome="/protected/reportes/Ingresos"/>
-        </p:breadCrumb>
-        
-        <p:growl id="messages" showDetail="true" />
-        
+	        <p:growl id="messages" showDetail="true" />
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
 	                <div class="card">
-	             		
-	             		<p:outputLabel value="Fecha Actual:" styleClass="p-ml-2"/>
-	             		<p:datePicker id="fechActual" value="#{reporteIngresosBean.fechaActual}" showIcon="true" disabled="true"  styleClass="p-ml-2 p-mr-4"/>
-	             		
 	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
-	             		
 	             			<p:outputLabel value="De:" styleClass="p-mr-2"></p:outputLabel>
 	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4" maxdate="#{reporteIngresosBean.maxDate}"/>
-	             			
 	             			<p:outputLabel value="A:" styleClass="p-mr-2"></p:outputLabel>
 	             			<p:datePicker id="fechaFin" value="#{reporteIngresosBean.fechaFin}" showIcon="true" maxdate="#{reporteIngresosBean.maxDate}"/>
 	             		</p:fieldset>
-	             		
-	             		
 	             		<p:fieldset legend="Banco" styleClass="p-mt-4">
 		             		<p:selectOneMenu id="select-banco" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.bancoSelect}">
 		             			<f:selectItem itemLabel="Todos Los Bancos" Itemvalue="" />
 		             			<f:selectItems value="#{reporteIngresosBean.listBanco}" var="banco" itemLabel="#{banco.nombre}" itemValue="#{banco}" />
 		             		</p:selectOneMenu>
 	             		</p:fieldset>
-	             		
 	             		<p:fieldset legend="Cliente" styleClass="p-mt-4">
 		             		<p:selectOneMenu id="select-cte" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.clienteSelect}">
 		             			<f:selectItem itemLabel="Todos Los Clientes" Itemvalue="" />
 		             			<f:selectItems value="#{reporteIngresosBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 		             		</p:selectOneMenu>
 	             		</p:fieldset>
-	             		
 	             		<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
 					 	 <p:toolbar>
 							<p:toolbarGroup>

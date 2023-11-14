@@ -33,7 +33,8 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "SerieNota.findByFechaInicio", query = "SELECT s FROM SerieNota s WHERE s.fechaInicio = :fechaInicio"),
     @NamedQuery(name = "SerieNota.findByNumeroInicial", query = "SELECT s FROM SerieNota s WHERE s.numeroInicial = :numeroInicial"),
     @NamedQuery(name = "SerieNota.findByNumeroActual", query = "SELECT s FROM SerieNota s WHERE s.numeroActual = :numeroActual"),
-    @NamedQuery(name = "SerieNota.findByNumeroFinal", query = "SELECT s FROM SerieNota s WHERE s.numeroFinal = :numeroFinal")})
+    @NamedQuery(name = "SerieNota.findByNumeroFinal", query = "SELECT s FROM SerieNota s WHERE s.numeroFinal = :numeroFinal"),
+    @NamedQuery(name = "SerieNota.findActivas", query = "SELECT s FROM SerieNota s WHERE s.statusSerie.id = 1 ")})
 public class SerieNota implements Serializable {
 
     private static final long serialVersionUID = 1L;

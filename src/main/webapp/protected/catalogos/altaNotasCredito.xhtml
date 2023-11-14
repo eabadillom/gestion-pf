@@ -13,7 +13,7 @@
 		<p:outputPanel id="emisor" class="p-grid">
 			<div class="p-grid ui-fluid p-col-12">
 				<div class="p-col-6 p-md-6">
-					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.clienteSelect}" >
+					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.clienteSelect}" filter="true" filterMatchMode="contains" >
 						<f:selectItem itemLabel="---Seleccione un cliente ---" noSelectionOption="true" />
 						<f:selectItems value="#{altaNotasCredito.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 						<p:ajax listener="#{altaNotasCredito.filtroFactura()}" process="@this" update="emisor rfc domicilio" />
@@ -21,7 +21,7 @@
 				</div>
 				<div class="p-col-6 p-md-6">
 					<p:selectOneMenu id="domicilio" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.domicilioSelect}">
-						<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
+						<f:selectItem itemLabel="---Seleccione el domicilio---" noSelectionOption="true"/>
 						<f:selectItems value="#{altaNotasCredito.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios}"/>
 						<p:ajax process="@this"/>
 					</p:selectOneMenu>
@@ -37,71 +37,27 @@
 				</div>
 			</div>
 		</p:outputPanel>
-		<p:toolbar>	
-			<p:toolbarGroup>
-				<p:outputLabel value="Buscar facturas por status: " />
-				
-				
+		<div style="margin-top: 2rem;">
+			<p:fieldset legend="Buscar factura">
 				<p:selectBooleanCheckbox itemLabel="Por Cobrar" value="#{altaNotasCredito.porCobrar}">
 					<p:ajax listener="#{altaNotasCredito.filtroFactura()}"/>
 				</p:selectBooleanCheckbox>
-				
 				<p:selectBooleanCheckbox itemLabel="Pago Parcial" value="#{altaNotasCredito.pagoParcial}">
 					<p:ajax listener="#{altaNotasCredito.filtroFactura()}"/>
 				</p:selectBooleanCheckbox>
-					
 				<p:selectBooleanCheckbox itemLabel="Pagada" value="#{altaNotasCredito.pagada}">
 					<p:ajax listener="#{altaNotasCredito.filtroFactura()}" />
 				</p:selectBooleanCheckbox>
-			</p:toolbarGroup>
-		</p:toolbar>
-		<div style="margin-top: 2rem;">
-			<p:fieldset legend="Datos generales">
-				<p:outputPanel id="notaCredito" >
-					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-3 p-md-3">
-							<p:outputLabel value="Fecha:" />
-							<p:datePicker showIcon="true" value="#{altaNotasCredito.notaCredito.fecha}" />
-						</div>
-						<div class="p-col-6 p-md-6">
-							<p:outputLabel value="Por los servicios:" />
-							<p:inputText value="#{altaNotasCredito.notaCredito.servicios}" />
-						</div>
-						<div class="p-col-3 p-md-3">
-							<p:outputLabel value="Segun C.D. No:" />
-							<p:inputText value="#{altaNotasCredito.notaCredito.constancia}" />
-						</div>
-						<div class="p-col-6 p-md-6">
-							<p:outputLabel value="Periodo:" />
-							<p:inputText value="#{altaNotasCredito.notaCredito.periodo}" />
-						</div>
-						<div class="p-col-6 p-md-6">
-							<p:outputLabel value="Cajero:" />
-							<p:inputText value="#{altaNotasCredito.notaCredito.cajero}" />
-						</div>
-						<div class="p-col-12 p-md-12">
-							<p:outputLabel value="Observaciones:" />
-							<p:inputTextarea value="#{altaNotasCredito.notaCredito.observaciones}" />
-						</div>
-					</div>
-				
-					<p:panelGrid layout="flex" columns="6" columnClasses="col-12 md:col-3 xl:col-2, 
-																	col-12 md:col-9 xl:col-4, 
-																	col-12 md:col-3 xl:col-2, 
-																	col-12 md:col-9 xl:col-4,
-																	col-12 md:col-3 xl:col-2, 
-																	col-12 md:col-9 xl:col-4"
-										contentStyleClass="ui-fluid" styleClass="customPanelGrid">
-					</p:panelGrid>
-				</p:outputPanel>
+				<p:outputLabel value="Del:"/>
+				<p:datePicker value="#{altaNotasCredito.fechaInicio}" showIcon="true">
+					<p:ajax process="@this" listener="#{altaNotasCredito.filtroFactura()}"/>
+				</p:datePicker>
+				<p:outputLabel value="Al:"/>
+				<p:datePicker value="#{altaNotasCredito.fechaFin}" showIcon="true">
+					<p:ajax process="@this" listener="#{altaNotasCredito.filtroFactura()}"/>
+				</p:datePicker>
 			</p:fieldset>
 		</div>
-		
-		
-		
-		
-		
-		
 		<div style="padding-top: 2rem;">
 			<p:dataTable id="dt-factura" value="#{altaNotasCredito.listaFactura}" var="factura" paginator="true" paginatorPosition="bottom"
 						reflow="true" rowKey="#{factura.id}" rows="5">
@@ -263,6 +219,48 @@
 				</f:facet>
 			
 			</p:dataTable>
+		</div>
+		
+		<div style="margin-top: 2rem;">
+			<p:fieldset legend="Información de la nota de crédito">
+				<p:outputPanel id="notaCredito" >
+					<div class="p-grid ui-fluid p-col-12">
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Fecha:" />
+							<p:datePicker showIcon="true" value="#{altaNotasCredito.notaCredito.fecha}" />
+						</div>
+						<div class="p-col-6 p-md-6">
+							<p:outputLabel value="Por los servicios:" />
+							<p:inputText value="#{altaNotasCredito.notaCredito.servicios}" />
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Segun C.D. No:" />
+							<p:inputText value="#{altaNotasCredito.notaCredito.constancia}" />
+						</div>
+						<div class="p-col-6 p-md-6">
+							<p:outputLabel value="Periodo:" />
+							<p:inputText value="#{altaNotasCredito.notaCredito.periodo}" />
+						</div>
+						<div class="p-col-6 p-md-6">
+							<p:outputLabel value="Cajero:" />
+							<p:inputText value="#{altaNotasCredito.notaCredito.cajero}" />
+						</div>
+						<div class="p-col-12 p-md-12">
+							<p:outputLabel value="Observaciones:" />
+							<p:inputTextarea value="#{altaNotasCredito.notaCredito.observaciones}" />
+						</div>
+					</div>
+				
+					<p:panelGrid layout="flex" columns="6" columnClasses="col-12 md:col-3 xl:col-2, 
+																	col-12 md:col-9 xl:col-4, 
+																	col-12 md:col-3 xl:col-2, 
+																	col-12 md:col-9 xl:col-4,
+																	col-12 md:col-3 xl:col-2, 
+																	col-12 md:col-9 xl:col-4"
+										contentStyleClass="ui-fluid" styleClass="customPanelGrid">
+					</p:panelGrid>
+				</p:outputPanel>
+			</p:fieldset>
 		</div>
 		
 		<div style="padding-top: 2rem;" align="center">

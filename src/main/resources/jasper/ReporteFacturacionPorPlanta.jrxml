@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteFacturacionPorPlanta" pageWidth="1200" pageHeight="612" columnWidth="1140" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="a166aec9-0683-45cc-bf0d-93a561e072f8">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[new String ("resources/logo_square.gif")]]></defaultValueExpression>
@@ -13,295 +13,150 @@
 	<parameter name="fechaFin" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT * FROM (
-
 	SELECT
-
 	    FAC.ID AS FACTURA,
-
 	    FAC.NUMERO,
-
 	    FAC.FECHA,
-
 	    FAC.RFC,
-	    
 	    FAC.nom_serie,
-
 	    FAC.NUMERO_CLIENTE,
-
 	    FAC.NOMBRE_CLIENTE,
-
 	    CF.FOLIO,
-
 	    CF.FOLIO_CLIENTE,
-
 	    CF.vigencia_inicio,
-
 	    CF.VIGENCIA_FIN,
-
 	    SC.DESCRIPCION,
-
 	    SUM(SC.COSTO) AS COSTO,
-
 	    SC.TARIFA,
-
 	    SUM(SC.BASECARGO) AS BASECARGO,
-
 	    SC.PLANTA_CVE,
-
 	    SC.PLANTA_ABREV,
-
 	    SC.PLANTA_DS,
-
 	    SC.CAMARA_CVE,
-
 	    SC.CAMARA_ABREV,
-
 	    SC.CAMARA_DS
-
 	FROM factura FAC
-
 	INNER JOIN constancia_factura CF ON FAC.ID = CF.FACTURA
-
 	INNER JOIN servicio_constancia SC ON CF.ID = SC.CONSTANCIA
-
 	WHERE SC.PLANTA_CVE IS NOT NULL
-
 	AND FAC.STATUS NOT IN ('0','2')
-
 	        AND ( (SC.PLANTA_CVE = $P{planta} ) OR ( $P{planta} IS NULL ) )
-
 	        AND ( (SC.CAMARA_CVE = $P{camara} ) OR ( $P{camara} IS NULL ) )
-
 	        AND ( (FAC.CLIENTE = $P{idCliente}) OR ($P{idCliente} IS NULL) )
-
 	        AND ( (FAC.FECHA BETWEEN $P{fechaInicio} AND $P{fechaFin} ) OR ($P{fechaInicio} IS NULL) )
-
 	        GROUP BY FAC.ID, FAC.NUMERO, FAC.FECHA, FAC.RFC, FAC.NUMERO_CLIENTE, FAC.NOMBRE_CLIENTE, CF.FOLIO, CF.FOLIO_CLIENTE,
-
 	            CF.vigencia_inicio, CF.VIGENCIA_FIN, SC.DESCRIPCION, SC.TARIFA,
-
 	            SC.PLANTA_CVE, SC.PLANTA_ABREV, SC.PLANTA_DS, SC.CAMARA_CVE,
-
 	            SC.CAMARA_ABREV, SC.CAMARA_DS
-
 	  
-
     UNION ALL
-
 	  
-
     SELECT
-
         FAC.ID AS FACTURA,
-
         FAC.NUMERO,
-
         FAC.FECHA,
-
 	    FAC.RFC,
-
  		FAC.nom_serie,
- 		
 	    FAC.NUMERO_CLIENTE,
-
 	    FAC.NOMBRE_CLIENTE,
-
 	    CF.FOLIO,
-
 	    CF.FOLIO_CLIENTE,
-
 	    CF.vigencia_inicio,
-
 	    CF.VIGENCIA_FIN,
-
 	    SC.SERVICIO_DS AS DESCRIPCION,
-
 	    SUM(SC.IMPORTE) AS COSTO,
-
 	    SC.CUOTA AS TARIFA,
-
 	    SUM(SC.PESO) AS BASECARGO,
-
 	    SC.PLANTA_CVE,
-
 	    SC.PLANTA_ABREV,
-
 	    SC.PLANTA_DS,
-
 	    SC.CAMARA_CVE,
-
 	    SC.CAMARA_ABREV,
-
 	    SC.CAMARA_DS
-
 	FROM factura FAC
-
 	INNER JOIN constancia_factura_cmp CF ON FAC.ID = CF.FACTURA
-
 	INNER JOIN detalle_constancia_cmp SC ON CF.ID = SC.CONSTANCIA
-
 	WHERE SC.PLANTA_CVE IS NOT NULL
-
 	AND FAC.STATUS NOT IN ('0','2')
-
 	AND ( (SC.PLANTA_CVE = $P{planta} ) OR ( $P{planta} IS NULL ) )
-
 	AND ( (SC.CAMARA_CVE = $P{camara} ) OR ( $P{camara} IS NULL ) )
-
 	AND ( (FAC.CLIENTE = $P{idCliente}) OR ($P{idCliente} IS NULL) )
-
 	AND ( (FAC.FECHA BETWEEN $P{fechaInicio} AND $P{fechaFin} ) OR ($P{fechaInicio} IS NULL) )
-
 	GROUP BY FAC.ID, FAC.NUMERO, FAC.FECHA, FAC.RFC, FAC.NUMERO_CLIENTE, FAC.NOMBRE_CLIENTE, CF.FOLIO, CF.FOLIO_CLIENTE,
-
 	    CF.vigencia_inicio, CF.VIGENCIA_FIN, SC.SERVICIO_DS, SC.CUOTA,
-
 	    SC.PLANTA_CVE, SC.PLANTA_ABREV, SC.PLANTA_DS, SC.CAMARA_CVE,
-
 	    SC.CAMARA_ABREV, SC.CAMARA_DS
-
 	
-
 	UNION ALL
-
 	
-
 	SELECT
-
 	    FAC.ID AS FACTURA,
-
 	    FAC.NUMERO,
-
 	    FAC.FECHA,
-
 	    FAC.RFC,
-
 	    FAC.NUMERO_CLIENTE,
-	    
-	     FAC.nom_serie,
-
+		FAC.nom_serie,
 	    FAC.NOMBRE_CLIENTE,
-
 	    CF.FOLIO,
-
 	    CF.FOLIO_CLIENTE,
-
 	    NULL AS VIGENCIA_INICIO,
-
 	    NULL AS VIGENCIA_FIN,
-
 	    SC.DESCRIPCION,
-
 	    SUM(SC.COSTO) AS COSTO,
-
 	    SC.TARIFA,
-
 	    SUM(SC.COSTO) AS BASECARGO,
-
 	    FAC.PLANTA AS PLANTA_CVE,
-
 	    PLT.PLANTA_ABREV,
-
 	    PLT.PLANTA_DS,
-
 	    NULL AS CAMARA_CVE,
-
 	    NULL AS CAMARA_ABREV,
-
 	    NULL AS CAMARA_DS
-
 	FROM factura FAC
-
 	INNER JOIN CONSTANCIA_FACTURA_DS CF ON FAC.ID = CF.FACTURA
-
 	INNER JOIN SERVICIO_CONSTANCIA_DS SC ON CF.ID = SC.CONSTANCIA
-
 	LEFT OUTER JOIN PLANTA PLT ON PLT.PLANTA_CVE = FAC.PLANTA
-
 	WHERE FAC.STATUS NOT IN ('0','2')
-
 	AND ( (FAC.PLANTA = $P{planta} ) OR ( $P{planta} IS NULL ) )
-
 	AND ( (FAC.CLIENTE = $P{idCliente}) OR ($P{idCliente} IS NULL) )
-
 	AND ( (FAC.FECHA BETWEEN $P{fechaInicio} AND $P{fechaFin} ) OR ($P{fechaInicio} IS NULL) )
-
 	GROUP BY FAC.ID, FAC.NUMERO, FAC.FECHA, FAC.RFC, FAC.NUMERO_CLIENTE, FAC.NOMBRE_CLIENTE, CF.FOLIO, CF.FOLIO_CLIENTE,
-
 	    SC.DESCRIPCION, SC.TARIFA,
-
 	    FAC.PLANTA, PLT.PLANTA_ABREV, PLT.PLANTA_DS
-
 	
-
 	UNION ALL
-
 	
-
 	SELECT
-
 	    FAC.ID AS FACTURA,
-
 	    FAC.NUMERO,
-
 	    FAC.FECHA,
-
 	    FAC.RFC,
-
 	    FAC.NUMERO_CLIENTE,
-	    
-	     FAC.nom_serie,
-
+		FAC.nom_serie,
 	    FAC.NOMBRE_CLIENTE,
-
 	    NULL AS FOLIO,
-
 	    NULL AS FOLIO_CLIENTE,
-
 	    NULL AS VIGENCIA_INICIO,
-
 	    NULL AS VIGENCIA_FIN,
-
 	    SF.DESCRIPCION,
-
 	    SUM(SF.COSTO) AS COSTO,
-
 	    SF.TARIFA,
-
 	    SUM(SF.CANTIDAD) AS BASECARGO,
-
 	    FAC.PLANTA AS PLANTA_CVE,
-
 	    PLT.PLANTA_ABREV,
-
 	    PLT.PLANTA_DS,
-
 	    NULL AS CAMARA_CVE,
-
 	    NULL AS CAMARA_ABREV,
-
 	    NULL AS CAMARA_DS
-
 	FROM factura FAC
-
 	INNER JOIN servicio_factura SF ON FAC.ID = SF.FACTURA
-
 	LEFT OUTER JOIN PLANTA PLT ON PLT.PLANTA_CVE = FAC.PLANTA
-
 	WHERE FAC.STATUS NOT IN ('0','2')
-
 	        AND ( (FAC.PLANTA = $P{planta} ) OR ( $P{planta} IS NULL ) )
-
 	        AND ( (FAC.CLIENTE = $P{idCliente}) OR ($P{idCliente} IS NULL) )
-
 	        AND ( (FAC.FECHA BETWEEN $P{fechaInicio} AND $P{fechaFin} ) OR ($P{fechaInicio} IS NULL) )
-
 	        GROUP BY FAC.ID, FAC.NUMERO, FAC.FECHA, FAC.RFC, FAC.NUMERO_CLIENTE, FAC.NOMBRE_CLIENTE,
-
 	            SF.DESCRIPCION, SF.TARIFA, FAC.PLANTA, PLT.PLANTA_ABREV, PLT.PLANTA_DS
-
 ) T
-
 ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 	</queryString>
 	<field name="FACTURA" class="java.lang.Integer">
@@ -388,13 +243,59 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 		<property name="com.jaspersoft.studio.field.name" value="CAMARA_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="CAMARA_DS"/>
 	</field>
+	<variable name="importeTotalPlanta" class="java.math.BigDecimal" resetType="Group" resetGroup="Planta" calculation="Sum">
+		<variableExpression><![CDATA[$F{COSTO}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+	</variable>
+	<group name="Planta">
+		<groupExpression><![CDATA[$F{PLANTA_DS}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="1140" height="15" forecolor="#2196F3" uuid="5e80d6b3-ae80-492e-9ce5-12099c375388">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{PLANTA_DS}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="44">
+				<staticText>
+					<reportElement x="0" y="1" width="880" height="13" forecolor="#2196F3" uuid="36ad24ef-776b-4b2e-95fb-a4dd842b1173"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total (planta):]]></text>
+				</staticText>
+				<textField pattern="$#,##0.00;$-#,##0.00">
+					<reportElement x="1050" y="1" width="90" height="13" forecolor="#2196F3" uuid="31e60ba5-0707-4f04-826a-ccbb1b931695"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{importeTotalPlanta}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="0" width="1140" height="1" forecolor="#2196F3" uuid="093b7c26-bdac-4cf4-bb9e-94295220f624">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="54" splitType="Stretch">
 			<staticText>
-				<reportElement x="160" y="10" width="761" height="21" forecolor="#2196F3" uuid="1172e067-f135-43fc-9eb3-09284c137f0b">
+				<reportElement x="0" y="0" width="1140" height="21" forecolor="#2196F3" uuid="1172e067-f135-43fc-9eb3-09284c137f0b">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -405,7 +306,7 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<text><![CDATA[REPORTE DE FACTURACION POR PLANTA]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="113" height="54" uuid="2613dd1a-b9cd-4f00-a4e5-7ae63e6114e7">
+				<reportElement x="0" y="0" width="159" height="54" uuid="2613dd1a-b9cd-4f00-a4e5-7ae63e6114e7">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -433,7 +334,7 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<textFieldExpression><![CDATA[$P{fechaFin}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="168" y="42" width="287" height="12" uuid="99581d73-f520-4f0c-b262-bab24b25c45b"/>
+				<reportElement x="0" y="42" width="455" height="12" uuid="99581d73-f520-4f0c-b262-bab24b25c45b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
@@ -442,45 +343,12 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 		</band>
 	</title>
 	<pageHeader>
+		<band height="11" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
 		<band height="11" splitType="Stretch">
 			<staticText>
-				<reportElement key="" mode="Opaque" x="0" y="0" width="50" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="9b74514c-0ea5-4ae8-827b-a4cd60ead13d">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Planta]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="" mode="Opaque" x="1030" y="0" width="40" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="898150b9-5eeb-42e3-a06d-e79b90aad97f">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Num. Camara]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="" mode="Opaque" x="860" y="0" width="100" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="a6b0beba-2c83-4e52-ba21-9b3d733640ba">
+				<reportElement key="" mode="Opaque" x="880" y="0" width="100" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="2529acd2-0ad5-4143-b346-83c92c1cd675">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -495,14 +363,13 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Tarifa]]></text>
+				<text><![CDATA[Costo Unitario]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="770" y="0" width="90" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="15faf957-4fec-4b03-94dc-21305406ff62">
+				<reportElement key="" mode="Opaque" x="1050" y="0" width="90" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="50dee5cb-664c-4e67-adcf-a642869a11ca">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -516,10 +383,9 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<text><![CDATA[Importe]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="50" y="0" width="168" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="96ca47a6-1bc4-41ab-afe4-91dc441bf56b">
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<reportElement key="" mode="Opaque" x="980" y="0" width="70" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="9f3806fa-1b42-4a0e-b5ea-3ff654739370">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<box>
@@ -531,12 +397,11 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Nombre]]></text>
+				<text><![CDATA[Cantidad]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="616" y="0" width="154" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="08cc6be7-8f52-4067-b202-bd8f1f0b9ed2">
+				<reportElement key="" mode="Opaque" x="398" y="0" width="482" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="911718d1-a7ff-470c-82c3-0721653133ca">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
@@ -552,47 +417,10 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<text><![CDATA[Servicio Facturado]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="1070" y="0" width="70" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="5159df81-0193-42ee-8e67-2264ef820f63">
+				<reportElement key="" mode="Opaque" x="80" y="0" width="318" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="c5a87a41-fca7-44de-8e20-7adec3e68846">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Camara]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="" mode="Opaque" x="536" y="0" width="80" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="3f7454d2-884f-450b-87f0-31d3bd804ddf">
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Factura]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="" mode="Opaque" x="218" y="0" width="318" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="b11de2cc-47c8-4011-bbbc-9870a20c0a71">
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -606,10 +434,9 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<text><![CDATA[Cliente]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="960" y="0" width="70" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="ed863017-9c31-4cf2-b170-56e953c7df52">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<reportElement key="" mode="Opaque" x="0" y="0" width="80" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="582184f2-0818-4517-8fca-d3b7f8c06171">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<box>
@@ -621,85 +448,68 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Base de cargo]]></text>
+				<text><![CDATA[Factura]]></text>
 			</staticText>
 		</band>
-	</pageHeader>
-	<columnHeader>
-		<band height="15" splitType="Stretch">
-			<textField isBlankWhenNull="true">
-				<reportElement x="50" y="0" width="168" height="15" uuid="00e7e340-5437-489b-ba1b-a9d9ceff254b">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{PLANTA_DS}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="50" height="15" uuid="7e40f1ae-45d8-45b1-8c44-7b0a1110d5bd">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{PLANTA_ABREV}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="218" y="0" width="318" height="15" uuid="541e7d3d-84d2-4999-bc9e-060d5a2cc813">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{NOMBRE_CLIENTE}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="536" y="0" width="80" height="15" uuid="7b497dfd-23d7-47dd-a1cd-f849d0035a18">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{NUMERO} + "-" + $F{nom_serie}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement x="616" y="0" width="154" height="15" uuid="419114fe-329a-4465-9e3d-624f6f50ea44">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{DESCRIPCION}]]></textFieldExpression>
-			</textField>
+	</columnHeader>
+	<detail>
+		<band height="15">
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="770" y="0" width="90" height="15" uuid="dfb29c02-8187-465d-b6cf-b0bf478a0c64">
+				<reportElement x="880" y="0" width="100" height="15" uuid="d17c74ba-4616-4197-974d-a831243c6503">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{COSTO}]]></textFieldExpression>
-			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="860" y="0" width="100" height="15" uuid="374d6d69-2ef8-4291-8355-815b0c430272">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{TARIFA}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="960" y="0" width="70" height="15" uuid="7e1d48be-e1d5-4b9f-8d74-23ecfe87ed9c">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="80" height="15" uuid="6c01b94b-1198-49dd-b318-9238b567488e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nom_serie} + "-" + $F{NUMERO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+				<reportElement x="980" y="0" width="70" height="15" uuid="212f2cb5-b545-47cb-b4ae-6c49ef52abf3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{BASECARGO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="1030" y="0" width="40" height="15" uuid="b6a16e85-d481-4e91-b098-ed69a17e2d59">
+				<reportElement x="1050" y="0" width="90" height="15" uuid="95c8a52d-ab0e-463f-9f3d-18a64187390d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{CAMARA_ABREV}]]></textFieldExpression>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COSTO}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="1070" y="0" width="70" height="15" uuid="55cfc369-6034-4906-9422-39b9b6e31c00">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="398" y="0" width="482" height="15" uuid="480e4e77-d9b4-4cc2-952d-bdcc14e9a8db">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{CAMARA_DS}]]></textFieldExpression>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPCION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="80" y="0" width="318" height="15" uuid="a6bb0dd1-ff60-4519-8530-57aef6691cc7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOMBRE_CLIENTE}]]></textFieldExpression>
 			</textField>
 		</band>
-	</columnHeader>
+	</detail>
 	<pageFooter>
 		<band height="8" splitType="Stretch">
 			<textField>
@@ -721,7 +531,7 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 	<noData>
 		<band height="79">
 			<staticText>
-				<reportElement x="0" y="10" width="1135" height="21" forecolor="#2196F3" uuid="4b0a1186-7953-45f8-9a5e-c11be733955d">
+				<reportElement x="0" y="10" width="1140" height="21" forecolor="#2196F3" uuid="4b0a1186-7953-45f8-9a5e-c11be733955d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -732,14 +542,14 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<text><![CDATA[REPORTE DE FACTURACION POR PLANTA]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="113" height="54" uuid="a8a1b1f7-4c60-483c-a345-90fd74382710">
+				<reportElement x="0" y="0" width="159" height="54" uuid="a8a1b1f7-4c60-483c-a345-90fd74382710">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="0" y="50" width="1139" height="29" uuid="486847b5-83a4-4681-aa92-6a7ebbd9afd0">
+				<reportElement x="0" y="50" width="1140" height="29" uuid="486847b5-83a4-4681-aa92-6a7ebbd9afd0">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>

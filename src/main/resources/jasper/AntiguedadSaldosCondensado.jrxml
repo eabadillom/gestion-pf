@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AntiguedadSaldosCondensado" pageWidth="1190" pageHeight="842" columnWidth="1150" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="45894633-976c-44f7-8838-576fdcbf36bb">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -12,350 +11,181 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
 	<parameter name="fecha" class="java.util.Date"/>
 	<parameter name="imagen" class="java.lang.String"/>
 	<parameter name="idCliente" class="java.lang.Integer"/>
 	<queryString>
 		<![CDATA[WITH cartera (id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias) AS
-
 (
-
 	SELECT
-
         factura.id,
-
         factura.numero_cliente,
-
         factura.cliente,
-
         factura.nom_serie,
-
         factura.numero,
-
         trim(factura.nombre_cliente) AS nombre_cliente,
-
         factura.fecha as fecha,
-
         factura.subtotal as subtotal,
-
         factura.iva as iva,
-
         factura.total as total,
-
         factura.total AS saldo,
-
         factura.status as status,
-
         status_factura.nombre as nombre_status,
-
         factura.plazo as plazo,
-
         DATEDIFF($P{fecha}, date_add(factura.fecha, INTERVAL factura.plazo DAY)) as dias
-
     FROM factura
-
     INNER JOIN status_factura on factura.status = status_factura.id
-
     WHERE
-
         factura.ID NOT IN(SELECT pago.factura FROM pago WHERE pago.fecha <= $P{fecha} ) AND
-
         factura.status NOT IN (0,2) AND
-
         factura.fecha <= $P{fecha} AND
-
         (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
     UNION all
-
     SELECT * FROM (
-
 	    SELECT
-
 	       factura.id as id,
-
 	       factura.numero_cliente AS numero_cte,
-
 	       factura.cliente as cliente,
-
 	       factura.nom_serie as nom_serie,
-
 	       factura.numero as numero,
-
 	       trim(factura.nombre_cliente) AS nombre_cliente,
-
 	       factura.fecha,
-
 	       (factura.total - ingreso.monto)/(1.16) as subtotal,
-
 	       (factura.total - ingreso.monto) - subtotal as iva,
-
 	       (factura.total - ingreso.monto) AS total,
-
 	       (factura.total - ingreso.monto) AS saldo,
-
 	       factura.status as status,
-
 	       status_factura.nombre as nombre,
-
 	       factura.plazo as plazo,
-
 	       DATEDIFF($P{fecha}, date_add(factura.fecha, INTERVAL factura.plazo DAY)) as dias
-
 	    FROM (
-
 	    	SELECT
-
 	    		factura,
-
 	    		sum(monto) as monto
-
 	    	FROM (
-
 	    		SELECT
-
 		    		p.factura,
-
 		    		sum(p.monto) as monto
-
 		    	FROM pago p
-
 		    	WHERE p.tipo NOT IN (5)
-
 		    	AND p.fecha <= $P{fecha}
-
 		    	GROUP BY p.factura
-
 		    	UNION ALL
-
 		    	SELECT
-
 		    		nf.FACTURA,
-
 		    		sum(nf.CANTIDAD) as monto
-
 		    	FROM NOTA_CREDITO nc
-
 		    	INNER JOIN NOTA_X_FACTURAS nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
-
 		    	WHERE nc.FECHA <= $P{fecha}
-
 		    	GROUP BY nf.FACTURA
-
 	    	) a
-
 	    	GROUP BY a.factura
-
 		) ingreso
-
 	    INNER JOIN factura ON ingreso.factura = factura.id
-
 	    INNER JOIN status_factura ON status_factura.id = factura.status
-
 	    WHERE
-
 	       (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	    ORDER BY fecha
-
     ) b WHERE b.saldo > 0
-
 )
-
 SELECT * FROM (
-
 	SELECT
-
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
-
 		sum(saldo) as en_plazo,
-
 		null as d_8,
-
 		null as d_15,
-
 		null as d_30,
-
 		null as d_60,
-
 		null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias < 1
-
 	GROUP BY numero_cliente, nombre_cliente
-
 	UNION 
-
 	SELECT
-
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
-
 		null as en_plazo,
-
 	    sum(saldo) as d_8,
-
 	    null as d_15,
-
 	    null as d_30,
-
 	    null as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 1 AND 8
-
 	GROUP BY numero_cliente, nombre_cliente
-
 	UNION 
-
 	SELECT
-
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
-
 		null as en_plazo,
-
 	    sum(saldo) as d_8,
-
 	    null as d_15,
-
 	    null as d_30,
-
 	    null as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 1 AND 8
-
 	GROUP BY numero_cliente, nombre_cliente
-
-	UNION 
-
+	UNION
 	SELECT
-
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
-
 		null as en_plazo,
-
 	    sum(saldo) as d_8,
-
 	    null as d_15,
-
 	    null as d_30,
-
 	    null as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 1 AND 8
-
 	GROUP BY numero_cliente, nombre_cliente
-
-	UNION ALL
-
+	UNION
 	SELECT
-
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
-
 		null as en_plazo,
-
 	    null as d_8,
-
 	    sum(saldo) as d_15,
-
 	    null as d_30,
-
 	    null as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 9 AND 15
-
 	GROUP BY numero_cliente, nombre_cliente
-
-	UNION ALL
-
+	UNION
 	SELECT
-
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
-
 		null as en_plazo,
-
 	    null as d_8,
-
 	    null as d_15,
-
 	    sum(saldo) as d_30,
-
 	    null as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 16 AND 30
-
 	GROUP BY numero_cliente, nombre_cliente
-
-	UNION ALL
-
+	UNION
 	SELECT
-
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
-
 		null as en_plazo,
-
 	    null as d_8,
-
 	    null as d_15,
-
 	    null as d_30,
-
 	    sum(saldo) as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 31 AND 60
-
 	GROUP BY numero_cliente, nombre_cliente
-
-	UNION ALL
-
+	UNION
 	SELECT
-
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
-
 		null as en_plazo,
-
 	    null as d_8,
-
 	    null as d_15,
-
 	    null as d_30,
-
 	    null as d_60,
-
 	    sum(saldo) as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias > 60
-
 	GROUP BY numero_cliente, nombre_cliente
-
 ) x
-
 ORDER BY x.nombre_cliente]]>
 	</queryString>
 	<field name="numero_cliente" class="java.lang.String">
