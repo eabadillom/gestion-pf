@@ -41,7 +41,7 @@ public class IngresoProducto implements Serializable,Cloneable{
 	private Integer cantidad;
 	
 	@JoinColumn(name = "id_unidad_medida", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	private UnidadDeManejo unidadDeManejo;
 	
 	@Column(name = "peso")
@@ -80,7 +80,7 @@ public class IngresoProducto implements Serializable,Cloneable{
 	private Ingreso ingreso;
 	
 	@JoinColumn(name = "id_producto", referencedColumnName = "PRODUCTO_CVE")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	private Producto producto;
 
 	public IngresoProducto() {

@@ -309,6 +309,11 @@
 			</f:facet>				
 		</p:dialog>
 		
+		<div style="text-align: center; margin-top: 12px" >
+			<p:splitButton value="Guardar" icon="pi pi-save" actionListener="#{ordenEntradaBean.save()}" process="@this">
+				<p:menuitem value="Imprimir" icon="pi pi-file-pdf" />
+			</p:splitButton>		
+		</div>
 		
 	</h:form>
 	</ui:define>
