@@ -36,11 +36,19 @@
 						<p:selectOneMenu id="ingreso" value="#{ordenEntradaBean.ingreso}" converter="entityConverter">
 							<f:selectItem itemLabel="Ordenes confirmadas para hoy" noSelectionOption="true" />
 							<f:selectItems value="#{ordenEntradaBean.listaIngreso}" var="ingreso" itemLabel="#{ingreso.folio}" itemValue="#{ingreso}" />
-							<p:ajax process="@this" update="form:dato-general  form:dt-ingresoProducto" listener="#{ordenEntradaBean.productoIngresoOrden}" />									
+							<p:ajax process="@this" update="form:dato-general  form:dt-ingresoProducto form:dt-ingresoServicios" listener="#{ordenEntradaBean.cargaIngresoOrden}" />									
 						</p:selectOneMenu>
 					</div>
 					
-					<div class="p-col-6 p-md-6" >
+					<div class="p-col-2 p-md-4">
+						<p:selectOneMenu id="aviso" autoWidth="false" converter="entityConverter" value="#{ordenEntradaBean.avisoSelect}" required="true" requiredMessage="Selecciona un aviso">
+							<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
+							<f:selectItems value="#{ordenEntradaBean.avisoPorCliente}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.categoriaCve.categoriaDs}-#{aviso.avisoVigencia}" itemValue="#{aviso}"/>
+							<p:ajax listener="#{ordenEntradaBean.renderServicio()}" update="form:seleccion-servicio form:messages form:dt-ingresoServicios"/>
+						</p:selectOneMenu>
+					</div>
+					
+					<div class="p-col-2 p-md-4" >
 						<p:selectOneMenu id="planta" value="#{ordenEntradaBean.planta}" converter="entityConverter" rendered="#{(usuario.perfil != 1) and (usuario.perfil != 4)}" >
 							<f:selectItem itemLabel="Selecciona planta" noSelectionOption="true" />
 							<f:selectItems value="#{ordenEntradaBean.listaPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
@@ -48,15 +56,13 @@
 						</p:selectOneMenu>					
 					</div>
 					
-					<div class="p-col-6 p-md-6" >
+					<div class="p-col-2 p-md-4" >
 						<p:selectOneMenu id="camara" value="#{ordenEntradaBean.camara}" converter="entityConverter" >
 							<f:selectItem itemLabel="Selecciona camara" noSelectionOption="true" />
 							<f:selectItems value="#{ordenEntradaBean.listaCamara}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />
 							<p:ajax listener="#{ordenEntradaBean.camaraDisponible}" />						
 						</p:selectOneMenu>					
 					</div>
-					
-					
 				</div>
 			</p:panel>
 			
@@ -141,7 +147,7 @@
 				</div>
 				
 				<div class="p-field p-col-2" style="margin-top: 22px">
-					<p:commandButton value="Agregar" oncomplete="PF('dlgTarima').show()"/>
+					<p:commandButton value="Agregar" oncomplete="PF('dlgTarima').show()" process="@this form:pnl-producto"/>
 				</div>
 				
 			</div>
@@ -176,6 +182,12 @@
 			
 			<p:column headerText="Peso total x Tarima">
 				<h:outputText value="#{ingresoProducto.peso}" />
+			</p:column>
+			
+			<p:column>
+				<p:commandButton action="#{ordenEntradaBean.eliminarIngresoProducto}" class="ui-button-danger" icon="pi pi-times" process="@this" update="form:dt-ingresoProducto">
+					<f:setPropertyActionListener value="#{ingresoProducto}" target="#{ordenEntradaBean.selectIngresoProducto}"></f:setPropertyActionListener>
+				</p:commandButton>
 			</p:column>
 		
 			<p:rowExpansion >
@@ -218,6 +230,71 @@
 		
 		</p:dataTable>
 		
+		<p:panel id="seleccion-servicio" header="PARA LOS SERVICIOS DE">
+			<div class="p-grid ui-fluid p-col-12">
+				<div class="p-col-2 p-md-2">
+					<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{ordenEntradaBean.isCongelacion}">
+						<p:ajax process="@this" update="congelacion form:dt-ingresoServicios" listener="#{ordenEntradaBean.addCongelacion}" ></p:ajax>
+					</p:selectBooleanCheckbox>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{ordenEntradaBean.isConservacion}">
+						<p:ajax process="@this" update="conservacion form:dt-ingresoServicios" listener="#{ordenEntradaBean.addConservacion}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{ordenEntradaBean.isRefrigeracion}">
+						<p:ajax process="@this" update="refrigeracion form:dt-ingresoServicios" listener="#{ordenEntradaBean.addRefrigeracion}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{ordenEntradaBean.isManiobras}">
+						<p:ajax process="@this" update="maniobras form:dt-ingresoServicios" listener="#{ordenEntradaBean.addManiobras}" ></p:ajax>
+					</p:selectBooleanCheckbox>
+				</div>
+			</div>
+			<div class="p-grid ui-fluid p-col-12">
+				<div class="p-col-6 p-md-6">
+					<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{ordenEntradaBean.precioServicioSelect}" >
+						<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
+						<f:selectItems value="#{ordenEntradaBean.listaServicioUnidad}" var="precioServicio" itemLabel="#{precioServicio.servicio.servicioDs} (Cobro por #{precioServicio.unidad.unidadDeManejoDs})" itemValue="#{precioServicio}" />	
+						<p:ajax process="@this"></p:ajax>
+					</p:selectOneMenu>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:spinner id="cantidadServicio" min="1" value="#{ordenEntradaBean.cantidadServicio}" placeholder="Cantidad">
+						<p:ajax process="@this"></p:ajax>
+					</p:spinner>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:commandButton id="cmd-agregar-servicio" value="Agregar" styleClass="edit-button" actionListener="#{ordenEntradaBean.saveIngresoServicio()}" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="form:dt-ingresoServicios form:seleccion-servicio" />
+				</div>
+			</div>
+		</p:panel>
+		
+		<p:dataTable id="dt-ingresoServicios" value="#{ordenEntradaBean.listaIngresoServicio}" var="ingresoServicio">
+		
+			<f:facet name="header">
+				<span>Servicios</span>
+			</f:facet>
+		
+			<p:column headerText="Servicio">
+				<h:outputText value="#{ingresoServicio.servicio.servicioDs}" />
+			</p:column>
+			
+			<p:column headerText="Cantidad">
+				<h:outputText value="#{ingresoServicio.cantidad}" />
+			</p:column>
+			
+			<p:column>
+				<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" action="#{ordenEntradaBean.eliminarIngresoServicio}" update="form:dt-ingresoServicios form:seleccion-servicio" >
+					<f:setPropertyActionListener value="#{ingresoServicio}" target="#{ordenEntradaBean.selectIngresoServicio}"></f:setPropertyActionListener>
+				</p:commandButton>
+			</p:column>
+		
+		</p:dataTable>
+		
+		
 		<p:dialog header="¿Cuantas tarimas deseas ingresar?" modal="true" widgetVar="dlgTarima" responsive="true" showEffect="hide">
 			<p:outputPanel id="tarimas" >
 				<div style="text-align: center">
@@ -233,9 +310,6 @@
 		</p:dialog>
 		
 		
-		
-	
-	
 	</h:form>
 	</ui:define>
 </ui:composition>	
