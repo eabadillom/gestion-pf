@@ -86,6 +86,11 @@
 						<p:inputText readonly="true" placeholder="Observaciones" value="#{ordenEntradaBean.ingreso.observaciones}" style="width:650px;"/>
 					</div>
 					
+					<div class="p-col-6 p-md-6">
+						<p:outputLabel value="Temp. mercancía (°C): " />
+						<p:spinner id="temp" value="#{ordenEntradaBean.temperatura}" stepFactor=".01" required="true"></p:spinner>
+					</div>
+					
 				</p:toolbarGroup>			
 			</p:toolbar>
 											
@@ -310,9 +315,10 @@
 		</p:dialog>
 		
 		<div style="text-align: center; margin-top: 12px" >
-			<p:splitButton value="Guardar" icon="pi pi-save" actionListener="#{ordenEntradaBean.save()}" process="@this">
+			<p:splitButton value="Guardar" icon="pi pi-save" actionListener="#{ordenEntradaBean.save()}" process="@this form:temp">
 				<p:menuitem value="Imprimir" icon="pi pi-file-pdf" />
 			</p:splitButton>		
+			<p:commandButton styleClass="p-ml-4" value="Nueva Orden" actionListener="#{ordenEntradaBean.reload()}" process="@this"/>
 		</div>
 		
 	</h:form>
