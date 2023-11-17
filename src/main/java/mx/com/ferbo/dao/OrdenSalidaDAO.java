@@ -3,9 +3,6 @@ package mx.com.ferbo.dao;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,13 +15,8 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
-import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.OrdenSalida;
-import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.ui.OrdenDeSalidas;
-import mx.com.ferbo.ui.RepEstadoCuenta;
-import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
@@ -191,18 +183,18 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 					+ " c.CAMARA_DS, "
 					+ "p3.PLANTA_DS "
 					+ "FROM pre_salida ps "
-					+ "INNER JOIN PARTIDA p ON ps.partida_cve = p.PARTIDA_CVE "
-					+ "INNER JOIN CAMARA c on p.CAMARA_CVE = c.CAMARA_CVE "
-					+ "INNER JOIN PLANTA p3 ON c.PLANTA_CVE = p3.PLANTA_CVE "
+					+ "INNER JOIN partida p ON ps.partida_cve = p.PARTIDA_CVE "
+					+ "INNER JOIN camara c on p.CAMARA_CVE = c.CAMARA_CVE "
+					+ "INNER JOIN planta p3 ON c.PLANTA_CVE = p3.PLANTA_CVE "
 					+ "INNER JOIN ("
-					+ "SELECT dp.* FROM DETALLE_PARTIDA dp "
+					+ "SELECT dp.* FROM detalle_partida dp "
 					+ "INNER JOIN ( "
-					+ "	select max(DET_PART_CVE) AS DET_PART_CVE, PARTIDA_CVE from DETALLE_PARTIDA dp GROUP BY PARTIDA_CVE "
+					+ "	select max(DET_PART_CVE) AS DET_PART_CVE, PARTIDA_CVE from detalle_partida dp GROUP BY PARTIDA_CVE "
 					+ ") maxDP ON maxDP.DET_PART_CVE = dp.DET_PART_CVE and maxDP.PARTIDA_CVE = dp.PARTIDA_CVE "
 					+ ") dp on p.PARTIDA_CVE = dp.PARTIDA_CVE "
-					+ "INNER JOIN UNIDAD_DE_PRODUCTO udp ON p.UNIDAD_DE_PRODUCTO_CVE = udp.UNIDAD_DE_PRODUCTO_CVE "
-					+ "INNER JOIN UNIDAD_DE_MANEJO udm ON udp.UNIDAD_DE_MANEJO_CVE  = udm.UNIDAD_DE_MANEJO_CVE "
-					+ "INNER JOIN PRODUCTO p2 ON udp.PRODUCTO_CVE = p2.PRODUCTO_CVE "
+					+ "INNER JOIN unidad_de_producto udp ON p.UNIDAD_DE_PRODUCTO_CVE = udp.UNIDAD_DE_PRODUCTO_CVE "
+					+ "INNER JOIN unidad_de_manejo udm ON udp.UNIDAD_DE_MANEJO_CVE  = udm.UNIDAD_DE_MANEJO_CVE "
+					+ "INNER JOIN producto p2 ON udp.PRODUCTO_CVE = p2.PRODUCTO_CVE "
 					+ "WHERE ps.st_estado = 'A' AND ps.cd_folio_salida  = :folioSalida AND ps.fh_salida = :fecha";
 			em = EntityManagerUtil.getEntityManager();
 			SimpleDateFormat formatoSimple = new SimpleDateFormat("yyyy-MM-dd");
@@ -263,11 +255,11 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 					 +"FROM "
 					 +"pre_salida ps "
 					 +"INNER JOIN "
-					 +"PARTIDA p "
+					 +"partida p "
 					 +"ON "
 					 +"ps.partida_cve = p.PARTIDA_CVE "
 					 +"INNER JOIN "
-					 +"CONSTANCIA_DE_DEPOSITO cdd ON p.FOLIO = cdd.FOLIO "
+					 +"constancia_de_deposito cdd ON p.FOLIO = cdd.FOLIO "
 					 +"WHERE ps.st_estado = 'A' AND ps.fh_salida = :fecha AND cdd.CTE_CVE = :idCliente ";
 			em = EntityManagerUtil.getEntityManager();
 			SimpleDateFormat formatoSimple = new SimpleDateFormat("yyyy-MM-dd");
@@ -316,7 +308,7 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 	}
 	
 	
-	@SuppressWarnings({ "unchecked", "deprecation" })
+	@SuppressWarnings({ "unchecked" })
 	public List<OrdenSalida> buscarFolioPorCliente(Cliente cliente, Date fecha) {
 		 List<OrdenSalida> listaOrdenSalida = null;
 		 EntityManager em = null;
@@ -333,11 +325,11 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 					 +"FROM "
 					 +"pre_salida ps "
 					 +"INNER JOIN "
-					 +"PARTIDA p "
+					 +"partida p "
 					 +"ON "
 					 +"ps.partida_cve = p.PARTIDA_CVE "
 					 +"INNER JOIN "
-					 +"CONSTANCIA_DE_DEPOSITO cdd ON p.FOLIO = cdd.FOLIO "
+					 +"constancia_de_deposito cdd ON p.FOLIO = cdd.FOLIO "
 					 +"WHERE ps.st_estado = 'A' AND ps.fh_salida = :fecha AND cdd.CTE_CVE = :idCliente ";
 				em = EntityManagerUtil.getEntityManager();
 				SimpleDateFormat formatoSimple = new SimpleDateFormat("yyyy-MM-dd");

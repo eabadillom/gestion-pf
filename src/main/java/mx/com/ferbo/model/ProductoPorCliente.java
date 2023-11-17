@@ -24,7 +24,7 @@ import javax.persistence.Table;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "PRODUCTO_POR_CLIENTE")
+@Table(name = "producto_por_cliente")
 @NamedQueries({
     @NamedQuery(name = "ProductoPorCliente.findAll", query = "SELECT p FROM ProductoPorCliente p"),
     @NamedQuery(name = "ProductoPorCliente.findByProdXCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.prodXCteCve = :prodXCteCve"),

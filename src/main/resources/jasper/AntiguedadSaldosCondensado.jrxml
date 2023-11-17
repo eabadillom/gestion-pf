@@ -11,7 +11,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<parameter name="fecha" class="java.util.Date"/>
 	<parameter name="imagen" class="java.lang.String"/>
 	<parameter name="idCliente" class="java.lang.Integer"/>
@@ -75,8 +75,8 @@
 		    	SELECT
 		    		nf.FACTURA,
 		    		sum(nf.CANTIDAD) as monto
-		    	FROM NOTA_CREDITO nc
-		    	INNER JOIN NOTA_X_FACTURAS nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
+		    	FROM nota_credito nc
+		    	INNER JOIN nota_x_facturas nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
 		    	WHERE nc.FECHA <= $P{fecha}
 		    	GROUP BY nf.FACTURA
 	    	) a
@@ -186,7 +186,8 @@ SELECT * FROM (
 	WHERE cartera.dias > 60
 	GROUP BY numero_cliente, nombre_cliente
 ) x
-ORDER BY x.nombre_cliente]]>
+ORDER BY x.nombre_cliente
+]]>
 	</queryString>
 	<field name="numero_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cliente"/>

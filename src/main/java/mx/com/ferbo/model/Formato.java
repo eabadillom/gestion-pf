@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "FORMATO")
+@Table(name = "formato")
 @NamedQueries({
     @NamedQuery(name = "Formato.findAll", query = "SELECT f FROM Formato f"),
     @NamedQuery(name = "Formato.findByFormatoCve", query = "SELECT f FROM Formato f WHERE f.formatoCve = :formatoCve"),
