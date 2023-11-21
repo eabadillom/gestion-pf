@@ -316,7 +316,9 @@
 		
 		<div style="text-align: center; margin-top: 12px" >
 			<p:splitButton value="Guardar" icon="pi pi-save" actionListener="#{ordenEntradaBean.save()}" process="@this form:temp">
-				<p:menuitem value="Imprimir" icon="pi pi-file-pdf" />
+				<p:menuitem value="Imprimir" icon="pi pi-file-pdf" actionListener="#{ordenEntradaBean.imprimirEntrada}" process="@this">
+					<p:fileDownload value="#{ordenEntradaBean.file}"></p:fileDownload>
+				</p:menuitem>
 			</p:splitButton>		
 			<p:commandButton styleClass="p-ml-4" value="Nueva Orden" actionListener="#{ordenEntradaBean.reload()}" process="@this"/>
 		</div>

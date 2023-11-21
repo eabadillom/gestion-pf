@@ -1,11 +1,18 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +28,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CamaraDAO;
@@ -59,6 +68,9 @@ import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
@@ -112,6 +124,9 @@ public class OrdenEntradaBean implements Serializable {
 	private AvisoDAO avisoDAO;
 	private Aviso avisoSelect;
 	
+	private StreamedContent file;
+	
+	private Boolean save;
 	private Date fechaActual;
 	private BigDecimal temperatura;
 	private BigDecimal sumaTarimas;
@@ -195,6 +210,7 @@ public class OrdenEntradaBean implements Serializable {
 		listaPlantas = plantaDAO.buscarTodos();
 		listaUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 		
+		save = false;
 		
 		isCongelacion = false;
 		isConservacion = false;
@@ -406,7 +422,6 @@ public class OrdenEntradaBean implements Serializable {
 			this.isManiobras = true;
 		}
 		
-		avisoSelect = new Aviso();
 		
 	}
 	
@@ -704,6 +719,8 @@ public class OrdenEntradaBean implements Serializable {
 			
 			constanciaDeDepositoDAO.guardar(constanciaDeDeposito);
 			
+			save = true;
+			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "La orden de entrada se registro correctamente";
 			
@@ -721,6 +738,61 @@ public class OrdenEntradaBean implements Serializable {
 		}
 		
 	}
+	
+public void imprimirEntrada() throws Exception{
+	
+		String jasperPath = "/jasper/GestionReport.jrxml";
+		String filename = "ticketEntrada.pdf";
+		String images = "/images/logoF.png";
+		String message = null;
+		Severity severity = null;
+		
+		File reportFile = new File(jasperPath);
+		File imgFile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			
+			if(save == false) {
+				message = "Debe guardar la orden de entrada";
+				throw new Exception("Debe guardar la orden de entrada");
+			}
+			
+			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
+			URL resourceimg = getClass().getResource(images); 
+			String file = resource.getFile();//retorna la ubicacion del archivo
+			String img = resourceimg.getFile();
+			reportFile = new File(file);//crea un archivo
+			imgFile = new File(img);
+			log.info(reportFile.getPath());
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("FOLIO","I" + this.ingreso.getFolio());
+			parameters.put("LogoPath", imgFile.getPath());
+			//jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentType("application/pdf")
+					.name(filename)
+					.stream(() -> input )
+					.build();
+			log.info("Orden de salida generada {}...", filename);			
+			
+		} catch (Exception e) {
+			e.printStackTrace();			
+			severity = FacesMessage.SEVERITY_INFO;						
+		}finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
+			PrimeFaces.current().ajax().update("form:messages");
+			conexion.close((Connection) connection);
+		}
+
+	}
+	
 	
 	public void reload() throws IOException {
 		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext(); 
@@ -989,6 +1061,14 @@ public class OrdenEntradaBean implements Serializable {
 
 	public void setSelectIngresoServicio(IngresoServicio selectIngresoServicio) {
 		this.selectIngresoServicio = selectIngresoServicio;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 	
 
