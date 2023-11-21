@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -23,24 +25,38 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
+import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
+import mx.com.ferbo.dao.EstadoConstanciaDAO;
+import mx.com.ferbo.dao.EstadoInventarioDAO;
 import mx.com.ferbo.dao.IngresoDAO;
 import mx.com.ferbo.dao.IngresoProductoDAO;
 import mx.com.ferbo.dao.IngresoServicioDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
+import mx.com.ferbo.dao.TipoMovimientoDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
+import mx.com.ferbo.dao.UnidadDeProductoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaDepositoDetalle;
+import mx.com.ferbo.model.DetallePartida;
+import mx.com.ferbo.model.DetallePartidaPK;
+import mx.com.ferbo.model.EstadoConstancia;
+import mx.com.ferbo.model.EstadoInventario;
 import mx.com.ferbo.model.Ingreso;
 import mx.com.ferbo.model.IngresoProducto;
 import mx.com.ferbo.model.IngresoServicio;
+import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
+import mx.com.ferbo.model.TipoMovimiento;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 
@@ -97,7 +113,7 @@ public class OrdenEntradaBean implements Serializable {
 	private Aviso avisoSelect;
 	
 	private Date fechaActual;
-	private Integer tarima;
+	private BigDecimal temperatura;
 	private BigDecimal sumaTarimas;
 	private BigDecimal sumaCantidad;
 	private BigDecimal sumaPeso;
@@ -202,6 +218,8 @@ public class OrdenEntradaBean implements Serializable {
 		
 		
 		try {
+			listaIngreso.clear();
+			ingreso = new Ingreso();
 			
 			Date fechaActualIni = new Date(fechaActual.getTime());
 			DateUtil.setTime(fechaActualIni, 0, 0, 0, 0);
@@ -320,6 +338,7 @@ public class OrdenEntradaBean implements Serializable {
 	
 	public void servicioIngresoOrden(){
 		
+		listaIngresoServicio.clear();
 		List<IngresoServicio> listaTmp = ingresoServicioDAO.buscarPorIngreso(ingreso.getIdIngreso());
 		listaIngresoServicio.addAll(listaTmp);		
 	}
@@ -327,7 +346,6 @@ public class OrdenEntradaBean implements Serializable {
 	public void renderServicio() {
 		
 		List<PrecioServicio> l = null;
-		
 		
 		log.info("AvisoSelect: " + avisoSelect);
 
@@ -387,6 +405,8 @@ public class OrdenEntradaBean implements Serializable {
 		if(l.size() > 0) {
 			this.isManiobras = true;
 		}
+		
+		avisoSelect = new Aviso();
 		
 	}
 	
@@ -575,6 +595,138 @@ public class OrdenEntradaBean implements Serializable {
 		
 	}
 	
+	public void save() {
+		
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			
+			//OBJETOS CONSTANCIA DE DEPOSITO
+			ConstanciaDeDeposito constanciaDeDeposito = new ConstanciaDeDeposito();
+			ConstanciaDeDepositoDAO constanciaDeDepositoDAO = new ConstanciaDeDepositoDAO();
+			EstadoConstancia status = new EstadoConstancia();
+			EstadoConstanciaDAO estadoConstanciaDAO = new EstadoConstanciaDAO();
+					
+			//OBJETOS UNIDAD DE PRODUCTO
+			UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
+			UnidadDeProductoDAO unidadDeProductoDAO = new UnidadDeProductoDAO();
+			
+			constanciaDeDeposito.setCteCve(ingreso.getIdCliente());
+			constanciaDeDeposito.setFechaIngreso(ingreso.getFechaHora());
+			constanciaDeDeposito.setNombreTransportista(ingreso.getTransportista());
+			constanciaDeDeposito.setPlacasTransporte(ingreso.getPlacas());
+			constanciaDeDeposito.setObservaciones(ingreso.getObservaciones());
+			constanciaDeDeposito.setFolioCliente("I" + ingreso.getFolio());
+			constanciaDeDeposito.setValorDeclarado(new BigDecimal(0)); 
+			
+			status = estadoConstanciaDAO.buscarPorId(0);
+			
+			constanciaDeDeposito.setStatus(status);
+			constanciaDeDeposito.setAvisoCve(avisoSelect);
+			constanciaDeDeposito.setTemperatura(temperatura.toString());
+			constanciaDeDeposito.setPartidaList(new ArrayList<Partida>());
+			constanciaDeDeposito.setConstanciaDepositoDetalleList(new ArrayList<ConstanciaDepositoDetalle>());
+			
+			for(IngresoProducto ip: listaIngresoProducto){
+				
+				Partida partida = new Partida();
+				
+				partida.setCamaraCve(camara);
+				partida.setFolio(constanciaDeDeposito);
+				partida.setPesoTotal(ip.getPeso());
+				partida.setCantidadTotal(ip.getCantidad());					
+				
+				unidadDeProducto = unidadDeProductoDAO.buscarPorProductoUnidad(ip.getProducto().getProductoCve(),ip.getUnidadDeManejo().getUnidadDeManejoCve());
+				
+				if(unidadDeProducto == null){
+					
+					unidadDeProducto = new UnidadDeProducto();
+					unidadDeProducto.setProductoCve(ip.getProducto());
+					unidadDeProducto.setUnidadDeManejoCve(ip.getUnidadDeManejo());
+					
+					unidadDeProductoDAO.guardar(unidadDeProducto);
+					
+				}else {
+					partida.setUnidadDeProductoCve(unidadDeProducto);//NO APARECE UNA UNIDAD DE PRODUCTO- QUE HACER EN ESE CASO? PORNER CONDICIONAL ¿?
+				}
+				
+				partida.setCantidadDeCobro(ip.getPeso());
+				partida.setUnidadDeCobro(ip.getUnidadDeManejo());
+				partida.setPartidaSeq(0); //DUDA
+				partida.setValorMercancia(new BigDecimal(1));
+				//FALTA RENDIMIENTO
+				partida.setNoTarimas(ip.getNoTarimas());				
+				
+				partida.setDetallePartidaList(new ArrayList<DetallePartida>());
+				
+				DetallePartida detallePartida = new DetallePartida();
+				DetallePartidaPK detallePartidaPK = new DetallePartidaPK();			
+				
+				TipoMovimiento tipoMovimiento = new TipoMovimiento();
+				TipoMovimientoDAO tipoMovimientoDAO = new TipoMovimientoDAO();
+				EstadoInventario estadoInventario = new EstadoInventario();
+				EstadoInventarioDAO estadoInventarioDAO = new EstadoInventarioDAO();			
+				
+				tipoMovimiento = tipoMovimientoDAO.buscarPorId(1);
+				estadoInventario = estadoInventarioDAO.buscarPorId(1);
+				
+				detallePartidaPK.setPartidaCve(partida);
+				
+				detallePartida.setDetallePartidaPK(detallePartidaPK);
+				detallePartida.setTipoMovCve(tipoMovimiento);
+				detallePartida.setEdoInvCve(estadoInventario);
+				detallePartida.setCantidadUManejo(partida.getCantidadTotal());
+				detallePartida.setUMedidaCve(partida.getUnidadDeProductoCve().getUnidadDeManejoCve());
+				detallePartida.setCantidadUMedida(partida.getPesoTotal());
+				detallePartida.setDtpLote(ip.getLote());
+				detallePartida.setDtpCaducidad(ip.getFechaCaducidad());
+				detallePartida.setDtpPO(ip.getOtro());
+				detallePartida.setDtpPedimento(ip.getPedimento());
+				detallePartida.setDtpSAP(ip.getContenedor());
+							
+				partida.getDetallePartidaList().add(detallePartida);
+				constanciaDeDeposito.getPartidaList().add(partida);
+				
+			}
+			
+			for(IngresoServicio is: listaIngresoServicio){
+				
+				ConstanciaDepositoDetalle constanciaDepositoDetalle = new ConstanciaDepositoDetalle();
+				
+				constanciaDepositoDetalle.setServicioCve(is.getServicio());
+				constanciaDepositoDetalle.setFolio(constanciaDeDeposito);
+				constanciaDepositoDetalle.setServicioCantidad(is.getCantidad());
+				
+				constanciaDeDeposito.getConstanciaDepositoDetalleList().add(constanciaDepositoDetalle);
+			}
+			
+			constanciaDeDepositoDAO.guardar(constanciaDeDeposito);
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "La orden de entrada se registro correctamente";
+			
+		} catch (Exception e) {
+			
+			severity = FacesMessage.SEVERITY_ERROR;
+			mensaje = "La orden de entrada no se pudo registrar";
+			
+			log.info("Error al guardar la Constancia de deposito " + e.getMessage());
+		}finally {
+			message = new FacesMessage(severity, "Orden de entrada", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
+	}
+	
+	public void reload() throws IOException {
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext(); 
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+	}
+	
 	public Cliente getCliente() {
 		return cliente;
 	}
@@ -693,14 +845,14 @@ public class OrdenEntradaBean implements Serializable {
 
 	public void setUnidadDeManejo(UnidadDeManejo unidadDeManejo) {
 		this.unidadDeManejo = unidadDeManejo;
+	}	
+
+	public BigDecimal getTemperatura() {
+		return temperatura;
 	}
 
-	public Integer getTarima() {
-		return tarima;
-	}
-
-	public void setTarima(Integer tarima) {
-		this.tarima = tarima;
+	public void setTemperatura(BigDecimal temperatura) {
+		this.temperatura = temperatura;
 	}
 
 	public List<IngresoProducto> getListaIngresoProducto() {
