@@ -179,19 +179,16 @@ public class AltaNotasCredito implements Serializable{
 			
 			if(porCobrar==true) {
 				sf.setId(1);
-//				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
 				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
 			if(pagada==true) {				
 				sf.setId(3);
-//				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
 				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
 			if(pagoParcial==true) {
 				sf.setId(4);
-//				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
 				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
@@ -267,6 +264,7 @@ public class AltaNotasCredito implements Serializable{
 		ivaSubtotal = sumaSubtotal.multiply(iva).setScale(2,BigDecimal.ROUND_HALF_UP);
 		total = sumaSubtotal.add(ivaSubtotal);
 		
+		log.info("Nota de credito - Subtotal: {}, IVA: {}, Total: {}", sumaSubtotal, ivaSubtotal, total);
 		
 		
 		totalCantidad = totalCantidad.add(cantidad).setScale(2,BigDecimal.ROUND_HALF_UP);
@@ -278,7 +276,7 @@ public class AltaNotasCredito implements Serializable{
 		notaPorFactura.getNotaPorFacturaPK().setFactura(facturaSelect);
 		notaPorFactura.setCantidad(cantidad);
 		
-		listaNotaXFactura.add(notaPorFactura);		
+		listaNotaXFactura.add(notaPorFactura);
 		
 		FormatUtil formato = new FormatUtil();
 		
@@ -318,7 +316,7 @@ public class AltaNotasCredito implements Serializable{
 			notaCredito.setRfc(clienteSelect.getCteRfc());
 			notaCredito.setSubtotal(sumaSubtotal);
 			notaCredito.setIva(ivaSubtotal);
-			notaCredito.setTotal(total);
+			notaCredito.setTotal(totalCantidad);
 			notaCredito.setTotalLetra(montoLetra);
 			notaCredito.setStatus(this.statusNotaNueva);
 			notaCredito.setNotaFacturaList(new ArrayList<NotaPorFactura>());

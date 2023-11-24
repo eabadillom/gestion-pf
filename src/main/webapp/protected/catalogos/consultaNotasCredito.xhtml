@@ -165,18 +165,22 @@
 								<h:outputText value="#{npf.notaPorFacturaPK.factura.fecha}" />
 							</p:column>
 							
-							<p:column headerText="Subtotal">
+							<p:column headerText="Subtotal factura">
 								<h:outputText value="#{npf.notaPorFacturaPK.factura.subtotal}" />
 							</p:column>
 							
-							<p:column headerText="IVA">
+							<p:column headerText="IVA factura">
 								<h:outputText value="#{npf.notaPorFacturaPK.factura.iva}" />
 							</p:column>
 							
-							<p:column headerText="Total">
+							<p:column headerText="Total factura">
 								<h:outputText value="#{npf.notaPorFacturaPK.factura.total}" />
 							</p:column>
-						
+							<p:column headerText="Importe nota">
+								<h:outputText value="#{npf.cantidad}">
+									
+								</h:outputText>
+							</p:column>
 						</p:dataTable>
 											
 					</p:outputPanel>
