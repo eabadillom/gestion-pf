@@ -18,7 +18,8 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class CiudadesPK implements Serializable {
 
-    @Basic(optional = false)
+    private static final long serialVersionUID = 3833888070514352421L;
+	@Basic(optional = false)
     @NotNull
     @Column(name = "pais_cve")
     private int paisCve;

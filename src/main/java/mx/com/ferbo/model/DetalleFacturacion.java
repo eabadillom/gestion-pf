@@ -19,7 +19,7 @@ import javax.persistence.Table;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "DETALLE_FACTURACION")
+@Table(name = "detalle_facturacion")
 @NamedQueries({
     @NamedQuery(name = "DetalleFacturacion.findAll", query = "SELECT d FROM DetalleFacturacion d"),
     @NamedQuery(name = "DetalleFacturacion.findByDetalleCve", query = "SELECT d FROM DetalleFacturacion d WHERE d.detalleFacturacionPK.detalleCve = :detalleCve"),

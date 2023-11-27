@@ -292,9 +292,9 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		
 		try {
 			sql = "select cdd.FOLIO, dcs.ID "
-					+ "from CONSTANCIA_DE_DEPOSITO cdd "
+					+ "from constancia_de_deposito cdd "
 					+ "inner join PARTIDA p ON cdd.FOLIO = p.FOLIO "
-					+ "left outer join DETALLE_CONSTANCIA_SALIDA dcs ON dcs.PARTIDA_CVE = p.PARTIDA_CVE "
+					+ "left outer join detalle_constancia_salida dcs ON dcs.PARTIDA_CVE = p.PARTIDA_CVE "
 					+ "where cdd.FOLIO = :folio "
 					+ "GROUP BY cdd.FOLIO, dcs.ID "
 					;
@@ -333,7 +333,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		
 		try {
 			sql = "select cdd.FOLIO, cf.id "
-					+ "from CONSTANCIA_DE_DEPOSITO cdd "
+					+ "from constancia_de_deposito cdd "
 					+ "left outer join constancia_factura cf ON cf.folio = cdd.FOLIO "
 					+ "where cdd.FOLIO = :folio "
 					+ "GROUP BY cdd.FOLIO, cf.id "

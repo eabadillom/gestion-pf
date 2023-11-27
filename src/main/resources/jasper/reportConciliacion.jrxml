@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reportConciliacion" pageWidth="790" pageHeight="842" columnWidth="750" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e85e9b20-1723-4925-954c-418035613c31">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="84"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="909"/>
@@ -11,131 +11,68 @@
 	<parameter name="imagen" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT
-
 	edc.cte_cve, edc.numero_cte, edc.nombre_cliente, edc.nom_serie, edc.numero, edc.fecha, edc.movimiento, edc.concepto,
-
 	COALESCE(si.saldo_inicial, 0) AS saldo_inicial, 
-	
 	edc.debe, edc.haber, 
-	
 	COALESCE (edc.debe,0) - COALESCE(edc.haber,0) AS parcial	
-	
 FROM (
-
 	SELECT
-
 		cte.CTE_CVE AS cte_cve, cte.numero_cte, cte.CTE_NOMBRE as nombre_cliente,
-
 		f.nom_serie, f.numero, f.fecha, 'Factura' as movimiento, 'Ventas del día' AS concepto,
-
 		f.total as debe, null as haber
-
 	FROM factura f
-
-	INNER JOIN CLIENTE cte ON f.cliente = cte.CTE_CVE 
-
+	INNER JOIN cliente cte ON f.cliente = cte.CTE_CVE 
 	WHERE f.status NOT IN (0,2)
-
 	AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	AND f.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin}
 
-	
-
 	UNION ALL
 
-	
-
 	SELECT
-
 		cte.CTE_CVE AS cte_cve, cte.numero_cte, cte.CTE_NOMBRE as nombre_cliente,
-
 		f.nom_serie, f.numero, p.fecha, 'Pago' as movimiento , 'Depósito del día' AS concepto,
-
 		null as debe, p.monto  as haber
-
 	FROM pago p
-
 	INNER JOIN factura f ON f.id = p.factura
-
-	INNER JOIN CLIENTE cte ON f.cliente = cte.CTE_CVE
-
+	INNER JOIN cliente cte ON f.cliente = cte.CTE_CVE
 	WHERE p.tipo NOT IN (5)
-
 	AND f.status NOT IN (0,2)
-
 	AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	AND p.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin}
 
-	
-
 	UNION ALL
 
-	
-
 	SELECT
-
 		cte.CTE_CVE AS cte_cve, cte.numero_cte, cte.CTE_NOMBRE as nombre_cliente,
-
 		f.nom_serie, f.numero, nc.FECHA, CONCAT('N.C. ', nc.NUMERO) AS movimiento, 'Nota de crédito' AS concepto,
-
 		null as debe, nf.CANTIDAD as haber
-
-	FROM NOTA_CREDITO nc
-
-	INNER JOIN NOTA_X_FACTURAS nf ON nc.id = nf.NOTA
-
+	FROM nota_credito nc
+	INNER JOIN nota_x_facturas nf ON nc.id = nf.NOTA
 	INNER JOIN factura f ON nf.FACTURA = f.id
-
-	INNER JOIN CLIENTE cte ON f.cliente = cte.CTE_CVE
-
+	INNER JOIN cliente cte ON f.cliente = cte.CTE_CVE
 	WHERE nc.STATUS NOT IN (0,2)
-
 	AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	AND nc.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin}
-
 ) edc
-
 LEFT OUTER JOIN (
-
 	SELECT saldoInicial.cliente, sum(saldo_inicial) as saldo_inicial FROM (
-
 		SELECT f.cliente, (f.total - COALESCE(p.monto, 0)) as saldo_inicial
-
 		FROM factura f
-
 		INNER JOIN status_factura sf ON sf.id = f.status
-
 		LEFT OUTER JOIN (
-
 			SELECT
-
 				factura, sum(p.monto) as monto
-
 			FROM pago p
-
 			WHERE p.fecha < $P{fechaInicio}
-
 			GROUP BY factura
-
 		) p ON f.id = p.factura
-
 		WHERE f.status NOT IN (0,2)
-
 		AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 		AND f.fecha < $P{fechaInicio}
-
 	) saldoInicial
-
 	WHERE saldoInicial.saldo_inicial > 0
-
 	GROUP BY cliente
-
 ) si ON si.cliente = edc.cte_cve
-
 ORDER BY edc.nombre_cliente, nom_serie, numero, edc.movimiento, fecha]]>
 	</queryString>
 	<field name="cte_cve" class="java.lang.Integer">
@@ -213,23 +150,16 @@ ORDER BY edc.nombre_cliente, nom_serie, numero, edc.movimiento, fecha]]>
 		<groupHeader>
 			<band height="21">
 				<textField isBlankWhenNull="true">
-					<reportElement x="0" y="0" width="80" height="15" forecolor="#2196F3" uuid="32c26f4e-7694-4dc1-bfb0-1a40fc312164"/>
-					<textElement textAlignment="Center">
-						<font isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{numero_cte}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement x="80" y="0" width="400" height="20" forecolor="#2196F3" uuid="8118d86b-4549-4e94-90fc-8bf6a3db596b">
+					<reportElement x="0" y="0" width="480" height="20" forecolor="#2196F3" uuid="8118d86b-4549-4e94-90fc-8bf6a3db596b">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
-					<textElement>
+					<textElement verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="480" y="0" width="190" height="20" uuid="9c60053f-e351-4053-b178-697ccf45a022">
+					<reportElement x="480" y="0" width="154" height="20" uuid="9c60053f-e351-4053-b178-697ccf45a022">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -238,8 +168,8 @@ ORDER BY edc.nombre_cliente, nom_serie, numero, edc.movimiento, fecha]]>
 					<text><![CDATA[Saldo inicial:]]></text>
 				</staticText>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="670" y="0" width="80" height="20" uuid="f65125e9-bcfb-4481-bd37-0e2263eb6434"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<reportElement x="634" y="0" width="116" height="20" uuid="f65125e9-bcfb-4481-bd37-0e2263eb6434"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{saldo_inicial}]]></textFieldExpression>
@@ -252,42 +182,42 @@ ORDER BY edc.nombre_cliente, nom_serie, numero, edc.movimiento, fecha]]>
 		<groupFooter>
 			<band height="21">
 				<staticText>
-					<reportElement x="0" y="0" width="280" height="20" uuid="c3b603ca-fac7-4315-b216-c0c7de7b25a3"/>
+					<reportElement mode="Opaque" x="0" y="0" width="280" height="20" forecolor="#FFFFFF" backcolor="#2196F3" uuid="c3b603ca-fac7-4315-b216-c0c7de7b25a3"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Total Doctos:]]></text>
 				</staticText>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="310" y="0" width="112" height="20" uuid="0b52bb21-cbfc-456b-8b1b-580013c32510"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<reportElement mode="Opaque" x="310" y="0" width="112" height="20" forecolor="#FFFFFF" backcolor="#2196F3" uuid="0b52bb21-cbfc-456b-8b1b-580013c32510"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{sumaCargos}]]></textFieldExpression>
 				</textField>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="422" y="0" width="112" height="20" uuid="19cdd2f1-cf3a-4b3d-bf73-3daa12e17713"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<reportElement mode="Opaque" x="422" y="0" width="112" height="20" forecolor="#FFFFFF" backcolor="#2196F3" uuid="19cdd2f1-cf3a-4b3d-bf73-3daa12e17713"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{sumaAbonos}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="280" y="0" width="30" height="20" uuid="73917f44-d993-4aaa-8e0b-f9702cb7a165"/>
+					<reportElement mode="Opaque" x="280" y="0" width="30" height="20" forecolor="#FFFFFF" backcolor="#2196F3" uuid="73917f44-d993-4aaa-8e0b-f9702cb7a165"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{cuentaDocumentos}]]></textFieldExpression>
 				</textField>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="534" y="0" width="112" height="20" uuid="79ca50e8-746f-43a9-aa84-d323edab60d2"/>
+					<reportElement mode="Opaque" x="534" y="0" width="100" height="20" forecolor="#FFFFFF" backcolor="#2196F3" uuid="79ca50e8-746f-43a9-aa84-d323edab60d2"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 				</textField>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="646" y="0" width="104" height="20" uuid="299cade4-c61b-4830-926a-cbd5dbdc0238"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<reportElement mode="Opaque" x="634" y="0" width="116" height="20" forecolor="#FFFFFF" backcolor="#2196F3" uuid="299cade4-c61b-4830-926a-cbd5dbdc0238"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{saldo_inicial}.add( $V{sumaParcial} )]]></textFieldExpression>
@@ -302,9 +232,9 @@ ORDER BY edc.nombre_cliente, nom_serie, numero, edc.movimiento, fecha]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="79" splitType="Stretch">
+		<band height="63" splitType="Stretch">
 			<image>
-				<reportElement x="0" y="0" width="115" height="79" uuid="400b554c-7bca-4fdb-9c19-1005db8d6aa9"/>
+				<reportElement x="0" y="0" width="209" height="59" uuid="400b554c-7bca-4fdb-9c19-1005db8d6aa9"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">

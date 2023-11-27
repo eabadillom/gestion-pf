@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteFacturacionPorPlanta" pageWidth="1200" pageHeight="612" columnWidth="1140" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="a166aec9-0683-45cc-bf0d-93a561e072f8">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[new String ("resources/logo_square.gif")]]></defaultValueExpression>
@@ -112,9 +112,9 @@
 	    NULL AS CAMARA_ABREV,
 	    NULL AS CAMARA_DS
 	FROM factura FAC
-	INNER JOIN CONSTANCIA_FACTURA_DS CF ON FAC.ID = CF.FACTURA
-	INNER JOIN SERVICIO_CONSTANCIA_DS SC ON CF.ID = SC.CONSTANCIA
-	LEFT OUTER JOIN PLANTA PLT ON PLT.PLANTA_CVE = FAC.PLANTA
+	INNER JOIN constancia_factura_ds CF ON FAC.ID = CF.FACTURA
+	INNER JOIN servicio_constancia_ds SC ON CF.ID = SC.CONSTANCIA
+	LEFT OUTER JOIN planta PLT ON PLT.PLANTA_CVE = FAC.PLANTA
 	WHERE FAC.STATUS NOT IN ('0','2')
 	AND ( (FAC.PLANTA = $P{planta} ) OR ( $P{planta} IS NULL ) )
 	AND ( (FAC.CLIENTE = $P{idCliente}) OR ($P{idCliente} IS NULL) )
@@ -149,7 +149,7 @@
 	    NULL AS CAMARA_DS
 	FROM factura FAC
 	INNER JOIN servicio_factura SF ON FAC.ID = SF.FACTURA
-	LEFT OUTER JOIN PLANTA PLT ON PLT.PLANTA_CVE = FAC.PLANTA
+	LEFT OUTER JOIN planta PLT ON PLT.PLANTA_CVE = FAC.PLANTA
 	WHERE FAC.STATUS NOT IN ('0','2')
 	        AND ( (FAC.PLANTA = $P{planta} ) OR ( $P{planta} IS NULL ) )
 	        AND ( (FAC.CLIENTE = $P{idCliente}) OR ($P{idCliente} IS NULL) )
@@ -313,28 +313,28 @@ ORDER BY T.PLANTA_CVE, T.FACTURA, T.FOLIO, T.VIGENCIA_INICIO, T.VIGENCIA_FIN]]>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<textField textAdjust="StretchHeight" pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="455" y="42" width="85" height="12" uuid="45d77c35-944a-4966-946b-a8683152004f"/>
+				<reportElement x="455" y="21" width="85" height="12" uuid="45d77c35-944a-4966-946b-a8683152004f"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{fechaInicio}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="540" y="42" width="50" height="12" uuid="cb5ad9d7-0d6d-4412-b7b9-dc6433d64c94"/>
+				<reportElement x="540" y="21" width="50" height="12" uuid="cb5ad9d7-0d6d-4412-b7b9-dc6433d64c94"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[al dia]]></text>
 			</staticText>
 			<textField textAdjust="StretchHeight" pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="590" y="42" width="550" height="12" uuid="cdf0447d-3c0b-499c-ae43-fca54a8a6378"/>
+				<reportElement x="590" y="21" width="550" height="12" uuid="cdf0447d-3c0b-499c-ae43-fca54a8a6378"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{fechaFin}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="42" width="455" height="12" uuid="99581d73-f520-4f0c-b262-bab24b25c45b"/>
+				<reportElement x="0" y="21" width="455" height="12" uuid="99581d73-f520-4f0c-b262-bab24b25c45b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>

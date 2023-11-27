@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Ingresos" pageWidth="732" pageHeight="595" orientation="Landscape" columnWidth="692" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="60caacc2-5e7a-4aa6-a1e0-a77af6030e9a">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -145,7 +145,7 @@ ORDER BY f.nombre_cliente, f.numero_cliente, p.fecha]]>
 		<groupHeader>
 			<band height="15">
 				<textField>
-					<reportElement x="0" y="0" width="692" height="15" printWhenGroupChanges="Cliente" uuid="73c10191-db3e-492e-bc7a-42b7dc76db9a"/>
+					<reportElement x="0" y="0" width="692" height="15" printWhenGroupChanges="Cliente" forecolor="#2199F6" uuid="73c10191-db3e-492e-bc7a-42b7dc76db9a"/>
 					<textElement>
 						<font isBold="true"/>
 					</textElement>
@@ -210,7 +210,7 @@ ORDER BY f.nombre_cliente, f.numero_cliente, p.fecha]]>
 	<title>
 		<band height="60" splitType="Stretch">
 			<image hAlign="Center" vAlign="Middle">
-				<reportElement x="0" y="0" width="140" height="59" uuid="1623bb30-f37c-493e-ba38-48f65fb79487"/>
+				<reportElement x="0" y="0" width="191" height="59" uuid="1623bb30-f37c-493e-ba38-48f65fb79487"/>
 				<imageExpression><![CDATA[$P{Imagen}]]></imageExpression>
 			</image>
 			<staticText>

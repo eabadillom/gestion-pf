@@ -112,7 +112,7 @@ public class SerieNotaDAO {
 		try {
 		 entity = EntityManagerUtil.getEntityManager();
 		entity.getTransaction().begin();
-		Query sql = entity.createNativeQuery("update SERIE_NOTA set STATUS_SERIE = 3 where ID = ?;");
+		Query sql = entity.createNativeQuery("update serie_nota set STATUS_SERIE = 3 where ID = ?;");
 		sql.setParameter(1, id);
 		sql.executeUpdate();
 		entity.getTransaction().commit();

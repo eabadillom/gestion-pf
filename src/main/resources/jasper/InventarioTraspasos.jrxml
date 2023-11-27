@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioTraspasos" pageWidth="800" pageHeight="842" orientation="Landscape" columnWidth="740" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="5c7e6641-a433-4197-bf46-29d6a2b2abd3">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<parameter name="fechaInicio" class="java.util.Date"/>
 	<parameter name="fechaFin" class="java.util.Date"/>
@@ -24,13 +24,13 @@
 	p.folio,
 	prd.producto_ds,
 	um.unidad_de_manejo_ds
-FROM CONSTANCIA_TRASPASO ct
+FROM constancia_traspaso ct
 INNER JOIN traspaso_partida tp ON ct.id = tp.traspaso
-INNER JOIN PARTIDA p ON tp.partida = p.PARTIDA_CVE
-INNER JOIN UNIDAD_DE_PRODUCTO up ON p.UNIDAD_DE_PRODUCTO_CVE = up.UNIDAD_DE_PRODUCTO_CVE
-INNER JOIN UNIDAD_DE_MANEJO um ON up.UNIDAD_DE_MANEJO_CVE = um.UNIDAD_DE_MANEJO_CVE
-INNER JOIN PRODUCTO prd ON up.PRODUCTO_CVE = prd.PRODUCTO_CVE
-INNER JOIN CLIENTE c ON ct.cliente = c.cte_cve
+INNER JOIN partida p ON tp.partida = p.PARTIDA_CVE
+INNER JOIN unidad_de_producto up ON p.UNIDAD_DE_PRODUCTO_CVE = up.UNIDAD_DE_PRODUCTO_CVE
+INNER JOIN unidad_de_manejo um ON up.UNIDAD_DE_MANEJO_CVE = um.UNIDAD_DE_MANEJO_CVE
+INNER JOIN producto prd ON up.PRODUCTO_CVE = prd.PRODUCTO_CVE
+INNER JOIN cliente c ON ct.cliente = c.cte_cve
 WHERE (ct.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin})
  AND (ct.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
 ORDER BY
@@ -42,27 +42,27 @@ ORDER BY
 	<field name="numero_cte" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cte"/>
 		<property name="com.jaspersoft.studio.field.label" value="numero_cte"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="cte_nombre" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
 		<property name="com.jaspersoft.studio.field.label" value="cte_nombre"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="numero" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero"/>
 		<property name="com.jaspersoft.studio.field.label" value="numero"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="fecha" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="fecha"/>
 		<property name="com.jaspersoft.studio.field.label" value="fecha"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="observacion" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="observacion"/>
 		<property name="com.jaspersoft.studio.field.label" value="observacion"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="constancia" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="constancia"/>
@@ -92,17 +92,17 @@ ORDER BY
 	<field name="folio" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="FOLIO"/>
 		<property name="com.jaspersoft.studio.field.label" value="folio"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="partida"/>
 	</field>
 	<field name="producto_ds" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PRODUCTO_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="producto_ds"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PRODUCTO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="producto"/>
 	</field>
 	<field name="unidad_de_manejo_ds" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="UNIDAD_DE_MANEJO_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="unidad_de_manejo_ds"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="unidad_de_manejo"/>
 	</field>
 	<variable name="cuentaTotal" class="java.lang.Integer" resetType="Group" resetGroup="Producto" calculation="Count">
 		<variableExpression><![CDATA[$F{producto_ds}]]></variableExpression>
@@ -141,7 +141,7 @@ ORDER BY
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="34" splitType="Stretch">
+		<band height="47" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
 				<reportElement x="0" y="0" width="740" height="19" forecolor="#2196F3" uuid="9610fa39-96bb-4be2-8b89-d5b558b695f8">
@@ -184,7 +184,9 @@ ORDER BY
 				<textFieldExpression><![CDATA[$P{fechaFin}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement x="0" y="0" width="112" height="31" uuid="a1308f0f-322f-4f4a-b13d-383617b72a51"/>
+				<reportElement x="0" y="0" width="170" height="47" uuid="a1308f0f-322f-4f4a-b13d-383617b72a51">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 		</band>

@@ -110,7 +110,7 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createNativeQuery("DELETE FROM CLIENTE_DOMICILIOS WHERE (id = :id)")
+			em.createNativeQuery("DELETE FROM cliente_domicilios WHERE (id = :id)")
 					.setParameter("id", clienteDom.getId()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
