@@ -234,19 +234,19 @@ ORDER BY nombre_cliente, numero_cliente]]>
 				<textElement textAlignment="Left"/>
 				<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-##0.##">
+			<textField pattern="¤#,##0.00;¤-##0.00">
 				<reportElement x="330" y="0" width="97" height="12" uuid="e28d58a0-5aa3-4f6c-9b6e-fb295e37ef10"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="¤#,##0.00;¤-##0.00">
 				<reportElement x="427" y="0" width="89" height="12" uuid="a55baf69-e3dd-491e-96b6-e549182462ed">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d9a06d2f-179c-4d2f-8397-e60a62a57870"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{iva}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="¤#,##0.00;¤-##0.00">
 				<reportElement x="516" y="0" width="105" height="12" uuid="e7372dcf-a7cf-4980-a510-ef6b1a24be4d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
