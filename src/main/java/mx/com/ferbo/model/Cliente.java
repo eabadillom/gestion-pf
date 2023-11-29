@@ -150,6 +150,9 @@ public class Cliente implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY, orphanRemoval = true)
     private CandadoSalida candadoSalida;
     
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "serieConstanciaPK.cliente", orphanRemoval = true)
+    private List<SerieConstancia> serieConstanciaList;
+    
     public Cliente() {
     }
 
@@ -440,6 +443,16 @@ public class Cliente implements Serializable {
 		this.candadoSalida = candadoSalida;
 	}
 
-	
+	public void addSerieConstancia(SerieConstancia serie) {
+		if(this.serieConstanciaList == null)
+			this.serieConstanciaList = new ArrayList<SerieConstancia>();
+		
+		if(serie.getSerieConstanciaPK() == null)
+			serie.setSerieConstanciaPK(new SerieConstanciaPK());
+		
+		serie.getSerieConstanciaPK().setCliente(this);
+		
+		this.serieConstanciaList.add(serie);
+	}
     
 }

@@ -73,43 +73,46 @@
 					<div class="p-grid">
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 							<p:outputLabel for="@next">Folio:</p:outputLabel>
-							<p:inputText value="#{constanciaServicioBean.seleccion.folioCliente}" disabled="true"/>
+							<p:inputText value="#{constanciaServicioBean.seleccion.folioCliente}" readonly="true"/>
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 							<p:outputLabel>Fecha:</p:outputLabel>
-							<p:datePicker id="fechaServicio" showIcon="true" disabled="true"
+							<p:datePicker id="fechaServicio" showIcon="true" disabled="#{(constanciaServicioBean.usuario.perfil == 4) or (constanciaServicioBean.usuario.perfil == 1)}"
 								styleClass="p-mr-4 p-mb-2" value="#{constanciaServicioBean.seleccion.fecha}"/>
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 40em;">
 							<p:outputLabel for="@next">Cliente</p:outputLabel>
-							<p:inputText value="#{constanciaServicioBean.seleccion.cteCve.cteNombre}" disabled="true" />
+							<p:inputText value="#{constanciaServicioBean.seleccion.cteCve.cteNombre}" readonly="true" />
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 							<p:outputLabel>Estado</p:outputLabel>
-							<p:inputText value="#{constanciaServicioBean.seleccion.status.descripcion}" disabled="true"></p:inputText>
+							<p:inputText value="#{constanciaServicioBean.seleccion.status.descripcion}" readonly="true"></p:inputText>
 						</div>
 					</div>
 					<div class="p-grid">
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 15em;">
 							<p:outputLabel for="@next">Nombre del transportista</p:outputLabel>
-							<p:inputText value="#{constanciaServicioBean.seleccion.nombreTransportista}" disabled="true"/>
+							<p:inputText value="#{constanciaServicioBean.seleccion.nombreTransportista}" readonly="true"/>
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 							<p:outputLabel for="@next">Placas del vehiculo</p:outputLabel>
-							<p:inputText value="#{constanciaServicioBean.seleccion.placasTransporte}" disabled="true"/>
+							<p:inputText value="#{constanciaServicioBean.seleccion.placasTransporte}" readonly="true"/>
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 40em;">
 							<p:outputLabel>Observaciones</p:outputLabel>
-							<p:inputText value="#{constanciaServicioBean.seleccion.observaciones}" disabled="true" />
+							<p:inputText value="#{constanciaServicioBean.seleccion.observaciones}" readonly="true" />
 						</div>
 					</div>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Cancelar Constancia" icon="pi pi-trash"
+					<p:commandButton value="Cancelar Constancia" icon="pi pi-times"
 						class="ui-button-danger"
 						actionListener="#{constanciaServicioBean.cancelar}"
 						update="constanciaDetalle"
 						process="constanciaDetalle @this" rendered="#{(constanciaServicioBean.usuario.perfil != 4) and (constanciaServicioBean.usuario.perfil != 1)}"/>
+					<p:commandButton value="Guardar cambios" icon="pi pi-save" actionListener="#{constanciaServicioBean.guardaDetalle}" update="constanciaDetalle" process="constanciaDetalle @this"
+						rendered="#{(constanciaServicioBean.usuario.perfil != 4) and (constanciaServicioBean.usuario.perfil != 1)}" >
+					</p:commandButton>
 					<p:commandButton value="Imprimir" icon="pi pi-print" actionListener="#{constanciaServicioBean.jasper}" ajax="false">
 						<p:fileDownload value="#{constanciaServicioBean.file}" />
 					</p:commandButton>

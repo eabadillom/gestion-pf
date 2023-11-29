@@ -281,7 +281,7 @@ public class AltaTraspasoBean implements Serializable {
 				throw new InventarioException("Debe seleccionar una planta");
 			
 			seriePK = new SerieConstanciaPK();
-			seriePK.setIdCliente(this.selCliente.getCteCve());
+			seriePK.setCliente(this.selCliente);
 			seriePK.setTpSerie("T");
 			serie = serieConstanciaDAO.buscarPorId(seriePK);
 
