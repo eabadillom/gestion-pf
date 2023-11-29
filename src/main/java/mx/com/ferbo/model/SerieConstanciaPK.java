@@ -6,9 +6,14 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -19,10 +24,12 @@ import javax.validation.constraints.Size;
 @Embeddable
 public class SerieConstanciaPK implements Serializable {
 
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "id_cliente")
-    private int idCliente;
+    private static final long serialVersionUID = -4873673664504600355L;
+
+	@JoinColumn(name="id_cliente")
+	@ManyToOne
+    private Cliente cliente;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 1)
@@ -32,17 +39,17 @@ public class SerieConstanciaPK implements Serializable {
     public SerieConstanciaPK() {
     }
 
-    public SerieConstanciaPK(int idCliente, String tpSerie) {
-        this.idCliente = idCliente;
+    public SerieConstanciaPK(Cliente cliente, String tpSerie) {
+        this.cliente = cliente;
         this.tpSerie = tpSerie;
     }
 
-    public int getIdCliente() {
-        return idCliente;
+    public Cliente getCliente() {
+        return this.cliente;
     }
 
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
     public String getTpSerie() {
@@ -54,32 +61,25 @@ public class SerieConstanciaPK implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (int) idCliente;
-        hash += (tpSerie != null ? tpSerie.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SerieConstanciaPK)) {
-            return false;
-        }
-        SerieConstanciaPK other = (SerieConstanciaPK) object;
-        if (this.idCliente != other.idCliente) {
-            return false;
-        }
-        if ((this.tpSerie == null && other.tpSerie != null) || (this.tpSerie != null && !this.tpSerie.equals(other.tpSerie))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public String toString() {
-        return "mx.com.ferbo.model.SerieConstanciaPK[ idCliente=" + idCliente + ", tpSerie=" + tpSerie + " ]";
+        return "mx.com.ferbo.model.SerieConstanciaPK[ idCliente=" + cliente + ", tpSerie=" + tpSerie + " ]";
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(cliente, tpSerie);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SerieConstanciaPK other = (SerieConstanciaPK) obj;
+		return Objects.equals(cliente, other.cliente) && Objects.equals(tpSerie, other.tpSerie);
+	}
     
 }

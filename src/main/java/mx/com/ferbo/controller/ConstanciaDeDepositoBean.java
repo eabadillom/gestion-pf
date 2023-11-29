@@ -308,7 +308,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				throw new InventarioException("Debe seleccionar una planta");
 			
 			seriePK = new SerieConstanciaPK();
-			seriePK.setIdCliente(this.clienteSelect.getCteCve());
+			seriePK.setCliente(this.clienteSelect);
 			seriePK.setTpSerie("I");
 			serie = serieConstanciaDAO.buscarPorId(seriePK);
 

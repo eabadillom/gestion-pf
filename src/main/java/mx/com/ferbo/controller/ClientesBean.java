@@ -97,7 +97,6 @@ public class ClientesBean implements Serializable {
 		clienteDAO = new ClienteDAO();
 		tipoMailDAO = new TipoMailDAO();
 		tipoTelefonoDAO = new TipoTelefonoDAO();
-//		mailDAO = new MailDAO();
 		nuevoCliente();
 		clienteContactoSelected = new ClienteContacto();
 		medioContactoSelected = new MedioCnt();
@@ -253,43 +252,40 @@ public class ClientesBean implements Serializable {
 			
 			clienteSelected.setCandadoSalida(candadoSalida);
 			
+			
+			SerieConstanciaPK serieConstanciaPK_I = new SerieConstanciaPK();
+			serieConstanciaPK_I.setCliente(clienteSelected);
+			serieConstanciaPK_I.setTpSerie("I");
+			SerieConstancia serieConstanciaI = new SerieConstancia();
+			serieConstanciaI.setSerieConstanciaPK(serieConstanciaPK_I);
+			serieConstanciaI.setNuSerie(1);
+			clienteSelected.addSerieConstancia(serieConstanciaI);
+			
+			SerieConstanciaPK serieConstanciaPK_O = new SerieConstanciaPK();
+			serieConstanciaPK_O.setCliente(clienteSelected);
+			serieConstanciaPK_O.setTpSerie("O");
+			SerieConstancia serieConstanciaO = new SerieConstancia();
+			serieConstanciaO.setSerieConstanciaPK(serieConstanciaPK_O);
+			serieConstanciaO.setNuSerie(1);
+			clienteSelected.addSerieConstancia(serieConstanciaO);
+			
+			SerieConstanciaPK serieConstanciaPK_T = new SerieConstanciaPK();
+			serieConstanciaPK_T.setCliente(clienteSelected);
+			serieConstanciaPK_T.setTpSerie("T");
+			SerieConstancia serieConstanciaT = new SerieConstancia();
+			serieConstanciaT.setSerieConstanciaPK(serieConstanciaPK_T);
+			serieConstanciaT.setNuSerie(1);
+			clienteSelected.addSerieConstancia(serieConstanciaT);
+			
+			SerieConstanciaPK serieConstanciaPK_S = new SerieConstanciaPK();
+			serieConstanciaPK_S.setCliente(clienteSelected);
+			serieConstanciaPK_S.setTpSerie("S");
+			SerieConstancia serieConstanciaS = new SerieConstancia();
+			serieConstanciaS.setSerieConstanciaPK(serieConstanciaPK_S);
+			serieConstanciaS.setNuSerie(1);
+			clienteSelected.addSerieConstancia(serieConstanciaS);
+			
 			if (clienteDAO.guardar(clienteSelected) == null) {
-				
-				
-				//SERIE CONSTANCIA 4 registros por cliente
-				
-				for(int i=0;i<4;i++) {
-					
-					SerieConstanciaPK serieConstanciaPK = new SerieConstanciaPK();
-					serieConstanciaPK.setIdCliente(clienteSelected.getCteCve());
-					switch (i) {
-					case 0:
-						serieConstanciaPK.setTpSerie("I");
-						break;
-					case 1:
-						serieConstanciaPK.setTpSerie("O");
-						break;
-						
-					case 2:
-						serieConstanciaPK.setTpSerie("S");
-						break;
-						
-					case 3:
-						serieConstanciaPK.setTpSerie("T");
-						break;
-						
-					default:
-						break;
-					}
-					
-					
-					SerieConstancia serieConstancia = new SerieConstancia();
-					serieConstancia.setSerieConstanciaPK(serieConstanciaPK);
-					serieConstancia.setNuSerie(1);
-					
-					serieDAO.guardar(serieConstancia);
-				}
-				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Agregado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -312,7 +308,7 @@ public class ClientesBean implements Serializable {
 	public void eliminarCliente() {
 		//if (clienteDAO.eliminar(clienteSelected) == null) {
 		if (clienteDAO.eliminar(clienteSelected.getCteCve()) == null) {
-			lstClientes.remove(clienteSelected);
+			this.consultaClientes();
 			clienteSelected = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Eliminado"));
 			PrimeFaces.current().ajax().update("form:dt-clientes");

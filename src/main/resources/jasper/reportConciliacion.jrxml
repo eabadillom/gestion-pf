@@ -431,7 +431,7 @@ ORDER BY edc.nombre_cliente, nom_serie, numero, edc.movimiento, fecha]]>
 			<textField isBlankWhenNull="true">
 				<reportElement x="150" y="0" width="60" height="21" uuid="7af7f204-6bd5-4ec6-ace6-d74113243e7a"/>
 				<textElement textAlignment="Center"/>
-				<textFieldExpression><![CDATA[$F{numero}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{nom_serie} + "-" + $F{numero}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="80" height="21" uuid="5f58d0c4-3fc6-454b-bc39-d976c665f2b1"/>
