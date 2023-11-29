@@ -103,9 +103,8 @@ public class Usuario implements Serializable {
     private String numEmpleado;
     
     @Basic(optional = false)
-    @NotNull
     @Column(name = "huella")
-    private boolean huella;
+    private Boolean huella;
     
     @OneToMany(mappedBy = "idUsuario")
     private List<Planta> plantaList;
