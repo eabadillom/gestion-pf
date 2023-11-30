@@ -100,6 +100,9 @@ public class AltaNotasCredito implements Serializable{
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
 	
+	private Date fechaInicio;
+	private Date fechaFin;
+	
 	
 	public AltaNotasCredito() {
 		
@@ -136,7 +139,8 @@ public class AltaNotasCredito implements Serializable{
 		this.pagoDAO = new PagoDAO();
 		
 		this.listaClientes = clienteDAO.buscarTodos();
-		this.listaSerieNota = serieNotaDAO.findAll();
+		//TODO timbrado CFDI para las notas de crédito. Se prepara parámetro para indicar planta (razón social) a la que pertenece la serie.
+		this.listaSerieNota = serieNotaDAO.buscarActivas(null);
 		this.tipoPagoNotaCredito = tipoPagoDAO.buscarPorId(TipoPago.TIPO_PAGO_NOTA_CREDITO);
 		
 		
@@ -158,6 +162,9 @@ public class AltaNotasCredito implements Serializable{
 				this.usuario.getApellido2() == null ? "" : this.usuario.getApellido2()
 		);
 		this.notaCredito.setCajero(cajero);
+		
+		this.fechaInicio = new Date();
+		this.fechaFin = new Date();
 	}
 	
 	public void filtroFactura() {
@@ -172,18 +179,17 @@ public class AltaNotasCredito implements Serializable{
 			
 			if(porCobrar==true) {
 				sf.setId(1);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
-				
+				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
 			if(pagada==true) {				
 				sf.setId(3);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
+				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
 			if(pagoParcial==true) {
 				sf.setId(4);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatus(sf, clienteSelect));
+				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
 			
 			if(clienteSelect == null) {
@@ -258,6 +264,7 @@ public class AltaNotasCredito implements Serializable{
 		ivaSubtotal = sumaSubtotal.multiply(iva).setScale(2,BigDecimal.ROUND_HALF_UP);
 		total = sumaSubtotal.add(ivaSubtotal);
 		
+		log.info("Nota de credito - Subtotal: {}, IVA: {}, Total: {}", sumaSubtotal, ivaSubtotal, total);
 		
 		
 		totalCantidad = totalCantidad.add(cantidad).setScale(2,BigDecimal.ROUND_HALF_UP);
@@ -269,7 +276,7 @@ public class AltaNotasCredito implements Serializable{
 		notaPorFactura.getNotaPorFacturaPK().setFactura(facturaSelect);
 		notaPorFactura.setCantidad(cantidad);
 		
-		listaNotaXFactura.add(notaPorFactura);		
+		listaNotaXFactura.add(notaPorFactura);
 		
 		FormatUtil formato = new FormatUtil();
 		
@@ -302,14 +309,14 @@ public class AltaNotasCredito implements Serializable{
 			domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
 			
 			
-			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual()));
+			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual() + 1));
 			notaCredito.setIdcliente(clienteSelect.getCteCve());
 			notaCredito.setCliente(clienteSelect.getCteNombre());
 			notaCredito.setDomicilio(domicilio);
 			notaCredito.setRfc(clienteSelect.getCteRfc());
 			notaCredito.setSubtotal(sumaSubtotal);
 			notaCredito.setIva(ivaSubtotal);
-			notaCredito.setTotal(total);
+			notaCredito.setTotal(totalCantidad);
 			notaCredito.setTotalLetra(montoLetra);
 			notaCredito.setStatus(this.statusNotaNueva);
 			notaCredito.setNotaFacturaList(new ArrayList<NotaPorFactura>());
@@ -578,5 +585,21 @@ public class AltaNotasCredito implements Serializable{
 
 	public void setSaldoSelected(BigDecimal saldoSelected) {
 		this.saldoSelected = saldoSelected;
+	}
+
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public void setFechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+
+	public Date getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
 	}
 }

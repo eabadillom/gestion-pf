@@ -29,9 +29,9 @@ import javax.validation.constraints.Size;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "SERVICIO")
+@Table(name = "servicio")
 @NamedQueries({
-    @NamedQuery(name = "Servicio.findAll", query = "SELECT s FROM Servicio s"),
+    @NamedQuery(name = "Servicio.findAll", query = "SELECT s FROM Servicio s ORDER BY s.servicioDs"),
     @NamedQuery(name = "Servicio.findByServicioCve", query = "SELECT s FROM Servicio s WHERE s.servicioCve = :servicioCve"),
     @NamedQuery(name = "Servicio.findByServicioDs", query = "SELECT s FROM Servicio s WHERE s.servicioDs = :servicioDs"),
     @NamedQuery(name = "Servicio.findByServicioCod", query = "SELECT s FROM Servicio s WHERE s.servicioCod = :servicioCod"),
@@ -40,25 +40,36 @@ import javax.validation.constraints.Size;
 public class Servicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "SERVICIO_CVE")
     private Integer servicioCve;
+    
     @Size(max = 80)
     @Column(name = "SERVICIO_DS")
     private String servicioDs;
+    
     @Size(max = 20)
     @Column(name = "SERVICIO_COD")
     private String servicioCod;
+    
     @Size(max = 5)
     @Column(name = "cd_unidad")
     private String cdUnidad;
+    
+    @Size(max = 50)
+    @Column(name = "SERVICIO_NOM")
+    private String servicioNombre;
+    
     @Size(max=50)
     @Column(name = "uuid")
     private String uuId;
+    
     @OneToMany(mappedBy = "servicioCve")
     private List<DetalleConstanciaServicios> detalleConstanciaServiciosList;
+    
     @OneToMany(mappedBy = "servicioCve")
     private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
     
@@ -68,18 +79,20 @@ public class Servicio implements Serializable {
     
     @JoinColumn(name = "cd_unidad", referencedColumnName = "cd_unidad", insertable=false,updatable=false)
     @ManyToOne
-    private ClaveUnidad claveUnit; //(AQUI HAY UN ERROR) 
+    private ClaveUnidad claveUnit; 
     
     @OneToMany(mappedBy = "servicioCve")
     private List<CuotaMensualServicio> cuotaMensualServicioList;
+    
     @OneToMany(mappedBy = "servicio")
     private List<PrecioServicio> precioServicioList;
+    
     @OneToMany(mappedBy = "servicioCve")
     private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
+    
     @OneToMany(cascade = CascadeType.DETACH, mappedBy = "servicioCve")
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
     
-
 	public Servicio() {
     }
 
@@ -117,6 +130,14 @@ public class Servicio implements Serializable {
 
 	public void setCdUnidad(String cdUnidad) {
 		this.cdUnidad = cdUnidad;
+	}
+	
+	public String getServicioNombre() {
+		return servicioNombre;
+	}
+
+	public void setServicioNombre(String servicioNombre) {
+		this.servicioNombre = servicioNombre;
 	}
 
 	public String getUuId() {
@@ -215,5 +236,4 @@ public class Servicio implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Servicio[ servicioCve=" + servicioCve + " ]";
     }
-    
 }

@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "CUOTA_MENSUAL_SERVICIO_DET")
+@Table(name = "cuota_mensual_servicio_det")
 @NamedQueries({
     @NamedQuery(name = "CuotaMensualServicioDet.findAll", query = "SELECT c FROM CuotaMensualServicioDet c"),
     @NamedQuery(name = "CuotaMensualServicioDet.findById", query = "SELECT c FROM CuotaMensualServicioDet c WHERE c.id = :id"),

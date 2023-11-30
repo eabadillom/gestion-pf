@@ -18,7 +18,8 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class DetalleFacturacionPK implements Serializable {
 
-    @Basic(optional = false)
+    private static final long serialVersionUID = -2888234836056967308L;
+	@Basic(optional = false)
     @NotNull
     @Column(name = "DETALLE_CVE")
     private int detalleCve;

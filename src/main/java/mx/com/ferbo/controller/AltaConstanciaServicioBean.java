@@ -220,7 +220,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 				throw new InventarioException("Debe seleccionar una planta");
 			
 			seriePK = new SerieConstanciaPK();
-			seriePK.setIdCliente(this.selCliente.getCteCve());
+			seriePK.setCliente(this.selCliente);
 			seriePK.setTpSerie("S");
 			serie = serieConstanciaDAO.buscarPorId(seriePK);
 

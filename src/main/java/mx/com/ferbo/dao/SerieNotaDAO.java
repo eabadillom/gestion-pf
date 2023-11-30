@@ -12,6 +12,14 @@ import mx.com.ferbo.model.SerieNota;
 import mx.com.ferbo.model.StatusSerie;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+/**
+ * @author esteban
+ *
+ */
+/**
+ * @author esteban
+ *
+ */
 public class SerieNotaDAO {
 	private static Logger log = LogManager.getLogger(PosicionCamaraDAO.class);
 
@@ -42,6 +50,30 @@ public class SerieNotaDAO {
 		}
 		return list;
 	};
+	
+	
+	/**Obtiene el listado de series activas.
+	 * @param idPlanta Por el momento, el parámetro idPlanta no se ocupa, pero se prepara para que a futuro se utilice con el timbrado CFDI.
+	 * @return Lista de Series activas por razón social (planta / sucursal).
+	 */
+	public List<SerieNota> buscarActivas(Integer idPlanta) {
+		EntityManager entity = null;
+		List<SerieNota> lista = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			lista = entity.createNamedQuery("SerieNota.findActivas", SerieNota.class)
+					.getResultList()
+					;
+			
+		} catch(Exception ex) {
+			
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
+		
+		return lista;
+		
+	}
 
 	public String save(SerieNota sN) {
 		EntityManager entity= null;
@@ -80,7 +112,7 @@ public class SerieNotaDAO {
 		try {
 		 entity = EntityManagerUtil.getEntityManager();
 		entity.getTransaction().begin();
-		Query sql = entity.createNativeQuery("update SERIE_NOTA set STATUS_SERIE = 3 where ID = ?;");
+		Query sql = entity.createNativeQuery("update serie_nota set STATUS_SERIE = 3 where ID = ?;");
 		sql.setParameter(1, id);
 		sql.executeUpdate();
 		entity.getTransaction().commit();

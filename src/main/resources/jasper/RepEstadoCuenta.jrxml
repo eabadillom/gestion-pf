@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RepEstadoCuenta" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="027c9084-a37b-4b31-8501-5c36fc4779ff">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="186"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="808"/>
 	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="648"/>
@@ -136,34 +136,33 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 	<group name="Group1">
 		<groupExpression><![CDATA[$F{emisor}]]></groupExpression>
 		<groupHeader>
-			<band height="42">
+			<band height="27">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<textField>
-					<reportElement x="0" y="0" width="530" height="31" forecolor="#2196F3" uuid="8defc783-c9c0-467b-adb2-b8bf6f7be361"/>
+					<reportElement x="0" y="0" width="530" height="16" forecolor="#2196F3" uuid="8defc783-c9c0-467b-adb2-b8bf6f7be361">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
 					<textElement verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{emisor}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="530" y="0" width="129" height="31" uuid="ac3714c2-08af-4b7b-9d11-9a55de746913">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
+					<reportElement x="552" y="0" width="129" height="16" uuid="ac3714c2-08af-4b7b-9d11-9a55de746913"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Saldo inicial:]]></text>
 				</staticText>
 				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="659" y="0" width="121" height="31" uuid="248423f3-4467-4fbb-95a0-87eff69e2e38">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
+					<reportElement x="681" y="0" width="121" height="16" uuid="248423f3-4467-4fbb-95a0-87eff69e2e38"/>
 					<textElement verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{saldo_inicial}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement key="" mode="Opaque" x="0" y="31" width="80" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="1f7dc0ea-c8db-4bcc-8448-29f8e3e463a1">
+					<reportElement key="" mode="Opaque" x="0" y="16" width="80" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="1f7dc0ea-c8db-4bcc-8448-29f8e3e463a1">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -180,7 +179,7 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 					<text><![CDATA[Fecha]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" mode="Opaque" x="80" y="31" width="350" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="e2d77eb4-7ffb-4f12-af0e-13ad782a2255">
+					<reportElement key="" mode="Opaque" x="80" y="16" width="350" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="e2d77eb4-7ffb-4f12-af0e-13ad782a2255">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -198,7 +197,7 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 					<text><![CDATA[Ventas]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" mode="Opaque" x="430" y="31" width="229" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="68ec2316-11b2-4d3b-8060-738609bc5baf">
+					<reportElement key="" mode="Opaque" x="430" y="16" width="251" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="68ec2316-11b2-4d3b-8060-738609bc5baf">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -215,7 +214,7 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 					<text><![CDATA[Ingresos]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" mode="Opaque" x="659" y="31" width="121" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="7192eb58-72ea-48d0-a467-742684133ab9">
+					<reportElement key="" mode="Opaque" x="681" y="16" width="121" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="7192eb58-72ea-48d0-a467-742684133ab9">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -235,9 +234,10 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="18">
+			<band height="14">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<staticText>
-					<reportElement x="0" y="4" width="180" height="13" uuid="eaed4971-a0ad-4115-8c17-c4e3bf10b96b">
+					<reportElement x="0" y="0" width="183" height="13" uuid="eaed4971-a0ad-4115-8c17-c4e3bf10b96b">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					</reportElement>
@@ -247,31 +247,33 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 					<text><![CDATA[Total de cargo y abonos:]]></text>
 				</staticText>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="280" y="4" width="101" height="13" uuid="3b75f914-5088-46fe-820a-23fafe0d8207"/>
+					<reportElement x="283" y="0" width="101" height="13" uuid="3b75f914-5088-46fe-820a-23fafe0d8207"/>
 					<textElement textAlignment="Center" verticalAlignment="Top">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SUMAVENTAS}]]></textFieldExpression>
 				</textField>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="470" y="4" width="130" height="13" uuid="4d08a815-adff-451f-be5b-9dec2af68574"/>
+					<reportElement x="473" y="0" width="130" height="13" uuid="4d08a815-adff-451f-be5b-9dec2af68574"/>
 					<textElement textAlignment="Center" verticalAlignment="Top">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SUMAINGRESOS}]]></textFieldExpression>
 				</textField>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="678" y="4" width="102" height="13" uuid="8ae25ddb-fe95-4dce-a205-2cfa99be95c6"/>
+					<reportElement x="681" y="0" width="121" height="13" uuid="8ae25ddb-fe95-4dce-a205-2cfa99be95c6"/>
 					<textElement textAlignment="Center" verticalAlignment="Top">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{restaVentasPagos}.add( $F{saldo_inicial})]]></textFieldExpression>
 				</textField>
 				<line>
-					<reportElement x="0" y="17" width="780" height="1" forecolor="#2196F3" uuid="66d0c7aa-347a-4c0b-b695-7bdfa414f7b5"/>
+					<reportElement x="0" y="13" width="802" height="1" forecolor="#2196F3" uuid="66d0c7aa-347a-4c0b-b695-7bdfa414f7b5">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
 				</line>
 				<staticText>
-					<reportElement x="180" y="4" width="100" height="13" uuid="02409251-9d17-4207-8cd5-e0cb0b0f20cb">
+					<reportElement x="183" y="0" width="100" height="13" uuid="02409251-9d17-4207-8cd5-e0cb0b0f20cb">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -280,30 +282,30 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 					<text><![CDATA[Ventas:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="381" y="4" width="89" height="13" uuid="a212d1e5-4ae0-4548-873e-88bb888189da"/>
+					<reportElement x="384" y="0" width="89" height="13" uuid="a212d1e5-4ae0-4548-873e-88bb888189da"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Ingresos:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="600" y="4" width="78" height="13" uuid="f4583a99-aa8d-410b-87a5-150e1c93fb3a"/>
+					<reportElement x="603" y="0" width="78" height="13" uuid="f4583a99-aa8d-410b-87a5-150e1c93fb3a"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Saldo final:]]></text>
 				</staticText>
 			</band>
-			<band height="51"/>
+			<band height="14"/>
 		</groupFooter>
 	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="110" splitType="Stretch">
+		<band height="71" splitType="Stretch">
 			<staticText>
-				<reportElement x="180" y="11" width="500" height="21" forecolor="#2196F3" uuid="c5380405-8e78-42bc-b1d0-4216230b1b8b">
+				<reportElement x="0" y="0" width="802" height="21" forecolor="#2196F3" uuid="c5380405-8e78-42bc-b1d0-4216230b1b8b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -314,32 +316,32 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 				<text><![CDATA[ESTADO DE RESULTADOS]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="150" height="110" uuid="f86f145f-036c-45ca-bb23-0fa613f74118"/>
+				<reportElement x="0" y="0" width="200" height="70" uuid="f86f145f-036c-45ca-bb23-0fa613f74118"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="180" y="32" width="170" height="18" uuid="ce7efcf2-8099-45d6-9221-7fc4d5d354cf"/>
+				<reportElement x="180" y="21" width="170" height="18" uuid="ce7efcf2-8099-45d6-9221-7fc4d5d354cf"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[del mes]]></text>
 			</staticText>
 			<textField pattern="MMMM" isBlankWhenNull="true">
-				<reportElement x="350" y="32" width="79" height="18" uuid="bc4bf551-57ea-4494-82fe-c65ce810b212"/>
+				<reportElement x="350" y="21" width="79" height="18" uuid="bc4bf551-57ea-4494-82fe-c65ce810b212"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{fechaIni}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="429" y="32" width="49" height="18" uuid="e480d442-c99e-4372-b396-047e8b5a9ed9"/>
+				<reportElement x="429" y="21" width="49" height="18" uuid="e480d442-c99e-4372-b396-047e8b5a9ed9"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[del año]]></text>
 			</staticText>
 			<textField pattern="yyyy" isBlankWhenNull="true">
-				<reportElement x="478" y="32" width="42" height="18" uuid="ee05c3f8-7b8f-483b-87b9-bd3ad9d6ce4a"/>
+				<reportElement x="478" y="21" width="42" height="18" uuid="ee05c3f8-7b8f-483b-87b9-bd3ad9d6ce4a"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
@@ -348,31 +350,36 @@ ORDER BY estadoCuenta.emisor, b.fecha]]>
 		</band>
 	</title>
 	<detail>
-		<band height="30" splitType="Stretch">
+		<band height="14" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="0" y="0" width="80" height="30" uuid="476d9c4c-e128-426d-a5ac-84c26b64e97e">
+				<reportElement x="0" y="0" width="80" height="14" uuid="476d9c4c-e128-426d-a5ac-84c26b64e97e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="819fe0c4-4b39-44fd-b406-6485e5883c73"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="80" y="0" width="350" height="30" uuid="93f6e330-6d6d-48c0-8d33-c86dbb1f95f9">
+				<reportElement x="80" y="0" width="350" height="14" uuid="93f6e330-6d6d-48c0-8d33-c86dbb1f95f9">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aae44e55-4eaf-46be-bb54-f387eb4a4a76"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{ventas}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="430" y="0" width="229" height="30" uuid="e64ce3d4-df93-4b5a-b971-1f90aeace160">
+				<reportElement x="430" y="0" width="251" height="14" uuid="e64ce3d4-df93-4b5a-b971-1f90aeace160">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fc390c59-95ef-405f-b6b9-1a04ab9abbc8"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{pagos}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="659" y="0" width="121" height="30" uuid="618880fd-9c03-4bb1-b4bf-043876f4f5af">
+				<reportElement x="681" y="0" width="121" height="14" uuid="618880fd-9c03-4bb1-b4bf-043876f4f5af">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1fa979d7-ea3e-405d-821f-ba2fe7396ab9"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$V{restaVentasPagos}.add( $F{saldo_inicial})]]></textFieldExpression>

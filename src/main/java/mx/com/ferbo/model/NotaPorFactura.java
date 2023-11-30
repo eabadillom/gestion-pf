@@ -11,7 +11,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "NOTA_X_FACTURAS")
+@Table(name = "nota_x_facturas")
 @NamedQueries({
 	
 	@NamedQuery(name = "NotaPorFactura.findByAll", query = "SELECT nf FROM NotaPorFactura nf")

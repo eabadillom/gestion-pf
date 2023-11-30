@@ -19,7 +19,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 
@@ -103,7 +102,6 @@ public class Usuario implements Serializable {
     private String numEmpleado;
     
     @Basic(optional = false)
-    @NotNull
     @Column(name = "huella")
     private boolean huella;
     

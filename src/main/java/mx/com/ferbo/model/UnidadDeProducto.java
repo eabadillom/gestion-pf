@@ -24,7 +24,7 @@ import javax.validation.constraints.NotNull;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "UNIDAD_DE_PRODUCTO")
+@Table(name = "unidad_de_producto")
 @NamedQueries({
         @NamedQuery(name = "UnidadDeProducto.findAll", query = "SELECT u FROM UnidadDeProducto u"),
         @NamedQuery(name = "UnidadDeProducto.findByUnidadDeProductoCve", query = "SELECT u FROM UnidadDeProducto u WHERE u.unidadDeProductoCve = :unidadDeProductoCve"),

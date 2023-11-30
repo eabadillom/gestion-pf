@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reportAuxCtes" pageWidth="720" pageHeight="842" columnWidth="680" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7a5829b0-7dba-4bbf-bb8d-d10ed05bf49d">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.report.description" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="182"/>
@@ -12,123 +12,62 @@
 	<parameter name="imagen" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT
-
 	edc.cte_cve, edc.numero_cte, edc.nombre_cliente, edc.nom_serie, edc.numero, edc.fecha, edc.movimiento, edc.concepto,
-
 	COALESCE(si.saldo_inicial, 0) as saldo_inicial, edc.debe, edc.haber, COALESCE (edc.debe,0) - COALESCE(edc.haber,0) AS parcial
-	
 FROM (
-
 	SELECT
-
 		cte.CTE_CVE AS cte_cve, cte.numero_cte, cte.CTE_NOMBRE as nombre_cliente,
-
 		f.nom_serie, f.numero, f.fecha, 'Factura' as movimiento, 'Ventas del día' AS concepto,
-
 		f.total as debe, null as haber
-
 	FROM factura f
-
-	INNER JOIN CLIENTE cte ON f.cliente = cte.CTE_CVE 
-
+	INNER JOIN cliente cte ON f.cliente = cte.CTE_CVE 
 	WHERE f.status NOT IN (0,2)
-
 	AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	AND f.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin}
-
 	UNION ALL
-
 	SELECT
-
 		cte.CTE_CVE AS cte_cve, cte.numero_cte, cte.CTE_NOMBRE as nombre_cliente,
-
 		f.nom_serie, f.numero, p.fecha, 'Pago' as movimiento , 'Depósito del día' AS concepto,
-
 		null as debe, p.monto  as haber
-
 	FROM pago p
-
 	INNER JOIN factura f ON f.id = p.factura
-
-	INNER JOIN CLIENTE cte ON f.cliente = cte.CTE_CVE
-
+	INNER JOIN cliente cte ON f.cliente = cte.CTE_CVE
 	WHERE p.tipo NOT IN (5)
-
 	AND f.status NOT IN (0,2)
-
 	AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	AND p.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin}
-
-	
-
 	UNION ALL
-
-	
-
 	SELECT
-
 		cte.CTE_CVE AS cte_cve, cte.numero_cte, cte.CTE_NOMBRE as nombre_cliente,
-
 		'' as nom_serie, nc.NUMERO, nc.FECHA, CONCAT('N.C. ', nc.NUMERO) AS movimiento, 'Nota de crédito' AS concepto,
-
 		null as debe, nf.CANTIDAD as haber
-
-	FROM NOTA_CREDITO nc
-
-	INNER JOIN NOTA_X_FACTURAS nf ON nc.id = nf.NOTA
-
+	FROM nota_credito nc
+	INNER JOIN nota_x_facturas nf ON nc.id = nf.NOTA
 	INNER JOIN factura f ON nf.FACTURA = f.id
-
-	INNER JOIN CLIENTE cte ON f.cliente = cte.CTE_CVE
-
+	INNER JOIN cliente cte ON f.cliente = cte.CTE_CVE
 	WHERE nc.STATUS NOT IN (0,2)
-
 	AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	AND nc.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin}
-
 ) edc
-
 LEFT OUTER JOIN (
-
 	SELECT saldoInicial.cliente, sum(saldo_inicial) as saldo_inicial FROM (
-
 		SELECT f.cliente, (f.total - COALESCE(p.monto, 0)) as saldo_inicial
-
 		FROM factura f
-
 		INNER JOIN status_factura sf ON sf.id = f.status
-
 		LEFT OUTER JOIN (
-
 			SELECT
-
 				factura, sum(p.monto) as monto
-
 			FROM pago p
-
 			WHERE p.fecha < $P{fechaInicio}
-
 			GROUP BY factura
-
 		) p ON f.id = p.factura
-
 		WHERE f.status NOT IN (0,2)
-
 		AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 		AND f.fecha < $P{fechaInicio}
-
 	) saldoInicial
-
 	WHERE saldoInicial.saldo_inicial > 0
-
 	GROUP BY cliente
-
 ) si ON si.cliente = edc.cte_cve
-
 ORDER BY edc.nombre_cliente, edc.fecha, edc.movimiento]]>
 	</queryString>
 	<field name="cte_cve" class="java.lang.Integer">
@@ -204,23 +143,19 @@ ORDER BY edc.nombre_cliente, edc.fecha, edc.movimiento]]>
 	<group name="Cliente">
 		<groupExpression><![CDATA[$F{nombre_cliente}]]></groupExpression>
 		<groupHeader>
-			<band height="31">
+			<band height="16">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<textField>
-					<reportElement x="80" y="0" width="400" height="31" forecolor="#2196F3" uuid="0686424c-1a92-45b6-8785-619bcbde4220"/>
+					<reportElement x="0" y="0" width="480" height="16" forecolor="#2196F3" uuid="0686424c-1a92-45b6-8785-619bcbde4220">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
 					<textElement verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="0" y="0" width="80" height="31" forecolor="#2196F3" uuid="0f2e1407-5f7f-406d-b50f-e7841f7f0a37"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{numero_cte}]]></textFieldExpression>
-				</textField>
 				<staticText>
-					<reportElement x="480" y="0" width="100" height="31" uuid="5908be7b-04c4-436d-ac4b-7bfb2b6516c0">
+					<reportElement x="480" y="0" width="100" height="16" uuid="5908be7b-04c4-436d-ac4b-7bfb2b6516c0">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -229,10 +164,8 @@ ORDER BY edc.nombre_cliente, edc.fecha, edc.movimiento]]>
 					<text><![CDATA[Saldo inicial:]]></text>
 				</staticText>
 				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="580" y="0" width="100" height="31" uuid="099980ed-3686-44e4-9023-252df15b4ff5">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle">
+					<reportElement x="580" y="0" width="100" height="16" uuid="099980ed-3686-44e4-9023-252df15b4ff5"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{saldo_inicial}]]></textFieldExpression>
@@ -253,21 +186,21 @@ ORDER BY edc.nombre_cliente, edc.fecha, edc.movimiento]]>
 				</staticText>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
 					<reportElement x="380" y="0" width="100" height="13" uuid="b9fda1fb-f79e-41bc-991f-024b4d86ebe1"/>
-					<textElement textAlignment="Center" verticalAlignment="Top">
+					<textElement textAlignment="Right" verticalAlignment="Top">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{Suma_debe}]]></textFieldExpression>
 				</textField>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
 					<reportElement x="480" y="0" width="100" height="13" uuid="2f9610ef-cb26-47ce-846e-045d52f513e7"/>
-					<textElement textAlignment="Center" verticalAlignment="Top">
+					<textElement textAlignment="Right" verticalAlignment="Top">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{Suma_haber}]]></textFieldExpression>
 				</textField>
 				<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
 					<reportElement x="580" y="0" width="100" height="13" uuid="05b7eec9-67b4-46d1-b29f-4bb311639939"/>
-					<textElement textAlignment="Center" verticalAlignment="Top">
+					<textElement textAlignment="Right" verticalAlignment="Top">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{saldo_inicial}.add($V{sumaParcial})]]></textFieldExpression>
@@ -282,7 +215,7 @@ ORDER BY edc.nombre_cliente, edc.fecha, edc.movimiento]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="79" splitType="Stretch">
+		<band height="59" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="680" height="21" forecolor="#2196F3" uuid="32aeb3f0-6f98-4407-8124-3291ebb3b40b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -327,7 +260,7 @@ ORDER BY edc.nombre_cliente, edc.fecha, edc.movimiento]]>
 				<text><![CDATA[del dia]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="115" height="79" uuid="4d398662-e5c8-4616-bc6b-f055ff4c155a"/>
+				<reportElement x="0" y="0" width="179" height="59" uuid="4d398662-e5c8-4616-bc6b-f055ff4c155a"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 		</band>
@@ -461,52 +394,61 @@ ORDER BY edc.nombre_cliente, edc.fecha, edc.movimiento]]>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="20" splitType="Stretch">
+		<band height="14" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="80" height="20" uuid="d4df6a34-c497-4409-b2e0-81548b07b350">
+				<reportElement x="0" y="0" width="80" height="14" uuid="d4df6a34-c497-4409-b2e0-81548b07b350">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9c0fa229-867e-41cf-a68c-66cea37d9213"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="80" y="0" width="100" height="20" uuid="1d8914a5-41bf-4d97-a2e8-b34bbff24000">
+				<reportElement x="80" y="0" width="100" height="14" uuid="1d8914a5-41bf-4d97-a2e8-b34bbff24000">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="003fc291-d753-4365-9ea5-adb810744035"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{movimiento}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="280" y="0" width="100" height="20" uuid="6ffa509b-4cc1-4a8d-ab47-ff43de5588fe">
+				<reportElement x="280" y="0" width="100" height="14" uuid="6ffa509b-4cc1-4a8d-ab47-ff43de5588fe">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dba45068-45a7-4808-8bdd-e7c4f3c4997b"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{concepto}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="380" y="0" width="100" height="20" uuid="e5f80706-4450-4ecb-80c5-fabfc9314be4">
+				<reportElement x="380" y="0" width="100" height="14" uuid="e5f80706-4450-4ecb-80c5-fabfc9314be4">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="18db8676-2f31-48f2-b950-20a1a7cdcb08"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{debe}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="480" y="0" width="100" height="20" uuid="cca10cb0-09e3-48ad-9ecb-a0b5517f45f5">
+				<reportElement x="480" y="0" width="100" height="14" uuid="cca10cb0-09e3-48ad-9ecb-a0b5517f45f5">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="db07af34-1d68-4882-8962-3248b5e17ab5"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{haber}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="180" y="0" width="100" height="20" uuid="e23ed59d-cc68-4f28-a24b-ef6e5fa7484a">
+				<reportElement x="180" y="0" width="100" height="14" uuid="e23ed59d-cc68-4f28-a24b-ef6e5fa7484a">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e270fb03-0c13-4418-9d32-f27e1e37d920"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
-				<textFieldExpression><![CDATA[$F{numero}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{nom_serie} + "-" + $F{numero}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="580" y="0" width="100" height="20" uuid="55ee3cdd-31d4-4345-9d44-f187f855275c"/>
-				<textElement textAlignment="Center"/>
+				<reportElement x="580" y="0" width="100" height="14" uuid="55ee3cdd-31d4-4345-9d44-f187f855275c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{saldo_inicial}.add($V{sumaParcial})]]></textFieldExpression>
 			</textField>
 		</band>

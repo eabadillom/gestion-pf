@@ -6,35 +6,17 @@
                 template="/WEB-INF/template.xhtml">
                 
 	<ui:define name="title">Notas de Credito</ui:define>
-   
     <ui:define name="content">
         <h:form id="form">
-        <p:breadCrumb>
-            <p:menuitem value="Home" outcome="/dashboard"/>
-            <p:menuitem value="Reportes"/>
-            <p:menuitem value="Ingresos"/>
-            <p:menuitem value="Nota de Credito" outcome="/protected/reportes/NotaCredito"/>
-        </p:breadCrumb>
-        
         <p:growl id="messages" showDetail="true" />
-        
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
 	                <div class="card">
-	             		
-	             		<p:datePicker value="#{reporteNotaCreditoBean.fechaActual}" showIcon="true" disabled="true"/>
-	             		
 	             		<p:fieldset legend="Periodo De Devolucion" styleClass="p-mt-4">
-	             		
 	             		<p:outputLabel value="De:" styleClass="p-mr-2"></p:outputLabel>
 	             		<p:datePicker value="#{reporteNotaCreditoBean.fechaInicio}" showIcon="true" maxdate="#{reporteNotaCreditoBean.maxDate}"/>
-	             		
 	             		<p:outputLabel value="A:" styleClass="p-mr-2 p-ml-4"></p:outputLabel>
 	             		<p:datePicker value="#{reporteNotaCreditoBean.fechaFin}" showIcon="true" maxdate="#{reporteNotaCreditoBean.maxDate}"/>
-	             		
-	             		
-	             		
-	             		
 	             		</p:fieldset>
 	             		
 	             		<p:fieldset legend="Cliente" styleClass="p-mt-4" >

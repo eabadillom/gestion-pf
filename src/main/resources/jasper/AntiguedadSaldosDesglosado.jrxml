@@ -1,292 +1,152 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AntiguedadSaldos" pageWidth="1120" pageHeight="842" columnWidth="1080" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="808cecf9-e20a-4d0e-8be9-da416fa5fad3">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<parameter name="fecha" class="java.util.Date"/>
 	<parameter name="imagen" class="java.lang.String"/>
 	<parameter name="idCliente" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[WITH cartera (id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias) AS
-
 (
-
 	SELECT
-
         factura.id,
-
         factura.numero_cliente,
-
         factura.cliente,
-
         factura.nom_serie,
-
         factura.numero,
-
         trim(factura.nombre_cliente) AS nombre_cliente,
-
         factura.fecha as fecha,
-
         factura.subtotal as subtotal,
-
         factura.iva as iva,
-
         factura.total as total,
-
         factura.total AS saldo,
-
         factura.status as status,
-
         status_factura.nombre as nombre_status,
-
         factura.plazo as plazo,
-
         DATEDIFF($P{fecha}, date_add(factura.fecha, INTERVAL factura.plazo DAY)) as dias
-
     FROM factura
-
     INNER JOIN status_factura on factura.status = status_factura.id
-
     WHERE
-
         factura.ID NOT IN(SELECT pago.factura FROM pago WHERE pago.fecha <= $P{fecha} ) AND
-
         factura.status NOT IN (0,2) AND
-
         factura.fecha <= $P{fecha} AND
-
         (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
     UNION all
-
     SELECT * FROM (
-
 	    SELECT
-
 	       factura.id as id,
-
 	       factura.numero_cliente AS numero_cte,
-
 	       factura.cliente as cliente,
-
 	       factura.nom_serie as nom_serie,
-
 	       factura.numero as numero,
-
 	       trim(factura.nombre_cliente) AS nombre_cliente,
-
 	       factura.fecha,
-
 	       (factura.total - ingreso.monto)/(1.16) as subtotal,
-
 	       (factura.total - ingreso.monto) - subtotal as iva,
-
 	       factura.total AS total,
-
 	       (factura.total - ingreso.monto) AS saldo,
-
 	       factura.status as status,
-
 	       status_factura.nombre as nombre,
-
 	       factura.plazo as plazo,
-
 	       DATEDIFF($P{fecha}, date_add(factura.fecha, INTERVAL factura.plazo DAY)) as dias
-
 	    FROM (
-
 	    	SELECT
-
 	    		factura,
-
 	    		sum(monto) as monto
-
 	    	FROM (
-
 	    		SELECT
-
 		    		p.factura,
-
 		    		sum(p.monto) as monto
-
 		    	FROM pago p
-
 		    	WHERE p.tipo NOT IN (5)
-
 		    	AND p.fecha <= $P{fecha}
-
 		    	GROUP BY p.factura
-
 		    	UNION ALL
-
 		    	SELECT
-
 		    		nf.FACTURA,
-
 		    		sum(nf.CANTIDAD) as monto
-
-		    	FROM NOTA_CREDITO nc
-
-		    	INNER JOIN NOTA_X_FACTURAS nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
-
+		    	FROM nota_credito nc
+		    	INNER JOIN nota_x_facturas nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
 		    	WHERE nc.FECHA <= $P{fecha}
-
 		    	GROUP BY nf.FACTURA
-
 	    	) a
-
 	    	GROUP BY a.factura
-
 		) ingreso
-
 	    INNER JOIN factura ON ingreso.factura = factura.id
-
 	    INNER JOIN status_factura ON status_factura.id = factura.status
-
 	    WHERE
-
 	       (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	    ORDER BY fecha
-
     ) b WHERE b.saldo > 0
-
 )
-
 SELECT * FROM (
-
 	SELECT
-
 		id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias,
-
 		saldo as en_plazo,
-
 		null as d_8,
-
 		null as d_15,
-
 		null as d_30,
-
 		null as d_60,
-
 		null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias < 1
-
 	UNION 
-
 	SELECT
-
 		id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias,
-
 		null as en_plazo,
-
 	    saldo as d_8,
-
 	    null as d_15,
-
 	    null as d_30,
-
 	    null as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 1 AND 8
-
 	UNION ALL
-
 	SELECT
-
 		id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias,
-
 		null as en_plazo,
-
 	    null as d_8,
-
 	    saldo as d_15,
-
 	    null as d_30,
-
 	    null as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 9 AND 15
-
 	UNION ALL
-
 	SELECT
-
 		id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias,
-
 		null as en_plazo,
-
 	    null as d_8,
-
 	    null as d_15,
-
 	    saldo as d_30,
-
 	    null as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 16 AND 30
-
 	UNION ALL
-
 	SELECT
-
 		id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias,
-
 		null as en_plazo,
-
 	    null as d_8,
-
 	    null as d_15,
-
 	    null as d_30,
-
 	    saldo as d_60,
-
 	    null as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias BETWEEN 31 AND 60
-
 	UNION ALL
-
 	SELECT
-
 		id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias,
-
 		null as en_plazo,
-
 	    null as d_8,
-
 	    null as d_15,
-
 	    null as d_30,
-
 	    null as d_60,
-
 	    saldo as md_60
-
 	FROM cartera
-
 	WHERE cartera.dias > 60
-
 ) x
-
 ORDER BY x.nombre_cliente, x.fecha]]>
 	</queryString>
 	<field name="id" class="java.lang.Integer">
@@ -447,51 +307,51 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 					</textElement>
 					<text><![CDATA[Total Parcial:]]></text>
 				</staticText>
-				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 					<reportElement x="180" y="0" width="100" height="19" uuid="b4eacc43-c838-4fec-9509-368bba8af545"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaCteporSaldo}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-					<reportElement x="380" y="0" width="100" height="19" uuid="f2983a67-90cb-4c6a-ae1b-88ed539cfda1"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+					<reportElement x="480" y="0" width="100" height="19" uuid="f2983a67-90cb-4c6a-ae1b-88ed539cfda1"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaCteporPlazo}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 					<reportElement x="580" y="0" width="100" height="19" uuid="a9d709ac-13b7-4cee-9857-c60ee57e688b"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaCte8d}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 					<reportElement x="680" y="0" width="99" height="19" uuid="acae350a-c7ef-45cd-8109-54ae9db7459a"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaCte15d}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 					<reportElement x="780" y="0" width="100" height="19" uuid="40404746-d6cc-4feb-9707-f9da09b788f6"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaCte30d}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 					<reportElement x="880" y="0" width="100" height="19" uuid="c6984efa-c408-4f82-9a7c-13176125b1ee"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaCte60d}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 					<reportElement x="980" y="0" width="100" height="19" uuid="28ad07ed-f6d1-48cf-a3ce-57dd225dc7e0"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaCte61dMas}]]></textFieldExpression>
@@ -550,7 +410,7 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Saldo]]></text>
@@ -568,7 +428,7 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Al corriente]]></text>
@@ -656,7 +516,7 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[16-30 dias]]></text>
@@ -674,7 +534,7 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[31-60 dias]]></text>
@@ -692,7 +552,7 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[61 ó mas dias]]></text>
@@ -709,7 +569,7 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[9-15 dias]]></text>
@@ -726,7 +586,7 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[1-8 dias]]></text>
@@ -749,7 +609,7 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="180" y="0" width="100" height="19" uuid="8ecc872c-1a97-4ccb-9524-e0df8c50929b">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d9a27fab-4abc-4651-9e99-e16e4e540d73"/>
 				</reportElement>
@@ -760,9 +620,10 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 				<reportElement x="280" y="0" width="100" height="19" uuid="e8f1e6e3-e2ec-41ce-8282-2b6d234edca8">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="834535c2-66ea-44ba-a688-983034cf9fe7"/>
 				</reportElement>
+				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{dias}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="480" y="0" width="100" height="19" uuid="aa0de6c5-c51e-40b5-a4b9-60bd4531442d">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="69d989a5-4e81-4a44-8aee-58d5ca2f9ce8"/>
 				</reportElement>
@@ -776,33 +637,33 @@ ORDER BY x.nombre_cliente, x.fecha]]>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{plazo}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="580" y="0" width="100" height="19" uuid="c682289a-db9b-4402-8a21-a9e808385783">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1cb20b14-4cd7-45d8-953d-80e402fa0bfd"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{d_8}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="680" y="0" width="100" height="19" uuid="117a9e9d-c22c-4fbf-ba3b-02514628dc20">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a543f2ba-1c75-4d05-a19f-cba2eb870a4e"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{d_15}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="780" y="0" width="100" height="19" uuid="1d0c756a-a94f-4cd1-88c5-079cbcd32c7b"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{d_30}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="880" y="0" width="100" height="19" uuid="0ac80215-2241-4638-9d1b-e18c0150126e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="331b0406-8471-44af-9fdf-8cbd68d2c31a"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{d_60}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="980" y="0" width="100" height="19" uuid="f6195cb1-f54d-4181-ad9b-7f8b508e4028">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e35d7f98-f5ac-46fd-b07e-fe2adc3a266e"/>
 				</reportElement>

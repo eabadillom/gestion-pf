@@ -148,7 +148,7 @@
 									</f:facet>
 								</p:cellEditor>
 							</p:column>
-							<p:column headerText="#Tarimas" width="4rem" style="text-align: center;">
+							<p:column headerText="#Tarimas" width="4rem" style="text-align: right;">
 								<p:cellEditor>
 				                    <f:facet name="output">
 				                        <h:outputText value="#{partida.noTarimas}"/>
@@ -161,7 +161,7 @@
 							<p:column headerText="Piezas x Tarima" width="4rem" style="text-align: center;">
 								#{partida.cantidadTotal / partida.noTarimas}							
 							</p:column>
-							<p:column headerText="Piezas" width="4rem" style="text-align: center;">
+							<p:column headerText="Piezas" width="4rem" style="text-align: right;">
 								<p:cellEditor>
 				                    <f:facet name="output">
 				                        <h:outputText value="#{partida.cantidadTotal}"/>
@@ -203,6 +203,21 @@
 									<f:setPropertyActionListener value="#{partida}" target="#{consultarConstanciaDeDepositoBean.partidaSelect}"></f:setPropertyActionListener>
 								</p:commandButton>	
 							</p:column>
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column style="text-align: left;" footerText="Totales"/>
+			        				<p:column style="text-align: right;" footerText="#{consultarConstanciaDeDepositoBean.tarimasTotal}"/>
+			        				<p:column />
+			        				<p:column style="text-align: right;" footerText="#{consultarConstanciaDeDepositoBean.cantidadTotal}" />
+			        				<p:column footerText="" />
+			        				<p:column style="text-align: right;" footerText="#{consultarConstanciaDeDepositoBean.pesoTotal}" />
+			        				<p:column footerText="" />
+			        				<p:column footerText="" />
+			        				<p:column footerText="" />
+			        				<p:column footerText="" />
+			        				<p:column footerText="" />
+								</p:row>
+							</p:columnGroup>
 						</p:dataTable> 
 					</p:outputPanel>				
 				</p:outputPanel>

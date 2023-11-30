@@ -5,11 +5,15 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ModPlazosPagoDAO {
+	private static Logger log = LogManager.getLogger(ModPlazosPagoDAO.class);
 
 	public List<Factura> findDacturas(Cliente c, Date de, Date hasta) {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
@@ -35,4 +39,26 @@ public class ModPlazosPagoDAO {
 		}
 		return null;
 	};
+	
+	public String updatePlazo(Factura factura, int plazo) {
+		String result = null;
+		EntityManager entity = null;
+		int rows = -1;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			entity.getTransaction().begin();
+			rows = entity.createNativeQuery("UPDATE factura SET plazo = :plazo WHERE factura.id = :idFactura")
+				.setParameter("plazo", plazo)
+				.setParameter("idFactura", factura.getId())
+				.executeUpdate()
+				;
+			log.info("Registros afectados: ({})", rows);
+			entity.getTransaction().commit();
+		} catch (Exception e) {
+			return e.getMessage();
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
+		return result;
+	}
 }

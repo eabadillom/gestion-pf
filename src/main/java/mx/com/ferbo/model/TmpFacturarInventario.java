@@ -25,7 +25,7 @@ import javax.validation.constraints.Size;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "TMP_FACTURAR_INVENTARIO")
+@Table(name = "tmp_facturar_inventario")
 @NamedQueries({
     @NamedQuery(name = "TmpFacturarInventario.findAll", query = "SELECT t FROM TmpFacturarInventario t"),
     @NamedQuery(name = "TmpFacturarInventario.findByUsuario", query = "SELECT t FROM TmpFacturarInventario t WHERE t.tmpFacturarInventarioPK.usuario = :usuario"),

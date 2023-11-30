@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="NotasCredito" pageWidth="622" pageHeight="595" orientation="Landscape" columnWidth="582" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d5d42d4c-5524-4b2c-b152-13e27161417f">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDB"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -18,48 +18,42 @@
 	<parameter name="idCliente" class="java.lang.Integer"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT
-
 	nc.NUMERO, nc.FECHA, nc.CLIENTE, nc.SUBTOTAL, nc.IVA, nc.TOTAL
-
-FROM NOTA_CREDITO nc
-
+FROM nota_credito nc
 WHERE nc.STATUS = 1
-
 AND nc.FECHA BETWEEN $P{fechaInicio} and $P{fechaFin}
-
 AND (nc.IDCLIENTE = $P{idCliente} OR $P{idCliente} IS NULL)
-
-ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
+ORDER BY nc.FECHA, nc.id, nc.CLIENTE]]>
 	</queryString>
 	<field name="NUMERO" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NUMERO"/>
 		<property name="com.jaspersoft.studio.field.label" value="NUMERO"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="FECHA" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="FECHA"/>
 		<property name="com.jaspersoft.studio.field.label" value="FECHA"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="CLIENTE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CLIENTE"/>
 		<property name="com.jaspersoft.studio.field.label" value="CLIENTE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="SUBTOTAL" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="SUBTOTAL"/>
 		<property name="com.jaspersoft.studio.field.label" value="SUBTOTAL"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="IVA" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="IVA"/>
 		<property name="com.jaspersoft.studio.field.label" value="IVA"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="TOTAL" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="TOTAL"/>
 		<property name="com.jaspersoft.studio.field.label" value="TOTAL"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<variable name="sumaNumero" class="java.lang.Integer" calculation="Count">
 		<variableExpression><![CDATA[$F{NUMERO}]]></variableExpression>
@@ -77,30 +71,30 @@ ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="82" splitType="Stretch">
+		<band height="50" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="582" height="40" forecolor="#2199F6" uuid="a24322d0-36d8-4491-8a43-572367a99765"/>
+				<reportElement x="0" y="0" width="582" height="20" forecolor="#2199F6" uuid="a24322d0-36d8-4491-8a43-572367a99765"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="20"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[REPORTE NOTAS DE CREDITO]]></text>
 			</staticText>
 			<image hAlign="Center" vAlign="Top">
-				<reportElement x="0" y="0" width="140" height="82" uuid="8028c79c-6c49-41f1-9577-fd903ce77209"/>
+				<reportElement x="0" y="0" width="140" height="50" uuid="8028c79c-6c49-41f1-9577-fd903ce77209"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<textField pattern="dd/MMM/yyyy">
-				<reportElement x="180" y="40" width="90" height="42" uuid="a8ee8fa6-cb46-4198-90eb-2bc8c20426f9"/>
+				<reportElement x="180" y="20" width="90" height="30" uuid="a8ee8fa6-cb46-4198-90eb-2bc8c20426f9"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{fechaInicio}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MMM/yyyy">
-				<reportElement x="310" y="40" width="272" height="42" uuid="7645571f-975f-4f5d-97a2-9e91bdb892c1"/>
+				<reportElement x="310" y="20" width="272" height="30" uuid="7645571f-975f-4f5d-97a2-9e91bdb892c1"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{fechaFin}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="40" width="180" height="42" uuid="1e50a62e-2316-4a63-9037-8c361ff535bd">
+				<reportElement x="0" y="20" width="180" height="30" uuid="1e50a62e-2316-4a63-9037-8c361ff535bd">
 					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -109,7 +103,7 @@ ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
 				<text><![CDATA[Del]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="270" y="40" width="40" height="42" uuid="59d57ceb-112d-4b11-b80c-0fc1274ebd6c"/>
+				<reportElement x="270" y="20" width="40" height="30" uuid="59d57ceb-112d-4b11-b80c-0fc1274ebd6c"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Al]]></text>
 			</staticText>
@@ -134,7 +128,7 @@ ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Fecha]]></text>
 			</staticText>
@@ -147,7 +141,7 @@ ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="9" isBold="true"/>
 					<paragraph leftIndent="3"/>
 				</textElement>
 				<text><![CDATA[Cliente]]></text>
@@ -161,7 +155,7 @@ ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Importe]]></text>
 			</staticText>
@@ -172,7 +166,7 @@ ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[I.V.A.]]></text>
 			</staticText>
@@ -182,54 +176,67 @@ ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="20" splitType="Stretch">
+		<band height="15" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="41" height="20" uuid="9bdb5a9c-e836-4158-9916-bd92555dee72">
+				<reportElement x="0" y="0" width="41" height="14" uuid="9bdb5a9c-e836-4158-9916-bd92555dee72">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="eff072d6-b40e-4deb-8a29-d15f0e8b1bdd"/>
 				</reportElement>
-				<textElement textAlignment="Center"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{NUMERO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MMM/yyyy">
-				<reportElement x="41" y="0" width="75" height="20" uuid="dbd860e0-e119-4652-81ab-169d919651c2">
+				<reportElement x="41" y="0" width="75" height="14" uuid="dbd860e0-e119-4652-81ab-169d919651c2">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="787a2f87-8fec-4588-a350-4aa04ca6f150"/>
 				</reportElement>
-				<textElement textAlignment="Center"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{FECHA}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="117" y="0" width="209" height="20" uuid="d3029e1c-2c1b-4402-866a-f5eb79465ebe">
+				<reportElement x="117" y="0" width="209" height="14" uuid="d3029e1c-2c1b-4402-866a-f5eb79465ebe">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3137927a-22cd-4b91-9d79-535f1cc8eaaf"/>
 				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{CLIENTE}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
-				<reportElement x="327" y="0" width="85" height="20" uuid="c4c57290-5b6f-4b3c-bff5-5dbbe229196c">
+			<textField pattern="$#,##0.00;$-#,##0.00">
+				<reportElement x="327" y="0" width="85" height="14" uuid="c4c57290-5b6f-4b3c-bff5-5dbbe229196c">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0fe5c3dd-8285-4085-9432-06d2e673a4e1"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{SUBTOTAL}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
-				<reportElement x="412" y="0" width="84" height="20" uuid="f7b51f17-9d15-41f7-b06c-9baf44dc8a5b">
+			<textField pattern="$#,##0.00;$-#,##0.00">
+				<reportElement x="412" y="0" width="84" height="14" uuid="f7b51f17-9d15-41f7-b06c-9baf44dc8a5b">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1627636f-87a5-437c-9694-8438a4f60364"/>
 				</reportElement>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{IVA}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
-				<reportElement x="497" y="0" width="85" height="20" uuid="ef148f34-1d13-4620-a2ae-115310357afe">
+			<textField pattern="$#,##0.00;$-#,##0.00">
+				<reportElement x="497" y="0" width="85" height="14" uuid="ef148f34-1d13-4620-a2ae-115310357afe">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="088a13e6-68ca-4c2a-a73f-5d975d8872d0"/>
 				</reportElement>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
 			</textField>
 		</band>
@@ -255,21 +262,21 @@ ORDER BY nc.NUMERO, nc.FECHA, nc.CLIENTE]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sumaNumero}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="$#,##0.00;$-#,##0.00">
 				<reportElement x="327" y="0" width="85" height="18" uuid="c696ac12-4a30-466c-bb09-7c15b884a7d7"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sumaSubtotal}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="$#,##0.00;$-#,##0.00">
 				<reportElement x="412" y="0" width="85" height="18" uuid="6f0869b2-7473-448e-956b-e31d0bb848b5"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sumaIva}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="$#,##0.00;$-#,##0.00">
 				<reportElement x="497" y="0" width="85" height="18" uuid="36f5b572-79b2-46b2-b641-cf5c6b02a8ff"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>

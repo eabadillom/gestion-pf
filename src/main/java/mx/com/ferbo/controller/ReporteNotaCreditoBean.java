@@ -63,7 +63,6 @@ public class ReporteNotaCreditoBean implements Serializable{
 		fechaFin = new Date();
 		fechaActual = new Date();
 		Date today = new Date();
-		long oneDay = 24 * 60 * 60 * 1000;
 
 		maxDate = new Date(today.getTime() );
 	}

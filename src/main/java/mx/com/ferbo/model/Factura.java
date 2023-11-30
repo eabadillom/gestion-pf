@@ -22,7 +22,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -72,183 +71,220 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Factura.findByClientePeriodo", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente AND f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
     @NamedQuery(name = "Factura.findByNomSerie", query = "SELECT f FROM Factura f WHERE f.nomSerie = :nomSerie"),
     @NamedQuery(name = "Factura.findBySerieNumero", query = "SELECT f FROM Factura f WHERE f.numero = :numero AND f.nomSerie = :serie"),
-    @NamedQuery(name = "Factura.findByPlanta", query = "SELECT f FROM Factura f WHERE f.planta.plantaCve = :plantaCve")})
+    @NamedQuery(name = "Factura.findByPlanta", query = "SELECT f FROM Factura f WHERE f.planta.plantaCve = :plantaCve"),
+    @NamedQuery(name = "Factura.findByStatusFacturaClientePeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin AND f.cliente.cteCve = :idCliente AND f.status.id = :idStatusFactura ORDER BY f.fecha, f.nomSerie, f.numero")})
 public class Factura implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "numero")
     private String numero;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "moneda")
     private String moneda;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 14)
     @Column(name = "rfc")
     private String rfc;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 80)
     @Column(name = "nombre_cliente")
     private String nombreCliente;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date fecha;
+    
     @Basic(optional = false)
     @Column(name = "observacion")
     private String observacion;
+    
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "subtotal")
     private BigDecimal subtotal;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "iva")
     private BigDecimal iva;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "total")
     private BigDecimal total;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "pais")
     private String pais;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "estado")
     private String estado;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 0, max = 30)
     @Column(name = "municipio")
     private String municipio;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 0, max = 30)
     @Column(name = "ciudad")
     private String ciudad;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 0, max = 30)
     @Column(name = "colonia")
     private String colonia;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 5)
     @Column(name = "cp")
     private String cp;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 75)
     @Column(name = "calle")
     private String calle;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "num_ext")
     private String numExt;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 0, max = 50)
     @Column(name = "num_int")
     private String numInt;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 0, max = 10)
     @Column(name = "telefono")
     private String telefono;
+    
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     @Size(max = 10)
     @Column(name = "fax")
     private String fax;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "porcentaje_iva")
     private BigDecimal porcentajeIva;
+    
     @Size(max = 30)
     @Column(name = "numero_cliente")
     private String numeroCliente;
+    
     @Column(name = "valor_declarado")
     private BigDecimal valorDeclarado;
+    
     @Column(name = "inicio_servicios")
     @Temporal(TemporalType.DATE)
     private Date inicioServicios;
+    
     @Column(name = "fin_servicios")
     @Temporal(TemporalType.DATE)
     private Date finServicios;
+    
     @Size(max = 255)
     @Column(name = "monto_letra")
     private String montoLetra;
+    
     @JoinColumn(name = "tipo_facturacion", referencedColumnName = "ID")
     @ManyToOne
     private TipoFacturacion tipoFacturacion;
+    
     @JoinColumn(name = "planta", referencedColumnName = "PLANTA_CVE")
     @ManyToOne
     private Planta planta;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "plazo")
     private int plazo;
+    
     @Column(name = "retencion")
     private BigDecimal retencion;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 5)
     @Column(name = "nom_serie")
     private String nomSerie;
+    
     @JoinColumn(name = "cliente", referencedColumnName = "CTE_CVE")
     @ManyToOne
     private Cliente cliente;
+    
     @JoinColumn(name = "status", referencedColumnName = "id")
     @ManyToOne
     private StatusFactura status;
+    
     @Size(max = 5)
     @Column(name = "metodo_pago")
     private String metodoPago;
+    
     @Size(max = 1)
     @Column(name = "tp_persona")
     private String tipoPersona;    
+    
     @Size(max = 5)
     @Column(name = "cd_regimen")
     private String cdRegimen;
+    
     @Size(max = 5)
     @Column(name = "cd_uso_cfdi")
     private String cdUsoCfdi;
+    
     @Size(max = 50)
     @Column(name = "uuid")
     private String uuid;
+    
     @Size(max = 80)
     @Column(name = "emi_nombre")
     private String emisorNombre;
+    
     @Size(max = 14)
     @Column(name = "emi_rfc")
     private String emisorRFC;
+    
     @Size(max = 5)
     @Column(name = "emi_cd_regimen")
     private String emisorCdRegimen;
     
-//    @OneToOne(mappedBy = "factura", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-//    private CancelaFactura cancelaFactura;
-    
-    @OneToMany(mappedBy = "facturaId")
-    private List<ChequeDevuelto> chequeDevueltoList;
-    
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "factura")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, mappedBy = "factura")
     private List<Pago> pagoList;
     
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "factura")
@@ -257,14 +293,11 @@ public class Factura implements Serializable {
     @OneToMany(cascade = {CascadeType.PERSIST}, mappedBy = "factura")
     private List<ServicioFactura> servicioFacturaList;
     
-    @OneToMany(cascade = {CascadeType.PERSIST},mappedBy = "factura")//MODIFIQUE 1 JUNIO
+    @OneToMany(cascade = {CascadeType.PERSIST},mappedBy = "factura")
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
     
-    @OneToMany(cascade = {CascadeType.PERSIST},mappedBy = "factura")//MODIFIQUE 1 JUNIO
+    @OneToMany(cascade = {CascadeType.PERSIST},mappedBy = "factura")
     private List<ConstanciaFactura> constanciaFacturaList;
-    
-    @OneToMany(mappedBy = "factura")
-    private List<ConstanciaFacturaCmp> constanciaFacturaCmpList;
     
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "notaPorFacturaPK.factura")
     private List<NotaPorFactura> notaFacturaList;
@@ -598,14 +631,6 @@ public class Factura implements Serializable {
         this.status = status;
     }
 
-    public List<ChequeDevuelto> getChequeDevueltoList() {
-        return chequeDevueltoList;
-    }
-
-    public void setChequeDevueltoList(List<ChequeDevuelto> chequeDevueltoList) {
-        this.chequeDevueltoList = chequeDevueltoList;
-    }
-
     public String getMetodoPago() {
 		return metodoPago;
 	}
@@ -710,14 +735,6 @@ public class Factura implements Serializable {
         this.constanciaFacturaList = constanciaFacturaList;
     }
 
-    public List<ConstanciaFacturaCmp> getConstanciaFacturaCmpList() {
-        return constanciaFacturaCmpList;
-    }
-
-    public void setConstanciaFacturaCmpList(List<ConstanciaFacturaCmp> constanciaFacturaCmpList) {
-        this.constanciaFacturaCmpList = constanciaFacturaCmpList;
-    }
-
     public List<NotaPorFactura> getNotaFacturaList() {
 		return notaFacturaList;
 	}
@@ -750,12 +767,4 @@ public class Factura implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
     }
-
-//	public CancelaFactura getCancelaFactura() {
-//		return cancelaFactura;
-//	}
-//
-//	public void setCancelaFactura(CancelaFactura cancelaFactura) {
-//		this.cancelaFactura = cancelaFactura;
-//	}
 }

@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteInventarioEntradas" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b1d23060-936c-4bd9-a427-94b0e5decc5d">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="173"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="820"/>
 	<parameter name="FechaIni" class="java.util.Date"/>
@@ -41,14 +41,15 @@
 	plt.planta_abrev AS planta,
 	cam.camara_cve,
 	cam.camara_abrev AS camara
-FROM PARTIDA p INNER JOIN CONSTANCIA_DE_DEPOSITO cdd ON cdd.folio = p.folio
-INNER JOIN CLIENTE c ON c.cte_cve = cdd.cte_cve
-INNER JOIN DETALLE_PARTIDA dp ON dp.partida_cve = p.partida_cve AND dp.DET_PART_CVE = 1
-INNER JOIN UNIDAD_DE_PRODUCTO udp ON udp.unidad_de_producto_cve = p.unidad_de_producto_cve
-INNER JOIN UNIDAD_DE_MANEJO udm ON udm.unidad_de_manejo_cve = udp.UNIDAD_DE_MANEJO_CVE
-INNER JOIN PRODUCTO prd ON prd.producto_cve = udp.producto_cve
-INNER JOIN CAMARA cam ON cam.camara_cve = p.camara_cve
-INNER JOIN PLANTA plt ON cam.planta_cve = plt.planta_cve
+FROM partida p
+INNER JOIN constancia_de_deposito cdd ON cdd.folio = p.folio
+INNER JOIN cliente c ON c.cte_cve = cdd.cte_cve
+INNER JOIN detalle_partida dp ON dp.partida_cve = p.partida_cve AND dp.DET_PART_CVE = 1
+INNER JOIN unidad_de_producto udp ON udp.unidad_de_producto_cve = p.unidad_de_producto_cve
+INNER JOIN unidad_de_manejo udm ON udm.unidad_de_manejo_cve = udp.UNIDAD_DE_MANEJO_CVE
+INNER JOIN producto prd ON prd.producto_cve = udp.producto_cve
+INNER JOIN camara cam ON cam.camara_cve = p.camara_cve
+INNER JOIN planta plt ON cam.planta_cve = plt.planta_cve
 WHERE cdd.FECHA_INGRESO BETWEEN $P{FechaIni} AND $P{FechaFin}
 	AND (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
 	AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL)
@@ -483,8 +484,8 @@ ORDER BY
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center">
-					<font fontName="SansSerif" size="12" isBold="true"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[REPORTE DE ENTRADAS]]></text>
 			</staticText>

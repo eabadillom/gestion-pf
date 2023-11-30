@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.CancelaNotaCredito;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
@@ -108,10 +107,16 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.merge(pago);
-//			em.createQuery("UPDATE Pago as p set p.tipo.id = :tipoId , p.banco.id = :bancoId where p.id = :id")
-//					.setParameter("tipoId", e.getTipo().getId()).setParameter("bancoId", e.getBanco().getId())
-//					.setParameter("id", e.getId()).executeUpdate();
+//			em.merge(pago);
+			em.createNativeQuery("UPDATE pago SET factura = :idFactura, tipo = :idTipo, monto= :monto, fecha = :fecha, banco = :idBanco, referencia = :referencia WHERE id = :idPago")
+					.setParameter("idFactura", pago.getFactura().getId())
+					.setParameter("idTipo", pago.getTipo().getId())
+					.setParameter("monto", pago.getMonto())
+					.setParameter("fecha", pago.getFecha())
+					.setParameter("idBanco", pago.getBanco().getId())
+					.setParameter("referencia", pago.getReferencia())
+					.setParameter("idPago", pago.getId())
+					.executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception ex) {

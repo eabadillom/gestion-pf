@@ -101,7 +101,7 @@ public class ConstanciaServicioBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-		listaClientes = clienteDao.buscarTodos();
+		listaClientes = clienteDao.buscarHabilitados(true);
 		listaEstadosConstancias = ecDAO.buscarTodos();
 		fechaInicio = new Date();
 		fechaFinal = new Date();
@@ -138,6 +138,35 @@ public class ConstanciaServicioBean implements Serializable{
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
+			PrimeFaces.current().ajax().update("form:messages","form:dlg-constancia", "form:dlg-partidas", "form:dlg-servicios");
+		}
+	}
+	
+	public void guardaDetalle() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Constancia de servicio...";
+		
+		String response = null;
+		
+		try {
+			response = constanciaServicioDAO.actualizar(this.seleccion);
+			log.debug("Respuesta del DAO: {}", response);
+			if(response != null )
+				throw new InventarioException("Problema para guardar la constancia de servicio...");
+			
+			mensaje = "La constancia se actualizó correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			
+			PrimeFaces.current().executeScript("PF('dlg-constancia').hide()");
+		} catch (Exception ex) {
+			log.error("Problema para cargar la información de la constancia...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages","form:dlg-constancia", "form:dlg-partidas", "form:dlg-servicios");
 		}
 	}

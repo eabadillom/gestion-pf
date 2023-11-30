@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "DOMICILIOS")
+@Table(name = "domicilios")
 @NamedQueries({
     @NamedQuery(name = "Domicilios.findAll", query = "SELECT d FROM Domicilios d"),
     @NamedQuery(name = "Domicilios.findByDomCve", query = "SELECT d FROM Domicilios d WHERE d.domCve = :domCve"),

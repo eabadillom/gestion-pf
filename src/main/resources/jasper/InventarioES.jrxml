@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioES" pageWidth="1300" pageHeight="612" columnWidth="1210" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="80904bf0-15c1-4ab7-835f-6ce082355124">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -20,9 +20,7 @@
 	</parameter>
 	<queryString>
 		<![CDATA[select * from (
-
 SELECT
-
     p.PARTIDA_CVE,
     1 as tp_mov,
     cdd.cte_cve,
@@ -38,61 +36,37 @@ SELECT
     p.cantidad_total - COALESCE (p.cantidad_total,0) as cantidad,
     udm.unidad_de_manejo_ds as unidad_manejo,
     prd.producto_ds
-    
-FROM CONSTANCIA_DE_DEPOSITO cdd
-
-INNER JOIN CLIENTE c ON c.CTE_CVE = cdd.CTE_CVE
-INNER JOIN PARTIDA p ON p.folio = cdd.folio
-INNER JOIN DETALLE_PARTIDA dp ON p.partida_cve = dp.partida_cve AND det_part_cve = 1
-INNER JOIN UNIDAD_DE_PRODUCTO udp ON p.unidad_de_producto_cve = udp.unidad_de_producto_cve
-INNER JOIN PRODUCTO prd ON udp.producto_cve = prd.producto_cve
-INNER JOIN UNIDAD_DE_MANEJO udm ON udp.unidad_de_manejo_cve = udm.unidad_de_manejo_cve
+FROM constancia_de_deposito cdd
+INNER JOIN cliente c ON c.CTE_CVE = cdd.CTE_CVE
+INNER JOIN partida p ON p.folio = cdd.folio
+INNER JOIN detalle_partida dp ON p.partida_cve = dp.partida_cve AND det_part_cve = 1
+INNER JOIN unidad_de_producto udp ON p.unidad_de_producto_cve = udp.unidad_de_producto_cve
+INNER JOIN producto prd ON udp.producto_cve = prd.producto_cve
+INNER JOIN unidad_de_manejo udm ON udp.unidad_de_manejo_cve = udm.unidad_de_manejo_cve
 INNER JOIN aviso a ON cdd.aviso_cve = a.aviso_cve
 LEFT OUTER JOIN
-
     (SELECT
-
         dcs.partida_cve,
-
         MAX(cs.fecha) as fecha_ult_sal,
-
         SUM(dcs.peso) ,
-
         'Kilogramo' as unidad_peso,
-
         SUM(dcs.cantidad),
-
         dcs.unidad as unidad_manejo
-
-     FROM CONSTANCIA_SALIDA cs
-
-     INNER JOIN CLIENTE c ON cs.cliente_cve = c.cte_cve
-
-     INNER JOIN DETALLE_CONSTANCIA_SALIDA dcs
-
+     FROM constancia_salida cs
+     INNER JOIN cliente c ON cs.cliente_cve = c.cte_cve
+     INNER JOIN detalle_constancia_salida dcs
         ON cs.id = dcs.constancia_cve
-
      WHERE cs.status = 1
-
 	AND (c.CTE_CVE = $P{idCliente} or $P{idCliente} IS NULL)
     AND cs.fecha < $P{fechaInicio}
-
      GROUP BY dcs.PARTIDA_CVE, dcs.UNIDAD ) T0
-
     ON p.partida_cve = p.partida_cve
-
 WHERE cdd.aviso_cve IS NOT NULL
-
     AND (CANTIDAD_TOTAL > 0) 
     AND (c.CTE_CVE = $P{idCliente} OR $P{idCliente} IS NULL)
     AND cdd.fecha_ingreso < $P{fechaInicio}
-
-
 UNION ALL
-
-
 SELECT 
-
     p.PARTIDA_CVE,
     2 as tp_mov,
     cdd.cte_cve,
@@ -108,87 +82,46 @@ SELECT
     p.CANTIDAD_TOTAL,
     udm.unidad_de_manejo_ds as unidad_manejo,
     prd.producto_ds
-
-from CONSTANCIA_DE_DEPOSITO cdd
-
-INNER JOIN CLIENTE c ON c.cte_cve = cdd.cte_cve
-
-INNER JOIN PARTIDA p ON cdd.FOLIO = p.FOLIO
-
-INNER JOIN UNIDAD_DE_PRODUCTO udp ON p.unidad_de_producto_cve = udp.unidad_de_producto_cve
-
-INNER JOIN PRODUCTO prd ON udp.producto_cve = prd.producto_cve
-
-INNER JOIN UNIDAD_DE_MANEJO udm ON udp.unidad_de_manejo_cve = udm.unidad_de_manejo_cve
-
+from constancia_de_deposito cdd
+INNER JOIN cliente c ON c.cte_cve = cdd.cte_cve
+INNER JOIN partida p ON cdd.FOLIO = p.FOLIO
+INNER JOIN unidad_de_producto udp ON p.unidad_de_producto_cve = udp.unidad_de_producto_cve
+INNER JOIN producto prd ON udp.producto_cve = prd.producto_cve
+INNER JOIN unidad_de_manejo udm ON udp.unidad_de_manejo_cve = udm.unidad_de_manejo_cve
 WHERE cdd.aviso_cve IS NOT NULL
-
     AND (CANTIDAD_TOTAL > 0)
-
     AND (c.CTE_CVE = $P{idCliente} OR $P{idCliente} IS NULL)
-
     AND cdd.fecha_ingreso >= $P{fechaInicio}
-
     AND cdd.fecha_ingreso <= $P{fechaFin}
-
-
 
 union all
 
-
 SELECT
-
     dcs.PARTIDA_CVE,
-
     3 as tp_mov,
-
     cs.cliente_cve,
-
     c.CTE_RFC,
-
     c.numero_cte,
-
     c.CTE_NOMBRE,
-
     p.FOLIO,
-
     cs.NUMERO as folio_cliente,
-
     cs.FECHA,
-
     cs.status,
-
     dcs.PESO,
-
     'Kilogramo' as unidad_peso,
-
     dcs.CANTIDAD,
-
     dcs.UNIDAD,
-
     dcs.PRODUCTO
-
-FROM CONSTANCIA_SALIDA cs
-
-INNER JOIN CLIENTE c ON cs.cliente_cve = c.cte_cve
-
-INNER JOIN DETALLE_CONSTANCIA_SALIDA dcs ON cs.id = dcs.constancia_cve
-
-INNER JOIN PARTIDA p ON p.PARTIDA_CVE = dcs.PARTIDA_CVE
-
+FROM constancia_salida cs
+INNER JOIN cliente c ON cs.cliente_cve = c.cte_cve
+INNER JOIN detalle_constancia_salida dcs ON cs.id = dcs.constancia_cve
+INNER JOIN partida p ON p.PARTIDA_CVE = dcs.PARTIDA_CVE
 WHERE
-
     cs.status = 1 and
-
     (c.CTE_CVE = $P{idCliente} OR $P{idCliente} IS NULL) 
-
     AND FECHA >= $P{fechaInicio} 
-
  	AND   FECHA <= $P{fechaFin}
-
-
 ) t
-
 ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 	</queryString>
 	<field name="PARTIDA_CVE" class="java.lang.Integer">
@@ -289,7 +222,7 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center">
-					<font fontName="SansSerif" size="14" isBold="false"/>
+					<font fontName="SansSerif" size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[REPORTE DE INVENTARIO - ENTRADAS VS SALIDAS]]></text>
 			</staticText>
@@ -322,7 +255,7 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 				<textFieldExpression><![CDATA[$P{fechaFin}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement x="0" y="0" width="140" height="57" uuid="cf04adda-c1a8-45b3-9533-15930cf57d3d"/>
+				<reportElement x="0" y="0" width="190" height="57" uuid="cf04adda-c1a8-45b3-9533-15930cf57d3d"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 		</band>
@@ -747,9 +680,9 @@ ORDER BY CTE_NOMBRE, folio, PARTIDA_CVE, fecha]]>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center">
-					<font fontName="SansSerif" size="14" isBold="false"/>
+					<font fontName="SansSerif" size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[REPORTE DE INVENTARIO]]></text>
+				<text><![CDATA[REPORTE DE INVENTARIO - ENTRADAS VS SALIDAS]]></text>
 			</staticText>
 			<image>
 				<reportElement x="0" y="0" width="120" height="50" uuid="e5e3bace-6372-42b9-8435-5845c4fc5200"/>

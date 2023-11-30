@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DomPorCliente" pageWidth="960" pageHeight="612" columnWidth="900" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="b4fb066c-e7d8-4940-bcac-00f682040c09">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -17,170 +17,122 @@
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT
-
-    CLIENTE.numero_cte,
-
-    CLIENTE.cte_nombre,
-
-    CLIENTE.cte_rfc,
-
-    DOMICILIOS.dom_cve,
-
-    DOMICILIOS.domicilio_colonia,
-
-    DOMICILIOS.domicilio_calle,
-
-    DOMICILIOS.domicilio_num_ext,
-
-    DOMICILIOS.domicilio_num_int,
-
-    DOMICILIOS.domicilio_tel1,
-
-    DOMICILIOS.domicilio_tel2,
-
-    DOMICILIOS.domicilio_fax,
-
-    DOMICILIOS.domicilio_cp,
-
+    cliente.numero_cte,
+    cliente.cte_nombre,
+    cliente.cte_rfc,
+    domicilios.dom_cve,
+    domicilios.domicilio_colonia,
+    domicilios.domicilio_calle,
+    domicilios.domicilio_num_ext,
+    domicilios.domicilio_num_int,
+    domicilios.domicilio_tel1,
+    domicilios.domicilio_tel2,
+    domicilios.domicilio_fax,
+    domicilios.domicilio_cp,
     paises.pais_desc,
-
     estados.estado_desc,
-
     municipios.municipio_ds,
-
     ciudades.ciudad_ds,
-
     tipoasntmnto_ds,
-
     asentamiento_humano.asentamiento_ds,
-
     asentamiento_humano.cp
-
 FROM
-
-    CLIENTE INNER JOIN CLIENTE_DOMICILIOS ON CLIENTE_DOMICILIOS.cte_cve = CLIENTE.cte_cve
-
-    INNER JOIN DOMICILIOS ON DOMICILIOS.domicilio_tipo_cve = CLIENTE_DOMICILIOS.domicilio_tipo_cve AND DOMICILIOS.dom_cve = CLIENTE_DOMICILIOS.dom_cve
-
-    INNER JOIN paises ON DOMICILIOS.pais_cve = paises.pais_cve
-
+	cliente INNER JOIN cliente_domicilios ON cliente_domicilios.cte_cve = cliente.cte_cve
+    INNER JOIN domicilios ON domicilios.domicilio_tipo_cve = cliente_domicilios.domicilio_tipo_cve AND domicilios.dom_cve = cliente_domicilios.dom_cve
+    INNER JOIN paises ON domicilios.pais_cve = paises.pais_cve
     INNER JOIN estados ON estados.pais_cve = paises.pais_cve
-
     INNER JOIN municipios ON municipios.pais_cve = estados.pais_cve AND municipios.estado_cve = estados.estado_cve
-
     INNER JOIN ciudades ON
-
         ciudades.pais_cve = municipios.pais_cve 
-
         AND ciudades.estado_cve = municipios.estado_cve
-
         AND ciudades.municipio_cve = municipios.municipio_cve
-
-        AND ciudades.pais_cve = DOMICILIOS.pais_cve
-
-        AND ciudades.estado_cve = DOMICILIOS.estado_cve
-
-        AND ciudades.municipio_cve = DOMICILIOS.municipio_cve
-
-        AND ciudades.ciudad_cve = DOMICILIOS.ciudad_cve
-
+        AND ciudades.pais_cve = domicilios.pais_cve
+        AND ciudades.estado_cve = domicilios.estado_cve
+        AND ciudades.municipio_cve = domicilios.municipio_cve
+        AND ciudades.ciudad_cve = domicilios.ciudad_cve
     INNER JOIN asentamiento_humano
-
         ON ciudades.pais_cve = asentamiento_humano.pais_cve
-
         AND ciudades.estado_cve = asentamiento_humano.estado_cve
-
         AND ciudades.municipio_cve = asentamiento_humano.municipio_cve
-
         AND ciudades.ciudad_cve = asentamiento_humano.ciudad_cve
-
-        AND asentamiento_humano.pais_cve = DOMICILIOS.pais_cve
-
-        AND asentamiento_humano.estado_cve = DOMICILIOS.estado_cve
-
-        AND asentamiento_humano.municipio_cve = DOMICILIOS.municipio_cve
-
-        AND asentamiento_humano.ciudad_cve = DOMICILIOS.ciudad_cve
-
-        AND asentamiento_humano.asentamiento_cve = DOMICILIOS.domicilio_colonia
-
+        AND asentamiento_humano.pais_cve = domicilios.pais_cve
+        AND asentamiento_humano.estado_cve = domicilios.estado_cve
+        AND asentamiento_humano.municipio_cve = domicilios.municipio_cve
+        AND asentamiento_humano.ciudad_cve = domicilios.ciudad_cve
+        AND asentamiento_humano.asentamiento_cve = domicilios.domicilio_colonia
         AND asentamiento_humano.pais_cve = estados.pais_cve
-
         AND asentamiento_humano.estado_cve = estados.estado_cve
-
         AND asentamiento_humano.pais_cve = municipios.pais_cve
-
         AND asentamiento_humano.estado_cve = municipios.estado_cve
-
         AND asentamiento_humano.municipio_cve = municipios.municipio_cve
-
         AND asentamiento_humano.pais_cve = paises.pais_cve
-
     INNER JOIN tipo_asentamiento
-
         ON asentamiento_humano.tipoasntmnto_cve = tipo_asentamiento.tipoasntmnto_cve
+ORDER BY cliente.cte_nombre
 
-ORDER BY CLIENTE.cte_nombre]]>
+
+
+]]>
 	</queryString>
 	<field name="numero_cte" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cte"/>
 		<property name="com.jaspersoft.studio.field.label" value="numero_cte"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="cte_nombre" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
 		<property name="com.jaspersoft.studio.field.label" value="cte_nombre"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="cte_rfc" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_RFC"/>
 		<property name="com.jaspersoft.studio.field.label" value="cte_rfc"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="dom_cve" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="dom_cve"/>
 		<property name="com.jaspersoft.studio.field.label" value="dom_cve"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_colonia" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_colonia"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_colonia"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_calle" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_calle"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_calle"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_num_ext" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_num_ext"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_num_ext"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_num_int" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_num_int"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_num_int"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_tel1" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_tel1"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_tel1"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_tel2" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_tel2"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_tel2"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_fax" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_fax"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_fax"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_cp" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_cp"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_cp"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DOMICILIOS"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="pais_desc" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="pais_desc"/>
@@ -229,7 +181,7 @@ ORDER BY CLIENTE.cte_nombre]]>
 					<textFieldExpression><![CDATA[$F{cte_nombre}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement mode="Opaque" x="0" y="0" width="69" height="24" forecolor="#2196F3" uuid="c0e53adc-c7cc-4962-8fd9-ab8888114571"/>
+					<reportElement mode="Transparent" x="0" y="0" width="69" height="24" forecolor="#2196F3" uuid="c0e53adc-c7cc-4962-8fd9-ab8888114571"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="12" isBold="true"/>
 					</textElement>
@@ -242,7 +194,7 @@ ORDER BY CLIENTE.cte_nombre]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="79" splitType="Stretch">
+		<band height="51" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="870" height="21" forecolor="#2196F3" uuid="539764c3-88bf-4ea9-8744-d19f28fb66f1">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -255,7 +207,7 @@ ORDER BY CLIENTE.cte_nombre]]>
 				<text><![CDATA[REPORTE DOMICILIO POR CLIENTE]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="170" height="79" uuid="4ff73eda-f1d3-4f27-a7aa-89fa8979d388"/>
+				<reportElement x="0" y="0" width="170" height="50" uuid="4ff73eda-f1d3-4f27-a7aa-89fa8979d388"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 		</band>

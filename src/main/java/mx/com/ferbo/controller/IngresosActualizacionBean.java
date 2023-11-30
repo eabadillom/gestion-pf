@@ -42,7 +42,7 @@ public class IngresosActualizacionBean implements Serializable{
 	private Date startDate;
 	private Date endDate;	
 	
-	private PagoDAO pagofactDAO;
+	private PagoDAO pagoDAO;
 	private ClienteDAO clienteDAO;
 	private TipoPagoDAO tipoPagoDAO;
 	private BancoDAO bancoDAO;
@@ -61,6 +61,8 @@ public class IngresosActualizacionBean implements Serializable{
 	private Pago pagoSelected;
 	private Cliente cteSelect;
 	
+	private BigDecimal totalPagos;
+	
 	public IngresosActualizacionBean() {
 		listaPago = new ArrayList<Pago>();
 		listaCtes = new ArrayList<Cliente>();
@@ -75,7 +77,7 @@ public class IngresosActualizacionBean implements Serializable{
 	public void init(){
 		
 		clienteDAO = new ClienteDAO();
-		pagofactDAO = new PagoDAO();
+		pagoDAO = new PagoDAO();
 		tipoPagoDAO = new TipoPagoDAO();
 		bancoDAO = new BancoDAO();
 		sfDAO = new StatusFacturaDAO();
@@ -92,6 +94,18 @@ public class IngresosActualizacionBean implements Serializable{
 		statusPagoParcial = sfDAO.buscarPorId(StatusFactura.STATUS_PAGO_PARCIAL);
 	}
 	
+	public void filtraPagos() {
+		listaPago = pagoDAO.buscaPorClienteFechas(cteSelect, startDate, endDate);
+		this.totalPagos = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		for(Pago pago : listaPago) {
+			this.totalPagos = this.totalPagos.add(pago.getMonto());
+		}
+	}
+	
+	public void cargaInfoPago() {
+		log.debug("Pago: {}", this.pagoSelected);
+	}
+	
 	
 	public void updatePago() {
 		String messages = null;
@@ -106,12 +120,12 @@ public class IngresosActualizacionBean implements Serializable{
 		try {
 			log.debug("Pago: {}", pagoSelected);
 			
-			respuesta = pagofactDAO.actualizar(pagoSelected);
+			respuesta = pagoDAO.actualizar(pagoSelected);
 			if(respuesta != null) {
 				throw new InventarioException("Ocurrió un problema al actualizar el pago.");
 			}
 			
-			pago = pagofactDAO.buscarPorId(this.pagoSelected.getId(), true);
+			pago = pagoDAO.buscarPorId(this.pagoSelected.getId(), true);
 			factura = pago.getFactura();
 			saldo = factura.getTotal();
 			
@@ -130,9 +144,9 @@ public class IngresosActualizacionBean implements Serializable{
 				throw new InventarioException(msg);
 			}
 			
-			facturaDAO.actualizar(factura);
+			facturaDAO.actualizaStatus(factura);
 			
-			listaPago = pagofactDAO.buscaPorClienteFechas(cteSelect, startDate, endDate);
+			listaPago = pagoDAO.buscaPorClienteFechas(cteSelect, startDate, endDate);
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			messages = "El pago se actualizó correctamente.";
@@ -165,10 +179,10 @@ public class IngresosActualizacionBean implements Serializable{
 		
 		try {
 			
-			pago = pagofactDAO.buscarPorId(this.pagoSelected.getId(), true);
+			pago = pagoDAO.buscarPorId(this.pagoSelected.getId(), true);
 			idFactura = pago.getFactura().getId();
 			
-			respuesta = pagofactDAO.eliminar(pagoSelected);
+			respuesta = pagoDAO.eliminar(pagoSelected);
 			
 			if(respuesta != null) {
 				log.error("Problema al eliminar el pago " + respuesta);
@@ -218,12 +232,6 @@ public class IngresosActualizacionBean implements Serializable{
 		}
 	}
 	
-	public void filtraPagos() {
-		
-		listaPago = pagofactDAO.buscaPorClienteFechas(cteSelect, startDate, endDate);
-		
-	}
-
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -286,6 +294,14 @@ public class IngresosActualizacionBean implements Serializable{
 
 	public void setListaBancos(List<Bancos> listaBancos) {
 		this.listaBancos = listaBancos;
+	}
+
+	public BigDecimal getTotalPagos() {
+		return totalPagos;
+	}
+
+	public void setTotalPagos(BigDecimal totalPagos) {
+		this.totalPagos = totalPagos;
 	}
 	
 	

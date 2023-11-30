@@ -49,7 +49,9 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 		try {
 			
 			em = EntityManagerUtil.getEntityManager();
-			lista = em.createNamedQuery("SerieConstancia.findByIdCliente",SerieConstancia.class).setParameter("idCliente", serie.getIdCliente()).getResultList();
+			lista = em.createNamedQuery("SerieConstancia.findByIdCliente",SerieConstancia.class)
+					.setParameter("idCliente", serie.getCliente().getCteCve())
+					.getResultList();
 			
 		} catch (Exception e2) {
 			log.error("Problema no encuentra registros por criterios",e2);

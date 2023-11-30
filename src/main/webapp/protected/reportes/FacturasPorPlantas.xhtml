@@ -9,34 +9,20 @@
 
     <ui:define name="content">
         <h:form id="form">
-        <p:breadCrumb>
-            <p:menuitem value="Home" outcome="/dashboard"/>
-            <p:menuitem value="Reportes"/>
-            <p:menuitem value="Facturacion"/>
-            <p:menuitem value="Facturas por Plantas" outcome="/protected/reportes/FacturasPorPlantas"/>
-        </p:breadCrumb>
+			<p:growl id="messages" showDetail="true" />
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
                     <div class="card">
-                        <p:growl id="messages" showDetail="true" />
-                        
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteFacturacionPorPlantaBean.fecha}" />
-						
 						 <p:fieldset legend="Rangos de fechas">
-			              
 			               <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionPorPlantaBean.fecha_ini}"  maxdate="#{reporteFacturacionPorPlantaBean.maxDate}" readonlyInput="true"/>
+			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionPorPlantaBean.fecha_ini}"  maxdate="#{reporteFacturacionPorPlantaBean.maxDate}" readonlyInput="true" showIcon="true"/>
 			                <p:outputLabel for="minmax1" value="Fecha de inicio "/>
 						</span>
-						
 						 <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax2" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionPorPlantaBean.fecha_fin}"  maxdate="#{reporteFacturacionPorPlantaBean.maxDate}" readonlyInput="true"/>
+			                <p:datePicker id="minmax2" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionPorPlantaBean.fecha_fin}"  maxdate="#{reporteFacturacionPorPlantaBean.maxDate}" readonlyInput="true" showIcon="true"/>
 			                <p:outputLabel for="minmax2" value="Fecha  final "/>
 						</span>
-           				 
-
 							</p:fieldset>
-		         	   
                         <p:fieldset legend="Datos del emisor/receptor">
                        			 <span class="ui-float-label ui-input-icon-left">
 									<p:selectOneMenu id="Cliente" value="#{reporteFacturacionPorPlantaBean.clienteSelect}" converter="entityConverter" >
