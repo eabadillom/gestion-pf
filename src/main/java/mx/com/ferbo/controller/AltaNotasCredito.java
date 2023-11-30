@@ -309,7 +309,7 @@ public class AltaNotasCredito implements Serializable{
 			domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
 			
 			
-			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual()));
+			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual() + 1));
 			notaCredito.setIdcliente(clienteSelect.getCteCve());
 			notaCredito.setCliente(clienteSelect.getCteNombre());
 			notaCredito.setDomicilio(domicilio);
