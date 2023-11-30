@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteEstadoCuentaCliente" pageWidth="570" pageHeight="842" columnWidth="480" leftMargin="45" rightMargin="45" topMargin="20" bottomMargin="20" uuid="234620c9-9a98-474b-8956-a5b21d4cc43d">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[new String ("resources/logo_square.gif")]]></defaultValueExpression>
 	</parameter>
@@ -12,7 +12,6 @@
 	<parameter name="idCliente" class="java.lang.Integer"/>
 	<queryString language="SQL">
 		<![CDATA[select
-
 	f.numero_cliente,
 	f.nombre_cliente,
 	f.numero,
@@ -20,21 +19,15 @@
 	f.fecha AS fecha_pago,
 	f.total AS aPagar,
 	'Por Cobrar' AS f_status
-
 FROM factura f
-INNER JOIN CLIENTE c ON c.cte_cve = f.cliente
+INNER JOIN cliente c ON c.cte_cve = f.cliente
 LEFT OUTER JOIN pago p ON f.id = p.factura
-
 WHERE f.id NOT IN(SELECT p.factura FROM pago p WHERE p.fecha <= $P{fecha})
 AND f.status NOT IN ('0','2')
 AND f.fecha <= $P{fecha}
 AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 UNION
-
-
 SELECT * FROM (
-
 SELECT
 	f.numero_cliente,
 	f.nombre_cliente,
@@ -43,22 +36,14 @@ SELECT
 	f.fecha AS fecha_pago,
 	(f.total - p.monto) AS aPagar,
 	'Pago Parcial' AS f_status
-
 FROM factura f
-
 INNER JOIN (
-
 	SELECT pago.factura, sum(pago.monto) as monto FROM pago WHERE pago.fecha <= $P{fecha} GROUP BY pago.factura
-
 ) p ON p.factura = f.id
-
 WHERE p.factura IN(SELECT factura.id FROM factura WHERE factura.fecha <= $P{fecha})
 AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 ) t
-
 WHERE t.aPagar > 0
-
 ORDER BY 2, 1, 3]]>
 	</queryString>
 	<field name="numero_cliente" class="java.lang.String">
@@ -99,7 +84,7 @@ ORDER BY 2, 1, 3]]>
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
-					<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
@@ -118,32 +103,32 @@ ORDER BY 2, 1, 3]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="85" splitType="Stretch">
+		<band height="42" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement x="109" y="20" width="270" height="21" forecolor="#2196F3" uuid="30503f40-3802-4b2f-af8e-687f33eacd87">
+				<reportElement x="109" y="0" width="371" height="21" forecolor="#2196F3" uuid="30503f40-3802-4b2f-af8e-687f33eacd87">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/>
+					<font fontName="SansSerif" size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[REPORTE ESTADO DE CUENTA POR CLIENTE]]></text>
 			</staticText>
 			<image hAlign="Left" vAlign="Middle">
-				<reportElement x="0" y="0" width="109" height="80" uuid="4c1284ca-f2e8-468f-9211-d178258ad14a"/>
+				<reportElement x="0" y="0" width="109" height="42" uuid="4c1284ca-f2e8-468f-9211-d178258ad14a"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="109" y="41" width="140" height="12" uuid="55275fc5-164b-4d36-a1ed-42c936b99d02"/>
+				<reportElement x="109" y="21" width="140" height="12" uuid="55275fc5-164b-4d36-a1ed-42c936b99d02"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[del dia]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="249" y="41" width="130" height="12" uuid="c5a26db0-e53f-43a0-85ec-cc05264853dd"/>
+				<reportElement x="249" y="21" width="130" height="12" uuid="c5a26db0-e53f-43a0-85ec-cc05264853dd"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>

@@ -13,10 +13,7 @@ import javax.inject.Named;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.TipoPagoDAO;
-import mx.com.ferbo.dao.UnidadDeManejoDAO;
-import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.TipoPago;
-import mx.com.ferbo.model.UnidadDeManejo;
 
 @Named
 @ViewScoped
@@ -50,17 +47,17 @@ public class TipoPagoBean implements Serializable {
 		if (this.tipoPagoSelected.getId() == null) {
 			if (tipoPagoDao.guardar(tipoPagoSelected) == null) {
 				this.listaTipoPago.add(this.tipoPagoSelected);
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Unidad de Medida Agregada"));
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Tipo de pago agregado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", "Ocurrió un error al intentar guardar la Medida Agregada"));
 			}
 		} else {
 			if (tipoPagoDao.actualizar(tipoPagoSelected) == null) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Unidad de Medida Actualizado"));
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Tipo de pago actualizado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						"Error", "Ocurrió un error al intentar actualizar la Unidad de Medida"));
+						"Error", "Ocurrió un error al intentar actualizar el tipo de pago."));
 			}
 		}
 		PrimeFaces.current().executeScript("PF('nuevaTipoPagoDialog').hide()");
@@ -70,11 +67,11 @@ public class TipoPagoBean implements Serializable {
 	public void eliminandoTipoPago() {
 		if (tipoPagoDao.eliminar(tipoPagoSelected) == null) {
 			this.listaTipoPago.remove(this.tipoPagoSelected);
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Unidad de Medida Eliminada"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Tipo de pago eliminado"));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-tipoPago");
 		} else {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ocurrió un error al intentar eliminar la Unidad de Medida"));
+					"Ocurrió un error al intentar eliminar el tipo de pago."));
 		}
 		PrimeFaces.current().executeScript("PF('deleteUnidadMedidaDialog').hide()");
 		PrimeFaces.current().ajax().update("form:messages");
@@ -109,7 +106,7 @@ public class TipoPagoBean implements Serializable {
 	}
 
 	public void setTipoPagoDao(TipoPagoDAO TipoPagoDao) {
-		this.tipoPagoDao = tipoPagoDao;
+		this.tipoPagoDao = TipoPagoDao;
 	}
 	
 	

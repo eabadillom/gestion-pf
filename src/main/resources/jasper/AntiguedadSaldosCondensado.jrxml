@@ -11,7 +11,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<parameter name="fecha" class="java.util.Date"/>
 	<parameter name="imagen" class="java.lang.String"/>
 	<parameter name="idCliente" class="java.lang.Integer"/>
@@ -75,8 +75,8 @@
 		    	SELECT
 		    		nf.FACTURA,
 		    		sum(nf.CANTIDAD) as monto
-		    	FROM NOTA_CREDITO nc
-		    	INNER JOIN NOTA_X_FACTURAS nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
+		    	FROM nota_credito nc
+		    	INNER JOIN nota_x_facturas nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
 		    	WHERE nc.FECHA <= $P{fecha}
 		    	GROUP BY nf.FACTURA
 	    	) a
@@ -89,7 +89,16 @@
 	    ORDER BY fecha
     ) b WHERE b.saldo > 0
 )
-SELECT * FROM (
+SELECT
+	numero_cliente, nombre_cliente,
+	sum(saldo) as saldo,
+	sum(COALESCE(en_plazo, 0)) as en_plazo,
+	sum(COALESCE(d_8, 0)) as d_8,
+	sum(COALESCE(d_15, 0)) as d_15,
+	sum(COALESCE(d_30, 0)) as d_30,
+	sum(COALESCE(d_60, 0)) as d_60,
+	sum(COALESCE(md_60,0)) as md_60
+FROM (
 	SELECT
 		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
 		sum(saldo) as en_plazo,
@@ -186,6 +195,8 @@ SELECT * FROM (
 	WHERE cartera.dias > 60
 	GROUP BY numero_cliente, nombre_cliente
 ) x
+GROUP BY
+	numero_cliente, nombre_cliente
 ORDER BY x.nombre_cliente]]>
 	</queryString>
 	<field name="numero_cliente" class="java.lang.String">
@@ -440,46 +451,58 @@ ORDER BY x.nombre_cliente]]>
 				<textFieldExpression><![CDATA[$F{saldo}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="419" y="0" width="162" height="21" uuid="ec88fdd0-851e-4cb2-9b19-149dfa7b4642"/>
+				<reportElement x="419" y="0" width="162" height="21" uuid="ec88fdd0-851e-4cb2-9b19-149dfa7b4642">
+					<printWhenExpression><![CDATA[new Boolean($F{en_plazo}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{en_plazo}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="581" y="0" width="128" height="21" uuid="93dc4ffc-9286-4616-ac32-222eccd4ffe9"/>
+				<reportElement x="581" y="0" width="128" height="21" uuid="93dc4ffc-9286-4616-ac32-222eccd4ffe9">
+					<printWhenExpression><![CDATA[new Boolean($F{d_8}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{d_8}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="709" y="0" width="99" height="21" uuid="74f65ef6-69f4-4777-8840-ef1fc3aa9f7c"/>
+				<reportElement x="709" y="0" width="99" height="21" uuid="74f65ef6-69f4-4777-8840-ef1fc3aa9f7c">
+					<printWhenExpression><![CDATA[new Boolean($F{d_15}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{d_15}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="808" y="0" width="100" height="21" uuid="83994a14-f8b0-42ef-aeb5-568a4e123115"/>
+				<reportElement x="808" y="0" width="100" height="21" uuid="83994a14-f8b0-42ef-aeb5-568a4e123115">
+					<printWhenExpression><![CDATA[new Boolean($F{d_30}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{d_30}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="1008" y="0" width="142" height="21" uuid="192df768-cff3-4da5-b415-52a7490a6478"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{d_60}]]></textFieldExpression>
-			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="908" y="0" width="100" height="21" uuid="3fbdcd18-96a0-41b1-9571-d4536480761e"/>
+				<reportElement x="1008" y="0" width="142" height="21" uuid="192df768-cff3-4da5-b415-52a7490a6478">
+					<printWhenExpression><![CDATA[new Boolean($F{md_60}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{md_60}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+				<reportElement x="908" y="0" width="100" height="21" uuid="3fbdcd18-96a0-41b1-9571-d4536480761e">
+					<printWhenExpression><![CDATA[new Boolean($F{d_60}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{d_60}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight">
 				<reportElement x="0" y="0" width="280" height="21" uuid="12472f83-7fae-4fc7-b30a-4b02a9cfadb6"/>

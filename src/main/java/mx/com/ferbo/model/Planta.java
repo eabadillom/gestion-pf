@@ -25,7 +25,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "PLANTA")
+@Table(name = "planta")
 @NamedQueries({ @NamedQuery(name = "Planta.findAll", query = "SELECT p FROM Planta p"),
 		@NamedQuery(name = "Planta.findByPlantaCve", query = "SELECT p FROM Planta p WHERE p.plantaCve = :plantaCve"),
 		@NamedQuery(name = "Planta.findByPlantaDs", query = "SELECT p FROM Planta p WHERE p.plantaDs = :plantaDs"),

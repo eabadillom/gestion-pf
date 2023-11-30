@@ -224,7 +224,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			if(contador == listadoConstanciasSalidas.size()) {
 				SerieConstanciaPK seriePK = new SerieConstanciaPK();
 				
-				seriePK.setIdCliente(this.clienteSelect.getCteCve());
+				seriePK.setCliente(this.clienteSelect);
 				seriePK.setTpSerie("O");
 				serie = serieConstanciaDAO.buscarPorId(seriePK);
 
@@ -288,7 +288,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 				throw new InventarioException("Debe seleccionar una planta");
 			
 			seriePK = new SerieConstanciaPK();
-			seriePK.setIdCliente(this.clienteSelect.getCteCve());
+			seriePK.setCliente(this.clienteSelect);
 			seriePK.setTpSerie("O");
 			serie = serieConstanciaDAO.buscarPorId(seriePK);
 

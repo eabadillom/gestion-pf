@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteTraspaso" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fcaa7500-ce1f-4ca0-9768-460b64cc8f6d">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
 		<box>
 			<topPen lineWidth="0.5" lineColor="#000000"/>
@@ -61,28 +61,25 @@
 		</box>
 	</style>
 	<subDataset name="Dataset1" uuid="af5cfd3a-52a0-4f7b-9b7a-0bd89cd76b2d">
-		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 		<parameter name="FOLIO" class="java.lang.String">
 			<defaultValueExpression><![CDATA[$P{FOLIO}]]></defaultValueExpression>
 		</parameter>
 		<queryString>
-			<![CDATA[SELECT gestiondb.`CONSTANCIA_TRASPASO`.numero,
-	gestiondb.traspaso_servicio.servicio,
-	gestiondb.traspaso_servicio.cantidad,
-	gestiondb.traspaso_servicio.precio,
-	gestiondb.traspaso_servicio.subtotal
-FROM gestiondb.traspaso_servicio
-	INNER JOIN gestiondb.`CONSTANCIA_TRASPASO` ON 
-	 gestiondb.traspaso_servicio.traspaso = gestiondb.`CONSTANCIA_TRASPASO`.id 
-	 AND gestiondb.traspaso_servicio.traspaso = gestiondb.`CONSTANCIA_TRASPASO`.id 
-WHERE 
-	 gestiondb.`CONSTANCIA_TRASPASO`.numero = $P{FOLIO}]]>
+			<![CDATA[SELECT ct.numero,
+	ts.servicio,
+	ts.cantidad,
+	ts.precio,
+	ts.subtotal
+FROM traspaso_servicio ts
+INNER JOIN constancia_traspaso ct ON ts.traspaso = ct.id 
+WHERE ct.numero = $P{FOLIO}]]>
 		</queryString>
 		<field name="numero" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.name" value="numero"/>
 			<property name="com.jaspersoft.studio.field.label" value="numero"/>
-			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 		</field>
 		<field name="servicio" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.name" value="servicio"/>
@@ -111,45 +108,43 @@ WHERE
 	</parameter>
 	<parameter name="LogoPath" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT gestiondb.`CONSTANCIA_TRASPASO`.numero,
-	gestiondb.`CONSTANCIA_TRASPASO`.fecha,
-	gestiondb.`CONSTANCIA_TRASPASO`.observacion,
-	gestiondb.`CONSTANCIA_TRASPASO`.`nombreCliente`,
-	gestiondb.traspaso_partida.constancia,
-	gestiondb.traspaso_partida.descripcion,
-	gestiondb.traspaso_partida.cantidad,
-	gestiondb.traspaso_partida.origen,
-	gestiondb.traspaso_partida.destino,
-	gestiondb.`CONSTANCIA_TRASPASO`.numero,
-	gestiondb.`CONSTANCIA_TRASPASO`.fecha,
-	gestiondb.`CONSTANCIA_TRASPASO`.`nombreCliente`,
-	gestiondb.`CONSTANCIA_TRASPASO`.observacion,
-	gestiondb.traspaso_partida.traspaso
-FROM gestiondb.traspaso_partida
-	INNER JOIN gestiondb.`CONSTANCIA_TRASPASO` ON 
-	 gestiondb.traspaso_partida.traspaso = gestiondb.`CONSTANCIA_TRASPASO`.id 
-	 AND gestiondb.traspaso_partida.traspaso = gestiondb.`CONSTANCIA_TRASPASO`.id
-	 WHERE gestiondb.`CONSTANCIA_TRASPASO`.numero = $P{FOLIO}]]>
+		<![CDATA[SELECT ct.numero,
+	ct.fecha,
+	ct.observacion,
+	ct.nombreCliente,
+	tp.constancia,
+	tp.descripcion,
+	tp.cantidad,
+	tp.origen,
+	tp.destino,
+	ct.numero,
+	ct.fecha,
+	ct.nombreCliente,
+	ct.observacion,
+	tp.traspaso
+FROM traspaso_partida tp
+LEFT OUTER JOIN constancia_traspaso ct ON  tp.traspaso = ct.id
+WHERE ct.numero = $P{FOLIO}]]>
 	</queryString>
 	<field name="numero" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero"/>
 		<property name="com.jaspersoft.studio.field.label" value="numero"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="fecha" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="fecha"/>
 		<property name="com.jaspersoft.studio.field.label" value="fecha"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="observacion" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="observacion"/>
 		<property name="com.jaspersoft.studio.field.label" value="observacion"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="nombreCliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="nombreCliente"/>
 		<property name="com.jaspersoft.studio.field.label" value="nombreCliente"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="constancia" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="constancia"/>
@@ -179,22 +174,22 @@ FROM gestiondb.traspaso_partida
 	<field name="COLUMN_10" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero"/>
 		<property name="com.jaspersoft.studio.field.label" value="numero"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="COLUMN_11" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="fecha"/>
 		<property name="com.jaspersoft.studio.field.label" value="fecha"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="COLUMN_12" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="nombreCliente"/>
 		<property name="com.jaspersoft.studio.field.label" value="nombreCliente"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="COLUMN_13" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="observacion"/>
 		<property name="com.jaspersoft.studio.field.label" value="observacion"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_TRASPASO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_traspaso"/>
 	</field>
 	<field name="traspaso" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="traspaso"/>

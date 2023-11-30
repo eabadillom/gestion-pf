@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="NotasCredito" pageWidth="622" pageHeight="595" orientation="Landscape" columnWidth="582" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d5d42d4c-5524-4b2c-b152-13e27161417f">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -19,7 +19,7 @@
 	<queryString language="SQL">
 		<![CDATA[SELECT
 	nc.NUMERO, nc.FECHA, nc.CLIENTE, nc.SUBTOTAL, nc.IVA, nc.TOTAL
-FROM NOTA_CREDITO nc
+FROM nota_credito nc
 WHERE nc.STATUS = 1
 AND nc.FECHA BETWEEN $P{fechaInicio} and $P{fechaFin}
 AND (nc.IDCLIENTE = $P{idCliente} OR $P{idCliente} IS NULL)
@@ -28,32 +28,32 @@ ORDER BY nc.FECHA, nc.id, nc.CLIENTE]]>
 	<field name="NUMERO" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NUMERO"/>
 		<property name="com.jaspersoft.studio.field.label" value="NUMERO"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="FECHA" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="FECHA"/>
 		<property name="com.jaspersoft.studio.field.label" value="FECHA"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="CLIENTE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CLIENTE"/>
 		<property name="com.jaspersoft.studio.field.label" value="CLIENTE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="SUBTOTAL" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="SUBTOTAL"/>
 		<property name="com.jaspersoft.studio.field.label" value="SUBTOTAL"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="IVA" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="IVA"/>
 		<property name="com.jaspersoft.studio.field.label" value="IVA"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<field name="TOTAL" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="TOTAL"/>
 		<property name="com.jaspersoft.studio.field.label" value="TOTAL"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="NOTA_CREDITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nota_credito"/>
 	</field>
 	<variable name="sumaNumero" class="java.lang.Integer" calculation="Count">
 		<variableExpression><![CDATA[$F{NUMERO}]]></variableExpression>
@@ -75,7 +75,7 @@ ORDER BY nc.FECHA, nc.id, nc.CLIENTE]]>
 			<staticText>
 				<reportElement x="0" y="0" width="582" height="20" forecolor="#2199F6" uuid="a24322d0-36d8-4491-8a43-572367a99765"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[REPORTE NOTAS DE CREDITO]]></text>
 			</staticText>

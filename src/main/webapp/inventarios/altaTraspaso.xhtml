@@ -188,58 +188,59 @@
 			</p:dialog>
 			<div style="padding-top: 1rem;">
 			</div>
-			<p:panel header="DESTINO">
-				<p:dataTable id="destino" var="partida" value="#{altaTraspasoBean.destino}" reflow="true" rowKey="#{altaTraspasoBean.selectedInventario}"  scrollable="true" scrollHeight="9em" scrollRows="4" >
-					<p:column style="width:32px;text-align: center"><p:commandButton styleClass="ui-button-flat" type="button" icon="pi pi-search" onclick="PF('dlg1').show()"/></p:column>
-					<p:column headerText="Producto" width="8em"><h:outputText value="#{partida.producto.productoDs}"/></p:column>
-					<p:column headerText="Planta destino" width="10em"><h:outputText value="#{partida.plantaDestino.plantaDs}"/></p:column>
-					<p:column headerText="Camara destino" width="10em"><h:outputText value="#{partida.camaraDestino.camaraDs}"/></p:column>
-					<p:column headerText="Posicion destino" width="10em"><h:outputText value="#{partida.posicionDestino.idPosicion}"/></p:column>
-					<p:fieldset legend="Header" toggleable="true" toggleSpeed="500">
-	            		<p:ajax event="toggle" listener="#{fieldsetView.handleToggle}"/>
-	        		</p:fieldset>
-					<p:column width="8em">
-						<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deletePartida(partida)}" update="destino" />
-					</p:column>
-				</p:dataTable>
-			</p:panel>
-			<div style="padding-top: 1rem;">
-				<p:toolbar>
-		            <p:toolbarGroup>
-				        <p:overlayPanel widgetVar="dlg1" dismissable="false" showCloseIcon="true" dynamic="true">
-							<p:outputPanel rendered="#{not empty altaTraspasoBean.inventario}">
-								<p:panel id="folioC">
-									<div class="field">
-										<span class="ui-float-label ui-input-icon-right">
-											<p:inputText widgetVar="folioC-new" id="folioC-new" value="#{altaTraspasoBean.selectedInventario.folio}" readonly="true"/>
-											<p:outputLabel for="folioC-new" value="Folio" styleClass="ml-4" />
-											<i class="pi pi-user" />
-										</span>
-									</div>
-								</p:panel>
-								<p:panel id="cantidad">
-									<div class="field">
-										<span class="ui-float-label ui-input-icon-right">
-											<p:inputText widgetVar="Cantidad-new" id="Cantidad-new" value="#{altaTraspasoBean.selectedInventario.cantidad}" readonly="true"/>
-											<p:outputLabel for="Cantidad-new" value="En existencia" styleClass="ml-4" />
-											<i class="pi pi-user" />
-										</span>
-									</div>
-								</p:panel>
-								<p:panel id="Kgs">
-									<div class="field">
-										<span class="ui-float-label ui-input-icon-right">
-											<p:inputText widgetVar="kg-new" id="kg-new" value="#{altaTraspasoBean.selectedInventario.peso}" readonly="true"/>
-											<p:outputLabel for="kg-new" value="Kilogramos" styleClass="ml-4" />
-											<i class="pi pi-user" />
-										</span>
-									</div>
-								</p:panel>
-							</p:outputPanel>
-						</p:overlayPanel>
-					</p:toolbarGroup>
-				</p:toolbar>
-			</div>
+			
+			<p:dataTable id="destino" var="partida" value="#{altaTraspasoBean.destino}" reflow="true" rowKey="#{altaTraspasoBean.selectedInventario}">
+				<f:facet name="header">
+					<p:outputLabel value="DESTINO" />
+				</f:facet>
+				<p:column style="text-align: center" width="2rem;">
+					<p:commandButton styleClass="ui-button-flat" type="button" icon="pi pi-search" onclick="PF('dlg1').show()"/>
+				</p:column>
+				<p:column headerText="Producto" width="8em"><h:outputText value="#{partida.producto.productoDs}"/></p:column>
+				<p:column headerText="Planta destino" width="10em"><h:outputText value="#{partida.plantaDestino.plantaDs}"/></p:column>
+				<p:column headerText="Camara destino" width="10em"><h:outputText value="#{partida.camaraDestino.camaraDs}"/></p:column>
+				<p:column headerText="Posicion destino" width="10em" rendered="partida != null"><h:outputText value="#{partida.posicionDestino.idPosicion}"/></p:column>
+				<p:fieldset legend="Header" toggleable="true" toggleSpeed="500">
+            		<p:ajax event="toggle" listener="#{fieldsetView.handleToggle}"/>
+        		</p:fieldset>
+				<p:column width="2em">
+					<p:commandButton icon="pi pi-times" styleClass="ui-button-danger p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deletePartida(partida)}" update="destino" />
+				</p:column>
+			</p:dataTable>
+			
+			
+			<p:overlayPanel widgetVar="dlg1" dismissable="false" showCloseIcon="true" dynamic="true">
+				<p:outputPanel rendered="#{not empty altaTraspasoBean.inventario}">
+					<p:panel id="folioC">
+						<div class="field">
+							<span class="ui-float-label ui-input-icon-right">
+								<p:inputText widgetVar="folioC-new" id="folioC-new" value="#{altaTraspasoBean.selectedInventario.folioCliente}" readonly="true"/>
+								<p:outputLabel for="folioC-new" value="Folio" styleClass="ml-4" />
+								<i class="pi pi-user" />
+							</span>
+						</div>
+					</p:panel>
+					<p:panel id="cantidad">
+						<div class="field">
+							<span class="ui-float-label ui-input-icon-right">
+								<p:inputText widgetVar="Cantidad-new" id="Cantidad-new" value="#{altaTraspasoBean.selectedInventario.cantidad}" readonly="true"/>
+								<p:outputLabel for="Cantidad-new" value="En existencia" styleClass="ml-4" />
+								<i class="pi pi-user" />
+							</span>
+						</div>
+					</p:panel>
+					<p:panel id="Kgs">
+						<div class="field">
+							<span class="ui-float-label ui-input-icon-right">
+								<p:inputText widgetVar="kg-new" id="kg-new" value="#{altaTraspasoBean.selectedInventario.peso}" readonly="true"/>
+								<p:outputLabel for="kg-new" value="Kilogramos" styleClass="ml-4" />
+								<i class="pi pi-user" />
+							</span>
+						</div>
+					</p:panel>
+				</p:outputPanel>
+			</p:overlayPanel>
+			
 			<div style="padding-top: 1rem;">
 				<p:panel header="SELECCIONE SUS SERVICIOS">
 					<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaTraspasoBean.idPrecioServicio}" filterMatchMode="startsWith">
@@ -265,7 +266,7 @@
 							<h:outputText value="#{servicio.cantidad}" />
 						</p:column>
 						<p:column width="2rem">
-							<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deleteServicio(servicio)}" update="dtServicios"/>
+							<p:commandButton icon="pi pi-times" styleClass="ui-button-danger p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deleteServicio(servicio)}" update="dtServicios"/>
 						</p:column>
 					</p:dataTable>
 				</p:panel>
@@ -280,7 +281,7 @@
 			<div>
 		        <p:splitButton value="Guardar" actionListener="#{altaTraspasoBean.guardar}" icon="pi pi-save">
 		            <p:menuitem value="Imprimir" actionListener="#{altaTraspasoBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-		            <p:menuitem value="Nuevo traspaso" action="#{altaTraspasoBean.reload}" update="messages" icon="pi pi-times"/>
+		            <p:menuitem value="Nuevo traspaso" action="#{altaTraspasoBean.reload}" update="messages" icon="pi pi-refresh"/>
 		        </p:splitButton>
 			</div>
 		</h:form>

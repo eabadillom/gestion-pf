@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "CONSTANCIA_FACTURA_DS")
+@Table(name = "constancia_factura_ds")
 @NamedQueries({
     @NamedQuery(name = "ConstanciaFacturaDs.findAll", query = "SELECT c FROM ConstanciaFacturaDs c"),
     @NamedQuery(name = "ConstanciaFacturaDs.findById", query = "SELECT c FROM ConstanciaFacturaDs c WHERE c.id = :id"),

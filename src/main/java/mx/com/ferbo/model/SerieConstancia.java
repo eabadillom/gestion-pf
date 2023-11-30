@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "serie_constancia")
 @NamedQueries({
     @NamedQuery(name = "SerieConstancia.findAll", query = "SELECT s FROM SerieConstancia s"),
-    @NamedQuery(name = "SerieConstancia.findByIdCliente", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.idCliente = :idCliente"),
+    @NamedQuery(name = "SerieConstancia.findByIdCliente", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.cliente.cteCve = :idCliente"),
     @NamedQuery(name = "SerieConstancia.findByTpSerie", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.tpSerie = :tpSerie"),
     @NamedQuery(name = "SerieConstancia.findByNuSerie", query = "SELECT s FROM SerieConstancia s WHERE s.nuSerie = :nuSerie")})
 public class SerieConstancia implements Serializable {
@@ -50,8 +50,8 @@ public class SerieConstancia implements Serializable {
         this.nuSerie = nuSerie;
     }
 
-    public SerieConstancia(int idCliente, String tpSerie) {
-        this.serieConstanciaPK = new SerieConstanciaPK(idCliente, tpSerie);
+    public SerieConstancia(Cliente cliente, String tpSerie) {
+        this.serieConstanciaPK = new SerieConstanciaPK(cliente, tpSerie);
     }
 
     public SerieConstanciaPK getSerieConstanciaPK() {

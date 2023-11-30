@@ -1,200 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteClienteAlmacen" pageWidth="960" pageHeight="612" orientation="Landscape" columnWidth="900" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="caeb39ea-9da4-4788-a3df-822b2152c96f">
-	<property name="com.jaspersoft.studio.data.sql.tables">
-		<![CDATA[YENPTlNUQU5DSUFfREVfREVQT1NJVE9gICwyNDgsMTUsZTIyNTRhNzItOWNiYy00Y2FjLWJkNmMt
-NmI3ZTgzNjdjYzliO2BDTElFTlRFYCAsMTMwLDE1LGVkMjMyZWZiLWYzODUtNDliNy04NDhiLTEy
-NTMxZTRhOTk5NDtgREVUQUxMRV9QQVJUSURBYCAsNjE0LDE1LGFjMGMyM2Q1LTMwZDMtNDljMi05
-M2IzLTY4OTQ5OWEwMWFjZDtgVU5JREFEX0RFX01BTkVKT2AgLDExNzEsMTUsMTA4ODk5ZDctN2Vi
-Mi00MWEzLWE3MTUtY2MxNzQ0MTg3YTMzO2BQTEFOVEFgICwxNSwxNSxhYzI5YTQ0OC00ZDM0LTQ3
-M2UtYTVhYy02Y2RhNWY4MmEzMWY7YFBBUlRJREFgICw1MDUsMTUsMmM0ZWZkNDktODNlYi00MzFl
-LTljZjktZDAwODI5MTc3OWVhO2BQUk9EVUNUT2AgLDEwMjksMTUsZDRkYWY5ZjItMDY2Ny00ZjM0
-LThiNzYtYWM0ZTg1NjgxM2Y5O2BVTklEQURfREVfUFJPRFVDVE9gICw3OTgsMTUsOTZhNmU5MGMt
-MDg4Yi00NTY3LTllMTctZjNiYTdkNjUyOTlkO2BDQU1BUkFgICwxMzkwLDE1LGFjODU4NjJlLWMw
-MmMtNGU4My1hZjdiLWI3NDg3MDFkMjJmZTs=]]>
-	</property>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<parameter name="idCliente" class="java.lang.Integer"/>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[new String ("resources/logo_square.gif")]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
 		<![CDATA[select
-
     cte.numero_cte,
-
     cte.cte_nombre,
-
     cdd.fecha_ingreso,
-
     cdd.folio_cliente,
-
     dp.cantidad_u_manejo,
-
     dp.u_medida_cve,
-
     prd.producto_ds,
-
     udm.unidad_de_manejo_ds,
-
     dp.cantidad_u_medida,
-
     dp.dtp_codigo,
-
     dp.dtp_lote,
-
     dp.dtp_caducidad,
-
     dp.dtp_po,
-
     dp.dtp_sap,
-
     dp.dtp_tarimas,
-
     cam.camara_cve,
-
     cam.camara_ds,
-
     plt.planta_cve,
-
     plt.planta_ds
-
-from CLIENTE cte
-
-    INNER JOIN CONSTANCIA_DE_DEPOSITO cdd ON cdd.cte_cve = cte.cte_cve
-
-    INNER JOIN PARTIDA p ON p.folio = cdd.folio
-
-    INNER JOIN DETALLE_PARTIDA dp ON p.partida_cve = dp.partida_cve
-
-    INNER JOIN UNIDAD_DE_PRODUCTO udp ON udp.unidad_de_producto_cve = p.unidad_de_producto_cve
-
-    INNER JOIN PRODUCTO prd ON prd.producto_cve = udp.producto_cve
-
-    INNER JOIN UNIDAD_DE_MANEJO udm ON udm.unidad_de_manejo_cve = udp.UNIDAD_DE_MANEJO_CVE
-
-    INNER JOIN CAMARA cam ON cam.camara_cve = p.camara_cve
-
-    INNER JOIN PLANTA plt ON plt.planta_cve = cam.planta_cve
-
+from cliente cte
+    INNER JOIN constancia_de_deposito cdd ON cdd.cte_cve = cte.cte_cve
+    INNER JOIN partida p ON p.folio = cdd.folio
+    INNER JOIN detalle_partida dp ON p.partida_cve = dp.partida_cve
+    INNER JOIN unidad_de_producto udp ON udp.unidad_de_producto_cve = p.unidad_de_producto_cve
+    INNER JOIN producto prd ON prd.producto_cve = udp.producto_cve
+    INNER JOIN unidad_de_manejo udm ON udm.unidad_de_manejo_cve = udp.UNIDAD_DE_MANEJO_CVE
+    INNER JOIN camara cam ON cam.camara_cve = p.camara_cve
+    INNER JOIN planta plt ON plt.planta_cve = cam.planta_cve
 WHERE
-
     ( ( dp.edo_inv_cve = 1 )
-
     AND ( dp.cantidad_u_manejo > 0 )
-
     AND  ( cdd.cte_cve = $P{idCliente}  OR $P{idCliente} IS NULL) )
-
-    
-
-    
-
 ORDER BY
-
     cte.cte_nombre ASC,
-
     cte.numero_cte ASC,
-
     producto_ds ASC,
-
     cdd.fecha_ingreso ASC,
-
     cdd.folio_cliente ASC]]>
 	</queryString>
 	<field name="numero_cte" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cte"/>
 		<property name="com.jaspersoft.studio.field.label" value="numero_cte"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="cte_nombre" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
 		<property name="com.jaspersoft.studio.field.label" value="cte_nombre"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="fecha_ingreso" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="FECHA_INGRESO"/>
 		<property name="com.jaspersoft.studio.field.label" value="fecha_ingreso"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_deposito"/>
 	</field>
 	<field name="folio_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="folio_cliente"/>
 		<property name="com.jaspersoft.studio.field.label" value="folio_cliente"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_deposito"/>
 	</field>
 	<field name="cantidad_u_manejo" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="cantidad_u_manejo"/>
 		<property name="com.jaspersoft.studio.field.label" value="cantidad_u_manejo"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="u_medida_cve" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="u_medida_cve"/>
 		<property name="com.jaspersoft.studio.field.label" value="u_medida_cve"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="producto_ds" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PRODUCTO_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="producto_ds"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PRODUCTO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="producto"/>
 	</field>
 	<field name="unidad_de_manejo_ds" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="UNIDAD_DE_MANEJO_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="unidad_de_manejo_ds"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="unidad_de_manejo"/>
 	</field>
 	<field name="cantidad_u_medida" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="cantidad_u_medida"/>
 		<property name="com.jaspersoft.studio.field.label" value="cantidad_u_medida"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="dtp_codigo" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="dtp_codigo"/>
 		<property name="com.jaspersoft.studio.field.label" value="dtp_codigo"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="dtp_lote" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="dtp_lote"/>
 		<property name="com.jaspersoft.studio.field.label" value="dtp_lote"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="dtp_caducidad" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="dtp_caducidad"/>
 		<property name="com.jaspersoft.studio.field.label" value="dtp_caducidad"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="dtp_po" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="dtp_PO"/>
 		<property name="com.jaspersoft.studio.field.label" value="dtp_po"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="dtp_sap" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="dtp_SAP"/>
 		<property name="com.jaspersoft.studio.field.label" value="dtp_sap"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="dtp_tarimas" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="dtp_tarimas"/>
 		<property name="com.jaspersoft.studio.field.label" value="dtp_tarimas"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="DETALLE_PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="detalle_partida"/>
 	</field>
 	<field name="camara_cve" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="CAMARA_CVE"/>
 		<property name="com.jaspersoft.studio.field.label" value="camara_cve"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CAMARA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="camara"/>
 	</field>
 	<field name="camara_ds" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CAMARA_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="camara_ds"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CAMARA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="camara"/>
 	</field>
 	<field name="planta_cve" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="PLANTA_CVE"/>
 		<property name="com.jaspersoft.studio.field.label" value="planta_cve"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PLANTA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="planta"/>
 	</field>
 	<field name="planta_ds" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PLANTA_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="planta_ds"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PLANTA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="planta"/>
 	</field>
 	<variable name="PesoPorCliente" class="java.math.BigDecimal" resetType="Group" resetGroup="Cliente" calculation="Sum">
 		<variableExpression><![CDATA[$F{cantidad_u_medida}]]></variableExpression>
@@ -266,7 +213,7 @@ ORDER BY
 	<title>
 		<band height="61" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="18" width="900" height="21" forecolor="#2196F3" uuid="69925919-c18a-447d-a820-a220d9c3961a">
+				<reportElement x="0" y="0" width="900" height="21" forecolor="#2196F3" uuid="69925919-c18a-447d-a820-a220d9c3961a">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -277,7 +224,7 @@ ORDER BY
 				<text><![CDATA[REPORTE DE ALMACEN (CLIENTE)]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="70" height="61" uuid="6c66ff8c-da58-442d-b427-998f00a57f5a"/>
+				<reportElement x="0" y="0" width="190" height="61" uuid="6c66ff8c-da58-442d-b427-998f00a57f5a"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 		</band>
@@ -595,10 +542,6 @@ ORDER BY
 				</textElement>
 				<text><![CDATA[REPORTE DE ALMACEN (CLIENTE)]]></text>
 			</staticText>
-			<image>
-				<reportElement x="0" y="0" width="70" height="61" uuid="cbde0a35-c0ee-4c02-8daa-a71920fe6e08"/>
-				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
-			</image>
 			<staticText>
 				<reportElement x="0" y="50" width="900" height="29" uuid="2d30cbd2-d23a-4e33-bd6e-6626acbe817b">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -611,6 +554,10 @@ ORDER BY
 				</textElement>
 				<text><![CDATA[NO SE ENCONTRO INFORMACION]]></text>
 			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="190" height="61" uuid="0d00e4aa-7a82-45fa-a033-61a878e2f5f6"/>
+				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
+			</image>
 		</band>
 	</noData>
 </jasperReport>

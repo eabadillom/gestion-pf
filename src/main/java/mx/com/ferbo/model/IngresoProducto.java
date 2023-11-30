@@ -41,7 +41,7 @@ public class IngresoProducto implements Serializable,Cloneable{
 	private Integer cantidad;
 	
 	@JoinColumn(name = "id_unidad_medida", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	private UnidadDeManejo unidadDeManejo;
 	
 	@Column(name = "peso")
@@ -56,15 +56,15 @@ public class IngresoProducto implements Serializable,Cloneable{
 	private BigDecimal noTarimas;
 	
 	@Column(name = "lote")
-	@Size(min = 1, max = 20)
+	@Size(max = 20)
 	private String lote;
 	
 	@Column(name = "pedimento")
-	@Size(min = 1, max = 13)
+	@Size(max = 13)
 	private String pedimento;
 	
 	@Column(name = "contenedor")
-	@Size(min = 1, max = 20)
+	@Size(max = 20)
 	private String contenedor;
 	
 	@Column(name = "fecha_Caducidad")
@@ -72,7 +72,7 @@ public class IngresoProducto implements Serializable,Cloneable{
 	private Date fechaCaducidad;
 	
 	@Column(name = "otro")
-	@Size(min = 1, max = 12)
+	@Size(max = 12)
 	private String otro;
 	
 	@JoinColumn(name = "id_ingreso", referencedColumnName = "id_ingreso")
@@ -80,7 +80,7 @@ public class IngresoProducto implements Serializable,Cloneable{
 	private Ingreso ingreso;
 	
 	@JoinColumn(name = "id_producto", referencedColumnName = "PRODUCTO_CVE")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	private Producto producto;
 
 	public IngresoProducto() {

@@ -31,7 +31,7 @@ import javax.validation.constraints.NotNull;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "PARTIDA")
+@Table(name = "partida")
 @NamedQueries({
         @NamedQuery(name = "Partida.findAll", query = "SELECT p FROM Partida p"),
         @NamedQuery(name = "Partida.findByPartidaCve", query = "SELECT p FROM Partida p WHERE p.partidaCve = :partidaCve"),

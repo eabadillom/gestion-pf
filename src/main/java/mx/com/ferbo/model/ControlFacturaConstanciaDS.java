@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 
-@Table(name="CONTROL_FACTURA_CONSTANCIA_DS")
+@Table(name="control_factura_constancia_ds")
 @NamedQueries({
 	@NamedQuery(name = "ControlFacturaConstanciaDS.findByConstancia", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.constanciaDeServicio.folio = :constancia"),
 	@NamedQuery(name = "ControlFacturaConstanciaDS.findByFactura", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.factura = :factura")

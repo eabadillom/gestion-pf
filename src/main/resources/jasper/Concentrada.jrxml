@@ -4,7 +4,7 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="141"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="853"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDB"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<parameter name="fecha" class="java.util.Date">
 		<defaultValueExpression><![CDATA[$P{fecha}]]></defaultValueExpression>
 	</parameter>
@@ -14,133 +14,69 @@
 	<parameter name="imagen" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT
-
 	numero_cliente,
-
 	nombre_cliente,
-
 	sum(aPagar) as aPagar,
-
 	sum(subtotal) as subtotal,
-
 	sum(iva) as iva
-
 FROM (
-
 	SELECT
-
 		f.numero_cliente,
-
 		f.nombre_cliente,
-
 		f.nom_serie,
-
 		f.numero,
-
 		f.fecha AS fecha_pago,
-
 		f.total AS aPagar,
-
 		f.subtotal as subtotal,
-
 		f.iva as iva,
-
 		'Por Cobrar' AS f_status
-
 	FROM factura f
-
 	WHERE f.id NOT IN (SELECT p.factura FROM pago p WHERE p.fecha <= $P{fecha})
-
 	AND f.status NOT IN (0, 2)
-
 	AND f.fecha <= $P{fecha}
-
 	AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 	
-
 	UNION ALL
-
 	
-
 	SELECT
-
 		factura.numero_cliente,
-
 		factura.nombre_cliente,
-
 		factura.nom_serie,
-
 		factura.numero,
-
 		factura.fecha AS fecha_pago,
-
 		(factura.total - ingreso.monto) AS aPagar,
-
 		(factura.total - ingreso.monto) / (1 + (factura.porcentaje_iva / 100)) as subtotal,
-
 		(factura.total - ingreso.monto) - subtotal as iva,
-
 		'Pago Parcial' AS f_status
-
 	FROM (
-
 		SELECT
-
 			i.factura,
-
 			sum(i.monto) AS monto
-
 		FROM (
-
 			SELECT
-
 				'P' AS tp_ingreso,
-
 				p.factura,
-
 				p.monto
-
 			FROM pago p
-
 			WHERE p.tipo NOT IN (5) AND p.fecha <= $P{fecha}
-
 			UNION ALL
-
 			SELECT
-
 				'NC' AS tp_ingreso,
-
 				nf.factura,
-
 				nf.cantidad as monto
-
-			FROM NOTA_CREDITO nc
-
-			INNER JOIN NOTA_X_FACTURAS nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
-
+			FROM nota_credito nc
+			INNER JOIN nota_x_facturas nf ON nc.ID = nf.NOTA AND nc.STATUS = 1
 			WHERE nc.FECHA <= $P{fecha}
-
 		) i
-
 		GROUP BY
-
 			i.factura
-
 	) ingreso
-
 	INNER JOIN factura ON ingreso.factura = factura.id
-
 	WHERE (factura.total - ingreso.monto) > 0
-
 	AND ingreso.factura IN (SELECT f.id FROM factura f WHERE f.fecha <= $P{fecha} )
-
 	AND (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
-
 ) t
-
 GROUP BY numero_cliente, nombre_cliente
-
 ORDER BY nombre_cliente, numero_cliente]]>
 	</queryString>
 	<field name="numero_cliente" class="java.lang.String">
@@ -190,7 +126,7 @@ ORDER BY nombre_cliente, numero_cliente]]>
 					<pen lineColor="#38B6FF"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font size="17"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[CARTERA DE CLIENTES CONCENTRADA]]></text>
 			</staticText>
@@ -214,7 +150,7 @@ ORDER BY nombre_cliente, numero_cliente]]>
 	<columnHeader>
 		<band height="12" splitType="Stretch">
 			<staticText>
-				<reportElement mode="Opaque" x="110" y="0" width="220" height="12" forecolor="#FFFFFF" backcolor="#2199F6" uuid="0f63857c-382d-4a40-8cb7-ab12e0c31985">
+				<reportElement mode="Opaque" x="60" y="0" width="270" height="12" forecolor="#FFFFFF" backcolor="#2199F6" uuid="0f63857c-382d-4a40-8cb7-ab12e0c31985">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -258,7 +194,7 @@ ORDER BY nombre_cliente, numero_cliente]]>
 				<text><![CDATA[<style pdfFontName= 'Helvetica-Bold'>I.V.A.</style>]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="0" y="0" width="110" height="12" forecolor="#FFFFFF" backcolor="#2199F6" uuid="f33d3d36-222e-4aa4-8fe4-5cd2eaba8b85">
+				<reportElement mode="Opaque" x="0" y="0" width="60" height="12" forecolor="#FFFFFF" backcolor="#2199F6" uuid="f33d3d36-222e-4aa4-8fe4-5cd2eaba8b85">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" markup="styled">
@@ -284,33 +220,33 @@ ORDER BY nombre_cliente, numero_cliente]]>
 	<detail>
 		<band height="12" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="110" height="12" uuid="f83012bb-f480-498c-bd0e-577bb9de12a2">
+				<reportElement x="0" y="0" width="60" height="12" uuid="f83012bb-f480-498c-bd0e-577bb9de12a2">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{numero_cliente}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="110" y="0" width="220" height="12" uuid="35e36aa8-8ca0-4ad6-859d-5c89b413115f">
+				<reportElement x="60" y="0" width="270" height="12" uuid="35e36aa8-8ca0-4ad6-859d-5c89b413115f">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a0d989d1-eb66-4fdd-9e6d-fff7ec4c464b"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left"/>
 				<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-##0.##">
+			<textField pattern="¤#,##0.00;¤-##0.00">
 				<reportElement x="330" y="0" width="97" height="12" uuid="e28d58a0-5aa3-4f6c-9b6e-fb295e37ef10"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="¤#,##0.00;¤-##0.00">
 				<reportElement x="427" y="0" width="89" height="12" uuid="a55baf69-e3dd-491e-96b6-e549182462ed">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d9a06d2f-179c-4d2f-8397-e60a62a57870"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{iva}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="¤#,##0.00;¤-##0.00">
 				<reportElement x="516" y="0" width="105" height="12" uuid="e7372dcf-a7cf-4980-a510-ef6b1a24be4d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>

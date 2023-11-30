@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.IngresoProducto;
+import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class IngresoProductoDAO extends IBaseDAO<IngresoProducto, Integer> {
@@ -37,9 +38,16 @@ public class IngresoProductoDAO extends IBaseDAO<IngresoProducto, Integer> {
 			query = "SELECT ip.* FROM ingreso_producto ip WHERE ip.id_ingreso = ? ";
 			
 			Query q = em.createNativeQuery(query, IngresoProducto.class)
-						.setParameter(1, idIngreso);
+						.setParameter(1, idIngreso);					
 			
 			listaIngresoProducto = q.getResultList();
+			
+			for(IngresoProducto ip: listaIngresoProducto){
+				
+				Producto prod = ip.getProducto();
+				System.out.println(prod);
+				
+			}
 			
 		} catch (Exception e) {
 			log.info("Error al encontrar Ingresos Productos por idIngreso" + e.getMessage());

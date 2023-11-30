@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardex" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="425b1dc8-4308-471e-971a-1434e451f548">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<parameter name="folio" class="java.lang.String"/>
 	<parameter name="imagen" class="java.lang.String"/>
 	<queryString language="SQL">
@@ -27,14 +27,14 @@
 	COALESCE(sal.PESO, 0) AS PESO,
 	sal.origen,
 	sal.destino
-FROM CONSTANCIA_DE_DEPOSITO cdd
-INNER JOIN CLIENTE c ON cdd.CTE_CVE = c.CTE_CVE
-INNER JOIN PARTIDA p ON cdd.FOLIO = p.FOLIO
-INNER JOIN UNIDAD_DE_PRODUCTO udp ON p.UNIDAD_DE_PRODUCTO_CVE = udp.UNIDAD_DE_PRODUCTO_CVE
-INNER JOIN UNIDAD_DE_MANEJO udm ON udp.UNIDAD_DE_MANEJO_CVE = udm.UNIDAD_DE_MANEJO_CVE
-INNER JOIN PRODUCTO prd ON udp.PRODUCTO_CVE = prd.PRODUCTO_CVE
-INNER JOIN CAMARA cam ON p.CAMARA_CVE = cam.CAMARA_CVE
-INNER JOIN PLANTA plt ON cam.PLANTA_CVE = plt.PLANTA_CVE
+FROM constancia_de_deposito cdd
+INNER JOIN cliente c ON cdd.CTE_CVE = c.CTE_CVE
+INNER JOIN partida p ON cdd.FOLIO = p.FOLIO
+INNER JOIN unidad_de_producto udp ON p.UNIDAD_DE_PRODUCTO_CVE = udp.UNIDAD_DE_PRODUCTO_CVE
+INNER JOIN unidad_de_manejo udm ON udp.UNIDAD_DE_MANEJO_CVE = udm.UNIDAD_DE_MANEJO_CVE
+INNER JOIN producto prd ON udp.PRODUCTO_CVE = prd.PRODUCTO_CVE
+INNER JOIN camara cam ON p.CAMARA_CVE = cam.CAMARA_CVE
+INNER JOIN planta plt ON cam.PLANTA_CVE = plt.PLANTA_CVE
 LEFT OUTER JOIN (
 	SELECT
 		dcs.PARTIDA_CVE,
@@ -45,8 +45,8 @@ LEFT OUTER JOIN (
 		dcs.PESO,
 		null as ORIGEN,
 		null as DESTINO
-	FROM DETALLE_CONSTANCIA_SALIDA dcs
-	INNER JOIN CONSTANCIA_SALIDA cs ON cs.ID = dcs.CONSTANCIA_CVE
+	FROM detalle_constancia_salida dcs
+	INNER JOIN constancia_salida cs ON cs.ID = dcs.CONSTANCIA_CVE
 	WHERE cs.STATUS IN (1) AND dcs.FOLIO_ENTRADA = $P{folio}
 	UNION ALL
 	select
@@ -59,83 +59,78 @@ LEFT OUTER JOIN (
 		tp.origen,
 		tp.destino
 	from
-		CONSTANCIA_TRASPASO ct
+		constancia_traspaso ct
 	INNER JOIN traspaso_partida tp ON ct.id = tp.traspaso
 	WHERE tp.constancia = $P{folio}
 	
 ) sal ON p.PARTIDA_CVE = sal.PARTIDA_CVE
 WHERE cdd.folio_cliente = $P{folio}
-ORDER BY partida_cve, fecha_ingreso, movimiento, fecha
-
-
-
-
-]]>
+ORDER BY partida_cve, fecha_ingreso, movimiento, fecha]]>
 	</queryString>
 	<field name="PARTIDA_CVE" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="PARTIDA_CVE"/>
 		<property name="com.jaspersoft.studio.field.label" value="PARTIDA_CVE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="partida"/>
 	</field>
 	<field name="CTE_NOMBRE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
 		<property name="com.jaspersoft.studio.field.label" value="CTE_NOMBRE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="CTE_RFC" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_RFC"/>
 		<property name="com.jaspersoft.studio.field.label" value="CTE_RFC"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="folio_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="folio_cliente"/>
 		<property name="com.jaspersoft.studio.field.label" value="folio_cliente"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_deposito"/>
 	</field>
 	<field name="FECHA_INGRESO" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="FECHA_INGRESO"/>
 		<property name="com.jaspersoft.studio.field.label" value="FECHA_INGRESO"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_deposito"/>
 	</field>
 	<field name="NOMBRE_TRANSPORTISTA" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NOMBRE_TRANSPORTISTA"/>
 		<property name="com.jaspersoft.studio.field.label" value="NOMBRE_TRANSPORTISTA"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_deposito"/>
 	</field>
 	<field name="PLACAS_TRANSPORTE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PLACAS_TRANSPORTE"/>
 		<property name="com.jaspersoft.studio.field.label" value="PLACAS_TRANSPORTE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_DEPOSITO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_deposito"/>
 	</field>
 	<field name="PLANTA_DS" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PLANTA_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="PLANTA_DS"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PLANTA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="planta"/>
 	</field>
 	<field name="CAMARA_DS" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CAMARA_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="CAMARA_DS"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CAMARA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="camara"/>
 	</field>
 	<field name="PRODUCTO_DS" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PRODUCTO_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="PRODUCTO_DS"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PRODUCTO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="producto"/>
 	</field>
 	<field name="CANTIDAD_TOTAL" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD_TOTAL"/>
 		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD_TOTAL"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="partida"/>
 	</field>
 	<field name="UNIDAD_DE_MANEJO_DS" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="UNIDAD_DE_MANEJO_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="UNIDAD_DE_MANEJO_DS"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="unidad_de_manejo"/>
 	</field>
 	<field name="PESO_TOTAL" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="PESO_TOTAL"/>
 		<property name="com.jaspersoft.studio.field.label" value="PESO_TOTAL"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="partida"/>
 	</field>
 	<field name="MOVIMIENTO" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="MOVIMIENTO"/>
@@ -188,7 +183,7 @@ ORDER BY partida_cve, fecha_ingreso, movimiento, fecha
 					<textFieldExpression><![CDATA[$F{PRODUCTO_DS}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="80" y="12" width="299" height="12" uuid="35576201-303a-4988-8559-ab2b777e4890">
+					<reportElement x="80" y="12" width="300" height="12" uuid="35576201-303a-4988-8559-ab2b777e4890">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
@@ -198,7 +193,7 @@ ORDER BY partida_cve, fecha_ingreso, movimiento, fecha
 					<textFieldExpression><![CDATA[$F{PLANTA_DS}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="379" y="12" width="191" height="12" uuid="160dfa55-a5f0-4bb9-a01e-0984211898d5">
+					<reportElement x="380" y="12" width="190" height="12" uuid="160dfa55-a5f0-4bb9-a01e-0984211898d5">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement>
@@ -378,21 +373,21 @@ ORDER BY partida_cve, fecha_ingreso, movimiento, fecha
 				<textFieldExpression><![CDATA["Transportista: "]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="430" y="49" width="93" height="16" uuid="fcd3aaf2-ec3d-48b3-877b-6e4419762fd1"/>
+				<reportElement x="380" y="49" width="99" height="16" uuid="fcd3aaf2-ec3d-48b3-877b-6e4419762fd1"/>
 				<textElement>
 					<font size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Placas transporte: "]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="210" y="49" width="220" height="16" uuid="b98cd534-8401-473f-b8d4-2c802034d3eb"/>
+				<reportElement x="210" y="49" width="170" height="16" uuid="b98cd534-8401-473f-b8d4-2c802034d3eb"/>
 				<textElement>
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{NOMBRE_TRANSPORTISTA}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="523" y="49" width="47" height="16" uuid="c2207f5f-a31e-4e6e-9882-95066d6d0462"/>
+				<reportElement x="479" y="49" width="91" height="16" uuid="c2207f5f-a31e-4e6e-9882-95066d6d0462"/>
 				<textElement>
 					<font size="9" isBold="true"/>
 				</textElement>
@@ -481,7 +476,7 @@ ORDER BY partida_cve, fecha_ingreso, movimiento, fecha
 				<textFieldExpression><![CDATA[" De " + $F{origen}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="385" y="1" width="94" height="10" printWhenGroupChanges="Partida" uuid="033be9e4-4e4d-4d43-8c4c-e87849b2f9bb">
+				<reportElement x="380" y="1" width="99" height="10" printWhenGroupChanges="Partida" uuid="033be9e4-4e4d-4d43-8c4c-e87849b2f9bb">
 					<printWhenExpression><![CDATA[new Boolean("Traspaso".equalsIgnoreCase($F{MOVIMIENTO}))]]></printWhenExpression>
 				</reportElement>
 				<textElement>

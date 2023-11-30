@@ -357,7 +357,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			
 			SerieConstanciaDAO serieDAO = new SerieConstanciaDAO();
 			SerieConstanciaPK seriePK = new SerieConstanciaPK();
-			seriePK.setIdCliente(cliente.getCteCve());
+			seriePK.setCliente(cliente);
 			
 			List<SerieConstancia> lstSerieConstancia = serieDAO.buscarPorIdCliente(seriePK);
 			

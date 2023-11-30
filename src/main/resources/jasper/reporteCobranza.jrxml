@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteCobranza" pageWidth="620" pageHeight="842" columnWidth="580" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e3f2f801-af8a-46ab-8cdb-525f5cbbbec9">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="175"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="818"/>
@@ -19,61 +19,33 @@
 	<parameter name="imagen" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT
-
 	CONCAT(YEAR(cd.FECHA_PAGO), MONTH(cd.FECHA_PAGO)) as periodo,
-
 	f.fecha as fecha_f,
-
 	f.nom_serie,
-
 	f.numero as numero,
-
 	cd.fecha_pago as fecha_p,
-
 	(cd.MONTO_PAGO / (f.porcentaje_iva / 100 + 1)) AS subtotal,
-
 	(cd.MONTO_PAGO - ( cd.MONTO_PAGO / (f.porcentaje_iva / 100 + 1)  ) ) AS iva,
-
 	cd.monto_pago as total
-
 from factura f
-
-INNER JOIN CHEQUE_DEVUELTO cd ON f.id = cd.factura_id
-
+INNER JOIN cheque_devuelto cd ON f.id = cd.factura_id
 where cd.fecha_pago between $P{fechaInicio} and $P{fechaFin}
-
 UNION ALL
-
 select
-
 	CONCAT (YEAR(p.fecha),MONTH(p.fecha)) as periodo,
-
 	f.fecha as fecha_f,
-
 	f.nom_serie,
-
 	f.numero as numero,
-
 	p.fecha as fecha_p,
-
 	(p.monto / (f.porcentaje_iva / 100 + 1)) AS subtotal,
-
 	(p.monto - ( p.monto / (f.porcentaje_iva / 100 + 1)  ) ) AS iva,
-
 	p.monto as total
-
 from factura f
-
 INNER JOIN pago p ON f.id = p.factura
-
 INNER JOIN tipo_pago tp ON p.tipo = tp.id
-
 WHERE tp.id NOT IN (5)
-
 	AND (p.factura = f.id )
-
 	AND (p.fecha between $P{fechaInicio} and $P{fechaFin} )
-
 ORDER BY fecha_p]]>
 	</queryString>
 	<field name="periodo" class="java.lang.String">
@@ -138,7 +110,7 @@ ORDER BY fecha_p]]>
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9372a95a-5b06-424f-9ce2-db5adab01980"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
-					<textElement textAlignment="Left">
+					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{fecha_p}]]></textFieldExpression>
@@ -192,9 +164,9 @@ ORDER BY fecha_p]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="90" splitType="Stretch">
+		<band height="50" splitType="Stretch">
 			<image>
-				<reportElement x="0" y="0" width="140" height="90" uuid="a7274947-87a1-48e9-adec-78f2f0e7110c"/>
+				<reportElement x="0" y="0" width="140" height="50" uuid="a7274947-87a1-48e9-adec-78f2f0e7110c"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<staticText>
@@ -352,46 +324,53 @@ ORDER BY fecha_p]]>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="20" splitType="Stretch">
+		<band height="14" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="0" y="0" width="80" height="20" uuid="e9c0bfd0-8340-4c2b-a12c-08e32685359e">
+				<reportElement x="0" y="0" width="80" height="14" uuid="e9c0bfd0-8340-4c2b-a12c-08e32685359e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a1282ea2-4915-44cf-bd43-6095df26383f"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{fecha_f}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="80" y="0" width="100" height="20" uuid="af5a4fb7-c96d-43a0-a71e-597431c58fd7">
+				<reportElement x="80" y="0" width="100" height="14" uuid="af5a4fb7-c96d-43a0-a71e-597431c58fd7">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5c973157-fbac-41c2-b63a-c581ec29e35e"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{nom_serie} + "-" + $F{numero}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement x="180" y="0" width="102" height="20" uuid="df320747-aa13-4c03-80cd-5b78909d6eff">
+				<reportElement x="180" y="0" width="102" height="14" uuid="df320747-aa13-4c03-80cd-5b78909d6eff">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="691984f5-c69a-40a8-9e7a-671901f5fdf7"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{fecha_p}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="282" y="0" width="100" height="20" uuid="0ba654cd-63bc-4a56-8ced-27009de09904">
+				<reportElement x="282" y="0" width="100" height="14" uuid="0ba654cd-63bc-4a56-8ced-27009de09904">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="21cadd40-02b9-4432-9423-fe71d1f52a14"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="382" y="0" width="100" height="20" uuid="02e161ef-3498-49cb-a32f-6e50a04858c6">
+				<reportElement x="382" y="0" width="100" height="14" uuid="02e161ef-3498-49cb-a32f-6e50a04858c6">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="230d6bb7-dbd3-46cd-8add-f6e350a85fb1"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{iva}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="482" y="0" width="98" height="20" uuid="6975aa1f-99bc-4c52-a9ee-2c56bc06f880">
+				<reportElement x="482" y="0" width="98" height="14" uuid="6975aa1f-99bc-4c52-a9ee-2c56bc06f880">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9372a95a-5b06-424f-9ce2-db5adab01980"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
@@ -420,7 +399,7 @@ ORDER BY fecha_p]]>
 			</staticText>
 			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
 				<reportElement mode="Opaque" x="482" y="0" width="98" height="10" forecolor="#FCF5F5" backcolor="#2196F3" uuid="54835f19-a918-4eb4-9021-6137025ff7fa"/>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{totalCobradoGlobal}]]></textFieldExpression>
@@ -438,7 +417,7 @@ ORDER BY fecha_p]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{totalImporteGlobal}]]></textFieldExpression>
@@ -456,7 +435,7 @@ ORDER BY fecha_p]]>
 					<bottomPen lineWidth="0.0" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{totalIVAGlobal}]]></textFieldExpression>

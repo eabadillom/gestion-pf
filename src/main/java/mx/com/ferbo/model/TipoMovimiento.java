@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "TIPO_MOVIMIENTO")
+@Table(name = "tipo_movimiento")
 @NamedQueries({
     @NamedQuery(name = "TipoMovimiento.findAll", query = "SELECT t FROM TipoMovimiento t"),
     @NamedQuery(name = "TipoMovimiento.findByClave", query = "SELECT t FROM TipoMovimiento t WHERE t.clave = :clave"),

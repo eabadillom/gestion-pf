@@ -247,7 +247,7 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			query =  em.createNativeQuery("SELECT COUNT(cdd.aviso_cve) FROM CONSTANCIA_DE_DEPOSITO cdd WHERE cdd.aviso_cve = :avisoCve");
+			query =  em.createNativeQuery("SELECT COUNT(cdd.aviso_cve) FROM constancia_de_deposito cdd WHERE cdd.aviso_cve = :avisoCve");
 			query.setParameter("avisoCve", aviso.getAvisoCve());	
 			count =  Integer.parseInt(query.getSingleResult().toString());
 			em.getTransaction().commit();

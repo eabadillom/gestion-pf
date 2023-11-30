@@ -48,9 +48,33 @@ public class IngresoDAO extends IBaseDAO<Ingreso, Integer> {
 			
 			em = EntityManagerUtil.getEntityManager();
 			
-			query = "SELECT i.* FROM ingreso i "
-					+ "INNER JOIN ingreso_producto ip ON ip.id_ingreso = i.id_ingreso "
-					+ "WHERE i.fecha_hora BETWEEN :fechaActualIni AND :fechaActualFin AND i.id_cliente = :idCliente AND ip.id_planta = :idPlanta ";
+			query = "SELECT"
+					+ "	i.id_ingreso, "
+					+ "	i.folio, "
+					+ "	i.fecha_hora, "
+					+ "	i.id_cliente, "
+					+ "	i.transportista, "
+					+ "	i.placas, "
+					+ "	i.observaciones, "
+					+ "	i.id_contacto, "
+					+ "	i.status  "
+					+ "FROM ingreso i "
+					+ "INNER JOIN ingreso_producto ip "
+					+ "	ON ip.id_ingreso = i.id_ingreso "
+					+ "WHERE i.fecha_hora BETWEEN :fechaActualIni AND :fechaActualFin AND i.id_cliente = :idCliente AND ip.id_planta = :idPlanta "
+					+ "GROUP BY i.id_ingreso, "
+					+ "	i.folio, "
+					+ "	i.fecha_hora, "
+					+ "	i.id_cliente, "
+					+ "	i.transportista,"
+					+ "	i.placas, "
+					+ "	i.observaciones, "
+					+ "	i.id_contacto, "
+					+ "	i.status ";
+			
+			/*"SELECT i.* FROM ingreso i "
+			+ "INNER JOIN ingreso_producto ip ON ip.id_ingreso = i.id_ingreso "
+			+ "WHERE i.fecha_hora BETWEEN :fechaActualIni AND :fechaActualFin AND i.id_cliente = :idCliente AND ip.id_planta = :idPlanta ";*/
 			
 			Query sql = em.createNativeQuery(query, Ingreso.class)
 					.setParameter("fechaActualIni", fechaActualIni)

@@ -41,22 +41,22 @@ WHERE cs.FOLIO_CLIENTE = $P{FOLIO}]]>
 		<field name="FOLIO_CLIENTE" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.name" value="FOLIO_CLIENTE"/>
 			<property name="com.jaspersoft.studio.field.label" value="FOLIO_CLIENTE"/>
-			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_servicio"/>
 		</field>
 		<field name="SERVICIO_CANTIDAD" class="java.math.BigDecimal">
 			<property name="com.jaspersoft.studio.field.name" value="SERVICIO_CANTIDAD"/>
 			<property name="com.jaspersoft.studio.field.label" value="SERVICIO_CANTIDAD"/>
-			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_SERVICIO_DETALLE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="constancia_servicio_detalle"/>
 		</field>
 		<field name="SERVICIO_DS" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.name" value="SERVICIO_DS"/>
 			<property name="com.jaspersoft.studio.field.label" value="SERVICIO_DS"/>
-			<property name="com.jaspersoft.studio.field.tree.path" value="SERVICIO"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="servicio"/>
 		</field>
 		<field name="COLUMN_4" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.name" value="FOLIO_CLIENTE"/>
 			<property name="com.jaspersoft.studio.field.label" value="FOLIO_CLIENTE"/>
-			<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_servicio"/>
 		</field>
 	</subDataset>
 	<parameter name="FOLIO" class="java.lang.String">
@@ -89,57 +89,57 @@ WHERE
 	<field name="FOLIO_CLIENTE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="FOLIO_CLIENTE"/>
 		<property name="com.jaspersoft.studio.field.label" value="FOLIO_CLIENTE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_servicio"/>
 	</field>
 	<field name="FECHA" class="java.sql.Date">
 		<property name="com.jaspersoft.studio.field.name" value="FECHA"/>
 		<property name="com.jaspersoft.studio.field.label" value="FECHA"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_servicio"/>
 	</field>
 	<field name="PLACAS_TRANSPORTE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PLACAS_TRANSPORTE"/>
 		<property name="com.jaspersoft.studio.field.label" value="PLACAS_TRANSPORTE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_servicio"/>
 	</field>
 	<field name="NOMBRE_TRANSPORTISTA" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NOMBRE_TRANSPORTISTA"/>
 		<property name="com.jaspersoft.studio.field.label" value="NOMBRE_TRANSPORTISTA"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_servicio"/>
 	</field>
 	<field name="CANTIDAD_DE_COBRO" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD_DE_COBRO"/>
 		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD_DE_COBRO"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA_SERVICIO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="partida_servicio"/>
 	</field>
 	<field name="OBSERVACIONES" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="OBSERVACIONES"/>
 		<property name="com.jaspersoft.studio.field.label" value="OBSERVACIONES"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_servicio"/>
 	</field>
 	<field name="VALOR_DECLARADO" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="VALOR_DECLARADO"/>
 		<property name="com.jaspersoft.studio.field.label" value="VALOR_DECLARADO"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CONSTANCIA_DE_SERVICIO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_servicio"/>
 	</field>
 	<field name="CANTIDAD_TOTAL" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="CANTIDAD_TOTAL"/>
 		<property name="com.jaspersoft.studio.field.label" value="CANTIDAD_TOTAL"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PARTIDA_SERVICIO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="partida_servicio"/>
 	</field>
 	<field name="CTE_NOMBRE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
 		<property name="com.jaspersoft.studio.field.label" value="CTE_NOMBRE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="CLIENTE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
 	</field>
 	<field name="UNIDAD_DE_MANEJO_DS" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="UNIDAD_DE_MANEJO_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="UNIDAD_DE_MANEJO_DS"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="UNIDAD_DE_MANEJO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="unidad_de_manejo"/>
 	</field>
 	<field name="PRODUCTO_DS" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PRODUCTO_DS"/>
 		<property name="com.jaspersoft.studio.field.label" value="PRODUCTO_DS"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="PRODUCTO"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="producto"/>
 	</field>
 	<variable name="Cantidad Total" class="java.lang.Integer" calculation="Sum">
 		<variableExpression><![CDATA[$F{CANTIDAD_DE_COBRO}]]></variableExpression>

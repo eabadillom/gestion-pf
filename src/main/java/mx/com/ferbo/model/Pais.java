@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
 @Entity
-@Table(name = "PAIS")
+@Table(name = "pais")
 @NamedQueries({
     @NamedQuery(name = "Pais.findAll", query = "SELECT p FROM Pais p"),
     @NamedQuery(name = "Pais.findByPaisCve", query = "SELECT p FROM Pais p WHERE p.paisCve = :paisCve"),
