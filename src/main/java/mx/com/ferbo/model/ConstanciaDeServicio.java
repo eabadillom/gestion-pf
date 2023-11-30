@@ -42,6 +42,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaDeServicio.findByPlacasTransporte", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.placasTransporte = :placasTransporte"),
     @NamedQuery(name = "ConstanciaDeServicio.findByObservaciones", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.observaciones = :observaciones"),
     @NamedQuery(name = "ConstanciaDeServicio.findByFolioCliente", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.folioCliente = :folioCliente"),
+    @NamedQuery(name = "ConstanciaDeServicio.findByPeriodoClienteFolioCliente", query = "SELECT c FROM ConstanciaDeServicio c WHERE (c.fecha BETWEEN :fechaInicio AND :fechaFin) AND (c.cteCve.cteCve = :idCliente OR :idCliente IS NULL) AND (c.folioCliente = :folioCliente OR :folioCliente IS NULL)"),
     @NamedQuery(name = "ConstanciaDeServicio.findByValorDeclarado", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.valorDeclarado = :valorDeclarado")})
 
 public class ConstanciaDeServicio implements Serializable {
@@ -94,7 +95,7 @@ public class ConstanciaDeServicio implements Serializable {
     @OneToMany(mappedBy = "folio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
     
-    @OneToMany(mappedBy = "constanciaDeServicio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "constanciaDeServicio", orphanRemoval = true)
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
 
     

@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ejemplo1" pageWidth="229" pageHeight="660" columnWidth="189" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="fcaa7500-ce1f-4ca0-9768-460b64cc8f6d">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDesarrollo.jrdax"/>
 	<style name="Table 1_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<topPen lineWidth="0.5" lineColor="#F7E9E9"/>
@@ -22,25 +22,21 @@
 		</box>
 	</style>
 	<subDataset name="Dataset1" uuid="af5cfd3a-52a0-4f7b-9b7a-0bd89cd76b2d">
-		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion DB Desarrollo"/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDesarrollo.jrdax"/>
 		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 		<parameter name="FOLIO" class="java.lang.String">
 			<defaultValueExpression><![CDATA[$P{FOLIO}]]></defaultValueExpression>
 		</parameter>
 		<queryString>
-			<![CDATA[SELECT gestiondb.`CONSTANCIA_DE_SERVICIO`.`FOLIO_CLIENTE`,
-	gestiondb.`CONSTANCIA_SERVICIO_DETALLE`.`SERVICIO_CANTIDAD`,
-	gestiondb.`SERVICIO`.`SERVICIO_DS`,
-	gestiondb.`CONSTANCIA_DE_SERVICIO`.`FOLIO_CLIENTE`
-FROM gestiondb.`CONSTANCIA_SERVICIO_DETALLE`
-	INNER JOIN gestiondb.`CONSTANCIA_DE_SERVICIO` ON 
-	 gestiondb.`CONSTANCIA_SERVICIO_DETALLE`.`FOLIO` = gestiondb.`CONSTANCIA_DE_SERVICIO`.`FOLIO` 
-	 AND gestiondb.`CONSTANCIA_SERVICIO_DETALLE`.`FOLIO` = gestiondb.`CONSTANCIA_DE_SERVICIO`.`FOLIO` 
-	INNER JOIN gestiondb.`SERVICIO` ON 
-	 gestiondb.`CONSTANCIA_SERVICIO_DETALLE`.`SERVICIO_CVE` = gestiondb.`SERVICIO`.`SERVICIO_CVE` 
-	 AND gestiondb.`CONSTANCIA_SERVICIO_DETALLE`.`SERVICIO_CVE` = gestiondb.`SERVICIO`.`SERVICIO_CVE` 
-WHERE 
-	 gestiondb.`CONSTANCIA_DE_SERVICIO`.`FOLIO_CLIENTE` = $P{FOLIO}]]>
+			<![CDATA[SELECT
+	cs.FOLIO_CLIENTE,
+	csd.SERVICIO_CANTIDAD,
+	srv.SERVICIO_DS,
+	cs.FOLIO_CLIENTE
+FROM constancia_servicio_detalle csd
+INNER JOIN constancia_de_servicio cs ON csd.FOLIO = cs.FOLIO
+INNER JOIN servicio srv ON csd.SERVICIO_CVE = srv.SERVICIO_CVE
+WHERE cs.FOLIO_CLIENTE = $P{FOLIO}]]>
 		</queryString>
 		<field name="FOLIO_CLIENTE" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.name" value="FOLIO_CLIENTE"/>
@@ -68,7 +64,8 @@ WHERE
 	</parameter>
 	<parameter name="LogoPath" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT cs.FOLIO_CLIENTE,
+		<![CDATA[SELECT
+	cs.FOLIO_CLIENTE,
 	cs.FECHA,
 	cs.PLACAS_TRANSPORTE,
 	cs.NOMBRE_TRANSPORTISTA,
@@ -76,23 +73,16 @@ WHERE
 	cs.OBSERVACIONES,
 	cs.VALOR_DECLARADO,
 	ps.CANTIDAD_TOTAL,
-	gestiondb.CLIENTE.CTE_NOMBRE,
-	gestiondb.UNIDAD_DE_MANEJO.UNIDAD_DE_MANEJO_DS,
-	gestiondb.PRODUCTO.PRODUCTO_DS
-FROM gestiondb.CONSTANCIA_DE_SERVICIO cs
-	left outer join gestiondb.PARTIDA_SERVICIO ps ON 
+	c.CTE_NOMBRE,
+	udm.UNIDAD_DE_MANEJO_DS,
+	prd.PRODUCTO_DS
+FROM constancia_de_servicio cs
+	left outer join partida_servicio ps ON 
 	 cs.FOLIO = ps.FOLIO 
-	INNER JOIN gestiondb.CLIENTE ON 
-	 cs.CTE_CVE = gestiondb.CLIENTE.CTE_CVE 
-	 AND cs.CTE_CVE = gestiondb.CLIENTE.CTE_CVE 
-	INNER JOIN gestiondb.UNIDAD_DE_MANEJO ON 
-	 ps.UNIDAD_DE_COBRO = gestiondb.UNIDAD_DE_MANEJO.UNIDAD_DE_MANEJO_CVE 
-	 AND ps.UNIDAD_DE_MANEJO_CVE = gestiondb.UNIDAD_DE_MANEJO.UNIDAD_DE_MANEJO_CVE 
-	 AND ps.UNIDAD_DE_COBRO = gestiondb.UNIDAD_DE_MANEJO.UNIDAD_DE_MANEJO_CVE 
-	 AND ps.UNIDAD_DE_MANEJO_CVE = gestiondb.UNIDAD_DE_MANEJO.UNIDAD_DE_MANEJO_CVE 
-	INNER JOIN gestiondb.PRODUCTO ON 
-	 ps.PRODUCTO_CVE = gestiondb.PRODUCTO.PRODUCTO_CVE 
-	 AND ps.PRODUCTO_CVE = gestiondb.PRODUCTO.PRODUCTO_CVE 
+	INNER JOIN cliente c ON cs.CTE_CVE = c.CTE_CVE 
+	INNER JOIN unidad_de_manejo udm ON ps.UNIDAD_DE_COBRO = udm.UNIDAD_DE_MANEJO_CVE
+	AND ps.UNIDAD_DE_MANEJO_CVE = udm.UNIDAD_DE_MANEJO_CVE 
+	INNER JOIN producto prd ON ps.PRODUCTO_CVE = prd.PRODUCTO_CVE 
 WHERE 
 	 cs.FOLIO_CLIENTE = $P{FOLIO}]]>
 	</queryString>

@@ -1,0 +1,315 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml" >
+	
+	<ui:define name="title">Ordenes de Entrada</ui:define>
+	
+	<ui:define name="content">
+	
+	<h:form id="form">
+	
+		<p:breadCrumb>
+			<p:menuitem value="Home" outcome="/dashboard" />
+			<p:menuitem value="Inventarios" />
+			<p:menuitem value="Entradas" />
+			<p:menuitem value="Orden de Entrada"
+				outcome="/inventarios/ordenEntrada" />
+		</p:breadCrumb>
+	
+		<p:growl id="messages" showDetail="true" life="2000" />
+		
+		<p:panel header="DATOS GENERALES">
+			<p:panel>
+				<div class="p-grid ui-fluid p-col-12">
+					<div class="p-col-6 p-md-6">
+						<p:selectOneMenu id="cliente" value="#{ordenEntradaBean.cliente}" converter="entityConverter">
+							<f:selectItem itemLabel="Selecciona al cliente" noSelectionOption="true" />
+							<f:selectItems value="#{ordenEntradaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+							<p:ajax listener="#{ordenEntradaBean.cargaInfoCliente}" process="@this" update="form:ingreso form:productoCte"/>
+						</p:selectOneMenu>
+					</div>
+					
+					<div class="p-col-6 p-md-4">
+						<p:selectOneMenu id="ingreso" value="#{ordenEntradaBean.ingreso}" converter="entityConverter">
+							<f:selectItem itemLabel="Ordenes confirmadas para hoy" noSelectionOption="true" />
+							<f:selectItems value="#{ordenEntradaBean.listaIngreso}" var="ingreso" itemLabel="#{ingreso.folio}" itemValue="#{ingreso}" />
+							<p:ajax process="@this" update="form:dato-general  form:dt-ingresoProducto form:dt-ingresoServicios" listener="#{ordenEntradaBean.cargaIngresoOrden}" />									
+						</p:selectOneMenu>
+					</div>
+					
+					<div class="p-col-2 p-md-4">
+						<p:selectOneMenu id="aviso" autoWidth="false" converter="entityConverter" value="#{ordenEntradaBean.avisoSelect}" required="true" requiredMessage="Selecciona un aviso">
+							<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
+							<f:selectItems value="#{ordenEntradaBean.avisoPorCliente}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.categoriaCve.categoriaDs}-#{aviso.avisoVigencia}" itemValue="#{aviso}"/>
+							<p:ajax listener="#{ordenEntradaBean.renderServicio()}" update="form:seleccion-servicio form:messages form:dt-ingresoServicios"/>
+						</p:selectOneMenu>
+					</div>
+					
+					<div class="p-col-2 p-md-4" >
+						<p:selectOneMenu id="planta" value="#{ordenEntradaBean.planta}" converter="entityConverter" rendered="#{(usuario.perfil != 1) and (usuario.perfil != 4)}" >
+							<f:selectItem itemLabel="Selecciona planta" noSelectionOption="true" />
+							<f:selectItems value="#{ordenEntradaBean.listaPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+							<p:ajax listener="#{ordenEntradaBean.camaraDisponible}" update="camara" />						
+						</p:selectOneMenu>					
+					</div>
+					
+					<div class="p-col-2 p-md-4" >
+						<p:selectOneMenu id="camara" value="#{ordenEntradaBean.camara}" converter="entityConverter" >
+							<f:selectItem itemLabel="Selecciona camara" noSelectionOption="true" />
+							<f:selectItems value="#{ordenEntradaBean.listaCamara}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />
+							<p:ajax listener="#{ordenEntradaBean.camaraDisponible}" />						
+						</p:selectOneMenu>					
+					</div>
+				</div>
+			</p:panel>
+			
+			<p:toolbar id="dato-general">
+				<p:toolbarGroup>				
+					
+					<p:datePicker id="fecha-hora" value="#{ordenEntradaBean.ingreso.fechaHora}" placeholder="Fecha-Hora" 
+					showTime="true" readonly="true"/>
+				
+					<p:divider />
+					
+					<p:inputText placeholder="Transportista" value="#{ordenEntradaBean.ingreso.transportista}" readonly="true"/>
+													
+					<p:divider layout="vertical" />
+					
+					<div class="p-col-6 p-md-6">
+						<p:inputText placeholder="Placas" value="#{ordenEntradaBean.ingreso.placas}" readonly="true" />
+					</div>
+					
+					<div class="p-col-6 p-md-6">	
+						<p:inputText readonly="true" placeholder="Observaciones" value="#{ordenEntradaBean.ingreso.observaciones}" style="width:650px;"/>
+					</div>
+					
+				</p:toolbarGroup>			
+			</p:toolbar>
+											
+		</p:panel>
+		
+		<p:panel id="pnl-producto" header="Producto">
+			<div class="p-grid ui-fluid">
+			
+				<div class="p-field p-col-4 p-md-6">
+					<p:outputLabel for="productoCte" value="Producto por Cliente" />
+					<p:selectOneMenu id="productoCte" value="#{ordenEntradaBean.ingresoProducto.producto}" converter="entityConverter">
+						<f:selectItem itemLabel="Selecciona producto" noSelectionOption="true" />
+						<f:selectItems value="#{ordenEntradaBean.listaProductos}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto}" />
+					</p:selectOneMenu>
+				</div>
+				
+				<div class="p-field p-col-6 p-md-2">
+					<p:outputLabel for="cantidad" value="Cantidad"/>
+					<p:inputText id="cantidad" value="#{ordenEntradaBean.ingresoProducto.cantidad}"/>									
+				</div>
+				
+				<div class="p-field p-col-4 p-md-2">
+					<p:outputLabel for="unidadManejo" value="Unidad de Manejo"/>
+					<p:selectOneMenu id="unidadManejo" value="#{ordenEntradaBean.ingresoProducto.unidadDeManejo}" converter="entityConverter">
+						<f:selectItem itemLabel="Selecciona unidad de manejo" noSelectionOption="true" />
+						<f:selectItems value="#{ordenEntradaBean.listaUnidadDeManejo}" var="unidadManejo" itemLabel="#{unidadManejo.unidadDeManejoDs}" itemValue="#{unidadManejo}" />
+					</p:selectOneMenu>				
+				</div>
+				
+				<div class="p-field p-col-4 p-md-2">
+					<p:outputLabel for="peso" value="Peso" />
+					<p:inputNumber id="peso" value="#{ordenEntradaBean.ingresoProducto.peso}" />
+				</div>
+				
+				<div class="p-field p-col-4 p-md-2">
+					<p:outputLabel for="lote" value="Lote" />
+					<p:inputText id="lote" value="#{ordenEntradaBean.ingresoProducto.lote}" />
+				</div>
+				
+				<div class="p-field p-col-4 p-md-2">
+					<p:outputLabel for="pedimento" value="Pedimento" />
+					<p:inputText id="pedimento" value="#{ordenEntradaBean.ingresoProducto.pedimento}" />
+				</div>
+				
+				<div class="p-field p-col-4 p-md-2">
+					<p:outputLabel for="contenedor" value="Contenedor" />
+					<p:inputText id="contenedor" value="#{ordenEntradaBean.ingresoProducto.contenedor}" />
+				</div>
+				
+				<div class="p-field p-col-4 p-md-2">
+					<p:outputLabel for="fechaCaducidad" value="Fecha Caducidad" />
+					<p:datePicker id="fechaCaducidad" value="#{ordenEntradaBean.ingresoProducto.fechaCaducidad}" showIcon="true" >
+					</p:datePicker>
+				</div>
+				
+				<div class="p-field p-col-4 p-md-2">
+					<p:outputLabel for="otro" value="Otro" />
+					<p:inputText id="otro" value="#{ordenEntradaBean.ingresoProducto.otro}" />
+				</div>
+				
+				<div class="p-field p-col-2" style="margin-top: 22px">
+					<p:commandButton value="Agregar" oncomplete="PF('dlgTarima').show()" process="@this form:pnl-producto"/>
+				</div>
+				
+			</div>
+		</p:panel>
+		
+		<p:dataTable id="dt-ingresoProducto" value="#{ordenEntradaBean.listaIngresoProducto}" var="ingresoProducto" paginator="true" rows="5" 
+					paginatorPosition="bottom" rowKey="#{ingresoProducto.cantidad}">
+					
+			<f:facet name="header">
+				<span>Productos</span>
+			</f:facet>
+			
+			<p:column exportable="false" width="3%">
+				<p:rowToggler/>
+			</p:column>
+		
+			<p:column headerText="Tarimas">
+				<h:outputText value="#{ingresoProducto.noTarimas}" />
+			</p:column>
+			
+			<p:column headerText="Producto">
+				<h:outputText value="#{ingresoProducto.producto.productoDs}" />
+			</p:column>
+			
+			<p:column headerText="Cantidad x Tarima">
+				<h:outputText value="#{ingresoProducto.cantidad}" />
+			</p:column>
+			
+			<p:column headerText="Unidad">
+				<h:outputText value="#{ingresoProducto.unidadDeManejo.unidadDeManejoDs}" />
+			</p:column>
+			
+			<p:column headerText="Peso total x Tarima">
+				<h:outputText value="#{ingresoProducto.peso}" />
+			</p:column>
+			
+			<p:column>
+				<p:commandButton action="#{ordenEntradaBean.eliminarIngresoProducto}" class="ui-button-danger" icon="pi pi-times" process="@this" update="form:dt-ingresoProducto">
+					<f:setPropertyActionListener value="#{ingresoProducto}" target="#{ordenEntradaBean.selectIngresoProducto}"></f:setPropertyActionListener>
+				</p:commandButton>
+			</p:column>
+		
+			<p:rowExpansion >
+								
+				<div class="p-grid ui-fluid">
+					<div class="p-field p-col-2 p-md-2">
+						<p:outputLabel for="@next" value="Lote" />
+						<p:inputText value="#{ingresoProducto.lote}" readonly="true" />
+					</div>									
+					<div class="p-field p-col-2 p-md-2">
+						<p:outputLabel for="@next" value="Pedimento"/>
+						<p:inputText value="#{ingresoProducto.pedimento}" readonly="true" />
+					</div>
+					<div class="p-field p-col-2 p-md-2">
+						<p:outputLabel for="@next" value="Contenedor"/>
+						<p:inputText value="#{ingresoProducto.contenedor}" readonly="true" />
+					</div>
+					<div class="p-field p-col-2 p-md-2">
+						<p:outputLabel for="@next" value="Fecha Caducidad"/>
+						<p:datePicker value="#{ingresoProducto.fechaCaducidad}" readonly="true"/>
+					</div>
+					<div class="p-field p-col-2 p-md-2">
+						<p:outputLabel for="@next" value="Otro"/>
+						<p:inputText value="#{ingresoProducto.otro}" readonly="true" />
+					</div>
+					
+				</div>						
+								
+			</p:rowExpansion>
+			
+			<f:facet name="footer">
+								
+				<span style="margin-left: 75px" >Tarimas: <h:outputText value="#{ordenEntradaBean.sumaTarimas}" /></span>
+				
+				<span style="margin-left: 550px"><h:outputText value="#{ordenEntradaBean.sumaCantidad}"/> unidades</span>
+				
+				<span style="margin-left: 550px"><h:outputText value="#{ordenEntradaBean.sumaPeso}"/> Kg.</span>
+				
+			</f:facet>
+		
+		</p:dataTable>
+		
+		<p:panel id="seleccion-servicio" header="PARA LOS SERVICIOS DE">
+			<div class="p-grid ui-fluid p-col-12">
+				<div class="p-col-2 p-md-2">
+					<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{ordenEntradaBean.isCongelacion}">
+						<p:ajax process="@this" update="congelacion form:dt-ingresoServicios" listener="#{ordenEntradaBean.addCongelacion}" ></p:ajax>
+					</p:selectBooleanCheckbox>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{ordenEntradaBean.isConservacion}">
+						<p:ajax process="@this" update="conservacion form:dt-ingresoServicios" listener="#{ordenEntradaBean.addConservacion}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{ordenEntradaBean.isRefrigeracion}">
+						<p:ajax process="@this" update="refrigeracion form:dt-ingresoServicios" listener="#{ordenEntradaBean.addRefrigeracion}"></p:ajax>
+					</p:selectBooleanCheckbox>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{ordenEntradaBean.isManiobras}">
+						<p:ajax process="@this" update="maniobras form:dt-ingresoServicios" listener="#{ordenEntradaBean.addManiobras}" ></p:ajax>
+					</p:selectBooleanCheckbox>
+				</div>
+			</div>
+			<div class="p-grid ui-fluid p-col-12">
+				<div class="p-col-6 p-md-6">
+					<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{ordenEntradaBean.precioServicioSelect}" >
+						<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
+						<f:selectItems value="#{ordenEntradaBean.listaServicioUnidad}" var="precioServicio" itemLabel="#{precioServicio.servicio.servicioDs} (Cobro por #{precioServicio.unidad.unidadDeManejoDs})" itemValue="#{precioServicio}" />	
+						<p:ajax process="@this"></p:ajax>
+					</p:selectOneMenu>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:spinner id="cantidadServicio" min="1" value="#{ordenEntradaBean.cantidadServicio}" placeholder="Cantidad">
+						<p:ajax process="@this"></p:ajax>
+					</p:spinner>
+				</div>
+				<div class="p-col-2 p-md-2">
+					<p:commandButton id="cmd-agregar-servicio" value="Agregar" styleClass="edit-button" actionListener="#{ordenEntradaBean.saveIngresoServicio()}" style="margin-right: .5rem" icon="pi pi-plus" process="@this" update="form:dt-ingresoServicios form:seleccion-servicio" />
+				</div>
+			</div>
+		</p:panel>
+		
+		<p:dataTable id="dt-ingresoServicios" value="#{ordenEntradaBean.listaIngresoServicio}" var="ingresoServicio">
+		
+			<f:facet name="header">
+				<span>Servicios</span>
+			</f:facet>
+		
+			<p:column headerText="Servicio">
+				<h:outputText value="#{ingresoServicio.servicio.servicioDs}" />
+			</p:column>
+			
+			<p:column headerText="Cantidad">
+				<h:outputText value="#{ingresoServicio.cantidad}" />
+			</p:column>
+			
+			<p:column>
+				<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" action="#{ordenEntradaBean.eliminarIngresoServicio}" update="form:dt-ingresoServicios form:seleccion-servicio" >
+					<f:setPropertyActionListener value="#{ingresoServicio}" target="#{ordenEntradaBean.selectIngresoServicio}"></f:setPropertyActionListener>
+				</p:commandButton>
+			</p:column>
+		
+		</p:dataTable>
+		
+		
+		<p:dialog header="¿Cuantas tarimas deseas ingresar?" modal="true" widgetVar="dlgTarima" responsive="true" showEffect="hide">
+			<p:outputPanel id="tarimas" >
+				<div style="text-align: center">
+					<p:spinner value="#{ordenEntradaBean.ingresoProducto.noTarimas}">
+					</p:spinner>
+				</div>
+			</p:outputPanel>
+			
+			<f:facet name="footer">
+				<p:commandButton value="Validar" onclick="PF('dlgTarima').hide()" actionListener="#{ordenEntradaBean.addIngresoProducto}" process="@this tarimas" update="form:dt-ingresoProducto tarimas form:pnl-producto" />
+				<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgTarima').hide()" />
+			</f:facet>				
+		</p:dialog>
+		
+		
+	</h:form>
+	</ui:define>
+</ui:composition>	

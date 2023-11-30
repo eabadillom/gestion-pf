@@ -12,28 +12,34 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaDepositoDetalleDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
+import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
 import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
+import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
+import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
@@ -41,7 +47,9 @@ import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 
@@ -50,7 +58,7 @@ import mx.com.ferbo.util.conexion;
 public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private static final long serialVersionUID = -3109002730694247052L;
-	
+	private static Logger log = LogManager.getLogger(ConsultarConstanciaDeDepositoBean.class);
 	
 	private Date fechaInicial;
 	private Date fechaFinal;
@@ -91,9 +99,19 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private String otro,pedimento,contenedor,lote,tarima;
 	
+	private List<Aviso> listaAvisos;
+	private AvisoDAO avisoDAO;
+	
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
 	private Usuario usuario;
+	
+	private EstadoConstancia statusCancelada;
+	private EstadoConstanciaDAO statusDAO;
+	
+	private Integer cantidadTotal = null;
+	private BigDecimal pesoTotal = null;
+	private BigDecimal tarimasTotal = null;
 	
 	public ConsultarConstanciaDeDepositoBean() {
 		
@@ -115,6 +133,9 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		constanciaDepositoDetalleDAO = new ConstanciaDepositoDetalleDAO();
 		
 		detallePartidaDAO = new DetallePartidaDAO();
+		
+		avisoDAO = new AvisoDAO();
+		statusDAO = new EstadoConstanciaDAO();
 	}
 
 	@PostConstruct
@@ -132,9 +153,380 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		folio = "";
 		
 		Date today = new Date();
-		long oneDay = 24 * 60 * 60 * 1000;
 		maxDate = new Date(today.getTime() );
 		
+		this.selectConstanciaDD = new ConstanciaDeDeposito();
+		this.selectConstanciaDD.setAvisoCve(new Aviso());
+		this.statusCancelada = statusDAO.buscarPorId(2);
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		log.info("Lanzando evento Pre-destroy...");
+	}
+	
+	public void buscarConstancias() {
+		Integer idCliente = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			
+			if(cliente != null)
+				idCliente = cliente.getCteCve();
+			
+			constanciaDeDepositoDAO.setEm(em);
+			
+			log.info( getFechaInicial() + "" + getFechaFinal());
+			log.info( fechaFinal + "" + fechaInicial);//si trae las fechas dadas por el usuario
+			
+			listadoConstanciaDeDepositos = constanciaDeDepositoDAO.buscarPor(folio, idCliente, fechaInicial, fechaFinal);
+			
+		} catch(Exception ex) {
+			log.error("Problema en la búsqueda de constancias de depósito...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+	}
+	
+	public void cargaDetalle() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Carga de información...";		
+		
+		try {
+			log.info("Constancia de deposito: {}",this.selectConstanciaDD);
+			this.selectConstanciaDD = constanciaDeDepositoDAO.buscarPorFolioCliente(this.selectConstanciaDD.getFolioCliente(), true);
+			
+			listadoProductoPorCliente.clear();
+			ProductoPorCliente productoPorCliente = new ProductoPorCliente();
+			productoPorCliente.setCteCve(this.selectConstanciaDD.getCteCve());
+			this.listadoProductoPorCliente = pdtoPorCliDAO.buscarPorCriterios(productoPorCliente);
+			this.listadoConstanciaDepositoDetalle = this.selectConstanciaDD.getConstanciaDepositoDetalleList();
+			log.info("Constancia de deposito: {}", this.selectConstanciaDD);
+			log.info("Partida: {}", this.selectConstanciaDD.getPartidaList().size());
+			this.productoSelect = null;
+			
+			if(selectConstanciaDD.getAvisoCve()!=null) {
+				listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
+			}
+			
+			this.cantidadTotal = new Integer(0);
+			this.pesoTotal = new BigDecimal("0.00").setScale(3, BigDecimal.ROUND_HALF_UP);
+			this.tarimasTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+			
+			for(Partida partida : this.selectConstanciaDD.getPartidaList()) {
+				this.cantidadTotal = Integer.sum(this.cantidadTotal, partida.getCantidadTotal());
+				this.pesoTotal = this.pesoTotal.add(partida.getPesoTotal());
+				this.tarimasTotal = this.tarimasTotal.add(partida.getNoTarimas());
+			}
+			
+			log.debug("{} tarimas, {} unidades, {} kg", this.tarimasTotal, this.pesoTotal);
+			
+			listaAvisos = avisoDAO.buscarPorCliente(this.selectConstanciaDD.getCteCve().getCteCve());
+			
+			servicioSelected = new Servicio();
+			this.cantidadServicio = null;
+			
+		} catch (Exception ex) {
+			log.error("Problema para cargar la información de la constancia...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages","form:dlg-constancia", "form:dlg-partidas", "form:dlg-servicios");
+			
+		}
+	}
+	
+	public void updateConstanciaDD() {
+		
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Producto";
+		
+		UnidadDeProducto unidadDeProducto = null;
+		
+		try {
+			if(productoSelect == null) {
+				unidadDeProducto = partidaSelect.getUnidadDeProductoCve();
+			} else {
+				unidadDeProducto = unidadDeProductoDAO.buscarPorProductoUnidad(this.productoSelect.getProductoCve(), partidaSelect.getUnidadDeProductoCve().getUnidadDeProductoCve());
+			}
+			
+			if(unidadDeProducto == null) {
+				unidadDeProducto = new UnidadDeProducto();
+				unidadDeProducto.setProductoCve(productoSelect);
+				unidadDeProducto.setUnidadDeManejoCve(partidaSelect.getUnidadDeProductoCve().getUnidadDeManejoCve());
+				unidadDeProductoDAO.guardar(unidadDeProducto);
+			}
+			
+			partidaSelect.setUnidadDeProductoCve(unidadDeProducto);
+			
+			constanciaDeDepositoDAO.actualizar(selectConstanciaDD);
+			
+			mensaje = "Producto actualizado correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			
+		} catch (Exception ex) {
+			log.error("Problema para actualizar el producto...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages","form:dt-partida");
+		}
+	}
+	
+	public void updateDetallePartida() {
+		
+		
+		List<DetallePartida> listadoDetallePartida = partidaSelect.getDetallePartidaList();
+		int size = listadoDetallePartida.size();
+		
+		DetallePartida detallePartida = listadoDetallePartida.get(size - 1);//obtengo el ultimo detalle de la Partidas
+		
+		detallePartida.setDtpPO(otro);//otro
+		detallePartida.setDtpPedimento(pedimento);
+		detallePartida.setDtpSAP(contenedor);//contenedor
+		detallePartida.setDtpLote(lote);
+		detallePartida.setDtpCaducidad(fechaCaducidad);
+		//detallePartida.setDtpPO(null);//otro
+		detallePartida.setDtpTarimas(tarima);
+		
+		if(detallePartidaDAO.actualizar(detallePartida) == null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Detalle de Partida Actualizada"));
+		}
+		
+		otro = "";
+		pedimento = "";
+		contenedor = "";
+		lote = "";
+		fechaCaducidad = new Date();
+		tarima = "";
+		
+		PrimeFaces.current().ajax().update("form:messages");
+		
+	}
+	
+	public void verDetallePartida() {
+		
+		List<DetallePartida> listaDetalleP = partidaSelect.getDetallePartidaList();
+		
+		int tam = listaDetalleP.size()-1;
+		
+		DetallePartida detalleP = listaDetalleP.get(tam);
+		
+		otro = detalleP.getDtpPO();
+		pedimento = detalleP.getDtpPedimento();
+		contenedor = detalleP.getDtpSAP();
+		lote = detalleP.getDtpLote();
+		fechaCaducidad = detalleP.getDtpCaducidad();
+		
+	}
+	
+	public void newServicio() {
+		constanciaSelect = new ConstanciaDepositoDetalle();
+	}
+	
+	public void updateServicio() {
+		
+		listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+		selectConstanciaDD.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
+		
+		for(ConstanciaDepositoDetalle c: selectConstanciaDD.getConstanciaDepositoDetalleList()) {
+			
+			if(c.getConstanciaDepositoDetalleCve().equals(constanciaSelect.getConstanciaDepositoDetalleCve())) {
+				c.setServicioCantidad(servicioCantidad);
+			}
+			
+		}
+		
+		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Servicio Actualizado"));
+			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+		}
+		
+		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
+	}
+	
+	public void saveServicio() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		ConstanciaDepositoDetalle conDepositoDetalle = null;
+		
+		try {
+			if(servicioSelected == null)
+				throw new InventarioException("Debe seleccionar un servicio.");
+			
+			if(cantidadServicio == null)
+				throw new InventarioException("Debe indicar una cantidad para el servicio.");
+			
+			if(cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
+				throw new InventarioException("Debe indicar una cantidad correcta para el servicio.");
+			
+			conDepositoDetalle = new ConstanciaDepositoDetalle();
+			conDepositoDetalle.setFolio(selectConstanciaDD);
+			conDepositoDetalle.setServicioCantidad(cantidadServicio);
+			conDepositoDetalle.setServicioCve(servicioSelected);
+			
+			if(constanciaDepositoDetalleDAO.guardar(conDepositoDetalle) != null) {
+				throw new InventarioException("Ocurrió un problema al guardar el servicio.");
+			}
+			
+			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+			selectConstanciaDD.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
+			
+			servicioSelected = new Servicio();
+			this.cantidadServicio = null;
+			
+			mensaje = "Servicio agregado correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception e) {
+			mensaje = "Problema al agregar el servicio.";
+			severity = FacesMessage.SEVERITY_WARN;
+		} finally {
+			message = new FacesMessage(severity,"Servicio" , mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle", "form:precioServicio", "form:cantidadServicio");
+		}
+		
+		
+		
+		
+		
+		
+	}
+	
+	public void deleteServicio() {
+		
+		if(constanciaDepositoDetalleDAO.eliminar(this.constanciaSelect)== null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado","Servicio Eliminado"));
+			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
+			selectConstanciaDD.getConstanciaDepositoDetalleList().remove(constanciaSelect);
+			constanciaSelect = new ConstanciaDepositoDetalle();
+		}
+		
+		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
+		
+	}
+	
+	public void updateDatosGenerales() {
+		
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			
+			if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
+				throw new Exception("No esta autorizado para modificar esta información.");
+			}
+			constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD);
+				
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "La información se guardó correctamente.";
+		}catch (Exception e) {
+			mensaje = "No esta autorizado para modificar";
+			severity = FacesMessage.SEVERITY_WARN;
+		}finally {
+			message = new FacesMessage(severity,"Corrección de información." , mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
+	}
+	
+	public void cancelarConstancia() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Producto";
+		
+		try {
+			
+			if(this.selectConstanciaDD.getStatus().getEdoCve() == 2)
+				throw new InventarioException("La constancia solicitada ya está cancelada.");
+			
+			if(constanciaDeDepositoDAO.tieneSalidas(this.selectConstanciaDD.getFolio()))
+				throw new InventarioException("La entrada solicitada ya tiene movimientos de salida. No es posible cancelarla.");
+			
+			if(constanciaDeDepositoDAO.tieneFacturas(this.selectConstanciaDD.getFolio()))
+				throw new InventarioException("La entrada solicitada ya tiene movimientos de facturación. No es posible cancelarla.");
+			
+			log.info("Cancelando constancia {}", this.selectConstanciaDD.getFolioCliente());
+			this.selectConstanciaDD.setStatus(statusCancelada);
+			this.selectConstanciaDD.setObservaciones("CONSTANCIA CANCELADA EL DIA " + DateUtil.getString(this.selectConstanciaDD.getFechaIngreso(), DateUtil.FORMATO_DD_MM_YYYY));
+			constanciaDeDepositoDAO.actualizar(selectConstanciaDD);
+			
+			mensaje = "Constancia cancelada correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('cancelDialog').hide()");
+		} catch (InventarioException ex) {
+			log.error("Problema para cancelar la entrada...", ex);
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception ex) {
+			log.error("Problema para cancelar la entrada...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages","form:dt-constanciaDeDeposito");
+		}
+		
+		
+		
+		
+	}
+	
+	public void imprimir() {
+		String jasperPath = "/jasper/GestionReport.jrxml";
+		String filename = "ticket.pdf";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
+		ConstanciaDeDeposito constancia = null;
+		 File reportFile = new File(jasperPath);
+		 File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+		try {
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			constancia = new ConstanciaDeDeposito();
+			constancia.setFolioCliente(this.selectConstanciaDD.getFolioCliente());
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("FOLIO", constancia.getFolioCliente());
+			parameters.put("LogoPath",imgfile.getPath());
+			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());		
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			message = String.format("No se pudo imprimir el folio %s", this.selectConstanciaDD.getFolioCliente());
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		} finally {
+			conexion.close((Connection) connection);
+		}
 		
 	}
 
@@ -346,247 +738,35 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		this.maxDate = maxDate;
 	}
 
-	public void buscarConstanciaDD() {
-		
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		EntityTransaction transaction = em.getTransaction();
-		transaction.begin();
-		constanciaDeDepositoDAO.setEm(em);
-		
-		System.out.println( getFechaInicial() + "" + getFechaFinal());
-		System.out.println( fechaFinal + "" + fechaInicial);//si trae las fechas dadas por el usuario
-		
-		listadoConstanciaDeDepositos = constanciaDeDepositoDAO.buscarPorCriterios(folio,fechaInicial, fechaFinal, cliente.getCteCve());
-		
-		for (ConstanciaDeDeposito constanciaDeDeposito : listadoConstanciaDeDepositos) {
-			List<Partida> alPartidas = constanciaDeDeposito.getPartidaList();
-			alPartidas.size();//permite recuperar la lista de partidas de la Constancia de Deposito
-			List<ConstanciaDepositoDetalle> alConstanciaDD = constanciaDeDeposito.getConstanciaDepositoDetalleList();
-			alConstanciaDD.size();
-			for(Partida p: alPartidas) {
-				String camara = p.getCamaraCve().getCamaraAbrev();
-				p.getCamaraCve().getPlantaCve().getPlantaDs();
-				List<DetallePartida> listadoDetallePartida = p.getDetallePartidaList();
-				listadoDetallePartida.size();
-			}
-		}
-		
-		transaction.commit();
-		em.close();
-		
-		listadoProductoPorCliente.clear();
-		ProductoPorCliente productoPorCliente = new ProductoPorCliente();
-		productoPorCliente.setCteCve(cliente);
-		listadoProductoPorCliente = pdtoPorCliDAO.buscarPorCriterios(productoPorCliente);
-		
-	
+	public List<Aviso> getListaAvisos() {
+		return listaAvisos;
 	}
-	
-	public void cargaDeDatos() {
-			
-		
-		
-			if(selectConstanciaDD.getAvisoCve()!=null) {
-				listadoPrecioServicio = precioServicioDAO.buscarPorAviso(selectConstanciaDD.getAvisoCve(), selectConstanciaDD.getCteCve());
-			}else {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso","No contiene aviso la contancia de deposito"));
-			}
-			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
-			PrimeFaces.current().ajax().update("form:messages");
-	}
-	
-	public void updateConstanciaDD() {
-		
-		
-		
-		UnidadDeProducto unidadDeProducto = new UnidadDeProducto();
-		unidadDeProducto = partidaSelect.getUnidadDeProductoCve();
-		if(productoSelect!=null) {
-			unidadDeProducto.setProductoCve(productoSelect);
-		}
-		if(unidadDeProductoDAO.actualizar(unidadDeProducto) == null && constanciaDeDepositoDAO.actualizar(selectConstanciaDD)==null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Partida Actualizada"));
-		}
-		
-		
-		PrimeFaces.current().ajax().update("form:messages","form:dt-partida");
-	}
-	
-	public void updateDetallePartida() {
-		
-		
-		List<DetallePartida> listadoDetallePartida = partidaSelect.getDetallePartidaList();
-		int size = listadoDetallePartida.size();
-		
-		DetallePartida detallePartida = listadoDetallePartida.get(size - 1);//obtengo el ultimo detalle de la Partidas
-		
-		detallePartida.setDtpPO(otro);//otro
-		detallePartida.setDtpPedimento(pedimento);
-		detallePartida.setDtpSAP(contenedor);//contenedor
-		detallePartida.setDtpLote(lote);
-		detallePartida.setDtpCaducidad(fechaCaducidad);
-		//detallePartida.setDtpPO(null);//otro
-		detallePartida.setDtpTarimas(tarima);
-		
-		if(detallePartidaDAO.actualizar(detallePartida) == null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Detalle de Partida Actualizada"));
-		}
-		
-		otro = "";
-		pedimento = "";
-		contenedor = "";
-		lote = "";
-		fechaCaducidad = new Date();
-		tarima = "";
-		
-		PrimeFaces.current().ajax().update("form:messages");
-		
-	}
-	
-	public void verDetallePartida() {
-		
-		List<DetallePartida> listaDetalleP = partidaSelect.getDetallePartidaList();
-		
-		int tam = listaDetalleP.size()-1;
-		
-		DetallePartida detalleP = listaDetalleP.get(tam);
-		
-		otro = detalleP.getDtpPO();
-		pedimento = detalleP.getDtpPedimento();
-		contenedor = detalleP.getDtpSAP();
-		lote = detalleP.getDtpLote();
-		fechaCaducidad = detalleP.getDtpCaducidad();
-		
-	}
-	
-	public void newServicio() {
-		constanciaSelect = new ConstanciaDepositoDetalle();
-	}
-	
-	public void updateServicio() {
-		
-		listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
-		selectConstanciaDD.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
-		
-		for(ConstanciaDepositoDetalle c: selectConstanciaDD.getConstanciaDepositoDetalleList()) {
-			
-			if(c.getConstanciaDepositoDetalleCve().equals(constanciaSelect.getConstanciaDepositoDetalleCve())) {
-				c.setServicioCantidad(servicioCantidad);
-			}
-			
-		}
-		
-		if(constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD) == null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Servicio Actualizado"));
-			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
-		}
-		
-		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
-	}
-	
-	public void saveServicio() {
-		
-		List<ConstanciaDepositoDetalle> lisConstanciaDepositoDetalles = selectConstanciaDD.getConstanciaDepositoDetalleList();
-		
-		ConstanciaDepositoDetalle conDepositoDetalle = new ConstanciaDepositoDetalle();
-		conDepositoDetalle.setFolio(selectConstanciaDD);
-		conDepositoDetalle.setServicioCantidad(cantidadServicio);
-		conDepositoDetalle.setServicioCve(servicioSelected);
-		
-		
-		if(constanciaDepositoDetalleDAO.guardar(conDepositoDetalle)== null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado","Servicio Agregado"));
-			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
-			selectConstanciaDD.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
-			
-		}
-		
-		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
-		
-	}
-	
-	public void deleteServicio() {
-		
-		if(constanciaDepositoDetalleDAO.eliminar(this.constanciaSelect)== null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado","Servicio Eliminado"));
-			listadoConstanciaDepositoDetalle = constanciaDepositoDetalleDAO.buscarPorFolio(selectConstanciaDD);
-			selectConstanciaDD.getConstanciaDepositoDetalleList().remove(constanciaSelect);
-			constanciaSelect = new ConstanciaDepositoDetalle();
-		}
-		
-		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
-		
-	}
-	
-	public void updateDatosGenerales() {
-		
-		FacesMessage message = null;
-		Severity severity = null;
-		String mensaje = null;
-		
-		try {
-			
-			if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
-				throw new Exception("No esta autorizado para modificar");
-			}
-			
-			constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD);
-				
-			severity = FacesMessage.SEVERITY_INFO;
-			mensaje = "Se modificaron los datos generales correctamente";
-			
-		}catch (Exception e) {
-			
-			mensaje = "No esta autorizado para modificar";
-			severity = FacesMessage.SEVERITY_WARN;
-		}finally {
-			
-			message = new FacesMessage(severity,"Modificacion" , mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("form:messages");
-			
-		}
-		
-	}
-	
-	public void imprimir() {
-		String jasperPath = "/jasper/GestionReport.jrxml";
-		String filename = "ticket.pdf";
-		String images = "/images/logo.jpeg";
-		String message = null;
-		Severity severity = null;
-		ConstanciaDeDeposito constancia = null;
-		 File reportFile = new File(jasperPath);
-		 File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		Connection connection = null;
-		parameters = new HashMap<String, Object>();
-		try {
-			URL resource = getClass().getResource(jasperPath);
-			URL resourceimg = getClass().getResource(images);
-			String file = resource.getFile();
-			String img = resourceimg.getFile();
-			reportFile = new File(file);
-			imgfile = new File(img);
-			constancia = new ConstanciaDeDeposito();
-			constancia.setFolioCliente(this.selectConstanciaDD.getFolioCliente());
-			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("FOLIO", constancia.getFolioCliente());
-			parameters.put("LogoPath",imgfile.getPath());
-			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());		
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			message = String.format("No se pudo imprimir el folio %s", this.selectConstanciaDD.getFolioCliente());
-			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-			PrimeFaces.current().ajax().update("form:messages");
-		} finally {
-			conexion.close((Connection) connection);
-		}
-		
-	}
-	
 
+	public void setListaAvisos(List<Aviso> listaAvisos) {
+		this.listaAvisos = listaAvisos;
+	}
+
+	public Integer getCantidadTotal() {
+		return cantidadTotal;
+	}
+
+	public void setCantidadTotal(Integer cantidadTotal) {
+		this.cantidadTotal = cantidadTotal;
+	}
+
+	public BigDecimal getPesoTotal() {
+		return pesoTotal;
+	}
+
+	public void setPesoTotal(BigDecimal pesoTotal) {
+		this.pesoTotal = pesoTotal;
+	}
+
+	public BigDecimal getTarimasTotal() {
+		return tarimasTotal;
+	}
+
+	public void setTarimasTotal(BigDecimal tarimasTotal) {
+		this.tarimasTotal = tarimasTotal;
+	}
 }

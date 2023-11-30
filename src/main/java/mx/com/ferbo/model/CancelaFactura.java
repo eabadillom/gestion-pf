@@ -49,7 +49,7 @@ public class CancelaFactura implements Serializable {
     private String descripcion;
     
     @JoinColumn(name = "factura")
-    @OneToOne(optional = false, cascade = {CascadeType.ALL})
+    @OneToOne(optional = false, cascade = {CascadeType.MERGE})
     private Factura factura;
 
     public CancelaFactura() {

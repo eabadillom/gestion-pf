@@ -171,7 +171,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaSerieF = serieFacturaDAO.findAll();
 		listaA = avisoDAO.buscarTodos();
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
-		listaMedioPago = medioPagoDAO.buscarTodos();
+		listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
 		
 		fechaCorte = new Date();
 		fechaFactura = new Date();

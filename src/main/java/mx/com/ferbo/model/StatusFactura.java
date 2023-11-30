@@ -32,6 +32,12 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "StatusFactura.findByNombre", query = "SELECT s FROM StatusFactura s WHERE s.nombre = :nombre"),
         @NamedQuery(name = "StatusFactura.findByDescripcion", query = "SELECT s FROM StatusFactura s WHERE s.descripcion = :descripcion") })
 public class StatusFactura implements Serializable {
+	
+	public static final int STATUS_ERROR = 0;
+	public static final int STATUS_POR_COBRAR = 1;
+	public static final int STATUS_CANCELADA = 2;
+	public static final int STATUS_PAGADA = 3;
+	public static final int STATUS_PAGO_PARCIAL = 4;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -47,8 +53,6 @@ public class StatusFactura implements Serializable {
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    @OneToMany(mappedBy = "status")
-    private List<Factura> facturaList;
 
     public StatusFactura() {
     }
@@ -84,14 +88,6 @@ public class StatusFactura implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public List<Factura> getFacturaList() {
-        return facturaList;
-    }
-
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
     }
 
     @Override

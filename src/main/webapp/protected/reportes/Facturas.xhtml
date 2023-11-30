@@ -9,30 +9,17 @@
 
     <ui:define name="content">
         <h:form id="form">
-        <p:breadCrumb>
-            <p:menuitem value="Home" outcome="/dashboard"/>
-            <p:menuitem value="Reportes"/>
-            <p:menuitem value="Facturas"/>
-            <p:menuitem value="Facturas" outcome="/protected/reportes/Facturas"/>
-        </p:breadCrumb>
+			<p:growl id="messages" showDetail="true" />
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
                     <div class="card">
-                        <p:growl id="messages" showDetail="true" />
-                        
-                         
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteFacturacionBean.fecha}" />
-					
-						
 						 <p:fieldset legend="Rangos de fechas">
-		         	   
 		         	     <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="ol-fechaIni" value="#{reporteFacturacionBean.fecha_ini}" maxdate="#{reporteFacturacionBean.maxDate}" requiredMessage="...."/>
+			                <p:datePicker id="ol-fechaIni" value="#{reporteFacturacionBean.fecha_ini}" maxdate="#{reporteFacturacionBean.maxDate}" requiredMessage="...." showIcon="true"/>
 			                <p:outputLabel for="ol-fechaIni" value="Fecha de inicio"/>
 			              </span>
-           				 
 				             <span class="ui-float-label ui-input-icon-left">
-				                <p:datePicker id="ol-fechafin" value="#{reporteFacturacionBean.fecha_fin}" maxdate="#{reporteFacturacionBean.maxDate}"/>
+				                <p:datePicker id="ol-fechafin" value="#{reporteFacturacionBean.fecha_fin}" maxdate="#{reporteFacturacionBean.maxDate}" showIcon="true"/>
 				                <p:outputLabel for="ol-fechafin" value="Fecha final"/>
 				                </span>
 							</p:fieldset>

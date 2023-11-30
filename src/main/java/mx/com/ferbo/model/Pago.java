@@ -9,8 +9,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -39,7 +41,7 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "Pago.findByCheque", query = "SELECT p FROM Pago p WHERE p.cheque = :cheque"),
         @NamedQuery(name = "Pago.findByChequeDevuelto", query = "SELECT p FROM Pago p WHERE p.chequeDevuelto = :chequeDevuelto"),
         @NamedQuery(name = "Pago.findByFacturaId", query = "SELECT p FROM Pago p WHERE p.factura.id = :facturaId"),
-        @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE p.factura.cliente.cteCve = :cteCve AND p.fecha BETWEEN :startDate AND :endDate") })
+        @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)") })
 public class Pago implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -68,12 +70,16 @@ public class Pago implements Serializable {
     private String cheque; 
     @Column(name = "cheque_devuelto")
     private Boolean chequeDevuelto;
+    
+    @Basic(optional = true)
     @JoinColumn(name = "banco", referencedColumnName = "id")
     @ManyToOne
     private Bancos banco;
+    
     @JoinColumn(name = "factura", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Factura factura;
+    
     @JoinColumn(name = "tipo", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private TipoPago tipo;

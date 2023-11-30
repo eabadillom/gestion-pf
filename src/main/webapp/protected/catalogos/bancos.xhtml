@@ -45,19 +45,8 @@
 								</div>
 							</f:facet>
 
-							<!-- 							<p:ajax event="rowSelect" update=":form:delete-servicios-button" /> -->
-							<!-- 							<p:ajax event="rowUnselect" -->
-							<!-- 								update=":form:delete-bancos-button" /> -->
-							<!-- 							<p:ajax event="rowSelectCheckbox" -->
-							<!-- 								update=":form:delete-bancos-button" /> -->
-							<!-- 							<p:ajax event="rowUnselectCheckbox" -->
-							<!-- 								update=":form:delete-bancos-button" /> -->
-							<!-- 							<p:ajax event="toggleSelect" -->
-							<!-- 								update=":form:delete-bancos-button" /> -->
-
-
 							<p:column headerText="Clave" sortBy="#{bancos.clave}"
-								filterBy="#{bancos.clave}" style="text-align:center">
+								filterBy="#{bancos.clave}" width="6rem" style="text-align: center;">
 								<h:outputText value="#{bancos.clave}" style="vertical-align: middle; margin-left: .5rem" />
 							</p:column>
 							<p:column headerText="Nombre" sortBy="#{bancos.nombre}"
@@ -65,13 +54,15 @@
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
 									value="#{bancos.nombre}" />
 							</p:column>
-							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil" update=":form:manage-bank-content-new" value="Modificar"
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-bank-content-new"
 												oncomplete="PF('nuevoBancoDialog').show()" styleClass="p-mr-2 p-mb-2" process="@this">
 									<f:setPropertyActionListener value="#{bancos}" target="#{bancosBean.bancoSelect}" />
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
-									icon="pi pi-trash" process="@this"
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton styleClass="p-mr-2 p-mb-2" class="ui-button-danger"
+									icon="pi pi-times" process="@this"
 									oncomplete="PF('deleteBancosDialog').show()">
 									<f:setPropertyActionListener value="#{bancos}"
 										target="#{bancosBean.bancoSelect}" />

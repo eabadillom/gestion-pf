@@ -9,31 +9,18 @@
 
     <ui:define name="content">
         <h:form id="form">
-        <p:breadCrumb>
-            <p:menuitem value="Home" outcome="/dashboard"/>
-            <p:menuitem value="Reportes"/>
-            <p:menuitem value="Facturacion"/>
-            <p:menuitem value="Antiguedad de Saldos" outcome="/protected/reportes/FacturasAntiguedadSaldos"/>
-        </p:breadCrumb>
+			<p:growl id="messages" showDetail="true" />
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
                     <div class="card">
-                        <p:growl id="messages" showDetail="true" />
-                        
-                         
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteFacturacionAntiguedadSaldosBean.fecha}" />
-					
-						
-						 <p:fieldset legend="Rangos de fechas">
-			              
+						 <p:fieldset legend="Fecha de corte">
 			               <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" readonlyInput="true"/>
-			                <p:outputLabel for="minmax1" value="Fecha de inicio "/>
+			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" readonlyInput="true" showIcon="true"/>
+			                <p:outputLabel for="minmax1" value="Al día"/>
 						</span>
-
 							</p:fieldset>
             
-                        <p:fieldset legend="Elección de cliente">
+                        <p:fieldset legend="Selección de cliente">
                        			 <span class="ui-float-label ui-input-icon-left">
 									<p:selectOneMenu id="Cliente" value="#{reporteFacturacionAntiguedadSaldosBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith">
 									<f:selectItem itemLabel="Todos los clientes"  itemValue=""  />

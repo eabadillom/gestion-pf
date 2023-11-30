@@ -31,6 +31,7 @@ import mx.com.ferbo.model.ServicioConstancia;
 import mx.com.ferbo.model.ServicioConstanciaDs;
 import mx.com.ferbo.model.ServicioFactura;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.InventarioException;
 
 public class FacturamaBL {
@@ -107,7 +108,8 @@ public class FacturamaBL {
 		for (ServicioFactura sf : alServiciosDetalle) {
 			ItemFullBindingModel item = new ItemFullBindingModel();
 			item.setProductCode(sf.getCodigo());
-			item.setDescription(sf.getDescripcion());
+			String descripcion = String.format("%s - VIGENCIA %s AL %s", sf.getDescripcion(), DateUtil.getString(factura.getInicioServicios(), DateUtil.FORMATO_DD_MM_YYYY), DateUtil.getString(factura.getFinServicios(), DateUtil.FORMATO_DD_MM_YYYY));
+			item.setDescription(descripcion);
 			item.setUnitCode(sf.getCdUnidad());
 			ClaveUnidad claveUnidad = claveDAO.buscarPorId(sf.getCdUnidad());
 			item.setUnit(claveUnidad.getNbUnidad());
@@ -199,7 +201,7 @@ public class FacturamaBL {
 		
 		CfdiInfoModel registra = cfdiBL.registra(cfdi);
 		factura.setUuid(registra.getId());
-		facturaDAO.actualizar(factura);
+		facturaDAO.actualizarUuid(factura);
 	}
 	
 	public void sendMail() throws FacturamaException {

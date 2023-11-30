@@ -9,17 +9,10 @@
 
     <ui:define name="content">
         <h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Inventarios" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Servicios" outcome="/protected/catalogos/servicios"/>
-			</p:breadCrumb>
+            <p:growl id="messages" showDetail="true" />
 			<div class="p-grid crud-demo">
                 <div class="p-col-12">
                     <div class="card">
-                        <p:growl id="messages" showDetail="true" />
-
                         <p:toolbar styleClass="p-mb-4">
                             <p:toolbarGroup>
                                 <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{serviciosBean.openNew()}" update="manage-servicio-content form:manage-servicio-content" oncomplete="PF('manageServicioDialog').show()" 
@@ -32,12 +25,10 @@
                             </p:toolbarGroup>
                         </p:toolbar>
 
-                        <p:dataTable id="dt-servicios" widgetVar="dtServicios" var="servicio" value="#{serviciosBean.servicios}" reflow="true"
-                                    selection="#{serviciosBean.selectedServicios}" rowKey="#{servicio.servicioCve}" paginator="true" rows="20" rowSelectMode="add" paginatorPosition="bottom">
+                        <p:dataTable id="dt-servicios" widgetVar="dtServicios" var="servicio" value="#{serviciosBean.servicios}" reflow="true" selection="#{serviciosBean.selectedServicios}" rowKey="#{servicio.servicioCve}" paginator="true" rows="20" rowSelectMode="add" paginatorPosition="bottom">
                              <f:facet name="header">
                                 <div class="products-table-header">
                                     <span style="font-weight: bold">Catálogo de Servicios</span>
-                                
                                     <span class="filter-container ui-input-icon-left">
                                         <i class="pi pi-search"></i>
                                         <p:inputText id="globalFilter" onkeyup="PF('dtServicios').filter()" placeholder="Buscar" />
@@ -45,23 +36,25 @@
                                 </div>
                             </f:facet>
                             
+                            <p:column headerText="Código SAT" sortBy="#{servicio.servicioCod}" filterBy="#{servicio.servicioCod}" width="8rem">
+                                <h:outputText value="#{servicio.servicioCod}" />
+                            </p:column>
+                            
                             <p:column headerText="Descripción" sortBy="#{servicio.servicioDs}" filterBy="#{servicio.servicioDs}">
                                 <h:outputText value="#{servicio.servicioDs}" />
                             </p:column>
                             
-                            <p:column headerText="Código de servicio" sortBy="#{servicio.servicioCod}" filterBy="#{servicio.servicioCod}">
-                                <h:outputText value="#{servicio.servicioCod}" />
-                            </p:column>
-
 							<p:column headerText="Tipo de cobro" sortBy="#{servicio.cobro.nombre}" filterBy="#{servicio.cobro.nombre}">
 								<h:outputText value="#{servicio.cobro.nombre}" />
-							</p:column>												
-							<p:column exportable="false" width="20%" style="text-align:center">
-                                <p:commandButton icon="pi pi-pencil" update=":form:manage-servicio-content" value="Modificar" oncomplete="PF('manageServicioDialog').show()" 
-                                    styleClass="edit-button ui-button-raised" process="@this">
+							</p:column>
+							
+							<p:column width="2rem" style="text-align: center;">
+                                <p:commandButton icon="pi pi-pencil" update=":form:manage-servicio-content" oncomplete="PF('manageServicioDialog').show()" process="@this">
                                     <f:setPropertyActionListener value="#{servicio}" target="#{serviciosBean.selectedServicio}" />
                                 </p:commandButton>
-                                <p:commandButton class="ui-button-danger" icon="pi pi-trash" value="Eliminar" process="@this" oncomplete="PF('deleteServicioDialog').show()" >
+                            </p:column>
+                            <p:column width="2rem" style="text-align: center;">
+                                <p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" oncomplete="PF('deleteServicioDialog').show()" >
                                     <f:setPropertyActionListener value="#{servicio}" target="#{serviciosBean.selectedServicio}" />
                                 </p:commandButton>
                             </p:column>

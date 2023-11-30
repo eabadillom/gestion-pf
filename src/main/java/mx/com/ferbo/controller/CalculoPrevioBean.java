@@ -43,6 +43,7 @@ import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
 import com.ferbo.mail.beans.Adjunto;
 
+import mx.com.ferbo.business.FacturamaBL;
 import mx.com.ferbo.business.SendMailFacturaBL;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
@@ -1100,144 +1101,18 @@ public class CalculoPrevioBean implements Serializable {
 	public void timbrado() throws InventarioException {
 		String message = null;
 		Severity severity = null;
-		CFDIInfo cfdi = new CFDIInfo();
-		CfdiBL cfdiBL = new CfdiBL();
 		
-		SendMailFacturaBL sendMailBO = null;
-        String sContent = null;
-        byte[] content = null;
-        
-        Adjunto adjunto = null;
-        List<Adjunto> alAdjuntos = null;
-        
+		FacturamaBL facturamaBO = new FacturamaBL(factura.getId(), this.usuario);
+		
 		try {
-			// Datos de emisor
-			IssuerBindingModel is = new IssuerBindingModel();
-			is.setName(plantaSelect.getIdEmisoresCFDIS().getNb_emisor());
-			is.setFiscalRegime(plantaSelect.getIdEmisoresCFDIS().getCd_regimen().getCd_regimen());
-			is.setRfc(plantaSelect.getIdEmisoresCFDIS().getNb_rfc());
-			cfdi.setIssuer(is);
-
-			// Datos de receptor
-			ReceiverBindingModel receptor = new ReceiverBindingModel();
-			receptor.setRfc(factura.getRfc());
-			receptor.setCfdiUse(factura.getCdUsoCfdi());
-			receptor.setName(factura.getNombreCliente());
-			receptor.setFiscalRegime(factura.getCdRegimen());
-			receptor.setTaxZipCode(factura.getCp());
-			cfdi.setReceiver(receptor);
-			
-			// Datos generales de la factura
-			cfdi.setDate(factura.getFecha());
-			cfdi.setFolio(factura.getNumero());
-			cfdi.setSerie(factura.getNomSerie());
-			cfdi.setCurrency(moneda);
-			cfdi.setCfdiType("I");
-			FacturaMedioPago facturaMedioPago = factura.getFacturaMedioPagoList().get(0);
-			cfdi.setPaymentForm(facturaMedioPago.getMpId().getFormaPago());
-			cfdi.setExpeditionPlace(plantaSelect.getCodigopostal().toString());
-			cfdi.setPaymentMethod(factura.getMetodoPago());
-			cfdi.setObservations(observaciones);
-			
-			// servicios a facturar (Constancias de ENTRADA y VIGENCIA)
-			List<ItemFullBindingModel> listaItems = new ArrayList<ItemFullBindingModel>();
-			for(ConstanciaFactura cf: factura.getConstanciaFacturaList()) {
-				for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
-					ItemFullBindingModel item = new ItemFullBindingModel();
-					
-					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");//formateo de vigenciafin
-					String fechaVigencia = format.format(cf.getVigenciaFin());
-					
-					String descripcion = sc.getDescripcion() + " - " + "CONSTANCIA " + cf.getId() + " - " + "VIGENCIA " + cf.getVigenciaInicio() + " AL " + fechaVigencia + " - " + "Tipo de cobro: " + sc.getUnidadMedida();
-					
-					item.setProductCode(sc.getCodigo());
-					item.setDescription(descripcion);//modificar leyenda 
-					ClaveUnidad claveUnidad = claveDAO.buscarPorId(sc.getCdUnidad());
-					item.setUnit(claveUnidad.getNbUnidad());
-					item.setUnitCode(sc.getCdUnidad());
-					item.setUnitPrice(sc.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
-					item.setQuantity(sc.getBaseCargo());
-					item.setSubtotal(sc.getCosto());
-					item.setTaxObject("02");
-					
-					Tax tx = new Tax();
-					BigDecimal costo = sc.getCosto().setScale(2,BigDecimal.ROUND_HALF_UP);
-					BigDecimal ivaTotal = costo.multiply(new BigDecimal(iva.getValor()).setScale(2,BigDecimal.ROUND_HALF_UP));
-					tx.setTotal(ivaTotal.setScale(2,BigDecimal.ROUND_HALF_UP));
-					tx.setName("IVA");
-					tx.setBase(sc.getCosto());
-					tx.setRate(new BigDecimal(iva.getValor()));
-					tx.setIsRetention(false);
-					item.setTaxes(new ArrayList<Tax>());
-					BigDecimal total = costo.add(ivaTotal.setScale(2,BigDecimal.ROUND_HALF_UP));
-					item.setTotal(total.setScale(2,BigDecimal.ROUND_HALF_UP));
-					item.getTaxes().add(tx);
-					listaItems.add(item);
-				}
-			}
 			
 			
-			//servicios a facturar de ConstanciaServicioDs
-			for(ConstanciaFacturaDs cf: factura.getConstanciaFacturaDsList()) {
-				for(ServicioConstanciaDs sc: cf.getServicioConstanciaDsList()) {
-					ItemFullBindingModel item = new ItemFullBindingModel();
-					
-					item.setProductCode(sc.getCodigo());
-					item.setDescription(sc.getDescripcion());
-					ClaveUnidad claveUnidad = claveDAO.buscarPorId(sc.getCdUnidad());
-					item.setUnit(claveUnidad.getNbUnidad());
-					item.setUnitCode(sc.getCdUnidad());
-					item.setUnitPrice(sc.getTarifa());
-					item.setQuantity(sc.getCantidad());
-					item.setSubtotal(sc.getCosto());
-					item.setTaxObject("02");
-					
-					Tax tx = new Tax();
-					
-					BigDecimal costo = sc.getCosto().setScale(2,BigDecimal.ROUND_HALF_UP);
-					BigDecimal ivaTotal = costo.multiply(new BigDecimal(iva.getValor()).setScale(2,BigDecimal.ROUND_HALF_UP));
-					tx.setTotal(ivaTotal.setScale(2,BigDecimal.ROUND_HALF_UP));
-					tx.setName("IVA");
-					tx.setBase(sc.getCosto());
-					tx.setRate(new BigDecimal(iva.getValor()));
-					tx.setIsRetention(false);
-					item.setTaxes(new ArrayList<Tax>());
-					BigDecimal total = costo.add(ivaTotal.setScale(2,BigDecimal.ROUND_HALF_UP));
-					item.setTotal(total.setScale(2,BigDecimal.ROUND_HALF_UP));
-					item.getTaxes().add(tx);
-					listaItems.add(item);
-				} 
-			}
-			
-			cfdi.setItems(listaItems);
-			CfdiInfoModel registra = cfdiBL.registra(cfdi);
-			Factura factura = new Factura();
-			factura = facturaDAO.buscarPorId(this.factura.getId());
-			factura.setUuid(registra.getId());
-			facturaDAO.actualizar(factura);
-			alAdjuntos = new ArrayList<Adjunto>();
-			FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", factura.getUuid());
-			sContent = fileXML.getContent();
-            content = Base64.getDecoder().decode(sContent);
-            adjunto = new Adjunto("Factura_" + factura.getNomSerie() + "-" + factura.getNumero() + ".xml", Adjunto.TP_ARCHIVO_XML, content);
-            alAdjuntos.add(adjunto);
-            
-            FileViewModel filePDF = cfdiBL.getFile("pdf", "issuedLite", factura.getUuid());
-            sContent = filePDF.getContent();
-            content = Base64.getDecoder().decode(sContent);
-            adjunto = new Adjunto("Factura_" + factura.getNomSerie()+ "-" + factura.getNumero() + ".pdf", Adjunto.TP_ARCHIVO_PDF, content);
-            alAdjuntos.add(adjunto);
-            
-            sendMailBO = new SendMailFacturaBL(factura.getCliente().getCteCve());
-            sendMailBO.setSerie(factura.getNomSerie());
-            sendMailBO.setFolio(factura.getNumero());
-            sendMailBO.setAlFiles(alAdjuntos);
-            sendMailBO.setLoggedUser(usuario);
-            sendMailBO.send();
-			
+			log.info("Timbrando factura: {}...", factura);
+			facturamaBO.timbrar();
+			facturamaBO.sendMail();
+			log.info("Timbrado completado correctamente.");
 			severity = FacesMessage.SEVERITY_INFO;
-			message = "El timbrado se genero correctamente";
-			
+			message = "El timbrado se generó correctamente";
 		} catch (FacturamaException e) {
 			severity = FacesMessage.SEVERITY_ERROR;
 			message = e.getMessage();
@@ -1248,9 +1123,12 @@ public class CalculoPrevioBean implements Serializable {
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
+			if(severity == null)
+				severity = FacesMessage.SEVERITY_FATAL;
+			if(message == null)
+				message = "Ocurrió un error con la actualización de la factura.";
 			
-			
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado exitoso", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado CFDI", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 		

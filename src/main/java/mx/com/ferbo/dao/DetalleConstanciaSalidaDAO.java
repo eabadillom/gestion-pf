@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
@@ -11,6 +14,7 @@ import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida, Integer>{
+	private static Logger log = LogManager.getLogger(DetalleConstanciaSalidaDAO.class);
 
 	@Override
 	public DetalleConstanciaSalida buscarPorId(Integer id) {
@@ -45,6 +49,23 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 		
 		return lista;
 	}
+	
+	public List<DetalleConstanciaSalida> buscarPorPartidaCve(Partida partida, boolean isFullInfo){
+		
+		EntityManager em = EntityManagerUtil.getEntityManager();
+		List<DetalleConstanciaSalida> lista = null;
+		lista = em.createNamedQuery("DetalleConstanciaSalida.findByPartidaCve", DetalleConstanciaSalida.class)
+				.setParameter("partidaCve", partida.getPartidaCve()).getResultList();
+		if(isFullInfo == false)
+			return lista;
+		
+		for(DetalleConstanciaSalida dcs : lista) {
+			log.debug("PartidaCve: {}", dcs.getPartidaCve().getPartidaCve());
+		}
+		
+		return lista;
+	}
+	
 	
 	@Override
 	public String actualizar(DetalleConstanciaSalida e) {

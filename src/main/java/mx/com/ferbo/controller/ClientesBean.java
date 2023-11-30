@@ -13,14 +13,12 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.CandadoSalidaDAO;
 import mx.com.ferbo.dao.ClienteContactoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.ContactoDAO;
 import mx.com.ferbo.dao.MedioCntDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
@@ -75,7 +73,6 @@ public class ClientesBean implements Serializable {
 	
 
 	private ClienteDAO clienteDAO;
-	private ContactoDAO contactoDAO;
 	private TipoMailDAO tipoMailDAO;
 	private TipoTelefonoDAO tipoTelefonoDAO;
 //	private MailDAO mailDAO;
@@ -86,6 +83,9 @@ public class ClientesBean implements Serializable {
 	private ClienteContactoDAO clienteContactoDAO;
 	private MedioCntDAO medioCntDAO;
 	private SerieConstanciaDAO serieDAO;
+	private String newPassword;
+	private String confirmPassword;
+	
 	
 	SecurityUtil util;
 
@@ -95,7 +95,6 @@ public class ClientesBean implements Serializable {
 		lstMetodoPago = new ArrayList<>();
 		
 		clienteDAO = new ClienteDAO();
-		contactoDAO = new ContactoDAO();
 		tipoMailDAO = new TipoMailDAO();
 		tipoTelefonoDAO = new TipoTelefonoDAO();
 //		mailDAO = new MailDAO();
@@ -584,9 +583,6 @@ public class ClientesBean implements Serializable {
 			if( this.medioContactoSelected == null )
 				throw new InventarioException("No hay un medio de contacto seleccionado.");
 			
-			/*List<MedioCnt> medioCntList = this.clienteContactoSelected.getIdContacto().getMedioCntList();
-			medioCntList.remove(this.medioContactoSelected);*/
-			
 			List<MedioCnt> medioCntList = medioCntDAO.buscarPorCriterios(medioContactoSelected);
 			
 			medioCntList.remove(medioContactoSelected);
@@ -594,7 +590,7 @@ public class ClientesBean implements Serializable {
 			this.clienteContactoSelected.getIdContacto().setMedioCntList(medioCntList);
 			
 			String actualizar = clienteContactoDAO.actualizar(this.clienteContactoSelected);
-			
+			log.debug("Respuesta del DAO actualización cliente contacto: {}", actualizar);
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Medio de contacto eliminado correctamente.";
@@ -609,6 +605,93 @@ public class ClientesBean implements Serializable {
 	        FacesContext.getCurrentInstance().addMessage(null, message);
 	        PrimeFaces.current().ajax().update(":form:messages", "dtMedioContacto");
 		}
+	}
+	
+	public void setPassword(ClienteContacto contacto) {
+		log.debug("Cliente contacto: {}", contacto);
+		this.clienteContactoSelected = contacto;
+		this.newPassword = null;
+		this.confirmPassword = null;
+	}
+	
+	public void validateNewPassword() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			if(this.newPassword == null)
+				throw new InventarioException("Debe indicar una contraseña nueva.");
+			
+			if(this.confirmPassword == null)
+				throw new InventarioException("Debe confirmar su contraseña nueva.");
+			
+			if(newPassword.equals(confirmPassword) == false)
+				throw new InventarioException("Su nueva contraseña no coincide en los dos campos.");
+			
+			mensaje = "Su nueva contraseña coincide correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			log.error("Problema con la emisión de salidas...", ex);
+			mensaje = "Su solicitud no se pudo generar.\nFavor de comunicarse con el administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Ajustes...", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages");
+		}
+	}
+	
+	public void changePassword() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		String newPasswordSHA512 = null;
+		
+		
+		try {
+			if(this.newPassword == null || "".equalsIgnoreCase(this.newPassword.trim()))
+				throw new InventarioException("Debe indicar su nueva contraseña");
+			
+			if(this.confirmPassword == null || "".equalsIgnoreCase(this.confirmPassword.trim()))
+				throw new InventarioException("Debe confirmar su nueva contraseña");
+			
+			util.checkPassword(this.newPassword);
+			
+			//TODO Por seguridad, se deben salar las contraseñas.
+			newPasswordSHA512 = util.getSHA512(this.newPassword);
+			
+			this.clienteContactoSelected.setNbPassword(newPasswordSHA512);
+			this.clienteContactoSelected.setStUsuario("A");;
+			
+			this.clienteContactoDAO.actualizar(clienteContactoSelected);
+			
+			log.info("Usuario actualizado");
+			
+			this.newPassword = null;
+			this.confirmPassword = null;
+			
+			mensaje = "Su contraseña se actualizó correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			
+			PrimeFaces.current().executeScript("PF('dlgPassword').hide()");
+		} catch(InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			log.error("Problema con la emisión de salidas...", ex);
+			mensaje = "Su solicitud no se pudo generar.\nFavor de comunicarse con el administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Ajustes...", mensaje);
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages", ":form:newPassword", ":form:confirmPassword");
+		}
+		
 	}
 
 	/**
@@ -741,6 +824,22 @@ public class ClientesBean implements Serializable {
 
 	public void setLstTipoTelefono(List<TipoTelefono> lstTipoTelefono) {
 		this.lstTipoTelefono = lstTipoTelefono;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 
 }

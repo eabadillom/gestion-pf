@@ -14,10 +14,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
+import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -105,6 +107,26 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			System.out.println("ERROR" + e.getMessage());
 			return null;
 		}
+	}
+	
+	public List<ConstanciaDeDeposito> buscarPor(String folioCliente, Integer idCliente, Date fechaInicio, Date fechaFin) {
+		EntityManager em = null;
+		List<ConstanciaDeDeposito> listado = null;
+		try {
+			 em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("ConstanciaDeDeposito.findByFolioClientePeriodo",ConstanciaDeDeposito.class)
+					.setParameter("idCliente", idCliente)
+					.setParameter("folioCliente", folioCliente)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.getResultList()
+			;
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		return listado;
 	}
 
 	@Override
@@ -205,6 +227,9 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				log.debug("Servicio: {}", cdet.getServicioCve().getServicioCod());
 			}
 			
+			Aviso aviso = constancia.getAvisoCve();
+			log.info("Aviso: {}", aviso.getAvisoCve());
+			
 			List<Partida> partidaList = constancia.getPartidaList();
 			for(Partida partida : partidaList) {
 				log.debug("Partida: {}",  partida.getPartidaCve());
@@ -224,6 +249,10 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 					log.info("Traspaso partida: {}",traspaso.getId());
 					log.info("Constancia traspaso: {}", traspaso.getTraspaso().getId());
 				}
+				List<DetallePartida> detallePartidaList = partida.getDetallePartidaList();
+				for(DetallePartida dp : detallePartidaList) {
+					log.info("Detalle Partida: {} - {}", dp.getDetallePartidaPK().getPartidaCve(), dp.getDetallePartidaPK().getDetPartCve());
+				}
 			}
 			
 		} catch(Exception ex) {
@@ -238,7 +267,6 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public ConstanciaDeDeposito buscarPorFolioCliente(String folio) {
 		ConstanciaDeDeposito constancia = null;
 		EntityManager em = null;
-		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			
@@ -254,6 +282,85 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			
 		return constancia;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean tieneSalidas(Integer folio) {
+		boolean respuesta = false;
+		EntityManager em = null;
+		String sql = null;
+		List<Object[]> results = null;
+		
+		try {
+			sql = "select cdd.FOLIO, dcs.ID "
+					+ "from CONSTANCIA_DE_DEPOSITO cdd "
+					+ "inner join PARTIDA p ON cdd.FOLIO = p.FOLIO "
+					+ "left outer join DETALLE_CONSTANCIA_SALIDA dcs ON dcs.PARTIDA_CVE = p.PARTIDA_CVE "
+					+ "where cdd.FOLIO = :folio "
+					+ "GROUP BY cdd.FOLIO, dcs.ID "
+					;
+			
+			em = EntityManagerUtil.getEntityManager();
+			results = em.createNativeQuery(sql)
+					.setParameter("folio", folio)
+					.getResultList()
+					;
+			
+			for(Object[] result : results) {
+					
+				if(result[1] != null) {
+					respuesta = true;
+					return respuesta;
+				}
+			}
+			
+			respuesta = false;
+		} catch(Exception ex) {
+			log.error("Problema para ejecutar la consulta...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return respuesta;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public boolean tieneFacturas(Integer folio) {
+		boolean respuesta = false;
+		EntityManager em = null;
+		List<Object[]> results = null;
+		String sql = null;
+		
+		try {
+			sql = "select cdd.FOLIO, cf.id "
+					+ "from CONSTANCIA_DE_DEPOSITO cdd "
+					+ "left outer join constancia_factura cf ON cf.folio = cdd.FOLIO "
+					+ "where cdd.FOLIO = :folio "
+					+ "GROUP BY cdd.FOLIO, cf.id "
+					;
+			
+			em = EntityManagerUtil.getEntityManager();
+			results = em.createNativeQuery(sql)
+					.setParameter("folio", folio)
+					.getResultList()
+					;
+			
+			for(Object[] result : results) {
+				if(result[1] != null) {
+					respuesta = true;
+					return respuesta;
+				}
+			}
+			
+			respuesta = false;
+		} catch(Exception ex) {
+			log.error("Problema para ejecutar la consulta...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return respuesta;
+	}
 
 	@Override
 	public List<ConstanciaDeDeposito> buscarPorCriterios(ConstanciaDeDeposito e) {
@@ -268,8 +375,4 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public void setEm(EntityManager em) {
 		this.em = em;
 	}
-
-	
-	
-	
 }

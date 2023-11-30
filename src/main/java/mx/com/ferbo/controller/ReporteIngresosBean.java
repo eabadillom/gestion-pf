@@ -74,68 +74,10 @@ public class ReporteIngresosBean implements Serializable {
 		listCliente = clienteDAO.buscarTodos();
 		listBanco = bancoDAO.findall();
 		Date today = new Date();
-		long oneDay = 24 * 60 * 60 * 1000;
-
 		maxDate = new Date(today.getTime() );
 	}
-
-	public Date getFechaInicio() {
-		return fechaInicio;
-	}
-
-	public void setFechaInicio(Date fechaInicio) {
-		this.fechaInicio = fechaInicio;
-	}
-
-	public Date getFechaFin() {
-		return fechaFin;
-	}
-
-	public void setFechaFin(Date fechaFin) {
-		this.fechaFin = fechaFin;
-	}
-
-	public List<Cliente> getListCliente() {
-		return listCliente;
-	}
-
-	public void setListCliente(List<Cliente> listCliente) {
-		this.listCliente = listCliente;
-	}
-
-	public Cliente getClienteSelect() {
-		return clienteSelect;
-	}
-
-	public void setClienteSelect(Cliente clienteSelect) {
-		this.clienteSelect = clienteSelect;
-	}
 	
-	public List<Bancos> getListBanco() {
-		return listBanco;
-	}
-
-	public void setListBanco(List<Bancos> listBanco) {
-		this.listBanco = listBanco;
-	}
-
-	public Bancos getBancoSelect() {
-		return bancoSelect;
-	}
-
-	public void setBancoSelect(Bancos bancoSelect) {
-		this.bancoSelect = bancoSelect;
-	}
-
-	public Date getFechaActual() {
-		return fechaActual;
-	}
-
-	public void setFechaActual(Date fechaActual) {
-		this.fechaActual = fechaActual;
-	}
-
-	public void exportarPdf() {
+public void exportarPdf() {
 		
 		log.info("exṕrtando a PDF");
 		String jasperPath = "/jasper/Ingresos.jrxml";
@@ -259,6 +201,62 @@ public class ReporteIngresosBean implements Serializable {
 			conexion.close((Connection) connection);
 		}
 		
+	}
+
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public void setFechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+
+	public Date getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
+	}
+
+	public List<Cliente> getListCliente() {
+		return listCliente;
+	}
+
+	public void setListCliente(List<Cliente> listCliente) {
+		this.listCliente = listCliente;
+	}
+
+	public Cliente getClienteSelect() {
+		return clienteSelect;
+	}
+
+	public void setClienteSelect(Cliente clienteSelect) {
+		this.clienteSelect = clienteSelect;
+	}
+	
+	public List<Bancos> getListBanco() {
+		return listBanco;
+	}
+
+	public void setListBanco(List<Bancos> listBanco) {
+		this.listBanco = listBanco;
+	}
+
+	public Bancos getBancoSelect() {
+		return bancoSelect;
+	}
+
+	public void setBancoSelect(Bancos bancoSelect) {
+		this.bancoSelect = bancoSelect;
+	}
+
+	public Date getFechaActual() {
+		return fechaActual;
+	}
+
+	public void setFechaActual(Date fechaActual) {
+		this.fechaActual = fechaActual;
 	}
 
 	public Date getMaxDate() {

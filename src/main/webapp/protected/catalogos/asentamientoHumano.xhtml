@@ -8,18 +8,9 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Domicilios" />
-				<p:menuitem value="Cambios" />
-				<p:menuitem value="Colonias" outcome="/protected/catalogos/colonias" />
-			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
-
-					  <p:fieldset legend="Filtro de busqueda">
+					  <p:fieldset>
 					<div class="card">
 					<span class="ui-float-label ui-input-icon-left">
 						<p:selectOneMenu id="countries-som" autoWidth="false" style="width: 250px; height: 33px" value="#{asentamientoHumanoBean.idPais}" filter="true" filterMatchMode="startsWith">
@@ -67,25 +58,18 @@
 						<p:ajax listener="#{asentamientoHumanoBean.handletypeAsn()}" update=" dt-AsentamientoHumano postalEntity2" />
 						</p:selectOneMenu>
 							<p:outputLabel for="settlementType2" value="Tipo de Asentamiento:" />
-							</span>
-						
+						</span>
 						<span class="ui-float-label ui-input-icon-left">
 						<p:selectOneMenu id="postalEntity2"  value="#{asentamientoHumanoBean.entidadpostalCve}" filter="true" filterMatchMode="startsWith">
 							<f:selectItem itemLabel="" itemValue=""  noSelectionOption="true"/>
 							<f:selectItems var="selectedPostalEntityOne" value="#{asentamientoHumanoBean.listaEntidadPostal}" itemLabel="#{selectedPostalEntityOne.entidadpostalDs}" itemValue="#{selectedPostalEntityOne.entidadpostalCve}" />
-						<p:ajax listener="#{asentamientoHumanoBean.handleEntidadPostal()}" update="dt-AsentamientoHumano" />
+							<p:ajax listener="#{asentamientoHumanoBean.handleEntidadPostal()}" update="dt-AsentamientoHumano" />
 						</p:selectOneMenu>
-							<p:outputLabel for="postalEntity2" value="Entidad Postal:" />
+						<p:outputLabel for="postalEntity2" value="Entidad Postal:" />
 						</span>
-						
-							<p:commandButton value="Agregar" icon="pi pi-plus"
-							actionListener="#{asentamientoHumanoBean.nuevoAsentamientoHumano}" update=":form:manage-cologne-content-new" oncomplete="PF('nuevoAsentemientoHumanoDialog').show()"
-							styleClass="p-mr-2 p-mb-2" process="@this" />
+						<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{asentamientoHumanoBean.nuevoAsentamientoHumano}" update=":form:manage-cologne-content-new" oncomplete="PF('nuevoAsentemientoHumanoDialog').show()" styleClass="p-mr-2 p-mb-2" process="@this" />
 					</div>
-					
-						
 					</p:fieldset>
-					
 				</div>
 			</div>
 
@@ -127,12 +111,13 @@
 								<h:outputText style="vertical-align: middle; margin-left: .5rem"
 									value="#{asentamientoHumano.cp}" />
 							</p:column>
-							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil" update=":form:manage-cologne-content-new" value="Modificar" oncomplete="PF('nuevoAsentemientoHumanoDialog').show()" 
-											styleClass="p-mr-2 p-mb-2" process="@this">
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-cologne-content-new" oncomplete="PF('nuevoAsentemientoHumanoDialog').show()" process="@this">
 									<f:setPropertyActionListener value="#{asentamientoHumano}" target="#{asentamientoHumanoBean.asentamientoHumanoSelect}" />
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2" icon="pi pi-trash" process="@this" oncomplete="PF('deleteAsentamientoHumanoDialog').show()">
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-times" class="ui-button-danger" process="@this" oncomplete="PF('deleteAsentamientoHumanoDialog').show()">
 									<f:setPropertyActionListener value="#{asentamientoHumano}" target="#{asentamientoHumanoBean.asentamientoHumanoSelect}" />
 								</p:commandButton>
 							</p:column>

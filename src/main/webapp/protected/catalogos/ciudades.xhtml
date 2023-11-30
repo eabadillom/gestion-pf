@@ -8,22 +8,12 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Domicilios" />
-				<p:menuitem value="Cambios" />
-				<p:menuitem value="Ciudades" outcome="/protected/catalogos/ciudades" />
-			</p:breadCrumb>
 			<div class="p-grid button-demo">
 				<div class="p-col-12">
-					
-					<p:fieldset legend="Filtro de busqueda">
+					<p:fieldset>
 					<div class="card">
-					
 					 <span class="ui-float-label ui-input-icon-left">
-						<p:selectOneMenu id="countries-som" autoWidth="false" value="#{ciudadesBean.idPais}" style="width: 250px; height: 33px">
+						<p:selectOneMenu id="countries-som" autoWidth="false" value="#{ciudadesBean.idPais}" style="width: 250px;" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="" itemValue=""   />
 							<f:selectItems var="selectedCountriesOne" value="#{ciudadesBean.listaPaises}" itemLabel="#{selectedCountriesOne.paisDesc}" itemValue="#{selectedCountriesOne.paisCve}" />
 							<p:ajax listener="#{ciudadesBean.handleContrySelect()}" update="states-som" />
@@ -32,28 +22,28 @@
 						</span>
 						
 						<span class="ui-float-label ui-input-icon-left">
-						<p:selectOneMenu id="states-som" autoWidth="false" value="#{ciudadesBean.idEstado}" style="width: 250px; height: 33px">
-							<f:selectItem itemLabel="" itemValue=""  />
-							<f:selectItems var="selectedStatesOne" value="#{ciudadesBean.listaEstados}" itemLabel="#{selectedStatesOne.estadoDesc}"
-								itemValue="#{selectedStatesOne.estadosPK.estadoCve}" />
-							<p:ajax listener="#{ciudadesBean.handleStateSelect()}" update="municipalities-som" />
-						</p:selectOneMenu>
-						<p:outputLabel for="states-som" value="Estados" />
+							<p:selectOneMenu id="states-som" autoWidth="false" value="#{ciudadesBean.idEstado}" style="width: 250px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="" itemValue=""  />
+								<f:selectItems var="selectedStatesOne" value="#{ciudadesBean.listaEstados}" itemLabel="#{selectedStatesOne.estadoDesc}"
+									itemValue="#{selectedStatesOne.estadosPK.estadoCve}" />
+								<p:ajax listener="#{ciudadesBean.handleStateSelect()}" update="municipalities-som" />
+							</p:selectOneMenu>
+							<p:outputLabel for="states-som" value="Estados" />
 						</span>
 
 						<span class="ui-float-label ui-input-icon-left">
-						<p:selectOneMenu id="municipalities-som" autoWidth="false" value="#{ciudadesBean.idMunicipio}" style="width: 250px; height: 33px">
-							<f:selectItem itemLabel="" itemValue=""  />
-							<f:selectItems var="selectedMunicipalitiesOne" value="#{ciudadesBean.listaMunicipios}" itemLabel="#{selectedMunicipalitiesOne.municipioDs}" itemValue="#{selectedMunicipalitiesOne.municipiosPK.municipioCve}" />
-							<p:ajax listener="#{ciudadesBean.handleMunicipalitySelect()}" update="dt-Ciudades" />
-						</p:selectOneMenu>
-						<p:outputLabel for="municipalities-som" value="Municipios" />
+							<p:selectOneMenu id="municipalities-som" autoWidth="false" value="#{ciudadesBean.idMunicipio}" style="width: 250px; height: 33px" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="" itemValue=""  />
+								<f:selectItems var="selectedMunicipalitiesOne" value="#{ciudadesBean.listaMunicipios}" itemLabel="#{selectedMunicipalitiesOne.municipioDs}" itemValue="#{selectedMunicipalitiesOne.municipiosPK.municipioCve}" />
+								<p:ajax listener="#{ciudadesBean.handleMunicipalitySelect()}" update="dt-Ciudades" />
+							</p:selectOneMenu>
+							<p:outputLabel for="municipalities-som" value="Municipios" />
 						</span>
 						<p:commandButton value="Agregar ciudad" icon="pi pi-plus"
 							actionListener="#{ciudadesBean.nuevaCiudad}"
 							update="manage-city-content-new form:manage-city-content-new"
 							oncomplete="PF('nuevaCiudadDialog').show()"
-							styleClass="p-mr-2 p-mb-2" process="@this" />
+							process="@this" />
 					
 					
 					</div>
@@ -80,39 +70,26 @@
 								</div>
 							</f:facet>
 
-							<p:column headerText="Pais" sortBy="#{ciudades.municipios.estados.paises.paisDesc}"
-								filterBy="#{ciudades.municipios.estados.paises.paisDesc}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
-									value="#{ciudades.municipios.estados.paises.paisDesc}" />
+							<p:column headerText="Pais" sortBy="#{ciudades.municipios.estados.paises.paisDesc}" filterBy="#{ciudades.municipios.estados.paises.paisDesc}" style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ciudades.municipios.estados.paises.paisDesc}" />
 							</p:column>
-							<p:column headerText="Estado" sortBy="#{ciudades.municipios.estados.estadoDesc}"
-								filterBy="#{ciudades.municipios.estados.estadoDesc}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{ciudades.municipios.estados.estadoDesc}" />
+							<p:column headerText="Estado" sortBy="#{ciudades.municipios.estados.estadoDesc}" filterBy="#{ciudades.municipios.estados.estadoDesc}" style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{ciudades.municipios.estados.estadoDesc}" />
 							</p:column>
-							<p:column headerText="Municipio" sortBy="#{ciudades.municipios.municipioDs}"
-								filterBy="#{ciudades.municipios.municipioDs}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{ciudades.municipios.municipioDs}" />
+							<p:column headerText="Municipio" sortBy="#{ciudades.municipios.municipioDs}" filterBy="#{ciudades.municipios.municipioDs}" style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{ciudades.municipios.municipioDs}" />
 							</p:column>
-							<p:column headerText="Ciudad" sortBy="#{ciudades.ciudadDs}"
-								filterBy="#{ciudades.ciudadDs}" style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .5rem"
-									value="#{ciudades.ciudadDs}" />
+							<p:column headerText="Ciudad" sortBy="#{ciudades.ciudadDs}" filterBy="#{ciudades.ciudadDs}" style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{ciudades.ciudadDs}" />
 							</p:column>
-							<p:column headerText="Acción" style="text-align:center">
-								<p:commandButton icon="pi pi-pencil"
-									update=":form:manage-city-content-new" value="Modificar"
-									oncomplete="PF('nuevaCiudadDialog').show()"
-									styleClass="p-mr-2 p-mb-2" process="@this">
-									<f:setPropertyActionListener value="#{ciudades}"
-										target="#{ciudadesBean.ciudadSelect}" />
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-pencil" update=":form:manage-city-content-new" oncomplete="PF('nuevaCiudadDialog').show()" process="@this">
+									<f:setPropertyActionListener value="#{ciudades}" target="#{ciudadesBean.ciudadSelect}"/>
 								</p:commandButton>
-								<p:commandButton value="Eliminar" styleClass="p-mr-2 p-mb-2"
-									icon="pi pi-trash" process="@this"
-									oncomplete="PF('deleteCiudadDialog').show()">
-									<f:setPropertyActionListener value="#{ciudades}"
-										target="#{ciudadesBean.ciudadSelect}" />
+							</p:column>
+							<p:column width="2rem" style="text-align: center;">
+								<p:commandButton icon="pi pi-times" class="ui-button-danger" process="@this" oncomplete="PF('deleteCiudadDialog').show()">
+									<f:setPropertyActionListener value="#{ciudades}" target="#{ciudadesBean.ciudadSelect}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>

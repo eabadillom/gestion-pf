@@ -15,7 +15,8 @@ import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturaMedioPago;
-import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.NotaPorFactura;
+import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.ProductoConstancia;
 import mx.com.ferbo.model.ProductoConstanciaDs;
 import mx.com.ferbo.model.ServicioConstancia;
@@ -41,8 +42,7 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 	@Override
 	public Factura buscarPorId(Integer id) {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
-		Factura fact = entity.createNamedQuery("Factura.findById", Factura.class)
-				.setParameter("id",id).getSingleResult();
+		Factura fact = entity.find(Factura.class, id);
 		return fact;
 	}
 	
@@ -97,6 +97,22 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 				}
 			}
 			
+			List<Pago> pagoList = factura.getPagoList();
+			for(Pago p : pagoList) {
+				log.debug("Pago: {}", p.getId());
+				log.debug("Tipo pago: {}", p.getTipo().getId());
+				log.debug("Factura: {}", p.getFactura().getId());
+				log.debug("Status factura: {}", p.getFactura().getStatus().getId());
+			}
+			
+			List<NotaPorFactura> notaPorFacturaList= factura.getNotaFacturaList();
+			for(NotaPorFactura nf : notaPorFacturaList) {
+				log.debug("Nota: {}", nf.getNotaPorFacturaPK().getNota().getId());
+				log.debug("Status nota: {}", nf.getNotaPorFacturaPK().getNota().getStatus().getId());
+				log.debug("Factura: {}", nf.getNotaPorFacturaPK().getFactura().getId());
+				log.debug("Status factura: {}", nf.getNotaPorFacturaPK().getFactura().getStatus().getId());
+				log.debug("Cantidad NxF: {}",nf.getCantidad());
+			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener la información de la factura id:{}", ex, id);
 		} finally {
@@ -115,11 +131,30 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
 		return entity.createNamedQuery("Factura.findByClienteStatusFactura", Factura.class)
 		.setParameter("clienteCve", cte.getCteCve()).setParameter("status", sf.getId()).getResultList();
+	}
+	
+	public List<Factura> buscarPorCteStatusClientePeriodo(StatusFactura sf, Cliente cte, Date fechaInicio, Date fechaFin){
+		List<Factura> lista = null;
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			lista = entity.createNamedQuery("Factura.findByStatusFacturaClientePeriodo", Factura.class)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.setParameter("idCliente", cte.getCteCve())
+					.setParameter("idStatusFactura", sf.getId())
+					.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener las facturas solicitadas...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
+		
+		return lista;
+	} 
 
 	@Override
 	public List<Factura> buscarTodos() {
-		// TODO Auto-generated method stub
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Factura.findAll", Factura.class).getResultList();
 	}
@@ -194,6 +229,22 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		return null;
 	}
 	
+	public String actualizarUuid(Factura f) {
+		try {
+			EntityManager em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.createNativeQuery("UPDATE factura SET uuid = :uuid "
+					+ "WHERE id = :id")
+					.setParameter("uuid", f.getUuid()).setParameter("id", f.getId()).executeUpdate();
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+			return "ERROR";
+		}
+		return null;
+	}
+	
 	public List<Factura> buscaFacturas(Cliente c, Date fechaInicio, Date fechaFin, boolean isFullInfo) {
 		EntityManager entity = null;
 		List<Factura> list = null;
@@ -237,8 +288,8 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 			for(Factura factura : list) {
 				log.debug("Status id: {}", factura.getStatus().getId());
 				
-				if(factura.getCancelaFactura() != null)
-					log.debug("CancelaFactura: id={}",factura.getCancelaFactura().getId());
+//				if(factura.getCancelaFactura() != null)
+//					log.debug("CancelaFactura: id={}",factura.getCancelaFactura().getId());
 			}
 			
 		} catch(Exception ex) {
@@ -248,6 +299,27 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		}
 		
 		return list;
+	}
+
+
+	public Factura buscarPorSerieNumero(String serie, String numero) {
+		Factura factura = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			factura = em.createNamedQuery("Factura.findBySerieNumero", Factura.class)
+					.setParameter("serie", serie)
+					.setParameter("numero", numero)
+					.getSingleResult()
+					;
+		} catch(Exception ex) {
+			log.debug(" ", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return factura;
 	}
 
 }

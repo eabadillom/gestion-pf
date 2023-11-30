@@ -96,7 +96,7 @@ public class DetalleConstanciaSalida implements Serializable {
     private int detPartCve;
     
     @JoinColumn(name = "PARTIDA_CVE", referencedColumnName = "PARTIDA_CVE")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Partida partidaCve;
 
     public DetalleConstanciaSalida() {
