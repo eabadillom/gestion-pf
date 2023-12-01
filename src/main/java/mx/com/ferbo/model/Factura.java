@@ -159,7 +159,7 @@ public class Factura implements Serializable {
     
     @Basic(optional = false)
     @NotNull
-    @Size(min = 0, max = 30)
+    @Size(min = 0, max = 150)
     @Column(name = "colonia")
     private String colonia;
     
