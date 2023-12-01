@@ -614,7 +614,7 @@ public class DateUtil {
 				}
 			}
 		} else {
-			vencimiento = DateUtil.addDay(vencimiento, diasVencimiento);
+			vencimiento = DateUtil.addDay(vencimiento, (diasVencimiento - 1));
 		}
 		
 		return vencimiento;
