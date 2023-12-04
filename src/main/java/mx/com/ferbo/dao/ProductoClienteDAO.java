@@ -69,6 +69,8 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 					.setParameter("cteCve", cteCve)
 					.getResultList();
 			
+			log.debug("Número de productos por cliente: {}", listado.size());
+			
 			if(isFullInfo == false)
 				return listado;
 			
