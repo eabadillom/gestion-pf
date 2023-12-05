@@ -33,7 +33,6 @@ import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CamaraDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.EstadoInventarioDAO;
@@ -80,7 +79,6 @@ public class OrdenEntradaBean implements Serializable {
 	private static Logger log = LogManager.getLogger(OrdenEntradaBean.class);
 	
 	private List<Cliente> listaClientes;
-	private ClienteDAO clienteDAO;
 	private Cliente cliente;
 	
 	private List<Ingreso> listaIngreso;
@@ -144,7 +142,6 @@ public class OrdenEntradaBean implements Serializable {
 	public OrdenEntradaBean(){
 		
 		listaClientes = new ArrayList<Cliente>();
-		clienteDAO = new ClienteDAO();
 		cliente = new Cliente();
 		
 		listaIngreso = new ArrayList<Ingreso>();
@@ -197,6 +194,7 @@ public class OrdenEntradaBean implements Serializable {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
@@ -206,7 +204,8 @@ public class OrdenEntradaBean implements Serializable {
         
         usuario = (Usuario) session.getAttribute("usuario");
 		
-		listaClientes = clienteDAO.buscarTodos();
+//		listaClientes = clienteDAO.buscarTodos();
+        listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		listaPlantas = plantaDAO.buscarTodos();
 		listaUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 		

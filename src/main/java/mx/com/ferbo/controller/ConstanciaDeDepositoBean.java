@@ -23,8 +23,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AvisoDAO;
@@ -165,7 +165,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
-
+    
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
@@ -201,6 +201,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		Planta planta = null;
@@ -223,7 +224,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			listadoPlanta = plantaDAO.findall();
 		}
 			 
-		listadoCliente = clienteDAO.buscarHabilitados(true);
+//		listadoCliente = clienteDAO.buscarHabilitados(true);
+		listadoCliente = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 		tipoMovimiento = tipoMovimientoDAO.buscarPorId(1);
 		estadoInventario = estadoInventarioDAO.buscarPorId(1);

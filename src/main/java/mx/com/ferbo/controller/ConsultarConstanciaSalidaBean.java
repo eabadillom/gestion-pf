@@ -23,7 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
 import mx.com.ferbo.dao.PartidaDAO;
@@ -59,7 +58,6 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	private String folio;
 	
 	private List<Cliente> listadoClientes;
-	private ClienteDAO clienteDAO;
 	private Cliente cliente;
 	private PartidaDAO partidaDAO;
 	
@@ -78,6 +76,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
@@ -87,12 +86,12 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		
 		constanciaSalidaDAO = new ConstanciaSalidaDAO();
 		detalleCSDAO = new DetalleConstanciaSalidaDAO();
-		clienteDAO = new ClienteDAO();
 		partidaDAO = new PartidaDAO();
 		statusDAO = new StatusConstanciaSalidaDAO();
 		
 		
-		listadoClientes = clienteDAO.buscarTodos();
+//		listadoClientes = clienteDAO.buscarTodos();
+		listadoClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		fechaInicial = new Date();
 		fechaFinal = new Date();
 		constanciaSelect = new ConstanciaSalida();

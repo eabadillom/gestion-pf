@@ -26,7 +26,6 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AvisoDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaDepositoDetalleDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
@@ -68,7 +67,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private String folio;
 	
-	private ClienteDAO clienteDAO;
 	private List<Cliente> listadoClientes;
 	private Cliente cliente;
 	
@@ -118,7 +116,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		constanciaDeDepositoDAO = new ConstanciaDeDepositoDAO();
 		listadoConstanciaDeDepositos = new ArrayList<ConstanciaDeDeposito>();
 		
-		clienteDAO = new ClienteDAO();
 		listadoClientes = new ArrayList<Cliente>();
 		
 		listadoProductoPorCliente = new ArrayList<>();
@@ -138,6 +135,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		statusDAO = new EstadoConstanciaDAO();
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
@@ -145,7 +143,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-		listadoClientes = clienteDAO.buscarTodos();
+//		listadoClientes = clienteDAO.buscarTodos();
+		listadoClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		
 		fechaInicial = new Date();
 		fechaFinal = new Date();

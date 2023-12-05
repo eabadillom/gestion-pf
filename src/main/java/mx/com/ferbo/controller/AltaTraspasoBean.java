@@ -147,7 +147,6 @@ public class AltaTraspasoBean implements Serializable {
 		camaraDAO = new CamaraDAO();
 		constanciaTDAO = new ConstanciaTraspasoDAO();
 		posicionDAO = new PosicionCamaraDAO();
-//		partidasAfectadasDAO = new partidasAfectadasDAO();
 		serieConstanciaDAO = new SerieConstanciaDAO();
 		
 		partida = new ArrayList<Partida>();
@@ -166,6 +165,7 @@ public class AltaTraspasoBean implements Serializable {
 		listaposicion = posicionDAO.findAll();
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		log.debug("Entrando a Init de alta Traspaso...");
@@ -173,8 +173,10 @@ public class AltaTraspasoBean implements Serializable {
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		
 		log.debug("Buscando lista de clientes...");
-		clientes = clienteDAO.buscarHabilitados(true, false);
+//		clientes = clienteDAO.buscarHabilitados(true, false);
+		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		fecha = new Date();
 		
 		log.debug("Buscando lista de unidades de medida");

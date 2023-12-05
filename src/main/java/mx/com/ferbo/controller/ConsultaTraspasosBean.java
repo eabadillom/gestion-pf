@@ -21,6 +21,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -97,6 +98,9 @@ public class ConsultaTraspasosBean implements Serializable {
 	private TraspasoServicioDAO traspasoServicioDAO;
 	
 	private boolean habilitareporte = false;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest httpServletRequest;
 
 	public ConsultaTraspasosBean() {
 		log.info("Entrando al constructor del controller...");
@@ -122,10 +126,12 @@ public class ConsultaTraspasosBean implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		log.info("Entrando a Init...");
+		faceContext = FacesContext.getCurrentInstance();
+        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		fecha_ini = new Date();
 		fecha_final = new Date();
-		clientes = clienteDAO.buscarTodos();
+//		clientes = clienteDAO.buscarTodos();
+		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		estados = edoDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
