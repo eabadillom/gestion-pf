@@ -30,7 +30,6 @@ import org.primefaces.model.charts.pie.PieChartDataSet;
 import org.primefaces.model.charts.pie.PieChartModel;
 
 import mx.com.ferbo.dao.CamaraDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.RepOcupacionCamaraDAO;
 import mx.com.ferbo.model.Camara;
@@ -68,7 +67,6 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	private List<Camara> listaCamara;
 	private List<OcupacionCamara> listaOcupacionCamara;
 
-	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
 	private RepOcupacionCamaraDAO ocupacionCamaraDAO;
@@ -81,7 +79,6 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 		
 		fecha = new Date();
 
-		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
 		ocupacionCamaraDAO = new RepOcupacionCamaraDAO();
@@ -95,6 +92,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init(){
 		
@@ -106,7 +104,8 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
 		
-		listaClientes = clienteDAO.buscarHabilitados(true);
+//		listaClientes = clienteDAO.buscarHabilitados(true);
+		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		
 		if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
 			listaPlanta.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));

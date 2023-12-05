@@ -8,15 +8,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -38,10 +35,8 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.CamaraDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
-import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.EstadoInventarioDAO;
@@ -66,12 +61,9 @@ import mx.com.ferbo.model.EstadoInventario;
 import mx.com.ferbo.model.OrdenSalida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
-import mx.com.ferbo.model.PreSalida;
 import mx.com.ferbo.model.PreSalidaServicio;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
-import mx.com.ferbo.model.Servicio;
-import mx.com.ferbo.model.ServicioFactura;
 import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.ui.OrdenDeSalidas;
@@ -81,7 +73,6 @@ import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
-import net.sf.jasperreports.engine.JRException;
 
 @Named
 @ViewScoped
@@ -98,9 +89,7 @@ public class OrdenSalidaBean implements Serializable {
 	private List<String> listaFolios;
 	private List<OrdenSalida> listaSalidasporFolio;
 	private List<PreSalidaUI> listaPreSalidaUI;
-	private List<ConstanciaSalidaServicios> listadoConstanciaSalidaServicios;
 	
-	private ClienteDAO clienteDAO;
 	private OrdenSalidaDAO ordenSalidaDAO;
 	private PrecioServicioDAO precioServicioDAO;
 	private PreSalidaServicioDAO presalidaservicioDAO;
@@ -144,10 +133,12 @@ public class OrdenSalidaBean implements Serializable {
 	private EstadoInventario estadoInventarioActual;
 	private EstadoInventario estadoInventarioHistorico;
 	private EstadoConstancia estadoConstancia;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest httpServletRequest;
 
 
 	public OrdenSalidaBean() {
-		clienteDAO = new ClienteDAO();
 		ordenSalidaDAO = new OrdenSalidaDAO();
 		presalidaservicioDAO = new PreSalidaServicioDAO();
 		precioServicioDAO = new PrecioServicioDAO();
@@ -169,12 +160,16 @@ public class OrdenSalidaBean implements Serializable {
 		listaPreSalidaUI = new ArrayList<>();
 		listaServicios = new ArrayList<PrecioServicio>();
 		listaSalidasporPlantas = new ArrayList<OrdenDeSalidas>();
-		listadoConstanciaSalidaServicios = new ArrayList<>();
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		listaClientes = clienteDAO.buscarHabilitados(true);
+		faceContext = FacesContext.getCurrentInstance();
+        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
+//		listaClientes = clienteDAO.buscarHabilitados(true);
+		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		fecha = new Date();
 		DateUtil.setTime(fecha, 0, 0, 0, 0);
 		estadoInventarioActual = estadoInventarioDAO.buscarPorId(1);
@@ -223,7 +218,6 @@ public class OrdenSalidaBean implements Serializable {
 
 	public void filtroPorPlanta() {
 		Integer folio = null;
-		OrdenSalida os = null;
 		System.out.println("Probando agregar producto...");
 		listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(folioSelected, fecha);
 		listaPreSalidaUI = new ArrayList<PreSalidaUI>();
@@ -280,7 +274,6 @@ public class OrdenSalidaBean implements Serializable {
 		Severity severity = null;
 		EntityManager manager = null;
 		List<PreSalidaUI> listapsU = null;
-		OrdenDeSalidas ods = null;
 
 		try {
 			log.info("Filtrando Producto...");
@@ -318,7 +311,7 @@ public class OrdenSalidaBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		PreSalidaServicio ps = null;
-		int count = 0;
+		
 		try {
 			if (this.idServicio == null)
 				throw new InventarioException("Selecione almenos un servicio");

@@ -126,6 +126,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 		aviso = new Aviso();
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		log.info("Entrando a Init...");
@@ -135,7 +136,8 @@ public class AltaConstanciaServicioBean implements Serializable {
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
 		fecha = new Date();
-		clientes = clienteDAO.buscarTodos();
+//		clientes = clienteDAO.buscarTodos();
+		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		alUnidades = udmDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();

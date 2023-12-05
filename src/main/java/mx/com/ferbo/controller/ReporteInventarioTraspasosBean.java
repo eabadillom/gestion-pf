@@ -18,12 +18,12 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.RepTraspasosDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.ui.RepTraspasos;
@@ -45,23 +45,25 @@ public class ReporteInventarioTraspasosBean implements Serializable {
 	private Date fecha_fin;
 	private Date maxDate;
 	private Cliente clienteSelect;
-
 	private List<Cliente> listaClientes;
-
-	private ClienteDAO clienteDAO;
-	
 	private List<RepTraspasos> reporte;
-
+	private FacesContext faceContext;
+    private HttpServletRequest httpServletRequest;
+    
 	public ReporteInventarioTraspasosBean() {
 		fecha = new Date();
-		clienteDAO = new ClienteDAO();
 		listaClientes = new ArrayList<Cliente>();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		faceContext = FacesContext.getCurrentInstance();
+        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
 		clienteSelect = new Cliente();
-		listaClientes = clienteDAO.buscarHabilitados(true);
+//		listaClientes = clienteDAO.buscarHabilitados(true);
+		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		Date today = new Date();
 		setMaxDate(new Date(today.getTime() ));
 		this.fecha_ini = new Date();

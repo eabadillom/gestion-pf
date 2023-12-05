@@ -85,6 +85,7 @@ public class ReporteSalidasBean implements Serializable {
 
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
@@ -96,7 +97,8 @@ public class ReporteSalidasBean implements Serializable {
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
 		
-		listaClientes = clienteDAO.buscarHabilitados(true);
+//		listaClientes = clienteDAO.buscarHabilitados(true);
+		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		
 		if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
 			listaPlanta.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));

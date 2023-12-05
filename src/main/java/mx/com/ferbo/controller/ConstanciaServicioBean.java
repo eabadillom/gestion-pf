@@ -87,6 +87,7 @@ public class ConstanciaServicioBean implements Serializable{
 		listaConstanciaServicios = new ArrayList<>();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
@@ -101,7 +102,9 @@ public class ConstanciaServicioBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-		listaClientes = clienteDao.buscarHabilitados(true);
+//		listaClientes = clienteDao.buscarHabilitados(true);
+		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+		
 		listaEstadosConstancias = ecDAO.buscarTodos();
 		fechaInicio = new Date();
 		fechaFinal = new Date();

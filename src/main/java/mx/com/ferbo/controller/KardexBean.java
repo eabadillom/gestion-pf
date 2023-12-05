@@ -173,7 +173,6 @@ public class KardexBean implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		//lstClientes = clienteDAO.buscarTodos();
 		listConstanciaDepositoFiltered = new ArrayList<>();
 		listDetalleSalida = new ArrayList<>();
 		listPartida = new ArrayList<>();
