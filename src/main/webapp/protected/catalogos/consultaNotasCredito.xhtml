@@ -13,7 +13,7 @@
 			<div class="p-grid ui-fluid p-col-12">
 				<div class="p-col-6 p-md-6">
 					<p:outputLabel value="Cliente:"/>
-					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{consultaNotasCreditoBean.clienteSelect}">
+					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{consultaNotasCreditoBean.clienteSelect}" filter="true" filterMatchMode="contains">
 						<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
 						<f:selectItems value="#{consultaNotasCreditoBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
 					</p:selectOneMenu>
@@ -21,12 +21,14 @@
 				<div class="p-col-3 p-md-3">
 					<p:outputLabel value="Fecha Inicio:" styleClass="p-mr-2 p-ml-3" />
 					<p:datePicker id="fechaInicio" value="#{consultaNotasCreditoBean.fechaInicio}" showIcon="true">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						<p:ajax process="@this" />
 					</p:datePicker>
 				</div>
 				<div class="p-col-3 p-md-3">
 					<p:outputLabel value="Fecha Fin:" styleClass="p-mr-2 p-ml-3"/>
 					<p:datePicker id="fechaFin" value="#{consultaNotasCreditoBean.fechaFin}" showIcon="true">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						<p:ajax process="@this" />
 					</p:datePicker>
 				</div>
@@ -104,7 +106,7 @@
 							<div class="p-col-4 p-md-4">
 								<p:outputLabel value="Fecha"/>
 								<p:datePicker value="#{consultaNotasCreditoBean.notaCreditoSelect.fecha}" showIcon="true">
-									<f:convertDateTime pattern="dd/MM/yyyy" />
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 								</p:datePicker>
 							</div>
 							<div class="p-col-8 p-md-8">
@@ -125,23 +127,23 @@
 							</div>
 							<div class="p-col-6 p-md-6">
 								<p:outputLabel value="Servicios:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.servicios}" readonly="true"/>
+								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.servicios}"/>
 							</div>
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="Constancia:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.constancia}" readonly="true"/>
+								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.constancia}"/>
 							</div>
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel  value="Periodo:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.periodo}" readonly="true"/>
+								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.periodo}"/>
 							</div>
 							<div class="p-col-12 p-md-12">
 								<p:outputLabel value="Observaciones" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.observaciones}" readonly="true"/>
+								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.observaciones}"/>
 							</div>
 							<div class="p-col-12 p-md-12">
 								<p:outputLabel value="Cajero" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.cajero}" readonly="true"/>
+								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.cajero}"/>
 							</div>
 						</div>
 					</p:outputPanel>

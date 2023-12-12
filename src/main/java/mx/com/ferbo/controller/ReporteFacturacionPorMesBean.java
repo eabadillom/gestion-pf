@@ -18,12 +18,12 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -45,19 +45,24 @@ public class ReporteFacturacionPorMesBean implements Serializable {
 	private Cliente clienteSelect;
 
 	private List<Cliente> listaClientes;
-
-	private ClienteDAO clienteDAO;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest request;
    
 	
 	public ReporteFacturacionPorMesBean() {
 		fecha = new Date();
-		clienteDAO = new ClienteDAO();
 		listaClientes = new ArrayList<Cliente>();
 	}
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
+		listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		clienteSelect = new Cliente();
-		listaClientes = clienteDAO.buscarHabilitados(true);
 		Date today = new Date();
 		maxDate = new Date(today.getTime() );
 		this.fecha_ini = new Date();

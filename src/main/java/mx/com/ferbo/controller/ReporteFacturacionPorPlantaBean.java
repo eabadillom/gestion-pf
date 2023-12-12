@@ -18,6 +18,7 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,14 +55,15 @@ public class ReporteFacturacionPorPlantaBean implements Serializable {
 	private List<Planta> listaPlanta;
 	private List<Camara> listaCamara;
 
-	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest request;
 
 	public ReporteFacturacionPorPlantaBean() {
 		fecha = new Date();
 
-		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
 
@@ -70,8 +72,15 @@ public class ReporteFacturacionPorPlantaBean implements Serializable {
 		listaCamara = new ArrayList<Camara>();
 
 	}
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        
+        listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+        listaPlanta = plantaDAO.buscarTodos();
+		
 		plantaSelect = new Planta();
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
@@ -79,8 +88,6 @@ public class ReporteFacturacionPorPlantaBean implements Serializable {
 		maxDate = new Date(today.getTime() );
 		this.fecha_ini = new Date();
 		this.fecha_fin = new Date();
-		listaClientes = clienteDAO.buscarHabilitados(true);
-		listaPlanta = plantaDAO.buscarTodos();
 		filtradoCamara();		
 		
 	}

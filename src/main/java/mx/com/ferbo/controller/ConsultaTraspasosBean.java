@@ -30,8 +30,6 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaTraspasoDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
-import mx.com.ferbo.dao.TraspasoPartidaDAO;
-import mx.com.ferbo.dao.TraspasoServicioDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
@@ -93,9 +91,7 @@ public class ConsultaTraspasosBean implements Serializable {
 	
 	private EstadoConstanciaDAO edoDAO;
 	private ClienteDAO clienteDAO;
-	private TraspasoPartidaDAO tpDAO;
 	private ConstanciaTraspasoDAO constanciaTraspasoDAO;
-	private TraspasoServicioDAO traspasoServicioDAO;
 	
 	private boolean habilitareporte = false;
 	
@@ -107,8 +103,6 @@ public class ConsultaTraspasosBean implements Serializable {
 		clienteDAO = new ClienteDAO();
 		edoDAO = new EstadoConstanciaDAO();
 		constanciaTraspasoDAO = new ConstanciaTraspasoDAO();
-		tpDAO = new TraspasoPartidaDAO();
-		traspasoServicioDAO = new TraspasoServicioDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
@@ -124,6 +118,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		clientes = clienteDAO.findall();
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();

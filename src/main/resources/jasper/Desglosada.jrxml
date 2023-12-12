@@ -251,7 +251,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 				<textElement textAlignment="Center">
 					<font size="8"/>
 				</textElement>
-				<text><![CDATA[Fecha de pago]]></text>
+				<text><![CDATA[Fecha de facturación]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="160" y="0" width="104" height="12" forecolor="#FFFFFF" backcolor="#2199F6" uuid="1e0980d7-86ca-4995-b8b3-f8439813230c"/>
@@ -320,7 +320,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 	</columnHeader>
 	<detail>
 		<band height="16" splitType="Stretch">
-			<textField evaluationTime="Report">
+			<textField>
 				<reportElement x="160" y="0" width="104" height="16" uuid="8e310f6d-03d7-40a7-b587-e0a7bc2397ca">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>

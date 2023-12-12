@@ -3,8 +3,10 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -13,12 +15,12 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.NotaCreditoDAO;
 import mx.com.ferbo.dao.PagoDAO;
@@ -46,7 +48,6 @@ public class ConsultaNotasCreditoBean implements Serializable{
 	private List<Cliente> listaCliente;
 	private List<NotaCredito> listaNotaCredito;
 	
-	private ClienteDAO clienteDAO;
 	private NotaCreditoDAO notaCreditoDAO;
 	
 	private Cliente clienteSelect;
@@ -66,12 +67,14 @@ public class ConsultaNotasCreditoBean implements Serializable{
 	private StatusFactura statusPagada;
 	private StatusFactura statusPagoParcial;
 	
+	private FacesContext faceContext;
+    private HttpServletRequest httpServletRequest;
+	
 	public ConsultaNotasCreditoBean() {
 		
 		listaCliente = new ArrayList<Cliente>();
 		listaNotaCredito = new ArrayList<NotaCredito>();
 		
-		clienteDAO = new ClienteDAO();
 		notaCreditoDAO = new NotaCreditoDAO();
 		notaCreditoSelect = new NotaCredito();
 		statusNotaCreditoDAO = new StatusNotaCreditoDAO();
@@ -82,10 +85,12 @@ public class ConsultaNotasCreditoBean implements Serializable{
 		sfDAO = new StatusFacturaDAO();
 	}	
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		
-		listaCliente = clienteDAO.buscarTodos();
+		faceContext = FacesContext.getCurrentInstance();
+        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		listaCliente = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		statusCancelada = statusNotaCreditoDAO.buscarPorId(StatusNotaCredito.STATUS_NOTA_CREDITO_CANCELADA);
 	
 		fechaInicio = new Date();
@@ -123,6 +128,10 @@ public class ConsultaNotasCreditoBean implements Serializable{
 	}
 	
 	public void actualizar() {
+		Calendar now = Calendar.getInstance();
+		TimeZone timeZone = now.getTimeZone();
+		log.debug("TimeZone: {}, {}", timeZone.getDisplayName(), timeZone.getID());
+		log.debug("Fecha nota credito: {}", this.notaCreditoSelect.getFecha());
 		notaCreditoDAO.actualizar(notaCreditoSelect);
 		this.consultarNotaCreditoCte();
 	}

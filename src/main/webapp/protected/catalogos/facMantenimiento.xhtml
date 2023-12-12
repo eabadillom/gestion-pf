@@ -27,7 +27,7 @@
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-col-6 p-md-6">
 						<p:outputLabel for="@next" value="Clientes"/>
-						<p:selectOneMenu value="#{facMantenimentoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith">
+						<p:selectOneMenu value="#{facMantenimentoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="---TODOS LOS CLIENTES---" />
 							<f:selectItems value="#{facMantenimentoBean.listClientes}" var="client" itemLabel="#{client.cteNombre}" itemValue="#{client}" />
 							<p:ajax update="form:bottomConsulta" />

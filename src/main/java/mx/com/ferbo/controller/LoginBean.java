@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -219,6 +220,7 @@ public class LoginBean implements Serializable  {
 			
 			clienteBL = new ClienteBL(this.usuario, this.clientesList, this.clientesActivosList, httpServletRequest.getSession());
 	        clienteBL.start();
+	        clienteBL.join();
 
 			faceContext.getExternalContext().redirect(nextPage);
 
@@ -271,5 +273,13 @@ public class LoginBean implements Serializable  {
 	}
 	public void setClientesActivosList(List<Cliente> clientesActivosList) {
 		this.clientesActivosList = clientesActivosList;
+	}
+
+	public ClienteBL getClienteBL() {
+		return clienteBL;
+	}
+
+	public void setClienteBL(ClienteBL clienteBL) {
+		this.clienteBL = clienteBL;
 	}
 }

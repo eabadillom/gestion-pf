@@ -1,19 +1,20 @@
 package mx.com.ferbo.controller;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
-import javax.inject.Named;
-
-import org.primefaces.PrimeFaces;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import mx.com.ferbo.dao.ClienteDAO;
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+
+import org.primefaces.PrimeFaces;
+
 import mx.com.ferbo.dao.ModPlazosPagoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
@@ -25,7 +26,6 @@ public class ModPlazosPagoBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private List<Cliente> listClientes;
-	private ClienteDAO daoCliente;
 	private Cliente clienteSelect;
 
 	private List<Factura> listFac;
@@ -37,16 +37,27 @@ public class ModPlazosPagoBean implements Serializable {
 	private Date actual = GregorianCalendar.getInstance().getTime();
 	private Date de;
 	private Date hasta;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest request;
 
 	public ModPlazosPagoBean() {
 		modNumber = 1;
-		daoCliente = new ClienteDAO();
 		daoFac = new ModPlazosPagoDAO();
-		listClientes = daoCliente.buscarTodos();
+		
 		facSelect = new ArrayList<Factura>();
+	};
+	
+	@SuppressWarnings("unchecked")
+	@PostConstruct
+	public void init() {
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
+		listClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		de = new Date();
 		hasta = new Date();
-	};
+	}
 	
 	public boolean hasClient() {
 		return this.clienteSelect != null;

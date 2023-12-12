@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
@@ -17,8 +16,8 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
@@ -87,14 +86,11 @@ public class FacturacionConstanciasBean implements Serializable{
 	private StatusFacturaDAO statusFacturaDAO;
 	private TipoFacturacionDAO tipoFacturacionDAO;
 	
-	
 	private List<Cliente> listaCliente;
-	private List<ClienteDomicilios> listaClienteDom;//recupera datos de la tabla cliente-domicilio
 	private List<ClienteDomicilios> listaClienteDomicilio;
 	private List<Planta> listaPlanta;
 	private List<SerieFactura> listaSerieF;//recupera todos los registros de serie factura
 	private List<SerieFactura> listaSerieFactura;
-	private List<Aviso> listaA;
 	private List<Aviso> listaAviso;
 	private List<MetodoPago> listaMetodoPago;
 	private List<MedioPago> listaMedioPago;
@@ -119,9 +115,7 @@ public class FacturacionConstanciasBean implements Serializable{
     private HttpServletRequest request;
     private HttpSession session;
 	
-	
 	public FacturacionConstanciasBean() {
-		
 		clienteDAO = new ClienteDAO();
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		plantaDAO = new PlantaDAO();
@@ -137,12 +131,10 @@ public class FacturacionConstanciasBean implements Serializable{
 		tipoFacturacionDAO = new TipoFacturacionDAO();
 		
 		listaCliente = new ArrayList<>();
-		listaClienteDom = new ArrayList<>();
 		listaClienteDomicilio = new ArrayList<>();
 		listaPlanta = new ArrayList<>();
 		listaSerieF = new ArrayList<>();
 		listaSerieFactura = new ArrayList<>();
-		listaA = new ArrayList<>();
 		listaAviso = new ArrayList<>();
 		listaMetodoPago = new ArrayList<>();
 		listaMedioPago = new ArrayList<>();
@@ -162,24 +154,35 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init(){
+		log.info("Entrando al init");
 		
-		listaCliente = clienteDAO.buscarTodos();
-		listaClienteDom = clienteDomicilioDAO.buscarTodos();
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        session = request.getSession(false);
+        
+		listaCliente = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+		log.debug("Lista de clientes cargada.");
+		
 		listaPlanta = plantaDAO.findall(true);
+		log.debug("Lista de plantas cargada.");
+		
 		listaSerieF = serieFacturaDAO.findAll();
-		listaA = avisoDAO.buscarTodos();
+		log.debug("Lista de series de facturas cargada.");
+		
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
+		log.debug("Lista de Métodos de pago cargada.");
+		
 		listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
+		log.debug("Lista de Formas de pago cargada.");
 		
 		fechaCorte = new Date();
 		fechaFactura = new Date();
 		
-		log.info("Entrando al init");
         
         //variables a inicializar en null al regreso de la pantalla
-
         selectedEntradas = new ArrayList<>();
 		selectedVigencias = new ArrayList<>();
 		selectedServicios = new ArrayList<>();
@@ -192,17 +195,9 @@ public class FacturacionConstanciasBean implements Serializable{
 			facturacionEntradas();
 			facturacionServicios();
 			facturacionVigencias();
-			
-			
 		}
 		
 		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios","form:medioPago");
-		
-		faceContext = FacesContext.getCurrentInstance();
-        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        session = request.getSession(false);
-		
-		
 	}
 
 	public Cliente getClienteSelect() {
@@ -461,7 +456,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.formaPagoCliente = formaPagoCliente;
 	}
 	
-	public void domicilioAvisoPorCliente() {
+	public void cargaInfoCliente() {
 		
 		clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), false);
 		formaPagoCliente = medioPagoDAO.buscarPorFormaPago(clienteSelect.getFormaPago()); 
@@ -474,18 +469,15 @@ public class FacturacionConstanciasBean implements Serializable{
 		resRetencion = resRetencion.multiply(new BigDecimal(100));//+++
 		//Domicilio
 		listaClienteDomicilio.clear();
-		listaClienteDomicilio = listaClienteDom.stream()
-								.filter(cd -> clienteSelect != null
-								?(cd.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
-								:false)
-								.collect(Collectors.toList());
-		if(listaClienteDomicilio.size()>0) {
-			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
+		listaClienteDomicilio = clienteDomicilioDAO.buscarPorCliente(clienteSelect.getCteCve());
 		
+		
+		if(listaClienteDomicilio.size() > 0) {
+			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
 		}
 		
 		//llenado de select plazo de pago
-		AvisoCliente();
+		this.avisoCliente();
 		
 		//carga de constancias si existe un cambio de cliente
 		cargarConstancias();
@@ -493,33 +485,30 @@ public class FacturacionConstanciasBean implements Serializable{
 		PrimeFaces.current().ajax().update("form:medioPago");
 	}
 	
-	public void AvisoCliente() {
+	public void avisoCliente() {
 		
 		// -------------- comienza recuperado de Aviso ----------------
 		
-				listaAviso.clear();
-				listaAviso = listaA.stream()
-							 .filter(av -> clienteSelect != null
-							 ?(av.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue())
-							 :false).collect(Collectors.toList());
-				
-				//obtengo de la listaAviso el registro con el plazo maximo
-				Aviso aviso;
-				if(listaAviso.size()>1) {//debe traer dos registros la lista o mas para poder comparar cul es el maximo
-					Optional<Aviso> numeroMax =  listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
-					
-					aviso = numeroMax.get();
-					this.plazoSelect = aviso.getAvisoPlazo();
-					
-				}else {
-					
-					if(listaAviso.size()==1) {
-						aviso = listaAviso.get(0);
-						this.plazoSelect = aviso.getAvisoPlazo();
-					}else {
-						System.out.println("el cliente no tiene aviso");
-					}
-				}
+		listaAviso.clear();
+		listaAviso = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
+		
+		//obtengo de la listaAviso el registro con el plazo maximo
+		Aviso aviso;
+		if(listaAviso.size()>1) {//debe traer dos registros la lista o mas para poder comparar cul es el maximo
+			Optional<Aviso> numeroMax =  listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
+			
+			aviso = numeroMax.get();
+			this.plazoSelect = aviso.getAvisoPlazo();
+			
+		}else {
+			
+			if(listaAviso.size()==1) {
+				aviso = listaAviso.get(0);
+				this.plazoSelect = aviso.getAvisoPlazo();
+			}else {
+				System.out.println("el cliente no tiene aviso");
+			}
+		}
 				
 				// ------------------- termina recuperacion de aviso -----------------------
 		
@@ -566,40 +555,21 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionEntradas(){
 		
-		//EntityManager em = null;
-		
 		try {
-			
-			/*em = EntityManagerUtil.getEntityManager();
-			EntityTransaction trans = em.getTransaction();
-			trans.begin();
-			facturacionConstanciasDAO.setEm(em);*/
-			
 			listaEntradas = facturacionConstanciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), plantaSelect.getPlantaCve());		
 			
 			if(listaEntradas.isEmpty()){
 				listaEntradas = new ArrayList<>();
 			}
-			
-			
 		}catch (Exception e) {
 			log.error(e);
 		}
-		
-		
 	}
 	
 	public void facturacionVigencias(){
 		
-		//EntityManager em = null;
 		try {
-		
-			/*em = EntityManagerUtil.getEntityManager();
-			EntityTransaction t = em.getTransaction();
-			t.begin();
-			facturacionVigenciasDAO.setEm(em);*/
-			
-			System.out.println(fechaFactura);
+			log.debug("Fecha de corte: ", fechaCorte);
 			DateUtil.setTime(fechaCorte, 0, 0, 0, 0);
 			
 			listaVigencias = facturacionVigenciasDAO.buscarNoFacturados(clienteSelect.getCteCve(), fechaCorte, plantaSelect.getPlantaCve());//Marca error cuando devuelve la lista vacia
@@ -616,37 +586,22 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void facturacionServicios(){
 		
-		//EntityManager em = null; 
-		
 		try {
-			
-			/*em = EntityManagerUtil.getEntityManager();
-			EntityTransaction trans = em.getTransaction();
-			trans.begin();
-			facturacionServiciosDAO.setEm(em);*/
-			
 			listaServicios = facturacionServiciosDAO.buscarNoFacturados(clienteSelect.getCteCve());
 			
 			if(listaServicios.isEmpty()) {
 				listaServicios = new ArrayList<>();
 			}
-		
-			
 		} catch (Exception e) {
 			log.error(e);
 		}
-		 
-		
 	}
 	
 	public String paginaCalculoPrevio() throws IOException {
-		
 		if(clienteSelect!=null & plantaSelect!=null) {
 			return "calculoPrevio.xhtml?faces-redirect=true";
 		} 
-		
 		return "";
-		
 	}
 	
 	public String inyeccionBean(){
