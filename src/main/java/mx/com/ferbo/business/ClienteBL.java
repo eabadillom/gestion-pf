@@ -47,7 +47,7 @@ public class ClienteBL extends Thread {
 		} else {
 			this.doConfig();
 		}
-		log.info("Total de clientes activos: {}", clientesActivos);
+		log.info("Total de clientes activos: {}", clientesActivos.size());
 		this.session.setAttribute("clientesTodosList", this.clientesTodos);
 		this.session.setAttribute("clientesActivosList", this.clientesActivos);
 	}
