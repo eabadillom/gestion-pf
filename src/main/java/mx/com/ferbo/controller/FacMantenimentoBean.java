@@ -34,7 +34,6 @@ import com.ferbo.facturama.tools.FacturamaException;
 
 import mx.com.ferbo.business.FacturamaBL;
 import mx.com.ferbo.dao.CancelaFacturaDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.model.CancelaFactura;
@@ -59,7 +58,6 @@ public class FacMantenimentoBean implements Serializable {
 	private HttpSession session;
 
 	private List<Cliente> listClientes;
-	private ClienteDAO daoCliente;
 	private Cliente clienteSelect;
 
 	private List<Factura> listFac;
@@ -75,24 +73,23 @@ public class FacMantenimentoBean implements Serializable {
 	
 	private StreamedContent file;
 	private Usuario usuario;
-
+	
 	public FacMantenimentoBean() {
 		seleccion = new Factura();
-		daoCliente = new ClienteDAO();
 		daoFac = new FacturaDAO();
 		cancelaDAO = new CancelaFacturaDAO();
-		listClientes = daoCliente.buscarTodos();
 		listFac = new ArrayList<Factura>();
 		de = new Date();
 		hasta = new Date();
 	};
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		context = FacesContext.getCurrentInstance();
 		request = (HttpServletRequest) context.getExternalContext().getRequest();
 		session = request.getSession(false);
-		
+		listClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		this.usuario = (Usuario) session.getAttribute("usuario");
 		
 		byte bytes[] = {};

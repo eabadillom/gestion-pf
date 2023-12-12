@@ -12,13 +12,13 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.BancoDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.PagoDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
@@ -43,7 +43,6 @@ public class IngresosActualizacionBean implements Serializable{
 	private Date endDate;	
 	
 	private PagoDAO pagoDAO;
-	private ClienteDAO clienteDAO;
 	private TipoPagoDAO tipoPagoDAO;
 	private BancoDAO bancoDAO;
 	private FacturaDAO facturaDAO;
@@ -63,6 +62,9 @@ public class IngresosActualizacionBean implements Serializable{
 	
 	private BigDecimal totalPagos;
 	
+	private FacesContext faceContext;
+	private HttpServletRequest httpServletRequest;
+	
 	public IngresosActualizacionBean() {
 		listaPago = new ArrayList<Pago>();
 		listaCtes = new ArrayList<Cliente>();
@@ -73,17 +75,19 @@ public class IngresosActualizacionBean implements Serializable{
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init(){
 		
-		clienteDAO = new ClienteDAO();
+		faceContext = FacesContext.getCurrentInstance();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		pagoDAO = new PagoDAO();
 		tipoPagoDAO = new TipoPagoDAO();
 		bancoDAO = new BancoDAO();
 		sfDAO = new StatusFacturaDAO();
 		facturaDAO = new FacturaDAO();
 		
-		listaCtes = clienteDAO.findall();
+		listaCtes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		listaBancos = bancoDAO.buscarTodos();
 		listatipoPago = tipoPagoDAO.buscarTodos();
 		this.startDate = new Date();

@@ -78,7 +78,8 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
 			log.debug(cliente.getRegimenFiscal().getCd_regimen());
 			log.debug(cliente.getUsoCfdi().getUsoCfdi());
-			log.info(cliente.getMetodoPago().getNbMetodoPago());
+			log.debug(cliente.getMetodoPago().getNbMetodoPago());
+			log.debug(cliente.getMetodoPago().getCdMetodoPago());
 			
 			for(ClienteContacto clienteContacto : clienteContactoList) {
 				

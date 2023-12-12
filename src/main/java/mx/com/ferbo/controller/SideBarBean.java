@@ -25,7 +25,7 @@ public class SideBarBean implements Serializable {
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
     private HttpSession session;
-	
+    
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
