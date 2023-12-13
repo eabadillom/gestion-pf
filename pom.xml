@@ -271,6 +271,21 @@
 			<name>PrimeFaces Maven Repository</name>
 			<url>http://repository.primefaces.org</url>
 		</repository>
+		<repository>
+			<id>Facturama-client</id>
+			<name>Cliente no oficial de facturama</name>
+			<url>https://maven.pkg.github.com/eabadillom/FacturamaClient</url>
+		</repository>
+		<repository>
+			<id>gestion-mail</id>
+			<name>Gestion mail api</name>
+			<url>https://github.com/eabadillom/gestion-mail</url>
+		</repository>
+		<repository>
+			<id>FP-client</id>
+			<name>FP-client</name>
+			<url>https://maven.pkg.github.com/eabadillom/gestion-fp</url>
+		</repository>
 	</repositories>
 
 	<build>
@@ -326,37 +341,7 @@
 			</plugin>
 			
 			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<execution>
-						<id>github-auth</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<echo>Configuring GitHub authentication...</echo>
-								<exec executable="git" dir="${project.basedir}">
-									<arg>config</arg>
-									<arg>--global</arg>
-									<arg>github.user</arg>
-									<arg>eabadillom</arg>
-								</exec>
-								<exec executable="git" dir="${project.basedir}">
-									<arg>config</arg>
-									<arg>--global</arg>
-									<arg>github.token</arg>
-									<arg>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</arg>
-								</exec>
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+			
 			
 			
 			
