@@ -344,7 +344,7 @@
 									<arg>config</arg>
 									<arg>--global</arg>
 									<arg>github.user</arg>
-									<arg>ebadillom</arg>
+									<arg>eabadillom</arg>
 								</exec>
 								<exec executable="git" dir="${project.basedir}">
 									<arg>config</arg>
