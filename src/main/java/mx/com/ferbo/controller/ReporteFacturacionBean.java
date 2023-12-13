@@ -19,12 +19,12 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.StatusFactura;
@@ -52,24 +52,29 @@ public class ReporteFacturacionBean implements Serializable {
 	private List<StatusFactura> listaStatusFactura;
 
 
-	private ClienteDAO clienteDAO;
 	private StatusFacturaDAO statusFacturaDAO;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest request;
 
 	public ReporteFacturacionBean() {
 		fecha = new Date();
 		
-		clienteDAO = new ClienteDAO();
 		statusFacturaDAO = new StatusFacturaDAO();
 		listaClientes = new ArrayList<Cliente>();
 		listaStatusFactura =new ArrayList<StatusFactura>();
 
 	}
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-
+		
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
+		listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		clienteSelect = new Cliente();
 		statusFacturaSelect  = new StatusFactura();
-		listaClientes = clienteDAO.buscarHabilitados(true);
 		listaStatusFactura = statusFacturaDAO.buscarTodos();
 		Date today = new Date();
 		maxDate = new Date(today.getTime() );

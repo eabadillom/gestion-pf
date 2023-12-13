@@ -36,6 +36,27 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 		return null;
 	}
 	
+	public List<ClienteDomicilios> buscarPorCliente(Integer idCliente) {
+		List<ClienteDomicilios> lista = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("ClienteDomicilios.findByCliente", ClienteDomicilios.class)
+					.setParameter("cteCve", idCliente)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de domicilios por cliente...", ex);
+		} finally {
+			
+		}
+		
+		
+		
+		return lista;
+	}
+	
 	public List<ClienteDomicilios> buscarDomicilioFiscalPorCliente(Integer idCliente, boolean isFullInfo) {
 		List<ClienteDomicilios> listado = null;
 		EntityManager em = null;

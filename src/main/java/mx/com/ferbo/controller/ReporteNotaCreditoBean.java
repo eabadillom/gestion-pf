@@ -17,12 +17,12 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -33,14 +33,10 @@ import mx.com.ferbo.util.conexion;
 
 public class ReporteNotaCreditoBean implements Serializable{
 	
-	
-	
-	
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(ReporteNotaCreditoBean.class);
 	
 	private Cliente clienteSelect;
-	private ClienteDAO clienteDAO;
 	private List<Cliente> listCliente;
 	
 	private Date fechaInicio;
@@ -48,16 +44,22 @@ public class ReporteNotaCreditoBean implements Serializable{
 	private Date fechaActual;
 	private Date maxDate;
 	
+	private FacesContext faceContext;
+    private HttpServletRequest request;
+	
 	public ReporteNotaCreditoBean(){
 		listCliente = new ArrayList<Cliente>();
 		clienteSelect = new Cliente();
-		clienteDAO = new ClienteDAO();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
-		listCliente = clienteDAO.buscarTodos();
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
+		listCliente = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		
 		fechaInicio = new Date();
 		fechaFin = new Date();

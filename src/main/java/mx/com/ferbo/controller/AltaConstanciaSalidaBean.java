@@ -26,7 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
@@ -76,7 +75,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private static Logger log = LogManager.getLogger(AltaConstanciaSalidaBean.class);
 	
 	private List<Cliente> listadoClientes;
-	private ClienteDAO clienteDAO;
 	private Cliente clienteSelect;
 	
 	private List<Planta> listadoPlantas;
@@ -151,7 +149,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		constanciaDeServicio = new ConstanciaDeServicio();
 		constanciaServicioDAO = new ConstanciaServicioDAO();
 		
-		clienteDAO = new ClienteDAO();
 		listadoClientes = new ArrayList<>();
 		
 		plantaDAO = new PlantaDAO();
@@ -183,6 +180,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		detallePartidaLista = new ArrayList<>();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
@@ -190,7 +188,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-		listadoClientes = clienteDAO.buscarHabilitados(true, false);
+//		listadoClientes = clienteDAO.buscarHabilitados(true, false);
+		listadoClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		status = statusDAO.buscarPorId(1);//Por defecto, el catálogo de status constancia salida tiene el valor 1 para una constancia vigente.
 		tpMovimientoSalida = tipoMovimientoDAO.buscarPorId(2);
 		edoInventarioActual = estadoInventarioDAO.buscarPorId(1);

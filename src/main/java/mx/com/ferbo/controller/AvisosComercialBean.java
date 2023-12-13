@@ -12,6 +12,7 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -133,6 +134,9 @@ public class AvisosComercialBean implements Serializable {
 	private String renderAvisosTable;
 	private String avisoTipoFacturacion;
 	private Integer plantaCveSelected;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest request;
 
 	/**
 	 * Constructores
@@ -163,9 +167,13 @@ public class AvisosComercialBean implements Serializable {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		lstClientes = clienteDAO.buscarTodos();
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
+		lstClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		lstCategoria = categoriaDAO.buscarTodos();
 		categoriaSelected = 1;
 		lstPlanta = plantaDAO.findall();

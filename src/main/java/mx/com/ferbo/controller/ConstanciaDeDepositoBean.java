@@ -23,8 +23,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AvisoDAO;
@@ -94,7 +94,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private EstadoInventario estadoInventario;
 	private EstadoInventarioDAO estadoInventarioDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
-	private Integer numTarimas;
+	private BigDecimal numTarimas;
 	private Boolean restricted = null;
 	private Boolean saved = null;
 	private List<Cliente> listadoCliente;
@@ -165,7 +165,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
-
+    
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
@@ -201,6 +201,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		Planta planta = null;
@@ -223,7 +224,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			listadoPlanta = plantaDAO.findall();
 		}
 			 
-		listadoCliente = clienteDAO.buscarHabilitados(true);
+//		listadoCliente = clienteDAO.buscarHabilitados(true);
+		listadoCliente = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 		tipoMovimiento = tipoMovimientoDAO.buscarPorId(1);
 		estadoInventario = estadoInventarioDAO.buscarPorId(1);
@@ -233,7 +235,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		detalle = this.newDetallePartida();
 
 		cantidadTotal = null;
-		numTarimas = 1;
+		numTarimas = null;
 
 		isCongelacion = false;
 		isConservacion = false;
@@ -249,7 +251,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		
 		saved = false;
 		Date today = new Date();
-		long oneDay = 24 * 60 * 60 * 1000;
 
 		maxDate = new Date(today.getTime() );
 		PrimeFaces.current().ajax().update(":form:planta", ":form:numeroC", ":form:cmdCambiarFolio");
@@ -356,7 +357,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		UnidadDeProducto udp = null;
 
 		partida = new Partida();
-		partida.setCantidadTotal(1);
+		partida.setCantidadTotal(0);
 		partida.setPesoTotal(new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP));
 		partida.setNoTarimas(new BigDecimal("0").setScale(1, BigDecimal.ROUND_HALF_UP));
 		udp = new UnidadDeProducto();
@@ -481,6 +482,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		
 		Partida p = null;
 		DetallePartida dp = null;
+		Integer intNumTarimas = null;
+		BigDecimal parcialTarima = null;
 
 		try {
 			udp = partida.getUnidadDeProductoCve();
@@ -501,6 +504,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			if(prd.getProductoCve() == null)
 				throw new InventarioException("Debe seleccionar un producto.");
+			
+			if(this.partida.getCantidadTotal() == null || this.partida.getCantidadTotal() == 0)
+				throw new InventarioException("Debe indicar una cantidad.");
+			
+			if(this.partida.getPesoTotal() == null || this.partida.getPesoTotal().compareTo(BigDecimal.ZERO) == 0)
+				throw new InventarioException("Debe indicar un peso.");
 
 			idUnidadDeManejo = partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve();
 			idProducto = partida.getUnidadDeProductoCve().getProductoCve().getProductoCve();
@@ -525,9 +534,15 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			partida.setNoTarimas(BigDecimal.ONE);
 			detalle.setCantidadUManejo(partida.getCantidadTotal());
 			detalle.setCantidadUMedida(partida.getPesoTotal());
-
-			for(int i = 0; i < this.numTarimas; i++) {
+			
+			intNumTarimas = this.numTarimas.intValue();
+			parcialTarima = this.numTarimas.subtract(new BigDecimal(intNumTarimas).setScale(2, BigDecimal.ROUND_HALF_UP));
+			
+			if(intNumTarimas > 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
+				throw new InventarioException("Debe indicar sólo tarimas completas o una tarima parcial.");
+			} else if(intNumTarimas == 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
 				p = (Partida) partida.clone();
+				p.setNoTarimas(parcialTarima);
 				dp = (DetallePartida) detalle.clone();
 				
 				DetallePartidaPK detallePk = new DetallePartidaPK();
@@ -539,9 +554,22 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				this.listadoPartida.add(p);
 			}
 
+			for(int i = 0; i < intNumTarimas; i++) {
+				p = (Partida) partida.clone();
+				dp = (DetallePartida) detalle.clone();
+				
+				DetallePartidaPK detallePk = new DetallePartidaPK();
+				detallePk.setDetPartCve(1);
+				detallePk.setPartidaCve(p);
+				dp.setDetallePartidaPK(detallePk);
+				
+				p.add(dp);
+				this.listadoPartida.add(p);
+			}
+			
 			this.partida = this.newPartida();
 			this.detalle = this.newDetallePartida();
-			this.numTarimas = 1;
+			this.numTarimas = null;
 
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Agregado correctamente";
@@ -1362,11 +1390,11 @@ public void deleteConstanciaDD() {
 		this.productoItems = productoItems;
 	}
 	
-	public Integer getNumTarimas() {
+	public BigDecimal getNumTarimas() {
 		return numTarimas;
 	}
 
-	public void setNumTarimas(Integer numTarimas) {
+	public void setNumTarimas(BigDecimal numTarimas) {
 		this.numTarimas = numTarimas;
 	}
 

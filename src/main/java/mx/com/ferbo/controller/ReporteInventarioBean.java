@@ -26,7 +26,6 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.CamaraDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.RepInventarioDAO;
 import mx.com.ferbo.model.Camara;
@@ -57,7 +56,6 @@ public class ReporteInventarioBean implements Serializable {
 	private List<Planta> listaPlanta;
 	private List<Camara> listaCamara;
 
-	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
 	
@@ -69,7 +67,6 @@ public class ReporteInventarioBean implements Serializable {
 	public ReporteInventarioBean() {
 		fecha = new Date();
 
-		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
 
@@ -78,6 +75,7 @@ public class ReporteInventarioBean implements Serializable {
 		listaCamara = new ArrayList<Camara>();
 
 	}
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		
@@ -89,7 +87,8 @@ public class ReporteInventarioBean implements Serializable {
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
 		
-		listaClientes = clienteDAO.buscarHabilitados(true);
+//		listaClientes = clienteDAO.buscarHabilitados(true);
+		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		
 		if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
 			listaPlanta.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));

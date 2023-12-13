@@ -17,13 +17,13 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.BancoDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -43,7 +43,6 @@ public class ReporteIngresosBean implements Serializable {
 	private Cliente clienteSelect;
 	private Bancos bancoSelect;
 	
-	private ClienteDAO clienteDAO;
 	private BancoDAO bancoDAO;
 	
 	private Date fechaInicio;
@@ -51,28 +50,33 @@ public class ReporteIngresosBean implements Serializable {
 	private Date fechaActual;
 	private Date maxDate;
 	
+	private FacesContext faceContext;
+    private HttpServletRequest request;
+	
 	public ReporteIngresosBean() {
 		
 		listCliente = new ArrayList<Cliente>();
 		listBanco = new ArrayList<Bancos>();
-		
-		clienteDAO = new ClienteDAO();
 		bancoDAO = new BancoDAO();
-		
 		clienteSelect = new Cliente();
 		bancoSelect = new Bancos();
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        
+        listCliente = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+        listBanco = bancoDAO.findall();
 		
 		fechaInicio = new Date();
 		fechaFin = new Date();
 		fechaActual = new Date();
 		
-		listCliente = clienteDAO.buscarTodos();
-		listBanco = bancoDAO.findall();
 		Date today = new Date();
 		maxDate = new Date(today.getTime() );
 	}

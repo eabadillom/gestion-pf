@@ -11,6 +11,8 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +50,10 @@ public class ProdClienteBean implements Serializable {
 	private List<Categoria> categoriaList;
 	private Categoria categoria;
 	private CategoriaDAO categoriaDAO;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest request;
+    private HttpSession session;
 
 	public ProdClienteBean() {
 		clienteDAO = new ClienteDAO();
@@ -58,8 +64,14 @@ public class ProdClienteBean implements Serializable {
 		categoriaDAO = new CategoriaDAO();
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		faceContext = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        session = request.getSession(false);
+        
+		lstClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		lstClientes = clienteDAO.buscarTodos();
 		categoriaList = categoriaDAO.buscarTodos();
 		try {

@@ -21,6 +21,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,8 +30,6 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaTraspasoDAO;
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
-import mx.com.ferbo.dao.TraspasoPartidaDAO;
-import mx.com.ferbo.dao.TraspasoServicioDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
@@ -92,19 +91,18 @@ public class ConsultaTraspasosBean implements Serializable {
 	
 	private EstadoConstanciaDAO edoDAO;
 	private ClienteDAO clienteDAO;
-	private TraspasoPartidaDAO tpDAO;
 	private ConstanciaTraspasoDAO constanciaTraspasoDAO;
-	private TraspasoServicioDAO traspasoServicioDAO;
 	
 	private boolean habilitareporte = false;
+	
+	private FacesContext faceContext;
+    private HttpServletRequest httpServletRequest;
 
 	public ConsultaTraspasosBean() {
 		log.info("Entrando al constructor del controller...");
 		clienteDAO = new ClienteDAO();
 		edoDAO = new EstadoConstanciaDAO();
 		constanciaTraspasoDAO = new ConstanciaTraspasoDAO();
-		tpDAO = new TraspasoPartidaDAO();
-		traspasoServicioDAO = new TraspasoServicioDAO();
 		clientes = new ArrayList<Cliente>();
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
@@ -120,12 +118,15 @@ public class ConsultaTraspasosBean implements Serializable {
 		clientes = clienteDAO.findall();
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		log.info("Entrando a Init...");
+		faceContext = FacesContext.getCurrentInstance();
+        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		fecha_ini = new Date();
 		fecha_final = new Date();
-		clientes = clienteDAO.buscarTodos();
+//		clientes = clienteDAO.buscarTodos();
+		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		estados = edoDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();

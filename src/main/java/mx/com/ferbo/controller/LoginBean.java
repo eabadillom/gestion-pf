@@ -5,9 +5,11 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -27,7 +29,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import mx.com.ferbo.business.ClienteBL;
 import mx.com.ferbo.dao.UsuarioDAO;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.response.DetBiometricoResponse;
 import mx.com.ferbo.util.SecurityUtil;
@@ -46,6 +50,10 @@ public class LoginBean implements Serializable  {
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
+	
+	private List<Cliente> clientesList = null;
+    private List<Cliente> clientesActivosList = null;
+    private ClienteBL clienteBL = null;
   
 	private SecurityUtil securityUtil = null;
 
@@ -56,7 +64,6 @@ public class LoginBean implements Serializable  {
 	@PostConstruct
 	public void init() {
 		securityUtil = new SecurityUtil();
-
 	}
 
 	public void login() {
@@ -199,7 +206,7 @@ public class LoginBean implements Serializable  {
 			message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Acceso correcto", null);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 
-			if ("R".equals(usuario.getStUsuario()))
+			if ("R".equals(this.usuario.getStUsuario()))
 				nextPage = "changePassword.xhtml";
 			else {
 
@@ -210,6 +217,10 @@ public class LoginBean implements Serializable  {
 				}
 
 			}
+			
+			clienteBL = new ClienteBL(this.usuario, this.clientesList, this.clientesActivosList, httpServletRequest.getSession());
+	        clienteBL.start();
+	        clienteBL.join();
 
 			faceContext.getExternalContext().redirect(nextPage);
 
@@ -249,5 +260,26 @@ public class LoginBean implements Serializable  {
 
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
+	}
+	
+	public List<Cliente> getClientesList() {
+		return clientesList;
+	}
+	public void setClientesList(List<Cliente> clientesList) {
+		this.clientesList = clientesList;
+	}
+	public List<Cliente> getClientesActivosList() {
+		return clientesActivosList;
+	}
+	public void setClientesActivosList(List<Cliente> clientesActivosList) {
+		this.clientesActivosList = clientesActivosList;
+	}
+
+	public ClienteBL getClienteBL() {
+		return clienteBL;
+	}
+
+	public void setClienteBL(ClienteBL clienteBL) {
+		this.clienteBL = clienteBL;
 	}
 }

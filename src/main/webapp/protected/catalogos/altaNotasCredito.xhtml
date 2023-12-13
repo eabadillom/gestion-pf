@@ -166,26 +166,26 @@
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="SubTotal">
+				<p:column headerText="SubTotal" style="text-align: right;">
 					<h:outputText value="#{notaFac.notaPorFacturaPK.factura.subtotal}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="IVA">
+				<p:column headerText="IVA" style="text-align: right;">
 					<h:outputText value="#{notaFac.notaPorFacturaPK.factura.iva}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="Total">
+				<p:column headerText="Total" style="text-align: right;">
 					<h:outputText value="#{notaFac.notaPorFacturaPK.factura.total}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="Cantidad">
-					<h:outputText value="#{notaFac.cantidad}">
+				<p:column headerText="Cantidad" style="text-align: right;">
+					<h:outputText value="#{notaFac.cantidad}" style="font-weight: bold;">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>

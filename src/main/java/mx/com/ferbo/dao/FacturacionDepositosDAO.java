@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.ConstanciaFactura;
@@ -43,7 +42,6 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		List<Partida> allPartida = null;
 		
 		ConstanciaFactura cf = null;
-		Camara camara = null;
 		Date vigenciaInicio = null;
 		Date vigenciaFin = null;
 		int vigencia = 0;
@@ -111,26 +109,16 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				cf.setFolioCliente(cdd.getFolioCliente());
 				cf.setVigenciaInicio(cdd.getFechaIngreso());
 				cf.setVigenciaFin(vigenciaFin);
+				
 				//FALTA RELACION DE POR CAD CONSTANCIA DE DEPOSITO AGREGAR LAS CONSTANCIAS FACTURAS CDD.SETLISTAFACTURAS
 				listaConstanciaFactura.add(cf);
 				cdd.setConstanciaFacturaList(new ArrayList<>());
 				cdd.setConstanciaFacturaList(listaConstanciaFactura);
 				
+				log.debug("Constancia factura: {}, {}, {}", cf.getFolioCliente(), cf.getVigenciaInicio(), cf.getVigenciaFin());
+				
 				allPartida = cdd.getPartidaList();
-				System.out.println(allPartida.size());
-				
-				/*for(Partida p: allPartida) {
-					camara = new Camara();
-					
-					camara = p.getCamaraCve();
-					log.info(camara.getCamaraAbrev());
-					log.info(camara.getCamaraCve());
-					log.info(camara.getCamaraDs());
-					
-				}*/
-				
-				
-				
+				log.debug("AllPartida.size: {}", allPartida.size());
 			}
 			
 			

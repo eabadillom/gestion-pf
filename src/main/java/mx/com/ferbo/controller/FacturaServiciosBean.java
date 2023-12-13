@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -195,12 +194,15 @@ public class FacturaServiciosBean implements Serializable {
 		psDAO = new PrecioServicioDAO();
 	}
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		clientes = clienteDAO.buscarHabilitados(true, true);
-		listaClienteDom = clienteDomicilioDAO.buscarTodos();
+		context = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) context.getExternalContext().getRequest();
+        session = request.getSession(false);
+        
+		clientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		listaPlanta = plantaDAO.findall();
-		listaA = avisoDAO.buscarTodos();
 		listaMetodoPago = metodoPagoDAO.buscarTodos();
 		listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
 		listaSerieF = seriefacturaDAO.findAll();
@@ -221,12 +223,14 @@ public class FacturaServiciosBean implements Serializable {
 		this.factura.setFinServicios(fechaFinDefault);
 	}
 
-	public void domicilioAvisoPorCliente() {
+	public void cargaInfoCliente() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		
 		try {
+			
+			this.clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 			
 			iva = parametroDAO.buscarPorNombre("IVA");
 			if(iva == null)
@@ -237,16 +241,11 @@ public class FacturaServiciosBean implements Serializable {
 			Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
 			List<PrecioServicio> precioServicioList = null;
 			listaClienteDomicilio.clear();
-			listaClienteDomicilio = listaClienteDom.stream()
-					.filter(cd -> clienteSelect != null
-							? (cd.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())
-							: false)
-					.collect(Collectors.toList());
+			listaClienteDomicilio = clienteDomicilioDAO.buscarPorCliente(clienteSelect.getCteCve());
+			
 			if (listaClienteDomicilio.size() > 0) {
 				domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
 			}
-			
-			this.clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 			
 			precioServicioList = psDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
 			Integer idAviso = new Integer(-1);
@@ -300,9 +299,7 @@ public class FacturaServiciosBean implements Serializable {
 
 	public void AvisoCliente() {
 		listaAviso.clear();
-		listaAviso = listaA.stream().filter(av -> clienteSelect != null
-						? (av.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())
-						: false).collect(Collectors.toList());
+		listaAviso = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
 		Aviso aviso;
 		if (listaAviso.size() > 1) {
 			Optional<Aviso> numeroMax = listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));

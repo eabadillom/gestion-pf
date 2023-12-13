@@ -10,8 +10,12 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DateUtil {
+	private static Logger log = LogManager.getLogger(DateUtil.class);
+	
 	public static String PREF_FECHA        = "fecha"; //Para lectura del .properties
 	public static String PREF_ASUETO       = "asueto"; //Para lectura del .properties
 	public static String PREF_DIA_ESPECIAL = "especial"; //Para lectura del .properties
@@ -591,32 +595,49 @@ public class DateUtil {
 		vencimiento = new Date(fecha.getTime());
 		fechaAux = new Date(fecha.getTime());
 		
-		int dia = -1;
-		int mes = -1;
-		int anio = -1;
-		
-		GregorianCalendar c = new GregorianCalendar();
-		
 		if(diasVencimiento == 30 && (esVigenciaNatural == false) ) {
-			
-			vencimiento = DateUtil.addMonth(vencimiento, 1);
-			dia = DateUtil.getDia(fechaAux);
-			mes = DateUtil.getMes(fechaAux);
-			anio = DateUtil.getAnio(fechaAux);
-			
-			if(c.isLeapYear(anio)) {
-				if( !(mes == DateUtil.ENERO && dia > 29) ){
-					vencimiento = DateUtil.addDay(vencimiento, -1);
-				} 
+			log.trace("Vencimiento: 30 días.");
+			int diaDelMes = getDia(fecha);
+			if(diaDelMes >= 1 && diaDelMes <= 29) {
+				log.trace("Día del mes entre 1 y 29");
+				vencimiento = DateUtil.addMonth(vencimiento, 1);
+				vencimiento = DateUtil.addDay(vencimiento,-1);
+				log.trace("Vencimiento: {}", vencimiento);
 			} else {
-				if( !(mes == DateUtil.ENERO && dia > 28)) {
+				log.trace("Día del mes entre 30, 31");
+				vencimiento = DateUtil.addMonth(vencimiento, 1);
+				log.trace("Vencimiento: {}", vencimiento);
+				if(getDia(vencimiento) == getDia(fechaAux)) {
+					log.trace("Día de vencimiento igual a fecha auxiliar.");
 					vencimiento = DateUtil.addDay(vencimiento, -1);
+					log.trace("Vencimiento: {}", vencimiento);
 				}
 			}
+			if(getDia(fechaAux) == 29 && getMes(fechaAux) == 1) {
+				log.trace("día de fecha auxiliar = 29 y mes 1");
+				String f = String.format("%d-02-28", getAnio(fechaAux));
+				vencimiento = DateUtil.getDate(f, FORMATO_YYYY_MM_DD);
+				log.trace("Vencimiento: {}", vencimiento);
+			}
+			log.trace("Vencimiento: {}", vencimiento);
 		} else {
-			vencimiento = DateUtil.addDay(vencimiento, diasVencimiento);
+			vencimiento = DateUtil.addDay(vencimiento, (diasVencimiento - 1));
 		}
 		
 		return vencimiento;
+	}
+	
+	public static void main(String[] args) {
+		String sFecha = "2023-11-01";
+		Date fecha = null;
+		Date vencimiento = null;
+		
+		try {
+			fecha = getDate(sFecha, FORMATO_YYYY_MM_DD);
+			vencimiento = DateUtil.fechaVencimiento(fecha, 30, false);
+			log.info("Fecha inicio: {}, fecha vencimiento: {}", fecha, vencimiento);
+		} catch(Exception ex) {
+			log.error("Problema para obtener el vencimiento...", ex);
+		}
 	}
 }

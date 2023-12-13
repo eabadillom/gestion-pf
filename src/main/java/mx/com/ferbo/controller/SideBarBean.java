@@ -25,20 +25,13 @@ public class SideBarBean implements Serializable {
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
     private HttpSession session;
-	
-	public Usuario getUsuario() {
-		return usuario;
-	}
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
-	}
-	
+    
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         session = httpServletRequest.getSession(false);
-        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");    
+        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
 	}
 	
 	public void logout() {
@@ -57,5 +50,12 @@ public class SideBarBean implements Serializable {
     	} catch(Exception ex) {
     		log.error("Problema en el cierre de sesión del usuario...", ex);
     	}
+	}
+	
+	public Usuario getUsuario() {
+		return usuario;
+	}
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 }

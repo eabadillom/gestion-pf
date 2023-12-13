@@ -244,9 +244,13 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 		int tmpIni = 0;
 		int tmpFin = 0;
 		
+		log.debug("Constancia: {}",constancia.getFolioCliente());
+		
 		vigencia = constancia.getAvisoCve().getAvisoVigencia();
 		vigenciaInicio = constancia.getFechaIngreso();
 		vigenciaFin = DateUtil.fechaVencimiento(vigenciaInicio, vigencia, false);
+		
+		log.debug(String.format("Calculando vigencia: inicio: %s, fin: %s", DateUtil.getString(vigenciaInicio, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS), DateUtil.getString(vigenciaFin, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS)));
 		
 		if(fechaCorte.compareTo(vigenciaInicio) < 0)
 			return null;
@@ -262,7 +266,6 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 			}
 			vigenciaInicio = DateUtil.addDay(vigenciaFin, 1);
 			vigenciaFin = DateUtil.fechaVencimiento(vigenciaInicio, vigencia, false);
-			log.debug(String.format("Calculando vigencia: %s, inicio: %s, fin: %s", constancia.getFolioCliente(), DateUtil.getString(vigenciaInicio, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS), DateUtil.getString(vigenciaFin, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS)));
 		}
 		
 		cf = new ConstanciaFactura();

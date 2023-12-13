@@ -18,12 +18,12 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -46,21 +46,23 @@ public class ReporteEntradaSalidaBean implements Serializable {
 
 	private List<Cliente> listaClientes;
   
-	private ClienteDAO clienteDAO;
+	private FacesContext faceContext;
+    private HttpServletRequest httpServletRequest;
 
 	public ReporteEntradaSalidaBean() {
 		fecha = new Date();
-		clienteDAO = new ClienteDAO();
 		listaClientes = new ArrayList<Cliente>();
-
-
 	}
+	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		faceContext = FacesContext.getCurrentInstance();
+        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		clienteSelect = new Cliente();
-		listaClientes = clienteDAO.buscarHabilitados(true);
+//		listaClientes = clienteDAO.buscarHabilitados(true);
+		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		Date today = new Date();
-		long oneDay = 24 * 60 * 60 * 1000;
 
 		maxDate = new Date(today.getTime() );
 		

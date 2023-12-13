@@ -27,6 +27,7 @@ import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.NotaCreditoDAO;
 import mx.com.ferbo.dao.PagoDAO;
+import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.SerieNotaDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.StatusNotaCreditoDAO;
@@ -40,6 +41,7 @@ import mx.com.ferbo.model.NotaCredito;
 import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.model.NotaPorFacturaPK;
 import mx.com.ferbo.model.Pago;
+import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.SerieNota;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.StatusNotaCredito;
@@ -102,6 +104,8 @@ public class AltaNotasCredito implements Serializable{
 	
 	private Date fechaInicio;
 	private Date fechaFin;
+	private Parametro pIVA = null;
+	private ParametroDAO parametroDAO = null;
 	
 	
 	public AltaNotasCredito() {
@@ -123,8 +127,10 @@ public class AltaNotasCredito implements Serializable{
 		serieNotaSelect = new SerieNota();
 		notaPorFactura = new NotaPorFactura();
 		notaCredito = new NotaCredito();
+		parametroDAO = new ParametroDAO();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init(){
 		this.clienteDAO = new ClienteDAO();
@@ -138,7 +144,7 @@ public class AltaNotasCredito implements Serializable{
 		this.statusNotaCreditoDAO = new StatusNotaCreditoDAO();
 		this.pagoDAO = new PagoDAO();
 		
-		this.listaClientes = clienteDAO.buscarTodos();
+		this.listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		//TODO timbrado CFDI para las notas de crédito. Se prepara parámetro para indicar planta (razón social) a la que pertenece la serie.
 		this.listaSerieNota = serieNotaDAO.buscarActivas(null);
 		this.tipoPagoNotaCredito = tipoPagoDAO.buscarPorId(TipoPago.TIPO_PAGO_NOTA_CREDITO);
@@ -165,6 +171,7 @@ public class AltaNotasCredito implements Serializable{
 		
 		this.fechaInicio = new Date();
 		this.fechaFin = new Date();
+		this.pIVA = parametroDAO.buscarPorNombre("IVA");
 	}
 	
 	public void filtroFactura() {
@@ -255,21 +262,11 @@ public class AltaNotasCredito implements Serializable{
 		log.debug("Saldo: {}", saldoSelected);
 	}
 	
-	public void facturasSeleccionadas() {//AQUI VAN LAS SUMAS 
+	public void facturasSeleccionadas() { 
 		
-		//SUMAS GENERALES
-		BigDecimal iva = new BigDecimal(.16).setScale(2,BigDecimal.ROUND_HALF_UP);
-		
-		sumaSubtotal = sumaSubtotal.add(facturaSelect.getSubtotal()).setScale(2,BigDecimal.ROUND_HALF_UP);
-		ivaSubtotal = sumaSubtotal.multiply(iva).setScale(2,BigDecimal.ROUND_HALF_UP);
-		total = sumaSubtotal.add(ivaSubtotal);
+		BigDecimal iva = new BigDecimal(pIVA.getValor()).setScale(2,BigDecimal.ROUND_HALF_UP);
 		
 		log.info("Nota de credito - Subtotal: {}, IVA: {}, Total: {}", sumaSubtotal, ivaSubtotal, total);
-		
-		
-		totalCantidad = totalCantidad.add(cantidad).setScale(2,BigDecimal.ROUND_HALF_UP);
-		ivaSubtotal = totalCantidad.multiply(iva).setScale(2, BigDecimal.ROUND_HALF_UP);
-		sumaSubtotal = totalCantidad.subtract(ivaSubtotal);
 		
 		notaPorFactura = new NotaPorFactura();
 		notaPorFactura.setNotaPorFacturaPK(new NotaPorFacturaPK());
@@ -277,6 +274,15 @@ public class AltaNotasCredito implements Serializable{
 		notaPorFactura.setCantidad(cantidad);
 		
 		listaNotaXFactura.add(notaPorFactura);
+		
+		totalCantidad = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		for(NotaPorFactura npf : this.listaNotaXFactura) {
+			log.debug("NotaXFactura - Cantidad: {}", npf.getCantidad());
+			totalCantidad = totalCantidad.add(npf.getCantidad());
+		}
+		
+		sumaSubtotal = totalCantidad.divide(new BigDecimal("1.00").setScale(2, BigDecimal.ROUND_HALF_UP).add(iva), BigDecimal.ROUND_HALF_UP);
+		ivaSubtotal = sumaSubtotal.multiply(iva);
 		
 		FormatUtil formato = new FormatUtil();
 		
