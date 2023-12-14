@@ -276,21 +276,21 @@
 			<name>github</name>
 			<url>https://maven.pkg.github.com</url>
 		</repository>
-		<repository>
+		<!-- <repository>
 			<id>Facturama-client</id>
 			<name>Cliente no oficial de facturama</name>
 			<url>https://maven.pkg.github.com/eabadillom/FacturamaClient</url>
-		</repository>
-		<repository>
+		</repository> -->
+		<!-- <repository>
 			<id>gestion-mail</id>
 			<name>Gestion mail api</name>
 			<url>https://maven.pkg.github.com/eabadillom/gestion-mail</url>
-		</repository>
-		<repository>
+		</repository> -->
+		<!-- <repository>
 			<id>FP-client</id>
 			<name>FP-client</name>
 			<url>https://maven.pkg.github.com/eabadillom/gestion-fp</url>
-		</repository>
+		</repository> -->
 	</repositories>
 
 	<build>
