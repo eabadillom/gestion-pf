@@ -274,7 +274,7 @@
 		<repository>
 			<id>github</id>
 			<name>github</name>
-			<url>https://maven.pkg.github.com/eabadillom</url>
+			<url>https://maven.pkg.github.com</url>
 		</repository>
 		<repository>
 			<id>Facturama-client</id>
