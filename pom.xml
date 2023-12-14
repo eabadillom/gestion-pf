@@ -271,16 +271,16 @@
 			<name>PrimeFaces Maven Repository</name>
 			<url>http://repository.primefaces.org</url>
 		</repository>
-		<!-- <repository>
+		<repository>
 			<id>github</id>
 			<name>github</name>
-			<url>https://maven.pkg.github.com/eabadillom</url>
-		</repository> -->
-		<repository>
+			<url>https://maven.pkg.github.com/eabadillom/*</url>
+		</repository>
+		<!-- <repository>
 			<id>Facturama-client</id>
 			<name>Cliente no oficial de facturama</name>
 			<url>https://maven.pkg.github.com/eabadillom/FacturamaClient</url>
-		</repository>
+		</repository> -->
 		<!-- <repository>
 			<id>gestion-mail</id>
 			<name>Gestion mail api</name>
