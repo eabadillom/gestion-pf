@@ -279,7 +279,7 @@
 		<repository>
 			<id>gestion-mail</id>
 			<name>Gestion mail api</name>
-			<url>https://github.com/eabadillom/gestion-mail</url>
+			<url>https://maven.pkg.github.com/eabadillom/gestion-mail</url>
 		</repository>
 		<repository>
 			<id>FP-client</id>
