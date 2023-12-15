@@ -135,6 +135,7 @@
 							</p:submenu>
 						</p:submenu>
 						<p:menuitem value="Usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
+						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
 						<p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
 					</po:menu>
