@@ -58,4 +58,4 @@ jobs:
           app-name: 'frb-gestion'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_72932E93A7464CD6ABF730AF3B1F21AD }}
-          package: '*.jar'
+          package: '*.war'
