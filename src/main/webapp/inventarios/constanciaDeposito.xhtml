@@ -147,7 +147,7 @@
 			</div>
 			<div style="padding-top: 2rem;">
 				<p:panel header="SUS PRODUCTOS">
-					<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="false"
+					<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="true"
 								  rowSelectMode="add" rows="10" rowKey="#{partida.pesoTotal}" reflow="true" selection="#{constanciaDeDepositoBean.selectedPartidas}" tableStyle="table-layout: auto;">
 				
 						<p:column exportable="false" width="3%">
