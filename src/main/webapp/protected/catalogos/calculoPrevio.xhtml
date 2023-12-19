@@ -90,12 +90,12 @@
 						</p:column>
 						<p:column headerText="Fecha Ingreso">
 							<h:outputText value="#{entrada.folio.fechaIngreso}">
-								<f:convertDateTime pattern="dd/MMM/YYYY" />
+								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 						<p:column headerText="Vigencia Fin">
 							<h:outputText value="#{entrada.vigenciaFin}">
-								<f:convertDateTime pattern="dd/MMM/YYYY" />
+								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 						<p:rowExpansion>
@@ -144,12 +144,12 @@
 						</p:column>
 						<p:column headerText="Vigencia Inicio">
 							<h:outputText value="#{vigencia.vigenciaInicio}">
-								<f:convertDateTime pattern="dd/MMM/YYYY" />
+								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 						<p:column headerText="Vigencia Fin">
 							<h:outputText value="#{vigencia.vigenciaFin}">
-								<f:convertDateTime pattern="dd/MMM/YYYY" />
+								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 						<p:rowExpansion>
@@ -195,7 +195,7 @@
 						</p:column>
 						<p:column headerText="Fecha de Emisión">
 							<h:outputText value="#{calculoPrevioBean.fechaEmision}">
-								<f:convertDateTime pattern="dd/MMM/YYYY" />
+								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 						<p:rowExpansion>

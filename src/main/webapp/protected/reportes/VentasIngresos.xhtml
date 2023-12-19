@@ -15,12 +15,18 @@
                     <div class="card">
 						 <p:fieldset legend="Periodo">
 			               <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteVentasIngresosBean.fecha_ini}"  maxdate="#{reporteVentasIngresosBean.maxDate}" readonlyInput="true" showIcon="true"/>
+			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteVentasIngresosBean.fecha_ini}"  maxdate="#{reporteVentasIngresosBean.maxDate}" readonlyInput="true" showIcon="true">
+			                	<p:ajax process="@this" />
+			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+			                </p:datePicker>
 			                <p:outputLabel for="minmax1" value="Fecha de inicio "/>
 						</span>
 						
 						 <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax2" styleClass="p-mr-4 p-mb-2" value="#{reporteVentasIngresosBean.fecha_fin}"  maxdate="#{reporteVentasIngresosBean.maxDate}" readonlyInput="true" showIcon="true"/>
+			                <p:datePicker id="minmax2" styleClass="p-mr-4 p-mb-2" value="#{reporteVentasIngresosBean.fecha_fin}"  maxdate="#{reporteVentasIngresosBean.maxDate}" readonlyInput="true" showIcon="true">
+			                	<p:ajax process="@this" />
+			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+			                </p:datePicker>
 			                <p:outputLabel for="minmax2" value="Fecha  final "/>
 						</span>
            				 

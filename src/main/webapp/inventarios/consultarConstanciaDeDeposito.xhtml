@@ -24,12 +24,14 @@
 					<p:outputLabel value="Del" styleClass="p-mr-2"/>
 					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaDeDepositoBean.fechaInicial}" maxdate="#{consultarConstanciaDeDepositoBean.maxDate}">
 						<p:ajax process="@this" />
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-field p-col-3 p-md-3">
 					<p:outputLabel value="al" styleClass="p-mr-2"/>
 					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaDeDepositoBean.fechaFinal}" maxdate="#{consultarConstanciaDeDepositoBean.maxDate}">
 						<p:ajax process="@this" />
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-field p-col-2 p-md-2">
@@ -97,6 +99,7 @@
 						<p:outputLabel value="Fecha Ingreso:"/>
 						<p:datePicker value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.fechaIngreso}" showIcon="true">
 							<p:ajax process="@this"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 					<div class="p-field p-col-3 p-md-3">
@@ -312,7 +315,10 @@
 							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="Caducidad:" />
-								<p:datePicker id="fechaCaducidad" showIcon="true" value="#{consultarConstanciaDeDepositoBean.fechaCaducidad}"></p:datePicker>
+								<p:datePicker id="fechaCaducidad" showIcon="true" value="#{consultarConstanciaDeDepositoBean.fechaCaducidad}">
+									<p:ajax process="@this" />
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+								</p:datePicker>
 							</div>		
 											
 							

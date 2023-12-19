@@ -156,13 +156,11 @@
 						<p:column headerText="Fecha Ingreso">
 							<h:outputText value="#{entrada.vigenciaInicio}">
 								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-								<!-- <f:convertDateTime pattern="dd/MMM/YYYY"  /> -->
 							</h:outputText>
 						</p:column>
 						<p:column headerText="Fin vigencia">
 							<h:outputText value="#{entrada.vigenciaFin}">
 								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-								<!-- <f:convertDateTime pattern="dd/MMM/YYYY" /> -->
 							</h:outputText>
 						</p:column>
 					</p:dataTable>
@@ -174,6 +172,7 @@
 					<p:outputLabel value="Fecha de corte"/>
 					<p:datePicker id="FechaCorte" showIcon="true" styleClass="p-ml-2" placeholder="Fecha de Corte" value="#{facturacionConstanciasBean.fechaCorte}" onchange="PF('statusInfoDialog').show();">
 						<p:ajax update="@this dt-vigencias" listener="#{facturacionConstanciasBean.facturacionVigencias}" oncomplete="PF('statusInfoDialog').hide();"/>
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 					<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" value="#{facturacionConstanciasBean.listaVigencias}" selection="#{facturacionConstanciasBean.selectedVigencias}" var="vigencia" rowKey="#{vigencia.folio.folio}" rowSelectMode="add" paginator="true" paginatorPosition="bottom" rows="5">
 						<p:ajax event="rowSelect" />
@@ -187,12 +186,12 @@
 						</p:column>
 						<p:column headerText="Inicio Vigencia">
 							<h:outputText value="#{vigencia.vigenciaInicio}">
-								<f:convertDateTime pattern="dd/MMM/YYYY" />
+								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 						<p:column headerText="Fin Vigencia">
 							<h:outputText value="#{vigencia.vigenciaFin}">
-								<f:convertDateTime pattern="dd/MMM/YYYY" />
+								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 					</p:dataTable>
@@ -213,7 +212,7 @@
 						</p:column>
 						<p:column headerText="Fecha">
 							<h:outputText value="#{servicio.constanciaDeServicio.fecha}">
-								<f:convertDateTime pattern="dd/MMM/YYYY" />
+								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 					</p:dataTable>

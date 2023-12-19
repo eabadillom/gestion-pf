@@ -51,10 +51,12 @@
 				<p:outputLabel value="Del:"/>
 				<p:datePicker value="#{altaNotasCredito.fechaInicio}" showIcon="true">
 					<p:ajax process="@this" listener="#{altaNotasCredito.filtroFactura()}"/>
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 				</p:datePicker>
 				<p:outputLabel value="Al:"/>
 				<p:datePicker value="#{altaNotasCredito.fechaFin}" showIcon="true">
 					<p:ajax process="@this" listener="#{altaNotasCredito.filtroFactura()}"/>
+					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 				</p:datePicker>
 			</p:fieldset>
 		</div>
@@ -118,7 +120,8 @@
 					
 					<p:outputLabel value="Fecha:" />
 					<p:datePicker value="#{altaNotasCredito.facturaSelect.fecha}" showIcon="true" readonly="true">
-						<f:convertDateTime pattern="dd/MM/yyyy" />
+						<p:ajax process="@this" />
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 					
 					<p:outputLabel value="Subtotal"/>
@@ -227,7 +230,9 @@
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Fecha:" />
-							<p:datePicker showIcon="true" value="#{altaNotasCredito.notaCredito.fecha}" />
+							<p:datePicker showIcon="true" value="#{altaNotasCredito.notaCredito.fecha}">
+								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+							</p:datePicker>
 						</div>
 						<div class="p-col-6 p-md-6">
 							<p:outputLabel value="Por los servicios:" />

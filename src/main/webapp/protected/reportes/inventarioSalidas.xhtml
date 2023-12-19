@@ -21,12 +21,14 @@
 							<span class="ui-float-label ui-input-icon-left">
 								<p:datePicker id="ol-fechaIni" showIcon="true" value="#{reporteSalidasBean.fecha_ini}" maxdate="#{reporteSalidasBean.maxDate}">
 									<p:ajax process="@this" />
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 								</p:datePicker>
 								<p:outputLabel for="ol-fechaIni" value="Fecha de inicio" />
 							</span>
 							<span class="ui-float-label ui-input-icon-left">
 								<p:datePicker id="ol-fechafin" showIcon="true" value="#{reporteSalidasBean.fecha_fin}" maxdate="#{reporteSalidasBean.maxDate}">
 									<p:ajax process="@this" />
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 								</p:datePicker>
 								<p:outputLabel for="ol-fechafin" value="Fecha final" />
 							</span>
@@ -99,7 +101,7 @@
             	</p:column>
             	<p:column headerText="Fecha" width="6rem" style="text-align: center;">
             		<h:outputText value="#{r.fecha}">
-            			<f:convertDateTime pattern="dd/MM/yyyy" />
+            			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
             		</h:outputText>
             	</p:column>
             	<p:column headerText="Cantidad" style="text-align: right;" width="5rem">
@@ -117,7 +119,7 @@
             			<div class="p-field p-col-2 p-md-2">
             				<p:outputLabel for="@next" value="Fecha" />
             				<p:inputText value="#{r.fechaIngreso}" readonly="true" style="text-align: center;">
-            					<f:convertDateTime pattern="dd/MM/yyyy" />
+            					<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
             				</p:inputText>
             			</div>
             			<div class="p-field p-col-2 p-md-2">

@@ -15,9 +15,15 @@
 	                <div class="card">
 	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
 	             			<p:outputLabel value="De:" styleClass="p-mr-2"></p:outputLabel>
-	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4" maxdate="#{reporteIngresosBean.maxDate}"/>
+	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4" maxdate="#{reporteIngresosBean.maxDate}">
+	             				<p:ajax process="@this" />
+	             				<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+	             			</p:datePicker>
 	             			<p:outputLabel value="A:" styleClass="p-mr-2"></p:outputLabel>
-	             			<p:datePicker id="fechaFin" value="#{reporteIngresosBean.fechaFin}" showIcon="true" maxdate="#{reporteIngresosBean.maxDate}"/>
+	             			<p:datePicker id="fechaFin" value="#{reporteIngresosBean.fechaFin}" showIcon="true" maxdate="#{reporteIngresosBean.maxDate}">
+	             				<p:ajax process="@this"/>
+	             				<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+	             			</p:datePicker>
 	             		</p:fieldset>
 	             		<p:fieldset legend="Banco" styleClass="p-mt-4">
 		             		<p:selectOneMenu id="select-banco" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.bancoSelect}">

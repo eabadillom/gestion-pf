@@ -19,7 +19,10 @@
                 <div class="p-col-12">
                     <div class="card">
                         <p:growl id="messages" showDetail="true" />
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteServClienteBean.fecha}" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteServClienteBean.fecha}">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 						 
 						 
 					  <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">

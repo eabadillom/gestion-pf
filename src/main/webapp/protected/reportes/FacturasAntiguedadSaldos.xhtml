@@ -15,7 +15,10 @@
                     <div class="card">
 						 <p:fieldset legend="Fecha de corte">
 			               <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" readonlyInput="true" showIcon="true"/>
+			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" readonlyInput="true" showIcon="true">
+			                	<p:ajax process="@this" />
+			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+			                </p:datePicker>
 			                <p:outputLabel for="minmax1" value="Al día"/>
 						</span>
 							</p:fieldset>

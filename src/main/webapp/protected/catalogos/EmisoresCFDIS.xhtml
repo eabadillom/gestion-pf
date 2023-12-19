@@ -107,15 +107,21 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 	
 						<div class="p-col-12 p-md-6 p-lg-4">
 							<span class="ui-float-label">
-								<p:datePicker value="#{emisoresCFDISBean.iniOperacion}" required="true" requiredMessage="Ingresa Fecha Inicio"/>
+								<p:datePicker value="#{emisoresCFDISBean.iniOperacion}" required="true" requiredMessage="Ingresa Fecha Inicio">
+									<p:ajax process="@this" />
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+								</p:datePicker>
 								<p:outputLabel for="@next" value="Inicio de operaciones" styleClass="ml-4"/>
 							</span>
 						</div>
 						
 						<div class="p-col-12 p-md-6 p-lg-4">
 							<span class="ui-float-label">
-							<p:datePicker value="#{emisoresCFDISBean.ultSAT}" required="true" requiredMessage="Ingresa Fecha Cambio"/>
-							<p:outputLabel for="@next" value="Ulltimo cambio en el Sat" styleClass="ml-4"/>
+								<p:datePicker value="#{emisoresCFDISBean.ultSAT}" required="true" requiredMessage="Ingresa Fecha Cambio">
+									<p:ajax process="@this" />
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+								</p:datePicker>
+								<p:outputLabel for="@next" value="Ulltimo cambio en el Sat" styleClass="ml-4"/>
 							</span>
 						</div>
 						
@@ -173,11 +179,17 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 					
 					<div class="p-col-12 p-md-6 p-lg-4">
 						<p:outputLabel for="@next" value="Inicio de operaciones" styleClass="ml-4"/>
-						<p:datePicker value="#{emisoresCFDISBean.emisor.fh_inicio_op}" required="true" requiredMessage="Ingresa Fecha Inicio"/>
+						<p:datePicker value="#{emisoresCFDISBean.emisor.fh_inicio_op}" required="true" requiredMessage="Ingresa Fecha Inicio">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 					</div>
 					<div class="p-col-12 p-md-6 p-lg-4">
 						<p:outputLabel for="@next" value="Ulltimo cambio en el Sat" styleClass="ml-4"/>
-						<p:datePicker value="#{emisoresCFDISBean.emisor.fh_ult_cambio}" required="true" requiredMessage="Ingresa Fecha Cambio"/>
+						<p:datePicker value="#{emisoresCFDISBean.emisor.fh_ult_cambio}" required="true" requiredMessage="Ingresa Fecha Cambio">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 					</div>
 					
 					
@@ -278,7 +290,10 @@ function EnabledDisabledTB(){
 					
        				
 				    <p:outputLabel for="@next" value="Fecha de registro" required="true"/>
-				    <p:datePicker  rows="1" cols="25" widgetVar="f-new" id="f-new" value="#{emisoresCFDISBean.certificado.fechaAlta}" disabled="true"/>
+				    <p:datePicker  rows="1" cols="25" widgetVar="f-new" id="f-new" value="#{emisoresCFDISBean.certificado.fechaAlta}" disabled="true">
+				    	<p:ajax process="@this" />
+				    	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+				    </p:datePicker>
        				     </p>
     			   </p:fieldset>
 				</div>

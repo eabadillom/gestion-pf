@@ -15,11 +15,17 @@
                     <div class="card">
 						 <p:fieldset legend="Rangos de fechas">
 		         	     <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="ol-fechaIni" value="#{reporteFacturacionBean.fecha_ini}" maxdate="#{reporteFacturacionBean.maxDate}" requiredMessage="...." showIcon="true"/>
+			                <p:datePicker id="ol-fechaIni" value="#{reporteFacturacionBean.fecha_ini}" maxdate="#{reporteFacturacionBean.maxDate}" requiredMessage="...." showIcon="true">
+			                	<p:ajax process="@this" />
+			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+			                </p:datePicker>
 			                <p:outputLabel for="ol-fechaIni" value="Fecha de inicio"/>
 			              </span>
 				             <span class="ui-float-label ui-input-icon-left">
-				                <p:datePicker id="ol-fechafin" value="#{reporteFacturacionBean.fecha_fin}" maxdate="#{reporteFacturacionBean.maxDate}" showIcon="true"/>
+				                <p:datePicker id="ol-fechafin" value="#{reporteFacturacionBean.fecha_fin}" maxdate="#{reporteFacturacionBean.maxDate}" showIcon="true">
+				                	<p:ajax process="@this" />
+				                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+				                </p:datePicker>
 				                <p:outputLabel for="ol-fechafin" value="Fecha final"/>
 				                </span>
 							</p:fieldset>
