@@ -37,7 +37,10 @@
                         <p:fieldset legend="Periodo" styleClass="p-mt-4">
                         
                         	<span class="ui-float-label ui-input-icon-left">
-	                       		<p:datePicker id="fecha" showIcon="true" value="#{reporteCarteraClienteBean.fecha}"  maxdate="#{reporteCarteraClienteBean.maxDate}"/>                       	
+	                       		<p:datePicker id="fecha" showIcon="true" value="#{reporteCarteraClienteBean.fecha}"  maxdate="#{reporteCarteraClienteBean.maxDate}">
+	                       			<p:ajax process="@this" />
+	                       			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+	                       		</p:datePicker>                       	
 	                       		<p:outputLabel for="fecha" value="Al Dia" />
 	                       	</span>
 	                       	

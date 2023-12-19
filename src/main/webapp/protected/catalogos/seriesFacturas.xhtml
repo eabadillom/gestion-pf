@@ -31,7 +31,7 @@
 						</p:column>
 						<p:column headerText="Fecha Inicio" width="7rem" style="text-align:center">
 							<h:outputText value="#{lista.fechaInicio}">
-								<f:convertDateTime pattern="dd/MM/yyyy" />
+								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
 						<p:column headerText="No. Inicial" width="5rem" style="text-align:center">
@@ -75,9 +75,10 @@
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
-						<p:datePicker value="#{serieFacturaBean.nuevo.fechaInicio}"
-							monthNavigator="true" yearNavigator="true" showWeek="true"
-							required="true" />
+						<p:datePicker value="#{serieFacturaBean.nuevo.fechaInicio}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true">
+							<p:ajax process="@this"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next">No. Inicial:</p:outputLabel>
@@ -136,9 +137,10 @@
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
-						<p:datePicker value="#{serieFacturaBean.seleccion.fechaInicio}"
-							monthNavigator="true" yearNavigator="true" showWeek="true"
-							required="true" />
+						<p:datePicker value="#{serieFacturaBean.seleccion.fechaInicio}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next">No. Inicial:</p:outputLabel>

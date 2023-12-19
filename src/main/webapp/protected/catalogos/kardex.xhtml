@@ -49,7 +49,7 @@
 					<div class="p-col-2 p-md-2">
 						<p:outputLabel for="@next" value="Ingreso" />
 						<p:datePicker id="fechaIngreso" value="#{kardexBean.entrada.fechaIngreso}" readonly="true" >
-							<f:convertDateTime pattern="dd/MM/yyyy" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 				</div>

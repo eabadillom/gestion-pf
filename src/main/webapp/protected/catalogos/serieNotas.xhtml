@@ -64,9 +64,10 @@
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
-						<p:datePicker value="#{serieNotaBean.nuevo.fechaInicio}"
-							monthNavigator="true" yearNavigator="true" showWeek="true"
-							required="true" />
+						<p:datePicker value="#{serieNotaBean.nuevo.fechaInicio}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next">No. Inicial:</p:outputLabel>
@@ -113,9 +114,10 @@
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
-						<p:datePicker value="#{serieNotaBean.seleccion.fechaInicio}"
-							monthNavigator="true" yearNavigator="true" showWeek="true"
-							required="true" />
+						<p:datePicker value="#{serieNotaBean.seleccion.fechaInicio}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next">No. Inicial:</p:outputLabel>

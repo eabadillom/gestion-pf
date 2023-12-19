@@ -69,8 +69,10 @@
 			<p:toolbar id="dato-general">
 				<p:toolbarGroup>				
 					
-					<p:datePicker id="fecha-hora" value="#{ordenEntradaBean.ingreso.fechaHora}" placeholder="Fecha-Hora" 
-					showTime="true" readonly="true"/>
+					<p:datePicker id="fecha-hora" value="#{ordenEntradaBean.ingreso.fechaHora}" placeholder="Fecha-Hora" showTime="true" readonly="true">
+						<p:ajax process="@this" />
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+					</p:datePicker>
 				
 					<p:divider />
 					
@@ -143,6 +145,8 @@
 				<div class="p-field p-col-4 p-md-2">
 					<p:outputLabel for="fechaCaducidad" value="Fecha Caducidad" />
 					<p:datePicker id="fechaCaducidad" value="#{ordenEntradaBean.ingresoProducto.fechaCaducidad}" showIcon="true" >
+						<p:ajax process="@this" />
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				
@@ -212,7 +216,9 @@
 					</div>
 					<div class="p-field p-col-2 p-md-2">
 						<p:outputLabel for="@next" value="Fecha Caducidad"/>
-						<p:datePicker value="#{ingresoProducto.fechaCaducidad}" readonly="true"/>
+						<p:datePicker value="#{ingresoProducto.fechaCaducidad}" readonly="true">
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 					</div>
 					<div class="p-field p-col-2 p-md-2">
 						<p:outputLabel for="@next" value="Otro"/>

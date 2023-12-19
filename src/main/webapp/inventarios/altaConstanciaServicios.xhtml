@@ -7,7 +7,10 @@
 	<ui:define name="content">
 		<h:form id="form">
 			<p:growl id="messages" showDetail="true" />
-			<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="#{(altaConstanciaServicioBean.usuario.perfil == 1) or (altaConstanciaServicioBean.usuario.perfil == 4)}" value="#{altaConstanciaServicioBean.fecha}" />
+			<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="#{(altaConstanciaServicioBean.usuario.perfil == 1) or (altaConstanciaServicioBean.usuario.perfil == 4)}" value="#{altaConstanciaServicioBean.fecha}" >
+				<p:ajax process="@this" />
+				<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+			</p:datePicker>
 			<p:inputText id="txtFolio" value="#{altaConstanciaServicioBean.folio}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>

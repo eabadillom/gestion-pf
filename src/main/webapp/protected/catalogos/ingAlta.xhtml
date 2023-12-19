@@ -36,7 +36,7 @@
 					</p:column>
 					<p:column headerText="Fecha" width="6rem" style="text-align: center;">
 						<h:outputText value="#{fact.fecha}">
-							<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</h:outputText>
 					</p:column>
 					<p:column headerText="Status" style="text-align: center;">
@@ -65,7 +65,10 @@
 					</div>
 					<div class="p-field p-col-3 p-md-3">
 						<p:outputLabel for="@next" value="Fecha de pago" styleClass="ml-4" />
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" value="#{ingresosCrudBean.fecha}" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" value="#{ingresosCrudBean.fecha}">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 					</div>
 					<div class="p-field p-col-3 p-md-3">
 						<p:outputLabel for="@next" value="Total factura" styleClass="ml-4" />
@@ -138,7 +141,7 @@
 					</p:column>
 					<p:column headerText="Fecha de Pago" style="text-align: center;">
 						<h:outputText value="#{detFactura.pago.fecha}" >
-						 	<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+						 	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						 </h:outputText>
 					</p:column>
 					<p:column headerText="Total factura" style="text-align: right;">

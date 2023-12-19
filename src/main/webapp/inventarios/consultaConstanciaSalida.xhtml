@@ -24,12 +24,14 @@
 					<p:outputLabel value="Del" styleClass="p-mr-2"/>
 					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaSalidaBean.fechaInicial}">
 						<p:ajax process="@this" />
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-field p-col-3 p-md-3">
 					<p:outputLabel value="al" styleClass="p-mr-2"/>
 					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaSalidaBean.fechaFinal}">
 						<p:ajax process="@this" />
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-field p-col-2 p-md-2">
