@@ -12,7 +12,7 @@ response.setHeader("Access-Control-Allow-Origin", "http://localhost");
 Properties prop = new Properties();
 InputStream in = getClass().getResourceAsStream("/config/gestion.properties");
 prop.load(in);
-String ipSgp = prop.getProperty("capture.url");
+String ipSgp = prop.getProperty("sgp.url");
 %>
 
 <!DOCTYPE html>
@@ -116,9 +116,10 @@ String ipSgp = prop.getProperty("capture.url");
 		 	}
 			
 		 	setTimeout(() => {closeDialog()}, 2700);
+		
 		 	
-		 	function invokeScan(f1, f2) {
-				
+			function invokeScan(f1, f2) {
+			
 				var obj = new Object();
 				obj.TpAccion = "VerifyFingerprint";
 				obj.FingerPrinToVerify = listado(f1, f2);
@@ -132,7 +133,6 @@ String ipSgp = prop.getProperty("capture.url");
 							timeout: 60000,
 							success : function(jsonObj) {
 								if (jsonObj.VerifyBiometricData == true) {
-									
 									window.location.href = "<%=basePath%>"+"/dashboard.xhtml";
 								} else {
 									window.location.href = "<%=basePath%>"+"/logout";
@@ -140,52 +140,6 @@ String ipSgp = prop.getProperty("capture.url");
 							},
 							error : function(jsonObj) {
 								myAlert("No hay respuesta del lector de huella.");
-							}
-						});	
-			}
-		
-		 	function registryCapture() {
-				myAlert();
-				var accion = "Capture";
-				$.ajax({
-					type : "GET",
-					dataType : "json",
-					url : "<%=ipSgp%>"+"/finger",
-					success : function(jsonObj) {
-						//var respuesta = JSON.parse(jsonObj.responseText);
-						console.log("Solicitando peticion al microservicio biometrico...");						
-						//myAlert(respuesta);
-						//invokeScan(respuesta.huella, respuesta.huella2);				
-					},
-					error : function(jsonObj) {
-						var respuesta = JSON.parse(jsonObj.responseText);
-						myAlert(respuesta);
-					}
-				});
-			}
-		 	
-			function invokeScanCapture() {
-			
-				var obj = new Object();
-				obj = {tpAccion:"Capture"}
-				
-				//obj.FingerPrinToVerify = listado(f1, f2);
-				var jsonString = JSON.stringify(obj);
-				var biometrico = null;
-				myAlert();		
-				$.ajax({
-							type : "POST",
-							dataType : 'json',
-							data : jsonString,
-							contentType: "application/json; charset=utf-8",
-							url : "http://localhost:8090"+"/finger",
-							timeout: 60000,
-							success : function(jsonObj) {
-								biometrico = jsonObj.getVerifyBiometricData1;
-								window.location.href = "<%=basePath%>"+"/dashboard.xhtml";
-							},
-							error : function(jsonObj) {
-								myAlert("Peticion a capture rechazada.");
 							}
 						});	
 			}
