@@ -136,13 +136,13 @@ public class LoginBean implements Serializable  {
 			// Por seguridad, se salan las contraseñas.
 			shaPassword = securityUtil.getSHA512(this.password + usr.getUsuario());
 
-			/*if (usr.getPassword().equals(shaPassword) == false) {
+			if (usr.getPassword().equals(shaPassword) == false) {
 				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
 				log.warn("Inicio de sesión incorrecto (contraseña incorrecta).");
 				FacesContext.getCurrentInstance().addMessage("login_form:growl", message);
 				this.espera();
 				return;
-			}*/
+			}
 
 			faceContext = FacesContext.getCurrentInstance();
 			httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
