@@ -13,11 +13,13 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
+import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
@@ -97,7 +99,13 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					Integer cantidadSalidas = 0;
 					BigDecimal pesoSalidas = new BigDecimal(0).setScale(3,RoundingMode.HALF_UP);
 					
-					for (DetalleConstanciaSalida dcs : detalleConstanciaSalidaList) { //Por cada partida, obtenemos su detalle de salidas.  
+					for (DetalleConstanciaSalida dcs : detalleConstanciaSalidaList) { //Por cada partida, obtenemos su detalle de salidas.
+						ConstanciaSalida constanciaSalida = dcs.getConstanciaCve();
+						StatusConstanciaSalida statusSalida = constanciaSalida.getStatus();
+						if(statusSalida.getId().compareTo(1) != 0) {
+							log.info("Constancia salida {} cancelada.", constanciaSalida.getNumero());
+							continue;
+						}
 						pesoSalidas     = pesoSalidas.add(dcs.getPeso()); 
 						cantidadSalidas = cantidadSalidas + dcs.getCantidad();
 					}
