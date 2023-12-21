@@ -61,7 +61,7 @@
 										</p:divider>
 									</div>
 									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value="Consultar" actionListener="#{reporteInventarioBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
+										<p:commandButton value="Consultar" actionListener="#{reporteInventarioBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
 									</div>
 								</p:toolbarGroup>
 							</p:toolbar>
