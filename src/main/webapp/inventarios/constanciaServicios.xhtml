@@ -16,11 +16,17 @@
 		    <div class="p-grid ui-fluid">
 		    	<div class="p-field p-col-3 p-md-3">
 		    		<p:outputLabel value="Del" />
-					<p:datePicker id="fechaInicial" showIcon="true" placeholder="Fecha de Inicio" value="#{constanciaServicioBean.fechaInicio}" />
+					<p:datePicker id="fechaInicial" showIcon="true" placeholder="Fecha de Inicio" value="#{constanciaServicioBean.fechaInicio}">
+						<p:ajax process="@this" />
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+					</p:datePicker>
 		    	</div>
 		    	<div class="p-field p-col-3 p-md-3">
 		    		<p:outputLabel value="al" />
-		    		<p:datePicker id="fechaFinal" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha Final" value="#{constanciaServicioBean.fechaFinal}" />
+		    		<p:datePicker id="fechaFinal" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha Final" value="#{constanciaServicioBean.fechaFinal}">
+		    			<p:ajax process="@this" />
+		    			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+		    		</p:datePicker>
 		    	</div>
 		    	<div class="p-field p-col-2 p-md-2">
 		    		<p:outputLabel value="Folio" />
@@ -77,8 +83,10 @@
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 							<p:outputLabel>Fecha:</p:outputLabel>
-							<p:datePicker id="fechaServicio" showIcon="true" disabled="#{(constanciaServicioBean.usuario.perfil == 4) or (constanciaServicioBean.usuario.perfil == 1)}"
-								styleClass="p-mr-4 p-mb-2" value="#{constanciaServicioBean.seleccion.fecha}"/>
+							<p:datePicker id="fechaServicio" showIcon="true" disabled="#{(constanciaServicioBean.usuario.perfil == 4) or (constanciaServicioBean.usuario.perfil == 1)}" styleClass="p-mr-4 p-mb-2" value="#{constanciaServicioBean.seleccion.fecha}">
+								<p:ajax process="@this" />
+								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+							</p:datePicker>
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 40em;">
 							<p:outputLabel for="@next">Cliente</p:outputLabel>

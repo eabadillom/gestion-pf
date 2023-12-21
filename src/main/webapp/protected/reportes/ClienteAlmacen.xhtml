@@ -21,7 +21,10 @@
                         <p:growl id="messages" showDetail="true" />
                         
                          
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteAlmacenClienteBean.fecha}" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteAlmacenClienteBean.fecha}">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
             
                         <p:fieldset legend="Seleccion de cliente">
                        			 <span class="ui-float-label ui-input-icon-left">

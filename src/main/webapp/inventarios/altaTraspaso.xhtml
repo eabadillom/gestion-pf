@@ -39,7 +39,10 @@
 						</p:selectOneMenu>
 		    		</div>
 		    		<div class="p-card p-col-2 p-md-2">
-		    			<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaTraspasoBean.fecha}" disabled="#{(altaTraspasoBean.usuario.perfil == 1) or (altaTraspasoBean.usuario.perfil == 4)}" value="#{altaTraspasoBean.fecha}" />
+		    			<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaTraspasoBean.fecha}" disabled="#{(altaTraspasoBean.usuario.perfil == 1) or (altaTraspasoBean.usuario.perfil == 4)}" value="#{altaTraspasoBean.fecha}" >
+		    				<p:ajax process="@this" />
+		    				<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+		    			</p:datePicker>
 		    		</div>
 		    		<div class="p-card p-col-2 p-md-2">
 			    		<p:inputText id="txtFolio" value="#{altaTraspasoBean.numero}" placeholder="Folio" readonly="true"/>

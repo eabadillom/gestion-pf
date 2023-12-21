@@ -23,14 +23,16 @@
 				</div>
 				<div class="p-col-3 p-md-3">
 					<p:outputLabel value="De"/>
-					<p:datePicker value="#{modPlazosPagoBean.de}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{modPlazosPagoBean.actual}">
+					<p:datePicker value="#{modPlazosPagoBean.de}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{modPlazosPagoBean.actual}" showIcon="true">
 						<p:ajax process="@this"/>
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-col-3 p-md-3">
 					<p:outputLabel value="A"/>
-					<p:datePicker value="#{modPlazosPagoBean.hasta}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{modPlazosPagoBean.actual}">
+					<p:datePicker value="#{modPlazosPagoBean.hasta}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{modPlazosPagoBean.actual}" showIcon="true">
 						<p:ajax process="@this"/>
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 			</div>

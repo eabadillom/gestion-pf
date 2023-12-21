@@ -37,12 +37,14 @@
 						<p:outputLabel value="del"/>
 						<p:datePicker value="#{facMantenimentoBean.de}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}">
 							<p:ajax process="@this"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 					<div class="p-col-3 p-md-3">
 						<p:outputLabel value="al" />
 						<p:datePicker value="#{facMantenimentoBean.hasta}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}">
 							<p:ajax process="@this"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 				</div>

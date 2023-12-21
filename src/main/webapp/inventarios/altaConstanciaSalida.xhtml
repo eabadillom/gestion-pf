@@ -44,6 +44,8 @@
 					</div>
 					<div class="p-card p-col-2 p-md-2">
 						<p:datePicker id="fechaSalida" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="#{altaConstanciaSalidaBean.fechaSalida}" value="#{altaConstanciaSalidaBean.fechaSalida}" disabled="#{(altaConstanciaSalidaBean.usuario.perfil == 4) or (altaConstanciaSalidaBean.usuario.perfil == 1)}">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 					

@@ -51,6 +51,7 @@
 					<div class="p-col-2 p-md-2">
 						<p:datePicker id="fechaIngreso" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Ingreso" value="#{constanciaDeDepositoBean.fechaIngreso}" maxdate="#{constanciaDeDepositoBean.maxDate}" disabled="#{constanciaDeDepositoBean.restricted}">
 							<p:ajax update="@this" process="@this"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 					<div class="p-col-2 p-md-2">
@@ -132,6 +133,7 @@
 						<div class="p-col-2 p-md-2">
 							<p:datePicker id="fechaCaducidad" showIcon="true" value="#{constanciaDeDepositoBean.detalle.dtpCaducidad}" disabled="#{not constanciaDeDepositoBean.showCaducidad}" placeholder="Caducidad" title="Caducidad">
 								<p:ajax process="@this"></p:ajax>
+								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</p:datePicker>
 						</div>
 						<div class="p-col-2 p-md-2">
@@ -147,7 +149,7 @@
 			</div>
 			<div style="padding-top: 2rem;">
 				<p:panel header="SUS PRODUCTOS">
-					<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="false"
+					<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="true"
 								  rowSelectMode="add" rows="10" rowKey="#{partida.pesoTotal}" reflow="true" selection="#{constanciaDeDepositoBean.selectedPartidas}" tableStyle="table-layout: auto;">
 				
 						<p:column exportable="false" width="3%">
@@ -187,7 +189,7 @@
 										<h:outputText value="#{detallePartida.dtpLote}" />
 									</p:column>
 									<p:column headerText="Caducidad">
-										<h:outputText value="#{detallePartida.dtpCaducidad}">
+										<h:outputText value="#{detallePartida.dtpCaducidad}"> 
 											<f:convertDateTime pattern="dd/MM/yyyy" />
 										</h:outputText>
 									</p:column>

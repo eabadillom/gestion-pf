@@ -54,7 +54,7 @@
 					</p:column>
 					<p:column headerText="Fecha" width="6rem" style="text-align: center;">
 						<h:outputText value="#{pPago.fecha}">
-							<f:convertDateTime pattern="dd/MM/yyyy" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</h:outputText>
 					</p:column>
 					<p:column headerText="Tipo de Pago">

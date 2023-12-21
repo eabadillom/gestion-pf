@@ -19,10 +19,16 @@
                 <div class="p-col-12">
                     <div class="card">
                         <p:growl id="messages" showDetail="true" />
-						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteClienteEstadoCuentaBean.fecha}" />
+						<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="true" value="#{reporteClienteEstadoCuentaBean.fecha}">
+							<p:ajax process="@this" />
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
 		             	<p:fieldset legend="Rangos de fechas">  
 					               <span class="ui-float-label ui-input-icon-left">
-					                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteClienteEstadoCuentaBean.fecha_ini}"  maxdate="#{reporteClienteEstadoCuentaBean.maxDate}" readonlyInput="true"/>
+					                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteClienteEstadoCuentaBean.fecha_ini}"  maxdate="#{reporteClienteEstadoCuentaBean.maxDate}" readonlyInput="true">
+					                	<p:ajax process="@this" />
+					                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+					                </p:datePicker>
 					                <p:outputLabel for="minmax1" value="Fecha "/>
 								</span>
 						</p:fieldset>
