@@ -663,6 +663,11 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			constanciaDeDeposito.setFechaIngreso(fechaIngreso);
 			constanciaDeDeposito.setAvisoCve(avisoSelect);
 			constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
+			
+			for(Partida p: listadoPartida) {
+				p.setCamaraCve(camaraSelect);
+			}
+			
 			constanciaDeDeposito.setPartidaList(listadoPartida);
 			constanciaDeDeposito.setStatus(status);
 			String guardar = constanciaDAO.guardar(constanciaDeDeposito);
