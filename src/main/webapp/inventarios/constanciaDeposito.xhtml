@@ -45,7 +45,7 @@
 						<p:selectOneMenu id="camara" autoWidth="false" value="#{constanciaDeDepositoBean.camaraSelect}" converter="entityConverter">
 							<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
 							<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />	
-							<p:ajax listener="#{constanciaDeDepositoBean.filtrarPosicion()}" update="posiciones" ></p:ajax>		
+							<p:ajax listener="#{constanciaDeDepositoBean.filtrarPosicion()}" update="posiciones camara" ></p:ajax>		
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-2 p-md-2">
@@ -331,7 +331,7 @@
 					</div>		
 				</p:outputPanel>
 				<f:facet name="footer">
-						<p:commandButton value="Validar" actionListener="#{constanciaDeDepositoBean.addPartida()}" oncomplete="PF('noTarimasDlg').hide()" update="form:dt-partidas @this" process="NoConstancia @this"/>
+						<p:commandButton value="Validar" actionListener="#{constanciaDeDepositoBean.addPartida()}" oncomplete="PF('noTarimasDlg').hide()" update="form:dt-partidas form:camara @this" process="NoConstancia @this"/>
 						<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('noTarimasDlg').hide()" class="ui-button-secondary"/>
 				</f:facet>
 			</p:dialog>
