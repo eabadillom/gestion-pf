@@ -105,6 +105,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private DetallePartidaDAO detallePartidaDAO;
 	
 	private List<Inventario> listaInventario;
+	private List<Inventario> listaInventarioCopy;
 	private List<Inventario> filteredInventario;
 	private List<String> listaEntradas;
 	private List<Date> listaIngresos;
@@ -164,6 +165,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 		inventarioDAO = new InventarioDAO();
 		listaInventario = new ArrayList<Inventario>();
+		listaInventarioCopy = new ArrayList<>();
 		
 		detallePartidaDAO = new DetallePartidaDAO();
 		serieConstanciaDAO = new SerieConstanciaDAO();
@@ -247,7 +249,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			listadoTemp = new ArrayList<DetalleConstanciaSalida>();
 			listadoConstanciaSalidaServicios = new ArrayList<ConstanciaSalidaServicios>();
 			partidaList = new ArrayList<Partida>();
-			
+			listaInventarioCopy = inventarioDAO.buscar(clienteSelect, plantaSelect);
 			
 			listaEntradas = new ArrayList<String>();
 			for(Inventario i : listaInventario) {
@@ -528,6 +530,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			mensaje = "El producto se registró correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			
+			listaInventario.remove(inventarioSelected);
+			
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -536,6 +540,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
+			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages","form:dt-salidas");
@@ -598,6 +603,20 @@ public class AltaConstanciaSalidaBean implements Serializable{
 				this.cantidadTotal += dcs.getCantidad();
 				this.pesoTotal = this.pesoTotal.add(dcs.getPeso());
 			}
+		
+			detalleSalida.getProducto();
+			detalleSalida.getFolioEntrada();
+			
+			Inventario inventarioTemp = new Inventario();
+			
+			for(Inventario i: listaInventarioCopy) {				
+				if((i.getProducto().getProductoDs().equals(detalleSalida.getProducto())) && (i.getFolioCliente().equals(detalleSalida.getFolioEntrada()))   ) {
+					inventarioTemp = i;
+					break;
+				}				
+			}
+			
+			listaInventario.add(inventarioTemp);
 			
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
@@ -1113,6 +1132,14 @@ public class AltaConstanciaSalidaBean implements Serializable{
 
 	public void setListaIngresos(List<Date> listaIngresos) {
 		this.listaIngresos = listaIngresos;
+	}
+
+	public List<Inventario> getListaInventarioCopy() {
+		return listaInventarioCopy;
+	}
+
+	public void setListaInventarioCopy(List<Inventario> listaInventarioCopy) {
+		this.listaInventarioCopy = listaInventarioCopy;
 	}
 	
 }

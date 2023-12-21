@@ -638,6 +638,19 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				srvManiobras.setFolio(constanciaDeDeposito);
 				listadoConstanciaDepositoDetalle.add(srvManiobras);
 			}
+			
+			if((avisoSelect==null) ) {
+				 throw new InventarioException("Debe seleccionar un aviso");
+			}
+			
+			if(plantaSelect == null) {
+				throw new InventarioException("Debe seleccionar una planta");
+			}
+			
+			if(camaraSelect == null) {
+				 throw new InventarioException("Debe seleccionar una camara");
+			}
+			
 
 			if(constanciaDeDeposito.getFolioCliente() == null || "".equalsIgnoreCase(constanciaDeDeposito.getFolioCliente()) )
 				this.constanciaDeDeposito.setFolioCliente(this.noConstanciaSelect);
@@ -650,6 +663,11 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			constanciaDeDeposito.setFechaIngreso(fechaIngreso);
 			constanciaDeDeposito.setAvisoCve(avisoSelect);
 			constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
+			
+			for(Partida p: listadoPartida) {
+				p.setCamaraCve(camaraSelect);
+			}
+			
 			constanciaDeDeposito.setPartidaList(listadoPartida);
 			constanciaDeDeposito.setStatus(status);
 			String guardar = constanciaDAO.guardar(constanciaDeDeposito);

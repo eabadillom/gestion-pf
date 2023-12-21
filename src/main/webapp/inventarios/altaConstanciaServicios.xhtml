@@ -55,7 +55,7 @@
 						<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
 					</p:selectOneMenu>
 					<p:column>
-						<p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/>
+						<p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="3" style="width: 6em;"/>
 					</p:column>
 					<p:column>
 						<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.agregarServicio}" update="dt-servicios"/>
