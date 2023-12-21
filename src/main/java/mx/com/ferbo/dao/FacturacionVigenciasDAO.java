@@ -152,7 +152,7 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				log.debug("Constancia de deposito: {}",constancia.getFolioCliente());
 				listaTmpConstancias = constancia.getConstanciaFacturaList();
 				List<ConstanciaDepositoDetalle> allConstanciaDepositoDetalle = constancia.getConstanciaDepositoDetalleList();
-				System.out.print(allConstanciaDepositoDetalle.size());
+				log.debug("Lista constanciaDepositoDetalle.size() = {}", allConstanciaDepositoDetalle.size());
 				lConstanciaFactura = listaTmpConstancias.stream()
 						.filter(c -> 
 							(c.getFactura().getStatus().getId() == 1) //Status Por cobrar

@@ -97,7 +97,7 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			
 			for(ConstanciaDeDeposito cdd: listaConstancias){
 				List<ConstanciaDepositoDetalle> allConstanciaDepositoDetalle = cdd.getConstanciaDepositoDetalleList();
-				System.out.println(allConstanciaDepositoDetalle.size());
+				log.debug("Lista ConstanciaDepositoDetalle.size() = {}", allConstanciaDepositoDetalle.size());
 				vigencia = cdd.getAvisoCve().getAvisoVigencia();
 				vigenciaInicio = cdd.getFechaIngreso();
 				vigenciaFin = DateUtil.fechaVencimiento(vigenciaInicio, vigencia, false);
