@@ -154,6 +154,9 @@ public class ReporteInventarioBean implements Serializable {
 			} else {
 				plantaCve = plantaSelect.getPlantaCve();
 			}
+			
+			if( (this.usuario.getPerfil() == 1 || this.usuario.getPerfil() == 4) && plantaCve == null )
+				throw new InventarioException("Debe seleccionar una planta.");
 
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
