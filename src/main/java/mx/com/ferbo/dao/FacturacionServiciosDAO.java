@@ -92,7 +92,7 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 			for(ConstanciaDeServicio constancia : listaConstancias) {
 				List<ConstanciaServicioDetalle> allConstanciaServicioDetalle = constancia.getConstanciaServicioDetalleList();//recuperando constancias de servicio detalle de servicio ds
 				List<PartidaServicio> allPartidaServicio = constancia.getPartidaServicioList();
-				System.out.println(allPartidaServicio.size());
+				log.debug("Lista PartidaServicio.size() = {}", allPartidaServicio.size());
 				listaTmpConstancias = constancia.getConstanciaFacturaDsList();
 				lConstanciaFactura = listaTmpConstancias.stream()
 						.filter(c ->
@@ -116,7 +116,7 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 				//modificacion
 				for(ConstanciaServicioDetalle csd: allConstanciaServicioDetalle) {
 					List<PrecioServicio> allPrecioServicio = csd.getServicioCve().getPrecioServicioList();
-					System.out.println(allPrecioServicio.size());
+					log.debug("Lista PrecioServicio.size() = {}", allPrecioServicio.size());
 				}
 				
 			}

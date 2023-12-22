@@ -7,9 +7,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,19 +30,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import com.ferbo.facturama.business.CfdiBL;
-import com.ferbo.facturama.request.CFDIInfo;
-import com.ferbo.facturama.request.IssuerBindingModel;
-import com.ferbo.facturama.request.ItemFullBindingModel;
-import com.ferbo.facturama.request.ReceiverBindingModel;
-import com.ferbo.facturama.request.Tax;
-import com.ferbo.facturama.response.CfdiInfoModel;
-import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
-import com.ferbo.mail.beans.Adjunto;
 
 import mx.com.ferbo.business.FacturamaBL;
-import mx.com.ferbo.business.SendMailFacturaBL;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.DomiciliosDAO;
@@ -54,7 +42,6 @@ import mx.com.ferbo.dao.SerieFacturaDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Camara;
-import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
@@ -63,7 +50,6 @@ import mx.com.ferbo.model.ConstanciaFacturaDs;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Factura;
-import mx.com.ferbo.model.FacturaMedioPago;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Parametro;
@@ -214,8 +200,8 @@ public class CalculoPrevioBean implements Serializable {
 			cargaDomicilio();
 			
 
-		} catch (Exception e) {
-			System.out.println("ERROR Aqui" + e.getLocalizedMessage());
+		} catch (Exception ex) {
+			log.error("Problema para obtener información del cálculo de la factura...", ex);
 		}
 
 	}
@@ -478,11 +464,11 @@ public class CalculoPrevioBean implements Serializable {
 
 				if (precioServicio.getPrecio() != null) {// modificado por error null al llamar al metodo
 															// getPrecioServicio
-					cantidad = precioServicio.getPrecio().setScale(2);// variable agregada
+					cantidad = precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP);// variable agregada
 					importe = csd.getServicioCantidad().multiply(cantidad);
 
-					servicioConstanciaDs.setCosto(importe.setScale(2));
-					servicioConstanciaDs.setTarifa(precioServicio.getPrecio().setScale(2));
+					servicioConstanciaDs.setCosto(importe.setScale(2, BigDecimal.ROUND_HALF_UP));
+					servicioConstanciaDs.setTarifa(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP));
 				}
 				servicioConstanciaDs.setCodigo(csd.getServicioCve().getServicioCod());
 				servicioConstanciaDs.setUdCobro("SRV");
@@ -502,7 +488,7 @@ public class CalculoPrevioBean implements Serializable {
 				productoConstanciaDs.setConstancia(cfd);
 				productoConstanciaDs.setCatidadCobro(ps.getCantidadDeCobro());
 				productoConstanciaDs.setUnidadCobro(ps.getUnidadDeCobro().getUnidadDeManejoDs());
-				productoConstanciaDs.setCantidadManejo(new BigDecimal(ps.getCantidadTotal()).setScale(2));
+				productoConstanciaDs.setCantidadManejo(new BigDecimal(ps.getCantidadTotal()).setScale(2, BigDecimal.ROUND_HALF_UP));
 				productoConstanciaDs.setUnidadManejo(ps.getUnidadDeManejoCve().getUnidadDeManejoDs());
 				
 				cfd.getProductoConstanciaDsList().add(productoConstanciaDs);
@@ -552,7 +538,6 @@ public class CalculoPrevioBean implements Serializable {
 
 			for (ConstanciaDepositoDetalle cs : cdd.getConstanciaDepositoDetalleList()) {
 
-				// System.out.println(cs.getServicioCve().getCobro().getId());
 				Servicio servicio = cs.getServicioCve();
 				TipoCobro tipoCobro = servicio.getCobro();
 				ServicioConstancia sc = new ServicioConstancia();
@@ -560,8 +545,6 @@ public class CalculoPrevioBean implements Serializable {
 				BigDecimal importe = new BigDecimal(0);
 				BigDecimal cantidad = null;
 
-				/*PrecioServicio precioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
-						clienteSelect.getCteCve(), servicio.getServicioCve());*/
 				List <PrecioServicio> listaPrecioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
 						clienteSelect.getCteCve(), servicio.getServicioCve());
 				PrecioServicio precioServicio = null;
@@ -575,9 +558,9 @@ public class CalculoPrevioBean implements Serializable {
 
 					cantidad = cs.getServicioCantidad();
 					importe = cantidad.multiply(precioServicio.getPrecio());
-					sc.setCosto(importe.setScale(2));
+					sc.setCosto(importe.setScale(2, BigDecimal.ROUND_HALF_UP));
 					sc.setUnidadMedida("SRV");
-					System.out.println("El tipo cobro es 1 o 2 y su importe es: " + importe);
+					log.debug("El tipo cobro es 1 o 2 y su importe es: " + importe);
 					break;
 
 				case 3:
@@ -586,8 +569,8 @@ public class CalculoPrevioBean implements Serializable {
 					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
 
 					importe = cantidad.multiply(precioServicio.getPrecio());
-					sc.setCosto(importe.setScale(2));
-					System.out.println("El tipo de cobro es 3 o 4 y su importe es entradas: " + importe);
+					sc.setCosto(importe.setScale(2, BigDecimal.ROUND_HALF_UP));
+					log.debug("El tipo de cobro es 3 o 4 y su importe es entradas: " + importe);
 
 					if (aviso.getAvisoTpFacturacion().equals("T")) {
 						sc.setUnidadMedida("TRM");
@@ -599,14 +582,14 @@ public class CalculoPrevioBean implements Serializable {
 
 				default:
 
-					System.out.println("No existe el tipo de cobro");
+					log.debug("No existe el tipo de cobro");
 					break;
 				}
 
 				sc.setId(id);
 				sc.setConstancia(cf);
-				sc.setTarifa(precioServicio.getPrecio().setScale(2));
-				sc.setBaseCargo(cantidad.setScale(2));
+				sc.setTarifa(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP));
+				sc.setBaseCargo(cantidad.setScale(2, BigDecimal.ROUND_HALF_UP));
 				sc.setDescripcion(cs.getServicioCve().getServicioDs());
 				sc.setPlantaCve(plantaSelect.getPlantaCve());
 				sc.setPlantaDs(plantaSelect.getPlantaDs());
@@ -639,7 +622,7 @@ public class CalculoPrevioBean implements Serializable {
 			cf.setCamaraDs(camara.getCamaraDs());
 			cf.setCamaraAbrev(camara.getCamaraAbrev());
 			
-			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2);
+			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			subTotalEntrada = subTotalEntrada.add(sumTmp);
 			
 			cdd.setConstanciaFacturaList(new ArrayList<>());
@@ -689,7 +672,6 @@ public class CalculoPrevioBean implements Serializable {
 
 			for (ConstanciaDepositoDetalle cs : cdd.getConstanciaDepositoDetalleList()) {
 
-				// System.out.println(cs.getServicioCve().getCobro().getId());
 				Servicio servicio = cs.getServicioCve();
 				TipoCobro tipoCobro = servicio.getCobro();
 				ServicioConstancia sc = new ServicioConstancia();
@@ -726,14 +708,14 @@ public class CalculoPrevioBean implements Serializable {
 
 				default:
 
-					System.out.println("No existe el tipo de cobro");
+					log.info("No existe el tipo de cobro");
 					break;
 				}
 				sc.setId(id);
 				sc.setConstancia(cf);
-				sc.setTarifa(precioServicio.getPrecio().setScale(2));
+				sc.setTarifa(precioServicio.getPrecio().setScale(2, BigDecimal.ROUND_HALF_UP));
 				if(cantidad!=null) {
-					sc.setBaseCargo(cantidad.setScale(2));
+					sc.setBaseCargo(cantidad.setScale(2, BigDecimal.ROUND_HALF_UP));
 				}
 				sc.setDescripcion(cs.getServicioCve().getServicioDs());
 				sc.setPlantaCve(plantaSelect.getPlantaCve());
@@ -775,7 +757,7 @@ public class CalculoPrevioBean implements Serializable {
 			cdd.getConstanciaFacturaList().addAll(listaEntradas);
 			cdd.getConstanciaFacturaList().addAll(listaVigencias);
 			
-			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2);
+			sumTmp = subTotalEntradaVigencias(cf.getServicioConstanciaList()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			subTotalVigencias = subTotalVigencias.add(sumTmp);
 			
 		}
@@ -966,7 +948,7 @@ public class CalculoPrevioBean implements Serializable {
 		
 		domicilioPlanta = domiciliosDAO.buscarPorAsentamiento(plantaSelect.getIdPais(), plantaSelect.getIdEstado(), plantaSelect.getIdMunicipio(), plantaSelect.getIdCiudad(), plantaSelect.getIdAsentamiento());
 		
-		System.out.println(asentamientoPlanta); 
+		log.debug(asentamientoPlanta); 
 		
 	}
 	
@@ -1020,8 +1002,8 @@ public class CalculoPrevioBean implements Serializable {
 			
 			//cerrarSesion();
 			
-		} catch (Exception e) {
-			System.out.println("Error al guardar Factura" + e.getMessage());
+		} catch (Exception ex) {
+			log.error("Error al guardar Factura", ex);
 		}
 		
 		
