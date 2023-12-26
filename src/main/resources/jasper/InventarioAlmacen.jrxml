@@ -51,7 +51,8 @@
 	inner join (
 		select *
 		from constancia_de_deposito cdd
-		WHERE (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
+		WHERE cdd.status = 1
+			and (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
 			AND cdd.fecha_ingreso <= $P{Fecha}
 	) cddEnt on parEnt.folio = cddEnt.folio
 	inner join unidad_de_producto udp on udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
