@@ -131,9 +131,10 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private ConstanciaDepositoDetalle selectedConstanciasDD;
 	private Partida selectedPartida;
 	private Partida partida;
+	private Partida partidaEdit;
 	private DetallePartida detalle;
 	private TipoMovimiento tipoMovimiento;
-
+	
 	private String noConstanciaSelect;
 	private BigDecimal unidadesPorTarima;
 	private BigDecimal cantidadTotal;
@@ -142,6 +143,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private String pedimento, contenedor, lote, otro;
 	private Boolean isCongelacion, isConservacion, isRefrigeracion, isManiobras;
 	private int congelacion = 619, conservacion = 620, refrigeracion = 621, maniobras = 622 ;
+	private boolean validaCarga;
+	private boolean showCodigo;
 	private boolean showPedimento;
 	private boolean showSAP;
 	private boolean showLote;
@@ -205,7 +208,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		Planta planta = null;
-		
+		partidaEdit = new Partida();
 		faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
@@ -243,6 +246,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		isManiobras = false;
 		fechaIngreso = new Date();
 
+		showCodigo = false;
 		showCaducidad = false;
 		showLote = false;
 		showOtro = false;
@@ -411,6 +415,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		List<PrecioServicio> l = null;
 		log.info("AvisoSelect: " + avisoSelect);
 
+		this.showCodigo = avisoSelect.getAvisoCodigo();
 		this.showPedimento = avisoSelect.getAvisoPedimento();
 		this.showSAP = avisoSelect.getAvisoSap();
 		this.showLote = avisoSelect.getAvisoLote();
@@ -511,6 +516,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			if(this.partida.getPesoTotal() == null || this.partida.getPesoTotal().compareTo(BigDecimal.ZERO) == 0)
 				throw new InventarioException("Debe indicar un peso.");
 
+		
 			idUnidadDeManejo = partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve();
 			idProducto = partida.getUnidadDeProductoCve().getProductoCve().getProductoCve();
 			prd = productoDAO.buscarPorId(idProducto);
@@ -553,24 +559,36 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				p.add(dp);
 				this.listadoPartida.add(p);
 			}
-
-			for(int i = 0; i < intNumTarimas; i++) {
-				p = (Partida) partida.clone();
-				dp = (DetallePartida) detalle.clone();
-				
+	if(validaCarga == true) {
+				partida.setNoTarimas(numTarimas);
 				DetallePartidaPK detallePk = new DetallePartidaPK();
 				detallePk.setDetPartCve(1);
-				detallePk.setPartidaCve(p);
-				dp.setDetallePartidaPK(detallePk);
+				detallePk.setPartidaCve(partida);
+				detalle.setDetallePartidaPK(detallePk);
 				
-				p.add(dp);
-				this.listadoPartida.add(p);
+				partida.add(detalle);
+				this.listadoPartida.add(partida);
+			}else {
+				
+				
+					for(int i = 0; i < intNumTarimas; i++) {
+						p = (Partida) partida.clone();
+						dp = (DetallePartida) detalle.clone();
+						
+						DetallePartidaPK detallePk = new DetallePartidaPK();
+						detallePk.setDetPartCve(1);
+						detallePk.setPartidaCve(p);
+						dp.setDetallePartidaPK(detallePk);
+						
+						p.add(dp);
+						this.listadoPartida.add(p);
+						
+					}
 			}
-			
 			this.partida = this.newPartida();
 			this.detalle = this.newDetallePartida();
 			this.numTarimas = null;
-
+			this.validaCarga = false;
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Agregado correctamente";
 		} catch (InventarioException ex) {
@@ -582,8 +600,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas");
+			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga");
 		}
+	}
+	
+	public void partidaEditada() {
+		System.out.println("");
 	}
 
 	public synchronized void saveConstanciaDeDeposito() {
@@ -1312,6 +1334,14 @@ public void deleteConstanciaDD() {
 		this.observacion = observacion;
 	}
 
+	public boolean isShowCodigo() {
+		return showCodigo;
+	}
+
+	public void setShowCodigo(boolean showCodigo) {
+		this.showCodigo = showCodigo;
+	}
+
 	public boolean isShowPedimento() {
 		return showPedimento;
 	}
@@ -1439,4 +1469,23 @@ public void deleteConstanciaDD() {
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
 	}
+
+	public boolean isValidaCarga() {
+		return validaCarga;
+	}
+
+	public void setValidaCarga(boolean validaCarga) {
+		this.validaCarga = validaCarga;
+	}
+
+	public Partida getPartidaEdit() {
+		return partidaEdit;
+	}
+
+	public void setPartidaEdit(Partida partidaEdit) {
+		this.partidaEdit = partidaEdit;
+	}
+	
+	
+	
 }
