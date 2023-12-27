@@ -23,8 +23,7 @@
 			<p:panel header="DATOS DEL CLIENTE">
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-card p-col-6 p-md-6">
-						<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{altaConstanciaSalidaBean.clienteSelect}"
-							onchange="PF('statusDialog').show();">
+						<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{altaConstanciaSalidaBean.clienteSelect}" onchange="PF('statusDialog').show();" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems value="#{altaConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 							<p:ajax listener="#{altaConstanciaSalidaBean.cargaInfoCliente}"
@@ -76,7 +75,7 @@
 					</p:column>
 					<p:column filterBy="#{inventario.folioCliente}" width="5rem" filterMatchMode="contains">
 						<f:facet name="filter">
-							<p:selectOneMenu onchange="PF('dt-inventario').filter()">
+							<p:selectOneMenu onchange="PF('dt-inventario').filter()" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Folio" itemValue="#{null}" noSelectionOption="true"/>
                     			<f:selectItems value="#{altaConstanciaSalidaBean.listaEntradas}" />
 							</p:selectOneMenu>
@@ -85,9 +84,9 @@
 					</p:column>
 					<p:column filterBy="#{inventario.fechaIngreso}" width="5rem" filterMatchMode="exact">
 						<f:facet name="filter">
-							<p:selectOneMenu onchange="PF('dt-inventario').filter()">
+							<p:selectOneMenu onchange="PF('dt-inventario').filter()" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Ingreso" itemValue="#{null}" noSelectionOption="true" />
-								<f:selectItems value="#{altaConstanciaSalidaBean.listaIngresos}">
+								<f:selectItems value="#{altaConstanciaSalidaBean.listaIngresos}" var="fhSalida" itemLabel="#{altaConstanciaSalidaBean.formatDate(fhSalida)}">
 								</f:selectItems>
 							</p:selectOneMenu>
 						</f:facet>
@@ -95,7 +94,7 @@
 							<f:convertDateTime pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</p:column>
-					<p:column headerText="Producto" sortBy="#{inventario.producto.productoDs}" sortOrder="asc" sortPriority="1" >
+					<p:column headerText="Producto" sortBy="#{inventario.producto.productoDs}" sortOrder="asc" sortPriority="1">
 						<h:outputText value="#{inventario.producto.productoDs}"/>
 					</p:column>
 					<p:column headerText="Cantidad" width="4rem">
@@ -182,36 +181,39 @@
 				</f:facet>
 			</p:dialog>
 			<div style="padding-top: 1rem;">
-				<p:panel header="SUS PRODUCTOS">
-					<p:dataTable id="dt-salidas" value="#{altaConstanciaSalidaBean.listadoTemp}" var="salida">
-						<p:column headerText="Entrada" width="3rem">
-							<h:outputText value="#{salida.folioEntrada}" />
-						</p:column>
-						<p:column headerText="Producto">
-							<h:outputText value="#{salida.producto}" />
-						</p:column>
-						<p:column headerText="Cantidad" width="4rem">
-							<h:outputText value="#{salida.cantidad}" />
-						</p:column>
-						<p:column headerText="Unidad" width="5rem">
-							<h:outputText value="#{salida.unidad}" />
-						</p:column>
-						<p:column headerText="Peso (kg)" width="5rem">
-							<h:outputText value="#{salida.peso}" />
-						</p:column>
-						<p:column headerText="Temp.(°C)" width="4rem">
-							<h:outputText value="#{salida.temperatura}" />
-						</p:column>
-						<p:column>
-							<p:commandButton class="ui-button-danger" icon="pi pi-times" actionListener="#{altaConstanciaSalidaBean.deleteDetalleConstanciaSalida(salida)}" update="form:dt-inventario">
-								<f:setPropertyActionListener value="#{salida}" target="#{altaConstanciaSalidaBean.detalleSalida}" />
-							</p:commandButton>
-						</p:column>
-						<f:facet name="footer">
-				            <span class="font-bold">En total hay #{altaConstanciaSalidaBean.cantidadTotal} unidades con #{altaConstanciaSalidaBean.pesoTotal} kg.</span>
-				        </f:facet>
-					</p:dataTable>
-				</p:panel>
+				<p:dataTable id="dt-salidas" value="#{altaConstanciaSalidaBean.listadoTemp}" var="salida">
+					<f:facet name="header">
+						<div>
+							<span>SUS PRODUCTOS</span>
+						</div>
+					</f:facet>
+					<p:column headerText="Entrada" width="3rem">
+						<h:outputText value="#{salida.folioEntrada}" />
+					</p:column>
+					<p:column headerText="Producto">
+						<h:outputText value="#{salida.producto}" />
+					</p:column>
+					<p:column headerText="Cantidad" width="4rem">
+						<h:outputText value="#{salida.cantidad}" />
+					</p:column>
+					<p:column headerText="Unidad" width="5rem">
+						<h:outputText value="#{salida.unidad}" />
+					</p:column>
+					<p:column headerText="Peso (kg)" width="5rem">
+						<h:outputText value="#{salida.peso}" />
+					</p:column>
+					<p:column headerText="Temp.(°C)" width="4rem">
+						<h:outputText value="#{salida.temperatura}" />
+					</p:column>
+					<p:column>
+						<p:commandButton class="ui-button-danger" icon="pi pi-times" actionListener="#{altaConstanciaSalidaBean.deleteDetalleConstanciaSalida(salida)}" update="form:dt-inventario">
+							<f:setPropertyActionListener value="#{salida}" target="#{altaConstanciaSalidaBean.detalleSalida}" />
+						</p:commandButton>
+					</p:column>
+					<f:facet name="footer">
+			            <span class="font-bold">En total hay #{altaConstanciaSalidaBean.cantidadTotal} unidades con #{altaConstanciaSalidaBean.pesoTotal} kg.</span>
+			        </f:facet>
+				</p:dataTable>
 			</div>
 			<div style="padding-top: 1rem;">
 				<p:panel header="AGREGUE LOS SERVICIOS">
@@ -236,25 +238,25 @@
 				</p:panel>
 			</div>
 			<div style="padding-top: 1rem;">
-				<p:panel header="SUS SERVICIOS">
-					<p:dataTable id="dt-servicio" value="#{altaConstanciaSalidaBean.listadoConstanciaSalidaServicios}"
-						var="constanciaServicios" >
-						<p:column headerText="Servicio" >
-							<h:outputText value="#{constanciaServicios.constanciaSalidaServiciosPK.servicioCve.servicioDs}" />
-						</p:column>
-					
-						<p:column headerText="Cantidad">
-							<h:outputText value="#{constanciaServicios.numCantidad}" />
-						</p:column>
-						<p:column>
-							<p:commandButton class="ui-button-danger" icon="pi pi-times"
-								actionListener="#{altaConstanciaSalidaBean.deleteConstanciaSalidaServicio(constanciaServicios)}"
-								update="dt-servicio">
-								<f:setPropertyActionListener value="#{constanciaServicios}" target="#{altaConstanciaSalidaBean.constanciaSalidaServicio}" />
-							</p:commandButton>
-						</p:column>
-					</p:dataTable>
-				</p:panel>
+				<p:dataTable id="dt-servicio" value="#{altaConstanciaSalidaBean.listadoConstanciaSalidaServicios}" var="constanciaServicios">
+					<f:facet name="header">
+						<div>SUS SERVICIOS</div>
+					</f:facet>
+					<p:column headerText="Servicio" >
+						<h:outputText value="#{constanciaServicios.constanciaSalidaServiciosPK.servicioCve.servicioDs}" />
+					</p:column>
+				
+					<p:column headerText="Cantidad">
+						<h:outputText value="#{constanciaServicios.numCantidad}" />
+					</p:column>
+					<p:column>
+						<p:commandButton class="ui-button-danger" icon="pi pi-times"
+							actionListener="#{altaConstanciaSalidaBean.deleteConstanciaSalidaServicio(constanciaServicios)}"
+							update="dt-servicio">
+							<f:setPropertyActionListener value="#{constanciaServicios}" target="#{altaConstanciaSalidaBean.constanciaSalidaServicio}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
 			</div>
 			<div style="margin-top: 1rem; margin-bottom: 1rem;">
 				<p:panel header="DATOS DEL TRANSPORTE Y OBSERVACIONES">

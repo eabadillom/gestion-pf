@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -145,6 +147,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
+	
+	public String formatDate(Date date) {
+	     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");   
+	     return dateFormat.format(date);
+	}
 	
 	public AltaConstanciaSalidaBean() {
 		constanciaDeServicio = new ConstanciaDeServicio();
