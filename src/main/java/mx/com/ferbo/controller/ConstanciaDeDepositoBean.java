@@ -471,7 +471,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 		PrimeFaces.current().ajax().update(":form:txtPedimento", ":form:txtSAP", ":form:txtLote",
 				":form:fechaCaducidad", ":form:txtOtro", ":form:precioServicio", ":congelacion",
-				":form:conservacion", ":form:refrigeracion", ":form:maniobras");
+				":form:conservacion", ":form:refrigeracion", ":form:maniobras","form:txtCodigo");
 	}
 	
 	public void addPartida() {
