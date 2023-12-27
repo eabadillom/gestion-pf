@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioAlmacen" pageWidth="851" pageHeight="611" columnWidth="761" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="2f361463-f417-4104-8c12-7ab1c04e4a00">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionProduccionMySQL.jrdax"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -89,8 +89,92 @@
 	) salidas ON parEnt.partida_cve = salidas.partida_cve
 	where
 		cddEnt.status <> 4
+		and parEnt.no_tarimas >= 1.000
 		AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
 		AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
+	
+	
+	/*---------------------------------------------------------------------*/
+	
+	
+	union all 
+	
+	/*---------------------------------------------------------------------*/
+	
+	select
+	    cddEnt.folio            as folio,
+	    cli.cte_nombre          as cliente,
+	    cli.numero_cte          as numero_cte,
+	    cddEnt.folio_cliente    as folio_cliente,
+	    cddEnt.fecha_ingreso    as ingreso,
+	    parEnt.PARTIDA_CVE,
+	    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
+	    udm.unidad_de_manejo_ds as unidad_cobro,
+	    parEnt.no_tarimas as tarima,
+	    (parEnt.peso_total - COALESCE(salidas.peso, 0)) as peso,
+	    prd.producto_cve        as producto_cve,
+	    prd.producto_ds         as producto, 
+	    detPart.dtp_caducidad   as caducidad,
+	    prd.numero_prod         as codigo,
+	    detPart.dtp_sap         as sap,
+	    detPart.dtp_po          as po,
+	    cam.camara_cve          as cam_cve,
+	    cam.camara_abrev        as camara,
+	    plt.planta_cve          as plt_cve,
+	    plt.planta_abrev        as planta,
+	    detPart.dtp_lote        as lote,
+		COALESCE(parEnt.valorMercancia,0) as valor,
+		(parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL) as base_cargo,
+		( cantidad * parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL)  as resultado,
+	    pos.cod_posicion
+	from partida parEnt
+	inner join (
+		select *
+		from constancia_de_deposito cdd
+		WHERE cdd.status = 1
+			and (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
+			AND cdd.fecha_ingreso <= $P{Fecha}
+	) cddEnt on parEnt.folio = cddEnt.folio
+	inner join unidad_de_producto udp on udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
+	inner join producto prd on prd.producto_cve = udp.producto_cve
+	inner join unidad_de_manejo udm on udm.unidad_de_manejo_cve = udp.unidad_de_manejo_cve
+	inner join camara cam on cam.camara_cve = parEnt.camara_cve
+	inner join planta plt on plt.planta_cve = cam.planta_cve
+	inner join cliente cli on cli.cte_cve = cddEnt.cte_cve
+	inner join 
+	(
+	    select tdp.* from detalle_partida tdp
+	    inner join (
+			select
+				dp.partida_cve,
+	            max(dp.det_part_cve) as det_part_cve
+			from detalle_partida dp
+			
+			group by dp.partida_cve
+	    ) tmdp on tdp.partida_cve = tmdp.partida_cve and tdp.det_part_cve = tmdp.det_part_cve
+	) detPart on detPart.partida_cve = parEnt.partida_cve
+	left outer join posicion_partida pp on parEnt.partida_cve = pp.ID_PARTIDA
+	left outer join posicion pos on pp.ID_POSICION = pos.id_posicion
+	left outer join (
+		select 
+	    	dcs.partida_cve,
+	    	sum(COALESCE(dcs.peso,0)) as peso,
+	    	sum(COALESCE(dcs.cantidad,0)) as cantidad
+	    from constancia_salida cSal
+	    inner join detalle_constancia_salida dcs on dcs.constancia_cve = cSal.id
+	    WHERE cSal.status = 1 
+	    	AND cSal.fecha <= $P{Fecha}
+	    group by
+			dcs.PARTIDA_CVE
+	) salidas ON parEnt.partida_cve = salidas.partida_cve
+	where
+		cddEnt.status <> 4
+		and parEnt.no_tarimas < 1.000
+		AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
+		AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
+		
+		
+		
 ) I
 WHERE I.cantidad > 0
 ORDER BY cliente,numero_cte, producto]]>
@@ -226,7 +310,7 @@ ORDER BY cliente,numero_cte, producto]]>
 	<variable name="TotalGeneral" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{valor}]]></variableExpression>
 	</variable>
-	<variable name="SumaProductoPorCliente" class="java.lang.String" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
+	<variable name="SumaProductoPorCliente" class="java.lang.String" resetType="Group" resetGroup="GroupCliente" calculation="Count">
 		<variableExpression><![CDATA[$F{producto}]]></variableExpression>
 	</variable>
 	<variable name="SumaTarimasPorCte" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
@@ -247,8 +331,8 @@ ORDER BY cliente,numero_cte, producto]]>
 	<variable name="SumaGLobalPeso" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{peso}]]></variableExpression>
 	</variable>
-	<variable name="SumaGlobalTarimas" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$V{SumaTarimasPorCte}]]></variableExpression>
+	<variable name="SumaGlobalTarimas" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tarima}]]></variableExpression>
 	</variable>
 	<variable name="ImporteTotalGlobal" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$V{TotalImporteParcial}]]></variableExpression>
@@ -305,14 +389,13 @@ ORDER BY cliente,numero_cte, producto]]>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Producto]]></text>
+					<text><![CDATA[]]></text>
 				</staticText>
 				<textField isBlankWhenNull="true">
 					<reportElement mode="Opaque" x="119" y="0" width="226" height="10" forecolor="#FCFCFC" backcolor="#2196F3" uuid="e16771e5-7c4d-4ffa-830d-15237523b200"/>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{SumaProductoPorCliente}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement key="" mode="Opaque" x="345" y="0" width="77" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="5d6ec033-c23f-49be-9103-bbe014d0fcd0">
@@ -905,6 +988,7 @@ ORDER BY cliente,numero_cte, producto]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -923,6 +1007,7 @@ ORDER BY cliente,numero_cte, producto]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -933,14 +1018,15 @@ ORDER BY cliente,numero_cte, producto]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Producto]]></text>
+				<text><![CDATA[]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="119" y="0" width="226" height="10" forecolor="#FCFCFC" backcolor="#2196F3" uuid="5685d377-08ac-477b-87cf-670a83d88dee"/>
+				<reportElement mode="Opaque" x="119" y="0" width="226" height="10" forecolor="#FCFCFC" backcolor="#2196F3" uuid="5685d377-08ac-477b-87cf-670a83d88dee">
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{SumaGlobalProducto}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement key="" mode="Opaque" x="345" y="0" width="77" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="161086ba-18ae-4e45-8666-c90b0ee1fdfb">
@@ -948,6 +1034,7 @@ ORDER BY cliente,numero_cte, producto]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -961,14 +1048,18 @@ ORDER BY cliente,numero_cte, producto]]>
 				<text><![CDATA[Tarimas]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="422" y="0" width="50" height="10" forecolor="#FCFAFA" backcolor="#2196F3" uuid="b8dabb68-79a9-4300-ae16-745248b76886"/>
+				<reportElement mode="Opaque" x="422" y="0" width="50" height="10" forecolor="#FCFAFA" backcolor="#2196F3" uuid="b8dabb68-79a9-4300-ae16-745248b76886">
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{SumaGlobalTarimas}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="472" y="0" width="61" height="10" forecolor="#FAF7F7" backcolor="#2196F3" uuid="45398072-5993-4f14-99d7-1650423dd275"/>
+				<reportElement mode="Opaque" x="472" y="0" width="61" height="10" forecolor="#FAF7F7" backcolor="#2196F3" uuid="45398072-5993-4f14-99d7-1650423dd275">
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
@@ -980,6 +1071,7 @@ ORDER BY cliente,numero_cte, producto]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -998,6 +1090,7 @@ ORDER BY cliente,numero_cte, producto]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1011,21 +1104,27 @@ ORDER BY cliente,numero_cte, producto]]>
 				<text><![CDATA[Valor]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="643" y="0" width="40" height="10" forecolor="#FCF5F5" backcolor="#2196F3" uuid="169d9521-6d62-4bea-b7ac-cbc748d38eb2"/>
+				<reportElement mode="Opaque" x="643" y="0" width="40" height="10" forecolor="#FCF5F5" backcolor="#2196F3" uuid="169d9521-6d62-4bea-b7ac-cbc748d38eb2">
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Kg]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="583" y="0" width="60" height="10" forecolor="#FFFCFC" backcolor="#2196F3" uuid="9847793b-0c21-4a19-a687-18ff84fd9fe9"/>
+				<reportElement mode="Opaque" x="583" y="0" width="60" height="10" forecolor="#FFFCFC" backcolor="#2196F3" uuid="9847793b-0c21-4a19-a687-18ff84fd9fe9">
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{SumaGLobalPeso}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="715" y="0" width="46" height="10" forecolor="#FAF5F5" backcolor="#2196F3" uuid="d4004406-db8f-43d2-b05e-b1c23ae50282"/>
+				<reportElement mode="Opaque" x="715" y="0" width="46" height="10" forecolor="#FAF5F5" backcolor="#2196F3" uuid="d4004406-db8f-43d2-b05e-b1c23ae50282">
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>

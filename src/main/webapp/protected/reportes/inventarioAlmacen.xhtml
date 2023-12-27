@@ -17,7 +17,7 @@
 						<p:growl id="messages" showDetail="true" />
 						<p:fieldset>
 							<span class="ui-float-label ui-input-icon-left">
-								<p:selectOneMenu id="Cliente" value="#{reporteInventarioBean.clienteSelect}" converter="entityConverter">
+								<p:selectOneMenu id="Cliente" value="#{reporteInventarioBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
 									<f:selectItem itemLabel="Todos los clientes" itemValue="" />
 									<f:selectItems value="#{reporteInventarioBean.listaClientes}" var="cte" itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
 									<p:ajax process="@this" />
