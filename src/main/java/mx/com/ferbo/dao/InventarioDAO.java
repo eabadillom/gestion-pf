@@ -74,6 +74,7 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					+ "		GROUP BY PARTIDA_CVE\n"
 					+ "	) sal ON p.PARTIDA_CVE = sal.PARTIDA_CVE\n"
 					+ "	WHERE cdd.CTE_CVE = :idCliente\n"
+					+ " AND cdd.status = 1\n"
 					+ "	AND plt.PLANTA_CVE = :idPlanta\n"
 					+ ") I WHERE I.cantidad > 0"
 					;
