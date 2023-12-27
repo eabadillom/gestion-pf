@@ -206,16 +206,15 @@ public class CalculoPrevioBean implements Serializable {
 
 	}
 	public void NuevaConstancia() {
-		FacesMessage message = null;
-			try {
-				ExternalContext externalContext = FacesContext.getCurrentInstance()
-					    .getExternalContext();
-				externalContext.redirect(externalContext.getRequestContextPath() + "/protected/catalogos/facturacionConstancias.xhtml");
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//		FacesMessage message = null;
+		try {
+			ExternalContext externalContext = FacesContext.getCurrentInstance()
+				    .getExternalContext();
+			externalContext.redirect(externalContext.getRequestContextPath() + "/protected/catalogos/facturacionConstancias.xhtml");
+			
+		} catch (IOException e) {
+			log.error("Problema para redirigir a la pantalla de inicio de facturación de constancias...",e);
+		}
 	}
 
 	public FacturacionConstanciasBean getFacturacionBean() {
@@ -643,8 +642,8 @@ public class CalculoPrevioBean implements Serializable {
 				// cantidad = p.getNoTarimas();
 			} else {
 				cantidad = cantidad.add(p.getPesoTotal());
-				log.info("Peso total: {}" + p.getPesoTotal());
-				log.info("Cantidad: " + cantidad);
+				log.debug("Peso total: {}" + p.getPesoTotal());
+				log.debug("Cantidad: " + cantidad);
 			}
 
 		}

@@ -230,8 +230,6 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				if(lCFFacturadas.size() > 0)
 					continue;
 				
-				list.add(cf);
-				
 				for(Partida p : constancia.getPartidaList()) {
 					BigDecimal cantidadT = new BigDecimal(p.getCantidadTotal());
 					BigDecimal pesoTotal = p.getPesoTotal();
@@ -252,7 +250,15 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 						if(constanciaSalida.getStatus().getId()==2)
 							continue;
 						
-						if(constanciaSalida.getFecha().after(cf.getVigenciaInicio()))
+						log.debug("Fecha salida:   {}  timestamp: {}",constanciaSalida.getFecha(), constanciaSalida.getFecha().getTime());
+						log.debug("Fecha vigencia: {}  timestamp: {}", cf.getVigenciaInicio(), cf.getVigenciaInicio().getTime());
+						log.debug("salida.compareTo(vigenciaIni) < 0: {}, salida.compareTo(vigenciaIni) = 0: {}, salida.compareTo(vigenciaIni) > 0: {}",
+								(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) < 0),
+								(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) == 0),
+								(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) > 0)
+								);
+						
+						if(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) >= 0)
 							continue;
 						
 						BigDecimal cantidad = new BigDecimal(dcs.getCantidad());
@@ -274,6 +280,7 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					
 					log.debug("Folio: {}, Saldo: cantidad = {}, peso = {}, tarimas = {}", constancia.getFolioCliente(), cantidadT, pesoTotal, noTarimas);
 				}
+				list.add(cf);
 				
 				constancia.setConstanciaFacturaList(new ArrayList<>());
 				constancia.setConstanciaFacturaList(list);

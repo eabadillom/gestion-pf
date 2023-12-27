@@ -214,6 +214,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 		this.cantidadTotal = 0;
 		this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+		
+		log.info("El usuario {} entra a Inventarios / Salidas / Alta.", this.usuario.getUsuario());
 	}
 	
 	public void validar() throws InventarioException {
