@@ -204,6 +204,9 @@
 						<p:rowExpansion>
 							<div class="orders-subtable">
 								<p:dataTable id="dtDetallePartida" value="#{partida.detallePartidaList}" var="detallePartida" reflow="true">
+									<p:column headerText="Codigo">
+										<h:outputText value="#{detallePartida.dtpCodigo}" />
+									</p:column>
 									<p:column headerText="Pedimento">
 										<h:outputText value="#{detallePartida.dtpPedimento}" />
 									</p:column>
@@ -229,6 +232,23 @@
 							    <f:setPropertyActionListener value="#{partida}" target="#{constanciaDeDepositoBean.selectedPartida}" />
 							</p:commandButton>
 						</p:column>
+						
+						<p:columnGroup type="footer" >
+                <p:row>
+                    <p:column colspan="3" style="text-align:left"  />
+                    <p:column>
+                        <f:facet name="footer">
+						<div align="left">
+							Total de tarimas:
+							<p:outputLabel value="#{constanciaDeDepositoBean.totalTarimas}" id="totalTarimas"/>
+						</div>
+					</f:facet>
+                    </p:column>
+                    </p:row>
+            </p:columnGroup>
+            
+            
+						
 					</p:dataTable>
 				</p:panel>
 			</div>

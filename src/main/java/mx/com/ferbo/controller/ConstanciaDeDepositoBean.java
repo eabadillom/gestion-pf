@@ -139,6 +139,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private BigDecimal unidadesPorTarima;
 	private BigDecimal cantidadTotal;
 	private BigDecimal pesoTotal;
+	private BigDecimal totalTarimas;
 	private BigDecimal valorMercancia;
 	private String pedimento, contenedor, lote, otro;
 	private Boolean isCongelacion, isConservacion, isRefrigeracion, isManiobras;
@@ -201,7 +202,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		selectedPartidas = new ArrayList<Partida>();
 		selectedConstanciaDD = new ArrayList<>();
 		estadoConstanciaDAO = new EstadoConstanciaDAO();
-
+		totalTarimas = new BigDecimal(0);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -259,6 +260,30 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		maxDate = new Date(today.getTime() );
 		PrimeFaces.current().ajax().update(":form:planta", ":form:numeroC", ":form:cmdCambiarFolio");
 	}
+	
+	public void totalesTarimas() {
+		BigDecimal sumaTotalTarimas;
+		
+		sumaTotalTarimas =TotalTarimas(listadoPartida);
+		totalTarimas = totalTarimas.add(sumaTotalTarimas);
+		
+		//selectedPartida.add(sumaTotalTarimas);
+		//subtotal.add(sumaTotalTarimas);
+		log.info(selectedPartida);
+		
+	}
+	
+	public BigDecimal TotalTarimas(List<Partida> lista) {
+		
+		BigDecimal subTotal = new BigDecimal(0);
+		
+		for(Partida p: listadoPartida) {
+			subTotal = subTotal.add(p.getNoTarimas());
+		}
+		
+		return subTotal;
+	}
+	
 	
 	private void setRestrictedAccess() {
 		if(usuario.getPerfil() == 1 || usuario.getPerfil() == 4)
@@ -558,6 +583,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				
 				p.add(dp);
 				this.listadoPartida.add(p);
+				
 			}
 	if(validaCarga == true) {
 				partida.setNoTarimas(numTarimas);
@@ -585,6 +611,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 						
 					}
 			}
+			totalTarimas = new BigDecimal(0);
+			totalesTarimas();
 			this.partida = this.newPartida();
 			this.detalle = this.newDetallePartida();
 			this.numTarimas = null;
@@ -600,7 +628,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga");
+			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas");
+			
 		}
 	}
 	
@@ -1484,6 +1513,14 @@ public void deleteConstanciaDD() {
 
 	public void setPartidaEdit(Partida partidaEdit) {
 		this.partidaEdit = partidaEdit;
+	}
+
+	public BigDecimal getTotalTarimas() {
+		return totalTarimas;
+	}
+
+	public void setTotalTarimas(BigDecimal totalTarimas) {
+		this.totalTarimas = totalTarimas;
 	}
 	
 	
