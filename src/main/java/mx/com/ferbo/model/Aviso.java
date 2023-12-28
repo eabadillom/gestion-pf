@@ -69,6 +69,11 @@ public class Aviso implements Serializable {
     
     @Basic(optional = false)
     @NotNull
+    @Column(name = "aviso_codigo")
+    private boolean avisoCodigo;
+    
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "aviso_pedimento")
     private boolean avisoPedimento;
     
@@ -192,7 +197,15 @@ public class Aviso implements Serializable {
         this.avisoPo = avisoPo;
     }
 
-    public boolean getAvisoPedimento() {
+	public boolean getAvisoCodigo() {
+		return avisoCodigo;
+	}
+
+	public void setAvisoCodigo(boolean avisoCodigo) {
+		this.avisoCodigo = avisoCodigo;
+	}
+
+	public boolean getAvisoPedimento() {
         return avisoPedimento;
     }
 
