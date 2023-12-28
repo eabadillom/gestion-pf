@@ -139,7 +139,10 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private BigDecimal unidadesPorTarima;
 	private BigDecimal cantidadTotal;
 	private BigDecimal pesoTotal;
+	private BigDecimal totalTarimas;
 	private BigDecimal valorMercancia;
+	private BigDecimal totalKilos;
+	private BigDecimal totalCajas;
 	private String pedimento, contenedor, lote, otro;
 	private Boolean isCongelacion, isConservacion, isRefrigeracion, isManiobras;
 	private int congelacion = 619, conservacion = 620, refrigeracion = 621, maniobras = 622 ;
@@ -201,7 +204,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		selectedPartidas = new ArrayList<Partida>();
 		selectedConstanciaDD = new ArrayList<>();
 		estadoConstanciaDAO = new EstadoConstanciaDAO();
-
+		totalTarimas = new BigDecimal(0);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -259,6 +262,53 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		maxDate = new Date(today.getTime() );
 		PrimeFaces.current().ajax().update(":form:planta", ":form:numeroC", ":form:cmdCambiarFolio");
 	}
+	
+	public void totalesTarimas() {
+		BigDecimal sumaTotalTarimas;
+		BigDecimal sumaTotalKilos;
+		BigDecimal sumaTotalCajas;
+		
+		sumaTotalTarimas =TotalTarimas(listadoPartida);
+		totalTarimas = totalTarimas.add(sumaTotalTarimas); 	
+		//selectedPartida.add(sumaTotalTarimas);
+		//subtotal.add(sumaTotalTarimas);
+	
+		
+		sumaTotalKilos = TotalKilos(listadoPartida);
+		totalKilos = totalKilos.add(sumaTotalKilos);
+		
+		sumaTotalCajas = TotalCajas(listadoPartida);
+		totalCajas = totalCajas.add(sumaTotalCajas);
+		
+		
+	}
+	
+	public BigDecimal TotalTarimas(List<Partida> lista) {
+		BigDecimal subTotal = new BigDecimal(0);
+		for(Partida p: listadoPartida) {
+			subTotal = subTotal.add(p.getNoTarimas());
+		}
+		return subTotal;
+	}
+	
+	public BigDecimal TotalKilos(List<Partida> lista) {
+		BigDecimal subTotal = new BigDecimal(0);
+		for(Partida p: listadoPartida) {
+			subTotal = subTotal.add(p.getPesoTotal());
+		}
+		return subTotal;
+	}
+	
+	public BigDecimal TotalCajas(List<Partida> lista) {
+		BigDecimal subTotal = new BigDecimal(0);
+		for(Partida p: listadoPartida) {
+			subTotal = subTotal.add(new BigDecimal(p.getCantidadTotal()));
+			
+		}
+		return subTotal;
+	}
+	
+	
 	
 	private void setRestrictedAccess() {
 		if(usuario.getPerfil() == 1 || usuario.getPerfil() == 4)
@@ -558,6 +608,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				
 				p.add(dp);
 				this.listadoPartida.add(p);
+				
 			}
 	if(validaCarga == true) {
 				partida.setNoTarimas(numTarimas);
@@ -585,6 +636,11 @@ public class ConstanciaDeDepositoBean implements Serializable {
 						
 					}
 			}
+			totalTarimas = new BigDecimal(0);
+			totalCajas = new BigDecimal(0);
+			totalKilos = new BigDecimal(0);
+			
+			totalesTarimas();
 			this.partida = this.newPartida();
 			this.detalle = this.newDetallePartida();
 			this.numTarimas = null;
@@ -600,7 +656,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga");
+			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos");
+			
 		}
 	}
 	
@@ -1484,6 +1541,30 @@ public void deleteConstanciaDD() {
 
 	public void setPartidaEdit(Partida partidaEdit) {
 		this.partidaEdit = partidaEdit;
+	}
+
+	public BigDecimal getTotalTarimas() {
+		return totalTarimas;
+	}
+
+	public void setTotalTarimas(BigDecimal totalTarimas) {
+		this.totalTarimas = totalTarimas;
+	}
+
+	public BigDecimal getTotalKilos() {
+		return totalKilos;
+	}
+
+	public void setTotalKilos(BigDecimal totalKilos) {
+		this.totalKilos = totalKilos;
+	}
+
+	public BigDecimal getTotalCajas() {
+		return totalCajas;
+	}
+
+	public void setTotalCajas(BigDecimal totalCajas) {
+		this.totalCajas = totalCajas;
 	}
 	
 	
