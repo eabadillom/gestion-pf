@@ -244,6 +244,24 @@
 						</div>
 					</f:facet>
                     </p:column>
+                    
+                    <p:column>
+                        <f:facet name="footer">
+						<div align="left">
+							Total de kilos:
+							<p:outputLabel value="#{constanciaDeDepositoBean.totalKilos}" id="totalKilos"/>
+						</div>
+					</f:facet>
+                    </p:column>
+                    
+                    <p:column>
+                        <f:facet name="footer">
+						<div align="left">
+							Total de cajas:
+							<p:outputLabel value="#{constanciaDeDepositoBean.totalCajas}" id="totalCajas"/>
+						</div>
+					</f:facet>
+                    </p:column>
                     </p:row>
             </p:columnGroup>
             
