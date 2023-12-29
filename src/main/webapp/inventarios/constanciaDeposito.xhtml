@@ -69,13 +69,13 @@
 							<p:outputLabel value="Producto"/>
 							<p:selectOneMenu id="claveProducto" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.productoCve.productoCve}" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona Producto" noSelectionOption="true"/>
-								<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto.productoCve}"/>
+								<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto.productoCve}"/>
 								<p:ajax process="@this"></p:ajax>
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-2 p-md-2">
-							<p:outputLabel value="Unidad de manejo" filter="true" filterMatchMode="contains"/>
-							<p:selectOneMenu autoWidth="false" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoCve}">
+							<p:outputLabel value="Unidad de manejo"/>
+							<p:selectOneMenu autoWidth="false" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoCve}" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
 								<f:selectItems value="#{constanciaDeDepositoBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad.unidadDeManejoCve}" />
 								<p:ajax process="@this" update=":form:cantidad"></p:ajax>
