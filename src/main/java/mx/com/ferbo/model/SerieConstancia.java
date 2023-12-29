@@ -10,6 +10,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -37,6 +39,11 @@ public class SerieConstancia implements Serializable {
     @NotNull
     @Column(name = "nu_serie")
     private int nuSerie;
+    
+    @JoinColumn(name = "id_planta", referencedColumnName = "PLANTA_CVE")
+    @ManyToOne
+    private Planta idPlanta;
+    
 
     public SerieConstancia() {
     }
@@ -69,8 +76,17 @@ public class SerieConstancia implements Serializable {
     public void setNuSerie(int nuSerie) {
         this.nuSerie = nuSerie;
     }
+    
 
-    @Override
+    public Planta getIdPlanta() {
+		return idPlanta;
+	}
+
+	public void setIdPlanta(Planta idPlanta) {
+		this.idPlanta = idPlanta;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (serieConstanciaPK != null ? serieConstanciaPK.hashCode() : 0);
