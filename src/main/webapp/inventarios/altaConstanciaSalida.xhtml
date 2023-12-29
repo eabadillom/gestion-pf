@@ -95,7 +95,7 @@
 						</h:outputText>
 					</p:column>
 					<p:column headerText="Producto" sortBy="#{inventario.producto.productoDs}" sortOrder="asc" sortPriority="1">
-						<h:outputText value="#{inventario.producto.productoDs}"/>
+						<h:outputText value="#{inventario.producto.numeroProd} - #{inventario.producto.productoDs}"/>
 					</p:column>
 					<p:column headerText="Cantidad" width="4rem">
 						<h:outputText value="#{inventario.cantidad}" />
