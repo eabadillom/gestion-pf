@@ -140,7 +140,7 @@ public class FacturamaBL {
 				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");//formateo de vigenciafin
 				String fechaVigencia = format.format(cf.getVigenciaFin());
 				
-				String descripcion = sc.getDescripcion() + " - " + "CONSTANCIA " + cf.getId() + " - " + "VIGENCIA " + cf.getVigenciaInicio() + " AL " + fechaVigencia + " - " + "Tipo de cobro: " + sc.getUnidadMedida();
+				String descripcion = sc.getDescripcion() + " - " + "CONSTANCIA " + cf.getFolioCliente() + " - " + "VIGENCIA " + cf.getVigenciaInicio() + " AL " + fechaVigencia + " - " + "Tipo de cobro: " + sc.getUnidadMedida();
 				
 				item.setProductCode(sc.getCodigo());
 				item.setDescription(descripcion);//modificar leyenda 
