@@ -65,6 +65,9 @@ public class Planta implements Serializable {
 	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Camara> camaraList;
 	
+	@OneToMany(mappedBy = "idPlanta", fetch = FetchType.LAZY)
+	private List<SerieConstancia> serieConstanciaList;
+	
 	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Aviso> avisoList;
 	

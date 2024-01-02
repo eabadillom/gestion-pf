@@ -140,6 +140,10 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 			}
 	}
 	
+	
+	
+	
+	
 	public List<ConstanciaTraspaso> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
 		List<ConstanciaTraspaso> resultList = null;
 		EntityManager em = null;

@@ -89,6 +89,7 @@ public class AltaTraspasoBean implements Serializable {
 	private List<String> listaEntradas;
 	private List<InventarioDetalle> destino;
 	private List<Planta> listaplanta;
+	private List<Planta> listadoPlantas;
 	private List<Camara> listacamara;
 	private List<Posicion> listaposicion;
 	
@@ -126,7 +127,7 @@ public class AltaTraspasoBean implements Serializable {
 //	private partidasAfectadasDAO partidasAfectadasDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
 	private Planta plantaSelect;
-	private List<Planta> listadoPlantas;
+	
 	private SerieConstancia serie;
 	
 	private Usuario usuario;
@@ -214,7 +215,7 @@ public class AltaTraspasoBean implements Serializable {
 			
 			for (Inventario i : inventarioList) {
 				InventarioDetalle invdet = new InventarioDetalle(i);
-				invdet.setListaplanta(listaplanta);
+				invdet.setListaplanta(listadoPlantas);
 				invdet.setListacamara(listacamara);
 				invdet.setListaposicion(listaposicion);
 				inventario.add(invdet);
@@ -269,7 +270,7 @@ public class AltaTraspasoBean implements Serializable {
 	public void generaFolioTraspaso() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
-
+		SerieConstancia serieConstancia = null; 
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
@@ -281,11 +282,13 @@ public class AltaTraspasoBean implements Serializable {
 
 			if (this.plantaSelect == null)
 				throw new InventarioException("Debe seleccionar una planta");
-			
+			serieConstancia = new SerieConstancia();
 			seriePK = new SerieConstanciaPK();
 			seriePK.setCliente(this.selCliente);
 			seriePK.setTpSerie("T");
-			serie = serieConstanciaDAO.buscarPorId(seriePK);
+			serieConstancia.setSerieConstanciaPK(seriePK);
+			serieConstancia.setIdPlanta(plantaSelect);
+			serie = serieConstanciaDAO.buscarPorClienteAndPlanta(serieConstancia);
 
 			if (serie == null) {
 				this.numero = "";
@@ -293,7 +296,7 @@ public class AltaTraspasoBean implements Serializable {
 						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
 			}
 
-			this.numero = String.format("%s%s%s%d", seriePK.getTpSerie(), plantaSelect.getPlantaSufijo(),
+			this.numero = String.format("%s%s%s%d", serieConstancia.getSerieConstanciaPK().getTpSerie(),plantaSelect.getPlantaSufijo(),
 					selCliente.getCodUnico(), serie.getNuSerie());
 			
 			this.serie = serie;
