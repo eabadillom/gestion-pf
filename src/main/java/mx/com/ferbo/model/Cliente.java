@@ -442,6 +442,14 @@ public class Cliente implements Serializable {
 	public void setCandadoSalida(CandadoSalida candadoSalida) {
 		this.candadoSalida = candadoSalida;
 	}
+	
+	public List<SerieConstancia> getSerieConstanciaList() {
+		return serieConstanciaList;
+	}
+
+	public void setSerieConstanciaList(List<SerieConstancia> serieConstanciaList) {
+		this.serieConstanciaList = serieConstanciaList;
+	}
 
 	public void addSerieConstancia(SerieConstancia serie) {
 		if(this.serieConstanciaList == null)
@@ -454,5 +462,7 @@ public class Cliente implements Serializable {
 		
 		this.serieConstanciaList.add(serie);
 	}
+
+	
     
 }

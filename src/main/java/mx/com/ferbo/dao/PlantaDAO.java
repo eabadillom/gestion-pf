@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -53,6 +54,9 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 				log.debug(p.getIdEmisoresCFDIS().getNb_emisor()); //no tienen notacion lazy
 				log.debug(p.getIdEmisoresCFDIS().getNb_rfc());
 				log.debug(p.getIdEmisoresCFDIS().getNb_emisor());
+				for(SerieConstancia serieConstancia : p.getSerieConstanciaList()) {
+					log.debug(serieConstancia.getSerieConstanciaPK().getPlanta().getPlantaCve());
+				}
 			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de Plantas...", ex);

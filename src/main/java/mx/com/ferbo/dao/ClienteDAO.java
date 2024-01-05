@@ -149,7 +149,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 					cliente.getCandadoSalida().getId();
 				
 				List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
-				System.out.println(clienteContactoList.size());
+				log.debug("Número de contactos del cliente: {}", clienteContactoList.size());
 				log.debug("ClienteContactoList: {}", clienteContactoList.size());
 				log.debug(cliente.getRegimenFiscal().getCd_regimen());
 				//log.debug(cliente.getUsoCfdi().getUsoCfdi());
@@ -175,6 +175,14 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 						if(idTelefono != null)
 							log.debug(idTelefono.getTpTelefono().getNbTelefono());
 					}
+				}
+				
+				for(SerieConstancia sc : cliente.getSerieConstanciaList()) {
+					log.debug("Serie Constancia: idCliente {} - idPlanta {} - TipoSerie {} - Serie {}",
+							sc.getSerieConstanciaPK().getCliente().getCteCve(),
+							sc.getSerieConstanciaPK().getPlanta().getPlantaCve(),
+							sc.getSerieConstanciaPK().getTpSerie(),
+							sc.getNuSerie());
 				}
 			}
 		} catch(Exception ex) {

@@ -365,11 +365,10 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			sConstancia = new SerieConstancia();
 			seriePK = new SerieConstanciaPK();
 			seriePK.setCliente(this.clienteSelect);
+			seriePK.setPlanta(plantaSelect);
 			seriePK.setTpSerie("I");
 			sConstancia.setSerieConstanciaPK(seriePK);
-			sConstancia.setIdPlanta(plantaSelect);
 			serie = serieConstanciaDAO.buscarPorClienteAndPlanta(sConstancia);
-			//serie = serieConstanciaDAO.buscarPorId(seriePK);
 			
 			if (serie == null) {
 				this.noConstanciaSelect = "";
