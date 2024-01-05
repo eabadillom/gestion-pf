@@ -302,10 +302,10 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			serieTemp = new SerieConstancia();
 			
 			seriePK.setCliente(this.clienteSelect);
+			seriePK.setPlanta(plantaSelect);
 			seriePK.setTpSerie("O");
 			
 			serieTemp.setSerieConstanciaPK(seriePK);
-			serieTemp.setIdPlanta(plantaSelect);
 			
 			
 			serie = serieConstanciaDAO.buscarPorClienteAndPlanta(serieTemp);

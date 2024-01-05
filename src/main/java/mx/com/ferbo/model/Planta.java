@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -65,7 +66,7 @@ public class Planta implements Serializable {
 	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Camara> camaraList;
 	
-	@OneToMany(mappedBy = "idPlanta", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "serieConstanciaPK.planta", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	private List<SerieConstancia> serieConstanciaList;
 	
 	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
@@ -324,6 +325,25 @@ public class Planta implements Serializable {
 
 	public void setPosicionList(List<Posicion> posicionList) {
 		this.posicionList = posicionList;
+	}
+
+	public List<SerieConstancia> getSerieConstanciaList() {
+		return serieConstanciaList;
+	}
+
+	public void setSerieConstanciaList(List<SerieConstancia> serieConstanciaList) {
+		this.serieConstanciaList = serieConstanciaList;
+	}
+	
+	public void add(SerieConstancia serieConstancia) {
+		if(this.serieConstanciaList == null)
+			this.serieConstanciaList = new ArrayList<SerieConstancia>();
+		
+		if(serieConstancia.getSerieConstanciaPK() == null)
+			serieConstancia.setSerieConstanciaPK(new SerieConstanciaPK());
+		
+		serieConstancia.getSerieConstanciaPK().setPlanta(this);
+		this.serieConstanciaList.add(serieConstancia);
 	}
 
 }

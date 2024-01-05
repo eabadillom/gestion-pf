@@ -285,9 +285,9 @@ public class AltaTraspasoBean implements Serializable {
 			serieConstancia = new SerieConstancia();
 			seriePK = new SerieConstanciaPK();
 			seriePK.setCliente(this.selCliente);
+			seriePK.setPlanta(plantaSelect);
 			seriePK.setTpSerie("T");
 			serieConstancia.setSerieConstanciaPK(seriePK);
-			serieConstancia.setIdPlanta(plantaSelect);
 			serie = serieConstanciaDAO.buscarPorClienteAndPlanta(serieConstancia);
 
 			if (serie == null) {
