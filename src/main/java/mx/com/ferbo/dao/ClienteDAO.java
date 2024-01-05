@@ -176,6 +176,14 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 							log.debug(idTelefono.getTpTelefono().getNbTelefono());
 					}
 				}
+				
+				for(SerieConstancia sc : cliente.getSerieConstanciaList()) {
+					log.debug("Serie Constancia: idCliente {} - idPlanta {} - TipoSerie {} - Serie {}",
+							sc.getSerieConstanciaPK().getCliente().getCteCve(),
+							sc.getSerieConstanciaPK().getPlanta().getPlantaCve(),
+							sc.getSerieConstanciaPK().getTpSerie(),
+							sc.getNuSerie());
+				}
 			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de clientes...", ex);
