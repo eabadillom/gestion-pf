@@ -82,8 +82,7 @@
 					<h:outputText value="#{(empty lista.uuid) ? '--' : 'SI'}"/>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-file-pdf" class="ui-button-info" process="@this"
-						oncomplete="PF('dg-factura').show()" title="Descargar PDF">
+					<p:commandButton icon="pi pi-file-pdf" class="ui-button-info" process="@this" oncomplete="PF('dg-factura').show()" title="Descargar PDF" action="#{facMantenimentoBean.datosCliente}" update="dgDescarga " >
 						<f:setPropertyActionListener value="#{lista}" target="#{facMantenimentoBean.seleccion}" />
 					</p:commandButton>
 				</p:column>
@@ -135,9 +134,65 @@
 				</p:commandButton>
 			</div>
 		</h:form>
-		<p:dialog header="Descargar de archivos" showEffect="fade" modal="true" widgetVar="dg-factura" responsive="true">
-			<h:form enctype="multipart/form-data">
-				<p:outputPanel class="ui-fluid">
+		<p:dialog header="Descargar de archivos" widgetVar="dg-factura" id="dgDescarga" showEffect="fade"  responsive="true" modal="true" style="text-align:center"> 
+			<h:form enctype="multipart/form-data" id="frmDescarga">
+				<p:outputPanel id="frm-Descarga" class="ui-fluid">
+				<div class="p-field p-col-10 p-md-3" >
+						<p:outputLabel>Cliente</p:outputLabel>
+						<p:inputText id="cliente" value="#{facMantenimentoBean.seleccion.cliente.cteNombre}"   readonly="true" style="width: 23em"></p:inputText>
+					</div>
+				<div class="p-grid ui-fluid p-col-12">
+					<div class="p-field p-col-4 p-md-6">
+					<p:outputLabel>Número de serie</p:outputLabel>
+											<p:inputText id="numSerie" value="#{facMantenimentoBean.seleccion.nomSerie}-#{facMantenimentoBean.seleccion.numero}"  readonly="true"></p:inputText>
+					</div>
+					
+					<div class="p-field p-col-6 p-md-6">
+						<p:outputLabel>Fecha</p:outputLabel>
+						<p:datePicker value="#{facMantenimentoBean.fechaModificada}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}">
+									<p:ajax process="@this"/>
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
+					</div>
+				</div>
+				<div class="p-field p-col-10 p-md-6">
+				<p:outputLabel>Método de pago</p:outputLabel>
+										<p:selectOneMenu id="metodoPago" value="#{facMantenimentoBean.cdMetodoPagoSelected}"  converter="entityConverter"  rendered="true">
+											<f:selectItem itemLabel="---Método de pago---" itemValue="" />
+											<f:selectItems value="#{facMantenimentoBean.listaMetodoPago}" var="metodoPago" itemLabel="#{metodoPago.cdMetodoPago} - #{metodoPago.nbMetodoPago}" itemValue="#{metodoPago.cdMetodoPago}" />
+										</p:selectOneMenu>
+				</div>
+										
+				<div class="p-field p-col-10 p-md-6">
+				<p:outputLabel>Forma de pago</p:outputLabel>
+										<p:selectOneMenu id="formaPago" value="#{facMantenimentoBean.idMedioPagoSelected}"  converter="entityConverter" rendered="true">
+											<f:selectItem itemLabel="---Forma de pago---" itemValue="" />
+											<f:selectItems value="#{facMantenimentoBean.listaMedioPago}" var="medioPago" itemLabel="#{medioPago.formaPago} - #{medioPago.mpDescripcion}" itemValue="#{medioPago.mpId}" />
+										</p:selectOneMenu>
+				</div>
+				<div class="p-grid ui-fluid p-col-12">
+					<div class="p-field p-col-3 p-md-3">				
+						<p:outputLabel>SubTotal:</p:outputLabel>
+						<p:inputText value="#{facMantenimentoBean.seleccion.subtotal}"  readonly="true"/>				
+						
+					</div>
+					
+					<div class="p-field p-col-3 p-md-3">			
+						<p:outputLabel>Iva:</p:outputLabel>
+						<p:inputText value="#{facMantenimentoBean.seleccion.iva}"  readonly="true"/>
+					</div>
+					
+					<div class="p-field p-col-3 p-md-3">			
+						<p:outputLabel>Total:</p:outputLabel>
+						<p:inputText value="#{facMantenimentoBean.seleccion.total}" readonly="true" />
+					</div>
+					
+				</div>
+				
+				<div class="p-field p-col-6 p-md-6" style="margin: auto;">
+				<p:commandButton value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}"/>
+				</div>
+				<div class="p-field p-col-6 p-md-6" style="margin: auto;">
 					<p:commandButton value="Descargar factura"
 						icon="pi pi-arrow-down"
 						styleClass="ui-button-outlined"
@@ -145,6 +200,7 @@
 						ajax="false">
 						<p:fileDownload value="#{facMantenimentoBean.file}" />
 					</p:commandButton>
+						</div>
 				</p:outputPanel>
 			</h:form>
 		</p:dialog>

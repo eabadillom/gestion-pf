@@ -18,8 +18,25 @@ public class MedioPagoDAO extends IBaseDAO<MedioPago,Integer>{
 
 	@Override
 	public MedioPago buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = null;
+		Query query = null;
+		MedioPago mp = null;
+		
+		try {
+			mp = new MedioPago();
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("MedioPago.findByMpId",MedioPago.class)
+					.setParameter("mpId",id);
+			
+			mp = (MedioPago) query.getSingleResult();
+			
+		} catch (Exception e) {
+			log.info("Error al buscar medio Pago por id", e.getMessage());
+		}finally {
+		 em.close();	
+		}
+		
+		return mp;
 	}
 	 public MedioPago buscarPorFormaPago(String formaPago) {
 		 EntityManager entity = EntityManagerUtil.getEntityManager();

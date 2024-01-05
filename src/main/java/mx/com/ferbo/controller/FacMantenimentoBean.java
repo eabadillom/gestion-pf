@@ -14,6 +14,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -35,10 +36,16 @@ import com.ferbo.facturama.tools.FacturamaException;
 import mx.com.ferbo.business.FacturamaBL;
 import mx.com.ferbo.dao.CancelaFacturaDAO;
 import mx.com.ferbo.dao.FacturaDAO;
+import mx.com.ferbo.dao.FacturaMedioPagoDAO;
+import mx.com.ferbo.dao.MedioPagoDAO;
+import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.model.CancelaFactura;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.FacturaMedioPago;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -52,37 +59,54 @@ import net.sf.jasperreports.engine.JRException;
 public class FacMantenimentoBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(FacMantenimentoBean.class);
-	
+
 	private FacesContext context;
 	private HttpServletRequest request;
 	private HttpSession session;
 
 	private List<Cliente> listClientes;
 	private Cliente clienteSelect;
+	private List<MetodoPago> listaMetodoPago;
+	private List<MedioPago> listaMedioPago;
 
 	private List<Factura> listFac;
 	private FacturaDAO daoFac;
 	private Factura seleccion;
+	private FacturaMedioPagoDAO factMedioPagoDAO;
+	
 	private CancelaFactura cancelaFactura = null;
 	private CancelaFacturaDAO cancelaDAO = null;
+	private MetodoPagoDAO metodoPagoDAO;
+	private MedioPagoDAO medioPagoDAO;
+
+	private String cdMetodoPagoSelected;
+	private Integer idMedioPagoSelected;
 
 	private Date actual = GregorianCalendar.getInstance().getTime();
 	private Date de;
 	private Date hasta;
 	private String folio;
-	
+	private Date fechaModificada;
+
 	private StreamedContent file;
 	private Usuario usuario;
-	
+
 	public FacMantenimentoBean() {
 		seleccion = new Factura();
 		daoFac = new FacturaDAO();
+		medioPagoDAO = new MedioPagoDAO();
+		metodoPagoDAO = new MetodoPagoDAO();
 		cancelaDAO = new CancelaFacturaDAO();
+		factMedioPagoDAO = new FacturaMedioPagoDAO();
 		listFac = new ArrayList<Factura>();
+		listClientes = new ArrayList<>();
+		listaMedioPago = new ArrayList<MedioPago>();
+		listaMetodoPago = new ArrayList<MetodoPago>();
 		de = new Date();
+		fechaModificada = new Date();
 		hasta = new Date();
 	};
-	
+
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
@@ -91,62 +115,108 @@ public class FacMantenimentoBean implements Serializable {
 		session = request.getSession(false);
 		listClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		this.usuario = (Usuario) session.getAttribute("usuario");
-		
 		byte bytes[] = {};
-		this.file = DefaultStreamedContent.builder()
-				.contentType("application/pdf")
-				.contentLength(bytes.length)
-				.name("factura.pdf")
-				.stream(() -> new ByteArrayInputStream(bytes) )
-				.build();
+		this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
+				.name("factura.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
 		
 	}
 
+	public void consultarPagos() {
+		this.listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
+		this.listaMetodoPago = metodoPagoDAO.buscarVigentes(new Date());
+	}
+
 	public void findFacture() {
-		
-		if(clienteSelect == null) {
+
+		if (clienteSelect == null) {
 			listFac = daoFac.buscaFacturas(de, actual, true);
 		} else {
 			listFac = daoFac.buscaFacturas(clienteSelect, de, actual, true);
 		}
 	};
-	
+
 	public void preparaCancelacion() {
 		this.cancelaFactura = new CancelaFactura();
 		this.cancelaFactura.setFactura(seleccion);
 	}
 
+	public void updateFactura() {
+		
+		FacesMessage message = null;
+		String mensaje = null;
+		Severity severity = null;
+		
+		MedioPago mp = medioPagoDAO.buscarPorId(idMedioPagoSelected);			
+		
+		FacturaMedioPago factMedioPago;
+		try {
+			factMedioPago = factMedioPagoDAO.buscarPorFactura(seleccion.getId());
+			factMedioPago.setMpDescripcion(mp.getMpDescripcion());
+			factMedioPago.setMpId(mp);
+			seleccion.setFecha(fechaModificada);
+			seleccion.setMetodoPago(cdMetodoPagoSelected);
+			if(factMedioPagoDAO.actualizar(factMedioPago ) == null && daoFac.actualizarFechaFactura(seleccion) == null) {
+				
+				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " actualizada";
+				severity = FacesMessage.SEVERITY_INFO;			
+			}else {
+				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " no actualizada";
+				severity = FacesMessage.SEVERITY_ERROR;
+			}
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		
+		
+		message = new FacesMessage(severity, "Actualizacion", mensaje );
+		FacesContext.getCurrentInstance().addMessage(null, message);
+		PrimeFaces.current().ajax().update("form:messages");
+		
+	}
+	
+	public void datosCliente() {
+		
+		consultarPagos();
+		
+		Factura fact = daoFac.buscarPorId(seleccion.getId(), true);		
+		idMedioPagoSelected = fact.getFacturaMedioPagoList().get(0).getMpId().getMpId();
+		
+		cdMetodoPagoSelected = seleccion.getMetodoPago();
+		
+	}
+
 	public void cancelaFactura() {
 		String message = null;
 		Severity severity = null;
-		
+
 		String respuesta = null;
-		
+
 		try {
 			StatusFacturaDAO statusDAO = new StatusFacturaDAO();
 			StatusFactura statusCancelada = statusDAO.buscarPorId(StatusFactura.STATUS_CANCELADA);
 			this.seleccion.setStatus(statusCancelada);
 			this.cancelaFactura.setFactura(seleccion);
-			
+
 			respuesta = daoFac.actualizaStatus(seleccion);
-			if(respuesta != null)
+			if (respuesta != null)
 				throw new InventarioException("Error al cancelar la factura.");
-			
+
 			respuesta = cancelaDAO.guardar(cancelaFactura);
-			if(respuesta != null)
+			if (respuesta != null)
 				throw new InventarioException("Error al cancelar la factura.");
-			
-			if(clienteSelect == null)
+
+			if (clienteSelect == null)
 				listFac = daoFac.buscaFacturas(de, actual, true);
 			else
 				listFac = daoFac.buscaFacturas(clienteSelect, de, actual, true);
-			
+
 			seleccion = new Factura();
 			cancelaFactura = null;
-			
+
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "La factura se canceló correctamente.";
-			
+
 			PrimeFaces.current().executeScript("PF('dg-delete').hide()");
 		} catch (InventarioException e) {
 			message = e.getMessage();
@@ -156,18 +226,17 @@ public class FacMantenimentoBean implements Serializable {
 			message = "Problema al cancelar la factura.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			
-			if(severity == null)
+
+			if (severity == null)
 				severity = FacesMessage.SEVERITY_FATAL;
-			if(message == null)
+			if (message == null)
 				message = "Ocurrió un error con la actualización de la factura.";
-			
+
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Timbrado CFDI", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
 		}
 	}
-	
-	
+
 	public void jasper() throws JRException, IOException, SQLException {
 		Factura factura = null;
 		String jasperPath = null;
@@ -181,10 +250,10 @@ public class FacMantenimentoBean implements Serializable {
 		Map<String, Object> parameters = null;
 		Connection conn = null;
 		Integer idFactura = null;
-		
+
 		try {
 			factura = this.seleccion;
-			
+
 			jasperPath = "/jasper/Factura.jrxml";
 			filename = String.format("Factura-Folio_%s-%s.pdf", factura.getNomSerie(), factura.getNumero());
 			images = "/images/logo.jpeg";
@@ -196,8 +265,7 @@ public class FacMantenimentoBean implements Serializable {
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.debug("Ruta del reporte: {}", reportFile.getPath());
-			
-			
+
 			idFactura = factura.getId();
 			conn = EntityManagerUtil.getConnection();
 			parameters = new HashMap<String, Object>();
@@ -206,22 +274,21 @@ public class FacMantenimentoBean implements Serializable {
 			parameters.put("dsIdFactura", idFactura);
 			parameters.put("imagen", imgfile.getPath());
 			log.debug("Parametros: {}", parameters.toString());
-			
+
 			jasperReportUtil = new JasperReportUtil();
-			//jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			// jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
 			InputStream input = new ByteArrayInputStream(bytes);
-			this.file = DefaultStreamedContent.builder()
-					.contentType("application/pdf")
-					.name(filename)
-					.stream(() -> input )
-					.build();
+			this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename)
+					.stream(() -> input).build();
 			log.info("Factura generada {}...", filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
-			message = String.format("No se pudo imprimir el folio %s-%s", this.seleccion.getNomSerie(), factura.getNumero());
+			message = String.format("No se pudo imprimir el folio %s-%s", this.seleccion.getNomSerie(),
+					factura.getNumero());
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
 		} finally {
 			conexion.close((Connection) conn);
@@ -229,18 +296,18 @@ public class FacMantenimentoBean implements Serializable {
 		}
 
 	}
-	
+
 	public void timbrar(Factura factura) {
 		String message = null;
 		Severity severity = null;
-		
+
 		FacturamaBL facturamaBO = new FacturamaBL(factura.getId(), this.usuario);
 		try {
 			log.info("Timbrando factura: {}...", factura);
 			facturamaBO.timbrar();
 			facturamaBO.sendMail();
 			log.info("Timbrado completado correctamente.");
-			
+
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se generó correctamente";
 		} catch (FacturamaException e) {
@@ -249,7 +316,7 @@ public class FacMantenimentoBean implements Serializable {
 		} catch (InventarioException e) {
 			message = e.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener los servicios del cliente.", ex);
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
@@ -258,7 +325,7 @@ public class FacMantenimentoBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
-	
+
 	public void exportar() throws JRException, IOException, SQLException {
 		String jasperPath = null;
 		String filename = null;
@@ -270,16 +337,16 @@ public class FacMantenimentoBean implements Serializable {
 		JasperReportUtil jasperReportUtil = null;
 		Map<String, Object> parameters = null;
 		Connection conn = null;
-		
+
 		Integer idCliente = null;
 		Date fechaInicio = null;
 		Date fechaFin = null;
-		
+
 		try {
 			idCliente = this.clienteSelect == null ? null : this.clienteSelect.getCteCve();
 			fechaInicio = this.de;
 			fechaFin = this.hasta;
-			
+
 			jasperPath = "/jasper/consulta_facturacion.jrxml";
 			filename = String.format("consulta_facturacion.xls");
 			images = "/images/logo.jpeg";
@@ -291,8 +358,7 @@ public class FacMantenimentoBean implements Serializable {
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.debug("Ruta del reporte: {}", reportFile.getPath());
-			
-			
+
 			conn = EntityManagerUtil.getConnection();
 			parameters = new HashMap<String, Object>();
 			parameters.put("REPORT_CONNECTION", conn);
@@ -300,11 +366,11 @@ public class FacMantenimentoBean implements Serializable {
 			parameters.put("fechaIni", fechaInicio);
 			parameters.put("fechaFin", fechaFin);
 			log.debug("Parametros: {}", parameters.toString());
-			
+
 			jasperReportUtil = new JasperReportUtil();
-			//jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			// jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 			this.file = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
-			//InputStream input = new ByteArrayInputStream(bytes);
+			// InputStream input = new ByteArrayInputStream(bytes);
 //			this.file = DefaultStreamedContent.builder()
 //					.contentType("application/vnd.ms-excel")
 //					.name(filename)
@@ -315,7 +381,8 @@ public class FacMantenimentoBean implements Serializable {
 			log.error("Problema general...", ex);
 			message = String.format("No se puede realizar la exportación de la consulta.");
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
 		} finally {
 			conexion.close((Connection) conn);
@@ -323,12 +390,12 @@ public class FacMantenimentoBean implements Serializable {
 		}
 
 	}
-	
+
 	public void setFolioFactura(Factura factura) {
 		this.folio = String.format("%s-%s", factura.getNomSerie(), factura.getNumero());
 		log.info("Preparando vista previa de la factura (Folio: {})", this.folio);
 	}
-	
+
 	public List<Cliente> getListClientes() {
 		return listClientes;
 	}
@@ -409,5 +476,52 @@ public class FacMantenimentoBean implements Serializable {
 		this.cancelaFactura = cancelaFactura;
 	}
 
-	
+	public String getCdMetodoPagoSelected() {
+		return cdMetodoPagoSelected;
+	}
+
+	public void setCdMetodoPagoSelected(String cdMetodoPagoSelected) {
+		this.cdMetodoPagoSelected = cdMetodoPagoSelected;
+	}
+
+	public Integer getIdMedioPagoSelected() {
+		return idMedioPagoSelected;
+	}
+
+	public void setIdMedioPagoSelected(Integer idMedioPagoSelected) {
+		this.idMedioPagoSelected = idMedioPagoSelected;
+	}
+
+	public List<MetodoPago> getLstMetodoPago() {
+		return listaMetodoPago;
+	}
+
+	public void setLstMetodoPago(List<MetodoPago> lstMetodoPago) {
+		this.listaMetodoPago = lstMetodoPago;
+	}
+
+	public List<MetodoPago> getListaMetodoPago() {
+		return listaMetodoPago;
+	}
+
+	public void setListaMetodoPago(List<MetodoPago> listaMetodoPago) {
+		this.listaMetodoPago = listaMetodoPago;
+	}
+
+	public List<MedioPago> getListaMedioPago() {
+		return listaMedioPago;
+	}
+
+	public void setListaMedioPago(List<MedioPago> listaMedioPago) {
+		this.listaMedioPago = listaMedioPago;
+	}
+
+	public Date getFechaModificada() {
+		return fechaModificada;
+	}
+
+	public void setFechaModificada(Date fechaModificada) {
+		this.fechaModificada = fechaModificada;
+	}
+
 }
