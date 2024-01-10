@@ -73,7 +73,7 @@ public class ClientesBean implements Serializable {
 	private String cdUsoCfdiSelected;
 	private String cdMetodoPagoSelected;
 	private Integer idMedioPagoSelected;
-	
+		
 
 	private ClienteDAO clienteDAO;
 	private TipoMailDAO tipoMailDAO;
