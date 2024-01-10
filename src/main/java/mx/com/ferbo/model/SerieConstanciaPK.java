@@ -63,14 +63,9 @@ public class SerieConstanciaPK implements Serializable {
         this.tpSerie = tpSerie;
     }
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.SerieConstanciaPK[ idCliente=" + cliente + ", tpSerie=" + tpSerie + " ]";
-    }
-
 	@Override
 	public int hashCode() {
-		return Objects.hash(cliente, tpSerie);
+		return Objects.hash(cliente, planta, tpSerie);
 	}
 
 	@Override
@@ -82,9 +77,12 @@ public class SerieConstanciaPK implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		SerieConstanciaPK other = (SerieConstanciaPK) obj;
-		return Objects.equals(cliente, other.cliente) && Objects.equals(tpSerie, other.tpSerie);
+		return Objects.equals(cliente, other.cliente) && Objects.equals(planta, other.planta)
+				&& Objects.equals(tpSerie, other.tpSerie);
 	}
 
-	
-    
+	@Override
+	public String toString() {
+		return "SerieConstanciaPK [cliente=" + cliente + ", tpSerie=" + tpSerie + ", planta=" + planta + "]";
+	}
 }
