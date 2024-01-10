@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+<ui:define name="title">Fix Serie-Constancia</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" />
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+		    <p:toolbar>
+		    	<p:toolbarGroup>
+		    		<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{fixSerieConstanciaBean.clienteSelect}" onchange="PF('statusDialog').show();" filter="true" filterMatchMode="contains">
+				    	<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
+				    	<f:selectItems value="#{fixSerieConstanciaBean.clienteList}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+				    	<p:ajax listener="#{fixSerieConstanciaBean.cargaInfo()}" update="dt-serie-constancia cmd-crear-series cmd-clonar-todo" oncomplete="PF('statusDialog').hide();"/>
+				    </p:selectOneMenu>
+				    <p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{fixSerieConstanciaBean.plantaSelect}" onchange="PF('statusDialog').show();" filter="true" filterMatchMode="contains">
+				    	<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true" />
+				    	<f:selectItems value="#{fixSerieConstanciaBean.plantaList}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+				    	<p:ajax listener="#{fixSerieConstanciaBean.cargaInfo()}" update="dt-serie-constancia cmd-crear-series cmd-clonar-todo" oncomplete="PF('statusDialog').hide();" />
+				    </p:selectOneMenu>
+		    	</p:toolbarGroup>
+		    	<p:toolbarGroup align="left">
+		    		<div style="padding-left: 1rem; padding-right: 1rem;">
+		    			<p:commandButton id="cmd-clonar-todo" value="Clonar todos los clientes"  onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" actionListener="#{fixSerieConstanciaBean.cloneAll()}" update="dgserie" rendered="#{fixSerieConstanciaBean.clienteSelect == null and fixSerieConstanciaBean.plantaSelect == null}" />
+		    		</div>
+		    		<div style="padding-left: 1rem; padding-right: 1rem;">
+		    			<p:commandButton id="cmd-clonar-series" value="Clonar series" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" actionListener="#{fixSerieConstanciaBean.fix}" update="dgserie" />
+		    		</div>
+		    		<div style="padding-left: 1rem; padding-right: 1rem;">
+			    		<p:commandButton id="cmd-crear-series" value="Crear series..." onclick="PF('dg-serie').show();" actionListener="#{fixSerieConstanciaBean.resetNumeros}" update="pnl-serie" disabled="#{fixSerieConstanciaBean.clienteSelect == null and fixSerieConstanciaBean.plantaList == null}"/>
+		    		</div>
+		    	</p:toolbarGroup>
+		    </p:toolbar>
+		    <p:dialog id="dgserie" widgetVar="dg-serie" header="Serie" showEffect="hide" modal="true">
+		    	<p:outputPanel id="pnl-serie" class="ui-fluid">
+		    		<div class="p-field">
+				    	<p:outputLabel value="#{fixSerieConstanciaBean.clienteSelect.cteNombre}" />
+		    		</div>
+		    		<div class="p-field">
+			    		<p:outputLabel value="#{fixSerieConstanciaBean.plantaSelect.plantaDs}" />
+		    		</div>
+		    		<div class="p-field">
+			    		<p:inputNumber value="#{fixSerieConstanciaBean.numeroEntrada}" placeholder="Número serie entrada" minValue="1" decimalPlaces="0"/>
+		    		</div>
+		    		<div class="p-field">
+			    		<p:inputNumber value="#{fixSerieConstanciaBean.numeroSalida}" placeholder="Número serie salida" minValue="1" decimalPlaces="0"/>
+		    		</div>
+		    		<div class="p-field">
+			    		<p:inputNumber value="#{fixSerieConstanciaBean.numeroTraspaso}" placeholder="Número serie traspaso" minValue="1" decimalPlaces="0"/>
+		    		</div>
+		    		<div class="p-field">
+			    		<p:inputNumber value="#{fixSerieConstanciaBean.numeroServicio}" placeholder="Número serie servicio" minValue="1" decimalPlaces="0"/>
+		    		</div>
+		    	</p:outputPanel>
+		    	<f:facet name="footer">
+			    	<p:commandButton value="Agregar" actionListener="#{fixSerieConstanciaBean.crearSeries()}" update="dt-serie-constancia" />
+		    	</f:facet>
+		    </p:dialog>
+			<p:dataTable id="dt-serie-constancia" widgetVar="dtSerieConstancia" var="serie" value="#{fixSerieConstanciaBean.serieConstanciaList}">
+				<p:column headerText="Cliente">
+					<h:outputText value="#{serie.serieConstanciaPK.cliente.cteNombre}" />
+				</p:column>
+				<p:column headerText="Planta">
+					<h:outputText value="#{serie.serieConstanciaPK.planta.plantaDs}" />
+				</p:column>
+				<p:column headerText="Serie" width="3rem">
+					<h:outputText value="#{serie.serieConstanciaPK.tpSerie}" />
+				</p:column>
+				<p:column headerText="Folio" width="3rem">
+					<h:outputText value="#{serie.nuSerie}" />
+				</p:column>
+				<p:column width="2rem">
+					<p:commandButton icon="pi pi-pencil" styleClass="edit-button ui-button-primary" process="@this" update=":form:pnl-edit-serie" onclick="PF('statusDialog').show();PF('dgEditSerie').show();" oncomplete="PF('statusDialog').hide();">
+						<f:setPropertyActionListener value="#{serie}" target="#{fixSerieConstanciaBean.serieConstanciaSelected}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			<p:dialog widgetVar="dgEditSerie" header="Serie" showEffect="hide" modal="true">
+		    	<p:outputPanel id="pnl-edit-serie" class="ui-fluid">
+		    		<div class="p-field">
+				    	<p:outputLabel value="#{fixSerieConstanciaBean.clienteSelect.cteNombre}" />
+		    		</div>
+		    		<div class="p-field">
+			    		<p:outputLabel value="#{fixSerieConstanciaBean.plantaSelect.plantaDs}" />
+		    		</div>
+		    		<div class="p-field">
+			    		<p:outputLabel value="Tipo de serie: #{fixSerieConstanciaBean.serieConstanciaSelected.serieConstanciaPK.tpSerie}" />
+		    		</div>
+		    		<div class="p-field">
+			    		<p:inputNumber value="#{fixSerieConstanciaBean.serieConstanciaSelected.nuSerie}" placeholder="Número serie" minValue="0" decimalPlaces="0" emptyValue="zero"/>
+		    		</div>
+		    	</p:outputPanel>
+		    	<f:facet name="footer">
+			    	<p:commandButton value="Actualizar" actionListener="#{fixSerieConstanciaBean.actualizarSerie()}" update="dt-serie-constancia" />
+		    	</f:facet>
+		    </p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

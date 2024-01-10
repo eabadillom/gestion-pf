@@ -40,7 +40,26 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public List<SerieConstancia> buscarPorClienteAndPlanta(Integer idCliente, Integer idPlanta) {
+		EntityManager em = null;
+		Query sql = null;
+		List<SerieConstancia> sc = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			sql = em.createNamedQuery("SerieConstancia.findByClienteAndPlanta", SerieConstancia.class)
+					.setParameter("idCliente", idCliente)
+					.setParameter("idPlanta", idPlanta)
+					;
+			sc = sql.getResultList();
+		} catch (Exception e) {
+			log.error("Error al buscar serie...", e);
+		}finally{
+			EntityManagerUtil.close(em);
+		}
+		return sc;
+	}
 	
 	public SerieConstancia buscarPorClienteAndPlanta(SerieConstancia serieConstancia) {
 		EntityManager em = null;
@@ -62,6 +81,30 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 		}
 		return sc;
 	}
+	
+public List<SerieConstancia> buscarPorIdCliente(Integer idCliente) {
+		
+		EntityManager em = null;
+		List<SerieConstancia> lista = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("SerieConstancia.findByIdCliente",SerieConstancia.class)
+					.setParameter("idCliente", idCliente)
+					.getResultList();
+			
+		} catch (Exception e2) {
+			log.error("Problema no encuentra registros por criterios",e2);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		return lista;
+	}
+	
+	
 	public List<SerieConstancia> buscarPorIdCliente(SerieConstanciaPK serie) {
 		
 		EntityManager em = null;
@@ -105,16 +148,15 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 
 	@Override
 	public String guardar(SerieConstancia serieConstancia) {
-		
 		EntityManager em = null;
 		
 		try {
-			
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(serieConstancia);
 			em.getTransaction().commit();
 		} catch (Exception e2) {
+			EntityManagerUtil.rollback(em);
 			log.error("Problema al guardar serie constancia", e2);
 		}finally {
 			EntityManagerUtil.close(em);
