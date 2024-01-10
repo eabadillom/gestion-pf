@@ -12,6 +12,7 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,8 +23,8 @@ import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.MedioCntDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
+import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.RegimenFiscalDAO;
-import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.TipoMailDAO;
 import mx.com.ferbo.dao.TipoTelefonoDAO;
 import mx.com.ferbo.dao.UsoCfdiDAO;
@@ -35,6 +36,7 @@ import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.SerieConstanciaPK;
@@ -42,6 +44,7 @@ import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.model.TipoTelefono;
 import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.ClienteUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.SecurityUtil;
@@ -70,21 +73,23 @@ public class ClientesBean implements Serializable {
 	private String cdUsoCfdiSelected;
 	private String cdMetodoPagoSelected;
 	private Integer idMedioPagoSelected;
-	
+		
 
 	private ClienteDAO clienteDAO;
 	private TipoMailDAO tipoMailDAO;
 	private TipoTelefonoDAO tipoTelefonoDAO;
-//	private MailDAO mailDAO;
 	private RegimenFiscalDAO regimenFiscalDAO;
 	private UsoCfdiDAO usoCfdiDAO;
 	private MetodoPagoDAO metodoPagoDAO;
 	private MedioPagoDAO medioPagoDAO;
 	private ClienteContactoDAO clienteContactoDAO;
 	private MedioCntDAO medioCntDAO;
-	private SerieConstanciaDAO serieDAO;
 	private String newPassword;
 	private String confirmPassword;
+	private PlantaDAO plantaDAO;
+	private Usuario usuario;
+	private FacesContext faceContext;
+    private HttpServletRequest httpServletRequest;
 	
 	
 	SecurityUtil util;
@@ -107,13 +112,20 @@ public class ClientesBean implements Serializable {
 		medioPagoDAO = new MedioPagoDAO();
 		clienteContactoDAO = new ClienteContactoDAO();
 		medioCntDAO = new MedioCntDAO();
-		serieDAO = new SerieConstanciaDAO();
+		plantaDAO = new PlantaDAO();
 	}
 
 	@PostConstruct
 	public void init() {
+		faceContext = FacesContext.getCurrentInstance();
+        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
+		
+        log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
+        
 		consultaClientes();
 		consultaCatalogos();
+		log.info("");
 	}
 
 	private void consultaClientes() {
@@ -184,6 +196,10 @@ public class ClientesBean implements Serializable {
 		clienteSelected = new Cliente();
 		clienteSelected.setHabilitado(true);
 		clienteSelected.setClienteContactoList(new ArrayList<>());
+		this.cdRegimenFiscalSelected = null;
+		this.cdUsoCfdiSelected = null;
+		this.cdMetodoPagoSelected = null;
+		this.idMedioPagoSelected = null;
 	}
 
 	/**
@@ -211,6 +227,8 @@ public class ClientesBean implements Serializable {
 	}
 
 	public void guardarCliente() {
+		List<Planta> plantaList = null;
+		
 		final String rf = this.cdRegimenFiscalSelected;
 		List<RegimenFiscal> lstRF = lstRegimenFiscal.stream().filter(r -> r.getCd_regimen().equals(rf))
 			.collect(Collectors.toList());
@@ -244,6 +262,7 @@ public class ClientesBean implements Serializable {
 		if (clienteSelected.getCteCve() == null) {
 			
 			//CANDADO SALIDA
+			plantaList = plantaDAO.findall(true);
 			
 			CandadoSalida candadoSalida = new CandadoSalida();
 			candadoSalida.setHabilitado(true);
@@ -252,44 +271,56 @@ public class ClientesBean implements Serializable {
 			
 			clienteSelected.setCandadoSalida(candadoSalida);
 			
-			
-			SerieConstanciaPK serieConstanciaPK_I = new SerieConstanciaPK();
-			serieConstanciaPK_I.setCliente(clienteSelected);
-			serieConstanciaPK_I.setTpSerie("I");
-			SerieConstancia serieConstanciaI = new SerieConstancia();
-			serieConstanciaI.setSerieConstanciaPK(serieConstanciaPK_I);
-			serieConstanciaI.setNuSerie(1);
-			clienteSelected.addSerieConstancia(serieConstanciaI);
-			
-			SerieConstanciaPK serieConstanciaPK_O = new SerieConstanciaPK();
-			serieConstanciaPK_O.setCliente(clienteSelected);
-			serieConstanciaPK_O.setTpSerie("O");
-			SerieConstancia serieConstanciaO = new SerieConstancia();
-			serieConstanciaO.setSerieConstanciaPK(serieConstanciaPK_O);
-			serieConstanciaO.setNuSerie(1);
-			clienteSelected.addSerieConstancia(serieConstanciaO);
-			
-			SerieConstanciaPK serieConstanciaPK_T = new SerieConstanciaPK();
-			serieConstanciaPK_T.setCliente(clienteSelected);
-			serieConstanciaPK_T.setTpSerie("T");
-			SerieConstancia serieConstanciaT = new SerieConstancia();
-			serieConstanciaT.setSerieConstanciaPK(serieConstanciaPK_T);
-			serieConstanciaT.setNuSerie(1);
-			clienteSelected.addSerieConstancia(serieConstanciaT);
-			
-			SerieConstanciaPK serieConstanciaPK_S = new SerieConstanciaPK();
-			serieConstanciaPK_S.setCliente(clienteSelected);
-			serieConstanciaPK_S.setTpSerie("S");
-			SerieConstancia serieConstanciaS = new SerieConstancia();
-			serieConstanciaS.setSerieConstanciaPK(serieConstanciaPK_S);
-			serieConstanciaS.setNuSerie(1);
-			clienteSelected.addSerieConstancia(serieConstanciaS);
+			for(Planta planta : plantaList) {
+				
+				SerieConstanciaPK serieConstanciaPK_I = new SerieConstanciaPK();
+				serieConstanciaPK_I.setCliente(clienteSelected);
+				serieConstanciaPK_I.setPlanta(planta);
+				serieConstanciaPK_I.setTpSerie("I");
+				SerieConstancia serieConstanciaI = new SerieConstancia();
+				serieConstanciaI.setSerieConstanciaPK(serieConstanciaPK_I);
+				serieConstanciaI.setNuSerie(1);
+				clienteSelected.addSerieConstancia(serieConstanciaI);
+				planta.add(serieConstanciaI);
+				
+				SerieConstanciaPK serieConstanciaPK_O = new SerieConstanciaPK();
+				serieConstanciaPK_O.setCliente(clienteSelected);
+				serieConstanciaPK_O.setPlanta(planta);
+				serieConstanciaPK_O.setTpSerie("O");
+				SerieConstancia serieConstanciaO = new SerieConstancia();
+				serieConstanciaO.setSerieConstanciaPK(serieConstanciaPK_O);
+				serieConstanciaO.setNuSerie(1);
+				clienteSelected.addSerieConstancia(serieConstanciaO);
+				planta.add(serieConstanciaO);
+				
+				SerieConstanciaPK serieConstanciaPK_T = new SerieConstanciaPK();
+				serieConstanciaPK_T.setCliente(clienteSelected);
+				serieConstanciaPK_T.setPlanta(planta);
+				serieConstanciaPK_T.setTpSerie("T");
+				SerieConstancia serieConstanciaT = new SerieConstancia();
+				serieConstanciaT.setSerieConstanciaPK(serieConstanciaPK_T);
+				serieConstanciaT.setNuSerie(1);
+				clienteSelected.addSerieConstancia(serieConstanciaT);
+				planta.add(serieConstanciaT);
+				
+				SerieConstanciaPK serieConstanciaPK_S = new SerieConstanciaPK();
+				serieConstanciaPK_S.setCliente(clienteSelected);
+				serieConstanciaPK_S.setPlanta(planta);
+				serieConstanciaPK_S.setTpSerie("S");
+				SerieConstancia serieConstanciaS = new SerieConstancia();
+				serieConstanciaS.setSerieConstanciaPK(serieConstanciaPK_S);
+				serieConstanciaS.setNuSerie(1);
+				clienteSelected.addSerieConstancia(serieConstanciaS);
+				planta.add(serieConstanciaS);
+			}
 			
 			if (clienteDAO.guardar(clienteSelected) == null) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Agregado"));
+				log.info("El usuario {} ha registrado el cliente {}.", this.usuario.getUsuario(), this.clienteSelected);
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", "Ocurrió un error al intentar guardar el Cliente"));
+				log.info("El usuario {} ha actualizado el cliente {}.", this.usuario.getUsuario(), this.clienteSelected);
 			}
 		} else {
 			if (clienteDAO.actualizar(clienteSelected) == null) {
@@ -301,6 +332,10 @@ public class ClientesBean implements Serializable {
 		}
 		
 		consultaClientes();
+		this.cdRegimenFiscalSelected = null;
+		this.cdUsoCfdiSelected = null;
+		this.cdMetodoPagoSelected = null;
+		this.idMedioPagoSelected = null;
 		PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-clientes");
 	}

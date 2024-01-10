@@ -284,6 +284,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	public void generaFolioSalida() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
+		SerieConstancia serieTemp = null;
 
 		FacesMessage message = null;
 		Severity severity = null;
@@ -296,19 +297,28 @@ public class AltaConstanciaSalidaBean implements Serializable{
 
 			if (this.plantaSelect == null)
 				throw new InventarioException("Debe seleccionar una planta");
-			
+						
 			seriePK = new SerieConstanciaPK();
+			serieTemp = new SerieConstancia();
+			
 			seriePK.setCliente(this.clienteSelect);
+			seriePK.setPlanta(plantaSelect);
 			seriePK.setTpSerie("O");
-			serie = serieConstanciaDAO.buscarPorId(seriePK);
+			
+			serieTemp.setSerieConstanciaPK(seriePK);
+			
+			
+			serie = serieConstanciaDAO.buscarPorClienteAndPlanta(serieTemp);
 
+			
+			
 			if (serie == null) {
 				this.numFolio = "";
 				throw new InventarioException(
 						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
 			}
 
-			this.numFolio = String.format("%s%s%s%d", seriePK.getTpSerie(), plantaSelect.getPlantaSufijo(),
+			this.numFolio = String.format("%s%s%s%d", serie.getSerieConstanciaPK().getTpSerie(), plantaSelect.getPlantaSufijo(),
 					clienteSelect.getCodUnico(), serie.getNuSerie());
 			
 			String folio = constanciaSalidaDAO.buscarPorNumero(numFolio);

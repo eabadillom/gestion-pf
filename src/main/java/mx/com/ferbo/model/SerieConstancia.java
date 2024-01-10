@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -15,17 +16,16 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "serie_constancia")
 @NamedQueries({
-    @NamedQuery(name = "SerieConstancia.findAll", query = "SELECT s FROM SerieConstancia s"),
-    @NamedQuery(name = "SerieConstancia.findByIdCliente", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.cliente.cteCve = :idCliente"),
-    @NamedQuery(name = "SerieConstancia.findByTpSerie", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.tpSerie = :tpSerie"),
-    @NamedQuery(name = "SerieConstancia.findByNuSerie", query = "SELECT s FROM SerieConstancia s WHERE s.nuSerie = :nuSerie")})
+    @NamedQuery(name = "SerieConstancia.findAll", query = "SELECT s FROM SerieConstancia s ORDER BY s.serieConstanciaPK.cliente, s.serieConstanciaPK.planta, s.serieConstanciaPK.tpSerie"),
+    @NamedQuery(name = "SerieConstancia.findByClienteTpSeriePlanta", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.cliente.cteCve = :idCliente AND s.serieConstanciaPK.tpSerie = :tpSerie AND s.serieConstanciaPK.planta.plantaCve = :idPlanta ORDER BY s.serieConstanciaPK.cliente, s.serieConstanciaPK.planta, s.serieConstanciaPK.tpSerie"),
+    @NamedQuery(name = "SerieConstancia.findByClienteAndPlanta", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.cliente.cteCve = :idCliente AND s.serieConstanciaPK.planta.plantaCve = :idPlanta ORDER BY s.serieConstanciaPK.cliente, s.serieConstanciaPK.planta, s.serieConstanciaPK.tpSerie"),
+    @NamedQuery(name = "SerieConstancia.findByClientePlanta", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.cliente.cteCve = :idCliente AND s.serieConstanciaPK.tpSerie = :tpSerie AND s.serieConstanciaPK.planta.plantaCve = :idPlanta ORDER BY s.serieConstanciaPK.cliente, s.serieConstanciaPK.planta, s.serieConstanciaPK.tpSerie"),
+    @NamedQuery(name = "SerieConstancia.findByIdCliente", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.cliente.cteCve = :idCliente ORDER BY s.serieConstanciaPK.cliente, s.serieConstanciaPK.planta, s.serieConstanciaPK.tpSerie"),
+    @NamedQuery(name = "SerieConstancia.findByTpSerie", query = "SELECT s FROM SerieConstancia s WHERE s.serieConstanciaPK.tpSerie = :tpSerie ORDER BY s.serieConstanciaPK.cliente, s.serieConstanciaPK.planta, s.serieConstanciaPK.tpSerie"),
+    @NamedQuery(name = "SerieConstancia.findByNuSerie", query = "SELECT s FROM SerieConstancia s WHERE s.nuSerie = :nuSerie ORDER BY s.serieConstanciaPK.cliente, s.serieConstanciaPK.planta, s.serieConstanciaPK.tpSerie")})
 public class SerieConstancia implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -37,7 +37,7 @@ public class SerieConstancia implements Serializable {
     @NotNull
     @Column(name = "nu_serie")
     private int nuSerie;
-
+    
     public SerieConstancia() {
     }
 
@@ -50,8 +50,8 @@ public class SerieConstancia implements Serializable {
         this.nuSerie = nuSerie;
     }
 
-    public SerieConstancia(Cliente cliente, String tpSerie) {
-        this.serieConstanciaPK = new SerieConstanciaPK(cliente, tpSerie);
+    public SerieConstancia(Cliente cliente, String tpSerie, Planta planta) {
+        this.serieConstanciaPK = new SerieConstanciaPK(cliente, tpSerie, planta);
     }
 
     public SerieConstanciaPK getSerieConstanciaPK() {
@@ -69,8 +69,9 @@ public class SerieConstancia implements Serializable {
     public void setNuSerie(int nuSerie) {
         this.nuSerie = nuSerie;
     }
+    
 
-    @Override
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (serieConstanciaPK != null ? serieConstanciaPK.hashCode() : 0);
@@ -79,7 +80,6 @@ public class SerieConstancia implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof SerieConstancia)) {
             return false;
         }

@@ -347,10 +347,11 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		}
 	}
 
+	
 	public void generaFolioEntrada() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
-
+		SerieConstancia sConstancia = null;
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
@@ -361,19 +362,21 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 			if (this.plantaSelect == null)
 				throw new InventarioException("Debe seleccionar una planta");
-			
+			sConstancia = new SerieConstancia();
 			seriePK = new SerieConstanciaPK();
 			seriePK.setCliente(this.clienteSelect);
+			seriePK.setPlanta(plantaSelect);
 			seriePK.setTpSerie("I");
-			serie = serieConstanciaDAO.buscarPorId(seriePK);
-
+			sConstancia.setSerieConstanciaPK(seriePK);
+			serie = serieConstanciaDAO.buscarPorClienteAndPlanta(sConstancia);
+			
 			if (serie == null) {
 				this.noConstanciaSelect = "";
 				throw new InventarioException(
 						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
 			}
 
-			this.noConstanciaSelect = String.format("%s%s%s%d", seriePK.getTpSerie(), plantaSelect.getPlantaSufijo(),
+			this.noConstanciaSelect = String.format("%s%s%s%d", serie.getSerieConstanciaPK().getTpSerie(), plantaSelect.getPlantaSufijo(),
 					clienteSelect.getCodUnico(), serie.getNuSerie());
 			
 			this.constanciaDeDeposito.setFolioCliente(this.noConstanciaSelect);
