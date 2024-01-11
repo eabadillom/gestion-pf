@@ -24,7 +24,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -44,8 +46,10 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 	boolean condensadoSelect;
 
 	private Cliente clienteSelect;
-
 	private List<Cliente> listaClientes;
+	private List<EmisoresCFDIS> emisorList;
+	private EmisoresCFDIS emisorSelect;
+	private EmisoresCFDISDAO emisoresDAO;
 
 	private FacesContext faceContext;
     private HttpServletRequest request;
@@ -53,16 +57,20 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 	public ReporteFacturacionAntiguedadSaldosBean() {
 		fecha = new Date();
 		listaClientes = new ArrayList<Cliente>();
+		emisoresDAO = new EmisoresCFDISDAO();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		faceContext = FacesContext.getCurrentInstance();
-        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		this.faceContext = FacesContext.getCurrentInstance();
+        this.request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		
-        listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
-		clienteSelect = new Cliente();
+        this.listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+		this.clienteSelect = new Cliente();
+		this.emisorList = emisoresDAO.buscarTodos();
+		this.emisorSelect = new EmisoresCFDIS();
+		
 		Date today = new Date();
 		maxDate = new Date(today.getTime() );
 		this.fecha_ini = new Date();
@@ -101,10 +109,17 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 				}else {
 					clienteCve = clienteSelect.getCteCve();
 				}
+				
+				String emisorRFC = null;
+				if(emisorSelect == null)
+					emisorRFC = null;
+				else
+					emisorRFC = emisorSelect.getNb_rfc();
 			
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
 				parameters.put("idCliente",clienteCve );
+				parameters.put("emisorRFC", emisorRFC);
 				parameters.put("fecha", fecha_ini);
 				parameters.put("imagen", imgfile.getPath());
 				log.info("Parametros: " + parameters.toString());
@@ -148,10 +163,17 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 					}else {
 						clienteCve = clienteSelect.getCteCve();
 					}
+					
+					String emisorRFC = null;
+					if(emisorSelect == null)
+						emisorRFC = null;
+					else
+						emisorRFC = emisorSelect.getNb_rfc();
 				
 					connection = EntityManagerUtil.getConnection();
 					parameters.put("REPORT_CONNECTION", connection);
 					parameters.put("idCliente",clienteCve );
+					parameters.put("emisorRFC", emisorRFC);
 					parameters.put("fecha", fecha_ini);
 					parameters.put("imagen", imgfile.getPath());
 					log.info("Parametros: " + parameters.toString());
@@ -201,9 +223,17 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 				}else {
 					clienteCve = clienteSelect.getCteCve();
 				}
+				
+				String emisorRFC = null;
+				if(emisorSelect == null)
+					emisorRFC = null;
+				else
+					emisorRFC = emisorSelect.getNb_rfc();
+				
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
 				parameters.put("idCliente",clienteCve);
+				parameters.put("emisorRFC", emisorRFC);
 				parameters.put("fecha", fecha_ini);
 				parameters.put("imagen", imgfile.getPath());
 				log.info("Parametros: " + parameters.toString());
@@ -247,9 +277,17 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 					}else {
 						clienteCve = clienteSelect.getCteCve();
 					}
+					
+					String emisorRFC = null;
+					if(emisorSelect == null)
+						emisorRFC = null;
+					else
+						emisorRFC = emisorSelect.getNb_rfc();
+					
 					connection = EntityManagerUtil.getConnection();
 					parameters.put("REPORT_CONNECTION", connection);
 					parameters.put("idCliente",clienteCve );
+					parameters.put("emisorRFC", emisorRFC);
 					parameters.put("fecha", fecha_ini);
 					parameters.put("imagen", imgfile.getPath());
 					log.info("Parametros: " + parameters.toString());
@@ -310,6 +348,22 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 	}
 	public void setCondensadoSelect(boolean condensadoSelect) {
 		this.condensadoSelect = condensadoSelect;
+	}
+
+	public List<EmisoresCFDIS> getEmisorList() {
+		return emisorList;
+	}
+
+	public void setEmisorList(List<EmisoresCFDIS> emisorList) {
+		this.emisorList = emisorList;
+	}
+
+	public EmisoresCFDIS getEmisorSelect() {
+		return emisorSelect;
+	}
+
+	public void setEmisorSelect(EmisoresCFDIS emisorSelect) {
+		this.emisorSelect = emisorSelect;
 	}
 
 

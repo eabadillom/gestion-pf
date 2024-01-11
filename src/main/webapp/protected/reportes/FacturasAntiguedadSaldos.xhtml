@@ -4,80 +4,70 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
-
     <ui:define name="title">Antiguedad de Saldo</ui:define>
-
     <ui:define name="content">
         <h:form id="form">
 			<p:growl id="messages" showDetail="true" />
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
                     <div class="card">
-						 <p:fieldset legend="Fecha de corte">
-			               <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" readonlyInput="true" showIcon="true">
+						<p:fieldset legend="Fecha de corte">
+			                <p:datePicker id="minmax1" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" readonlyInput="true" showIcon="true">
 			                	<p:ajax process="@this" />
 			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 			                </p:datePicker>
-			                <p:outputLabel for="minmax1" value="Al día"/>
-						</span>
-							</p:fieldset>
-            
-                        <p:fieldset legend="Selección de cliente">
-                       			 <span class="ui-float-label ui-input-icon-left">
-									<p:selectOneMenu id="Cliente" value="#{reporteFacturacionAntiguedadSaldosBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith">
-									<f:selectItem itemLabel="Todos los clientes"  itemValue=""  />
-									<f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
-									<p:ajax process ="@this" />
-									</p:selectOneMenu>
-								<p:outputLabel for="Cliente" value="Cliente" />
-							</span>
-								
-					</p:fieldset>
-					
-					<p:fieldset legend="Filtros de descarga" styleClass="p-mt-2">
-						 <p:toolbar>
-				<p:toolbarGroup>
-					   <div class="col-5 flex align-items-center justify-content-center">
-							<p:outputLabel for="@next">Desglosado</p:outputLabel>
-       							<p:selectBooleanCheckbox  value="#{reporteFacturacionAntiguedadSaldosBean.condensadoSelect}" />
-       						 </div>
-							         <div class="col-2">
-							            <p:divider layout="vertical">
-							            </p:divider>
-							        </div>
-										 <div class="col-5 flex align-items-center justify-content-center">
-										  <p:outputLabel for="@next">Concentrado</p:outputLabel>
-												<p:selectBooleanCheckbox  value="#{reporteFacturacionAntiguedadSaldosBean.concentradoSelect}" />
-							     </div>
-							        </p:toolbarGroup>
-							        </p:toolbar>
-
-        </p:fieldset>
-			
-					  <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
-					  <p:toolbar>
-				<p:toolbarGroup>
-					   <div class="col-5 flex align-items-center justify-content-center">
-						<p:commandButton value=".pdf" actionListener="#{reporteFacturacionAntiguedadSaldosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
-						 </div>
-							         <div class="col-2">
-							            <p:divider layout="vertical">
-							            </p:divider>
-							        </div>
-										 <div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".xlsx"  actionListener="#{reporteFacturacionAntiguedadSaldosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
-							     </div>
-							        </p:toolbarGroup>
-							        </p:toolbar>
 						</p:fieldset>
-						
-						
+                        <p:fieldset legend="Cliente">
+                        	<p:selectOneMenu id="Cliente" value="#{reporteFacturacionAntiguedadSaldosBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="Todos los clientes"  itemValue=""  />
+								<f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+								<p:ajax process ="@this" />
+							</p:selectOneMenu>
+						</p:fieldset>
+						<p:fieldset legend="Emisor">
+							<p:selectOneMenu id="Emisor" value="#{reporteFacturacionAntiguedadSaldosBean.emisorSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="Todos los emisores" itemValue="" />
+								<f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.emisorList}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"/>
+								<p:ajax process="@this" />
+							</p:selectOneMenu>
+						</p:fieldset>
+						<p:fieldset legend="Filtros de descarga" styleClass="p-mt-2">
+							<p:toolbar>
+								<p:toolbarGroup>
+									<div class="col-5 flex align-items-center justify-content-center">
+										<p:outputLabel for="@next">Desglosado</p:outputLabel>
+										<p:selectBooleanCheckbox  value="#{reporteFacturacionAntiguedadSaldosBean.condensadoSelect}" />
+									</div>
+									<div class="col-2">
+										<p:divider layout="vertical">
+										</p:divider>
+									</div>
+									<div class="col-5 flex align-items-center justify-content-center">
+										<p:outputLabel for="@next">Concentrado</p:outputLabel>
+										<p:selectBooleanCheckbox  value="#{reporteFacturacionAntiguedadSaldosBean.concentradoSelect}" />
+									</div>
+								</p:toolbarGroup>
+							</p:toolbar>
+						</p:fieldset>
+						<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+							<p:toolbar>
+								<p:toolbarGroup>
+									<div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value=".pdf" actionListener="#{reporteFacturacionAntiguedadSaldosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+									</div>
+									<div class="col-2">
+										<p:divider layout="vertical">
+										</p:divider>
+									</div>
+									<div class="col-5 flex align-items-center justify-content-center">
+										<p:commandButton value=".xlsx"  actionListener="#{reporteFacturacionAntiguedadSaldosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
+									</div>
+								</p:toolbarGroup>
+							</p:toolbar>
+						</p:fieldset>
                     </div>
                 </div>
             </div>
         </h:form>
-
     </ui:define>
-
 </ui:composition>

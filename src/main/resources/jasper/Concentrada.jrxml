@@ -4,7 +4,7 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="141"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="853"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionProduccionMySQL.jrdax"/>
 	<parameter name="fecha" class="java.util.Date">
 		<defaultValueExpression><![CDATA[$P{fecha}]]></defaultValueExpression>
 	</parameter>
@@ -12,15 +12,22 @@
 		<defaultValueExpression><![CDATA[$P{idCliente}]]></defaultValueExpression>
 	</parameter>
 	<parameter name="imagen" class="java.lang.String"/>
+	<parameter name="emisorRFC" class="java.lang.String">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
 	<queryString language="SQL">
 		<![CDATA[SELECT
+	emi_rfc,
+	emi_nombre,
 	numero_cliente,
 	nombre_cliente,
 	sum(aPagar) as aPagar,
 	sum(subtotal) as subtotal,
 	sum(iva) as iva
 FROM (
-	SELECT
+	select
+		f.emi_rfc,
+		f.emi_nombre,
 		f.numero_cliente,
 		f.nombre_cliente,
 		f.nom_serie,
@@ -35,10 +42,13 @@ FROM (
 	AND f.status NOT IN (0, 2)
 	AND f.fecha <= $P{fecha}
 	AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
+	and (f.emi_rfc = $P{emisorRFC} or $P{emisorRFC} is NULL)
 	
 	UNION ALL
 	
-	SELECT
+	select
+		factura.emi_rfc,
+		factura.emi_nombre,
 		factura.numero_cliente,
 		factura.nombre_cliente,
 		factura.nom_serie,
@@ -75,10 +85,19 @@ FROM (
 	WHERE (factura.total - ingreso.monto) > 0
 	AND ingreso.factura IN (SELECT f.id FROM factura f WHERE f.fecha <= $P{fecha} )
 	AND (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
+	and (factura.emi_rfc = $P{emisorRFC} or $P{emisorRFC} is NULL)
 ) t
-GROUP BY numero_cliente, nombre_cliente
-ORDER BY nombre_cliente, numero_cliente]]>
+GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
+ORDER BY emi_nombre, nombre_cliente, numero_cliente]]>
 	</queryString>
+	<field name="emi_rfc" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="emi_rfc"/>
+		<property name="com.jaspersoft.studio.field.label" value="emi_rfc"/>
+	</field>
+	<field name="emi_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="emi_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="emi_nombre"/>
+	</field>
 	<field name="numero_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cliente"/>
 		<property name="com.jaspersoft.studio.field.label" value="numero_cliente"/>
@@ -111,6 +130,74 @@ ORDER BY nombre_cliente, numero_cliente]]>
 	<variable name="sumaSaldo" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{aPagar}]]></variableExpression>
 	</variable>
+	<variable name="sumaEmiSubtotal" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{subtotal}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+	</variable>
+	<variable name="sumaEmiIVA" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{iva}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+	</variable>
+	<variable name="sumaEmiSaldo" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{aPagar}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+	</variable>
+	<group name="Emisor Group">
+		<groupExpression><![CDATA[$F{emi_nombre}]]></groupExpression>
+		<groupHeader>
+			<band height="18">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField>
+					<reportElement x="0" y="0" width="621" height="18" uuid="8da6c714-7412-4274-ba32-92e63f8c9d6c">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["EMISOR: " + $F{emi_rfc} + " - " + $F{emi_nombre}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="17" width="621" height="1" forecolor="#2196F3" uuid="26b36483-7ec7-4739-bece-60233e8859ab">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50">
+				<textField pattern="$#,##0.##;$-#,##0.##">
+					<reportElement x="330" y="0" width="97" height="17" uuid="9f303441-1b40-4d3f-bf76-05fc61fc98c9"/>
+					<textElement textAlignment="Right" markup="none">
+						<font isBold="true" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmiSubtotal}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.##;$-#,##0.##">
+					<reportElement x="427" y="0" width="89" height="17" uuid="46442ad8-ef7c-49a5-99c9-89eb443f078a"/>
+					<textElement textAlignment="Right" markup="styled">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmiIVA}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.##;$-#,##0.##">
+					<reportElement x="516" y="0" width="105" height="17" uuid="059519c3-b837-461a-9a3f-6c08e9a792da"/>
+					<textElement textAlignment="Right" markup="styled">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmiSaldo}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="0" width="621" height="1" forecolor="#2196F3" uuid="f4cf6ad7-1819-43fa-8e01-e009430b4305">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -133,7 +220,7 @@ ORDER BY nombre_cliente, numero_cliente]]>
 			<staticText>
 				<reportElement x="0" y="33" width="320" height="17" uuid="69fc98d0-e960-40a9-8798-207c261e5d1c"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<text><![CDATA[Al Dia ]]></text>
+				<text><![CDATA[Al dia ]]></text>
 			</staticText>
 			<textField pattern="dd/MMM/yyyy">
 				<reportElement x="320" y="33" width="301" height="17" uuid="b94582bd-0631-4a62-b116-d84eee20bcd3">
@@ -234,19 +321,19 @@ ORDER BY nombre_cliente, numero_cliente]]>
 				<textElement textAlignment="Left"/>
 				<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00">
+			<textField pattern="$#,##0.00;$-##0.00">
 				<reportElement x="330" y="0" width="97" height="12" uuid="e28d58a0-5aa3-4f6c-9b6e-fb295e37ef10"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00">
+			<textField pattern="$#,##0.00;$-##0.00">
 				<reportElement x="427" y="0" width="89" height="12" uuid="a55baf69-e3dd-491e-96b6-e549182462ed">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d9a06d2f-179c-4d2f-8397-e60a62a57870"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{iva}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00">
+			<textField pattern="$#,##0.00;$-##0.00">
 				<reportElement x="516" y="0" width="105" height="12" uuid="e7372dcf-a7cf-4980-a510-ef6b1a24be4d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -275,26 +362,26 @@ ORDER BY nombre_cliente, numero_cliente]]>
 				<textElement textAlignment="Center" markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$V{totalClientes}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{totalClientes}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="0" y="0" width="621" height="1" forecolor="#2199F6" uuid="770583e0-8fc6-423a-9c50-182cab316fdc"/>
 			</line>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="$#,##0.##;$-#,##0.##">
 				<reportElement x="329" y="0" width="98" height="17" uuid="7096a767-1623-4458-b800-2164d1cbd805"/>
 				<textElement textAlignment="Right" markup="none">
 					<font isBold="true" isStrikeThrough="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sumaSubtotal}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-##0.##">
+			<textField pattern="$#,##0.##;$-#,##0.##">
 				<reportElement x="427" y="0" width="89" height="17" uuid="0ec70ff7-f5d6-4fb7-b004-e43657fab803"/>
 				<textElement textAlignment="Right" markup="styled">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sumaIva}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="$#,##0.##;$-#,##0.##">
 				<reportElement x="516" y="0" width="105" height="17" uuid="840c8b16-1882-4abb-bfc5-f2c0a7e66535"/>
 				<textElement textAlignment="Right" markup="styled">
 					<font isBold="true"/>
