@@ -88,10 +88,7 @@ FROM (
 	and (factura.emi_rfc = $P{emisorRFC} or $P{emisorRFC} is NULL)
 ) t
 GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
-ORDER BY emi_nombre, nombre_cliente, numero_cliente
-
-
-]]>
+ORDER BY emi_nombre, nombre_cliente, numero_cliente]]>
 	</queryString>
 	<field name="emi_rfc" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="emi_rfc"/>
@@ -324,19 +321,19 @@ ORDER BY emi_nombre, nombre_cliente, numero_cliente
 				<textElement textAlignment="Left"/>
 				<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00">
+			<textField pattern="$#,##0.00;$-##0.00">
 				<reportElement x="330" y="0" width="97" height="12" uuid="e28d58a0-5aa3-4f6c-9b6e-fb295e37ef10"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00">
+			<textField pattern="$#,##0.00;$-##0.00">
 				<reportElement x="427" y="0" width="89" height="12" uuid="a55baf69-e3dd-491e-96b6-e549182462ed">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d9a06d2f-179c-4d2f-8397-e60a62a57870"/>
 				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{iva}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00">
+			<textField pattern="$#,##0.00;$-##0.00">
 				<reportElement x="516" y="0" width="105" height="12" uuid="e7372dcf-a7cf-4980-a510-ef6b1a24be4d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -370,21 +367,21 @@ ORDER BY emi_nombre, nombre_cliente, numero_cliente
 			<line>
 				<reportElement x="0" y="0" width="621" height="1" forecolor="#2199F6" uuid="770583e0-8fc6-423a-9c50-182cab316fdc"/>
 			</line>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="$#,##0.##;$-#,##0.##">
 				<reportElement x="329" y="0" width="98" height="17" uuid="7096a767-1623-4458-b800-2164d1cbd805"/>
 				<textElement textAlignment="Right" markup="none">
 					<font isBold="true" isStrikeThrough="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sumaEmiSubtotal}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-##0.##">
+			<textField pattern="$#,##0.##;$-#,##0.##">
 				<reportElement x="427" y="0" width="89" height="17" uuid="0ec70ff7-f5d6-4fb7-b004-e43657fab803"/>
 				<textElement textAlignment="Right" markup="styled">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sumaIva}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.##;¤-#,##0.##">
+			<textField pattern="$#,##0.##;$-#,##0.##">
 				<reportElement x="516" y="0" width="105" height="17" uuid="840c8b16-1882-4abb-bfc5-f2c0a7e66535"/>
 				<textElement textAlignment="Right" markup="styled">
 					<font isBold="true"/>
