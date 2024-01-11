@@ -1,15 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
@@ -17,10 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Embeddable
 public class SerieConstanciaPK implements Serializable {
 
@@ -35,13 +25,18 @@ public class SerieConstanciaPK implements Serializable {
     @Size(min = 1, max = 1)
     @Column(name = "tp_serie")
     private String tpSerie;
+    
+    @ManyToOne
+    @JoinColumn(name = "id_planta")
+    private Planta planta;
 
     public SerieConstanciaPK() {
     }
 
-    public SerieConstanciaPK(Cliente cliente, String tpSerie) {
+    public SerieConstanciaPK(Cliente cliente, String tpSerie, Planta planta) {
         this.cliente = cliente;
         this.tpSerie = tpSerie;
+        this.planta = planta;
     }
 
     public Cliente getCliente() {
@@ -51,6 +46,14 @@ public class SerieConstanciaPK implements Serializable {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
+    
+    public Planta getPlanta() {
+		return planta;
+	}
+
+	public void setPlanta(Planta planta) {
+		this.planta = planta;
+	}
 
     public String getTpSerie() {
         return tpSerie;
@@ -60,14 +63,9 @@ public class SerieConstanciaPK implements Serializable {
         this.tpSerie = tpSerie;
     }
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.SerieConstanciaPK[ idCliente=" + cliente + ", tpSerie=" + tpSerie + " ]";
-    }
-
 	@Override
 	public int hashCode() {
-		return Objects.hash(cliente, tpSerie);
+		return Objects.hash(cliente, planta, tpSerie);
 	}
 
 	@Override
@@ -79,7 +77,12 @@ public class SerieConstanciaPK implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		SerieConstanciaPK other = (SerieConstanciaPK) obj;
-		return Objects.equals(cliente, other.cliente) && Objects.equals(tpSerie, other.tpSerie);
+		return Objects.equals(cliente, other.cliente) && Objects.equals(planta, other.planta)
+				&& Objects.equals(tpSerie, other.tpSerie);
 	}
-    
+
+	@Override
+	public String toString() {
+		return "SerieConstanciaPK [cliente=" + cliente + ", tpSerie=" + tpSerie + ", planta=" + planta + "]";
+	}
 }

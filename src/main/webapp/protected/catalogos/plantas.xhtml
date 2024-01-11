@@ -8,21 +8,15 @@
 	<ui:define name="content">
 		<h:form id="form">
 			<p:growl id="messages" showDetail="true" />
-			<div class="p-grid button-demo">
-				<div class="p-col-12">
-					<div class="card">
-						<p:toolbar styleClass="p-mb-4">
-							<p:toolbarGroup>
-								<p:commandButton value="Agregar" icon="pi pi-plus"
-									action="#{plantaBean.openNew()}"
-									update="frm-agrega"
-									oncomplete="PF('dg-agrega').show()" 
-									styleClass="ui-button-info p-mr-2 p-mb-2" process="@this"/>
-							</p:toolbarGroup>
-						</p:toolbar>
-					 </div>
-				</div>
-			</div>
+			<p:toolbar styleClass="p-mb-4">
+				<p:toolbarGroup>
+					<p:commandButton value="Agregar" icon="pi pi-plus"
+						action="#{plantaBean.openNew()}"
+						update="frm-agrega"
+						oncomplete="PF('dg-agrega').show()" 
+						styleClass="ui-button-info p-mr-2 p-mb-2" process="@this"/>
+				</p:toolbarGroup>
+			</p:toolbar>
 			<p:dataTable id="dt-planta" widgetVar="dtPlanta" var="planta" value="#{plantaBean.list}" reflow="true"
 				rowKey="#{planta.plantaCve}" paginator="true" rows="5" paginatorPosition="bottom" rowSelectMode="add">
 				<p:column headerText="Nombre Planta">
@@ -38,7 +32,7 @@
 					<h:outputText value="#{planta.idUsuario.nombre} #{planta.idUsuario.apellido1} #{planta.idUsuario.apellido2}" />
 				</p:column>							
 				<p:column width="2rem" style="text-align: center;">
-					<p:commandButton icon="pi pi-pencil" update=":form:frm-agrega" oncomplete="PF('dg-agrega').show()" styleClass="p-mr-2 p-mb-2" process="@this" action="#{plantaBean.datosPlanta()}">
+					<p:commandButton icon="pi pi-pencil" update=":form:frm-agrega" oncomplete="PF('dg-agrega').show()" process="@this" action="#{plantaBean.datosPlanta()}">
 						<f:setPropertyActionListener value="#{planta}" target="#{plantaBean.planta}" />
 					</p:commandButton>
 				</p:column>
@@ -70,47 +64,47 @@
 		<p:inputText id="sufijo-new" value="#{plantaBean.planta.plantaSufijo}" required="true" />
 
 		<p:outputLabel for="responsable" value="Responsable de Planta:" />
-		<p:selectOneMenu id="responsable" value="#{plantaBean.planta.idUsuario}" converter="entityConverter" >
+		<p:selectOneMenu id="responsable" value="#{plantaBean.planta.idUsuario}" converter="entityConverter" filter="true" filterMatchMode="contains">
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""  />
 			<f:selectItems value="#{plantaBean.usuarios}" var="user" itemLabel="#{user.usuario}" itemValue="#{user}" />
 		</p:selectOneMenu>
 		
 		<p:outputLabel for="razonSocial" value="Razon Social:" />
-		<p:selectOneMenu id="razonSocial" autoWidth="false" value="#{plantaBean.planta.idEmisoresCFDIS}" converter="entityConverter" >
+		<p:selectOneMenu id="razonSocial" autoWidth="false" value="#{plantaBean.planta.idEmisoresCFDIS}" converter="entityConverter" filter="true" filterMatchMode="contains" >
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 			<f:selectItems value="#{plantaBean.listaEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"></f:selectItems>
 		</p:selectOneMenu>
 		
 		<p:outputLabel for="pais" value="Pais:" />
-		<p:selectOneMenu id="pais" autoWidth="false" value="#{plantaBean.paisSelect}" converter="entityConverter">
+		<p:selectOneMenu id="pais" autoWidth="false" value="#{plantaBean.paisSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 			<f:selectItems value="#{plantaBean.listaPaises}" var="selectedTown" itemLabel="#{selectedTown.paisDesc}" itemValue="#{selectedTown}" />
 			<p:ajax listener="#{plantaBean.filtroEstado}" process="@this" update = "state"/>
 		</p:selectOneMenu>
 						
 		<p:outputLabel for="state" value="Estado:"/>
-			<p:selectOneMenu id="state" value="#{plantaBean.estadoSelect}"  converter="entityConverter">
+		<p:selectOneMenu id="state" value="#{plantaBean.estadoSelect}"  converter="entityConverter" filter="true" filterMatchMode="contains">
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 			<f:selectItems value="#{plantaBean.estadosList}" var="selectedState" itemLabel="#{selectedState.estadoDesc}" itemValue="#{selectedState}"/>
 			<p:ajax listener="#{plantaBean.filtroMunicipio}" process="@this" update="Municipality city asentamiento"/>
 		</p:selectOneMenu>
 						
 		<p:outputLabel for="Municipality" value="Municipio:"/>
-		<p:selectOneMenu id="Municipality" autoWidth="false" value="#{plantaBean.municipioSelect}"  converter="entityConverter">
+		<p:selectOneMenu id="Municipality" autoWidth="false" value="#{plantaBean.municipioSelect}"  converter="entityConverter" filter="true" filterMatchMode="contains">
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 			<f:selectItems value="#{plantaBean.listaMunicipios}" var="selectedMunicipality" itemLabel="#{selectedMunicipality.municipioDs}" itemValue="#{selectedMunicipality}"/>
 			<p:ajax listener="#{plantaBean.filtroCiudad}" process="@this" update="city asentamiento"/>
 		</p:selectOneMenu>
         					
 		<p:outputLabel for="city" value="Ciudad:" />
-		<p:selectOneMenu id="city"  autoWidth="false" value="#{plantaBean.ciudadSelect}"  converter="entityConverter">
+		<p:selectOneMenu id="city"  autoWidth="false" value="#{plantaBean.ciudadSelect}"  converter="entityConverter" filter="true" filterMatchMode="contains">
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 			<f:selectItems value="#{plantaBean.listaCiudades}" var="selectedCity" itemLabel="#{selectedCity.ciudadDs}" itemValue="#{selectedCity}" />
 			<p:ajax listener="#{plantaBean.filtroAsentamiento}" process="@this" update="asentamiento"/>
 		</p:selectOneMenu>
 
 		<p:outputLabel for="asentamiento" value="Asentamiento:" />
-		<p:selectOneMenu id="asentamiento"  autoWidth="false" value="#{plantaBean.asentamientoHumanoSelect}" converter="entityConverter">
+		<p:selectOneMenu id="asentamiento"  autoWidth="false" value="#{plantaBean.asentamientoHumanoSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
 			<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
 			<f:selectItems var="selectedAsn" value="#{plantaBean.asentamientoHumanoList}" itemLabel="#{selectedAsn.asentamientoDs}" itemValue="#{selectedAsn}" />
 			<p:ajax listener="#{plantaBean.tipoAsentamiento}" process="@this" update="Tasn-new codigopostal-new" />

@@ -149,7 +149,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 					cliente.getCandadoSalida().getId();
 				
 				List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
-				System.out.println(clienteContactoList.size());
+				log.debug("Número de contactos del cliente: {}", clienteContactoList.size());
 				log.debug("ClienteContactoList: {}", clienteContactoList.size());
 				log.debug(cliente.getRegimenFiscal().getCd_regimen());
 				//log.debug(cliente.getUsoCfdi().getUsoCfdi());
@@ -175,6 +175,14 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 						if(idTelefono != null)
 							log.debug(idTelefono.getTpTelefono().getNbTelefono());
 					}
+				}
+				
+				for(SerieConstancia sc : cliente.getSerieConstanciaList()) {
+					log.debug("Serie Constancia: idCliente {} - idPlanta {} - TipoSerie {} - Serie {}",
+							sc.getSerieConstanciaPK().getCliente().getCteCve(),
+							sc.getSerieConstanciaPK().getPlanta().getPlantaCve(),
+							sc.getSerieConstanciaPK().getTpSerie(),
+							sc.getNuSerie());
 				}
 			}
 		} catch(Exception ex) {
@@ -261,6 +269,60 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		}
 		return lista;
 	}
+	
+	public List<Cliente> buscarTodosSerieConstancia() {
+		List<Cliente> lista = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("Cliente.findAll", Cliente.class)
+					.getResultList();
+			
+			for(Cliente c : lista) {
+				
+				for(SerieConstancia sc : c.getSerieConstanciaList()) {
+					log.debug("Cliente: {} - TipoSerie: {} - Planta: {} - Serie: {}",
+							sc.getSerieConstanciaPK().getCliente().getCteCve(),
+							sc.getSerieConstanciaPK().getTpSerie(),
+							sc.getSerieConstanciaPK().getPlanta().getPlantaCve(),
+							sc.getNuSerie());
+				}
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de clientes...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return lista;
+	}
+	
+	public Cliente buscarDetalleSerieConstancia(Integer idCliente) {
+		Cliente cliente = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			cliente = em.find(Cliente.class, idCliente);
+			
+			for(SerieConstancia sc : cliente.getSerieConstanciaList()) {
+				log.debug("Cliente: {} - TipoSerie: {} - Planta: {} - Serie: {}",
+						sc.getSerieConstanciaPK().getCliente().getCteCve(),
+						sc.getSerieConstanciaPK().getTpSerie(),
+						sc.getSerieConstanciaPK().getPlanta().getPlantaCve(),
+						sc.getNuSerie());
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el cliente con el detealle de sus series de constancias...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return cliente;
+	}
+		
 
 	@Override
 	public String actualizar(Cliente cliente) {

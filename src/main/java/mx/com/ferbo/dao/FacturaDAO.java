@@ -184,6 +184,26 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		return null;
 	}
 
+	
+	public String actualizarFechaFactura(Factura f) {
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			entity.getTransaction().begin();
+			entity.createNativeQuery("UPDATE factura f SET f.fecha =:fecha, f.metodo_pago = :metodoPago WHERE f.id = :id",Factura.class )
+			.setParameter("fecha", f.getFecha()) 
+			.setParameter("metodoPago", f.getMetodoPago()) 
+			.setParameter("id", f.getId()).executeUpdate(); 
+			entity.getTransaction().commit();
+		}catch (Exception e){
+			log.error("Problema al actualizar la factura: {}", e, f);
+			return "Failed!!";
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
+		return null;
+	}
+	
 	@Override
 	public String guardar(Factura factura) {
 		EntityManager em =null;

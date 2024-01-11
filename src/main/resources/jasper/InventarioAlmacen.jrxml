@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioAlmacen" pageWidth="851" pageHeight="611" columnWidth="761" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="2f361463-f417-4104-8c12-7ab1c04e4a00">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionProduccionMySQL.jrdax"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -15,7 +15,9 @@
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[new String ("resources/logo_square.gif")]]></defaultValueExpression>
 	</parameter>
-	<parameter name="idCliente" class="java.lang.Integer"/>
+	<parameter name="idCliente" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
 	<parameter name="Camara" class="java.lang.Integer"/>
 	<parameter name="Planta" class="java.lang.Integer"/>
 	<parameter name="Fecha" class="java.util.Date"/>
@@ -89,8 +91,92 @@
 	) salidas ON parEnt.partida_cve = salidas.partida_cve
 	where
 		cddEnt.status <> 4
+		and parEnt.no_tarimas >= 1.000
 		AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
 		AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
+	
+	
+	/*---------------------------------------------------------------------*/
+	
+	
+	union all 
+	
+	/*---------------------------------------------------------------------*/
+	
+	select
+	    cddEnt.folio            as folio,
+	    cli.cte_nombre          as cliente,
+	    cli.numero_cte          as numero_cte,
+	    cddEnt.folio_cliente    as folio_cliente,
+	    cddEnt.fecha_ingreso    as ingreso,
+	    parEnt.PARTIDA_CVE,
+	    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
+	    udm.unidad_de_manejo_ds as unidad_cobro,
+	    parEnt.no_tarimas as tarima,
+	    (parEnt.peso_total - COALESCE(salidas.peso, 0)) as peso,
+	    prd.producto_cve        as producto_cve,
+	    prd.producto_ds         as producto, 
+	    detPart.dtp_caducidad   as caducidad,
+	    prd.numero_prod         as codigo,
+	    detPart.dtp_sap         as sap,
+	    detPart.dtp_po          as po,
+	    cam.camara_cve          as cam_cve,
+	    cam.camara_abrev        as camara,
+	    plt.planta_cve          as plt_cve,
+	    plt.planta_abrev        as planta,
+	    detPart.dtp_lote        as lote,
+		COALESCE(parEnt.valorMercancia,0) as valor,
+		(parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL) as base_cargo,
+		( cantidad * parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL)  as resultado,
+	    pos.cod_posicion
+	from partida parEnt
+	inner join (
+		select *
+		from constancia_de_deposito cdd
+		WHERE cdd.status = 1
+			and (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
+			AND cdd.fecha_ingreso <= $P{Fecha}
+	) cddEnt on parEnt.folio = cddEnt.folio
+	inner join unidad_de_producto udp on udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
+	inner join producto prd on prd.producto_cve = udp.producto_cve
+	inner join unidad_de_manejo udm on udm.unidad_de_manejo_cve = udp.unidad_de_manejo_cve
+	inner join camara cam on cam.camara_cve = parEnt.camara_cve
+	inner join planta plt on plt.planta_cve = cam.planta_cve
+	inner join cliente cli on cli.cte_cve = cddEnt.cte_cve
+	inner join 
+	(
+	    select tdp.* from detalle_partida tdp
+	    inner join (
+			select
+				dp.partida_cve,
+	            max(dp.det_part_cve) as det_part_cve
+			from detalle_partida dp
+			
+			group by dp.partida_cve
+	    ) tmdp on tdp.partida_cve = tmdp.partida_cve and tdp.det_part_cve = tmdp.det_part_cve
+	) detPart on detPart.partida_cve = parEnt.partida_cve
+	left outer join posicion_partida pp on parEnt.partida_cve = pp.ID_PARTIDA
+	left outer join posicion pos on pp.ID_POSICION = pos.id_posicion
+	left outer join (
+		select 
+	    	dcs.partida_cve,
+	    	sum(COALESCE(dcs.peso,0)) as peso,
+	    	sum(COALESCE(dcs.cantidad,0)) as cantidad
+	    from constancia_salida cSal
+	    inner join detalle_constancia_salida dcs on dcs.constancia_cve = cSal.id
+	    WHERE cSal.status = 1 
+	    	AND cSal.fecha <= $P{Fecha}
+	    group by
+			dcs.PARTIDA_CVE
+	) salidas ON parEnt.partida_cve = salidas.partida_cve
+	where
+		cddEnt.status <> 4
+		and parEnt.no_tarimas < 1.000
+		AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
+		AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
+		
+		
+		
 ) I
 WHERE I.cantidad > 0
 ORDER BY cliente,numero_cte, producto]]>
@@ -226,7 +312,7 @@ ORDER BY cliente,numero_cte, producto]]>
 	<variable name="TotalGeneral" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{valor}]]></variableExpression>
 	</variable>
-	<variable name="SumaProductoPorCliente" class="java.lang.String" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
+	<variable name="SumaProductoPorCliente" class="java.lang.String" resetType="Group" resetGroup="GroupCliente" calculation="Count">
 		<variableExpression><![CDATA[$F{producto}]]></variableExpression>
 	</variable>
 	<variable name="SumaTarimasPorCte" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupCliente" calculation="Sum">
@@ -247,8 +333,8 @@ ORDER BY cliente,numero_cte, producto]]>
 	<variable name="SumaGLobalPeso" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{peso}]]></variableExpression>
 	</variable>
-	<variable name="SumaGlobalTarimas" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$V{SumaTarimasPorCte}]]></variableExpression>
+	<variable name="SumaGlobalTarimas" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tarima}]]></variableExpression>
 	</variable>
 	<variable name="ImporteTotalGlobal" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$V{TotalImporteParcial}]]></variableExpression>
@@ -270,12 +356,12 @@ ORDER BY cliente,numero_cte, producto]]>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="20">
+			<band height="50">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<staticText>
-					<reportElement key="" mode="Opaque" x="0" y="0" width="60" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="32b0253c-145f-4f3e-a96f-0ca3a7e73931">
+					<reportElement key="" mode="Transparent" x="0" y="16" width="113" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="32b0253c-145f-4f3e-a96f-0ca3a7e73931">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
 					<box>
@@ -287,38 +373,20 @@ ORDER BY cliente,numero_cte, producto]]>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Total Cliente]]></text>
-				</staticText>
-				<staticText>
-					<reportElement key="" mode="Opaque" x="60" y="0" width="59" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="9f8201c6-edf1-4fb1-9017-1728f6b0583e">
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					</reportElement>
-					<box>
-						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="0.0" lineColor="#000000"/>
-						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="8" isBold="true"/>
-					</textElement>
-					<text><![CDATA[Producto]]></text>
+					<text><![CDATA[TOTAL CLIENTE]]></text>
 				</staticText>
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="119" y="0" width="226" height="10" forecolor="#FCFCFC" backcolor="#2196F3" uuid="e16771e5-7c4d-4ffa-830d-15237523b200"/>
+					<reportElement mode="Transparent" x="113" y="16" width="232" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="e16771e5-7c4d-4ffa-830d-15237523b200">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{SumaProductoPorCliente}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement key="" mode="Opaque" x="345" y="0" width="77" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="5d6ec033-c23f-49be-9103-bbe014d0fcd0">
+					<reportElement key="" mode="Transparent" x="345" y="16" width="77" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="5d6ec033-c23f-49be-9103-bbe014d0fcd0">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
 					<box>
@@ -334,24 +402,27 @@ ORDER BY cliente,numero_cte, producto]]>
 					<text><![CDATA[Tarimas]]></text>
 				</staticText>
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="422" y="0" width="50" height="10" forecolor="#FCFAFA" backcolor="#2196F3" uuid="85024531-aa83-4bc0-a2b8-ea491c85ea51"/>
+					<reportElement mode="Transparent" x="422" y="16" width="50" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="85024531-aa83-4bc0-a2b8-ea491c85ea51">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaTarimasPorCte}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="472" y="0" width="61" height="10" forecolor="#FAF7F7" backcolor="#2196F3" uuid="475b6a83-23f2-4d3b-8adb-0f8f2790360e"/>
+					<reportElement mode="Transparent" x="472" y="16" width="61" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="475b6a83-23f2-4d3b-8adb-0f8f2790360e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaCantidadPorCte}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement key="" mode="Opaque" x="533" y="0" width="50" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="a4392d93-f72e-4d26-bd89-90b096226fc2">
+					<reportElement key="" mode="Transparent" x="533" y="16" width="50" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="a4392d93-f72e-4d26-bd89-90b096226fc2">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
 					<box>
@@ -366,10 +437,9 @@ ORDER BY cliente,numero_cte, producto]]>
 					<text><![CDATA[Unidades]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" mode="Opaque" x="683" y="0" width="32" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="244b5406-7a8d-45ac-ac4b-c822ad2be557">
+					<reportElement key="" mode="Transparent" x="683" y="16" width="32" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="244b5406-7a8d-45ac-ac4b-c822ad2be557">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
 					<box>
@@ -384,29 +454,38 @@ ORDER BY cliente,numero_cte, producto]]>
 					<text><![CDATA[Valor]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="643" y="0" width="40" height="10" forecolor="#FCF5F5" backcolor="#2196F3" uuid="7a3f5557-d0fe-47ed-8091-0f951cf04294"/>
+					<reportElement mode="Transparent" x="643" y="16" width="40" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="7a3f5557-d0fe-47ed-8091-0f951cf04294">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Kg]]></text>
 				</staticText>
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="583" y="0" width="60" height="10" forecolor="#FFFCFC" backcolor="#2196F3" uuid="bbab530e-17b9-46d4-8ac2-659d9e7c88a8"/>
+					<reportElement mode="Transparent" x="583" y="16" width="60" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="bbab530e-17b9-46d4-8ac2-659d9e7c88a8">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{SumaPesoporCliente}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="715" y="0" width="46" height="10" forecolor="#FAF5F5" backcolor="#2196F3" uuid="f00908f1-5e73-4e30-ba11-aa15902b1319"/>
+					<reportElement mode="Transparent" x="715" y="16" width="46" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="f00908f1-5e73-4e30-ba11-aa15902b1319">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{TotalImporteParcial}]]></textFieldExpression>
 				</textField>
-				<rectangle>
-					<reportElement mode="Opaque" x="0" y="10" width="761" height="10" forecolor="#FAEEED" uuid="707ecf38-e007-4d6b-91c5-bff2373f8226"/>
-				</rectangle>
+				<line>
+					<reportElement x="0" y="15" width="761" height="1" forecolor="#1696F7" backcolor="#1696F7" uuid="c11f3360-49eb-4b5c-8cee-c89b91c44096"/>
+				</line>
+				<line>
+					<reportElement x="0" y="29" width="761" height="1" forecolor="#1696F7" backcolor="#1696F7" uuid="78cf493c-ae49-41a2-a310-dbdbdb2654ec"/>
+				</line>
 			</band>
 		</groupFooter>
 	</group>
@@ -874,14 +953,14 @@ ORDER BY cliente,numero_cte, producto]]>
 		<band height="8" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement x="0" y="0" width="119" height="8" uuid="5f009e6e-5661-456f-b910-d083dbe51902"/>
+				<reportElement x="0" y="0" width="113" height="8" uuid="5f009e6e-5661-456f-b910-d083dbe51902"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="119" y="0" width="564" height="8" uuid="e3d8a092-83d1-42de-9bcf-f200435c52d0"/>
+				<reportElement x="113" y="0" width="570" height="8" uuid="e3d8a092-83d1-42de-9bcf-f200435c52d0"/>
 				<textElement textAlignment="Right">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
@@ -897,14 +976,14 @@ ORDER BY cliente,numero_cte, producto]]>
 		</band>
 	</pageFooter>
 	<lastPageFooter>
-		<band height="19">
+		<band height="22">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="0" y="0" width="60" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="7a2f629c-d4eb-4901-a3cc-5029ea938b82">
+				<reportElement key="" mode="Opaque" x="0" y="0" width="113" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="7a2f629c-d4eb-4901-a3cc-5029ea938b82">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -915,39 +994,23 @@ ORDER BY cliente,numero_cte, producto]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Total]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="" mode="Opaque" x="60" y="0" width="59" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="013e12af-aab4-47dc-a3c6-b93159fefd3b">
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Producto]]></text>
+				<text><![CDATA[TOTAL GENERAL]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="119" y="0" width="226" height="10" forecolor="#FCFCFC" backcolor="#2196F3" uuid="5685d377-08ac-477b-87cf-670a83d88dee"/>
+				<reportElement mode="Opaque" x="113" y="0" width="232" height="13" forecolor="#FCFCFC" backcolor="#2196F3" uuid="5685d377-08ac-477b-87cf-670a83d88dee">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{SumaGlobalProducto}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="345" y="0" width="77" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="161086ba-18ae-4e45-8666-c90b0ee1fdfb">
+				<reportElement key="" mode="Opaque" x="345" y="0" width="77" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="161086ba-18ae-4e45-8666-c90b0ee1fdfb">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -961,25 +1024,32 @@ ORDER BY cliente,numero_cte, producto]]>
 				<text><![CDATA[Tarimas]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="422" y="0" width="50" height="10" forecolor="#FCFAFA" backcolor="#2196F3" uuid="b8dabb68-79a9-4300-ae16-745248b76886"/>
+				<reportElement mode="Opaque" x="422" y="0" width="50" height="13" forecolor="#FCFAFA" backcolor="#2196F3" uuid="b8dabb68-79a9-4300-ae16-745248b76886">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{SumaGlobalTarimas}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="472" y="0" width="61" height="10" forecolor="#FAF7F7" backcolor="#2196F3" uuid="45398072-5993-4f14-99d7-1650423dd275"/>
+				<reportElement mode="Opaque" x="472" y="0" width="61" height="13" forecolor="#FAF7F7" backcolor="#2196F3" uuid="45398072-5993-4f14-99d7-1650423dd275">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{SumaGlobalCantidad}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="533" y="0" width="50" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="57a821e5-7553-4443-b44a-a41ce02126ec">
+				<reportElement key="" mode="Opaque" x="533" y="0" width="50" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="57a821e5-7553-4443-b44a-a41ce02126ec">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -993,11 +1063,11 @@ ORDER BY cliente,numero_cte, producto]]>
 				<text><![CDATA[Unidades]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="683" y="0" width="32" height="10" forecolor="#F7EEED" backcolor="#2196F3" uuid="b800a125-3628-4b87-8040-8a5f1ca32d97">
+				<reportElement key="" mode="Opaque" x="683" y="0" width="32" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="b800a125-3628-4b87-8040-8a5f1ca32d97">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1011,42 +1081,51 @@ ORDER BY cliente,numero_cte, producto]]>
 				<text><![CDATA[Valor]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="643" y="0" width="40" height="10" forecolor="#FCF5F5" backcolor="#2196F3" uuid="169d9521-6d62-4bea-b7ac-cbc748d38eb2"/>
+				<reportElement mode="Opaque" x="643" y="0" width="40" height="13" forecolor="#FCF5F5" backcolor="#2196F3" uuid="169d9521-6d62-4bea-b7ac-cbc748d38eb2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Kg]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="583" y="0" width="60" height="10" forecolor="#FFFCFC" backcolor="#2196F3" uuid="9847793b-0c21-4a19-a687-18ff84fd9fe9"/>
+				<reportElement mode="Opaque" x="583" y="0" width="60" height="13" forecolor="#FFFCFC" backcolor="#2196F3" uuid="9847793b-0c21-4a19-a687-18ff84fd9fe9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{SumaGLobalPeso}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="715" y="0" width="46" height="10" forecolor="#FAF5F5" backcolor="#2196F3" uuid="d4004406-db8f-43d2-b05e-b1c23ae50282"/>
+				<reportElement mode="Opaque" x="715" y="0" width="46" height="13" forecolor="#FAF5F5" backcolor="#2196F3" uuid="d4004406-db8f-43d2-b05e-b1c23ae50282">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{ImporteTotalGlobal}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="660" y="10" width="101" height="9" uuid="06a75abb-0cea-43e9-9a20-8981f2f98da7"/>
+				<reportElement x="660" y="13" width="101" height="9" uuid="06a75abb-0cea-43e9-9a20-8981f2f98da7"/>
 				<textElement textAlignment="Left">
 					<font fontName="SansSerif" size="5"/>
 				</textElement>
 				<textFieldExpression><![CDATA[" "  + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement x="0" y="10" width="119" height="9" uuid="0ba51749-37ac-4ee9-87fd-edc729cdbefc"/>
+				<reportElement x="0" y="13" width="113" height="9" uuid="0ba51749-37ac-4ee9-87fd-edc729cdbefc"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="119" y="10" width="541" height="9" uuid="e4195d56-0159-4961-8f5e-2f8ed3069282"/>
+				<reportElement x="113" y="13" width="547" height="9" uuid="e4195d56-0159-4961-8f5e-2f8ed3069282"/>
 				<textElement textAlignment="Right">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>

@@ -92,7 +92,7 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 			for (ConstanciaDeDeposito c : constancias) {
 				partidaList = c.getPartidaList();
 				for (Partida p : partidaList) {
-					log.debug("Partida.plantaCve: {}", p.getCamaraCve().getPlantaCve().getPlantaCve());
+					log.debug("Partida.plantaCve: {}, Planta abrev: {}", p.getCamaraCve().getPlantaCve().getPlantaCve(), p.getCamaraCve().getPlantaCve().getPlantaAbrev());
 					if(p.getCamaraCve().getPlantaCve().getPlantaCve() != planta.getPlantaCve())
 						continue;
 					Integer cantidadInicial = p.getCantidadTotal();
