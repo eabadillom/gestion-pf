@@ -48,10 +48,11 @@
 						<div class="p-grid ui-fluid p-col-12">
 							<div class="p-col-6 p-md-6">
 								<p:outputLabel value="Cliente" />
-								<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}" required="true" requiredMessage="Seleccione un Cliente" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
+								<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}" required="true" requiredMessage="Seleccione un Cliente" 
+										onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
 									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-									<p:ajax update="receptor factura messages medioPago" listener="#{facturacionConstanciasBean.cargaInfoCliente}" oncomplete="PF('statusInfoDialog').hide();"/>
+									<p:ajax update="receptor factura messages medioPago medio metodo metodoPago" listener="#{facturacionConstanciasBean.cargaInfoCliente}" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-6 p-md-6">
@@ -94,12 +95,13 @@
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-6 p-md-6">
-								<p:outputLabel value="Metodo de Pago (SAT)" />
-								<p:selectOneMenu id="metodoPago" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.metodoPagoSelect}" required="true" requiredMessage="Ingresa un Metodo de Pago" >
-									<f:selectItem itemLabel="#{facturacionConstanciasBean.clienteSelect.metodoPago.cdMetodoPago} - #{facturacionConstanciasBean.clienteSelect.metodoPago.nbMetodoPago}" itemValue="#{facturacionConstanciasBean.clienteSelect.metodoPago}" />
+							<p:outputLabel value="Metodo de Pago (SAT)" />
+							<p:selectOneMenu id="metodoPago" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.metodoPagoSelect}" required="true" requiredMessage="Ingresa una Forma de Pago">
+									<f:selectItem itemLabel="#{facturacionConstanciasBean.MPagoSelect.cdMetodoPago} - #{facturacionConstanciasBean.MPagoSelect.nbMetodoPago}" itemValue="#{facturacionConstanciasBean.MPagoSelect}"  />
 									<f:selectItems value="#{facturacionConstanciasBean.listaMetodoPago}" var="metodoP" itemLabel="#{metodoP.cdMetodoPago} - #{metodoP.nbMetodoPago}" itemValue="#{metodoP}" />
-									<p:ajax process="@this" update="messages" />
-								</p:selectOneMenu>
+									<p:ajax process="@this"  />
+								</p:selectOneMenu> 
+	
 							</div>
 							<div class="p-col-6 p-md-6">
 								<p:outputLabel value="Forma de pago (SAT)" />
@@ -132,7 +134,7 @@
 							</div>
 							<div class="p-col-12 p-md-12">
 								<p:outputLabel value="Observaciones:" />
-								<p:inputTextarea autoResize="true" value="#{facturacionConstanciasBean.observacion}" />
+								<p:inputTextarea autoResize="true" value="#{facturacionConstanciasBean.factura.observacion}" />
 							</div>
 						</div>
 					</p:outputPanel>
@@ -143,11 +145,13 @@
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Entradas por facturar (Inventario)">
 					<p:outputLabel value="Se facturan por primera vez las constancias de deposito. Si la constancia que desea no se encuentra, ya fue facturada" />
-					<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}" var="entrada" rowKey="#{entrada.folio.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5" selection="#{facturacionConstanciasBean.selectedEntradas}">
+					<p:dataTable id="dt-constanciasE" emptyMessage="No Hay Constancias Por Facturar" value="#{facturacionConstanciasBean.listaEntradas}" var="entrada" 
+								rowKey="#{entrada.folio.folio}" paginator="true" paginatorPosition="bottom" rowSelectMode="add" rows="5" selection="#{facturacionConstanciasBean.selectedEntradas}" >
+								
 						<p:ajax event="rowSelect" />
-						<p:ajax event="rowSelectCheckbox" />
-						<p:ajax event="rowUnselect" update="form:dt-constanciasE" />
-						<p:ajax event="rowUnselectCheckbox" update="form:dt-constanciasE" />
+						<p:ajax event="rowSelectCheckbox"  listener="#{facturacionConstanciasBean.relacionConstanciaFacturaEntradas}" update="form:dt-constanciasE" />
+						<p:ajax event="rowUnselect" update="form:dt-constanciasE form:dt-serviciosEntrada" />
+						<p:ajax event="rowUnselectCheckbox" update="form:dt-constanciasE" listener="#{facturacionConstanciasBean.recalculoEntradas}"  />
 						<p:ajax event="toggleSelect" />
 						<p:column selectionMode="multiple" exportable="false" />
 						<p:column headerText="Folio Cliente">
@@ -163,22 +167,75 @@
 								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
+						<p:column headerText="Detalles de Factura" >
+						<p:commandButton value="Visualizar" onclick="PF('statusInfoDialog').show();" oncomplete="PF('dialogEntradas').show();"  update="form:Entradas" process="@this" >
+							<f:setPropertyActionListener value="#{entrada}" target="#{facturacionConstanciasBean.entradaSelect}"  ></f:setPropertyActionListener>							
+						</p:commandButton>
+						</p:column>
+						
+						<f:facet name="footer">
+							<div align="right">
+								Subtotal Entradas:
+								<h:outputText id="subEntradas" value="#{facturacionConstanciasBean.subTotalEntrada}">
+									<f:convertNumber pattern=" $ #,##0.00" />
+								</h:outputText>
+							</div>
+						</f:facet>
+						
 					</p:dataTable>
 				</p:fieldset>
 			</div>
 			
+			<p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogEntradas" responsive="true">
+				<p:ajax event="open"  oncomplete="PF('statusInfoDialog').hide();"  ></p:ajax>
+				<p:outputPanel id="Entradas">
+						
+						<p:dataTable id="dt-serviciosEntrada" value="#{facturacionConstanciasBean.entradaSelect.servicioConstanciaList}" var="servicioConstancia"  rows="5" reflow="true" 
+										paginator="true" paginatorPosition="bottom" lazy="true">
+										<p:column headerText="Servicio">
+											<h:outputText value="#{servicioConstancia.descripcion}" />
+										</p:column>
+										<p:column headerText="Cantidad">
+											<h:outputText value="#{servicioConstancia.baseCargo}" />
+										</p:column>
+										<p:column headerText="Unidad">
+											<h:outputText value="#{servicioConstancia.unidadMedida}" />
+										</p:column>
+										<p:column headerText="Precio Unitario">
+											<h:outputText value="#{servicioConstancia.tarifa}" />
+										</p:column>
+										<p:column headerText="Importe">
+											<h:outputText value="#{servicioConstancia.costo}">
+												<f:convertNumber pattern="$#,##0.00" />
+											</h:outputText>
+										</p:column>
+										<p:column headerText="Acción">
+											<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioEntrada()}"  icon="pi pi-times" styleClass="ui-button-danger">
+												<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioE}"></f:setPropertyActionListener>
+											</p:commandButton>
+										</p:column>
+									</p:dataTable>
+								
+							</p:outputPanel>
+			</p:dialog>
+			
+			
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Vigencias por facturar (Inventario)">
 					<p:outputLabel value="Fecha de corte"/>
-					<p:datePicker id="FechaCorte" showIcon="true" styleClass="p-ml-2" placeholder="Fecha de Corte" value="#{facturacionConstanciasBean.fechaCorte}" onchange="PF('statusInfoDialog').show();">
-						<p:ajax update="@this dt-vigencias" listener="#{facturacionConstanciasBean.facturacionVigencias}" oncomplete="PF('statusInfoDialog').hide();"/>
+					<p:datePicker id="FechaCorte" showIcon="true" styleClass="p-ml-2" placeholder="Fecha de Corte" value="#{facturacionConstanciasBean.fechaCorte}" onchange="PF('statusInfoDialog').show();" >
+						<p:ajax listener="#{facturacionConstanciasBean.facturacionVigencias}" oncomplete="PF('statusInfoDialog').hide();"/>
 						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
-					<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" value="#{facturacionConstanciasBean.listaVigencias}" selection="#{facturacionConstanciasBean.selectedVigencias}" var="vigencia" rowKey="#{vigencia.folio.folio}" rowSelectMode="add" paginator="true" paginatorPosition="bottom" rows="5">
+					
+					<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" value="#{facturacionConstanciasBean.listaVigencias}" var="vigencia" 
+							selection="#{facturacionConstanciasBean.selectedVigencias}" rowKey="#{vigencia.folio.folio}" rowSelectMode="add" paginator="true" paginatorPosition="bottom" rows="5" >
+
+
 						<p:ajax event="rowSelect" />
-						<p:ajax event="rowSelectCheckbox" />
-						<p:ajax event="rowUnselect" update="form:dt-vigencias" />
-						<p:ajax event="rowUnselectCheckbox" update="form:dt-vigencias" />
+						<p:ajax event="rowSelectCheckbox" listener="#{facturacionConstanciasBean.relacionConstanciaFacturaVigencias}" update="form:dt-vigencias"/>
+						<p:ajax event="rowUnselect" update="form:dt-vigencias form:dt-serviciosVigencia" />
+						<p:ajax event="rowUnselectCheckbox" update="form:dt-vigencias" listener="#{facturacionConstanciasBean.recalculoVigencias()}" />
 						<p:ajax event="toggleSelect" />
 						<p:column selectionMode="multiple" exportable="false"></p:column>
 						<p:column headerText="Folio Cliente">
@@ -194,16 +251,70 @@
 								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
+						<p:column headerText="Detalles de Factura" >
+						<p:commandButton value="Visualizar" onclick="PF('statusInfoDialog').show();"  oncomplete="PF('dialogVigencias').show();" 
+															update="form:Vigencias" process="@this">
+						<f:setPropertyActionListener value="#{vigencia}" target="#{facturacionConstanciasBean.vigenciaSelect}" ></f:setPropertyActionListener>				
+						
+						</p:commandButton>
+						</p:column>
+						
+						<f:facet name="footer">
+							<div align="right">
+								Subtotal Vigencias:
+								<h:outputText id="subServiciosDs" value="#{facturacionConstanciasBean.subTotalVigencias}">
+									<f:convertNumber pattern=" $ #,##0.00" />
+								</h:outputText>
+							</div>
+						</f:facet>
+						
 					</p:dataTable>
 				</p:fieldset>
 			</div>
+			
+			<p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogVigencias" responsive="true">
+			<p:ajax event="open"  oncomplete="PF('statusInfoDialog').hide();"  ></p:ajax>
+			<p:outputPanel id="Vigencias">
+
+			<p:dataTable id="dt-serviciosVigencia" value="#{facturacionConstanciasBean.vigenciaSelect.servicioConstanciaList}" var="servicioConstancia" lazy="true">
+			
+								<p:column headerText="Servicio">
+									<h:outputText value="#{servicioConstancia.descripcion}" />
+								</p:column>
+								<p:column headerText="Cantidad">
+									<h:outputText value="#{servicioConstancia.baseCargo}" />
+								</p:column>
+								<p:column headerText="Unidad">
+									<h:outputText value="#{servicioConstancia.unidadMedida}" />
+								</p:column>
+								<p:column headerText="Precio Unitario">
+									<h:outputText value="#{servicioConstancia.tarifa}" />
+								</p:column>
+								<p:column headerText="Importe">
+									<h:outputText value="#{servicioConstancia.costo}">
+										<f:convertNumber pattern="$#,##0.00" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Acción">
+									<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioVigencia()}" update="form:dt-serviciosVigencia " icon="pi pi-times" styleClass="ui-button-danger">
+										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioV}"></f:setPropertyActionListener>
+									</p:commandButton>
+								</p:column>
+						
+							</p:dataTable>
+							
+							</p:outputPanel>
+			</p:dialog>
+			
+			
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Constancias de servicio por facturar">
-					<p:dataTable id="dt-servicios" emptyMessage="No Hay Servicios Por Facturar" value="#{facturacionConstanciasBean.listaServicios}" var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}" paginator="true" paginatorPosition="bottom" rows="5" rowSelectMode="add" selection="#{facturacionConstanciasBean.selectedServicios}">
+					<p:dataTable id="dt-servicios" emptyMessage="No Hay Servicios Por Facturar" value="#{facturacionConstanciasBean.listaServicios}" 
+									var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}" paginator="true" paginatorPosition="bottom" rows="5" rowSelectMode="add" selection="#{facturacionConstanciasBean.selectedServicios}">
 						<p:ajax event="rowSelect" />
-						<p:ajax event="rowSelectCheckbox" />
+						<p:ajax event="rowSelectCheckbox" listener="#{facturacionConstanciasBean.recalculoServicioDs}" update="form:dt-servicios"/>
 						<p:ajax event="rowUnselect" update="form:dt-servicios" />
-						<p:ajax event="rowUnselectCheckbox" update="form:dt-servicios" />
+						<p:ajax event="rowUnselectCheckbox" update="form:dt-servicios" listener="#{facturacionConstanciasBean.recalculoServicioDs}"/>
 						<p:ajax event="toggleSelect" />
 						<p:column selectionMode="multiple" exportable="false" />
 						<p:column headerText="Folio Cliente">
@@ -215,14 +326,124 @@
 								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
+						<p:column headerText="Detalles de Factura" >
+						<p:commandButton value="Visualizar" onclick="PF('statusInfoDialog').show();"  oncomplete="PF('dialogServicios').show();" 
+															update="form:serviciosConstancia" process="@this">
+						<f:setPropertyActionListener value="#{servicio}" target="#{facturacionConstanciasBean.servicioConstanciaSelect}" ></f:setPropertyActionListener>				
+						
+						</p:commandButton>
+						</p:column>
+						
+						<f:facet name="footer">
+							<div align="right">
+								Subtotal Servicios:
+								<h:outputText id="subServiciosDs" value="#{facturacionConstanciasBean.subTotalServicios}">
+									<f:convertNumber pattern=" $ #,##0.00" />
+								</h:outputText>
+							</div>
+						</f:facet>
+						
 					</p:dataTable>
 				</p:fieldset>
 			</div>
-			<div style="text-align: center; margin-top: 2rem;">
-				<p:commandButton value="Siguiente"
-					action="#{facturacionConstanciasBean.inyeccionBean}"
-					 icon="pi pi-arrow-circle-right" />
+			
+			<p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogServicios" responsive="true">
+				<p:ajax event="open"  oncomplete="PF('statusInfoDialog').hide();"  ></p:ajax>
+			<p:outputPanel id="serviciosConstancia">
+			
+			<p:dataTable id="dt-serviciosDs" value="#{facturacionConstanciasBean.servicioConstanciaSelect.servicioConstanciaDsList}" var="servicioConstancia" rowIndexVar="row" lazy="true">
+								<p:column headerText="Servicio">
+									<h:outputText value="#{servicioConstancia.descripcion}" />
+								</p:column>
+								<p:column headerText="Cantidad">
+									<h:outputText value="#{servicioConstancia.cantidad}"></h:outputText>
+								</p:column>
+								<p:column headerText="Precio Unitario">
+									<h:outputText value="#{servicioConstancia.tarifa}" />
+								</p:column>
+								<p:column headerText="Importe">
+									<h:outputText value="#{servicioConstancia.costo}" />
+								</p:column>
+								<p:column headerText="Acción">
+									<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioDs()}" update="form:dt-serviciosDs " icon="pi pi-times" styleClass="ui-button-danger">
+										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioDs}" />
+									</p:commandButton>
+								</p:column>
+							</p:dataTable>
+							</p:outputPanel>
+			</p:dialog>
+			
+			<div style="margin-top: 2rem;">
+				<p:fieldset legend="Resumen">
+					<div>
+						<p:outputLabel  value="Metodo de Pago:" styleClass="p-mr-2" />
+						<b><p:outputLabel id="metodo"
+								value="#{facturacionConstanciasBean.metodoPagoSelect.cdMetodoPago} - #{facturacionConstanciasBean.metodoPagoSelect.nbMetodoPago}" /></b>
+					</div>
+
+					<div>
+						<p:outputLabel  value="Forma de Pago:" styleClass="p-mr-2" />
+						<b><p:outputLabel id="medio"
+								value="#{facturacionConstanciasBean.medioPagoSelect.formaPago} - #{facturacionConstanciasBean.medioPagoSelect.mpDescripcion}" /></b>
+					</div>
+
+					<div style="text-align: right">
+						<p:outputLabel>Subtotal:</p:outputLabel>
+						<b><h:outputText id="subTotalGeneral"
+								value="#{facturacionConstanciasBean.subTotalGeneral}">
+								<f:convertNumber pattern=" $ ###,###,###.00" />
+							</h:outputText></b>
+					</div>
+
+					<div style="text-align: right">
+						<p:outputLabel>IVA:</p:outputLabel>
+						<b><h:outputText id="iva"
+								value="#{facturacionConstanciasBean.ivaTotal}">
+								<f:convertNumber pattern=" $ ###,###,###.00" />
+							</h:outputText> </b>
+					</div>
+
+					<div style="float: left;">
+						<p:outputLabel>Monto en letra:</p:outputLabel>
+						<b><h:outputText id="montoLetra"
+								value="#{facturacionConstanciasBean.montoLetra}"></h:outputText></b>
+					</div>
+
+					<div style="text-align: right">
+						<p:outputLabel>Total:</p:outputLabel>
+						<b><h:outputText id="total"
+								value="#{facturacionConstanciasBean.total}">
+								<f:convertNumber pattern=" $ ###,###,###.00" />
+							</h:outputText> </b>
+					</div>
+				</p:fieldset>
 			</div>
+		
+			
+			<p:fieldset styleClass="p-mt-2">
+					 	 <p:toolbar>
+							<p:toolbarGroup>
+					  		  <div style="margin-top: 2rem;" align="center">
+								<p:splitButton value="Guardar" actionListener="#{facturacionConstanciasBean.saveFactura}" icon="pi pi-save" styleClass="ui-button-raised ui-button-secondary" >
+								 	<p:menuitem value="Imprimir" actionListener="#{facturacionConstanciasBean.jasper}"  icon="pi pi-file-pdf" ajax="false" process="@this"/>		
+						      		 <p:menuitem value="Nueva Factura" action="#{facturacionConstanciasBean.reset()}"  icon="pi pi-refresh" process="@this"/>
+						        </p:splitButton>
+				     		 </div>
+							         
+					         <div style="margin-top: 2rem;" align="center" class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+       
+							 <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facturacionConstanciasBean.timbrado()}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>
+				     		 </div>
+							</p:toolbarGroup>
+
+						 </p:toolbar>
+						</p:fieldset>
+						
+			
 		</h:form>
 	</ui:define>
 </ui:composition>

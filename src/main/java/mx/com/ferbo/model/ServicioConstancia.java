@@ -95,7 +95,7 @@ public class ServicioConstancia implements Serializable {
     @Column(name = "cd_unidad")
     private String cdUnidad;
     @JoinColumn(name = "constancia", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false)//modificado 10 de enero 2021
     private ConstanciaFactura constancia;
 
     public ServicioConstancia() {

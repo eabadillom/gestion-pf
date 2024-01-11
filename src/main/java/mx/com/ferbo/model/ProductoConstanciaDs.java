@@ -65,7 +65,7 @@ public class ProductoConstanciaDs implements Serializable {
     @Column(name = "UNIDAD_MANEJO")
     private String unidadManejo;
     @JoinColumn(name = "CONSTANCIA", referencedColumnName = "ID")
-    @ManyToOne(cascade = CascadeType.ALL)//Modificado 5 de junio
+    @ManyToOne(optional = false)//Modificado 5 de junio
     private ConstanciaFacturaDs constancia;
 
     public ProductoConstanciaDs() {
