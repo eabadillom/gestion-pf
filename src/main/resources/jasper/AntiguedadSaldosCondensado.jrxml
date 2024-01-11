@@ -11,12 +11,17 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionProduccionMySQL.jrdax"/>
 	<parameter name="fecha" class="java.util.Date"/>
 	<parameter name="imagen" class="java.lang.String"/>
-	<parameter name="idCliente" class="java.lang.Integer"/>
+	<parameter name="idCliente" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="emisorRFC" class="java.lang.String">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
 	<queryString>
-		<![CDATA[WITH cartera (id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, plazo, dias) AS
+		<![CDATA[WITH cartera (id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, emi_rfc, emi_nombre,plazo, dias) AS
 (
 	SELECT
         factura.id,
@@ -32,6 +37,8 @@
         factura.total AS saldo,
         factura.status as status,
         status_factura.nombre as nombre_status,
+        factura.emi_rfc,
+        factura.emi_nombre,
         factura.plazo as plazo,
         DATEDIFF($P{fecha}, date_add(factura.fecha, INTERVAL factura.plazo DAY)) as dias
     FROM factura
@@ -40,7 +47,8 @@
         factura.ID NOT IN(SELECT pago.factura FROM pago WHERE pago.fecha <= $P{fecha} ) AND
         factura.status NOT IN (0,2) AND
         factura.fecha <= $P{fecha} AND
-        (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
+        (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL) AND
+        (factura.emi_rfc = $P{emisorRFC} OR $P{emisorRFC} IS NULL)
     UNION all
     SELECT * FROM (
 	    SELECT
@@ -57,6 +65,8 @@
 	       (factura.total - ingreso.monto) AS saldo,
 	       factura.status as status,
 	       status_factura.nombre as nombre,
+	       factura.emi_rfc,
+	       factura.emi_nombre,
 	       factura.plazo as plazo,
 	       DATEDIFF($P{fecha}, date_add(factura.fecha, INTERVAL factura.plazo DAY)) as dias
 	    FROM (
@@ -85,12 +95,13 @@
 	    INNER JOIN factura ON ingreso.factura = factura.id
 	    INNER JOIN status_factura ON status_factura.id = factura.status
 	    WHERE
-	       (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
+	       (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL) AND
+	       (factura.emi_rfc = $P{emisorRFC} OR $P{emisorRFC} IS NULL)
 	    ORDER BY fecha
     ) b WHERE b.saldo > 0
 )
 SELECT
-	numero_cliente, nombre_cliente,
+	numero_cliente, nombre_cliente, emi_rfc, emi_nombre,
 	sum(saldo) as saldo,
 	sum(COALESCE(en_plazo, 0)) as en_plazo,
 	sum(COALESCE(d_8, 0)) as d_8,
@@ -100,7 +111,7 @@ SELECT
 	sum(COALESCE(md_60,0)) as md_60
 FROM (
 	SELECT
-		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
+		numero_cliente, nombre_cliente, emi_rfc, emi_nombre, sum(saldo) AS saldo,
 		sum(saldo) as en_plazo,
 		null as d_8,
 		null as d_15,
@@ -109,10 +120,10 @@ FROM (
 		null as md_60
 	FROM cartera
 	WHERE cartera.dias < 1
-	GROUP BY numero_cliente, nombre_cliente
+	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
 	UNION 
 	SELECT
-		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
+		numero_cliente, nombre_cliente, emi_rfc, emi_nombre, sum(saldo) AS saldo,
 		null as en_plazo,
 	    sum(saldo) as d_8,
 	    null as d_15,
@@ -121,10 +132,10 @@ FROM (
 	    null as md_60
 	FROM cartera
 	WHERE cartera.dias BETWEEN 1 AND 8
-	GROUP BY numero_cliente, nombre_cliente
+	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
 	UNION 
 	SELECT
-		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
+		numero_cliente, nombre_cliente, emi_rfc, emi_nombre, sum(saldo) AS saldo,
 		null as en_plazo,
 	    sum(saldo) as d_8,
 	    null as d_15,
@@ -133,10 +144,10 @@ FROM (
 	    null as md_60
 	FROM cartera
 	WHERE cartera.dias BETWEEN 1 AND 8
-	GROUP BY numero_cliente, nombre_cliente
+	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
 	UNION
 	SELECT
-		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
+		numero_cliente, nombre_cliente, emi_rfc, emi_nombre, sum(saldo) AS saldo,
 		null as en_plazo,
 	    sum(saldo) as d_8,
 	    null as d_15,
@@ -145,10 +156,10 @@ FROM (
 	    null as md_60
 	FROM cartera
 	WHERE cartera.dias BETWEEN 1 AND 8
-	GROUP BY numero_cliente, nombre_cliente
+	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
 	UNION
 	SELECT
-		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
+		numero_cliente, nombre_cliente, emi_rfc, emi_nombre, sum(saldo) AS saldo,
 		null as en_plazo,
 	    null as d_8,
 	    sum(saldo) as d_15,
@@ -157,10 +168,10 @@ FROM (
 	    null as md_60
 	FROM cartera
 	WHERE cartera.dias BETWEEN 9 AND 15
-	GROUP BY numero_cliente, nombre_cliente
+	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
 	UNION
 	SELECT
-		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
+		numero_cliente, nombre_cliente, emi_rfc, emi_nombre, sum(saldo) AS saldo,
 		null as en_plazo,
 	    null as d_8,
 	    null as d_15,
@@ -169,10 +180,10 @@ FROM (
 	    null as md_60
 	FROM cartera
 	WHERE cartera.dias BETWEEN 16 AND 30
-	GROUP BY numero_cliente, nombre_cliente
+	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
 	UNION
 	SELECT
-		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
+		numero_cliente, nombre_cliente, emi_rfc, emi_nombre, sum(saldo) AS saldo,
 		null as en_plazo,
 	    null as d_8,
 	    null as d_15,
@@ -181,10 +192,10 @@ FROM (
 	    null as md_60
 	FROM cartera
 	WHERE cartera.dias BETWEEN 31 AND 60
-	GROUP BY numero_cliente, nombre_cliente
+	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
 	UNION
 	SELECT
-		numero_cliente, nombre_cliente, sum(saldo) AS saldo,
+		numero_cliente, nombre_cliente, emi_rfc, emi_nombre, sum(saldo) AS saldo,
 		null as en_plazo,
 	    null as d_8,
 	    null as d_15,
@@ -193,11 +204,11 @@ FROM (
 	    sum(saldo) as md_60
 	FROM cartera
 	WHERE cartera.dias > 60
-	GROUP BY numero_cliente, nombre_cliente
+	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente
 ) x
 GROUP BY
-	numero_cliente, nombre_cliente
-ORDER BY x.nombre_cliente]]>
+	emi_rfc, emi_nombre, numero_cliente, nombre_cliente
+ORDER BY x.emi_nombre, x.nombre_cliente]]>
 	</queryString>
 	<field name="numero_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cliente"/>
@@ -206,6 +217,14 @@ ORDER BY x.nombre_cliente]]>
 	<field name="nombre_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="nombre_cliente"/>
 		<property name="com.jaspersoft.studio.field.label" value="nombre_cliente"/>
+	</field>
+	<field name="emi_rfc" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="emi_rfc"/>
+		<property name="com.jaspersoft.studio.field.label" value="emi_rfc"/>
+	</field>
+	<field name="emi_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="emi_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="emi_nombre"/>
 	</field>
 	<field name="saldo" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="saldo"/>
@@ -259,13 +278,188 @@ ORDER BY x.nombre_cliente]]>
 	<variable name="sumaSaldo" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{saldo}]]></variableExpression>
 	</variable>
+	<variable name="SumaEmi8d" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{d_8}]]></variableExpression>
+	</variable>
+	<variable name="sumaEmiCtes" class="java.lang.Integer" resetType="Group" resetGroup="Emisor Group" calculation="Count">
+		<variableExpression><![CDATA[$F{nombre_cliente}]]></variableExpression>
+	</variable>
+	<variable name="sumaEmiPlazo" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{en_plazo}]]></variableExpression>
+	</variable>
+	<variable name="SumaEmi15d" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{d_15}]]></variableExpression>
+	</variable>
+	<variable name="SumaEmi30d" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{d_30}]]></variableExpression>
+	</variable>
+	<variable name="SumaEmi60d" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{d_60}]]></variableExpression>
+	</variable>
+	<variable name="sumaEmi60Md" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{md_60}]]></variableExpression>
+	</variable>
+	<variable name="sumaEmiSaldo" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{saldo}]]></variableExpression>
+	</variable>
+	<group name="Emisor Group">
+		<groupExpression><![CDATA[$F{emi_nombre}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField>
+					<reportElement x="0" y="0" width="1150" height="20" uuid="cff6b328-ef7b-485f-8bfd-55fa7faa5847">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["EMISOR: " + $F{emi_rfc} + " - " + $F{emi_nombre}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50">
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="908" y="0" width="100" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="2808399f-9fea-40f1-a44c-d32735519423">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{SumaEmi60d}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="709" y="0" width="99" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="bf407fcc-0f3e-499d-925a-17882dc86810">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{SumaEmi15d}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="1008" y="0" width="142" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="0944ffce-3fde-4db1-aa72-fd2f4657902e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmi60Md}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="0" width="280" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="4ab109f6-138d-4b57-9c82-3d01d44598a5">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[TOTAL EMISOR: ]]></text>
+				</staticText>
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="808" y="0" width="100" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="e57319ca-cb06-476d-895b-b1b45201047a">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{SumaEmi30d}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="420" y="0" width="160" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="9a21045e-250a-453b-b3bb-8c447856b9fa">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmiPlazo}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="280" y="0" width="140" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="807ba671-24a1-4113-87bd-bd89f5aec20e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmiSaldo}]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="580" y="0" width="129" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="0e003f5f-57ac-4158-863b-99d97685414b">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{SumaEmi8d}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="0" width="1150" height="1" forecolor="#2196F3" uuid="e59f2f4e-fc89-467b-8c2b-6f2fd014b9b1">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="114" splitType="Stretch">
+		<band height="70" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<image>
-				<reportElement x="0" y="0" width="170" height="110" uuid="aabcebf4-6d14-4d3e-b481-58620d51b8df"/>
+				<reportElement x="0" y="0" width="170" height="70" uuid="aabcebf4-6d14-4d3e-b481-58620d51b8df"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<staticText>
@@ -277,7 +471,7 @@ ORDER BY x.nombre_cliente]]>
 				<textElement textAlignment="Center">
 					<font fontName="SansSerif" size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[REPORTE DE ANTIGUEDAD DE SALDOS- CONDENSADO]]></text>
+				<text><![CDATA[ANTIGUEDAD DE SALDOS]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy">
 				<reportElement x="580" y="31" width="570" height="18" uuid="af213159-6056-4b15-9225-bc779eb6545a"/>
@@ -287,7 +481,7 @@ ORDER BY x.nombre_cliente]]>
 				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="174" y="31" width="406" height="18" uuid="ef1b5e86-ec41-4340-a850-c16abb8bc783"/>
+				<reportElement x="0" y="31" width="580" height="18" uuid="ef1b5e86-ec41-4340-a850-c16abb8bc783"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>
 				</textElement>
@@ -296,12 +490,13 @@ ORDER BY x.nombre_cliente]]>
 		</band>
 	</title>
 	<columnHeader>
-		<band height="10" splitType="Stretch">
+		<band height="12" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="580" y="-1" width="128" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="e8886140-b0b7-4b64-a5f1-c3089039474c">
+				<reportElement key="" mode="Opaque" x="580" y="0" width="128" height="12" forecolor="#F7EEED" backcolor="#2196F3" uuid="e8886140-b0b7-4b64-a5f1-c3089039474c">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -315,10 +510,8 @@ ORDER BY x.nombre_cliente]]>
 				<text><![CDATA[1-8 dias]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="808" y="-1" width="100" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="f065ae36-280e-43a2-bdec-b0d31b12983e">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<reportElement key="" mode="Opaque" x="808" y="0" width="100" height="12" forecolor="#F7EEED" backcolor="#2196F3" uuid="f065ae36-280e-43a2-bdec-b0d31b12983e">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<box>
@@ -333,9 +526,7 @@ ORDER BY x.nombre_cliente]]>
 				<text><![CDATA[16-30 dias]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="1008" y="-1" width="142" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="be0a2ba7-e11b-4969-95e6-747e41802be4">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<reportElement key="" mode="Opaque" x="1008" y="0" width="142" height="12" forecolor="#F7EEED" backcolor="#2196F3" uuid="be0a2ba7-e11b-4969-95e6-747e41802be4">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
@@ -351,10 +542,8 @@ ORDER BY x.nombre_cliente]]>
 				<text><![CDATA[61 ó mas dias]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="420" y="-1" width="160" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="b932fd74-593f-4288-b190-3e225f7560b4">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<reportElement key="" mode="Opaque" x="420" y="0" width="160" height="12" forecolor="#F7EEED" backcolor="#2196F3" uuid="b932fd74-593f-4288-b190-3e225f7560b4">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<box>
@@ -369,10 +558,10 @@ ORDER BY x.nombre_cliente]]>
 				<text><![CDATA[Al corriente]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="708" y="-1" width="100" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="89104a13-3b16-47cc-8737-de8d6bfb05a0">
+				<reportElement key="" mode="Opaque" x="708" y="0" width="100" height="12" forecolor="#F7EEED" backcolor="#2196F3" uuid="89104a13-3b16-47cc-8737-de8d6bfb05a0">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -386,11 +575,9 @@ ORDER BY x.nombre_cliente]]>
 				<text><![CDATA[9-15 dias]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="908" y="-1" width="100" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="31e76e81-0af7-4794-a919-2450a2a5669d">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<reportElement key="" mode="Opaque" x="908" y="0" width="100" height="12" forecolor="#F7EEED" backcolor="#2196F3" uuid="31e76e81-0af7-4794-a919-2450a2a5669d">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -404,10 +591,8 @@ ORDER BY x.nombre_cliente]]>
 				<text><![CDATA[31-60 dias]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="280" y="-1" width="140" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="a5a7e966-e6d7-4c63-b7f0-71e4b338a681">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<reportElement key="" mode="Opaque" x="280" y="0" width="140" height="12" forecolor="#F7EEED" backcolor="#2196F3" uuid="a5a7e966-e6d7-4c63-b7f0-71e4b338a681">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<box>
@@ -422,11 +607,11 @@ ORDER BY x.nombre_cliente]]>
 				<text><![CDATA[Saldo]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="0" y="-1" width="280" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="50e914b1-de97-4b26-9de9-ce4045f83b85">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<reportElement key="" mode="Opaque" x="0" y="0" width="280" height="12" forecolor="#F7EEED" backcolor="#2196F3" uuid="50e914b1-de97-4b26-9de9-ce4045f83b85">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -443,15 +628,15 @@ ORDER BY x.nombre_cliente]]>
 	</columnHeader>
 	<detail>
 		<band height="21" splitType="Stretch">
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="280" y="0" width="139" height="21" uuid="2f88cf76-05e0-48af-a17f-abcf04ce21b5"/>
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+				<reportElement x="280" y="0" width="140" height="21" uuid="2f88cf76-05e0-48af-a17f-abcf04ce21b5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{saldo}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="419" y="0" width="162" height="21" uuid="ec88fdd0-851e-4cb2-9b19-149dfa7b4642">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+				<reportElement x="420" y="0" width="160" height="21" uuid="ec88fdd0-851e-4cb2-9b19-149dfa7b4642">
 					<printWhenExpression><![CDATA[new Boolean($F{en_plazo}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -459,8 +644,8 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{en_plazo}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement x="581" y="0" width="128" height="21" uuid="93dc4ffc-9286-4616-ac32-222eccd4ffe9">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+				<reportElement x="580" y="0" width="129" height="21" uuid="93dc4ffc-9286-4616-ac32-222eccd4ffe9">
 					<printWhenExpression><![CDATA[new Boolean($F{d_8}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -468,7 +653,7 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{d_8}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="709" y="0" width="99" height="21" uuid="74f65ef6-69f4-4777-8840-ef1fc3aa9f7c">
 					<printWhenExpression><![CDATA[new Boolean($F{d_15}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
 				</reportElement>
@@ -477,7 +662,7 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{d_15}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="808" y="0" width="100" height="21" uuid="83994a14-f8b0-42ef-aeb5-568a4e123115">
 					<printWhenExpression><![CDATA[new Boolean($F{d_30}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
 				</reportElement>
@@ -486,7 +671,7 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{d_30}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="1008" y="0" width="142" height="21" uuid="192df768-cff3-4da5-b415-52a7490a6478">
 					<printWhenExpression><![CDATA[new Boolean($F{md_60}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
 				</reportElement>
@@ -495,7 +680,7 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{md_60}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="908" y="0" width="100" height="21" uuid="3fbdcd18-96a0-41b1-9571-d4536480761e">
 					<printWhenExpression><![CDATA[new Boolean($F{d_60}.compareTo(BigDecimal.ZERO) > 0)]]></printWhenExpression>
 				</reportElement>
@@ -513,36 +698,8 @@ ORDER BY x.nombre_cliente]]>
 	</detail>
 	<lastPageFooter>
 		<band height="23">
-			<staticText>
-				<reportElement mode="Opaque" x="0" y="11" width="103" height="12" forecolor="#FFFCFC" backcolor="#2196F3" uuid="a84b15bb-4525-4ca3-9fb3-fb4a6638612c">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="SansSerif" isBold="true"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="103" y="11" width="177" height="12" forecolor="#FFFCFC" backcolor="#2196F3" uuid="99548bba-d9b5-421e-8a69-114a19e15606"/>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="SansSerif" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$V{sumaCtes}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="460" y="11" width="137" height="12" forecolor="#FFFFFF" backcolor="#2196F3" uuid="51ead45c-9c13-45ec-a21d-7c164b3cb38b"/>
+			<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="420" y="11" width="160" height="12" forecolor="#FFFFFF" backcolor="#2196F3" uuid="51ead45c-9c13-45ec-a21d-7c164b3cb38b"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -554,8 +711,8 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{sumaPlazo}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="597" y="11" width="111" height="12" forecolor="#FFFCFC" backcolor="#2196F3" uuid="67148c54-b041-46d2-aa1a-cfe36158bb2f"/>
+			<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="580" y="11" width="128" height="12" forecolor="#FFFCFC" backcolor="#2196F3" uuid="67148c54-b041-46d2-aa1a-cfe36158bb2f"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -567,7 +724,7 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{suma8d}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement mode="Opaque" x="708" y="11" width="100" height="12" forecolor="#FFFCFC" backcolor="#2196F3" uuid="6ddafb0b-b730-4451-8f13-345b911a020a"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -580,7 +737,7 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{suma15d}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement mode="Opaque" x="808" y="11" width="99" height="12" forecolor="#FFFCFC" backcolor="#2196F3" uuid="281cf00e-b1f7-488d-99e2-308c2f228952"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -593,7 +750,7 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{suma30d}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement mode="Opaque" x="907" y="11" width="102" height="12" forecolor="#FFFCFC" backcolor="#2196F3" uuid="9453c70a-6c8a-42bb-9750-5c93f14ac020"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -606,7 +763,7 @@ ORDER BY x.nombre_cliente]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{d_60}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement mode="Opaque" x="1009" y="11" width="141" height="12" forecolor="#FFFCFC" backcolor="#2196F3" uuid="78ae4ea7-0efb-4086-b624-fcf462770267"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -620,14 +777,14 @@ ORDER BY x.nombre_cliente]]>
 				<textFieldExpression><![CDATA[$F{md_60}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="60" y="11" width="43" height="12" forecolor="#F7E9E9" uuid="90250686-dfb6-406c-8811-83c475d94e72"/>
+				<reportElement mode="Opaque" x="0" y="11" width="280" height="12" forecolor="#F7E9E9" backcolor="#2196F3" uuid="90250686-dfb6-406c-8811-83c475d94e72"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total:]]></text>
 			</staticText>
-			<textField textAdjust="StretchHeight" pattern="¤#,##0.00;¤-##0.00" isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="280" y="11" width="180" height="12" forecolor="#FFFFFF" backcolor="#2196F3" uuid="2e891fff-4d71-44cb-b51b-3a8f47da8ba5"/>
+			<textField textAdjust="StretchHeight" pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="280" y="11" width="140" height="12" forecolor="#FFFFFF" backcolor="#2196F3" uuid="2e891fff-4d71-44cb-b51b-3a8f47da8ba5"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
