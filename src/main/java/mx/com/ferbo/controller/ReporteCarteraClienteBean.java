@@ -23,7 +23,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -38,6 +40,9 @@ public class ReporteCarteraClienteBean implements Serializable{
 	
 	private Cliente clienteSelect;
 	private List<Cliente> listCliente;
+	private List<EmisoresCFDIS> emisorList;
+	private EmisoresCFDIS emisorSelect;
+	private EmisoresCFDISDAO emisoresDAO;
 	
 	private Date fecha;
 	private Date maxDate;
@@ -47,19 +52,20 @@ public class ReporteCarteraClienteBean implements Serializable{
     private HttpServletRequest request;
 	
 	public ReporteCarteraClienteBean() {
-		
 		clienteSelect = new Cliente();
 		listCliente = new ArrayList<Cliente>();
-		
+		emisoresDAO = new EmisoresCFDISDAO();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init(){
-		faceContext = FacesContext.getCurrentInstance();
-        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		this.faceContext = FacesContext.getCurrentInstance();
+        this.request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		
-		listCliente = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+		this.listCliente = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+		this.emisorList = emisoresDAO.buscarTodos();
+		this.emisorSelect = new EmisoresCFDIS();
 		
 		fecha = new Date();
 		Date today = new Date();
@@ -100,8 +106,6 @@ public class ReporteCarteraClienteBean implements Serializable{
 	}
 
 	public void exportarPdf() {
-		
-		System.out.println("Exportando a pdf.....");
 		String jasperPath = null;
 		String filename = null;
 		String images = null;
@@ -144,10 +148,16 @@ public class ReporteCarteraClienteBean implements Serializable{
 					clienteCve = clienteSelect.getCteCve();
 				}
 				
+				String emisorRFC = null;
+				if(emisorSelect == null)
+					emisorRFC = null;
+				else
+					emisorRFC = emisorSelect.getNb_rfc();
 			
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
 				parameters.put("idCliente",clienteCve );
+				parameters.put("emisorRFC", emisorRFC);
 				parameters.put("fecha",fecha );
 				parameters.put("imagen", imgfile.getPath());
 				log.info("Parametros: " + parameters.toString());
@@ -192,10 +202,16 @@ public class ReporteCarteraClienteBean implements Serializable{
 					clienteCve = clienteSelect.getCteCve();
 				}
 				
-			
+				String emisorRFC = null;
+				if(emisorSelect == null)
+					emisorRFC = null;
+				else
+					emisorRFC = emisorSelect.getNb_rfc();
+				
 				connection = EntityManagerUtil.getConnection();
 				parameters.put("REPORT_CONNECTION", connection);
 				parameters.put("idCliente",clienteCve );
+				parameters.put("emisorRFC", emisorRFC);
 				parameters.put("fecha",fecha );
 				parameters.put("imagen", imgfile.getPath());
 				log.info("Parametros: " + parameters.toString());
@@ -262,10 +278,16 @@ public class ReporteCarteraClienteBean implements Serializable{
 						clienteCve = clienteSelect.getCteCve();
 					}
 					
+					String emisorRFC = null;
+					if(emisorSelect == null)
+						emisorRFC = null;
+					else
+						emisorRFC = emisorSelect.getNb_rfc();
 				
 					connection = EntityManagerUtil.getConnection();
 					parameters.put("REPORT_CONNECTION", connection);
 					parameters.put("idCliente",clienteCve );
+					parameters.put("emisorRFC", emisorRFC);
 					parameters.put("fecha",fecha );
 					parameters.put("imagen", imgfile.getPath());
 					log.info("Parametros: " + parameters.toString());
@@ -310,10 +332,16 @@ public class ReporteCarteraClienteBean implements Serializable{
 						clienteCve = clienteSelect.getCteCve();
 					}
 					
+					String emisorRFC = null;
+					if(emisorSelect == null)
+						emisorRFC = null;
+					else
+						emisorRFC = emisorSelect.getNb_rfc();
 				
 					connection = EntityManagerUtil.getConnection();
 					parameters.put("REPORT_CONNECTION", connection);
 					parameters.put("idCliente",clienteCve );
+					parameters.put("emisorRFC", emisorRFC);
 					parameters.put("fecha",fecha );
 					parameters.put("imagen", imgfile.getPath());
 					log.info("Parametros: " + parameters.toString());
@@ -339,6 +367,22 @@ public class ReporteCarteraClienteBean implements Serializable{
 
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
+	}
+
+	public List<EmisoresCFDIS> getEmisorList() {
+		return emisorList;
+	}
+
+	public void setEmisorList(List<EmisoresCFDIS> emisorList) {
+		this.emisorList = emisorList;
+	}
+
+	public EmisoresCFDIS getEmisorSelect() {
+		return emisorSelect;
+	}
+
+	public void setEmisorSelect(EmisoresCFDIS emisorSelect) {
+		this.emisorSelect = emisorSelect;
 	}
 	
 	

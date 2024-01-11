@@ -9,56 +9,35 @@
 
     <ui:define name="content">
         <h:form id="form">
-        <p:breadCrumb>
-            <p:menuitem value="Home" outcome="/dashboard"/>
-            <p:menuitem value="Reportes"/>
-            <p:menuitem value="Facturacion"/>
-            <p:menuitem value="Cartera De Cliente" outcome="/protected/reportes/CarteraCliente"/>
-        </p:breadCrumb>
-        
         <p:growl id="messages" showDetail="true" />
-        
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
                     <div class="card">
-                        
                         <p:fieldset legend="Consultar" >
-                        
-	                       	<span class="ui-float-label ui-input-icon-left">
-	                       		<p:selectOneMenu id="orden" autoWidth="true" value="#{reporteCarteraClienteBean.consulta}">
-	                       			<f:selectItem itemLabel="Concentrada" itemValue="Concentrada"></f:selectItem>
-	                       			<f:selectItem itemLabel="Desglosada" itemValue="Desglosada"></f:selectItem>
-	                       		</p:selectOneMenu>
-	                       		<p:outputLabel for="orden" value="Ordenar Por" />
-	                       	</span>
-                        
+                       		<p:selectOneMenu id="orden" autoWidth="true" value="#{reporteCarteraClienteBean.consulta}">
+                       			<f:selectItem itemLabel="Concentrada" itemValue="Concentrada"></f:selectItem>
+                       			<f:selectItem itemLabel="Desglosada" itemValue="Desglosada"></f:selectItem>
+                       		</p:selectOneMenu>
                         </p:fieldset>
-                        
-                        <p:fieldset legend="Periodo" styleClass="p-mt-4">
-                        
-                        	<span class="ui-float-label ui-input-icon-left">
-	                       		<p:datePicker id="fecha" showIcon="true" value="#{reporteCarteraClienteBean.fecha}"  maxdate="#{reporteCarteraClienteBean.maxDate}">
-	                       			<p:ajax process="@this" />
-	                       			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-	                       		</p:datePicker>                       	
-	                       		<p:outputLabel for="fecha" value="Al Dia" />
-	                       	</span>
-	                       	
+                        <p:fieldset legend="Fecha de corte" styleClass="p-mt-4">
+                       		<p:datePicker id="fecha" showIcon="true" value="#{reporteCarteraClienteBean.fecha}"  maxdate="#{reporteCarteraClienteBean.maxDate}">
+                       			<p:ajax process="@this" />
+                       			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                       		</p:datePicker>                       	
 	                   	</p:fieldset>
-	                   	
-	                   	<p:fieldset legend="Cliente" styleClass="p-mt-4">
-	                   	
-	                   		<span class="ui-float-label ui-input-icon-left">
-	                       		<p:selectOneMenu id="cliente" autoWidth="true" converter="entityConverter" value="#{reporteCarteraClienteBean.clienteSelect}" >
-	                       			<f:selectItem itemLabel="Todos los Clientes" itemValue="" />
-	                       			<f:selectItems value="#{reporteCarteraClienteBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-	                       		</p:selectOneMenu>                       	
-	                       		<p:outputLabel for="cliente" value="Cliente" />
-	                       	</span>
-	                       		                   
+	                   	<p:fieldset legend="Cliente">
+                       		<p:selectOneMenu id="cliente" autoWidth="true" converter="entityConverter" value="#{reporteCarteraClienteBean.clienteSelect}" >
+                       			<f:selectItem itemLabel="Todos los Clientes" itemValue="" />
+                       			<f:selectItems value="#{reporteCarteraClienteBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+                       		</p:selectOneMenu>                       	
 	                   	</p:fieldset>
-	                	                	
-	                 	
+	                   	<p:fieldset legend="Emisor">
+							<p:selectOneMenu id="Emisor" value="#{reporteCarteraClienteBean.emisorSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="Todos los emisores" itemValue="" />
+								<f:selectItems value="#{reporteCarteraClienteBean.emisorList}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"/>
+								<p:ajax process="@this" />
+							</p:selectOneMenu>
+						</p:fieldset>
 	                 	<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
 					 	 <p:toolbar>
 							<p:toolbarGroup>

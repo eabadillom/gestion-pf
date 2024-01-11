@@ -4,7 +4,7 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="359"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="629"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionProduccionMySQL.jrdax"/>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[$P{imagen}]]></defaultValueExpression>
 	</parameter>
@@ -14,8 +14,13 @@
 	<parameter name="fecha" class="java.util.Date">
 		<defaultValueExpression><![CDATA[$P{fecha}]]></defaultValueExpression>
 	</parameter>
+	<parameter name="emisorRFC" class="java.lang.String">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT
+		<![CDATA[select
+	emi_rfc,
+	emi_nombre,
 	numero_cliente,
 	nombre_cliente,
 	nom_serie,
@@ -26,7 +31,9 @@
 	iva,
 	f_status
 FROM (
-	SELECT
+	select
+		f.emi_rfc,
+		f.emi_nombre,
 		f.numero_cliente,
 		f.nombre_cliente,
 		f.nom_serie,
@@ -41,10 +48,13 @@ FROM (
 		AND f.status NOT IN (0, 2)
 		AND f.fecha <= $P{fecha}
 		AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
+		AND (f.emi_rfc = $P{emisorRFC} or $P{emisorRFC} IS NULL)
 	
 	UNION ALL
 	
-	SELECT
+	select
+		factura.emi_rfc,
+		factura.emi_nombre,
 		factura.numero_cliente,
 		factura.nombre_cliente,
 		factura.nom_serie,
@@ -83,9 +93,18 @@ FROM (
 		(factura.total - ingreso.monto) > 0
 		AND ingreso.factura IN ( SELECT f.id FROM factura f WHERE f.fecha <= $P{fecha} )
 		AND (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
+		AND (factura.emi_rfc = $P{emisorRFC} or $P{emisorRFC} IS NULL)
 ) t
-ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
+ORDER BY emi_nombre, nombre_cliente, numero_cliente, nom_serie, numero]]>
 	</queryString>
+	<field name="emi_rfc" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="emi_rfc"/>
+		<property name="com.jaspersoft.studio.field.label" value="emi_rfc"/>
+	</field>
+	<field name="emi_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="emi_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="emi_nombre"/>
+	</field>
 	<field name="numero_cliente" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cliente"/>
 		<property name="com.jaspersoft.studio.field.label" value="numero_cliente"/>
@@ -146,6 +165,83 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 	<variable name="totalSaldo" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{aPagar}]]></variableExpression>
 	</variable>
+	<variable name="sumaEmiSubtotal" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{subtotal}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+	</variable>
+	<variable name="sumaEmiIVA" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{iva}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+	</variable>
+	<variable name="sumaEmiSaldo" class="java.math.BigDecimal" resetType="Group" resetGroup="Emisor Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{aPagar}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+	</variable>
+	<group name="Emisor Group">
+		<groupExpression><![CDATA[$F{emi_nombre}]]></groupExpression>
+		<groupHeader>
+			<band height="18">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField>
+					<reportElement x="0" y="0" width="618" height="18" uuid="f0a342c9-f68d-41ec-8b1f-fb95d37b53d2">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["EMISOR: " + $F{emi_rfc} + " - " + $F{emi_nombre}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="17" width="618" height="1" forecolor="#2196F3" uuid="a3e9139e-4894-4606-8236-a5d319d805dd">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50">
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="361" y="0" width="85" height="17" uuid="00d5a4a1-1337-4c95-af3e-642bb147eb6b"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+						<font isBold="true" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmiSubtotal}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-##0.##">
+					<reportElement x="446" y="0" width="84" height="17" uuid="07972a23-bf2f-46b2-b3a2-8dc6cea3812e"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmiIVA}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.##;¤-#,##0.##">
+					<reportElement x="530" y="0" width="88" height="17" uuid="85c1c229-ac12-4aec-914d-4e4661087887"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumaEmiSaldo}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="0" width="621" height="1" forecolor="#2196F3" uuid="29d0a442-1799-472c-9da9-6b0d746f346e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</line>
+				<staticText>
+					<reportElement x="0" y="0" width="160" height="17" forecolor="#000000" uuid="3651adfb-cc8c-402c-ae65-d2e149a27c5b">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total emisor:]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
 	<group name="Cliente">
 		<groupExpression><![CDATA[$F{nombre_cliente}]]></groupExpression>
 		<groupHeader>
@@ -158,14 +254,14 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<textElement markup="styled">
 						<font isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{nombre_cliente}+"</style>"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
 		<groupFooter>
 			<band height="18">
 				<staticText>
-					<reportElement x="0" y="0" width="160" height="17" uuid="7db96550-abdc-4eee-bba1-dcd7ee9e6578">
+					<reportElement x="0" y="0" width="160" height="17" forecolor="#2199F6" uuid="7db96550-abdc-4eee-bba1-dcd7ee9e6578">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Right" markup="styled">
@@ -174,31 +270,31 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<text><![CDATA[<style pdfFontName= 'Helvetica-Bold'>Total Cliente:</style>]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="160" y="0" width="200" height="17" uuid="647d85fc-8866-45ed-bd08-fcc3dc98c357"/>
+					<reportElement x="160" y="0" width="200" height="17" forecolor="#2199F6" uuid="647d85fc-8866-45ed-bd08-fcc3dc98c357"/>
 					<textElement textAlignment="Left" markup="styled">
 						<font isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{totalClientes}+"</style>"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{totalClientes}]]></textFieldExpression>
 				</textField>
 				<line>
 					<reportElement x="0" y="17" width="618" height="1" forecolor="#2199F6" uuid="ee315132-9eaa-4392-aadc-b59b91c379c6"/>
 				</line>
 				<textField pattern="$#,##0.00;$-#,##0.00">
-					<reportElement x="361" y="0" width="85" height="17" uuid="c4015c4d-8a29-432d-b9f0-347dfc866aa6"/>
+					<reportElement x="361" y="0" width="85" height="17" forecolor="#2199F6" uuid="c4015c4d-8a29-432d-b9f0-347dfc866aa6"/>
 					<textElement textAlignment="Right" markup="styled">
 						<font size="10" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{sumaSubtotal}]]></textFieldExpression>
 				</textField>
 				<textField pattern="$#,##0.00;$-#,##0.00">
-					<reportElement x="446" y="0" width="84" height="17" uuid="957717ed-ce10-4df4-972a-b07a603ab629"/>
+					<reportElement x="446" y="0" width="84" height="17" forecolor="#2199F6" uuid="957717ed-ce10-4df4-972a-b07a603ab629"/>
 					<textElement textAlignment="Right" markup="styled">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{I.V.A.}]]></textFieldExpression>
 				</textField>
 				<textField pattern="$#,##0.00;$-#,##0.00">
-					<reportElement x="530" y="0" width="88" height="17" uuid="8e1b6291-5cdc-4f73-9bf7-4bb3b57cc7cd"/>
+					<reportElement x="530" y="0" width="88" height="17" forecolor="#2199F6" uuid="8e1b6291-5cdc-4f73-9bf7-4bb3b57cc7cd"/>
 					<textElement textAlignment="Right" markup="styled">
 						<font isBold="true"/>
 					</textElement>
@@ -394,8 +490,8 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<pen lineColor="#FFFFFF"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
-				<textElement textAlignment="Right" markup="styled">
-					<font isBold="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
+					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[<style pdfFontName= 'Helvetica-Bold'>Total</style>]]></text>
 			</staticText>
@@ -406,10 +502,10 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
-				<textElement textAlignment="Center" markup="styled">
-					<font isBold="true"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $V{totalGeneral}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{totalGeneral}]]></textFieldExpression>
 			</textField>
 			<textField pattern="$#,##0.00;$-#,##0.00">
 				<reportElement mode="Opaque" x="360" y="0" width="86" height="20" forecolor="#FFFFFF" backcolor="#2199F6" uuid="dc64e684-ccc7-4441-aeaf-506b42e3c833"/>
@@ -418,7 +514,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
-				<textElement textAlignment="Right" markup="styled">
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{subTotal}]]></textFieldExpression>
@@ -430,7 +526,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
-				<textElement textAlignment="Right" markup="styled">
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{totalI.V.A.}]]></textFieldExpression>
@@ -445,7 +541,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
-				<textElement textAlignment="Right" markup="styled">
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{totalSaldo}]]></textFieldExpression>
@@ -456,6 +552,7 @@ ORDER BY nombre_cliente, numero_cliente, nom_serie, numero]]>
 					<leftPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
+				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[]]></text>
 			</staticText>
 		</band>
