@@ -167,21 +167,21 @@ ORDER BY emi_nombre, nombre_cliente, numero_cliente]]>
 		</groupHeader>
 		<groupFooter>
 			<band height="50">
-				<textField pattern="¤#,##0.##;¤-#,##0.##">
+				<textField pattern="$#,##0.##;$-#,##0.##">
 					<reportElement x="330" y="0" width="97" height="17" uuid="9f303441-1b40-4d3f-bf76-05fc61fc98c9"/>
 					<textElement textAlignment="Right" markup="none">
 						<font isBold="true" isStrikeThrough="false"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{sumaEmiSubtotal}]]></textFieldExpression>
 				</textField>
-				<textField pattern="¤#,##0.##;¤-##0.##">
+				<textField pattern="$#,##0.##;$-#,##0.##">
 					<reportElement x="427" y="0" width="89" height="17" uuid="46442ad8-ef7c-49a5-99c9-89eb443f078a"/>
 					<textElement textAlignment="Right" markup="styled">
 						<font isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{sumaEmiIVA}]]></textFieldExpression>
 				</textField>
-				<textField pattern="¤#,##0.##;¤-#,##0.##">
+				<textField pattern="$#,##0.##;$-#,##0.##">
 					<reportElement x="516" y="0" width="105" height="17" uuid="059519c3-b837-461a-9a3f-6c08e9a792da"/>
 					<textElement textAlignment="Right" markup="styled">
 						<font isBold="true"/>
