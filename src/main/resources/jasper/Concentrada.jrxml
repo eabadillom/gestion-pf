@@ -372,7 +372,7 @@ ORDER BY emi_nombre, nombre_cliente, numero_cliente]]>
 				<textElement textAlignment="Right" markup="none">
 					<font isBold="true" isStrikeThrough="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{sumaEmiSubtotal}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{sumaSubtotal}]]></textFieldExpression>
 			</textField>
 			<textField pattern="$#,##0.##;$-#,##0.##">
 				<reportElement x="427" y="0" width="89" height="17" uuid="0ec70ff7-f5d6-4fb7-b004-e43657fab803"/>
