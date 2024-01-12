@@ -152,7 +152,7 @@
 						<p:ajax event="rowSelectCheckbox"  listener="#{facturacionConstanciasBean.relacionConstanciaFacturaEntradas}" update="form:dt-constanciasE" />
 						<p:ajax event="rowUnselect" update="form:dt-constanciasE form:dt-serviciosEntrada" />
 						<p:ajax event="rowUnselectCheckbox" update="form:dt-constanciasE" listener="#{facturacionConstanciasBean.recalculoEntradas}"  />
-						<p:ajax event="toggleSelect" />
+						<p:ajax event="toggleSelect" update="form:dt-constanciasE" listener="#{facturacionConstanciasBean.recalculoEntradas}" />
 						<p:column selectionMode="multiple" exportable="false" />
 						<p:column headerText="Folio Cliente">
 							<h:outputText value="#{entrada.folioCliente}" />
@@ -236,7 +236,7 @@
 						<p:ajax event="rowSelectCheckbox" listener="#{facturacionConstanciasBean.relacionConstanciaFacturaVigencias}" update="form:dt-vigencias"/>
 						<p:ajax event="rowUnselect" update="form:dt-vigencias form:dt-serviciosVigencia" />
 						<p:ajax event="rowUnselectCheckbox" update="form:dt-vigencias" listener="#{facturacionConstanciasBean.recalculoVigencias()}" />
-						<p:ajax event="toggleSelect" />
+						<p:ajax event="toggleSelect" update="form:dt-vigencias" listener="#{facturacionConstanciasBean.recalculoVigencias()}" />
 						<p:column selectionMode="multiple" exportable="false"></p:column>
 						<p:column headerText="Folio Cliente">
 							<h:outputText value="#{vigencia.folioCliente}" />
@@ -315,7 +315,7 @@
 						<p:ajax event="rowSelectCheckbox" listener="#{facturacionConstanciasBean.recalculoServicioDs}" update="form:dt-servicios"/>
 						<p:ajax event="rowUnselect" update="form:dt-servicios" />
 						<p:ajax event="rowUnselectCheckbox" update="form:dt-servicios" listener="#{facturacionConstanciasBean.recalculoServicioDs}"/>
-						<p:ajax event="toggleSelect" />
+						<p:ajax event="toggleSelect" update="form:dt-servicios" listener="#{facturacionConstanciasBean.recalculoServicioDs}" />
 						<p:column selectionMode="multiple" exportable="false" />
 						<p:column headerText="Folio Cliente">
 							<h:outputText
@@ -378,7 +378,7 @@
 					<div>
 						<p:outputLabel  value="Metodo de Pago:" styleClass="p-mr-2" />
 						<b><p:outputLabel id="metodo"
-								value="#{facturacionConstanciasBean.metodoPagoSelect.cdMetodoPago} - #{facturacionConstanciasBean.metodoPagoSelect.nbMetodoPago}" /></b>
+								value="#{facturacionConstanciasBean.MPagoSelect.cdMetodoPago} - #{facturacionConstanciasBean.MPagoSelect.nbMetodoPago}" /></b>
 					</div>
 
 					<div>
@@ -423,11 +423,30 @@
 			<p:fieldset styleClass="p-mt-2">
 					 	 <p:toolbar>
 							<p:toolbarGroup>
-					  		  <div style="margin-top: 2rem;" align="center">
-								<p:splitButton value="Guardar" actionListener="#{facturacionConstanciasBean.saveFactura}" icon="pi pi-save" styleClass="ui-button-raised ui-button-secondary" >
-								 	<p:menuitem value="Imprimir" actionListener="#{facturacionConstanciasBean.jasper}"  icon="pi pi-file-pdf" ajax="false" process="@this"/>		
-						      		 <p:menuitem value="Nueva Factura" action="#{facturacionConstanciasBean.reset()}"  icon="pi pi-refresh" process="@this"/>
-						        </p:splitButton>
+				     		 <div style="margin-top: 2rem;" align="center" class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+					         
+					         <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton process="@this" actionListener="#{facturacionConstanciasBean.saveFactura}" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary"  ajax="false"/>
+				     		 </div>
+				     		 
+				     		  <div style="margin-top: 2rem;" align="center" class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+				     		 <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton process="@this" actionListener="#{facturacionConstanciasBean.reset()}" title="NuevaFactura" value="Nueva Factura" styleClass="ui-button-raised ui-button-secondary"  ajax="false"/>
+				     		 </div>
+					         
+				     		 <div style="margin-top: 2rem;" align="center" class="col-2">
+					            <p:divider layout="vertical">
+					            </p:divider>
+					         </div>
+					         
+				     		 <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+								<p:commandButton icon="pi pi-file-pdf"  process="@this" actionListener="#{facturacionConstanciasBean.jasper}" title="Imprimir" value=".pdf" styleClass="ui-button-raised ui-button-secondary"  ajax="false"/>
 				     		 </div>
 							         
 					         <div style="margin-top: 2rem;" align="center" class="col-2">
@@ -436,7 +455,7 @@
 					         </div>
        
 							 <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-								<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facturacionConstanciasBean.timbrado()}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>
+								<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facturacionConstanciasBean.timbrado()}" title="Timbrar" value="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>
 				     		 </div>
 							</p:toolbarGroup>
 

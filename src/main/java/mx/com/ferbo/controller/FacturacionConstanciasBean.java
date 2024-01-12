@@ -1016,7 +1016,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		fmp.setFacturaMedioPagoPK(facturaPK);
 		
 		MedioPago medioP = new MedioPago();
-		if(medioPagoSelect.getFormaPago()!=null) {
+		if((medioPagoSelect.getFormaPago()!=null)&&(medioPagoSelect.getFormaPago().equals(formaPagoCliente.getFormaPago()))) { //se queda con el medioPagoSelect anterior por tanto como en el segundo no es nulo entra a buscar el mismo mediopagoSelect
 			medioP = medioPagoDAO.buscarPorFormaPago(medioPagoSelect.getFormaPago());      //ERROR ,EDIO PAGO SELECT		
 		}else {
 			medioP = medioPagoDAO.buscarPorFormaPago(formaPagoCliente.getFormaPago());      //ERROR ,EDIO PAGO SELECT
