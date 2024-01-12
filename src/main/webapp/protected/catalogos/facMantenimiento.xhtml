@@ -82,7 +82,7 @@
 					<h:outputText value="#{(empty lista.uuid) ? '--' : 'SI'}"/>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-file-pdf" class="ui-button-info" process="@this" oncomplete="PF('dg-factura').show()" title="Descargar PDF" action="#{facMantenimentoBean.datosCliente}" update="dgDescarga " >
+					<p:commandButton icon="pi pi-bars" class="ui-button-info" process="@this" oncomplete="PF('dg-factura').show()" title="Descargar PDF" action="#{facMantenimentoBean.datosCliente}" update="dgDescarga " >
 						<f:setPropertyActionListener value="#{lista}" target="#{facMantenimentoBean.seleccion}" />
 					</p:commandButton>
 				</p:column>
@@ -172,25 +172,25 @@
 				</div>
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-field p-col-3 p-md-3">				
-						<p:outputLabel>SubTotal:</p:outputLabel>
-						<p:inputText value="#{facMantenimentoBean.seleccion.subtotal}"  readonly="true"/>				
+						<p:outputLabel>Subtotal:</p:outputLabel>
+						<p:inputNumber value="#{facMantenimentoBean.seleccion.subtotal}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true"/>
 						
 					</div>
 					
 					<div class="p-field p-col-3 p-md-3">			
-						<p:outputLabel>Iva:</p:outputLabel>
-						<p:inputText value="#{facMantenimentoBean.seleccion.iva}"  readonly="true"/>
+						<p:outputLabel>IVA:</p:outputLabel>
+						<p:inputNumber value="#{facMantenimentoBean.seleccion.iva}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true"/>
 					</div>
 					
 					<div class="p-field p-col-3 p-md-3">			
 						<p:outputLabel>Total:</p:outputLabel>
-						<p:inputText value="#{facMantenimentoBean.seleccion.total}" readonly="true" />
+						<p:inputNumber value="#{facMantenimentoBean.seleccion.total}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true"/>
 					</div>
 					
 				</div>
 				
 				<div class="p-field p-col-6 p-md-6" style="margin: auto;">
-				<p:commandButton value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}"/>
+				<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}"/>
 				</div>
 				<div class="p-field p-col-6 p-md-6" style="margin: auto;">
 					<p:commandButton value="Descargar factura"
