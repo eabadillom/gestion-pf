@@ -149,7 +149,7 @@
 					
 					<div class="p-field p-col-6 p-md-6">
 						<p:outputLabel>Fecha</p:outputLabel>
-						<p:datePicker value="#{facMantenimentoBean.fechaModificada}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}">
+						<p:datePicker value="#{facMantenimentoBean.seleccion.fecha}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}">
 									<p:ajax process="@this"/>
 									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>

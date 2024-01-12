@@ -153,7 +153,8 @@ public class FacMantenimentoBean implements Serializable {
 			factMedioPago = factMedioPagoDAO.buscarPorFactura(seleccion.getId());
 			factMedioPago.setMpDescripcion(mp.getMpDescripcion());
 			factMedioPago.setMpId(mp);
-			seleccion.setFecha(fechaModificada);
+			//seleccion.setFecha(fechaModificada);
+			
 			seleccion.setMetodoPago(cdMetodoPagoSelected);
 			if(factMedioPagoDAO.actualizar(factMedioPago ) == null && daoFac.actualizarFechaFactura(seleccion) == null) {
 				
