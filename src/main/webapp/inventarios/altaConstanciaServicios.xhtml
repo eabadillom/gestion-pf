@@ -19,6 +19,12 @@
 							<f:selectItems var="cte" value="#{altaConstanciaServicioBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
 							<p:ajax listener="#{altaConstanciaServicioBean.filtrarCliente}" process="@this" update=":form:selProducto :form:selServicio :form:txtFolio"/>
 						</p:selectOneMenu>
+						<p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{altaConstanciaServicioBean.plantaSelect}"
+							onchange="PF('statusDialog').show();">
+							<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true" />
+							<f:selectItems value="#{altaConstanciaServicioBean.listadoPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+							<p:ajax listener="#{altaConstanciaServicioBean.filtrarCliente}" process="@this" update=":form:selProducto :form:selServicio :form:txtFolio" oncomplete="PF('statusDialog').hide();"/>
+						</p:selectOneMenu>
 				</p:toolbarGroup>
 			</p:toolbar>
 			<h5></h5>

@@ -380,9 +380,8 @@ public class ClientesBean implements Serializable {
 	}
 	
 	public void nuevoMedio() {
-		System.out.println("Nuevo medio de contacto...");
+		log.info("Nuevo medio de contacto...");
 		this.medioContactoSelected = new MedioCnt();
-		
 	}
 	
 	public void addTipoMedioContacto() {
@@ -390,10 +389,15 @@ public class ClientesBean implements Serializable {
 			Telefono telefono = new Telefono();
 			this.medioContactoSelected.setIdTelefono(telefono);
 			this.medioContactoSelected.setIdMail(null);
+			log.info("Agregando tipo de medio Telefono.");
 		} else if ("m".equalsIgnoreCase(this.medioContactoSelected.getTpMedio())) {
+			TipoMail tipo = new TipoMailDAO().buscarPorId(1);
 			Mail mail = new Mail();
+			mail.setStPrincipal(true);
+			mail.setTpMail(tipo);
 			this.medioContactoSelected.setIdMail(mail);
 			this.medioContactoSelected.setIdTelefono(null);
+			log.info("Agregando tipo de medio Mail.");
 		}
 	}
 	
@@ -477,6 +481,7 @@ public class ClientesBean implements Serializable {
 			if(indexOf < 0) {
 				cliente.add(clienteContactoSelected);
 				clienteDAO.actualizar(cliente);
+				log.info("El cliente se actualizó correctamente: {}", cliente);
 				this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
 			}else {
 				
@@ -493,6 +498,7 @@ public class ClientesBean implements Serializable {
 						clienteContacto.setRecibeInventario(clienteContactoSelected.getRecibeInventario());
 						
 						clienteDAO.actualizar(cliente);
+						log.info("El cliente se actualizó correctamente: {}", cliente);
 					}
 				}
 			}
@@ -566,6 +572,8 @@ public class ClientesBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		
+		String daoResponse = null;
+		
 		try {
 			if(this.medioContactoSelected == null)
 				throw new InventarioException("No hay un medio de contacto seleccionado.");
@@ -575,15 +583,21 @@ public class ClientesBean implements Serializable {
 				medioCntList = new ArrayList<MedioCnt>();
 			medioCntList.add(this.medioContactoSelected);
 			
-			if("T".equalsIgnoreCase(medioContactoSelected.getTpMedio()))
+			if("T".equalsIgnoreCase(medioContactoSelected.getTpMedio())) {
 				this.medioContactoSelected.getIdTelefono().setMedioCntList(medioCntList);
-			if("M".equalsIgnoreCase(medioContactoSelected.getTpMedio()))
+				log.info("Estableciendo medio de contacto: {}", medioContactoSelected.getIdTelefono().getNbTelefono());
+			}
+			if("M".equalsIgnoreCase(medioContactoSelected.getTpMedio())) {
 				this.medioContactoSelected.getIdMail().setMedioCntList(medioCntList);
+				log.info("Estableciendo medio de contacto: {}", medioContactoSelected.getIdMail().getNbMail());
+			}
 			
 			Contacto contacto = this.clienteContactoSelected.getIdContacto();
 			medioContactoSelected.setIdContacto(contacto);
 			medioContactoSelected.setIdMedio(null);
-			medioCntDAO.actualizar(medioContactoSelected);//cambie por guardar el metodo actualizar
+			daoResponse = medioCntDAO.actualizar(medioContactoSelected);
+			if(daoResponse == null)
+				log.info("El medio de contacto se guardó correctamente: {}", this.medioContactoSelected);
 			
 			medioCntList = medioCntDAO.buscarPorCriterios(medioContactoSelected);
 			

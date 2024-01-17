@@ -137,19 +137,31 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<ConstanciaSalida> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
 		List<ConstanciaSalida> resultList = null;
 		EntityManager em = null;
+		Query sql = null;
 		
 		try {
+			if(folioCliente != null && folioCliente.contains("%") == false)
+				folioCliente = "%".concat(folioCliente).concat("%");
+			
 			em = EntityManagerUtil.getEntityManager();
-			resultList = em.createNamedQuery("ConstanciaSalida.findByPeriodoClienteFolio", ConstanciaSalida.class)
+			sql = em.createNativeQuery("SELECT * FROM (\n"
+					+ "	SELECT * FROM (\n"
+					+ "		SELECT *\n"
+					+ "		FROM constancia_salida cs\n"
+					+ "		where (:idCliente IS NULL OR cs.CLIENTE_CVE = :idCliente)\n"
+					+ "	) cs2 WHERE ((cs2.FECHA BETWEEN :fechaInicio AND :fechaFin) OR (:fechaInicio IS NULL OR :fechaFin IS NULL)) \n"
+					+ ") cs3 WHERE (:folioCliente IS NULL OR cs3.NUMERO like :folioCliente ) ORDER BY cs3.FECHA", ConstanciaSalida.class)
 					.setParameter("fechaInicio", fechaInicio)
 					.setParameter("fechaFin", fechaFin)
 					.setParameter("idCliente", idCliente)
 					.setParameter("folioCliente", folioCliente)
-					.getResultList()
 					;
+			resultList = sql.getResultList();
+			
 		} catch(Exception ex) {
 			log.error("Problema para consultar las constancias de salida...", ex);
 		} finally {

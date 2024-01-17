@@ -71,6 +71,9 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private List<PrecioServicio> alServicios;
 	private List<ProductoPorCliente> alProductosFiltered;
 	private List<UnidadDeManejo> alUnidades;
+	
+	private List<Planta> listadoPlantas;
+	private Planta plantaSelect;
 
 	private Date fecha;
 	private String folio;
@@ -120,6 +123,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 		alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		edoDAO = new EstadoConstanciaDAO();
 		plantaDAO = new PlantaDAO();
+		listadoPlantas = new ArrayList<>();
 		serieConstanciaDAO = new SerieConstanciaDAO();
 		selCliente = new Cliente();
 		constanciadep = new ConstanciaDeDeposito();
@@ -136,12 +140,18 @@ public class AltaConstanciaServicioBean implements Serializable {
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
 		fecha = new Date();
-//		clientes = clienteDAO.buscarTodos();
 		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		alUnidades = udmDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		estados = edoDAO.buscarTodos();
+		
+		if((usuario.getPerfil() == 1)||(usuario.getPerfil() == 4)) {
+			listadoPlantas.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
+		}else {
+			listadoPlantas = plantaDAO.findall(false);
+		}
+		plantaSelect = listadoPlantas.get(0);
 	}
 
 	public void filtrarCliente() {
@@ -223,6 +233,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 			
 			seriePK = new SerieConstanciaPK();
 			seriePK.setCliente(this.selCliente);
+			seriePK.setPlanta(this.plantaSelect);
 			seriePK.setTpSerie("S");
 			serie = serieConstanciaDAO.buscarPorId(seriePK);
 
@@ -698,6 +709,22 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
+	}
+
+	public List<Planta> getListadoPlantas() {
+		return listadoPlantas;
+	}
+
+	public void setListadoPlantas(List<Planta> listadoPlantas) {
+		this.listadoPlantas = listadoPlantas;
+	}
+
+	public Planta getPlantaSelect() {
+		return plantaSelect;
+	}
+
+	public void setPlantaSelect(Planta plantaSelect) {
+		this.plantaSelect = plantaSelect;
 	}
 
 }

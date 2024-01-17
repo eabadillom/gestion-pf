@@ -89,14 +89,13 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		partidaDAO = new PartidaDAO();
 		statusDAO = new StatusConstanciaSalidaDAO();
 		
-		
-//		listadoClientes = clienteDAO.buscarTodos();
 		listadoClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
-		fechaInicial = new Date();
-		fechaFinal = new Date();
+		if(listadoClientes.size() == 1)
+			this.cliente = listadoClientes.get(0);
 		constanciaSelect = new ConstanciaSalida();
 		statusCancelada = statusDAO.buscarPorId(StatusConstanciaSalida.STATUS_CANCELADA);
 		
+		log.info("El usuario {} ingresa a la consulta de constancias de salida.", this.usuario.getUsuario());
 	}
 	
 	public void buscarConstanciaSalida() {
@@ -105,6 +104,9 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		
 		if("".equalsIgnoreCase(this.folio))
 			this.folio = null;
+		
+		if(listadoClientes.size() == 1)
+			this.cliente = listadoClientes.get(0);
 		
 		listadoConstanciaSalida = constanciaSalidaDAO.buscar(fechaInicial, fechaFinal, (cliente == null ? null : cliente.getCteCve()), folio);
 	}
@@ -147,7 +149,6 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
 		try {
-			
 			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
 			URL resourceimg = getClass().getResource(images); 
 			String file = resource.getFile();//retorna la ubicacion del archivo

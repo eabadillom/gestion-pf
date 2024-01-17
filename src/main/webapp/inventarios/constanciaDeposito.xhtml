@@ -45,7 +45,7 @@
 						<p:selectOneMenu id="camara" autoWidth="false" value="#{constanciaDeDepositoBean.camaraSelect}" converter="entityConverter">
 							<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
 							<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />	
-							<p:ajax listener="#{constanciaDeDepositoBean.filtrarPosicion()}" update="posiciones camara" ></p:ajax>		
+							<p:ajax listener="#{constanciaDeDepositoBean.filtrarPosicion()}" update="camara" ></p:ajax>		
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-2 p-md-2">
@@ -65,7 +65,7 @@
 			<div style="padding-top: 2rem;">
 				<p:panel id="seleccion-mercancia" header="SELECCIONE LA MERCANCIA">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-6 p-md-6">
+						<div class="p-col-8 p-md-8">
 							<p:outputLabel value="Producto"/>
 							<p:selectOneMenu id="claveProducto" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.productoCve.productoCve}" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona Producto" noSelectionOption="true"/>
@@ -93,26 +93,26 @@
 								<p:ajax process="@this"></p:ajax>
 							</p:inputNumber>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<!-- <div class="p-col-2 p-md-2">
 							<p:outputLabel value="Ubicación" />
 							<p:selectOneMenu id="posiciones" autoWidth="false" value="#{constanciaDeDepositoBean.posicionCamaraSelect}" converter="entityConverter">
 								<f:selectItem itemLabel="Selecciona Ubicacion" itemValue="" noSelectionOption="true"></f:selectItem>
 								<f:selectItems value="#{constanciaDeDepositoBean.posiciones}" var="posicion" itemLabel="#{posicion.descPosicion}" itemValue="#{posicion}"/>
 								<p:ajax process="@this"></p:ajax>
 							</p:selectOneMenu>
-						</div>
+						</div> -->
 						<div class="p-col-2 p-md-2">
 							<p:outputLabel value="Valor de la mercancía"/>
 							<p:inputNumber value="#{constanciaDeDepositoBean.partida.valorMercancia}" placeholder="Valor($) Mercancia">
 								<p:ajax process="@this"></p:ajax>
 							</p:inputNumber>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<!-- <div class="p-col-2 p-md-2">
 							<p:outputLabel value="m&#178; por camara"/>
 							<p:inputNumber value="#{constanciaDeDepositoBean.partida.rendimiento}" placeholder="m&#178; por camara">
 								<p:ajax process="@this"></p:ajax>
 							</p:inputNumber>
-						</div>
+						</div> -->
 					</div>
 					<div class="p-grid ui-fluid p-col-12">
 					    <div class="p-col-2 p-md-2">

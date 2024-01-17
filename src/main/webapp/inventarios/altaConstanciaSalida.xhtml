@@ -187,7 +187,7 @@
 							<span>SUS PRODUCTOS</span>
 						</div>
 					</f:facet>
-					<p:column headerText="Entrada" width="3rem">
+					<p:column headerText="Entrada" width="5rem">
 						<h:outputText value="#{salida.folioEntrada}" />
 					</p:column>
 					<p:column headerText="Producto">
@@ -205,7 +205,7 @@
 					<p:column headerText="Temp.(°C)" width="4rem">
 						<h:outputText value="#{salida.temperatura}" />
 					</p:column>
-					<p:column>
+					<p:column width="3rem">
 						<p:commandButton class="ui-button-danger" icon="pi pi-times" actionListener="#{altaConstanciaSalidaBean.deleteDetalleConstanciaSalida(salida)}" update="form:dt-inventario">
 							<f:setPropertyActionListener value="#{salida}" target="#{altaConstanciaSalidaBean.detalleSalida}" />
 						</p:commandButton>

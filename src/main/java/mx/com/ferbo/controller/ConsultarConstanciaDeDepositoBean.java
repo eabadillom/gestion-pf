@@ -138,21 +138,19 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-		
-//		listadoClientes = clienteDAO.buscarTodos();
 		listadoClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		
-		fechaInicial = new Date();
-		fechaFinal = new Date();
+		if(listadoClientes.size() == 1)
+			this.cliente = listadoClientes.get(0);
+		
 		fechaCaducidad = new Date();
 		folio = "";
 		
 		Date today = new Date();
-		maxDate = new Date(today.getTime() );
+		maxDate = new Date(today.getTime());
 		
 		this.selectConstanciaDD = new ConstanciaDeDeposito();
 		this.selectConstanciaDD.setAvisoCve(new Aviso());
@@ -166,24 +164,18 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	public void buscarConstancias() {
 		Integer idCliente = null;
-		EntityManager em = null;
+		
 		try {
-			em = EntityManagerUtil.getEntityManager();
+			if(listadoClientes.size() == 1)
+				this.cliente = listadoClientes.get(0);
 			
 			if(cliente != null)
 				idCliente = cliente.getCteCve();
-			
-			constanciaDeDepositoDAO.setEm(em);
-			
-			log.info( getFechaInicial() + "" + getFechaFinal());
-			log.info( fechaFinal + "" + fechaInicial);//si trae las fechas dadas por el usuario
 			
 			listadoConstanciaDeDepositos = constanciaDeDepositoDAO.buscarPor(folio, idCliente, fechaInicial, fechaFinal);
 			
 		} catch(Exception ex) {
 			log.error("Problema en la búsqueda de constancias de depósito...", ex);
-		} finally {
-			EntityManagerUtil.close(em);
 		}
 	}
 	

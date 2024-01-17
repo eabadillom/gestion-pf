@@ -27,10 +27,12 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "candado_salida")
-@NamedQueries({ @NamedQuery(name = "CandadoSalida.findAll", query = "SELECT c FROM CandadoSalida c"),
+@NamedQueries({ @NamedQuery(name = "CandadoSalida.findAll", query = "SELECT c FROM CandadoSalida c ORDER BY c.cliente.cteNombre ASC"),
 		@NamedQuery(name = "CandadoSalida.findById", query = "SELECT c FROM CandadoSalida c WHERE c.id = :id"),
 		@NamedQuery(name = "CandadoSalida.findByHabilitado", query = "SELECT c FROM CandadoSalida c WHERE c.habilitado = :habilitado"),
-		@NamedQuery(name = "CandadoSalida.findByNumSalidas", query = "SELECT c FROM CandadoSalida c WHERE c.numSalidas = :numSalidas") })
+		@NamedQuery(name = "CandadoSalida.findByNumSalidas", query = "SELECT c FROM CandadoSalida c WHERE c.numSalidas = :numSalidas"),
+		@NamedQuery(name = "CandadoSalida.findByCliente", query = "SELECT c FROM CandadoSalida c WHERE c.cliente.cteCve = :idCliente")
+})
 public class CandadoSalida implements Serializable {
 
 	private static final long serialVersionUID = 1L;
