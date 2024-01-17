@@ -172,7 +172,14 @@ public class FacturamaBL {
 				ItemFullBindingModel item = new ItemFullBindingModel();
 				
 				item.setProductCode(sc.getCodigo());
-				item.setDescription(sc.getDescripcion());
+				String fecha = null;
+				try {
+					fecha = DateUtil.getString(sc.getConstancia().getConstanciaDeServicio().getFecha(), DateUtil.FORMATO_DD_MM_YYYY);
+				} catch(Exception ex) {
+					fecha = "";
+				}
+				String descripcion = String.format("%S - %S - %S", sc.getDescripcion(), sc.getConstancia().getFolioCliente(), fecha);
+				item.setDescription(descripcion);
 				ClaveUnidad claveUnidad = claveDAO.buscarPorId(sc.getCdUnidad());
 				item.setUnit(claveUnidad.getNbUnidad());
 				item.setUnitCode(sc.getCdUnidad());

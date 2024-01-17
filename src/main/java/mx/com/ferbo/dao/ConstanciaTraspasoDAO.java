@@ -144,13 +144,22 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 	
 	
 	
+	@SuppressWarnings("unchecked")
 	public List<ConstanciaTraspaso> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
 		List<ConstanciaTraspaso> resultList = null;
 		EntityManager em = null;
 		
 		try {
+			if(folioCliente != null && folioCliente.contains("%") == false)
+				folioCliente = "%".concat(folioCliente).concat("%");
+			
 			em = EntityManagerUtil.getEntityManager();
-			resultList = em.createNamedQuery("ConstanciaTraspaso.findByPeriodoClienteNumero", ConstanciaTraspaso.class)
+			resultList = em.createNativeQuery("SELECT * FROM (\n"
+					+ "	SELECT * FROM (\n"
+					+ "		SELECT * FROM constancia_traspaso ct \n"
+					+ "		WHERE (:idCliente IS NULL OR ct.cliente = :idCliente)\n"
+					+ "	) cdd2 WHERE ((cdd2.FECHA BETWEEN :fechaInicio AND :fechaFin) OR (:fechaInicio IS NULL OR :fechaFin IS NULL))\n"
+					+ ") cs3 WHERE (:folioCliente IS NULL OR cs3.NUMERO LIKE :folioCliente)", ConstanciaTraspaso.class)
 					.setParameter("fechaInicio", fechaInicio)
 					.setParameter("fechaFin", fechaFin)
 					.setParameter("idCliente", idCliente)
@@ -162,7 +171,6 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
 		
 		return resultList;
 	}

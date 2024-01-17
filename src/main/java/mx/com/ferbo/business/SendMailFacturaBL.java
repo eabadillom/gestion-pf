@@ -93,6 +93,9 @@ public class SendMailFacturaBL {
 	public void processUsers() {
     	//Usuarios de facturacion
     	List<Usuario> usuarios = null;
+    	String destinatario = null;
+    	String sMail = null;
+    	Correo mailLoggedUser = null;
     	usuarios = usuarioDAO.buscarPorPerfil(2);
     	for(Usuario usuario : usuarios) {
     		if( !"A".equalsIgnoreCase(usuario.getStUsuario() ) ) {
@@ -105,16 +108,17 @@ public class SendMailFacturaBL {
             alCC.add(correo);
     	}
     	
-    	String destinatario = String.format("%s %s %s",
-                this.loggedUser.getNombre() == null ? "" : this.loggedUser.getNombre(),
-                this.loggedUser.getApellido1() == null ? "" : this.loggedUser.getApellido1(),
-                this.loggedUser.getApellido2() == null ? "" : this.loggedUser.getApellido2());
-        
-        String sMail = this.loggedUser.getMail();
-        Correo mailLoggedUser = new Correo(sMail, destinatario);
-        
-        alCC.add(mailLoggedUser);
-    	
+    	if(this.loggedUser != null) {
+    		destinatario = String.format("%s %s %s",
+    				this.loggedUser.getNombre() == null ? "" : this.loggedUser.getNombre(),
+    						this.loggedUser.getApellido1() == null ? "" : this.loggedUser.getApellido1(),
+    								this.loggedUser.getApellido2() == null ? "" : this.loggedUser.getApellido2());
+    		
+    		sMail = this.loggedUser.getMail();
+    		mailLoggedUser = new Correo(sMail, destinatario);
+    		
+    		alCC.add(mailLoggedUser);
+    	}
     }
     
     

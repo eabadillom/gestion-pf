@@ -613,7 +613,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				this.listadoPartida.add(p);
 				
 			}
-	if(validaCarga == true) {
+			if(validaCarga == true) {
 				partida.setNoTarimas(numTarimas);
 				DetallePartidaPK detallePk = new DetallePartidaPK();
 				detallePk.setDetPartCve(1);
@@ -675,6 +675,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		String mensaje = null;
 		
 		try {
+			log.info("El usuario {} intenta guardar una constancia de depósito...", this.usuario.getUsuario());
 			EstadoConstancia status = estadoConstanciaDAO.buscarPorId(1);
 			String folioCliente = this.constanciaDeDeposito.getFolioCliente();
 			if(folioCliente == null)
@@ -733,7 +734,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				 throw new InventarioException("Debe seleccionar una camara");
 			}
 			
-
 			if(constanciaDeDeposito.getFolioCliente() == null || "".equalsIgnoreCase(constanciaDeDeposito.getFolioCliente()) )
 				this.constanciaDeDeposito.setFolioCliente(this.noConstanciaSelect);
 			
@@ -762,6 +762,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			serieConstanciaDAO.actualizar(this.serie);
 			
 			saved = true;
+			log.info("El usuario {} guardó la constancia de depósito {} correctamente.", this.usuario.getUsuario(), this.constanciaDeDeposito.getFolioCliente());
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = String.format("La constancia de depósito %s se registró correctamente.", folioCliente);
 		} catch (InventarioException ex) {
@@ -776,12 +777,14 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-partidas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto");
 		}
 	}
-public void deleteConstanciaDD() {
-	this.listadoConstanciaDepositoDetalle.remove(0);
-	this.selectedConstanciaDD = null;
-	FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado", "Se elimino el registro correctamente"));
-	PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaDD");
-}
+	
+	public void deleteConstanciaDD() {
+		this.listadoConstanciaDepositoDetalle.remove(0);
+		this.selectedConstanciaDD = null;
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado", "Se elimino el registro correctamente"));
+		PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaDD");
+	}
+	
 	public void deleteSelectedPartidas() {
 
 		for (Partida p : listadoPartida) {
