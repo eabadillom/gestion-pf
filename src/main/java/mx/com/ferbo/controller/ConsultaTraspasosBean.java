@@ -123,17 +123,15 @@ public class ConsultaTraspasosBean implements Serializable {
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-		fecha_ini = new Date();
-		fecha_final = new Date();
-//		clientes = clienteDAO.buscarTodos();
 		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+		if(clientes.size() == 1)
+			this.idCliente = clientes.get(0).getCteCve();
 		estados = edoDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		
 		Date today = new Date();
 		setMaxDate(new Date(today.getTime() ));
-		
 		this.selectedconstancia = new ConstanciaTraspaso();
 		
 	}
@@ -143,6 +141,10 @@ public class ConsultaTraspasosBean implements Serializable {
 		
 		if("".equalsIgnoreCase(this.numero))
 			this.numero = null;
+		
+		if(clientes.size() == 1) {
+			this.idCliente = clientes.get(0).getCteCve();
+		}
 		
 		listaTraspasos = constanciaTraspasoDAO.buscar(fecha_ini, fecha_final, idCliente, numero);
 		log.debug("Lista constancias de traspaso: {}", listaTraspasos.size());

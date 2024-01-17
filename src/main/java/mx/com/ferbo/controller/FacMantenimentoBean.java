@@ -164,9 +164,8 @@ public class FacMantenimentoBean implements Serializable {
 				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " no actualizada";
 				severity = FacesMessage.SEVERITY_ERROR;
 			}
-		} catch (SQLException e) {
-			
-			e.printStackTrace();
+		} catch (Exception e) {
+			log.error("Ocurrió un problema en la actualización de la factura...", e);
 		}
 		
 		

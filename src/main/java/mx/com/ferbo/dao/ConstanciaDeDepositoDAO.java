@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
@@ -109,21 +110,31 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<ConstanciaDeDeposito> buscarPor(String folioCliente, Integer idCliente, Date fechaInicio, Date fechaFin) {
 		EntityManager em = null;
 		List<ConstanciaDeDeposito> listado = null;
+		
 		try {
-			 em = EntityManagerUtil.getEntityManager();
-			listado = em.createNamedQuery("ConstanciaDeDeposito.findByFolioClientePeriodo",ConstanciaDeDeposito.class)
+			if(folioCliente != null && folioCliente.contains("%") == false)
+				folioCliente = "%".concat(folioCliente).concat("%");
+			
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNativeQuery("SELECT * FROM (\n"
+					+ "	SELECT * FROM (\n"
+					+ "		SELECT * FROM constancia_de_deposito cdd \n"
+					+ "		WHERE (:idCliente IS NULL OR cdd.CTE_CVE = :idCliente)\n"
+					+ "	) cdd2 WHERE ((cdd2.FECHA_INGRESO BETWEEN :fechaInicio AND :fechaFin) OR (:fechaInicio IS NULL OR :fechaFin IS NULL))\n"
+					+ ") cs3 WHERE (:folioCliente IS NULL OR cs3.FOLIO_CLIENTE LIKE :folioCliente)", ConstanciaDeDeposito.class)
 					.setParameter("idCliente", idCliente)
 					.setParameter("folioCliente", folioCliente)
 					.setParameter("fechaInicio", fechaInicio)
 					.setParameter("fechaFin", fechaFin)
 					.getResultList()
-			;
-		}catch(Exception e) {
+					;
+		} catch(Exception e) {
 			log.error("Error al obtener informacion",e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return listado;
@@ -195,6 +206,8 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 					.setParameter("folioCliente",cons.getFolioCliente())
 					.getResultList();
 			
+		} catch(NoResultException ex) {
+			log.warn("No se encontró la constancia solicitada (folio_cliente): {}", cons.getFolioCliente());
 		} catch(Exception ex) {
 			log.error("Problema para obtener la constancia de depósito...", ex);
 		} finally {

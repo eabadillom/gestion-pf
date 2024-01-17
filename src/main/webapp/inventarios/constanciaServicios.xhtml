@@ -38,10 +38,10 @@
 		    		<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{constanciaServicioBean.idCliente}" filter="true" filterMatchMode="contains">
 		    			<f:selectItem itemLabel="Selecione Cliente" noSelectionOption="true" />
 						<f:selectItems var="selectedCliente" value="#{constanciaServicioBean.listaClientes}" itemLabel="#{selectedCliente.cteNombre}" itemValue="#{selectedCliente.cteCve}" />
-						</p:selectOneMenu>
+					</p:selectOneMenu>
 		    	</div>
 		    	<div class="p-field p-col-2 p-md-2">
-		    		<p:commandButton value="Consultar" styleClass="p-mr-2 p-mb-2" icon="pi pi-fw pi-search" actionListener="#{constanciaServicioBean.buscarConstancia}" update="@widgetVar(dtConstanciaServicios)"/>
+		    		<p:commandButton value="Consultar" icon="pi pi-fw pi-search" actionListener="#{constanciaServicioBean.buscarConstancia}" update="@widgetVar(dtConstanciaServicios) cliente-som"/>
 		    	</div>
 		    </div>
 		    <p:dataTable id="dt-constanciaServicios" widgetVar="dtConstanciaServicios" var="constancia" reflow="true" rowKey="#{constancia.folio}" value="#{constanciaServicioBean.listaConstanciaServicios}" paginator="true" rows="10" paginatorPosition="bottom">

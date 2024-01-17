@@ -4,18 +4,21 @@
 
 	<ui:define name="content">
 		<h:form id="form">
+			<p:growl id="messages" showDetail="true" />
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-						<p:growl id="messages" showDetail="true" />
-
 						<p:toolbar styleClass="p-mb-4">
 							<p:toolbarGroup>
 								<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-raised" style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}"
 									process="@this" update="dialogCliente" oncomplete="PF('dialogCliente').show();" />
 							</p:toolbarGroup>
 						</p:toolbar>
-
 						<p:dataTable id="dt-clientes" widgetVar="dtClientes" value="#{clientesBean.lstClientes}" var="cliente" rowKey="#{cliente.cteCve}"
 							selection="#{clientesBean.lstClientesSelected}" reflow="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
 							<f:facet name="header">
@@ -201,7 +204,7 @@
 								</p:outputPanel>
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarCliente()}" process="@this pnlCliente" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarCliente()}" process="@this pnlCliente" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" resetValues="pnlCliente" process=" @this pnlCliente"/>
 							</f:facet>
 						</p:dialog>
@@ -219,13 +222,13 @@
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Primer apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Debe indicar el primer apellido del contacto." />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}"/>
 											</div>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Segundo apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Debe indicar el segundo apellido del contacto." />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}"/>
 											</div>
 										</div>
 										<div class="p-col-12 p-md-4 p-lg-4">
@@ -234,15 +237,6 @@
 												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto." />
 											</div>
 										</div>
-										<!-- <div class="p-col-12 p-md-4 p-lg-4">
-											<div class="p-field">
-												<p:outputLabel>Contraseña</p:outputLabel>
-												<p:panelGrid id="pgPass" columns="2" style="width:100%" styleClass="border-none">
-													<p:password id="toggle" value="#{clientesBean.clienteContactoSelected.nbPassword}" toggleMask="true" redisplay="true" />
-													<p:commandButton icon="icon-varita" actionListener="#{clientesBean.generaPassword()}" styleClass="edit-button" process="@this" update="pgPass" />
-												</p:panelGrid>
-											</div>
-										</div> -->
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Estatus usuario</p:outputLabel>
@@ -280,10 +274,9 @@
 										</div>
 									</div>
 								</p:scrollPanel>
-								
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes messages" process="pnlContacto @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes messages" process="pnlContacto @this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogAddContacto').hide()" class="ui-button-secondary" />
 							</f:facet>
 						</p:dialog>
@@ -292,7 +285,6 @@
 							style="max-width:80em !important;">
 							<p:outputPanel id="pnlEditContacto" class="ui-fluid">
 								<p:scrollPanel mode="native" style="height: 500px; overflow:auto;">
-
 									<div class="p-grid">
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
@@ -303,13 +295,13 @@
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Primer apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" required="true" requiredMessage="Debe indicar el primer apellido del contacto." />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}"/>
 											</div>
 										</div>
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Segundo apellido</p:outputLabel>
-												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" required="true" requiredMessage="Debe indicar el segundo apellido del contacto." />
+												<p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}"/>
 											</div>
 										</div>
 
@@ -319,15 +311,6 @@
 												<p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true" requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto."/>
 											</div>
 										</div>
-										<!-- <div class="p-col-12 p-md-4 p-lg-4">
-											<div id="pgPassEdit" class="p-field">
-												<p:outputLabel>Contraseña</p:outputLabel>
-												<p:panelGrid id="pgPassEdit" columns="2" style="width:100%" styleClass="border-none">
-													<p:password value="#{clientesBean.clienteContactoSelected.nbPassword}" toggleMask="true" redisplay="true" />
-													<p:commandButton icon="icon-varita" actionListener="#{clientesBean.generaPassword()}" styleClass="edit-button" process="@this" update="pgPassEdit" />
-												</p:panelGrid>
-											</div>
-										</div> -->
 										<div class="p-col-12 p-md-6 p-lg-4">
 											<div class="p-field">
 												<p:outputLabel>Estatus usuario</p:outputLabel>
@@ -400,7 +383,7 @@
 								</p:scrollPanel>
 							</p:outputPanel>
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes messages" process="pnlEditContacto @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.guardarContacto()}" update="pnlContacto dt-clientes messages" process="pnlEditContacto @this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
 								<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogEditContacto').hide()" class="ui-button-secondary" />
 							</f:facet>
 						</p:dialog>

@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.CandadoSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
 import mx.com.ferbo.dao.DetallePartidaDAO;
@@ -36,9 +37,11 @@ import mx.com.ferbo.dao.InventarioDAO;
 import mx.com.ferbo.dao.PartidaDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.PrecioServicioDAO;
+import mx.com.ferbo.dao.SaldoDAO;
 import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.StatusConstanciaSalidaDAO;
 import mx.com.ferbo.dao.TipoMovimientoDAO;
+import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
@@ -56,6 +59,7 @@ import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.Saldo;
 import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.SerieConstanciaPK;
 import mx.com.ferbo.model.Servicio;
@@ -142,6 +146,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private EstadoInventario edoInventarioHistorico;
 	private List<Partida> partidaList;
 	
+	private SaldoDAO saldoDAO;
+	private Saldo saldo;
+	private CandadoSalidaDAO candadoDAO = null;
+	private CandadoSalida candadoSalida = null;
+	
 	private boolean saved = false;
 	
 	private Usuario usuario;
@@ -187,6 +196,9 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		listadoDetalleConstanciaSalida = new ArrayList<>();
 		listadoTemp = new ArrayList<>();
 		detallePartidaLista = new ArrayList<>();
+		
+		saldoDAO = new SaldoDAO();
+		candadoDAO = new CandadoSalidaDAO();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -197,9 +209,9 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-//		listadoClientes = clienteDAO.buscarHabilitados(true, false);
 		listadoClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
-		status = statusDAO.buscarPorId(1);//Por defecto, el catálogo de status constancia salida tiene el valor 1 para una constancia vigente.
+		//Por defecto, el catálogo de status constancia salida tiene el valor 1 para una constancia vigente.
+		status = statusDAO.buscarPorId(1);
 		tpMovimientoSalida = tipoMovimientoDAO.buscarPorId(2);
 		edoInventarioActual = estadoInventarioDAO.buscarPorId(1);
 		edoInventarioHistorico = estadoInventarioDAO.buscarPorId(2);
@@ -251,7 +263,13 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	}
 	
 	public void cargaInfoCliente() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Constancia salida";
+		
 		try {
+			this.validaSaldo();
 			this.generaFolioSalida();//si el folio existe no ejecutar lo demas y mandar a llamar a validar 
 			serviciosCliente = preciosServicioDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
 			listaInventario = inventarioDAO.buscar(clienteSelect, plantaSelect);
@@ -275,12 +293,46 @@ public class AltaConstanciaSalidaBean implements Serializable{
 				listaIngresos.add(i.getFechaIngreso());
 			}
 			log.debug("Lista fechas de ingreso: {}", listaIngresos);
-			
-		} catch(Exception ex) {
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (Exception ex) {
 			log.error("Problema para cargar la información del cliente...", ex);
+		} finally {
+			PrimeFaces.current().ajax().update(":form:messages", ":form:folio");	
 		}
 	}
 	
+	private void validaSaldo()
+	throws InventarioException {
+		boolean isSaldoVencido = false;
+		boolean isHabilitarSalida = false;
+		
+		saldo = saldoDAO.getSaldo(clienteSelect);
+		
+		if(saldo.getSaldo().compareTo(BigDecimal.ZERO) > 0) {
+			isSaldoVencido = true;
+			log.info("El cliente {} presenta un saldo vencido: {}", this.clienteSelect.getCteNombre(), this.saldo.getSaldo());
+		}
+		
+		candadoSalida = candadoDAO.buscarPorCliente(this.clienteSelect.getCteCve());
+		
+		isHabilitarSalida = candadoSalida.getHabilitado();
+		
+		if(isSaldoVencido == false)
+			//retorna el control sin acciones, debido a que SI tiene permitidas las salidas.
+			return;
+		
+		if(isHabilitarSalida && candadoSalida.getNumSalidas() > 0) {
+			log.info("El cliente {} presenta un saldo vencido ({}), pero tiene permitidas las salidas", this.clienteSelect.getCteNombre(), this.saldo.getSaldo());
+			return;
+		}
+		
+		throw new InventarioException("El cliente no tiene  permitida la salida de mercancia porque presenta un saldo vencido. Favor de contactar al área de cobranza.");
+	}
+
 	public void generaFolioSalida() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
@@ -688,18 +740,29 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		log.debug("Reiniciando el valor de cantidad total (servicio)");
 	}
 	
-	public void saveConstanciaSalida() {
+	public synchronized void saveConstanciaSalida() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Guardar constancia";
 		
 		ConstanciaSalida constancia = new ConstanciaSalida();
+		String folioCliente = null;
+		
+		String respuesta = null;
 		
 		try {
-			
+			log.info("El usuario {} intenta guardar una constancia de salida...", this.usuario.getUsuario());
 			if(saved)
 				throw new InventarioException("La constancia ya está registrada.");
+			
+			folioCliente = constanciaSalidaDAO.buscarPorNumero(this.numFolio);
+			if(folioCliente != null && folioCliente.length() > 0 )
+				throw new InventarioException(String.format("La constancia ya está registrada: %s", folioCliente));
+			
+			if(this.numFolio == null || "".equalsIgnoreCase(this.numFolio.trim()))
+				throw new InventarioException("No se ha indicado un folio para la constancia de salida.");
+			
 			constancia.setFecha(fechaSalida);
 			constancia.setNumero(numFolio);
 			constancia.setClienteCve(clienteSelect);
@@ -730,10 +793,17 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 			DetallePartida detallePartida = detallePartidaList.get(detallePartidaList.size() - 1);
 	 			detallePartidaDAO.guardar(detallePartida);
 	 		}
-	 		constanciaSalidaDAO.guardar(constancia); //REGISTRO LA CONTSANCIA SALIDA
+	 		respuesta = constanciaSalidaDAO.guardar(constancia); //REGISTRO LA CONSTANCIA SALIDA
+	 		if(respuesta != null)
+	 			throw new InventarioException("Existe un problema para guardar la constancia de salida.");
+	 		
+	 		saved = true;
+	 		
 	 		Integer numeroSerie = this.serie.getNuSerie() + 1;
 			this.serie.setNuSerie(numeroSerie);
-			serieConstanciaDAO.actualizar(this.serie);
+			respuesta = serieConstanciaDAO.actualizar(this.serie);
+			if(respuesta != null)
+				throw new InventarioException("Existe un problema para actualizar el folio de la serie de salida.");
 	 		
 	 		if(!(constancia.getConstanciaSalidaServiciosList().isEmpty())) {
 	 			
@@ -777,14 +847,18 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 			
 	 			constanciaDeServicio.setPartidaServicioList(new ArrayList<>());
 	 			constanciaDeServicio.setPartidaServicioList(partidaServicios);
-	 			
-	 			if(constanciaServicioDAO.guardar(constanciaDeServicio)==null) {
-	 				System.out.println("se guardo correctamente la constancia de servicio");
+	 			respuesta = constanciaServicioDAO.guardar(constanciaDeServicio);
+	 			if(respuesta != null) {
+	 				throw new InventarioException("Existe un problema para guardar la constancia de servicio.");
 	 			}
-	 			
 	 		}
-	 		saved = true;
+	 		this.candadoSalida.setNumSalidas(this.candadoSalida.getNumSalidas() - 1);
+	 		respuesta = this.candadoDAO.actualizar(candadoSalida);
 	 		
+	 		if(respuesta != null )
+	 			throw new InventarioException("Ocurrió un problema para actualizar el candado de salida del cliente.");
+	 		
+	 		log.info("El usuario {} guardó correctamente la constancia de salida {}", this.usuario.getUsuario(), this.numFolio);
 	 		mensaje = "La constancia de salida se guardó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
@@ -812,10 +886,10 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 	}
 	
-	public void imprimirTicket() throws Exception{
+	public void imprimirTicket() {
 		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-		String filename = "ticket.pdf";
+		String filename = String.format("ticket-salida-%s.pdf", this.numFolio);
 		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
@@ -844,12 +918,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 			   
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Ocurrió un problema al imprimir el ticket de la constancia de salida...", e);
 			message = String.format("No se pudo imprimir el folio %s", this.numFolio);
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
 			PrimeFaces.current().ajax().update("form:messages");
-			
 		}finally {
 			conexion.close((Connection) connection);
 		}
