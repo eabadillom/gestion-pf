@@ -23,7 +23,7 @@ public class SaldoDAO {
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNativeQuery("select sum(saldo) as saldo from (\n"
+			query = em.createNativeQuery("select coalesce(sum(saldo), 0) as saldo from (\n"
 					+ "	select\n"
 					+ "		f.cliente,\n"
 					+ "		f.id,\n"
