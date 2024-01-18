@@ -40,7 +40,6 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaSalida.findByNumero", query = "SELECT c FROM ConstanciaSalida c WHERE c.numero = :numero"),
     @NamedQuery(name = "ConstanciaSalida.findByNombreCte", query = "SELECT c FROM ConstanciaSalida c WHERE c.nombreCte = :nombreCte"),
     @NamedQuery(name = "ConstanciaSalida.findByStatus", query = "SELECT c FROM ConstanciaSalida c WHERE c.status = :status"),
-    @NamedQuery(name = "ConstanciaSalida.findByPeriodoClienteFolio", query = "SELECT c FROM ConstanciaSalida c WHERE c.fecha BETWEEN :fechaInicio AND :fechaFin AND (c.clienteCve.cteCve = :idCliente OR :idCliente IS NULL) AND (c.numero = :folioCliente OR :folioCliente IS NULL)"),
     @NamedQuery(name = "ConstanciaSalida.findByObservaciones", query = "SELECT c FROM ConstanciaSalida c WHERE c.observaciones = :observaciones")})
 
 public class ConstanciaSalida implements Serializable {

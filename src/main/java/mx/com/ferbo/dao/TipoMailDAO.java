@@ -4,16 +4,32 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoMailDAO extends IBaseDAO<TipoMail, Integer> {
+	
+	private static Logger log = LogManager.getLogger(TipoMailDAO.class);
 
 	@Override
 	public TipoMail buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		TipoMail tipo = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			tipo = em.find(TipoMail.class, id);
+		} catch(Exception ex) {
+			log.error("Problema para obtener el tipo de mail: {}", id);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return tipo;
 	}
 
 	@Override

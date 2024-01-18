@@ -8,46 +8,27 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:breadCrumb>
-				<p:menuitem value="Home" outcome="/dashboard" />
-				<p:menuitem value="Facturación" />
-				<p:menuitem value="Catálogos" />
-				<p:menuitem value="Candado Salida"
-					outcome="/protected/catalogos/candadoSalida" />
-			</p:breadCrumb>
-
+			<p:growl id="messages" showDetail="true" />
 			<div class="p-col-12">
 				<div class="card">
-
-					<p:growl id="messages" showDetail="true" />
-
 					<p:dataTable id="dtCandado" widgetVar="dtCandado" var="lista"
 						value="#{candadoSalidaBean.lista}" rowKey="#{lista.id}"
 						reflow="true" selection="#{candadoSalidaBean.seleccion}"
 						paginator="true" rows="10" paginatorPosition="bottom">
-
-						<f:facet name="header">
-							<div class="products-table-header" align="center">
-								<span> El candado de salida es modificado automáticamente
-									a las 00:00 hrs bloqueando la salida de mercancia de los
-									clientes con saldo vencido.</span>
-							</div>
-						</f:facet>
-
-						<p:column headerText="No. Cliente">
+						<p:column headerText="Núm." width="3rem" style="text-alignment: center;">
 							<h:outputText value="#{lista.cliente.cteCve}" />
 						</p:column>
 						<p:column headerText="Nombre">
 							<h:outputText value="#{lista.cliente.cteNombre}" />
 						</p:column>
-						<p:column headerText="Permitir Salida (1 dia)">
+						<p:column headerText="Permitir Salida" width="10rem" style="text-alignment: center;">
 							<h:outputText value="#{lista.habilitado ? 'Si' : 'No'}" />
 						</p:column>
-						<p:column headerText="No. Salidas Permitidas">
+						<p:column headerText="No. Salidas Permitidas" width="10rem" style="text-alignment: center;">
 							<h:outputText value="#{lista.numSalidas}" />
 						</p:column>
-						<p:column class="p-text-center">
-							<p:commandButton value="Modificar" icon="pi pi-pencil"
+						<p:column class="p-text-center" width="3rem" style="text-alignment: center;">
+							<p:commandButton icon="pi pi-pencil"
 								styleClass="ui-button-info p-mr-2 p-mb-2"
 								update="form:frm-modifica" process="@this"
 								oncomplete="PF('dg-modifica').show()">
@@ -56,10 +37,8 @@
 							</p:commandButton>
 						</p:column>
 					</p:dataTable>
-
 				</div>
 			</div>
-
 			<p:dialog header="Modificar Candado Salida" widgetVar="dg-modifica"
 				modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-modifica" class="ui-fluid">

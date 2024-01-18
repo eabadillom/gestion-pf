@@ -160,14 +160,23 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<ConstanciaDeServicio> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
 		List<ConstanciaDeServicio> resultList = null;
 		EntityManager em = null;
 		
 		try {
+			if(folioCliente != null && folioCliente.contains("%") == false)
+				folioCliente = "%".concat(folioCliente).concat("%");
+			
 			em = EntityManagerUtil.getEntityManager();
 			
-			resultList = em.createNamedQuery("ConstanciaDeServicio.findByPeriodoClienteFolioCliente", ConstanciaDeServicio.class)
+			resultList = em.createNativeQuery("SELECT * FROM (\n"
+					+ "	SELECT * FROM (\n"
+					+ "		SELECT * FROM constancia_de_servicio cds\n"
+					+ "		WHERE (:idCliente IS NULL OR cds.CTE_CVE = :idCliente)\n"
+					+ "	) cdd2 WHERE ((cdd2.FECHA BETWEEN :fechaInicio AND :fechaFin) OR (:fechaInicio IS NULL OR :fechaFin IS NULL))\n"
+					+ ") cs3 WHERE (:folioCliente IS NULL OR cs3.FOLIO_CLIENTE LIKE :folioCliente)", ConstanciaDeServicio.class)
 					.setParameter("fechaInicio", fechaInicio)
 					.setParameter("fechaFin", fechaFin)
 					.setParameter("idCliente", idCliente)

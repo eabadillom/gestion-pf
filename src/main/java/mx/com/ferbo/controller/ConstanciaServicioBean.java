@@ -102,12 +102,11 @@ public class ConstanciaServicioBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-//		listaClientes = clienteDao.buscarHabilitados(true);
 		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+		if(listaClientes.size() == 1)
+			this.idCliente = listaClientes.get(0).getCteCve();
 		
 		listaEstadosConstancias = ecDAO.buscarTodos();
-		fechaInicio = new Date();
-		fechaFinal = new Date();
 		folio = "";
 		seleccion = new ConstanciaDeServicio();
 	}
@@ -118,6 +117,9 @@ public class ConstanciaServicioBean implements Serializable{
 		
 		if("".equalsIgnoreCase(this.folio))
 			this.folio = null;
+		
+		if(listaClientes.size() == 1)
+			this.idCliente = listaClientes.get(0).getCteCve();
 		
 		listaConstanciaServicios = constanciaServicioDAO.buscar(fechaInicio, fechaFinal, idCliente, folio);
 	}
