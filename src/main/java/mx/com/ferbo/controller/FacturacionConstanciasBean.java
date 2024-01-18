@@ -1051,13 +1051,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			MPagoSelect = mp;
 		}
 		
-		/*MetodoPago mp = new MetodoPago();
-		if(metodoPagoSelect.getCdMetodoPago()!=null) {
-			mp = metodoPagoDAO.buscarPorMetodoPago(metodoPagoSelect.getCdMetodoPago());      //ERROR ,EDIO PAGO SELECT		
-		}else {
-			mp = metodoPagoDAO.buscarPorMetodoPago(MPagoSelect.getCdMetodoPago());      //ERROR ,EDIO PAGO SELECT
-			metodoPagoSelect = mp;
-		}*/
+	
 		
 		factura.setTipoPersona(clienteSelect.getTipoPersona());
 		factura.setCdRegimen(clienteSelect.getRegimenFiscal().getCd_regimen());
@@ -1070,7 +1064,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		PrimeFaces.current().ajax().update("form:metodoPago");
 	}
 	
-	public void saveFactura() {
+	public void saveFactura() throws InventarioException {
 		String mensaje = null;
 		FacesMessage message = null;
 		Severity severity = null;
@@ -1104,8 +1098,11 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		try {
 			
-			if(factura.getId()==null && BigDecimal.ZERO.compareTo(subTotalGeneral) != 0 ){
-				
+			
+			if(factura.getId()!=null)
+				throw new InventarioException("Registro erroneo, la factura ya se encuentra registrada	");
+			
+				if(BigDecimal.ZERO.compareTo(subTotalGeneral) != 0 ) {
 				SerieFacturaDAO serieDAO = new SerieFacturaDAO();
 				
 				this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
@@ -1120,11 +1117,13 @@ public class FacturacionConstanciasBean implements Serializable{
 			
 			}else {
 			//cerrarSesion();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "Favor de verificar el importe"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "El importe es de $0.00"));
 			PrimeFaces.current().ajax().update("form:messages");
 			}
+			
 		} catch (Exception ex) {
 				ex.getStackTrace();
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "La factura ya se encuentra registrada	"));
 			log.error("Error al guardar Factura", ex);
 		}
 		
@@ -1178,53 +1177,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		}
 
 	}
-	
-	/*public void exportarPdf() throws JRException, IOException, SQLException{
-		System.out.println("Exportando a pdf.....");
-			String jasperPath = "/jasper/Factura.jrxml";
-			String filename = "Factura " +fechaCorte+".pdf";
-			String images = "/images/logo.jpeg";
-			String message = null;
-			Severity severity = null;
-			Factura sf = null;
-			File reportFile = new File(jasperPath);
-			File imgfile = null;
-			JasperReportUtil jasperReportUtil = new JasperReportUtil();
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			Connection connection = null;
-			parameters = new HashMap<String, Object>();
-			
-			try {
-				
-				if (this.factura.getId() == null)
-					throw new InventarioException("Debe Guardar la Factura primero");
-				
-				URL resource = getClass().getResource(jasperPath);
-				URL resourceimg = getClass().getResource(images);
-				String file = resource.getFile();
-				String img = resourceimg.getFile();
-				
-				reportFile = new File(file);
-				imgfile = new File(img);
-				sf = new Factura();
-				Integer num = factura.getId();
-				log.info(reportFile.getPath());
-			
-				connection = EntityManagerUtil.getConnection();
-				parameters.put("idFactura", num);
-				parameters.put("imagen", imgfile.getPath());
-				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			} catch (Exception ex) {
-				log.error("Problema general...", ex);
-				message = String.format("No se pudo imprimir el reporte");
-				severity = FacesMessage.SEVERITY_INFO;
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages");
-			} finally {
-				conexion.close((Connection) connection);
-			}
-		}*/
 	
 	public void timbrado() throws InventarioException {
 		String message = null;
@@ -1350,7 +1302,7 @@ public String  reset() {
 	medioPagoSelect = new MedioPago();
 	metodoPagoSelect = new MetodoPago();
 	MPagoSelect = new MetodoPago();
-	
+	montoLetra = new String();
 	return "facturacionConstancias.xhtml?faces-redirect=true";
 
 }
