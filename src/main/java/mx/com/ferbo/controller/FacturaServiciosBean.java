@@ -423,8 +423,12 @@ public class FacturaServiciosBean implements Serializable {
 		Factura buscaFactura = null;
 		
 		try {
+			if(factura.getId()!=null)
+				throw new InventarioException("Registro erroneo, la factura ya se encuentra registrada	");
+			
 			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
 				throw new InventarioException("Debe indicar al menos un servicio");
+			if(BigDecimal.ZERO.compareTo(total) != 0 ) {
 			// Datos receptor
 			cliente = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 			
@@ -517,7 +521,7 @@ public class FacturaServiciosBean implements Serializable {
 			else {
 				throw new InventarioException("La factura ya está registrada.");
 			}
-			
+			}
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "La factura se guardo correctamente";
 		} catch (InventarioException ex) {
