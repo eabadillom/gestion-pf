@@ -233,7 +233,7 @@
 				</p:fieldset>
 			</div>
 			<div style="text-align: center; margin-top: 2rem;">
-				<p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.saveFactura}" icon="pi pi-save">
+				<p:splitButton value="Guardar" actionListener="#{facturaServiciosBean.saveFactura}" icon="pi pi-save" process="@this" update="form:serieFactura">
 		            <p:menuitem value="Imprimir" actionListener="#{facturaServiciosBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
 		            <p:menuitem value="Timbrar" action="#{facturaServiciosBean.timbrado}" icon="pi pi-qrcode" ajax="false" process="@this" onclick="PF('statusCfdiDialog').show();" oncomplete="PF('statusCfdiDialog').hide();"/> 
 		            <p:menuitem value="Nueva Factura" action="#{facturaServiciosBean.reload}" update="messages" icon="pi pi-refresh"/>

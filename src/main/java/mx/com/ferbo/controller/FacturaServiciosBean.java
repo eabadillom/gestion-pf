@@ -421,8 +421,13 @@ public class FacturaServiciosBean implements Serializable {
 		Severity severity = null;
 		Cliente cliente = null;
 		Factura buscaFactura = null;
-		
+		SerieFactura serieFacturaTemp = null;
+				
 		try {
+			
+			serieFacturaTemp = seriefacturaDAO.findById(serieFacturaSelect.getId()); //forzar a que serie Factura traiga el dato actualizado. 
+			serieFacturaSelect = serieFacturaTemp;
+			
 			if(factura.getId()!=null)
 				throw new InventarioException("Registro erroneo, la factura ya se encuentra registrada	");
 			
@@ -432,7 +437,18 @@ public class FacturaServiciosBean implements Serializable {
 			// Datos receptor
 			cliente = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 			
-			buscaFactura = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual()+1));
+			buscaFactura = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual()+1)); //ERROR
+			
+			int serie = (serieFacturaSelect.getNumeroActual()+1);
+			serieFacturaSelect.setNumeroActual(serie);
+			String resultadoSerie = seriefacturaDAO.update(serieFacturaSelect);
+			listaSerieFactura.clear();
+			listaSerieFactura.add(serieFacturaSelect);
+			
+			serieFacturaSelect = listaSerieFactura.get(0);
+			
+			if(resultadoSerie != null)
+				throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
 			
 			if(buscaFactura == null || buscaFactura.getId() == null) {
 				
@@ -441,7 +457,7 @@ public class FacturaServiciosBean implements Serializable {
 				alFacturas.add(factura);
 				cliente.setFacturaList(alFacturas);
 				factura.setCliente(cliente);
-				factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()+1));
+				factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
 				factura.setMoneda(this.moneda);
 				factura.setRfc(cliente.getCteRfc());
 				factura.setNombreCliente(cliente.getCteNombre());
@@ -508,17 +524,16 @@ public class FacturaServiciosBean implements Serializable {
 					sef.setId(null);
 					sef.setFactura(factura);
 				}
-				int serie = (serieFacturaSelect.getNumeroActual()+1);
-				serieFacturaSelect.setNumeroActual(serie);
-				String resultadoSerie = seriefacturaDAO.update(serieFacturaSelect);
-				if(resultadoSerie != null)
-					throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
+				
 				String resultado = facturaDAO.guardar(factura);
 				if(resultado != null)
 					throw new InventarioException("Ocurrió un problema al guardar la factura.");
 			}
 			
 			else {
+				
+				//serieFactura();
+				
 				throw new InventarioException("La factura ya está registrada.");
 			}
 			}
@@ -534,9 +549,9 @@ public class FacturaServiciosBean implements Serializable {
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			
+			//serieFacturaSelect = new SerieFactura();
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Factura" , message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios", "form:serieFactura");
 		}
 	}
 
