@@ -29,6 +29,28 @@ public class SerieFacturaDAO {
 		}
 		return list;
 	};
+	
+	public SerieFactura findById(Integer idSerie) {
+		
+		EntityManager em = null;
+		SerieFactura serie = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNamedQuery("SerieFactura.findById", SerieFactura.class).setParameter("id",idSerie);
+			
+			serie = (SerieFactura) query.getSingleResult();
+			
+		} catch (Exception e) {
+			log.info("Error al buscar Serie Factura por ID", e.getMessage());
+			return null;
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return serie;
+	}
 
 	public List<StatusSerie> findStatus() {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
