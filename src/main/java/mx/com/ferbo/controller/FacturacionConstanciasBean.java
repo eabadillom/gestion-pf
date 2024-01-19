@@ -972,7 +972,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura = new Factura();
 		
 		factura.setCliente(clienteSelect);
-		factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
+		//factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
 		factura.setMoneda(moneda);
 		factura.setRfc(clienteSelect.getCteRfc());
 		factura.setNombreCliente(clienteSelect.getCteNombre());
@@ -1069,6 +1069,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		FacesMessage message = null;
 		Severity severity = null;
 		String titulo = "Importe erroneo";
+		Factura facturaTmp = null;
+		SerieFactura serieTmp = null;
 		//haciendo null id de los servicios constancias de constancias de deposito 
 		
 		for(ConstanciaFactura cf: selectedEntradas) {
@@ -1105,15 +1107,28 @@ public class FacturacionConstanciasBean implements Serializable{
 				if(BigDecimal.ZERO.compareTo(subTotalGeneral) != 0 ) {
 				SerieFacturaDAO serieDAO = new SerieFacturaDAO();
 				
+				serieTmp = serieDAO.findById(serieFacturaSelect.getId());
+				
+				serieFacturaSelect = serieTmp;
+								
 				this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
-				
-				facturaDAO.guardar(factura);
-				
 				serieDAO.update(this.serieFacturaSelect);
+				listaSerieFactura.clear();
+				listaSerieFactura.add(serieFacturaSelect);
+				serieFacturaSelect = listaSerieFactura.get(0);
+				
+				facturaTmp = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() ));
+				
+				if(facturaTmp == null || facturaTmp.getId() == null) {
+					factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
+					facturaDAO.guardar(factura);
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
+					PrimeFaces.current().ajax().update("form:messages");
+				}else {
+					throw new InventarioException("El registro existe de factura ...");
+				}
 				
 				
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
-				PrimeFaces.current().ajax().update("form:messages");
 			
 			}else {
 			//cerrarSesion();
@@ -1124,7 +1139,9 @@ public class FacturacionConstanciasBean implements Serializable{
 		} catch (Exception ex) {
 				ex.getStackTrace();
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "La factura ya se encuentra registrada	"));
-			log.error("Error al guardar Factura", ex);
+			log.error("Error al guardar Factura", ex);			
+		}finally {
+			PrimeFaces.current().ajax().update("form:serieFactura");
 		}
 		
 		
