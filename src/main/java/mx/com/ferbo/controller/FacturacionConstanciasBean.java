@@ -1064,6 +1064,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void saveFactura() throws InventarioException {
 		
+		List<Factura> listaFactura = null;
 		Factura facturaTmp = null;
 		SerieFactura serieTmp = null;
 		//haciendo null id de los servicios constancias de constancias de deposito 
@@ -1101,22 +1102,27 @@ public class FacturacionConstanciasBean implements Serializable{
 			
 				if(BigDecimal.ZERO.compareTo(subTotalGeneral) != 0 ) {
 					SerieFacturaDAO serieDAO = new SerieFacturaDAO();
+					Integer size = 0;
 					
 					serieTmp = serieDAO.findById(serieFacturaSelect.getId());
 					
 					serieFacturaSelect = serieTmp;
 														
-					facturaTmp = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
+					listaFactura = facturaDAO.buscarPorSerieNumeroList(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1)); //MODIFICAR O REALIZAR OTRO METODO DE BUSQUEDA QUE RETORNE UNA LISTA POR SI HAY MAS DE UN REGISTRO CANCELADO DE FACTURA Y TOMAR EL ULTIMO QUE SE CANCELO O SE GENERO
+					size = listaFactura.size();
 					
-					if((facturaTmp.getStatus().getId()==0) || (facturaTmp.getStatus().getId()==2) ) {
+					if(listaFactura.size()>0) {
+						facturaTmp = listaFactura.get(size -1 );
+					}
+					
+					if((facturaTmp == null || facturaTmp.getId() == null) || (facturaTmp.getStatus().getId() == 0 || facturaTmp.getStatus().getId() == 2 ) ) {
+						
 						this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
 						serieDAO.update(this.serieFacturaSelect);
 						listaSerieFactura.clear();
 						listaSerieFactura.add(serieFacturaSelect);
 						serieFacturaSelect = listaSerieFactura.get(0);
-					}
-					
-					if((facturaTmp == null || facturaTmp.getId() == null) || (facturaTmp.getStatus().getId() == 0 || facturaTmp.getStatus().getId() == 2 ) ) {
+						
 						factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
 						facturaDAO.guardar(factura);
 						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
