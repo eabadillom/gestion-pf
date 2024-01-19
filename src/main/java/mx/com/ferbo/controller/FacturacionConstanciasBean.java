@@ -18,11 +18,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -90,7 +89,7 @@ import net.sf.jasperreports.engine.JRException;
 
 
 @Named
-@SessionScoped
+@ViewScoped
 public class FacturacionConstanciasBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
@@ -815,7 +814,6 @@ public class FacturacionConstanciasBean implements Serializable{
 	public void procesarServicios() {
 
 		BigDecimal importe = new BigDecimal(0);
-		BigDecimal sumTmp;
 		Integer idS = 0,idP = 0;
 		
 		for (ConstanciaFacturaDs cfd : listaServicios) {
@@ -1065,10 +1063,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 	
 	public void saveFactura() throws InventarioException {
-		String mensaje = null;
-		FacesMessage message = null;
-		Severity severity = null;
-		String titulo = "Importe erroneo";
+		
 		Factura facturaTmp = null;
 		SerieFactura serieTmp = null;
 		//haciendo null id de los servicios constancias de constancias de deposito 
@@ -1105,31 +1100,31 @@ public class FacturacionConstanciasBean implements Serializable{
 				throw new InventarioException("Registro erroneo, la factura ya se encuentra registrada	");
 			
 				if(BigDecimal.ZERO.compareTo(subTotalGeneral) != 0 ) {
-				SerieFacturaDAO serieDAO = new SerieFacturaDAO();
+					SerieFacturaDAO serieDAO = new SerieFacturaDAO();
+					
+					serieTmp = serieDAO.findById(serieFacturaSelect.getId());
+					
+					serieFacturaSelect = serieTmp;
+														
+					facturaTmp = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
+					
+					if((facturaTmp.getStatus().getId()==0) || (facturaTmp.getStatus().getId()==2) ) {
+						this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
+						serieDAO.update(this.serieFacturaSelect);
+						listaSerieFactura.clear();
+						listaSerieFactura.add(serieFacturaSelect);
+						serieFacturaSelect = listaSerieFactura.get(0);
+					}
+					
+					if((facturaTmp == null || facturaTmp.getId() == null) || (facturaTmp.getStatus().getId() == 0 || facturaTmp.getStatus().getId() == 2 ) ) {
+						factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
+						facturaDAO.guardar(factura);
+						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
+						PrimeFaces.current().ajax().update("form:messages");
+					}else {
+						throw new InventarioException("El registro existe de factura ...");
+					}
 				
-				serieTmp = serieDAO.findById(serieFacturaSelect.getId());
-				
-				serieFacturaSelect = serieTmp;
-								
-				this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
-				serieDAO.update(this.serieFacturaSelect);
-				listaSerieFactura.clear();
-				listaSerieFactura.add(serieFacturaSelect);
-				serieFacturaSelect = listaSerieFactura.get(0);
-				
-				facturaTmp = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() ));
-				
-				if(facturaTmp == null || facturaTmp.getId() == null) {
-					factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
-					facturaDAO.guardar(factura);
-					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
-					PrimeFaces.current().ajax().update("form:messages");
-				}else {
-					throw new InventarioException("El registro existe de factura ...");
-				}
-				
-				
-			
 			}else {
 			//cerrarSesion();
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "El importe es de $0.00"));
