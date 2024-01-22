@@ -137,7 +137,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	public void imprimirTicket() {
 		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-		String filename = String.format("Salida_%s.pdf", constanciaSelect.getNumero());
+		String filename = String.format("ticket-salida_%s.pdf", constanciaSelect.getNumero());
 		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
@@ -165,7 +165,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 			   
 		} catch (Exception e) {
 			e.printStackTrace();
-			message = String.format("No se pudo imprimir el folio %s", constancia.getNumero());
+			message = String.format("No se pudo imprimir el folio %s", (constancia == null ? "" : constancia.getNumero()));
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
 			PrimeFaces.current().ajax().update("form:messages");
