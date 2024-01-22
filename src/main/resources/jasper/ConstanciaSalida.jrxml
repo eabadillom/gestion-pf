@@ -261,7 +261,7 @@ GROUP BY
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="80" splitType="Stretch">
+		<band height="81" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
 				<reportElement x="0" y="0" width="189" height="32" uuid="28336fe5-ce6e-476d-a097-b21c2d0b49a2"/>
@@ -341,40 +341,48 @@ GROUP BY
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PESO}]]></textFieldExpression>
 			</textField>
+			<line>
+				<reportElement x="0" y="80" width="189" height="1" uuid="9fd33bcb-b7dd-4e00-bc8b-8efeaadfbab8">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
 		</band>
 	</detail>
 	<columnFooter>
 		<band height="96" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="71" width="88" height="12" uuid="449df2ac-6f9d-4fc0-b5e0-0980ad967dca"/>
+				<reportElement x="0" y="72" width="88" height="12" uuid="449df2ac-6f9d-4fc0-b5e0-0980ad967dca"/>
 				<textElement textAlignment="Right" markup="styled">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[<style pdfFontName="Helvetica-Bold">Cantidad total</style>]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="83" width="88" height="12" uuid="529c61e0-bdb2-4d64-bbee-5a36334f537e"/>
+				<reportElement x="0" y="84" width="88" height="12" uuid="529c61e0-bdb2-4d64-bbee-5a36334f537e"/>
 				<textElement textAlignment="Right" markup="styled">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[<style pdfFontName="Helvetica-Bold">Peso total</style>]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="88" y="71" width="101" height="12" uuid="8f1f6cf5-e0e7-4df0-8ef1-9e84d655340e"/>
+				<reportElement x="88" y="72" width="101" height="12" uuid="8f1f6cf5-e0e7-4df0-8ef1-9e84d655340e"/>
 				<textElement textAlignment="Right" markup="styled">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{Cantidad Total} + "pz"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="88" y="83" width="101" height="12" uuid="ea4a5d4f-9efd-481f-b3aa-0454438f4dbb"/>
+				<reportElement x="88" y="84" width="101" height="12" uuid="ea4a5d4f-9efd-481f-b3aa-0454438f4dbb"/>
 				<textElement textAlignment="Right" markup="styled">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{Peso Total} + "kg"]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="1" width="189" height="12" uuid="7f192c57-3c9f-43c7-9272-c2386e8e467b">
+				<reportElement x="0" y="0" width="189" height="12" uuid="7f192c57-3c9f-43c7-9272-c2386e8e467b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
@@ -384,17 +392,11 @@ GROUP BY
 				<text><![CDATA[<style pdfFontName="Helvetica-Bold">Observaciones</style>]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="13" width="189" height="58" uuid="80809134-05d1-4558-97fc-2dcb6769c4c2">
+				<reportElement x="0" y="12" width="189" height="60" uuid="80809134-05d1-4558-97fc-2dcb6769c4c2">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{OBSERVACIONES}]]></textFieldExpression>
 			</textField>
-			<line>
-				<reportElement x="0" y="0" width="189" height="1" uuid="59dff4db-de41-4931-b94b-cadf24c937cb"/>
-				<graphicElement>
-					<pen lineWidth="1.0"/>
-				</graphicElement>
-			</line>
 		</band>
 	</columnFooter>
 	<lastPageFooter>
