@@ -18,11 +18,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -90,7 +89,7 @@ import net.sf.jasperreports.engine.JRException;
 
 
 @Named
-@SessionScoped
+@ViewScoped
 public class FacturacionConstanciasBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
@@ -815,7 +814,6 @@ public class FacturacionConstanciasBean implements Serializable{
 	public void procesarServicios() {
 
 		BigDecimal importe = new BigDecimal(0);
-		BigDecimal sumTmp;
 		Integer idS = 0,idP = 0;
 		
 		for (ConstanciaFacturaDs cfd : listaServicios) {
@@ -972,7 +970,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura = new Factura();
 		
 		factura.setCliente(clienteSelect);
-		factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
+		//factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
 		factura.setMoneda(moneda);
 		factura.setRfc(clienteSelect.getCteRfc());
 		factura.setNombreCliente(clienteSelect.getCteNombre());
@@ -1051,13 +1049,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			MPagoSelect = mp;
 		}
 		
-		/*MetodoPago mp = new MetodoPago();
-		if(metodoPagoSelect.getCdMetodoPago()!=null) {
-			mp = metodoPagoDAO.buscarPorMetodoPago(metodoPagoSelect.getCdMetodoPago());      //ERROR ,EDIO PAGO SELECT		
-		}else {
-			mp = metodoPagoDAO.buscarPorMetodoPago(MPagoSelect.getCdMetodoPago());      //ERROR ,EDIO PAGO SELECT
-			metodoPagoSelect = mp;
-		}*/
+	
 		
 		factura.setTipoPersona(clienteSelect.getTipoPersona());
 		factura.setCdRegimen(clienteSelect.getRegimenFiscal().getCd_regimen());
@@ -1070,11 +1062,11 @@ public class FacturacionConstanciasBean implements Serializable{
 		PrimeFaces.current().ajax().update("form:metodoPago");
 	}
 	
-	public void saveFactura() {
-		String mensaje = null;
-		FacesMessage message = null;
-		Severity severity = null;
-		String titulo = "Importe erroneo";
+	public void saveFactura() throws InventarioException {
+		
+		List<Factura> listaFactura = null;
+		Factura facturaTmp = null;
+		SerieFactura serieTmp = null;
 		//haciendo null id de los servicios constancias de constancias de deposito 
 		
 		for(ConstanciaFactura cf: selectedEntradas) {
@@ -1104,28 +1096,53 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		try {
 			
-			if(factura.getId()==null && BigDecimal.ZERO.compareTo(subTotalGeneral) != 0 ){
-				
-				SerieFacturaDAO serieDAO = new SerieFacturaDAO();
-				
-				this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
-				
-				facturaDAO.guardar(factura);
-				
-				serieDAO.update(this.serieFacturaSelect);
-				
-				
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
-				PrimeFaces.current().ajax().update("form:messages");
 			
+			if(factura.getId()!=null)
+				throw new InventarioException("Registro erroneo, la factura ya se encuentra registrada	");
+			
+				if(BigDecimal.ZERO.compareTo(subTotalGeneral) != 0 ) {
+					SerieFacturaDAO serieDAO = new SerieFacturaDAO();
+					Integer size = 0;
+					
+					serieTmp = serieDAO.findById(serieFacturaSelect.getId());
+					
+					serieFacturaSelect = serieTmp;
+														
+					listaFactura = facturaDAO.buscarPorSerieNumeroList(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1)); //MODIFICAR O REALIZAR OTRO METODO DE BUSQUEDA QUE RETORNE UNA LISTA POR SI HAY MAS DE UN REGISTRO CANCELADO DE FACTURA Y TOMAR EL ULTIMO QUE SE CANCELO O SE GENERO
+					size = listaFactura.size();
+					
+					if(listaFactura.size()>0) {
+						facturaTmp = listaFactura.get(size -1 );
+					}
+					
+					if((facturaTmp == null || facturaTmp.getId() == null) || (facturaTmp.getStatus().getId() == 0 || facturaTmp.getStatus().getId() == 2 ) ) {
+						
+						this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
+						serieDAO.update(this.serieFacturaSelect);
+						listaSerieFactura.clear();
+						listaSerieFactura.add(serieFacturaSelect);
+						serieFacturaSelect = listaSerieFactura.get(0);
+						
+						factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
+						facturaDAO.guardar(factura);
+						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
+						PrimeFaces.current().ajax().update("form:messages");
+					}else {
+						throw new InventarioException("El registro existe de factura ...");
+					}
+				
 			}else {
 			//cerrarSesion();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "Favor de verificar el importe"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "El importe es de $0.00"));
 			PrimeFaces.current().ajax().update("form:messages");
 			}
+			
 		} catch (Exception ex) {
 				ex.getStackTrace();
-			log.error("Error al guardar Factura", ex);
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "La factura ya se encuentra registrada	"));
+			log.error("Error al guardar Factura", ex);			
+		}finally {
+			PrimeFaces.current().ajax().update("form:serieFactura");
 		}
 		
 		
@@ -1178,53 +1195,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		}
 
 	}
-	
-	/*public void exportarPdf() throws JRException, IOException, SQLException{
-		System.out.println("Exportando a pdf.....");
-			String jasperPath = "/jasper/Factura.jrxml";
-			String filename = "Factura " +fechaCorte+".pdf";
-			String images = "/images/logo.jpeg";
-			String message = null;
-			Severity severity = null;
-			Factura sf = null;
-			File reportFile = new File(jasperPath);
-			File imgfile = null;
-			JasperReportUtil jasperReportUtil = new JasperReportUtil();
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			Connection connection = null;
-			parameters = new HashMap<String, Object>();
-			
-			try {
-				
-				if (this.factura.getId() == null)
-					throw new InventarioException("Debe Guardar la Factura primero");
-				
-				URL resource = getClass().getResource(jasperPath);
-				URL resourceimg = getClass().getResource(images);
-				String file = resource.getFile();
-				String img = resourceimg.getFile();
-				
-				reportFile = new File(file);
-				imgfile = new File(img);
-				sf = new Factura();
-				Integer num = factura.getId();
-				log.info(reportFile.getPath());
-			
-				connection = EntityManagerUtil.getConnection();
-				parameters.put("idFactura", num);
-				parameters.put("imagen", imgfile.getPath());
-				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			} catch (Exception ex) {
-				log.error("Problema general...", ex);
-				message = String.format("No se pudo imprimir el reporte");
-				severity = FacesMessage.SEVERITY_INFO;
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages");
-			} finally {
-				conexion.close((Connection) connection);
-			}
-		}*/
 	
 	public void timbrado() throws InventarioException {
 		String message = null;
@@ -1350,7 +1320,7 @@ public String  reset() {
 	medioPagoSelect = new MedioPago();
 	metodoPagoSelect = new MetodoPago();
 	MPagoSelect = new MetodoPago();
-	
+	montoLetra = new String();
 	return "facturacionConstancias.xhtml?faces-redirect=true";
 
 }

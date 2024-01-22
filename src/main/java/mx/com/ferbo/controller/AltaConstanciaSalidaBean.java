@@ -773,6 +773,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			constancia.setPlacasTransporte(placas);
 			constancia.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
 			constancia.setDetalleConstanciaSalidaList(listadoTemp);
+			log.info("Constancia salida: (numero = {}), (fecha = {}), (cliente = {})", constancia.getNumero(), constancia.getFecha(), constancia.getNombreCte());
 			
 	 		for(ConstanciaSalidaServicios c: listadoConstanciaSalidaServicios) {
 	 			Servicio servicioCve = c.getConstanciaSalidaServiciosPK().getServicioCve();
@@ -780,6 +781,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 			c.setIdConstancia(constancia);
 	 			c.setServicioCve(servicioCve);
 	 			log.debug("ConstanciaSalidaServicio: {}", c);
+	 			log.info("Constancia salida servicio: (cantidad = {}), (servicio = {})", c.getNumCantidad(), servicioCve.getServicioDs());
 			}
 	 		
 	 		for(DetalleConstanciaSalida d: listadoTemp) {
@@ -792,6 +794,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 			List<DetallePartida> detallePartidaList = d.getPartidaCve().getDetallePartidaList();
 	 			DetallePartida detallePartida = detallePartidaList.get(detallePartidaList.size() - 1);
 	 			detallePartidaDAO.guardar(detallePartida);
+	 			log.info("Detalle constancia salida: (cantidad = {}), (peso = {}), (producto = {})", d.getCantidad(), d.getPeso(), d.getProducto());
 	 		}
 	 		respuesta = constanciaSalidaDAO.guardar(constancia); //REGISTRO LA CONSTANCIA SALIDA
 	 		if(respuesta != null)
