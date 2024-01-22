@@ -421,6 +421,7 @@ public class FacturaServiciosBean implements Serializable {
 		Severity severity = null;
 		Cliente cliente = null;
 		Factura buscaFactura = null;
+		List<Factura> listaFacturas = null;
 		SerieFactura serieFacturaTemp = null;
 				
 		try {
@@ -437,20 +438,25 @@ public class FacturaServiciosBean implements Serializable {
 			// Datos receptor
 			cliente = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 			
-			buscaFactura = facturaDAO.buscarPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual()+1)); //ERROR
+			listaFacturas = facturaDAO.buscarPorSerieNumeroList(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual()+1)); //ERROR
+						
+			int size  = listaFacturas.size() - 1;
 			
-			int serie = (serieFacturaSelect.getNumeroActual()+1);
-			serieFacturaSelect.setNumeroActual(serie);
-			String resultadoSerie = seriefacturaDAO.update(serieFacturaSelect);
-			listaSerieFactura.clear();
-			listaSerieFactura.add(serieFacturaSelect);
+			if(listaFacturas.size()>0) {
+				buscaFactura = listaFacturas.get(size);
+			}					
 			
-			serieFacturaSelect = listaSerieFactura.get(0);
-			
-			if(resultadoSerie != null)
-				throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
-			
-			if(buscaFactura == null || buscaFactura.getId() == null) {
+			if((buscaFactura == null || buscaFactura.getId() == null) || (buscaFactura.getStatus().getId() == 0 || buscaFactura.getStatus().getId() == 2 ) ) {
+				
+				int serie = (serieFacturaSelect.getNumeroActual()+1);
+				serieFacturaSelect.setNumeroActual(serie);
+				String resultadoSerie = seriefacturaDAO.update(serieFacturaSelect);
+				listaSerieFactura.clear();
+				listaSerieFactura.add(serieFacturaSelect);
+				serieFacturaSelect = listaSerieFactura.get(0);
+				
+				if(resultadoSerie != null)
+					throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
 				
 				List<Factura> alFacturas = new ArrayList<>();
 				factura.setId(idFactura);
