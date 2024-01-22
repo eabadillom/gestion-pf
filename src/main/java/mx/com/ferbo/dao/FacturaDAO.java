@@ -342,6 +342,7 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		return factura;
 	}
 	
+	
 	public List<Factura> buscarPorSerieNumeroList(String serie, String numero) {
 		List<Factura> factura = null;
 		EntityManager em = null;
