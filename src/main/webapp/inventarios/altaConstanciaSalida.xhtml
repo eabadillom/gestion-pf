@@ -27,7 +27,7 @@
 							<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems value="#{altaConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 							<p:ajax listener="#{altaConstanciaSalidaBean.cargaInfoCliente}"
-								update="s-servicio dt-inventario s-planta dt-salidas dt-servicio"
+								update="s-servicio dt-inventario s-planta dt-salidas dt-servicio cmdGuardar"
 								oncomplete="PF('statusDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
@@ -37,7 +37,7 @@
 							<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true" />
 							<f:selectItems value="#{altaConstanciaSalidaBean.listadoPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
 							<p:ajax listener="#{altaConstanciaSalidaBean.cargaInfoCliente}"
-								update="dt-inventario dt-servicio"
+								update="dt-inventario dt-servicio cmdGuardar"
 								oncomplete="PF('statusDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
@@ -275,7 +275,7 @@
 			</div>
 			<p:toolbar styleClass="p-mt-3">
 				<p:toolbarGroup>
-					<p:splitButton value="Guardar" actionListener="#{altaConstanciaSalidaBean.saveConstanciaSalida()}" icon="pi pi-save" update="@this">
+					<p:splitButton id="cmdGuardar" value="Guardar" actionListener="#{altaConstanciaSalidaBean.saveConstanciaSalida()}" icon="pi pi-save" update="@this" rendered="#{altaConstanciaSalidaBean.saldoVencido == false}">
 						<p:menuitem value="Ticket" icon="pi pi-print" actionListener="#{altaConstanciaSalidaBean.imprimirTicket()}" ajax="false"/>
 						<p:menuitem value="Nuevo" icon="pi pi-refresh" actionListener="#{altaConstanciaSalidaBean.nuevoRegistro()}" update="@form"/>
 					</p:splitButton>
