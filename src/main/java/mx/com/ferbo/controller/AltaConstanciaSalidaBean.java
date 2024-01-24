@@ -314,6 +314,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 		saldo = saldoDAO.getSaldo(clienteSelect, fechaSalida, null);
 		cantidadInventario = inventarioDAO.getCantidad(clienteSelect.getCteCve(), fechaSalida);
+		candadoSalida = candadoDAO.buscarPorCliente(this.clienteSelect.getCteCve());
 		
 		if(saldo == null) {
 			log.info("El cliente NO tiene saldos pendientes, puede retirar su mercancia.");
@@ -329,8 +330,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			this.saldoVencido = true;
 			log.info("El cliente {} presenta un saldo vencido: {}", this.clienteSelect.getCteNombre(), this.saldo.getSaldo());
 		}
-		
-		candadoSalida = candadoDAO.buscarPorCliente(this.clienteSelect.getCteCve());
 		
 		isHabilitarSalida = candadoSalida.getHabilitado();
 		
@@ -776,6 +775,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Guardar constancia";
+		BigDecimal saldoTotal = null;
 		
 		ConstanciaSalida constancia = new ConstanciaSalida();
 		String folioCliente = null;
@@ -794,10 +794,14 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			if(this.numFolio == null || "".equalsIgnoreCase(this.numFolio.trim()))
 				throw new InventarioException("No se ha indicado un folio para la constancia de salida.");
 			
+			saldoTotal = (this.saldo == null ? new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP) : this.saldo.getSaldo());
+			
 			log.info("Peso: {} kg, Cantidad: {} unidades.", this.pesoTotal, this.cantidadTotal);
 			log.info("En inventario: {} unidades", this.cantidadInventario);
+			log.info("Saldo: {}", saldoTotal);
 			
-			if(this.cantidadInventario.compareTo(new BigDecimal(this.cantidadTotal).setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0)
+			
+			if(this.cantidadInventario.compareTo(new BigDecimal(this.cantidadTotal).setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0 && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
 				throw new InventarioException("El cliente no puede sacar toda su mercancía hasta liquidar sus adeudos.");
 			
 			constancia.setFecha(fechaSalida);
