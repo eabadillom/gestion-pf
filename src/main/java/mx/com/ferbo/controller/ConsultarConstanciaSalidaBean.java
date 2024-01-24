@@ -173,8 +173,6 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		}finally {
 			conexion.close((Connection) connection);
 		}
-		
-		
 	}
 
 	public void cancelarConstancia() {

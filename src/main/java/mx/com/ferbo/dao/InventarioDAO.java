@@ -2,9 +2,11 @@ package mx.com.ferbo.dao;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,11 +21,63 @@ import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.Saldo;
 import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 	private static Logger log = LogManager.getLogger(InventarioDAO.class);
+	
+	public BigDecimal getCantidad(Integer idCliente, Date fecha) {
+		BigDecimal cantidad = null;
+		EntityManager em = null;
+		Query query = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNativeQuery("select\n"
+//					+ "	cte_cve,\n"
+					+ "	sum(cantidad) as cantidad\n"
+//					+ "	sum(peso) as peso\n"
+					+ "from (\n"
+					+ "	select\n"
+					+ "		cdd.CTE_CVE,\n"
+					+ "		(p.CANTIDAD_TOTAL - coalesce(sal.cantidad, 0)) as cantidad,\n"
+					+ "		(p.PESO_TOTAL - coalesce(sal.peso, 0)) as peso\n"
+					+ "	from constancia_de_deposito cdd\n"
+					+ "	inner join partida p on cdd.FOLIO = p.FOLIO\n"
+					+ "	left outer join (\n"
+					+ "		select\n"
+					+ "			dcs.PARTIDA_CVE,\n"
+					+ "			SUM(dcs.CANTIDAD) as CANTIDAD,\n"
+					+ "			SUM(dcs.PESO) as PESO\n"
+					+ "		from constancia_salida cs \n"
+					+ "		inner join detalle_constancia_salida dcs on cs.ID = dcs.CONSTANCIA_CVE \n"
+					+ "		where (cs.status = 1)\n"
+					+ "		group by dcs.PARTIDA_CVE\n"
+					+ "	) sal on p.PARTIDA_CVE = sal.PARTIDA_CVE\n"
+					+ "	where (cdd.status = 1) and (cdd.CTE_CVE = :idCliente or :idCliente is null)\n"
+					+ "	and cdd.FECHA_INGRESO <= :fechaCorte\n"
+					+ ") inv\n"
+					+ "where inv.cantidad > 0\n"
+					+ "group by cte_cve")
+					.setParameter("idCliente", idCliente)
+					.setParameter("fechaCorte", fecha)
+					;
+			
+			cantidad = (BigDecimal) query.getSingleResult();
+			
+		} catch(NoResultException ex) {
+			log.warn("Saldo no encontrado para el cliente id: {}", idCliente);
+		} catch(Exception ex) {
+			log.error("Problema para obtener el saldo...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return cantidad;
+			
+	}
 	
 	@SuppressWarnings("unchecked")
 	public List<ConstanciaDeDeposito> findall() {
