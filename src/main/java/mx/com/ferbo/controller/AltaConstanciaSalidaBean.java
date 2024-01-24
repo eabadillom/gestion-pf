@@ -334,10 +334,19 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 		isHabilitarSalida = candadoSalida.getHabilitado();
 		
-		if(candadoSalida.getNumSalidas() <= 0)
-			throw new InventarioException("El cliente no tiene permitida la salida de mercancía. Por favor, comuníquese con el área de Facturación.");
+//		if(candadoSalida.getNumSalidas() <= 0)
+//			throw new InventarioException("El cliente no tiene permitida la salida de mercancía. Por favor, comuníquese con el área de Facturación.");
 		
-		if(this.saldoVencido) {
+		if(this.saldoVencido && isHabilitarSalida && candadoSalida.getNumSalidas() > 0) {
+			log.info("El cliente tiene un saldo vencido, pero tiene {} salidas permitidas.", candadoSalida.getNumSalidas());
+			return;
+		}
+		
+		if(this.saldoVencido && isHabilitarSalida && candadoSalida.getNumSalidas() <= 0) {
+			throw new InventarioException("El cliente tiene adeudos vencidos. Favor de contactar con el área de facturacíon");
+		}
+		
+		if(this.saldoVencido && isHabilitarSalida == false) {
 			throw new InventarioException("El cliente tiene adeudos vencidos. Favor de contactar con el área de facturación.");
 		}
 		
@@ -821,6 +830,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 			d.setConstanciaCve(constancia);
 	 			List<DetallePartida> detallePartidaList = d.getPartidaCve().getDetallePartidaList();
 	 			DetallePartida detallePartida = detallePartidaList.get(detallePartidaList.size() - 1);
+	 			detallePartida.setCantidadUManejo(detallePartida.getCantidadUManejo() - d.getCantidad());
+	 			detallePartida.setCantidadUMedida(detallePartida.getCantidadUMedida().subtract(d.getPeso()));
 	 			detallePartidaDAO.guardar(detallePartida);
 	 			log.info("Detalle constancia salida: (cantidad = {}), (peso = {}), (producto = {})", d.getCantidad(), d.getPeso(), d.getProducto());
 	 		}
@@ -883,7 +894,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 				throw new InventarioException("Existe un problema para guardar la constancia de servicio.");
 	 			}
 	 		}
-	 		this.candadoSalida.setNumSalidas(this.candadoSalida.getNumSalidas() - 1);
+	 		int numSalidas = this.candadoSalida.getNumSalidas() > 0 ? (this.candadoSalida.getNumSalidas() - 1) : 0;
+	 		boolean isHabilitado = numSalidas > 0 ? true : false;
+	 		
+	 		this.candadoSalida.setNumSalidas(numSalidas);
+	 		this.candadoSalida.setHabilitado(isHabilitado);
 	 		respuesta = this.candadoDAO.actualizar(candadoSalida);
 	 		
 	 		if(respuesta != null )

@@ -275,7 +275,7 @@
 			</div>
 			<p:toolbar styleClass="p-mt-3">
 				<p:toolbarGroup>
-					<p:splitButton id="cmdGuardar" value="Guardar" actionListener="#{altaConstanciaSalidaBean.saveConstanciaSalida()}" icon="pi pi-save" update="@this" rendered="#{altaConstanciaSalidaBean.saldoVencido == false}">
+					<p:splitButton id="cmdGuardar" value="Guardar" actionListener="#{altaConstanciaSalidaBean.saveConstanciaSalida()}" icon="pi pi-save" update="@this">
 						<p:menuitem value="Ticket" icon="pi pi-print" actionListener="#{altaConstanciaSalidaBean.imprimirTicket()}" ajax="false"/>
 						<p:menuitem value="Nuevo" icon="pi pi-refresh" actionListener="#{altaConstanciaSalidaBean.nuevoRegistro()}" update="@form"/>
 					</p:splitButton>
