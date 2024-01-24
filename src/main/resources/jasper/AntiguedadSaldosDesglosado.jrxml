@@ -810,7 +810,7 @@ ORDER BY x.emi_nombre, x.nombre_cliente, x.fecha]]>
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="834535c2-66ea-44ba-a688-983034cf9fe7"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html"/>
-				<textFieldExpression><![CDATA[$F{dias}.compareTo(0L) <= 0 ? null : $F{dias}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dias}]]></textFieldExpression>
 			</textField>
 			<textField pattern="$#,##0.00;$-##0.00" isBlankWhenNull="true">
 				<reportElement x="480" y="0" width="100" height="19" uuid="aa0de6c5-c51e-40b5-a4b9-60bd4531442d">

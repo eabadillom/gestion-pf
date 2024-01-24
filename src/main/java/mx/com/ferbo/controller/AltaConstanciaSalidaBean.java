@@ -150,6 +150,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private Saldo saldo;
 	private CandadoSalidaDAO candadoDAO = null;
 	private CandadoSalida candadoSalida = null;
+	private BigDecimal cantidadInventario = null;
+	private boolean saldoVencido = false;
 	
 	private boolean saved = false;
 	
@@ -307,30 +309,58 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	
 	private void validaSaldo()
 	throws InventarioException {
-		boolean isSaldoVencido = false;
 		boolean isHabilitarSalida = false;
+		BigDecimal saldoVencido = null;
 		
-		saldo = saldoDAO.getSaldo(clienteSelect);
+		saldo = saldoDAO.getSaldo(clienteSelect, fechaSalida, null);
+		cantidadInventario = inventarioDAO.getCantidad(clienteSelect.getCteCve(), fechaSalida);
+		candadoSalida = candadoDAO.buscarPorCliente(this.clienteSelect.getCteCve());
 		
-		if(saldo.getSaldo().compareTo(BigDecimal.ZERO) > 0) {
-			isSaldoVencido = true;
+		if(saldo == null) {
+			log.info("El cliente NO tiene saldos pendientes, puede retirar su mercancia.");
+			return;
+		}
+		
+		log.info("Saldo: en plazo = {}, 15 días = {}, 30 días = {}, 60 días = {}, más de 60 días = {}", saldo.getEnPlazo(), saldo.getAtraso15dias(), saldo.getAtraso30dias(), saldo.getAtraso60dias(), saldo.getAtrasoMayor60dias());
+		log.info("Cantidad en inventario: {} piezas.", cantidadInventario);
+		
+		saldoVencido = saldo.getAtraso8dias().add(saldo.getAtraso15dias()).add(saldo.getAtraso30dias()).add(saldo.getAtraso60dias()).add(saldo.getAtrasoMayor60dias());
+		
+		if(saldoVencido.compareTo(BigDecimal.ZERO) > 0) {
+			this.saldoVencido = true;
 			log.info("El cliente {} presenta un saldo vencido: {}", this.clienteSelect.getCteNombre(), this.saldo.getSaldo());
 		}
 		
-		candadoSalida = candadoDAO.buscarPorCliente(this.clienteSelect.getCteCve());
-		
 		isHabilitarSalida = candadoSalida.getHabilitado();
 		
-		if(isSaldoVencido == false)
-			//retorna el control sin acciones, debido a que SI tiene permitidas las salidas.
+//		if(candadoSalida.getNumSalidas() <= 0)
+//			throw new InventarioException("El cliente no tiene permitida la salida de mercancía. Por favor, comuníquese con el área de Facturación.");
+		
+		if(this.saldoVencido && isHabilitarSalida && candadoSalida.getNumSalidas() > 0) {
+			log.info("El cliente tiene un saldo vencido, pero tiene {} salidas permitidas.", candadoSalida.getNumSalidas());
 			return;
+		}
+		
+		if(this.saldoVencido && isHabilitarSalida && candadoSalida.getNumSalidas() <= 0) {
+			throw new InventarioException("El cliente tiene adeudos vencidos. Favor de contactar con el área de facturacíon");
+		}
+		
+		if(this.saldoVencido && isHabilitarSalida == false) {
+			throw new InventarioException("El cliente tiene adeudos vencidos. Favor de contactar con el área de facturación.");
+		}
+		
+		if(this.saldoVencido == false) {
+			//retorna el control sin acciones, debido a que SI tiene permitidas las salidas.
+			log.info("El cliente NO tiene saldos vencidos, puede retirar su mercancia.");
+			return;
+		}
 		
 		if(isHabilitarSalida && candadoSalida.getNumSalidas() > 0) {
 			log.info("El cliente {} presenta un saldo vencido ({}), pero tiene permitidas las salidas", this.clienteSelect.getCteNombre(), this.saldo.getSaldo());
 			return;
 		}
 		
-		throw new InventarioException("El cliente no tiene  permitida la salida de mercancia porque presenta un saldo vencido. Favor de contactar al área de cobranza.");
+		throw new InventarioException("El cliente no tiene  permitida la salida de mercancia porque presenta un adeudo. Favor de contactar al área de cobranza.");
 	}
 
 	public void generaFolioSalida() {
@@ -745,6 +775,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Guardar constancia";
+		BigDecimal saldoTotal = null;
 		
 		ConstanciaSalida constancia = new ConstanciaSalida();
 		String folioCliente = null;
@@ -762,6 +793,16 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			
 			if(this.numFolio == null || "".equalsIgnoreCase(this.numFolio.trim()))
 				throw new InventarioException("No se ha indicado un folio para la constancia de salida.");
+			
+			saldoTotal = (this.saldo == null ? new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP) : this.saldo.getSaldo());
+			
+			log.info("Peso: {} kg, Cantidad: {} unidades.", this.pesoTotal, this.cantidadTotal);
+			log.info("En inventario: {} unidades", this.cantidadInventario);
+			log.info("Saldo: {}", saldoTotal);
+			
+			
+			if(this.cantidadInventario.compareTo(new BigDecimal(this.cantidadTotal).setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0 && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
+				throw new InventarioException("El cliente no puede sacar toda su mercancía hasta liquidar sus adeudos.");
 			
 			constancia.setFecha(fechaSalida);
 			constancia.setNumero(numFolio);
@@ -793,6 +834,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 			d.setConstanciaCve(constancia);
 	 			List<DetallePartida> detallePartidaList = d.getPartidaCve().getDetallePartidaList();
 	 			DetallePartida detallePartida = detallePartidaList.get(detallePartidaList.size() - 1);
+	 			detallePartida.setCantidadUManejo(detallePartida.getCantidadUManejo() - d.getCantidad());
+	 			detallePartida.setCantidadUMedida(detallePartida.getCantidadUMedida().subtract(d.getPeso()));
 	 			detallePartidaDAO.guardar(detallePartida);
 	 			log.info("Detalle constancia salida: (cantidad = {}), (peso = {}), (producto = {})", d.getCantidad(), d.getPeso(), d.getProducto());
 	 		}
@@ -855,7 +898,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 				throw new InventarioException("Existe un problema para guardar la constancia de servicio.");
 	 			}
 	 		}
-	 		this.candadoSalida.setNumSalidas(this.candadoSalida.getNumSalidas() - 1);
+	 		int numSalidas = this.candadoSalida.getNumSalidas() > 0 ? (this.candadoSalida.getNumSalidas() - 1) : 0;
+	 		boolean isHabilitado = numSalidas > 0 ? true : false;
+	 		
+	 		this.candadoSalida.setNumSalidas(numSalidas);
+	 		this.candadoSalida.setHabilitado(isHabilitado);
 	 		respuesta = this.candadoDAO.actualizar(candadoSalida);
 	 		
 	 		if(respuesta != null )
@@ -1236,5 +1283,12 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	public void setListaInventarioCopy(List<Inventario> listaInventarioCopy) {
 		this.listaInventarioCopy = listaInventarioCopy;
 	}
-	
+
+	public boolean isSaldoVencido() {
+		return saldoVencido;
+	}
+
+	public void setSaldoVencido(boolean saldoVencido) {
+		this.saldoVencido = saldoVencido;
+	}
 }
