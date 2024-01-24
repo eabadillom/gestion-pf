@@ -268,6 +268,8 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 				}
 			}
 			
+		} catch(NoResultException ex) {
+			log.warn("No se encontró la constancia solicitada (folio_cliente): {}", folioCliente);
 		} catch(Exception ex) {
 			log.error("Problema para obtener la constancia de depósito...", ex);
 		} finally {
@@ -287,6 +289,8 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 					.setParameter("folioCliente", folio)
 					.getSingleResult();
 			
+		} catch(NoResultException ex) {
+			log.warn("No se encontró la constancia solicitada (folio_cliente): {}", folio);
 		} catch(Exception ex) {
 			log.error("Problema para obtener la constancia de depósito...", ex);
 		} finally {
