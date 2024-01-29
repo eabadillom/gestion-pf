@@ -65,7 +65,7 @@
 			<div style="padding-top: 2rem;">
 				<p:panel id="seleccion-mercancia" header="SELECCIONE LA MERCANCIA">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-8 p-md-8">
+						<div class="p-col-12 p-md-12">
 							<p:outputLabel value="Producto"/>
 							<p:selectOneMenu id="claveProducto" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.productoCve.productoCve}" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona Producto" noSelectionOption="true"/>
@@ -74,18 +74,18 @@
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-2 p-md-2">
+							<p:outputLabel value="Cantidad"/>
+							<p:inputNumber id="cantidad" value="#{constanciaDeDepositoBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="empty" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" symbol="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" symbolPosition="s">
+								<p:ajax process="@this" update="@this"></p:ajax>
+							</p:inputNumber>
+						</div>
+						<div class="p-col-2 p-md-2">
 							<p:outputLabel value="Unidad de manejo"/>
 							<p:selectOneMenu autoWidth="false" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoCve}" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
 								<f:selectItems value="#{constanciaDeDepositoBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad.unidadDeManejoCve}" />
 								<p:ajax process="@this" update=":form:cantidad"></p:ajax>
 							</p:selectOneMenu>
-						</div>
-						<div class="p-col-2 p-md-2">
-							<p:outputLabel value="Cantidad"/>
-							<p:inputNumber id="cantidad" value="#{constanciaDeDepositoBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="empty" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" symbol="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" symbolPosition="s">
-								<p:ajax process="@this" update="@this"></p:ajax>
-							</p:inputNumber>
 						</div>
 						<div class="p-col-2 p-md-2">
 							<p:outputLabel value="Peso (kg)" />
@@ -101,12 +101,12 @@
 								<p:ajax process="@this"></p:ajax>
 							</p:selectOneMenu>
 						</div> -->
-						<div class="p-col-2 p-md-2">
+						<!-- <div class="p-col-2 p-md-2">
 							<p:outputLabel value="Valor de la mercancía"/>
 							<p:inputNumber value="#{constanciaDeDepositoBean.partida.valorMercancia}" placeholder="Valor($) Mercancia">
 								<p:ajax process="@this"></p:ajax>
 							</p:inputNumber>
-						</div>
+						</div> -->
 						<!-- <div class="p-col-2 p-md-2">
 							<p:outputLabel value="m&#178; por camara"/>
 							<p:inputNumber value="#{constanciaDeDepositoBean.partida.rendimiento}" placeholder="m&#178; por camara">
@@ -160,9 +160,12 @@
 								  
 								   <p:ajax event="cellEdit" listener="#{constanciaDeDepositoBean.partidaEditada}" update=":form:messages"/>
 				
-						<p:column exportable="false" width="3%">
+						<p:column exportable="false" width="2rem">
 							<p:rowToggler />
-						</p:column>							
+						</p:column>
+						<p:column headerText="Producto">
+							<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
+						</p:column>
 						<p:column headerText="Camara">
 							<h:outputText value="#{partida.camaraCve.camaraAbrev}"/>
 						</p:column>
@@ -192,13 +195,11 @@
 						<p:column headerText="Unidad">
 							<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}"/>
 						</p:column>
-						<p:column headerText="Producto">
-							<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
-						</p:column>
-						<p:column headerText="Valor($)">
+						
+						<!-- <p:column headerText="Valor($)">
 							<h:outputText value="#{partida.valorMercancia}"/>
-						</p:column>
-						<p:column headerText="#Tarimas">
+						</p:column> -->
+						<p:column headerText="Tarimas">
 							<h:outputText value="#{partida.noTarimas}"/>
 						</p:column>
 						<p:rowExpansion>
@@ -262,6 +263,7 @@
 						</div>
 					</f:facet>
                     </p:column>
+                    <p:column colspan="2" style="text-align:left"  />
                     </p:row>
             </p:columnGroup>
             
