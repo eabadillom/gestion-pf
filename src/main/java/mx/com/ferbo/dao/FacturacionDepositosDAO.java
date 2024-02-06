@@ -82,7 +82,7 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 					+ "	SELECT FOLIO, COUNT(FOLIO) AS CTA_SERVICIOS from constancia_deposito_detalle cdet "
 					+ "	GROUP BY FOLIO "
 					+ ") det ON cdd.FOLIO = det.FOLIO "
-					+ "WHERE cdd.status not in (4) "
+					+ "WHERE cdd.status not in (2,4) "
 					+ "AND cdd.CTE_CVE = :cteCve "
 					+ "AND tCF.id IS NULL "
 					+ "AND tPlt.planta_cve = :plantaCve "
