@@ -41,15 +41,36 @@ public class CandadoSalida implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id")
 	private Integer id;
+	
+	/**Habilita la salida de mercancía, bajo la condición de que el cliente no tenga saldo vencido.
+	 * 
+	 */
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "habilitado")
 	private boolean habilitado;
+	
+	/**Indica el número de salidas que tiene permitido el cliente, cuando se autorice con un saldo vencido.
+	 * 
+	 */
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "num_salidas")
 	private int numSalidas;
 	
+	@Basic(optional = false)
+	@NotNull
+	@Column(name = "salida_total")
+	private boolean salidaTotal;
+	
+	public boolean isSalidaTotal() {
+		return salidaTotal;
+	}
+
+	public void setSalidaTotal(boolean salidaTotal) {
+		this.salidaTotal = salidaTotal;
+	}
+
 	@JoinColumn(name = "cte_cve", referencedColumnName = "CTE_CVE")
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Cliente cliente;
