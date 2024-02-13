@@ -54,17 +54,15 @@
 							required="true" disabled="true" />
 					</div>
 					<div class="p-field">
-						<p:outputLabel for="@next" value="Permitir Salida (1 dia):" />
-						<p:selectBooleanCheckbox styleClass="p-ml-3"
-							value="#{candadoSalidaBean.seleccion.habilitado}" />
+						<p:outputLabel for="@next" value="Permitir Salida (1 dia, con saldo vencido):" />
+						<p:selectBooleanCheckbox value="#{candadoSalidaBean.seleccion.habilitado}" />
 					</div>
 					<div class="p-field">
 						<p:outputLabel for="@next" value="Numero Salidas Permitidas:" />
-						<p:inputNumber value="#{candadoSalidaBean.seleccion.numSalidas}"
-							required="true" decimalPlaces="0" />
+						<p:inputNumber value="#{candadoSalidaBean.seleccion.numSalidas}" required="true" decimalPlaces="0" />
 					</div>
 					<div class="p-field">
-						<p:outputLabel for="@next" value="Permitir salida del total de la mercancía"/>
+						<p:outputLabel for="@next" value="Permitir salida del total de la mercancía:"/>
 						<p:selectBooleanCheckbox value="#{candadoSalidaBean.seleccion.salidaTotal}"/>
 					</div>
 				</p:outputPanel>
