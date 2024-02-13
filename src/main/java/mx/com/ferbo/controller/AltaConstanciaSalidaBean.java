@@ -271,7 +271,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		String titulo = "Constancia salida";
 		
 		try {
-//			this.validaSaldo();
+			this.validaSaldo();
 			this.generaFolioSalida();//si el folio existe no ejecutar lo demas y mandar a llamar a validar 
 			serviciosCliente = preciosServicioDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
 			listaInventario = inventarioDAO.buscar(clienteSelect, plantaSelect);
@@ -295,11 +295,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 				listaIngresos.add(i.getFechaIngreso());
 			}
 			log.debug("Lista fechas de ingreso: {}", listaIngresos);
-//		} catch (InventarioException ex) {
-//			mensaje = ex.getMessage();
-//			severity = FacesMessage.SEVERITY_ERROR;
-//			message = new FacesMessage(severity, titulo, mensaje);
-//			FacesContext.getCurrentInstance().addMessage(null, message);
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
 		} catch (Exception ex) {
 			log.error("Problema para cargar la información del cliente...", ex);
 		} finally {
@@ -794,15 +794,15 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			if(this.numFolio == null || "".equalsIgnoreCase(this.numFolio.trim()))
 				throw new InventarioException("No se ha indicado un folio para la constancia de salida.");
 			
-//			saldoTotal = (this.saldo == null ? new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP) : this.saldo.getSaldo());
+			saldoTotal = (this.saldo == null ? new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP) : this.saldo.getSaldo());
 			
-//			log.info("Peso: {} kg, Cantidad: {} unidades.", this.pesoTotal, this.cantidadTotal);
-//			log.info("En inventario: {} unidades", this.cantidadInventario);
-//			log.info("Saldo: {}", saldoTotal);
+			log.info("Peso: {} kg, Cantidad: {} unidades.", this.pesoTotal, this.cantidadTotal);
+			log.info("En inventario: {} unidades", this.cantidadInventario);
+			log.info("Saldo: {}", saldoTotal);
 			
 			
-//			if(this.cantidadInventario.compareTo(new BigDecimal(this.cantidadTotal).setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0 && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
-//				throw new InventarioException("El cliente no puede sacar toda su mercancía hasta liquidar sus adeudos.");
+			if(this.cantidadInventario.compareTo(new BigDecimal(this.cantidadTotal).setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0 && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
+				throw new InventarioException("El cliente no puede sacar toda su mercancía hasta liquidar sus adeudos.");
 			
 			constancia.setFecha(fechaSalida);
 			constancia.setNumero(numFolio);
@@ -898,15 +898,15 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 				throw new InventarioException("Existe un problema para guardar la constancia de servicio.");
 	 			}
 	 		}
-//	 		int numSalidas = this.candadoSalida.getNumSalidas() > 0 ? (this.candadoSalida.getNumSalidas() - 1) : 0;
-//	 		boolean isHabilitado = numSalidas > 0 ? true : false;
-//	 		
-//	 		this.candadoSalida.setNumSalidas(numSalidas);
-//	 		this.candadoSalida.setHabilitado(isHabilitado);
-//	 		respuesta = this.candadoDAO.actualizar(candadoSalida);
-//	 		
-//	 		if(respuesta != null )
-//	 			throw new InventarioException("Ocurrió un problema para actualizar el candado de salida del cliente.");
+	 		int numSalidas = this.candadoSalida.getNumSalidas() > 0 ? (this.candadoSalida.getNumSalidas() - 1) : 0;
+	 		boolean isHabilitado = numSalidas > 0 ? true : false;
+	 		
+	 		this.candadoSalida.setNumSalidas(numSalidas);
+	 		this.candadoSalida.setHabilitado(isHabilitado);
+	 		respuesta = this.candadoDAO.actualizar(candadoSalida);
+	 		
+	 		if(respuesta != null )
+	 			throw new InventarioException("Ocurrió un problema para actualizar el candado de salida del cliente.");
 	 		
 	 		log.info("El usuario {} guardó correctamente la constancia de salida {}", this.usuario.getUsuario(), this.numFolio);
 	 		mensaje = "La constancia de salida se guardó correctamente.";
