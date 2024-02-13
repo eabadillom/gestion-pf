@@ -63,6 +63,10 @@
 						<p:inputNumber value="#{candadoSalidaBean.seleccion.numSalidas}"
 							required="true" decimalPlaces="0" />
 					</div>
+					<div class="p-field">
+						<p:outputLabel for="@next" value="Permitir salida del total de la mercancía"/>
+						<p:selectBooleanCheckbox value="#{candadoSalidaBean.seleccion.salidaTotal}"/>
+					</div>
 				</p:outputPanel>
 
 				<f:facet name="footer">
