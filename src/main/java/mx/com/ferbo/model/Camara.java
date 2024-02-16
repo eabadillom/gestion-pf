@@ -53,6 +53,9 @@ public class Camara implements Serializable {
     @Size(max = 6)
     @Column(name = "CAMARA_ABREV")
     private String camaraAbrev;
+    @Column(name = "TOTAL_POSICIONES")
+    private Integer totalPosicion;
+    
     @JoinColumn(name = "PLANTA_CVE", referencedColumnName = "PLANTA_CVE")
     @ManyToOne(fetch = FetchType.LAZY)
     private Planta plantaCve;
@@ -97,9 +100,17 @@ public class Camara implements Serializable {
 
     public void setPlantaCve(Planta plantaCve) {
         this.plantaCve = plantaCve;
-    }
+    }       
 
-    public List<Partida> getPartidaList() {
+    public Integer getTotalPosicion() {
+		return totalPosicion;
+	}
+
+	public void setTotalPosicion(Integer totalPosicion) {
+		this.totalPosicion = totalPosicion;
+	}
+
+	public List<Partida> getPartidaList() {
         return partidaList;
     }
 
