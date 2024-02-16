@@ -39,7 +39,7 @@ public class RepOcupacionCamaraDAO {
 					+ "	cam.CAMARA_DS AS camara_ds,"
 					+ "	plt.PLANTA_DS AS planta_ds,"
 					+ "	SUM(CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL )) as tarima"
-					+ "	from PARTIDA parEnt"
+					+ "	from partida parEnt"
 					+ "	inner join ("
 					+ "	select *"
 					+ "	from constancia_de_deposito cdd"

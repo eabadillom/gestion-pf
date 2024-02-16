@@ -90,8 +90,6 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer>{
 
 	@Override
 	public List<EmisoresCFDIS> buscarTodos() {
-		
-		
 		List<EmisoresCFDIS> listaEmisores = null;
 		EntityManager em = null;
 		
