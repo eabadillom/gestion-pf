@@ -19,14 +19,14 @@
 						<p:growl id="messages" showDetail="true" />
 						<p:fieldset>
 							<span class="ui-float-label ui-input-icon-left">
-								<p:datePicker id="min" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteEntradasBean.fecha_ini}"  maxdate="#{reporteEntradasBean.maxDate}" readonlyInput="true">
+								<p:datePicker id="min" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteEntradasBean.fecha_ini}"  maxdate="#{reporteEntradasBean.maxDate}" >
 									<p:ajax process="@this" />
 									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 								</p:datePicker>
 								<p:outputLabel for="min" value="Fecha inicial"/>
 							</span>
 							<span class="ui-float-label ui-input-icon-left">
-								<p:datePicker id="max" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteEntradasBean.fecha_fin}"  maxdate="#{reporteEntradasBean.maxDate}" readonlyInput="true">
+								<p:datePicker id="max" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteEntradasBean.fecha_fin}"  maxdate="#{reporteEntradasBean.maxDate}" >
 									<p:ajax process="@this" />
 									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 								</p:datePicker>
