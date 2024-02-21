@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OcupacionCamara" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d8a15733-41b2-4cd9-aa5b-23ad3c056967">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OcupacionCamara" pageWidth="560" pageHeight="842" columnWidth="520" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d8a15733-41b2-4cd9-aa5b-23ad3c056967">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDB"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="508"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="478"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA["/home/giovanny/Imágenes/Capturas de pantalla/logoF.png"]]></defaultValueExpression>
 	</parameter>
@@ -17,49 +28,84 @@
 	</parameter>
 	<parameter name="Fecha" class="java.util.Date"/>
 	<queryString language="SQL">
-		<![CDATA[select * from (
-	select		
-		cam.CAMARA_CVE AS camara_cve,
-		cam.CAMARA_ABREV AS camara_abrev,
-		cam.CAMARA_DS AS camara_ds,
-		plt.PLANTA_DS AS planta_ds,
-	    SUM(CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL )) as tarima	    
-	from partida parEnt
+		<![CDATA[select
+	*,
+	(I.total_pos - I.tarima) AS posiciones_Disponibles
+from
+	(
+	select
+			cam.CAMARA_CVE AS camara_cve,
+			cam.CAMARA_ABREV AS camara_abrev,
+			cam.CAMARA_DS AS camara_ds,			
+			plt.PLANTA_DS AS planta_ds,						
+			SUM(CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL )) as tarima,
+			cam.total_posiciones AS total_pos
+	from
+		partida parEnt
 	inner join (
-		select *
-		from constancia_de_deposito cdd
-		WHERE (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
+		select
+			*
+		from
+			constancia_de_deposito cdd
+		WHERE
+			(cdd.cte_cve = $P{idCliente}
+				OR $P{idCliente} IS NULL)
 			AND cdd.fecha_ingreso <= $P{Fecha}
-	) cddEnt on parEnt.folio = cddEnt.folio   
-	inner join unidad_de_producto udp on udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
-	inner join producto prd on prd.producto_cve = udp.producto_cve
-	inner join unidad_de_manejo udm on udm.unidad_de_manejo_cve = udp.unidad_de_manejo_cve
-	inner join camara cam on cam.camara_cve = parEnt.camara_cve
-	inner join planta plt on plt.planta_cve = cam.planta_cve
-	inner join cliente cli on cli.cte_cve = cddEnt.cte_cve
-	left outer join posicion_partida pp on parEnt.partida_cve = pp.ID_PARTIDA
-	left outer join posicion pos on pp.ID_POSICION = pos.id_posicion
+					) cddEnt on
+		parEnt.folio = cddEnt.folio
+	inner join unidad_de_producto udp on
+		udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
+	inner join producto prd on
+		prd.producto_cve = udp.producto_cve
+	inner join unidad_de_manejo udm on
+		udm.unidad_de_manejo_cve = udp.unidad_de_manejo_cve
+	inner join camara cam on
+		cam.camara_cve = parEnt.camara_cve
+	inner join planta plt on
+		plt.planta_cve = cam.planta_cve
+	inner join cliente cli on
+		cli.cte_cve = cddEnt.cte_cve
+	left outer join posicion_partida pp on
+		parEnt.partida_cve = pp.ID_PARTIDA
+	left outer join posicion pos on
+		pp.ID_POSICION = pos.id_posicion
 	left outer join (
-		select 
-	    	dcs.partida_cve,
-	    	sum(COALESCE(dcs.peso,0)) as peso,
-	    	sum(COALESCE(dcs.cantidad,0)) as cantidad
-	    from constancia_salida cSal
-	    inner join detalle_constancia_salida dcs on dcs.constancia_cve = cSal.id
-	    WHERE cSal.status = 1 
-	    	AND cSal.fecha <= $P{Fecha}
-	    group by
-			dcs.PARTIDA_CVE
-	) salidas ON parEnt.partida_cve = salidas.partida_cve 
+		select
+							dcs.partida_cve,
+							sum(COALESCE(dcs.peso, 0)) as peso,
+							sum(COALESCE(dcs.cantidad, 0)) as cantidad
+		from
+			constancia_salida cSal
+		inner join detalle_constancia_salida dcs on
+			dcs.constancia_cve = cSal.id
+		WHERE
+			cSal.status = 1
+			AND cSal.fecha <= $P{Fecha}
+		group by
+						dcs.PARTIDA_CVE
+						) salidas ON
+		parEnt.partida_cve = salidas.partida_cve
 	where
-		cddEnt.status <> 4
-		AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
-		AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
-	GROUP BY camara_cve,camara_ds, camara_abrev
-	ORDER BY planta_ds
-) I
-WHERE tarima > 0
-GROUP BY I.camara_cve, I.camara_ds, I.camara_abrev]]>
+						cddEnt.status <> 4
+		AND (cam.camara_cve = $P{Camara}
+			OR $P{Camara} IS NULL )
+		AND (plt.planta_cve = $P{Planta}
+			OR $P{Planta} IS NULL )
+	GROUP BY
+		camara_cve,
+		camara_ds,
+		camara_abrev,
+		planta_ds
+	ORDER BY
+		camara_cve
+					) I
+WHERE
+	tarima > 0
+GROUP BY
+	I.camara_cve,
+	I.camara_ds,
+	I.camara_abrev ,
+	I.planta_ds]]>
 	</queryString>
 	<field name="camara_cve" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="camara_cve"/>
@@ -85,28 +131,75 @@ GROUP BY I.camara_cve, I.camara_ds, I.camara_abrev]]>
 		<property name="com.jaspersoft.studio.field.name" value="tarima"/>
 		<property name="com.jaspersoft.studio.field.label" value="tarima"/>
 	</field>
+	<field name="total_pos" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="total_pos"/>
+		<property name="com.jaspersoft.studio.field.label" value="total_pos"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="camara"/>
+	</field>
+	<field name="posiciones_Disponibles" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="posiciones_Disponibles"/>
+		<property name="com.jaspersoft.studio.field.label" value="posiciones_Disponibles"/>
+	</field>
 	<group name="Planta">
 		<groupExpression><![CDATA[$F{planta_ds}]]></groupExpression>
 		<groupHeader>
-			<band height="33">
+			<band height="70">
 				<textField>
-					<reportElement x="0" y="0" width="555" height="19" forecolor="#2196F3" uuid="78592b3f-1138-4f39-80db-8ac8d5b872c1"/>
+					<reportElement x="0" y="0" width="520" height="40" forecolor="#2196F3" uuid="78592b3f-1138-4f39-80db-8ac8d5b872c1"/>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
-						<font size="10" isBold="true"/>
+						<font size="14" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{planta_ds}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="0" y="19" width="280" height="13" uuid="56a72cd6-12ea-4a20-89d6-8a5d065074a1"/>
+					<reportElement mode="Opaque" x="0" y="40" width="130" height="30" forecolor="#FFFFFF" backcolor="#2196F3" uuid="56a72cd6-12ea-4a20-89d6-8a5d065074a1"/>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="10" isBold="true"/>
+						<font size="12" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Camara]]></text>
+					<text><![CDATA[Cámara]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="280" y="19" width="275" height="13" uuid="1a52e230-6f99-4e49-9afd-4097d990a96c"/>
+					<reportElement mode="Opaque" x="130" y="40" width="130" height="30" forecolor="#FFFFFF" backcolor="#2196F3" uuid="1a52e230-6f99-4e49-9afd-4097d990a96c"/>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="10" isBold="true"/>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Posiciones por cámara]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="390" y="40" width="130" height="30" forecolor="#FFFFFF" backcolor="#2196F3" uuid="46ef1c03-a55e-4baa-aa97-e9dba71a5876"/>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Posiciones Disponibles ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="260" y="40" width="130" height="30" forecolor="#FFFFFF" backcolor="#2196F3" uuid="09296530-c0d5-472a-a88c-987e02b3fcec"/>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Tarimas]]></text>
 				</staticText>
@@ -116,24 +209,32 @@ GROUP BY I.camara_cve, I.camara_ds, I.camara_abrev]]>
 	<group name="Camara">
 		<groupExpression><![CDATA[$F{camara_cve}]]></groupExpression>
 		<groupHeader>
-			<band height="17">
+			<band height="37">
 				<textField>
-					<reportElement x="0" y="0" width="280" height="16" uuid="b22dc8f9-0276-4535-902f-7e3970427c83">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
+					<reportElement x="0" y="0" width="130" height="36" uuid="b22dc8f9-0276-4535-902f-7e3970427c83"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="10"/>
+						<font size="10"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{camara_ds}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="280" y="0" width="275" height="16" uuid="704a0729-bc33-4193-be5c-943aad9be9bc">
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					</reportElement>
+					<reportElement x="260" y="0" width="130" height="36" uuid="704a0729-bc33-4193-be5c-943aad9be9bc"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="10"/>
+						<font size="10"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{tarima}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="390" y="0" width="130" height="36" uuid="99436adb-51c2-4187-b08e-42392f6a53db"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{posiciones_Disponibles}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="131" y="0" width="129" height="36" uuid="b0751d56-c113-4282-819f-97b707e4c689"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{total_pos}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -142,18 +243,31 @@ GROUP BY I.camara_cve, I.camara_ds, I.camara_abrev]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="46" splitType="Stretch">
+		<band height="102" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="555" height="30" forecolor="#5093E6" backcolor="#FFFFFF" uuid="30f52bc1-2ac4-4519-9a62-c8b6a33f0624"/>
+				<reportElement x="0" y="0" width="520" height="30" forecolor="#5093E6" backcolor="#FFFFFF" uuid="30f52bc1-2ac4-4519-9a62-c8b6a33f0624"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="14" isBold="true"/>
+					<font size="20"/>
 				</textElement>
-				<text><![CDATA[REPORTE DE OCUPACIÓN DE CÁMARAS]]></text>
+				<text><![CDATA[Reporte Ocupación de Cámaras ]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="120" height="40" uuid="9bb13c97-a93b-4d87-87c2-d43e36f3d989"/>
+				<reportElement x="0" y="30" width="180" height="72" uuid="9bb13c97-a93b-4d87-87c2-d43e36f3d989"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
+			<staticText>
+				<reportElement x="0" y="30" width="280" height="30" uuid="1bc91916-8a0a-4bbc-9cea-4ff5a99fe5e4">
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<paragraph lineSpacingSize="1.0" rightIndent="10"/>
+				</textElement>
+				<text><![CDATA[Al dia ]]></text>
+			</staticText>
+			<textField pattern="YYYY/MM/dd">
+				<reportElement x="280" y="30" width="240" height="30" uuid="8ad489f1-c5db-433f-92d5-563aa9da38f5"/>
+				<textFieldExpression><![CDATA[$P{Fecha}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 </jasperReport>
