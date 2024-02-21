@@ -196,13 +196,17 @@
 											<h:outputText value="#{servicioConstancia.descripcion}" />
 										</p:column>
 										<p:column headerText="Cantidad">
-											<h:outputText value="#{servicioConstancia.baseCargo}" />
+											<p:inputNumber value="#{servicioConstancia.baseCargo}" >
+												<p:ajax event="change" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosEntrada form:dt-constanciasE"/>
+											</p:inputNumber>
 										</p:column>
 										<p:column headerText="Unidad">
 											<h:outputText value="#{servicioConstancia.unidadMedida}" />
 										</p:column>
 										<p:column headerText="Precio Unitario">
-											<h:outputText value="#{servicioConstancia.tarifa}" />
+											<p:inputNumber value="#{servicioConstancia.tarifa}" >
+												<p:ajax event="change" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosEntrada form:dt-constanciasE"/>
+											</p:inputNumber>
 										</p:column>
 										<p:column headerText="Importe">
 											<h:outputText value="#{servicioConstancia.costo}">
@@ -282,13 +286,17 @@
 									<h:outputText value="#{servicioConstancia.descripcion}" />
 								</p:column>
 								<p:column headerText="Cantidad">
-									<h:outputText value="#{servicioConstancia.baseCargo}" />
+									<p:inputNumber value="#{servicioConstancia.baseCargo}" >
+										<p:ajax event="change" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosVigencia form:dt-vigencias"/>
+									</p:inputNumber>
 								</p:column>
 								<p:column headerText="Unidad">
 									<h:outputText value="#{servicioConstancia.unidadMedida}" />
 								</p:column>
 								<p:column headerText="Precio Unitario">
-									<h:outputText value="#{servicioConstancia.tarifa}" />
+									<p:inputNumber value="#{servicioConstancia.tarifa}" >
+										<p:ajax event="change" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosVigencia form:dt-vigencias"/>
+									</p:inputNumber>
 								</p:column>
 								<p:column headerText="Importe">
 									<h:outputText value="#{servicioConstancia.costo}">
