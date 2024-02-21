@@ -377,6 +377,21 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 	}
 	
+	public void calcula(ServicioConstancia sc) {
+		BigDecimal subtotal = null;
+		
+		try {
+			log.info("Servicio constancia: {}", sc);
+			subtotal = sc.getBaseCargo().multiply(sc.getTarifa()).setScale(2, BigDecimal.ROUND_HALF_UP);
+			sc.setCosto(subtotal);
+		} catch(Exception ex) {
+			log.error("Problema al recalcular los servicios...", ex);
+		} finally {
+			this.recalculoEntradas();
+			this.recalculoVigencias();
+		}
+	}
+	
 	public void sumaGeneral() {
 		
 		subTotalGeneral = subTotalEntrada.add(subTotalServicios.add(subTotalVigencias)).setScale(2,BigDecimal.ROUND_HALF_UP);
