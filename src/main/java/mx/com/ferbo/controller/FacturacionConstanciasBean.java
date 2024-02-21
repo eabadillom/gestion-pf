@@ -378,17 +378,35 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 	
 	public void calcula(ServicioConstancia sc) {
+		String message = null;
+		Severity severity = null;
+		
 		BigDecimal subtotal = null;
 		
 		try {
-			log.info("Servicio constancia: {}", sc);
 			subtotal = sc.getBaseCargo().multiply(sc.getTarifa()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			sc.setCosto(subtotal);
+			
+			log.info("Importe actualizado en servicio constancia: cantidad = {}, costo unitario = {}, subtotal = {}", sc.getBaseCargo(), sc.getTarifa(), sc.getCosto());
+		} catch(NullPointerException ex) {
+			log.warn("Problema al recalcular los servicios: {}", ex.getMessage());
+			message = "NO puede dejar datos vacíos.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Actualizar importe", message));
+			PrimeFaces.current().ajax().update("form:messages");
 		} catch(Exception ex) {
-			log.error("Problema al recalcular los servicios...", ex);
+			log.warn("Problema al recalcular los servicios: {}", ex.getMessage());
+			message = "Problema con la información de servicios.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Actualizar importe", message));
+			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
 			this.recalculoEntradas();
 			this.recalculoVigencias();
+			
+			
 		}
 	}
 	
