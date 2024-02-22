@@ -26,8 +26,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.charts.ChartData;
+import org.primefaces.model.charts.optionconfig.legend.Legend;
+import org.primefaces.model.charts.optionconfig.legend.LegendLabel;
 import org.primefaces.model.charts.pie.PieChartDataSet;
 import org.primefaces.model.charts.pie.PieChartModel;
+import org.primefaces.model.charts.pie.PieChartOptions;
 
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.PlantaDAO;
@@ -55,6 +58,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	Integer idCamara = null;
 	
 	private PieChartModel pieModel;
+	private PieChartModel model;
 	
 	private Date fecha;
 
@@ -190,7 +194,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	public void exportarPdf() throws JRException, IOException, SQLException{
 		System.out.println("Exportando a pdf.....");
 			String jasperPath = "/jasper/OcupacionCamara.jrxml";
-			String filename = "InventarioAlmacen" +fecha+".pdf";
+			String filename = "Ocupacion Camaras" +fecha+".pdf";
 			String images = "/images/logo.jpeg";
 			String message = null;
 			Severity severity = null;
@@ -262,7 +266,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	public void exportarExcel() throws JRException, IOException, SQLException{
 		System.out.println("Exportando a pdf.....");
 			String jasperPath = "/jasper/OcupacionCamara.jrxml";
-			String filename = "InventarioAlmacen" +fecha+".xlsx";
+			String filename = "Ocupacion Camaras" +fecha+".xlsx";
 			String images = "/images/logo.jpeg";
 			String message = null;
 			Severity severity = null;
@@ -341,7 +345,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
         for(OcupacionCamara oc: listaOcupacionCamara) {
         	
         	if(i < size) {
-        		values.add(oc.getTarima());
+        		values.add(oc.getPosiciones_Disponibles());//solo se deberian de ver saldos positivos?
         		labels.add(oc.getPlanta_ds()+"- "+oc.getCamara_ds());
         		i++;
         	}
@@ -349,10 +353,6 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
         }
         
         dataSet.setData(values);
-        
-        /*values.add(300);
-        values.add(50);
-        values.add(100);*/
         
         List<Integer> rgb = null;
         List<String> bgColors = new ArrayList<>();
@@ -375,20 +375,25 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
         data.addChartDataSet(dataSet);        
         data.setLabels(labels);
         
-        pieModel.setData(data);
+        PieChartOptions options = new PieChartOptions();
         
-       /* bgColors.add("rgb(255, 99, 132)");
-        bgColors.add("rgb(54, 162, 235)");
-        bgColors.add("rgb(255, 205, 86)");*/
+        Legend legend = new Legend();
+        legend.setDisplay(true);
+        //legend.setPosition("top");
+        LegendLabel legendLabels = new LegendLabel();
+        legendLabels.setFontStyle("bold");
+        legendLabels.setFontColor("#2980B9");
+        legendLabels.setFontSize(12);
         
+        legend.setLabels(legendLabels);
+        options.setLegend(legend);
         
-        /*labels.add("Red");
-        labels.add("Blue");
-        labels.add("Yellow");*/
+        pieModel.setOptions(options);
+        
+        pieModel.setData(data);        
         
     }
 
-	
 
 	public Date getFecha() {
 		return fecha;
@@ -484,6 +489,14 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 
 	public void setPieModel(PieChartModel pieModel) {
 		this.pieModel = pieModel;
+	}
+
+	public PieChartModel getModel() {
+		return model;
+	}
+
+	public void setModel(PieChartModel model) {
+		this.model = model;
 	}
 	
 	

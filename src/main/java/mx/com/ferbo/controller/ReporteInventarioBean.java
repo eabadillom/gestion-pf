@@ -115,7 +115,7 @@ public class ReporteInventarioBean implements Serializable {
 		log.info("Exportando a pdf.....");
 		String jasperPath = "/jasper/InventarioAlmacen.jrxml";
 		String filename = "InventarioAlmacen" + fecha + ".pdf";
-		String images = "/images/logo.jpeg";
+		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
 		File reportFile = new File(jasperPath);
@@ -187,7 +187,7 @@ public class ReporteInventarioBean implements Serializable {
 		log.info("Exportando a excel.....");
 		String jasperPath = "/jasper/InventarioAlmacen.jrxml";
 		String filename = "InventarioAlmacen" + fecha + ".xlsx";
-		String images = "/images/logo.jpeg";
+		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
 		File reportFile = new File(jasperPath);

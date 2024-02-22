@@ -72,11 +72,15 @@
                                     <div class="p-field">
                                         <p:outputLabel for="txtDescipcion">Descripción</p:outputLabel>
                                         <p:inputText id="txtDescipcion" value="#{camarasBean.camaraSelect.camaraDs}" required="true" requiredMessage="Campo requerido"/>
-                                    </div>
+                                    </div>                                    
                                     <div class="p-field">
                                         <p:outputLabel for="txtCodigo">Abreviación</p:outputLabel>
                                         <p:inputTextarea id="txtCodigo" value="#{camarasBean.camaraSelect.camaraAbrev}" />
                                     </div>
+                                    <div class="p-field">
+                                    	<p:outputLabel for="totalPosicion">Total Posiciones</p:outputLabel>
+                                    	<p:inputText id = "totalPosicion" value="#{camarasBean.camaraSelect.totalPosicion}" />
+                                    </div>                                                                                                           
                                     <div class="p-field">
                                         <p:outputLabel for="soPlanta" value="Planta"/>
                                         <p:selectOneMenu id="soPlanta" value="#{camarasBean.camaraSelect.plantaCve}"  converter="entityConverter" required="true" requiredMessage="Campo requerido">

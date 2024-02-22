@@ -24,78 +24,124 @@
 	<queryString language="SQL">
 		<![CDATA[select * from (
 	select
-	    cddEnt.folio            as folio,
-	    cli.cte_nombre          as cliente,
-	    cli.numero_cte          as numero_cte,
-	    cddEnt.folio_cliente    as folio_cliente,
-	    cddEnt.fecha_ingreso    as ingreso,
-	    parEnt.PARTIDA_CVE,
-	    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
-	    udm.unidad_de_manejo_ds as unidad_cobro,
-	    CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL ) as tarima,
-	    (parEnt.peso_total - COALESCE(salidas.peso, 0)) as peso,
-	    prd.producto_cve        as producto_cve,
-	    prd.producto_ds         as producto, 
-	    detPart.dtp_caducidad   as caducidad,
-	    prd.numero_prod         as codigo,
-	    detPart.dtp_sap         as sap,
-	    detPart.dtp_po          as po,
-	    cam.camara_cve          as cam_cve,
-	    cam.camara_abrev        as camara,
-	    plt.planta_cve          as plt_cve,
-	    plt.planta_abrev        as planta,
-	    detPart.dtp_lote        as lote,
-		COALESCE(parEnt.valorMercancia,0) as valor,
-		(parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL) as base_cargo,
-		( cantidad * parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL)  as resultado,
-	    pos.cod_posicion
-	from partida parEnt
-	inner join (
-		select *
-		from constancia_de_deposito cdd
-		WHERE cdd.status = 1
-			and (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
-			AND cdd.fecha_ingreso <= $P{Fecha}
-	) cddEnt on parEnt.folio = cddEnt.folio
-	inner join unidad_de_producto udp on udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
-	inner join producto prd on prd.producto_cve = udp.producto_cve
-	inner join unidad_de_manejo udm on udm.unidad_de_manejo_cve = udp.unidad_de_manejo_cve
-	inner join camara cam on cam.camara_cve = parEnt.camara_cve
-	inner join planta plt on plt.planta_cve = cam.planta_cve
-	inner join cliente cli on cli.cte_cve = cddEnt.cte_cve
-	inner join 
-	(
-	    select tdp.* from detalle_partida tdp
-	    inner join (
-			select
-				dp.partida_cve,
-	            max(dp.det_part_cve) as det_part_cve
-			from detalle_partida dp
-			
-			group by dp.partida_cve
-	    ) tmdp on tdp.partida_cve = tmdp.partida_cve and tdp.det_part_cve = tmdp.det_part_cve
-	) detPart on detPart.partida_cve = parEnt.partida_cve
-	left outer join posicion_partida pp on parEnt.partida_cve = pp.ID_PARTIDA
-	left outer join posicion pos on pp.ID_POSICION = pos.id_posicion
-	left outer join (
-		select 
-	    	dcs.partida_cve,
-	    	sum(COALESCE(dcs.peso,0)) as peso,
-	    	sum(COALESCE(dcs.cantidad,0)) as cantidad
-	    from constancia_salida cSal
-	    inner join detalle_constancia_salida dcs on dcs.constancia_cve = cSal.id
-	    WHERE cSal.status = 1 
-	    	AND cSal.fecha <= $P{Fecha}
-	    group by
-			dcs.PARTIDA_CVE
-	) salidas ON parEnt.partida_cve = salidas.partida_cve
-	where
-		cddEnt.status <> 4
-		and parEnt.no_tarimas >= 1.000
-		AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
-		AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
+		folio,
+		cliente,
+		numero_cte,
+		folio_cliente,
+		ingreso,
+		sum(cantidad) as cantidad,
+		unidad_cobro,
+		sum(tarima) as tarima,
+		sum(peso) as peso,
+		producto_cve,
+		producto,
+		caducidad,
+		codigo,
+		sap,
+		po,
+		cam_cve,
+		camara,
+		plt_cve,
+		planta,
+		lote,
+		valor,
+		sum(base_cargo) as base_cargo,
+		sum(resultado) as resultado,
+		cod_posicion
+	from (
+		select
+		    cddEnt.folio            as folio,
+		    cli.cte_nombre          as cliente,
+		    cli.numero_cte          as numero_cte,
+		    cddEnt.folio_cliente    as folio_cliente,
+		    cddEnt.fecha_ingreso    as ingreso,
+		    parEnt.PARTIDA_CVE,
+		    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
+		    udm.unidad_de_manejo_ds as unidad_cobro,
+		    CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL ) as tarima,
+		    (parEnt.peso_total - COALESCE(salidas.peso, 0)) as peso,
+		    prd.producto_cve        as producto_cve,
+		    prd.producto_ds         as producto, 
+		    detPart.dtp_caducidad   as caducidad,
+		    prd.numero_prod         as codigo,
+		    detPart.dtp_sap         as sap,
+		    detPart.dtp_po          as po,
+		    cam.camara_cve          as cam_cve,
+		    cam.camara_abrev        as camara,
+		    plt.planta_cve          as plt_cve,
+		    plt.planta_abrev        as planta,
+		    detPart.dtp_lote        as lote,
+			COALESCE(parEnt.valorMercancia,0) as valor,
+			(parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL) as base_cargo,
+			( cantidad * parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL)  as resultado,
+		    pos.cod_posicion
+		from partida parEnt
+		inner join (
+			select *
+			from constancia_de_deposito cdd
+			WHERE cdd.status = 1
+				and (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
+				AND cdd.fecha_ingreso <= $P{Fecha}
+		) cddEnt on parEnt.folio = cddEnt.folio
+		inner join unidad_de_producto udp on udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
+		inner join producto prd on prd.producto_cve = udp.producto_cve
+		inner join unidad_de_manejo udm on udm.unidad_de_manejo_cve = udp.unidad_de_manejo_cve
+		inner join camara cam on cam.camara_cve = parEnt.camara_cve
+		inner join planta plt on plt.planta_cve = cam.planta_cve
+		inner join cliente cli on cli.cte_cve = cddEnt.cte_cve
+		inner join 
+		(
+		    select tdp.* from detalle_partida tdp
+		    inner join (
+				select
+					dp.partida_cve,
+		            max(dp.det_part_cve) as det_part_cve
+				from detalle_partida dp
+				
+				group by dp.partida_cve
+		    ) tmdp on tdp.partida_cve = tmdp.partida_cve and tdp.det_part_cve = tmdp.det_part_cve
+		) detPart on detPart.partida_cve = parEnt.partida_cve
+		left outer join posicion_partida pp on parEnt.partida_cve = pp.ID_PARTIDA
+		left outer join posicion pos on pp.ID_POSICION = pos.id_posicion
+		left outer join (
+			select 
+		    	dcs.partida_cve,
+		    	sum(COALESCE(dcs.peso,0)) as peso,
+		    	sum(COALESCE(dcs.cantidad,0)) as cantidad
+		    from constancia_salida cSal
+		    inner join detalle_constancia_salida dcs on dcs.constancia_cve = cSal.id
+		    WHERE cSal.status = 1 
+		    	AND cSal.fecha <= $P{Fecha}
+		    group by
+				dcs.PARTIDA_CVE
+		) salidas ON parEnt.partida_cve = salidas.partida_cve
+		where
+			cddEnt.status <> 4
+			and parEnt.no_tarimas >= 1.000
+			AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
+			AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
 	
-	
+	) t1
+	group by
+		folio,
+		cliente,
+		numero_cte,
+		folio_cliente,
+		ingreso,
+		unidad_cobro,
+		producto_cve,
+		producto,
+		caducidad,
+		codigo,
+		sap,
+		po,
+		cam_cve,
+		camara,
+		plt_cve,
+		planta,
+		lote,
+		valor,
+		cod_posicion
 	/*---------------------------------------------------------------------*/
 	
 	
@@ -104,82 +150,130 @@
 	/*---------------------------------------------------------------------*/
 	
 	select
-	    cddEnt.folio            as folio,
-	    cli.cte_nombre          as cliente,
-	    cli.numero_cte          as numero_cte,
-	    cddEnt.folio_cliente    as folio_cliente,
-	    cddEnt.fecha_ingreso    as ingreso,
-	    parEnt.PARTIDA_CVE,
-	    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
-	    udm.unidad_de_manejo_ds as unidad_cobro,
-	    parEnt.no_tarimas as tarima,
-	    (parEnt.peso_total - COALESCE(salidas.peso, 0)) as peso,
-	    prd.producto_cve        as producto_cve,
-	    prd.producto_ds         as producto, 
-	    detPart.dtp_caducidad   as caducidad,
-	    prd.numero_prod         as codigo,
-	    detPart.dtp_sap         as sap,
-	    detPart.dtp_po          as po,
-	    cam.camara_cve          as cam_cve,
-	    cam.camara_abrev        as camara,
-	    plt.planta_cve          as plt_cve,
-	    plt.planta_abrev        as planta,
-	    detPart.dtp_lote        as lote,
-		COALESCE(parEnt.valorMercancia,0) as valor,
-		(parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL) as base_cargo,
-		( cantidad * parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL)  as resultado,
-	    pos.cod_posicion
-	from partida parEnt
-	inner join (
-		select *
-		from constancia_de_deposito cdd
-		WHERE cdd.status = 1
-			and (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
-			AND cdd.fecha_ingreso <= $P{Fecha}
-	) cddEnt on parEnt.folio = cddEnt.folio
-	inner join unidad_de_producto udp on udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
-	inner join producto prd on prd.producto_cve = udp.producto_cve
-	inner join unidad_de_manejo udm on udm.unidad_de_manejo_cve = udp.unidad_de_manejo_cve
-	inner join camara cam on cam.camara_cve = parEnt.camara_cve
-	inner join planta plt on plt.planta_cve = cam.planta_cve
-	inner join cliente cli on cli.cte_cve = cddEnt.cte_cve
-	inner join 
-	(
-	    select tdp.* from detalle_partida tdp
-	    inner join (
-			select
-				dp.partida_cve,
-	            max(dp.det_part_cve) as det_part_cve
-			from detalle_partida dp
-			
-			group by dp.partida_cve
-	    ) tmdp on tdp.partida_cve = tmdp.partida_cve and tdp.det_part_cve = tmdp.det_part_cve
-	) detPart on detPart.partida_cve = parEnt.partida_cve
-	left outer join posicion_partida pp on parEnt.partida_cve = pp.ID_PARTIDA
-	left outer join posicion pos on pp.ID_POSICION = pos.id_posicion
-	left outer join (
-		select 
-	    	dcs.partida_cve,
-	    	sum(COALESCE(dcs.peso,0)) as peso,
-	    	sum(COALESCE(dcs.cantidad,0)) as cantidad
-	    from constancia_salida cSal
-	    inner join detalle_constancia_salida dcs on dcs.constancia_cve = cSal.id
-	    WHERE cSal.status = 1 
-	    	AND cSal.fecha <= $P{Fecha}
-	    group by
-			dcs.PARTIDA_CVE
-	) salidas ON parEnt.partida_cve = salidas.partida_cve
-	where
-		cddEnt.status <> 4
-		and parEnt.no_tarimas < 1.000
-		AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
-		AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
-		
+		folio,
+		cliente,
+		numero_cte,
+		folio_cliente,
+		ingreso,
+		sum(cantidad) as cantidad,
+		unidad_cobro,
+		sum(tarima) as tarima,
+		sum(peso) as peso,
+		producto_cve,
+		producto,
+		caducidad,
+		codigo,
+		sap,
+		po,
+		cam_cve,
+		camara,
+		plt_cve,
+		planta,
+		lote,
+		valor,
+		sum(base_cargo) as base_cargo,
+		sum(resultado) as resultado,
+		cod_posicion
+	from (
+		select
+		    cddEnt.folio            as folio,
+		    cli.cte_nombre          as cliente,
+		    cli.numero_cte          as numero_cte,
+		    cddEnt.folio_cliente    as folio_cliente,
+		    cddEnt.fecha_ingreso    as ingreso,
+		    parEnt.PARTIDA_CVE,
+		    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
+		    udm.unidad_de_manejo_ds as unidad_cobro,
+		    parEnt.no_tarimas as tarima,
+		    (parEnt.peso_total - COALESCE(salidas.peso, 0)) as peso,
+		    prd.producto_cve        as producto_cve,
+		    prd.producto_ds         as producto, 
+		    detPart.dtp_caducidad   as caducidad,
+		    prd.numero_prod         as codigo,
+		    detPart.dtp_sap         as sap,
+		    detPart.dtp_po          as po,
+		    cam.camara_cve          as cam_cve,
+		    cam.camara_abrev        as camara,
+		    plt.planta_cve          as plt_cve,
+		    plt.planta_abrev        as planta,
+		    detPart.dtp_lote        as lote,
+			COALESCE(parEnt.valorMercancia,0) as valor,
+			(parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL) as base_cargo,
+			( cantidad * parEnt.valorMercancia / parEnt.CANTIDAD_TOTAL)  as resultado,
+		    pos.cod_posicion
+		from partida parEnt
+		inner join (
+			select *
+			from constancia_de_deposito cdd
+			WHERE cdd.status = 1
+				and (cdd.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
+				AND cdd.fecha_ingreso <= $P{Fecha}
+		) cddEnt on parEnt.folio = cddEnt.folio
+		inner join unidad_de_producto udp on udp.unidad_de_producto_cve = parEnt.unidad_de_producto_cve
+		inner join producto prd on prd.producto_cve = udp.producto_cve
+		inner join unidad_de_manejo udm on udm.unidad_de_manejo_cve = udp.unidad_de_manejo_cve
+		inner join camara cam on cam.camara_cve = parEnt.camara_cve
+		inner join planta plt on plt.planta_cve = cam.planta_cve
+		inner join cliente cli on cli.cte_cve = cddEnt.cte_cve
+		inner join 
+		(
+		    select tdp.* from detalle_partida tdp
+		    inner join (
+				select
+					dp.partida_cve,
+		            max(dp.det_part_cve) as det_part_cve
+				from detalle_partida dp
+				
+				group by dp.partida_cve
+		    ) tmdp on tdp.partida_cve = tmdp.partida_cve and tdp.det_part_cve = tmdp.det_part_cve
+		) detPart on detPart.partida_cve = parEnt.partida_cve
+		left outer join posicion_partida pp on parEnt.partida_cve = pp.ID_PARTIDA
+		left outer join posicion pos on pp.ID_POSICION = pos.id_posicion
+		left outer join (
+			select 
+		    	dcs.partida_cve,
+		    	sum(COALESCE(dcs.peso,0)) as peso,
+		    	sum(COALESCE(dcs.cantidad,0)) as cantidad
+		    from constancia_salida cSal
+		    inner join detalle_constancia_salida dcs on dcs.constancia_cve = cSal.id
+		    WHERE cSal.status = 1 
+		    	AND cSal.fecha <= $P{Fecha}
+		    group by
+				dcs.PARTIDA_CVE
+		) salidas ON parEnt.partida_cve = salidas.partida_cve
+		where
+			cddEnt.status <> 4
+			and parEnt.no_tarimas < 1.000
+			AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
+			AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
+	
+	) t2
+	group by
+		folio,
+		cliente,
+		numero_cte,
+		folio_cliente,
+		ingreso,
+		unidad_cobro,
+		producto_cve,
+		producto,
+		caducidad,
+		codigo,
+		sap,
+		po,
+		cam_cve,
+		camara,
+		plt_cve,
+		planta,
+		lote,
+		valor,
+		cod_posicion
 		
 		
 ) I
 WHERE I.cantidad > 0
-ORDER BY cliente,numero_cte, producto]]>
+ORDER BY cliente,numero_cte, producto
+]]>
 	</queryString>
 	<field name="folio" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="folio"/>
@@ -205,11 +299,6 @@ ORDER BY cliente,numero_cte, producto]]>
 		<property name="com.jaspersoft.studio.field.name" value="ingreso"/>
 		<property name="com.jaspersoft.studio.field.label" value="ingreso"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_de_deposito"/>
-	</field>
-	<field name="PARTIDA_CVE" class="java.lang.Integer">
-		<property name="com.jaspersoft.studio.field.name" value="PARTIDA_CVE"/>
-		<property name="com.jaspersoft.studio.field.label" value="PARTIDA_CVE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="partida"/>
 	</field>
 	<field name="cantidad" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="cantidad"/>
