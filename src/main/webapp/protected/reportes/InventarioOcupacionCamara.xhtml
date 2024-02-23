@@ -24,6 +24,7 @@
 					
 					
 					<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha"  value="#{reporteInventarioOcupacionCamaraBean.fecha}">
+
 						<p:ajax process="@this" />
 						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
@@ -106,8 +107,16 @@
 					 <h:outputText value="#{ocupacionCamara.camara_ds}" />
 					</p:column>
 					
+					<p:column headerText="Posiciones por Cámara" >
+						<h:outputText value="#{ocupacionCamara.total_pos}" />
+					</p:column>
+					
 					<p:column headerText="Posiciones Ocupadas">
 					 <h:outputText value="#{ocupacionCamara.tarima}" />
+					</p:column>
+					
+					<p:column headerText="Posiciones Disponibles" >
+						<h:outputText value="#{ocupacionCamara.posiciones_Disponibles}" />
 					</p:column>
 					
 					<f:facet name="footer">
@@ -121,7 +130,7 @@
 						
 							<p:outputPanel id="grafica-panel" class="ui-fluid">
 								
-									<p:pieChart model="#{reporteInventarioOcupacionCamaraBean.pieModel}" style="width:100%; height: 300px;" ></p:pieChart>
+									<p:pieChart model="#{reporteInventarioOcupacionCamaraBean.pieModel}" style="width:100%; height: 300px;" />
 									
 							</p:outputPanel>
 							

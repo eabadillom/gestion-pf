@@ -8,7 +8,9 @@ public class OcupacionCamara {
 	private String camara_abrev;
 	private String camara_ds;
 	private String planta_ds;
-	private BigDecimal tarima;
+	private BigDecimal tarima;//agregar posiciones que permite la camara  y posiciones disponibles
+	private Integer total_pos;
+	private BigDecimal posiciones_Disponibles;
 	
 	public OcupacionCamara() {
 		
@@ -52,13 +54,32 @@ public class OcupacionCamara {
 
 	public void setTarima(BigDecimal tarima) {
 		this.tarima = tarima;
+	}	
+
+	public Integer getTotal_pos() {
+		return total_pos;
+	}
+
+	public void setTotal_pos(Integer total_pos) {
+		this.total_pos = total_pos;
+	}
+
+	public BigDecimal getPosiciones_Disponibles() {
+		return posiciones_Disponibles;
+	}
+
+	public void setPosiciones_Disponibles(BigDecimal posiciones_Disponibles) {
+		this.posiciones_Disponibles = posiciones_Disponibles;
 	}
 
 	@Override
 	public String toString() {
 		return "OcupacionCamara [camara_cve=" + camara_cve + ", camara_abrev=" + camara_abrev + ", camara_ds="
-				+ camara_ds + ", planta_ds=" + planta_ds + ", tarima=" + tarima + "]";
+				+ camara_ds + ", planta_ds=" + planta_ds + ", tarima=" + tarima + ", total_pos=" + total_pos
+				+ ", posiciones_Disponibles=" + posiciones_Disponibles + "]";
 	}
+
+	
 
 	
 	

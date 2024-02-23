@@ -31,7 +31,7 @@ public class RepOcupacionCamaraDAO {
 			
 			
 			listaOcupacionCamara = new ArrayList<OcupacionCamara>();
-			
+
 			sql = "select * from ("
 					+ "	select"
 					+ "	cam.CAMARA_CVE AS camara_cve,"
@@ -75,6 +75,7 @@ public class RepOcupacionCamaraDAO {
 					+ ") I"
 					+ " WHERE tarima > 0"
 					+ " GROUP BY I.camara_cve, I.camara_ds, I.camara_abrev ,I.planta_ds";
+
 			
 			Query query = em.createNativeQuery(sql)
 					.setParameter("Fecha", fecha)
@@ -94,7 +95,9 @@ public class RepOcupacionCamaraDAO {
 				oc.setCamara_abrev((String) o[id++]);
 				oc.setCamara_ds((String) o[id++]);
 				oc.setPlanta_ds((String) o[id++]);
-				oc.setTarima((BigDecimal)o[id++]);
+				oc.setTarima((BigDecimal)o[id++]);//setear al objeto total posiciones y posiciones disponibles
+				oc.setTotal_pos((Integer) o[id++]);				
+				oc.setPosiciones_Disponibles((BigDecimal)o[id++]);
 				
 				listaOcupacionCamara.add(oc);
 				

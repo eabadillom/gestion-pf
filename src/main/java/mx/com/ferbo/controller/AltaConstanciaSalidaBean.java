@@ -801,7 +801,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			log.info("Saldo: {}", saldoTotal);
 			
 			
-			if(this.cantidadInventario.compareTo(new BigDecimal(this.cantidadTotal).setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0 && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
+			if(this.cantidadInventario.compareTo(new BigDecimal(this.cantidadTotal).setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0
+				&& this.candadoSalida.isSalidaTotal() == false && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
 				throw new InventarioException("El cliente no puede sacar toda su mercancía hasta liquidar sus adeudos.");
 			
 			constancia.setFecha(fechaSalida);
@@ -903,6 +904,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	 		
 	 		this.candadoSalida.setNumSalidas(numSalidas);
 	 		this.candadoSalida.setHabilitado(isHabilitado);
+	 		this.candadoSalida.setSalidaTotal(false);
 	 		respuesta = this.candadoDAO.actualizar(candadoSalida);
 	 		
 	 		if(respuesta != null )

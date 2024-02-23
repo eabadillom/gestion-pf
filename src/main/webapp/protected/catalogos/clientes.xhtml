@@ -355,19 +355,19 @@
 										</f:facet>
 
 										<p:column headerText="Tipo medio" width="10%">
-											<h:outputText value="#{medio.tpMedio eq 'm' ? 'MAIL' : 'TELÉFONO'}" />
+											<h:outputText value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? 'MAIL' : 'TELÉFONO'}" />
 										</p:column>
 										<p:column headerText="Mail">
-											<h:outputText value="#{medio.tpMedio eq 'm' ? medio.idMail.nbMail : ''}" />
+											<h:outputText value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? medio.idMail.nbMail : ''}" />
 										</p:column>
 										<p:column headerText="Tipo mail">
-											<h:outputText value="#{medio.tpMedio eq 'm' ? medio.idMail.tpMail.nbTipo  : ''}" />
+											<h:outputText value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? medio.idMail.tpMail.nbTipo  : ''}" />
 										</p:column>
 										<p:column headerText="Teléfono">
-											<h:outputText value="#{medio.tpMedio eq 't' ? medio.idTelefono.nbTelefono : ''}" />
+											<h:outputText value="#{medio.tpMedio eq 't' or medio.tpMedio eq 'T' ? medio.idTelefono.nbTelefono : ''}" />
 										</p:column>
 										<p:column headerText="Tipo telefono">
-											<h:outputText value="#{medio.tpMedio eq 't' ? medio.idTelefono.tpTelefono.nbTelefono : ''}" />
+											<h:outputText value="#{medio.tpMedio eq 't' or medio.tpMedio eq 'T' ? medio.idTelefono.tpTelefono.nbTelefono : ''}" />
 										</p:column>
 										<p:column headerText="Estatus" width="10%">
 											<h:outputText value="#{medio.stMedio eq true ? 'ACTIVO' : 'INACTIVO'}" />

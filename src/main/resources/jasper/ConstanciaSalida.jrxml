@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.19.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConstanciaSalida" pageWidth="229" pageHeight="660" columnWidth="189" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="c5c48a35-06c6-47f9-8382-ea6bb2ea082e">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionProduccionMySQL.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion Dev"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -245,7 +245,7 @@ GROUP BY
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PLANTA_DS}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="yyyy-MM-dd">
 				<reportElement x="39" y="65" width="150" height="12" uuid="db039c12-98e8-498a-a368-0e60b198ec59"/>
 				<textElement markup="styled">
 					<font isBold="true"/>
