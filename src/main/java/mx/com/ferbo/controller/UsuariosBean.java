@@ -72,7 +72,7 @@ public class UsuariosBean implements Serializable {
 		this.usuario.setStUsuario("R");
 		this.showPassword = false;
 		this.idstatus = "R";
-	};
+	}
 	
 	public void cargaUsuario() {
 		log.debug("Usuario: {}, Status: {}, StNtfSrvExt: {}", this.usuario.getUsuario(), this.usuario.getStUsuario(), this.usuario.isStNtfSrvExt());
