@@ -326,6 +326,7 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 			}
 			vigenciaInicio = DateUtil.addDay(vigenciaFin, 1);
 			vigenciaFin = DateUtil.fechaVencimiento(vigenciaInicio, vigencia, false);
+			log.debug("Constancia: {} - Vigencia: {} - {}", constancia.getFolioCliente(), vigenciaInicio, vigenciaFin);
 		}
 		
 		cf = new ConstanciaFactura();
