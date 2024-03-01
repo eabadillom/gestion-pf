@@ -423,8 +423,11 @@ public class FacturaServiciosBean implements Serializable {
 		Factura buscaFactura = null;
 		List<Factura> listaFacturas = null;
 		SerieFactura serieFacturaTemp = null;
+		List<SerieFactura> listaSerieFacturaBkp = null;
 				
 		try {
+			listaSerieFacturaBkp = new ArrayList<SerieFactura>();
+			listaSerieFacturaBkp.addAll(listaSerieFactura);
 			
 			serieFacturaTemp = seriefacturaDAO.findById(serieFacturaSelect.getId()); //forzar a que serie Factura traiga el dato actualizado. 
 			serieFacturaSelect = serieFacturaTemp;
@@ -434,17 +437,21 @@ public class FacturaServiciosBean implements Serializable {
 			
 			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
 				throw new InventarioException("Debe indicar al menos un servicio");
-			if(BigDecimal.ZERO.compareTo(total) != 0 ) {
+			
+			if(BigDecimal.ZERO.compareTo(total) == 0) {
+				throw new InventarioException("El total de la factura no puede ser cero.");
+			}
+			
 			// Datos receptor
 			cliente = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
 			
 			listaFacturas = facturaDAO.buscarPorSerieNumeroList(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual()+1)); //ERROR
-						
+			
 			int size  = listaFacturas.size() - 1;
 			
 			if(listaFacturas.size()>0) {
 				buscaFactura = listaFacturas.get(size);
-			}					
+			}
 			
 			if((buscaFactura == null || buscaFactura.getId() == null) || (buscaFactura.getStatus().getId() == 0 || buscaFactura.getStatus().getId() == 2 ) ) {
 				
@@ -478,10 +485,10 @@ public class FacturaServiciosBean implements Serializable {
 				factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
 				factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
 				AsentamientoHumano asentamiento = asnDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
-				domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
-				domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
-				domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
-				domicilioSelect.getDomicilioColonia());
+						domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
+						domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+						domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
+						domicilioSelect.getDomicilioColonia());
 				factura.setColonia(asentamiento.getAsentamientoDs());
 				factura.setCp(domicilioSelect.getDomicilioCp());
 				factura.setCalle(domicilioSelect.getDomicilioCalle());
@@ -534,15 +541,12 @@ public class FacturaServiciosBean implements Serializable {
 				String resultado = facturaDAO.guardar(factura);
 				if(resultado != null)
 					throw new InventarioException("Ocurrió un problema al guardar la factura.");
-			}
-			
-			else {
 				
-				//serieFactura();
-				
+				this.listaSerieFactura = listaSerieFacturaBkp;
+			} else {
 				throw new InventarioException("La factura ya está registrada.");
 			}
-			}
+			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "La factura se guardo correctamente";
 		} catch (InventarioException ex) {
