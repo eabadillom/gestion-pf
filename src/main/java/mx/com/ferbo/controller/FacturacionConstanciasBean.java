@@ -1100,74 +1100,78 @@ public class FacturacionConstanciasBean implements Serializable{
 		List<Factura> listaFactura = null;
 		Factura facturaTmp = null;
 		SerieFactura serieTmp = null;
-		//haciendo null id de los servicios constancias de constancias de deposito 
-		
-		for(ConstanciaFactura cf: selectedEntradas) {
-			for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
-				sc.setId(null);
-			}
-		}
-		
-		for(ConstanciaFactura cf: selectedVigencias) {
-			for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
-				sc.setId(null);
-			}
-		}
-		
-		//haciendo null id de serviciosDs  y productosDs de constancia servicios 
-		
-		for(ConstanciaFacturaDs cfd: selectedServicios) {
-			for(ServicioConstanciaDs scd: cfd.getServicioConstanciaDsList()) {
-				scd.setId(null);
-			}
-			
-			for(ProductoConstanciaDs pcd: cfd.getProductoConstanciaDsList()) {
-				pcd.setId(null);
-			}	
-			
-		}
+		List<SerieFactura> listaSerieFacturaBkp = null;
 		
 		try {
+			listaSerieFacturaBkp = new ArrayList<SerieFactura>();
+			listaSerieFacturaBkp.addAll(listaSerieFactura);
+			
+			//haciendo null id de los servicios constancias de constancias de deposito 
+			for(ConstanciaFactura cf: selectedEntradas) {
+				for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
+					sc.setId(null);
+				}
+			}
+			
+			for(ConstanciaFactura cf: selectedVigencias) {
+				for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
+					sc.setId(null);
+				}
+			}
+			
+			//haciendo null id de serviciosDs  y productosDs de constancia servicios 
+			
+			for(ConstanciaFacturaDs cfd: selectedServicios) {
+				for(ServicioConstanciaDs scd: cfd.getServicioConstanciaDsList()) {
+					scd.setId(null);
+				}
+				
+				for(ProductoConstanciaDs pcd: cfd.getProductoConstanciaDsList()) {
+					pcd.setId(null);
+				}	
+				
+			}
 			
 			
 			if(factura.getId()!=null)
-				throw new InventarioException("Registro erroneo, la factura ya se encuentra registrada	");
+				throw new InventarioException("La factura ya se encuentra registrada");
 			
-				if(BigDecimal.ZERO.compareTo(subTotalGeneral) != 0 ) {
-					SerieFacturaDAO serieDAO = new SerieFacturaDAO();
-					Integer size = 0;
-					
-					serieTmp = serieDAO.findById(serieFacturaSelect.getId());
-					
-					serieFacturaSelect = serieTmp;
-														
-					listaFactura = facturaDAO.buscarPorSerieNumeroList(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1)); //MODIFICAR O REALIZAR OTRO METODO DE BUSQUEDA QUE RETORNE UNA LISTA POR SI HAY MAS DE UN REGISTRO CANCELADO DE FACTURA Y TOMAR EL ULTIMO QUE SE CANCELO O SE GENERO
-					size = listaFactura.size();
-					
-					if(listaFactura.size()>0) {
-						facturaTmp = listaFactura.get(size -1 );
-					}
-					
-					if((facturaTmp == null || facturaTmp.getId() == null) || (facturaTmp.getStatus().getId() == 0 || facturaTmp.getStatus().getId() == 2 ) ) {
-						
-						this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
-						serieDAO.update(this.serieFacturaSelect);
-						listaSerieFactura.clear();
-						listaSerieFactura.add(serieFacturaSelect);
-						serieFacturaSelect = listaSerieFactura.get(0);
-						
-						factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
-						facturaDAO.guardar(factura);
-						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
-						PrimeFaces.current().ajax().update("form:messages");
-					}else {
-						throw new InventarioException("El registro existe de factura ...");
-					}
+			if(BigDecimal.ZERO.compareTo(subTotalGeneral) == 0) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "El importe es de $0.00"));
+				PrimeFaces.current().ajax().update("form:messages");
+				return;
+			}
+			
+			SerieFacturaDAO serieDAO = new SerieFacturaDAO();
+			Integer size = 0;
+			
+			serieTmp = serieDAO.findById(serieFacturaSelect.getId());
+			
+			serieFacturaSelect = serieTmp;
+												
+			listaFactura = facturaDAO.buscarPorSerieNumeroList(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1)); //MODIFICAR O REALIZAR OTRO METODO DE BUSQUEDA QUE RETORNE UNA LISTA POR SI HAY MAS DE UN REGISTRO CANCELADO DE FACTURA Y TOMAR EL ULTIMO QUE SE CANCELO O SE GENERO
+			size = listaFactura.size();
+			
+			if(listaFactura.size()>0) {
+				facturaTmp = listaFactura.get(size -1 );
+			}
+			
+			if((facturaTmp == null || facturaTmp.getId() == null) || (facturaTmp.getStatus().getId() == 0 || facturaTmp.getStatus().getId() == 2 ) ) {
 				
+				this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
+				serieDAO.update(this.serieFacturaSelect);
+				listaSerieFactura.clear();
+				listaSerieFactura.add(serieFacturaSelect);
+				serieFacturaSelect = listaSerieFactura.get(0);
+				
+				factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
+				facturaDAO.guardar(factura);
+				
+				this.listaSerieFactura = listaSerieFacturaBkp;
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso", "La factura se guardo correctamente"));
+				PrimeFaces.current().ajax().update("form:messages");
 			}else {
-			//cerrarSesion();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registro erroneo", "El importe es de $0.00"));
-			PrimeFaces.current().ajax().update("form:messages");
+				throw new InventarioException("El registro existe de factura ...");
 			}
 			
 		} catch (Exception ex) {
@@ -1184,7 +1188,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	
 	public void jasper() throws JRException, IOException, SQLException {
 		String jasperPath = "/jasper/Factura.jrxml";
-		String filename = "Factura  .pdf";
+		String filename = null;
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
@@ -1199,6 +1203,8 @@ public class FacturacionConstanciasBean implements Serializable{
 			
 			if (this.factura.getId() == null)
 				throw new InventarioException("Debe Guardar la Factura primero");
+			
+			filename = String.format("Factura_%s-%s.pdf", factura.getNomSerie(), factura.getNumero());
 			
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
