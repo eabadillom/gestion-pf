@@ -603,13 +603,14 @@ public class DateUtil {
 	
 	public static Date fechaVencimiento(Date fecha, int diasVencimiento, boolean esVigenciaNatural){
 		Date vencimiento = null;
-		Date fechaAux = null;
+		Date fechaInicial = null;
 		int diaFechaAux = -1;
 		int mesFechaAux = -1;
 		
 		vencimiento = new Date(fecha.getTime());
-		fechaAux = new Date(fecha.getTime());
+		fechaInicial = new Date(fecha.getTime());
 		boolean isAnioBisiesto = esAnioBisiesto(fecha);
+		
 		if(isAnioBisiesto)
 			log.debug("{}: año bisiesto.", fecha);
 		
@@ -625,17 +626,17 @@ public class DateUtil {
 				log.trace("Día del mes entre 30, 31");
 				vencimiento = DateUtil.addMonth(vencimiento, 1);
 				log.trace("Vencimiento: {}", vencimiento);
-				if(getDia(vencimiento) == getDia(fechaAux)) {
+				if(getDia(vencimiento) == getDia(fechaInicial)) {
 					log.trace("Día de vencimiento igual a fecha auxiliar.");
 					vencimiento = DateUtil.addDay(vencimiento, -1);
 					log.trace("Vencimiento: {}", vencimiento);
 				}
 			}
-			diaFechaAux = getDia(fechaAux);
-			mesFechaAux = getMes(fechaAux);
+			diaFechaAux = getDia(fechaInicial);
+			mesFechaAux = getMes(fechaInicial);
 			if(diaFechaAux == 29 && mesFechaAux == 1 && isAnioBisiesto == false) {
 				log.trace("día de fecha auxiliar = 29 y mes 1");
-				String f = String.format("%d-02-28", getAnio(fechaAux));
+				String f = String.format("%d-02-28", getAnio(fechaInicial));
 				vencimiento = DateUtil.getDate(f, FORMATO_YYYY_MM_DD);
 				log.trace("Vencimiento: {}", vencimiento);
 			}
