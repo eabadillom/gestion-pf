@@ -8,7 +8,11 @@ import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -113,7 +117,7 @@ public class egresosBean implements Serializable{
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void Init() {
-		
+		listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null, mesActual);
 		nuevoImporte = new ImporteEgreso();
 		listaEgresos = egresosDAO.buscarTodos();
 		listaEmisores = emisoresDAO.buscarTodos();
@@ -316,87 +320,21 @@ public class egresosBean implements Serializable{
 
 	}
 	
-	public void grafica() {
-		 /*barModel = new BarChartModel();
-	        ChartData data = new ChartData();
-	        Date finMes;
-	        BarChartDataSet barDataSet = new BarChartDataSet();
-	       barDataSet.setLabel("A");
-	       barDataSet.setLabel("B");
-	        finMes = DateUtil.getLastDayOfMonth(mesActual);
-			listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null);
-			List<Number> listaUtilidad = new ArrayList<>();
-			
-			for(importeUtilidad u : listaImporteUtilidad)
-				listaUtilidad.add(u.getUtilidadPerdida());
-			
-			barDataSet.setData(listaUtilidad);
-			
-	        List<String> bgColor = new ArrayList<>();
-	        bgColor.add("rgba(255, 99, 132, 0.2)");
-	        bgColor.add("rgba(255, 159, 64, 0.2)");
-	        bgColor.add("rgba(255, 205, 86, 0.2)");
-	        bgColor.add("rgba(75, 192, 192, 0.2)");
-	        bgColor.add("rgba(54, 162, 235, 0.2)");
-	        bgColor.add("rgba(153, 102, 255, 0.2)");
-	        bgColor.add("rgba(201, 203, 207, 0.2)");
-	        barDataSet.setBackgroundColor(bgColor);
-
-	        List<String> borderColor = new ArrayList<>();
-	        borderColor.add("rgb(255, 99, 132)");
-	        borderColor.add("rgb(255, 159, 64)");
-	        borderColor.add("rgb(255, 205, 86)");
-	        borderColor.add("rgb(75, 192, 192)");
-	        borderColor.add("rgb(54, 162, 235)");
-	        borderColor.add("rgb(153, 102, 255)");
-	        borderColor.add("rgb(201, 203, 207)");
-	        barDataSet.setBorderColor(borderColor);
-	        barDataSet.setBorderWidth(1);
-
-	        data.addChartDataSet(barDataSet);
-
-	        
-	        List<String> listaEmisor = new ArrayList<>();
-	        for(importeUtilidad i : listaImporteUtilidad)
-	        listaEmisor.add(i.getEmiNombre());
-	        data.setLabels(listaEmisor);
-	        barModel.setData(data);
-	    	
-	        BarChartOptions options = new BarChartOptions();
-	     
-	        CartesianScales cScales = new CartesianScales();
-	        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
-	        linearAxes.setOffset(true);
-	        CartesianLinearTicks ticks = new CartesianLinearTicks();
-	        linearAxes.setTicks(ticks);
-	        cScales.addYAxesData(linearAxes);
-	        options.setScales(cScales);
-
-	        Title title = new Title();
-	        title.setDisplay(true);
-	        title.setText("Bar Chart");
-	        options.setTitle(title);
-
-	        Legend legend = new Legend();
-	        legend.setDisplay(true);
-	        legend.setPosition("top");
-	        LegendLabel legendLabels = new LegendLabel();
-	        legendLabels.setFontStyle("italic");
-	        legendLabels.setFontColor("#2980B9");
-	        legendLabels.setFontSize(24);
-	        legend.setLabels(legendLabels);
-	        options.setLegend(legend);
-
-	        // disable animation
-	        Animation animation = new Animation();
-	        animation.setDuration(0);
-	        options.setAnimation(animation);
-
-	        barModel.setOptions(options);*/
-		
+	public void grafica() throws ParseException {
+	
 		 	stackedGroupBarModel = new BarChartModel();
 	        ChartData data = new ChartData();
-	        listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null);
+	        Date fechaAnt = null;
+			String fechaActual = DateFormat.getDateInstance().format(new Date());
+			Date fecha = new SimpleDateFormat("dd/MM/yyyy").parse(fechaActual);
+			Calendar calendario = Calendar.getInstance();
+			calendario.setTime(fecha);
+			calendario.add(Calendar.MONTH, -1);
+			String nuevaFecha = new SimpleDateFormat("dd/MM/yyyy").format(calendario.getTime());
+			System.out.println(nuevaFecha);
+			fechaAnt=new SimpleDateFormat("dd/MM/yyyy").parse(nuevaFecha);  
+		    System.out.println(nuevaFecha+"\t"+fechaAnt);  
+		    listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null,fechaAnt);
 	        //Primer dataSet
 	        BarChartDataSet barDataSet = new BarChartDataSet();
 	        barDataSet.setLabel("Ingresos");
@@ -462,8 +400,10 @@ public class egresosBean implements Serializable{
 	        options.setTooltip(tooltip);
 
 	        stackedGroupBarModel.setOptions(options);
-		
+	    	stackedGroupBarModel.setExtender("charExtender");
+
 	}
+	
 	
 	
 	

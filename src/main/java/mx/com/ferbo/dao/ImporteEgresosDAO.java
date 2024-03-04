@@ -46,7 +46,7 @@ public class ImporteEgresosDAO extends IBaseDAO<ImporteEgreso, Integer>{
 		return listaEgresos;
 	}
 	
-	public List<importeUtilidad> obtenerUtilidadPorEmisor(String emisor){
+	public List<importeUtilidad> obtenerUtilidadPorEmisor(String emisor, Date fecha){
 		List<importeUtilidad> lista = null;
 		EntityManager entity = null;
 		String sql = null;
@@ -72,7 +72,7 @@ public class ImporteEgresosDAO extends IBaseDAO<ImporteEgreso, Integer>{
 					+ "    FROM  "
 					+ "        emisor e "
 					+ "        LEFT JOIN importe_egreso ie ON e.cd_emisor = ie.cd_emisor "
-					+ "            AND DATE_FORMAT(ie.fecha, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')   "
+					+ "            AND DATE_FORMAT(ie.fecha, '%Y-%m') = DATE_FORMAT(:fecha, '%Y-%m')   "
 					+ "    WHERE  "
 					+ "        (e.nb_emisor = :EMISOR OR :EMISOR IS NULL) "
 					+ "    GROUP BY  "
@@ -88,7 +88,7 @@ public class ImporteEgresosDAO extends IBaseDAO<ImporteEgreso, Integer>{
 					+ "    FROM  "
 					+ "        factura f "
 					+ "        LEFT JOIN pago p ON f.id = p.factura "
-					+ "            AND DATE_FORMAT(f.fecha, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')   "
+					+ "            AND DATE_FORMAT(f.fecha, '%Y-%m') = DATE_FORMAT(:fecha, '%Y-%m')   "
 					+ "    WHERE  "
 					+ "        (f.emi_nombre = :EMISOR OR :EMISOR IS NULL) "
 					+ "    GROUP BY  "
@@ -101,7 +101,8 @@ public class ImporteEgresosDAO extends IBaseDAO<ImporteEgreso, Integer>{
 					+ "    fecha, emi_nombre; ";
 			
 			Query query = entity.createNativeQuery(sql)
-					.setParameter("EMISOR",emisor);
+					.setParameter("EMISOR",emisor)
+					.setParameter("fecha", fecha);
 					
 					List<Object[]> listaObjetos = query.getResultList();
 					
@@ -110,8 +111,8 @@ public class ImporteEgresosDAO extends IBaseDAO<ImporteEgreso, Integer>{
 						importeUtilidad u = new importeUtilidad();
 						int id = 0;
 						u.setEmiNombre((String) o[id++]);
-						String fecha = ((String) o[id++]);
-						Date f = DateUtil.getDate(fecha, DateUtil.FORMATO_YYYY_MM);
+						String fh = ((String) o[id++]);
+						Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);
 						u.setFecha(f);
 						u.setPagos((BigDecimal) o[id++]);
 						u.setEgresos((BigDecimal) o[id++] );
