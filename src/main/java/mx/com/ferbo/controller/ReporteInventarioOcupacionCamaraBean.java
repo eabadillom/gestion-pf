@@ -379,71 +379,6 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 			}
 	
 	
-	/*public void createPieModelCake() {
-        pieModel = new PieChartModel();
-        ChartData data = new ChartData();
-        Random rnd = new Random();
-
-        PieChartDataSet dataSet = new PieChartDataSet();
-        List<Number> values = new ArrayList<>();
-        
-        Integer size = listaOcupacionCamara.size();
-        Integer i = 0;
-        
-        List<String> labels = new ArrayList<>();
-        
-        for(OcupacionCamara oc: listaOcupacionCamara) {
-        	
-        	if(i < size) {
-        		values.add(oc.getPosiciones_Disponibles());//solo se deberian de ver saldos positivos?
-        		labels.add(oc.getPlanta_ds()+"- "+oc.getCamara_ds());
-        		i++;
-        	}
-        	
-        }
-        
-        dataSet.setData(values);
-        
-        List<Integer> rgb = null;
-        List<String> bgColors = new ArrayList<>();
-        Integer numero;
-        
-        for(int bgcolor = 0 ; bgcolor < size;bgcolor++ ) { //repito las acciones la veces del tamaño de mi lista de ocupacionCamaras son los objetos que se van a crear de bgColors
-        	
-        	rgb = new ArrayList<Integer>();
-        	
-        	for(int color = 0; color < 3;color++) {//creo 3 numeros random tomando en cuenta el rango de valores RGB        		
-        		numero = (int)(rnd.nextDouble()*256);
-        		rgb.add(numero);
-        	}
-        	
-        	bgColors.add("rgb("+rgb.get(0).toString()+","+rgb.get(1).toString()+","+rgb.get(2).toString()+")");//le agrego los datos a la lista bgColors
-        	log.info(bgColors.get(bgcolor));
-        }
-        
-        dataSet.setBackgroundColor(bgColors);
-        data.addChartDataSet(dataSet);        
-        data.setLabels(labels);
-        
-        PieChartOptions options = new PieChartOptions();
-        
-        Legend legend = new Legend();
-        legend.setDisplay(true);
-        //legend.setPosition("top");
-        LegendLabel legendLabels = new LegendLabel();
-        legendLabels.setFontStyle("bold");
-        legendLabels.setFontColor("#2980B9");
-        legendLabels.setFontSize(12);
-        
-        legend.setLabels(legendLabels);
-        options.setLegend(legend);
-        
-        pieModel.setOptions(options);
-        
-        pieModel.setData(data);        
-        
-    }*/
-	
 	public void createPieModel2() {
 		
 		
@@ -522,6 +457,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
         options.setTooltip(tooltip);
 
         modelBar.setOptions(options);
+        modelBar.setExtender("chartExtender");
 		
 		
 	}
@@ -534,7 +470,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, plantaSelect.getPlantaCve(), null);
 		}
 		
-		createPieModel3();
+		createPieModel2();
 	}
 	
 	public void graficaPorCamara() {
@@ -612,105 +548,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 		
 	}
 	
-	public void createPieModel3(){
-		
-		modelBar = new BarChartModel();
-		
-		ChartData data = new ChartData();
-		
-		BarChartDataSet dataSetP1 = new BarChartDataSet();
-		BarChartDataSet dataSetP2 = new BarChartDataSet();
-		
-		dataSetP1.setLabel("Posiciones Disponibles");		
-		dataSetP1.setBackgroundColor("rgb(255, 99, 132)");
-		dataSetP1.setStack("Stack 0");
-		
-		/*dataSetP2.setLabel("Planta 2");
-        dataSetP2.setBackgroundColor("rgb(54, 162, 235)");
-        dataSetP2.setStack("Stack 0");*/
-		
-		List<Number> valuesP1 = new ArrayList<>();
-		//List<Number> valuesP2 = new ArrayList<>();
-		List<String> labels = new ArrayList<>();
-		
-		for(OcupacionCamara oc: listaOcupacionCamara) {	
-			
-			if(oc.getPlanta_ds().equals("P1 CENTRAL DE ABASTOS")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());				
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P2 TEPALCATES")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P3 CENTRAL DE ABASTOS")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P4 URBANA IXHUATEPEC")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P5 ORO")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-		}
-		
-		dataSetP1.setData(valuesP1);
-		//dataSetP2.setData(valuesP2);
-		
-		data.addChartDataSet(dataSetP1);
-		//data.addChartDataSet(dataSetP2);	
-		data.setLabels(labels);
-		
-		modelBar.setData(data);
-		
-		BarChartOptions options = new BarChartOptions();
-        CartesianScales cScales = new CartesianScales();
-        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
-        linearAxes.setStacked(true);
-        linearAxes.setOffset(true);        
-        cScales.addXAxesData(linearAxes);
-        cScales.addYAxesData(linearAxes);
-        options.setScales(cScales);
-        
-        Title title = new Title();
-        title.setDisplay(true);
-        title.setText("Ocupación de cámaras");
-        options.setTitle(title);
-        
-        /*Legend legend = new Legend();
-        legend.setDisplay(true);        
-        legend.setPosition("top");
-        LegendLabel legendLabels = new LegendLabel();
-        legendLabels.setFontStyle("bold");
-        legendLabels.setFontColor("#2980B9");
-        legendLabels.setFontSize(24);
-        legend.setLabels(legendLabels);
-        options.setLegend(legend);*/
-        
-        modelBar.setExtender("chartExtender");
-        
-        Tooltip tooltip = new Tooltip();
-        tooltip.setMode("index");
-        tooltip.setIntersect(true);        
-        options.setTooltip(tooltip);
-        options.setOffsetGridLines(false);
-        
-        modelBar.setOptions(options);
-		
-		
-		
-		
-		
-		
-	}
+	
 
 
 	public Date getFecha() {
