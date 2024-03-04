@@ -5,8 +5,35 @@
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
 	<ui:define name="title">Detalle de Egresos </ui:define>
-
+	
 	<ui:define name="content">
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+        <script type ="text/javascript">
+		function charExtender() {
+			var options = {
+					options: {
+						plugins:{
+							tiitle: {
+							display: true,
+							text: "title set from JavaScript"
+						},legend:{
+							display: false
+						}
+						}, scales:{
+							y: {
+								beginAtZero: false
+							}
+						}
+					},plugins: [ChartDataLabels],
+						options: {
+						}
+					};
+			//merge all options into to main chart options
+			$.extend(true, this.cfg.config, options);
+			};
+</script>
+
 		<h:form id="form">
 			<div class="p-col-12">
 				<div class="card">
@@ -107,16 +134,7 @@
 						<p:outputLabel for="emisorImporte-som" value="Emisor" />
 					</span>
 					</div>
-					
-					<div class="p-field">
-					<span class="ui-float-label ui-input-icon-left">
-					<p:selectOneMenu id="tipoImporte-som" value="#{egresosBean.importeSelected.idEgreso.tipoEgreso}" converter="entityConverter"  disabled="true" >  
-							<f:selectItem itemLabel="#{egresosBean.importeSelected.idEgreso.tipoEgreso.nombreTipoEgreso}" itemValue=""/>
-							<f:selectItems value="#{egresosBean.listaTipoEgresos}" var="tipo" itemLabel="#{tipo.nombreTipoEgreso}" itemValue="#{tipo}" />
-						</p:selectOneMenu>
-						<p:outputLabel for="tipoImporte-som" value="tipo" />
-					</span>
-					</div>
+
 					
 						<div class="p-field">
 					<span class="ui-float-label ui-input-icon-left">
@@ -167,15 +185,6 @@
 				</span>
 					</div>
 
-					<div class="p-field">
-					<span class="ui-float-label ui-input-icon-left">
-					<p:selectOneMenu id="tipo-som" value="#{egresosBean.nuevoEgreso.tipoEgreso}" converter="entityConverter"  >  
-							<f:selectItem itemLabel="" itemValue=""/>
-							<f:selectItems value="#{egresosBean.listaTipoEgresos}" var="tipo" itemLabel="#{tipo.nombreTipoEgreso}" itemValue="#{tipo}" />
-						</p:selectOneMenu>
-						<p:outputLabel for="tipo-som" value="tipo" />
-					</span>
-					</div>
 					
 				</p:outputPanel>
 
@@ -246,3 +255,4 @@
 	</ui:define>
 
 </ui:composition>
+
