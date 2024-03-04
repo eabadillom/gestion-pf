@@ -3,12 +3,62 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
-
+		
+	<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> --> 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css" rel="stylesheet" />
+	<canvas id="skillChart" width="400" height="200"></canvas>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js" ></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js"></script>
 	<ui:define name="title">Facturacion Constancias</ui:define>
 
 	<ui:define name="content">
+	
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> 	
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>	 
 
+	
+	<script type="text/javascript">
+		
+			
+			
+		 function chartExtender(){
+			//var options = $.extend(true, {}, this.cfg.config);
+			
+            var options = {
+            	
+                options: {
+                    plugins:{
+                        title: {
+                            display: true,
+                            text: "title set from JavaScript"
+                        },legend:{
+                        	display: false
+                        }
+                       
+                    },scales:{
+                    	y: {
+                    		beginAtZero: true
+                    	}
+                    }                 
+                },plugins: [ChartDataLabels],
+                	options: {
+                		
+                	}
+            };
+        
+            //merge all options into the main chart options
+            $.extend(true, this.cfg.config, options);
+			};
+			
+   </script>
+   
 		<h:form id="form">
+		
+		
+		
 			<p:breadCrumb>
 	            <p:menuitem value="Home" outcome="/dashboard"/>
 	            <p:menuitem value="Reportes"/>
@@ -22,6 +72,7 @@
 				<div class="p-col-12">
 					<div class="card">
 					
+					<div id="chart"></div>
 					
 					<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="false" value="#{reporteInventarioOcupacionCamaraBean.fecha}">
 						<p:ajax process="@this" />
@@ -126,7 +177,8 @@
 					</p:dataTable>
 					
 					<div style="margin-top: 12px;">
-						<p:commandButton id="graficaGeneral" value="Grafica Por Cliente" oncomplete="PF('dlg-grafica').show()" update="@widgetVar(dlg-grafica) @this" action="#{reporteInventarioOcupacionCamaraBean.createPieModel2()}" disabled="#{reporteInventarioOcupacionCamaraBean.general}" styleClass="p-mr-4"/>
+						<p:commandButton id="graficaGeneral" value="Grafica Por Cliente" oncomplete="PF('dlg-grafica').show()" update="@widgetVar(dlg-grafica) @this" action="#{reporteInventarioOcupacionCamaraBean.createPieModel3()}" disabled="#{reporteInventarioOcupacionCamaraBean.general}" styleClass="p-mr-4"/>
+						<!--<p:commandButton id="graficaGeneral" value="Grafica Por Cliente" oncomplete="PF('dlg-grafica').show()" update="@widgetVar(dlg-grafica) @this" action="#{reporteInventarioOcupacionCamaraBean.createPieModel2()}" disabled="#{reporteInventarioOcupacionCamaraBean.general}" styleClass="p-mr-4"/>-->
 						<p:commandButton id="graficaPlanta" value="Graficar Por Planta" oncomplete="PF('dlg-grafica').show()" disabled="#{reporteInventarioOcupacionCamaraBean.selectPlanta}" update="@widgetVar(dlg-grafica) @this" action="#{reporteInventarioOcupacionCamaraBean.graficaPorPlanta()}" styleClass="p-mr-4" />
 						<p:commandButton id="graficaCamara" value="Graficar Por Cámara" oncomplete="PF('dlg-grafica').show()" disabled="#{reporteInventarioOcupacionCamaraBean.selectCamara}" update="@widgetVar(dlg-grafica) @this" action="#{reporteInventarioOcupacionCamaraBean.graficaPorCamara()}" />
 					</div>
@@ -135,8 +187,9 @@
 						
 							<p:outputPanel id="grafica-panel" class="ui-fluid">
 								
-									<p:barChart model="#{reporteInventarioOcupacionCamaraBean.modelBar}" style="width: 100%; height: 500px;" />
-								
+									<p:barChart model="#{reporteInventarioOcupacionCamaraBean.modelBar}" style="width: 100%; height: 500px;">										
+									</p:barChart>									
+																		
 									<!-- <p:pieChart model="#{reporteInventarioOcupacionCamaraBean.pieModel}" style="width:100%; height: 300px;" /> -->
 									
 							</p:outputPanel>

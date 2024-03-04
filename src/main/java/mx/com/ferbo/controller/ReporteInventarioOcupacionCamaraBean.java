@@ -25,6 +25,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.chart.Axis;
+import org.primefaces.model.chart.AxisType;
+import org.primefaces.model.chart.BarChartSeries;
+import org.primefaces.model.chart.CartesianChartModel;
+import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.charts.ChartData;
 import org.primefaces.model.charts.axes.cartesian.CartesianScales;
 import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
@@ -68,6 +73,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	private PieChartModel model;
 	
 	private BarChartModel modelBar;
+	
 	
 	private Date fecha;
 
@@ -500,11 +506,11 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
         CartesianScales cScales = new CartesianScales();
         CartesianLinearAxes linearAxes = new CartesianLinearAxes();
         linearAxes.setStacked(true);
-        linearAxes.setOffset(true);
+        linearAxes.setOffset(true);        
         cScales.addXAxesData(linearAxes);
         cScales.addYAxesData(linearAxes);
         options.setScales(cScales);
-
+     
         Title title = new Title();
         title.setDisplay(true);
         title.setText("Ocupación de cámaras");
@@ -528,7 +534,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, plantaSelect.getPlantaCve(), null);
 		}
 		
-		createPieModel();
+		createPieModel3();
 	}
 	
 	public void graficaPorCamara() {
@@ -592,6 +598,8 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	        title.setDisplay(true);
 	        title.setText("Ocupación de cámaras");
 	        options.setTitle(title);
+	        
+	        modelBar.setExtender("chartExtender");
 	
 	        Tooltip tooltip = new Tooltip();
 	        tooltip.setMode("index");
@@ -599,6 +607,106 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	        options.setTooltip(tooltip);
 	
 	        modelBar.setOptions(options);
+		
+		
+		
+	}
+	
+	public void createPieModel3(){
+		
+		modelBar = new BarChartModel();
+		
+		ChartData data = new ChartData();
+		
+		BarChartDataSet dataSetP1 = new BarChartDataSet();
+		BarChartDataSet dataSetP2 = new BarChartDataSet();
+		
+		dataSetP1.setLabel("Posiciones Disponibles");		
+		dataSetP1.setBackgroundColor("rgb(255, 99, 132)");
+		dataSetP1.setStack("Stack 0");
+		
+		/*dataSetP2.setLabel("Planta 2");
+        dataSetP2.setBackgroundColor("rgb(54, 162, 235)");
+        dataSetP2.setStack("Stack 0");*/
+		
+		List<Number> valuesP1 = new ArrayList<>();
+		//List<Number> valuesP2 = new ArrayList<>();
+		List<String> labels = new ArrayList<>();
+		
+		for(OcupacionCamara oc: listaOcupacionCamara) {	
+			
+			if(oc.getPlanta_ds().equals("P1 CENTRAL DE ABASTOS")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());				
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P2 TEPALCATES")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P3 CENTRAL DE ABASTOS")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P4 URBANA IXHUATEPEC")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P5 ORO")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+		}
+		
+		dataSetP1.setData(valuesP1);
+		//dataSetP2.setData(valuesP2);
+		
+		data.addChartDataSet(dataSetP1);
+		//data.addChartDataSet(dataSetP2);	
+		data.setLabels(labels);
+		
+		modelBar.setData(data);
+		
+		BarChartOptions options = new BarChartOptions();
+        CartesianScales cScales = new CartesianScales();
+        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+        linearAxes.setStacked(true);
+        linearAxes.setOffset(true);        
+        cScales.addXAxesData(linearAxes);
+        cScales.addYAxesData(linearAxes);
+        options.setScales(cScales);
+        
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Ocupación de cámaras");
+        options.setTitle(title);
+        
+        /*Legend legend = new Legend();
+        legend.setDisplay(true);        
+        legend.setPosition("top");
+        LegendLabel legendLabels = new LegendLabel();
+        legendLabels.setFontStyle("bold");
+        legendLabels.setFontColor("#2980B9");
+        legendLabels.setFontSize(24);
+        legend.setLabels(legendLabels);
+        options.setLegend(legend);*/
+        
+        modelBar.setExtender("chartExtender");
+        
+        Tooltip tooltip = new Tooltip();
+        tooltip.setMode("index");
+        tooltip.setIntersect(true);        
+        options.setTooltip(tooltip);
+        options.setOffsetGridLines(false);
+        
+        modelBar.setOptions(options);
+		
+		
+		
 		
 		
 		
