@@ -94,6 +94,9 @@
 							<p:menuitem id="frb_facturacion_ingresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/ingAlta" />
 							<p:menuitem id="frb_facturacion_ingresos_actualizar" value="Consultar" icon="pi pi-fw pi-search" outcome="/protected/catalogos/ingAct" />
 						</p:submenu>
+						<p:submenu id="frb_facturacion_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+							<p:menuitem id="facturacion_egresos" value="Alta/Consulta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/Egresos" />
+						</p:submenu>
 						<p:submenu label="Notas de Credito" icon="pi pi-file-o" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />
 							<p:menuitem value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/consultaNotasCredito"></p:menuitem>
@@ -138,6 +141,8 @@
 						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
 						<p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
+
+						
 					</po:menu>
 				</div>
 			</div>
