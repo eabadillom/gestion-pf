@@ -25,9 +25,21 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.chart.Axis;
+import org.primefaces.model.chart.AxisType;
+import org.primefaces.model.chart.BarChartSeries;
+import org.primefaces.model.chart.CartesianChartModel;
+import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.charts.ChartData;
+import org.primefaces.model.charts.axes.cartesian.CartesianScales;
+import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
+import org.primefaces.model.charts.bar.BarChartDataSet;
+import org.primefaces.model.charts.bar.BarChartModel;
+import org.primefaces.model.charts.bar.BarChartOptions;
 import org.primefaces.model.charts.optionconfig.legend.Legend;
 import org.primefaces.model.charts.optionconfig.legend.LegendLabel;
+import org.primefaces.model.charts.optionconfig.title.Title;
+import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 import org.primefaces.model.charts.pie.PieChartDataSet;
 import org.primefaces.model.charts.pie.PieChartModel;
 import org.primefaces.model.charts.pie.PieChartOptions;
@@ -60,11 +72,18 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	private PieChartModel pieModel;
 	private PieChartModel model;
 	
+	private BarChartModel modelBar;
+	
+	
 	private Date fecha;
 
 	private Planta plantaSelect;
+	private Planta plantaGrafica;
+	private Boolean selectPlanta;
+	private Boolean general;
 	private Camara camaraSelect;
 	private Cliente clienteSelect;
+	private Boolean selectCamara;
 
 	private List<Cliente> listaClientes;
 	private List<Planta> listaPlanta;
@@ -82,6 +101,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	public ReporteInventarioOcupacionCamaraBean() {
 		
 		fecha = new Date();
+		
 
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
@@ -108,6 +128,8 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
 		
+		selectPlanta = true;
+		selectCamara = true;
 //		listaClientes = clienteDAO.buscarHabilitados(true);
 		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		
@@ -123,18 +145,47 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	
 	public void filtradoCamara() {
 		
+		
+		
 		if(plantaSelect!=null) {
+			if(plantaSelect.getPlantaCve()!=null) {
+				listaCamara = camaraDAO.buscarPorPlanta(plantaSelect);
+			
+				plantaSelect.setCamaraList(listaCamara);
+				selectPlanta = false;
+				general = true;
+			}else {		
+				
+				selectPlanta = true;
+				general = false;
+			}			
+		}else {
+			selectPlanta = true;
+		}
+				
+		//ocupacionCamara();		
+	}
+	
+	public void seleccionCamara() {
 		
-			listaCamara = camaraDAO.buscarPorPlanta(plantaSelect);
-		
-			plantaSelect.setCamaraList(listaCamara);
+		if(camaraSelect!=null) {
+			
+			if(camaraSelect.getCamaraCve()!= null) {
+				selectCamara = false;
+			}else {
+				selectCamara = true;
+				general = false;
+			}
+			
+		}else {
+			selectCamara = true;
+			general = false;
 		}
 		
-		//ocupacionCamara();
 		
 	}
 	
-	public void ocupacionCamara() throws InventarioException{
+	public void ocupacionCamara() throws InventarioException{//se debe de modificar para obtener grafica general
 		
 		idCliente = null;
 		idPlanta = null;
@@ -148,33 +199,32 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 		try {
 			
 			if(clienteSelect!=null) {
-				idCliente = clienteSelect.getCteCve();
+				idCliente = clienteSelect.getCteCve();				
 			}else {
-				throw new InventarioException("Debe seleccionar un cliente");
+				//throw new InventarioException("Debe seleccionar un cliente");
+				clienteSelect = new Cliente();
+				idCliente = clienteSelect.getCteCve();
 			}
 			
 			if(plantaSelect!=null) {
 				idPlanta = plantaSelect.getPlantaCve();
 			}else {
-				throw new InventarioException("Debe seleccionar una planta");
+				//throw new InventarioException("Debe seleccionar una planta");
+				plantaSelect = new Planta();
+				idPlanta = plantaSelect.getPlantaCve();
 			}
 			
 			if(camaraSelect!=null) {
 				idCamara = camaraSelect.getCamaraCve();
 			}else {
-				throw new InventarioException("Debe seleccionar una camara");
+				//throw new InventarioException("Debe seleccionar una camara");
+				camaraSelect = new Camara();
+				idCamara = camaraSelect.getCamaraCve();
 			}
 			
 			
 			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, idPlanta, idCamara);
 			
-		}catch(InventarioException ex) {
-			mensaje = ex.getMessage();
-			
-			severity = FacesMessage.SEVERITY_WARN;
-			
-			message = new FacesMessage(severity, titulo, mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
 		}catch(Exception e) {
 			mensaje = e.getMessage();
 			
@@ -329,70 +379,176 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 			}
 	
 	
-	public void createPieModel() {
-        pieModel = new PieChartModel();
-        ChartData data = new ChartData();
-        Random rnd = new Random();
+	public void createPieModel2() {
+		
+		
+		modelBar = new BarChartModel();		
+		ChartData data = new ChartData();
+		
+		BarChartDataSet dataSetP1 = new BarChartDataSet();
+		BarChartDataSet dataSetP2 = new BarChartDataSet();
+		
+		dataSetP1.setLabel("Posiciones Disponibles");
+		dataSetP1.setBackgroundColor("rgb(255, 99, 132)");
+		dataSetP1.setStack("Stack 0");
+		
+		/*dataSetP2.setLabel("Planta 2");
+        dataSetP2.setBackgroundColor("rgb(54, 162, 235)");
+        dataSetP2.setStack("Stack 0");*/
+		
+		List<Number> valuesP1 = new ArrayList<>();
+		//List<Number> valuesP2 = new ArrayList<>();
+		List<String> labels = new ArrayList<>();
+		
+		for(OcupacionCamara oc: listaOcupacionCamara) {	
+			
+			if(oc.getPlanta_ds().equals("P1 CENTRAL DE ABASTOS")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P2 TEPALCATES")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P3 CENTRAL DE ABASTOS")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P4 URBANA IXHUATEPEC")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P5 ORO")) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+		}
+		
+		dataSetP1.setData(valuesP1);
+		//dataSetP2.setData(valuesP2);
+		
+		data.addChartDataSet(dataSetP1);
+		//data.addChartDataSet(dataSetP2);	
+		data.setLabels(labels);
+		modelBar.setData(data);
+		
+		BarChartOptions options = new BarChartOptions();
+        CartesianScales cScales = new CartesianScales();
+        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+        linearAxes.setStacked(true);
+        linearAxes.setOffset(true);        
+        cScales.addXAxesData(linearAxes);
+        cScales.addYAxesData(linearAxes);
+        options.setScales(cScales);
+     
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Ocupación de cámaras");
+        options.setTitle(title);
 
-        PieChartDataSet dataSet = new PieChartDataSet();
-        List<Number> values = new ArrayList<>();
-        
-        Integer size = listaOcupacionCamara.size();
-        Integer i = 0;
-        
-        List<String> labels = new ArrayList<>();
-        
-        for(OcupacionCamara oc: listaOcupacionCamara) {
-        	
-        	if(i < size) {
-        		values.add(oc.getPosiciones_Disponibles());//solo se deberian de ver saldos positivos?
-        		labels.add(oc.getPlanta_ds()+"- "+oc.getCamara_ds());
-        		i++;
-        	}
-        	
-        }
-        
-        dataSet.setData(values);
-        
-        List<Integer> rgb = null;
-        List<String> bgColors = new ArrayList<>();
-        Integer numero;
-        
-        for(int bgcolor = 0 ; bgcolor < size;bgcolor++ ) { //repito las acciones la veces del tamaño de mi lista de ocupacionCamaras son los objetos que se van a crear de bgColors
-        	
-        	rgb = new ArrayList<Integer>();
-        	
-        	for(int color = 0; color < 3;color++) {//creo 3 numeros random tomando en cuenta el rango de valores RGB        		
-        		numero = (int)(rnd.nextDouble()*256);
-        		rgb.add(numero);
-        	}
-        	
-        	bgColors.add("rgb("+rgb.get(0).toString()+","+rgb.get(1).toString()+","+rgb.get(2).toString()+")");//le agrego los datos a la lista bgColors
-        	log.info(bgColors.get(bgcolor));
-        }
-        
-        dataSet.setBackgroundColor(bgColors);
-        data.addChartDataSet(dataSet);        
-        data.setLabels(labels);
-        
-        PieChartOptions options = new PieChartOptions();
-        
-        Legend legend = new Legend();
-        legend.setDisplay(true);
-        //legend.setPosition("top");
-        LegendLabel legendLabels = new LegendLabel();
-        legendLabels.setFontStyle("bold");
-        legendLabels.setFontColor("#2980B9");
-        legendLabels.setFontSize(12);
-        
-        legend.setLabels(legendLabels);
-        options.setLegend(legend);
-        
-        pieModel.setOptions(options);
-        
-        pieModel.setData(data);        
-        
-    }
+        Tooltip tooltip = new Tooltip();
+        tooltip.setMode("index");
+        tooltip.setIntersect(false);
+        options.setTooltip(tooltip);
+
+        modelBar.setOptions(options);
+        modelBar.setExtender("chartExtender");
+		
+		
+	}
+	
+	
+	// PROPUESTA 2 --------------------------------------------
+	
+	public void graficaPorPlanta() {
+		if(plantaSelect.getPlantaCve()!=null) {
+			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, plantaSelect.getPlantaCve(), null);
+		}
+		
+		createPieModel2();
+	}
+	
+	public void graficaPorCamara() {
+		if(plantaSelect.getPlantaCve()!=null && camaraSelect!=null) {
+			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, plantaSelect.getPlantaCve(), camaraSelect.getCamaraCve());
+		}
+		createPieModel();
+	}
+	
+	public void createPieModel() {
+		
+		
+	
+			modelBar = new BarChartModel();		
+			ChartData data = new ChartData();
+			
+			BarChartDataSet dataSetP1 = new BarChartDataSet();
+			BarChartDataSet dataSetP2 = new BarChartDataSet();
+			
+			dataSetP1.setLabel("Posiciones Disponibles");
+			dataSetP1.setBackgroundColor("rgb(255, 99, 132)");
+			dataSetP1.setStack("Stack 0");
+			
+			dataSetP2.setLabel("Posiciones Ocupadas");
+	        dataSetP2.setBackgroundColor("rgb(54, 162, 235)");
+	        dataSetP2.setStack("Stack 0");
+			
+			List<Number> valuesP1 = new ArrayList<>();
+			List<Number> valuesP2 = new ArrayList<>();
+			List<String> labels = new ArrayList<>();
+			
+			for(OcupacionCamara oc: listaOcupacionCamara) {	
+				
+				if(oc.getPlanta_ds().equals(plantaSelect.getPlantaDs())) {
+					valuesP1.add(oc.getPosiciones_Disponibles());
+					valuesP2.add(oc.getTarima());
+					labels.add(oc.getCamara_ds());
+				}
+				
+				
+			}
+			
+			dataSetP1.setData(valuesP1);
+			dataSetP2.setData(valuesP2);
+			
+			data.addChartDataSet(dataSetP1);
+			data.addChartDataSet(dataSetP2);	
+			data.setLabels(labels);
+			modelBar.setData(data);
+			
+			BarChartOptions options = new BarChartOptions();
+	        CartesianScales cScales = new CartesianScales();
+	        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+	        linearAxes.setStacked(true);
+	        linearAxes.setOffset(true);
+	        cScales.addXAxesData(linearAxes);
+	        cScales.addYAxesData(linearAxes);
+	        options.setScales(cScales);
+	
+	        Title title = new Title();
+	        title.setDisplay(true);
+	        title.setText("Ocupación de cámaras");
+	        options.setTitle(title);
+	        
+	        modelBar.setExtender("chartExtender");
+	
+	        Tooltip tooltip = new Tooltip();
+	        tooltip.setMode("index");
+	        tooltip.setIntersect(false);
+	        options.setTooltip(tooltip);
+	
+	        modelBar.setOptions(options);
+		
+		
+		
+	}
+	
+	
 
 
 	public Date getFecha() {
@@ -497,6 +653,46 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 
 	public void setModel(PieChartModel model) {
 		this.model = model;
+	}
+
+	public BarChartModel getModelBar() {
+		return modelBar;
+	}
+
+	public void setModelBar(BarChartModel modelBar) {
+		this.modelBar = modelBar;
+	}
+
+	public Planta getPlantaGrafica() {
+		return plantaGrafica;
+	}
+
+	public void setPlantaGrafica(Planta plantaGrafica) {
+		this.plantaGrafica = plantaGrafica;
+	}
+
+	public Boolean getSelectPlanta() {
+		return selectPlanta;
+	}
+
+	public void setSelectPlanta(Boolean selectPlanta) {
+		this.selectPlanta = selectPlanta;
+	}
+
+	public Boolean getGeneral() {
+		return general;
+	}
+
+	public void setGeneral(Boolean general) {
+		this.general = general;
+	}
+
+	public Boolean getSelectCamara() {
+		return selectCamara;
+	}
+
+	public void setSelectCamara(Boolean selectCamara) {
+		this.selectCamara = selectCamara;
 	}
 	
 	
