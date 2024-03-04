@@ -11,10 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.persistence.NamedQuery;
-
 
 @Entity
 @Table(name = "concepto_egreso")
@@ -42,8 +41,6 @@ public class egresos implements Serializable{
 	@Column(name="nombre_egreso")
 	private String nombreEgreso;
 	
-
-
 	public Integer getIdEgreso() {
 		return idEgreso;
 	}
