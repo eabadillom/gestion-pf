@@ -13,14 +13,12 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ImporteEgreso;
-import mx.com.ferbo.model.egresos;
 import mx.com.ferbo.ui.importeUtilidad;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ImporteEgresosDAO extends IBaseDAO<ImporteEgreso, Integer>{
 	
-	private static final long serialVersionUID = -586280005718635555L;
 	private static Logger log = LogManager.getLogger(ImporteEgresosDAO.class);
 	
 	
