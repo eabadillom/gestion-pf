@@ -272,13 +272,13 @@
 
             
             <div class="card" >
-			 
-
-
-<p:barChart model="#{dashBoardBean.stackedGroupBarModel}" style="width: 100%; height: 500px;" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}" >
-</p:barChart>
-
-						</div>
+				<p:barChart model="#{dashBoardBean.stackedGroupBarModel}" style="width: 100%; height: 500px;" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}" ></p:barChart>
+			</div>
+						
+			<div class="card">
+				<p:barChart model="#{dashBoardBean.modelCamara}" style="width: 100%; height: 500px;"></p:barChart>
+			</div>
+						
         </div>
 
     </ui:define>
