@@ -87,9 +87,9 @@ public class dashBoardBean implements Serializable{
 		calendario.setTime(fecha);
 		calendario.add(Calendar.MONTH, -1);
 		String nuevaFecha = new SimpleDateFormat("dd/MM/yyyy").format(calendario.getTime());
-		System.out.println(nuevaFecha);
+		log.debug(nuevaFecha);
 		fechaAnt=new SimpleDateFormat("dd/MM/yyyy").parse(nuevaFecha);  
-	    System.out.println(nuevaFecha+"\t"+fechaAnt);  
+	    log.debug(nuevaFecha+"\t"+fechaAnt);  
 	    listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null,fechaAnt);
 
 		//Primer SET
@@ -162,7 +162,7 @@ public class dashBoardBean implements Serializable{
 		
 		Title subtitle = new Title();
 		subtitle.setDisplay(true);
-		subtitle.setText("Ingesos - Egresos"); // Mostrar el primer valor de pagos como ejemplo
+		subtitle.setText("Ingresos - Egresos"); // Mostrar el primer valor de pagos como ejemplo
 		options.setTitle(subtitle);
 		Tooltip tooltip = new Tooltip();
 		tooltip.setMode("index");
