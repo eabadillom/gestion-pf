@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="title">Ventas</ui:define>
+
+	<ui:define name="content">
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+        <script type ="text/javascript">
+		function charExtender() {
+			var options = {
+					options: {
+						plugins:{
+							tiitle: {
+							display: true,
+							text: "title set from JavaScript"
+						},legend:{
+							display: false
+						}
+						}, scales:{
+							y: {
+								beginAtZero: false
+							}
+						}
+					},plugins: [ChartDataLabels],
+						options: {
+						}
+					};
+			//merge all options into to main chart options
+			$.extend(true, this.cfg.config, options);
+			};
+</script>
+
+		<h:form id="form">
+			<div class="p-col-12">
+				<div class="card">
+					<p:growl id="messages" showDetail="true" />
+					
+					
+					
+		<p:fieldset legend="Venta">		
+			<p:commandButton value="Agregar"  icon="pi pi-plus" oncomplete="PF('dlg-venta').show()"></p:commandButton>				
+		</p:fieldset>
+						
+					
+					
+		<p:dialog header="Generacion de Venta" widgetVar="dlg-venta" modal="true" showEffect="fade" responsive="true">
+				<p:outputPanel id="frm-agregaVenta" class="ui-fluid">
+					<div class="p-field">
+						<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{ventasBean.clienteSelect}">
+							<f:selectItem itemLabel="Selecciona cliente" itemValue="" noSelectionOption="true" />
+							<f:selectItems value="#{ventasBean.listCliente}" var="cliente"  itemLabel="#{cliente.cteNombre}"  itemValue="#{cliente}"  />
+						</p:selectOneMenu>
+						<p:outputLabel for="cliente" value="Cliente"></p:outputLabel>						
+					</div>
+					
+					<div class="p-field">
+					<span class="ui-float-label ui-input-icon-left">
+					<p:selectOneMenu id="emisorImporte-som" value="#{egresosBean.importeSelected.cdEmisor}" converter="entityConverter"  >  
+							<f:selectItem itemLabel="Selecciona un emisor" itemValue="" noSelectionOption="" />
+							<f:selectItems value="#{egresosBean.listaEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
+						</p:selectOneMenu>
+						<p:outputLabel for="emisorImporte-som" value="Emisor" />
+					</span>
+					</div>
+					
+					<div class="p-field">
+						<p:outputLabel value="concepto:" />
+						<p:inputText  value="#{ventasBean.concepto}" ></p:inputText>
+					</div>
+					
+					<div class="p-field">
+						<p:outputLabel for="@next">Importe:</p:outputLabel>
+						<p:inputNumber id="importe" value="#{egresosBean.importeSelected.importe}"  />
+					</div>
+				</p:outputPanel>
+
+				<f:facet name="footer">
+					<p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{egresosBean.actualizar()}" process="importe @this"  />
+					<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-danger" oncomplete="PF('dlg-venta').hide()" process="@this"/>
+				</f:facet>
+			</p:dialog>
+										
+						
+			
+					<p:dataTable id="dt-egresos" widgetVar="dt-egresos" var="importe" value="#{egresosBean.listaImporteEgreso}" rowKey="#{importe.idImporte}" reflow="true" selection="#{egresosBean.importeSelected}" rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom">
+						<f:facet name="header">
+							<div class="products-table-header">
+								<span style="font-weight: bold">Egresos</span>
+							</div>
+						</f:facet>
+						<p:column headerText="Egreso" width="5rem" style="text-align:center">
+							<h:outputText value="#{importe.idEgreso.nombreEgreso}" />
+						</p:column>
+						
+							<p:column headerText="Fecha" width="5rem" style="text-align:center">
+							<h:outputText value="#{importe.fecha}" >
+								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00" />
+							</h:outputText>
+						</p:column>
+							
+							<p:column headerText="Emisor" width="5rem" style="text-align:center">
+							<h:outputText value="#{importe.cdEmisor.nb_emisor}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
+							</h:outputText>
+							</p:column>
+							
+							<p:column headerText="Importe" width="5rem" style="text-align:center">
+							<h:outputText value="#{importe.importe}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
+								<f:convertNumber pattern="$#0.00" />
+							</h:outputText>
+						</p:column>
+						
+						
+					</p:dataTable>
+					
+				</div>
+			</div>
+			
+			<p:confirmDialog widgetVar="dg-delete" showEffect="fade" width="300" message="¿Desea cancelar la serie factura?" header="Eliminar Serie Factura" severity="warn">
+				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{serieFacturaBean.cancelar()}" process="@this" />
+				<p:commandButton value="No" type="button" styleClass="ui-button-danger" icon="pi pi-times" onclick="PF('dg-delete').hide()" />
+			</p:confirmDialog>
+
+		</h:form>
+	</ui:define>
+
+</ui:composition>

@@ -107,9 +107,9 @@
 					         </div>
 							        
 							 <div class="col-5 flex align-items-center justify-content-center">
-                					<p:commandButton value="Mostrar"  oncomplete="PF('dgEgresos').show()" update="@widgetVar(dgEgresos)" action="#{egresosBean.grafica()}" process="@this" styleClass="ui-button-outlined ui-button-secondary"/>  
+                					<p:commandButton id="barChart" value="Mostrar"  oncomplete="PF('dgEgresos').show()" update="@widgetVar(dgEgresos)" action="#{egresosBean.grafica()}" process="@this" styleClass="ui-button-outlined ui-button-secondary"/>  
 				     		 </div>
-
+							
 							</p:toolbarGroup>
 
 						 </p:toolbar>
@@ -203,9 +203,13 @@
 							    <h5>Stacked Group</h5>
 							    <p:barChart model="#{egresosBean.stackedGroupBarModel}" style="width: 100%; height: 500px;"/>
 							</div>
-
+							   
 							</p:outputPanel>
-							
+							<f:facet name="footer">
+							<p:commandButton type="button" value="Print"  icon="pi pi-print" styleClass="mr-2 mb-2">
+							       <p:printer target="barChart" title="Bar Chart" />
+							    </p:commandButton>
+							   </f:facet>
 							<f:facet name="footer">
 								<p:commandButton value="Cerrar" oncomplete="PF('dgEgresos').hide()" />
 							</f:facet>
