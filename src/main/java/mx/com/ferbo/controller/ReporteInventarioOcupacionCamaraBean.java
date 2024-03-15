@@ -392,39 +392,21 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 		dataSetP1.setBackgroundColor("rgb(255, 99, 132)");
 		dataSetP1.setStack("Stack 0");
 		
-		/*dataSetP2.setLabel("Planta 2");
-        dataSetP2.setBackgroundColor("rgb(54, 162, 235)");
-        dataSetP2.setStack("Stack 0");*/
+		List<Planta> listPlanta = new ArrayList<Planta>();
+		listPlanta = plantaDAO.findall(false);
 		
 		List<Number> valuesP1 = new ArrayList<>();
 		//List<Number> valuesP2 = new ArrayList<>();
 		List<String> labels = new ArrayList<>();
 		
 		for(OcupacionCamara oc: listaOcupacionCamara) {	
-			
-			if(oc.getPlanta_ds().equals("P1 CENTRAL DE ABASTOS")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P2 TEPALCATES")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P3 CENTRAL DE ABASTOS")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P4 URBANA IXHUATEPEC")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P5 ORO")) {
-				valuesP1.add(oc.getPosiciones_Disponibles());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			for(Planta p: listPlanta) {
+				
+				if(oc.getPlanta_ds().equals(p.getPlantaDs())) {
+					valuesP1.add(oc.getPosiciones_Disponibles());
+					labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+				}
+				
 			}
 			
 		}
