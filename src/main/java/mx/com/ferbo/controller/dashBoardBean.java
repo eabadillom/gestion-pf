@@ -32,11 +32,16 @@ import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
 import mx.com.ferbo.dao.ImporteEgresosDAO;
+
 import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.ReportesVentasDAO;
 import mx.com.ferbo.model.FacturacionGeneral;
 import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.VentasGlobales;
+
+import mx.com.ferbo.dao.RepOcupacionCamaraDAO;
+import mx.com.ferbo.ui.OcupacionCamara;
+
 import mx.com.ferbo.ui.importeUtilidad;
 import mx.com.ferbo.util.DateUtil;
 
@@ -63,12 +68,17 @@ public class dashBoardBean implements Serializable{
 	private ReportesVentasDAO reportesVentasDAO;
 	
 	private List<importeUtilidad> listaImporteUtilidad;
+
 	private List<FacturacionGeneral> listaFacturacionGeneral;
 	private List<FacturacionGeneral> listFacturacionMesAnt;
 	private List<VentasGlobales> listaVentasGlobales;
 	private List<FacturacionGeneral> listaVentaDia;
 	
-	
+
+	private BarChartModel modelCamara;
+	private List<OcupacionCamara> listOcupacionCamara;
+	private RepOcupacionCamaraDAO ocupacionCamaraDAO;
+
 
 	public dashBoardBean() {
 		listaImporteUtilidad = new ArrayList<>();
@@ -80,7 +90,10 @@ public class dashBoardBean implements Serializable{
 		reportesVentasDAO = new ReportesVentasDAO();
 		listaFacturacionGeneral = new ArrayList<>();
 		listaVentaDia = new ArrayList<>();
-		//mesActual = new Date();
+		
+		listOcupacionCamara = new ArrayList<>();
+		ocupacionCamaraDAO = new RepOcupacionCamaraDAO();
+		
 	}
 
 	@PostConstruct
@@ -94,6 +107,7 @@ public class dashBoardBean implements Serializable{
 			grafica();
 			ventaGlobales();
 		
+			graficaOcupacionCamaras();
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -315,18 +329,7 @@ public class dashBoardBean implements Serializable{
 		Date fechaInicial = new Date();
 		Date fechaFinal = new Date();
 	
-		/*Date fechaAnt = null;
-		String fechaActual = DateFormat.getDateInstance().format(new Date());
-		Date fecha = new SimpleDateFormat("dd/MM/yyyy").parse(fechaActual);
-		Calendar calendario = Calendar.getInstance();
-		calendario.setTime(fecha);
-		calendario.add(Calendar.MONTH, -1);
-		String nuevaFecha = new SimpleDateFormat("dd/MM/yyyy").format(calendario.getTime());
-		System.out.println(nuevaFecha);
-		fechaAnt=new SimpleDateFormat("dd/MM/yyyy").parse(nuevaFecha);  
-	    System.out.println(nuevaFecha+"\t"+fechaAnt);  
-		listaImporteUtilidad = reportesVentasDAO.UtilidadPorMesAnual(fechaAnt, fecha);
-	    */
+	
 		DateUtil.setDia(fechaInicial, 1);
 		DateUtil.setMes(fechaInicial, 0);
 		DateUtil.setAnio(fechaInicial,DateUtil.getAnio(fechaFinal) );		
@@ -336,6 +339,11 @@ public class dashBoardBean implements Serializable{
 		String nuevaFechaInicio = new SimpleDateFormat("yyyy-MM-dd").format(fechaInicial);
 		String nuevaFechaFin = new SimpleDateFormat("yyyy-MM-dd").format(fechaFinal);
 		listaImporteUtilidad = reportesVentasDAO.UtilidadPorMesAnual(nuevaFechaInicio, nuevaFechaFin);
+
+	    log.debug(nuevaFecha+"\t"+fechaAnt);  
+	    listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null,fechaAnt);
+
+
 		//Primer SET
 				BarChartDataSet barDS = new BarChartDataSet();
 				barDS.setLabel("Ingresos");
@@ -407,13 +415,83 @@ public class dashBoardBean implements Serializable{
 		
 		Title subtitle = new Title();
 		subtitle.setDisplay(true);
-		subtitle.setText("Ingesos - Egresos"); // Mostrar el primer valor de pagos como ejemplo
+		subtitle.setText("Ingresos - Egresos"); // Mostrar el primer valor de pagos como ejemplo
 		options.setTitle(subtitle);
 		Tooltip tooltip = new Tooltip();
 		tooltip.setMode("index");
 		tooltip.setIntersect(false);
 		options.setTooltip(tooltip);
 		stackedGroupBarModel.setOptions(options);
+	}
+	
+	public void graficaOcupacionCamaras() {
+		
+		Date fecha = new Date();
+		
+		modelCamara = new BarChartModel();		
+		ChartData dataSet = new ChartData();
+		
+		BarChartDataSet barDataSet = new BarChartDataSet();
+		BarChartDataSet barDataSet2 = new BarChartDataSet();
+		
+		barDataSet.setLabel("Disponibles");
+		barDataSet.setBackgroundColor("rgb(255, 99, 132)");
+		barDataSet.setStack("Stack 0");
+		
+		barDataSet2.setLabel("Ocupadas");
+		barDataSet2.setBackgroundColor("rgb(54, 162, 235)");
+		barDataSet2.setStack("Stack 1");
+		
+		List<Number> values = new ArrayList<>();
+		List<Number> values2 = new ArrayList<>();
+		List<String> labels = new ArrayList<>();
+		
+		listOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, null, null, null);
+		
+		for(OcupacionCamara oc: listOcupacionCamara) {
+			
+			if(oc.getPlanta_ds().equals("P1 CENTRAL DE ABASTOS")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P2 TEPALCATES")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P3 CENTRAL DE ABASTOS")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P4 URBANA IXHUATEPEC")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P5 ORO")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+		}
+		
+		barDataSet.setData(values);
+		barDataSet2.setData(values2);
+		dataSet.setLabels(labels);
+		dataSet.addChartDataSet(barDataSet);
+		dataSet.addChartDataSet(barDataSet2);
+		
+		modelCamara.setData(dataSet);
+		modelCamara.setData(dataSet);
+		modelCamara.setExtender("charExtender");
+		
 	}
 
 	
@@ -481,7 +559,6 @@ public class dashBoardBean implements Serializable{
 	public static void setLog(Logger log) {
 		dashBoardBean.log = log;
 	}
-
 	public FacturacionGeneral getFacturacionSelected() {
 		return facturacionSelected;
 	}
@@ -544,6 +621,14 @@ public class dashBoardBean implements Serializable{
 
 	public void setVentasGlobales(VentasGlobales ventasGlobales) {
 		this.ventasGlobales = ventasGlobales;
+
+	public BarChartModel getModelCamara() {
+		return modelCamara;
+	}
+
+	public void setModelCamara(BarChartModel modelCamara) {
+		this.modelCamara = modelCamara;
+
 	}
 
 
