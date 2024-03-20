@@ -1,22 +1,39 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
-    <ui:define name="title">Dashboard</ui:define>
+	<ui:define name="title">Dashboard</ui:define>
+	<ui:define name="head">
+	</ui:define>
+	<ui:define name="content">
+		<style type="text/css">
 
-    <ui:define name="head">
+							.green {
+								background-color: #a5e594 !important;
+								background-image: none !important;
+								color: #11971f !important;
+									padding: 15px;
+								border-radius: 5px 5px 5px 5px;
+								font-weight: bold;
 
-
-
-    </ui:define>
-
-    <ui:define name="content">
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-        <script type ="text/javascript">
+							}
+							
+							.red {
+								background-color: #e99989 !important;
+								background-image: none !important;
+								color:  #922b21 !important;
+									padding: 15px;
+								border-radius: 5px 5px 5px 5px;
+								font-weight: bold;
+							}
+							</style>
+		<script
+			src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+		<script type="text/javascript">
 		function charExtender() {
 			var options = {
 					options: {
@@ -40,247 +57,115 @@
 			$.extend(true, this.cfg.config, options);
 			};
 </script>
-         <div class="dashboard p-grid ui-fluid">
-         <!--   <div class="p-col-12 p-md-4">
-                <div class="card summary p-d-flex p-jc-between">
-                    <div>
-                          <span class="title">Users</span>  
-                        <span class="detail">Number of visitors</span>
-                    </div>
-                   <div class="p-d-flex p-ai-center">
-                       <span class="count visitors p-p-2">12</span>
-                    </div>
-                </div>
-            </div> -->  
-            
-          <!--    <div class="p-col-12 p-md-4">
-                <div class="card summary p-d-flex p-jc-between">
-                   <div>
-                        <span class="title">Sales</span>
-                        <span class="detail">Number of purchases</span>
-                    </div>
-                    <div class="p-d-flex p-ai-center">
-                        <span class="count purchases p-p-2">534</span>
-                    </div>
-                </div>
-            </div> --> 
-            
-          <!--   <div class="p-col-12 p-md-4">
-                <div class="card summary p-d-flex p-jc-between">
-                  <div>
-                        <span class="title">Revenue</span>
-                        <span class="detail">Income for today</span>
-                    </div>
-                    <div class="p-d-flex p-ai-center">
-                        <span class="count revenue p-p-2">$3,200</span>
-                    </div> 
-                </div>
-            </div> --> 
-
-       <!--      <div class="p-col-12 p-md-6 p-lg-3">
-                <div class="card overview-box paypal">
-                    <div class="p-d-flex p-jc-between">
-                        <i class="logo pi pi-paypal p-mb-3"/>
-                        <p:commandButton id="paypal-button" type="button" icon="pi pi-ellipsis-v"
-                                         styleClass="rounded-button ui-button-flat ui-button-plain"/>
-                        <p:menu overlay="true" trigger="paypal-button" my="left top" at="left bottom">
-                            <p:menuitem value="Display More" icon="pi pi pi-chart-bar" url="#"/>
-                            <p:menuitem value="Settings" icon="pi pi-cog" url="#"/>
-                        </p:menu>
-                    </div>
-                    <h5 class="p-mb-3">PayPal</h5>
-                    <p class="p-mb-1"><strong>$421</strong> / $1212</p>
-                    <p:progressBar value="35" labelTemplate="" displayOnly="true"/>
-                </div>
-            </div> -->
-
-        <!--     <div class="p-col-12 p-md-6 p-lg-3">
-                <div class="card overview-box amazon">
-                    <div class="p-d-flex p-jc-between">
-                        <i class="logo pi pi-amazon p-mb-3"/>
-                        <p:commandButton id="amazon-button" type="button" icon="pi pi-ellipsis-v"
-                                         styleClass="rounded-button ui-button-flat ui-button-plain"/>
-                        <p:menu overlay="true" trigger="amazon-button" my="left top" at="left bottom">
-                            <p:menuitem value="Display More" icon="pi pi-chart-bar" url="#"/>
-                            <p:menuitem value="Settings" icon="pi pi-cog" url="#"/>
-                        </p:menu>
-                    </div>
-                    <h5 class="p-mb-3">Amazon</h5>
-                    <p class="p-mb-1"><strong>$6752</strong> / $9550</p>
-                    <p:progressBar value="70" labelTemplate="" displayOnly="true"/>
-                </div>
-            </div> -->
-
-       <!--      <div class="p-col-12 p-md-6 p-lg-3">
-                <div class="card overview-box youtube">
-                    <div class="p-d-flex p-jc-between">
-                        <i class="logo pi pi-youtube p-mb-3"/>
-                        <p:commandButton id="youtube-button" type="button" icon="pi pi-ellipsis-v"
-                                         styleClass="rounded-button ui-button-flat ui-button-plain"/>
-                        <p:menu overlay="true" trigger="youtube-button" my="left top" at="left bottom">
-                            <p:menuitem value="Display More" icon="pi pi-chart-bar" url="#"/>
-                            <p:menuitem value="Settings" icon="pi pi-cog" url="#"/>
-                        </p:menu>
-                    </div>
-                    <h5 class="p-mb-3">YouTube</h5>
-                    <p class="p-mb-1"><strong>$1132</strong> / $6987</p>
-                    <p:progressBar value="13" labelTemplate="" displayOnly="true"/>
-                </div>
-            </div> -->
-
-         <!--  <div class="p-col-12 p-md-6 p-lg-3">
-                <div class="card overview-box apple">
-                    <div class="p-d-flex p-jc-between">
-                        <i class="logo pi pi-apple p-mb-3"/>
-                        <p:commandButton id="apple-button" type="button" icon="pi pi-ellipsis-v"
-                                         styleClass="rounded-button ui-button-flat ui-button-plain"/>
-                        <p:menu overlay="true" trigger="apple-button" my="left top" at="left bottom">
-                            <p:menuitem value="Display More" icon="pi pi-chart-bar" url="#"/>
-                            <p:menuitem value="Settings" icon="pi pi-cog" url="#"/>
-                        </p:menu>
-                    </div>
-                    <h5 class="p-mb-3">Apple</h5>
-                    <p class="p-mb-1"><strong>$58990</strong> / $65650</p>
-                    <p:progressBar value="90" labelTemplate="" displayOnly="true"/>
-                </div>
-            </div> -->   
-
-        <!--      <div class="p-col-12 p-md-6 p-lg-4">
-                <p:panel header="Tasks" style="height:100%">
-                    <ul class="task-list">
-                        <li>
-                            <p:selectBooleanCheckbox/>
-                            <span class="task-name">Sales reports</span>
-                            <p:commandButton type="button" icon="pi pi-check"></p:commandButton>
-                        </li>
-                        <li>
-                            <p:selectBooleanCheckbox/>
-                            <span class="task-name">Pay the invoices</span>
-                            <p:commandButton type="button" icon="pi pi-check"></p:commandButton>
-                        </li>
-                        <li>
-                            <p:selectBooleanCheckbox/>
-                            <span class="task-name">Dinner with Tony</span>
-                            <p:commandButton type="button" icon="pi pi-check"></p:commandButton>
-                        </li>
-                        <li>
-                            <p:selectBooleanCheckbox/>
-                            <span class="task-name">Team meeting</span>
-                            <p:commandButton type="button" icon="pi pi-check"></p:commandButton>
-                        </li>
-                        <li>
-                            <p:selectBooleanCheckbox/>
-                            <span class="task-name">Plan the new theme</span>
-                            <p:commandButton type="button" icon="pi pi-check"></p:commandButton>
-                        </li>
-                        <li>
-                            <p:selectBooleanCheckbox/>
-                            <span class="task-name">Client meeting</span>
-                            <p:commandButton type="button" icon="pi pi-check"></p:commandButton>
-                        </li>
-                    </ul>
-                </p:panel>
-            </div>-->
-
-         <!--    <div class="p-col-12 p-md-6 p-lg-4">
-                <p:panel header="Contact Us" style="background:#fff;height:100%">
-                    <div class="p-grid">
-                        <div class="p-col-12">
-                            <p:selectOneMenu id="cities" autoWidth="false">
-                                <f:selectItem itemLabel="Select City" itemValue=""/>
-                                <f:selectItem itemLabel="New York" itemValue="New York"/>
-                                <f:selectItem itemLabel="Rome" itemValue="Rome"/>
-                                <f:selectItem itemLabel="London" itemValue="London"/>
-                                <f:selectItem itemLabel="Istanbul" itemValue="Istanbul"/>
-                                <f:selectItem itemLabel="Paris" itemValue="Paris"/>
-                            </p:selectOneMenu>
-                        </div>
-                        <div class="p-col-12">
-                            <p:inputText placeholder="Name"/>
-                        </div>
-                        <div class="p-col-12">
-                            <p:inputText placeholder="Age"/>
-                        </div>
-                        <div class="p-col-12">
-                            <p:inputTextarea rows="2" placeholder="Message" autoResize="false"/>
-                        </div>
-                    </div>
-                    <p:commandButton type="button" value="Send" icon="pi pi-plus"/>
-                </p:panel>
-            </div> -->
-         <!--   <div class="p-col-12 p-lg-4">
-                <p:panel header="Contacts" style="height:100%">
-                    <ul class="contacts">
-                        <li>
-                            <a href="#">
-                                <p:graphicImage name="images/avatar_1.png" library="omega-layout" width="35"/>
-                                <span class="name">Claire Williams</span>
-                                <span class="email">clare@pf-omega.com</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <p:graphicImage name="images/avatar_2.png" library="omega-layout" width="35"/>
-                                <span class="name">Jason Dourne</span>
-                                <span class="email">jason@pf-omega.com</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <p:graphicImage name="images/avatar_3.png" library="omega-layout" width="35"/>
-                                <span class="name">Jane Davidson</span>
-                                <span class="email">jane@pf-omega.com</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <p:graphicImage name="images/avatar_4.png" library="omega-layout" width="35"/>
-                                <span class="name">Tony Corleone</span>
-                                <span class="email">tony@pf-omega.com</span>
-                            </a>
-                        </li>
-                    </ul>
-                </p:panel>
-            </div>   -->
-            
-
-         <!--   <div class="p-col-12 p-md-4">
-                <p:panel header="Recent Sales" style="height:100%">
-                    <p:dataTable id="productsTable" var="product" value="#{dataTableDemoView.products1}" reflow="true"
-                                 paginatorPosition="bottom"
-                                 rowKey="#{product.id}" paginator="true" rows="5">
-                        <p:column headerText="Id" sortBy="#{product.id}">
-                            <h:outputText value="#{product.id}"/>
-                        </p:column>
-                        <p:column headerText="Category" sortBy="#{product.category}">
-                            <h:outputText value="#{product.category}"/>
-                        </p:column>
-                        <p:column headerText="Price" sortBy="#{product.price}">
-                            <h:outputText value="#{product.price}">
-                                <f:convertNumber currencySymbol="$" type="currency"/>
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="Status" sortBy="#{product.inventoryStatus}">
-                            <span class="product-badge status-#{product.inventoryStatus.name().toLowerCase()}">#{product.inventoryStatus}</span>
-                        </p:column>
-                        <p:column style="text-align: center">
-                            <p:commandButton icon="pi pi-search"/>
-                        </p:column>
-                    </p:dataTable>
-                </p:panel>
-            </div>  -->
-
-            
-            <div class="card" >
-			 
-
-
-<p:barChart model="#{dashBoardBean.stackedGroupBarModel}" style="width: 100%; height: 500px;" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}" >
-</p:barChart>
-
-						</div>
-        </div>
-
-    </ui:define>
-
+<h:form id="form">
+			<div class="card" style="width: 1000px">
+				<p:barChart model="#{dashBoardBean.stackedGroupBarModel}" style="width: 400px; height: 200px;" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}"/>
+			</div>
+			
+			<p:fieldset legend="Periodo" styleClass="p-mt-4">
+                <p:outputLabel for="yearMonth" value="Periodo "/>
+                <p:datePicker id="yearMonth" view="month" value="#{dashBoardBean.fechaPrueba}" pattern="dd/MM/yyyy" yearNavigator="true" yearRange="2000:2030" showIcon="true" maxdate="#{dashBoardBean.maxDate}" >
+              	  <p:ajax listener="#{dashBoardBean.VentaDia()}" update="dt-ventas @this" process="@this"/>
+                </p:datePicker>
+                <p:commandButton value="Mostrar Detalle" oncomplete="PF('dlgDesglose').show()" action="#{dashBoardBean.readerList()}"  update="form:dlg-Desglose form:yearMonth"  />
+	             		</p:fieldset>
+			<p:dataTable id="dt-ventas" widgetVar="dtVentas" var="ventas" value="#{dashBoardBean.listaVentaDia}" reflow="true" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
+							<p:column headerText="Fecha"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.fecha}" />
+							</p:column>
+							
+								<p:column headerText="Facturacion al día"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_facturacion}" >
+								  <f:convertNumber currencySymbol="$" type="currency" />
+								</h:outputText>
+								
+							</p:column>
+							
+							<p:column headerText="Mes VS Mes"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.porcentaje} %" styleClass="#{ventas.porcentaje gt 0 ? 'green' : ventas.porcentaje le 0 ? 'red' : null}"/>
+							</p:column>
+							
+							<p:column headerText="Pendiente por cobrar (factura)"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_facturacion}" >
+								  <f:convertNumber currencySymbol="$" type="currency" />
+								</h:outputText>
+							</p:column>
+							
+							<p:column headerText="Pendiente por cobrar (efectivo)"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_por_efectivo}"  />
+							</p:column>
+							
+							</p:dataTable>
+							
+				
+				<p:dialog id="dlg-Desglose" widgetVar="dlgDesglose" modal="true"  responsive="true" style="max-width:80em !important;">
+					<p:outputPanel>
+					
+						<p:dataTable id="dt-facturacionGeneral" widgetVar="dtFacturacion" var="ventas" value="#{dashBoardBean.listaFacturacionGeneral}" reflow="true" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add" >
+							<p:column headerText="Fecha"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.fecha}" >
+									<f:convertDateTime pattern="dd/MM/YYYY"></f:convertDateTime>
+								</h:outputText>
+							</p:column>
+							
+								<p:column headerText="Facturacion al día"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_facturacion}" >
+								  <f:convertNumber currencySymbol="$" type="currency" />
+								</h:outputText>
+							</p:column>
+							
+							<p:column headerText="Mes VS Mes"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.porcentaje} %" styleClass="#{ventas.porcentaje gt 0 ? 'green' : ventas.porcentaje le 0 ? 'red' : null}" />
+							</p:column>
+							
+							<p:column headerText="Pendiente por cobrar (factura)"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_facturacion}" >
+								 <f:convertNumber currencySymbol="$" type="currency" />
+								</h:outputText>
+							</p:column>
+							
+							<p:column headerText="Pendiente por cobrar (efectivo)"  style="text-align:center">
+								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_por_efectivo}" >
+								</h:outputText>
+							</p:column>
+							
+							</p:dataTable>	
+										
+					</p:outputPanel>
+						
+					<f:facet name="footer">
+						<p:commandButton value="Cerrar"  onclick="PF('dlg-Desglose').hide()"/>
+					</f:facet>
+				</p:dialog>
+				
+				<h5>Ventas Totales</h5>
+								<p:panelGrid columns="4" >
+								<p:panel id="ventas">
+								<div class="field">              
+							                    <p:outputLabel for="@next" value="Ventas Totales" styleClass="p-mr-2"/>
+							                    <p:inputText value="#{dashBoardBean.ventasGlobales.ventasTotales}" readonly="true" >
+							                      <f:convertNumber currencySymbol="$" type="currency" />
+							                    </p:inputText>
+							                </div>
+							        </p:panel>
+							        
+							     <p:panel id="Ganancias">
+							    <div class="field">              
+							                    <p:outputLabel for="@next" value="Ganancias" styleClass="p-mr-2"/>
+							                    <p:inputText value="#{dashBoardBean.ventasGlobales.ganancias}" readonly="true" >
+							                      <f:convertNumber currencySymbol="$" type="currency" />
+							                    </p:inputText>
+							      </div>
+							       </p:panel>
+							       
+							       
+							      <p:panel id="porcentaje">
+							        <div class="field">              
+							                    <p:outputLabel for="@next" value="Porcentaje" styleClass="p-mr-2"/>
+							                    <p:inputText value="#{dashBoardBean.ventasGlobales.porcentajeGanancias} %" readonly="true" />
+							      </div>
+							       </p:panel>
+								</p:panelGrid>
+</h:form>							
+	</ui:define>
 </ui:composition>

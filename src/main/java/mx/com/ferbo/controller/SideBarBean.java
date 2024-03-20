@@ -12,6 +12,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.dao.ParametroDAO;
+import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Usuario;
 
 @Named
@@ -21,7 +23,9 @@ public class SideBarBean implements Serializable {
 	private static final long serialVersionUID = 8802717839932668484L;
 	private static Logger log = LogManager.getLogger(SideBarBean.class);
 	private Usuario usuario;
+	private Parametro parametro;
 	
+	private ParametroDAO parametroDAO;
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
     private HttpSession session;
@@ -32,12 +36,14 @@ public class SideBarBean implements Serializable {
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         session = httpServletRequest.getSession(false);
         this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
+        parametroDAO = new ParametroDAO();
 	}
 	
 	public void logout() {
 		String contextPath = null;
 		String fullPath = null;
 		try {
+			parametro=parametroDAO.buscarPorNombre("SWITCH");
 			contextPath = faceContext.getExternalContext().getApplicationContextPath();
 			fullPath = contextPath + "/login.xhtml";
     		this.usuario = (Usuario)session.getAttribute("usuario");
@@ -57,5 +63,13 @@ public class SideBarBean implements Serializable {
 	}
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
+	}
+
+	public Parametro getParametro() {
+		return parametro;
+	}
+
+	public void setParametro(Parametro parametro) {
+		this.parametro = parametro;
 	}
 }

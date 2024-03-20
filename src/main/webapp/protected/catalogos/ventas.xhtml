@@ -8,31 +8,7 @@
 
 	<ui:define name="content">
 	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-        <script type ="text/javascript">
-		function charExtender() {
-			var options = {
-					options: {
-						plugins:{
-							tiitle: {
-							display: true,
-							text: "title set from JavaScript"
-						},legend:{
-							display: false
-						}
-						}, scales:{
-							y: {
-								beginAtZero: false
-							}
-						}
-					},plugins: [ChartDataLabels],
-						options: {
-						}
-					};
-			//merge all options into to main chart options
-			$.extend(true, this.cfg.config, options);
-			};
-</script>
+
 
 		<h:form id="form">
 			<div class="p-col-12">
@@ -50,31 +26,32 @@
 		<p:dialog header="Generacion de Venta" widgetVar="dlg-venta" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-agregaVenta" class="ui-fluid">
 					<div class="p-field">
-						<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{ventasBean.clienteSelect}">
+					<p:outputLabel for="cliente" value="Cliente" />
+						<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{ventasBean.venta.cteCve}">
 							<f:selectItem itemLabel="Selecciona cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems value="#{ventasBean.listCliente}" var="cliente"  itemLabel="#{cliente.cteNombre}"  itemValue="#{cliente}"  />
 						</p:selectOneMenu>
-						<p:outputLabel for="cliente" value="Cliente"></p:outputLabel>						
 					</div>
 					
 					<div class="p-field">
-					<span class="ui-float-label ui-input-icon-left">
-					<p:selectOneMenu id="emisorImporte-som" value="#{egresosBean.importeSelected.cdEmisor}" converter="entityConverter"  >  
-							<f:selectItem itemLabel="Selecciona un emisor" itemValue="" noSelectionOption="" />
-							<f:selectItems value="#{egresosBean.listaEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
+					
+					<p:outputLabel for="emisor" value="Emisor" />
+					<p:selectOneMenu id="emisor" value="#{ventasBean.venta.cdEmisor}" converter="entityConverter"  >  
+							<f:selectItem itemLabel="Selecciona un emisor" itemValue="" noSelectionOption="true" />
+							<f:selectItems value="#{ventasBean.listEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
 						</p:selectOneMenu>
-						<p:outputLabel for="emisorImporte-som" value="Emisor" />
-					</span>
+						
+					
 					</div>
 					
 					<div class="p-field">
-						<p:outputLabel value="concepto:" />
-						<p:inputText  value="#{ventasBean.concepto}" ></p:inputText>
+						<p:outputLabel for="@next" value="concepto:" />
+						<p:inputText  value="#{ventasBean.venta.concepto}" ></p:inputText>
 					</div>
 					
 					<div class="p-field">
 						<p:outputLabel for="@next">Importe:</p:outputLabel>
-						<p:inputNumber id="importe" value="#{egresosBean.importeSelected.importe}"  />
+						<p:inputNumber id="importe" value="#{ventasBean.venta.total}"  />
 					</div>
 				</p:outputPanel>
 
@@ -83,38 +60,45 @@
 					<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-danger" oncomplete="PF('dlg-venta').hide()" process="@this"/>
 				</f:facet>
 			</p:dialog>
-										
-						
-			
-					<p:dataTable id="dt-egresos" widgetVar="dt-egresos" var="importe" value="#{egresosBean.listaImporteEgreso}" rowKey="#{importe.idImporte}" reflow="true" selection="#{egresosBean.importeSelected}" rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom">
+					
+					
+					<p:dataTable id="dt-venta" widgetVar="dt-Venta" var="venta" value="#{ventasBean.listVenta}" rowKey="#{venta.idVentas}" reflow="true"  rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom">
 						<f:facet name="header">
 							<div class="products-table-header">
-								<span style="font-weight: bold">Egresos</span>
+								<span style="font-weight: bold">Venta</span>
 							</div>
-						</f:facet>
-						<p:column headerText="Egreso" width="5rem" style="text-align:center">
-							<h:outputText value="#{importe.idEgreso.nombreEgreso}" />
-						</p:column>
+						</f:facet>						
 						
 							<p:column headerText="Fecha" width="5rem" style="text-align:center">
-							<h:outputText value="#{importe.fecha}" >
-								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00" />
-							</h:outputText>
-						</p:column>
-							
-							<p:column headerText="Emisor" width="5rem" style="text-align:center">
-							<h:outputText value="#{importe.cdEmisor.nb_emisor}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
-							</h:outputText>
+								<h:outputText value="#{venta.fecha}" >
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00" />
+								</h:outputText>
 							</p:column>
 							
+							<p:column headerText="Concepto" width="5rem" style="text-align:center">
+								<h:outputText value="#{venta.concepto}" >
+								</h:outputText>
+							</p:column>
+							
+							<p:column headerText="Cliente" width="5rem" style="text-align:center">
+								<h:outputText value="#{venta.cteCve.cteNombre}" >
+								</h:outputText>
+							</p:column>
+						
 							<p:column headerText="Importe" width="5rem" style="text-align:center">
-							<h:outputText value="#{importe.importe}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
+							<h:outputText value="#{venta.total}" >
 								<f:convertNumber pattern="$#0.00" />
 							</h:outputText>
 						</p:column>
 						
+							<p:column headerText="Status" width="5rem" style="text-align:center">
+								<h:outputText value="#{(venta.status == true ? 'por cobrar': 'pagada')  } 	 "  >
+								</h:outputText>
+							</p:column>
 						
 					</p:dataTable>
+					
+					
 					
 				</div>
 			</div>

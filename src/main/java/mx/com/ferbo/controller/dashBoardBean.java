@@ -3,15 +3,18 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -28,10 +31,12 @@ import org.primefaces.model.charts.bar.BarChartOptions;
 import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
-import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.ImporteEgresosDAO;
+import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.ReportesVentasDAO;
 import mx.com.ferbo.model.FacturacionGeneral;
+import mx.com.ferbo.model.Parametro;
+import mx.com.ferbo.model.VentasGlobales;
 import mx.com.ferbo.ui.importeUtilidad;
 import mx.com.ferbo.util.DateUtil;
 
@@ -42,6 +47,7 @@ public class dashBoardBean implements Serializable{
 
 	private static final long serialVersionUID = -6551673633472266325L;
 	private static Logger log = LogManager.getLogger(dashBoardBean.class);
+	
     private BarChartModel stackedGroupBarModel;
 	private importeUtilidad fechaUtilidad;
     private LineChartModel cartesianLinerModel;
@@ -51,33 +57,43 @@ public class dashBoardBean implements Serializable{
 	private BigDecimal sumaEgresosSelect;
 	private Date mesActual;
 	private Date maxDate;
-	
+	private Date fechaPrueba = new Date();
+	private VentasGlobales ventasGlobales;
 	private ImporteEgresosDAO importeEgresosDAO;
 	private ReportesVentasDAO reportesVentasDAO;
 	
 	private List<importeUtilidad> listaImporteUtilidad;
 	private List<FacturacionGeneral> listaFacturacionGeneral;
+	private List<FacturacionGeneral> listFacturacionMesAnt;
+	private List<VentasGlobales> listaVentasGlobales;
+	private List<FacturacionGeneral> listaVentaDia;
+	
 	
 
 	public dashBoardBean() {
 		listaImporteUtilidad = new ArrayList<>();
+		listaVentasGlobales = new ArrayList<>();
 		importeEgresosDAO = new ImporteEgresosDAO();
 		totalFacturacion = null;
 		sumaEgresosSelect = null;
+		ventasGlobales = new VentasGlobales();
 		reportesVentasDAO = new ReportesVentasDAO();
 		listaFacturacionGeneral = new ArrayList<>();
+		listaVentaDia = new ArrayList<>();
 		//mesActual = new Date();
 	}
 
 	@PostConstruct
 	public void init()  {
 		try {
+			
 			Date today = new Date();
 			long oneDay = 24 * 60 * 60 * 1000;
 			mesActual = new Date();
-			maxDate = new Date(today.getTime());
+			//maxDate = new Date(today.getTime());
 			grafica();
-		//	facturacion();
+			ventaGlobales();
+		
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -85,54 +101,221 @@ public class dashBoardBean implements Serializable{
 	}
 	
 	
-		public void facturacion() throws ParseException {
+	public void ventaGlobales() {
+		Date iniMes;
+		iniMes = DateUtil.getFirstDayOfMonth(fechaPrueba);
+		listaVentasGlobales = reportesVentasDAO.ventasGanancias(iniMes, fechaPrueba);
+		for (VentasGlobales vg : listaVentasGlobales) {
+			ventasGlobales.setVentasTotales(vg.getVentasTotales());
+			ventasGlobales.setGanancias(vg.getGanancias());
+			ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias());
+		}
+		//
+	}
+	
+	public void VentaDia() {
+		
+		int dia = DateUtil.getDia(mesActual);		
+		DateUtil.setDia(fechaPrueba,dia);	
+		
+		listaVentaDia = reportesVentasDAO.obtenerVentaDia(fechaPrueba);//venta del dia 
+		
+		//venta de mes anterior 
+		
+		PrimeFaces.current().ajax().update("form:dt-ventas");
+		
+	}
+	
+		public void facturacion() {
 			//Date finMes;
+			
 			BigDecimal porcentaje = new BigDecimal(0).setScale(2);
+			BigDecimal resta = new BigDecimal(0).setScale(2);
 			BigDecimal acumulado = null;
-			Date iniMes;
-			//finMes = DateUtil.getLastDayOfMonth(mesActual);
-			iniMes = DateUtil.getFirstDayOfMonth(mesActual);
-			listaFacturacionGeneral = reportesVentasDAO.desgloseFacturacion(iniMes, mesActual);
+			int count = 0;
 			
-			//modificar fechas
-			Calendar calendario = Calendar.getInstance();
-			calendario.setTime(mesActual);
-			calendario.add(Calendar.MONTH, -1);
-			mesActual = calendario.getTime();
-			iniMes = DateUtil.getFirstDayOfMonth(mesActual);
 			
-			List<FacturacionGeneral> listFacturacionMesAnt = reportesVentasDAO.desgloseFacturacion(iniMes, mesActual);
+			FacturacionGeneral factAct = new FacturacionGeneral();
+			FacturacionGeneral factAnt = new FacturacionGeneral();
 			
-			for (FacturacionGeneral fg : listaFacturacionGeneral) {
-				for (FacturacionGeneral f : listFacturacionMesAnt) {
+			Collections.sort(listaFacturacionGeneral);
+			Collections.sort(listFacturacionMesAnt);
+			
+			for (FacturacionGeneral fg : listaFacturacionGeneral) { // 12 de marzo, 11 de marzo, 8, 9							
 				
-					if(DateUtil.getDia(fg.getFecha()) == DateUtil.getDia(f.getFecha())) {
-						if(fg.getTotal_facturacion() .compareTo( f.getTotal_facturacion()) == 1 ) {
-							porcentaje = ((fg.getTotal_facturacion().subtract(f.getTotal_facturacion())).divide(fg.getTotal_facturacion(),2,RoundingMode.HALF_UP));
-						}else {
-							porcentaje = ((f.getTotal_facturacion().subtract(fg.getTotal_facturacion())).divide(f.getTotal_facturacion(),2,RoundingMode.HALF_UP));
-						}
-						fg.setPorcentaje(porcentaje);
-						break;
-					}else {
-						fg.setPorcentaje(new BigDecimal(0));
-					}
 				
+				if(fg.getTotal_facturacion().compareTo(new BigDecimal(0))==0) {
+					fg.setTotal_facturacion(factAct.getTotal_facturacion());
 				}
+				factAct = fg;
+				if(factAct.getTotal_facturacion() == null) {
+					factAct.setTotal_facturacion(new BigDecimal(0));
+				}
+				
+				for (FacturacionGeneral f : listFacturacionMesAnt) { // 12 de febrero , 10, 8, 9
+					
+					if(f.getTotal_facturacion().compareTo(new BigDecimal(0))==0) {
+						f.setTotal_facturacion(factAnt.getTotal_facturacion());
+					}
+					factAnt = f;
+					if(factAnt.getTotal_facturacion() ==null) {
+						factAnt.setTotal_facturacion(new BigDecimal(0));
+					}
+					
+					if(DateUtil.getDia(fg.getFecha()) == DateUtil.getDia(f.getFecha())) {
+					
+						resta = fg.getTotal_facturacion().subtract(f.getTotal_facturacion());
+						System.out.println(resta);
+						porcentaje = resta.divide(fg.getTotal_facturacion(),2,RoundingMode.HALF_UP);
+						
+						fg.setPorcentaje(porcentaje);
+						count ++;
+						break;						
+					}
+					porcentaje = new BigDecimal(0).setScale(2);
+				}
+				
 				//acumulado = acumulado.add(fg.getTotal_facturacion());
 				fg.setAcumulado(acumulado);				
 			}			
-			//listaFacturacionGeneral.add(facturacionSelected);
 			
+			
+			//listaFacturacionGeneral.add(facturacionSelected);
 			mesActual = new Date();
 			PrimeFaces.current().ajax().update("dt-facturacion");
 		}
+	
+	public void readerList() {
+		FacesMessage msj = null;
+		String mensaje = null;
+		Severity severity = null;
+		
+		listaFacturacionGeneral = new ArrayList<>();
+		listFacturacionMesAnt = new ArrayList<>();
+		try {
+			
+		Date iniMes;
+		int dia = DateUtil.getDia(fechaPrueba);
+		//finMes = DateUtil.getLastDayOfMonth(mesActual);
+		iniMes = DateUtil.getFirstDayOfMonth(fechaPrueba);
+		
+		listaFacturacionGeneral = reportesVentasDAO.desgloseFacturacion(iniMes, fechaPrueba);
+		
+		//modificar fechas
+		Calendar calendario = Calendar.getInstance();
+		calendario.setTime(fechaPrueba);
+		calendario.add(Calendar.MONTH, -1);
+		fechaPrueba = calendario.getTime();
+		iniMes = DateUtil.getFirstDayOfMonth(fechaPrueba);
+		
+		listFacturacionMesAnt = reportesVentasDAO.desgloseFacturacion(iniMes, fechaPrueba);
+		listFacturacionMesAnt = mesAnterior(listFacturacionMesAnt,dia); //llenamos lista de mes anterior con fechas no existentes 
+		listaFacturacionGeneral = mesActual(listaFacturacionGeneral, dia);//llenar lista de mes actual con fechas no existentes 
+		facturacion();
+		
+		System.out.println("Lista mes actual: " + listaFacturacionGeneral);
+		System.out.println("Lista mes anterior: " + listFacturacionMesAnt);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			mensaje = e.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+			msj = new FacesMessage(severity, "Error Facturacion", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, msj);
+			
+		} finally {
+			PrimeFaces.current().ajax().update(":form:messages" );	
+		}
+	
+		
+		
+	}
+	
+	public List<FacturacionGeneral> mesAnterior(List<FacturacionGeneral> listMesAnt , int dia) {
+		
+		BigDecimal porcentaje = new BigDecimal(0).setScale(2);		
+		int count = 0;
+		
+		while(dia>0) {
+			for (FacturacionGeneral f : listMesAnt) { // 12 de febrero , 10, 8, 9
+			
+				if(dia == DateUtil.getDia(f.getFecha())) {					
+					count ++;
+					break;						
+				}
+			
+			}
+			if(count==0) {
+				Date fech = new Date();
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(fech);
+				cal.add(Calendar.MONTH, -1);
+				
+				fech = cal.getTime();
+				
+				DateUtil.setDia(fech, dia);				
+				
+				FacturacionGeneral factTemp = new FacturacionGeneral();					
+				factTemp.setFecha(fech);
+				factTemp.setAcumulado(new BigDecimal(0));
+				factTemp.setPorcentaje(new BigDecimal(0));
+				factTemp.setTotal_facturacion(new BigDecimal(0));
+				listMesAnt.add(factTemp);				
+			}
+			count = 0;
+			dia--;
+		}			
+		
+		return listMesAnt;
+		
+	}
+	
+	public List<FacturacionGeneral> mesActual(List<FacturacionGeneral> listMesAct, int dia ) {
+		
+		int count  = 0;
+		
+		while(dia>0) {
+			for(FacturacionGeneral ant: listMesAct) {//11 de marzo, 9 de marz				
+				if(dia == DateUtil.getDia(ant.getFecha())) {					
+					count ++;			
+					break;
+				}
+			}
+			
+			if(count == 0) {
+				Date fech = new Date(); //problema tomo fecha actual en marzo y genera fechas de mes de marzo
+				
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(fechaPrueba);
+				cal.add(Calendar.MONTH, 1);
+				
+				fech = cal.getTime();
+				
+				DateUtil.setDia(fech, dia);	
+				
+				FacturacionGeneral factTemp = new FacturacionGeneral();					
+				factTemp.setFecha(fech);
+				factTemp.setAcumulado(new BigDecimal(0));
+				factTemp.setPorcentaje(new BigDecimal(0));
+				factTemp.setTotal_facturacion(new BigDecimal(0));
+				listMesAct.add(factTemp);				
+			}
+			count = 0;
+			dia--;
+		}
+		return listMesAct;
+	}
+	
+	
 		 
 	public void grafica() throws ParseException {
 		stackedGroupBarModel = new BarChartModel();
 		ChartData data = new ChartData();
 		fechaUtilidad = null;
-		Date fechaAnt = null;
+		Date fechaInicial = new Date();
+		Date fechaFinal = new Date();
+	
+		/*Date fechaAnt = null;
 		String fechaActual = DateFormat.getDateInstance().format(new Date());
 		Date fecha = new SimpleDateFormat("dd/MM/yyyy").parse(fechaActual);
 		Calendar calendario = Calendar.getInstance();
@@ -142,8 +325,17 @@ public class dashBoardBean implements Serializable{
 		System.out.println(nuevaFecha);
 		fechaAnt=new SimpleDateFormat("dd/MM/yyyy").parse(nuevaFecha);  
 	    System.out.println(nuevaFecha+"\t"+fechaAnt);  
-	    listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null,fechaAnt);
-
+		listaImporteUtilidad = reportesVentasDAO.UtilidadPorMesAnual(fechaAnt, fecha);
+	    */
+		DateUtil.setDia(fechaInicial, 1);
+		DateUtil.setMes(fechaInicial, 0);
+		DateUtil.setAnio(fechaInicial,DateUtil.getAnio(fechaFinal) );		
+		
+		System.out.println(fechaFinal);
+		System.out.println(fechaInicial);
+		String nuevaFechaInicio = new SimpleDateFormat("yyyy-MM-dd").format(fechaInicial);
+		String nuevaFechaFin = new SimpleDateFormat("yyyy-MM-dd").format(fechaFinal);
+		listaImporteUtilidad = reportesVentasDAO.UtilidadPorMesAnual(nuevaFechaInicio, nuevaFechaFin);
 		//Primer SET
 				BarChartDataSet barDS = new BarChartDataSet();
 				barDS.setLabel("Ingresos");
@@ -163,13 +355,13 @@ public class dashBoardBean implements Serializable{
 				barDS3.setBackgroundColor("rgb(75,192,192)");
 				barDS3.setStack("Stack 2");
 				  
-		List<String> listaEmisor = new ArrayList<>();
+		List<String> listaFecha = new ArrayList<>();
 		List<Number> listaPagos = new ArrayList<>();
 		List<Number> listaEgresos = new ArrayList<>();
 		List<Number> listaUtilidad = new ArrayList<>();
 		
 		for(importeUtilidad u : listaImporteUtilidad) {
-			u.setFecha(fechaAnt);
+			//u.setFecha(fechaInicial);
 			
 			listaPagos.add(u.getPagos());
 			barDS.setData(listaPagos);
@@ -180,14 +372,15 @@ public class dashBoardBean implements Serializable{
 
 			listaUtilidad.add(u.getUtilidadPerdida());
 			barDS3.setData(listaUtilidad);			
+			String parse = new SimpleDateFormat("MMM").format(u.getFecha());
+			listaFecha.add(parse);
 			
-			listaEmisor.add(u.getEmiNombre());
 		
 		}
 		data.addChartDataSet(barDS);
 		data.addChartDataSet(barDS2);
 		data.addChartDataSet(barDS3);
-		data.setLabels(listaEmisor);
+		data.setLabels(listaFecha);
 		stackedGroupBarModel.setData(data);
 	stackedGroupBarModel.setExtender("charExtender");
 		//configuracion de labels
@@ -319,6 +512,38 @@ public class dashBoardBean implements Serializable{
 
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
+	}
+
+	public List<FacturacionGeneral> getListaVentaDia() {
+		return listaVentaDia;
+	}
+
+	public void setListaVentaDia(List<FacturacionGeneral> listaVentaDia) {
+		this.listaVentaDia = listaVentaDia;
+	}
+
+	public Date getFechaPrueba() {
+		return fechaPrueba;
+	}
+
+	public void setFechaPrueba(Date fechaPrueba) {
+		this.fechaPrueba = fechaPrueba;
+	}
+
+	public List<FacturacionGeneral> getListFacturacionMesAnt() {
+		return listFacturacionMesAnt;
+	}
+
+	public void setListFacturacionMesAnt(List<FacturacionGeneral> listFacturacionMesAnt) {
+		this.listFacturacionMesAnt = listFacturacionMesAnt;
+	}
+
+	public VentasGlobales getVentasGlobales() {
+		return ventasGlobales;
+	}
+
+	public void setVentasGlobales(VentasGlobales ventasGlobales) {
+		this.ventasGlobales = ventasGlobales;
 	}
 
 

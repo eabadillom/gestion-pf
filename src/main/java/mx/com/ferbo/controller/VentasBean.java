@@ -10,8 +10,10 @@ import javax.inject.Named;
 
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
+import mx.com.ferbo.dao.VentaDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.EmisoresCFDIS;
+import mx.com.ferbo.model.Ventas;
 
 @Named
 @ViewScoped
@@ -19,24 +21,28 @@ public class VentasBean implements Serializable{
 
 	private static final long serialVersionUID = -1785488265380235016L;
 	
-	private String concepto;
+	private VentaDAO ventaDAO;
+	private List<Ventas> listVenta;
+	private Ventas venta;
 	
-	private Cliente clienteSelect;
 	private ClienteDAO clienteDAO;
 	private List<Cliente> listCliente;
 	
-	private EmisoresCFDIS emisorSelect;
 	private EmisoresCFDISDAO emisorDAO;
 	private List<EmisoresCFDIS> listEmisores;
 	
 	
-	public VentasBean() {
+	public VentasBean() {		
 		
 		clienteDAO = new ClienteDAO();
 		listCliente = new ArrayList<>();
 		
 		emisorDAO = new EmisoresCFDISDAO();
 		listEmisores = new ArrayList<>();
+		
+		ventaDAO = new VentaDAO();		
+		listVenta = new ArrayList<>();
+		venta = new Ventas();
 		
 	}
 	
@@ -46,7 +52,18 @@ public class VentasBean implements Serializable{
 		
 		listCliente = clienteDAO.findall();
 		listEmisores = emisorDAO.findall(false);
+		listVenta = ventaDAO.buscarTodos();
 		
+	}
+
+
+	public List<Ventas> getListVenta() {
+		return listVenta;
+	}
+
+
+	public void setListVenta(List<Ventas> listVenta) {
+		this.listVenta = listVenta;
 	}
 
 
@@ -70,33 +87,13 @@ public class VentasBean implements Serializable{
 	}
 
 
-	public Cliente getClienteSelect() {
-		return clienteSelect;
+	public Ventas getVenta() {
+		return venta;
 	}
 
 
-	public void setClienteSelect(Cliente clienteSelect) {
-		this.clienteSelect = clienteSelect;
-	}
-
-
-	public EmisoresCFDIS getEmisorSelect() {
-		return emisorSelect;
-	}
-
-
-	public void setEmisorSelect(EmisoresCFDIS emisorSelect) {
-		this.emisorSelect = emisorSelect;
-	}
-
-
-	public String getConcepto() {
-		return concepto;
-	}
-
-
-	public void setConcepto(String concepto) {
-		this.concepto = concepto;
+	public void setVenta(Ventas venta) {
+		this.venta = venta;
 	}
 	
 	

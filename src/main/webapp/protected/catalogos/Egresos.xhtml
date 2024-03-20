@@ -234,12 +234,12 @@
 						</p:column>
 							
 							<p:column headerText="Emisor" width="5rem" style="text-align:center">
-							<h:outputText value="#{importe.cdEmisor.nb_emisor}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
+							<h:outputText value="#{importe.cdEmisor.nb_emisor}">
 							</h:outputText>
 							</p:column>
 							
 							<p:column headerText="Importe" width="5rem" style="text-align:center">
-							<h:outputText value="#{importe.importe}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
+							<h:outputText value="#{importe.importe}" >
 								<f:convertNumber pattern="$#0.00" />
 							</h:outputText>
 						</p:column>
