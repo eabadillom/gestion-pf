@@ -66,7 +66,7 @@ public class Ventas implements Serializable{
 	public Integer getIdVentas() {
 		return idVentas;
 	}
-
+     
 	public void setIdVentas(Integer idVentas) {
 		this.idVentas = idVentas;
 	}

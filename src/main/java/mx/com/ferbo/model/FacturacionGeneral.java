@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class FacturacionGeneral implements Comparable<Object> {
-	
+	   
 	private BigDecimal total_facturacion;
 	private Date fecha;
 	private BigDecimal acumulado;

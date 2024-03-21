@@ -200,7 +200,7 @@ public class dashBoardBean implements Serializable{
 		listaFacturacionGeneral = new ArrayList<>();
 		listFacturacionMesAnt = new ArrayList<>();
 		try {
-			
+			  
 		Date iniMes;
 		int dia = DateUtil.getDia(fechaPrueba);
 		//finMes = DateUtil.getLastDayOfMonth(mesActual);

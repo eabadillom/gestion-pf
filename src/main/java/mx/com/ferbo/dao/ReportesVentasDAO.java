@@ -233,13 +233,13 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 			e.printStackTrace();
 		}
 		return lista;
-	}
-
+	}   
+  
 	public List<FacturacionGeneral> ventasPorMesAnual(Date fechaini, Date fechafin) {
 		List<FacturacionGeneral> lista = null;
 		EntityManager entity = null;
 		String sql = null;
-
+    
 		try {
 			entity = EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
