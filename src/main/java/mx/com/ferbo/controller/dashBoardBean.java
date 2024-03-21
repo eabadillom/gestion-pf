@@ -59,7 +59,6 @@ public class dashBoardBean implements Serializable{
 	private Date maxDate;
 	private Date fechaPrueba = new Date();
 	private VentasGlobales ventasGlobales;
-	private ImporteEgresosDAO importeEgresosDAO;
 	private ReportesVentasDAO reportesVentasDAO;
 	
 	private List<importeUtilidad> listaImporteUtilidad;
@@ -67,13 +66,12 @@ public class dashBoardBean implements Serializable{
 	private List<FacturacionGeneral> listFacturacionMesAnt;
 	private List<VentasGlobales> listaVentasGlobales;
 	private List<FacturacionGeneral> listaVentaDia;
-	
+	private List<FacturacionGeneral> listaImporteGlobal;
 	
 
 	public dashBoardBean() {
 		listaImporteUtilidad = new ArrayList<>();
 		listaVentasGlobales = new ArrayList<>();
-		importeEgresosDAO = new ImporteEgresosDAO();
 		totalFacturacion = null;
 		sumaEgresosSelect = null;
 		ventasGlobales = new VentasGlobales();
@@ -93,6 +91,7 @@ public class dashBoardBean implements Serializable{
 			//maxDate = new Date(today.getTime());
 			grafica();
 			ventaGlobales();
+			ventasPorMes();
 		
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -185,6 +184,14 @@ public class dashBoardBean implements Serializable{
 			PrimeFaces.current().ajax().update("dt-facturacion");
 		}
 	
+		public void ventasPorMes() {
+			Date iniMes = new Date();
+			DateUtil.setDia(iniMes, 01);
+			DateUtil.setMes(iniMes, 0);
+			System.out.println("Ventas realizadas por mes");
+			listaImporteGlobal = reportesVentasDAO.ventasPorMesAnual(iniMes, fechaPrueba);
+		}
+		
 	public void readerList() {
 		FacesMessage msj = null;
 		String mensaje = null;
@@ -225,6 +232,10 @@ public class dashBoardBean implements Serializable{
 			
 		} finally {
 			PrimeFaces.current().ajax().update(":form:messages" );	
+			Calendar calendario = Calendar.getInstance();
+			calendario.setTime(fechaPrueba);
+			calendario.add(Calendar.MONTH, 1);
+			fechaPrueba = calendario.getTime();
 		}
 	
 		
@@ -352,13 +363,21 @@ public class dashBoardBean implements Serializable{
 		//Tercer SET
 				BarChartDataSet barDS3 = new BarChartDataSet();
 				barDS3.setLabel("Utilidad/Perdida ");
-				barDS3.setBackgroundColor("rgb(75,192,192)");
+				barDS3.setBackgroundColor("rgb(109,236,236)");
 				barDS3.setStack("Stack 2");
+				
+				 
+		//Tercer SET
+						BarChartDataSet barDS4 = new BarChartDataSet();
+						barDS4.setLabel("Efectivo ");
+						barDS4.setBackgroundColor("rgb(75,192,192)");
+						barDS4.setStack("Stack 3");
 				  
 		List<String> listaFecha = new ArrayList<>();
 		List<Number> listaPagos = new ArrayList<>();
 		List<Number> listaEgresos = new ArrayList<>();
 		List<Number> listaUtilidad = new ArrayList<>();
+		List<Number> listaEfectivo = new ArrayList<>();
 		
 		for(importeUtilidad u : listaImporteUtilidad) {
 			//u.setFecha(fechaInicial);
@@ -372,6 +391,10 @@ public class dashBoardBean implements Serializable{
 
 			listaUtilidad.add(u.getUtilidadPerdida());
 			barDS3.setData(listaUtilidad);			
+			
+			listaEfectivo.add(u.getIzq());
+			barDS4.setData(listaEfectivo);
+			
 			String parse = new SimpleDateFormat("MMM").format(u.getFecha());
 			listaFecha.add(parse);
 			
@@ -380,6 +403,7 @@ public class dashBoardBean implements Serializable{
 		data.addChartDataSet(barDS);
 		data.addChartDataSet(barDS2);
 		data.addChartDataSet(barDS3);
+		data.addChartDataSet(barDS4);
 		data.setLabels(listaFecha);
 		stackedGroupBarModel.setData(data);
 	stackedGroupBarModel.setExtender("charExtender");
@@ -416,7 +440,9 @@ public class dashBoardBean implements Serializable{
 		stackedGroupBarModel.setOptions(options);
 	}
 
-	
+	public void desglosePorMes() {
+		
+	}
 
 	public BarChartModel getStackedGroupBarModel() {
 		return stackedGroupBarModel;
@@ -544,6 +570,22 @@ public class dashBoardBean implements Serializable{
 
 	public void setVentasGlobales(VentasGlobales ventasGlobales) {
 		this.ventasGlobales = ventasGlobales;
+	}
+
+	public List<VentasGlobales> getListaVentasGlobales() {
+		return listaVentasGlobales;
+	}
+
+	public void setListaVentasGlobales(List<VentasGlobales> listaVentasGlobales) {
+		this.listaVentasGlobales = listaVentasGlobales;
+	}
+
+	public List<FacturacionGeneral> getListaImporteGlobal() {
+		return listaImporteGlobal;
+	}
+
+	public void setListaImporteGlobal(List<FacturacionGeneral> listaImporteGlobal) {
+		this.listaImporteGlobal = listaImporteGlobal;
 	}
 
 

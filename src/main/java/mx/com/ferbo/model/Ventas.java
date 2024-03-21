@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 
 
 @Entity
-@Table(name = "ventas")
+@Table(name = "venta")
 @NamedQueries({ @NamedQuery(name = "Ventas.findByAll", query = "SELECT v FROM Ventas v"),
 		@NamedQuery(name = "Ventas.findById", query = "SELECT v FROM Ventas v WHERE v.idVentas = :id"),
 		@NamedQuery(name = "Ventas.findByfecha", query = "SELECT v FROM Ventas v WHERE v.fecha= :fecha"),
@@ -35,7 +35,7 @@ public class Ventas implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
-	@Column(name = "id_ventas")
+	@Column(name = "id_venta")
 	private Integer idVentas;
 
 	@Column(name = "fecha")

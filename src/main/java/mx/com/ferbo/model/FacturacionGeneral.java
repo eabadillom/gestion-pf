@@ -10,6 +10,7 @@ public class FacturacionGeneral implements Comparable<Object> {
 	private BigDecimal acumulado;
 	private BigDecimal porcentaje; 
 	private BigDecimal total_por_efectivo;
+	private BigDecimal pagosPorMes;
 	
 	public BigDecimal getTotal_facturacion() {
 		return total_facturacion;
@@ -52,6 +53,12 @@ public class FacturacionGeneral implements Comparable<Object> {
 	}
 	public void setTotal_por_efectivo(BigDecimal total_por_efectivo) {
 		this.total_por_efectivo = total_por_efectivo;
+	}
+	public BigDecimal getPagosPorMes() {
+		return pagosPorMes;
+	}
+	public void setPagosPorMes(BigDecimal pagosPorMes) {
+		this.pagosPorMes = pagosPorMes;
 	}
 	
 	

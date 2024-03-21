@@ -9,6 +9,7 @@ public class importeUtilidad {
 	private 	BigDecimal pagos;
 	private BigDecimal egresos;
 	private BigDecimal utilidadPerdida;
+	private BigDecimal izq;
 	
 	
 	public Date getFecha() {
@@ -40,6 +41,12 @@ public class importeUtilidad {
 	}
 	public void setUtilidadPerdida(BigDecimal utilidadPerdida) {
 		this.utilidadPerdida = utilidadPerdida;
+	}
+	public BigDecimal getIzq() {
+		return izq;
+	}
+	public void setIzq(BigDecimal izq) {
+		this.izq = izq;
 	}
 	
 	

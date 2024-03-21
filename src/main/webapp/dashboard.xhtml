@@ -102,6 +102,7 @@
 					<p:outputPanel>
 					
 						<p:dataTable id="dt-facturacionGeneral" widgetVar="dtFacturacion" var="ventas" value="#{dashBoardBean.listaFacturacionGeneral}" reflow="true" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add" >
+							
 							<p:column headerText="Fecha"  style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.fecha}" >
 									<f:convertDateTime pattern="dd/MM/YYYY"></f:convertDateTime>
@@ -138,7 +139,7 @@
 					</f:facet>
 				</p:dialog>
 				
-				<h5>Ventas Totales</h5>
+
 								<p:panelGrid columns="4" >
 								<p:panel id="ventas">
 								<div class="field">              
@@ -166,6 +167,40 @@
 							      </div>
 							       </p:panel>
 								</p:panelGrid>
+								
+								
+						<h5>Ventas por mes</h5>						
+						<p:dataTable id="dt-ventasMes" widgetVar="dtVM" var="ventasM" value="#{dashBoardBean.listaImporteGlobal}" reflow="true" style="max-width:20em !important;">
+								
+							<p:column headerText="Mes"  style="text-align:left">
+									<h:outputText style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem" value="#{ventasM.fecha}" >
+										<f:convertDateTime pattern="MM/YYYY"></f:convertDateTime>
+									</h:outputText>
+								</p:column>
+								
+								<p:column headerText="Venta"  style="text-align:center">
+									<h:outputText style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem" value="#{ventasM.pagosPorMes}" >
+									 <f:convertNumber currencySymbol="$" type="currency" />
+									</h:outputText>
+								</p:column>
+								
+								
+							</p:dataTable>
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
 </h:form>							
 	</ui:define>
 </ui:composition>
