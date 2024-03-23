@@ -232,7 +232,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		log.info("El usuario {} entra a Inventarios / Salidas / Alta.", this.usuario.getUsuario());
 	}
 	
-	public void validar() throws InventarioException {
+	public synchronized void validar() throws InventarioException {
 		
 		int contador = 0;
 		SerieConstancia serie = new SerieConstancia();
@@ -264,7 +264,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 	}
 	
-	public void cargaInfoCliente() {
+	public synchronized void cargaInfoCliente() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
@@ -363,7 +363,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		throw new InventarioException("El cliente no tiene  permitida la salida de mercancia porque presenta un adeudo. Favor de contactar al área de cobranza.");
 	}
 
-	public void generaFolioSalida() {
+	public synchronized void generaFolioSalida() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
 		SerieConstancia serieTemp = null;
