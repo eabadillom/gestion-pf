@@ -62,40 +62,6 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		return null;
 	}
 
-	/*
-	 * public VentasGlobales ventasGanancias(Date fechaIni, Date fechaFin) {
-	 * 
-	 * VentasGlobales ventas =null; EntityManager em = null; String sql = null; try
-	 * { em = EntityManagerUtil.getEntityManager(); //em.getTransaction().begin();
-	 * sql =
-	 * "select a.ventas_totales ,(a.ventas_totales - a.egresos) as ganancias,((a.ventas_totales - a.egresos) / a.ventas_totales) as porcentaje from(\n "
-	 * +
-	 * "select SUM(combined.total_facturas), SUM(combined.total_ventas), sum(combined.total_facturas + combined.total_ventas ) as ventas_totales, sum(combined.Total_egresos) as egresos\n "
-	 * + "from (\n " +
-	 * "select sum(f.total) as total_facturas,0 as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n "
-	 * + "from factura f\n " +
-	 * "where f.fecha BETWEEN :fechaini and :fechaFin and status in (1,3,4)\n " +
-	 * "group by fecha\n " + "\n" + "UNION\n " + "\n" +
-	 * "select 0 as total_facturas,sum(v.total) as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n "
-	 * + "from ventas v\n " + "where v.fecha BETWEEN :fechaini AND :fechaFin\n " +
-	 * "group by fecha\n " + "UNION\n" +
-	 * "select 0 as total_facturas,0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales\n "
-	 * + "from importe_egreso ie\n " +
-	 * "where ie.fecha BETWEEN :fechaini AND :fechaFin\n " + "group by fecha\n " +
-	 * "\n" + ")combined\n " + ") a\n ";
-	 * 
-	 * Query query = em.createNativeQuery(sql)
-	 * .setParameter("fechaini",DateUtil.getString(fechaIni,
-	 * DateUtil.FORMATO_YYYY_MM_DD)) .setParameter("fechaFin",
-	 * DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
-	 * 
-	 * ventas = (VentasGlobales) query.getSingleResult();
-	 * 
-	 * } catch (Exception e) { e.printStackTrace(); return null; } return ventas;
-	 * 
-	 * }
-	 */
-
 	@SuppressWarnings("unchecked")
 	public List<VentasGlobales> ventasGanancias(Date fechaIni, Date fechaFin) {
 		List<VentasGlobales> listaVentas = null;
@@ -113,7 +79,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					+ "from factura f\n" + "where f.fecha BETWEEN :fechaini and :fechaFin and status in (1,3,4)\n"
 					+ "group by fecha\n" + "\n" + "UNION\n" + "\n"
 					+ "select 0 as total_facturas,sum(v.total) as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n"
-					+ "from ventas v\n" + "where v.fecha BETWEEN :fechaini AND :fechaFin\n" + "group by fecha\n"
+					+ "from venta v\n" + "where v.fecha BETWEEN :fechaini AND :fechaFin\n" + "group by fecha\n"
 					+ "UNION\n"
 					+ "select 0 as total_facturas,0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales\n"
 					+ "from importe_egreso ie\n" + "where ie.fecha BETWEEN :fechaini AND :fechaFin\n"
@@ -157,7 +123,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					+ "from factura f\n" + "where f.fecha BETWEEN :fechaIni AND :fechaFin and status in (1,3,4)\n"
 					+ "\n" + "group by fecha\n" + "\n" + "union\n" + "\n"
 					+ "select fecha,null as total_facturas, sum(v.total) as total_efectivo_por_dia\n"
-					+ "from ventas v\n" + "inner join parametro p on p.valor = 'true'\n"
+					+ "from venta v\n" + "inner join parametro p on p.valor = 'true'\n"
 					+ "where v.fecha BETWEEN :fechaIni AND :fechaFin\n" + "\n" + "group by fecha\n" + "\n"
 					+ ")combined\n" + "group by combined.fecha\n" + "order by combined.fecha DESC\n" + "\n" + "\n";
 
@@ -207,7 +173,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					+ "FROM  factura f\n" + "LEFT JOIN pago p ON f.id = p.factura\n" + "and status in (1,3,4)\n"
 					+ "AND DATE_FORMAT(f.fecha, '%Y-%m') BETWEEN  DATE_FORMAT(:fechaIni, '%Y-%m') and DATE_FORMAT(:fechaFin, '%Y-%m')\n"
 					+ "GROUP BY  f.fecha\n" + "\n" + "UNION\n" + "\n"
-					+ "SELECT v.fecha,0 as total_egresos, 0 as total_pagos,sum(total) as efectivo\n" + "FROM ventas v\n"
+					+ "SELECT v.fecha,0 as total_egresos, 0 as total_pagos,sum(total) as efectivo\n" + "FROM venta v\n"
 					+ "GROUP BY  v.fecha\n" + ") AS combined\n" + "where fecha  is not null\n" + "GROUP BY\n"
 					+ "DATE_FORMAT(combined.fecha, '%Y-%m')\n" + "ORDER BY  fecha;\n";
 
@@ -267,7 +233,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					"UNION\n" + 
 					"\n" + 
 					"SELECT v.fecha ,0 AS total_pagos, sum(total) as efectivo\n" + 
-					"FROM ventas v\n" + 
+					"FROM venta v\n" + 
 					"GROUP BY  v.fecha\n" + 
 					"\n" + 
 					") AS combined\n" + 
@@ -319,7 +285,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					+ "from factura f\n" + "where f.fecha = :fechaIni and status in (1,3,4)\n" + "group by fecha\n"
 					+ "\n" + "union\n"
 					+ "select fecha ,null as total_facturas, SUM(v.total) as total_efectivo_por_dia\n"
-					+ "from ventas v\n" + "where v.fecha = :fechaIni\n" + "group by fecha\n" + "\n" + ")combined\n"
+					+ "from venta v\n" + "where v.fecha = :fechaIni\n" + "group by fecha\n" + "\n" + ")combined\n"
 					+ "\n" + "group by combined.fecha\n" + "order by combined.fecha\n";
 
 			Query query = entity.createNativeQuery(sql).setParameter("fechaIni",
@@ -344,5 +310,191 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		}
 		return lista;
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public List<FacturacionGeneral> ventaPorRazonSocial(Date fechaInicio, Date fechaFin ){
+		
+		List<FacturacionGeneral> list = new ArrayList<>();
+		EntityManager em = null;
+		String sql = null;
+		Query query = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			
+			sql = "select SUM(c.total) as total, c.emisor as emisor from(\n" + 
+					"select sum(f.total) as total, f.emi_nombre as emisor\n" + 
+					"from factura f\n" + 
+					"where f.fecha between :fechaini and :fechafin and f.status in (1,3,4)\n" + 
+					"group by emisor\n" + 
+					"\n" + 
+					"union\n" + 
+					"\n" + 
+					"select sum(v.total) as total, e.nb_emisor as emisor\n" + 
+					"from venta v\n" + 
+					"inner join emisor e on e.cd_emisor = v.id_emisor\n" + 
+					"where v.fecha between :fechaini and :fechafin\n" + 
+					"GROUP by emisor\n" + 
+					")c\n" + 
+					"GROUP BY emisor\n";
+			
+			query = em.createNativeQuery(sql)
+						.setParameter("fechaini",DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
+						.setParameter("fechafin",DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+			
+			List<Object[]> listaObjetos = query.getResultList();
+			
+			for (Object[] o : listaObjetos) {
+				FacturacionGeneral fg = new FacturacionGeneral();
+				int id = 0;
+
+				fg.setTotal_facturacion((BigDecimal) o[id++]);				
+				fg.setRazonSocial((String) o[id++]);
+				list.add(fg);
+			}
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+				
+		return list;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<FacturacionGeneral> gananciaPorRazonSocial(Date fechaInicio, Date fechaFin ){
+		
+		List<FacturacionGeneral> list = new ArrayList<>();
+		EntityManager em = null;
+		String sql = null;
+		Query query = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			
+			sql = "select sum(d.total - d.egreso) as ganancia, d.emisor as emisor from(\n" + 
+					"select SUM(c.total) as total, c.emisor as emisor, 0 as egreso from(\n" + 
+					"select sum(f.total) as total, f.emi_nombre as emisor\n" + 
+					"from factura f\n" + 
+					"where f.fecha between :fechaini and :fechafin and f.status in (1,3,4)\n" + 
+					"group by emisor\n" + 
+					"\n" + 
+					"union\n" + 
+					"\n" + 
+					"select sum(v.total), e.nb_emisor as emisor\n" + 
+					"from venta v\n" + 
+					"inner join emisor e on e.cd_emisor = v.id_emisor\n" + 
+					"where v.fecha between :fechaini and :fechafin\n" + 
+					"GROUP by emisor\n" + 
+					"\n" + 
+					")c\n" + 
+					"GROUP BY emisor\n" + 
+					"\n" + 
+					"\n" + 
+					"union\n" + 
+					"\n" + 
+					"select 0 as total , e.nb_emisor as emisor,sum(ie.importe) as egreso\n" + 
+					"from importe_egreso ie\n" + 
+					"inner join emisor e on ie.cd_emisor = e.cd_emisor\n" + 
+					"where ie.fecha between :fechaini and :fechafin\n" + 
+					"group by emisor\n" + 
+					"\n" + 
+					")d\n" + 
+					"group by emisor\n";
+			
+			query = em.createNativeQuery(sql)
+						.setParameter("fechaini",DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
+						.setParameter("fechafin",DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+			
+			List<Object[]> listaObjetos = query.getResultList();
+			
+			for (Object[] o : listaObjetos) {
+				FacturacionGeneral fg = new FacturacionGeneral();
+				int id = 0;
+
+				fg.setTotal_facturacion((BigDecimal) o[id++]);				
+				fg.setRazonSocial((String) o[id++]);
+				list.add(fg);
+			}
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+				
+		return list;
+	}
+	
+	
+@SuppressWarnings("unchecked")
+public List<FacturacionGeneral> ventaPorFormaPago(Date fechaInicio, Date fechaFin ){
+		
+		List<FacturacionGeneral> list = new ArrayList<>();
+		EntityManager em = null;
+		String sql = null;
+		Query query = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			
+			sql = "select date_format(c.fecha,'%Y-%m') as mes, sum(c.monto), c.tipo as tipo  from(\n" + 
+					"SELECT p.fecha as fecha,sum(p.monto) as monto, tp.nombre as tipo from factura f\n" + 
+					"inner join pago p on p.factura = f.id\n" + 
+					"inner join tipo_pago tp on tp.id = p.tipo\n" + 
+					"where p.fecha BETWEEN :fechaini and :fechafin\n" + 
+					"group by p.tipo, p.fecha\n" + 
+					"union\n" + 
+					"select v.fecha as fecha, v.total as monto, 'Efectivo' as tipo\n" + 
+					"from venta v\n" + 
+					"where v.fecha between :fechaini and :fechafin\n" + 
+					")c\n" + 
+					"Group by mes, tipo\n" +
+					"Order by mes";
+			
+			query = em.createNativeQuery(sql)
+						.setParameter("fechaini",DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
+						.setParameter("fechafin",DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+			
+			List<Object[]> listaObjetos = query.getResultList();
+			
+			for (Object[] o : listaObjetos) {
+				FacturacionGeneral fg = new FacturacionGeneral();
+				int id = 0;
+
+				String fh = ((String) o[id++]);
+				Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);
+				fg.setFecha(f);
+				fg.setPagosPorMes((BigDecimal) o[id++]);				
+				fg.setTipoPago((String) o[id++]);
+				list.add(fg);
+			}
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+				
+		return list;
+	}
+	
+	
+	
+	
+	
+	
+	
 
 }

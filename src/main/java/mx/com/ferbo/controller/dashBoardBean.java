@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -21,6 +24,7 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.chart.ChartModel;
 import org.primefaces.model.chart.LineChartModel;
 import org.primefaces.model.charts.ChartData;
 import org.primefaces.model.charts.axes.cartesian.CartesianScales;
@@ -28,17 +32,21 @@ import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
 import org.primefaces.model.charts.bar.BarChartDataSet;
 import org.primefaces.model.charts.bar.BarChartModel;
 import org.primefaces.model.charts.bar.BarChartOptions;
+import org.primefaces.model.charts.donut.DonutChartDataSet;
+import org.primefaces.model.charts.donut.DonutChartModel;
+import org.primefaces.model.charts.donut.DonutChartOptions;
 import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
-import mx.com.ferbo.dao.ImporteEgresosDAO;
-import mx.com.ferbo.dao.ParametroDAO;
+import mx.com.ferbo.dao.RepOcupacionCamaraDAO;
 import mx.com.ferbo.dao.ReportesVentasDAO;
+import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.model.FacturacionGeneral;
-import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.VentasGlobales;
+import mx.com.ferbo.ui.OcupacionCamara;
 import mx.com.ferbo.ui.importeUtilidad;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.ReporteVentaUtil;
 
 
 @Named
@@ -48,7 +56,10 @@ public class dashBoardBean implements Serializable{
 	private static final long serialVersionUID = -6551673633472266325L;
 	private static Logger log = LogManager.getLogger(dashBoardBean.class);
 	
+	private DonutChartModel donutModel;
     private BarChartModel stackedGroupBarModel;
+    private BarChartModel smVentasFormaPago;
+    
 	private importeUtilidad fechaUtilidad;
     private LineChartModel cartesianLinerModel;
 	private FacturacionGeneral facturacionSelected;
@@ -57,9 +68,10 @@ public class dashBoardBean implements Serializable{
 	private BigDecimal sumaEgresosSelect;
 	private Date mesActual;
 	private Date maxDate;
-	private Date fechaPrueba = new Date();
+	private Date fechaPrueba;
 	private VentasGlobales ventasGlobales;
 	private ReportesVentasDAO reportesVentasDAO;
+	
 	
 	private List<importeUtilidad> listaImporteUtilidad;
 	private List<FacturacionGeneral> listaFacturacionGeneral;
@@ -67,7 +79,14 @@ public class dashBoardBean implements Serializable{
 	private List<VentasGlobales> listaVentasGlobales;
 	private List<FacturacionGeneral> listaVentaDia;
 	private List<FacturacionGeneral> listaImporteGlobal;
+	private List<FacturacionGeneral> listaVentaRazonSocial;
+	private List<FacturacionGeneral> listaGananciaRazonSocial;
+	private List<FacturacionGeneral> listaVentaPagos;
 	
+	private BarChartModel modelCamara;
+	private List<OcupacionCamara> listOcupacionCamara;
+	private RepOcupacionCamaraDAO ocupacionCamaraDAO;
+
 
 	public dashBoardBean() {
 		listaImporteUtilidad = new ArrayList<>();
@@ -78,27 +97,78 @@ public class dashBoardBean implements Serializable{
 		reportesVentasDAO = new ReportesVentasDAO();
 		listaFacturacionGeneral = new ArrayList<>();
 		listaVentaDia = new ArrayList<>();
-		//mesActual = new Date();
+		listaVentaRazonSocial = new ArrayList<>();
+		listaGananciaRazonSocial = new ArrayList<>();
+		listaVentaPagos = new ArrayList<>();
+		
+		listOcupacionCamara = new ArrayList<>();		
+		ocupacionCamaraDAO = new RepOcupacionCamaraDAO();
+		
 	}
 
 	@PostConstruct
 	public void init()  {
 		try {
-			
-			Date today = new Date();
-			long oneDay = 24 * 60 * 60 * 1000;
+			fechaPrueba = new Date();
 			mesActual = new Date();
-			//maxDate = new Date(today.getTime());
+			
 			grafica();
 			ventaGlobales();
 			ventasPorMes();
-		
+			ventaRazonSocial();
+			gananciaPorRazonSocial();
+			createDonutModel();
+			graficaOcupacionCamaras();
+			
+			ventaPorPago();
+			createStackedBarModel();
+			
+			Date today = new Date();
+			maxDate = new Date(today.getTime());
+			
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}
 	
+	
+	 
+	public void ventaPorPago() {
+		
+		Date fechaInicio = new Date();
+		DateUtil.setDia(fechaInicio, 01);
+		DateUtil.setMes(fechaInicio, 00);
+		
+		
+		Date fechaFin = new Date();
+		
+		listaVentaPagos = reportesVentasDAO.ventaPorFormaPago(fechaInicio, fechaFin);
+		
+		
+	}
+	
+	public void ventaRazonSocial() {
+		
+		Date fechaInicio = DateUtil.getFirstDayOfMonth(fechaPrueba);
+		Date fechaFin = new Date();
+		
+		listaVentaRazonSocial = reportesVentasDAO.ventaPorRazonSocial(fechaInicio, fechaFin);
+		
+		PrimeFaces.current().ajax().update("form:dt-ventaRS");
+		
+	}
+	
+	public void gananciaPorRazonSocial() {		
+		
+		Date fechaFin = new Date();
+		Date fechainicio = DateUtil.getFirstDayOfMonth(fechaFin);
+		
+		listaGananciaRazonSocial = reportesVentasDAO.gananciaPorRazonSocial(fechainicio, fechaFin);
+		
+		PrimeFaces.current().ajax().update("form:dt-gananciaRS");
+		
+	}
 	
 	public void ventaGlobales() {
 		Date iniMes;
@@ -107,21 +177,21 @@ public class dashBoardBean implements Serializable{
 		for (VentasGlobales vg : listaVentasGlobales) {
 			ventasGlobales.setVentasTotales(vg.getVentasTotales());
 			ventasGlobales.setGanancias(vg.getGanancias());
-			ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias());
+			ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias().setScale(2,RoundingMode.DOWN));
 		}
 		//
 	}
 	
 	public void VentaDia() {
-		
-		int dia = DateUtil.getDia(mesActual);		
-		DateUtil.setDia(fechaPrueba,dia);	
-		
-		listaVentaDia = reportesVentasDAO.obtenerVentaDia(fechaPrueba);//venta del dia 
-		
-		//venta de mes anterior 
-		
-		PrimeFaces.current().ajax().update("form:dt-ventas");
+		System.out.println(mesActual);
+		int dia = DateUtil.getDia(maxDate);		
+		DateUtil.setDia(mesActual,dia);	
+		listaVentaDia = reportesVentasDAO.obtenerVentaDia(mesActual);//venta del dia 
+		if(!listaVentaDia.isEmpty()) {
+		listaVentaDia.get(0).setPorcentaje(new BigDecimal(0));
+		}
+		//venta de mes anterior 		
+		PrimeFaces.current().ajax().update("form:dt-ventas");	
 		
 	}
 	
@@ -131,7 +201,6 @@ public class dashBoardBean implements Serializable{
 			BigDecimal porcentaje = new BigDecimal(0).setScale(2);
 			BigDecimal resta = new BigDecimal(0).setScale(2);
 			BigDecimal acumulado = null;
-			int count = 0;
 			
 			
 			FacturacionGeneral factAct = new FacturacionGeneral();
@@ -168,7 +237,6 @@ public class dashBoardBean implements Serializable{
 						porcentaje = resta.divide(fg.getTotal_facturacion(),2,RoundingMode.HALF_UP);
 						
 						fg.setPorcentaje(porcentaje);
-						count ++;
 						break;						
 					}
 					porcentaje = new BigDecimal(0).setScale(2);
@@ -180,7 +248,7 @@ public class dashBoardBean implements Serializable{
 			
 			
 			//listaFacturacionGeneral.add(facturacionSelected);
-			mesActual = new Date();
+			//mesActual = new Date();
 			PrimeFaces.current().ajax().update("dt-facturacion");
 		}
 	
@@ -193,6 +261,7 @@ public class dashBoardBean implements Serializable{
 		}
 		
 	public void readerList() {
+		
 		FacesMessage msj = null;
 		String mensaje = null;
 		Severity severity = null;
@@ -200,7 +269,7 @@ public class dashBoardBean implements Serializable{
 		listaFacturacionGeneral = new ArrayList<>();
 		listFacturacionMesAnt = new ArrayList<>();
 		try {
-			  
+			  DateUtil.setMes(fechaPrueba, DateUtil.getMes(mesActual));
 		Date iniMes;
 		int dia = DateUtil.getDia(fechaPrueba);
 		//finMes = DateUtil.getLastDayOfMonth(mesActual);
@@ -244,7 +313,7 @@ public class dashBoardBean implements Serializable{
 	
 	public List<FacturacionGeneral> mesAnterior(List<FacturacionGeneral> listMesAnt , int dia) {
 		
-		BigDecimal porcentaje = new BigDecimal(0).setScale(2);		
+		
 		int count = 0;
 		
 		while(dia>0) {
@@ -326,18 +395,7 @@ public class dashBoardBean implements Serializable{
 		Date fechaInicial = new Date();
 		Date fechaFinal = new Date();
 	
-		/*Date fechaAnt = null;
-		String fechaActual = DateFormat.getDateInstance().format(new Date());
-		Date fecha = new SimpleDateFormat("dd/MM/yyyy").parse(fechaActual);
-		Calendar calendario = Calendar.getInstance();
-		calendario.setTime(fecha);
-		calendario.add(Calendar.MONTH, -1);
-		String nuevaFecha = new SimpleDateFormat("dd/MM/yyyy").format(calendario.getTime());
-		System.out.println(nuevaFecha);
-		fechaAnt=new SimpleDateFormat("dd/MM/yyyy").parse(nuevaFecha);  
-	    System.out.println(nuevaFecha+"\t"+fechaAnt);  
-		listaImporteUtilidad = reportesVentasDAO.UtilidadPorMesAnual(fechaAnt, fecha);
-	    */
+	
 		DateUtil.setDia(fechaInicial, 1);
 		DateUtil.setMes(fechaInicial, 0);
 		DateUtil.setAnio(fechaInicial,DateUtil.getAnio(fechaFinal) );		
@@ -347,6 +405,10 @@ public class dashBoardBean implements Serializable{
 		String nuevaFechaInicio = new SimpleDateFormat("yyyy-MM-dd").format(fechaInicial);
 		String nuevaFechaFin = new SimpleDateFormat("yyyy-MM-dd").format(fechaFinal);
 		listaImporteUtilidad = reportesVentasDAO.UtilidadPorMesAnual(nuevaFechaInicio, nuevaFechaFin);
+  
+	    //listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null,fechaAnt);
+
+
 		//Primer SET
 				BarChartDataSet barDS = new BarChartDataSet();
 				barDS.setLabel("Ingresos");
@@ -356,14 +418,14 @@ public class dashBoardBean implements Serializable{
 		//Segundo SET 
 				BarChartDataSet barDS2 = new BarChartDataSet();
 				barDS2.setLabel("Egresos");
-				barDS2.setBackgroundColor("rgb(128,197,237)");
+				barDS2.setBackgroundColor("rgb(54, 162, 235)");
 				barDS2.setStack("Stack 1");
 				
 				 
 		//Tercer SET
 				BarChartDataSet barDS3 = new BarChartDataSet();
 				barDS3.setLabel("Utilidad/Perdida ");
-				barDS3.setBackgroundColor("rgb(109,236,236)");
+				barDS3.setBackgroundColor("rgb(255, 205, 86)");
 				barDS3.setStack("Stack 2");
 				
 				 
@@ -406,13 +468,12 @@ public class dashBoardBean implements Serializable{
 		data.addChartDataSet(barDS4);
 		data.setLabels(listaFecha);
 		stackedGroupBarModel.setData(data);
-	stackedGroupBarModel.setExtender("charExtender");
+	//stackedGroupBarModel.setExtender("charExtender");
 		//configuracion de labels
 
 		
 		//Options
-		BarChartOptions options = new BarChartOptions();
-		CartesianScales cScales = new CartesianScales();
+		BarChartOptions options = new BarChartOptions();		
 		CartesianLinearAxes linearAxes = new CartesianLinearAxes();
 		
 		linearAxes.setStacked(false);
@@ -431,18 +492,364 @@ public class dashBoardBean implements Serializable{
 		
 		Title subtitle = new Title();
 		subtitle.setDisplay(true);
-		subtitle.setText("Ingesos - Egresos"); // Mostrar el primer valor de pagos como ejemplo
+		subtitle.setText("Ingresos - Egresos"); // Mostrar el primer valor de pagos como ejemplo
 		options.setTitle(subtitle);
 		Tooltip tooltip = new Tooltip();
 		tooltip.setMode("index");
 		tooltip.setIntersect(false);
 		options.setTooltip(tooltip);
 		stackedGroupBarModel.setOptions(options);
+		
+		PrimeFaces.current().ajax().update("form:grafica");
 	}
-
-	public void desglosePorMes() {
+	
+	public void graficaOcupacionCamaras() {
+		
+		Date fecha = new Date();
+		
+		modelCamara = new BarChartModel();		
+		ChartData dataSet = new ChartData();
+		
+		BarChartDataSet barDataSet = new BarChartDataSet();
+		BarChartDataSet barDataSet2 = new BarChartDataSet();
+		
+		barDataSet.setLabel("Disponibles");
+		barDataSet.setBackgroundColor("rgb(255, 99, 132)");
+		barDataSet.setStack("Stack 0");
+		
+		barDataSet2.setLabel("Ocupadas");
+		barDataSet2.setBackgroundColor("rgb(54, 162, 235)");
+		barDataSet2.setStack("Stack 1");
+		
+		List<Number> values = new ArrayList<>();
+		List<Number> values2 = new ArrayList<>();
+		List<String> labels = new ArrayList<>();
+		
+		listOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, null, null, null);
+		
+		for(OcupacionCamara oc: listOcupacionCamara) {
+			
+			if(oc.getPlanta_ds().equals("P1 CENTRAL DE ABASTOS")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P2 TEPALCATES")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P3 CENTRAL DE ABASTOS")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P4 URBANA IXHUATEPEC")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+			if(oc.getPlanta_ds().equals("P5 ORO")) {
+				values.add(oc.getPosiciones_Disponibles());
+				values2.add(oc.getTarima());
+				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+			}
+			
+		}
+		
+		barDataSet.setData(values);
+		barDataSet2.setData(values2);
+		dataSet.setLabels(labels);
+		dataSet.addChartDataSet(barDataSet);
+		dataSet.addChartDataSet(barDataSet2);
+		
+		Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Ocupación Cámaras");
+        BarChartOptions options = new BarChartOptions();;
+		options.setTitle(title);
+		
+		modelCamara.setData(dataSet);
+		modelCamara.setData(dataSet);
+		modelCamara.setOptions(options);
+		modelCamara.setExtender("charExtender");
 		
 	}
+	
+	public void createDonutModel() {
+        donutModel = new DonutChartModel();
+        ChartData data = new ChartData();
+        DonutChartOptions options = new DonutChartOptions();
+        donutModel.setOptions(options);
+
+        DonutChartDataSet dataSet = new DonutChartDataSet();
+        List<Number> listaventas = new ArrayList<>();
+        for (FacturacionGeneral f : listaVentaRazonSocial) {
+        	listaventas.add(f.getTotal_facturacion());
+        	dataSet.setData(listaventas);	
+		}
+
+        List<String> bgColors = new ArrayList<>();
+        bgColors.add("rgb(255, 99, 132)");
+        bgColors.add("rgb(54, 162, 235)");
+        bgColors.add("rgb(255, 205, 86)");
+        dataSet.setBackgroundColor(bgColors);
+
+        data.addChartDataSet(dataSet);
+        List<String> listaEmisores = new ArrayList<>();
+        for (FacturacionGeneral fc :listaVentaRazonSocial) {
+        	listaEmisores.add(fc.getRazonSocial());
+        	data.setLabels(listaEmisores);
+		}
+
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Ventas Por Razón Social");
+		options.setTitle(title);
+        
+        donutModel.setData(data);
+        donutModel.setExtender("charExtender");
+    }
+	
+	
+	
+	 public void createStackedBarModel() {
+		 	smVentasFormaPago = new BarChartModel();
+	        ChartData data = new ChartData();
+
+	        BarChartDataSet barDataSet = new BarChartDataSet();
+	        barDataSet.setLabel("Efectivo");
+	        barDataSet.setBackgroundColor("rgb(255, 99, 132)");
+	        List<Number> value = new ArrayList<>();
+	        List<String> labels = new ArrayList<>();
+	        
+	        BarChartDataSet barDataSet2 = new BarChartDataSet();
+	        barDataSet2.setLabel("Documento de transferencia");
+	        barDataSet2.setBackgroundColor("rgb(54, 162, 235)");
+	        List<Number> value2 = new ArrayList<>();
+	       
+	        BarChartDataSet barDataSet3 = new BarChartDataSet();
+	        barDataSet3.setLabel("Nota de credito");
+	        barDataSet3.setBackgroundColor("rgb(75, 192, 192)");
+	        List<Number> value3 = new ArrayList<>();
+	        
+	        BarChartDataSet barDataSet4 = new BarChartDataSet();
+	        barDataSet4.setLabel("Cheque de caja");
+	        barDataSet4.setBackgroundColor("rgb(255, 205, 86)");
+	        List<Number> value4 = new ArrayList<>();
+	        
+	      List<FacturacionGeneral> listEnero = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==0).collect(Collectors.toList());
+	      List<FacturacionGeneral> listFebrero = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==1).collect(Collectors.toList());
+	      List<FacturacionGeneral> listMarzo = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==2).collect(Collectors.toList());
+	      List<FacturacionGeneral> listAbril = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==3).collect(Collectors.toList());
+	      List<FacturacionGeneral> listMayo = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==4).collect(Collectors.toList());
+	      List<FacturacionGeneral> listJunio = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==5).collect(Collectors.toList());
+	      List<FacturacionGeneral> listJulio = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==6).collect(Collectors.toList());
+	      List<FacturacionGeneral> listAgosto = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==7).collect(Collectors.toList());
+	      List<FacturacionGeneral> listSeptiembre = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==8).collect(Collectors.toList());
+	      List<FacturacionGeneral> listOctubre = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==9).collect(Collectors.toList());
+	      List<FacturacionGeneral> listNoviembre = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==10).collect(Collectors.toList());
+	      List<FacturacionGeneral> listDiciembre = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha())==11).collect(Collectors.toList());
+	      
+	      HashMap<String,FacturacionGeneral> Enero = new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Febrero = new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Marzo = new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Abril  = new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Mayo = new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Junio = new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Julio= new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Agosto= new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Septiembre = new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Octubre = new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Noviembre= new HashMap<String,FacturacionGeneral>();
+	      HashMap<String,FacturacionGeneral> Diciembre= new HashMap<String,FacturacionGeneral>();
+	      
+	      Enero = verificarMes(listEnero);
+	      Febrero = verificarMes(listFebrero);
+	      Marzo = verificarMes(listMarzo);
+	      Abril = verificarMes(listAbril);
+	      Mayo = verificarMes(listMayo);
+	      Junio = verificarMes(listJunio);
+	      Julio= verificarMes(listJulio);
+	      Agosto= verificarMes(listAgosto);
+	      Septiembre = verificarMes(listSeptiembre);
+	      Octubre = verificarMes(listOctubre);
+	      Noviembre = verificarMes(listNoviembre);
+	      Diciembre = verificarMes(listDiciembre);
+	      
+	      ReporteVentaUtil reporteVentaUtil = new ReporteVentaUtil();
+	      
+	      value = reporteVentaUtil.ventaMesPago(Enero, "Efectivo");
+	      value3 = reporteVentaUtil.ventaMesPago(Enero, "Nota de credito");
+	      value2 = reporteVentaUtil.ventaMesPago(Enero, "Documento de transferencia");
+	      value4 = reporteVentaUtil.ventaMesPago(Enero, "Cheque de caja");
+	      
+	     value.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Abril, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Abril, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Abril, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Abril, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Junio, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Junio, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Junio, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Junio, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Julio, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Julio, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Julio, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Julio, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Cheque de caja"));
+	      
+	      value.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Efectivo"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Nota de credito"));
+	      value2.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Documento de transferencia"));
+	      value4.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Cheque de caja"));
+	      
+	      	barDataSet.setData(value);
+	        barDataSet2.setData(value2);
+	        barDataSet3.setData(value3);
+	        barDataSet4.setData(value4);
+
+	        data.addChartDataSet(barDataSet);
+	        data.addChartDataSet(barDataSet2);
+	        data.addChartDataSet(barDataSet3);
+	        data.addChartDataSet(barDataSet4);
+	       
+	        labels.add("Enero");
+	        labels.add("Febrero");
+	        labels.add("Marzo");
+	        labels.add("Abril");
+	        labels.add("Mayo");
+	        labels.add("Junio");
+	        labels.add("Julio");
+	        labels.add("Agosto");
+	        labels.add("Septiembre");
+	        labels.add("Octubre");
+	        labels.add("Noviembre");
+	        labels.add("Diciembre");
+	        
+	        data.setLabels(labels);
+	        smVentasFormaPago.setData(data);
+
+	        //Options
+	        BarChartOptions options = new BarChartOptions();
+	        CartesianScales cScales = new CartesianScales();
+	        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+	        linearAxes.setStacked(true);
+	        linearAxes.setOffset(true);
+	        cScales.addXAxesData(linearAxes);
+	        cScales.addYAxesData(linearAxes);
+	        options.setScales(cScales);
+
+	        Title title = new Title();
+	        title.setDisplay(true);
+	        title.setText("Ventas por tipo de Pago");
+	        options.setTitle(title);
+
+	        Tooltip tooltip = new Tooltip();
+	        tooltip.setMode("index");
+	        tooltip.setIntersect(false);
+	        options.setTooltip(tooltip);
+
+	        smVentasFormaPago.setOptions(options);
+	    	smVentasFormaPago.setExtender("charExtender"); 
+	        
+	     }
+
+	 
+	 public  HashMap<String,FacturacionGeneral> verificarMes(List<FacturacionGeneral> list){
+		 
+		 HashMap<String,FacturacionGeneral> map = new HashMap<String,FacturacionGeneral>();
+		FacturacionGeneral fg = new FacturacionGeneral();
+		boolean efectivo = false;
+		boolean doc = false;
+		boolean nota = false;
+		boolean cheque = false;
+		
+		fg.setPagosPorMes(new BigDecimal(0));
+		
+				
+		 for(FacturacionGeneral f: list) {
+			 if(f.getTipoPago().equals( "Efectivo") ) {
+			 map.put("Efectivo", f);
+			 efectivo = true;
+			 }else {
+				 if(efectivo == false) {
+				 map.put("Efectivo", fg);
+				 }
+			 }
+			 
+			 if(f.getTipoPago().equals( "Documento de transferencia") ) {
+			 map.put("Documento de transferencia", f);
+			 doc  = true;
+			 }else {
+				 if(doc == false) {
+				 map.put("Documento de transferencia", fg);
+				 }
+			 }
+			 
+			 if(f.getTipoPago().equals( "Nota de credito") ) {
+			 map.put("Nota de credito", f);
+			 nota =true;
+			 }else {
+				 if(nota == false) {
+				 map.put("Nota de credito", fg);
+				 }
+			 }
+			 
+			if(f.getTipoPago().equals("Cheque de caja")){
+			 map.put("Cheque de caja", f);
+			 cheque = true;
+			 }else {
+				 if(cheque==false) {
+					 map.put("Cheque de caja", fg);
+				 }
+			 }
+			 
+		 }
+			 
+		 return map;
+	 }
+	 
+		 
 
 	public BarChartModel getStackedGroupBarModel() {
 		return stackedGroupBarModel;
@@ -507,7 +914,6 @@ public class dashBoardBean implements Serializable{
 	public static void setLog(Logger log) {
 		dashBoardBean.log = log;
 	}
-
 	public FacturacionGeneral getFacturacionSelected() {
 		return facturacionSelected;
 	}
@@ -571,6 +977,15 @@ public class dashBoardBean implements Serializable{
 	public void setVentasGlobales(VentasGlobales ventasGlobales) {
 		this.ventasGlobales = ventasGlobales;
 	}
+	
+	public BarChartModel getModelCamara() {
+		return modelCamara;
+	}
+
+	public void setModelCamara(BarChartModel modelCamara) {
+		this.modelCamara = modelCamara;
+
+	}
 
 	public List<VentasGlobales> getListaVentasGlobales() {
 		return listaVentasGlobales;
@@ -586,6 +1001,46 @@ public class dashBoardBean implements Serializable{
 
 	public void setListaImporteGlobal(List<FacturacionGeneral> listaImporteGlobal) {
 		this.listaImporteGlobal = listaImporteGlobal;
+	}
+
+	public List<FacturacionGeneral> getListaVentaRazonSocial() {
+		return listaVentaRazonSocial;
+	}
+
+	public void setListaVentaRazonSocial(List<FacturacionGeneral> listaVentaRazonSocial) {
+		this.listaVentaRazonSocial = listaVentaRazonSocial;
+	}
+
+	public DonutChartModel getDonutModel() {
+		return donutModel;
+	}
+
+	public void setDonutModel(DonutChartModel donutModel) {
+		this.donutModel = donutModel;
+	}
+
+	public BarChartModel getSmVentasFormaPago() {
+		return smVentasFormaPago;
+	}
+
+	public void setSmVentasFormaPago(BarChartModel smVentasFormaPago) {
+		this.smVentasFormaPago = smVentasFormaPago;
+	}
+
+	public List<FacturacionGeneral> getListaVentaPagos() {
+		return listaVentaPagos;
+	}
+
+	public void setListaVentaPagos(List<FacturacionGeneral> listaVentaPagos) {
+		this.listaVentaPagos = listaVentaPagos;
+	}
+
+	public List<FacturacionGeneral> getListaGananciaRazonSocial() {
+		return listaGananciaRazonSocial;
+	}
+
+	public void setListaGananciaRazonSocial(List<FacturacionGeneral> listaGananciaRazonSocial) {
+		this.listaGananciaRazonSocial = listaGananciaRazonSocial;
 	}
 
 

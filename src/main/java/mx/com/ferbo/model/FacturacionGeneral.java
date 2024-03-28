@@ -11,6 +11,8 @@ public class FacturacionGeneral implements Comparable<Object> {
 	private BigDecimal porcentaje; 
 	private BigDecimal total_por_efectivo;
 	private BigDecimal pagosPorMes;
+	private String razonSocial;
+	private String tipoPago;
 	
 	public BigDecimal getTotal_facturacion() {
 		return total_facturacion;
@@ -59,6 +61,18 @@ public class FacturacionGeneral implements Comparable<Object> {
 	}
 	public void setPagosPorMes(BigDecimal pagosPorMes) {
 		this.pagosPorMes = pagosPorMes;
+	}
+	public String getRazonSocial() {
+		return razonSocial;
+	}
+	public void setRazonSocial(String razonSocial) {
+		this.razonSocial = razonSocial;
+	}
+	public String getTipoPago() {
+		return tipoPago;
+	}
+	public void setTipoPago(String tipoPago) {
+		this.tipoPago = tipoPago;
 	}
 	
 	
