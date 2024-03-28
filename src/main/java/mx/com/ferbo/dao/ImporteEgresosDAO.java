@@ -44,6 +44,7 @@ public class ImporteEgresosDAO extends IBaseDAO<ImporteEgreso, Integer>{
 		return listaEgresos;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<importeUtilidad> obtenerUtilidadPorEmisor(String emisor, Date fecha){
 		List<importeUtilidad> lista = null;
 		EntityManager entity = null;
