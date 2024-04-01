@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -24,7 +23,6 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
-import org.primefaces.model.chart.ChartModel;
 import org.primefaces.model.chart.LineChartModel;
 import org.primefaces.model.charts.ChartData;
 import org.primefaces.model.charts.axes.cartesian.CartesianScales;
@@ -40,7 +38,6 @@ import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
 import mx.com.ferbo.dao.RepOcupacionCamaraDAO;
 import mx.com.ferbo.dao.ReportesVentasDAO;
-import mx.com.ferbo.model.ConstanciaTraspaso;
 import mx.com.ferbo.model.FacturacionGeneral;
 import mx.com.ferbo.model.VentasGlobales;
 import mx.com.ferbo.ui.OcupacionCamara;
@@ -170,16 +167,32 @@ public class dashBoardBean implements Serializable{
 		
 	}
 	
+	@SuppressWarnings("static-access")
 	public void ventaGlobales() {
 		Date iniMes;
 		iniMes = DateUtil.getFirstDayOfMonth(fechaPrueba);
 		listaVentasGlobales = reportesVentasDAO.ventasGanancias(iniMes, fechaPrueba);
-		for (VentasGlobales vg : listaVentasGlobales) {
-			ventasGlobales.setVentasTotales(vg.getVentasTotales());
-			ventasGlobales.setGanancias(vg.getGanancias());
-			ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias().setScale(2,RoundingMode.DOWN));
+		try {
+			for (VentasGlobales vg : listaVentasGlobales) {
+				ventasGlobales.setVentasTotales(vg.getVentasTotales());
+				ventasGlobales.setGanancias(vg.getGanancias());
+				ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias().setScale(2,RoundingMode.DOWN));
+				
+			}
+		} catch (Exception e) {
+			if(ventasGlobales.getVentasTotales() == null) {
+			ventasGlobales.setVentasTotales(new BigDecimal(0));
+			}
+			if(ventasGlobales.getGanancias() == null) {
+				ventasGlobales.setGanancias(new BigDecimal(0));
+				}
+			if(ventasGlobales.getPorcentajeGanancias() == null) {
+				ventasGlobales.setPorcentajeGanancias(new BigDecimal(0));
+				}
+			
 		}
-		//
+		
+		
 	}
 	
 	public void VentaDia() {
@@ -270,6 +283,7 @@ public class dashBoardBean implements Serializable{
 		listFacturacionMesAnt = new ArrayList<>();
 		try {
 			  DateUtil.setMes(fechaPrueba, DateUtil.getMes(mesActual));
+			  DateUtil.setAnio(fechaPrueba, DateUtil.getAnio(mesActual));
 		Date iniMes;
 		int dia = DateUtil.getDia(fechaPrueba);
 		//finMes = DateUtil.getLastDayOfMonth(mesActual);
@@ -293,7 +307,14 @@ public class dashBoardBean implements Serializable{
 		System.out.println("Lista mes anterior: " + listFacturacionMesAnt);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			if(listFacturacionMesAnt == null ) {
+				listFacturacionMesAnt = new ArrayList<>();
+			}
+			
+			if(listaFacturacionGeneral == null ) {
+				listaFacturacionGeneral = new ArrayList<>();
+			}
 			mensaje = e.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 			msj = new FacesMessage(severity, "Error Facturacion", mensaje);

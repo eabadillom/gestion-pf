@@ -1,7 +1,6 @@
 package mx.com.ferbo.dao;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,7 +11,6 @@ import javax.persistence.Query;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturacionGeneral;
-import mx.com.ferbo.model.Ventas;
 import mx.com.ferbo.model.VentasGlobales;
 import mx.com.ferbo.ui.importeUtilidad;
 import mx.com.ferbo.util.DateUtil;
@@ -79,11 +77,14 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					+ "from factura f\n" + "where f.fecha BETWEEN :fechaini and :fechaFin and status in (1,3,4)\n"
 					+ "group by fecha\n" + "\n" + "UNION\n" + "\n"
 					+ "select 0 as total_facturas,sum(v.total) as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n"
-					+ "from venta v\n" + "where v.fecha BETWEEN :fechaini AND :fechaFin\n" + "group by fecha\n"
-					+ "UNION\n"
-					+ "select 0 as total_facturas,0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales\n"
+					+ "from venta v\n" 
+					+"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " 
+					+ "where v.fecha BETWEEN :fechaini AND :fechaFin \n " 
+					+ "group by fecha \n"
+					+ "UNION \n"
+					+ "select 0 as total_facturas, 0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales \n"
 					+ "from importe_egreso ie\n" + "where ie.fecha BETWEEN :fechaini AND :fechaFin\n"
-					+ "group by fecha\n" + "\n" + ")combined\n" + ") a\n";
+					+ "group by fecha \n" + "\n" + ")combined \n" + ")a \n";
 
 			Query query = em.createNativeQuery(sql)
 					.setParameter("fechaini", DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD))
@@ -123,9 +124,11 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					+ "from factura f\n" + "where f.fecha BETWEEN :fechaIni AND :fechaFin and status in (1,3,4)\n"
 					+ "\n" + "group by fecha\n" + "\n" + "union\n" + "\n"
 					+ "select fecha,null as total_facturas, sum(v.total) as total_efectivo_por_dia\n"
-					+ "from venta v\n" + "inner join parametro p on p.valor = 'true'\n"
-					+ "where v.fecha BETWEEN :fechaIni AND :fechaFin\n" + "\n" + "group by fecha\n" + "\n"
-					+ ")combined\n" + "group by combined.fecha\n" + "order by combined.fecha DESC\n" + "\n" + "\n";
+					+ "from venta v\n" 
+					+"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " 
+					+ "where v.fecha BETWEEN :fechaIni AND :fechaFin \n" 
+					+ "group by fecha \n" 
+					+ ")combined \n" + "group by combined.fecha \n" + "order by combined.fecha DESC \n" + "\n" + "\n";
 
 			Query query = em.createNativeQuery(sql)
 					.setParameter("fechaIni", DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD))
@@ -173,7 +176,8 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					+ "FROM  factura f\n" + "LEFT JOIN pago p ON f.id = p.factura\n" + "and status in (1,3,4)\n"
 					+ "AND DATE_FORMAT(f.fecha, '%Y-%m') BETWEEN  DATE_FORMAT(:fechaIni, '%Y-%m') and DATE_FORMAT(:fechaFin, '%Y-%m')\n"
 					+ "GROUP BY  f.fecha\n" + "\n" + "UNION\n" + "\n"
-					+ "SELECT v.fecha,0 as total_egresos, 0 as total_pagos,sum(total) as efectivo\n" + "FROM venta v\n"
+					+ "SELECT v.fecha,0 as total_egresos, 0 as total_pagos,sum(total) as efectivo\n" + "FROM venta v\n "
+					+"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " 
 					+ "GROUP BY  v.fecha\n" + ") AS combined\n" + "where fecha  is not null\n" + "GROUP BY\n"
 					+ "DATE_FORMAT(combined.fecha, '%Y-%m')\n" + "ORDER BY  fecha;\n";
 
@@ -201,6 +205,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		return lista;
 	}   
   
+	@SuppressWarnings("unchecked")
 	public List<FacturacionGeneral> ventasPorMesAnual(Date fechaini, Date fechafin) {
 		List<FacturacionGeneral> lista = null;
 		EntityManager entity = null;
@@ -234,6 +239,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					"\n" + 
 					"SELECT v.fecha ,0 AS total_pagos, sum(total) as efectivo\n" + 
 					"FROM venta v\n" + 
+					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " +
 					"GROUP BY  v.fecha\n" + 
 					"\n" + 
 					") AS combined\n" + 
@@ -279,14 +285,16 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 
 			lista = new ArrayList<>();
 
-			sql = "select combined.fecha,sum(combined.total_facturas),sum(combined.total_efectivo_por_dia)\n" + "\n"
-					+ "from\n" + "(\n"
-					+ "select fecha , SUM(f.total) as total_facturas, null as total_efectivo_por_dia\n"
-					+ "from factura f\n" + "where f.fecha = :fechaIni and status in (1,3,4)\n" + "group by fecha\n"
-					+ "\n" + "union\n"
-					+ "select fecha ,null as total_facturas, SUM(v.total) as total_efectivo_por_dia\n"
-					+ "from venta v\n" + "where v.fecha = :fechaIni\n" + "group by fecha\n" + "\n" + ")combined\n"
-					+ "\n" + "group by combined.fecha\n" + "order by combined.fecha\n";
+			sql = "select combined.fecha,sum(combined.total_facturas),sum(combined.total_efectivo_por_dia)\n" + 
+					"from  (\n" + 
+					"select fecha , SUM(f.total) as total_facturas, null as total_efectivo_por_dia\n" + 
+					"from factura f  where f.fecha = :fechaIni and status in (1,3,4)  group by fecha\n" + 
+					"union\n" + 
+					"select fecha ,null as total_facturas, SUM(v.total) as total_efectivo_por_dia\n" + 
+					"from venta v\n" + 
+					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " +
+					"where v.fecha = :fechaIni  group by fecha    )combined\n" + 
+					"group by combined.fecha  order by combined.fecha;\n";
 
 			Query query = entity.createNativeQuery(sql).setParameter("fechaIni",
 					DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD));
@@ -334,11 +342,12 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					"\n" + 
 					"select sum(v.total) as total, e.nb_emisor as emisor\n" + 
 					"from venta v\n" + 
-					"inner join emisor e on e.cd_emisor = v.id_emisor\n" + 
-					"where v.fecha between :fechaini and :fechafin\n" + 
-					"GROUP by emisor\n" + 
-					")c\n" + 
-					"GROUP BY emisor\n";
+					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " + 
+					"inner join emisor e on e.cd_emisor = v.id_emisor \n" + 
+					"where v.fecha between :fechaini and :fechafin \n" + 
+					"GROUP by emisor \n " + 
+					")c \n" + 
+					"GROUP BY emisor \n ";
 			
 			query = em.createNativeQuery(sql)
 						.setParameter("fechaini",DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
@@ -389,6 +398,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					"\n" + 
 					"select sum(v.total), e.nb_emisor as emisor\n" + 
 					"from venta v\n" + 
+					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n "  + 
 					"inner join emisor e on e.cd_emisor = v.id_emisor\n" + 
 					"where v.fecha between :fechaini and :fechafin\n" + 
 					"GROUP by emisor\n" + 
@@ -456,10 +466,11 @@ public List<FacturacionGeneral> ventaPorFormaPago(Date fechaInicio, Date fechaFi
 					"union\n" + 
 					"select v.fecha as fecha, v.total as monto, 'Efectivo' as tipo\n" + 
 					"from venta v\n" + 
-					"where v.fecha between :fechaini and :fechafin\n" + 
-					")c\n" + 
-					"Group by mes, tipo\n" +
-					"Order by mes";
+					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " + 
+					"where v.fecha between :fechaini and :fechafin \n " + 
+					")c \n" + 
+					"Group by mes, tipo \n" + 
+					"order by mes\n";
 			
 			query = em.createNativeQuery(sql)
 						.setParameter("fechaini",DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
