@@ -116,7 +116,7 @@ public class dashBoardBean implements Serializable{
 			gananciaPorRazonSocial();
 			createDonutModel();
 			graficaOcupacionCamaras();
-			
+			VentaDia();
 			ventaPorPago();
 			createStackedBarModel();
 			
@@ -197,8 +197,8 @@ public class dashBoardBean implements Serializable{
 	
 	public void VentaDia() {
 		System.out.println(mesActual);
-		int dia = DateUtil.getDia(maxDate);		
-		DateUtil.setDia(mesActual,dia);	
+		//int dia = DateUtil.getDia(maxDate);		
+		//DateUtil.setDia(mesActual,dia);	
 		listaVentaDia = reportesVentasDAO.obtenerVentaDia(mesActual);//venta del dia 
 		if(!listaVentaDia.isEmpty()) {
 		listaVentaDia.get(0).setPorcentaje(new BigDecimal(0));

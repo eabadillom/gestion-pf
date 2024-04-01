@@ -129,6 +129,7 @@
 							
 							<p:column headerText="Pendiente por cobrar (efectivo)"  style="text-align:center">
 								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_por_efectivo}" >
+								 <f:convertNumber currencySymbol="$" type="currency" />
 								</h:outputText>
 							</p:column>
 							
