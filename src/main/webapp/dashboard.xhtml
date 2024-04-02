@@ -56,210 +56,282 @@
 </script>
 <h:form id="form">
 
-			<div class="card" style="width: 900px;float: right;">
-				<p:barChart model="#{dashBoardBean.stackedGroupBarModel}" style="width: 700px; height: 500px;" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}"/>
+			<div class="card" style="width: 750px; float: right;">
+				<p:barChart model="#{dashBoardBean.stackedGroupBarModel}"
+					style="width: 700px; height: 565px;"
+					rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}" />
 			</div>
-			
-			 <div class="card" style="width: 900px;">				
-				<p:barChart model="#{dashBoardBean.modelCamara}" style="width: 500px; height: 400px;" ></p:barChart>
-			</div> 
-			
-                <p:outputLabel value="Periodo "/>
-             <p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
- 			<p:datePicker id="yearMonth" view="month" value="#{dashBoardBean.mesActual}" pattern="MM/yyyy" yearNavigator="true" yearRange="2000:2030" maxdate="#{dashBoardBean.maxDate}">
-              <p:ajax listener="#{dashBoardBean.VentaDia()}" update="dt-ventas @this"/>
-                </p:datePicker>
-              </p:fieldset>
-                <p:commandButton value="Mostrar Detalle" oncomplete="PF('dlgDesglose').show()" action="#{dashBoardBean.readerList()}" process="form:yearMonth @this" update="form:dlg-Desglose form:yearMonth "  />
-			
-			<p:dataTable id="dt-ventas" widgetVar="dtVentas" var="ventas" value="#{dashBoardBean.listaVentaDia}" reflow="true" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
-							<p:column headerText="Fecha"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.fecha}" />
-							</p:column>
-							
-								<p:column headerText="Facturacion al día"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_facturacion}" >
-								  <f:convertNumber currencySymbol="$" type="currency" />
-								</h:outputText>
-								
-							</p:column>
-							
-							<p:column headerText="Mes VS Mes"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.porcentaje} %" styleClass="#{(ventas.porcentaje ge 0 ? 'green' : (ventas.porcentaje lt 0 ? 'red' : null)) }"/>
-							</p:column>
-							
-							<p:column headerText="Pendiente por cobrar (factura)"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_facturacion}" >
-								  <f:convertNumber currencySymbol="$" type="currency" />
-								</h:outputText>
-							</p:column>
-							
-							<p:column headerText="Pendiente por cobrar (efectivo)"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_por_efectivo}"  />
-							</p:column>
-							
+
+			<div class="card" style="width: 750px;">
+				<p:barChart model="#{dashBoardBean.modelCamara}"
+					style="width: 500px; height: 400px;"></p:barChart>
+			</div>
+
+
+			<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4 p-mb-2"
+				style="width:100%;">
+
+				<p:datePicker id="yearMonth" view="month"
+					value="#{dashBoardBean.mesActual}" pattern="MM/yyyy"
+					yearNavigator="true" yearRange="2000:2030"
+					maxdate="#{dashBoardBean.maxDate}">
+					<p:ajax listener="#{dashBoardBean.VentaDia()}"
+						update="dt-ventas @this" />
+				</p:datePicker>
+
+				<p:commandButton styleClass="p-ml-2" value="Mostrar Detalle"
+					oncomplete="PF('dlgDesglose').show()"
+					action="#{dashBoardBean.readerList()}"
+					process="form:yearMonth @this"
+					update="form:dlg-Desglose form:yearMonth " />
+
+			</p:fieldset>
+
+
+			<p:dataTable id="dt-ventas" widgetVar="dtVentas" var="ventas"
+				value="#{dashBoardBean.listaVentaDia}" reflow="true"
+				paginator="false" rows="10" paginatorPosition="bottom"
+				rowSelectMode="add">
+				<p:column headerText="Fecha" style="text-align:center">
+					<h:outputText
+						style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+						value="#{ventas.fecha}" />
+				</p:column>
+
+				<p:column headerText="Facturacion al día" style="text-align:center">
+					<h:outputText
+						style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+						value="#{ventas.total_facturacion}">
+						<f:convertNumber currencySymbol="$" type="currency" />
+					</h:outputText>
+
+				</p:column>
+
+				<p:column headerText="Mes VS Mes" style="text-align:center">
+					<h:outputText
+						style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+						value="#{ventas.porcentaje} %"
+						styleClass="#{(ventas.porcentaje ge 0 ? 'green' : (ventas.porcentaje lt 0 ? 'red' : null)) }" />
+				</p:column>
+
+				<p:column headerText="Pendiente por cobrar (factura)"
+					style="text-align:center">
+					<h:outputText
+						style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+						value="#{ventas.total_facturacion}">
+						<f:convertNumber currencySymbol="$" type="currency" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Pendiente por cobrar (efectivo)"
+					style="text-align:center">
+					<h:outputText
+						style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+						value="#{ventas.total_por_efectivo}" />
+				</p:column>
+
 			</p:dataTable>
-							
-				
-				<p:dialog id="dlg-Desglose" widgetVar="dlgDesglose" modal="true"  responsive="true" style="max-width:80em !important;">
-					<p:outputPanel>
-					
-						<p:dataTable id="dt-facturacionGeneral" widgetVar="dtFacturacion" var="ventas" value="#{dashBoardBean.listaFacturacionGeneral}" reflow="true" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add" >
-							<p:column headerText="Fecha"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.fecha}" >
-									<f:convertDateTime pattern="dd/MM/YYYY"></f:convertDateTime>
-								</h:outputText>
-							</p:column>
-							
-								<p:column headerText="Facturacion al día"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_facturacion}" >
-								  <f:convertNumber currencySymbol="$" type="currency" />
-								</h:outputText>
-							</p:column>
-							
-							<p:column headerText="Mes VS Mes"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.porcentaje} %" styleClass="#{(ventas.porcentaje ge 0 ? 'green' : (ventas.porcentaje lt 0 ? 'red' : null)) }" />
-							</p:column>
-							
-							<p:column headerText="Pendiente por cobrar (factura)"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_facturacion}" >
-								 <f:convertNumber currencySymbol="$" type="currency" />
-								</h:outputText>
-							</p:column>
-							
-							<p:column headerText="Pendiente por cobrar (efectivo)"  style="text-align:center">
-								<h:outputText style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem" value="#{ventas.total_por_efectivo}" >
-								 <f:convertNumber currencySymbol="$" type="currency" />
-								</h:outputText>
-							</p:column>
-							
-							</p:dataTable>	
-										
-					</p:outputPanel>
-						
-					<f:facet name="footer">
-						<p:commandButton value="Cerrar"  onclick="PF('dlgDesglose').hide();"/>
+
+
+			<p:dialog id="dlg-Desglose" widgetVar="dlgDesglose" modal="true"
+				responsive="true" style="max-width:80em !important;">
+				<p:outputPanel>
+
+					<p:dataTable id="dt-facturacionGeneral" widgetVar="dtFacturacion"
+						var="ventas" value="#{dashBoardBean.listaFacturacionGeneral}"
+						reflow="true" paginator="true" rows="10"
+						paginatorPosition="bottom" rowSelectMode="add">
+						<p:column headerText="Fecha" style="text-align:center">
+							<h:outputText
+								style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+								value="#{ventas.fecha}">
+								<f:convertDateTime pattern="dd/MM/YYYY"></f:convertDateTime>
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="Facturacion al día"
+							style="text-align:center">
+							<h:outputText
+								style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+								value="#{ventas.total_facturacion}">
+								<f:convertNumber currencySymbol="$" type="currency" />
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="Mes VS Mes" style="text-align:center">
+							<h:outputText
+								style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+								value="#{ventas.porcentaje} %"
+								styleClass="#{(ventas.porcentaje ge 0 ? 'green' : (ventas.porcentaje lt 0 ? 'red' : null)) }" />
+						</p:column>
+
+						<p:column headerText="Pendiente por cobrar (factura)"
+							style="text-align:center">
+							<h:outputText
+								style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+								value="#{ventas.total_facturacion}">
+								<f:convertNumber currencySymbol="$" type="currency" />
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="Pendiente por cobrar (efectivo)"
+							style="text-align:center">
+							<h:outputText
+								style="vertical-align: middle; margin-left: .2rem; margin-right: .2rem"
+								value="#{ventas.total_por_efectivo}">
+								<f:convertNumber currencySymbol="$" type="currency" />
+							</h:outputText>
+						</p:column>
+
+					</p:dataTable>
+
+				</p:outputPanel>
+
+				<f:facet name="footer">
+					<p:commandButton value="Cerrar" onclick="PF('dlgDesglose').hide();" />
+				</f:facet>
+			</p:dialog>
+
+			<h5>Ventas Totales</h5>
+			<p:panelGrid columns="4" style=" margin:0 auto;">
+				<p:panel id="ventas">
+					<div class="field">
+						<p:outputLabel for="@next" value="Ventas Totales"
+							styleClass="p-mr-2" />
+						<p:inputText value="#{dashBoardBean.ventasGlobales.ventasTotales}"
+							readonly="true">
+							<f:convertNumber currencySymbol="$" type="currency" />
+						</p:inputText>
+					</div>
+				</p:panel>
+
+				<p:panel id="Ganancias">
+					<div class="field">
+						<p:outputLabel for="@next" value="Ganancias" styleClass="p-mr-2" />
+						<p:inputText value="#{dashBoardBean.ventasGlobales.ganancias}"
+							readonly="true">
+							<f:convertNumber currencySymbol="$" type="currency" />
+						</p:inputText>
+					</div>
+				</p:panel>
+
+
+				<p:panel id="porcentaje">
+					<div class="field">
+						<p:outputLabel for="@next" value="Porcentaje" styleClass="p-mr-2" />
+						<p:inputText
+							value="#{dashBoardBean.ventasGlobales.porcentajeGanancias} %"
+							readonly="true">
+							<f:convertNumber pattern=" ##0.00" />
+						</p:inputText>
+					</div>
+				</p:panel>
+			</p:panelGrid>
+
+
+			<div
+				style="margin-top: 19px; width: 48%; height: 640px; float: left;">
+
+				<p:dataTable id="dt-ventasMes" widgetVar="dtVM" var="ventasM"
+					value="#{dashBoardBean.listaImporteGlobal}" reflow="true"
+					style="max-width:80em !important;">
+
+					<f:facet name="header">
+						<div>
+							<span>Ventas Por Mes</span>
+						</div>
 					</f:facet>
-				</p:dialog>
+
+					<p:column headerText="Mes" style="text-align:left">
+						<h:outputText
+							style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem"
+							value="#{ventasM.fecha}">
+							<f:convertDateTime pattern="MM/YYYY"></f:convertDateTime>
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Venta" style="text-align:center">
+						<h:outputText
+							style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem"
+							value="#{ventasM.pagosPorMes}">
+							<f:convertNumber currencySymbol="$" type="currency" />
+						</h:outputText>
+					</p:column>
+
+				</p:dataTable>
+			</div>
+
+
+
+			<div style="text-align: left; margin-top: 20px; width: 48%; height: 640px; float: right;">
+
+				<p:dataTable id="dt-ventaRS" widgetVar="dt-VRS" var="ventaRS"
+					value="#{dashBoardBean.listaVentaRazonSocial}" reflow="true"
+					style="max-width:60em !important;margin:0 auto;">
+
+					<f:facet name="header">
+						<div>
+							<span>Ventas Por Razón Social</span>
+						</div>
+					</f:facet>
+
+					<p:column headerText="Razón Social" style="text-align:left">
+						<h:outputText
+							style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem"
+							value="#{ventaRS.razonSocial}"></h:outputText>
+					</p:column>
+
+					<p:column headerText="Venta" style="text-align:center">
+						<h:outputText
+							style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem"
+							value="#{ventaRS.total_facturacion}">
+							<f:convertNumber currencySymbol="$" type="currency" />
+						</h:outputText>
+					</p:column>
+
+				</p:dataTable>
 				
-				<h5>Ventas Totales</h5>
-								<p:panelGrid columns="4"  style=" margin:0 auto;">
-								<p:panel id="ventas">
-								<div class="field">              
-							                    <p:outputLabel for="@next" value="Ventas Totales" styleClass="p-mr-2"/>
-							                    <p:inputText value="#{dashBoardBean.ventasGlobales.ventasTotales}" readonly="true" >
-							                      <f:convertNumber currencySymbol="$" type="currency" />
-							                    </p:inputText>
-							                </div>
-							        </p:panel>
-							        
-							     <p:panel id="Ganancias">
-							    <div class="field">              
-							                    <p:outputLabel for="@next" value="Ganancias" styleClass="p-mr-2"/>
-							                    <p:inputText value="#{dashBoardBean.ventasGlobales.ganancias}" readonly="true" >
-							                      <f:convertNumber currencySymbol="$" type="currency" />
-							                    </p:inputText>
-							      </div>
-							       </p:panel>
-							       
-							       
-							      <p:panel id="porcentaje">
-							        <div class="field">              
-							                    <p:outputLabel for="@next" value="Porcentaje" styleClass="p-mr-2"/>
-							                    <p:inputText value="#{dashBoardBean.ventasGlobales.porcentajeGanancias} %" readonly="true" >
-							                    	<f:convertNumber pattern=" ##0.00" />
-							                    </p:inputText>
-							      </div>
-							       </p:panel>
-								</p:panelGrid>
-								
-								
-							<div style="margin-top: 15px;width: 50%;height: 640px;float: left;" >	
-						<p:dataTable id="dt-ventasMes" widgetVar="dtVM" var="ventasM" value="#{dashBoardBean.listaImporteGlobal}" reflow="true" style="max-width:80em !important;">
-								
-								<f:facet name="header">
-										<div>
-											<span>Ventas Por Mes</span>
-										</div>
-									</f:facet>
-								
-							<p:column headerText="Mes"  style="text-align:left">
-									<h:outputText style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem" value="#{ventasM.fecha}" >
-										<f:convertDateTime pattern="MM/YYYY"></f:convertDateTime>
-									</h:outputText>
-								</p:column>
-								  
-								<p:column headerText="Venta"  style="text-align:center">
-									<h:outputText style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem" value="#{ventasM.pagosPorMes}" >
-									 <f:convertNumber currencySymbol="$" type="currency" />
-									</h:outputText>
-								</p:column>							
-								
-							</p:dataTable>
-							</div>
-							
-						
-							
-							<div style="text-align: left;margin-top: 20px; width: 50%;height:640px;float:right;" >
-							
-							 <p:dataTable id="dt-ventaRS" widgetVar="dt-VRS" var="ventaRS" value="#{dashBoardBean.listaVentaRazonSocial}" reflow="true" style="max-width:60em !important;margin:0 auto;">
-									
-									<f:facet name="header">
-										<div>
-											<span>Ventas Por Razón Social</span>
-										</div>
-									</f:facet>
-									
-									<p:column headerText="Razón Social"  style="text-align:left">
-										 <h:outputText style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem" value="#{ventaRS.razonSocial}" ></h:outputText> 
-									</p:column>
-									  
-									<p:column headerText="Venta"  style="text-align:center">
-										 <h:outputText style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem" value="#{ventaRS.total_facturacion}" >
-										 <f:convertNumber currencySymbol="$" type="currency" />
-										</h:outputText> 
-									</p:column>			
-								
-								</p:dataTable>  
-								<div class="card" style="width: 400px;margin: 0 auto;">
-								<p:donutChart model="#{dashBoardBean.donutModel}" style="width: 300px; height: 100px;" ></p:donutChart>
-								</div>
-								
-								
-							</div>	
-							
-							<div style="width: 50%;height:500px;float: left;">
-							<p:barChart model="#{dashBoardBean.smVentasFormaPago}" style="width: 100%; height: 400px;"/>
-							</div>
-							
-							
-							 <p:dataTable id="dt-gananciaRS" widgetVar="dt-VRS" var="gananciaRS" value="#{dashBoardBean.listaGananciaRazonSocial}" reflow="true" style="max-width:70em !important;float:right;">
-								
-									<f:facet name="header">
-										<div>
-											<span>Ganancia Por Razón Social</span>
-										</div>
-									</f:facet>
-									
-									<p:column headerText="Razón Social"  style="text-align:left">
-										 <h:outputText style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem" value="#{gananciaRS.razonSocial}" ></h:outputText> 
-									</p:column>
-									  
-									<p:column headerText="Venta"  style="text-align:center">
-										 <h:outputText style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem" value="#{gananciaRS.total_facturacion}" >
-										 <f:convertNumber currencySymbol="$" type="currency" />
-										</h:outputText> 
-									</p:column>			
-								
-								</p:dataTable>  
-					
-			<!-- <div class="card" style="width: 1000px">
-				<h5 style="text-align: center;">Ocupación de cámaras</h5>
-				<p:barChart model="#{dashBoardBean.modelCamara}" style="width: 300px; height: 200px;" ></p:barChart>
-			</div> -->
+				<div class="card" style="width: 400px; margin: 0 auto;">
+					<p:donutChart model="#{dashBoardBean.donutModel}"
+						style="width: 300px; height: 100px;"></p:donutChart>
+				</div>
 
 
-</h:form>							
+			</div>
+
+			<div class="card" style="width: 45%; height: 500px; float: left;">
+				<p:barChart model="#{dashBoardBean.smVentasFormaPago}"
+					style="width: 100%; height: 400px;" />
+			</div>
+
+			<p:dataTable id="dt-gananciaRS" widgetVar="dt-VRS" var="gananciaRS"
+				value="#{dashBoardBean.listaGananciaRazonSocial}" reflow="true"
+				style="max-width:50em !important;float:right;">
+
+				<f:facet name="header">
+					<div>
+						<span>Ganancia Por Razón Social</span>
+					</div>
+				</f:facet>
+
+				<p:column headerText="Razón Social" style="text-align:left">
+					<h:outputText
+						style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem"
+						value="#{gananciaRS.razonSocial}"></h:outputText>
+				</p:column>
+
+				<p:column headerText="Venta" style="text-align:center">
+					<h:outputText
+						style="vertical-align: middle; margin-center: .2rem; margin-right: .2rem"
+						value="#{gananciaRS.total_facturacion}">
+						<f:convertNumber currencySymbol="$" type="currency" />
+					</h:outputText>
+				</p:column>
+
+			</p:dataTable>
+
+
+		</h:form>							
 	</ui:define>
 
 

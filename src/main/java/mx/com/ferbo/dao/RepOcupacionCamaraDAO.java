@@ -37,6 +37,7 @@ public class RepOcupacionCamaraDAO {
 					"gen.camaraAbrev, " + 
 					"gen.camaraDs, " + 
 					"gen.plantaDs, " + 
+					"gen.plantaAbrev, " + 
 					"cli.totalPos as posicionesPermitidasCamara, " + 
 					"cli.tarima as posicionesOcupadasCliente, " + 
 					"gen.tarima as posicionesGeneralesOcupadas, " + 
@@ -131,14 +132,14 @@ public class RepOcupacionCamaraDAO {
 					"OR :idCamara IS NULL ) " + 
 					"AND (plt.planta_cve = :idPlanta " + 
 					"OR :idPlanta IS NULL ) " + 
-					"union all " + 					
+					"union all " + 
 					"select " + 
 					"cam.CAMARA_CVE AS camara_cve, " + 
 					"cam.CAMARA_ABREV AS camara_abrev, " + 
 					"cam.CAMARA_DS AS camara_ds, " + 
 					"plt.PLANTA_DS AS planta_ds, " + 
 					"(parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad, " + 
-					"parEnt.no_tarimas, " + 					
+					"parEnt.no_tarimas, " + 
 					"cam.total_posiciones AS total_pos " + 
 					"from " + 
 					"partida parEnt " + 
@@ -229,6 +230,7 @@ public class RepOcupacionCamaraDAO {
 					"I.camara_abrev AS camaraAbrev, " + 
 					"I.camara_ds AS camaraDs, " + 
 					"I.planta_ds AS plantaDs, " + 
+					"I.planta_abrev AS plantaAbrev, " + 
 					"SUM(I.tarima) AS tarima " + 
 					"from " + 
 					"( " + 
@@ -237,6 +239,7 @@ public class RepOcupacionCamaraDAO {
 					"cam.CAMARA_ABREV AS camara_abrev, " + 
 					"cam.CAMARA_DS AS camara_ds, " + 
 					"plt.PLANTA_DS AS planta_ds, " + 
+					"plt.planta_abrev AS planta_abrev, " + 
 					"(parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad, " + 
 					"CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL ) as tarima, " + 
 					"cam.total_posiciones AS total_pos " + 
@@ -315,8 +318,9 @@ public class RepOcupacionCamaraDAO {
 					"cam.CAMARA_ABREV AS camara_abrev, " + 
 					"cam.CAMARA_DS AS camara_ds, " + 
 					"plt.PLANTA_DS AS planta_ds, " + 
+					"plt.planta_abrev AS planta_abrev, " + 
 					"(parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad, " + 
-					"parEnt.no_tarimas, " + 					
+					"parEnt.no_tarimas, " + 
 					"cam.total_posiciones AS total_pos " + 
 					"from " + 
 					"partida parEnt " + 
@@ -396,7 +400,8 @@ public class RepOcupacionCamaraDAO {
 					"camaraCve, " + 
 					"camaraAbrev, " + 
 					"camaraDs, " + 
-					"plantaDs " + 
+					"plantaDs, " + 
+					"plantaAbrev " + 
 					")gen " + 
 					"on " + 
 					"cli.camaraCve = gen.camaraCve " + 
@@ -421,6 +426,7 @@ public class RepOcupacionCamaraDAO {
 				oc.setCamara_abrev((String) o[id++]);
 				oc.setCamara_ds((String) o[id++]);
 				oc.setPlanta_ds((String) o[id++]);
+				oc.setPlanta_abrev((String) o[id++]);
 				oc.setTotal_pos((Integer) o[id++]);	
 				oc.setTarima((BigDecimal)o[id++]);
 				oc.setPosiciones_Generales_Ocupadas((BigDecimal)o[id++]);
