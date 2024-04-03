@@ -36,9 +36,11 @@ import org.primefaces.model.charts.donut.DonutChartOptions;
 import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
+import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.RepOcupacionCamaraDAO;
 import mx.com.ferbo.dao.ReportesVentasDAO;
 import mx.com.ferbo.model.FacturacionGeneral;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.VentasGlobales;
 import mx.com.ferbo.ui.OcupacionCamara;
 import mx.com.ferbo.ui.importeUtilidad;
@@ -83,6 +85,9 @@ public class dashBoardBean implements Serializable{
 	private BarChartModel modelCamara;
 	private List<OcupacionCamara> listOcupacionCamara;
 	private RepOcupacionCamaraDAO ocupacionCamaraDAO;
+	
+	private List<Planta> listPlantas;
+	private PlantaDAO plantaDAO;
 
 
 	public dashBoardBean() {
@@ -100,6 +105,9 @@ public class dashBoardBean implements Serializable{
 		
 		listOcupacionCamara = new ArrayList<>();		
 		ocupacionCamaraDAO = new RepOcupacionCamaraDAO();
+		
+		listPlantas = new ArrayList<Planta>();
+		plantaDAO = new PlantaDAO();
 		
 	}
 
@@ -167,7 +175,7 @@ public class dashBoardBean implements Serializable{
 		
 	}
 	
-	@SuppressWarnings("static-access")
+	//@SuppressWarnings("static-access")
 	public void ventaGlobales() {
 		Date iniMes;
 		iniMes = DateUtil.getFirstDayOfMonth(fechaPrueba);
@@ -179,8 +187,8 @@ public class dashBoardBean implements Serializable{
 				ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias().setScale(2,RoundingMode.DOWN));
 				
 			}
-		} catch (Exception e) {
-			if(ventasGlobales.getVentasTotales() == null) {
+		} catch (Exception e) {// ??????????????????????
+			/*if(ventasGlobales.getVentasTotales() == null) {
 			ventasGlobales.setVentasTotales(new BigDecimal(0));
 			}
 			if(ventasGlobales.getGanancias() == null) {
@@ -188,7 +196,9 @@ public class dashBoardBean implements Serializable{
 				}
 			if(ventasGlobales.getPorcentajeGanancias() == null) {
 				ventasGlobales.setPorcentajeGanancias(new BigDecimal(0));
-				}
+				}*/
+			e.printStackTrace();
+			log.info("Error ventas globales" + e.getMessage());
 			
 		}
 		
@@ -196,14 +206,14 @@ public class dashBoardBean implements Serializable{
 	}
 	
 	public void VentaDia() {
-		System.out.println(mesActual);
-		//int dia = DateUtil.getDia(maxDate);		
-		//DateUtil.setDia(mesActual,dia);	
+		//System.out.println(mesActual);
+		
 		listaVentaDia = reportesVentasDAO.obtenerVentaDia(mesActual);//venta del dia 
+		
 		if(!listaVentaDia.isEmpty()) {
-		listaVentaDia.get(0).setPorcentaje(new BigDecimal(0));
+			listaVentaDia.get(0).setPorcentaje(new BigDecimal(0));
 		}
-		//venta de mes anterior 		
+			
 		PrimeFaces.current().ajax().update("form:dt-ventas");	
 		
 	}
@@ -265,13 +275,13 @@ public class dashBoardBean implements Serializable{
 			PrimeFaces.current().ajax().update("dt-facturacion");
 		}
 	
-		public void ventasPorMes() {
-			Date iniMes = new Date();
-			DateUtil.setDia(iniMes, 01);
-			DateUtil.setMes(iniMes, 0);
-			System.out.println("Ventas realizadas por mes");
-			listaImporteGlobal = reportesVentasDAO.ventasPorMesAnual(iniMes, fechaPrueba);
-		}
+	public void ventasPorMes() {
+		Date iniMes = new Date();
+		DateUtil.setDia(iniMes, 01);
+		DateUtil.setMes(iniMes, 0);
+		//System.out.println("Ventas realizadas por mes");
+		listaImporteGlobal = reportesVentasDAO.ventasPorMesAnual(iniMes, fechaPrueba);
+	}
 		
 	public void readerList() {
 		
@@ -431,30 +441,30 @@ public class dashBoardBean implements Serializable{
 
 
 		//Primer SET
-				BarChartDataSet barDS = new BarChartDataSet();
-				barDS.setLabel("Ingresos");
-				barDS.setBackgroundColor("rgb(255,99,132)");
-				barDS.setStack("Stack 0");
+		BarChartDataSet barDS = new BarChartDataSet();
+		barDS.setLabel("Ingresos");
+		barDS.setBackgroundColor("rgb(255,99,132)");
+		barDS.setStack("Stack 0");
 				
 		//Segundo SET 
-				BarChartDataSet barDS2 = new BarChartDataSet();
-				barDS2.setLabel("Egresos");
-				barDS2.setBackgroundColor("rgb(54, 162, 235)");
-				barDS2.setStack("Stack 1");
+		BarChartDataSet barDS2 = new BarChartDataSet();
+		barDS2.setLabel("Egresos");
+		barDS2.setBackgroundColor("rgb(54, 162, 235)");
+		barDS2.setStack("Stack 1");
 				
 				 
 		//Tercer SET
-				BarChartDataSet barDS3 = new BarChartDataSet();
-				barDS3.setLabel("Utilidad/Perdida ");
-				barDS3.setBackgroundColor("rgb(255, 205, 86)");
-				barDS3.setStack("Stack 2");
+		BarChartDataSet barDS3 = new BarChartDataSet();
+		barDS3.setLabel("Utilidad/Perdida ");
+		barDS3.setBackgroundColor("rgb(255, 205, 86)");
+		barDS3.setStack("Stack 2");
 				
 				 
-		//Tercer SET
-						BarChartDataSet barDS4 = new BarChartDataSet();
-						barDS4.setLabel("Efectivo ");
-						barDS4.setBackgroundColor("rgb(75,192,192)");
-						barDS4.setStack("Stack 3");
+		//Cuarto SET
+		BarChartDataSet barDS4 = new BarChartDataSet();
+		barDS4.setLabel("Efectivo ");
+		barDS4.setBackgroundColor("rgb(75,192,192)");
+		barDS4.setStack("Stack 3");
 				  
 		List<String> listaFecha = new ArrayList<>();
 		List<Number> listaPagos = new ArrayList<>();
@@ -489,7 +499,7 @@ public class dashBoardBean implements Serializable{
 		data.addChartDataSet(barDS4);
 		data.setLabels(listaFecha);
 		stackedGroupBarModel.setData(data);
-	//stackedGroupBarModel.setExtender("charExtender");
+	
 		//configuracion de labels
 
 		
@@ -500,12 +510,9 @@ public class dashBoardBean implements Serializable{
 		linearAxes.setStacked(false);
 		linearAxes.setOffset(false);
 		
-		/*cScales.addXAxesData(linearAxes);
-		cScales.addYAxesData(linearAxes);
-		options.setScales(cScales);*/
-		
-		    stackedGroupBarModel.setOptions(options);
-		    stackedGroupBarModel.setExtender("charExtender");
+	    stackedGroupBarModel.setOptions(options);
+	    stackedGroupBarModel.setExtender("charExtender");
+	    
 		Title title = new Title();
 		title.setDisplay(false);
 		title.setText("Balance General");
@@ -548,36 +555,17 @@ public class dashBoardBean implements Serializable{
 		
 		listOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, null, null, null);
 		
+		listPlantas = plantaDAO.findall(false);
+		
 		for(OcupacionCamara oc: listOcupacionCamara) {
+			for(Planta p: listPlantas) {
 			
-			if(oc.getPlanta_ds().equals("P1 CENTRAL DE ABASTOS")) {
-				values.add(oc.getPosiciones_Disponibles());
-				values2.add(oc.getTarima());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P2 TEPALCATES")) {
-				values.add(oc.getPosiciones_Disponibles());
-				values2.add(oc.getTarima());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P3 CENTRAL DE ABASTOS")) {
-				values.add(oc.getPosiciones_Disponibles());
-				values2.add(oc.getTarima());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P4 URBANA IXHUATEPEC")) {
-				values.add(oc.getPosiciones_Disponibles());
-				values2.add(oc.getTarima());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
-			}
-			
-			if(oc.getPlanta_ds().equals("P5 ORO")) {
-				values.add(oc.getPosiciones_Disponibles());
-				values2.add(oc.getTarima());
-				labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+				if(oc.getPlanta_ds().equals(p.getPlantaDs())) {
+					
+					values.add(oc.getPosiciones_Disponibles());
+					values2.add(oc.getTarima());
+					labels.add("P"+oc.getPlanta_abrev()+": "+oc.getCamara_abrev());
+				}
 			}
 			
 		}
@@ -591,7 +579,7 @@ public class dashBoardBean implements Serializable{
 		Title title = new Title();
         title.setDisplay(true);
         title.setText("Ocupación Cámaras");
-        BarChartOptions options = new BarChartOptions();;
+        BarChartOptions options = new BarChartOptions();
 		options.setTitle(title);
 		
 		modelCamara.setData(dataSet);
@@ -705,63 +693,63 @@ public class dashBoardBean implements Serializable{
 	      ReporteVentaUtil reporteVentaUtil = new ReporteVentaUtil();
 	      
 	      value = reporteVentaUtil.ventaMesPago(Enero, "Efectivo");
-	      value3 = reporteVentaUtil.ventaMesPago(Enero, "Nota de credito");
 	      value2 = reporteVentaUtil.ventaMesPago(Enero, "Documento de transferencia");
+	      value3 = reporteVentaUtil.ventaMesPago(Enero, "Nota de credito");
 	      value4 = reporteVentaUtil.ventaMesPago(Enero, "Cheque de caja");
 	      
-	     value.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Nota de credito"));
+	      value.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Efectivo"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Febrero, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Marzo, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Abril, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Abril, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Abril, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Abril, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Abril, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Mayo, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Junio, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Junio, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Junio, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Junio, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Junio, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Julio, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Julio, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Julio, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Julio, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Julio, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Agosto, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Septiembre, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Octubre, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Noviembre, "Cheque de caja"));
 	      
 	      value.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Efectivo"));
-	      value3.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Nota de credito"));
 	      value2.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Documento de transferencia"));
+	      value3.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Nota de credito"));
 	      value4.addAll(reporteVentaUtil.ventaMesPago(Diciembre, "Cheque de caja"));
 	      
 	      	barDataSet.setData(value);
@@ -816,9 +804,9 @@ public class dashBoardBean implements Serializable{
 	     }
 
 	 
-	 public  HashMap<String,FacturacionGeneral> verificarMes(List<FacturacionGeneral> list){
+	 public HashMap<String,FacturacionGeneral> verificarMes(List<FacturacionGeneral> list){
 		 
-		 HashMap<String,FacturacionGeneral> map = new HashMap<String,FacturacionGeneral>();
+		HashMap<String,FacturacionGeneral> map = new HashMap<String,FacturacionGeneral>();
 		FacturacionGeneral fg = new FacturacionGeneral();
 		boolean efectivo = false;
 		boolean doc = false;
@@ -830,35 +818,35 @@ public class dashBoardBean implements Serializable{
 				
 		 for(FacturacionGeneral f: list) {
 			 if(f.getTipoPago().equals( "Efectivo") ) {
-			 map.put("Efectivo", f);
-			 efectivo = true;
+				 map.put("Efectivo", f);
+				 efectivo = true;
 			 }else {
 				 if(efectivo == false) {
-				 map.put("Efectivo", fg);
+					 map.put("Efectivo", fg);
 				 }
 			 }
 			 
 			 if(f.getTipoPago().equals( "Documento de transferencia") ) {
-			 map.put("Documento de transferencia", f);
-			 doc  = true;
+				 map.put("Documento de transferencia", f);
+				 doc  = true;
 			 }else {
 				 if(doc == false) {
-				 map.put("Documento de transferencia", fg);
+					 map.put("Documento de transferencia", fg);
 				 }
 			 }
 			 
 			 if(f.getTipoPago().equals( "Nota de credito") ) {
-			 map.put("Nota de credito", f);
-			 nota =true;
+				 map.put("Nota de credito", f);
+				 nota =true;
 			 }else {
 				 if(nota == false) {
-				 map.put("Nota de credito", fg);
+					 map.put("Nota de credito", fg);
 				 }
 			 }
 			 
 			if(f.getTipoPago().equals("Cheque de caja")){
-			 map.put("Cheque de caja", f);
-			 cheque = true;
+				 map.put("Cheque de caja", f);
+				 cheque = true;
 			 }else {
 				 if(cheque==false) {
 					 map.put("Cheque de caja", fg);

@@ -8,6 +8,7 @@ public class OcupacionCamara {
 	private String camara_abrev;
 	private String camara_ds;
 	private String planta_ds;
+	private String planta_abrev;
 	private BigDecimal tarima;
 	private Integer total_pos;
 	private BigDecimal posiciones_Generales_Ocupadas;
@@ -79,6 +80,14 @@ public class OcupacionCamara {
 
 	public void setPosiciones_Generales_Ocupadas(BigDecimal posiciones_Generales_Ocupadas) {
 		this.posiciones_Generales_Ocupadas = posiciones_Generales_Ocupadas;
+	}	
+
+	public String getPlanta_abrev() {
+		return planta_abrev;
+	}
+
+	public void setPlanta_abrev(String planta_abrev) {
+		this.planta_abrev = planta_abrev;
 	}
 
 	@Override

@@ -404,7 +404,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 				
 				if(oc.getPlanta_ds().equals(p.getPlantaDs())) {
 					valuesP1.add(oc.getPosiciones_Disponibles());
-					labels.add(oc.getPlanta_ds()+":"+oc.getCamara_ds());
+					labels.add("P"+oc.getPlanta_abrev()+":"+oc.getCamara_abrev());
 				}
 				
 			}
@@ -489,7 +489,7 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 				if(oc.getPlanta_ds().equals(plantaSelect.getPlantaDs())) {
 					valuesP1.add(oc.getPosiciones_Disponibles());
 					valuesP2.add(oc.getTarima());
-					labels.add(oc.getCamara_ds());
+					labels.add(oc.getCamara_abrev());
 				}
 				
 				
