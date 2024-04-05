@@ -134,7 +134,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private Partida partidaEdit;
 	private DetallePartida detalle;
 	private TipoMovimiento tipoMovimiento;
-	
+
 	private String noConstanciaSelect;
 	private BigDecimal unidadesPorTarima;
 	private BigDecimal cantidadTotal;
@@ -145,7 +145,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private BigDecimal totalCajas;
 	private String pedimento, contenedor, lote, otro;
 	private Boolean isCongelacion, isConservacion, isRefrigeracion, isManiobras;
-	private int congelacion = 619, conservacion = 620, refrigeracion = 621, maniobras = 622 ;
+	private int congelacion = 619, conservacion = 620, refrigeracion = 621, maniobras = 622;
 	private boolean validaCarga;
 	private boolean showCodigo;
 	private boolean showPedimento;
@@ -168,10 +168,10 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private Date maxDate;
 	private SerieConstancia serie;
 	private Usuario usuario;
-	
+
 	private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
-    
+	private HttpServletRequest httpServletRequest;
+
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
@@ -213,12 +213,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		Planta planta = null;
 		partidaEdit = new Partida();
 		faceContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
-        
-        this.setRestrictedAccess();
-		
-		if(restricted) {
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
+
+		this.setRestrictedAccess();
+
+		if (restricted) {
 			log.info("Estableciendo solo la planta para el usuario de almacen...");
 			planta = plantaDAO.buscarPorId(usuario.getIdPlanta());
 			listadoPlanta = new ArrayList<Planta>();
@@ -229,7 +229,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			log.info("Estableciendo todo el listado de plantas para usuarios de administración...");
 			listadoPlanta = plantaDAO.findall();
 		}
-			 
+
 //		listadoCliente = clienteDAO.buscarHabilitados(true);
 		listadoCliente = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
@@ -255,68 +255,64 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		showOtro = false;
 		showPedimento = false;
 		showSAP = false;
-		
+
 		saved = false;
 		Date today = new Date();
 
-		maxDate = new Date(today.getTime() );
+		maxDate = new Date(today.getTime());
 		PrimeFaces.current().ajax().update(":form:planta", ":form:numeroC", ":form:cmdCambiarFolio");
 	}
-	
+
 	public void totalesTarimas() {
 		BigDecimal sumaTotalTarimas;
 		BigDecimal sumaTotalKilos;
 		BigDecimal sumaTotalCajas;
-		
-		sumaTotalTarimas =TotalTarimas(listadoPartida);
-		totalTarimas = totalTarimas.add(sumaTotalTarimas); 	
-		//selectedPartida.add(sumaTotalTarimas);
-		//subtotal.add(sumaTotalTarimas);
-	
-		
+
+		sumaTotalTarimas = TotalTarimas(listadoPartida);
+		totalTarimas = totalTarimas.add(sumaTotalTarimas);
+		// selectedPartida.add(sumaTotalTarimas);
+		// subtotal.add(sumaTotalTarimas);
+
 		sumaTotalKilos = TotalKilos(listadoPartida);
 		totalKilos = totalKilos.add(sumaTotalKilos);
-		
+
 		sumaTotalCajas = TotalCajas(listadoPartida);
 		totalCajas = totalCajas.add(sumaTotalCajas);
-		
-		
+
 	}
-	
+
 	public BigDecimal TotalTarimas(List<Partida> lista) {
 		BigDecimal subTotal = new BigDecimal(0);
-		for(Partida p: listadoPartida) {
+		for (Partida p : listadoPartida) {
 			subTotal = subTotal.add(p.getNoTarimas());
 		}
 		return subTotal;
 	}
-	
+
 	public BigDecimal TotalKilos(List<Partida> lista) {
 		BigDecimal subTotal = new BigDecimal(0);
-		for(Partida p: listadoPartida) {
+		for (Partida p : listadoPartida) {
 			subTotal = subTotal.add(p.getPesoTotal());
 		}
 		return subTotal;
 	}
-	
+
 	public BigDecimal TotalCajas(List<Partida> lista) {
 		BigDecimal subTotal = new BigDecimal(0);
-		for(Partida p: listadoPartida) {
+		for (Partida p : listadoPartida) {
 			subTotal = subTotal.add(new BigDecimal(p.getCantidadTotal()));
-			
+
 		}
 		return subTotal;
 	}
-	
-	
-	
+
 	private void setRestrictedAccess() {
-		if(usuario.getPerfil() == 1 || usuario.getPerfil() == 4)
-        	restricted = true;
-        else
-        	restricted = false;
+		if (usuario.getPerfil() == 1 || usuario.getPerfil() == 4)
+			restricted = true;
+		else
+			restricted = false;
 	}
-	
+
 	public void cargaInfoCliente() {
 		FacesMessage message = null;
 		Severity severity = null;
@@ -340,14 +336,13 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} catch (Exception ex) {
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
-			
+
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update(":form:messages");
 		}
 	}
 
-	
 	public void generaFolioEntrada() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
@@ -369,38 +364,36 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			seriePK.setTpSerie("I");
 			sConstancia.setSerieConstanciaPK(seriePK);
 			serie = serieConstanciaDAO.buscarPorClienteAndPlanta(sConstancia);
-			
+
 			if (serie == null) {
 				this.noConstanciaSelect = "";
 				throw new InventarioException(
 						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
 			}
 
-			this.noConstanciaSelect = String.format("%s%s%s%d", serie.getSerieConstanciaPK().getTpSerie(), plantaSelect.getPlantaSufijo(),
-					clienteSelect.getCodUnico(), serie.getNuSerie());
-			
+			this.noConstanciaSelect = String.format("%s%s%s%d", serie.getSerieConstanciaPK().getTpSerie(),
+					plantaSelect.getPlantaSufijo(), clienteSelect.getCodUnico(), serie.getNuSerie());
+
 			this.constanciaDeDeposito.setFolioCliente(this.noConstanciaSelect);
 			this.serie = serie;
 
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-			
+
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} catch (Exception ex) {
 			log.error("Problema para generar el folio de entrada...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
-			
+
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
 			PrimeFaces.current().ajax().update(":form:messages", ":form:numeroC");
 		}
 	}
-
-	
 
 	public void filtrarPosicion() {
 		Posicion posicion = new Posicion();
@@ -433,11 +426,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		detalle.setEdoInvCve(estadoInventario);
 		return detalle;
 	}
-	
+
 	public void verDatosPartida() {
 		log.info("Cantidad: " + partida.getCantidadTotal());
 		log.info("ProductoCve: " + partida.getUnidadDeProductoCve().getProductoCve().getProductoCve());
-		log.info("UnidadDeManejoCve: " + partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
+		log.info(
+				"UnidadDeManejoCve: " + partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
 		log.info("Peso: " + partida.getCantidadTotal());
 		log.info("Num. Tarimas: " + partida.getNoTarimas());
 		log.info("Folio: " + this.noConstanciaSelect);
@@ -483,50 +477,44 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		isRefrigeracion = false;
 		isConservacion = false;
 		isManiobras = false;
-		
+
 		List<PrecioServicio> precioServicioTemp = new ArrayList<PrecioServicio>();
 		precioServicioTemp.clear();
-		precioServicioTemp = listaServicioUnidad.stream()
-				.filter(p -> (
-						p.getServicio().getServicioCve() == congelacion ||
-						p.getServicio().getServicioCve() == conservacion ||
-						p.getServicio().getServicioCve() == refrigeracion ||
-						p.getServicio().getServicioCve() == maniobras
-						))
-				.collect(Collectors.toList());
-		
+		precioServicioTemp = listaServicioUnidad.stream().filter(p -> (p.getServicio().getServicioCve() == congelacion
+				|| p.getServicio().getServicioCve() == conservacion || p.getServicio().getServicioCve() == refrigeracion
+				|| p.getServicio().getServicioCve() == maniobras)).collect(Collectors.toList());
+
 		listaServicioUnidad.removeAll(precioServicioTemp);
-		
+
 		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 619)
-		.collect(Collectors.toList());
-		if(l.size() > 0) {
+				.collect(Collectors.toList());
+		if (l.size() > 0) {
 			this.isCongelacion = true;
 		}
-			
-		
+
 		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 620)
 				.collect(Collectors.toList());
-		if(l.size() > 0) {
+		if (l.size() > 0) {
 			this.isConservacion = true;
 		}
-		
+
 		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 621)
 				.collect(Collectors.toList());
-		if(l.size() > 0) {
+		if (l.size() > 0) {
 			this.isRefrigeracion = true;
 		}
-		
+
 		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 622)
 				.collect(Collectors.toList());
-		if(l.size() > 0) {
+		if (l.size() > 0) {
 			this.isManiobras = true;
 		}
 
 		PrimeFaces.current().ajax().update(":form:txtPedimento", ":form:txtSAP", ":form:txtLote",
-				":form:fechaCaducidad", ":form:txtOtro", ":form:precioServicio", ":congelacion",
-				":form:conservacion", ":form:refrigeracion", ":form:maniobras","form:txtCodigo");
+				":form:fechaCaducidad", ":form:txtOtro", ":form:precioServicio", ":congelacion", ":form:conservacion",
+				":form:refrigeracion", ":form:maniobras", "form:txtCodigo");
 	}
-	
+
 	public void addPartida() {
 		FacesMessage message = null;
 		Severity severity = null;
@@ -537,7 +525,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		Integer idUnidadDeManejo = null;
 		Producto prd = null;
 		Integer idProducto = null;
-		
+
 		Partida p = null;
 		DetallePartida dp = null;
 		Integer intNumTarimas = null;
@@ -552,24 +540,23 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			udm = udp.getUnidadDeManejoCve();
 			if (udm == null)
 				throw new InventarioException("Debe seleccionar una unidad de manejo.");
-			
-			if(udm.getUnidadDeManejoCve() == null)
+
+			if (udm.getUnidadDeManejoCve() == null)
 				throw new InventarioException("Debe seleccionar una unidad de manejo.");
 
 			prd = udp.getProductoCve();
 			if (prd == null)
 				throw new InventarioException("Debe seleccionar un producto.");
-			
-			if(prd.getProductoCve() == null)
+
+			if (prd.getProductoCve() == null)
 				throw new InventarioException("Debe seleccionar un producto.");
-			
-			if(this.partida.getCantidadTotal() == null || this.partida.getCantidadTotal() == 0)
+
+			if (this.partida.getCantidadTotal() == null || this.partida.getCantidadTotal() == 0)
 				throw new InventarioException("Debe indicar una cantidad.");
-			
-			if(this.partida.getPesoTotal() == null || this.partida.getPesoTotal().compareTo(BigDecimal.ZERO) == 0)
+
+			if (this.partida.getPesoTotal() == null || this.partida.getPesoTotal().compareTo(BigDecimal.ZERO) == 0)
 				throw new InventarioException("Debe indicar un peso.");
 
-		
 			idUnidadDeManejo = partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve();
 			idProducto = partida.getUnidadDeProductoCve().getProductoCve().getProductoCve();
 			prd = productoDAO.buscarPorId(idProducto);
@@ -593,56 +580,56 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			partida.setNoTarimas(BigDecimal.ONE);
 			detalle.setCantidadUManejo(partida.getCantidadTotal());
 			detalle.setCantidadUMedida(partida.getPesoTotal());
-			
+
 			intNumTarimas = this.numTarimas.intValue();
-			parcialTarima = this.numTarimas.subtract(new BigDecimal(intNumTarimas).setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			if(intNumTarimas > 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
+			parcialTarima = this.numTarimas
+					.subtract(new BigDecimal(intNumTarimas).setScale(2, BigDecimal.ROUND_HALF_UP));
+
+			if (intNumTarimas > 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
 				throw new InventarioException("Debe indicar sólo tarimas completas o una tarima parcial.");
-			} else if(intNumTarimas == 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
+			} else if (intNumTarimas == 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
 				p = (Partida) partida.clone();
 				p.setNoTarimas(parcialTarima);
 				dp = (DetallePartida) detalle.clone();
-				
+
 				DetallePartidaPK detallePk = new DetallePartidaPK();
 				detallePk.setDetPartCve(1);
 				detallePk.setPartidaCve(p);
 				dp.setDetallePartidaPK(detallePk);
-				
+
 				p.add(dp);
 				this.listadoPartida.add(p);
-				
+
 			}
-			if(validaCarga == true) {
+			if (validaCarga == true) {
 				partida.setNoTarimas(numTarimas);
 				DetallePartidaPK detallePk = new DetallePartidaPK();
 				detallePk.setDetPartCve(1);
 				detallePk.setPartidaCve(partida);
 				detalle.setDetallePartidaPK(detallePk);
-				
+
 				partida.add(detalle);
 				this.listadoPartida.add(partida);
-			}else {
-				
-				
-					for(int i = 0; i < intNumTarimas; i++) {
-						p = (Partida) partida.clone();
-						dp = (DetallePartida) detalle.clone();
-						
-						DetallePartidaPK detallePk = new DetallePartidaPK();
-						detallePk.setDetPartCve(1);
-						detallePk.setPartidaCve(p);
-						dp.setDetallePartidaPK(detallePk);
-						
-						p.add(dp);
-						this.listadoPartida.add(p);
-						
-					}
+			} else {
+
+				for (int i = 0; i < intNumTarimas; i++) {
+					p = (Partida) partida.clone();
+					dp = (DetallePartida) detalle.clone();
+
+					DetallePartidaPK detallePk = new DetallePartidaPK();
+					detallePk.setDetPartCve(1);
+					detallePk.setPartidaCve(p);
+					dp.setDetallePartidaPK(detallePk);
+
+					p.add(dp);
+					this.listadoPartida.add(p);
+
+				}
 			}
 			totalTarimas = new BigDecimal(0);
 			totalCajas = new BigDecimal(0);
 			totalKilos = new BigDecimal(0);
-			
+
 			totalesTarimas();
 			this.partida = this.newPartida();
 			this.detalle = this.newDetallePartida();
@@ -659,34 +646,36 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos");
-			
+			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas",
+					"form:id-validaCarga", "form:totalTarimas", "form:totalCajas", "form:totalKilos");
+
 		}
 	}
-	
+
 	public void partidaEditada() {
 		System.out.println("");
 	}
 
 	public synchronized void saveConstanciaDeDeposito() {
-		
+
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		try {
 			log.info("El usuario {} intenta guardar una constancia de depósito...", this.usuario.getUsuario());
 			EstadoConstancia status = estadoConstanciaDAO.buscarPorId(1);
 			String folioCliente = this.constanciaDeDeposito.getFolioCliente();
-			if(folioCliente == null)
+			if (folioCliente == null)
 				folioCliente = this.noConstanciaSelect;
-			
+
 			ConstanciaDeDeposito constancia = constanciaDAO.buscarPorFolioCliente(folioCliente);
-			
-			if(constancia != null)
-				throw new InventarioException(String.format("La constancia %s ya se encuentra registrada", folioCliente));
-			
-			if(this.isCongelacion) { //servicio_cve: 2
+
+			if (constancia != null)
+				throw new InventarioException(
+						String.format("La constancia %s ya se encuentra registrada", folioCliente));
+
+			if (this.isCongelacion) { // servicio_cve: 2
 				Servicio congelacion = servicioDAO.buscarPorId(619);
 				ConstanciaDepositoDetalle srvCongelacion = new ConstanciaDepositoDetalle();
 				srvCongelacion.setServicioCve(congelacion);
@@ -694,8 +683,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				srvCongelacion.setFolio(constanciaDeDeposito);
 				listadoConstanciaDepositoDetalle.add(srvCongelacion);
 			}
-			
-			if(this.isConservacion) { //servicio_cve: 32
+
+			if (this.isConservacion) { // servicio_cve: 32
 				Servicio conservacion = servicioDAO.buscarPorId(620);
 				ConstanciaDepositoDetalle srvConservacion = new ConstanciaDepositoDetalle();
 				srvConservacion.setServicioCve(conservacion);
@@ -703,8 +692,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				srvConservacion.setFolio(constanciaDeDeposito);
 				listadoConstanciaDepositoDetalle.add(srvConservacion);
 			}
-			
-			if(this.isRefrigeracion) { //servicio_cve: 33
+
+			if (this.isRefrigeracion) { // servicio_cve: 33
 				Servicio refrigeracion = servicioDAO.buscarPorId(621);
 				ConstanciaDepositoDetalle srvRefrigeracion = new ConstanciaDepositoDetalle();
 				srvRefrigeracion.setServicioCve(refrigeracion);
@@ -712,8 +701,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				srvRefrigeracion.setFolio(constanciaDeDeposito);
 				listadoConstanciaDepositoDetalle.add(srvRefrigeracion);
 			}
-			
-			if(this.isManiobras) { //servicio_cve: 34
+
+			if (this.isManiobras) { // servicio_cve: 34
 				Servicio maniobras = servicioDAO.buscarPorId(622);
 				ConstanciaDepositoDetalle srvManiobras = new ConstanciaDepositoDetalle();
 				srvManiobras.setServicioCve(maniobras);
@@ -721,22 +710,23 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				srvManiobras.setFolio(constanciaDeDeposito);
 				listadoConstanciaDepositoDetalle.add(srvManiobras);
 			}
-			
-			if((avisoSelect==null) ) {
-				 throw new InventarioException("Debe seleccionar un aviso");
+
+			if ((avisoSelect == null)) {
+				throw new InventarioException("Debe seleccionar un aviso");
 			}
-			
-			if(plantaSelect == null) {
+
+			if (plantaSelect == null) {
 				throw new InventarioException("Debe seleccionar una planta");
 			}
-			
-			if(camaraSelect == null) {
-				 throw new InventarioException("Debe seleccionar una camara");
+
+			if (camaraSelect == null) {
+				throw new InventarioException("Debe seleccionar una camara");
 			}
-			
-			if(constanciaDeDeposito.getFolioCliente() == null || "".equalsIgnoreCase(constanciaDeDeposito.getFolioCliente()) )
+
+			if (constanciaDeDeposito.getFolioCliente() == null
+					|| "".equalsIgnoreCase(constanciaDeDeposito.getFolioCliente()))
 				this.constanciaDeDeposito.setFolioCliente(this.noConstanciaSelect);
-			
+
 			constanciaDeDeposito.setNombreTransportista(nombreTransportista);
 			constanciaDeDeposito.setPlacasTransporte(placas);
 			constanciaDeDeposito.setObservaciones(observacion);
@@ -745,24 +735,25 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			constanciaDeDeposito.setFechaIngreso(fechaIngreso);
 			constanciaDeDeposito.setAvisoCve(avisoSelect);
 			constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
-			
-			for(Partida p: listadoPartida) {
+
+			for (Partida p : listadoPartida) {
 				p.setCamaraCve(camaraSelect);
 			}
-			
+
 			constanciaDeDeposito.setPartidaList(listadoPartida);
 			constanciaDeDeposito.setStatus(status);
 			String guardar = constanciaDAO.guardar(constanciaDeDeposito);
-			
-			if(guardar != null)
+
+			if (guardar != null)
 				throw new InventarioException("Ocurrió un problema al guardar la constancia de depósito.");
-			
+
 			Integer numeroSerie = this.serie.getNuSerie() + 1;
 			this.serie.setNuSerie(numeroSerie);
 			serieConstanciaDAO.actualizar(this.serie);
-			
+
 			saved = true;
-			log.info("El usuario {} guardó la constancia de depósito {} correctamente.", this.usuario.getUsuario(), this.constanciaDeDeposito.getFolioCliente());
+			log.info("El usuario {} guardó la constancia de depósito {} correctamente.", this.usuario.getUsuario(),
+					this.constanciaDeDeposito.getFolioCliente());
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = String.format("La constancia de depósito %s se registró correctamente.", folioCliente);
 		} catch (InventarioException ex) {
@@ -774,17 +765,19 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-partidas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto");
+			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-partidas", ":form:dt-constanciaDD",
+					":form:seleccion-mercancia", ":form:seleccion-producto");
 		}
 	}
-	
+
 	public void deleteConstanciaDD() {
 		this.listadoConstanciaDepositoDetalle.remove(0);
 		this.selectedConstanciaDD = null;
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado", "Se elimino el registro correctamente"));
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado", "Se elimino el registro correctamente"));
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaDD");
 	}
-	
+
 	public void deleteSelectedPartidas() {
 
 		for (Partida p : listadoPartida) {
@@ -829,7 +822,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		this.noConstanciaSelect = null;
 		PrimeFaces.current().ajax().update("form:messages", "form:numeroC");
 	}
-	
+
 	public void imprimir() {
 		String jasperPath = "/jasper/GestionReport.jrxml";
 		String filename = String.format("Entrada_%s.pdf", constanciaDeDeposito.getFolioCliente());
@@ -842,7 +835,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
-		
+
 		try {
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
@@ -867,7 +860,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		}
 
 	}
-	
+
 	public void limpiar() {
 		productoSelect = null;
 		unidadDeManejoSelect = new UnidadDeManejo();
@@ -895,10 +888,10 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		listadoConstanciaDepositoDetalle = new ArrayList<ConstanciaDepositoDetalle>();
 		constanciaDeDeposito = new ConstanciaDeDeposito();
 	}
-	
+
 	public void reload() throws IOException {
-	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
 
 	public List<Cliente> getListadoCliente() {
@@ -1500,7 +1493,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	public void setProductoItems(UISelectItems productoItems) {
 		this.productoItems = productoItems;
 	}
-	
+
 	public BigDecimal getNumTarimas() {
 		return numTarimas;
 	}
@@ -1572,7 +1565,5 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	public void setTotalCajas(BigDecimal totalCajas) {
 		this.totalCajas = totalCajas;
 	}
-	
-	
-	
+
 }

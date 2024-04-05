@@ -19,7 +19,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
-
 @Entity
 @Table(name = "venta")
 @NamedQueries({ @NamedQuery(name = "Ventas.findByAll", query = "SELECT v FROM Ventas v"),
@@ -27,9 +26,8 @@ import javax.validation.constraints.NotNull;
 		@NamedQuery(name = "Ventas.findByfecha", query = "SELECT v FROM Ventas v WHERE v.fecha= :fecha"),
 		@NamedQuery(name = "Ventas.findByCliente", query = "SELECT v FROM Ventas v WHERE v.cteCve = :cliente"),
 		@NamedQuery(name = "Ventas.findByStatus", query = "SELECT v FROM Ventas v WHERE v.status = :status"),
-		@NamedQuery(name = "Ventas.findByPlanta", query = "SELECT v FROM Ventas v WHERE v.cdEmisor = :emisor")
-})
-public class Ventas implements Serializable{
+		@NamedQuery(name = "Ventas.findByPlanta", query = "SELECT v FROM Ventas v WHERE v.cdEmisor = :emisor") })
+public class Ventas implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -41,7 +39,7 @@ public class Ventas implements Serializable{
 	@Column(name = "fecha")
 	@Temporal(TemporalType.DATE)
 	Date fecha;
-	
+
 	@Column(name = "concepto")
 	@NotNull
 	private String concepto;
@@ -49,16 +47,16 @@ public class Ventas implements Serializable{
 	@JoinColumn(name = "id_cliente", referencedColumnName = "CTE_CVE")
 	@ManyToOne
 	private Cliente cteCve;
-	
-	@Column(name="total")
+
+	@Column(name = "total")
 	private BigDecimal total;
-	
-	@Column(name="monto_letra")
+
+	@Column(name = "monto_letra")
 	private String montoLetra;
-	
-	@Column(name="status")
+
+	@Column(name = "status")
 	private boolean status;
-	
+
 	@JoinColumn(name = "id_emisor", referencedColumnName = "cd_emisor")
 	@ManyToOne
 	private EmisoresCFDIS cdEmisor;
@@ -66,7 +64,7 @@ public class Ventas implements Serializable{
 	public Integer getIdVentas() {
 		return idVentas;
 	}
-     
+
 	public void setIdVentas(Integer idVentas) {
 		this.idVentas = idVentas;
 	}
@@ -127,8 +125,4 @@ public class Ventas implements Serializable{
 		this.cdEmisor = cdEmisor;
 	}
 
-	
-	
-	
-	
 }

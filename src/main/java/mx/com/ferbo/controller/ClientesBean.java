@@ -64,8 +64,8 @@ public class ClientesBean implements Serializable {
 	private List<RegimenFiscal> lstRegimenFiscal;
 	private List<UsoCfdi> lstUsoCfdi;
 	private List<MetodoPago> lstMetodoPago;
-	private List<MedioPago> lstMedioPago; //lista forma de pago
-	
+	private List<MedioPago> lstMedioPago; // lista forma de pago
+
 	private Cliente clienteSelected;
 	private ClienteContacto clienteContactoSelected;
 	private MedioCnt medioContactoSelected;
@@ -73,7 +73,6 @@ public class ClientesBean implements Serializable {
 	private String cdUsoCfdiSelected;
 	private String cdMetodoPagoSelected;
 	private Integer idMedioPagoSelected;
-		
 
 	private ClienteDAO clienteDAO;
 	private TipoMailDAO tipoMailDAO;
@@ -89,16 +88,15 @@ public class ClientesBean implements Serializable {
 	private PlantaDAO plantaDAO;
 	private Usuario usuario;
 	private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
-	
-	
+	private HttpServletRequest httpServletRequest;
+
 	SecurityUtil util;
 
 	public ClientesBean() {
 		lstClienteContactoSelected = new ArrayList<>();
 		lstClientesSelected = new ArrayList<>();
 		lstMetodoPago = new ArrayList<>();
-		
+
 		clienteDAO = new ClienteDAO();
 		tipoMailDAO = new TipoMailDAO();
 		tipoTelefonoDAO = new TipoTelefonoDAO();
@@ -118,11 +116,11 @@ public class ClientesBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
-		
-        log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
-        
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
+
+		log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
+
 		consultaClientes();
 		consultaCatalogos();
 		log.info("");
@@ -149,41 +147,41 @@ public class ClientesBean implements Serializable {
 		}
 		return "Eliminar";
 	}
-	
+
 	public void cargaInfoCliente() {
-		
+
 		log.info("Cargando información del cliente: " + this.clienteSelected);
-		if("M".equals(clienteSelected.getTipoPersona())) {
+		if ("M".equals(clienteSelected.getTipoPersona())) {
 			lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaMoral();
 			lstUsoCfdi = usoCfdiDAO.buscaPorPersonaMoral();
 		}
-		if("F".equals(clienteSelected.getTipoPersona())) {
+		if ("F".equals(clienteSelected.getTipoPersona())) {
 			lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaFisica();
 			lstUsoCfdi = usoCfdiDAO.buscaPorPersonaFisica();
 		}
-		
+
 		this.cdRegimenFiscalSelected = null;
-		if(this.clienteSelected.getRegimenFiscal() != null) {
+		if (this.clienteSelected.getRegimenFiscal() != null) {
 			this.cdRegimenFiscalSelected = this.clienteSelected.getRegimenFiscal().getCd_regimen();
 		}
-		
+
 		this.cdUsoCfdiSelected = null;
-		if(this.clienteSelected.getUsoCfdi() != null) {
+		if (this.clienteSelected.getUsoCfdi() != null) {
 			this.cdUsoCfdiSelected = this.clienteSelected.getUsoCfdi().getCdUsoCfdi();
 		}
-		
-		if(this.clienteSelected.getMetodoPago() != null) {
+
+		if (this.clienteSelected.getMetodoPago() != null) {
 			this.cdMetodoPagoSelected = this.clienteSelected.getMetodoPago().getCdMetodoPago();
 		}
-		
+
 		this.idMedioPagoSelected = null;
-		if(this.clienteSelected.getFormaPago() != null) {
-			
+		if (this.clienteSelected.getFormaPago() != null) {
+
 			final String fp = this.clienteSelected.getFormaPago();
-			
+
 			List<MedioPago> lst = this.lstMedioPago.stream().filter(c -> fp.equals(c.getFormaPago()))
 					.collect(Collectors.toList());
-			if(lst != null && lst.size() > 0) {
+			if (lst != null && lst.size() > 0) {
 				this.idMedioPagoSelected = lst.get(0).getMpId();
 			}
 		}
@@ -213,7 +211,7 @@ public class ClientesBean implements Serializable {
 		Contacto contacto = new Contacto();
 		clienteContactoSelected.setIdContacto(contacto);
 		contacto.setClienteContactoList(this.clienteSelected.getClienteContactoList());
-		
+
 		clienteSelected = clienteSel;
 		clienteSelected.add(clienteContactoSelected);
 		medioContactoSelected = new MedioCnt();
@@ -228,51 +226,51 @@ public class ClientesBean implements Serializable {
 
 	public void guardarCliente() {
 		List<Planta> plantaList = null;
-		
+
 		final String rf = this.cdRegimenFiscalSelected;
 		List<RegimenFiscal> lstRF = lstRegimenFiscal.stream().filter(r -> r.getCd_regimen().equals(rf))
-			.collect(Collectors.toList());
-		
-		if(lstRF != null && lstRF.size() > 0) {
+				.collect(Collectors.toList());
+
+		if (lstRF != null && lstRF.size() > 0) {
 			this.clienteSelected.setRegimenFiscal(lstRF.get(0));
 		}
-		
+
 		final String uso = this.cdUsoCfdiSelected;
 		List<UsoCfdi> lstUsoCFDITmp = this.lstUsoCfdi.stream().filter(u -> uso.equals(uso))
-			.collect(Collectors.toList());
-		
-		if(lstUsoCFDITmp != null && lstUsoCFDITmp.size() > 0) {
+				.collect(Collectors.toList());
+
+		if (lstUsoCFDITmp != null && lstUsoCFDITmp.size() > 0) {
 			this.clienteSelected.setUsoCfdi(lstUsoCFDITmp.get(0));
 		}
-		
+
 		final String mp = this.cdMetodoPagoSelected;
 		List<MetodoPago> lstMetodoPagoTmp = this.lstMetodoPago.stream().filter(m -> m.getCdMetodoPago().equals(mp))
-			.collect(Collectors.toList());
-		if(lstMetodoPagoTmp != null && lstMetodoPagoTmp.size() > 0) {
+				.collect(Collectors.toList());
+		if (lstMetodoPagoTmp != null && lstMetodoPagoTmp.size() > 0) {
 			this.clienteSelected.setMetodoPago(lstMetodoPagoTmp.get(0));
 		}
-		
+
 		final Integer idMPTmp = this.idMedioPagoSelected;
 		List<MedioPago> lstMedioPagoTmp = this.lstMedioPago.stream().filter(m -> m.getMpId() == idMPTmp)
-			.collect(Collectors.toList());
-		if(lstMedioPagoTmp != null && lstMedioPagoTmp.size() > 0) {
-			this.clienteSelected.setFormaPago(lstMedioPagoTmp.get(0).getFormaPago());			
+				.collect(Collectors.toList());
+		if (lstMedioPagoTmp != null && lstMedioPagoTmp.size() > 0) {
+			this.clienteSelected.setFormaPago(lstMedioPagoTmp.get(0).getFormaPago());
 		}
-		
+
 		if (clienteSelected.getCteCve() == null) {
-			
-			//CANDADO SALIDA
+
+			// CANDADO SALIDA
 			plantaList = plantaDAO.findall(true);
-			
+
 			CandadoSalida candadoSalida = new CandadoSalida();
 			candadoSalida.setHabilitado(true);
 			candadoSalida.setCliente(clienteSelected);
 			candadoSalida.setNumSalidas(1);
-			
+
 			clienteSelected.setCandadoSalida(candadoSalida);
-			
-			for(Planta planta : plantaList) {
-				
+
+			for (Planta planta : plantaList) {
+
 				SerieConstanciaPK serieConstanciaPK_I = new SerieConstanciaPK();
 				serieConstanciaPK_I.setCliente(clienteSelected);
 				serieConstanciaPK_I.setPlanta(planta);
@@ -282,7 +280,7 @@ public class ClientesBean implements Serializable {
 				serieConstanciaI.setNuSerie(1);
 				clienteSelected.addSerieConstancia(serieConstanciaI);
 				planta.add(serieConstanciaI);
-				
+
 				SerieConstanciaPK serieConstanciaPK_O = new SerieConstanciaPK();
 				serieConstanciaPK_O.setCliente(clienteSelected);
 				serieConstanciaPK_O.setPlanta(planta);
@@ -292,7 +290,7 @@ public class ClientesBean implements Serializable {
 				serieConstanciaO.setNuSerie(1);
 				clienteSelected.addSerieConstancia(serieConstanciaO);
 				planta.add(serieConstanciaO);
-				
+
 				SerieConstanciaPK serieConstanciaPK_T = new SerieConstanciaPK();
 				serieConstanciaPK_T.setCliente(clienteSelected);
 				serieConstanciaPK_T.setPlanta(planta);
@@ -302,7 +300,7 @@ public class ClientesBean implements Serializable {
 				serieConstanciaT.setNuSerie(1);
 				clienteSelected.addSerieConstancia(serieConstanciaT);
 				planta.add(serieConstanciaT);
-				
+
 				SerieConstanciaPK serieConstanciaPK_S = new SerieConstanciaPK();
 				serieConstanciaPK_S.setCliente(clienteSelected);
 				serieConstanciaPK_S.setPlanta(planta);
@@ -313,14 +311,15 @@ public class ClientesBean implements Serializable {
 				clienteSelected.addSerieConstancia(serieConstanciaS);
 				planta.add(serieConstanciaS);
 			}
-			
+
 			if (clienteDAO.guardar(clienteSelected) == null) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Agregado"));
 				log.info("El usuario {} ha registrado el cliente {}.", this.usuario.getUsuario(), this.clienteSelected);
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", "Ocurrió un error al intentar guardar el Cliente"));
-				log.info("El usuario {} ha actualizado el cliente {}.", this.usuario.getUsuario(), this.clienteSelected);
+				log.info("El usuario {} ha actualizado el cliente {}.", this.usuario.getUsuario(),
+						this.clienteSelected);
 			}
 		} else {
 			if (clienteDAO.actualizar(clienteSelected) == null) {
@@ -330,7 +329,7 @@ public class ClientesBean implements Serializable {
 						"Error", "Ocurrió un error al intentar actualizar el Cliente"));
 			}
 		}
-		
+
 		consultaClientes();
 		this.cdRegimenFiscalSelected = null;
 		this.cdUsoCfdiSelected = null;
@@ -341,14 +340,15 @@ public class ClientesBean implements Serializable {
 	}
 
 	public void eliminarCliente() {
-		//if (clienteDAO.eliminar(clienteSelected) == null) {
+		// if (clienteDAO.eliminar(clienteSelected) == null) {
 		if (clienteDAO.eliminar(clienteSelected.getCteCve()) == null) {
 			this.consultaClientes();
 			clienteSelected = null;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Eliminado"));
 			PrimeFaces.current().ajax().update("form:dt-clientes");
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error","Favor de eliminar contacto(s) del cliente a eliminar"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"Favor de eliminar contacto(s) del cliente a eliminar"));
 		}
 		PrimeFaces.current().ajax().update("form:messages");
 	}
@@ -366,26 +366,25 @@ public class ClientesBean implements Serializable {
 		PrimeFaces.current().ajax().update("form:messages");
 	}
 
-
 	public void consultaContactos(ClienteContacto clienteContacto) {
 		clienteContactoSelected = clienteContacto;
-		
+
 		PrimeFaces.current().ajax().update("form:dialogEditContacto", "form:pnlEditContacto");
 		PrimeFaces.current().executeScript("PF('dialogEditContacto').show();");
 
 	}
-	
+
 	public void generaPassword() {
 		clienteContactoSelected.setNbPassword(util.getRandomString());
 	}
-	
+
 	public void nuevoMedio() {
 		log.info("Nuevo medio de contacto...");
 		this.medioContactoSelected = new MedioCnt();
 	}
-	
+
 	public void addTipoMedioContacto() {
-		if( "t".equalsIgnoreCase(this.medioContactoSelected.getTpMedio()) ) {
+		if ("t".equalsIgnoreCase(this.medioContactoSelected.getTpMedio())) {
 			Telefono telefono = new Telefono();
 			this.medioContactoSelected.setIdTelefono(telefono);
 			this.medioContactoSelected.setIdMail(null);
@@ -400,22 +399,23 @@ public class ClientesBean implements Serializable {
 			log.info("Agregando tipo de medio Mail.");
 		}
 	}
-	
+
 	public void validarRFC() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		try {
-			
-			if(ClienteUtil.validarRFC(this.clienteSelected.getTipoPersona(), this.clienteSelected.getCteRfc()) == false ) {
+
+			if (ClienteUtil.validarRFC(this.clienteSelected.getTipoPersona(),
+					this.clienteSelected.getCteRfc()) == false) {
 				mensaje = "El RFC es incorrecto";
 				throw new InventarioException("El RFC es incorrecto");
 			}
-			
+
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "RFC Correcto";
-			
+
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
@@ -424,23 +424,23 @@ public class ClientesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages");
 		}
 	}
-	
+
 	public void regimenSelect() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		try {
-			
-			if("M".equals(this.clienteSelected.getTipoPersona())) {	
+
+			if ("M".equals(this.clienteSelected.getTipoPersona())) {
 				lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaMoral();
 				lstUsoCfdi = usoCfdiDAO.buscaPorPersonaMoral();
 				log.info(String.format("Lista de regimenes para personas morales: (%d) ", lstRegimenFiscal.size()));
-			}else if("F".equals(this.clienteSelected.getTipoPersona())) {
+			} else if ("F".equals(this.clienteSelected.getTipoPersona())) {
 				lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaFisica();
 				lstUsoCfdi = usoCfdiDAO.buscaPorPersonaFisica();
 				log.info(String.format("Lista de regimenes para personas físicas: (%d) ", lstRegimenFiscal.size()));
@@ -449,7 +449,7 @@ public class ClientesBean implements Serializable {
 			}
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Seleccione el régimen fiscal y uso del CFDI.";
-			
+
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
@@ -458,37 +458,37 @@ public class ClientesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages");
 		}
 	}
-	
+
 	public void guardarContacto() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		Cliente cliente = null;
-		
+
 		try {
 			cliente = this.clienteContactoSelected.getIdCliente();
 			cliente = clienteDAO.buscarPorId(cliente.getCteCve(), true);
-			
-			if(this.clienteContactoSelected == null)
+
+			if (this.clienteContactoSelected == null)
 				throw new InventarioException("No hay un contacto seleccionado.");
-			
+
 			int indexOf = cliente.getClienteContactoList().indexOf(this.clienteContactoSelected);
-			if(indexOf < 0) {
+			if (indexOf < 0) {
 				cliente.add(clienteContactoSelected);
 				clienteDAO.actualizar(cliente);
 				log.info("El cliente se actualizó correctamente: {}", cliente);
 				this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
-			}else {
-				
-				for(ClienteContacto clienteContacto: cliente.getClienteContactoList()) {
-				
-					if(clienteContactoSelected.equals(clienteContacto)) {
-											
+			} else {
+
+				for (ClienteContacto clienteContacto : cliente.getClienteContactoList()) {
+
+					if (clienteContactoSelected.equals(clienteContacto)) {
+
 						clienteContacto.setIdContacto(clienteContactoSelected.getIdContacto());
 						clienteContacto.setNbUsuario(clienteContactoSelected.getNbUsuario());
 						clienteContacto.setNbPassword(clienteContactoSelected.getNbPassword());
@@ -496,7 +496,7 @@ public class ClientesBean implements Serializable {
 						clienteContacto.setStHabilitado(clienteContactoSelected.getStHabilitado());
 						clienteContacto.setRecibeFacturacion(clienteContactoSelected.getRecibeFacturacion());
 						clienteContacto.setRecibeInventario(clienteContactoSelected.getRecibeInventario());
-						
+
 						clienteDAO.actualizar(cliente);
 						log.info("El cliente se actualizó correctamente: {}", cliente);
 					}
@@ -505,7 +505,7 @@ public class ClientesBean implements Serializable {
 			this.consultaClientes();
 			PrimeFaces.current().executeScript("PF('dialogAddContacto').hide()");
 			PrimeFaces.current().executeScript("PF('dialogEditContacto').hide()");
-			
+
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Contacto actualizado correctamente.";
 		} catch (InventarioException ex) {
@@ -517,39 +517,39 @@ public class ClientesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update("pnlContacto", "pnlEditContacto", "dt-clientes", "messages");
-	          
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("pnlContacto", "pnlEditContacto", "dt-clientes", "messages");
+
 		}
 	}
-	
+
 	public void eliminarContacto() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		Cliente cliente = null;
-		
+
 		try {
-			if(this.clienteContactoSelected == null)
+			if (this.clienteContactoSelected == null)
 				throw new InventarioException("No hay un contacto seleccionado.");
-			
+
 			cliente = this.clienteContactoSelected.getIdCliente();
 			cliente = clienteDAO.buscarPorId(cliente.getCteCve(), true);
-			
+
 			int indexOf = cliente.getClienteContactoList().indexOf(this.clienteContactoSelected);
-			if(indexOf < 0)
+			if (indexOf < 0)
 				throw new InventarioException("El contacto seleccionado es incorrecto.");
-			
+
 			cliente.remove(clienteContactoSelected);
 			String respuesta = clienteDAO.actualizar(cliente);
-			
-			if(respuesta != null)
+
+			if (respuesta != null)
 				throw new InventarioException("Ocurrió un problema al eliminar al contacto del cliente.");
-			
+
 			this.clienteSelected = clienteDAO.buscarPorId(cliente.getCteCve());
 			this.consultaClientes();
-			
+
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Contacto eliminado correctamente.";
 		} catch (InventarioException ex) {
@@ -560,49 +560,48 @@ public class ClientesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages", "dtContactos");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages", "dtContactos");
 		}
-		
-		
+
 	}
-	
+
 	public void guardaMedioContacto() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		String daoResponse = null;
-		
+
 		try {
-			if(this.medioContactoSelected == null)
+			if (this.medioContactoSelected == null)
 				throw new InventarioException("No hay un medio de contacto seleccionado.");
-			
+
 			List<MedioCnt> medioCntList = this.clienteContactoSelected.getIdContacto().getMedioCntList();
-			if(medioCntList == null)
+			if (medioCntList == null)
 				medioCntList = new ArrayList<MedioCnt>();
 			medioCntList.add(this.medioContactoSelected);
-			
-			if("T".equalsIgnoreCase(medioContactoSelected.getTpMedio())) {
+
+			if ("T".equalsIgnoreCase(medioContactoSelected.getTpMedio())) {
 				this.medioContactoSelected.getIdTelefono().setMedioCntList(medioCntList);
 				log.info("Estableciendo medio de contacto: {}", medioContactoSelected.getIdTelefono().getNbTelefono());
 			}
-			if("M".equalsIgnoreCase(medioContactoSelected.getTpMedio())) {
+			if ("M".equalsIgnoreCase(medioContactoSelected.getTpMedio())) {
 				this.medioContactoSelected.getIdMail().setMedioCntList(medioCntList);
 				log.info("Estableciendo medio de contacto: {}", medioContactoSelected.getIdMail().getNbMail());
 			}
-			
+
 			Contacto contacto = this.clienteContactoSelected.getIdContacto();
 			medioContactoSelected.setIdContacto(contacto);
 			medioContactoSelected.setIdMedio(null);
 			daoResponse = medioCntDAO.actualizar(medioContactoSelected);
-			if(daoResponse == null)
+			if (daoResponse == null)
 				log.info("El medio de contacto se guardó correctamente: {}", this.medioContactoSelected);
-			
+
 			medioCntList = medioCntDAO.buscarPorCriterios(medioContactoSelected);
-			
+
 			this.clienteContactoSelected.getIdContacto().setMedioCntList(medioCntList);
-			
+
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Medio de contacto registrado correctamente.";
 		} catch (InventarioException ex) {
@@ -613,30 +612,30 @@ public class ClientesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages", ":form:dtMedioContacto");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages", ":form:dtMedioContacto");
 		}
 	}
-	
+
 	public void eliminarMedioContacto() {
-		
+
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		try {
-			if( this.medioContactoSelected == null )
+			if (this.medioContactoSelected == null)
 				throw new InventarioException("No hay un medio de contacto seleccionado.");
-			
+
 			List<MedioCnt> medioCntList = medioCntDAO.buscarPorCriterios(medioContactoSelected);
-			
+
 			medioCntList.remove(medioContactoSelected);
-			
+
 			this.clienteContactoSelected.getIdContacto().setMedioCntList(medioCntList);
-			
+
 			String actualizar = clienteContactoDAO.actualizar(this.clienteContactoSelected);
 			log.debug("Respuesta del DAO actualización cliente contacto: {}", actualizar);
-			
+
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Medio de contacto eliminado correctamente.";
 		} catch (InventarioException ex) {
@@ -647,36 +646,36 @@ public class ClientesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages", "dtMedioContacto");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages", "dtMedioContacto");
 		}
 	}
-	
+
 	public void setPassword(ClienteContacto contacto) {
 		log.debug("Cliente contacto: {}", contacto);
 		this.clienteContactoSelected = contacto;
 		this.newPassword = null;
 		this.confirmPassword = null;
 	}
-	
+
 	public void validateNewPassword() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		try {
-			if(this.newPassword == null)
+			if (this.newPassword == null)
 				throw new InventarioException("Debe indicar una contraseña nueva.");
-			
-			if(this.confirmPassword == null)
+
+			if (this.confirmPassword == null)
 				throw new InventarioException("Debe confirmar su contraseña nueva.");
-			
-			if(newPassword.equals(confirmPassword) == false)
+
+			if (newPassword.equals(confirmPassword) == false)
 				throw new InventarioException("Su nueva contraseña no coincide en los dos campos.");
-			
+
 			mensaje = "Su nueva contraseña coincide correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-		} catch(InventarioException ex) {
+		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 		} catch (Exception ex) {
@@ -685,64 +684,64 @@ public class ClientesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Ajustes...", mensaje);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages");
 		}
 	}
-	
+
 	public void changePassword() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		String newPasswordSHA512 = null;
-		
-		
+
 		try {
-			if(this.newPassword == null || "".equalsIgnoreCase(this.newPassword.trim()))
+			if (this.newPassword == null || "".equalsIgnoreCase(this.newPassword.trim()))
 				throw new InventarioException("Debe indicar su nueva contraseña");
-			
-			if(this.confirmPassword == null || "".equalsIgnoreCase(this.confirmPassword.trim()))
+
+			if (this.confirmPassword == null || "".equalsIgnoreCase(this.confirmPassword.trim()))
 				throw new InventarioException("Debe confirmar su nueva contraseña");
-			
+
 			util.checkPassword(this.newPassword);
-			
-			//TODO Por seguridad, se deben salar las contraseñas.
+
+			// TODO Por seguridad, se deben salar las contraseñas.
 			newPasswordSHA512 = util.getSHA512(this.newPassword);
-			
+
 			this.clienteContactoSelected.setNbPassword(newPasswordSHA512);
-			this.clienteContactoSelected.setStUsuario("A");;
-			
+			this.clienteContactoSelected.setStUsuario("A");
+			;
+
 			this.clienteContactoDAO.actualizar(clienteContactoSelected);
-			
+
 			log.info("Usuario actualizado");
-			
+
 			this.newPassword = null;
 			this.confirmPassword = null;
-			
+
 			mensaje = "Su contraseña se actualizó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-			
+
 			PrimeFaces.current().executeScript("PF('dlgPassword').hide()");
-		} catch(InventarioException ex) {
+		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema con la emisión de salidas...", ex);
 			mensaje = "Su solicitud no se pudo generar.\nFavor de comunicarse con el administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Ajustes...", mensaje);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update(":form:messages", ":form:newPassword", ":form:confirmPassword");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages", ":form:newPassword", ":form:confirmPassword");
 		}
-		
+
 	}
 
 	/**
 	 * Getters & Setters
 	 */
-	
+
 	public List<Cliente> getLstClientes() {
 		return lstClientes;
 	}

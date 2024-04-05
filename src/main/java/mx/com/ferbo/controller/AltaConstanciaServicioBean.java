@@ -25,8 +25,8 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
@@ -35,9 +35,7 @@ import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
-import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.EstadoConstancia;
@@ -71,7 +69,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private List<PrecioServicio> alServicios;
 	private List<ProductoPorCliente> alProductosFiltered;
 	private List<UnidadDeManejo> alUnidades;
-	
+
 	private List<Planta> listadoPlantas;
 	private Planta plantaSelect;
 
@@ -100,12 +98,10 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private SerieConstancia serie;
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
-	private ConstanciaDeDeposito constanciadep;
-	private Aviso aviso;
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 	private List<EstadoConstancia> estados = null;
-	
+
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
@@ -126,29 +122,27 @@ public class AltaConstanciaServicioBean implements Serializable {
 		listadoPlantas = new ArrayList<>();
 		serieConstanciaDAO = new SerieConstanciaDAO();
 		selCliente = new Cliente();
-		constanciadep = new ConstanciaDeDeposito();
-		aviso = new Aviso();
 	}
 
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		log.info("Entrando a Init...");
-		
+
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-		
+
 		fecha = new Date();
 		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		alUnidades = udmDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		estados = edoDAO.buscarTodos();
-		
-		if((usuario.getPerfil() == 1)||(usuario.getPerfil() == 4)) {
+
+		if ((usuario.getPerfil() == 1) || (usuario.getPerfil() == 4)) {
 			listadoPlantas.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
-		}else {
+		} else {
 			listadoPlantas = plantaDAO.findall(false);
 		}
 		plantaSelect = listadoPlantas.get(0);
@@ -164,9 +158,9 @@ public class AltaConstanciaServicioBean implements Serializable {
 		selCliente.setCteCve(this.idCliente);
 		try {
 			log.info("Entrando a filtrar cliente...");
-			
+
 			this.generaFolioServicio();
-			
+
 			manager = EntityManagerUtil.getEntityManager();
 			cliente = manager.createNamedQuery("Cliente.findByCteCve", Cliente.class)
 					.setParameter("cteCve", this.idCliente).getSingleResult();
@@ -210,7 +204,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 		}
 		log.info("Productos y/o servicios del cliente filtrados.");
 	}
-	
+
 	public void generaFolioServicio() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
@@ -218,19 +212,19 @@ public class AltaConstanciaServicioBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		Planta plantaSelect = null;
 
 		try {
 			this.selCliente = clienteDAO.buscarPorId(this.selCliente.getCteCve());
 			if (this.selCliente == null)
 				throw new InventarioException("Debe seleccionar un cliente");
-			
+
 			plantaSelect = plantaDAO.buscarPorId(usuario.getIdPlanta());
 
 			if (plantaSelect == null)
 				throw new InventarioException("Debe seleccionar una planta");
-			
+
 			seriePK = new SerieConstanciaPK();
 			seriePK.setCliente(this.selCliente);
 			seriePK.setPlanta(this.plantaSelect);
@@ -245,20 +239,20 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 			this.folio = String.format("%s%s%s%d", seriePK.getTpSerie(), plantaSelect.getPlantaSufijo(),
 					selCliente.getCodUnico(), serie.getNuSerie());
-			
+
 			this.serie = serie;
 
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-			
+
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} catch (Exception ex) {
 			log.error("Problema para generar el folio de entrada...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
-			
+
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
@@ -369,7 +363,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 	public synchronized void guardar() {
 		String message = null;
-		Severity severity = null;		
+		Severity severity = null;
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
 		EstadoConstancia estado = null;
@@ -408,16 +402,16 @@ public class AltaConstanciaServicioBean implements Serializable {
 				servicio.setFolio(constancia);
 			}
 			csDAO.actualizar(constancia);
-			
+
 			Integer numeroSerie = this.serie.getNuSerie() + 1;
 			this.serie.setNuSerie(numeroSerie);
 			serieConstanciaDAO.actualizar(this.serie);
-			
+
 			this.isSaved = true;
 			this.habilitareporte = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
-			
+
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -433,7 +427,6 @@ public class AltaConstanciaServicioBean implements Serializable {
 		}
 	}
 
-
 	public void jasper() throws JRException, IOException, SQLException {
 		String jasperPath = "/jasper/ticketServicio.jrxml";
 		String filename = "Constancia_de_servicio.pdf";
@@ -441,17 +434,14 @@ public class AltaConstanciaServicioBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		ConstanciaDeServicio constancia = null;
-		List<ConstanciaDeServicio> alConstancias = null;
-		alConstancias = csDAO.buscarPorFolioCliente(this.folio);
-		 File reportFile = new File(jasperPath);
-		 File imgfile = null;
+		File reportFile = new File(jasperPath);
+		File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		ConstanciaDeServicio cds = new ConstanciaDeServicio();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
 		try {
-			if(habilitareporte == false ) {
+			if (habilitareporte == false) {
 				throw new Exception("Favor de guardar constancia");
 			}
 			URL resource = getClass().getResource(jasperPath);
@@ -467,26 +457,27 @@ public class AltaConstanciaServicioBean implements Serializable {
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", folio);
-			parameters.put("LogoPath",imgfile.getPath());
+			parameters.put("LogoPath", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());			
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 		} catch (Exception ex) {
 			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		} finally {
 			conexion.close((Connection) connection);
 		}
 	}
-	
+
 	public void reload() throws IOException {
-	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
-	
+
 	public String getUnidadcobro() {
 		return unidadcobro;
 	}

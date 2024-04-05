@@ -8,24 +8,24 @@
 	</ui:define>
 	<ui:define name="content">
 		<style type="text/css">
-							.green {
-								background-color: #a5e594 !important;
-								background-image: none !important;
-								color: #11971f !important;
-									padding: 15px;
-								border-radius: 5px 5px 5px 5px;
-								font-weight: bold;
-							}
-							
-							.red {
-								background-color: #e99989 !important;
-								background-image: none !important;
-								color:  #922b21 !important;
-									padding: 15px;
-								border-radius: 5px 5px 5px 5px;
-								font-weight: bold;
-							}
-							</style>
+.green {
+	background-color: #a5e594 !important;
+	background-image: none !important;
+	color: #11971f !important;
+	padding: 15px;
+	border-radius: 5px 5px 5px 5px;
+	font-weight: bold;
+}
+
+.red {
+	background-color: #e99989 !important;
+	background-image: none !important;
+	color: #922b21 !important;
+	padding: 15px;
+	border-radius: 5px 5px 5px 5px;
+	font-weight: bold;
+}
+</style>
 		<script
 			src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 		<script
@@ -54,7 +54,7 @@
 			$.extend(true, this.cfg.config, options);
 			};
 </script>
-<h:form id="form">
+		<h:form id="form">
 
 			<div class="card" style="width: 750px; float: right;">
 				<p:barChart model="#{dashBoardBean.stackedGroupBarModel}"
@@ -230,7 +230,7 @@
 
 
 			<div
-				style="margin-top: 19px; width: 48%; height: 640px; float: left;">
+				style="margin-top: 19px; width: 48%; height: 900px; float: left;">
 
 				<p:dataTable id="dt-ventasMes" widgetVar="dtVM" var="ventasM"
 					value="#{dashBoardBean.listaImporteGlobal}" reflow="true"
@@ -263,7 +263,8 @@
 
 
 
-			<div style="text-align: left; margin-top: 20px; width: 48%; height: 640px; float: right;">
+			<div
+				style="text-align: left; margin-top: 20px; width: 48%; height: 640px; float: right;">
 
 				<p:dataTable id="dt-ventaRS" widgetVar="dt-VRS" var="ventaRS"
 					value="#{dashBoardBean.listaVentaRazonSocial}" reflow="true"
@@ -290,7 +291,7 @@
 					</p:column>
 
 				</p:dataTable>
-				
+
 				<div class="card" style="width: 400px; margin: 0 auto;">
 					<p:donutChart model="#{dashBoardBean.donutModel}"
 						style="width: 300px; height: 100px;"></p:donutChart>
@@ -299,10 +300,6 @@
 
 			</div>
 
-			<div class="card" style="width: 45%; height: 500px; float: left;">
-				<p:barChart model="#{dashBoardBean.smVentasFormaPago}"
-					style="width: 100%; height: 400px;" />
-			</div>
 
 			<p:dataTable id="dt-gananciaRS" widgetVar="dt-VRS" var="gananciaRS"
 				value="#{dashBoardBean.listaGananciaRazonSocial}" reflow="true"
@@ -330,8 +327,12 @@
 
 			</p:dataTable>
 
+			<div class="card" style="width: 100%; height: 500px; float: left;">
+				<p:barChart model="#{dashBoardBean.smVentasFormaPago}"
+					style="width: 100%; height: 400px;" />
+			</div>
 
-		</h:form>							
+		</h:form>
 	</ui:define>
 
 

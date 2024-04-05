@@ -19,21 +19,21 @@ public class TiposPagoDAO {
 		EntityManager entity = null;
 		List<MedioPago> tipos = null;
 		try {
-		entity = EntityManagerUtil.getEntityManager();
-		Query sql = entity.createNamedQuery("MedioPago.findAll", MedioPago.class);
-		tipos = sql.getResultList();
-		}catch(Exception e) {
-			Log.error("Problemas para obtener informacion",e);
-		}finally {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("MedioPago.findAll", MedioPago.class);
+			tipos = sql.getResultList();
+		} catch (Exception e) {
+			Log.error("Problemas para obtener informacion", e);
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return tipos;
 	}
 
 	public String save(MedioPago mp) {
-		
+
 		EntityManager entity = null;
-		
+
 		try {
 			entity = getEntityManager();
 			entity.getTransaction().begin();
@@ -41,16 +41,16 @@ public class TiposPagoDAO {
 			entity.getTransaction().commit();
 		} catch (Exception e) {
 			Log.error("Problema al guardar medio pago", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return null;
 	}
 
 	public String update(MedioPago mp) {
-		
+
 		EntityManager entity = null;
-		
+
 		try {
 			entity = getEntityManager();
 			entity.getTransaction().begin();
@@ -58,7 +58,7 @@ public class TiposPagoDAO {
 			entity.getTransaction().commit();
 		} catch (Exception e) {
 			Log.error("Problema para actualizar", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return null;

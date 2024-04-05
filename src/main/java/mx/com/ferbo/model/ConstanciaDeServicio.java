@@ -34,202 +34,200 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "constancia_de_servicio")
-@NamedQueries({
-    @NamedQuery(name = "ConstanciaDeServicio.findAll", query = "SELECT c FROM ConstanciaDeServicio c"),
-    @NamedQuery(name = "ConstanciaDeServicio.findByFolio", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.folio = :folio"),
-    @NamedQuery(name = "ConstanciaDeServicio.findByFecha", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.fecha = :fecha"),
-    @NamedQuery(name = "ConstanciaDeServicio.findByNombreTransportista", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.nombreTransportista = :nombreTransportista"),
-    @NamedQuery(name = "ConstanciaDeServicio.findByPlacasTransporte", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.placasTransporte = :placasTransporte"),
-    @NamedQuery(name = "ConstanciaDeServicio.findByObservaciones", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.observaciones = :observaciones"),
-    @NamedQuery(name = "ConstanciaDeServicio.findByFolioCliente", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.folioCliente = :folioCliente"),
-    @NamedQuery(name = "ConstanciaDeServicio.findByPeriodoClienteFolioCliente", query = "SELECT c FROM ConstanciaDeServicio c WHERE (c.fecha BETWEEN :fechaInicio AND :fechaFin) AND (c.cteCve.cteCve = :idCliente OR :idCliente IS NULL) AND (c.folioCliente = :folioCliente OR :folioCliente IS NULL)"),
-    @NamedQuery(name = "ConstanciaDeServicio.findByValorDeclarado", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.valorDeclarado = :valorDeclarado")})
+@NamedQueries({ @NamedQuery(name = "ConstanciaDeServicio.findAll", query = "SELECT c FROM ConstanciaDeServicio c"),
+		@NamedQuery(name = "ConstanciaDeServicio.findByFolio", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.folio = :folio"),
+		@NamedQuery(name = "ConstanciaDeServicio.findByFecha", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.fecha = :fecha"),
+		@NamedQuery(name = "ConstanciaDeServicio.findByNombreTransportista", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.nombreTransportista = :nombreTransportista"),
+		@NamedQuery(name = "ConstanciaDeServicio.findByPlacasTransporte", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.placasTransporte = :placasTransporte"),
+		@NamedQuery(name = "ConstanciaDeServicio.findByObservaciones", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.observaciones = :observaciones"),
+		@NamedQuery(name = "ConstanciaDeServicio.findByFolioCliente", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.folioCliente = :folioCliente"),
+		@NamedQuery(name = "ConstanciaDeServicio.findByPeriodoClienteFolioCliente", query = "SELECT c FROM ConstanciaDeServicio c WHERE (c.fecha BETWEEN :fechaInicio AND :fechaFin) AND (c.cteCve.cteCve = :idCliente OR :idCliente IS NULL) AND (c.folioCliente = :folioCliente OR :folioCliente IS NULL)"),
+		@NamedQuery(name = "ConstanciaDeServicio.findByValorDeclarado", query = "SELECT c FROM ConstanciaDeServicio c WHERE c.valorDeclarado = :valorDeclarado") })
 
 public class ConstanciaDeServicio implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "FOLIO")
-    private Integer folio;
-    
-    @Column(name = "FECHA")
-    @Temporal(TemporalType.DATE)
-    private Date fecha;
-    
-    @Size(max = 100)
-    @Column(name = "NOMBRE_TRANSPORTISTA")
-    private String nombreTransportista;
-    
-    @Size(max = 8)
-    @Column(name = "PLACAS_TRANSPORTE")
-    private String placasTransporte;
-    
-    @Size(max = 200)
-    @Column(name = "OBSERVACIONES")
-    private String observaciones;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 8)
-    @Column(name = "FOLIO_CLIENTE")
-    private String folioCliente;
-    
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "VALOR_DECLARADO")
-    private BigDecimal valorDeclarado;
-    
-    @OneToMany(mappedBy = "folio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PartidaServicio> partidaServicioList;
-    
-    @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
-    @ManyToOne
-    private Cliente cteCve;
-    
-    @JoinColumn(name = "STATUS", referencedColumnName = "edo_cve")
-    @ManyToOne
-    private EstadoConstancia status;
-    
-    @OneToMany(mappedBy = "folio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
-    
-    @OneToMany(mappedBy = "constanciaDeServicio", orphanRemoval = true)
-    private List<ConstanciaFacturaDs> constanciaFacturaDsList;
+	private static final long serialVersionUID = 1L;
 
-    
-    public ConstanciaDeServicio() {
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "FOLIO")
+	private Integer folio;
 
-    public ConstanciaDeServicio(Integer folio) {
-        this.folio = folio;
-    }
+	@Column(name = "FECHA")
+	@Temporal(TemporalType.DATE)
+	private Date fecha;
 
-    public ConstanciaDeServicio(Integer folio, String folioCliente) {
-        this.folio = folio;
-        this.folioCliente = folioCliente;
-    }
+	@Size(max = 100)
+	@Column(name = "NOMBRE_TRANSPORTISTA")
+	private String nombreTransportista;
 
-    public Integer getFolio() {
-        return folio;
-    }
+	@Size(max = 8)
+	@Column(name = "PLACAS_TRANSPORTE")
+	private String placasTransporte;
 
-    public void setFolio(Integer folio) {
-        this.folio = folio;
-    }
+	@Size(max = 200)
+	@Column(name = "OBSERVACIONES")
+	private String observaciones;
 
-    public Date getFecha() {
-        return fecha;
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Size(min = 1, max = 8)
+	@Column(name = "FOLIO_CLIENTE")
+	private String folioCliente;
 
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
-    }
+	// @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+	// consider using these annotations to enforce field validation
+	@Column(name = "VALOR_DECLARADO")
+	private BigDecimal valorDeclarado;
 
-    public String getNombreTransportista() {
-        return nombreTransportista;
-    }
+	@OneToMany(mappedBy = "folio", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PartidaServicio> partidaServicioList;
 
-    public void setNombreTransportista(String nombreTransportista) {
-        this.nombreTransportista = nombreTransportista;
-    }
+	@JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
+	@ManyToOne
+	private Cliente cteCve;
 
-    public String getPlacasTransporte() {
-        return placasTransporte;
-    }
+	@JoinColumn(name = "STATUS", referencedColumnName = "edo_cve")
+	@ManyToOne
+	private EstadoConstancia status;
 
-    public void setPlacasTransporte(String placasTransporte) {
-        this.placasTransporte = placasTransporte;
-    }
+	@OneToMany(mappedBy = "folio", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
 
-    public String getObservaciones() {
-        return observaciones;
-    }
+	@OneToMany(mappedBy = "constanciaDeServicio", orphanRemoval = true)
+	private List<ConstanciaFacturaDs> constanciaFacturaDsList;
 
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
-    }
+	public ConstanciaDeServicio() {
+	}
 
-    public String getFolioCliente() {
-        return folioCliente;
-    }
+	public ConstanciaDeServicio(Integer folio) {
+		this.folio = folio;
+	}
 
-    public void setFolioCliente(String folioCliente) {
-        this.folioCliente = folioCliente;
-    }
+	public ConstanciaDeServicio(Integer folio, String folioCliente) {
+		this.folio = folio;
+		this.folioCliente = folioCliente;
+	}
 
-    public BigDecimal getValorDeclarado() {
-        return valorDeclarado;
-    }
+	public Integer getFolio() {
+		return folio;
+	}
 
-    public void setValorDeclarado(BigDecimal valorDeclarado) {
-        this.valorDeclarado = valorDeclarado;
-    }
+	public void setFolio(Integer folio) {
+		this.folio = folio;
+	}
 
-    public List<PartidaServicio> getPartidaServicioList() {
-        return partidaServicioList;
-    }
+	public Date getFecha() {
+		return fecha;
+	}
 
-    public void setPartidaServicioList(List<PartidaServicio> partidaServicioList) {
-        this.partidaServicioList = partidaServicioList;
-    }
+	public void setFecha(Date fecha) {
+		this.fecha = fecha;
+	}
 
-    public Cliente getCteCve() {
-        return cteCve;
-    }
+	public String getNombreTransportista() {
+		return nombreTransportista;
+	}
 
-    public void setCteCve(Cliente cteCve) {
-        this.cteCve = cteCve;
-    }
+	public void setNombreTransportista(String nombreTransportista) {
+		this.nombreTransportista = nombreTransportista;
+	}
 
-    public EstadoConstancia getStatus() {
-        return status;
-    }
+	public String getPlacasTransporte() {
+		return placasTransporte;
+	}
 
-    public void setStatus(EstadoConstancia status) {
-        this.status = status;
-    }
+	public void setPlacasTransporte(String placasTransporte) {
+		this.placasTransporte = placasTransporte;
+	}
 
-    public List<ConstanciaServicioDetalle> getConstanciaServicioDetalleList() {
-        return constanciaServicioDetalleList;
-    }
+	public String getObservaciones() {
+		return observaciones;
+	}
 
-    public void setConstanciaServicioDetalleList(List<ConstanciaServicioDetalle> constanciaServicioDetalleList) {
-        this.constanciaServicioDetalleList = constanciaServicioDetalleList;
-    }
-    
-    public List<ConstanciaFacturaDs> getConstanciaFacturaDsList() {
-        return constanciaFacturaDsList;
-    }
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
 
-    public void setConstanciaFacturaDsList(List<ConstanciaFacturaDs> constanciaFacturaDsList) {
-        this.constanciaFacturaDsList = constanciaFacturaDsList;
-    }
+	public String getFolioCliente() {
+		return folioCliente;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (folio != null ? folio.hashCode() : 0);
-        return hash;
-    }
+	public void setFolioCliente(String folioCliente) {
+		this.folioCliente = folioCliente;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ConstanciaDeServicio)) {
-            return false;
-        }
-        ConstanciaDeServicio other = (ConstanciaDeServicio) object;
-        if ((this.folio == null && other.folio != null) || (this.folio != null && !this.folio.equals(other.folio))) {
-            return false;
-        }
-        return true;
-    }
+	public BigDecimal getValorDeclarado() {
+		return valorDeclarado;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.ConstanciaDeServicio[ folio=" + folio + " ]";
-    }
-    
+	public void setValorDeclarado(BigDecimal valorDeclarado) {
+		this.valorDeclarado = valorDeclarado;
+	}
+
+	public List<PartidaServicio> getPartidaServicioList() {
+		return partidaServicioList;
+	}
+
+	public void setPartidaServicioList(List<PartidaServicio> partidaServicioList) {
+		this.partidaServicioList = partidaServicioList;
+	}
+
+	public Cliente getCteCve() {
+		return cteCve;
+	}
+
+	public void setCteCve(Cliente cteCve) {
+		this.cteCve = cteCve;
+	}
+
+	public EstadoConstancia getStatus() {
+		return status;
+	}
+
+	public void setStatus(EstadoConstancia status) {
+		this.status = status;
+	}
+
+	public List<ConstanciaServicioDetalle> getConstanciaServicioDetalleList() {
+		return constanciaServicioDetalleList;
+	}
+
+	public void setConstanciaServicioDetalleList(List<ConstanciaServicioDetalle> constanciaServicioDetalleList) {
+		this.constanciaServicioDetalleList = constanciaServicioDetalleList;
+	}
+
+	public List<ConstanciaFacturaDs> getConstanciaFacturaDsList() {
+		return constanciaFacturaDsList;
+	}
+
+	public void setConstanciaFacturaDsList(List<ConstanciaFacturaDs> constanciaFacturaDsList) {
+		this.constanciaFacturaDsList = constanciaFacturaDsList;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (folio != null ? folio.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof ConstanciaDeServicio)) {
+			return false;
+		}
+		ConstanciaDeServicio other = (ConstanciaDeServicio) object;
+		if ((this.folio == null && other.folio != null) || (this.folio != null && !this.folio.equals(other.folio))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.ConstanciaDeServicio[ folio=" + folio + " ]";
+	}
+
 }

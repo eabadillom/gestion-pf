@@ -13,19 +13,18 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "nota_x_facturas")
 @NamedQueries({
-	
-	@NamedQuery(name = "NotaPorFactura.findByAll", query = "SELECT nf FROM NotaPorFactura nf")
-	
+
+		@NamedQuery(name = "NotaPorFactura.findByAll", query = "SELECT nf FROM NotaPorFactura nf")
+
 })
 
-
-public class NotaPorFactura implements Serializable, Cloneable{
+public class NotaPorFactura implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@EmbeddedId
 	private NotaPorFacturaPK notaPorFacturaPK;
-	
+
 //	@JoinColumn(name = "NOTA", referencedColumnName = "ID",insertable = false, updatable = false)
 //    @ManyToOne(optional = false, cascade = CascadeType.ALL)
 //	private NotaCredito nota;
@@ -33,14 +32,14 @@ public class NotaPorFactura implements Serializable, Cloneable{
 //	@JoinColumn(name = "FACTURA", referencedColumnName = "id", insertable = false, updatable = false)
 //    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
 //    private Factura factura;
-	
+
 	@Column(name = "CANTIDAD")
 	private BigDecimal cantidad;
-	
-	public NotaPorFactura(){
-		
+
+	public NotaPorFactura() {
+
 	}
-	
+
 	public NotaPorFacturaPK getNotaPorFacturaPK() {
 		return notaPorFacturaPK;
 	}

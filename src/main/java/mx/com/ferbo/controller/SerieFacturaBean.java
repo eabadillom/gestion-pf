@@ -80,11 +80,11 @@ public class SerieFacturaBean implements Serializable {
 		}
 		this.seleccion = new SerieFactura();
 	};
-	
+
 	public void cancelar() {
 		PrimeFaces.current().executeScript("PF('dg-delete').hide()");
 		String message = daoSerie.cancelar(seleccion.getId());
-		
+
 		if (message == null) {
 			listSerie.clear();
 			listSerie = daoSerie.findAll();
@@ -134,7 +134,5 @@ public class SerieFacturaBean implements Serializable {
 	public void setListaPlanta(List<Planta> listaPlanta) {
 		this.listaPlanta = listaPlanta;
 	};
-	
-	
 
 }

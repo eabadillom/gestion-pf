@@ -12,7 +12,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturacionGeneral;
 import mx.com.ferbo.model.VentasGlobales;
-import mx.com.ferbo.ui.importeUtilidad;
+import mx.com.ferbo.ui.ImporteUtilidad;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -153,8 +153,8 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<importeUtilidad> UtilidadPorMesAnual(String fechaIni, String fechaFin) {
-		List<importeUtilidad> lista = null;
+	public List<ImporteUtilidad> UtilidadPorMesAnual(String fechaIni, String fechaFin) {
+		List<ImporteUtilidad> lista = null;
 		EntityManager entity = null;
 		String sql = null;
 
@@ -187,7 +187,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 			List<Object[]> listaObjetos = query.getResultList();
 
 			for (Object[] o : listaObjetos) {
-				importeUtilidad u = new importeUtilidad();
+				ImporteUtilidad u = new ImporteUtilidad();
 				int id = 0;
 				String fh = ((String) o[id++]);
 				Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);

@@ -16,46 +16,39 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name="importe_egreso")
-@NamedQueries({
-	@NamedQuery(name = "ImporteEgreso.findByAll", query = "SELECT i FROM ImporteEgreso i"),
-	@NamedQuery(name ="ImporteEgreso.findById", query ="SELECT i FROM ImporteEgreso i WHERE i.idImporte = :idImporte"),
-	@NamedQuery(name ="ImporteEgreso.findByFecha", query ="SELECT i FROM ImporteEgreso i WHERE i.fecha = :fecha"),
-	@NamedQuery(name ="ImporteEgreso.findByidEgreso", query = "SELECT i FROM ImporteEgreso i WHERE i.idEgreso = :idEgreso"),
-	@NamedQuery(name ="ImporteEgreso.findBycdEmisor", query ="SELECT i FROM ImporteEgreso i WHERE i.cdEmisor = :cdEmisor")
-})
+@Table(name = "importe_egreso")
+@NamedQueries({ @NamedQuery(name = "ImporteEgreso.findByAll", query = "SELECT i FROM ImporteEgreso i"),
+		@NamedQuery(name = "ImporteEgreso.findById", query = "SELECT i FROM ImporteEgreso i WHERE i.idImporte = :idImporte"),
+		@NamedQuery(name = "ImporteEgreso.findByFecha", query = "SELECT i FROM ImporteEgreso i WHERE i.fecha = :fecha"),
+		@NamedQuery(name = "ImporteEgreso.findByidEgreso", query = "SELECT i FROM ImporteEgreso i WHERE i.idEgreso = :idEgreso"),
+		@NamedQuery(name = "ImporteEgreso.findBycdEmisor", query = "SELECT i FROM ImporteEgreso i WHERE i.cdEmisor = :cdEmisor") })
 
-
-public class ImporteEgreso implements Serializable{
+public class ImporteEgreso implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
-	@Column(name ="id_importe")
+	@Column(name = "id_importe")
 	private Integer idImporte;
-	
-	
-	@Column(name ="fecha")
+
+	@Column(name = "fecha")
 	private Date fecha;
-	
+
 	@JoinColumn(name = "id_egreso", referencedColumnName = "id_egreso")
 	@ManyToOne(optional = false)
-	private egresos idEgreso;
-	
+	private Egresos idEgreso;
+
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
 	@ManyToOne(optional = false)
 	private EmisoresCFDIS cdEmisor;
 
-	@Column(name ="importe")
+	@Column(name = "importe")
 	private BigDecimal importe;
 
-	
 	public Integer getIdImporte() {
 		return idImporte;
 	}
@@ -72,11 +65,11 @@ public class ImporteEgreso implements Serializable{
 		this.fecha = fecha;
 	}
 
-	public egresos getIdEgreso() {
+	public Egresos getIdEgreso() {
 		return idEgreso;
 	}
 
-	public void setIdEgreso(egresos idEgreso) {
+	public void setIdEgreso(Egresos idEgreso) {
 		this.idEgreso = idEgreso;
 	}
 
@@ -121,6 +114,4 @@ public class ImporteEgreso implements Serializable{
 				+ cdEmisor + ", importe=" + importe + "]";
 	}
 
-	
-	
 }

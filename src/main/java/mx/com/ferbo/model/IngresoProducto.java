@@ -21,75 +21,73 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-
 @Entity
 @Table(name = "ingreso_producto")
-@NamedQueries({
-	@NamedQuery(name = "IngresoProducto.findByAll", query = "SELECT ip FROM IngresoProducto ip")})
+@NamedQueries({ @NamedQuery(name = "IngresoProducto.findByAll", query = "SELECT ip FROM IngresoProducto ip") })
 
-public class IngresoProducto implements Serializable,Cloneable{
+public class IngresoProducto implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "id_ingreso_producto")
 	private Integer idIngresoProducto;
-	
+
 	@Column(name = "cantidad")
 	private Integer cantidad;
-	
+
 	@JoinColumn(name = "id_unidad_medida", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
 	@ManyToOne
 	private UnidadDeManejo unidadDeManejo;
-	
+
 	@Column(name = "peso")
 	private BigDecimal peso;
-	
+
 	@JoinColumn(name = "id_planta", referencedColumnName = "PLANTA_CVE")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Planta planta;
-	
+
 	@Column(name = "no_tarimas")
 	@NotNull
 	private BigDecimal noTarimas;
-	
+
 	@Column(name = "lote")
 	@Size(max = 20)
 	private String lote;
-	
+
 	@Column(name = "pedimento")
 	@Size(max = 13)
 	private String pedimento;
-	
+
 	@Column(name = "contenedor")
 	@Size(max = 20)
 	private String contenedor;
-	
+
 	@Column(name = "fecha_Caducidad")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaCaducidad;
-	
+
 	@Column(name = "otro")
 	@Size(max = 12)
 	private String otro;
-	
+
 	@JoinColumn(name = "id_ingreso", referencedColumnName = "id_ingreso")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Ingreso ingreso;
-	
+
 	@JoinColumn(name = "id_producto", referencedColumnName = "PRODUCTO_CVE")
 	@ManyToOne
 	private Producto producto;
 
 	public IngresoProducto() {
-		
+
 	}
-	
-	public IngresoProducto clone() throws CloneNotSupportedException{  
-    	return (IngresoProducto) super.clone();  
-	} 
+
+	public IngresoProducto clone() throws CloneNotSupportedException {
+		return (IngresoProducto) super.clone();
+	}
 
 	public Integer getIdIngresoProducto() {
 		return idIngresoProducto;
@@ -194,25 +192,25 @@ public class IngresoProducto implements Serializable,Cloneable{
 	public void setProducto(Producto producto) {
 		this.producto = producto;
 	}
-	
-	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idIngresoProducto != null ? idIngresoProducto.hashCode() : 0);
-        return hash;
-    }
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof IngresoProducto)) {
-            return false;
-        }
-        IngresoProducto other = (IngresoProducto) object;
-        if ((this.idIngresoProducto == null && other.idIngresoProducto != null) || (this.idIngresoProducto != null && !this.idIngresoProducto.equals(other.idIngresoProducto))) {
-            return false;
-        }
-        return true;
-    }
-	
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (idIngresoProducto != null ? idIngresoProducto.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof IngresoProducto)) {
+			return false;
+		}
+		IngresoProducto other = (IngresoProducto) object;
+		if ((this.idIngresoProducto == null && other.idIngresoProducto != null)
+				|| (this.idIngresoProducto != null && !this.idIngresoProducto.equals(other.idIngresoProducto))) {
+			return false;
+		}
+		return true;
+	}
+
 }

@@ -5,7 +5,6 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -14,27 +13,26 @@ import javax.persistence.Table;
 
 @Entity
 
-@Table(name="control_factura_constancia_ds")
+@Table(name = "control_factura_constancia_ds")
 @NamedQueries({
-	@NamedQuery(name = "ControlFacturaConstanciaDS.findByConstancia", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.constanciaDeServicio.folio = :constancia"),
-	@NamedQuery(name = "ControlFacturaConstanciaDS.findByFactura", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.factura = :factura")
-})
+		@NamedQuery(name = "ControlFacturaConstanciaDS.findByConstancia", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.constanciaDeServicio.folio = :constancia"),
+		@NamedQuery(name = "ControlFacturaConstanciaDS.findByFactura", query = "SELECT c FROM ControlFacturaConstanciaDS c WHERE c.factura = :factura") })
 public class ControlFacturaConstanciaDS implements Serializable {
 
 	private static final long serialVersionUID = 5847560075881311313L;
-	
+
 	@EmbeddedId
 	private ControlFacturaConstanciaDsPK controlFactConstDsPK;
-	
-	@JoinColumn(name = "CONSTANCIA", referencedColumnName = "FOLIO",insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-	private ConstanciaDeServicio constanciaDeServicio; 
-	
-	@JoinColumn(name = "FACTURA", referencedColumnName = "id",insertable = false, updatable = false)
-    @ManyToOne(optional = false)
+
+	@JoinColumn(name = "CONSTANCIA", referencedColumnName = "FOLIO", insertable = false, updatable = false)
+	@ManyToOne(optional = false)
+	private ConstanciaDeServicio constanciaDeServicio;
+
+	@JoinColumn(name = "FACTURA", referencedColumnName = "id", insertable = false, updatable = false)
+	@ManyToOne(optional = false)
 	private Factura factura;
-	
-	@Column(name="STATUS")
+
+	@Column(name = "STATUS")
 	private Integer status;
 
 	public Integer getStatus() {
@@ -44,7 +42,7 @@ public class ControlFacturaConstanciaDS implements Serializable {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	
+
 	public ControlFacturaConstanciaDS() {
 	}
 
@@ -80,7 +78,8 @@ public class ControlFacturaConstanciaDS implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((constanciaDeServicio.getFolio() == null) ? 0 : constanciaDeServicio.getFolio().hashCode());
+		result = prime * result
+				+ ((constanciaDeServicio.getFolio() == null) ? 0 : constanciaDeServicio.getFolio().hashCode());
 		result = prime * result + ((factura.getId() == null) ? 0 : factura.getId().hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		return result;
@@ -118,11 +117,5 @@ public class ControlFacturaConstanciaDS implements Serializable {
 		return "ControlFacturaConstanciaDS [controlFactConstDsPK=" + controlFactConstDsPK + ", constanciaDeServicio="
 				+ constanciaDeServicio + ", factura=" + factura + ", status=" + status + "]";
 	}
-
-	
-
-	
-	
-	
 
 }

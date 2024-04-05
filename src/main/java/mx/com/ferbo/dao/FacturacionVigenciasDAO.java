@@ -32,19 +32,16 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 
 	@Override
 	public ConstanciaFactura buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<ConstanciaFactura> buscarTodos() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<ConstanciaFactura> buscarPorCriterios(ConstanciaFactura e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -348,25 +345,21 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 
 	@Override
 	public String actualizar(ConstanciaFactura e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String guardar(ConstanciaFactura e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminar(ConstanciaFactura e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<ConstanciaFactura> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.util.EntityManagerUtil;
+
 /**
  *
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
@@ -21,16 +22,16 @@ public class ProductoDAO extends IBaseDAO<Producto, Integer> {
 	public Producto buscarPorId(Integer id) {
 		Producto producto = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			producto = em.find(Producto.class, id);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el producto...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return producto;
 	}
 
@@ -41,7 +42,7 @@ public class ProductoDAO extends IBaseDAO<Producto, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("Producto.findAll", Producto.class).getResultList();
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de productos...", ex);
 		} finally {
 			EntityManagerUtil.close(em);

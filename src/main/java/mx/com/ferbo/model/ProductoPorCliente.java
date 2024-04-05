@@ -25,58 +25,56 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "producto_por_cliente")
-@NamedQueries({
-    @NamedQuery(name = "ProductoPorCliente.findAll", query = "SELECT p FROM ProductoPorCliente p"),
-    @NamedQuery(name = "ProductoPorCliente.findByProdXCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.prodXCteCve = :prodXCteCve"),
-    @NamedQuery(name = "ProductoPorCliente.findByProductoCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.productoCve = :productoCve"),
-    @NamedQuery(name = "ProductoPorCliente.findByCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve.cteCve = :cteCve"),
-    @NamedQuery(name = "ProductoPorCliente.findByCteCveOrderByProductoDs", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve.cteCve = :cteCve ORDER BY p.productoCve.productoDs"),
-    @NamedQuery(name = "ProductoPorCliente.findByCliente", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve = :cteCve")})
+@NamedQueries({ @NamedQuery(name = "ProductoPorCliente.findAll", query = "SELECT p FROM ProductoPorCliente p"),
+		@NamedQuery(name = "ProductoPorCliente.findByProdXCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.prodXCteCve = :prodXCteCve"),
+		@NamedQuery(name = "ProductoPorCliente.findByProductoCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.productoCve = :productoCve"),
+		@NamedQuery(name = "ProductoPorCliente.findByCteCve", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve.cteCve = :cteCve"),
+		@NamedQuery(name = "ProductoPorCliente.findByCteCveOrderByProductoDs", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve.cteCve = :cteCve ORDER BY p.productoCve.productoDs"),
+		@NamedQuery(name = "ProductoPorCliente.findByCliente", query = "SELECT p FROM ProductoPorCliente p WHERE p.cteCve = :cteCve") })
 
 public class ProductoPorCliente implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "PROD_X_CTE_CVE")
-    private Integer prodXCteCve;
-    @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
-    @ManyToOne(optional = false)
-    private Cliente cteCve;
-    @JoinColumn(name = "PRODUCTO_CVE", referencedColumnName = "PRODUCTO_CVE")
-    @ManyToOne(optional = false)
-    private Producto productoCve;
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "PROD_X_CTE_CVE")
+	private Integer prodXCteCve;
+	@JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
+	@ManyToOne(optional = false)
+	private Cliente cteCve;
+	@JoinColumn(name = "PRODUCTO_CVE", referencedColumnName = "PRODUCTO_CVE")
+	@ManyToOne(optional = false)
+	private Producto productoCve;
 
-    public ProductoPorCliente() {
-    }
+	public ProductoPorCliente() {
+	}
 
-    public ProductoPorCliente(Integer prodXCteCve) {
-        this.prodXCteCve = prodXCteCve;
-    }
-    
-    public ProductoPorCliente(Cliente cliente) {//nuevo
-    	this.cteCve = cliente;
-    }
+	public ProductoPorCliente(Integer prodXCteCve) {
+		this.prodXCteCve = prodXCteCve;
+	}
 
-    public Integer getProdXCteCve() {
-        return prodXCteCve;
-    }
+	public ProductoPorCliente(Cliente cliente) {// nuevo
+		this.cteCve = cliente;
+	}
 
-    public void setProdXCteCve(Integer prodXCteCve) {
-        this.prodXCteCve = prodXCteCve;
-    }
+	public Integer getProdXCteCve() {
+		return prodXCteCve;
+	}
 
-    public Cliente getCteCve() {
-        return cteCve;
-    }
+	public void setProdXCteCve(Integer prodXCteCve) {
+		this.prodXCteCve = prodXCteCve;
+	}
 
-    public void setCteCve(Cliente cteCve) {
-        this.cteCve = cteCve;
-    }
+	public Cliente getCteCve() {
+		return cteCve;
+	}
 
-    
-    public Producto getProductoCve() {
+	public void setCteCve(Cliente cteCve) {
+		this.cteCve = cteCve;
+	}
+
+	public Producto getProductoCve() {
 		return productoCve;
 	}
 
@@ -85,28 +83,28 @@ public class ProductoPorCliente implements Serializable {
 	}
 
 	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (prodXCteCve != null ? prodXCteCve.hashCode() : 0);
-        return hash;
-    }
+	public int hashCode() {
+		int hash = 0;
+		hash += (prodXCteCve != null ? prodXCteCve.hashCode() : 0);
+		return hash;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ProductoPorCliente)) {
-            return false;
-        }
-        ProductoPorCliente other = (ProductoPorCliente) object;
-        if ((this.prodXCteCve == null && other.prodXCteCve != null) || (this.prodXCteCve != null && !this.prodXCteCve.equals(other.prodXCteCve))) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof ProductoPorCliente)) {
+			return false;
+		}
+		ProductoPorCliente other = (ProductoPorCliente) object;
+		if ((this.prodXCteCve == null && other.prodXCteCve != null)
+				|| (this.prodXCteCve != null && !this.prodXCteCve.equals(other.prodXCteCve))) {
+			return false;
+		}
+		return true;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.ProductoPorCliente[ prodXCteCve=" + prodXCteCve + " ]";
-    }
-    
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.ProductoPorCliente[ prodXCteCve=" + prodXCteCve + " ]";
+	}
+
 }

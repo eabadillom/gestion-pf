@@ -32,249 +32,250 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "partida")
-@NamedQueries({
-        @NamedQuery(name = "Partida.findAll", query = "SELECT p FROM Partida p"),
-        @NamedQuery(name = "Partida.findByPartidaCve", query = "SELECT p FROM Partida p WHERE p.partidaCve = :partidaCve"),
-        @NamedQuery(name = "Partida.findByPesoTotal", query = "SELECT p FROM Partida p WHERE p.pesoTotal = :pesoTotal"),
-        @NamedQuery(name = "Partida.findByCantidadTotal", query = "SELECT p FROM Partida p WHERE p.cantidadTotal = :cantidadTotal"),
-        @NamedQuery(name = "Partida.findByUnidadDeProductoCve", query = "SELECT p FROM Partida p WHERE p.unidadDeProductoCve = :unidadDeProductoCve"),
-        @NamedQuery(name = "Partida.findByCantidadDeCobro", query = "SELECT p FROM Partida p WHERE p.cantidadDeCobro = :cantidadDeCobro"),
-        @NamedQuery(name = "Partida.findByPartidaSeq", query = "SELECT p FROM Partida p WHERE p.partidaSeq = :partidaSeq"),
-        @NamedQuery(name = "Partida.findByValorMercancia", query = "SELECT p FROM Partida p WHERE p.valorMercancia = :valorMercancia"),
-        @NamedQuery(name = "Partida.findByRendimiento", query = "SELECT p FROM Partida p WHERE p.rendimiento = :rendimiento"),
-        @NamedQuery(name = "Partida.findByNoTarimas", query = "SELECT p FROM Partida p WHERE p.noTarimas = :noTarimas"),
-        @NamedQuery(name = "Partida.findByConstanciaDeDeposito", query = "SELECT p FROM Partida p WHERE p.folio.folioCliente = :folioCliente") })
+@NamedQueries({ @NamedQuery(name = "Partida.findAll", query = "SELECT p FROM Partida p"),
+		@NamedQuery(name = "Partida.findByPartidaCve", query = "SELECT p FROM Partida p WHERE p.partidaCve = :partidaCve"),
+		@NamedQuery(name = "Partida.findByPesoTotal", query = "SELECT p FROM Partida p WHERE p.pesoTotal = :pesoTotal"),
+		@NamedQuery(name = "Partida.findByCantidadTotal", query = "SELECT p FROM Partida p WHERE p.cantidadTotal = :cantidadTotal"),
+		@NamedQuery(name = "Partida.findByUnidadDeProductoCve", query = "SELECT p FROM Partida p WHERE p.unidadDeProductoCve = :unidadDeProductoCve"),
+		@NamedQuery(name = "Partida.findByCantidadDeCobro", query = "SELECT p FROM Partida p WHERE p.cantidadDeCobro = :cantidadDeCobro"),
+		@NamedQuery(name = "Partida.findByPartidaSeq", query = "SELECT p FROM Partida p WHERE p.partidaSeq = :partidaSeq"),
+		@NamedQuery(name = "Partida.findByValorMercancia", query = "SELECT p FROM Partida p WHERE p.valorMercancia = :valorMercancia"),
+		@NamedQuery(name = "Partida.findByRendimiento", query = "SELECT p FROM Partida p WHERE p.rendimiento = :rendimiento"),
+		@NamedQuery(name = "Partida.findByNoTarimas", query = "SELECT p FROM Partida p WHERE p.noTarimas = :noTarimas"),
+		@NamedQuery(name = "Partida.findByConstanciaDeDeposito", query = "SELECT p FROM Partida p WHERE p.folio.folioCliente = :folioCliente") })
 public class Partida implements Serializable, Cloneable {
 
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "PARTIDA_CVE")
-    private Integer partidaCve;
-    
-    @Column(name = "PESO_TOTAL")
-    private BigDecimal pesoTotal;
-    
-    @Column(name = "CANTIDAD_TOTAL")
-    private Integer cantidadTotal;
-    
-    @Column(name = "cantidad_de_cobro")
-    private BigDecimal cantidadDeCobro;
-    
-    @Column(name = "partida_seq")
-    private Integer partidaSeq;
-    
-    @Column(name = "valorMercancia")
-    private BigDecimal valorMercancia;
-    
-    @Column(name = "rendimiento")
-    private BigDecimal rendimiento;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "no_tarimas")
-    private BigDecimal noTarimas;
-    
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "detallePartidaPK.partidaCve")//PENDIENTE NO MNODIFICA EL DETALLE PARTIDA DE LA PARTIDA SELECCIONADA detallePartidaPK.partidaCve
-    private List<DetallePartida> detallePartidaList;
-    
-    @JoinColumn(name = "CAMARA_CVE", referencedColumnName = "CAMARA_CVE")
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Camara camaraCve;
-    
-    @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    @ManyToOne(optional = false, cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
-    private ConstanciaDeDeposito folio;
-    
-    @JoinColumn(name = "unidad_de_cobro", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UnidadDeManejo unidadDeCobro;
-    
-    @OneToMany(mappedBy = "partidaCve", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
+	private static final long serialVersionUID = 1L;
 
-    @JoinColumn(name = "UNIDAD_DE_PRODUCTO_CVE", referencedColumnName = "UNIDAD_DE_PRODUCTO_CVE")
-    @ManyToOne(optional = false)
-    private UnidadDeProducto unidadDeProductoCve;
-    
-    @OneToMany(mappedBy = "partida", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
-    private List<TraspasoPartida> traspasoPartidaList;
-    
-    public Partida clone() throws CloneNotSupportedException{  
-    	return (Partida) super.clone();  
-	} 
-    
-    public void add(DetallePartida detalle) {
-    	if(this.detallePartidaList == null)
-    		this.detallePartidaList = new ArrayList<DetallePartida>();
-    	
-    	if(detalle.getDetallePartidaPK() == null)
-    		detalle.setDetallePartidaPK(new DetallePartidaPK(detallePartidaList.size(), this));
-    	
-    	this.detallePartidaList.add(detalle);
-    }
-    
-    public void add(DetalleConstanciaSalida detalleConstanciaSalida) {
-    	if(this.detalleConstanciaSalidaList == null)
-    		this.detalleConstanciaSalidaList = new ArrayList<DetalleConstanciaSalida>();
-    	
-    	this.detalleConstanciaSalidaList.add(detalleConstanciaSalida);
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "PARTIDA_CVE")
+	private Integer partidaCve;
 
-    public void setUnidadDeProductoCve(UnidadDeProducto unidadDeProductoCve) {
-        this.unidadDeProductoCve = unidadDeProductoCve;
-    }
+	@Column(name = "PESO_TOTAL")
+	private BigDecimal pesoTotal;
 
-    public Partida() {
-    }
+	@Column(name = "CANTIDAD_TOTAL")
+	private Integer cantidadTotal;
 
-    public Partida(Integer partidaCve) {
-        this.partidaCve = partidaCve;
-    }
+	@Column(name = "cantidad_de_cobro")
+	private BigDecimal cantidadDeCobro;
 
-    public Partida(Integer partidaCve, BigDecimal noTarimas) {
-        this.partidaCve = partidaCve;
-        this.noTarimas = noTarimas;
-    }
+	@Column(name = "partida_seq")
+	private Integer partidaSeq;
 
-    public Integer getPartidaCve() {
-        return partidaCve;
-    }
+	@Column(name = "valorMercancia")
+	private BigDecimal valorMercancia;
 
-    public void setPartidaCve(Integer partidaCve) {
-        this.partidaCve = partidaCve;
-    }
+	@Column(name = "rendimiento")
+	private BigDecimal rendimiento;
 
-    public BigDecimal getPesoTotal() {
-        return pesoTotal;
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Column(name = "no_tarimas")
+	private BigDecimal noTarimas;
 
-    public void setPesoTotal(BigDecimal pesoTotal) {
-        this.pesoTotal = pesoTotal;
-    }
+	@OneToMany(cascade = CascadeType.PERSIST, mappedBy = "detallePartidaPK.partidaCve") // PENDIENTE NO MNODIFICA EL
+																						// DETALLE PARTIDA DE LA PARTIDA
+																						// SELECCIONADA
+																						// detallePartidaPK.partidaCve
+	private List<DetallePartida> detallePartidaList;
 
-    public Integer getCantidadTotal() {
-        return cantidadTotal;
-    }
+	@JoinColumn(name = "CAMARA_CVE", referencedColumnName = "CAMARA_CVE")
+	@ManyToOne(fetch = FetchType.EAGER)
+	private Camara camaraCve;
 
-    public void setCantidadTotal(Integer cantidadTotal) {
-        this.cantidadTotal = cantidadTotal;
-    }
+	@JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
+	@ManyToOne(optional = false, cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+	private ConstanciaDeDeposito folio;
 
-    public BigDecimal getCantidadDeCobro() {
-        return cantidadDeCobro;
-    }
+	@JoinColumn(name = "unidad_de_cobro", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
+	@ManyToOne(fetch = FetchType.LAZY)
+	private UnidadDeManejo unidadDeCobro;
 
-    public void setCantidadDeCobro(BigDecimal cantidadDeCobro) {
-        this.cantidadDeCobro = cantidadDeCobro;
-    }
+	@OneToMany(mappedBy = "partidaCve", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+	private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
 
-    public Integer getPartidaSeq() {
-        return partidaSeq;
-    }
+	@JoinColumn(name = "UNIDAD_DE_PRODUCTO_CVE", referencedColumnName = "UNIDAD_DE_PRODUCTO_CVE")
+	@ManyToOne(optional = false)
+	private UnidadDeProducto unidadDeProductoCve;
 
-    public void setPartidaSeq(Integer partidaSeq) {
-        this.partidaSeq = partidaSeq;
-    }
+	@OneToMany(mappedBy = "partida", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	private List<TraspasoPartida> traspasoPartidaList;
 
-    public BigDecimal getValorMercancia() {
-        return valorMercancia;
-    }
+	public Partida clone() throws CloneNotSupportedException {
+		return (Partida) super.clone();
+	}
 
-    public void setValorMercancia(BigDecimal valorMercancia) {
-        this.valorMercancia = valorMercancia;
-    }
+	public void add(DetallePartida detalle) {
+		if (this.detallePartidaList == null)
+			this.detallePartidaList = new ArrayList<DetallePartida>();
 
-    public BigDecimal getRendimiento() {
-        return rendimiento;
-    }
+		if (detalle.getDetallePartidaPK() == null)
+			detalle.setDetallePartidaPK(new DetallePartidaPK(detallePartidaList.size(), this));
 
-    public void setRendimiento(BigDecimal rendimiento) {
-        this.rendimiento = rendimiento;
-    }
+		this.detallePartidaList.add(detalle);
+	}
 
-    public BigDecimal getNoTarimas() {
-        return noTarimas;
-    }
+	public void add(DetalleConstanciaSalida detalleConstanciaSalida) {
+		if (this.detalleConstanciaSalidaList == null)
+			this.detalleConstanciaSalidaList = new ArrayList<DetalleConstanciaSalida>();
 
-    public void setNoTarimas(BigDecimal noTarimas) {
-        this.noTarimas = noTarimas;
-    }
+		this.detalleConstanciaSalidaList.add(detalleConstanciaSalida);
+	}
 
-    public List<DetallePartida> getDetallePartidaList() {
-        return detallePartidaList;
-    }
+	public void setUnidadDeProductoCve(UnidadDeProducto unidadDeProductoCve) {
+		this.unidadDeProductoCve = unidadDeProductoCve;
+	}
 
-    public void setDetallePartidaList(List<DetallePartida> detallePartidaList) {
-        this.detallePartidaList = detallePartidaList;
-        for(DetallePartida dp : detallePartidaList) {
-        	dp.getDetallePartidaPK().setPartidaCve(this);
-        }
-    }
+	public Partida() {
+	}
 
-    public Camara getCamaraCve() {
-        return camaraCve;
-    }
+	public Partida(Integer partidaCve) {
+		this.partidaCve = partidaCve;
+	}
 
-    public void setCamaraCve(Camara camaraCve) {
-        this.camaraCve = camaraCve;
-    }
+	public Partida(Integer partidaCve, BigDecimal noTarimas) {
+		this.partidaCve = partidaCve;
+		this.noTarimas = noTarimas;
+	}
 
-    public ConstanciaDeDeposito getFolio() {
-        return folio;
-    }
+	public Integer getPartidaCve() {
+		return partidaCve;
+	}
 
-    public void setFolio(ConstanciaDeDeposito folio) {
-        this.folio = folio;
-    }
+	public void setPartidaCve(Integer partidaCve) {
+		this.partidaCve = partidaCve;
+	}
 
-    public UnidadDeManejo getUnidadDeCobro() {
-        return unidadDeCobro;
-    }
+	public BigDecimal getPesoTotal() {
+		return pesoTotal;
+	}
 
-    public void setUnidadDeCobro(UnidadDeManejo unidadDeCobro) {
-        this.unidadDeCobro = unidadDeCobro;
-    }
+	public void setPesoTotal(BigDecimal pesoTotal) {
+		this.pesoTotal = pesoTotal;
+	}
 
-    public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
-        return detalleConstanciaSalidaList;
-    }
+	public Integer getCantidadTotal() {
+		return cantidadTotal;
+	}
 
-    public void setDetalleConstanciaSalidaList(List<DetalleConstanciaSalida> detalleConstanciaSalidaList) {
-        this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
-    }
+	public void setCantidadTotal(Integer cantidadTotal) {
+		this.cantidadTotal = cantidadTotal;
+	}
 
-    public UnidadDeProducto getUnidadDeProductoCve() {
-        return unidadDeProductoCve;
-    }
+	public BigDecimal getCantidadDeCobro() {
+		return cantidadDeCobro;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (partidaCve != null ? partidaCve.hashCode() : 0);
-        return hash;
-    }
+	public void setCantidadDeCobro(BigDecimal cantidadDeCobro) {
+		this.cantidadDeCobro = cantidadDeCobro;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Partida)) {
-            return false;
-        }
-        Partida other = (Partida) object;
-        if ((this.partidaCve == null && other.partidaCve != null)
-                || (this.partidaCve != null && !this.partidaCve.equals(other.partidaCve))) {
-            return false;
-        }
-        return true;
-    }
+	public Integer getPartidaSeq() {
+		return partidaSeq;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + " ]";
-    }
+	public void setPartidaSeq(Integer partidaSeq) {
+		this.partidaSeq = partidaSeq;
+	}
+
+	public BigDecimal getValorMercancia() {
+		return valorMercancia;
+	}
+
+	public void setValorMercancia(BigDecimal valorMercancia) {
+		this.valorMercancia = valorMercancia;
+	}
+
+	public BigDecimal getRendimiento() {
+		return rendimiento;
+	}
+
+	public void setRendimiento(BigDecimal rendimiento) {
+		this.rendimiento = rendimiento;
+	}
+
+	public BigDecimal getNoTarimas() {
+		return noTarimas;
+	}
+
+	public void setNoTarimas(BigDecimal noTarimas) {
+		this.noTarimas = noTarimas;
+	}
+
+	public List<DetallePartida> getDetallePartidaList() {
+		return detallePartidaList;
+	}
+
+	public void setDetallePartidaList(List<DetallePartida> detallePartidaList) {
+		this.detallePartidaList = detallePartidaList;
+		for (DetallePartida dp : detallePartidaList) {
+			dp.getDetallePartidaPK().setPartidaCve(this);
+		}
+	}
+
+	public Camara getCamaraCve() {
+		return camaraCve;
+	}
+
+	public void setCamaraCve(Camara camaraCve) {
+		this.camaraCve = camaraCve;
+	}
+
+	public ConstanciaDeDeposito getFolio() {
+		return folio;
+	}
+
+	public void setFolio(ConstanciaDeDeposito folio) {
+		this.folio = folio;
+	}
+
+	public UnidadDeManejo getUnidadDeCobro() {
+		return unidadDeCobro;
+	}
+
+	public void setUnidadDeCobro(UnidadDeManejo unidadDeCobro) {
+		this.unidadDeCobro = unidadDeCobro;
+	}
+
+	public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
+		return detalleConstanciaSalidaList;
+	}
+
+	public void setDetalleConstanciaSalidaList(List<DetalleConstanciaSalida> detalleConstanciaSalidaList) {
+		this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
+	}
+
+	public UnidadDeProducto getUnidadDeProductoCve() {
+		return unidadDeProductoCve;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (partidaCve != null ? partidaCve.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Partida)) {
+			return false;
+		}
+		Partida other = (Partida) object;
+		if ((this.partidaCve == null && other.partidaCve != null)
+				|| (this.partidaCve != null && !this.partidaCve.equals(other.partidaCve))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + " ]";
+	}
 
 	public List<TraspasoPartida> getTraspasoPartidaList() {
 		return traspasoPartidaList;
@@ -283,7 +284,5 @@ public class Partida implements Serializable, Cloneable {
 	public void setTraspasoPartidaList(List<TraspasoPartida> traspasoPartidaList) {
 		this.traspasoPartidaList = traspasoPartidaList;
 	}
-
-	
 
 }

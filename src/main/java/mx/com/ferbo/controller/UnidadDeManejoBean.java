@@ -13,7 +13,6 @@ import javax.inject.Named;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
-import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.UnidadDeManejo;
 
 @Named
@@ -21,29 +20,29 @@ import mx.com.ferbo.model.UnidadDeManejo;
 public class UnidadDeManejoBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private List<UnidadDeManejo> listaUnidadManejo;
-	
+
 	private List<UnidadDeManejo> listaUnidadManejoSelected;
-	
+
 	private UnidadDeManejo unidadManejoSelected;
-	
+
 	private UnidadDeManejoDAO unidadManejoDao;
 
 	public UnidadDeManejoBean() {
 		unidadManejoDao = new UnidadDeManejoDAO();
 		listaUnidadManejoSelected = new ArrayList<>();
 	}
-	
+
 	@PostConstruct
 	public void init() {
 		listaUnidadManejo = unidadManejoDao.buscarTodos();
 	}
-	
+
 	public void nuevaUnidadManejo() {
 		this.unidadManejoSelected = new UnidadDeManejo();
 	}
-	
+
 	public void guardarUnidadManejo() {
 		if (this.unidadManejoSelected.getUnidadDeManejoCve() == null) {
 			if (unidadManejoDao.guardar(unidadManejoSelected) == null) {
@@ -109,6 +108,5 @@ public class UnidadDeManejoBean implements Serializable {
 	public void setUnidadManejoDao(UnidadDeManejoDAO unidadManejoDao) {
 		this.unidadManejoDao = unidadManejoDao;
 	}
-	
-	
+
 }

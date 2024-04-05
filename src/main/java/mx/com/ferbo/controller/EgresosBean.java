@@ -37,16 +37,16 @@ import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
 import mx.com.ferbo.dao.CategoriaEgresosDAO;
+import mx.com.ferbo.dao.EgresosDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.ImporteEgresosDAO;
-import mx.com.ferbo.dao.egresosDAO;
-import mx.com.ferbo.dao.tipoEgresoDAO;
+import mx.com.ferbo.dao.TipoEgresoDAO;
 import mx.com.ferbo.model.CategoriaEgreso;
+import mx.com.ferbo.model.Egresos;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.ImporteEgreso;
 import mx.com.ferbo.model.TipoEgreso;
-import mx.com.ferbo.model.egresos;
-import mx.com.ferbo.ui.importeUtilidad;
+import mx.com.ferbo.ui.ImporteUtilidad;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -55,53 +55,52 @@ import net.sf.jasperreports.engine.JRException;
 
 @Named
 @ViewScoped
-public class egresosBean implements Serializable{
-	private static Logger log = LogManager.getLogger(egresosBean.class);
+public class EgresosBean implements Serializable {
+	private static Logger log = LogManager.getLogger(EgresosBean.class);
 	private static final long serialVersionUID = 1L;
-	
-	private egresos nuevoEgreso;
+
+	private Egresos nuevoEgreso;
 	private String conceptoEgreso;
 	private Date fechaActual;
 	private CategoriaEgreso categoriaSelect;
 	private TipoEgreso tipoSelect;
 	private EmisoresCFDIS emisor;
 	private BarChartModel barModel;
-    private BarChartModel stackedGroupBarModel;
-	
+	private BarChartModel stackedGroupBarModel;
+
 	private ImporteEgreso nuevoImporte;
 	private ImporteEgreso importeSelected;
 	private String importe;
 	private Date mesActual;
-	
+
 	private List<CategoriaEgreso> listaCatEgresos;
 	private List<TipoEgreso> listaTipoEgresos;
 	private List<EmisoresCFDIS> listaEmisores;
 	private List<ImporteEgreso> listaImporteEgreso;
-	private List<importeUtilidad> listaImporteUtilidad;
-	private List<egresos> listaEgresos;
+	private List<ImporteUtilidad> listaImporteUtilidad;
+	private List<Egresos> listaEgresos;
 	private CategoriaEgresosDAO categoriaDAO;
-	private tipoEgresoDAO tipoDAO;
+	private TipoEgresoDAO tipoDAO;
 	private EmisoresCFDISDAO emisoresDAO;
-	private egresosDAO egresosDAO;
+	private EgresosDAO egresosDAO;
 	private ImporteEgresosDAO importeEgresosDAO;
 	private ImporteEgreso i;
-	
-	public egresosBean() {
+
+	public EgresosBean() {
 		listaEmisores = new ArrayList<>();
 		listaCatEgresos = new ArrayList<>();
 		listaTipoEgresos = new ArrayList<>();
 		listaEgresos = new ArrayList<>();
 		categoriaDAO = new CategoriaEgresosDAO();
-		tipoDAO = new tipoEgresoDAO();
+		tipoDAO = new TipoEgresoDAO();
 		emisoresDAO = new EmisoresCFDISDAO();
-		egresosDAO = new egresosDAO();
+		egresosDAO = new EgresosDAO();
 		fechaActual = new Date();
 		importeEgresosDAO = new ImporteEgresosDAO();
 		importeSelected = new ImporteEgreso();
 		listaImporteUtilidad = new ArrayList<>();
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@PostConstruct
 	public void Init() {
 		listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null, mesActual);
@@ -112,60 +111,67 @@ public class egresosBean implements Serializable{
 		listaTipoEgresos = tipoDAO.findByAll();
 		listaImporteEgreso = importeEgresosDAO.buscarTodos();
 		mesActual = new Date();
-		nuevoEgreso = new egresos();
+		nuevoEgreso = new Egresos();
 		barModel = new BarChartModel();
 		stackedGroupBarModel = new BarChartModel();
 	}
-	
+
 	public void actualizar() {
 		PrimeFaces.current().executeInitScript("PF('dg-importe').hide()");
 		try {
 			String msj = importeEgresosDAO.guardar(importeSelected);
-			if(msj == null) {
+			if (msj == null) {
 				listaImporteEgreso = importeEgresosDAO.buscarTodos();
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Importe agregado"+ importeSelected.getImporte(), null));
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+						"Importe agregado" + importeSelected.getImporte(), null));
 				PrimeFaces.current().ajax().update("form:messages", "form:dt-egresos");
-		} 
-		}catch (Exception e) {
-		e.printStackTrace();
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-				"Error al modificar " + importeSelected.getImporte(), null));
-		PrimeFaces.current().ajax().update("form:messages");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"Error al modificar " + importeSelected.getImporte(), null));
+			PrimeFaces.current().ajax().update("form:messages");
 		}
-		//}else {
+		// }else {
 	}
-	
+
 	public void nuevoRegistroImporte() {
 		nuevoImporte = new ImporteEgreso();
 	}
-	public void nuevoRegistro() {
-		nuevoEgreso = new egresos();
-	}
-	
-	public void handleToggle(ToggleEvent event) {
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Toggled", "Visibility:" + event.getVisibility());
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }
 
+	public void nuevoRegistro() {
+		nuevoEgreso = new Egresos();
+	}
+
+	public void handleToggle(ToggleEvent event) {
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Toggled",
+				"Visibility:" + event.getVisibility());
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
+
+	@SuppressWarnings("unused")
 	public void guardar() {
 		PrimeFaces.current().executeInitScript("PF('dg-agregaConcepto').hide()");
 		String msj = null;
-		
-		if(msj == null) {
+
+		if (msj == null) {
 			listaEgresos.clear();
 			nuevoEgreso.setNombreEgreso(conceptoEgreso);
-			listaEgresos= egresosDAO.buscarTodos();
+			listaEgresos = egresosDAO.buscarTodos();
 			msj = egresosDAO.guardar(nuevoEgreso);
-			FacesContext.getCurrentInstance().addMessage( null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Egreso registrado", null));
-			PrimeFaces.current().ajax().update("form:messages","form:messages");
-		}else {
-			FacesContext.getCurrentInstance().addMessage( null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Egreso no registrado", msj));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Egreso registrado", null));
+			PrimeFaces.current().ajax().update("form:messages", "form:messages");
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Egreso no registrado", msj));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
-		//nuevoEgreso = new egresos();
+		// nuevoEgreso = new egresos();
 	};
 
-	public void exportarPDF() throws JRException, IOException, SQLException{
+	@SuppressWarnings("unused")
+	public void exportarPDF() throws JRException, IOException, SQLException {
 		log.info("exportando a PDF");
 		String jasperPath = null;
 		String filename = null;
@@ -181,8 +187,8 @@ public class egresosBean implements Serializable{
 		parameters = new HashMap<String, Object>();
 
 		try {
-			jasperPath =  "/jasper/estado_de_resultados.jrxml";
-			filename ="estado_de_resultados" + mesActual + ".pdf";
+			jasperPath = "/jasper/estado_de_resultados.jrxml";
+			filename = "estado_de_resultados" + mesActual + ".pdf";
 			images = "/images/logo.jpeg";
 			reportFile = new File(jasperPath);
 			URL resource = getClass().getResource(jasperPath);
@@ -192,34 +198,33 @@ public class egresosBean implements Serializable{
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
-			
+
 			String emi = null;
 			Integer cd_emi = null;
-			
 
-				if (cd_emi == null )
-					emi = null;
-				else
-					emi = importeSelected.getCdEmisor().getNb_emisor();
-			
+			if (cd_emi == null)
+				emi = null;
+			else
+				emi = importeSelected.getCdEmisor().getNb_emisor();
+
 			finMes = DateUtil.getLastDayOfMonth(mesActual);
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("EMISOR",emi );
+			parameters.put("EMISOR", emi);
 			parameters.put("FECHAINI", mesActual);
 			parameters.put("FECHAFIN", finMes);
 			parameters.put("image", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			//egresoPDF = jasperReportUtil.getPdf(filename, parameters, reportFile.getPath());
-			/*jasperReportUtil = new JasperReportUtil();
-			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
-			InputStream input = new ByteArrayInputStream(bytes);
-			this.egresoPDF = DefaultStreamedContent.builder()
-					.contentType("application/pdf")
-					.name(filename)
-					.stream(() -> input )
-					.build();*/
+			// egresoPDF = jasperReportUtil.getPdf(filename, parameters,
+			// reportFile.getPath());
+			/*
+			 * jasperReportUtil = new JasperReportUtil(); byte[] bytes =
+			 * jasperReportUtil.createPDF(parameters, reportFile.getPath()); InputStream
+			 * input = new ByteArrayInputStream(bytes); this.egresoPDF =
+			 * DefaultStreamedContent.builder() .contentType("application/pdf")
+			 * .name(filename) .stream(() -> input ) .build();
+			 */
 			log.info("Reporte generado {}...", filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
@@ -230,13 +235,12 @@ public class egresosBean implements Serializable{
 			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
 			conexion.close((Connection) connection);
-			
+
 		}
 
 	}
 
-	
-	
+	@SuppressWarnings("unused")
 	public void exportarExcel() {
 		log.info("exportando a PDF");
 		String jasperPath = null;
@@ -253,8 +257,8 @@ public class egresosBean implements Serializable{
 		parameters = new HashMap<String, Object>();
 
 		try {
-			jasperPath =  "/jasper/estado_de_resultados.jrxml";
-			filename ="estado_de_resultados" + mesActual + ".xlsx";
+			jasperPath = "/jasper/estado_de_resultados.jrxml";
+			filename = "estado_de_resultados" + mesActual + ".xlsx";
 			images = "/images/logo.jpeg";
 			reportFile = new File(jasperPath);
 			URL resource = getClass().getResource(jasperPath);
@@ -264,34 +268,33 @@ public class egresosBean implements Serializable{
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
-			
+
 			String emi = null;
 			Integer cd_emi = null;
-			
 
-				if (cd_emi == null )
-					emi = null;
-				else
-					emi = importeSelected.getCdEmisor().getNb_emisor();
-			
+			if (cd_emi == null)
+				emi = null;
+			else
+				emi = importeSelected.getCdEmisor().getNb_emisor();
+
 			finMes = DateUtil.getLastDayOfMonth(mesActual);
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("EMISOR",emi );
+			parameters.put("EMISOR", emi);
 			parameters.put("FECHAINI", mesActual);
 			parameters.put("FECHAFIN", finMes);
 			parameters.put("image", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
 			jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
-			//egresoPDF = jasperReportUtil.getPdf(filename, parameters, reportFile.getPath());
-			/*jasperReportUtil = new JasperReportUtil();
-			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
-			InputStream input = new ByteArrayInputStream(bytes);
-			this.egresoPDF = DefaultStreamedContent.builder()
-					.contentType("application/pdf")
-					.name(filename)
-					.stream(() -> input )
-					.build();*/
+			// egresoPDF = jasperReportUtil.getPdf(filename, parameters,
+			// reportFile.getPath());
+			/*
+			 * jasperReportUtil = new JasperReportUtil(); byte[] bytes =
+			 * jasperReportUtil.createPDF(parameters, reportFile.getPath()); InputStream
+			 * input = new ByteArrayInputStream(bytes); this.egresoPDF =
+			 * DefaultStreamedContent.builder() .contentType("application/pdf")
+			 * .name(filename) .stream(() -> input ) .build();
+			 */
 			log.info("Reporte generado {}...", filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
@@ -302,107 +305,101 @@ public class egresosBean implements Serializable{
 			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
 			conexion.close((Connection) connection);
-			
+
 		}
 
 	}
-	
+
 	public void grafica() throws ParseException {
-	
-		 	stackedGroupBarModel = new BarChartModel();
-	        ChartData data = new ChartData();
-	        Date fechaAnt = null;
-			String fechaActual = DateFormat.getDateInstance().format(new Date());
-			Date fecha = new SimpleDateFormat("dd/MM/yyyy").parse(fechaActual);
-			Calendar calendario = Calendar.getInstance();
-			calendario.setTime(fecha);
-			calendario.add(Calendar.MONTH, -1);
-			String nuevaFecha = new SimpleDateFormat("dd/MM/yyyy").format(calendario.getTime());
-			System.out.println(nuevaFecha);
-			fechaAnt=new SimpleDateFormat("dd/MM/yyyy").parse(nuevaFecha);  
-		    System.out.println(nuevaFecha+"\t"+fechaAnt);  
-		    listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null,fechaAnt);
-	        //Primer dataSet
-	        BarChartDataSet barDataSet = new BarChartDataSet();
-	        barDataSet.setLabel("Ingresos");
-	        barDataSet.setBackgroundColor("rgb(255, 99, 132)");
-	        barDataSet.setStack("Stack 0");
-			
-			List<Number> listaUtilidadPagos = new ArrayList<>();
-			for(importeUtilidad u : listaImporteUtilidad)
-				listaUtilidadPagos.add(u.getPagos());
-			barDataSet.setData(listaUtilidadPagos);
 
-			//Segundo DataSet
-			BarChartDataSet barDataSet2 = new BarChartDataSet();
-			barDataSet2.setLabel("Egresos");
-			barDataSet2.setBackgroundColor("rgb(54, 162, 235)");
-			barDataSet2.setStack("Stack 1");
+		stackedGroupBarModel = new BarChartModel();
+		ChartData data = new ChartData();
+		Date fechaAnt = null;
+		String fechaActual = DateFormat.getDateInstance().format(new Date());
+		Date fecha = new SimpleDateFormat("dd/MM/yyyy").parse(fechaActual);
+		Calendar calendario = Calendar.getInstance();
+		calendario.setTime(fecha);
+		calendario.add(Calendar.MONTH, -1);
+		String nuevaFecha = new SimpleDateFormat("dd/MM/yyyy").format(calendario.getTime());
+		System.out.println(nuevaFecha);
+		fechaAnt = new SimpleDateFormat("dd/MM/yyyy").parse(nuevaFecha);
+		System.out.println(nuevaFecha + "\t" + fechaAnt);
+		listaImporteUtilidad = importeEgresosDAO.obtenerUtilidadPorEmisor(null, fechaAnt);
+		// Primer dataSet
+		BarChartDataSet barDataSet = new BarChartDataSet();
+		barDataSet.setLabel("Ingresos");
+		barDataSet.setBackgroundColor("rgb(255, 99, 132)");
+		barDataSet.setStack("Stack 0");
 
-			List<Number> listaUtilidadEgresos = new ArrayList<>();
-			for(importeUtilidad u : listaImporteUtilidad)
-				listaUtilidadEgresos.add(u.getEgresos());
-			barDataSet2.setData(listaUtilidadEgresos);
-	        
-			//terccer dataset
-			BarChartDataSet barDataSet3 = new BarChartDataSet();
-			barDataSet3.setLabel("Utilidad/Perdida");
-			barDataSet3.setBackgroundColor("rgb(75, 192, 192)");
-			barDataSet3.setStack("Stack 2");
+		List<Number> listaUtilidadPagos = new ArrayList<>();
+		for (ImporteUtilidad u : listaImporteUtilidad)
+			listaUtilidadPagos.add(u.getPagos());
+		barDataSet.setData(listaUtilidadPagos);
 
-			List<Number> listaUtilidadPerdida = new ArrayList<>();
-			for(importeUtilidad u : listaImporteUtilidad)
-				listaUtilidadPerdida.add(u.getUtilidadPerdida());
-			barDataSet3.setData(listaUtilidadPerdida);
-	        			
+		// Segundo DataSet
+		BarChartDataSet barDataSet2 = new BarChartDataSet();
+		barDataSet2.setLabel("Egresos");
+		barDataSet2.setBackgroundColor("rgb(54, 162, 235)");
+		barDataSet2.setStack("Stack 1");
 
-	        data.addChartDataSet(barDataSet);
-	       data.addChartDataSet(barDataSet2);
-	        data.addChartDataSet(barDataSet3);
+		List<Number> listaUtilidadEgresos = new ArrayList<>();
+		for (ImporteUtilidad u : listaImporteUtilidad)
+			listaUtilidadEgresos.add(u.getEgresos());
+		barDataSet2.setData(listaUtilidadEgresos);
 
-	        List<String> listaEmisores = new ArrayList<>();
-	        for(importeUtilidad i : listaImporteUtilidad)
-	        	listaEmisores.add(i.getEmiNombre());
-	        data.setLabels(listaEmisores);
-	        stackedGroupBarModel.setData(data);
+		// terccer dataset
+		BarChartDataSet barDataSet3 = new BarChartDataSet();
+		barDataSet3.setLabel("Utilidad/Perdida");
+		barDataSet3.setBackgroundColor("rgb(75, 192, 192)");
+		barDataSet3.setStack("Stack 2");
 
-	        //Options
-	        BarChartOptions options = new BarChartOptions();
-	        CartesianScales cScales = new CartesianScales();
-	        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
-	        linearAxes.setStacked(true);
-	        linearAxes.setOffset(true);
-	        cScales.addXAxesData(linearAxes);
-	        cScales.addYAxesData(linearAxes);
-	        options.setScales(cScales);
+		List<Number> listaUtilidadPerdida = new ArrayList<>();
+		for (ImporteUtilidad u : listaImporteUtilidad)
+			listaUtilidadPerdida.add(u.getUtilidadPerdida());
+		barDataSet3.setData(listaUtilidadPerdida);
 
-	        Title title = new Title();
-	        title.setDisplay(true);
-	        title.setText("Balance General");
-	        options.setTitle(title);
+		data.addChartDataSet(barDataSet);
+		data.addChartDataSet(barDataSet2);
+		data.addChartDataSet(barDataSet3);
 
-	        Tooltip tooltip = new Tooltip();
-	        tooltip.setMode("index");
-	        tooltip.setIntersect(false);
-	        options.setTooltip(tooltip);
+		List<String> listaEmisores = new ArrayList<>();
+		for (ImporteUtilidad i : listaImporteUtilidad)
+			listaEmisores.add(i.getEmiNombre());
+		data.setLabels(listaEmisores);
+		stackedGroupBarModel.setData(data);
 
-	        stackedGroupBarModel.setOptions(options);
-	    	stackedGroupBarModel.setExtender("charExtender");
+		// Options
+		BarChartOptions options = new BarChartOptions();
+		CartesianScales cScales = new CartesianScales();
+		CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+		linearAxes.setStacked(true);
+		linearAxes.setOffset(true);
+		cScales.addXAxesData(linearAxes);
+		cScales.addYAxesData(linearAxes);
+		options.setScales(cScales);
+
+		Title title = new Title();
+		title.setDisplay(true);
+		title.setText("Balance General");
+		options.setTitle(title);
+
+		Tooltip tooltip = new Tooltip();
+		tooltip.setMode("index");
+		tooltip.setIntersect(false);
+		options.setTooltip(tooltip);
+
+		stackedGroupBarModel.setOptions(options);
+		stackedGroupBarModel.setExtender("charExtender");
 
 	}
-	
-	
-	
-	
-	public egresos getNuevoEgreso() {
+
+	public Egresos getNuevoEgreso() {
 		return nuevoEgreso;
 	}
 
-
-	public void setNuevoEgreso(egresos nuevoEgreso) {
+	public void setNuevoEgreso(Egresos nuevoEgreso) {
 		this.nuevoEgreso = nuevoEgreso;
 	}
-
 
 	public CategoriaEgreso getCategoriaSelect() {
 		return categoriaSelect;
@@ -443,7 +440,7 @@ public class egresosBean implements Serializable{
 	public void setListaEmisores(List<EmisoresCFDIS> listaEmisores) {
 		this.listaEmisores = listaEmisores;
 	}
-	
+
 	public ImporteEgreso getNuevoImporte() {
 		return nuevoImporte;
 	}
@@ -452,11 +449,11 @@ public class egresosBean implements Serializable{
 		this.nuevoImporte = nuevoImporte;
 	}
 
-	public List<egresos> getListaEgresos() {
+	public List<Egresos> getListaEgresos() {
 		return listaEgresos;
 	}
 
-	public void setListaEgresos(List<egresos> listaEgresos) {
+	public void setListaEgresos(List<Egresos> listaEgresos) {
 		this.listaEgresos = listaEgresos;
 	}
 
@@ -508,7 +505,6 @@ public class egresosBean implements Serializable{
 		this.emisor = emisor;
 	}
 
-
 	public String getConceptoEgreso() {
 		return conceptoEgreso;
 	}
@@ -533,11 +529,11 @@ public class egresosBean implements Serializable{
 		this.i = i;
 	}
 
-	public List<importeUtilidad> getListaImporteUtilidad() {
+	public List<ImporteUtilidad> getListaImporteUtilidad() {
 		return listaImporteUtilidad;
 	}
 
-	public void setListaImporteUtilidad(List<importeUtilidad> listaImporteUtilidad) {
+	public void setListaImporteUtilidad(List<ImporteUtilidad> listaImporteUtilidad) {
 		this.listaImporteUtilidad = listaImporteUtilidad;
 	}
 
@@ -549,8 +545,4 @@ public class egresosBean implements Serializable{
 		this.stackedGroupBarModel = stackedGroupBarModel;
 	}
 
-
-	
-	
 }
-

@@ -23,43 +23,41 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class FacturaMedioPagoPK implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @ManyToOne(optional = false,cascade = CascadeType.ALL)//MODIFIQUE JUNIO 1
-    @JoinColumn(name = "factura_id")
-    private Factura facturaId;
-	
+	private static final long serialVersionUID = 1L;
+	@ManyToOne(optional = false, cascade = CascadeType.ALL) // MODIFIQUE JUNIO 1
+	@JoinColumn(name = "factura_id")
+	private Factura facturaId;
+
 	@Basic(optional = false)
-    @NotNull
-    @Column(name = "fmp_id")
-    private int fmpId;
+	@NotNull
+	@Column(name = "fmp_id")
+	private int fmpId;
 
-    public FacturaMedioPagoPK() {
-    }
+	public FacturaMedioPagoPK() {
+	}
 
-    public FacturaMedioPagoPK(Factura facturaId, int fmpId) {
-        this.facturaId = facturaId;
-        this.fmpId = fmpId;
-    }
+	public FacturaMedioPagoPK(Factura facturaId, int fmpId) {
+		this.facturaId = facturaId;
+		this.fmpId = fmpId;
+	}
 
-    public Factura getFacturaId() {
-        return facturaId;
-    }
+	public Factura getFacturaId() {
+		return facturaId;
+	}
 
-    public void setFacturaId(Factura facturaId) {
-        this.facturaId = facturaId;
-    }
+	public void setFacturaId(Factura facturaId) {
+		this.facturaId = facturaId;
+	}
 
-    public int getFmpId() {
-        return fmpId;
-    }
+	public int getFmpId() {
+		return fmpId;
+	}
 
-    public void setFmpId(int fmpId) {
-        this.fmpId = fmpId;
-    }
+	public void setFmpId(int fmpId) {
+		this.fmpId = fmpId;
+	}
 
-  
-
-    @Override
+	@Override
 	public int hashCode() {
 		return Objects.hash(facturaId, fmpId);
 	}
@@ -81,5 +79,4 @@ public class FacturaMedioPagoPK implements Serializable {
 		return "FacturaMedioPagoPK [facturaId=" + facturaId + ", fmpId=" + fmpId + "]";
 	}
 
-	
 }

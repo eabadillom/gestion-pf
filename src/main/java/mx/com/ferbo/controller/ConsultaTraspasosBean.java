@@ -1,6 +1,5 @@
 package mx.com.ferbo.controller;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -67,11 +66,11 @@ public class ConsultaTraspasosBean implements Serializable {
 	private List<TraspasoPartida> listaTraspasoPartida;
 	private List<ConstanciaTraspaso> listaTraspasos;
 	private List<TraspasoServicio> listaServicios;
-	
+
 	private Date fecha_ini;
 	private Date fecha_final;
 	private Date maxDate;
-	
+
 	private String numero;
 	private Integer cantidad;
 	private Integer idUnidadManejo;
@@ -80,23 +79,22 @@ public class ConsultaTraspasosBean implements Serializable {
 	private String observaciones;
 	private BigDecimal cantidadServicio;
 	private Integer idCliente;
-	
+
 	private Cliente selCliente;
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
 	private TraspasoPartida tp;
 	private Inventario inv;
 	private ConstanciaTraspaso selectedconstancia;
-	
-	
+
 	private EstadoConstanciaDAO edoDAO;
 	private ClienteDAO clienteDAO;
 	private ConstanciaTraspasoDAO constanciaTraspasoDAO;
-	
+
 	private boolean habilitareporte = false;
-	
+
 	private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
+	private HttpServletRequest httpServletRequest;
 
 	public ConsultaTraspasosBean() {
 		log.info("Entrando al constructor del controller...");
@@ -111,7 +109,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		listaconstanciadepo = new ArrayList<ConstanciaDeDeposito>();
 		listaTraspasoPartida = new ArrayList<TraspasoPartida>();
-		listaServicios  = new ArrayList<TraspasoServicio>();
+		listaServicios = new ArrayList<TraspasoServicio>();
 		selCliente = new Cliente();
 		selectedconstancia = new ConstanciaTraspaso();
 		tp = new TraspasoPartida();
@@ -122,34 +120,35 @@ public class ConsultaTraspasosBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
-		if(clientes.size() == 1)
+		if (clientes.size() == 1)
 			this.idCliente = clientes.get(0).getCteCve();
 		estados = edoDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
-		
+
 		Date today = new Date();
-		setMaxDate(new Date(today.getTime() ));
+		setMaxDate(new Date(today.getTime()));
 		this.selectedconstancia = new ConstanciaTraspaso();
-		
+
 	}
+
 	public void buscarConstancia() {
-		if(numero != null && "".equalsIgnoreCase(numero.trim()))
+		if (numero != null && "".equalsIgnoreCase(numero.trim()))
 			this.numero = null;
-		
-		if("".equalsIgnoreCase(this.numero))
+
+		if ("".equalsIgnoreCase(this.numero))
 			this.numero = null;
-		
-		if(clientes.size() == 1) {
+
+		if (clientes.size() == 1) {
 			this.idCliente = clientes.get(0).getCteCve();
 		}
-		
+
 		listaTraspasos = constanciaTraspasoDAO.buscar(fecha_ini, fecha_final, idCliente, numero);
 		log.debug("Lista constancias de traspaso: {}", listaTraspasos.size());
 	}
-	
+
 	public void cargaDetalle() {
 		String message = null;
 		Severity severity = null;
@@ -157,7 +156,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		try {
 			log.info("Cargando constancia de traspaso: {}", this.selectedconstancia);
 			this.selectedconstancia = constanciaTraspasoDAO.buscarPorId(this.selectedconstancia.getId(), true);
-			
+
 			log.debug("TraspasoPartida (size): {}", selectedconstancia.getTraspasoPartidaList().size());
 			listaTraspasoPartida = selectedconstancia.getTraspasoPartidaList();
 			listaServicios = selectedconstancia.getTraspasoServicioList();
@@ -165,14 +164,14 @@ public class ConsultaTraspasosBean implements Serializable {
 			log.error("Problema para recuperar los datos del cliente.", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
-			
+
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
 			EntityManagerUtil.close(manager);
 		}
 	}
-	
+
 	public void jasper() throws JRException, IOException, SQLException {
 		String jasperPath = "/jasper/ReporteTraspaso.jrxml";
 		String filename = "Constancia_de_traspaso.pdf";
@@ -197,7 +196,7 @@ public class ConsultaTraspasosBean implements Serializable {
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", this.selectedconstancia.getNumero());
 			parameters.put("LogoPath", imgfile.getPath());
-			log.info("Parametros: " + parameters.toString());			
+			log.info("Parametros: " + parameters.toString());
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 		} catch (Exception ex) {
 			ex.fillInStackTrace();
@@ -235,7 +234,7 @@ public class ConsultaTraspasosBean implements Serializable {
 	public void setNumero(String numero) {
 		this.numero = numero;
 	}
-	
+
 	public String getObservaciones() {
 		return observaciones;
 	}
@@ -316,7 +315,6 @@ public class ConsultaTraspasosBean implements Serializable {
 		this.alServiciosDetalle = alServiciosDetalle;
 	}
 
-
 	public ConstanciaServicioDetalle getSelServicio() {
 		return selServicio;
 	}
@@ -357,8 +355,6 @@ public class ConsultaTraspasosBean implements Serializable {
 		this.listaconstanciadepo = listaconstanciadepo;
 	}
 
-
-
 	public List<Partida> getPartida() {
 		return partida;
 	}
@@ -382,8 +378,6 @@ public class ConsultaTraspasosBean implements Serializable {
 	public void setInventario(List<InventarioDetalle> inventario) {
 		this.inventario = inventario;
 	}
-
-
 
 	public TraspasoPartida getTp() {
 		return tp;
@@ -424,7 +418,6 @@ public class ConsultaTraspasosBean implements Serializable {
 	public void setInv(Inventario inv) {
 		this.inv = inv;
 	}
-
 
 	public List<ConstanciaTraspaso> getListaTraspasos() {
 		return listaTraspasos;
@@ -473,7 +466,5 @@ public class ConsultaTraspasosBean implements Serializable {
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
 	}
-
-
 
 }

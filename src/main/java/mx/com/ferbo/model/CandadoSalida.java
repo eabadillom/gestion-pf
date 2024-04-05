@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,12 +28,12 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "candado_salida")
-@NamedQueries({ @NamedQuery(name = "CandadoSalida.findAll", query = "SELECT c FROM CandadoSalida c ORDER BY c.cliente.cteNombre ASC"),
+@NamedQueries({
+		@NamedQuery(name = "CandadoSalida.findAll", query = "SELECT c FROM CandadoSalida c ORDER BY c.cliente.cteNombre ASC"),
 		@NamedQuery(name = "CandadoSalida.findById", query = "SELECT c FROM CandadoSalida c WHERE c.id = :id"),
 		@NamedQuery(name = "CandadoSalida.findByHabilitado", query = "SELECT c FROM CandadoSalida c WHERE c.habilitado = :habilitado"),
 		@NamedQuery(name = "CandadoSalida.findByNumSalidas", query = "SELECT c FROM CandadoSalida c WHERE c.numSalidas = :numSalidas"),
-		@NamedQuery(name = "CandadoSalida.findByCliente", query = "SELECT c FROM CandadoSalida c WHERE c.cliente.cteCve = :idCliente")
-})
+		@NamedQuery(name = "CandadoSalida.findByCliente", query = "SELECT c FROM CandadoSalida c WHERE c.cliente.cteCve = :idCliente") })
 public class CandadoSalida implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -41,28 +42,32 @@ public class CandadoSalida implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id")
 	private Integer id;
-	
-	/**Habilita la salida de mercancía, bajo la condición de que el cliente no tenga saldo vencido.
+
+	/**
+	 * Habilita la salida de mercancía, bajo la condición de que el cliente no tenga
+	 * saldo vencido.
 	 * 
 	 */
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "habilitado")
 	private boolean habilitado;
-	
-	/**Indica el número de salidas que tiene permitido el cliente, cuando se autorice con un saldo vencido.
+
+	/**
+	 * Indica el número de salidas que tiene permitido el cliente, cuando se
+	 * autorice con un saldo vencido.
 	 * 
 	 */
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "num_salidas")
 	private int numSalidas;
-	
+
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "salida_total")
 	private boolean salidaTotal;
-	
+
 	public boolean isSalidaTotal() {
 		return salidaTotal;
 	}
@@ -129,7 +134,6 @@ public class CandadoSalida implements Serializable {
 
 	@Override
 	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
 		if (!(object instanceof CandadoSalida)) {
 			return false;
 		}

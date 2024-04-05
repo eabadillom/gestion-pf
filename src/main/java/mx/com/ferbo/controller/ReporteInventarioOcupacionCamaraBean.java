@@ -60,21 +60,20 @@ import net.sf.jasperreports.engine.JRException;
 
 @Named
 @ViewScoped
-public class ReporteInventarioOcupacionCamaraBean implements Serializable{
-	
+public class ReporteInventarioOcupacionCamaraBean implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(ReporteInventarioOcupacionCamaraBean.class);
 
 	Integer idCliente = null;
 	Integer idPlanta = null;
 	Integer idCamara = null;
-	
+
 	private PieChartModel pieModel;
 	private PieChartModel model;
-	
+
 	private BarChartModel modelBar;
-	
-	
+
 	private Date fecha;
 
 	private Planta plantaSelect;
@@ -93,15 +92,14 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
 	private RepOcupacionCamaraDAO ocupacionCamaraDAO;
-	
+
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
 	private Usuario usuario;
-	
+
 	public ReporteInventarioOcupacionCamaraBean() {
-		
+
 		fecha = new Date();
-		
 
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
@@ -109,429 +107,411 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 
 		listaClientes = new ArrayList<Cliente>();
 		listaPlanta = new ArrayList<Planta>();
-		listaCamara = new ArrayList<Camara>();		
+		listaCamara = new ArrayList<Camara>();
 		listaOcupacionCamara = new ArrayList<OcupacionCamara>();
-		
-		
-		
+
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@PostConstruct
-	public void init(){
-		
+	public void init() {
+
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-		
+
 		plantaSelect = new Planta();
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
-		
+
 		selectPlanta = true;
 		selectCamara = true;
 //		listaClientes = clienteDAO.buscarHabilitados(true);
 		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
-		
-		if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
+
+		if ((usuario.getPerfil() == 1) || (usuario.getPerfil() == 4)) {
 			listaPlanta.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
-		}else {
+		} else {
 			listaPlanta = plantaDAO.buscarTodos();
 		}
-		
+
 		filtradoCamara();
 		createPieModel();
 	}
-	
+
 	public void filtradoCamara() {
-		
-		
-		
-		if(plantaSelect!=null) {
-			if(plantaSelect.getPlantaCve()!=null) {
+
+		if (plantaSelect != null) {
+			if (plantaSelect.getPlantaCve() != null) {
 				listaCamara = camaraDAO.buscarPorPlanta(plantaSelect);
-			
+
 				plantaSelect.setCamaraList(listaCamara);
 				selectPlanta = false;
 				general = true;
-			}else {		
-				
+			} else {
+
 				selectPlanta = true;
 				general = false;
-			}			
-		}else {
+			}
+		} else {
 			selectPlanta = true;
 		}
-				
-		//ocupacionCamara();		
+
+		// ocupacionCamara();
 	}
-	
+
 	public void seleccionCamara() {
-		
-		if(camaraSelect!=null) {
-			
-			if(camaraSelect.getCamaraCve()!= null) {
+
+		if (camaraSelect != null) {
+
+			if (camaraSelect.getCamaraCve() != null) {
 				selectCamara = false;
-			}else {
+			} else {
 				selectCamara = true;
 				general = false;
 			}
-			
-		}else {
+
+		} else {
 			selectCamara = true;
 			general = false;
 		}
-		
-		
+
 	}
-	
-	public void ocupacionCamara() throws InventarioException{//se debe de modificar para obtener grafica general
-		
+
+	public void ocupacionCamara() throws InventarioException {// se debe de modificar para obtener grafica general
+
 		idCliente = null;
 		idPlanta = null;
 		idCamara = null;
-		
+
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Reporte entradas";
-		
+
 		try {
-			
-			if(clienteSelect!=null) {
-				idCliente = clienteSelect.getCteCve();				
-			}else {
-				//throw new InventarioException("Debe seleccionar un cliente");
+
+			if (clienteSelect != null) {
+				idCliente = clienteSelect.getCteCve();
+			} else {
+				// throw new InventarioException("Debe seleccionar un cliente");
 				clienteSelect = new Cliente();
 				idCliente = clienteSelect.getCteCve();
 			}
-			
-			if(plantaSelect!=null) {
+
+			if (plantaSelect != null) {
 				idPlanta = plantaSelect.getPlantaCve();
-			}else {
-				//throw new InventarioException("Debe seleccionar una planta");
+			} else {
+				// throw new InventarioException("Debe seleccionar una planta");
 				plantaSelect = new Planta();
 				idPlanta = plantaSelect.getPlantaCve();
 			}
-			
-			if(camaraSelect!=null) {
+
+			if (camaraSelect != null) {
 				idCamara = camaraSelect.getCamaraCve();
-			}else {
-				//throw new InventarioException("Debe seleccionar una camara");
+			} else {
+				// throw new InventarioException("Debe seleccionar una camara");
 				camaraSelect = new Camara();
 				idCamara = camaraSelect.getCamaraCve();
 			}
-			
-			
+
 			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, idPlanta, idCamara);
-			
-		}catch(Exception e) {
+
+		} catch (Exception e) {
 			mensaje = e.getMessage();
-			
+
 			severity = FacesMessage.SEVERITY_WARN;
-			
+
 			message = new FacesMessage(severity, titulo, mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);			
-		}finally {	
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
 			PrimeFaces.current().ajax().update("form:dt-OcupacionCamara", "form:messages");
 		}
-		
-		//createPieModel();
-		//System.out.println(listaOcupacionCamara.get(0).getTarima());
+
+		// createPieModel();
+		// System.out.println(listaOcupacionCamara.get(0).getTarima());
 	}
-	
-	
-	public void exportarPdf() throws JRException, IOException, SQLException{
+
+	public void exportarPdf() throws JRException, IOException, SQLException {
 		System.out.println("Exportando a pdf.....");
-			String jasperPath = "/jasper/OcupacionCamara.jrxml";
-			String filename = "Ocupacion Camaras" +fecha+".pdf";
-			String images = "/images/logo.jpeg";
-			String message = null;
-			Severity severity = null;
-			File reportFile = new File(jasperPath);
-			File imgfile = null;
-			JasperReportUtil jasperReportUtil = new JasperReportUtil();
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			Connection connection = null;
-			parameters = new HashMap<String, Object>();
-			
-			try {
-			
-				URL resource = getClass().getResource(jasperPath);
-				URL resourceimg = getClass().getResource(images);
-				String file = resource.getFile();
-				String img = resourceimg.getFile();
-				reportFile = new File(file);
-				imgfile = new File(img);
-				log.info(reportFile.getPath());
-			
-				Integer clienteCve = null;
-				if(clienteSelect == null) {
-					clienteCve = null;
-				}else {
-					clienteCve = clienteSelect.getCteCve();
-			}
-				
-				Integer camaraCve = null;
-				if(camaraSelect == null) {
-					camaraCve= null;
-				}else {
-					camaraCve= camaraSelect.getCamaraCve();
-				}
-			
-				Integer plantaCve = null;
-				if(plantaSelect == null) {
-				plantaCve = null;
-				}else {
-					plantaCve = plantaSelect.getPlantaCve();
-				}
-			
-				connection = EntityManagerUtil.getConnection();
-				parameters.put("REPORT_CONNECTION", connection);
-				parameters.put("idCliente",clienteCve );
-				parameters.put("Camara", camaraCve);
-				parameters.put("Planta", plantaCve);
-				parameters.put("Fecha",fecha );
-				parameters.put("imagen", imgfile.getPath());
-				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			} catch (Exception ex) {
-				log.error("Problema general...", ex);
-				message = String.format("No se pudo imprimir el reporte");
-				severity = FacesMessage.SEVERITY_INFO;
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
-			} finally {
-				conexion.close((Connection) connection);
-			}
+		String jasperPath = "/jasper/OcupacionCamara.jrxml";
+		String filename = "Ocupacion Camaras" + fecha + ".pdf";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
+		File reportFile = new File(jasperPath);
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+
+		try {
+
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			log.info(reportFile.getPath());
+
+			Integer clienteCve = null;
+			if (clienteSelect == null) {
+				clienteCve = null;
+			} else {
+				clienteCve = clienteSelect.getCteCve();
 			}
 
-		
-	
-	public void sleep() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(5);
-    }
-	
-	
-	public void exportarExcel() throws JRException, IOException, SQLException{
-		System.out.println("Exportando a pdf.....");
-			String jasperPath = "/jasper/OcupacionCamara.jrxml";
-			String filename = "Ocupacion Camaras" +fecha+".xlsx";
-			String images = "/images/logo.jpeg";
-			String message = null;
-			Severity severity = null;
-			File reportFile = new File(jasperPath);
-			File imgfile = null;
-			JasperReportUtil jasperReportUtil = new JasperReportUtil();
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			Connection connection = null;
-			parameters = new HashMap<String, Object>();
-			
-			try {
-			
-				URL resource = getClass().getResource(jasperPath);
-				URL resourceimg = getClass().getResource(images);
-				String file = resource.getFile();
-				String img = resourceimg.getFile();
-				reportFile = new File(file);
-				imgfile = new File(img);
-				log.info(reportFile.getPath());
-			
-				Integer clienteCve = null;
-				if(clienteSelect == null) {
-					clienteCve = null;
-				}else {
-					clienteCve = clienteSelect.getCteCve();
+			Integer camaraCve = null;
+			if (camaraSelect == null) {
+				camaraCve = null;
+			} else {
+				camaraCve = camaraSelect.getCamaraCve();
 			}
-				
-				Integer camaraCve = null;
-				if(camaraSelect == null) {
-					camaraCve= null;
-				}else {
-					camaraCve= camaraSelect.getCamaraCve();
-				}
-			
-				Integer plantaCve = null;
-				if(plantaSelect == null) {
+
+			Integer plantaCve = null;
+			if (plantaSelect == null) {
 				plantaCve = null;
-				}else {
-					plantaCve = plantaSelect.getPlantaCve();
-				}
-			
-				connection = EntityManagerUtil.getConnection();
-				parameters.put("REPORT_CONNECTION", connection);
-				parameters.put("idCliente",clienteCve );
-				parameters.put("Camara", camaraCve);
-				parameters.put("Planta", plantaCve);
-				parameters.put("Fecha",fecha );
-				parameters.put("imagen", imgfile.getPath());
-				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
-			} catch (Exception ex) {
-				log.error("Problema general...", ex);
-				message = String.format("No se pudo imprimir el reporte");
-				severity = FacesMessage.SEVERITY_INFO;
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
-			} finally {
-				conexion.close((Connection) connection);
+			} else {
+				plantaCve = plantaSelect.getPlantaCve();
 			}
+
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("idCliente", clienteCve);
+			parameters.put("Camara", camaraCve);
+			parameters.put("Planta", plantaCve);
+			parameters.put("Fecha", fecha);
+			parameters.put("imagen", imgfile.getPath());
+			log.info("Parametros: " + parameters.toString());
+			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+		} catch (Exception ex) {
+			log.error("Problema general...", ex);
+			message = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
+		} finally {
+			conexion.close((Connection) connection);
+		}
+	}
+
+	public void sleep() throws InterruptedException {
+		TimeUnit.SECONDS.sleep(5);
+	}
+
+	public void exportarExcel() throws JRException, IOException, SQLException {
+		System.out.println("Exportando a pdf.....");
+		String jasperPath = "/jasper/OcupacionCamara.jrxml";
+		String filename = "Ocupacion Camaras" + fecha + ".xlsx";
+		String images = "/images/logo.jpeg";
+		String message = null;
+		Severity severity = null;
+		File reportFile = new File(jasperPath);
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		Connection connection = null;
+		parameters = new HashMap<String, Object>();
+
+		try {
+
+			URL resource = getClass().getResource(jasperPath);
+			URL resourceimg = getClass().getResource(images);
+			String file = resource.getFile();
+			String img = resourceimg.getFile();
+			reportFile = new File(file);
+			imgfile = new File(img);
+			log.info(reportFile.getPath());
+
+			Integer clienteCve = null;
+			if (clienteSelect == null) {
+				clienteCve = null;
+			} else {
+				clienteCve = clienteSelect.getCteCve();
 			}
-	
-	
+
+			Integer camaraCve = null;
+			if (camaraSelect == null) {
+				camaraCve = null;
+			} else {
+				camaraCve = camaraSelect.getCamaraCve();
+			}
+
+			Integer plantaCve = null;
+			if (plantaSelect == null) {
+				plantaCve = null;
+			} else {
+				plantaCve = plantaSelect.getPlantaCve();
+			}
+
+			connection = EntityManagerUtil.getConnection();
+			parameters.put("REPORT_CONNECTION", connection);
+			parameters.put("idCliente", clienteCve);
+			parameters.put("Camara", camaraCve);
+			parameters.put("Planta", plantaCve);
+			parameters.put("Fecha", fecha);
+			parameters.put("imagen", imgfile.getPath());
+			log.info("Parametros: " + parameters.toString());
+			jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
+		} catch (Exception ex) {
+			log.error("Problema general...", ex);
+			message = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios");
+		} finally {
+			conexion.close((Connection) connection);
+		}
+	}
+
 	public void createPieModel2() {
-		
-		
-		modelBar = new BarChartModel();		
+
+		modelBar = new BarChartModel();
 		ChartData data = new ChartData();
-		
+
 		BarChartDataSet dataSetP1 = new BarChartDataSet();
 		BarChartDataSet dataSetP2 = new BarChartDataSet();
-		
+
 		dataSetP1.setLabel("Posiciones Disponibles");
 		dataSetP1.setBackgroundColor("rgb(255, 99, 132)");
 		dataSetP1.setStack("Stack 0");
-		
+
 		List<Planta> listPlanta = new ArrayList<Planta>();
 		listPlanta = plantaDAO.findall(false);
-		
+
 		List<Number> valuesP1 = new ArrayList<>();
-		//List<Number> valuesP2 = new ArrayList<>();
+		// List<Number> valuesP2 = new ArrayList<>();
 		List<String> labels = new ArrayList<>();
-		
-		for(OcupacionCamara oc: listaOcupacionCamara) {	
-			for(Planta p: listPlanta) {
-				
-				if(oc.getPlanta_ds().equals(p.getPlantaDs())) {
+
+		for (OcupacionCamara oc : listaOcupacionCamara) {
+			for (Planta p : listPlanta) {
+
+				if (oc.getPlanta_ds().equals(p.getPlantaDs())) {
 					valuesP1.add(oc.getPosiciones_Disponibles());
-					labels.add("P"+oc.getPlanta_abrev()+":"+oc.getCamara_abrev());
+					labels.add("P" + oc.getPlanta_abrev() + ":" + oc.getCamara_abrev());
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		dataSetP1.setData(valuesP1);
-		//dataSetP2.setData(valuesP2);
-		
+		// dataSetP2.setData(valuesP2);
+
 		data.addChartDataSet(dataSetP1);
-		//data.addChartDataSet(dataSetP2);	
+		// data.addChartDataSet(dataSetP2);
 		data.setLabels(labels);
 		modelBar.setData(data);
-		
+
 		BarChartOptions options = new BarChartOptions();
-        CartesianScales cScales = new CartesianScales();
-        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
-        linearAxes.setStacked(true);
-        linearAxes.setOffset(true);        
-        cScales.addXAxesData(linearAxes);
-        cScales.addYAxesData(linearAxes);
-        options.setScales(cScales);
-     
-        Title title = new Title();
-        title.setDisplay(true);
-        title.setText("Ocupación de cámaras");
-        options.setTitle(title);
+		CartesianScales cScales = new CartesianScales();
+		CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+		linearAxes.setStacked(true);
+		linearAxes.setOffset(true);
+		cScales.addXAxesData(linearAxes);
+		cScales.addYAxesData(linearAxes);
+		options.setScales(cScales);
 
-        Tooltip tooltip = new Tooltip();
-        tooltip.setMode("index");
-        tooltip.setIntersect(false);
-        options.setTooltip(tooltip);
+		Title title = new Title();
+		title.setDisplay(true);
+		title.setText("Ocupación de cámaras");
+		options.setTitle(title);
 
-        modelBar.setOptions(options);
-        modelBar.setExtender("chartExtender");
-		
-		
+		Tooltip tooltip = new Tooltip();
+		tooltip.setMode("index");
+		tooltip.setIntersect(false);
+		options.setTooltip(tooltip);
+
+		modelBar.setOptions(options);
+		modelBar.setExtender("chartExtender");
+
 	}
-	
-	
+
 	// PROPUESTA 2 --------------------------------------------
-	
+
 	public void graficaPorPlanta() {
-		if(plantaSelect.getPlantaCve()!=null) {
-			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, plantaSelect.getPlantaCve(), null);
+		if (plantaSelect.getPlantaCve() != null) {
+			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, plantaSelect.getPlantaCve(),
+					null);
 		}
-		
+
 		createPieModel2();
 	}
-	
+
 	public void graficaPorCamara() {
-		if(plantaSelect.getPlantaCve()!=null && camaraSelect!=null) {
-			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, plantaSelect.getPlantaCve(), camaraSelect.getCamaraCve());
+		if (plantaSelect.getPlantaCve() != null && camaraSelect != null) {
+			listaOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, idCliente, plantaSelect.getPlantaCve(),
+					camaraSelect.getCamaraCve());
 		}
 		createPieModel();
 	}
-	
-	public void createPieModel() {
-		
-		
-	
-			modelBar = new BarChartModel();		
-			ChartData data = new ChartData();
-			
-			BarChartDataSet dataSetP1 = new BarChartDataSet();
-			BarChartDataSet dataSetP2 = new BarChartDataSet();
-			
-			dataSetP1.setLabel("Posiciones Disponibles");
-			dataSetP1.setBackgroundColor("rgb(255, 99, 132)");
-			dataSetP1.setStack("Stack 0");
-			
-			dataSetP2.setLabel("Posiciones Ocupadas");
-	        dataSetP2.setBackgroundColor("rgb(54, 162, 235)");
-	        dataSetP2.setStack("Stack 0");
-			
-			List<Number> valuesP1 = new ArrayList<>();
-			List<Number> valuesP2 = new ArrayList<>();
-			List<String> labels = new ArrayList<>();
-			
-			for(OcupacionCamara oc: listaOcupacionCamara) {	
-				
-				if(oc.getPlanta_ds().equals(plantaSelect.getPlantaDs())) {
-					valuesP1.add(oc.getPosiciones_Disponibles());
-					valuesP2.add(oc.getTarima());
-					labels.add(oc.getCamara_abrev());
-				}
-				
-				
-			}
-			
-			dataSetP1.setData(valuesP1);
-			dataSetP2.setData(valuesP2);
-			
-			data.addChartDataSet(dataSetP1);
-			data.addChartDataSet(dataSetP2);	
-			data.setLabels(labels);
-			modelBar.setData(data);
-			
-			BarChartOptions options = new BarChartOptions();
-	        CartesianScales cScales = new CartesianScales();
-	        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
-	        linearAxes.setStacked(true);
-	        linearAxes.setOffset(true);
-	        cScales.addXAxesData(linearAxes);
-	        cScales.addYAxesData(linearAxes);
-	        options.setScales(cScales);
-	
-	        Title title = new Title();
-	        title.setDisplay(true);
-	        title.setText("Ocupación de cámaras");
-	        options.setTitle(title);
-	        
-	        modelBar.setExtender("chartExtender");
-	
-	        Tooltip tooltip = new Tooltip();
-	        tooltip.setMode("index");
-	        tooltip.setIntersect(false);
-	        options.setTooltip(tooltip);
-	
-	        modelBar.setOptions(options);
-		
-		
-		
-	}
-	
-	
 
+	public void createPieModel() {
+
+		modelBar = new BarChartModel();
+		ChartData data = new ChartData();
+
+		BarChartDataSet dataSetP1 = new BarChartDataSet();
+		BarChartDataSet dataSetP2 = new BarChartDataSet();
+
+		dataSetP1.setLabel("Posiciones Disponibles");
+		dataSetP1.setBackgroundColor("rgb(255, 99, 132)");
+		dataSetP1.setStack("Stack 0");
+
+		dataSetP2.setLabel("Posiciones Ocupadas");
+		dataSetP2.setBackgroundColor("rgb(54, 162, 235)");
+		dataSetP2.setStack("Stack 0");
+
+		List<Number> valuesP1 = new ArrayList<>();
+		List<Number> valuesP2 = new ArrayList<>();
+		List<String> labels = new ArrayList<>();
+
+		for (OcupacionCamara oc : listaOcupacionCamara) {
+
+			if (oc.getPlanta_ds().equals(plantaSelect.getPlantaDs())) {
+				valuesP1.add(oc.getPosiciones_Disponibles());
+				valuesP2.add(oc.getTarima());
+				labels.add(oc.getCamara_abrev());
+			}
+
+		}
+
+		dataSetP1.setData(valuesP1);
+		dataSetP2.setData(valuesP2);
+
+		data.addChartDataSet(dataSetP1);
+		data.addChartDataSet(dataSetP2);
+		data.setLabels(labels);
+		modelBar.setData(data);
+
+		BarChartOptions options = new BarChartOptions();
+		CartesianScales cScales = new CartesianScales();
+		CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+		linearAxes.setStacked(true);
+		linearAxes.setOffset(true);
+		cScales.addXAxesData(linearAxes);
+		cScales.addYAxesData(linearAxes);
+		options.setScales(cScales);
+
+		Title title = new Title();
+		title.setDisplay(true);
+		title.setText("Ocupación de cámaras");
+		options.setTitle(title);
+
+		modelBar.setExtender("chartExtender");
+
+		Tooltip tooltip = new Tooltip();
+		tooltip.setMode("index");
+		tooltip.setIntersect(false);
+		options.setTooltip(tooltip);
+
+		modelBar.setOptions(options);
+
+	}
 
 	public Date getFecha() {
 		return fecha;
@@ -676,8 +656,5 @@ public class ReporteInventarioOcupacionCamaraBean implements Serializable{
 	public void setSelectCamara(Boolean selectCamara) {
 		this.selectCamara = selectCamara;
 	}
-	
-	
-	
-	
+
 }

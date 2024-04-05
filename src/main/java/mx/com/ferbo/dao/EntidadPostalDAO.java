@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import org.jfree.util.Log;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.EntidadPostal;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -15,7 +14,6 @@ public class EntidadPostalDAO extends IBaseDAO<EntidadPostal, Integer> {
 
 	@Override
 	public EntidadPostal buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -29,23 +27,22 @@ public class EntidadPostalDAO extends IBaseDAO<EntidadPostal, Integer> {
 
 	@Override
 	public List<EntidadPostal> buscarPorCriterios(EntidadPostal e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String actualizar(EntidadPostal entidadPostal) {
-		
+
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(entidadPostal);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			Log.error("Problema al actualizar entidad postal",e);
-		}finally {
+			Log.error("Problema al actualizar entidad postal", e);
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -83,7 +80,6 @@ public class EntidadPostalDAO extends IBaseDAO<EntidadPostal, Integer> {
 
 	@Override
 	public String eliminarListado(List<EntidadPostal> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -31,47 +31,47 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "medio_pago")
-@NamedQueries({ @NamedQuery(name = "MedioPago.findAll", query = "SELECT m FROM MedioPago m ORDER BY m.mpDescripcion, m.vigenciaInicio, m.vigenciaFin"),
+@NamedQueries({
+		@NamedQuery(name = "MedioPago.findAll", query = "SELECT m FROM MedioPago m ORDER BY m.mpDescripcion, m.vigenciaInicio, m.vigenciaFin"),
 		@NamedQuery(name = "MedioPago.findByMpId", query = "SELECT m FROM MedioPago m WHERE m.mpId = :mpId"),
 		@NamedQuery(name = "MedioPago.findByMpDescripcion", query = "SELECT m FROM MedioPago m WHERE m.mpDescripcion = :mpDescripcion"),
 		@NamedQuery(name = "MedioPago.findVigentes", query = "SELECT m FROM MedioPago m WHERE m.vigenciaInicio <= :fecha AND (m.vigenciaFin IS NULL OR m.vigenciaFin >= :fecha) ORDER BY m.mpDescripcion"),
-		@NamedQuery(name = "MedioPago.findByMpReqReferencia", query = "SELECT m FROM MedioPago m WHERE m.mpReqReferencia = :mpReqReferencia"), 
-		@NamedQuery(name = "MedioPago.findBympformaPago", query = "SELECT m FROM MedioPago m WHERE m.formaPago = :mpformaPago") 
-})
+		@NamedQuery(name = "MedioPago.findByMpReqReferencia", query = "SELECT m FROM MedioPago m WHERE m.mpReqReferencia = :mpReqReferencia"),
+		@NamedQuery(name = "MedioPago.findBympformaPago", query = "SELECT m FROM MedioPago m WHERE m.formaPago = :mpformaPago") })
 public class MedioPago implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "mp_id")
 	private Integer mpId;
-	
+
 	@Basic(optional = false)
 	@NotNull
 	@Size(min = 1, max = 100)
 	@Column(name = "mp_descripcion")
 	private String mpDescripcion;
-	
+
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "mp_req_referencia")
 	private boolean mpReqReferencia;
-	
+
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "mpId")
-    private List<FacturaMedioPago> facturaMedioPagoList;
-	
-	@Column(name="mp_forma_pago")
+	private List<FacturaMedioPago> facturaMedioPagoList;
+
+	@Column(name = "mp_forma_pago")
 	@Size(min = 1, max = 5)
 	private String formaPago = null;
-	
+
 	@Column(name = "mp_fh_vigencia_ini")
-    @Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.DATE)
 	private Date vigenciaInicio = null;
-	
+
 	@Column(name = "mp_fh_vigencia_fin")
-    @Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.DATE)
 	private Date vigenciaFin = null;
 
 	public MedioPago() {
@@ -110,16 +110,16 @@ public class MedioPago implements Serializable {
 	public void setMpReqReferencia(boolean mpReqReferencia) {
 		this.mpReqReferencia = mpReqReferencia;
 	}
-	
-	public List<FacturaMedioPago> getFacturaMedioPagoList() {
-        return facturaMedioPagoList;
-    }
 
-    public void setFacturaMedioPagoList(List<FacturaMedioPago> facturaMedioPagoList) {
-        this.facturaMedioPagoList = facturaMedioPagoList;
-    }
-    
-    public String getFormaPago() {
+	public List<FacturaMedioPago> getFacturaMedioPagoList() {
+		return facturaMedioPagoList;
+	}
+
+	public void setFacturaMedioPagoList(List<FacturaMedioPago> facturaMedioPagoList) {
+		this.facturaMedioPagoList = facturaMedioPagoList;
+	}
+
+	public String getFormaPago() {
 		return formaPago;
 	}
 
@@ -152,7 +152,6 @@ public class MedioPago implements Serializable {
 
 	@Override
 	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
 		if (!(object instanceof MedioPago)) {
 			return false;
 		}
@@ -167,7 +166,5 @@ public class MedioPago implements Serializable {
 	public String toString() {
 		return "mx.com.ferbo.model.MedioPago[ mpId=" + mpId + " ]";
 	}
-
-	
 
 }

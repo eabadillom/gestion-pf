@@ -20,15 +20,15 @@ import mx.com.ferbo.model.Paises;
 public class PaisesBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private List<Paises> listaPaises;
-	
+
 	private List<Paises> listaPaisesSelect;
-	
+
 	private Paises paisSelect;
-	
+
 	private PaisesDAO paisesDao;
-	
+
 	/**
 	 * Se inicializan las variables
 	 */
@@ -36,7 +36,7 @@ public class PaisesBean implements Serializable {
 		paisesDao = new PaisesDAO();
 		listaPaisesSelect = new ArrayList<>();
 	}
-	
+
 	/**
 	 * En caso de ser necesario se asignan datos
 	 */
@@ -48,10 +48,10 @@ public class PaisesBean implements Serializable {
 	public void nuevoPais() {
 		this.paisSelect = new Paises();
 	}
-	
+
 	public void guardarPais() {
 		if (this.paisSelect.getPaisCve() == null) {
-			int tamanioListaPaises = listaPaises.size()+1;
+			int tamanioListaPaises = listaPaises.size() + 1;
 			paisSelect.setPaisCve(tamanioListaPaises);
 			if (paisesDao.guardar(paisSelect) == null) {
 				this.listaPaises.add(this.paisSelect);
@@ -75,7 +75,7 @@ public class PaisesBean implements Serializable {
 		PrimeFaces.current().executeScript("PF('nuevoPaisDialog').hide()");
 		PrimeFaces.current().ajax().update("form");
 	}
-	
+
 	public void eliminandoPais() {
 		if (paisesDao.eliminar(paisSelect) == null) {
 			this.listaPaises.remove(this.paisSelect);

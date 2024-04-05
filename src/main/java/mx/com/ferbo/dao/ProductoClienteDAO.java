@@ -18,7 +18,6 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 
 	@Override
 	public ProductoPorCliente buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -28,10 +27,10 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			listado = em.createNamedQuery("ProductoPorCliente.findAll", ProductoPorCliente.class).getResultList();			
-		}catch(Exception e) {
+			listado = em.createNamedQuery("ProductoPorCliente.findAll", ProductoPorCliente.class).getResultList();
+		} catch (Exception e) {
 			log.error("Problemas para obtener informacion", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return listado;
@@ -43,69 +42,67 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			listado = em.createNamedQuery("ProductoPorCliente.findByCteCve",ProductoPorCliente.class).setParameter("cteCve", e.getCteCve().getCteCve()).getResultList();
-		} catch(Exception ex) {
+			listado = em.createNamedQuery("ProductoPorCliente.findByCteCve", ProductoPorCliente.class)
+					.setParameter("cteCve", e.getCteCve().getCteCve()).getResultList();
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de productos por cliente...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return listado;
 	}
-	
-	
+
 	public List<ProductoPorCliente> buscarPorCliente(Integer cteCve, boolean isFullInfo) {
 		List<ProductoPorCliente> listado = null;
 		EntityManager em = null;
 		String namedQuery = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			if(isFullInfo)
+			if (isFullInfo)
 				namedQuery = "ProductoPorCliente.findByCteCveOrderByProductoDs";
 			else
 				namedQuery = "ProductoPorCliente.findByCteCve";
-			
-			listado = em.createNamedQuery(namedQuery,ProductoPorCliente.class)
-					.setParameter("cteCve", cteCve)
+
+			listado = em.createNamedQuery(namedQuery, ProductoPorCliente.class).setParameter("cteCve", cteCve)
 					.getResultList();
-			
+
 			log.debug("Número de productos por cliente: {}", listado.size());
-			
-			if(isFullInfo == false)
+
+			if (isFullInfo == false)
 				return listado;
-			
-			for(ProductoPorCliente p : listado) {
+
+			for (ProductoPorCliente p : listado) {
 				p.getProductoCve().getProductoCve();
 				log.debug("Producto por cliente list size: {}", p.getProductoCve().getProductoPorClienteList().size());
 			}
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de productos por cliente...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return listado;
 	}
-	
+
 	public List<ProductoPorCliente> buscarPorCteCve(Cliente cliente) {
 		List<ProductoPorCliente> alProductos = null;
 		boolean entityManagerInternal = false;
 		EntityManager em = null;
 		try {
-			if(em == null) {
+			if (em == null) {
 				entityManagerInternal = true;
 				em = EntityManagerUtil.getEntityManager();
 			}
 			alProductos = em.createNamedQuery("ProductoPorCliente.findByCteCve", ProductoPorCliente.class)
-					.setParameter("cteCve", cliente)
-					.getResultList();
+					.setParameter("cteCve", cliente).getResultList();
 		} finally {
-			if(entityManagerInternal) {
+			if (entityManagerInternal) {
 				EntityManagerUtil.close(em);
 			}
 		}
-		
+
 		return alProductos;
 	}
 
@@ -115,16 +112,16 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createQuery("UPDATE ProductoPorCliente as pc set pc.productoCve.productoCve = :prdCve where pc.prodXCteCve = :pxc AND pc.cteCve.cteCve = :cteCve")
-			.setParameter("prdCve", productoCliente.getProductoCve().getProductoCve())
-			.setParameter("pxc", productoCliente.getProdXCteCve())
-			.setParameter("cteCve", productoCliente.getCteCve().getCteCve())
-			.executeUpdate();
+			em.createQuery(
+					"UPDATE ProductoPorCliente as pc set pc.productoCve.productoCve = :prdCve where pc.prodXCteCve = :pxc AND pc.cteCve.cteCve = :cteCve")
+					.setParameter("prdCve", productoCliente.getProductoCve().getProductoCve())
+					.setParameter("pxc", productoCliente.getProdXCteCve())
+					.setParameter("cteCve", productoCliente.getCteCve().getCteCve()).executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -134,14 +131,14 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 	public String guardar(ProductoPorCliente prodCliente) {
 		EntityManager em = null;
 		try {
-			 em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(prodCliente);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -151,26 +148,25 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 	public String eliminar(ProductoPorCliente prodCliente) {
 		EntityManager em = null;
 		try {
-			 em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createQuery("DELETE from ProductoPorCliente as pc where pc.prodXCteCve = :pxc AND pc.cteCve.cteCve = :cteCve and pc.productoCve.productoCve = :prdCve")
-			.setParameter("prdCve", prodCliente.getProductoCve().getProductoCve())
-			.setParameter("pxc", prodCliente.getProdXCteCve())
-			.setParameter("cteCve", prodCliente.getCteCve().getCteCve())
-			.executeUpdate();
+			em.createQuery(
+					"DELETE from ProductoPorCliente as pc where pc.prodXCteCve = :pxc AND pc.cteCve.cteCve = :cteCve and pc.productoCve.productoCve = :prdCve")
+					.setParameter("prdCve", prodCliente.getProductoCve().getProductoCve())
+					.setParameter("pxc", prodCliente.getProdXCteCve())
+					.setParameter("cteCve", prodCliente.getCteCve().getCteCve()).executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		}finally {
-			EntityManagerUtil.close(em);	
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<ProductoPorCliente> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -15,30 +15,27 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "categoria_egreso")
-@NamedQueries({
-	@NamedQuery(name="CategoriaEgreso.findByAll", query ="SELECT ce FROM CategoriaEgreso ce"),
-	@NamedQuery(name ="CategoriaEgreso.findById", query ="SELECT ce FROM CategoriaEgreso ce WHERE ce.idCategoria = :idCategoria"),
-	@NamedQuery(name="CategoriaEgreso.findByTipoCategoria", query="SELECT ce FROM CategoriaEgreso ce WHERE ce.tipoCategoria = :tipoCategoria"),
-	@NamedQuery(name ="CategoriaEgreso.findByNombreCategoria", query ="SELECT ce FROM CategoriaEgreso ce WHERE ce.nombreCategoria = :nombreCategoria")	
-})
+@NamedQueries({ @NamedQuery(name = "CategoriaEgreso.findByAll", query = "SELECT ce FROM CategoriaEgreso ce"),
+		@NamedQuery(name = "CategoriaEgreso.findById", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.idCategoria = :idCategoria"),
+		@NamedQuery(name = "CategoriaEgreso.findByTipoCategoria", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.tipoCategoria = :tipoCategoria"),
+		@NamedQuery(name = "CategoriaEgreso.findByNombreCategoria", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.nombreCategoria = :nombreCategoria") })
 
-
-public class CategoriaEgreso implements Serializable{
+public class CategoriaEgreso implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic
-	@Column(name ="id_categoria_egreso")
+	@Column(name = "id_categoria_egreso")
 	@NotNull
 	private Integer idCategoria;
-	
-	@Column(name ="tipo_categoria")
+
+	@Column(name = "tipo_categoria")
 	@NotNull
 	private String tipoCategoria;
-	
-	@Column(name ="nombre_categoria")
+
+	@Column(name = "nombre_categoria")
 	@NotNull
 	private String nombreCategoria;
 
@@ -65,6 +62,5 @@ public class CategoriaEgreso implements Serializable{
 	public void setNombreCategoria(String nombreCategoria) {
 		this.nombreCategoria = nombreCategoria;
 	}
-	
-	
+
 }

@@ -17,43 +17,40 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "pre_salida_srv")
-@NamedQueries({
-	@NamedQuery(name = "PreSalidaServicio.findAll", query = "SELECT pss FROM PreSalidaServicio pss"),
-	@NamedQuery(name = "PreSalidaServicio.findByfolioSalida", query = "SELECT pss FROM PreSalidaServicio pss WHERE pss.folioSalida = :folioSalida"),
-	@NamedQuery(name = "PreSalidaServicio.findByidServicio", query = "SELECT pss FROM PreSalidaServicio pss WHERE pss.idServicio = :idServicio"),
-	@NamedQuery(name = "PreSalidaServicio.findByCantidad", query = "SELECT pss FROM PreSalidaServicio pss WHERE pss.cantidad = :cantidad"),
-	@NamedQuery(name = "PreSalidaServicio.findByUnidadManejo", query = "SELECT pss FROM PreSalidaServicio pss WHERE pss.idUnidadManejo = :idUnidad")})
-
+@NamedQueries({ @NamedQuery(name = "PreSalidaServicio.findAll", query = "SELECT pss FROM PreSalidaServicio pss"),
+		@NamedQuery(name = "PreSalidaServicio.findByfolioSalida", query = "SELECT pss FROM PreSalidaServicio pss WHERE pss.folioSalida = :folioSalida"),
+		@NamedQuery(name = "PreSalidaServicio.findByidServicio", query = "SELECT pss FROM PreSalidaServicio pss WHERE pss.idServicio = :idServicio"),
+		@NamedQuery(name = "PreSalidaServicio.findByCantidad", query = "SELECT pss FROM PreSalidaServicio pss WHERE pss.cantidad = :cantidad"),
+		@NamedQuery(name = "PreSalidaServicio.findByUnidadManejo", query = "SELECT pss FROM PreSalidaServicio pss WHERE pss.idUnidadManejo = :idUnidad") })
 
 public class PreSalidaServicio {
-	
+
 	@SuppressWarnings("unused")
 	private static final long serialVersionUID = 1L;
-	
-	
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "cd_folio_salida")
-    private String folioSalida;	
 
-    //@JoinColumn(name = "SERVICIO_CVE")
-    @JoinColumn(name = "id_servicio", referencedColumnName = "SERVICIO_CVE", insertable = false, updatable = false)
-    @ManyToOne
-    //@Column(name = "id_servicio")
-    private Servicio idServicio;
-    
-    @Column(name = "nu_cantidad ")
-    private Integer cantidad;
-    
-    @Size(max = 100)
-    @Column(name = "observacion")
-    private String observacion;
-    
-    @JoinColumn(name = "id_unidad_manejo", referencedColumnName = "UNIDAD_DE_MANEJO_CVE", insertable = false, updatable = false)
-    @ManyToOne
-   //@Column(name = "id_unidad_manejo")
-    private UnidadDeManejo idUnidadManejo;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "cd_folio_salida")
+	private String folioSalida;
+
+	// @JoinColumn(name = "SERVICIO_CVE")
+	@JoinColumn(name = "id_servicio", referencedColumnName = "SERVICIO_CVE", insertable = false, updatable = false)
+	@ManyToOne
+	// @Column(name = "id_servicio")
+	private Servicio idServicio;
+
+	@Column(name = "nu_cantidad ")
+	private Integer cantidad;
+
+	@Size(max = 100)
+	@Column(name = "observacion")
+	private String observacion;
+
+	@JoinColumn(name = "id_unidad_manejo", referencedColumnName = "UNIDAD_DE_MANEJO_CVE", insertable = false, updatable = false)
+	@ManyToOne
+	// @Column(name = "id_unidad_manejo")
+	private UnidadDeManejo idUnidadManejo;
 
 	public String getFolioSalida() {
 		return folioSalida;
@@ -78,7 +75,6 @@ public class PreSalidaServicio {
 	public void setObservacion(String observacion) {
 		this.observacion = observacion;
 	}
-
 
 	public Servicio getIdServicio() {
 		return idServicio;
@@ -121,18 +117,4 @@ public class PreSalidaServicio {
 				&& Objects.equals(observacion, other.observacion);
 	}
 
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-

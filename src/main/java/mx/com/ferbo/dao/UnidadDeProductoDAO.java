@@ -9,7 +9,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
+public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer> {
 
 	@Override
 	public UnidadDeProducto buscarPorId(Integer id) {
@@ -18,14 +18,13 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			Query query = em.createNamedQuery("UnidadDeProducto.findByUnidadDeProductoCve", UnidadDeProducto.class)
-					.setParameter("productoCve", id)
-					;
+					.setParameter("productoCve", id);
 			bean = (UnidadDeProducto) query.getSingleResult();
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			if(em != null)
+			if (em != null)
 				em.close();
 		}
 		return bean;
@@ -33,16 +32,14 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 
 	@Override
 	public List<UnidadDeProducto> buscarTodos() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<UnidadDeProducto> buscarPorCriterios(UnidadDeProducto e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public UnidadDeProducto buscarPorProductoUnidad(Integer idProducto, Integer idUnidad) {
 		List<UnidadDeProducto> list = null;
@@ -50,23 +47,23 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			Query query = em.createNamedQuery("UnidadDeProducto.findByProductoCveUnidadDeProductoCve", UnidadDeProducto.class)
-					.setParameter("productoCve", idProducto)
-					.setParameter("unidadDeManejoCve", idUnidad);
-			
+			Query query = em
+					.createNamedQuery("UnidadDeProducto.findByProductoCveUnidadDeProductoCve", UnidadDeProducto.class)
+					.setParameter("productoCve", idProducto).setParameter("unidadDeManejoCve", idUnidad);
+
 			list = query.getResultList();
-			
-			if(list == null || list.size() <= 0)
+
+			if (list == null || list.size() <= 0)
 				return null;
 
 			bean = list.get(0);
 			bean.getProductoCve();
 			bean.getUnidadDeManejoCve();
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			if(em != null)
+			if (em != null)
 				em.close();
 		}
 		return bean;
@@ -84,8 +81,7 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
 		}
-		
-		
+
 		return null;
 	}
 
@@ -106,13 +102,11 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 
 	@Override
 	public String eliminar(UnidadDeProducto e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<UnidadDeProducto> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

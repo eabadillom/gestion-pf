@@ -85,7 +85,7 @@ public class AsentamientoHumanoBean implements Serializable {
 		tipoAsentamientoDao = new TipoAsentamientoDAO();
 		entidadPostalDao = new EntidadPostalDAO();
 		asentamientoHumandoDao = new AsentamientoHumandoDAO();
-		
+
 		listaPaises = new ArrayList<>();
 		listaEstados = new ArrayList<>();
 		listaMunicipios = new ArrayList<>();
@@ -109,17 +109,17 @@ public class AsentamientoHumanoBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		listaPaises = paisesDao.buscarTodos();
-		//listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
-		//listaEntidadPostal = entidadPostalDao.buscarTodos();
-		
+		// listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
+		// listaEntidadPostal = entidadPostalDao.buscarTodos();
+
 	}
 
 	public void nuevoAsentamientoHumano() {
 		idPais = 0;
 		idMunicipio = 0;
-		idCiudad = 0 ;
+		idCiudad = 0;
 		idEntidadPostal = 0;
-		idEstado = 0 ;
+		idEstado = 0;
 		tipoasntmntoCve = 0;
 		asentamientoHumanoSelect.setAsentamientoDs(null);
 		asentamientoHumanoSelect.setCp(null);
@@ -134,19 +134,23 @@ public class AsentamientoHumanoBean implements Serializable {
 		this.ciudadSelect = new Ciudades();
 		this.ciudadPKSelect = new CiudadesPK();
 		ciudadSelect.setCiudadesPK(ciudadPKSelect);
-		//this.asentamientoHumanoPKSelect = new AsentamientoHumanoPK();
+		// this.asentamientoHumanoPKSelect = new AsentamientoHumanoPK();
 		asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 	}
-	
+
 	public void guardarAsentamientoHumano() {
 		if (this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getAsentamientoCve() == 0) {
-			List<AsentamientoHumano> listaAsentamientoCiudadMunicipioEstadoPais = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
-			int tamanioListaAsentamientoCiudadMunicipioEstadoPais = listaAsentamientoCiudadMunicipioEstadoPais.size() + 1;
+			List<AsentamientoHumano> listaAsentamientoCiudadMunicipioEstadoPais = asentamientoHumandoDao
+					.buscarPorCriterios(asentamientoHumanoSelect);
+			int tamanioListaAsentamientoCiudadMunicipioEstadoPais = listaAsentamientoCiudadMunicipioEstadoPais.size()
+					+ 1;
 			asentamientoHumanoPKSelect.setAsentamientoCve(tamanioListaAsentamientoCiudadMunicipioEstadoPais);
-			asentamientoHumanoPKSelect.setEntidadpostalCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getEntidadpostalCve());
-			asentamientoHumanoPKSelect.setTipoasntmntoCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getTipoasntmntoCve());
+			asentamientoHumanoPKSelect
+					.setEntidadpostalCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getEntidadpostalCve());
+			asentamientoHumanoPKSelect
+					.setTipoasntmntoCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getTipoasntmntoCve());
 			asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
-			if(asentamientoHumandoDao.guardar(asentamientoHumanoSelect) == null) {
+			if (asentamientoHumandoDao.guardar(asentamientoHumanoSelect) == null) {
 				this.listaAsentamientoHumano.add(this.asentamientoHumanoSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Colonia Agregada"));
 			} else {
@@ -154,20 +158,20 @@ public class AsentamientoHumanoBean implements Serializable {
 						"Error", "Ocurrió un error al intentar guardar la Colonia"));
 			}
 		} else {
-			if(asentamientoHumandoDao.actualizar(asentamientoHumanoSelect) == null) {
+			if (asentamientoHumandoDao.actualizar(asentamientoHumanoSelect) == null) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Colonia Actualizada"));
 
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", "Ocurrió un error al intentar actualizar la Colonia"));
 			}
-		} 
+		}
 		listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
-		//this.asentamientoHumanoSelect = new AsentamientoHumano();
+		// this.asentamientoHumanoSelect = new AsentamientoHumano();
 
 		PrimeFaces.current().executeScript("PF('nuevoAsentemientoHumanoDialog').hide()");
 		PrimeFaces.current().ajax().update("form:messages");
-		
+
 	}
 
 	public void eliminandoAsentamientoHumano() {
@@ -183,17 +187,20 @@ public class AsentamientoHumanoBean implements Serializable {
 		PrimeFaces.current().ajax().update("form");
 		PrimeFaces.current().ajax().update("form:messages");
 	}
-	
+
 	public void filtroAsentamientoHumano() {
-		if(asentamientoHumanoSelect.getAsentamientoHumanoPK()!=null) {
+		if (asentamientoHumanoSelect.getAsentamientoHumanoPK() != null) {
 			idPais = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getPaisCve();
-			idEstado =  this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getEstadoCve();
-			idMunicipio =  this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getMunicipioCve();
+			idEstado = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getEstadoCve();
+			idMunicipio = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getMunicipioCve();
 			idCiudad = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getCiudadCve();
-			//tipoasntmntoCve = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getTipoasntmntoCve();
-			//entidadpostalCve = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getEntidadpostalCve();
+			// tipoasntmntoCve =
+			// this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getTipoasntmntoCve();
+			// entidadpostalCve =
+			// this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getEntidadpostalCve();
 		}
 	}
+
 	public void handleContrySelect() {
 		filtroAsentamientoHumano();
 		if (idPais != -1) {
@@ -202,7 +209,7 @@ public class AsentamientoHumanoBean implements Serializable {
 			listaEstados = estadosDao.buscarPorCriteriosEstados(estadoSelect);
 		}
 	}
-	
+
 	public void handleStateSelect() {
 		filtroAsentamientoHumano();
 		if (this.idEstado != -1) {
@@ -212,7 +219,7 @@ public class AsentamientoHumanoBean implements Serializable {
 			listaMunicipios = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
 		}
 	}
-	
+
 	public void handleMunicipalitySelect() {
 		filtroAsentamientoHumano();
 		if (this.idMunicipio != -1) {
@@ -223,7 +230,7 @@ public class AsentamientoHumanoBean implements Serializable {
 			listaCiudades = ciudadesDao.buscarPorCriteriosCiudades(ciudadSelect);
 		}
 	}
-	
+
 	public void handleCitySelect() {
 		filtroAsentamientoHumano();
 		if (this.idCiudad != -1) {
@@ -231,31 +238,31 @@ public class AsentamientoHumanoBean implements Serializable {
 			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
 			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
 			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
-			//this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
+			// this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
 			listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
-			
+
 		}
 	}
-	
+
 	public void handletypeAsn() {
 		filtroAsentamientoHumano();
-		if(this.tipoasntmntoCve != -1) {
+		if (this.tipoasntmntoCve != -1) {
 			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
 			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
-			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);	
+			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
 			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
 			this.asentamientoHumanoPKSelect.setTipoasntmntoCve((short) tipoasntmntoCve);
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
-			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterioEspecial(asentamientoHumanoSelect);	
-			
+			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterioEspecial(asentamientoHumanoSelect);
+
 			listaEntidadPostal = entidadPostalDao.buscarTodos();
 		}
 	}
-	
+
 	public void handleEntidadPostal() {
 		filtroAsentamientoHumano();
-		if(this.entidadpostalCve != -1) {
+		if (this.entidadpostalCve != -1) {
 			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
 			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
 			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
@@ -538,9 +545,5 @@ public class AsentamientoHumanoBean implements Serializable {
 	public void setEntidadpostalCve(int entidadpostalCve) {
 		this.entidadpostalCve = entidadpostalCve;
 	}
-
-	
-
-	
 
 }

@@ -92,7 +92,7 @@ public class AltaTraspasoBean implements Serializable {
 	private List<Planta> listadoPlantas;
 	private List<Camara> listacamara;
 	private List<Posicion> listaposicion;
-	
+
 	private Date fecha;
 	private String numero;
 	private Integer cantidad;
@@ -114,7 +114,7 @@ public class AltaTraspasoBean implements Serializable {
 	private ConstanciaDeDeposito ctecve;
 	private PartidaServicio selPartida;
 	private ConstanciaServicioDetalle selServicio;
-	
+
 	private UnidadDeManejoDAO udmDAO;
 	private EstadoConstanciaDAO edoDAO;
 	private ClienteDAO clienteDAO;
@@ -127,13 +127,13 @@ public class AltaTraspasoBean implements Serializable {
 //	private partidasAfectadasDAO partidasAfectadasDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
 	private Planta plantaSelect;
-	
+
 	private SerieConstancia serie;
-	
+
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
-	
+
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
 
@@ -149,7 +149,7 @@ public class AltaTraspasoBean implements Serializable {
 		constanciaTDAO = new ConstanciaTraspasoDAO();
 		posicionDAO = new PosicionCamaraDAO();
 		serieConstanciaDAO = new SerieConstanciaDAO();
-		
+
 		partida = new ArrayList<Partida>();
 		ldpartida = new ArrayList<DetallePartida>();
 		inventario = new ArrayList<InventarioDetalle>();
@@ -160,7 +160,7 @@ public class AltaTraspasoBean implements Serializable {
 		listaconstanciadepo = new ArrayList<ConstanciaDeDeposito>();
 		destino = new ArrayList<InventarioDetalle>();
 		selCliente = new Cliente();
-		
+
 		listaplanta = plantaDAO.findall();
 		listacamara = camaraDAO.findall();
 		listaposicion = posicionDAO.findAll();
@@ -170,49 +170,49 @@ public class AltaTraspasoBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		log.debug("Entrando a Init de alta Traspaso...");
-		
+
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-		
+
 		log.debug("Buscando lista de clientes...");
 //		clientes = clienteDAO.buscarHabilitados(true, false);
 		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		fecha = new Date();
-		
+
 		log.debug("Buscando lista de unidades de medida");
 		alUnidades = udmDAO.buscarTodos();
 		if (alProductosFiltered == null)
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		estados = edoDAO.buscarTodos();
 		log.debug("Usuario con perfil: {}", usuario.getPerfil());
-		if((usuario.getPerfil() == 1)||(usuario.getPerfil() == 4)) {
+		if ((usuario.getPerfil() == 1) || (usuario.getPerfil() == 4)) {
 			listadoPlantas = new ArrayList<Planta>();
 			listadoPlantas.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
-		}else {
+		} else {
 			listadoPlantas = plantaDAO.findall(false);
 		}
 		plantaSelect = listadoPlantas.get(0);
-		
+
 	}
 
 	public void filtrarCliente() {
 		String message = null;
 		Severity severity = null;
-		
+
 		Cliente cliente = null;
 		List<Inventario> inventarioList = null;
 		Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
 		List<PrecioServicio> precioServicioList = null;
-		
+
 		try {
 			log.debug("Entrando a filtrar cliente...");
-			
+
 			this.selCliente = clienteDAO.buscarPorId(idCliente, false);
 			inventarioList = inventarioDAO.buscar(selCliente, plantaSelect);
 			this.inventario.clear();
 			this.generaFolioTraspaso();
-			
+
 			for (Inventario i : inventarioList) {
 				InventarioDetalle invdet = new InventarioDetalle(i);
 				invdet.setListaplanta(listadoPlantas);
@@ -220,25 +220,25 @@ public class AltaTraspasoBean implements Serializable {
 				invdet.setListaposicion(listaposicion);
 				inventario.add(invdet);
 			}
-			
+
 			listaEntradas = new ArrayList<String>();
-			for(InventarioDetalle i : inventario) {
-				if(listaEntradas.contains(i.getFolioCliente()))
+			for (InventarioDetalle i : inventario) {
+				if (listaEntradas.contains(i.getFolioCliente()))
 					continue;
 				listaEntradas.add(i.getFolioCliente());
 			}
 			log.debug("Lista entradas: {}", listaEntradas);
-			
+
 			cliente = clienteDAO.buscarProductosServicios(this.idCliente);
 			alProductosFiltered = cliente.getProductoPorClienteList();
-			
+
 			precioServicioList = cliente.getPrecioServicioList();
 			Integer idAviso = new Integer(-1);
 			for (PrecioServicio ps : precioServicioList) {
 				Integer avisoCve = ps.getAvisoCve().getAvisoCve();
 				if (avisoCve > idAviso)
 					idAviso = new Integer(avisoCve);
-				
+
 				List<PrecioServicio> list = mpPrecioServicio.get(avisoCve);
 				if (list == null) {
 					list = new ArrayList<PrecioServicio>();
@@ -261,16 +261,17 @@ public class AltaTraspasoBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:destino", "form:txtFolio", ":form:traspaso", "form:selServicio");
+			PrimeFaces.current().ajax().update("form:messages", "form:destino", "form:txtFolio", ":form:traspaso",
+					"form:selServicio");
 		}
-		
+
 		log.debug("Servicios del cliente filtrados.");
 	}
-	
+
 	public void generaFolioTraspaso() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
-		SerieConstancia serieConstancia = null; 
+		SerieConstancia serieConstancia = null;
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
@@ -296,73 +297,70 @@ public class AltaTraspasoBean implements Serializable {
 						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
 			}
 
-			this.numero = String.format("%s%s%s%d", serieConstancia.getSerieConstanciaPK().getTpSerie(),plantaSelect.getPlantaSufijo(),
-					selCliente.getCodUnico(), serie.getNuSerie());
-			
+			this.numero = String.format("%s%s%s%d", serieConstancia.getSerieConstanciaPK().getTpSerie(),
+					plantaSelect.getPlantaSufijo(), selCliente.getCodUnico(), serie.getNuSerie());
+
 			this.serie = serie;
 
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-			
+
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} catch (Exception ex) {
 			log.error("Problema para generar el folio de entrada...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
-			
+
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
 			PrimeFaces.current().ajax().update(":form:messages", ":form:folio");
 		}
 	}
-		
+
 	public void agrega() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Producto";
-		
+
 		try {
 			log.debug(this.selectedInventario);
-			
+
 			if (this.selectedInventario == null)
 				throw new InventarioException("Debe indicar un producto.");
 
 			List<InventarioDetalle> list = destino.stream()
 					.filter(t -> t.getPartidaCve() == this.selectedInventario.getPartidaCve())
 					.collect(Collectors.toList());
-			
-			if(list.size() > 0)
+
+			if (list.size() > 0)
 				throw new InventarioException("El producto ya se encuentra en la lista de traspaso.");
-			
+
 			destino.add(selectedInventario);
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
-			
+
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-			
+
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} catch (Exception ex) {
 			log.error("Problema para generar el folio de entrada...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
-			
+
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
 			PrimeFaces.current().ajax().update(":form:messages");
 		}
-		
-		
-		
 
 	}
-	
+
 	public void agregarServicio() {
 		String message = null;
 		Severity severity = null;
@@ -405,25 +403,25 @@ public class AltaTraspasoBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-altaTraspaso");
 		}
 	}
-	
+
 	public void plantaselect() {
 		Planta plantaDestino = this.selectedInventario.getPlantaDestino();
 		List<Camara> listaCamarasDestino = camaraDAO.buscarPorPlanta(plantaDestino);
 		selectedInventario.setListacamara(listaCamarasDestino);
 	}
+
 	public void camaraselect() {
-			Camara camD = this.selectedInventario.getCamaraDestino();
-			List<Posicion> listaposicionDestino = posicionDAO.buscarPorCamara(camD);
-			selectedInventario.setListaposicion(listaposicionDestino);
-		}
+		Camara camD = this.selectedInventario.getCamaraDestino();
+		List<Posicion> listaposicionDestino = posicionDAO.buscarPorCamara(camD);
+		selectedInventario.setListaposicion(listaposicionDestino);
+	}
 
 	public synchronized void guardar() {
 		String message = null;
 		Severity severity = null;
 		ConstanciaTraspaso constancia = null;
 		List<ConstanciaTraspaso> alConstancias = null;
-		EstadoConstancia estado = null;
-		
+
 		try {
 			if (this.isSaved)
 				throw new InventarioException("La constancia ya se encuentra registrada.");
@@ -439,27 +437,26 @@ public class AltaTraspasoBean implements Serializable {
 			if (alConstancias != null && alConstancias.size() > 0)
 				throw new InventarioException(String.format("El folio %s ya se encuentra registrado.", this.numero));
 
-			estado = estados.stream().filter(e -> e.getEdoCve() == 1).collect(Collectors.toList()).get(0);
 			constancia = new ConstanciaTraspaso();
 			constancia.setFecha(this.fecha);
-			
+
 			constancia.setNumero(this.numero);
 			constancia.setCliente(this.selCliente);
 			constancia.setObservacion(this.observaciones);
 			constancia.setNombreCliente(this.selCliente.getCteNombre());
 			constancia.setFechaCadena(DateUtil.getString(this.fecha, DateUtil.FORMATO_FECHA_CADENA));
 			List<TraspasoPartida> listaTraspasoPartida = new ArrayList<TraspasoPartida>();
-			
-			for(InventarioDetalle i : destino ) {
+
+			for (InventarioDetalle i : destino) {
 				log.debug("InventarioDetalle: {}", i);
-				
+
 				Partida partida = partidaDAO.buscarPorId(i.getPartidaCve());
 				TraspasoPartida traspasoPartida = new TraspasoPartida();
 				UnidadDeProducto udp = partida.getUnidadDeProductoCve();
 				Producto pr = udp.getProductoCve();
-				
+
 				partida.setCamaraCve(i.getCamaraDestino());
-				
+
 				traspasoPartida.setTraspaso(constancia);
 				traspasoPartida.setConstancia(i.getFolioCliente());
 				traspasoPartida.setPartida(partida);
@@ -467,24 +464,24 @@ public class AltaTraspasoBean implements Serializable {
 				traspasoPartida.setCantidad(i.getCantidad());
 				traspasoPartida.setOrigen(i.getCamara().getCamaraDs());
 				traspasoPartida.setDestino(i.getCamaraDestino().getCamaraDs());
-				
+
 				PartidasAfectadas pa = new PartidasAfectadas();
 				pa.setPartidatraspaso(traspasoPartida);
 				pa.setPartida(partida);
-				
+
 				traspasoPartida.setPartidasAfectadas(pa);
-				
+
 				listaTraspasoPartida.add(traspasoPartida);
-				
+
 				partidaDAO.actualizar(partida);
 			}
-			for(TraspasoServicio servicio : alServiciosDetalle) {
+			for (TraspasoServicio servicio : alServiciosDetalle) {
 				servicio.setTraspaso(constancia);
 			}
 			constancia.setTraspasoServicioList(alServiciosDetalle);
 			constancia.setTraspasoPartidaList(listaTraspasoPartida);
 			constanciaTDAO.guardar(constancia);
-			
+
 			Integer numeroSerie = this.serie.getNuSerie() + 1;
 			this.serie.setNuSerie(numeroSerie);
 			serieConstanciaDAO.actualizar(this.serie);
@@ -512,7 +509,7 @@ public class AltaTraspasoBean implements Serializable {
 	public void jasper() throws JRException, IOException, SQLException {
 		String message = null;
 		Severity severity = null;
-		
+
 		String jasperPath = "/jasper/ReporteTraspaso.jrxml";
 		String filename = "Constancia_de_traspaso.pdf";
 		String images = "/images/logo.jpeg";
@@ -524,7 +521,7 @@ public class AltaTraspasoBean implements Serializable {
 		try {
 			if (habilitareporte == false)
 				throw new InventarioException("Favor de guardar la constancia");
-			
+
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
@@ -532,28 +529,30 @@ public class AltaTraspasoBean implements Serializable {
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.debug(reportFile.getPath());
-			
+
 			connection = EntityManagerUtil.getConnection();
 			parameters = new HashMap<String, Object>();
-			
+
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", this.numero);
 			parameters.put("LogoPath", imgfile.getPath());
 			log.debug("Parametros: " + parameters.toString());
-			
+
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			
-		} catch(InventarioException ex) {
+
+		} catch (InventarioException ex) {
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-			
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.numero);
 			severity = FacesMessage.SEVERITY_ERROR;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
 		} finally {
 			conexion.close((Connection) connection);
@@ -581,12 +580,13 @@ public class AltaTraspasoBean implements Serializable {
 		this.unidadcobro = unidadcobro;
 	}
 
-		public void deleteServicio(TraspasoServicio servicio) {
+	public void deleteServicio(TraspasoServicio servicio) {
 		this.alServiciosDetalle.remove(servicio);
 	}
-		public void deletePartida(InventarioDetalle partida) {
-			this.destino.remove(partida);
-		}
+
+	public void deletePartida(InventarioDetalle partida) {
+		this.destino.remove(partida);
+	}
 
 	public Cliente getSelCliente() {
 		return selCliente;

@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.NotaCreditoDAO;
@@ -53,26 +52,25 @@ import mx.com.ferbo.util.InventarioException;
 @Named
 @ViewScoped
 
-public class AltaNotasCredito implements Serializable{
-	
+public class AltaNotasCredito implements Serializable {
+
 	private static final long serialVersionUID = -626048119540963939L;
 	private static Logger log = LogManager.getLogger(AltaNotasCredito.class);
-	
+
 	private List<Cliente> listaClientes;
 	private List<Factura> listaFactura;
 	private List<ClienteDomicilios> listaClienteDom;
 	private List<ClienteDomicilios> listaClienteDomicilio;
 	private List<NotaPorFactura> listaNotaXFactura;
 	private List<SerieNota> listaSerieNota;
-	
-	private ClienteDAO clienteDAO;
+
 	private FacturaDAO facturaDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
 	private AsentamientoHumandoDAO asentamientoHumanoDAO;
 	private NotaCreditoDAO notaCreditoDAO;
 	private SerieNotaDAO serieNotaDAO;
-	//private NotaPorFacturaDAO notaFactDAO;
-	
+	// private NotaPorFacturaDAO notaFactDAO;
+
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
 	private Factura facturaSelect;
@@ -80,7 +78,7 @@ public class AltaNotasCredito implements Serializable{
 	private AsentamientoHumano asentamientoCliente;
 	private NotaCredito notaCredito;
 	private SerieNota serieNotaSelect;
-	
+
 	private Boolean pagoParcial;
 	private Boolean porCobrar;
 	private Boolean pagada;
@@ -97,30 +95,29 @@ public class AltaNotasCredito implements Serializable{
 	private StatusNotaCreditoDAO statusNotaCreditoDAO;
 	private PagoDAO pagoDAO;
 	private BigDecimal saldoSelected;
-	
+
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
-	
+
 	private Date fechaInicio;
 	private Date fechaFin;
 	private Parametro pIVA = null;
 	private ParametroDAO parametroDAO = null;
-	
-	
+
 	public AltaNotasCredito() {
-		
+
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-		
+
 		listaClientes = new ArrayList<Cliente>();
 		listaFactura = new ArrayList<Factura>();
 		listaClienteDom = new ArrayList<ClienteDomicilios>();
 		listaClienteDomicilio = new ArrayList<ClienteDomicilios>();
 		listaNotaXFactura = new ArrayList<NotaPorFactura>();
 		listaSerieNota = new ArrayList<SerieNota>();
-		
+
 		clienteSelect = new Cliente();
 		domicilioSelect = new Domicilios();
 		facturaSelect = new Factura();
@@ -129,11 +126,11 @@ public class AltaNotasCredito implements Serializable{
 		notaCredito = new NotaCredito();
 		parametroDAO = new ParametroDAO();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@PostConstruct
-	public void init(){
-		this.clienteDAO = new ClienteDAO();
+	public void init() {
+		
 		this.facturaDAO = new FacturaDAO();
 		this.clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		this.asentamientoHumanoDAO = new AsentamientoHumandoDAO();
@@ -143,13 +140,13 @@ public class AltaNotasCredito implements Serializable{
 		this.statusFacturaDAO = new StatusFacturaDAO();
 		this.statusNotaCreditoDAO = new StatusNotaCreditoDAO();
 		this.pagoDAO = new PagoDAO();
-		
+
 		this.listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
-		//TODO timbrado CFDI para las notas de crédito. Se prepara parámetro para indicar planta (razón social) a la que pertenece la serie.
+		// timbrado CFDI para las notas de crédito. Se prepara parámetro para
+		// indicar planta (razón social) a la que pertenece la serie.
 		this.listaSerieNota = serieNotaDAO.buscarActivas(null);
 		this.tipoPagoNotaCredito = tipoPagoDAO.buscarPorId(TipoPago.TIPO_PAGO_NOTA_CREDITO);
-		
-		
+
 		this.porCobrar = false;
 		this.pagada = false;
 		this.pagoParcial = false;
@@ -162,159 +159,162 @@ public class AltaNotasCredito implements Serializable{
 		this.statusFacturaPagada = statusFacturaDAO.buscarPorId(StatusFactura.STATUS_PAGADA);
 		this.statusFacturaPagoParcial = statusFacturaDAO.buscarPorId(StatusFactura.STATUS_PAGO_PARCIAL);
 		this.statusNotaNueva = statusNotaCreditoDAO.buscarPorId(StatusNotaCredito.STATUS_NOTA_CREDITO_NUEVA);
-		String cajero = String.format("%s %s %s",
-				this.usuario.getNombre() == null ? "" : this.usuario.getNombre(),
+		String cajero = String.format("%s %s %s", this.usuario.getNombre() == null ? "" : this.usuario.getNombre(),
 				this.usuario.getApellido1() == null ? "" : this.usuario.getApellido1(),
-				this.usuario.getApellido2() == null ? "" : this.usuario.getApellido2()
-		);
+				this.usuario.getApellido2() == null ? "" : this.usuario.getApellido2());
 		this.notaCredito.setCajero(cajero);
-		
+
 		this.fechaInicio = new Date();
 		this.fechaFin = new Date();
 		this.pIVA = parametroDAO.buscarPorNombre("IVA");
 	}
-	
+
 	public void filtroFactura() {
-		
+
 		String message = null;
 		Severity severity = null;
 		StatusFactura sf = new StatusFactura();
 		this.listaFactura.clear();
 		this.listaNotaXFactura.clear();
-		
+
 		try {
-			
-			if(porCobrar==true) {
+
+			if (porCobrar == true) {
 				sf.setId(1);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
+				listaFactura
+						.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
-			
-			if(pagada==true) {				
+
+			if (pagada == true) {
 				sf.setId(3);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
+				listaFactura
+						.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
-			
-			if(pagoParcial==true) {
+
+			if (pagoParcial == true) {
 				sf.setId(4);
-				listaFactura.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
+				listaFactura
+						.addAll(facturaDAO.buscarPorCteStatusClientePeriodo(sf, clienteSelect, fechaInicio, fechaFin));
 			}
-			
-			if(clienteSelect == null) {
+
+			if (clienteSelect == null) {
 				throw new InventarioException("Seleccione un cliente.");
 			}
-			
-			if(clienteSelect.getCteCve() == null) {
+
+			if (clienteSelect.getCteCve() == null) {
 				throw new InventarioException("Seleccione un cliente.");
 			}
-			
+
 			domicilioCliente(clienteSelect);
-			
-			if((porCobrar==false)&&(pagada==false)&&(pagoParcial==false)) {			
+
+			if ((porCobrar == false) && (pagada == false) && (pagoParcial == false)) {
 				throw new InventarioException("Seleccione el status de sus facturas.");
 			}
-			
+
 			message = "Agregue una factura a su nota de crédito.";
 			severity = FacesMessage.SEVERITY_INFO;
-			
+
 		} catch (InventarioException ex) {
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception e) {
 			message = "Ocurrió un problema en la consulta de notas de crédito.";
 			severity = FacesMessage.SEVERITY_ERROR;
-		}finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Cliente", message));
-			PrimeFaces.current().ajax().update("form:dt-factura","form:messages","form:domicilio");
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cliente", message));
+			PrimeFaces.current().ajax().update("form:dt-factura", "form:messages", "form:domicilio");
 		}
-		
+
 	}
-	
+
 	public void domicilioCliente(Cliente clienteSelect) {
-		
+
 		listaClienteDom = clienteDomicilioDAO.buscarDomicilioFiscalPorCliente(clienteSelect.getCteCve(), true);
-		
+
 		listaClienteDomicilio.clear();
 		listaClienteDomicilio = listaClienteDom.stream()
-			.filter(cd -> clienteSelect != null ? (cd.getCteCve().getCteCve().intValue()==clienteSelect.getCteCve().intValue()) :false)
-			.collect(Collectors.toList());
-		if(listaClienteDomicilio.size() > 0) {
+				.filter(cd -> clienteSelect != null
+						? (cd.getCteCve().getCteCve().intValue() == clienteSelect.getCteCve().intValue())
+						: false)
+				.collect(Collectors.toList());
+		if (listaClienteDomicilio.size() > 0) {
 			this.domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
-			log.debug("Domicilio Selected: {}",this.domicilioSelect);
+			log.debug("Domicilio Selected: {}", this.domicilioSelect);
 		}
 	}
-	
+
 	public void agregaFactura() {
 		log.debug("Factura seleccionada: {}", this.facturaSelect);
-		
-		if(facturaSelect == null)
+
+		if (facturaSelect == null)
 			return;
-		
-		if(facturaSelect.getId() == null)
+
+		if (facturaSelect.getId() == null)
 			return;
-		
+
 		facturaSelect = facturaDAO.buscarPorId(facturaSelect.getId(), true);
-		
+
 		saldoSelected = facturaSelect.getTotal();
 		log.debug("Total factura: {}", facturaSelect.getTotal());
-		for(Pago p : facturaSelect.getPagoList()) {
+		for (Pago p : facturaSelect.getPagoList()) {
 			saldoSelected = saldoSelected.subtract(p.getMonto());
 		}
 		log.debug("Saldo: {}", saldoSelected);
 	}
-	
-	public void facturasSeleccionadas() { 
-		
-		BigDecimal iva = new BigDecimal(pIVA.getValor()).setScale(2,BigDecimal.ROUND_HALF_UP);
-		
+
+	public void facturasSeleccionadas() {
+
+		BigDecimal iva = new BigDecimal(pIVA.getValor()).setScale(2, BigDecimal.ROUND_HALF_UP);
+
 		log.info("Nota de credito - Subtotal: {}, IVA: {}, Total: {}", sumaSubtotal, ivaSubtotal, total);
-		
+
 		notaPorFactura = new NotaPorFactura();
 		notaPorFactura.setNotaPorFacturaPK(new NotaPorFacturaPK());
 		notaPorFactura.getNotaPorFacturaPK().setFactura(facturaSelect);
 		notaPorFactura.setCantidad(cantidad);
-		
+
 		listaNotaXFactura.add(notaPorFactura);
-		
+
 		totalCantidad = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
-		for(NotaPorFactura npf : this.listaNotaXFactura) {
+		for (NotaPorFactura npf : this.listaNotaXFactura) {
 			log.debug("NotaXFactura - Cantidad: {}", npf.getCantidad());
 			totalCantidad = totalCantidad.add(npf.getCantidad());
 		}
-		
-		sumaSubtotal = totalCantidad.divide(new BigDecimal("1.00").setScale(2, BigDecimal.ROUND_HALF_UP).add(iva), BigDecimal.ROUND_HALF_UP);
+
+		sumaSubtotal = totalCantidad.divide(new BigDecimal("1.00").setScale(2, BigDecimal.ROUND_HALF_UP).add(iva),
+				BigDecimal.ROUND_HALF_UP);
 		ivaSubtotal = sumaSubtotal.multiply(iva);
-		
+
 		FormatUtil formato = new FormatUtil();
-		
+
 		montoLetra = formato.getMontoConLetra(totalCantidad.doubleValue());
-		
+
 		cantidad = new BigDecimal(0).setScale(2);
-		
-		PrimeFaces.current().ajax().update("form:dt-NotasPorFactura","form:cantidad","form:montoLetra");
-		
+
+		PrimeFaces.current().ajax().update("form:dt-NotasPorFactura", "form:cantidad", "form:montoLetra");
+
 	}
-	
+
 	public void save() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		StatusFactura statusF = null;
 		String domicilio = null;
-		
+
 		try {
 			domicilioCliente(clienteSelect);
-			
+
 			asentamientoCliente = asentamientoHumanoDAO.buscarPorAsentamiento(
 					domicilioSelect.getPaisCved().getPaisCve(),
 					domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
-					domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve() ,
+					domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
 					domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
-					domicilioSelect.getDomicilioColonia()
-				);
-			domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
-			
-			
+					domicilioSelect.getDomicilioColonia());
+			domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " "
+					+ domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
+
 			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual() + 1));
 			notaCredito.setIdcliente(clienteSelect.getCteCve());
 			notaCredito.setCliente(clienteSelect.getCteNombre());
@@ -327,17 +327,16 @@ public class AltaNotasCredito implements Serializable{
 			notaCredito.setStatus(this.statusNotaNueva);
 			notaCredito.setNotaFacturaList(new ArrayList<NotaPorFactura>());
 			notaCredito.getNotaFacturaList().addAll(listaNotaXFactura);
-			
-			for(NotaPorFactura ntf: listaNotaXFactura) {
-				
+
+			for (NotaPorFactura ntf : listaNotaXFactura) {
+
 				Factura factura = ntf.getNotaPorFacturaPK().getFactura();
 				Pago pago = new Pago();
-				
-				
+
 				NotaPorFacturaPK notaFacturaPK = new NotaPorFacturaPK();
 				notaFacturaPK.setNota(notaCredito);
 				notaFacturaPK.setFactura(factura);
-				
+
 				pago.setFactura(factura);
 				pago.setTipo(tipoPagoNotaCredito);
 				pago.setMonto(ntf.getCantidad());
@@ -345,67 +344,65 @@ public class AltaNotasCredito implements Serializable{
 				pago.setReferencia(String.format("Nota Credito No %s", notaCredito.getNumero()));
 				pago.setCheque("");
 				pago.setChequeDevuelto(false);
-				
+
 				factura.getPagoList().add(pago);
-				
+
 				ntf.setNotaPorFacturaPK(notaFacturaPK);
 //				ntf. setNota(notaCredito);
-				
-				if(factura.getNotaFacturaList() == null)
+
+				if (factura.getNotaFacturaList() == null)
 					factura.setNotaFacturaList(new ArrayList<NotaPorFactura>());
-				
+
 				factura.getNotaFacturaList().add(ntf);
-				
-				//Actualizacion de factura
-				
-				//si cantidad es igual a total de factura
-				if((ntf.getCantidad().compareTo(ntf.getNotaPorFacturaPK().getFactura().getTotal())==0)) {
+
+				// Actualizacion de factura
+
+				// si cantidad es igual a total de factura
+				if ((ntf.getCantidad().compareTo(ntf.getNotaPorFacturaPK().getFactura().getTotal()) == 0)) {
 					statusF = this.statusFacturaPagada;
 				}
-				
-				//si cantidad es menor que el total de factura
-				if((ntf.getCantidad().compareTo(ntf.getNotaPorFacturaPK().getFactura().getTotal())==-1)) {
+
+				// si cantidad es menor que el total de factura
+				if ((ntf.getCantidad().compareTo(ntf.getNotaPorFacturaPK().getFactura().getTotal()) == -1)) {
 					statusF = this.statusFacturaPagoParcial;
 				}
-				
+
 				ntf.getNotaPorFacturaPK().getFactura().setStatus(statusF);
 			}
-			
+
 			notaCreditoDAO.guardar(notaCredito);
-			
-			for(NotaPorFactura ntf: listaNotaXFactura) {
+
+			for (NotaPorFactura ntf : listaNotaXFactura) {
 				int index = ntf.getNotaPorFacturaPK().getFactura().getPagoList().size();
 				pagoDAO.guardar(ntf.getNotaPorFacturaPK().getFactura().getPagoList().get(index - 1));
 			}
-			
-			for(NotaPorFactura ntf: listaNotaXFactura) {
-				
+
+			for (NotaPorFactura ntf : listaNotaXFactura) {
+
 				Factura factura = facturaDAO.buscarPorId(ntf.getNotaPorFacturaPK().getFactura().getId(), false);
 				List<Pago> pagosList = pagoDAO.buscarPorFactura(factura.getId());
-				
+
 				BigDecimal saldo = factura.getTotal();
-				
-				for(Pago pago : pagosList) {
+
+				for (Pago pago : pagosList) {
 					saldo = saldo.subtract(pago.getMonto());
 				}
-				
-				if(saldo.compareTo(BigDecimal.ZERO) > 0)
+
+				if (saldo.compareTo(BigDecimal.ZERO) > 0)
 					factura.setStatus(statusFacturaPagoParcial);
 				else
 					factura.setStatus(statusFacturaPagada);
-				
+
 				facturaDAO.actualizaStatus(factura);
 			}
-			
-			serieNotaSelect.setNumeroActual(serieNotaSelect.getNumeroActual()+1);
+
+			serieNotaSelect.setNumeroActual(serieNotaSelect.getNumeroActual() + 1);
 			serieNotaDAO.update(serieNotaSelect);
-			
-			
+
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Nota agregada correctamente";
-			
-			
-		} catch(Exception e) {
+
+		} catch (Exception e) {
 			log.error("Ocurrió un problema al guardar la nota de crédito...", e);
 			mensaje = "Ocurrió un problema al guardar la nota de crédito.";
 			severity = FacesMessage.SEVERITY_ERROR;
@@ -414,16 +411,14 @@ public class AltaNotasCredito implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update(":form:messages");
 		}
-			
+
 	}
-	
+
 	public void reload() throws IOException {
 		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
-		
+
 	}
-	
-	
 
 	public List<Cliente> getListaClientes() {
 		return listaClientes;
@@ -472,7 +467,7 @@ public class AltaNotasCredito implements Serializable{
 	public void setListaFactura(List<Factura> listaFactura) {
 		this.listaFactura = listaFactura;
 	}
-	
+
 	public Domicilios getDomicilioSelect() {
 		return domicilioSelect;
 	}
@@ -480,7 +475,7 @@ public class AltaNotasCredito implements Serializable{
 	public void setDomicilioSelect(Domicilios domicilioSelect) {
 		this.domicilioSelect = domicilioSelect;
 	}
-	
+
 	public List<ClienteDomicilios> getListaClienteDomicilio() {
 		return listaClienteDomicilio;
 	}
@@ -536,7 +531,7 @@ public class AltaNotasCredito implements Serializable{
 	public void setAsentamientoCliente(AsentamientoHumano asentamientoCliente) {
 		this.asentamientoCliente = asentamientoCliente;
 	}
-	
+
 	public NotaCredito getNotaCredito() {
 		return notaCredito;
 	}

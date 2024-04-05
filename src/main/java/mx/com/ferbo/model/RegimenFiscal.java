@@ -16,47 +16,43 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-
 @Entity
 @Table(name = "regimen_fiscal")
-@NamedQueries({
-	@NamedQuery(name = "RegimenFiscal.findAll", query = "SELECT r FROM  RegimenFiscal r"),
-	@NamedQuery(name = "RegimenFiscal.findBycdRegimen", query = "SELECT r FROM RegimenFiscal r WHERE  r.cd_regimen = :cd_regimen"),
-	@NamedQuery(name = "RegimenFiscal.findBynb_regimen", query = "SELECT r FROM RegimenFiscal r WHERE  r.nb_regimen = :nbr_regimen" ),
-	@NamedQuery(name = "RegimenFiscal.findByst_per_fisica", query = "SELECT r FROM RegimenFiscal r WHERE r.personaFisica = true" ),
-	@NamedQuery(name = "RegimenFiscal.findByst_per_moral", query = "SELECT r FROM RegimenFiscal r WHERE r.personaMoral = true" ),
-	@NamedQuery(name = "RegimenFiscal.findByfh_vigencia_ini", query = "SELECT r FROM RegimenFiscal r WHERE  r.vigenciaInicio = :fh_vigencia_ini" ),
-	@NamedQuery(name = "RegimenFiscal.findByfh_vigencia_fin", query = "SELECT r FROM RegimenFiscal r WHERE r.vigenciaFin = :fh_vigencia_fin")
-})
+@NamedQueries({ @NamedQuery(name = "RegimenFiscal.findAll", query = "SELECT r FROM  RegimenFiscal r"),
+		@NamedQuery(name = "RegimenFiscal.findBycdRegimen", query = "SELECT r FROM RegimenFiscal r WHERE  r.cd_regimen = :cd_regimen"),
+		@NamedQuery(name = "RegimenFiscal.findBynb_regimen", query = "SELECT r FROM RegimenFiscal r WHERE  r.nb_regimen = :nbr_regimen"),
+		@NamedQuery(name = "RegimenFiscal.findByst_per_fisica", query = "SELECT r FROM RegimenFiscal r WHERE r.personaFisica = true"),
+		@NamedQuery(name = "RegimenFiscal.findByst_per_moral", query = "SELECT r FROM RegimenFiscal r WHERE r.personaMoral = true"),
+		@NamedQuery(name = "RegimenFiscal.findByfh_vigencia_ini", query = "SELECT r FROM RegimenFiscal r WHERE  r.vigenciaInicio = :fh_vigencia_ini"),
+		@NamedQuery(name = "RegimenFiscal.findByfh_vigencia_fin", query = "SELECT r FROM RegimenFiscal r WHERE r.vigenciaFin = :fh_vigencia_fin") })
 public class RegimenFiscal implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
 	@Basic(optional = false)
 	@NotNull
-	@Size(min=1, max = 5)
+	@Size(min = 1, max = 5)
 	@Column(name = "cd_regimen")
 	private String cd_regimen;
-	
+
 	@Size(min = 1, max = 255)
-	@Column (name = "nb_regimen")
+	@Column(name = "nb_regimen")
 	private String nb_regimen;
-	
+
 	@Basic(optional = false)
-    @NotNull
+	@NotNull
 	@Column(name = "st_per_fisica")
 	private boolean personaFisica;
-	
+
 	@Basic(optional = false)
-    @NotNull
+	@NotNull
 	@Column(name = "st_per_moral")
 	private boolean personaMoral;
-	
-	
+
 	@Column(name = "fh_vigencia_ini")
 	@Temporal(TemporalType.DATE)
 	private Date vigenciaInicio;
-	
+
 	@Column(name = "fh_vigencia_fin")
 	@Temporal(TemporalType.DATE)
 	private Date vigenciaFin;
@@ -138,7 +134,5 @@ public class RegimenFiscal implements Serializable {
 				+ personaFisica + ", personaMoral=" + personaMoral + ", vigenciaInicio=" + vigenciaInicio
 				+ ", vigenciaFin=" + vigenciaFin + "]";
 	}
-	
- }
 
-
+}

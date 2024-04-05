@@ -14,40 +14,40 @@ import javax.validation.constraints.Size;
 @Embeddable
 public class SerieConstanciaPK implements Serializable {
 
-    private static final long serialVersionUID = -4873673664504600355L;
+	private static final long serialVersionUID = -4873673664504600355L;
 
-	@JoinColumn(name="id_cliente")
+	@JoinColumn(name = "id_cliente")
 	@ManyToOne
-    private Cliente cliente;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 1)
-    @Column(name = "tp_serie")
-    private String tpSerie;
-    
-    @ManyToOne
-    @JoinColumn(name = "id_planta")
-    private Planta planta;
+	private Cliente cliente;
 
-    public SerieConstanciaPK() {
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Size(min = 1, max = 1)
+	@Column(name = "tp_serie")
+	private String tpSerie;
 
-    public SerieConstanciaPK(Cliente cliente, String tpSerie, Planta planta) {
-        this.cliente = cliente;
-        this.tpSerie = tpSerie;
-        this.planta = planta;
-    }
+	@ManyToOne
+	@JoinColumn(name = "id_planta")
+	private Planta planta;
 
-    public Cliente getCliente() {
-        return this.cliente;
-    }
+	public SerieConstanciaPK() {
+	}
 
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-    
-    public Planta getPlanta() {
+	public SerieConstanciaPK(Cliente cliente, String tpSerie, Planta planta) {
+		this.cliente = cliente;
+		this.tpSerie = tpSerie;
+		this.planta = planta;
+	}
+
+	public Cliente getCliente() {
+		return this.cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public Planta getPlanta() {
 		return planta;
 	}
 
@@ -55,13 +55,13 @@ public class SerieConstanciaPK implements Serializable {
 		this.planta = planta;
 	}
 
-    public String getTpSerie() {
-        return tpSerie;
-    }
+	public String getTpSerie() {
+		return tpSerie;
+	}
 
-    public void setTpSerie(String tpSerie) {
-        this.tpSerie = tpSerie;
-    }
+	public void setTpSerie(String tpSerie) {
+		this.tpSerie = tpSerie;
+	}
 
 	@Override
 	public int hashCode() {
