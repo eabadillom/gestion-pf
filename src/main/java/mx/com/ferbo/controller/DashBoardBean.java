@@ -197,13 +197,18 @@ public class DashBoardBean implements Serializable {
 
 	public void VentaDia() {
 		// System.out.println(mesActual);
-
+		Date fechaActual = new  Date();
+		DateUtil.setMes(fechaActual, DateUtil.getMes(mesActual));
+		DateUtil.setAnio(fechaActual, DateUtil.getAnio(mesActual));
+		mesActual = fechaActual;
+		DateUtil.getLastDayOfMonth(mesActual);
 		listaVentaDia = reportesVentasDAO.obtenerVentaDia(mesActual);// venta del dia
 
 		if (!listaVentaDia.isEmpty()) {
 			listaVentaDia.get(0).setPorcentaje(new BigDecimal(0));
 		}
-
+		
+	
 		PrimeFaces.current().ajax().update("form:dt-ventas");
 
 	}
@@ -426,25 +431,25 @@ public class DashBoardBean implements Serializable {
 		// Primer SET
 		BarChartDataSet barDS = new BarChartDataSet();
 		barDS.setLabel("Ingresos");
-		barDS.setBackgroundColor("rgb(255,99,132)");
+		barDS.setBackgroundColor("rgb( 252, 174, 174)");
 		barDS.setStack("Stack 0");
 
 		// Segundo SET
 		BarChartDataSet barDS2 = new BarChartDataSet();
 		barDS2.setLabel("Egresos");
-		barDS2.setBackgroundColor("rgb(54, 162, 235)");
+		barDS2.setBackgroundColor("rgb( 174, 252, 244)");
 		barDS2.setStack("Stack 1");
 
 		// Tercer SET
 		BarChartDataSet barDS3 = new BarChartDataSet();
 		barDS3.setLabel("Utilidad/Perdida ");
-		barDS3.setBackgroundColor("rgb(255, 205, 86)");
+		barDS3.setBackgroundColor("rgb(  233, 193, 250 )");
 		barDS3.setStack("Stack 2");
 
 		// Cuarto SET
 		BarChartDataSet barDS4 = new BarChartDataSet();
 		barDS4.setLabel("Efectivo ");
-		barDS4.setBackgroundColor("rgb(75,192,192)");
+		barDS4.setBackgroundColor("rgb( 194, 193, 250 )");
 		barDS4.setStack("Stack 3");
 
 		List<String> listaFecha = new ArrayList<>();
@@ -520,11 +525,11 @@ public class DashBoardBean implements Serializable {
 		BarChartDataSet barDataSet2 = new BarChartDataSet();
 
 		barDataSet.setLabel("Disponibles");
-		barDataSet.setBackgroundColor("rgb(255, 99, 132)");
+		barDataSet.setBackgroundColor("rgb( 252, 174, 174)");
 		barDataSet.setStack("Stack 0");
 
 		barDataSet2.setLabel("Ocupadas");
-		barDataSet2.setBackgroundColor("rgb(54, 162, 235)");
+		barDataSet2.setBackgroundColor("rgb(  233, 193, 250 )");
 		barDataSet2.setStack("Stack 1");
 
 		List<Number> values = new ArrayList<>();
@@ -581,9 +586,9 @@ public class DashBoardBean implements Serializable {
 		}
 
 		List<String> bgColors = new ArrayList<>();
-		bgColors.add("rgb(255, 99, 132)");
-		bgColors.add("rgb(54, 162, 235)");
-		bgColors.add("rgb(255, 205, 86)");
+		bgColors.add("rgb( 194, 193, 250 )");
+		bgColors.add("rgb(  233, 193, 250 )");
+		bgColors.add("rgb( 174, 252, 244)");
 		dataSet.setBackgroundColor(bgColors);
 
 		data.addChartDataSet(dataSet);
@@ -599,7 +604,7 @@ public class DashBoardBean implements Serializable {
 		options.setTitle(title);
 
 		donutModel.setData(data);
-		donutModel.setExtender("charExtender");
+		donutModel.setExtender("charExtenderDonut");
 	}
 
 	public void createStackedBarModel() {
@@ -608,23 +613,23 @@ public class DashBoardBean implements Serializable {
 
 		BarChartDataSet barDataSet = new BarChartDataSet();
 		barDataSet.setLabel("Efectivo");
-		barDataSet.setBackgroundColor("rgb(255, 99, 132)");
+		barDataSet.setBackgroundColor("rgb( 252, 174, 174)");
 		List<Number> value = new ArrayList<>();
 		List<String> labels = new ArrayList<>();
 
 		BarChartDataSet barDataSet2 = new BarChartDataSet();
 		barDataSet2.setLabel("Documento de transferencia");
-		barDataSet2.setBackgroundColor("rgb(54, 162, 235)");
+		barDataSet2.setBackgroundColor("rgb( 174, 252, 244)");
 		List<Number> value2 = new ArrayList<>();
 
 		BarChartDataSet barDataSet3 = new BarChartDataSet();
 		barDataSet3.setLabel("Nota de credito");
-		barDataSet3.setBackgroundColor("rgb(75, 192, 192)");
+		barDataSet3.setBackgroundColor("rgb(  233, 193, 250 )");
 		List<Number> value3 = new ArrayList<>();
 
 		BarChartDataSet barDataSet4 = new BarChartDataSet();
 		barDataSet4.setLabel("Cheque de caja");
-		barDataSet4.setBackgroundColor("rgb(255, 205, 86)");
+		barDataSet4.setBackgroundColor("rgb( 194, 193, 250 )");
 		List<Number> value4 = new ArrayList<>();
 
 		List<FacturacionGeneral> listEnero = listaVentaPagos.stream().filter(e -> DateUtil.getMes(e.getFecha()) == 0)
