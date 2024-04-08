@@ -2,26 +2,25 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Embeddable
 public class ControlFacturaConstanciaDsPK implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	@JoinColumn(name = "CONSTANCIA")
-    @ManyToOne(optional = false)
-	private ConstanciaDeServicio constanciaDeServicio; 
-	
+	@ManyToOne(optional = false)
+	private ConstanciaDeServicio constanciaDeServicio;
+
 	@JoinColumn(name = "FACTURA")
-    @ManyToOne(optional = false)
+	@ManyToOne(optional = false)
 	private Factura factura;
-	
+
 	public ControlFacturaConstanciaDsPK() {
-	}		
+	}
 
 	public ControlFacturaConstanciaDsPK(ConstanciaDeServicio constanciaDeServicio, Factura factura) {
 		super();
@@ -43,7 +42,7 @@ public class ControlFacturaConstanciaDsPK implements Serializable {
 
 	public void setFactura(Factura factura) {
 		this.factura = factura;
-	}	
+	}
 
 	@Override
 	public String toString() {
@@ -55,7 +54,8 @@ public class ControlFacturaConstanciaDsPK implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((constanciaDeServicio.getFolio() == null) ? 0 : constanciaDeServicio.getFolio().hashCode());
+		result = prime * result
+				+ ((constanciaDeServicio.getFolio() == null) ? 0 : constanciaDeServicio.getFolio().hashCode());
 		result = prime * result + ((factura.getId() == null) ? 0 : factura.getId().hashCode());
 		return result;
 	}

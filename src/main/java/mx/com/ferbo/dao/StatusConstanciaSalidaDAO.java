@@ -12,59 +12,53 @@ import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class StatusConstanciaSalidaDAO extends IBaseDAO<StatusConstanciaSalida, Integer> {
-	
+
 	private static Logger log = LogManager.getLogger(StatusConstanciaSalidaDAO.class);
 
 	@Override
 	public StatusConstanciaSalida buscarPorId(Integer id) {
 		StatusConstanciaSalida status = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			status = em.find(StatusConstanciaSalida.class, id);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el status de la constancia de salida...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return status;
 	}
 
 	@Override
 	public List<StatusConstanciaSalida> buscarTodos() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<StatusConstanciaSalida> buscarPorCriterios(StatusConstanciaSalida e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String actualizar(StatusConstanciaSalida e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String guardar(StatusConstanciaSalida e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminar(StatusConstanciaSalida e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<StatusConstanciaSalida> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

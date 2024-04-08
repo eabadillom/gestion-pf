@@ -11,22 +11,22 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.CategoriaEgreso;
 import mx.com.ferbo.model.EmisoresCFDIS;
-import mx.com.ferbo.model.egresos;
+import mx.com.ferbo.model.Egresos;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class egresosDAO extends IBaseDAO<egresos, Integer>{
+public class EgresosDAO extends IBaseDAO<Egresos, Integer>{
 	private static final long serialVersionUID = -586280005718635555L;
-	private static Logger log = LogManager.getLogger(egresosDAO.class);
+	private static Logger log = LogManager.getLogger(EgresosDAO.class);
 	
 	@SuppressWarnings("unchecked")
 		
-	public List<egresos> findByAll() {
-		List<egresos> listaEgresos = null;
+	public List<Egresos> findByAll() {
+		List<Egresos> listaEgresos = null;
 		EntityManager entity = null;
 		
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			listaEgresos = entity.createNamedQuery("egresos.findByAll", egresos.class).getResultList();
+			listaEgresos = entity.createNamedQuery("egresos.findByAll", Egresos.class).getResultList();
 		}catch(Exception e) {
 			log.error("Error al obtener informacion",e);
 		}finally {
@@ -36,19 +36,19 @@ public class egresosDAO extends IBaseDAO<egresos, Integer>{
 	}
 
 	@Override
-	public egresos buscarPorId(Integer id) {
+	public Egresos buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<egresos> buscarTodos() {
-		List<egresos> listaEgresos = null;
+	public List<Egresos> buscarTodos() {
+		List<Egresos> listaEgresos = null;
 		EntityManager entity = null;
 		
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			listaEgresos = entity.createNamedQuery("egresos.findByAll", egresos.class).getResultList();
+			listaEgresos = entity.createNamedQuery("egresos.findByAll", Egresos.class).getResultList();
 		}catch(Exception e) {
 			log.error("Error al obtener informacion",e);
 		}finally {
@@ -58,19 +58,19 @@ public class egresosDAO extends IBaseDAO<egresos, Integer>{
 	}
 
 	@Override
-	public List<egresos> buscarPorCriterios(egresos e) {
+	public List<Egresos> buscarPorCriterios(Egresos e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String actualizar(egresos e) {
+	public String actualizar(Egresos e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String guardar(egresos es) {
+	public String guardar(Egresos es) {
 		EntityManager entity = null;
 		try {
 			 entity = EntityManagerUtil.getEntityManager();
@@ -87,13 +87,13 @@ public class egresosDAO extends IBaseDAO<egresos, Integer>{
 	};
 
 	@Override
-	public String eliminar(egresos e) {
+	public String eliminar(Egresos e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String eliminarListado(List<egresos> listado) {
+	public String eliminarListado(List<Egresos> listado) {
 		// TODO Auto-generated method stub
 		return null;
 	};

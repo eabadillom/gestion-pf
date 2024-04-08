@@ -14,55 +14,39 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.ui.RepEntradas;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class RepEntradasDAO extends IBaseDAO<RepEntradas, Integer>{
+public class RepEntradasDAO extends IBaseDAO<RepEntradas, Integer> {
 	private static Logger log = LogManager.getLogger(RepEntradasDAO.class);
 
 	@Override
 	public RepEntradas buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<RepEntradas> buscarTodos() {
-		
+
 		return null;
 	}
 
 	@Override
 	public List<RepEntradas> buscarPorCriterios(RepEntradas e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public List<RepEntradas> buscar(Date fechaIni, Date fechaFin, Integer idCliente, Integer idPlanta, Integer idCamara) {
+	public List<RepEntradas> buscar(Date fechaIni, Date fechaFin, Integer idCliente, Integer idPlanta,
+			Integer idCamara) {
 		List<RepEntradas> resultList = null;
 		EntityManager entity = null;
 		String sql = null;
-		
+
 		try {
-			sql = "SELECT "
-					+ "	cdd.folio_cliente, "
-					+ "	cdd.fecha_ingreso, "
-					+ "	c.numero_cte, "
-					+ "	c.cte_nombre, "
-					+ "	p.PESO_TOTAL, "
-					+ "	p.CANTIDAD_TOTAL, "
-					+ "	p.valorMercancia, "
-					+ "	dp.dtp_codigo, "
-					+ "	dp.dtp_SAP, "
-					+ "	prd.producto_ds, "
-					+ "	dp.dtp_lote, "
-					+ "	dp.dtp_po, "
-					+ "	dp.dtp_caducidad, "
-					+ "	dp.dtp_tarimas, "
-					+ "	dp.cantidad_u_manejo, "
-					+ "	udm.unidad_de_manejo_ds, "
-					+ "	plt.planta_cve, "
-					+ "	plt.planta_abrev AS planta, "
-					+ "	cam.camara_cve, "
-					+ "	cam.camara_abrev AS camara "
+			sql = "SELECT " + "	cdd.folio_cliente, " + "	cdd.fecha_ingreso, " + "	c.numero_cte, "
+					+ "	c.cte_nombre, " + "	p.PESO_TOTAL, " + "	p.CANTIDAD_TOTAL, " + "	p.valorMercancia, "
+					+ "	dp.dtp_codigo, " + "	dp.dtp_SAP, " + "	prd.producto_ds, " + "	dp.dtp_lote, "
+					+ "	dp.dtp_po, " + "	dp.dtp_caducidad, " + "	dp.dtp_tarimas, " + "	dp.cantidad_u_manejo, "
+					+ "	udm.unidad_de_manejo_ds, " + "	plt.planta_cve, " + "	plt.planta_abrev AS planta, "
+					+ "	cam.camara_cve, " + "	cam.camara_abrev AS camara "
 					+ "FROM partida p INNER JOIN constancia_de_deposito cdd ON cdd.folio = p.folio "
 					+ "INNER JOIN cliente c ON c.cte_cve = cdd.cte_cve "
 					+ "INNER JOIN detalle_partida dp ON dp.partida_cve = p.partida_cve AND dp.DET_PART_CVE = 1 "
@@ -74,25 +58,16 @@ public class RepEntradasDAO extends IBaseDAO<RepEntradas, Integer>{
 					+ "WHERE cdd.fecha_ingreso BETWEEN :fechaIni AND :fechaFin "
 					+ "	AND (cdd.cte_cve = :idCliente OR :idCliente IS NULL) "
 					+ "	AND (cam.camara_cve = :idCamara OR :idCamara IS NULL) "
-					+ "	AND (plt.planta_cve = :idPlanta OR :idPlanta IS NULL) "
-					+ "ORDER BY "
-					+ "	c.cte_nombre DESC, "
-					+ "	c.numero_cte DESC, "
-					+ "	prd.producto_ds DESC, "
-					+ "	cdd.fecha_ingreso DESC ";
+					+ "	AND (plt.planta_cve = :idPlanta OR :idPlanta IS NULL) " + "ORDER BY " + "	c.cte_nombre DESC, "
+					+ "	c.numero_cte DESC, " + "	prd.producto_ds DESC, " + "	cdd.fecha_ingreso DESC ";
 			entity = EntityManagerUtil.getEntityManager();
-			
-			List<Object[]> results = entity.createNativeQuery(sql)
-					.setParameter("fechaIni", fechaIni)
-					.setParameter("fechaFin", fechaFin)
-					.setParameter("idCliente", idCliente)
-					.setParameter("idPlanta", idPlanta)
-					.setParameter("idCamara", idCamara)
-					.getResultList()
-					;
-			
+
+			List<Object[]> results = entity.createNativeQuery(sql).setParameter("fechaIni", fechaIni)
+					.setParameter("fechaFin", fechaFin).setParameter("idCliente", idCliente)
+					.setParameter("idPlanta", idPlanta).setParameter("idCamara", idCamara).getResultList();
+
 			resultList = new ArrayList<RepEntradas>();
-			for(Object[] o : results) {
+			for (Object[] o : results) {
 				RepEntradas r = new RepEntradas();
 				int idx = 0;
 				r.setFolioCliente((String) o[idx++]);
@@ -115,41 +90,37 @@ public class RepEntradasDAO extends IBaseDAO<RepEntradas, Integer>{
 				r.setNombrePlanta((String) o[idx++]);
 				r.setIdCamara((Integer) o[idx++]);
 				r.setNombreCamara((String) o[idx++]);
-				
+
 				resultList.add(r);
 			}
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			log.error("Problema para obtener el reporte de Entradas...", ex);
 		} finally {
 			EntityManagerUtil.close(entity);
 		}
-		
+
 		return resultList;
 	}
 
 	@Override
 	public String actualizar(RepEntradas e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String guardar(RepEntradas e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminar(RepEntradas e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<RepEntradas> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

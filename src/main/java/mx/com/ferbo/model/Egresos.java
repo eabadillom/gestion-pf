@@ -17,30 +17,28 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "concepto_egreso")
-@NamedQueries({
-	@NamedQuery(name = "egresos.findByAll", query ="SELECT e FROM egresos e"),
-	@NamedQuery(name ="egresos.finById", query = "SELECT e FROM egresos e WHERE  e.idEgreso = :id"),
-	@NamedQuery(name = "egresos.findByCategoria", query = "SELECT e FROM egresos e WHERE  e.categoriaEgreso = :categoriaEgreso"),
-	@NamedQuery(name = "egresos.findByNombreEgreso", query ="SELECT e FROM egresos e WHERE e.nombreEgreso = :nombreEgreso")
-})
-public class egresos implements Serializable{
+@NamedQueries({ @NamedQuery(name = "Egresos.findByAll", query = "SELECT e FROM Egresos e"),
+		@NamedQuery(name = "Egresos.finById", query = "SELECT e FROM Egresos e WHERE  e.idEgreso = :id"),
+		@NamedQuery(name = "Egresos.findByCategoria", query = "SELECT e FROM Egresos e WHERE  e.categoriaEgreso = :categoriaEgreso"),
+		@NamedQuery(name = "Egresos.findByNombreEgreso", query = "SELECT e FROM Egresos e WHERE e.nombreEgreso = :nombreEgreso") })
+public class Egresos implements Serializable {
 
 	private static final long serialVersionUID = 5758852946569378638L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Basic(optional =false)
+	@Basic(optional = false)
 	@Column(name = "id_egreso")
 	private Integer idEgreso;
-	
+
 	@JoinColumn(name = "categoria_egreso", referencedColumnName = "id_categoria_egreso")
 	@ManyToOne(optional = false)
-	private CategoriaEgreso  categoriaEgreso;
-	
+	private CategoriaEgreso categoriaEgreso;
+
 	@NotNull
-	@Column(name="nombre_egreso")
+	@Column(name = "nombre_egreso")
 	private String nombreEgreso;
-	
+
 	public Integer getIdEgreso() {
 		return idEgreso;
 	}
@@ -65,9 +63,4 @@ public class egresos implements Serializable{
 		this.nombreEgreso = nombreEgreso;
 	}
 
-	
-	
 }
-
-
-

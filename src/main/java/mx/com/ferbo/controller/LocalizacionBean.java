@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.faces.model.SelectItem;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -23,22 +22,22 @@ import mx.com.ferbo.model.Paises;
 public class LocalizacionBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private Paises pais;
 	private Estados estado;
 	private Municipios municipio;
 	private Ciudades ciudad;
-	
+
 	private List<Paises> listaPaises;
 	private List<Estados> listaEstados;
 	private List<Municipios> listaMunicipios;
 	private List<Ciudades> listaCiudades;
-	
+
 	private PaisesDAO paisesDao;
 	private EstadosDAO estadosDao;
 	private MunicipiosDAO municipiosDao;
 	private CiudadesDAO ciudadesDao;
-	
+
 	public LocalizacionBean() {
 		paisesDao = new PaisesDAO();
 		estadosDao = new EstadosDAO();
@@ -49,7 +48,7 @@ public class LocalizacionBean implements Serializable {
 		listaMunicipios = new ArrayList<>();
 		listaCiudades = new ArrayList<>();
 	}
-	
+
 	@PostConstruct
 	public void init() {
 		listaPaises = paisesDao.buscarTodos();
@@ -154,5 +153,4 @@ public class LocalizacionBean implements Serializable {
 		this.ciudadesDao = ciudadesDao;
 	}
 
-	
 }

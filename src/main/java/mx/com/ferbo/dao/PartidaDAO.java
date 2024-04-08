@@ -16,27 +16,28 @@ import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class PartidaDAO extends IBaseDAO<Partida, Integer>{
+public class PartidaDAO extends IBaseDAO<Partida, Integer> {
 	private static Logger log = LogManager.getLogger(PartidaDAO.class);
+
 	@SuppressWarnings("unchecked")
 	public List<Partida> findall() {
-		
+
 		EntityManager entity = null;
-		List<Partida> partida= null;
-		
+		List<Partida> partida = null;
+
 		try {
 			entity = EntityManagerUtil.getEntityManager();
 			Query sql = entity.createNamedQuery("Partida.findAll", Partida.class);
 			partida = sql.getResultList();
 		} catch (Exception e) {
 			log.error("Problema para traer list de partida", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
-		
+
 		return partida;
 	}
-	
+
 	@Override
 	public Partida buscarPorId(Integer partidaClave) {
 
@@ -44,39 +45,40 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 		Partida p = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			p = em.createNamedQuery("Partida.findByPartidaCve", Partida.class).setParameter("partidaCve", partidaClave).getSingleResult();
-		} catch(Exception ex) {
+			p = em.createNamedQuery("Partida.findByPartidaCve", Partida.class).setParameter("partidaCve", partidaClave)
+					.getSingleResult();
+		} catch (Exception ex) {
 			log.error("Problema para obtener la partida: " + partidaClave, ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return p;
 	}
-	
+
 	public Partida buscarPorId(Integer partidaCve, boolean isFullInfo) {
 		EntityManager em = null;
 		Partida p = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			p = em.find(Partida.class, partidaCve);
-			
-			if(isFullInfo == false)
+
+			if (isFullInfo == false)
 				return p;
-			
-			
+
 			log.debug("DetalleConstanciaSalidaList: {}", p.getDetalleConstanciaSalidaList().size());
-			for(DetalleConstanciaSalida dcs : p.getDetalleConstanciaSalidaList()) {
+			for (DetalleConstanciaSalida dcs : p.getDetalleConstanciaSalidaList()) {
 				log.debug("DetalleconstanciaSalida: {}", dcs.getId());
 			}
-			
+
 			List<DetallePartida> detallePartidaList = p.getDetallePartidaList();
 			log.debug("Lista detallePartida: {}", detallePartidaList.size());
-			for(DetallePartida detallePartida : detallePartidaList) {
-				log.debug("DetallePartida: {}, {}", detallePartida.getDetallePartidaPK().getPartidaCve(), detallePartida.getDetallePartidaPK().getDetPartCve());
+			for (DetallePartida detallePartida : detallePartidaList) {
+				log.debug("DetallePartida: {}, {}", detallePartida.getDetallePartidaPK().getPartidaCve(),
+						detallePartida.getDetallePartidaPK().getDetPartCve());
 				log.debug("Unidad de Medida: {}", detallePartida.getUMedidaCve());
 			}
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			log.error("Problema para obtener la partida: " + partidaCve, ex);
 		} finally {
 			EntityManagerUtil.close(em);
@@ -90,21 +92,18 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			list = em.createNamedQuery("Partida.findAll", Partida.class)
-					.getResultList()
-			;
-		} catch(Exception ex) {
-			log.error("Problema para obtener el listado de partidas...",  ex);
+			list = em.createNamedQuery("Partida.findAll", Partida.class).getResultList();
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de partidas...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return list;
 	}
 
 	@Override
 	public List<Partida> buscarPorCriterios(Partida e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -134,7 +133,7 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 			em.persist(partida);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			log.error("Problema para guardar la partida: " + partida,  e);
+			log.error("Problema para guardar la partida: " + partida, e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -144,34 +143,31 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 
 	@Override
 	public String eliminar(Partida e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<Partida> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	public List<Partida> buscarPorConstanciaDeposito(ConstanciaDeDeposito cons){
-		
+
+	public List<Partida> buscarPorConstanciaDeposito(ConstanciaDeDeposito cons) {
+
 		EntityManager em = null;
 		List<Partida> buscaPartidas = new ArrayList<>();
-		
+
 		try {
-			em = EntityManagerUtil.getEntityManager();		
-			buscaPartidas=em.createNamedQuery("Partida.findByConstanciaDeDeposito",Partida.class)
+			em = EntityManagerUtil.getEntityManager();
+			buscaPartidas = em.createNamedQuery("Partida.findByConstanciaDeDeposito", Partida.class)
 					.setParameter("folioCliente", cons.getFolioCliente()).getResultList();
 		} catch (Exception e) {
 			log.error("Problema al buscar constancias de deposito", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return buscaPartidas;
 
-		
 	}
 
 }

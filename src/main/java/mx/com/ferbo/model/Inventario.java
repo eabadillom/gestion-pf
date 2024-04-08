@@ -36,9 +36,11 @@ public class Inventario {
 	protected ConstanciaDeDeposito constanciaDeDeposito;
 	protected Servicio srv;
 	protected BigDecimal numeroTarimas;
+
 	public Inventario() {
 
 	}
+
 	public void listas() {
 	}
 
@@ -64,14 +66,14 @@ public class Inventario {
 		this.folioCliente = folioCliente;
 		this.Observaciones = observaciones;
 		this.descripcion = descripcion;
-		
+
 	}
 
 	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidadManejo, Planta planta,
-			Date caducidad, String codigo, String lote, String sap, Camara camara, Posicion posicion, Integer partidaCve,
-			BigDecimal peso, String inventarioCve, String detalleAnt, Integer detallePartidaAnterior,
-			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas,
-			Servicio srv, ConstanciaDeDeposito constanciaDeDeposito) {
+			Date caducidad, String codigo, String lote, String sap, Camara camara, Posicion posicion,
+			Integer partidaCve, BigDecimal peso, String inventarioCve, String detalleAnt,
+			Integer detallePartidaAnterior, Integer detallePadre, Integer detallePartidaPadre, String po, String mp,
+			String pedimento, String tarimas, Servicio srv, ConstanciaDeDeposito constanciaDeDeposito) {
 		this.folio = folio;
 		this.producto = producto;
 		this.cantidad = cantidad;
@@ -97,7 +99,7 @@ public class Inventario {
 		this.srv = srv;
 		this.constanciaDeDeposito = constanciaDeDeposito;
 	}
-	
+
 	public ConstanciaDeDeposito getConstanciaDeDeposito() {
 		return constanciaDeDeposito;
 	}
@@ -193,7 +195,7 @@ public class Inventario {
 	public void setCamara(Camara camara) {
 		this.camara = camara;
 	}
-	
+
 	public Integer getPartidaCve() {
 		return partidaCve;
 	}
@@ -337,6 +339,7 @@ public class Inventario {
 	public void setPosicion(Posicion posicion) {
 		this.posicion = posicion;
 	}
+
 	@Override
 	public String toString() {
 		return "Inventario [folio=" + folio + ", producto=" + producto + ", cliente=" + cliente + ", cantidad="
@@ -349,17 +352,20 @@ public class Inventario {
 				+ tarimas + ", folioCliente=" + folioCliente + ", Observaciones=" + Observaciones + ", descripcion="
 				+ descripcion + ", constanciaDeDeposito=" + constanciaDeDeposito + ", srv=" + srv + "]";
 	}
+
 	public Date getFechaIngreso() {
 		return fechaIngreso;
 	}
+
 	public void setFechaIngreso(Date fechaIngreso) {
 		this.fechaIngreso = fechaIngreso;
 	}
+
 	public BigDecimal getNumeroTarimas() {
 		return numeroTarimas;
 	}
+
 	public void setNumeroTarimas(BigDecimal numeroTarimas) {
 		this.numeroTarimas = numeroTarimas;
 	}
 }
-

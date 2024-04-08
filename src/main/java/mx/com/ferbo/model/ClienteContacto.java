@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -30,193 +31,191 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "cliente_contacto")
-@NamedQueries({
-    @NamedQuery(name = "ClienteContacto.findAll", query = "SELECT c FROM ClienteContacto c"),
-    @NamedQuery(name = "ClienteContacto.findByStHabilitado", query = "SELECT c FROM ClienteContacto c WHERE c.stHabilitado = :stHabilitado"),
-    @NamedQuery(name = "ClienteContacto.findByNbUsuario", query = "SELECT c FROM ClienteContacto c WHERE c.nbUsuario = :nbUsuario"),
-    @NamedQuery(name = "ClienteContacto.findByNbPassword", query = "SELECT c FROM ClienteContacto c WHERE c.nbPassword = :nbPassword"),
-    @NamedQuery(name = "ClienteContacto.findByStUsuario", query = "SELECT c FROM ClienteContacto c WHERE c.stUsuario = :stUsuario"),
-    @NamedQuery(name = "ClienteContacto.findByFhAlta", query = "SELECT c FROM ClienteContacto c WHERE c.fhAlta = :fhAlta"),
-    @NamedQuery(name = "ClienteContacto.findByFhCadPasswd", query = "SELECT c FROM ClienteContacto c WHERE c.fhCadPasswd = :fhCadPasswd"),
-    @NamedQuery(name = "ClienteContacto.findByFhUltAcceso", query = "SELECT c FROM ClienteContacto c WHERE c.fhUltAcceso = :fhUltAcceso"),
-    @NamedQuery(name = "ClienteContacto.findById", query = "SELECT c FROM ClienteContacto c WHERE c.id = :id")})
+@NamedQueries({ @NamedQuery(name = "ClienteContacto.findAll", query = "SELECT c FROM ClienteContacto c"),
+		@NamedQuery(name = "ClienteContacto.findByStHabilitado", query = "SELECT c FROM ClienteContacto c WHERE c.stHabilitado = :stHabilitado"),
+		@NamedQuery(name = "ClienteContacto.findByNbUsuario", query = "SELECT c FROM ClienteContacto c WHERE c.nbUsuario = :nbUsuario"),
+		@NamedQuery(name = "ClienteContacto.findByNbPassword", query = "SELECT c FROM ClienteContacto c WHERE c.nbPassword = :nbPassword"),
+		@NamedQuery(name = "ClienteContacto.findByStUsuario", query = "SELECT c FROM ClienteContacto c WHERE c.stUsuario = :stUsuario"),
+		@NamedQuery(name = "ClienteContacto.findByFhAlta", query = "SELECT c FROM ClienteContacto c WHERE c.fhAlta = :fhAlta"),
+		@NamedQuery(name = "ClienteContacto.findByFhCadPasswd", query = "SELECT c FROM ClienteContacto c WHERE c.fhCadPasswd = :fhCadPasswd"),
+		@NamedQuery(name = "ClienteContacto.findByFhUltAcceso", query = "SELECT c FROM ClienteContacto c WHERE c.fhUltAcceso = :fhUltAcceso"),
+		@NamedQuery(name = "ClienteContacto.findById", query = "SELECT c FROM ClienteContacto c WHERE c.id = :id") })
 public class ClienteContacto implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "st_habilitado")
-    private boolean stHabilitado;
-    
-    @Size(max = 50)
-    @Column(name = "nb_usuario")
-    private String nbUsuario;
-    
-    @Size(max = 1024)
-    @Column(name = "nb_password")
-    private String nbPassword;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 1)
-    @Column(name = "st_usuario")
-    private String stUsuario;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "fh_alta")
-    @Temporal(TemporalType.DATE)
-    private Date fhAlta;
-    
-    @Column(name = "fh_cad_passwd")
-    @Temporal(TemporalType.DATE)
-    private Date fhCadPasswd;
-    
-    @Column(name = "fh_ult_acceso")
-    @Temporal(TemporalType.DATE)
-    private Date fhUltAcceso;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
-    
-    @JoinColumn(name = "id_cliente", referencedColumnName = "CTE_CVE")
-    @ManyToOne(optional = false)
-    private Cliente idCliente;
-    
-    @JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    private Contacto idContacto;
-    
-    @Column(name="st_facturacion")
-    private Boolean recibeFacturacion;
-    
-    @Column(name="st_inventario")
-    private Boolean recibeInventario;
+	private static final long serialVersionUID = 1L;
 
-    public ClienteContacto() {
-    	idCliente = new Cliente();
-    	idContacto = new Contacto();
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Column(name = "st_habilitado")
+	private boolean stHabilitado;
 
-    public ClienteContacto(Integer id) {
-        this.id = id;
-    }
+	@Size(max = 50)
+	@Column(name = "nb_usuario")
+	private String nbUsuario;
 
-    public ClienteContacto(Integer id, boolean stHabilitado, String stUsuario, Date fhAlta) {
-        this.id = id;
-        this.stHabilitado = stHabilitado;
-        this.stUsuario = stUsuario;
-        this.fhAlta = fhAlta;
-    }
+	@Size(max = 1024)
+	@Column(name = "nb_password")
+	private String nbPassword;
 
-    public boolean getStHabilitado() {
-        return stHabilitado;
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Size(min = 1, max = 1)
+	@Column(name = "st_usuario")
+	private String stUsuario;
 
-    public void setStHabilitado(boolean stHabilitado) {
-        this.stHabilitado = stHabilitado;
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Column(name = "fh_alta")
+	@Temporal(TemporalType.DATE)
+	private Date fhAlta;
 
-    public String getNbUsuario() {
-        return nbUsuario;
-    }
+	@Column(name = "fh_cad_passwd")
+	@Temporal(TemporalType.DATE)
+	private Date fhCadPasswd;
 
-    public void setNbUsuario(String nbUsuario) {
-        this.nbUsuario = nbUsuario;
-    }
+	@Column(name = "fh_ult_acceso")
+	@Temporal(TemporalType.DATE)
+	private Date fhUltAcceso;
 
-    public String getNbPassword() {
-        return nbPassword;
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "id")
+	private Integer id;
 
-    public void setNbPassword(String nbPassword) {
-        this.nbPassword = nbPassword;
-    }
+	@JoinColumn(name = "id_cliente", referencedColumnName = "CTE_CVE")
+	@ManyToOne(optional = false)
+	private Cliente idCliente;
 
-    public String getStUsuario() {
-        return stUsuario;
-    }
+	@JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
+	@ManyToOne(optional = false, cascade = CascadeType.ALL)
+	private Contacto idContacto;
 
-    public void setStUsuario(String stUsuario) {
-        this.stUsuario = stUsuario;
-    }
+	@Column(name = "st_facturacion")
+	private Boolean recibeFacturacion;
 
-    public Date getFhAlta() {
-        return fhAlta;
-    }
+	@Column(name = "st_inventario")
+	private Boolean recibeInventario;
 
-    public void setFhAlta(Date fhAlta) {
-        this.fhAlta = fhAlta;
-    }
+	public ClienteContacto() {
+		idCliente = new Cliente();
+		idContacto = new Contacto();
+	}
 
-    public Date getFhCadPasswd() {
-        return fhCadPasswd;
-    }
+	public ClienteContacto(Integer id) {
+		this.id = id;
+	}
 
-    public void setFhCadPasswd(Date fhCadPasswd) {
-        this.fhCadPasswd = fhCadPasswd;
-    }
+	public ClienteContacto(Integer id, boolean stHabilitado, String stUsuario, Date fhAlta) {
+		this.id = id;
+		this.stHabilitado = stHabilitado;
+		this.stUsuario = stUsuario;
+		this.fhAlta = fhAlta;
+	}
 
-    public Date getFhUltAcceso() {
-        return fhUltAcceso;
-    }
+	public boolean getStHabilitado() {
+		return stHabilitado;
+	}
 
-    public void setFhUltAcceso(Date fhUltAcceso) {
-        this.fhUltAcceso = fhUltAcceso;
-    }
+	public void setStHabilitado(boolean stHabilitado) {
+		this.stHabilitado = stHabilitado;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public String getNbUsuario() {
+		return nbUsuario;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setNbUsuario(String nbUsuario) {
+		this.nbUsuario = nbUsuario;
+	}
 
-    public Cliente getIdCliente() {
-        return idCliente;
-    }
+	public String getNbPassword() {
+		return nbPassword;
+	}
 
-    public void setIdCliente(Cliente idCliente) {
-        this.idCliente = idCliente;
-    }
+	public void setNbPassword(String nbPassword) {
+		this.nbPassword = nbPassword;
+	}
 
-    public Contacto getIdContacto() {
-        return idContacto;
-    }
+	public String getStUsuario() {
+		return stUsuario;
+	}
 
-    public void setIdContacto(Contacto idContacto) {
-        this.idContacto = idContacto;
-    }
+	public void setStUsuario(String stUsuario) {
+		this.stUsuario = stUsuario;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
+	public Date getFhAlta() {
+		return fhAlta;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ClienteContacto)) {
-            return false;
-        }
-        ClienteContacto other = (ClienteContacto) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
+	public void setFhAlta(Date fhAlta) {
+		this.fhAlta = fhAlta;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.ClienteContacto[ id=" + id + " ]";
-    }
+	public Date getFhCadPasswd() {
+		return fhCadPasswd;
+	}
+
+	public void setFhCadPasswd(Date fhCadPasswd) {
+		this.fhCadPasswd = fhCadPasswd;
+	}
+
+	public Date getFhUltAcceso() {
+		return fhUltAcceso;
+	}
+
+	public void setFhUltAcceso(Date fhUltAcceso) {
+		this.fhUltAcceso = fhUltAcceso;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Cliente getIdCliente() {
+		return idCliente;
+	}
+
+	public void setIdCliente(Cliente idCliente) {
+		this.idCliente = idCliente;
+	}
+
+	public Contacto getIdContacto() {
+		return idContacto;
+	}
+
+	public void setIdContacto(Contacto idContacto) {
+		this.idContacto = idContacto;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof ClienteContacto)) {
+			return false;
+		}
+		ClienteContacto other = (ClienteContacto) object;
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.ClienteContacto[ id=" + id + " ]";
+	}
 
 	public Boolean getRecibeFacturacion() {
 		return recibeFacturacion;
@@ -233,5 +232,5 @@ public class ClienteContacto implements Serializable {
 	public void setRecibeInventario(Boolean recibeInventario) {
 		this.recibeInventario = recibeInventario;
 	}
-    
+
 }

@@ -30,115 +30,114 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "mail")
-@NamedQueries({
-    @NamedQuery(name = "Mail.findAll", query = "SELECT m FROM Mail m"),
-    @NamedQuery(name = "Mail.findByIdMail", query = "SELECT m FROM Mail m WHERE m.idMail = :idMail"),
-    @NamedQuery(name = "Mail.findByNbMail", query = "SELECT m FROM Mail m WHERE m.nbMail = :nbMail"),
-    @NamedQuery(name = "Mail.findByStPrincipal", query = "SELECT m FROM Mail m WHERE m.stPrincipal = :stPrincipal")})
+@NamedQueries({ @NamedQuery(name = "Mail.findAll", query = "SELECT m FROM Mail m"),
+		@NamedQuery(name = "Mail.findByIdMail", query = "SELECT m FROM Mail m WHERE m.idMail = :idMail"),
+		@NamedQuery(name = "Mail.findByNbMail", query = "SELECT m FROM Mail m WHERE m.nbMail = :nbMail"),
+		@NamedQuery(name = "Mail.findByStPrincipal", query = "SELECT m FROM Mail m WHERE m.stPrincipal = :stPrincipal") })
 public class Mail implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id_mail")
-    private Integer idMail;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 100)
-    @Column(name = "nb_mail")
-    private String nbMail;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "st_principal")
-    private boolean stPrincipal;
-    
-    @JoinColumn(name = "tp_mail", referencedColumnName = "tp_mail")
-    @ManyToOne(optional = false)
-    private TipoMail tpMail;
-    
-    @OneToMany(mappedBy = "idMail", cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<MedioCnt> medioCntList;
+	private static final long serialVersionUID = 1L;
 
-    public Mail() {
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "id_mail")
+	private Integer idMail;
 
-    public Mail(Integer idMail) {
-        this.idMail = idMail;
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Size(min = 1, max = 100)
+	@Column(name = "nb_mail")
+	private String nbMail;
 
-    public Mail(Integer idMail, String nbMail, boolean stPrincipal) {
-        this.idMail = idMail;
-        this.nbMail = nbMail;
-        this.stPrincipal = stPrincipal;
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Column(name = "st_principal")
+	private boolean stPrincipal;
 
-    public Integer getIdMail() {
-        return idMail;
-    }
+	@JoinColumn(name = "tp_mail", referencedColumnName = "tp_mail")
+	@ManyToOne(optional = false)
+	private TipoMail tpMail;
 
-    public void setIdMail(Integer idMail) {
-        this.idMail = idMail;
-    }
+	@OneToMany(mappedBy = "idMail", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MedioCnt> medioCntList;
 
-    public String getNbMail() {
-        return nbMail;
-    }
+	public Mail() {
+	}
 
-    public void setNbMail(String nbMail) {
-        this.nbMail = nbMail;
-    }
+	public Mail(Integer idMail) {
+		this.idMail = idMail;
+	}
 
-    public boolean getStPrincipal() {
-        return stPrincipal;
-    }
+	public Mail(Integer idMail, String nbMail, boolean stPrincipal) {
+		this.idMail = idMail;
+		this.nbMail = nbMail;
+		this.stPrincipal = stPrincipal;
+	}
 
-    public void setStPrincipal(boolean stPrincipal) {
-        this.stPrincipal = stPrincipal;
-    }
+	public Integer getIdMail() {
+		return idMail;
+	}
 
-    public TipoMail getTpMail() {
-        return tpMail;
-    }
+	public void setIdMail(Integer idMail) {
+		this.idMail = idMail;
+	}
 
-    public void setTpMail(TipoMail tpMail) {
-        this.tpMail = tpMail;
-    }
+	public String getNbMail() {
+		return nbMail;
+	}
 
-    public List<MedioCnt> getMedioCntList() {
-        return medioCntList;
-    }
+	public void setNbMail(String nbMail) {
+		this.nbMail = nbMail;
+	}
 
-    public void setMedioCntList(List<MedioCnt> medioCntList) {
-        this.medioCntList = medioCntList;
-    }
+	public boolean getStPrincipal() {
+		return stPrincipal;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idMail != null ? idMail.hashCode() : 0);
-        return hash;
-    }
+	public void setStPrincipal(boolean stPrincipal) {
+		this.stPrincipal = stPrincipal;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Mail)) {
-            return false;
-        }
-        Mail other = (Mail) object;
-        if ((this.idMail == null && other.idMail != null) || (this.idMail != null && !this.idMail.equals(other.idMail))) {
-            return false;
-        }
-        return true;
-    }
+	public TipoMail getTpMail() {
+		return tpMail;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Mail[ idMail=" + idMail + " ]";
-    }
-    
+	public void setTpMail(TipoMail tpMail) {
+		this.tpMail = tpMail;
+	}
+
+	public List<MedioCnt> getMedioCntList() {
+		return medioCntList;
+	}
+
+	public void setMedioCntList(List<MedioCnt> medioCntList) {
+		this.medioCntList = medioCntList;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (idMail != null ? idMail.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Mail)) {
+			return false;
+		}
+		Mail other = (Mail) object;
+		if ((this.idMail == null && other.idMail != null)
+				|| (this.idMail != null && !this.idMail.equals(other.idMail))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.Mail[ idMail=" + idMail + " ]";
+	}
+
 }

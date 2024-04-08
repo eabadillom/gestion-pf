@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,107 +25,105 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "tipo_cobro")
-@NamedQueries({
-    @NamedQuery(name = "TipoCobro.findAll", query = "SELECT t FROM TipoCobro t"),
-    @NamedQuery(name = "TipoCobro.findById", query = "SELECT t FROM TipoCobro t WHERE t.id = :id"),
-    @NamedQuery(name = "TipoCobro.findByNombre", query = "SELECT t FROM TipoCobro t WHERE t.nombre = :nombre"),
-    @NamedQuery(name = "TipoCobro.findByDescripcion", query = "SELECT t FROM TipoCobro t WHERE t.descripcion = :descripcion")})
+@NamedQueries({ @NamedQuery(name = "TipoCobro.findAll", query = "SELECT t FROM TipoCobro t"),
+		@NamedQuery(name = "TipoCobro.findById", query = "SELECT t FROM TipoCobro t WHERE t.id = :id"),
+		@NamedQuery(name = "TipoCobro.findByNombre", query = "SELECT t FROM TipoCobro t WHERE t.nombre = :nombre"),
+		@NamedQuery(name = "TipoCobro.findByDescripcion", query = "SELECT t FROM TipoCobro t WHERE t.descripcion = :descripcion") })
 public class TipoCobro implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "id")
-    private Integer id;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 30)
-    @Column(name = "nombre")
-    private String nombre;
-    @Size(max = 255)
-    @Column(name = "descripcion")
-    private String descripcion;
-    @OneToMany(mappedBy = "cobro")
-    private List<Servicio> servicioList;
-    @OneToMany(mappedBy = "tipoCobro")
-    private List<ServicioFactura> servicioFacturaList;
+	private static final long serialVersionUID = 1L;
+	@Id
+	@Basic(optional = false)
+	@NotNull
+	@Column(name = "id")
+	private Integer id;
+	@Basic(optional = false)
+	@NotNull
+	@Size(min = 1, max = 30)
+	@Column(name = "nombre")
+	private String nombre;
+	@Size(max = 255)
+	@Column(name = "descripcion")
+	private String descripcion;
+	@OneToMany(mappedBy = "cobro")
+	private List<Servicio> servicioList;
+	@OneToMany(mappedBy = "tipoCobro")
+	private List<ServicioFactura> servicioFacturaList;
 
-    public TipoCobro() {
-    }
+	public TipoCobro() {
+	}
 
-    public TipoCobro(Integer id) {
-        this.id = id;
-    }
+	public TipoCobro(Integer id) {
+		this.id = id;
+	}
 
-    public TipoCobro(Integer id, String nombre) {
-        this.id = id;
-        this.nombre = nombre;
-    }
+	public TipoCobro(Integer id, String nombre) {
+		this.id = id;
+		this.nombre = nombre;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public String getNombre() {
-        return nombre;
-    }
+	public String getNombre() {
+		return nombre;
+	}
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+	public String getDescripcion() {
+		return descripcion;
+	}
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 
-    public List<Servicio> getServicioList() {
-        return servicioList;
-    }
+	public List<Servicio> getServicioList() {
+		return servicioList;
+	}
 
-    public void setServicioList(List<Servicio> servicioList) {
-        this.servicioList = servicioList;
-    }
-    
-    public List<ServicioFactura> getServicioFacturaList() {
-        return servicioFacturaList;
-    }
+	public void setServicioList(List<Servicio> servicioList) {
+		this.servicioList = servicioList;
+	}
 
-    public void setServicioFacturaList(List<ServicioFactura> servicioFacturaList) {
-        this.servicioFacturaList = servicioFacturaList;
-    }
+	public List<ServicioFactura> getServicioFacturaList() {
+		return servicioFacturaList;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
+	public void setServicioFacturaList(List<ServicioFactura> servicioFacturaList) {
+		this.servicioFacturaList = servicioFacturaList;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof TipoCobro)) {
-            return false;
-        }
-        TipoCobro other = (TipoCobro) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.TipoCobro[ id=" + id + " ]";
-    }
-    
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof TipoCobro)) {
+			return false;
+		}
+		TipoCobro other = (TipoCobro) object;
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.TipoCobro[ id=" + id + " ]";
+	}
+
 }

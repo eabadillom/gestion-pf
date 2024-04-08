@@ -14,25 +14,26 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 	private static Logger log = LogManager.getLogger(BancoDAO.class);
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Bancos> findall() {
-		
+
 		EntityManager entity = null;
 		List<Bancos> b = null;
-		
+
 		try {
 			entity = EntityManagerUtil.getEntityManager();
 			Query sql = entity.createNamedQuery("Bancos.findAll", Bancos.class);
 			b = sql.getResultList();
 		} catch (Exception e) {
-			log.error("Problema al encontrar bancos",e);
-		}finally {
+			log.error("Problema al encontrar bancos", e);
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
-		
+
 		return b;
-	}	 
+	}
+
 	@Override
 	public Bancos buscarPorId(Integer id) {
 		Bancos bc = null;
@@ -40,10 +41,10 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			bc = em.find(Bancos.class, id);
-			
-		}catch(Exception e) {
-			log.error("Error al buscar banco...",e);
-		}finally {
+
+		} catch (Exception e) {
+			log.error("Error al buscar banco...", e);
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return bc;
@@ -51,33 +52,33 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 
 	@Override
 	public List<Bancos> buscarTodos() {
-		
-		EntityManager em = null;		
+
+		EntityManager em = null;
 		List<Bancos> listado = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("Bancos.findAll", Bancos.class).getResultList();
 		} catch (Exception e) {
 			log.error("Problema para buscar Todos los bancos", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return listado;
 	}
 
 	@Override
 	public List<Bancos> buscarPorCriterios(Bancos e) {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String actualizar(Bancos bancos) {
-		
+
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -86,7 +87,7 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 		} catch (Exception e) {
 			System.out.println("ERROR actualizando Banco" + e.getMessage());
 			return "ERROR";
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -95,15 +96,15 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 	@Override
 	public String guardar(Bancos bancos) {
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(bancos);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			log.error("Problema al guardar banco",e);
-		}finally {
+			log.error("Problema al guardar banco", e);
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -111,9 +112,9 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 
 	@Override
 	public String eliminar(Bancos bancos) {
-		
+
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -121,7 +122,7 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			log.error("Problema al eliminar banco", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -129,7 +130,7 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 
 	@Override
 	public String eliminarListado(List<Bancos> listado) {
-		// TODO Auto-generated method stub
+		//  Auto-generated method stub
 		return null;
 	}
 
@@ -170,7 +171,7 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 ////				CLOSE(PREPAREDSTATEMENT);
 ////				CLOSE(CONNECTION);
 ////			} CATCH (SQLEXCEPTION E) {
-////				// TODO AUTO-GENERATED CATCH BLOCK
+////				//  AUTO-GENERATED CATCH BLOCK
 ////				E.PRINTSTACKTRACE();
 ////			}
 //		}
@@ -190,14 +191,14 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 //
 //			CONNECTION.COMMIT();
 //		} CATCH (SQLEXCEPTION E) {
-//			// TODO AUTO-GENERATED CATCH BLOCK
+//			//  AUTO-GENERATED CATCH BLOCK
 //			E.PRINTSTACKTRACE();
 //		} FINALLY {
 ////			TRY {
 ////				CLOSE(PREPAREDSTATEMENT);
 ////				CLOSE(CONNECTION);
 ////			} CATCH (SQLEXCEPTION E) {
-////				// TODO AUTO-GENERATED CATCH BLOCK
+////				//  AUTO-GENERATED CATCH BLOCK
 ////				E.PRINTSTACKTRACE();
 ////			}
 //		}
@@ -264,18 +265,17 @@ public class BancoDAO extends IBaseDAO<Bancos, Integer> {
 //
 //			CONNECTION.COMMIT();
 //		} CATCH (SQLEXCEPTION E) {
-//			// TODO AUTO-GENERATED CATCH BLOCK
+//			//  AUTO-GENERATED CATCH BLOCK
 //			E.PRINTSTACKTRACE();
 //		} FINALLY {
 ////			TRY {
 ////				CLOSE(PREPAREDSTATEMENT);
 ////				CLOSE(CONNECTION);
 ////			} CATCH (SQLEXCEPTION E) {
-////				// TODO AUTO-GENERATED CATCH BLOCK
+////				//  AUTO-GENERATED CATCH BLOCK
 ////				E.PRINTSTACKTRACE();
 ////			}
 //		}
 //	}
 
-	
 }

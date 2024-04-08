@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,100 +27,99 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "detalle_constancia_servicios")
 @NamedQueries({
-    @NamedQuery(name = "DetalleConstanciaServicios.findAll", query = "SELECT d FROM DetalleConstanciaServicios d"),
-    @NamedQuery(name = "DetalleConstanciaServicios.findById", query = "SELECT d FROM DetalleConstanciaServicios d WHERE d.id = :id"),
-    @NamedQuery(name = "DetalleConstanciaServicios.findByServicioDes", query = "SELECT d FROM DetalleConstanciaServicios d WHERE d.servicioDes = :servicioDes"),
-    @NamedQuery(name = "DetalleConstanciaServicios.findByCantidad", query = "SELECT d FROM DetalleConstanciaServicios d WHERE d.cantidad = :cantidad")})
+		@NamedQuery(name = "DetalleConstanciaServicios.findAll", query = "SELECT d FROM DetalleConstanciaServicios d"),
+		@NamedQuery(name = "DetalleConstanciaServicios.findById", query = "SELECT d FROM DetalleConstanciaServicios d WHERE d.id = :id"),
+		@NamedQuery(name = "DetalleConstanciaServicios.findByServicioDes", query = "SELECT d FROM DetalleConstanciaServicios d WHERE d.servicioDes = :servicioDes"),
+		@NamedQuery(name = "DetalleConstanciaServicios.findByCantidad", query = "SELECT d FROM DetalleConstanciaServicios d WHERE d.cantidad = :cantidad") })
 public class DetalleConstanciaServicios implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "ID")
-    private Integer id;
-    @Size(max = 200)
-    @Column(name = "SERVICIO_DES")
-    private String servicioDes;
-    @Column(name = "CANTIDAD")
-    private Integer cantidad;
-    @JoinColumn(name = "CONSTANCIA_CVE", referencedColumnName = "ID")
-    @ManyToOne
-    private ConstanciaServicios constanciaCve;
-    @JoinColumn(name = "SERVICIO_CVE", referencedColumnName = "SERVICIO_CVE")
-    @ManyToOne
-    private Servicio servicioCve;
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "ID")
+	private Integer id;
+	@Size(max = 200)
+	@Column(name = "SERVICIO_DES")
+	private String servicioDes;
+	@Column(name = "CANTIDAD")
+	private Integer cantidad;
+	@JoinColumn(name = "CONSTANCIA_CVE", referencedColumnName = "ID")
+	@ManyToOne
+	private ConstanciaServicios constanciaCve;
+	@JoinColumn(name = "SERVICIO_CVE", referencedColumnName = "SERVICIO_CVE")
+	@ManyToOne
+	private Servicio servicioCve;
 
-    public DetalleConstanciaServicios() {
-    }
+	public DetalleConstanciaServicios() {
+	}
 
-    public DetalleConstanciaServicios(Integer id) {
-        this.id = id;
-    }
+	public DetalleConstanciaServicios(Integer id) {
+		this.id = id;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public String getServicioDes() {
-        return servicioDes;
-    }
+	public String getServicioDes() {
+		return servicioDes;
+	}
 
-    public void setServicioDes(String servicioDes) {
-        this.servicioDes = servicioDes;
-    }
+	public void setServicioDes(String servicioDes) {
+		this.servicioDes = servicioDes;
+	}
 
-    public Integer getCantidad() {
-        return cantidad;
-    }
+	public Integer getCantidad() {
+		return cantidad;
+	}
 
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
-    }
+	public void setCantidad(Integer cantidad) {
+		this.cantidad = cantidad;
+	}
 
-    public ConstanciaServicios getConstanciaCve() {
-        return constanciaCve;
-    }
+	public ConstanciaServicios getConstanciaCve() {
+		return constanciaCve;
+	}
 
-    public void setConstanciaCve(ConstanciaServicios constanciaCve) {
-        this.constanciaCve = constanciaCve;
-    }
+	public void setConstanciaCve(ConstanciaServicios constanciaCve) {
+		this.constanciaCve = constanciaCve;
+	}
 
-    public Servicio getServicioCve() {
-        return servicioCve;
-    }
+	public Servicio getServicioCve() {
+		return servicioCve;
+	}
 
-    public void setServicioCve(Servicio servicioCve) {
-        this.servicioCve = servicioCve;
-    }
+	public void setServicioCve(Servicio servicioCve) {
+		this.servicioCve = servicioCve;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof DetalleConstanciaServicios)) {
-            return false;
-        }
-        DetalleConstanciaServicios other = (DetalleConstanciaServicios) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof DetalleConstanciaServicios)) {
+			return false;
+		}
+		DetalleConstanciaServicios other = (DetalleConstanciaServicios) object;
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+			return false;
+		}
+		return true;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.DetalleConstanciaServicios[ id=" + id + " ]";
-    }
-    
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.DetalleConstanciaServicios[ id=" + id + " ]";
+	}
+
 }

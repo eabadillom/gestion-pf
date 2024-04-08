@@ -20,29 +20,29 @@ import mx.com.ferbo.model.TipoPago;
 public class TipoPagoBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private List<TipoPago> listaTipoPago;
-	
+
 	private List<TipoPago> listaTipoPagoSelected;
-	
+
 	private TipoPago tipoPagoSelected;
-	
+
 	private TipoPagoDAO tipoPagoDao;
 
 	public TipoPagoBean() {
 		tipoPagoDao = new TipoPagoDAO();
 		listaTipoPagoSelected = new ArrayList<>();
 	}
-	
+
 	@PostConstruct
 	public void init() {
 		listaTipoPago = tipoPagoDao.buscarTodos();
 	}
-	
+
 	public void nuevoTipoPago() {
 		this.tipoPagoSelected = new TipoPago();
 	}
-	
+
 	public void guardarTipoPago() {
 		if (this.tipoPagoSelected.getId() == null) {
 			if (tipoPagoDao.guardar(tipoPagoSelected) == null) {
@@ -108,6 +108,5 @@ public class TipoPagoBean implements Serializable {
 	public void setTipoPagoDao(TipoPagoDAO TipoPagoDao) {
 		this.tipoPagoDao = TipoPagoDao;
 	}
-	
-	
+
 }

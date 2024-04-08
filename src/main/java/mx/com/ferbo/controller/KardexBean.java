@@ -149,9 +149,9 @@ public class KardexBean implements Serializable {
 	private Integer cantidadTotal;
 	private BigDecimal pesoTotal;
 	private boolean pintaTraspaso;
-	
+
 	private ConstanciaDeDeposito entrada;
-	
+
 	private StreamedContent scKardexPDF = null;
 	private StreamedContent scKardexExcel = null;
 
@@ -187,68 +187,68 @@ public class KardexBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Folio";
-		
+
 		try {
-			if(this.folioClienteSelected == null)
+			if (this.folioClienteSelected == null)
 				throw new InventarioException("Debe indicar un folio de entrada.");
-			
-			if("".equalsIgnoreCase(this.folioClienteSelected.trim()))
+
+			if ("".equalsIgnoreCase(this.folioClienteSelected.trim()))
 				throw new InventarioException("Debe indicar un folio de entrada.");
-			
+
 			this.entrada = constanciaDeDepositoDAO.buscarPorFolioCliente(folioClienteSelected, true);
-			
-			if(this.entrada == null)
+
+			if (this.entrada == null)
 				throw new InventarioException("El folio indicado no existe.");
-			
+
 			this.imprimeConstancia(entrada);
-			
+
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-			
+
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} catch (Exception ex) {
 			log.error("Problema para obtener el folio de entrada...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
-			
+
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
 			PrimeFaces.current().ajax().update(":form:messages", "form:dt-entradasKardex", "form:dt-salidasKardex",
 					"form:dt-traspasos", "form:button-traspasos", "form:cmd-pdf", "form:cmd-xlsx");
 		}
-		
-		
+
 	}
-	
+
 	public void getSaldo(Partida partida) {
 		log.info("Obteniendo información de partida... {}", partida);
 	}
 
 	private void imprimeConstancia(ConstanciaDeDeposito constancia) {
 		List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList = constancia.getConstanciaDepositoDetalleList();
-		for(ConstanciaDepositoDetalle cdet : constanciaDepositoDetalleList) {
+		for (ConstanciaDepositoDetalle cdet : constanciaDepositoDetalleList) {
 			log.debug("Servicio: {}", cdet.getServicioCve().getServicioCod());
 		}
-		
+
 		List<Partida> partidaList = constancia.getPartidaList();
-		for(Partida partida : partidaList) {
-			log.debug("Partida: {}",  partida.getPartidaCve());
+		for (Partida partida : partidaList) {
+			log.debug("Partida: {}", partida.getPartidaCve());
 			log.debug("Planta: {}", partida.getCamaraCve().getPlantaCve().getPlantaCve());
-			log.debug("Producto: {}",partida.getUnidadDeProductoCve().getProductoCve().getProductoCve());
-			log.debug("Unidad de Manejo: {}",partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
-			log.debug("Unidad de cobro: {}",  partida.getUnidadDeCobro().getUnidadDeManejoCve());
+			log.debug("Producto: {}", partida.getUnidadDeProductoCve().getProductoCve().getProductoCve());
+			log.debug("Unidad de Manejo: {}",
+					partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
+			log.debug("Unidad de cobro: {}", partida.getUnidadDeCobro().getUnidadDeManejoCve());
 			List<DetalleConstanciaSalida> detalleConstanciaSalidaList = partida.getDetalleConstanciaSalidaList();
-			for(DetalleConstanciaSalida dcs : detalleConstanciaSalidaList) {
-				log.debug("Detalle constancia salida: {}",dcs.getId());
+			for (DetalleConstanciaSalida dcs : detalleConstanciaSalidaList) {
+				log.debug("Detalle constancia salida: {}", dcs.getId());
 				log.debug("Constancia salida: {}", dcs.getConstanciaCve().getId());
 			}
 		}
-		
+
 	}
-	
+
 	public void exportToPDF() {
 		String jasperPath = null;
 		String filename = null;
@@ -261,24 +261,24 @@ public class KardexBean implements Serializable {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
-		
+
 		try {
 			jasperPath = "/jasper/kardex.jrxml";
 			images = "/images/logoF.png";
-			
+
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
 			String img = resourceimg.getFile();
-			
+
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
 			filename = String.format("kardex_%s.pdf", this.entrada.getFolioCliente());
-			
+
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("folio", this.entrada.getFolioCliente() );
+			parameters.put("folio", this.entrada.getFolioCliente());
 			parameters.put("imagen", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
 			scKardexPDF = jasperReportUtil.getPdf(filename, parameters, reportFile.getPath());
@@ -287,13 +287,14 @@ public class KardexBean implements Serializable {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-inventarioEntradas");
 		} finally {
 			conexion.close((Connection) connection);
 		}
 	}
-	
+
 	public void exportToExcel() {
 		String jasperPath = null;
 		String filename = null;
@@ -306,24 +307,24 @@ public class KardexBean implements Serializable {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
-		
+
 		try {
 			jasperPath = "/jasper/kardex.jrxml";
 			images = "/images/logoF.png";
-			
+
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
 			String img = resourceimg.getFile();
-			
+
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
 			filename = String.format("kardex_%s.xlsx", this.entrada.getFolioCliente());
-			
+
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("folio", this.entrada.getFolioCliente() );
+			parameters.put("folio", this.entrada.getFolioCliente());
 			parameters.put("imagen", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
 			scKardexExcel = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
@@ -332,7 +333,8 @@ public class KardexBean implements Serializable {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 		} finally {
 			conexion.close((Connection) connection);
 			PrimeFaces.current().ajax().update("form:messages", "form:cmd-xlsx");
@@ -678,9 +680,5 @@ public class KardexBean implements Serializable {
 	public void setScKardexExcel(StreamedContent scKardexExcel) {
 		this.scKardexExcel = scKardexExcel;
 	}
-
-	
-
-	
 
 }

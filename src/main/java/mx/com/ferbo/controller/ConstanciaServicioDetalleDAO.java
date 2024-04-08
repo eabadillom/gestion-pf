@@ -71,12 +71,11 @@ public class ConstanciaServicioDetalleDAO extends IBaseDAO<ConstanciaServicioDet
 	public String actualizar(ConstanciaServicioDetalle e) {
 		EntityManager entity = null;
 		EntityTransaction transaction = null;
-		ConstanciaServicioDetalle servicio = null;
 		try {
 			entity = EntityManagerUtil.getEntityManager();
 			transaction = entity.getTransaction();
 			transaction.begin();
-			servicio = entity.merge(e);
+			entity.merge(e);
 			transaction.commit();
 		} catch(Exception ex) {
 			log.error("Problema para actualizar Constancia Servicio Detalle...", ex);

@@ -18,66 +18,66 @@ public class SerieFacturaDAO {
 	public List<SerieFactura> findAll() {
 		EntityManager entity = null;
 		List<SerieFactura> list = null;
-		
+
 		try {
 			entity = EntityManagerUtil.getEntityManager();
 			list = entity.createNamedQuery("SerieFactura.findAll", SerieFactura.class).getResultList();
-		}catch(Exception e) {
-			log.error("Error al obtener informacion",e);
-		}finally {
+		} catch (Exception e) {
+			log.error("Error al obtener informacion", e);
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return list;
 	};
-	
+
 	public SerieFactura findById(Integer idSerie) {
-		
+
 		EntityManager em = null;
 		SerieFactura serie = null;
 		Query query = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("SerieFactura.findById", SerieFactura.class).setParameter("id",idSerie);
-			
+			query = em.createNamedQuery("SerieFactura.findById", SerieFactura.class).setParameter("id", idSerie);
+
 			serie = (SerieFactura) query.getSingleResult();
-			
+
 		} catch (Exception e) {
 			log.info("Error al buscar Serie Factura por ID", e.getMessage());
 			return null;
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return serie;
 	}
 
 	public List<StatusSerie> findStatus() {
 		EntityManager entity = EntityManagerUtil.getEntityManager();
 		List<StatusSerie> list = null;
-	try {
-		entity = EntityManagerUtil.getEntityManager();
-		list = entity.createNamedQuery("StatusSerie.findAll", StatusSerie.class).getResultList();
-		}catch(Exception e) {
-			log.error("Error al obtener informacion",e);
-		}finally {
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			list = entity.createNamedQuery("StatusSerie.findAll", StatusSerie.class).getResultList();
+		} catch (Exception e) {
+			log.error("Error al obtener informacion", e);
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
-	
+
 		return list;
 	};
 
 	public String save(SerieFactura sF) {
 		EntityManager entity = null;
 		try {
-			 entity = EntityManagerUtil.getEntityManager();
+			entity = EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
 			entity.persist(sF);
 			entity.getTransaction().commit();
 			entity.close();
 		} catch (Exception e) {
 			return e.getMessage();
-		}finally {
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return null;
@@ -86,13 +86,13 @@ public class SerieFacturaDAO {
 	public String update(SerieFactura sF) {
 		EntityManager entity = null;
 		try {
-			 entity = EntityManagerUtil.getEntityManager();
+			entity = EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
 			entity.merge(sF);
 			entity.getTransaction().commit();
 		} catch (Exception e) {
 			return e.getMessage();
-		}finally {
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return null;
@@ -101,15 +101,15 @@ public class SerieFacturaDAO {
 	public String cancelar(int id) {
 		EntityManager entity = null;
 		try {
-		 entity = EntityManagerUtil.getEntityManager();
-		entity.getTransaction().begin();
-		Query sql = entity.createNativeQuery("update serie_factura set status_serie = 3 where id = ?;");
-		sql.setParameter(1, id);
-		sql.executeUpdate();
-		entity.getTransaction().commit();
-		}catch(Exception e) {
-			log.error("Error al obtener informacion",e);
-		}finally {
+			entity = EntityManagerUtil.getEntityManager();
+			entity.getTransaction().begin();
+			Query sql = entity.createNativeQuery("update serie_factura set status_serie = 3 where id = ?;");
+			sql.setParameter(1, id);
+			sql.executeUpdate();
+			entity.getTransaction().commit();
+		} catch (Exception e) {
+			log.error("Error al obtener informacion", e);
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return null;
@@ -118,13 +118,13 @@ public class SerieFacturaDAO {
 	public String delete(SerieFactura sF) {
 		EntityManager entity = null;
 		try {
-			 entity = EntityManagerUtil.getEntityManager();
+			entity = EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
 			entity.remove(entity.merge(sF));
 			entity.getTransaction().commit();
 		} catch (Exception e) {
 			return e.getMessage();
-		}finally {
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return null;

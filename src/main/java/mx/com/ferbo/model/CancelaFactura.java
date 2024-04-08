@@ -28,89 +28,88 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "cancela_factura")
-@NamedQueries({
-    @NamedQuery(name = "CancelaFactura.findAll", query = "SELECT c FROM CancelaFactura c"),
-    @NamedQuery(name = "CancelaFactura.findById", query = "SELECT c FROM CancelaFactura c WHERE c.id = :id"),
-    @NamedQuery(name = "CancelaFactura.findByDescripcion", query = "SELECT c FROM CancelaFactura c WHERE c.descripcion = :descripcion")})
+@NamedQueries({ @NamedQuery(name = "CancelaFactura.findAll", query = "SELECT c FROM CancelaFactura c"),
+		@NamedQuery(name = "CancelaFactura.findById", query = "SELECT c FROM CancelaFactura c WHERE c.id = :id"),
+		@NamedQuery(name = "CancelaFactura.findByDescripcion", query = "SELECT c FROM CancelaFactura c WHERE c.descripcion = :descripcion") })
 public class CancelaFactura implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
-    
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 75)
-    @Column(name = "descripcion")
-    private String descripcion;
-    
-    @JoinColumn(name = "factura")
-    @OneToOne(optional = false, cascade = {CascadeType.MERGE})
-    private Factura factura;
+	private static final long serialVersionUID = 1L;
 
-    public CancelaFactura() {
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "id")
+	private Integer id;
 
-    public CancelaFactura(Integer id) {
-        this.id = id;
-    }
+	@Basic(optional = false)
+	@NotNull
+	@Size(min = 1, max = 75)
+	@Column(name = "descripcion")
+	private String descripcion;
 
-    public CancelaFactura(Integer id, String descripcion) {
-        this.id = id;
-        this.descripcion = descripcion;
-    }
+	@JoinColumn(name = "factura")
+	@OneToOne(optional = false, cascade = { CascadeType.MERGE })
+	private Factura factura;
 
-    public Integer getId() {
-        return id;
-    }
+	public CancelaFactura() {
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public CancelaFactura(Integer id) {
+		this.id = id;
+	}
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+	public CancelaFactura(Integer id, String descripcion) {
+		this.id = id;
+		this.descripcion = descripcion;
+	}
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public Factura getFactura() {
-        return factura;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setFactura(Factura factura) {
-        this.factura = factura;
-    }
+	public String getDescripcion() {
+		return descripcion;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof CancelaFactura)) {
-            return false;
-        }
-        CancelaFactura other = (CancelaFactura) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
+	public Factura getFactura() {
+		return factura;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.CancelaFactura[ id=" + id + " ]";
-    }
-    
+	public void setFactura(Factura factura) {
+		this.factura = factura;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		// TODO: Warning - this method won't work in the case the id fields are not set
+		if (!(object instanceof CancelaFactura)) {
+			return false;
+		}
+		CancelaFactura other = (CancelaFactura) object;
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.CancelaFactura[ id=" + id + " ]";
+	}
+
 }

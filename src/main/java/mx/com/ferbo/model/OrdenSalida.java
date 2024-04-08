@@ -16,21 +16,19 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
-
 @Entity
 @Table(name = "pre_salida")
 @NamedQueries({
-    @NamedQuery(name = "OrdenSalida.findAll", query = "SELECT os FROM OrdenSalida os ORDER BY os.idPreSalida"),
-    @NamedQuery(name = "OrdenSalida.findByidPreSalida",  query = "SELECT os FROM OrdenSalida os WHERE os.idPreSalida = :idPreSalida"),
-    @NamedQuery(name = "OrdenSalida.findByFolioSalida", query = "SELECT os FROM OrdenSalida  os  WHERE os.FolioSalida = :FolioSalida"),
-    @NamedQuery(name = "OrdenSalida.findByfechaSalida",query = "SELECT os FROM OrdenSalida  os  WHERE os.fechaSalida = :fechaSalida AND os.stEstado ='A' "),
-    @NamedQuery(name = "OrdenSalida.findBystEstado",query = "SELECT os FROM OrdenSalida  os  WHERE os.stEstado = :stEstado "),
-    @NamedQuery(name = "OrdenSalida.findBynombrePlacas",query = "SELECT os FROM OrdenSalida  os  WHERE os.nombrePlacas = :nombrePlacas"),
-    @NamedQuery(name = "OrdenSalida.findBynombreOperador", query = "SELECT os FROM OrdenSalida  os  WHERE os.nombreOperador = :nombreOperador"),
-    @NamedQuery(name = "OrdenSalida.findBypartidaClave", query = "SELECT os FROM OrdenSalida  os  WHERE os.partidaClave = :partidaClave "),
-    @NamedQuery(name = "OrdenSalida.findByCliente", query = "SELECT os FROM OrdenSalida  os  WHERE os.partidaClave = :partidaClave "),
-    @NamedQuery(name = "OrdenSalida.findByfolio", query = "SELECT os FROM OrdenSalida  os  WHERE os.folio = :folio")})
-
+		@NamedQuery(name = "OrdenSalida.findAll", query = "SELECT os FROM OrdenSalida os ORDER BY os.idPreSalida"),
+		@NamedQuery(name = "OrdenSalida.findByidPreSalida", query = "SELECT os FROM OrdenSalida os WHERE os.idPreSalida = :idPreSalida"),
+		@NamedQuery(name = "OrdenSalida.findByFolioSalida", query = "SELECT os FROM OrdenSalida  os  WHERE os.FolioSalida = :FolioSalida"),
+		@NamedQuery(name = "OrdenSalida.findByfechaSalida", query = "SELECT os FROM OrdenSalida  os  WHERE os.fechaSalida = :fechaSalida AND os.stEstado ='A' "),
+		@NamedQuery(name = "OrdenSalida.findBystEstado", query = "SELECT os FROM OrdenSalida  os  WHERE os.stEstado = :stEstado "),
+		@NamedQuery(name = "OrdenSalida.findBynombrePlacas", query = "SELECT os FROM OrdenSalida  os  WHERE os.nombrePlacas = :nombrePlacas"),
+		@NamedQuery(name = "OrdenSalida.findBynombreOperador", query = "SELECT os FROM OrdenSalida  os  WHERE os.nombreOperador = :nombreOperador"),
+		@NamedQuery(name = "OrdenSalida.findBypartidaClave", query = "SELECT os FROM OrdenSalida  os  WHERE os.partidaClave = :partidaClave "),
+		@NamedQuery(name = "OrdenSalida.findByCliente", query = "SELECT os FROM OrdenSalida  os  WHERE os.partidaClave = :partidaClave "),
+		@NamedQuery(name = "OrdenSalida.findByfolio", query = "SELECT os FROM OrdenSalida  os  WHERE os.folio = :folio") })
 
 public class OrdenSalida implements Serializable {
 
@@ -41,47 +39,48 @@ public class OrdenSalida implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id_pre_salida")
 	private Integer idPreSalida;
-	
+
 	@Size(max = 10)
-	@Column(name ="cd_folio_salida")
+	@Column(name = "cd_folio_salida")
 	private String FolioSalida;
-	
+
 	@Size(max = 1)
-	@Column(name ="st_estado")
+	@Column(name = "st_estado")
 	private String stEstado;
-	
-	@Column(name ="fh_salida")
+
+	@Column(name = "fh_salida")
 	private Date fechaSalida;
-	
-	@Column(name ="tm_salida")
+
+	@Column(name = "tm_salida")
 	private Time horaSalida;
-	
+
 	@Size(max = 8)
-	@Column(name ="nb_placa_tte")
+	@Column(name = "nb_placa_tte")
 	private String nombrePlacas;
-	
+
 	@Size(max = 100)
-	@Column(name ="nb_operador_tte")
+	@Column(name = "nb_operador_tte")
 	private String nombreOperador;
 
-	@Column(name ="partida_cve")
+	@Column(name = "partida_cve")
 	private Integer partidaClave;
-	
-	@Column(name ="folio")
+
+	@Column(name = "folio")
 	private Integer folio;
-	
-	@Column(name ="nu_cantidad")
+
+	@Column(name = "nu_cantidad")
 	private Integer cantidad;
-	
-	@Column(name ="id_contacto")
+
+	@Column(name = "id_contacto")
 	private Integer idContacto;
 
 	public OrdenSalida() {
 
 	}
 
-	public OrdenSalida(Integer idPreSalida, String folioSalida, String stEstado,Date fechaSalida,  Time horaSalida, String nombrePlacas,
-			String nombreOperador, Integer partidaClave, Integer folio, Integer cantidad, Integer idContacto) {
+	public OrdenSalida(Integer idPreSalida, String folioSalida, String stEstado, Date fechaSalida, Time horaSalida,
+			String nombrePlacas, String nombreOperador, Integer partidaClave, Integer folio, Integer cantidad,
+			Integer idContacto) {
 		super();
 		this.idPreSalida = idPreSalida;
 		FolioSalida = folioSalida;
@@ -186,9 +185,9 @@ public class OrdenSalida implements Serializable {
 
 	@Override
 	public int hashCode() {
-	    int hash = 0;
-        hash += (idPreSalida != null ? idPreSalida.hashCode() : 0);
-        return hash;
+		int hash = 0;
+		hash += (idPreSalida != null ? idPreSalida.hashCode() : 0);
+		return hash;
 	}
 
 	@Override
@@ -210,6 +209,5 @@ public class OrdenSalida implements Serializable {
 				+ ", nombreOperador=" + nombreOperador + ", partidaClave=" + partidaClave + ", folio=" + folio
 				+ ", cantidad=" + cantidad + ", idContacto=" + idContacto + "]";
 	}
-	
-	
+
 }

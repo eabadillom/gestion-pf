@@ -15,7 +15,7 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.util.JPAEntity;
 import mx.com.ferbo.model.Posicion;
 
-public class chequesDevueltosDAO {
+public class ChequesDevueltosDAO {
 	
 	EntityManager entity = JPAEntity.getEntity().createEntityManager();
 	

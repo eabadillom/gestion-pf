@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -16,7 +15,6 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.EstadosDAO;
 import mx.com.ferbo.dao.MunicipiosDAO;
 import mx.com.ferbo.dao.PaisesDAO;
-
 import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.EstadosPK;
 import mx.com.ferbo.model.Municipios;
@@ -77,7 +75,7 @@ public class MunicipiosBean implements Serializable {
 		this.municipioPkSelect = new MunicipiosPK();
 		municipioSelect.setMunicipiosPK(municipioPkSelect);
 	}
-	
+
 	public void guardarMunicipio() {
 		int tamanioListaMunicipioEstadoPais = 0;
 		if (this.municipioSelect.getMunicipiosPK().getMunicipioCve() == 0) {
@@ -91,7 +89,7 @@ public class MunicipiosBean implements Serializable {
 			}
 			municipioPkSelect.setMunicipioCve(tamanioListaMunicipioEstadoPais);
 			municipioSelect.setMunicipiosPK(municipioPkSelect);
-			if(municipiosDao.guardar(municipioSelect) == null) {
+			if (municipiosDao.guardar(municipioSelect) == null) {
 				this.listaMunicipios.add(this.municipioSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Municipio Agregado"));
 			} else {
@@ -99,14 +97,14 @@ public class MunicipiosBean implements Serializable {
 						"Error", "Ocurrió un error al intentar guardar el Municipio / Alcaldía"));
 			}
 		} else {
-			if(municipiosDao.actualizar(municipioSelect) == null) {
+			if (municipiosDao.actualizar(municipioSelect) == null) {
 //				this.listaMunicipios.add(this.municipioSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Municipio Actualizado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", "Ocurrió un error al intentar actualizar el Municipio / Alcaldía"));
 			}
-		} 
+		}
 		listaMunicipios = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
 		PrimeFaces.current().executeScript("PF('nuevoMunicipioDialog').hide()");
 	}
@@ -119,11 +117,12 @@ public class MunicipiosBean implements Serializable {
 		municipioPkSelect.setEstadoCve(idEstado);
 		municipioPkSelect.setMunicipioCve(idMunicipio);
 		municipioSelect.setMunicipiosPK(municipioPkSelect);
-		if (municipiosDao.eliminar(municipioSelect) == null ) {
+		if (municipiosDao.eliminar(municipioSelect) == null) {
 			this.listaMunicipios.remove(this.municipioSelect);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Municipio Eliminado"));
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error","Ocurrió un error al intentar eliminar el Municipio"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"Ocurrió un error al intentar eliminar el Municipio"));
 		}
 		PrimeFaces.current().executeScript("PF('deleteMunicipioDialog').hide()");
 		PrimeFaces.current().ajax().update("form");
@@ -136,7 +135,7 @@ public class MunicipiosBean implements Serializable {
 			listaEstados = estadosDao.buscarPorCriteriosEstados(estadoSelect);
 		}
 	}
-	
+
 	public void handleStateSelect() {
 		if (this.idEstado != -1) {
 			this.municipioPkSelect.setPaisCve(idPais);
@@ -265,5 +264,5 @@ public class MunicipiosBean implements Serializable {
 	public void setIdEstado(int idEstado) {
 		this.idEstado = idEstado;
 	}
-	
+
 }

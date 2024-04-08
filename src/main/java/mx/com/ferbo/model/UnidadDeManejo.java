@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Collection;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -30,141 +31,140 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(name = "unidad_de_manejo")
 @XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "UnidadDeManejo.findAll", query = "SELECT u FROM UnidadDeManejo u"),
-    @NamedQuery(name = "UnidadDeManejo.findByUnidadDeManejoCve", query = "SELECT u FROM UnidadDeManejo u WHERE u.unidadDeManejoCve = :unidadDeManejoCve"),
-    @NamedQuery(name = "UnidadDeManejo.findByUnidadDeManejoDs", query = "SELECT u FROM UnidadDeManejo u WHERE u.unidadDeManejoDs = :unidadDeManejoDs")})
+@NamedQueries({ @NamedQuery(name = "UnidadDeManejo.findAll", query = "SELECT u FROM UnidadDeManejo u"),
+		@NamedQuery(name = "UnidadDeManejo.findByUnidadDeManejoCve", query = "SELECT u FROM UnidadDeManejo u WHERE u.unidadDeManejoCve = :unidadDeManejoCve"),
+		@NamedQuery(name = "UnidadDeManejo.findByUnidadDeManejoDs", query = "SELECT u FROM UnidadDeManejo u WHERE u.unidadDeManejoDs = :unidadDeManejoDs") })
 public class UnidadDeManejo implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "UNIDAD_DE_MANEJO_CVE")
-    private Integer unidadDeManejoCve;
-    
-    @Size(max = 100)
-    @Column(name = "UNIDAD_DE_MANEJO_DS")
-    private String unidadDeManejoDs;
-    
-    @OneToMany(mappedBy = "uMedidaCve")
-    private Collection<DetallePartida> detallePartidaCollection;
-    
-    @OneToMany(mappedBy = "unidadDeCobro")
-    private Collection<Partida> partidaCollection;
-    
-    @OneToMany(mappedBy = "unidadDeManejoCve")
-    private Collection<PartidaServicio> partidaServicioCollection;
-    
-    @OneToMany(mappedBy = "unidadDeCobro")
-    private Collection<PartidaServicio> partidaServicioCollection1;
-    
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "unidad", fetch = FetchType.LAZY)
-    private Collection<PrecioServicio> precioServicioCollection;
-    
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "unidadDeManejoCve", fetch = FetchType.LAZY)
-    private Collection<UnidadDeProducto> unidadDeProductoCollection;
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "UNIDAD_DE_MANEJO_CVE")
+	private Integer unidadDeManejoCve;
 
-    public UnidadDeManejo() {
-    }
+	@Size(max = 100)
+	@Column(name = "UNIDAD_DE_MANEJO_DS")
+	private String unidadDeManejoDs;
 
-    public UnidadDeManejo(Integer unidadDeManejoCve) {
-        this.unidadDeManejoCve = unidadDeManejoCve;
-    }
+	@OneToMany(mappedBy = "uMedidaCve")
+	private Collection<DetallePartida> detallePartidaCollection;
 
-    public Integer getUnidadDeManejoCve() {
-        return unidadDeManejoCve;
-    }
+	@OneToMany(mappedBy = "unidadDeCobro")
+	private Collection<Partida> partidaCollection;
 
-    public void setUnidadDeManejoCve(Integer unidadDeManejoCve) {
-        this.unidadDeManejoCve = unidadDeManejoCve;
-    }
+	@OneToMany(mappedBy = "unidadDeManejoCve")
+	private Collection<PartidaServicio> partidaServicioCollection;
 
-    public String getUnidadDeManejoDs() {
-        return unidadDeManejoDs;
-    }
+	@OneToMany(mappedBy = "unidadDeCobro")
+	private Collection<PartidaServicio> partidaServicioCollection1;
 
-    public void setUnidadDeManejoDs(String unidadDeManejoDs) {
-        this.unidadDeManejoDs = unidadDeManejoDs;
-    }
+	@OneToMany(cascade = CascadeType.DETACH, mappedBy = "unidad", fetch = FetchType.LAZY)
+	private Collection<PrecioServicio> precioServicioCollection;
 
-    @XmlTransient
-    public Collection<DetallePartida> getDetallePartidaCollection() {
-        return detallePartidaCollection;
-    }
+	@OneToMany(cascade = CascadeType.DETACH, mappedBy = "unidadDeManejoCve", fetch = FetchType.LAZY)
+	private Collection<UnidadDeProducto> unidadDeProductoCollection;
 
-    public void setDetallePartidaCollection(Collection<DetallePartida> detallePartidaCollection) {
-        this.detallePartidaCollection = detallePartidaCollection;
-    }
+	public UnidadDeManejo() {
+	}
 
-    @XmlTransient
-    public Collection<Partida> getPartidaCollection() {
-        return partidaCollection;
-    }
+	public UnidadDeManejo(Integer unidadDeManejoCve) {
+		this.unidadDeManejoCve = unidadDeManejoCve;
+	}
 
-    public void setPartidaCollection(Collection<Partida> partidaCollection) {
-        this.partidaCollection = partidaCollection;
-    }
+	public Integer getUnidadDeManejoCve() {
+		return unidadDeManejoCve;
+	}
 
-    @XmlTransient
-    public Collection<PartidaServicio> getPartidaServicioCollection() {
-        return partidaServicioCollection;
-    }
+	public void setUnidadDeManejoCve(Integer unidadDeManejoCve) {
+		this.unidadDeManejoCve = unidadDeManejoCve;
+	}
 
-    public void setPartidaServicioCollection(Collection<PartidaServicio> partidaServicioCollection) {
-        this.partidaServicioCollection = partidaServicioCollection;
-    }
+	public String getUnidadDeManejoDs() {
+		return unidadDeManejoDs;
+	}
 
-    @XmlTransient
-    public Collection<PartidaServicio> getPartidaServicioCollection1() {
-        return partidaServicioCollection1;
-    }
+	public void setUnidadDeManejoDs(String unidadDeManejoDs) {
+		this.unidadDeManejoDs = unidadDeManejoDs;
+	}
 
-    public void setPartidaServicioCollection1(Collection<PartidaServicio> partidaServicioCollection1) {
-        this.partidaServicioCollection1 = partidaServicioCollection1;
-    }
+	@XmlTransient
+	public Collection<DetallePartida> getDetallePartidaCollection() {
+		return detallePartidaCollection;
+	}
 
-    @XmlTransient
-    public Collection<PrecioServicio> getPrecioServicioCollection() {
-        return precioServicioCollection;
-    }
+	public void setDetallePartidaCollection(Collection<DetallePartida> detallePartidaCollection) {
+		this.detallePartidaCollection = detallePartidaCollection;
+	}
 
-    public void setPrecioServicioCollection(Collection<PrecioServicio> precioServicioCollection) {
-        this.precioServicioCollection = precioServicioCollection;
-    }
+	@XmlTransient
+	public Collection<Partida> getPartidaCollection() {
+		return partidaCollection;
+	}
 
-    @XmlTransient
-    public Collection<UnidadDeProducto> getUnidadDeProductoCollection() {
-        return unidadDeProductoCollection;
-    }
+	public void setPartidaCollection(Collection<Partida> partidaCollection) {
+		this.partidaCollection = partidaCollection;
+	}
 
-    public void setUnidadDeProductoCollection(Collection<UnidadDeProducto> unidadDeProductoCollection) {
-        this.unidadDeProductoCollection = unidadDeProductoCollection;
-    }
+	@XmlTransient
+	public Collection<PartidaServicio> getPartidaServicioCollection() {
+		return partidaServicioCollection;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (unidadDeManejoCve != null ? unidadDeManejoCve.hashCode() : 0);
-        return hash;
-    }
+	public void setPartidaServicioCollection(Collection<PartidaServicio> partidaServicioCollection) {
+		this.partidaServicioCollection = partidaServicioCollection;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof UnidadDeManejo)) {
-            return false;
-        }
-        UnidadDeManejo other = (UnidadDeManejo) object;
-        if ((this.unidadDeManejoCve == null && other.unidadDeManejoCve != null) || (this.unidadDeManejoCve != null && !this.unidadDeManejoCve.equals(other.unidadDeManejoCve))) {
-            return false;
-        }
-        return true;
-    }
+	@XmlTransient
+	public Collection<PartidaServicio> getPartidaServicioCollection1() {
+		return partidaServicioCollection1;
+	}
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.UnidadDeManejo[ unidadDeManejoCve=" + unidadDeManejoCve + " ]";
-    }
-    
+	public void setPartidaServicioCollection1(Collection<PartidaServicio> partidaServicioCollection1) {
+		this.partidaServicioCollection1 = partidaServicioCollection1;
+	}
+
+	@XmlTransient
+	public Collection<PrecioServicio> getPrecioServicioCollection() {
+		return precioServicioCollection;
+	}
+
+	public void setPrecioServicioCollection(Collection<PrecioServicio> precioServicioCollection) {
+		this.precioServicioCollection = precioServicioCollection;
+	}
+
+	@XmlTransient
+	public Collection<UnidadDeProducto> getUnidadDeProductoCollection() {
+		return unidadDeProductoCollection;
+	}
+
+	public void setUnidadDeProductoCollection(Collection<UnidadDeProducto> unidadDeProductoCollection) {
+		this.unidadDeProductoCollection = unidadDeProductoCollection;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (unidadDeManejoCve != null ? unidadDeManejoCve.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof UnidadDeManejo)) {
+			return false;
+		}
+		UnidadDeManejo other = (UnidadDeManejo) object;
+		if ((this.unidadDeManejoCve == null && other.unidadDeManejoCve != null)
+				|| (this.unidadDeManejoCve != null && !this.unidadDeManejoCve.equals(other.unidadDeManejoCve))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.UnidadDeManejo[ unidadDeManejoCve=" + unidadDeManejoCve + " ]";
+	}
+
 }

@@ -154,8 +154,8 @@ public class ReporteInventarioBean implements Serializable {
 			} else {
 				plantaCve = plantaSelect.getPlantaCve();
 			}
-			
-			if( (this.usuario.getPerfil() == 1 || this.usuario.getPerfil() == 4) && plantaCve == null )
+
+			if ((this.usuario.getPerfil() == 1 || this.usuario.getPerfil() == 4) && plantaCve == null)
 				throw new InventarioException("Debe seleccionar una planta.");
 
 			connection = EntityManagerUtil.getConnection();
@@ -278,15 +278,16 @@ public class ReporteInventarioBean implements Serializable {
 			}
 
 			Integer plantaCve = null;
-			/*if (plantaSelect == null) {
-				throw new InventarioException("Debe seleccionar una planta.");
-			}*/
+			/*
+			 * if (plantaSelect == null) { throw new
+			 * InventarioException("Debe seleccionar una planta."); }
+			 */
 
-			/*if (plantaSelect.getPlantaCve() == null) {
-				throw new InventarioException("Debe seleccionar una planta.");
-			} else {
-				plantaCve = plantaSelect.getPlantaCve();
-			}*/
+			/*
+			 * if (plantaSelect.getPlantaCve() == null) { throw new
+			 * InventarioException("Debe seleccionar una planta."); } else { plantaCve =
+			 * plantaSelect.getPlantaCve(); }
+			 */
 
 			reporteDAO = new RepInventarioDAO();
 			reporte = reporteDAO.buscar(fecha, clienteCve, plantaCve, camaraCve);

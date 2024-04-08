@@ -66,6 +66,7 @@ public class LoginBean implements Serializable  {
 		securityUtil = new SecurityUtil();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void login() {
 		FacesMessage message = null;
 		DetBiometricoResponse bean = null;

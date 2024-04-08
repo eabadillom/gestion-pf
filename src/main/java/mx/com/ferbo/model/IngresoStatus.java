@@ -14,22 +14,22 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "ingreso_status")
 
-public class IngresoStatus implements Serializable{
+public class IngresoStatus implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_status")
 	private Integer id_status;
-	
+
 	@Column(name = "descripcion")
-	@Size(min = 1 ,max = 50)
+	@Size(min = 1, max = 50)
 	@NotNull
 	private String descripcion;
 
 	public IngresoStatus() {
-		
+
 	}
 
 	public Integer getId_status() {
@@ -47,6 +47,5 @@ public class IngresoStatus implements Serializable{
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
-		
-	
+
 }

@@ -36,86 +36,87 @@ import javax.validation.constraints.Size;
 public class Planta implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "PLANTA_CVE")
 	private Integer plantaCve;
-	
+
 	@Size(max = 80)
 	@Column(name = "PLANTA_DS")
 	private String plantaDs;
-	
+
 	@Size(max = 6)
 	@Column(name = "planta_abrev")
 	private String plantaAbrev;
-	
+
 	@Size(max = 6)
 	@Column(name = "planta_sufijo")
 	private String plantaSufijo;
-	
+
 	@Size(max = 10)
 	@Column(name = "PLANTA_COD")
 	private String plantaCod;
-	
+
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Usuario idUsuario;
-	
+
 	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Camara> camaraList;
-	
-	@OneToMany(mappedBy = "serieConstanciaPK.planta", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+
+	@OneToMany(mappedBy = "serieConstanciaPK.planta", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {
+			CascadeType.PERSIST, CascadeType.REMOVE })
 	private List<SerieConstancia> serieConstanciaList;
-	
+
 	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
 	private List<Aviso> avisoList;
-	
+
 	@OneToMany(mappedBy = "planta", fetch = FetchType.LAZY)
-    private List<Factura> facturaList;
-	
+	private List<Factura> facturaList;
+
 	@Column(name = " id_pais")
 	private Integer idPais;
-	
+
 	@Column(name = "uuid")
 	private String uuid;
-	
-	@Column (name = "id_estado")
+
+	@Column(name = "id_estado")
 	private Integer idEstado;
-	
-	@Column(name ="id_municipio")
+
+	@Column(name = "id_municipio")
 	private Integer idMunicipio;
-	
-	@Column(name ="id_ciudad")
+
+	@Column(name = "id_ciudad")
 	private Integer idCiudad;
-	
-	@Column(name ="id_asentamiento")
+
+	@Column(name = "id_asentamiento")
 	private Integer idAsentamiento;
-	
-	@Column(name ="tp_asentamiento")
+
+	@Column(name = "tp_asentamiento")
 	private Integer tipoasentamiento;
-	
-	@Column(name ="nb_cp")
+
+	@Column(name = "nb_cp")
 	private String codigopostal;
-	
-	@Size (max = 20)
-	@Column(name ="nb_calle")
+
+	@Size(max = 20)
+	@Column(name = "nb_calle")
 	private String calle;
-	
-	@Column(name ="nu_exterior")
+
+	@Column(name = "nu_exterior")
 	private String numexterior;
-	
-	@Column(name ="nu_interior")
+
+	@Column(name = "nu_interior")
 	private String numinterior;
-	
+
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH, optional = false)
-	private EmisoresCFDIS idEmisoresCFDIS;//agregado
-	
+	private EmisoresCFDIS idEmisoresCFDIS;// agregado
+
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta", fetch = FetchType.LAZY)
 	private List<Posicion> posicionList;
-	
+
 	public Planta() {
 
 	}
@@ -130,7 +131,7 @@ public class Planta implements Serializable {
 
 	public Integer getIdCiudad() {
 		return idCiudad;
-	} 
+	}
 
 	public void setIdCiudad(Integer idCiudad) {
 		this.idCiudad = idCiudad;
@@ -252,7 +253,6 @@ public class Planta implements Serializable {
 		this.plantaCod = plantaCod;
 	}
 
-	
 	public Usuario getIdUsuario() {
 		return idUsuario;
 	}
@@ -276,14 +276,14 @@ public class Planta implements Serializable {
 	public void setAvisoList(List<Aviso> avisoList) {
 		this.avisoList = avisoList;
 	}
-	
-	public List<Factura> getFacturaList() {
-        return facturaList;
-    }
 
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
-    }	
+	public List<Factura> getFacturaList() {
+		return facturaList;
+	}
+
+	public void setFacturaList(List<Factura> facturaList) {
+		this.facturaList = facturaList;
+	}
 
 	public EmisoresCFDIS getIdEmisoresCFDIS() {
 		return idEmisoresCFDIS;
@@ -312,13 +312,12 @@ public class Planta implements Serializable {
 		}
 		return true;
 	}
-	
 
 	@Override
 	public String toString() {
 		return "mx.com.ferbo.model.Planta[ plantaCve=" + plantaCve + " ]";
 	}
-	
+
 	public List<Posicion> getPosicionList() {
 		return posicionList;
 	}
@@ -334,14 +333,14 @@ public class Planta implements Serializable {
 	public void setSerieConstanciaList(List<SerieConstancia> serieConstanciaList) {
 		this.serieConstanciaList = serieConstanciaList;
 	}
-	
+
 	public void add(SerieConstancia serieConstancia) {
-		if(this.serieConstanciaList == null)
+		if (this.serieConstanciaList == null)
 			this.serieConstanciaList = new ArrayList<SerieConstancia>();
-		
-		if(serieConstancia.getSerieConstanciaPK() == null)
+
+		if (serieConstancia.getSerieConstanciaPK() == null)
 			serieConstancia.setSerieConstanciaPK(new SerieConstanciaPK());
-		
+
 		serieConstancia.getSerieConstanciaPK().setPlanta(this);
 		this.serieConstanciaList.add(serieConstancia);
 	}

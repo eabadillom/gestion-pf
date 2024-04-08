@@ -15,25 +15,23 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 
 	@Override
 	public Contacto buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
 	@Override
 	public List<Contacto> buscarTodos() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<Contacto> buscarPorCriterios(Contacto e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String actualizar(Contacto contacto) {
-		EntityManager em = null;		
+		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -43,7 +41,7 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -66,7 +64,7 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -74,10 +72,9 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 
 	@Override
 	public String eliminarListado(List<Contacto> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public String guardarClienteContacto(Contacto contacto, Cliente cliente) {
 		ClienteContactoDAO clienteContactoDAO = new ClienteContactoDAO();
 		ClienteContacto clienteContacto = new ClienteContacto();

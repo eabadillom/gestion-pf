@@ -8,24 +8,24 @@
 	</ui:define>
 	<ui:define name="content">
 		<style type="text/css">
-							.green {
-								background-color: #a5e594 !important;
-								background-image: none !important;
-								color: #11971f !important;
-									padding: 15px;
-								border-radius: 5px 5px 5px 5px;
-								font-weight: bold;
-							}
-							
-							.red {
-								background-color: #e99989 !important;
-								background-image: none !important;
-								color:  #922b21 !important;
-									padding: 15px;
-								border-radius: 5px 5px 5px 5px;
-								font-weight: bold;
-							}
-							</style>
+.green {
+	background-color: #a5e594 !important;
+	background-image: none !important;
+	color: #11971f !important;
+	padding: 15px;
+	border-radius: 5px 5px 5px 5px;
+	font-weight: bold;
+}
+
+.red {
+	background-color: #e99989 !important;
+	background-image: none !important;
+	color: #922b21 !important;
+	padding: 15px;
+	border-radius: 5px 5px 5px 5px;
+	font-weight: bold;
+}
+</style>
 		<script
 			src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 		<script
@@ -38,31 +38,67 @@
 							tiitle: {
 							display: true,
 							text: "title set from JavaScript"
+							
 						},legend:{
-							display: false
+							display: true
+						},
+						datalabels:{
+							rotation: 90,
+							font: 'bold 12px sans-serif'
 						}
 						}, scales:{
+							
 							y: {
 								beginAtZero: false
+							
 							}
 						}
-					},plugins: [ChartDataLabels],
-						options: {
-						}
+					},plugins: [ChartDataLabels]
+						
 					};
+			
 			//merge all options into to main chart options
 			$.extend(true, this.cfg.config, options);
 			};
+			
+			
+			function charExtenderDonut() {
+				var options = {
+						options: {
+							plugins:{
+								tiitle: {
+								display: true,
+								text: "title set from JavaScript"
+								
+							},legend:{
+								display: true
+							}
+							
+							}, scales:{
+								
+								y: {
+									beginAtZero: false
+								
+								}
+							}
+						},plugins: [ChartDataLabels]
+						};
+				
+				//merge all options into to main chart options
+				$.extend(true, this.cfg.config, options);
+				};
+				
+				
 </script>
-<h:form id="form">
+		<h:form id="form">
 
-			<div class="card" style="width: 750px; float: right;">
+			<div class="card" style="width: 50%; float: right;">
 				<p:barChart model="#{dashBoardBean.stackedGroupBarModel}"
 					style="width: 700px; height: 565px;"
 					rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}" />
 			</div>
 
-			<div class="card" style="width: 750px;">
+			<div class="card" style="width: 50%;">
 				<p:barChart model="#{dashBoardBean.modelCamara}"
 					style="width: 500px; height: 400px;"></p:barChart>
 			</div>
@@ -230,7 +266,7 @@
 
 
 			<div
-				style="margin-top: 19px; width: 48%; height: 640px; float: left;">
+				style="margin-top: 19px; width: 48%; height: 350px; float: left;">
 
 				<p:dataTable id="dt-ventasMes" widgetVar="dtVM" var="ventasM"
 					value="#{dashBoardBean.listaImporteGlobal}" reflow="true"
@@ -263,7 +299,8 @@
 
 
 
-			<div style="text-align: left; margin-top: 20px; width: 48%; height: 640px; float: right;">
+			<div
+				style="text-align: left; margin-top: 19px; width: 48%; height: 440px; float: right;">
 
 				<p:dataTable id="dt-ventaRS" widgetVar="dt-VRS" var="ventaRS"
 					value="#{dashBoardBean.listaVentaRazonSocial}" reflow="true"
@@ -290,14 +327,17 @@
 					</p:column>
 
 				</p:dataTable>
-				
-				<div class="card" style="width: 400px; margin: 0 auto;">
+
+
+
+
+				<div class="card"
+					style="width: 400px; height: 400px; margin: 0 auto; margin-top: 100px; align-content: center">
 					<p:donutChart model="#{dashBoardBean.donutModel}"
-						style="width: 300px; height: 100px;"></p:donutChart>
+						style="width: 700px; height: 900px;"></p:donutChart>
 				</div>
-
-
 			</div>
+
 
 			<div class="card" style="width: 45%; height: 500px; float: left;">
 				<p:barChart model="#{dashBoardBean.smVentasFormaPago}"
@@ -306,7 +346,7 @@
 
 			<p:dataTable id="dt-gananciaRS" widgetVar="dt-VRS" var="gananciaRS"
 				value="#{dashBoardBean.listaGananciaRazonSocial}" reflow="true"
-				style="max-width:50em !important;float:right;">
+				style="max-width:35em !important;float:right;margin-top:330px">
 
 				<f:facet name="header">
 					<div>
@@ -331,7 +371,7 @@
 			</p:dataTable>
 
 
-		</h:form>							
+		</h:form>
 	</ui:define>
 
 

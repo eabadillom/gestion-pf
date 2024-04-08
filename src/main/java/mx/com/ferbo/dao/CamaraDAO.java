@@ -2,14 +2,13 @@ package mx.com.ferbo.dao;
 
 import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
 
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
@@ -18,7 +17,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 	private static Logger log = LogManager.getLogger(CamaraDAO.class);
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Camara> findall() {
 		List<Camara> camara = null;
@@ -28,36 +27,36 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 			entity = getEntityManager();
 			sql = entity.createNamedQuery("Camara.findAll", Camara.class);
 			camara = sql.getResultList();
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de cámaras...", ex);
 		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return camara;
 	}
-	
+
 	public List<Camara> findall(Boolean isFullInfo) {
 		List<Camara> camara = null;
 		EntityManager entity = null;
 		try {
 			entity = getEntityManager();
 			camara = entity.createNamedQuery("Camara.findAll", Camara.class).getResultList();
-			
-			if(isFullInfo==false)
+
+			if (isFullInfo == false)
 				return camara;
-			
-			for(Camara c: camara) {
+
+			for (Camara c : camara) {
 				log.debug(c.getPlantaCve().getPlantaDs());
 			}
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de cámaras...", ex);
 		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		return camara;
 	}
-	
+
 	@Override
 	public Camara buscarPorId(Integer id) {
 		Camara camara = null;
@@ -65,7 +64,7 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			camara = em.find(Camara.class, id);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener la camara...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
@@ -80,7 +79,7 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("Camara.findAll", Camara.class).getResultList();
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de cámaras...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
@@ -94,24 +93,24 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 		List<Camara> listaC = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			listaC = em.createNamedQuery("Camara.findByplantaCve", Camara.class).setParameter("plantaCve",e.getPlantaCve()).getResultList();
-		} catch(Exception ex) {
+			listaC = em.createNamedQuery("Camara.findByplantaCve", Camara.class)
+					.setParameter("plantaCve", e.getPlantaCve()).getResultList();
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de cámaras...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return listaC;
 	}
-	
+
 	public List<Camara> buscarPorPlanta(Planta p) {
 		List<Camara> listaC = null;
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listaC = em.createNamedQuery("Camara.findByPlantaCve", Camara.class)
-					.setParameter("plantaCve", p.getPlantaCve())
-					.getResultList();
-		} catch(Exception ex) {
+					.setParameter("plantaCve", p.getPlantaCve()).getResultList();
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de cámaras...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
@@ -188,7 +187,5 @@ public class CamaraDAO extends IBaseDAO<Camara, Integer> {
 		}
 		return null;
 	}
-	
-	
 
 }

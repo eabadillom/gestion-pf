@@ -13,12 +13,12 @@ import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
-	
+
 	private static Logger log = LogManager.getLogger(ClienteDomiciliosDAO.class);
 
 	@Override
 	public ClienteDomicilios buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -32,63 +32,56 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 
 	@Override
 	public List<ClienteDomicilios> buscarPorCriterios(ClienteDomicilios e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public List<ClienteDomicilios> buscarPorCliente(Integer idCliente) {
 		List<ClienteDomicilios> lista = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			lista = em.createNamedQuery("ClienteDomicilios.findByCliente", ClienteDomicilios.class)
-					.setParameter("cteCve", idCliente)
-					.getResultList()
-					;
-		} catch(Exception ex) {
+					.setParameter("cteCve", idCliente).getResultList();
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de domicilios por cliente...", ex);
 		} finally {
-			
+
 		}
-		
-		
-		
+
 		return lista;
 	}
-	
+
 	public List<ClienteDomicilios> buscarDomicilioFiscalPorCliente(Integer idCliente, boolean isFullInfo) {
 		List<ClienteDomicilios> listado = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("ClienteDomicilios.findByClienteDomFiscal", ClienteDomicilios.class)
-					.setParameter("cteCve", idCliente)
-					.getResultList()
-					;
-			
-			if(isFullInfo == false)
+					.setParameter("cteCve", idCliente).getResultList();
+
+			if (isFullInfo == false)
 				return listado;
-			
-			for(ClienteDomicilios cd : listado) {
+
+			for (ClienteDomicilios cd : listado) {
 				log.debug("Domicilio cve: {}", cd.getDomicilios().getDomCve());
-				log.debug("PaisCve: {}", cd.getDomicilios().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve() );
+				log.debug("PaisCve: {}",
+						cd.getDomicilios().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve());
 			}
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de domicilios por cliente...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
-		
+
 		return listado;
 	}
 
 	@Override
 	public String actualizar(ClienteDomicilios clienteDomicilio) {
-		// TODO Auto-generated method stub
+		
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -98,8 +91,7 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 					.setParameter("domicilioTipoCve",
 							clienteDomicilio.getDomicilios().getDomicilioTipoCve().getDomicilioTipoCve())
 					.setParameter("domCve", clienteDomicilio.getDomicilios().getDomCve())
-					.setParameter("id", clienteDomicilio.getId())
-					.executeUpdate();
+					.setParameter("id", clienteDomicilio.getId()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
@@ -111,7 +103,7 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 
 	@Override
 	public String guardar(ClienteDomicilios clienteDomicilio) {
-		// TODO Auto-generated method stub
+		
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -127,7 +119,7 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 
 	@Override
 	public String eliminar(ClienteDomicilios clienteDom) {
-		// TODO Auto-generated method stub
+		
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -144,7 +136,7 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 
 	@Override
 	public String eliminarListado(List<ClienteDomicilios> listado) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

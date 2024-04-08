@@ -13,9 +13,9 @@ public class OcupacionCamara {
 	private Integer total_pos;
 	private BigDecimal posiciones_Generales_Ocupadas;
 	private BigDecimal posiciones_Disponibles;
-	
+
 	public OcupacionCamara() {
-		
+
 	}
 
 	public Integer getCamara_cve() {
@@ -56,7 +56,7 @@ public class OcupacionCamara {
 
 	public void setTarima(BigDecimal tarima) {
 		this.tarima = tarima;
-	}	
+	}
 
 	public Integer getTotal_pos() {
 		return total_pos;
@@ -80,7 +80,7 @@ public class OcupacionCamara {
 
 	public void setPosiciones_Generales_Ocupadas(BigDecimal posiciones_Generales_Ocupadas) {
 		this.posiciones_Generales_Ocupadas = posiciones_Generales_Ocupadas;
-	}	
+	}
 
 	public String getPlanta_abrev() {
 		return planta_abrev;
@@ -98,10 +98,4 @@ public class OcupacionCamara {
 				+ posiciones_Disponibles + "]";
 	}
 
-	
-
-	
-
-	
-	
 }

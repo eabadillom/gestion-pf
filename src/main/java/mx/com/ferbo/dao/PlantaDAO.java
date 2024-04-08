@@ -17,7 +17,7 @@ import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class PlantaDAO extends IBaseDAO<Planta, Integer>{
+public class PlantaDAO extends IBaseDAO<Planta, Integer> {
 	private static Logger log = LogManager.getLogger(PlantaDAO.class);
 
 	@SuppressWarnings("unchecked")
@@ -27,15 +27,15 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 		try {
 			Query sql = entity.createNamedQuery("Planta.findAll", Planta.class);
 			plantas = sql.getResultList();
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de Plantas...", ex);
 		} finally {
 			EntityManagerUtil.close(entity);
 		}
-		
+
 		return plantas;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Planta> findall(boolean isFullInfo) {
 		EntityManager entity = null;
@@ -44,123 +44,118 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 			entity = getEntityManager();
 			Query sql = entity.createNamedQuery("Planta.findAll", Planta.class);
 			plantas = sql.getResultList();
-			
-			if(isFullInfo == false)
+
+			if (isFullInfo == false)
 				return plantas;
-			
-			for(Planta p : plantas) {
-				log.debug(p.getIdUsuario().getUsuario());//ERROR lazy 
-				
-				log.debug(p.getIdEmisoresCFDIS().getNb_emisor()); //no tienen notacion lazy
+
+			for (Planta p : plantas) {
+				log.debug(p.getIdUsuario().getUsuario());// ERROR lazy
+
+				log.debug(p.getIdEmisoresCFDIS().getNb_emisor()); // no tienen notacion lazy
 				log.debug(p.getIdEmisoresCFDIS().getNb_rfc());
 				log.debug(p.getIdEmisoresCFDIS().getNb_emisor());
-				for(SerieConstancia serieConstancia : p.getSerieConstanciaList()) {
+				for (SerieConstancia serieConstancia : p.getSerieConstanciaList()) {
 					log.debug(serieConstancia.getSerieConstanciaPK().getPlanta().getPlantaCve());
 				}
 			}
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de Plantas...", ex);
 		} finally {
 			EntityManagerUtil.close(entity);
 		}
-		
+
 		return plantas;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Usuario> getUsuarios() { //MODIFICADO	
+	public List<Usuario> getUsuarios() { // MODIFICADO
 		EntityManager entity = null;
 		List<Usuario> usuarios = null;
-		
+
 		try {
-		
+
 			entity = getEntityManager();
 			Query sql = entity.createQuery("SELECT u FROM Usuario u WHERE u.perfil IN (1, 4)");
-			usuarios = sql.getResultList();			
-			
-		}catch (Exception e) {
+			usuarios = sql.getResultList();
+
+		} catch (Exception e) {
 			log.error("Problema al obtener a los usuarios", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
-		return usuarios;		
-		
+		return usuarios;
+
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<EmisoresCFDIS> getEmisor() { //MODIFICADO	
-		
+	public List<EmisoresCFDIS> getEmisor() { // MODIFICADO
+
 		EntityManager entity = null;
 		List<EmisoresCFDIS> emisor = null;
-		
+
 		try {
-			
+
 			entity = getEntityManager();
 			Query sql = entity.createQuery("SELECT e FROM EmisoresCFDIS e ");
 			emisor = sql.getResultList();
-			
+
 		} catch (Exception e) {
-			log.error("Problema al obtener a los emisores",e);
-		}finally {
+			log.error("Problema al obtener a los emisores", e);
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
-		
+
 		return emisor;
 	}
-	
+
 	public List<Planta> buscarTodosSerieConstancia() {
 		List<Planta> lista = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			lista = em.createNamedQuery("Planta.findAll", Planta.class)
-					.getResultList();
-			
-			for(Planta planta : lista) {
-				for(SerieConstancia sc : planta.getSerieConstanciaList()) {
+			lista = em.createNamedQuery("Planta.findAll", Planta.class).getResultList();
+
+			for (Planta planta : lista) {
+				for (SerieConstancia sc : planta.getSerieConstanciaList()) {
 					log.debug("Cliente: {} - TipoSerie: {} - Planta: {} - Serie: {}",
-						sc.getSerieConstanciaPK().getCliente().getCteCve(),
-						sc.getSerieConstanciaPK().getTpSerie(),
-						sc.getSerieConstanciaPK().getPlanta().getPlantaCve(),
-						sc.getNuSerie());
+							sc.getSerieConstanciaPK().getCliente().getCteCve(), sc.getSerieConstanciaPK().getTpSerie(),
+							sc.getSerieConstanciaPK().getPlanta().getPlantaCve(), sc.getNuSerie());
 				}
 			}
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de plantas...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return lista;
 	}
-	
+
 	public Planta buscarDetalleSerieConstancia(Integer idPlanta) {
 		Planta planta = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			planta = em.find(Planta.class, idPlanta);
-			
-			for(SerieConstancia sc : planta.getSerieConstanciaList()) {
+
+			for (SerieConstancia sc : planta.getSerieConstanciaList()) {
 				log.debug("Cliente: {} - TipoSerie: {} - Planta: {} - Serie: {}",
-					sc.getSerieConstanciaPK().getCliente().getCteCve(),
-					sc.getSerieConstanciaPK().getTpSerie(),
-					sc.getSerieConstanciaPK().getPlanta().getPlantaCve(),
-					sc.getNuSerie());
+						sc.getSerieConstanciaPK().getCliente().getCteCve(), sc.getSerieConstanciaPK().getTpSerie(),
+						sc.getSerieConstanciaPK().getPlanta().getPlantaCve(), sc.getNuSerie());
 			}
-			
-		} catch(Exception ex) {
+
+		} catch (Exception ex) {
 			log.error("Problema para obtener la planta con el detealle de sus series de constancias...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return planta;
 	}
-	
+
 	public String save(Planta p) {
 		EntityManager entity = null;
 		try {
@@ -176,7 +171,6 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 		}
 		return null;
 	}
-	
 
 	public String update(Planta p) {
 		EntityManager entity = null;
@@ -214,11 +208,11 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 	public Planta buscarPorId(Integer id) {
 		Planta planta = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			planta = em.find(Planta.class, id);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener la planta: " + id, ex);
 		} finally {
 			EntityManagerUtil.close(em);
@@ -233,7 +227,7 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("Planta.findAll", Planta.class).getResultList();
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de cámaras...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
@@ -243,33 +237,27 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 
 	@Override
 	public List<Planta> buscarPorCriterios(Planta e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String actualizar(Planta e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String guardar(Planta e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminar(Planta e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<Planta> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
 }
