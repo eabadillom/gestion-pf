@@ -26,7 +26,7 @@ public class EgresosDAO extends IBaseDAO<Egresos, Integer>{
 		
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			listaEgresos = entity.createNamedQuery("egresos.findByAll", Egresos.class).getResultList();
+			listaEgresos = entity.createNamedQuery("Egresos.findByAll", Egresos.class).getResultList();
 		}catch(Exception e) {
 			log.error("Error al obtener informacion",e);
 		}finally {
@@ -48,7 +48,7 @@ public class EgresosDAO extends IBaseDAO<Egresos, Integer>{
 		
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			listaEgresos = entity.createNamedQuery("egresos.findByAll", Egresos.class).getResultList();
+			listaEgresos = entity.createNamedQuery("Egresos.findByAll", Egresos.class).getResultList();
 		}catch(Exception e) {
 			log.error("Error al obtener informacion",e);
 		}finally {

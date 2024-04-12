@@ -53,6 +53,22 @@ public class VentaDAO extends IBaseDAO<Ventas, Integer> {
 
 	@Override
 	public String guardar(Ventas e) {
+		
+		EntityManager em = null;
+		
+		try {
+			em =  EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(e);
+			em.getTransaction().commit();			
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		
+		
 		return null;
 	}
 

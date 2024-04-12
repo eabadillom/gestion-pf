@@ -70,21 +70,24 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 			em.getTransaction().begin();
 			listaVentas = new ArrayList<>();
 
-			sql = "select a.ventas_totales ,(a.ventas_totales - a.egresos) as ganancias,((a.ventas_totales - a.egresos) / a.ventas_totales) as porcentaje_ganancia from(\n"
-					+ "select SUM(combined.total_facturas), SUM(combined.total_ventas), sum(combined.total_facturas + combined.total_ventas ) as ventas_totales, sum(combined.Total_egresos) as egresos\n"
-					+ "from (\n"
-					+ "select sum(f.total) as total_facturas,0 as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n"
-					+ "from factura f\n" + "where f.fecha BETWEEN :fechaini and :fechaFin and status in (1,3,4)\n"
-					+ "group by fecha\n" + "\n" + "UNION\n" + "\n"
-					+ "select 0 as total_facturas,sum(v.total) as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n"
-					+ "from venta v\n" 
-					+"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " 
-					+ "where v.fecha BETWEEN :fechaini AND :fechaFin \n " 
-					+ "group by fecha \n"
-					+ "UNION \n"
-					+ "select 0 as total_facturas, 0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales \n"
-					+ "from importe_egreso ie\n" + "where ie.fecha BETWEEN :fechaini AND :fechaFin\n"
-					+ "group by fecha \n" + "\n" + ")combined \n" + ")a \n";
+			sql = "select COALESCE(a.ventas_totales, 0) ,\n" + 
+					"COALESCE((a.ventas_totales - a.egresos),0) as ganancias,\n" + 
+					"COALESCE(((a.ventas_totales - a.egresos) / a.ventas_totales),0) as porcentaje_ganancia\n" + 
+					"from(\n" + 
+					"select SUM(combined.total_facturas), SUM(combined.total_ventas), sum(combined.total_facturas +  combined.total_ventas ) as ventas_totales, sum(combined.Total_egresos) as egresos\n" + 
+					"from (\n" + 
+					"select sum(f.total) as total_facturas,0 as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n" + 
+					"from factura f  where f.fecha BETWEEN :fechaini and :fechaFin and status in (1,3,4)\n" + 
+					"group by fecha    UNION\n" + 
+					"select 0 as total_facturas,sum(v.total) as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n" + 
+					"from venta v\n" + 
+					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ'\n" + 
+					"where v.fecha BETWEEN :fechaini AND :fechaFin\n" + 
+					"group by fecha\n" + 
+					"UNION\n" + 
+					"select 0 as total_facturas, 0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales\n" + 
+					"from importe_egreso ie  where ie.fecha BETWEEN :fechaini AND :fechaFin\n" + 
+					"group by fecha     )combined   )a ;\n";
 
 			Query query = em.createNativeQuery(sql)
 					.setParameter("fechaini", DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD))
