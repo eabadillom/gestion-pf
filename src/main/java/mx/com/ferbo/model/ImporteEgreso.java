@@ -45,6 +45,15 @@ public class ImporteEgreso implements Serializable {
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
 	@ManyToOne(optional = false)
 	private EmisoresCFDIS cdEmisor;
+	
+	@Column(name = "subTotal")
+	private BigDecimal subTotal;
+	
+	@Column(name = "IVA")
+	private BigDecimal iva;
+	
+	@Column(name = "IEPS")
+	private BigDecimal ieps;
 
 	@Column(name = "importe")
 	private BigDecimal importe;
@@ -87,6 +96,30 @@ public class ImporteEgreso implements Serializable {
 
 	public void setImporte(BigDecimal importe) {
 		this.importe = importe;
+	}
+
+	public BigDecimal getSubTotal() {
+		return subTotal;
+	}
+
+	public void setSubTotal(BigDecimal subTotal) {
+		this.subTotal = subTotal;
+	}
+
+	public BigDecimal getIva() {
+		return iva;
+	}
+
+	public void setIva(BigDecimal iva) {
+		this.iva = iva;
+	}
+
+	public BigDecimal getIeps() {
+		return ieps;
+	}
+
+	public void setIeps(BigDecimal ieps) {
+		this.ieps = ieps;
 	}
 
 	@Override

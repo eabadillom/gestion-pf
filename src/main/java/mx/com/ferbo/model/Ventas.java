@@ -47,7 +47,7 @@ public class Ventas implements Serializable {
 	@JoinColumn(name = "id_cliente", referencedColumnName = "CTE_CVE")
 	@ManyToOne
 	private Cliente cteCve;
-
+	
 	@Column(name = "total")
 	private BigDecimal total;
 
@@ -125,4 +125,6 @@ public class Ventas implements Serializable {
 		this.cdEmisor = cdEmisor;
 	}
 
+
+	
 }

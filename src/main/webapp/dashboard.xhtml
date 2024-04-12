@@ -36,7 +36,7 @@
 					options: {
 						plugins:{
 							tiitle: {
-							display: true,
+							display: false,
 							text: "title set from JavaScript"
 							
 						},legend:{
@@ -44,12 +44,16 @@
 						},
 						datalabels:{
 							rotation: 90,
-							font: 'bold 12px sans-serif'
+							font: 'bold 20px sans-serif',
+							formatter: function(value, context) {
+								  return '$' + value.toLocaleString('es-MX'); // 1200
+								}
 						}
+						
 						}, scales:{
 							
 							y: {
-								beginAtZero: false
+								beginAtZero: true
 							
 							}
 						}
@@ -67,12 +71,19 @@
 						options: {
 							plugins:{
 								tiitle: {
-								display: true,
+								display: false,
 								text: "title set from JavaScript"
 								
 							},legend:{
 								display: true
+							},
+							datalabels:{
+								font: 'bold 16px sans-serif',
+									formatter: function(value, context) {
+										  return '$' + value.toLocaleString('es-MX'); // 1200
+										}
 							}
+							
 							
 							}, scales:{
 								
@@ -332,21 +343,21 @@
 
 
 				<div class="card"
-					style="width: 400px; height: 400px; margin: 0 auto; margin-top: 100px; align-content: center">
+					style="width: 550px; height: 400px; margin: 0 auto; margin-top: 100px; align-content: center">
 					<p:donutChart model="#{dashBoardBean.donutModel}"
 						style="width: 700px; height: 900px;"></p:donutChart>
 				</div>
 			</div>
 
 
-			<div class="card" style="width: 45%; height: 500px; float: left;">
+			<div class="card" style="width: 60%; height: 500px; float: left;">
 				<p:barChart model="#{dashBoardBean.smVentasFormaPago}"
-					style="width: 100%; height: 400px;" />
+					style="width: 100%; height: 650px;" />
 			</div>
 
 			<p:dataTable id="dt-gananciaRS" widgetVar="dt-VRS" var="gananciaRS"
 				value="#{dashBoardBean.listaGananciaRazonSocial}" reflow="true"
-				style="max-width:35em !important;float:right;margin-top:330px">
+				style="max-width:35em !important;float:right;margin-top:650px">
 
 				<f:facet name="header">
 					<div>

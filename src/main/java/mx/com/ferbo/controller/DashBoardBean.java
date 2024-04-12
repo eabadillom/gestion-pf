@@ -174,12 +174,14 @@ public class DashBoardBean implements Serializable {
 		iniMes = DateUtil.getFirstDayOfMonth(fechaPrueba);
 		listaVentasGlobales = reportesVentasDAO.ventasGanancias(iniMes, fechaPrueba);
 		try {
-			for (VentasGlobales vg : listaVentasGlobales) {
-				ventasGlobales.setVentasTotales(vg.getVentasTotales());
-				ventasGlobales.setGanancias(vg.getGanancias());
-				ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias().setScale(2, RoundingMode.DOWN));
-
+			
+			
+			for (VentasGlobales vg : listaVentasGlobales) {					
+					ventasGlobales.setVentasTotales(vg.getVentasTotales());
+					ventasGlobales.setGanancias(vg.getGanancias());
+					ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias().setScale(2, RoundingMode.DOWN));
 			}
+			
 		} catch (Exception e) {// ??????????????????????
 			/*
 			 * if(ventasGlobales.getVentasTotales() == null) {
@@ -589,6 +591,9 @@ public class DashBoardBean implements Serializable {
 		bgColors.add("rgb( 194, 193, 250 )");
 		bgColors.add("rgb(  233, 193, 250 )");
 		bgColors.add("rgb( 174, 252, 244)");
+		bgColors.add("rgb(  165, 204, 249 )");
+		bgColors.add("rgb( 250, 223, 193 )");
+		
 		dataSet.setBackgroundColor(bgColors);
 
 		data.addChartDataSet(dataSet);
@@ -767,7 +772,6 @@ public class DashBoardBean implements Serializable {
 		labels.add("Octubre");
 		labels.add("Noviembre");
 		labels.add("Diciembre");
-
 		data.setLabels(labels);
 		smVentasFormaPago.setData(data);
 

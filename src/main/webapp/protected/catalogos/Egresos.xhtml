@@ -72,7 +72,7 @@
 					<p:outputLabel for="concepto-som" value="Concepto" />
 			  </span>
 						
-					<p:commandButton value="Añadir importe" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{egresosBean.nuevoRegistroImporte()}" oncomplete="PF('dg-importe').show();" process="@this" update="frm-agregaimporte"/>
+					<p:commandButton value="Añadir importe" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" oncomplete="PF('dg-importe').show();" process="@this" update="frm-agregaimporte "/>
 					         </div>
 					</p:fieldset>
 					
@@ -155,13 +155,36 @@
 					</div>
 					
 					<div class="p-field">
-						<p:outputLabel for="@next">Importe:</p:outputLabel>
+						<p:outputLabel for="@next">IVA:</p:outputLabel>
+						<p:inputNumber id="iva" value="#{egresosBean.parametro.valor}"  />
+					</div>
+					
+					<div class="p-field">
+						<p:selectBooleanCheckbox id="iepsCheck" itemLabel="IEPS" value="#{egresosBean.ieps}">
+							<p:ajax update="iepsCheck ieps" />
+						</p:selectBooleanCheckbox>
+					</div>
+					<div class="p-field">
+						<p:outputLabel for="@next">IEPS:</p:outputLabel>
+						<p:inputNumber id="ieps" value="#{egresosBean.iepsSelect}"  readonly="#{(egresosBean.ieps != true)}" />
+					</div>										
+										
+					<div class="p-field">
+						<p:outputLabel for="@next">Subtotal:</p:outputLabel>
+						<p:inputNumber id="subTotal" value="#{egresosBean.importeSelected.subTotal}"  >
+						<p:ajax event="blur" update="importe ieps" process=" ieps @this" listener="#{egresosBean.calcularTotal()}"/> 
+						</p:inputNumber>
+					</div>	
+
+					
+					<div class="p-field">
+						<p:outputLabel for="@next">Total:</p:outputLabel>
 						<p:inputNumber id="importe" value="#{egresosBean.importeSelected.importe}"  />
 					</div>
 				</p:outputPanel>
 
 				<f:facet name="footer">
-					<p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{egresosBean.actualizar()}" process="importe @this"  />
+					<p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{egresosBean.actualizar()}" process="frm-agregaimporte @this"  />
 					<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-danger" oncomplete="PF('dg-importe').hide()" process="@this"/>
 				</f:facet>
 			</p:dialog>

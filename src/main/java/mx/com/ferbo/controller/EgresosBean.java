@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -40,11 +41,13 @@ import mx.com.ferbo.dao.CategoriaEgresosDAO;
 import mx.com.ferbo.dao.EgresosDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.ImporteEgresosDAO;
+import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.TipoEgresoDAO;
 import mx.com.ferbo.model.CategoriaEgreso;
 import mx.com.ferbo.model.Egresos;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.ImporteEgreso;
+import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.TipoEgreso;
 import mx.com.ferbo.ui.ImporteUtilidad;
 import mx.com.ferbo.util.DateUtil;
@@ -68,10 +71,13 @@ public class EgresosBean implements Serializable {
 	private BarChartModel barModel;
 	private BarChartModel stackedGroupBarModel;
 
+	private Boolean ieps;
+	
 	private ImporteEgreso nuevoImporte;
 	private ImporteEgreso importeSelected;
 	private String importe;
 	private Date mesActual;
+	private BigDecimal iepsSelect; 
 
 	private List<CategoriaEgreso> listaCatEgresos;
 	private List<TipoEgreso> listaTipoEgresos;
@@ -85,6 +91,8 @@ public class EgresosBean implements Serializable {
 	private EgresosDAO egresosDAO;
 	private ImporteEgresosDAO importeEgresosDAO;
 	private ImporteEgreso i;
+	private Parametro parametro;
+	private ParametroDAO parametroDAO;
 
 	public EgresosBean() {
 		listaEmisores = new ArrayList<>();
@@ -99,6 +107,8 @@ public class EgresosBean implements Serializable {
 		importeEgresosDAO = new ImporteEgresosDAO();
 		importeSelected = new ImporteEgreso();
 		listaImporteUtilidad = new ArrayList<>();
+		parametro = new Parametro();
+		parametroDAO = new ParametroDAO();
 	}
 
 	@PostConstruct
@@ -114,33 +124,63 @@ public class EgresosBean implements Serializable {
 		nuevoEgreso = new Egresos();
 		barModel = new BarChartModel();
 		stackedGroupBarModel = new BarChartModel();
+		
+		parametro = parametroDAO.buscarPorNombre("IVA");
+		
 	}
 
 	public void actualizar() {
 		PrimeFaces.current().executeInitScript("PF('dg-importe').hide()");
+		/*BigDecimal porcentajeIVA = new BigDecimal(0).setScale(2);
+		BigDecimal porcentajeIESP = new BigDecimal(0).setScale(2);*/
+		
 		try {
+			
+			/*porcentajeIVA = importeSelected.getSubTotal().multiply(new BigDecimal(parametro.getValor()));
+			porcentajeIESP = importeSelected.getSubTotal().multiply(iepsSelect);
+						
+			importeSelected.setIva(porcentajeIVA);
+			importeSelected.setIeps(porcentajeIESP);
+			importeSelected.setImporte(porcentajeIVA.add(porcentajeIESP).add(importeSelected.getSubTotal()));*/
+			
 			String msj = importeEgresosDAO.guardar(importeSelected);
 			if (msj == null) {
 				listaImporteEgreso = importeEgresosDAO.buscarTodos();
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 						"Importe agregado" + importeSelected.getImporte(), null));
 				PrimeFaces.current().ajax().update("form:messages", "form:dt-egresos");
+				importeSelected = new ImporteEgreso();
+				iepsSelect = new BigDecimal(0); 
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					"Error al modificar " + importeSelected.getImporte(), null));
-			PrimeFaces.current().ajax().update("form:messages");
+			PrimeFaces.current().ajax().update("form:messages.form:dg-importe");
 		}
 		// }else {
 	}
 
 	public void nuevoRegistroImporte() {
-		nuevoImporte = new ImporteEgreso();
+		importeSelected = new ImporteEgreso();
 	}
 
 	public void nuevoRegistro() {
 		nuevoEgreso = new Egresos();
+	}
+	
+	
+	public void calcularTotal() {
+		BigDecimal porcentajeIVA = new BigDecimal(0).setScale(2);
+		BigDecimal porcentajeIESP = new BigDecimal(0).setScale(2);
+			
+			porcentajeIVA = importeSelected.getSubTotal().multiply(new BigDecimal(parametro.getValor()));
+			porcentajeIESP = importeSelected.getSubTotal().multiply(iepsSelect);
+						
+			importeSelected.setIva(porcentajeIVA);
+			importeSelected.setIeps(porcentajeIESP);
+			importeSelected.setImporte(porcentajeIVA.add(porcentajeIESP).add(importeSelected.getSubTotal()));
+		
 	}
 
 	public void handleToggle(ToggleEvent event) {
@@ -543,6 +583,30 @@ public class EgresosBean implements Serializable {
 
 	public void setStackedGroupBarModel(BarChartModel stackedGroupBarModel) {
 		this.stackedGroupBarModel = stackedGroupBarModel;
+	}
+
+	public Boolean getIeps() {
+		return ieps;
+	}
+
+	public void setIeps(Boolean ieps) {
+		this.ieps = ieps;
+	}
+
+	public Parametro getParametro() {
+		return parametro;
+	}
+
+	public void setParametro(Parametro parametro) {
+		this.parametro = parametro;
+	}
+
+	public BigDecimal getIepsSelect() {
+		return iepsSelect;
+	}
+
+	public void setIepsSelect(BigDecimal iepsSelect) {
+		this.iepsSelect = iepsSelect;
 	}
 
 }

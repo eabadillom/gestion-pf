@@ -18,7 +18,7 @@
 					
 					
 		<p:fieldset legend="Venta">		
-			<p:commandButton value="Agregar"  icon="pi pi-plus" oncomplete="PF('dlg-venta').show()"></p:commandButton>				
+			<p:commandButton value="Agregar"  action="#{ventasBean.newVenta()}" icon="pi pi-plus" oncomplete="PF('dlg-venta').show()"></p:commandButton>				
 		</p:fieldset>
 						
 					
@@ -46,17 +46,18 @@
 					
 					<div class="p-field">
 						<p:outputLabel for="@next" value="concepto:" />
-						<p:inputText  value="#{ventasBean.venta.concepto}" ></p:inputText>
+						<p:inputText  id="concepto" value="#{ventasBean.venta.concepto}" ></p:inputText>
 					</div>
 					
+					
 					<div class="p-field">
-						<p:outputLabel for="@next">Importe:</p:outputLabel>
-						<p:inputNumber id="importe" value="#{ventasBean.venta.total}"  />
+						<p:outputLabel for="@next">Total:</p:outputLabel>
+						<p:inputNumber id="total" value="#{ventasBean.venta.total}" />
 					</div>
 				</p:outputPanel>
 
 				<f:facet name="footer">
-					<p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{egresosBean.actualizar()}" process="importe @this"  />
+					<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{ventasBean.save()}" process="frm-agregaVenta @this"  />
 					<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-danger" oncomplete="PF('dlg-venta').hide()" process="@this"/>
 				</f:facet>
 			</p:dialog>
