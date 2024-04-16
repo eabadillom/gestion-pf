@@ -95,14 +95,12 @@ public class UsuariosBean implements Serializable {
 				sha512Password = securityBO.getSHA512("temporal" + usuario.getUsuario());
 				usuario.setPassword(sha512Password);
 				usuario.setStUsuario("R");
-				mensaje = "El usuario se agrego correctamente";
+				mensaje = "El usuario se agrego correctamente. Contraseña: temporal";
 			}else {
 				mensaje = "El usuario se actualizo correctamente";
 			}
 			
 			log.debug("Usuario: {}", usuario);
-			usuario.setIdPlanta(this.idplanta);
-			//usuario.setPerfil(this.perfil);
 			String user = usuarioDAO.actualizar(usuario);
 			
 			if(user != null)
