@@ -18,7 +18,6 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
@@ -61,7 +60,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private Date fechaInicial;
 	private Date fechaFinal;
-	private Date fechaCaducidad;
+//	private Date fechaCaducidad;
 	private Date fechaIngreso;
 	private Date maxDate;
 	
@@ -95,7 +94,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private BigDecimal servicioCantidad,cantidadServicio;
 	
-	private String otro,pedimento,contenedor,lote,tarima;
+//	private String otro,pedimento,contenedor,lote,tarima;
 	
 	private List<Aviso> listaAvisos;
 	private AvisoDAO avisoDAO;
@@ -110,6 +109,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private Integer cantidadTotal = null;
 	private BigDecimal pesoTotal = null;
 	private BigDecimal tarimasTotal = null;
+	
+	private DetallePartida detallePartida = null;
 	
 	public ConsultarConstanciaDeDepositoBean() {
 		
@@ -146,7 +147,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		if(listadoClientes.size() == 1)
 			this.cliente = listadoClientes.get(0);
 		
-		fechaCaducidad = new Date();
+//		fechaCaducidad = new Date();
 		folio = "";
 		
 		Date today = new Date();
@@ -275,50 +276,42 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	}
 	
 	public void updateDetallePartida() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Detalle del producto";
 		
+		String resultado = null;
 		
-		List<DetallePartida> listadoDetallePartida = partidaSelect.getDetallePartidaList();
-		int size = listadoDetallePartida.size();
-		
-		DetallePartida detallePartida = listadoDetallePartida.get(size - 1);//obtengo el ultimo detalle de la Partidas
-		
-		detallePartida.setDtpPO(otro);//otro
-		detallePartida.setDtpPedimento(pedimento);
-		detallePartida.setDtpSAP(contenedor);//contenedor
-		detallePartida.setDtpLote(lote);
-		detallePartida.setDtpCaducidad(fechaCaducidad);
-		//detallePartida.setDtpPO(null);//otro
-		detallePartida.setDtpTarimas(tarima);
-		
-		if(detallePartidaDAO.actualizar(detallePartida) == null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Actualizacion","Detalle de Partida Actualizada"));
+		try {
+			log.info("Actualizando detalle partida: {}", this.detallePartida);
+			
+			resultado = detallePartidaDAO.actualizar(this.detallePartida);
+			if(resultado != null) {
+				throw new InventarioException(resultado);
+			}
+			
+			mensaje = "Información del producto actualizada.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception ex) {
+			mensaje = "Existe un problema para actualizar el detalle del producto.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages");	
 		}
 		
-		otro = "";
-		pedimento = "";
-		contenedor = "";
-		lote = "";
-		fechaCaducidad = new Date();
-		tarima = "";
-		
-		PrimeFaces.current().ajax().update("form:messages");
 		
 	}
 	
 	public void verDetallePartida() {
-		
 		List<DetallePartida> listaDetalleP = partidaSelect.getDetallePartidaList();
-		
-		int tam = listaDetalleP.size()-1;
-		
-		DetallePartida detalleP = listaDetalleP.get(tam);
-		
-		otro = detalleP.getDtpPO();
-		pedimento = detalleP.getDtpPedimento();
-		contenedor = detalleP.getDtpSAP();
-		lote = detalleP.getDtpLote();
-		fechaCaducidad = detalleP.getDtpCaducidad();
-		
+		DetallePartida detalleP = listaDetalleP.get(0);
+		this.detallePartida = detalleP;
 	}
 	
 	public void newServicio() {
@@ -609,53 +602,53 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		this.partidaSelect = partidaSelect;
 	}
 	
-	public Date getFechaCaducidad() {
-		return fechaCaducidad;
-	}
-
-	public void setFechaCaducidad(Date fechaCaducidad) {
-		this.fechaCaducidad = fechaCaducidad;
-	}
-
-	public String getOtro() {
-		return otro;
-	}
-
-	public void setOtro(String otro) {
-		this.otro = otro;
-	}
-
-	public String getPedimento() {
-		return pedimento;
-	}
-
-	public void setPedimento(String pedimento) {
-		this.pedimento = pedimento;
-	}
-
-	public String getContenedor() {
-		return contenedor;
-	}
-
-	public void setContenedor(String contenedor) {
-		this.contenedor = contenedor;
-	}
-
-	public String getLote() {
-		return lote;
-	}
-
-	public void setLote(String lote) {
-		this.lote = lote;
-	}
-
-	public String getTarima() {
-		return tarima;
-	}
-
-	public void setTarima(String tarima) {
-		this.tarima = tarima;
-	}
+//	public Date getFechaCaducidad() {
+//		return fechaCaducidad;
+//	}
+//
+//	public void setFechaCaducidad(Date fechaCaducidad) {
+//		this.fechaCaducidad = fechaCaducidad;
+//	}
+//
+//	public String getOtro() {
+//		return otro;
+//	}
+//
+//	public void setOtro(String otro) {
+//		this.otro = otro;
+//	}
+//
+//	public String getPedimento() {
+//		return pedimento;
+//	}
+//
+//	public void setPedimento(String pedimento) {
+//		this.pedimento = pedimento;
+//	}
+//
+//	public String getContenedor() {
+//		return contenedor;
+//	}
+//
+//	public void setContenedor(String contenedor) {
+//		this.contenedor = contenedor;
+//	}
+//
+//	public String getLote() {
+//		return lote;
+//	}
+//
+//	public void setLote(String lote) {
+//		this.lote = lote;
+//	}
+//
+//	public String getTarima() {
+//		return tarima;
+//	}
+//
+//	public void setTarima(String tarima) {
+//		this.tarima = tarima;
+//	}
 
 	public List<PrecioServicio> getListadoPrecioServicio() {
 		return listadoPrecioServicio;
@@ -759,5 +752,13 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 
 	public void setTarimasTotal(BigDecimal tarimasTotal) {
 		this.tarimasTotal = tarimasTotal;
+	}
+
+	public DetallePartida getDetallePartida() {
+		return detallePartida;
+	}
+
+	public void setDetallePartida(DetallePartida detallePartida) {
+		this.detallePartida = detallePartida;
 	}
 }
