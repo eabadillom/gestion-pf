@@ -22,16 +22,14 @@
 			<div class="p-grid ui-fluid">
 				<div class="p-field p-col-3 p-md-3">
 					<p:outputLabel value="Del" styleClass="p-mr-2"/>
-					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" value="#{consultarConstanciaSalidaBean.fechaInicial}">
+					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" value="#{consultarConstanciaSalidaBean.fechaInicial}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
 						<p:ajax process="@this" />
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-field p-col-3 p-md-3">
 					<p:outputLabel value="al" styleClass="p-mr-2"/>
-					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" value="#{consultarConstanciaSalidaBean.fechaFinal}">
+					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" value="#{consultarConstanciaSalidaBean.fechaFinal}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
 						<p:ajax process="@this" />
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-field p-col-2 p-md-2">
