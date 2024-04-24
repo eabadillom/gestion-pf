@@ -284,9 +284,19 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		String resultado = null;
 		
 		try {
-			log.info("Actualizando detalle partida: {}", this.detallePartida);
+			for(DetallePartida dp : partidaSelect.getDetallePartidaList()) {
+				dp.setDtpCaducidad(this.detallePartida.getDtpCaducidad());
+				dp.setDtpCodigo(this.detallePartida.getDtpCodigo());
+				dp.setDtpLote(this.detallePartida.getDtpLote());
+				dp.setDtpMP(this.detallePartida.getDtpMP());
+				dp.setDtpPedimento(this.detallePartida.getDtpPedimento());
+				dp.setDtpPO(this.detallePartida.getDtpPO());
+				dp.setDtpSAP(this.detallePartida.getDtpSAP());
+				dp.setDtpTarimas(this.detallePartida.getDtpTarimas());
+				log.info("Actualizando detalle partida: {}", this.detallePartida);
+				resultado = detallePartidaDAO.actualizar(dp);
+			}
 			
-			resultado = detallePartidaDAO.actualizar(this.detallePartida);
 			if(resultado != null) {
 				throw new InventarioException(resultado);
 			}
