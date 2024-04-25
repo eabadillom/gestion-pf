@@ -76,10 +76,11 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 				cliente.getCandadoSalida().getId();
 			
 			List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
-			log.debug(cliente.getRegimenFiscal().getCd_regimen());
-			log.debug(cliente.getUsoCfdi().getUsoCfdi());
-			log.debug(cliente.getMetodoPago().getNbMetodoPago());
-			log.debug(cliente.getMetodoPago().getCdMetodoPago());
+			log.info(cliente.getRegimenFiscal().getCd_regimen());
+			log.info(cliente.getRegimenFiscal().getNb_regimen());
+			log.info(cliente.getUsoCfdi().getUsoCfdi());
+			log.info(cliente.getMetodoPago().getNbMetodoPago());
+			log.info(cliente.getMetodoPago().getCdMetodoPago());
 			
 			for(ClienteContacto clienteContacto : clienteContactoList) {
 				
@@ -151,7 +152,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 				List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
 				log.debug("Número de contactos del cliente: {}", clienteContactoList.size());
 				log.debug("ClienteContactoList: {}", clienteContactoList.size());
-				log.debug(cliente.getRegimenFiscal().getCd_regimen());
+				log.debug(cliente.getRegimenFiscal().toString());
 				//log.debug(cliente.getUsoCfdi().getUsoCfdi());
 				
 				if(cliente.getMetodoPago()!=null) {				
