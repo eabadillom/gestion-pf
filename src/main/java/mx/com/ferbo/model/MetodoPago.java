@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -92,4 +93,23 @@ public class MetodoPago implements Serializable {
 	public String toString() {
 		return "MetodoPago [cdMetodoPago=" + cdMetodoPago + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(cdMetodoPago);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MetodoPago other = (MetodoPago) obj;
+		return Objects.equals(cdMetodoPago, other.cdMetodoPago);
+	}
+	
+	
 }

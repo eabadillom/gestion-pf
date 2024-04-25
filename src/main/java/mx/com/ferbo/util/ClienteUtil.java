@@ -4,13 +4,21 @@ import java.util.regex.Pattern;
 
 public class ClienteUtil {
 	
+	public static final String RFC_GENERICO_NACIONAL = "XAXX010101000";
+	public static final String RFC_GENERICO_EXTRANJERO = "XEXX010101000";
+	
 	public static boolean validarRFC(String tipoPersona, String rfc) {
 		boolean isValid = false;
-		if("M".equals(tipoPersona)) {
+		
+		if(RFC_GENERICO_NACIONAL.equalsIgnoreCase(rfc)) {
+			isValid = true;
+		} else if (RFC_GENERICO_EXTRANJERO.equalsIgnoreCase(rfc)) {
+			isValid = true;
+		} else if("M".equals(tipoPersona)) {
 			isValid = validarRFCMoral(rfc);
 		} else if ("F".equals(tipoPersona)) {
 			isValid = validarRFCFisica(rfc);
-		}
+		} 
 		return isValid;
 	}
 	
