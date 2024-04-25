@@ -22,16 +22,14 @@
 			<div class="p-grid ui-fluid">
 				<div class="p-field p-col-3 p-md-3">
 					<p:outputLabel value="Del" styleClass="p-mr-2"/>
-					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaDeDepositoBean.fechaInicial}" maxdate="#{consultarConstanciaDeDepositoBean.maxDate}">
+					<p:datePicker id="FechaI" placeholder="Fecha de Inicio" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaDeDepositoBean.fechaInicial}" maxdate="#{consultarConstanciaDeDepositoBean.maxDate}" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy">
 						<p:ajax process="@this" />
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-field p-col-3 p-md-3">
 					<p:outputLabel value="al" styleClass="p-mr-2"/>
-					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaDeDepositoBean.fechaFinal}" maxdate="#{consultarConstanciaDeDepositoBean.maxDate}">
+					<p:datePicker id="FechaF" placeholder="Fecha Final" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{consultarConstanciaDeDepositoBean.fechaFinal}" maxdate="#{consultarConstanciaDeDepositoBean.maxDate}" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy">
 						<p:ajax process="@this" />
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 				</div>
 				<div class="p-field p-col-2 p-md-2">
@@ -289,39 +287,36 @@
 						<div class="p-grid">
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="PO:" />
-								<p:inputText value="#{consultarConstanciaDeDepositoBean.otro}" ></p:inputText>														
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpPedimento}" ></p:inputText>														
 							</div>
 							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="Pedimento:" />												
-								<p:inputText value="#{consultarConstanciaDeDepositoBean.pedimento}"></p:inputText>
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpPedimento}"></p:inputText>
 								
 							</div>
 							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="Contenedor:" />													
-								<p:inputText value="#{consultarConstanciaDeDepositoBean.contenedor}"></p:inputText>
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpSAP}"></p:inputText>
 							</div>		
 											
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="Lote:" />							
-								<p:inputText value="#{consultarConstanciaDeDepositoBean.lote}"></p:inputText>
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpLote}"></p:inputText>
 							</div>
 							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="Tarima:" />							
-								<p:inputText value="#{consultarConstanciaDeDepositoBean.tarima}" ></p:inputText>
+								<p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpTarimas}" ></p:inputText>
 							</div>
 							
 							<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 								<p:outputLabel value="Caducidad:" />
-								<p:datePicker id="fechaCaducidad" showIcon="true" value="#{consultarConstanciaDeDepositoBean.fechaCaducidad}">
+								<p:datePicker id="fechaCaducidad" showIcon="true" value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpCaducidad}" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es">
 									<p:ajax process="@this" />
-									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 								</p:datePicker>
 							</div>		
-											
-							
 						</div>
 					</p:outputPanel>
 				</p:outputPanel>

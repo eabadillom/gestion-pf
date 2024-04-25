@@ -151,7 +151,10 @@ public class ClientesBean implements Serializable {
 	public void cargaInfoCliente() {
 
 		log.info("Cargando información del cliente: " + this.clienteSelected);
-		if ("M".equals(clienteSelected.getTipoPersona())) {
+		this.clienteSelected = clienteDAO.buscarPorId(this.clienteSelected.getCteCve(), true);
+		
+		
+		if("M".equals(clienteSelected.getTipoPersona())) {
 			lstRegimenFiscal = regimenFiscalDAO.buscarPorPersonaMoral();
 			lstUsoCfdi = usoCfdiDAO.buscaPorPersonaMoral();
 		}
@@ -187,9 +190,6 @@ public class ClientesBean implements Serializable {
 		}
 	}
 
-	/**
-	 * Método para inicializar objeto tipo Cliente
-	 */
 	public void nuevoCliente() {
 		clienteSelected = new Cliente();
 		clienteSelected.setHabilitado(true);
@@ -200,9 +200,6 @@ public class ClientesBean implements Serializable {
 		this.idMedioPagoSelected = null;
 	}
 
-	/**
-	 * Método para inicializar objeto tipo Contacto
-	 */
 	public void nuevoContacto(Cliente clienteSel) {
 		clienteContactoSelected = new ClienteContacto();
 		clienteContactoSelected.setFhAlta(new Date());
@@ -217,130 +214,119 @@ public class ClientesBean implements Serializable {
 		medioContactoSelected = new MedioCnt();
 	}
 
-	/**
-	 * Método para validar si se ha seleccionado uno o varios objetos tipo Cliente
-	 */
 	public boolean clienteSeleccionado() {
 		return this.lstClientesSelected != null && !this.lstClientesSelected.isEmpty();
 	}
 
 	public void guardarCliente() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Guardar cliente...";
+		
 		List<Planta> plantaList = null;
-
-		final String rf = this.cdRegimenFiscalSelected;
-		List<RegimenFiscal> lstRF = lstRegimenFiscal.stream().filter(r -> r.getCd_regimen().equals(rf))
-				.collect(Collectors.toList());
-
-		if (lstRF != null && lstRF.size() > 0) {
-			this.clienteSelected.setRegimenFiscal(lstRF.get(0));
-		}
-
-		final String uso = this.cdUsoCfdiSelected;
-		List<UsoCfdi> lstUsoCFDITmp = this.lstUsoCfdi.stream().filter(u -> uso.equals(uso))
-				.collect(Collectors.toList());
-
-		if (lstUsoCFDITmp != null && lstUsoCFDITmp.size() > 0) {
-			this.clienteSelected.setUsoCfdi(lstUsoCFDITmp.get(0));
-		}
-
-		final String mp = this.cdMetodoPagoSelected;
-		List<MetodoPago> lstMetodoPagoTmp = this.lstMetodoPago.stream().filter(m -> m.getCdMetodoPago().equals(mp))
-				.collect(Collectors.toList());
-		if (lstMetodoPagoTmp != null && lstMetodoPagoTmp.size() > 0) {
-			this.clienteSelected.setMetodoPago(lstMetodoPagoTmp.get(0));
-		}
-
-		final Integer idMPTmp = this.idMedioPagoSelected;
-		List<MedioPago> lstMedioPagoTmp = this.lstMedioPago.stream().filter(m -> m.getMpId() == idMPTmp)
-				.collect(Collectors.toList());
-		if (lstMedioPagoTmp != null && lstMedioPagoTmp.size() > 0) {
-			this.clienteSelected.setFormaPago(lstMedioPagoTmp.get(0).getFormaPago());
-		}
-
-		if (clienteSelected.getCteCve() == null) {
-
-			// CANDADO SALIDA
-			plantaList = plantaDAO.findall(true);
-
-			CandadoSalida candadoSalida = new CandadoSalida();
-			candadoSalida.setHabilitado(true);
-			candadoSalida.setCliente(clienteSelected);
-			candadoSalida.setNumSalidas(1);
-
-			clienteSelected.setCandadoSalida(candadoSalida);
-
-			for (Planta planta : plantaList) {
-
-				SerieConstanciaPK serieConstanciaPK_I = new SerieConstanciaPK();
-				serieConstanciaPK_I.setCliente(clienteSelected);
-				serieConstanciaPK_I.setPlanta(planta);
-				serieConstanciaPK_I.setTpSerie("I");
-				SerieConstancia serieConstanciaI = new SerieConstancia();
-				serieConstanciaI.setSerieConstanciaPK(serieConstanciaPK_I);
-				serieConstanciaI.setNuSerie(1);
-				clienteSelected.addSerieConstancia(serieConstanciaI);
-				planta.add(serieConstanciaI);
-
-				SerieConstanciaPK serieConstanciaPK_O = new SerieConstanciaPK();
-				serieConstanciaPK_O.setCliente(clienteSelected);
-				serieConstanciaPK_O.setPlanta(planta);
-				serieConstanciaPK_O.setTpSerie("O");
-				SerieConstancia serieConstanciaO = new SerieConstancia();
-				serieConstanciaO.setSerieConstanciaPK(serieConstanciaPK_O);
-				serieConstanciaO.setNuSerie(1);
-				clienteSelected.addSerieConstancia(serieConstanciaO);
-				planta.add(serieConstanciaO);
-
-				SerieConstanciaPK serieConstanciaPK_T = new SerieConstanciaPK();
-				serieConstanciaPK_T.setCliente(clienteSelected);
-				serieConstanciaPK_T.setPlanta(planta);
-				serieConstanciaPK_T.setTpSerie("T");
-				SerieConstancia serieConstanciaT = new SerieConstancia();
-				serieConstanciaT.setSerieConstanciaPK(serieConstanciaPK_T);
-				serieConstanciaT.setNuSerie(1);
-				clienteSelected.addSerieConstancia(serieConstanciaT);
-				planta.add(serieConstanciaT);
-
-				SerieConstanciaPK serieConstanciaPK_S = new SerieConstanciaPK();
-				serieConstanciaPK_S.setCliente(clienteSelected);
-				serieConstanciaPK_S.setPlanta(planta);
-				serieConstanciaPK_S.setTpSerie("S");
-				SerieConstancia serieConstanciaS = new SerieConstancia();
-				serieConstanciaS.setSerieConstanciaPK(serieConstanciaPK_S);
-				serieConstanciaS.setNuSerie(1);
-				clienteSelected.addSerieConstancia(serieConstanciaS);
-				planta.add(serieConstanciaS);
+		String resultado = null;
+		
+		try {
+			if("M".equalsIgnoreCase(this.clienteSelected.getCteRfc()) 
+					&& (this.clienteSelected.getRegimenCapital() == null || this.clienteSelected.getRegimenCapital().trim().equalsIgnoreCase(""))) {
+				throw new InventarioException("Debe indicar un régimen capital");
 			}
-
-			if (clienteDAO.guardar(clienteSelected) == null) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Agregado"));
-				log.info("El usuario {} ha registrado el cliente {}.", this.usuario.getUsuario(), this.clienteSelected);
+			
+			if (clienteSelected.getCteCve() == null) {
+				//CANDADO SALIDA
+				plantaList = plantaDAO.findall(true);
+				
+				CandadoSalida candadoSalida = new CandadoSalida();
+				candadoSalida.setHabilitado(true);
+				candadoSalida.setCliente(clienteSelected);
+				candadoSalida.setNumSalidas(1);
+				
+				clienteSelected.setCandadoSalida(candadoSalida);
+				
+				for(Planta planta : plantaList) {
+					
+					SerieConstanciaPK serieConstanciaPK_I = new SerieConstanciaPK();
+					serieConstanciaPK_I.setCliente(clienteSelected);
+					serieConstanciaPK_I.setPlanta(planta);
+					serieConstanciaPK_I.setTpSerie("I");
+					SerieConstancia serieConstanciaI = new SerieConstancia();
+					serieConstanciaI.setSerieConstanciaPK(serieConstanciaPK_I);
+					serieConstanciaI.setNuSerie(1);
+					clienteSelected.addSerieConstancia(serieConstanciaI);
+					planta.add(serieConstanciaI);
+					
+					SerieConstanciaPK serieConstanciaPK_O = new SerieConstanciaPK();
+					serieConstanciaPK_O.setCliente(clienteSelected);
+					serieConstanciaPK_O.setPlanta(planta);
+					serieConstanciaPK_O.setTpSerie("O");
+					SerieConstancia serieConstanciaO = new SerieConstancia();
+					serieConstanciaO.setSerieConstanciaPK(serieConstanciaPK_O);
+					serieConstanciaO.setNuSerie(1);
+					clienteSelected.addSerieConstancia(serieConstanciaO);
+					planta.add(serieConstanciaO);
+					
+					SerieConstanciaPK serieConstanciaPK_T = new SerieConstanciaPK();
+					serieConstanciaPK_T.setCliente(clienteSelected);
+					serieConstanciaPK_T.setPlanta(planta);
+					serieConstanciaPK_T.setTpSerie("T");
+					SerieConstancia serieConstanciaT = new SerieConstancia();
+					serieConstanciaT.setSerieConstanciaPK(serieConstanciaPK_T);
+					serieConstanciaT.setNuSerie(1);
+					clienteSelected.addSerieConstancia(serieConstanciaT);
+					planta.add(serieConstanciaT);
+					
+					SerieConstanciaPK serieConstanciaPK_S = new SerieConstanciaPK();
+					serieConstanciaPK_S.setCliente(clienteSelected);
+					serieConstanciaPK_S.setPlanta(planta);
+					serieConstanciaPK_S.setTpSerie("S");
+					SerieConstancia serieConstanciaS = new SerieConstancia();
+					serieConstanciaS.setSerieConstanciaPK(serieConstanciaPK_S);
+					serieConstanciaS.setNuSerie(1);
+					clienteSelected.addSerieConstancia(serieConstanciaS);
+					planta.add(serieConstanciaS);
+				}
+				resultado = clienteDAO.guardar(clienteSelected);
+				if (resultado != null) {
+					throw new InventarioException("Existe un problema para guardar al cliente: " + resultado);
+				}
+				
+				log.info("El usuario {} ha agregado el cliente {}.", this.usuario.getUsuario(), this.clienteSelected);
 			} else {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						"Error", "Ocurrió un error al intentar guardar el Cliente"));
-				log.info("El usuario {} ha actualizado el cliente {}.", this.usuario.getUsuario(),
-						this.clienteSelected);
+				
+				resultado = clienteDAO.actualizar(clienteSelected);
+				
+				if (resultado != null) {
+					throw new InventarioException("Existe un problema para guardar al cliente: " + resultado);
+				}
+				
+				log.info("El usuario {} ha actualizado el cliente {}.", this.usuario.getUsuario(), this.clienteSelected);
 			}
-		} else {
-			if (clienteDAO.actualizar(clienteSelected) == null) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Actualizado"));
-			} else {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						"Error", "Ocurrió un error al intentar actualizar el Cliente"));
-			}
+			
+			this.consultaClientes();
+			this.cdRegimenFiscalSelected = null;
+			this.cdUsoCfdiSelected = null;
+			this.cdMetodoPagoSelected = null;
+			this.idMedioPagoSelected = null;
+			
+			mensaje = "El cliente registrado correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
+		} catch(InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			log.error("Problema para cargar la información de la constancia...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-clientes");
 		}
-
-		consultaClientes();
-		this.cdRegimenFiscalSelected = null;
-		this.cdUsoCfdiSelected = null;
-		this.cdMetodoPagoSelected = null;
-		this.idMedioPagoSelected = null;
-		PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
-		PrimeFaces.current().ajax().update("form:messages", "form:dt-clientes");
 	}
 
 	public void eliminarCliente() {
-		// if (clienteDAO.eliminar(clienteSelected) == null) {
 		if (clienteDAO.eliminar(clienteSelected.getCteCve()) == null) {
 			this.consultaClientes();
 			clienteSelected = null;
@@ -404,7 +390,9 @@ public class ClientesBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-
+		
+		String codigoUnico = null;
+		
 		try {
 
 			if (ClienteUtil.validarRFC(this.clienteSelected.getTipoPersona(),
@@ -412,7 +400,22 @@ public class ClientesBean implements Serializable {
 				mensaje = "El RFC es incorrecto";
 				throw new InventarioException("El RFC es incorrecto");
 			}
-
+			
+			codigoUnico = this.clienteSelected.getCteRfc();
+			if("F".equalsIgnoreCase(this.clienteSelected.getTipoPersona())) {
+				codigoUnico = codigoUnico.substring(0, 4);
+			} else if("M".equalsIgnoreCase(this.clienteSelected.getTipoPersona())) {
+				codigoUnico = codigoUnico.substring(0, 3);
+			}
+			
+			if(this.clienteSelected.getCteCve() == null && 
+					(   ClienteUtil.RFC_GENERICO_NACIONAL.equalsIgnoreCase(this.clienteSelected.getCteRfc()) == false
+					 || ClienteUtil.RFC_GENERICO_EXTRANJERO.equalsIgnoreCase(this.clienteSelected.getCteRfc()) == false
+					)
+			  ) {
+				this.clienteSelected.setCodUnico(codigoUnico);
+			}
+			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "RFC Correcto";
 
