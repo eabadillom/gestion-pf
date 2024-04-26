@@ -86,11 +86,11 @@ public class Cliente implements Serializable {
     @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
     private RegimenFiscal  regimenFiscal;
     
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE, optional = false)
     @JoinColumn(name = "cd_uso_cfdi", referencedColumnName = "cd_uso_cfdi")
     private UsoCfdi usoCfdi;
     
-    @ManyToOne(cascade = CascadeType.MERGE,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cd_metodo_pago", referencedColumnName = "cd_metodo_pago")
     private MetodoPago metodoPago;
     
