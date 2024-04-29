@@ -112,7 +112,8 @@ public class FacturaServiciosBean implements Serializable {
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
 	private Planta plantaSelect;
-	private String metodoPagoSelect;
+//	private String metodoPagoSelect;
+	private MetodoPago metodoPagoSelect;
 	private String medioPagoSelect;
 	private Parametro iva, retencion;
 	private SerieFactura serieFacturaSelect;
@@ -242,7 +243,11 @@ public class FacturaServiciosBean implements Serializable {
 			List<PrecioServicio> precioServicioList = null;
 			listaClienteDomicilio.clear();
 			listaClienteDomicilio = clienteDomicilioDAO.buscarPorCliente(clienteSelect.getCteCve());
-			
+			if(this.clienteSelect.getMetodoPago() == null)
+				throw new InventarioException("El cliente no tiene un método de pago configurado.");
+			this.metodoPagoSelect = this.clienteSelect.getMetodoPago();
+//			this.metodoPagoSelect = this.clienteSelect.getMetodoPago().getCdMetodoPago();
+					
 			if (listaClienteDomicilio.size() > 0) {
 				domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
 			}
@@ -293,7 +298,8 @@ public class FacturaServiciosBean implements Serializable {
 		}
 		
 		public void setMetodoPago() {
-			metodoPagoSelect = clienteSelect.getMetodoPago().getCdMetodoPago();
+			this.metodoPagoSelect = clienteSelect.getMetodoPago();
+//			metodoPagoSelect = clienteSelect.getMetodoPago().getCdMetodoPago();
 		}
 
 
@@ -522,7 +528,8 @@ public class FacturaServiciosBean implements Serializable {
 				factura.setPlazo(this.plazoSelect);
 				factura.setRetencion(BigDecimal.ZERO);
 				factura.setNomSerie(serieFacturaSelect.getNomSerie());
-				MetodoPago metodoP = metodoPagoDAO.buscarPorMetodoPago(metodoPagoSelect);
+				MetodoPago metodoP = this.metodoPagoSelect;
+//				MetodoPago metodoP = metodoPagoDAO.buscarPorMetodoPago(metodoPagoSelect);
 				factura.setMetodoPago(metodoP.getCdMetodoPago());
 				factura.setTipoPersona(cliente.getTipoPersona());
 				factura.setCdRegimen(cliente.getRegimenFiscal().getCd_regimen());
@@ -678,12 +685,20 @@ public class FacturaServiciosBean implements Serializable {
 		this.plantaSelect = plantaSelect;
 	}
 
-	public String getMetodoPagoSelect() {
-		return metodoPagoSelect;
+//	public String getMetodoPagoSelect() {
+//		return metodoPagoSelect;
+//	}
+//
+//	public void setMetodoPagoSelect(String metodoPagoSelect) {
+//		this.metodoPagoSelect = metodoPagoSelect;
+//	}
+	
+	public MetodoPago getMetodoPagoSelect() {
+		return this.metodoPagoSelect;
 	}
-
-	public void setMetodoPagoSelect(String metodoPagoSelect) {
-		this.metodoPagoSelect = metodoPagoSelect;
+	
+	public void setMetodoPagoSelect(MetodoPago metodoPago) {
+		this.metodoPagoSelect = metodoPago;
 	}
 
 	public String getMedioPagoSelect() {
