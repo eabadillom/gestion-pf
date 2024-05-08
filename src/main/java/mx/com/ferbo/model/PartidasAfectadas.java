@@ -34,8 +34,8 @@ private static final long serialVersionUID = 1L;
 @Column(name = "id")
 private Integer id;
 
-@Basic(optional = false)
- @Null
+@Basic(optional = true)
+@Null
 @Column(name = "traspaso")
  private String traspaso;
 

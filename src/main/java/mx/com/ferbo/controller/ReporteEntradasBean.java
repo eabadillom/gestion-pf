@@ -65,8 +65,8 @@ public class ReporteEntradasBean implements Serializable {
 	private CamaraDAO camaraDAO;
 	
 	private Usuario usuario;
-	private FacesContext faceContext;
-	private HttpServletRequest httpServletRequest;
+	private FacesContext context;
+	private HttpServletRequest request;
 	
 	List<RepEntradas> reporte = null;
 
@@ -86,15 +86,15 @@ public class ReporteEntradasBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		
-		faceContext = FacesContext.getCurrentInstance();
-		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		context = FacesContext.getCurrentInstance();
+		request = (HttpServletRequest) context.getExternalContext().getRequest();
+		usuario = (Usuario) request.getSession(false).getAttribute("usuario");
 		
 		plantaSelect = new Planta();
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
 		
-		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+		listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		
 		if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
 			listaPlanta.add(plantaDAO.buscarPorId(usuario.getIdPlanta())); 
