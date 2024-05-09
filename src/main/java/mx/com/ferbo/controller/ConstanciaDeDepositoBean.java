@@ -466,6 +466,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	public void renderConstanciaDeDeposito() {
 		List<PrecioServicio> l = null;
+		List<PrecioServicio> serviciosBasicos = null;
 		log.info("AvisoSelect: " + avisoSelect);
 
 		this.showCodigo = avisoSelect.getAvisoCodigo();
@@ -484,9 +485,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		isConservacion = false;
 		isManiobras = false;
 		
-		List<PrecioServicio> precioServicioTemp = new ArrayList<PrecioServicio>();
-		precioServicioTemp.clear();
-		precioServicioTemp = listaServicioUnidad.stream()
+//		serviciosBasicos = new ArrayList<PrecioServicio>();
+//		serviciosBasicos.clear();
+		serviciosBasicos = listaServicioUnidad.stream()
 				.filter(p -> (
 						p.getServicio().getServicioCve() == congelacion ||
 						p.getServicio().getServicioCve() == conservacion ||
@@ -495,35 +496,38 @@ public class ConstanciaDeDepositoBean implements Serializable {
 						))
 				.collect(Collectors.toList());
 		
-		listaServicioUnidad.removeAll(precioServicioTemp);
+		listaServicioUnidad.removeAll(serviciosBasicos);
 		
-		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 619)
+		l = serviciosBasicos.stream().filter(ps -> ps.getServicio().getServicioCve() == 619) //*CONGELACION
 		.collect(Collectors.toList());
 		if(l.size() > 0) {
 			this.isCongelacion = true;
+			log.info("El cliente tiene preconfigurado el servicio de *CONGELACION");
 		}
-			
 		
-		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 620)
+		l = serviciosBasicos.stream().filter(ps -> ps.getServicio().getServicioCve() == 620) //*CONSERVACION
 				.collect(Collectors.toList());
 		if(l.size() > 0) {
 			this.isConservacion = true;
+			log.info("El cliente tiene preconfigurado el servicio de *CONSERVACION");
 		}
 		
-		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 621)
+		l = serviciosBasicos.stream().filter(ps -> ps.getServicio().getServicioCve() == 621) //*REFRIGERACION
 				.collect(Collectors.toList());
 		if(l.size() > 0) {
 			this.isRefrigeracion = true;
+			log.info("El cliente tiene preconfigurado el servicio de *REFRIGERACION");
 		}
 		
-		l = precioServicioTemp.stream().filter(ps -> ps.getServicio().getServicioCve() == 622)
+		l = serviciosBasicos.stream().filter(ps -> ps.getServicio().getServicioCve() == 622) //*MANIOBRAS
 				.collect(Collectors.toList());
 		if(l.size() > 0) {
 			this.isManiobras = true;
+			log.info("El cliente tiene preconfigurado el servicio de *MANIOBRAS");
 		}
 
 		PrimeFaces.current().ajax().update(":form:txtPedimento", ":form:txtSAP", ":form:txtLote",
-				":form:fechaCaducidad", ":form:txtOtro", ":form:precioServicio", ":congelacion",
+				":form:fechaCaducidad", ":form:txtOtro", ":form:precioServicio", "form:congelacion",
 				":form:conservacion", ":form:refrigeracion", ":form:maniobras","form:txtCodigo");
 	}
 	
@@ -622,22 +626,21 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				
 				partida.add(detalle);
 				this.listadoPartida.add(partida);
-			}else {
-				
-				
-					for(int i = 0; i < intNumTarimas; i++) {
-						p = (Partida) partida.clone();
-						dp = (DetallePartida) detalle.clone();
-						
-						DetallePartidaPK detallePk = new DetallePartidaPK();
-						detallePk.setDetPartCve(1);
-						detallePk.setPartidaCve(p);
-						dp.setDetallePartidaPK(detallePk);
-						
-						p.add(dp);
-						this.listadoPartida.add(p);
-						
-					}
+				log.info("Partida agregada: {}", partida);
+			} else {
+				for(int i = 0; i < intNumTarimas; i++) {
+					p = (Partida) partida.clone();
+					dp = (DetallePartida) detalle.clone();
+					
+					DetallePartidaPK detallePk = new DetallePartidaPK();
+					detallePk.setDetPartCve(1);
+					detallePk.setPartidaCve(p);
+					dp.setDetallePartidaPK(detallePk);
+					
+					p.add(dp);
+					this.listadoPartida.add(p);
+					log.info("Partida agregada: {}", p);
+				}
 			}
 			totalTarimas = new BigDecimal(0);
 			totalCajas = new BigDecimal(0);
@@ -665,7 +668,23 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	}
 	
 	public void partidaEditada() {
-		System.out.println("");
+		log.info("Partida editada.");
+	}
+	
+	public void logServiciosBasicos() {
+		log.info("Cambio en los servicios basicos seleccionados...");
+		
+		if(this.isCongelacion)
+			log.info("El cliente tiene preconfigurado el servicio de *CONGELACION");
+		
+		if(this.isConservacion)
+			log.info("El cliente tiene preconfigurado el servicio de *CONSERVACION");
+		
+		if(this.isRefrigeracion)
+			log.info("El cliente tiene preconfigurado el servicio de *REFRIGERACION");
+		
+		if(this.isManiobras)
+			log.info("El cliente tiene preconfigurado el servicio de *MANIOBRAS");
 	}
 
 	public synchronized void saveConstanciaDeDeposito() {
