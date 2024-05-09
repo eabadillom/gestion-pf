@@ -33,7 +33,7 @@ public class PartidasAfectadas implements Serializable {
 	@Column(name = "id")
 	private Integer id;
 
-	@Basic(optional = false)
+	@Basic(optional = true)
 	@Null
 	@Column(name = "traspaso")
 	private String traspaso;
