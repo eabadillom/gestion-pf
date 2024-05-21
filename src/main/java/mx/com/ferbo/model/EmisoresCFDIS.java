@@ -2,7 +2,6 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -24,7 +23,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "emisor")
 @NamedQueries({
-@NamedQuery(name = "EmisoresCFDIS.findAll", query ="SELECT e FROM EmisoresCFDIS e"),
+@NamedQuery(name = "EmisoresCFDIS.findAll", query ="SELECT e FROM EmisoresCFDIS e ORDER BY e.nb_emisor"),
 @NamedQuery(name = "EmisoresCFDIS.findBycdEmisor", query = "SELECT e FROM EmisoresCFDIS e WHERE e.cd_emisor = :cd_emisor"),
 @NamedQuery(name = "EmisoresCFDIS.findBynbEmisor", query = "SELECT e FROM EmisoresCFDIS e WHERE e.nb_emisor = :nb_emisor"),
 @NamedQuery(name = "EmisoresCFDIS.findBytpPersona", query = "SELECT e FROM EmisoresCFDIS e WHERE e.tp_persona = :tp_persona"),

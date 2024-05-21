@@ -162,7 +162,7 @@ public class FacturacionConstanciasBean implements Serializable{
 	private BigDecimal total;
 	private String montoLetra;
 	private FacesContext context;
-	HttpSession session;
+	private HttpSession session;
 	private String observaciones;
 	
 	
@@ -170,7 +170,6 @@ public class FacturacionConstanciasBean implements Serializable{
     private HttpServletRequest request;
     
 	
-	@SuppressWarnings("unchecked")
 	public FacturacionConstanciasBean() {
 		clienteDAO = new ClienteDAO();
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
@@ -199,9 +198,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		listaEntradas = new ArrayList<>();
 		listaVigencias = new ArrayList<>();
 		listaServicios = new ArrayList<>();
-		/*listaEntradas = (List<ConstanciaFactura>) session.getAttribute("entradas");
-		listaVigencias = (List<ConstanciaFactura>) session.getAttribute("vigencias");
-		listaServicios = (List<ConstanciaFacturaDs>) session.getAttribute("servicios");*/
+		
 		selectedEntradas = new ArrayList<>();
 		selectedVigencias = new ArrayList<>();
 		selectedServicios = new ArrayList<>();

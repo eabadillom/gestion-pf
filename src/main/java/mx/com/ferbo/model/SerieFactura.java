@@ -36,48 +36,52 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "SerieFactura.findByNumeroInicial", query = "SELECT s FROM SerieFactura s WHERE s.numeroInicial = :numeroInicial"),
     @NamedQuery(name = "SerieFactura.findByNumeroActual", query = "SELECT s FROM SerieFactura s WHERE s.numeroActual = :numeroActual"),
     @NamedQuery(name = "SerieFactura.findByNumeroFinal", query = "SELECT s FROM SerieFactura s WHERE s.numeroFinal = :numeroFinal"),
-    @NamedQuery(name = "SerieFactura.findByNomSerie", query = "SELECT s FROM SerieFactura s WHERE s.nomSerie = :nomSerie"),
-    @NamedQuery(name = "SerieFactura.findByIsDflt", query = "SELECT s FROM SerieFactura s WHERE s.isDflt = :isDflt")})
+    @NamedQuery(name = "SerieFactura.findByNomSerie", query = "SELECT s FROM SerieFactura s WHERE s.nomSerie = :nomSerie")
+})
 public class SerieFactura implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_inicio")
     @Temporal(TemporalType.DATE)
     private Date fechaInicio;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "numero_inicial")
     private int numeroInicial;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "numero_actual")
     private int numeroActual;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "numero_final")
     private Integer numeroFinal;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 5)
     @Column(name = "nom_serie")
     private String nomSerie;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "IS_DFLT")
-    private boolean isDflt;
+    
     @JoinColumn(name = "status_serie", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private StatusSerie statusSerie;
-    @JoinColumn(name = "id_planta", referencedColumnName = "PLANTA_CVE")
-    @ManyToOne(optional = false)
-    private Planta idPlanta;
+    
+    @JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
+    @ManyToOne(optional = true)
+    private EmisoresCFDIS emisor;
 
     public SerieFactura() {
     }
@@ -86,14 +90,13 @@ public class SerieFactura implements Serializable {
         this.id = id;
     }
 
-    public SerieFactura(Integer id, Date fechaInicio, int numeroInicial, int numeroActual, int numeroFinal, String nomSerie, boolean isDflt) {
+    public SerieFactura(Integer id, Date fechaInicio, int numeroInicial, int numeroActual, int numeroFinal, String nomSerie) {
         this.id = id;
         this.fechaInicio = fechaInicio;
         this.numeroInicial = numeroInicial;
         this.numeroActual = numeroActual;
         this.numeroFinal = numeroFinal;
         this.nomSerie = nomSerie;
-        this.isDflt = isDflt;
     }
 
     public Integer getId() {
@@ -144,14 +147,6 @@ public class SerieFactura implements Serializable {
         this.nomSerie = nomSerie;
     }
 
-    public boolean getIsDflt() {
-        return isDflt;
-    }
-
-    public void setIsDflt(boolean isDflt) {
-        this.isDflt = isDflt;
-    }
-
     public StatusSerie getStatusSerie() {
         return statusSerie;
     }
@@ -160,14 +155,14 @@ public class SerieFactura implements Serializable {
         this.statusSerie = statusSerie;
     }
     
-    public Planta getIdPlanta() {
-		return idPlanta;
+	public EmisoresCFDIS getEmisor() {
+		return emisor;
 	}
-
-	public void setIdPlanta(Planta idPlanta) {
-		this.idPlanta = idPlanta;
+	
+	public void setEmisor(EmisoresCFDIS emisor) {
+		this.emisor = emisor;
 	}
-
+	
 	@Override
     public int hashCode() {
         int hash = 0;
@@ -192,5 +187,6 @@ public class SerieFactura implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.SerieFactura[ id=" + id + " ]";
     }
+
     
 }

@@ -111,13 +111,16 @@ public class Planta implements Serializable {
 	
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH, optional = false)
-	private EmisoresCFDIS idEmisoresCFDIS;//agregado
+	private EmisoresCFDIS idEmisoresCFDIS;
+	
+	@JoinColumn(name = "id_sf", referencedColumnName = "id")
+	@ManyToOne(optional = true)
+	private SerieFactura serieFacturaDefault;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta", fetch = FetchType.LAZY)
 	private List<Posicion> posicionList;
 	
 	public Planta() {
-
 	}
 
 	public String getUuid() {

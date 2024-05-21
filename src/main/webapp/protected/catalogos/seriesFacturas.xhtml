@@ -63,14 +63,14 @@
 				modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 					<div class="p-field">
-						<p:outputLabel for="@next">Serie:</p:outputLabel>
+						<p:outputLabel for="@next" value="Serie:"/>
 						<p:inputText value="#{serieFacturaBean.nuevo.nomSerie}" required="true" placeholder="maximo 5 caracteres"/>
 					</div>
 					<div class="p-field">
-						<p:outputLabel value="(SUCURSAL) PLANTA:" />
-						<p:selectOneMenu value="#{serieFacturaBean.nuevo.idPlanta}" converter="entityConverter" required="true"> 
-							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
-							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						<p:outputLabel value="EMISOR:" />
+						<p:selectOneMenu value="#{serieFacturaBean.nuevo.emisor}" converter="entityConverter" required="true"> 
+							<f:selectItem itemLabel="---Seleccione---" itemValue="" noSelectionOption="true"/>
+							<f:selectItems value="#{serieFacturaBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
 						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
@@ -104,10 +104,6 @@
 								itemLabel="#{status.descripcion}" itemValue="#{status}" />
 						</p:selectOneMenu>
 					</div>
-					<div class="p-field">
-						<p:outputLabel for="@next">Default:</p:outputLabel>
-						<p:selectBooleanCheckbox value="#{serieFacturaBean.nuevo.isDflt}" />
-					</div>
 				</p:outputPanel>
 
 				<f:facet name="footer">
@@ -120,40 +116,38 @@
 				</f:facet>
 			</p:dialog>
 
-			<p:dialog header="Modificar Serie Factura" widgetVar="dg-modifica"
-				modal="true" showEffect="fade" responsive="true">
+			<p:dialog header="Modificar Serie Factura" widgetVar="dg-modifica" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-modifica" class="ui-fluid">
 					<div class="p-field">
-						<p:outputLabel for="@next">Serie:</p:outputLabel>
+						<p:outputLabel for="@next" value="Serie" />
 						<p:inputText value="#{serieFacturaBean.seleccion.nomSerie}"
 							required="true" placeholder="maximo 5 caracteres"/>
 					</div>
 					<div class="p-field">
-						<p:outputLabel value="(SUCURSAL) PLANTA:" />
-						<p:selectOneMenu value="#{serieFacturaBean.seleccion.idPlanta}" converter="entityConverter" required="true">
-							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
-							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						<p:outputLabel value="Emisor" for="@next"/>
+						<p:selectOneMenu value="#{serieFacturaBean.seleccion.emisor}" converter="entityConverter" required="true">
+							<f:selectItem itemLabel="---Seleccione---" itemValue="" noSelectionOption="true"/>
+							<f:selectItems value="#{serieFacturaBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
 						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
-						<p:outputLabel value="Fecha Inicio:" />
+						<p:outputLabel value="Fecha Inicio" for="@next"/>
 						<p:datePicker value="#{serieFacturaBean.seleccion.fechaInicio}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true">
 							<p:ajax process="@this" />
 							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 					<div class="p-field">
-						<p:outputLabel for="@next">No. Inicial:</p:outputLabel>
-						<p:inputNumber value="#{serieFacturaBean.seleccion.numeroInicial}"
-							required="true" decimalPlaces="0" />
+						<p:outputLabel for="@next" value="No. Inicial" />
+						<p:inputNumber value="#{serieFacturaBean.seleccion.numeroInicial}" required="true" decimalPlaces="0" />
 					</div>
 					<div class="p-field">
-						<p:outputLabel for="@next">No. Actual:</p:outputLabel>
+						<p:outputLabel for="@next" value="Número actual"/>
 						<p:inputNumber value="#{serieFacturaBean.seleccion.numeroActual}"
 							required="true" decimalPlaces="0" />
 					</div>
 					<div class="p-field">
-						<p:outputLabel for="@next">No. Final:</p:outputLabel>
+						<p:outputLabel for="@next" value="Número final"/>
 						<p:inputNumber value="#{serieFacturaBean.seleccion.numeroFinal}"
 							required="true" decimalPlaces="0" />
 					</div>
@@ -165,11 +159,6 @@
 							<f:selectItems value="#{serieFacturaBean.status}" var="status"
 								itemLabel="#{status.descripcion}" itemValue="#{status}" />
 						</p:selectOneMenu>
-					</div>
-					<div class="p-field">
-						<p:outputLabel for="@next">Default:</p:outputLabel>
-						<p:selectBooleanCheckbox
-							value="#{serieFacturaBean.seleccion.isDflt}" />
 					</div>
 				</p:outputPanel>
 
