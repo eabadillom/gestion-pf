@@ -8,6 +8,7 @@ import javax.persistence.Query;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.SerieFactura;
 import mx.com.ferbo.model.StatusSerie;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -128,6 +129,51 @@ public class SerieFacturaDAO {
 			EntityManagerUtil.close(entity);
 		}
 		return null;
-	};
+	}
+
+	public List<SerieFactura> buscarPorEmisor(EmisoresCFDIS idEmisoresCFDIS) {
+		List<SerieFactura> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			modelList = em.createNamedQuery("SerieFactura.findByEmisor", SerieFactura.class)
+					.setParameter("idEmisor", idEmisoresCFDIS.getCd_emisor())
+					.getResultList()
+					;
+			
+		} catch(Exception ex) {
+			log.warn("Problema para obtener el listado de series de facturas...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return modelList;
+	}
+	
+	public List<SerieFactura> buscarPorEmisor(EmisoresCFDIS idEmisoresCFDIS, boolean isFullInfo) {
+		List<SerieFactura> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			modelList = em.createNamedQuery("SerieFactura.findByEmisor", SerieFactura.class)
+					.setParameter("idEmisor", idEmisoresCFDIS.getCd_emisor())
+					.getResultList()
+					;
+			
+			if(isFullInfo == false)
+				return modelList;
+			
+			//TODO pendiente la logica para obtener datos dependientes...
+			
+		} catch(Exception ex) {
+			log.warn("Problema para obtener el listado de series de facturas...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return modelList;
+	}
 
 }

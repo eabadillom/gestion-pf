@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Estados;
+import mx.com.ferbo.model.EstadosPK;
 import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -52,6 +53,23 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 		
 		
 		return estado;
+	}
+	
+	public Estados buscarPorId(Integer idPais, Integer idEstado) {
+		Estados model = null;
+		EntityManager em = null;
+		
+		try {
+			em = getEntityManager();
+			model = em.find(Estados.class, new EstadosPK(idPais, idEstado));
+			
+		} catch(Exception ex) {
+			log.warn("Problema para obtener la información del Estado...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return model;
 	}
 	
 
@@ -168,5 +186,6 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 		
 		return list;
 	}
+	
 
 }

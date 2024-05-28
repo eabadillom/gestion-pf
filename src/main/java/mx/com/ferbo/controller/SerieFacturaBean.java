@@ -30,7 +30,7 @@ public class SerieFacturaBean implements Serializable {
 	private static final long serialVersionUID = 1;
 	private static final Logger log = LogManager.getLogger(SerieFacturaBean.class);
 
-	private List<SerieFactura> listSerie;
+	private List<SerieFactura> series;
 	private List<StatusSerie> status;
 	private List<EmisoresCFDIS> emisores;
 	
@@ -38,23 +38,16 @@ public class SerieFacturaBean implements Serializable {
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
 
-	public List<EmisoresCFDIS> getEmisores() {
-		return emisores;
-	}
-
-	public void setEmisores(List<EmisoresCFDIS> emisores) {
-		this.emisores = emisores;
-	}
-
 	private SerieFactura nuevo;
 	private SerieFactura seleccion;
+	private EmisoresCFDIS emisor;
 
 	private SerieFacturaDAO daoSerie;
 	private EmisoresCFDISDAO emisorDAO;
 
 	public SerieFacturaBean() {
 		daoSerie = new SerieFacturaDAO();
-		listSerie = daoSerie.findAll();
+		series = daoSerie.findAll();
 		status = daoSerie.findStatus();
 		seleccion = new SerieFactura();
 		emisorDAO = new EmisoresCFDISDAO();
@@ -66,12 +59,21 @@ public class SerieFacturaBean implements Serializable {
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
-		emisores = emisorDAO.findall();
+		emisores = emisorDAO.buscarTodos(true);
 		log.info("El usuario {} entra a Facturación / Catálogos / Series / Series de Facturas...", this.usuario.getUsuario());
 	}
 
 	public void openNew() {
 		nuevo = new SerieFactura();
+		nuevo.setEmisor(this.emisor);
+	}
+	
+	public void filtraSeries () {
+		log.info("Emisor seleccionado: {}", this.emisor);
+		if(this.emisor == null)
+			this.series = daoSerie.findAll();
+		else
+			this.series = daoSerie.buscarPorEmisor(emisor, true);
 	}
 
 	public void save() {
@@ -90,8 +92,8 @@ public class SerieFacturaBean implements Serializable {
 			
 			log.info("El usuario {} guarda la serie factura {}", this.usuario.getUsuario(), this.nuevo);
 			
-			listSerie.clear();
-			listSerie = daoSerie.findAll();
+			series.clear();
+			series = daoSerie.findAll();
 			nuevo = new SerieFactura();
 			
 			PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
@@ -130,8 +132,8 @@ public class SerieFacturaBean implements Serializable {
 			
 			log.info("El usuario {} actualiza la serie factura {}", this.usuario.getUsuario(), this.seleccion);
 			
-			listSerie.clear();
-			listSerie = daoSerie.findAll();
+			series.clear();
+			series = daoSerie.findAll();
 			this.seleccion = new SerieFactura();
 			
 			PrimeFaces.current().executeScript("PF('dg-modifica').hide()");
@@ -151,29 +153,7 @@ public class SerieFacturaBean implements Serializable {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
-		} 
-		
-		
-		
-		
-		
-		
-		
-//		PrimeFaces.current().executeScript("PF('dg-modifica').hide()");
-//		String message = daoSerie.update(seleccion);
-//
-//		if (message == null) {
-//			listSerie.clear();
-//			listSerie = daoSerie.findAll();
-//			FacesContext.getCurrentInstance().addMessage(null,
-//					new FacesMessage(FacesMessage.SEVERITY_INFO, "Serie Modificada " + seleccion.getNomSerie(), null));
-//			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
-//		} else {
-//			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//					"Error al modificar " + seleccion.getNomSerie(), message));
-//			PrimeFaces.current().ajax().update("form:messages");
-//		}
-//		this.seleccion = new SerieFactura();
+		}
 	}
 	
 	public void cancelar() {
@@ -181,8 +161,8 @@ public class SerieFacturaBean implements Serializable {
 		String message = daoSerie.cancelar(seleccion.getId());
 		
 		if (message == null) {
-			listSerie.clear();
-			listSerie = daoSerie.findAll();
+			series.clear();
+			series = daoSerie.findAll();
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Serie Cancelada " + seleccion.getNomSerie(), null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
@@ -194,12 +174,12 @@ public class SerieFacturaBean implements Serializable {
 		this.seleccion = new SerieFactura();
 	}
 
-	public List<SerieFactura> getListSerie() {
-		return listSerie;
+	public List<SerieFactura> getSeries() {
+		return series;
 	}
 
-	public void setListSerie(List<SerieFactura> listSerie) {
-		this.listSerie = listSerie;
+	public void setSeries(List<SerieFactura> series) {
+		this.series = series;
 	}
 
 	public SerieFactura getNuevo() {
@@ -220,5 +200,21 @@ public class SerieFacturaBean implements Serializable {
 
 	public void setSeleccion(SerieFactura seleccion) {
 		this.seleccion = seleccion;
+	}
+	
+	public List<EmisoresCFDIS> getEmisores() {
+		return emisores;
+	}
+
+	public void setEmisores(List<EmisoresCFDIS> emisores) {
+		this.emisores = emisores;
+	}
+
+	public EmisoresCFDIS getEmisor() {
+		return emisor;
+	}
+
+	public void setEmisor(EmisoresCFDIS emisor) {
+		this.emisor = emisor;
 	}
 }

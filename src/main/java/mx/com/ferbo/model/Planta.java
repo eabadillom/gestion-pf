@@ -60,7 +60,7 @@ public class Planta implements Serializable {
 	private String plantaCod;
 	
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	private Usuario idUsuario;
 	
 	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
@@ -110,7 +110,7 @@ public class Planta implements Serializable {
 	private String numinterior;
 	
 	@JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH, optional = false)
+	@ManyToOne(optional = false)
 	private EmisoresCFDIS idEmisoresCFDIS;
 	
 	@JoinColumn(name = "id_sf", referencedColumnName = "id")
@@ -347,6 +347,14 @@ public class Planta implements Serializable {
 		
 		serieConstancia.getSerieConstanciaPK().setPlanta(this);
 		this.serieConstanciaList.add(serieConstancia);
+	}
+
+	public SerieFactura getSerieFacturaDefault() {
+		return serieFacturaDefault;
+	}
+
+	public void setSerieFacturaDefault(SerieFactura serieFacturaDefault) {
+		this.serieFacturaDefault = serieFacturaDefault;
 	}
 
 }

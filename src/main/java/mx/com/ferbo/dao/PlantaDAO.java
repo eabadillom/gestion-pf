@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.EmisoresCFDIS;
+import mx.com.ferbo.model.Certificado;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.Usuario;
@@ -85,27 +85,6 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 		}
 		return usuarios;		
 		
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<EmisoresCFDIS> getEmisor() { //MODIFICADO	
-		
-		EntityManager entity = null;
-		List<EmisoresCFDIS> emisor = null;
-		
-		try {
-			
-			entity = getEntityManager();
-			Query sql = entity.createQuery("SELECT e FROM EmisoresCFDIS e ");
-			emisor = sql.getResultList();
-			
-		} catch (Exception e) {
-			log.error("Problema al obtener a los emisores",e);
-		}finally {
-			EntityManagerUtil.close(entity);
-		}
-		
-		return emisor;
 	}
 	
 	public List<Planta> buscarTodosSerieConstancia() {
@@ -225,6 +204,34 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 		}
 		return planta;
 	}
+	
+	public Planta buscarPorId(Integer id, boolean isFullInfo) {
+		Planta planta = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			planta = em.find(Planta.class, id);
+			
+			if(isFullInfo == false)
+				return planta;
+			
+			log.info("Usuario: {}", planta.getIdUsuario().getidUsuario());
+			log.info("Emisor: {}", planta.getIdEmisoresCFDIS().getCd_emisor());
+			for(Certificado c : planta.getIdEmisoresCFDIS().getListaCertificado()) {
+				log.info("Certificado: {}", c.getCdCertificado());
+			}
+			log.info("Serie Factura: {}", (planta.getSerieFacturaDefault() == null ? null : planta.getSerieFacturaDefault().getId()));
+			
+		} catch(Exception ex) {
+			log.warn("Problema para obtener la información de la planta...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return planta;
+	}
+	
 
 	@Override
 	public List<Planta> buscarTodos() {

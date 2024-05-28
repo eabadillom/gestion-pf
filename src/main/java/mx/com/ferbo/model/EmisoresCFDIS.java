@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -79,8 +78,7 @@ private static final long serialVersionUID = 1L;
 		@Size(min = 1, max = 50)
 		private String uuid = null;
 		
-		//mappedBy = "<atributo>": el "atributo" debe coincidir con el nombre "java" del atributo al que se está mapeando.
-		@OneToMany(cascade = CascadeType.ALL, mappedBy = "emisor")
+		@OneToMany(mappedBy = "emisor")
 		private List<Certificado> listaCertificado;
 		
 		public EmisoresCFDIS() {

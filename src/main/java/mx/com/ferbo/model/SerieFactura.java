@@ -36,7 +36,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "SerieFactura.findByNumeroInicial", query = "SELECT s FROM SerieFactura s WHERE s.numeroInicial = :numeroInicial"),
     @NamedQuery(name = "SerieFactura.findByNumeroActual", query = "SELECT s FROM SerieFactura s WHERE s.numeroActual = :numeroActual"),
     @NamedQuery(name = "SerieFactura.findByNumeroFinal", query = "SELECT s FROM SerieFactura s WHERE s.numeroFinal = :numeroFinal"),
-    @NamedQuery(name = "SerieFactura.findByNomSerie", query = "SELECT s FROM SerieFactura s WHERE s.nomSerie = :nomSerie")
+    @NamedQuery(name = "SerieFactura.findByNomSerie", query = "SELECT s FROM SerieFactura s WHERE s.nomSerie = :nomSerie"),
+    @NamedQuery(name = "SerieFactura.findByEmisor", query = "SELECT s FROM SerieFactura s WHERE s.statusSerie.id in (1,2) AND s.emisor.cd_emisor = :idEmisor")
 })
 public class SerieFactura implements Serializable {
 
