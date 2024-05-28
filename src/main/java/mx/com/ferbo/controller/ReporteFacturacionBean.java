@@ -88,7 +88,7 @@ public class ReporteFacturacionBean implements Serializable {
 		System.out.println("Exportando a pdf.....");
 			String jasperPath = "/jasper/ReporteFacturacion.jrxml";
 			String filename = "ReporteFacturacionporFecha"+fecha+".pdf";
-			String images = "/images/logo.jpeg";
+			String images = "/images/logoF.png";
 			String message = null;
 			Severity severity = null;
 			File reportFile = new File(jasperPath);
