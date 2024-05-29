@@ -47,8 +47,6 @@ public class SerieFacturaBean implements Serializable {
 
 	public SerieFacturaBean() {
 		daoSerie = new SerieFacturaDAO();
-		series = daoSerie.findAll();
-		status = daoSerie.findStatus();
 		seleccion = new SerieFactura();
 		emisorDAO = new EmisoresCFDISDAO();
 	}
@@ -59,6 +57,8 @@ public class SerieFacturaBean implements Serializable {
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
+		series = daoSerie.findAll(true);
+		status = daoSerie.findStatus();
 		emisores = emisorDAO.buscarTodos(true);
 		log.info("El usuario {} entra a Facturación / Catálogos / Series / Series de Facturas...", this.usuario.getUsuario());
 	}

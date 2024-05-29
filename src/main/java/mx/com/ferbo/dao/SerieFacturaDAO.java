@@ -29,7 +29,32 @@ public class SerieFacturaDAO {
 			EntityManagerUtil.close(entity);
 		}
 		return list;
-	};
+	}
+	
+	public List<SerieFactura> findAll(boolean isFullInfo) {
+		EntityManager entity = null;
+		List<SerieFactura> modelList = null;
+		
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			modelList = entity.createNamedQuery("SerieFactura.findAll", SerieFactura.class)
+					.getResultList()
+					;
+			
+			if(isFullInfo == false)
+				return modelList;
+			
+			for(SerieFactura model : modelList) {
+				log.debug("Emisor: {}", model.getEmisor().getCd_emisor());
+			}
+			
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(entity);
+		}
+		return modelList;
+	}
 	
 	public SerieFactura findById(Integer idSerie) {
 		
