@@ -65,7 +65,8 @@
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Numero"/>
-							<p:inputNumber value="#{facturaServiciosBean.clienteSelect.numeroCte}" decimalPlaces="0" readonly="true" /> 
+							<p:inputNumber value="#{facturaServiciosBean.clienteSelect.numeroCte}" decimalPlaces="0" readonly="true" decimalSeparator=".
+							" /> 
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="RFC"/>
@@ -117,7 +118,7 @@
 							</div>
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="IVA" />
-								<p:inputNumber value="#{facturaServiciosBean.iva.valor * 100}" decimalSeparator="2" readonly="true" symbol="%" symbolPosition="s" required="true" emptyValue="empty"/>
+								<p:inputNumber value="#{facturaServiciosBean.iva.valor * 100}" decimalSeparator="." readonly="true" symbol="%" symbolPosition="s" required="true" emptyValue="empty" decimalPlaces="2"/>
 							</div>
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="Plazo de Pago" />
@@ -162,13 +163,13 @@
 								<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info" action="#{facturaServiciosBean.agregarServicio}" update="dt-servicios subtotal iva total"/>
 							</div>
 							<div class="p-col-12 p-md-2">
-								<p:commandButton value="Otro servicio" icon="pi pi-plus" styleClass="ui-button-info" action="#{facturaServiciosBean.crearOtroServicio}" process="@this" update="dt-servicios subtotal iva total" onclick="PF('dgOtroServicio').show();"/>
+								<p:commandButton value="Otro servicio" icon="pi pi-plus" styleClass="ui-button-info" action="#{facturaServiciosBean.crearOtroServicio}" process="@this" update="dt-servicios subtotal iva total otro-servicio" onclick="PF('dgOtroServicio').show();"/>
 							</div>
 						</div>
 					</p:outputPanel>
 					
-					<p:dialog id="dg-otro-servicio" widgetVar="dgOtroServicio" header="Otro concepto">
-						<p:outputPanel class="ui-fluid">
+					<p:dialog id="dg-otro-servicio" widgetVar="dgOtroServicio" header="Otro concepto" modal="true">
+						<p:outputPanel id="otro-servicio" class="ui-fluid">
 							<div class="p-field">
 								<p:outputLabel value="Concepto"/>
 								<p:inputText value="#{facturaServiciosBean.otroServicio.descripcion}"></p:inputText>
@@ -213,13 +214,13 @@
 							</div>
 							<div class="p-field">
 								<p:outputLabel value="Precio Unitario"/>
-								<p:inputNumber value="#{facturaServiciosBean.otroServicio.tarifa}">
+								<p:inputNumber value="#{facturaServiciosBean.otroServicio.tarifa}" decimalSeparator=".">
 									<p:ajax process="@this" listener="#{facturaServiciosBean.subtotalOtroServicio}" update="subtotalOtroServicio"/>
 								</p:inputNumber>
 							</div>
 							<div class="p-field">
 								<p:outputLabel value="Subtotal" />
-								<p:inputNumber id="subtotalOtroServicio" value="#{facturaServiciosBean.otroServicio.costo}" readonly="true" symbol="$"/>
+								<p:inputNumber id="subtotalOtroServicio" value="#{facturaServiciosBean.otroServicio.costo}" readonly="true" symbol="$" decimalSeparator="."/>
 							</div>
 						</p:outputPanel>
 						<f:facet name="footer">

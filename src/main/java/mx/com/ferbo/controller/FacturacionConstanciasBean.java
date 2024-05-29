@@ -139,7 +139,6 @@ public class FacturacionConstanciasBean implements Serializable{
 	private List<Cliente> listaCliente;
 	private List<ClienteDomicilios> listaClienteDomicilio;
 	private List<Planta> listaPlanta;
-//	private List<SerieFactura> listaSerieF;//recupera todos los registros de serie factura
 	private List<SerieFactura> listaSerieFactura;
 	private List<Aviso> listaAviso;
 	private List<MetodoPago> listaMetodoPago;
@@ -218,7 +217,11 @@ public class FacturacionConstanciasBean implements Serializable{
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init(){
-		log.info("Entrando al init");
+		faceContext = FacesContext.getCurrentInstance();
+		request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		usuario = (Usuario) request.getSession(false).getAttribute("usuario");
+		
+		log.info("El usuario {} ingresa a la facturación de constancias", this.usuario.getUsuario());
 		
 		subTotalServicios = new BigDecimal(0);
 		subTotalEntrada = new BigDecimal(0);
@@ -227,8 +230,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		ivaTotal = new BigDecimal(0);
 		total = new BigDecimal(0);
 		
-		faceContext = FacesContext.getCurrentInstance();
-        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         
 		listaCliente = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		log.debug("Lista de clientes cargada.");
@@ -340,6 +341,10 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.listaSerieFactura = this.serieFacturaDAO.buscarPorEmisor(this.emisor, true);
 		this.serieFacturaSelect = this.plantaSelect.getSerieFacturaDefault();
 		
+		log.info("Planta seleccionada: {}", this.plantaSelect);
+		log.info("Emisor seleccionado: {}", this.emisor);
+		log.info("Serie factura seleccionada: {}", this.serieFacturaSelect);
+		
 		//Carga de constancias si existe cambio en planta 
 		cargarConstancias();
 	}
@@ -353,11 +358,14 @@ public class FacturacionConstanciasBean implements Serializable{
 		try {
 			if(this.emisor == null)
 				throw new InventarioException("Debe seleccionar un emisor");
-			log.info("Emisor: {}, Serie: {}", this.emisor.getNb_emisor(), this.listaSerieFactura);
 			this.listaSerieFactura = serieFacturaDAO.buscarPorEmisor(this.emisor, true);
 			
+			log.info("Planta seleccionada: {}", this.plantaSelect);
+			log.info("Emisor seleccionado: {}", this.emisor);
+			log.info("Serie factura seleccionada: {}", this.serieFacturaSelect);
+			
 			mensaje = "Debe seleccionar una serie";
-			severity = FacesMessage.SEVERITY_INFO;
+			severity = FacesMessage.SEVERITY_WARN;
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -377,15 +385,16 @@ public class FacturacionConstanciasBean implements Serializable{
 	}
 
 	public void recargaDatos() {
-		System.out.println(".....................");
+		log.info("Recargando datos...");
 	}
-	public void cargarConstancias(){
+	
+	public void cargarConstancias() {
 		
-		if(clienteSelect == null){
+		if(clienteSelect == null) {
 			return;
 		}
 		
-		if(plantaSelect == null){
+		if(plantaSelect == null) {
 			return;
 		}
 		
@@ -1131,13 +1140,20 @@ public class FacturacionConstanciasBean implements Serializable{
 			if(BigDecimal.ZERO.compareTo(subTotalGeneral) == 0)
 				throw new InventarioException("Debe registrar un importe mayor a cero.");
 			
+			log.info("Emisor: {}", this.emisor);
+			log.info("Serie-número: {}-{}", this.serieFacturaSelect.getNomSerie(), (this.serieFacturaSelect.getNumeroActual() + 1));
+			
 			serieTmp = serieFacturaDAO.findById(serieFacturaSelect.getId());
 			buscaFacturasList = facturaDAO.buscarActivasPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
 			
 			if(buscaFacturasList.size() > 0)
 				throw new InventarioException("La factura ya se encuentra registrada.");
 			
+			factura.setEmisorNombre(this.emisor.getNb_emisor());
+			factura.setEmisorRFC(this.emisor.getNb_rfc());
+			factura.setEmisorCdRegimen(this.emisor.getCd_regimen().getCd_regimen());
 			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
+			factura.setNomSerie(this.serieFacturaSelect.getNomSerie());
 			resultado = facturaDAO.guardar(factura);
 			
 			if(resultado != null && "".equalsIgnoreCase(resultado.trim()))

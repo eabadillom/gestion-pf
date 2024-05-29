@@ -455,6 +455,10 @@ public class FacturaServiciosBean implements Serializable {
 		this.otroServicio = new ServicioFactura();
 		this.otroServicio.setUdCobro("Servicio");
 		this.otroServicio.setTipoCobro(this.tipoCobroPrecioFijo);
+		this.concepto = new Concepto();
+		this.claveUnidad = new ClaveUnidad();
+		log.info("Creando un nuevo servicio fuera de catálogo...");
+		PrimeFaces.current().ajax().update("dg-otro-servicio");
 	}
 	
 	public List<Concepto> buscaConcepto(String query) {
