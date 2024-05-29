@@ -209,7 +209,7 @@ public class AsentamientoHumanoBean implements Serializable {
 			this.municipioPkSelect.setPaisCve(idPais);
 			this.municipioPkSelect.setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);
-			listaMunicipios = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
+			listaMunicipios = municipiosDao.buscarPorPaisEstado(municipioSelect);
 		}
 	}
 	

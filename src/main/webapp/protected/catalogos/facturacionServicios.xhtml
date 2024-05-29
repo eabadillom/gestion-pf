@@ -3,13 +3,6 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
-	<script>
-	    //<![CDATA[
-	        PF('statusCfdiDialog').show();
-	
-	        PF('statusCfdiDialog').hide();
-	    //]]>   
-	</script>
 	<ui:define name="title">Facturacion Servicios</ui:define> 
 	<ui:define name="content">
 		<h:form id="form">
@@ -36,11 +29,15 @@
 					</div>
 					<div class="p-col-6 p-md-6">
 						<p:outputLabel value="Razon Social"/>
-						<p:inputText value="#{facturaServiciosBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" readonly="true"/> 
+						<p:selectOneMenu id="selEmisor" value="#{facturaServiciosBean.emisor}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
+							<f:selectItem itemLabel="---SELECCIONE UN EMISOR---" noSelectionOption="true" />
+							<f:selectItems value="#{facturaServiciosBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"></f:selectItems>
+							<p:ajax update="txtRFC serieFactura" process="@this" listener="#{facturaServiciosBean.filtraSeries}" />
+						</p:selectOneMenu>
 					</div>
 					<div class="p-col-3 p-md-3">
 						<p:outputLabel value="RFC"/>
-						<p:inputText value="#{facturaServiciosBean.plantaSelect.idEmisoresCFDIS.nb_rfc}" readonly="true" /> 
+						<p:inputText id="txtRFC" value="#{facturaServiciosBean.emisor.nb_rfc}" readonly="true" /> 
 					</div>
 					<div class="p-col-3 p-md-3">
 						<p:outputLabel value="Serie-número (Factura)"/>
@@ -68,7 +65,8 @@
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Numero"/>
-							<p:inputNumber value="#{facturaServiciosBean.clienteSelect.numeroCte}" decimalPlaces="0" readonly="true" /> 
+							<p:inputNumber value="#{facturaServiciosBean.clienteSelect.numeroCte}" decimalPlaces="0" readonly="true" decimalSeparator=".
+							" /> 
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="RFC"/>
@@ -120,7 +118,7 @@
 							</div>
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="IVA" />
-								<p:inputNumber value="#{facturaServiciosBean.iva.valor * 100}" decimalSeparator="2" readonly="true" symbol="%" symbolPosition="s" required="true" emptyValue="empty"/>
+								<p:inputNumber value="#{facturaServiciosBean.iva.valor * 100}" decimalSeparator="." readonly="true" symbol="%" symbolPosition="s" required="true" emptyValue="empty" decimalPlaces="2"/>
 							</div>
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="Plazo de Pago" />
@@ -129,17 +127,12 @@
 									<f:selectItems value="#{facturaServiciosBean.listaAviso}" var="aviso" itemLabel="#{aviso.avisoPlazo}" itemValue="#{aviso.avisoPlazo}" />
 								</p:selectOneMenu>
 							</div>
-							<!-- <div class="p-col-3 p-md-3">
-								<p:selectBooleanCheckbox itemLabel="Retención" disabled="true" />
-								<p:inputNumber value="#{facturaServiciosBean.retencion.valor}" decimalSeparator="2" readonly="true" symbol="%" symbolPosition="s" required="true" emptyValue="empty"/>
-							</div> -->
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="InicioPeriodo" />
 								<p:datePicker id="fechaInicio" showIcon="true" value="#{facturaServiciosBean.factura.inicioServicios}" pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6">
 									<p:ajax process="@this"></p:ajax>
 								</p:datePicker>
 							</div>
-							
 							<div class="p-col-3 p-md-3">
 								<p:outputLabel value="Fin periodo" />
 								<p:datePicker id="fechaFin" showIcon="true" value="#{facturaServiciosBean.factura.finServicios}" pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6">
@@ -156,17 +149,85 @@
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Servicios a facturar">
 					<p:outputPanel id="servicioSelect">
-						<p:selectOneMenu id="selServicio" autoWidth="true" converter="entityConverter" value="#{facturaServiciosBean.precioServicio}" filterMatchMode="startsWith">
-							<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} ($#{selectedPrecioServicio.precio} por #{selectedPrecioServicio.unidad.unidadDeManejoDs} - Aviso #{selectedPrecioServicio.avisoCve.avisoCve})" itemValue="#{selectedPrecioServicio}" />
-						</p:selectOneMenu>
-						<p:column>
-							<p:inputNumber id="txtCantidadSrv" value="#{facturaServiciosBean.cantidadServicio}" placeholder="Cantidad" decimalPlaces="0"/>
-						</p:column>
-						<p:column>
-							<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info" action="#{facturaServiciosBean.agregarServicio}" update="dt-servicios subtotal iva total"/>
-						</p:column>
+						<div class="p-grid ui-fluid p-col-12">
+							<div class="p-col-12 p-md-6">
+								<p:selectOneMenu id="selServicio" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.precioServicio}" filterMatchMode="startsWith">
+									<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
+									<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} ($#{selectedPrecioServicio.precio} por #{selectedPrecioServicio.unidad.unidadDeManejoDs} - Aviso #{selectedPrecioServicio.avisoCve.avisoCve})" itemValue="#{selectedPrecioServicio}" />
+								</p:selectOneMenu>
+							</div>
+							<div class="p-col-12 p-md-2">
+								<p:inputNumber id="txtCantidadSrv" value="#{facturaServiciosBean.cantidadServicio}" placeholder="Cantidad" decimalPlaces="0"/>
+							</div>
+							<div class="p-col-12 p-md-2">
+								<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info" action="#{facturaServiciosBean.agregarServicio}" update="dt-servicios subtotal iva total"/>
+							</div>
+							<div class="p-col-12 p-md-2">
+								<p:commandButton value="Otro servicio" icon="pi pi-plus" styleClass="ui-button-info" action="#{facturaServiciosBean.crearOtroServicio}" process="@this" update="dt-servicios subtotal iva total otro-servicio" onclick="PF('dgOtroServicio').show();"/>
+							</div>
+						</div>
 					</p:outputPanel>
+					
+					<p:dialog id="dg-otro-servicio" widgetVar="dgOtroServicio" header="Otro concepto" modal="true">
+						<p:outputPanel id="otro-servicio" class="ui-fluid">
+							<div class="p-field">
+								<p:outputLabel value="Concepto"/>
+								<p:inputText value="#{facturaServiciosBean.otroServicio.descripcion}"></p:inputText>
+							</div>
+							<div class="p-field">
+								<p:outputLabel value="Codigo (SAT)"/>
+								<p:autoComplete value="#{facturaServiciosBean.concepto}" minQueryLength="5" completeMethod="#{facturaServiciosBean.buscaConcepto}" var="concepto" itemLabel="#{concepto.clave}" itemValue="#{concepto}" converter="entityConverter" forceSelection="true" scrollHeight="250">
+									<p:ajax process="@this" />
+									<p:column>
+										<p:outputLabel value="#{concepto.clave}"/>
+									</p:column>
+									<p:column>
+										<p:outputLabel value="#{concepto.nombre}" />
+									</p:column>
+								</p:autoComplete>
+							</div>
+							<div class="p-field">
+								<p:outputLabel value="Cantidad"/>
+								<p:inputNumber value="#{facturaServiciosBean.otroServicio.cantidad}">
+									<p:ajax process="@this" listener="#{facturaServiciosBean.subtotalOtroServicio}" update="subtotalOtroServicio"/>
+								</p:inputNumber>
+							</div>
+							<div class="p-field">
+								<p:outputLabel value="Unidad" />
+								<p:selectOneMenu value="#{facturaServiciosBean.otroServicio.unidad}" filter="true" filterMatchMode="contains">
+									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
+									<f:selectItems value="#{facturaServiciosBean.alUnidades}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad.unidadDeManejoDs}"/>
+									<p:ajax process="@this" />
+								</p:selectOneMenu>
+							</div>
+							<div class="p-field">
+								<p:outputLabel value="Unidad (SAT)"/>
+								<p:autoComplete value="#{facturaServiciosBean.claveUnidad}" minQueryLength="3" completeMethod="#{facturaServiciosBean.buscaUnidad}" var="unidad" itemLabel="#{unidad.cdUnidad}" itemValue="#{unidad}" converter="entityConverter" forceSelection="true" scrollHeight="250">
+									<p:ajax process="@this" />
+									<p:column>
+										<p:outputLabel value="#{unidad.cdUnidad}"/>
+									</p:column>
+									<p:column>
+										<p:outputLabel value="#{unidad.nbUnidad}"/>
+									</p:column>
+								</p:autoComplete>
+							</div>
+							<div class="p-field">
+								<p:outputLabel value="Precio Unitario"/>
+								<p:inputNumber value="#{facturaServiciosBean.otroServicio.tarifa}" decimalSeparator=".">
+									<p:ajax process="@this" listener="#{facturaServiciosBean.subtotalOtroServicio}" update="subtotalOtroServicio"/>
+								</p:inputNumber>
+							</div>
+							<div class="p-field">
+								<p:outputLabel value="Subtotal" />
+								<p:inputNumber id="subtotalOtroServicio" value="#{facturaServiciosBean.otroServicio.costo}" readonly="true" symbol="$" decimalSeparator="."/>
+							</div>
+						</p:outputPanel>
+						<f:facet name="footer">
+							<p:commandButton value="Guardar" actionListener="#{facturaServiciosBean.agregaOtroServicio}" update="dt-servicios subtotal iva total"/>
+							<p:commandButton value="Cancelar" onclick="PF('dgOtroServicio').hide();"/>
+						</f:facet>
+					</p:dialog>
 						   
 					<p:dataTable id="dt-servicios"	var="servicio" lazy="true" selection="#{facturaServiciosBean.selServicio}" value="#{facturaServiciosBean.alServiciosDetalle}" reflow="true">	
 						<p:column headerText="Servicio"><h:outputText value="#{servicio.descripcion}" /></p:column>
@@ -234,7 +295,7 @@
 				<p:toolbar>
 					<p:toolbarGroup>
 						<div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-							<p:commandButton icon="pi pi-save" process="@this" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary" ajax="false" actionListener="#{facturaServiciosBean.saveFactura}" update="form:serieFactura"/>
+							<p:commandButton icon="pi pi-save" process="@this" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary" actionListener="#{facturaServiciosBean.saveFactura}" update="form:serieFactura" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 						</div>
 						<div style="margin-top: 2rem;" align="center" class="col-2">
 					            <p:divider layout="vertical">
@@ -248,7 +309,7 @@
 					            </p:divider>
 					         </div>
 						<div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-							<p:commandButton icon="pi pi-qrcode" process="@this" title="Timbrar" value="Timbrar" styleClass="ui-button-raised ui-button-secondary" ajax="false" action="#{facturaServiciosBean.timbrado}" onclick="PF('statusCfdiDialog').show();" oncomplete="PF('statusCfdiDialog').hide();"/>
+							<p:commandButton icon="pi pi-qrcode" process="@this" title="Timbrar" value="Timbrar" styleClass="ui-button-raised ui-button-secondary" action="#{facturaServiciosBean.timbrado}" onclick="PF('statusCfdiDialog').show();" oncomplete="PF('statusCfdiDialog').hide();"/>
 						</div>
 						<div style="margin-top: 2rem;" align="center" class="col-2">
 					            <p:divider layout="vertical">

@@ -13,7 +13,7 @@
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
                     <div class="card">
-						 <p:fieldset legend="Rangos de fechas">
+						 <p:fieldset legend="Periodo">
 		         	     <span class="ui-float-label ui-input-icon-left">
 			                <p:datePicker id="ol-fechaIni" value="#{reporteFacturacionBean.fecha_ini}" maxdate="#{reporteFacturacionBean.maxDate}" requiredMessage="...." showIcon="true">
 			                	<p:ajax process="@this" />
@@ -30,7 +30,7 @@
 				                </span>
 							</p:fieldset>
             
-                        <p:fieldset legend="Datos del emisor y receptor">
+                        <p:fieldset legend="Cliente">
                        			 <span class="ui-float-label ui-input-icon-left">
 									<p:selectOneMenu id="Cliente" value="#{reporteFacturacionBean.clienteSelect}" converter="entityConverter" >
 									<f:selectItem itemLabel="Todos los clientes"  itemValue=""  />

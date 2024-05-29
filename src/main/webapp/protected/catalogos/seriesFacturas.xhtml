@@ -8,69 +8,73 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<div class="p-col-12">
-				<div class="card">
-					<p:growl id="messages" showDetail="true" />
-					<p:toolbar styleClass="p-mb-4">
-						<p:toolbarGroup>
-							<p:commandButton value="Agregar" icon="pi pi-plus"
-								styleClass="ui-button-info p-mr-2 p-mb-2"
-								actionListener="#{serieFacturaBean.openNew()}"
-								oncomplete="PF('dg-agrega').show();" update="frm-agrega"
-								process="@this" />
-						</p:toolbarGroup>
-					</p:toolbar>
-					<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista" value="#{serieFacturaBean.listSerie}" rowKey="#{lista.id}" reflow="true" selection="#{serieFacturaBean.seleccion}" rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom">
-						<f:facet name="header">
-							<div class="products-table-header">
-								<span style="font-weight: bold">Serie de Facturas</span>
-							</div>
-						</f:facet>
-						<p:column headerText="Serie" width="5rem" style="text-align:center">
-							<h:outputText value="#{lista.nomSerie}" />
-						</p:column>
-						<p:column headerText="Fecha Inicio" width="7rem" style="text-align:center">
-							<h:outputText value="#{lista.fechaInicio}">
-								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-							</h:outputText>
-						</p:column>
-						<p:column headerText="No. Inicial" width="5rem" style="text-align:center">
-							<h:outputText value="#{lista.numeroInicial}" />
-						</p:column>
-						<p:column headerText="No. Actual" width="5rem" style="text-align:center">
-							<h:outputText value="#{lista.numeroActual}" />
-						</p:column>
-						<p:column headerText="No. Final" width="5rem" style="text-align:center">
-							<h:outputText value="#{lista.numeroFinal}" />
-						</p:column>
-						<p:column headerText="Status" width="10rem" style="text-align:center">
-							<h:outputText value="#{lista.statusSerie.descripcion}" />
-						</p:column>
-						<p:column width="2rem" style="text-align: center;">
-							<p:commandButton icon="pi pi-pencil" styleClass="ui-button-info" update="form:frm-modifica" process="@this" oncomplete="PF('dg-modifica').show()">
-								<f:setPropertyActionListener value="#{lista}" target="#{serieFacturaBean.seleccion}" />
-							</p:commandButton>
-						</p:column>
-						<p:column width="2rem" style="text-align: center;">
-							<p:commandButton icon="pi pi-trash" styleClass="ui-button-danger" process="@this" oncomplete="PF('dg-delete').show()" disabled="#{lista.statusSerie.id == 3 ? true : false}">
-								<f:setPropertyActionListener value="#{lista}" target="#{serieFacturaBean.seleccion}" />
-							</p:commandButton>
-						</p:column>
-					</p:dataTable>
-				</div>
+			<p:growl id="messages" showDetail="true" />
+			<p:toolbar styleClass="p-mb-4">
+				<p:toolbarGroup>
+					<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{serieFacturaBean.openNew()}" oncomplete="PF('dg-agrega').show();" update="frm-agrega" process="@this" />
+				</p:toolbarGroup>
+				<p:toolbarGroup align="right">
+					<p:selectOneMenu value="#{serieFacturaBean.emisor}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
+						<f:selectItem itemLabel="---TODOS LOS EMISORES---" noSelectionOption="true"/>
+						<f:selectItems value="#{serieFacturaBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"/>
+						<p:ajax listener="#{serieFacturaBean.filtraSeries}" process="@this" update="dtSerieFac" />
+					</p:selectOneMenu>
+				</p:toolbarGroup>
+			</p:toolbar>
+			<div style="padding-top: 1rem;">
+				<p:dataTable id="dtSerieFac" widgetVar="dtSerieFac" var="lista" value="#{serieFacturaBean.series}" rowKey="#{lista.id}" reflow="true" selection="#{serieFacturaBean.seleccion}" rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom">
+					<f:facet name="header">
+						<div class="products-table-header">
+							<span style="font-weight: bold">Serie de Facturas</span>
+						</div>
+					</f:facet>
+					<p:column headerText="Serie" width="5rem" style="text-align:center">
+						<h:outputText value="#{lista.nomSerie}" />
+					</p:column>
+					<p:column headerText="Fecha Inicio" width="7rem" style="text-align:center">
+						<h:outputText value="#{lista.fechaInicio}">
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</h:outputText>
+					</p:column>
+					<p:column headerText="No. Inicial" width="5rem" style="text-align:center">
+						<h:outputText value="#{lista.numeroInicial}" />
+					</p:column>
+					<p:column headerText="No. Actual" width="5rem" style="text-align:center">
+						<h:outputText value="#{lista.numeroActual}" />
+					</p:column>
+					<p:column headerText="No. Final" width="5rem" style="text-align:center">
+						<h:outputText value="#{lista.numeroFinal}" />
+					</p:column>
+					<p:column headerText="Emisor">
+						<h:outputText value="#{lista.emisor.nb_emisor}" />
+					</p:column>
+					<p:column headerText="Status" width="10rem" style="text-align:center">
+						<h:outputText value="#{lista.statusSerie.descripcion}" />
+					</p:column>
+					<p:column width="2rem" style="text-align: center;">
+						<p:commandButton icon="pi pi-pencil" styleClass="ui-button-info" update="form:frm-modifica" process="@this" oncomplete="PF('dg-modifica').show()" disabled="#{lista.statusSerie.id == 3 ? true : false}">
+							<f:setPropertyActionListener value="#{lista}" target="#{serieFacturaBean.seleccion}" />
+						</p:commandButton>
+					</p:column>
+					<p:column width="2rem" style="text-align: center;">
+						<p:commandButton icon="pi pi-trash" styleClass="ui-button-danger" process="@this" oncomplete="PF('dg-delete').show()" disabled="#{lista.statusSerie.id == 3 ? true : false}">
+							<f:setPropertyActionListener value="#{lista}" target="#{serieFacturaBean.seleccion}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
 			</div>
 			<p:dialog header="Agregar Serie Factura" widgetVar="dg-agrega"
 				modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 					<div class="p-field">
-						<p:outputLabel for="@next">Serie:</p:outputLabel>
+						<p:outputLabel for="@next" value="Serie:"/>
 						<p:inputText value="#{serieFacturaBean.nuevo.nomSerie}" required="true" placeholder="maximo 5 caracteres"/>
 					</div>
 					<div class="p-field">
-						<p:outputLabel value="(SUCURSAL) PLANTA:" />
-						<p:selectOneMenu value="#{serieFacturaBean.nuevo.idPlanta}" converter="entityConverter" required="true"> 
-							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
-							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						<p:outputLabel value="EMISOR:" />
+						<p:selectOneMenu value="#{serieFacturaBean.nuevo.emisor}" converter="entityConverter" required="true"> 
+							<f:selectItem itemLabel="---Seleccione---" itemValue="" noSelectionOption="true"/>
+							<f:selectItems value="#{serieFacturaBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
 						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
@@ -104,10 +108,6 @@
 								itemLabel="#{status.descripcion}" itemValue="#{status}" />
 						</p:selectOneMenu>
 					</div>
-					<div class="p-field">
-						<p:outputLabel for="@next">Default:</p:outputLabel>
-						<p:selectBooleanCheckbox value="#{serieFacturaBean.nuevo.isDflt}" />
-					</div>
 				</p:outputPanel>
 
 				<f:facet name="footer">
@@ -120,40 +120,38 @@
 				</f:facet>
 			</p:dialog>
 
-			<p:dialog header="Modificar Serie Factura" widgetVar="dg-modifica"
-				modal="true" showEffect="fade" responsive="true">
+			<p:dialog header="Modificar Serie Factura" widgetVar="dg-modifica" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-modifica" class="ui-fluid">
 					<div class="p-field">
-						<p:outputLabel for="@next">Serie:</p:outputLabel>
+						<p:outputLabel for="@next" value="Serie" />
 						<p:inputText value="#{serieFacturaBean.seleccion.nomSerie}"
 							required="true" placeholder="maximo 5 caracteres"/>
 					</div>
 					<div class="p-field">
-						<p:outputLabel value="(SUCURSAL) PLANTA:" />
-						<p:selectOneMenu value="#{serieFacturaBean.seleccion.idPlanta}" converter="entityConverter" required="true">
-							<f:selectItem itemLabel="---Seleccione---" itemValue=""/>
-							<f:selectItems value="#{serieFacturaBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+						<p:outputLabel value="Emisor" for="@next"/>
+						<p:selectOneMenu value="#{serieFacturaBean.seleccion.emisor}" converter="entityConverter" required="true">
+							<f:selectItem itemLabel="---Seleccione---" itemValue="" noSelectionOption="true"/>
+							<f:selectItems value="#{serieFacturaBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
 						</p:selectOneMenu>
 					</div>
 					<div class="p-field">
-						<p:outputLabel value="Fecha Inicio:" />
+						<p:outputLabel value="Fecha Inicio" for="@next"/>
 						<p:datePicker value="#{serieFacturaBean.seleccion.fechaInicio}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true">
 							<p:ajax process="@this" />
 							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 					<div class="p-field">
-						<p:outputLabel for="@next">No. Inicial:</p:outputLabel>
-						<p:inputNumber value="#{serieFacturaBean.seleccion.numeroInicial}"
-							required="true" decimalPlaces="0" />
+						<p:outputLabel for="@next" value="No. Inicial" />
+						<p:inputNumber value="#{serieFacturaBean.seleccion.numeroInicial}" required="true" decimalPlaces="0" />
 					</div>
 					<div class="p-field">
-						<p:outputLabel for="@next">No. Actual:</p:outputLabel>
+						<p:outputLabel for="@next" value="Número actual"/>
 						<p:inputNumber value="#{serieFacturaBean.seleccion.numeroActual}"
 							required="true" decimalPlaces="0" />
 					</div>
 					<div class="p-field">
-						<p:outputLabel for="@next">No. Final:</p:outputLabel>
+						<p:outputLabel for="@next" value="Número final"/>
 						<p:inputNumber value="#{serieFacturaBean.seleccion.numeroFinal}"
 							required="true" decimalPlaces="0" />
 					</div>
@@ -165,11 +163,6 @@
 							<f:selectItems value="#{serieFacturaBean.status}" var="status"
 								itemLabel="#{status.descripcion}" itemValue="#{status}" />
 						</p:selectOneMenu>
-					</div>
-					<div class="p-field">
-						<p:outputLabel for="@next">Default:</p:outputLabel>
-						<p:selectBooleanCheckbox
-							value="#{serieFacturaBean.seleccion.isDflt}" />
 					</div>
 				</p:outputPanel>
 

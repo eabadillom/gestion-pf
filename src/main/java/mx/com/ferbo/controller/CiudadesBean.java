@@ -108,7 +108,7 @@ public class CiudadesBean implements Serializable {
 			this.municipioPkSelect.setPaisCve(idPais);
 			this.municipioPkSelect.setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);			
-			List<Municipios> listaMunicipiosTmp = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
+			List<Municipios> listaMunicipiosTmp = municipiosDao.buscarPorPaisEstado(municipioSelect);
 			List<Municipios> municipioTmp = listaMunicipiosTmp.stream().filter(m ->m.getMunicipiosPK().getMunicipioCve()==idMunicipio).collect(Collectors.toList());
 			Municipios municipio = municipioTmp.get(0);
 			ciudadSelect.setMunicipios(municipio);
@@ -160,7 +160,7 @@ public class CiudadesBean implements Serializable {
 			this.municipioPkSelect.setPaisCve(idPais);
 			this.municipioPkSelect.setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);
-			listaMunicipios = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
+			listaMunicipios = municipiosDao.buscarPorPaisEstado(municipioSelect);
 		}
 	}
 	

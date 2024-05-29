@@ -23,8 +23,8 @@ import javax.validation.constraints.Size;
 	@NamedQuery(name = "RegimenFiscal.findAll", query = "SELECT r FROM  RegimenFiscal r"),
 	@NamedQuery(name = "RegimenFiscal.findBycdRegimen", query = "SELECT r FROM RegimenFiscal r WHERE  r.cd_regimen = :cd_regimen"),
 	@NamedQuery(name = "RegimenFiscal.findBynb_regimen", query = "SELECT r FROM RegimenFiscal r WHERE  r.nb_regimen = :nbr_regimen" ),
-	@NamedQuery(name = "RegimenFiscal.findByst_per_fisica", query = "SELECT r FROM RegimenFiscal r WHERE r.personaFisica = true" ),
-	@NamedQuery(name = "RegimenFiscal.findByst_per_moral", query = "SELECT r FROM RegimenFiscal r WHERE r.personaMoral = true" ),
+	@NamedQuery(name = "RegimenFiscal.findByst_per_fisica", query = "SELECT r FROM RegimenFiscal r WHERE r.personaFisica = true ORDER BY r.nb_regimen" ),
+	@NamedQuery(name = "RegimenFiscal.findByst_per_moral", query = "SELECT r FROM RegimenFiscal r WHERE r.personaMoral = true ORDER BY r.nb_regimen" ),
 	@NamedQuery(name = "RegimenFiscal.findByfh_vigencia_ini", query = "SELECT r FROM RegimenFiscal r WHERE  r.vigenciaInicio = :fh_vigencia_ini" ),
 	@NamedQuery(name = "RegimenFiscal.findByfh_vigencia_fin", query = "SELECT r FROM RegimenFiscal r WHERE r.vigenciaFin = :fh_vigencia_fin")
 })

@@ -59,28 +59,28 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 				return factura;
 			}
 			
-			log.debug("Planta: {}", factura.getPlanta().getPlantaCve());
+			log.info("Planta: {}", factura.getPlanta().getPlantaCve());
 			
 			List<FacturaMedioPago> facturaMedioPagoList = factura.getFacturaMedioPagoList();
 			for(FacturaMedioPago medio : facturaMedioPagoList) {
-				log.debug("Medio de pago (Forma de pago SAT): {}", medio.getMpId().getMpId());
+				log.info("Medio de pago (Forma de pago SAT): {}", medio.getMpId().getMpId());
 			}
 			
 			List<ServicioFactura> servicioFacturaList = factura.getServicioFacturaList();
 			for(ServicioFactura s : servicioFacturaList) {
-				log.debug("Tipo cobro: {}", s.getTipoCobro().getId());
+				log.info("Tipo cobro: {}", s.getTipoCobro().getId());
 			}
 			
 			List<ConstanciaFacturaDs> constanciaFacturaDsList = factura.getConstanciaFacturaDsList();
 			for(ConstanciaFacturaDs cf : constanciaFacturaDsList) {
 				List<ProductoConstanciaDs> productoConstanciaDsList = cf.getProductoConstanciaDsList();
 				for(ProductoConstanciaDs pc : productoConstanciaDsList) {
-					log.debug("Producto constancia DS: {}", pc.getId());
+					log.info("Producto constancia DS: {}", pc.getId());
 				}
 				
 				List<ServicioConstanciaDs> servicioConstanciaDsList = cf.getServicioConstanciaDsList();
 				for(ServicioConstanciaDs sc : servicioConstanciaDsList) {
-					log.debug("Servicio constancia DS: {}", sc.getId());
+					log.info("Servicio constancia DS: {}", sc.getId());
 				}
 			}
 			
@@ -88,21 +88,21 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 			for(ConstanciaFactura cf : constanciaFacturaList) {
 				List<ProductoConstancia> productoConstanciaList = cf.getProductoConstanciaList();
 				for(ProductoConstancia pc : productoConstanciaList) {
-					log.debug("Producto constancia: {}", pc.getId());
+					log.info("Producto constancia: {}", pc.getId());
 				}
 				
 				List<ServicioConstancia> servicioConstanciaList = cf.getServicioConstanciaList();
 				for(ServicioConstancia sc : servicioConstanciaList) {
-					log.debug("Servicio constancia: {}", sc.getId());
+					log.info("Servicio constancia: {}", sc.getId());
 				}
 			}
 			
 			List<Pago> pagoList = factura.getPagoList();
 			for(Pago p : pagoList) {
-				log.debug("Pago: {}", p.getId());
-				log.debug("Tipo pago: {}", p.getTipo().getId());
-				log.debug("Factura: {}", p.getFactura().getId());
-				log.debug("Status factura: {}", p.getFactura().getStatus().getId());
+				log.info("Pago: {}", p.getId());
+				log.info("Tipo pago: {}", p.getTipo().getId());
+				log.info("Factura: {}", p.getFactura().getId());
+				log.info("Status factura: {}", p.getFactura().getStatus().getId());
 			}
 			
 			List<NotaPorFactura> notaPorFacturaList= factura.getNotaFacturaList();
@@ -340,6 +340,26 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		}
 		
 		return factura;
+	}
+	
+	public List<Factura> buscarActivasPorSerieNumero(String serie, String numero) {
+		List<Factura> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			modelList = em.createNamedQuery("Factura.findActivasBySerieNumero", Factura.class)
+					.setParameter("serie", serie)
+					.setParameter("numero", numero)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.warn("Problema para obtener el listado de facturas...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return modelList;
 	}
 	
 	

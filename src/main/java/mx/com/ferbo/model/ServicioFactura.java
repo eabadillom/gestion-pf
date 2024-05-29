@@ -77,8 +77,9 @@ public class ServicioFactura implements Serializable {
     private String udCobro;
     
     @Size(max = 20)
-    @Column(name = "codigo")
-    private String codigo;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "codigo", referencedColumnName = "cd_concepto")
+    private Concepto codigo;
     
     @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne(optional = false)
@@ -88,8 +89,9 @@ public class ServicioFactura implements Serializable {
     @ManyToOne
     private TipoCobro tipoCobro;
     
-    @Column(name = "cd_unidad")
-    private String cdUnidad;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "cd_unidad", referencedColumnName = "cd_unidad")
+    private ClaveUnidad cdUnidad;
 
     public ServicioFactura() {
     }
@@ -170,11 +172,11 @@ public class ServicioFactura implements Serializable {
         this.udCobro = udCobro;
     }
 
-    public String getCodigo() {
+    public Concepto getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(String codigo) {
+    public void setCodigo(Concepto codigo) {
         this.codigo = codigo;
     }
 
@@ -186,11 +188,11 @@ public class ServicioFactura implements Serializable {
         this.factura = factura;
     }
 
-    public String getCdUnidad() {
+    public ClaveUnidad getCdUnidad() {
 		return cdUnidad;
 	}
 
-	public void setCdUnidad(String cdUnidad) {
+	public void setCdUnidad(ClaveUnidad cdUnidad) {
 		this.cdUnidad = cdUnidad;
 	}
 

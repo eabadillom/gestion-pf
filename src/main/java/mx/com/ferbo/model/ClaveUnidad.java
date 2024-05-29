@@ -25,16 +25,18 @@ import javax.validation.constraints.Size;
 	@NamedQuery(name = "ClaveUnidad.findByNbNota", query = "SELECT c FROM ClaveUnidad c WHERE c.nbNota = :nbNota"),
 	@NamedQuery(name = "ClaveUnidad.findByFechaInicio",query = "SELECT c FROM ClaveUnidad c WHERE c.fechInicio = :fechInicio"),
 	@NamedQuery(name = "ClaveUnidad.findByFechaFinal", query = "SELECT c FROM ClaveUnidad c WHERE c.fechFinal = :fechFinal"),
-	@NamedQuery(name = "ClaveUnidad.findByNbSimbolo", query = "SELECT c FROM ClaveUnidad c WHERE c.nbSimbolo = :nbSimbolo")})
+	@NamedQuery(name = "ClaveUnidad.findByNbSimbolo", query = "SELECT c FROM ClaveUnidad c WHERE c.nbSimbolo = :nbSimbolo"),
+	@NamedQuery(name = "ClaveUnidad.likeClaveNombre", query = "SELECT c FROM ClaveUnidad c WHERE c.cdUnidad like :clave OR c.nbUnidad like :nombre")
+})
 
 public class ClaveUnidad implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
-	@Id//identifica el campo como id 
-	@Basic(optional = false)//indica que el campo no acepta valores NULL¿
+	@Id 
+	@Basic(optional = false)
 	@NotNull
 	@Size(max = 5)
-	@Column(name = "cd_unidad")//relaciona la columna de bd a la variable declarada debajo
+	@Column(name = "cd_unidad")
 	private String cdUnidad;
 	
 	@Basic(optional = false)
@@ -54,6 +56,7 @@ public class ClaveUnidad implements Serializable{
 	@Temporal(TemporalType.DATE)//Devuelve fecha y descarta la hora
 	@Column(name = "fh_vigencia_ini")
 	private Date fechInicio;
+	
 	@Temporal(TemporalType.DATE)
 	@Column(name = "fh_vigencia_fin")
 	private Date fechFinal;

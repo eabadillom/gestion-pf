@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Municipios;
+import mx.com.ferbo.model.MunicipiosPK;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
@@ -38,6 +39,23 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public Municipios buscarPorId(MunicipiosPK municipioPK) {
+		Municipios model = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			model = em.find(Municipios.class, municipioPK);
+			
+		} catch(Exception ex) {
+			log.warn("Problema para obtener la información del municipio...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return model;
+	}
 
 	@Override
 	public List<Municipios> buscarTodos() {
@@ -53,13 +71,37 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		}
 		return listado;
 	}
+	
+	public List<Municipios> buscarPorPaisEstado(Integer idPais, Integer idEstado) {
+		List<Municipios> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			modelList = em.createNamedQuery("Municipios.findByPaisCveEstadoCve", Municipios.class)
+					.setParameter("paisCve", idPais)
+					.setParameter("estadoCve", idEstado)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.warn("Problema para obtener la lista de municipios...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return modelList;
+	}
 
-	public List<Municipios> buscarPorCriteriosMunicipios(Municipios m) {
+	public List<Municipios> buscarPorPaisEstado(Municipios m) {
 		List<Municipios> listado = null;
 		EntityManager em = null;
 		try {
 		em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Municipios.findByPaisCveEstadoCve", Municipios.class).setParameter("estadoCve", m.getMunicipiosPK().getEstadoCve()).setParameter("paisCve", m.getMunicipiosPK().getPaisCve()).getResultList();
+		listado = em.createNamedQuery("Municipios.findByPaisCveEstadoCve", Municipios.class)
+				.setParameter("estadoCve", m.getMunicipiosPK().getEstadoCve())
+				.setParameter("paisCve", m.getMunicipiosPK().getPaisCve())
+				.getResultList()
+				;
 		
 		}catch(Exception e) {
 			log.error("Problemas para obtener informacion",e);
@@ -176,5 +218,4 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		}
 		return null;
 	}
-
 }
