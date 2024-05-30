@@ -107,11 +107,11 @@ public class FacturamaBL {
 		List<ServicioFactura> alServiciosDetalle = factura.getServicioFacturaList();
 		for (ServicioFactura sf : alServiciosDetalle) {
 			ItemFullBindingModel item = new ItemFullBindingModel();
-			item.setProductCode(sf.getCodigo());
+			item.setProductCode(sf.getCodigo().getClave());
 			String descripcion = String.format("%s - VIGENCIA %s AL %s", sf.getDescripcion(), DateUtil.getString(factura.getInicioServicios(), DateUtil.FORMATO_DD_MM_YYYY), DateUtil.getString(factura.getFinServicios(), DateUtil.FORMATO_DD_MM_YYYY));
 			item.setDescription(descripcion);
-			item.setUnitCode(sf.getCdUnidad());
-			ClaveUnidad claveUnidad = claveDAO.buscarPorId(sf.getCdUnidad());
+			item.setUnitCode(sf.getCdUnidad().getcdUnidad());
+			ClaveUnidad claveUnidad = claveDAO.buscarPorId(sf.getCdUnidad().getcdUnidad());
 			item.setUnit(claveUnidad.getNbUnidad());
 			// item.setUnit(claveUnidad.getNombre());
 			item.setQuantity(sf.getCantidad());

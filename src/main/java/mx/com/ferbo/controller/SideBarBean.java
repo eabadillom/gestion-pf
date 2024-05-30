@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -15,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.model.Usuario;
 
 @Named
-@ViewScoped
+@SessionScoped
 public class SideBarBean implements Serializable {
 
 	private static final long serialVersionUID = 8802717839932668484L;
@@ -25,6 +26,10 @@ public class SideBarBean implements Serializable {
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
     private HttpSession session;
+    
+    public SideBarBean() {
+    	this.usuario = new Usuario();
+    }
     
 	@PostConstruct
 	public void init() {

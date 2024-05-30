@@ -83,7 +83,7 @@ public class MunicipiosBean implements Serializable {
 		if (this.municipioSelect.getMunicipiosPK().getMunicipioCve() == 0) {
 			municipioPkSelect.setPaisCve(idPais);
 			municipioPkSelect.setEstadoCve(idEstado);
-			List<Municipios> listaMunicipioEstadoPais = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
+			List<Municipios> listaMunicipioEstadoPais = municipiosDao.buscarPorPaisEstado(municipioSelect);
 			if (municipioSelect.getMunicipiosPK().getEstadoCve() == 9) {
 				tamanioListaMunicipioEstadoPais = listaMunicipioEstadoPais.size() + 2;
 			} else {
@@ -107,7 +107,7 @@ public class MunicipiosBean implements Serializable {
 						"Error", "Ocurrió un error al intentar actualizar el Municipio / Alcaldía"));
 			}
 		} 
-		listaMunicipios = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
+		listaMunicipios = municipiosDao.buscarPorPaisEstado(municipioSelect);
 		PrimeFaces.current().executeScript("PF('nuevoMunicipioDialog').hide()");
 	}
 
@@ -142,7 +142,7 @@ public class MunicipiosBean implements Serializable {
 			this.municipioPkSelect.setPaisCve(idPais);
 			this.municipioPkSelect.setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);
-			listaMunicipios = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
+			listaMunicipios = municipiosDao.buscarPorPaisEstado(municipioSelect);
 		}
 	}
 

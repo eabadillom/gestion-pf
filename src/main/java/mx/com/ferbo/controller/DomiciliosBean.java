@@ -250,7 +250,7 @@ public class DomiciliosBean implements Serializable {
 		municipiosPK.setEstadoCve(estadoSelected.getEstadosPK().getEstadoCve());
 		municipiosPK.setPaisCve(paisSelected.getPaisCve());
 		municipioAux.setMunicipiosPK(municipiosPK);
-		lstMunicipios = municipiosDAO.buscarPorCriteriosMunicipios(municipioAux);//ERROR BUSCA SOLO POR ESTADO Y NO POR PAIS
+		lstMunicipios = municipiosDAO.buscarPorPaisEstado(municipioAux);//ERROR BUSCA SOLO POR ESTADO Y NO POR PAIS
 		lstMunicipiosFiltered = lstMunicipios;
 		System.out.println("Municipios Filtrados:" + lstMunicipiosFiltered.toString());
 

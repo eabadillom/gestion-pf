@@ -32,6 +32,7 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 		}
 		return asnHumano;
 	}
+	
 	public AsentamientoHumano buscarPorAsentamiento(Integer paisCve, Integer estadoCve, Integer municipioCve, Integer ciudadCve, Integer asentamientoCve) {
 		EntityManager entity = null;
 		AsentamientoHumano asn = null;
@@ -50,6 +51,28 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 			EntityManagerUtil.close(entity);
 		}
 		return asn;
+	}
+	
+	public List<AsentamientoHumano> buscarPorPaisEstadoMunicipioCiudad(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idCiudad) {
+		EntityManager entity = null;
+		List<AsentamientoHumano> modelList = null;
+		
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			modelList = entity.createNamedQuery("AsentamientoHumano.findByPaisEstadoMunicipioCiudad", AsentamientoHumano.class)
+					.setParameter("paisCve",idPais)
+					.setParameter("estadoCve", idEstado)
+					.setParameter("municipioCve",idMunicipio)
+					.setParameter("ciudadCve", idCiudad)
+					.getResultList()
+					;
+		} catch(Exception e) {
+			log.error("Problemas para obtener informacion", e);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
+		
+		return modelList;
 	}
 
 	@Override
@@ -216,5 +239,4 @@ public class AsentamientoHumandoDAO extends IBaseDAO<AsentamientoHumano, Integer
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

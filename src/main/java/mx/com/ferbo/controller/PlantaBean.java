@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -19,10 +20,12 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
 import mx.com.ferbo.dao.ClienteDAO;
+import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.EstadosDAO;
 import mx.com.ferbo.dao.MunicipiosDAO;
 import mx.com.ferbo.dao.PaisesDAO;
 import mx.com.ferbo.dao.PlantaDAO;
+import mx.com.ferbo.dao.SerieFacturaDAO;
 import mx.com.ferbo.dao.TipoAsentamientoDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
@@ -38,8 +41,10 @@ import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.SerieConstanciaPK;
+import mx.com.ferbo.model.SerieFactura;
 import mx.com.ferbo.model.TipoAsentamiento;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
@@ -53,8 +58,10 @@ public class PlantaBean implements Serializable {
 	private CiudadesDAO ciudadesDao;
 	private TipoAsentamiento tipoAsentamientoSelect; 
 	private TipoAsentamientoDAO tipoAsentamientoDao;
-	private AsentamientoHumandoDAO asentamientoHumandoDao;
+	private AsentamientoHumandoDAO asentamientoHumanoDao;
 	private ClienteDAO clienteDAO;
+	private SerieFacturaDAO sfDAO;
+	private EmisoresCFDISDAO emisorDAO;
 
 	private List<Planta> list;
 	private List<Usuario> usuarios;
@@ -65,6 +72,7 @@ public class PlantaBean implements Serializable {
 	private List<TipoAsentamiento> listaTipoAsentamiento;
 	private List<AsentamientoHumano> asentamientoHumanoList;
 	private List<EmisoresCFDIS> listaEmisores;
+	private List<SerieFactura> listaSerieFactura;
 
 	private Paises paisSelect;
 	private EstadosPK estadoPkSelect;
@@ -101,8 +109,10 @@ public class PlantaBean implements Serializable {
 		daoMunicipios = new MunicipiosDAO();
 		ciudadesDao = new CiudadesDAO();
 		tipoAsentamientoDao = new TipoAsentamientoDAO();
-		asentamientoHumandoDao = new AsentamientoHumandoDAO();
+		asentamientoHumanoDao = new AsentamientoHumandoDAO();
 		clienteDAO = new ClienteDAO();
+		sfDAO = new SerieFacturaDAO();
+		emisorDAO = new EmisoresCFDISDAO();
 		
 		listaEmisores = new ArrayList<EmisoresCFDIS>();
 		listaMunicipios = new ArrayList<>();
@@ -111,22 +121,19 @@ public class PlantaBean implements Serializable {
 		
 		planta = new Planta();
 		seleccion = new Planta();
-	};
+	}
 	
 	@PostConstruct
-	public void init() {
+	public synchronized void init() {
 		this.faceContext = FacesContext.getCurrentInstance();
         this.httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
         
         log.info("El usuario {} ingresa al catálogo de plantas (sucursales).", this.usuario.getUsuario());
 		
-		list = daoPlanta.findall(true);
+		list = daoPlanta.findall(false);
+		listaEmisores = emisorDAO.buscarTodos(true);
 		usuarios = daoPlanta.getUsuarios();
-		listaPaises = daoPaises.findall();
-		listaEmisores = daoPlanta.getEmisor();
-		
-		listaPaises = daoPaises.buscarTodos();
 		listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
 		asentamientoHumanoList = new ArrayList<>();
 		this.paisSelect = new Paises();
@@ -142,255 +149,228 @@ public class PlantaBean implements Serializable {
 		this.idEmisoresCFDIS = new EmisoresCFDIS();
 	}
 	
-	public void datosPlanta() {
+	public void openNew() {
+		this.planta = new Planta();
+		
+		this.listaPaises = daoPaises.buscarTodos();
+		if(this.planta.getPlantaCve() == null)
+			paisSelect = daoPaises.buscarPorId(150);
+		this.estadoSelect = new Estados();
+		this.filtroEstado();
+		this.municipioSelect = new Municipios();
+		this.listaMunicipios = null;
+		this.ciudadSelect = new Ciudades();
+		this.listaCiudades = null;
+		this.asentamientoHumanoSelect = new AsentamientoHumano();
+		this.asentamientoHumanoList = null;
+		this.tipoAsentamientoSelected = "";
+		this.codigopostalSelected = "";
+	}
+	
+	public void datosPlanta(Planta planta) {
+		this.planta = daoPlanta.buscarPorId(planta.getPlantaCve(), true);
+		cargaSeries();
 		filtroPais();
-		//Cargar de datos de estado planta
+		cargaPais();
+		//Carga de datos de estado planta
 		filtroEstado();
-		
-		List<Estados> tmpEstadosList = estadosList.stream().filter(e -> e.getEstadosPK().getEstadoCve() == planta.getIdEstado())
-				.collect(Collectors.toList());
-		if((tmpEstadosList != null ) && (tmpEstadosList.size()>0)) {
-			Estados estado = tmpEstadosList.get(0);
-			estadoSelect = estado;
-		}
-		
-		//Cargar de datos de municipio planta
+		cargaEstado();
+		//Carga de datos de municipio planta
 		filtroMunicipio();
-		
-		List<Municipios> tmpMunicipios = listaMunicipios.stream().filter(m -> m.getMunicipiosPK().getMunicipioCve() == planta.getIdMunicipio())
-				.collect(Collectors.toList());
-		
-		if((tmpMunicipios != null)&&(tmpMunicipios.size()>0)) {
-			Municipios municipio = tmpMunicipios.get(0);
-			municipioSelect = municipio;//EVITAR QUE SE HAGA ESTA ASIGNACION CUANDO SE MODIFICA EL ESTADO (QUE NO ESTE SELECCIONADO)
-		}
-		
-		//Cargar de datos de ciudades planta
+		cargaMunicipio();
+		//Carga de datos de ciudades planta
 		filtroCiudad();
-		
-		List<Ciudades> tmpCiudades = listaCiudades.stream().filter(c -> c.getCiudadesPK().getCiudadCve()==planta.getIdCiudad())
-				.collect(Collectors.toList());
-		
-		if((tmpCiudades != null)&&(tmpCiudades.size()>0)) {
-			Ciudades ciudad = tmpCiudades.get(0);
-			ciudadSelect = ciudad;
-		}
-		
-		//Cargar de datos de asentamiento planta
+		cargaCiudad();
+		//Carga de datos de asentamiento planta
 		filtroAsentamiento();
-		
-		List<AsentamientoHumano> tmpAsentamientoHumano = asentamientoHumanoList.stream().filter(ah -> ah.getAsentamientoHumanoPK().getAsentamientoCve()==planta.getIdAsentamiento())
-				.collect(Collectors.toList());
-		
-		if((tmpAsentamientoHumano != null)&&(tmpAsentamientoHumano.size()>0)) { 
-			AsentamientoHumano asentamientoT = tmpAsentamientoHumano.get(0);
-			asentamientoHumanoSelect = asentamientoT;
-		}
-		
+		cargaAsentamiento();
+		//Carga tipo de asentamiento
 		tipoAsentamiento();
+		//Carga domicilio de la planta
+		cargaDireccion();
 		
 		PrimeFaces.current().ajax().update("form:state","form:messages","form:Municipality","form:city","form:asentamiento","form:codigopostal-new","form:Tasn-new");
+	}
+	
+	public void cargaSeries() {
+		if(this.planta == null) {
+			log.warn("No hay una planta seleccionada");
+			return;
+		}
+		if(this.idEmisoresCFDIS == null) {
+			log.warn("No hay un emisor seleccionado");
+			return;
+		}
 		
+		log.info("Emisor seleccionado: {}", this.planta.getIdEmisoresCFDIS());
+		
+		this.listaSerieFactura = sfDAO.buscarPorEmisor(this.planta.getIdEmisoresCFDIS());
+		log.info("Emisor: {}, Total de series de facturas: {}", this.planta.getIdEmisoresCFDIS(), this.listaSerieFactura.size());
+	}
+	
+	public void filtroPais() {
+		if(this.planta ==null) {
+			return;
+		}
+		
+		this.listaPaises = daoPaises.buscarTodos();
+		if(this.planta.getPlantaCve() == null)
+			paisSelect = daoPaises.buscarPorId(150);
+	}
+	
+	public void cargaPais() {
+		if(this.planta == null)
+			return;
+		
+		if(this.planta.getIdPais() == null)
+			return;
+		
+		this.paisSelect = daoPaises.buscarPorId(this.planta.getIdPais());
+	}
+	
+	public void filtroEstado() {
+		if(this.planta == null) {
+			log.warn("No hay una planta seleccionada.");
+			return;
+		}
+		
+		if(this.paisSelect == null) {
+			log.warn("No hay un pais seleccionado.");
+			return;
+		}
+		
+		log.info("Pais seleccionado: {}", this.paisSelect);
+		
+		estadosList = daoEstados.buscarPorPais(paisSelect);
+	}
+	
+	public void cargaEstado() {
+		if(this.planta == null)
+			return;
+		
+		if(this.planta.getPlantaCve() == null)
+			return;
+		
+		if(this.paisSelect == null)
+			return;
+		
+		this.estadoSelect = daoEstados.buscarPorId(this.planta.getIdPais(), this.planta.getIdEstado());
+	}
+	
+	public void filtroMunicipio() {
+		EstadosPK estadosPK = null;
+		
+		if(this.planta == null) {
+			log.warn("No hay un pais seleccionado.");
+			return;
+		}
+		
+		if(this.paisSelect == null) {
+			log.warn("No hay un pais seleccionado.");
+			return;
+		}
+		
+		if(this.estadoSelect == null) {
+			log.warn("No hay un estado seleccionado.");
+			return;
+		}
+		
+		estadosPK = this.estadoSelect.getEstadosPK();
+		
+		log.info("Buscando información de municipios: idPais {}, idEstado {}",
+				estadosPK.getPaisCve() , estadosPK.getEstadoCve());
+		listaMunicipios = daoMunicipios.buscarPorPaisEstado(estadosPK.getPaisCve() , estadosPK.getEstadoCve());
+	}
+	
+	public void cargaMunicipio() {
+		if(this.planta == null)
+			return;
+		if(this.planta.getPlantaCve() == null)
+			return;
+		if(this.paisSelect == null)
+			return;
+		if(this.estadoSelect == null)
+			return;
+		
+		this.municipioSelect = daoMunicipios.buscarPorId(
+				new MunicipiosPK(this.planta.getIdPais(), this.planta.getIdEstado(), this.planta.getIdMunicipio()));
 	}
 	
 	
-	public int filtroPais() {
+	public void filtroCiudad() {
+		MunicipiosPK municipioPK = this.municipioSelect.getMunicipiosPK();
 		
-		paisSelect = null;
-		if(planta.getPlantaCve()!=null) {
-			paisSelect = daoPaises.buscarPorId(planta.getIdPais());
-		}else {
-			listaPaises = daoPaises.buscarTodos();
-		}
+		if(this.planta == null)
+			return;
 		
-		return 0;
+		if(this.paisSelect == null)
+			return;
 		
+		if(this.estadoSelect == null)
+			return;
+		
+		if(this.municipioSelect == null)
+			return;
+		
+		listaCiudades = ciudadesDao.buscarPorPaisEstadoMunicipio(municipioPK.getPaisCve(), municipioPK.getEstadoCve(), municipioPK.getMunicipioCve());
 	}
 	
-	public int filtroEstado() {
+	public void cargaCiudad() {
+		if(this.planta == null)
+			return;
+		if(this.planta.getPlantaCve() == null)
+			return;
+		if(this.paisSelect == null)
+			return;
+		if(this.estadoSelect == null)
+			return;
+		if(this.municipioSelect == null)
+			return;
 		
-		estadoSelect = new Estados();
-		
-		if(planta.getIdPais()!=null) {
-			estadosList = daoEstados.buscarPorPais(paisSelect);
-			if(estadosList.isEmpty()) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay estados para el pais seleccionado"));
-			}else {
-				listaMunicipios.clear();
-				listaCiudades.clear();
-				asentamientoHumanoList.clear();
-				tipoAsentamientoSelected = "";
-				codigopostalSelected = "";
-			}
-			
-			PrimeFaces.current().ajax().update("form:state","form:messages","form:Municipality","form:city","form:asentamiento","form:codigopostal-new","form:Tasn-new");
-			
-			return 0;
-		}
-		else if(paisSelect != null) {
-			estadosList = daoEstados.buscarPorPais(paisSelect);
-			if(estadosList.isEmpty()) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay estados para el pais seleccionado"));
-			}else {
-				listaMunicipios.clear();
-				listaCiudades.clear();
-				asentamientoHumanoList.clear();
-				tipoAsentamientoSelected = "";
-				codigopostalSelected = "";
-			}
-		}
-		
-		PrimeFaces.current().ajax().update("form:state","form:messages","form:Municipality","form:city","form:asentamiento","form:codigopostal-new","form:Tasn-new");
-		
-		return 0;
-		
+		this.ciudadSelect = ciudadesDao.buscarPorId(
+				new CiudadesPK(this.planta.getIdPais(), this.planta.getIdEstado(), this.planta.getIdMunicipio(), this.planta.getIdCiudad()));
 	}
 	
-	public int filtroMunicipio() {
+	public void filtroAsentamiento() {
+		CiudadesPK ciudadPK = this.ciudadSelect.getCiudadesPK();
+		if(this.planta == null)
+			return;
 		
-		municipioSelect = new Municipios();
+		if(this.paisSelect == null)
+			return;
 		
-		if(planta.getIdMunicipio()!=null) {
-			
-			municipioPkSelect.setPaisCve(paisSelect.getPaisCve());
-			municipioPkSelect.setEstadoCve(estadoSelect.getEstadosPK().getEstadoCve());
-			municipioSelect.setMunicipiosPK(municipioPkSelect);
-			
-			listaMunicipios = daoMunicipios.buscarPorCriteriosMunicipios(municipioSelect);
-			
-			if(listaMunicipios.isEmpty()) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay municipios para el estado seleccionado"));
-			}
-			
-			listaCiudades.clear();
-			asentamientoHumanoList.clear();
-			tipoAsentamientoSelected = "";
-			codigopostalSelected = "";
-			
-			
-			PrimeFaces.current().ajax().update("form:messages");
-			return 0;
-		}else if(estadoSelect!=null && paisSelect!=null) {
-			//Buscar por pais y estado
-			
-			municipioPkSelect.setPaisCve(paisSelect.getPaisCve());
-			municipioPkSelect.setEstadoCve(estadoSelect.getEstadosPK().getEstadoCve());
-			municipioSelect.setMunicipiosPK(municipioPkSelect);
-			
-			listaMunicipios = daoMunicipios.buscarPorCriteriosMunicipios(municipioSelect);
-			
-			
-			if(listaMunicipios.isEmpty()) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay municipios para el estado seleccionado"));
-			}
-			listaCiudades.clear();
-			asentamientoHumanoList.clear();
-			
-		}
+		if(this.estadoSelect == null)
+			return;
 		
-		PrimeFaces.current().ajax().update("form:messages","form:city","form:asentamiento","form:codigopostal-new","form:Tasn-new");
+		if(this.municipioSelect == null)
+			return;
 		
-		return 0;
+		if(this.ciudadSelect == null)
+			return;
 		
+		this.asentamientoHumanoList = asentamientoHumanoDao.buscarPorPaisEstadoMunicipioCiudad(ciudadPK.getPaisCve(), ciudadPK.getEstadoCve(), ciudadPK.getMunicipioCve(), ciudadPK.getCiudadCve());
 	}
 	
-	public int filtroCiudad() {
-		
-		ciudadSelect = new Ciudades();
-	
-		if(planta.getIdCiudad()!=null) {
-			
-			this.ciudadPKSelect.setPaisCve(paisSelect.getPaisCve());
-			this.ciudadPKSelect.setEstadoCve(estadoSelect.getEstadosPK().getEstadoCve());
-			this.ciudadPKSelect.setMunicipioCve(municipioSelect.getMunicipiosPK().getMunicipioCve());
-			this.ciudadSelect.setCiudadesPK(ciudadPKSelect);
-						
-			listaCiudades = ciudadesDao.buscarPorCriteriosCiudades(ciudadSelect);
-			
-			ciudadSelect = new Ciudades();
-			
-			if(listaCiudades.isEmpty()) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay ciudades para el municipio seleccionado"));
-				
-			}
-			
-			asentamientoHumanoList.clear();
-			tipoAsentamientoSelected = "";
-			codigopostalSelected = "";
-			
-			
-			PrimeFaces.current().ajax().update("form:messages","form:codigopostal-new","form:Tasn-new","form:city");
-			return 0;			
-		}else if(paisSelect!=null&&estadoSelect!=null&&municipioSelect!=null) {
-			
-			this.ciudadPKSelect.setPaisCve(paisSelect.getPaisCve());
-			this.ciudadPKSelect.setEstadoCve(estadoSelect.getEstadosPK().getEstadoCve());
-			this.ciudadPKSelect.setMunicipioCve(municipioSelect.getMunicipiosPK().getMunicipioCve());
-			this.ciudadSelect.setCiudadesPK(ciudadPKSelect);
-						
-			listaCiudades = ciudadesDao.buscarPorCriteriosCiudades(ciudadSelect);
-			
-			if((listaCiudades.isEmpty())) {
-				ciudadSelect = new Ciudades();
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay ciudades para el municipio seleccionado"));
-				
-			}else {
-				asentamientoHumanoList.clear(); //Limpiar asentamientos MODIFICAR
-				ciudadSelect = new Ciudades();
-			}
-		}
-		
-		PrimeFaces.current().ajax().update("form:messages","form:city");
-		
-		return 0;
-		
+	public void cargaAsentamiento() {
+		if(this.planta == null)
+			return;
+		if(this.planta.getPlantaCve() == null)
+			return;
+		if(this.paisSelect == null)
+			return;
+		if(this.estadoSelect == null)
+			return;
+		if(this.municipioSelect == null)
+			return;
+		if(this.ciudadSelect == null)
+			return;
+		this.asentamientoHumanoSelect = this.asentamientoHumanoList.stream()
+				.filter(a -> a.getAsentamientoHumanoPK().getAsentamientoCve() == this.planta.getIdAsentamiento())
+				.collect(Collectors.toList())
+				.get(0)
+				;
 	}
 	
-	public int filtroAsentamiento() {
-		
-		asentamientoHumanoSelect = new AsentamientoHumano();
-		
-		if(planta.getIdAsentamiento()!=null) {
-			
-			this.asentamientoHumanoPKSelect.setPaisCve(paisSelect.getPaisCve());
-			this.asentamientoHumanoPKSelect.setEstadoCve(estadoSelect.getEstadosPK().getEstadoCve());
-			this.asentamientoHumanoPKSelect.setMunicipioCve(municipioSelect.getMunicipiosPK().getMunicipioCve());
-			this.asentamientoHumanoPKSelect.setCiudadCve(ciudadSelect.getCiudadesPK().getCiudadCve());
-			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);			
-			
-			asentamientoHumanoList = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
-			
-			if(asentamientoHumanoList.isEmpty()) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay asentamientos para la ciudad seleccionada"));				
-				asentamientoHumanoList.clear();
-				tipoAsentamientoSelected = "";
-				codigopostalSelected = "";
-			}
-			
-			
-			PrimeFaces.current().ajax().update("form:messages","form:codigopostal-new","form:Tasn-new");
-			return 0;			
-		}else if(paisSelect!=null&&estadoSelect!=null&&municipioSelect!=null&&ciudadSelect!=null) {
-			
-			this.asentamientoHumanoPKSelect.setPaisCve(paisSelect.getPaisCve());
-			this.asentamientoHumanoPKSelect.setEstadoCve(estadoSelect.getEstadosPK().getEstadoCve());
-			this.asentamientoHumanoPKSelect.setMunicipioCve(municipioSelect.getMunicipiosPK().getMunicipioCve());
-			this.asentamientoHumanoPKSelect.setCiudadCve(ciudadSelect.getCiudadesPK().getCiudadCve());
-			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);			
-			
-			asentamientoHumanoList = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
-			
-			if(asentamientoHumanoList.isEmpty()) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No hay asentamientos para la ciudad seleccionada"));
-			}
-			
-		}
-		
-		PrimeFaces.current().ajax().update("form:messages");
-		
-		return 0;
-		
-	}
 	
 	public void tipoAsentamiento() {
 		
@@ -407,18 +387,47 @@ public class PlantaBean implements Serializable {
 			//asentamientoHumanoSelect = new AsentamientoHumano();
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			asentamientoHumanoPKSelect = new AsentamientoHumanoPK();
-		  ah = asentamientoHumandoDao.buscar(asentamientoHumanoSelect);
+		  ah = asentamientoHumanoDao.buscar(asentamientoHumanoSelect);
 		  if(ah!=null) {
 				this.tipoAsentamientoSelected = ah.getTipoAsentamiento().getTipoasntmntoDs();
 				this.idTipoAsentamiento = ah.getTipoAsentamiento().getTipoasntmntoCve();
 				this.codigopostalSelected = ah.getCp();
-		  }else {
+		  } else {
 			  FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error", "No tiene asentamiento humano existente"));
 		  }
 		
 		 PrimeFaces.current().ajax().update("form:messages");
 			
 		}
+	}
+	
+	public void cargaDireccion() {
+		AsentamientoHumanoPK aPK = null;
+		
+		if(this.planta == null)
+			return;
+		
+		if(this.planta.getPlantaCve() == null)
+			return;
+		
+		aPK = new AsentamientoHumanoPK();
+		aPK.setPaisCve(this.planta.getIdPais());
+		aPK.setEstadoCve(this.planta.getIdEstado());
+		aPK.setMunicipioCve(this.planta.getIdMunicipio());
+		aPK.setCiudadCve(this.planta.getIdCiudad());
+		aPK.setAsentamientoCve(this.planta.getIdAsentamiento());
+		
+		paisSelect = daoPaises.buscarPorId(aPK.getPaisCve());
+		log.info("Pais: {}", this.paisSelect.getPaisCve());
+		
+		estadoSelect = daoEstados.buscarPorId(aPK.getPaisCve(), aPK.getEstadoCve());
+		log.info("Estado: {}", this.estadoSelect.getEstadosPK());
+		
+		
+		MunicipiosPK municipioPK = new MunicipiosPK(aPK.getPaisCve(), aPK.getEstadoCve(), aPK.getMunicipioCve());
+		this.municipioSelect = daoMunicipios.buscarPorId(municipioPK);
+		log.info("Municipio: {}", this.municipioSelect.getMunicipiosPK());
+		
 	}
 	
 	public void handleUsers () {
@@ -439,68 +448,112 @@ public class PlantaBean implements Serializable {
 		this.asentamientoHumanoSelect = new AsentamientoHumano();
 		this.tipoAsentamientoSelect = new TipoAsentamiento();
 	}
-
-	public void openNew() {
-		this.planta = new Planta();
-		this.paisSelect = new Paises();
-		this.estadoSelect = new Estados();
-		this.municipioSelect = new Municipios();
-		this.ciudadSelect = new Ciudades();
-		this.asentamientoHumanoSelect = new AsentamientoHumano();
-		this.tipoAsentamientoSelected = "";
-		this.codigopostalSelected = "";
-	}
 	
 	public void update() {
-		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Guardar planta";
 		
-		int idPais = paisSelect.getPaisCve();
-		int idEstado = estadoSelect.getEstadosPK().getEstadoCve();
-		int idMunicipio = municipioSelect.getMunicipiosPK().getMunicipioCve();
-		int idCiudad = ciudadSelect.getCiudadesPK().getCiudadCve();
-		int idAsentamiento = asentamientoHumanoSelect.getAsentamientoHumanoPK().getAsentamientoCve();
+		String result = null;
+		Integer idPais = null;
+		Integer idEstado = null;
+		Integer idMunicipio = null;
+		Integer idCiudad = null;
+		Integer idAsentamiento = null;
 		
-		planta.setIdPais(idPais);
-		planta.setIdEstado(idEstado);
-		planta.setIdMunicipio(idMunicipio);
-		planta.setIdCiudad(idCiudad);
-		planta.setIdAsentamiento(idAsentamiento);
-		planta.setTipoasentamiento(idTipoAsentamiento);
-		planta.setCodigopostal(codigopostalSelected);
-		planta.setIdEmisoresCFDIS(planta.getIdEmisoresCFDIS());
-		
-		String message = null;
-		if(planta.getPlantaCve() == null) {//No guardaba
+		try {
+			if(this.planta.getPlantaDs() == null || "".equalsIgnoreCase(this.planta.getPlantaDs().trim()))
+				throw new InventarioException("Debe indicar el nombre de la planta");
 			
-			this.processSerieConstancia(planta);
-			daoPlanta.save(this.planta);
-			list = daoPlanta.findall(true);
+			if(this.planta.getPlantaAbrev() == null || "".equalsIgnoreCase(this.planta.getPlantaAbrev().trim()))
+				throw new InventarioException("Debe indicar el número de la planta");
 			
-			log.info("El usuario {} ha registrado la planta {}.", this.usuario.getUsuario(), this.planta);
+			if(this.planta.getPlantaSufijo() == null || "".equalsIgnoreCase(this.planta.getPlantaSufijo().trim()))
+				throw new InventarioException("Debe indicar el sufijo (código) de la planta");
 			
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Agregada correctamente" ,  planta.getPlantaDs()));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
-		
-		}else {
-			if (message == null) {
-				list.clear();
-				daoPlanta.update(planta);
+			if(this.planta.getIdUsuario() == null)
+				throw new InventarioException("Debe indicar un usuario responsable de la planta");
+			
+			if(this.planta.getIdEmisoresCFDIS() == null)
+				throw new InventarioException("Debe indicar un emisor de CFDI para la planta");
+			
+			if(this.paisSelect == null)
+				throw new InventarioException("Debe seleccionar un país");
+			
+			if(this.estadoSelect == null)
+				throw new InventarioException("Debe seleccionar un estado");
+			
+			if(this.municipioSelect == null)
+				throw new InventarioException("Debe seleccionar un municipio");
+			
+			if(this.ciudadSelect == null)
+				throw new InventarioException("Debe seleccionar una ciudad");
+			
+			if(this.asentamientoHumanoSelect == null)
+				throw new InventarioException("Debe seleccionar un asentamiento (colonia)");
+			
+			if(this.planta.getCalle() == null || "".equalsIgnoreCase(this.planta.getCalle().trim()))
+				throw new InventarioException("Debe indicar la calle del domicilio de la planta");
+			
+			if(this.planta.getNumexterior() == null || "".equalsIgnoreCase(this.planta.getNumexterior().trim()))
+				throw new InventarioException("Debe indicar el número exterior del domicilio de la planta.");
+			
+			idPais = paisSelect.getPaisCve();
+			idEstado = estadoSelect.getEstadosPK().getEstadoCve();
+			idMunicipio = municipioSelect.getMunicipiosPK().getMunicipioCve();
+			idCiudad = ciudadSelect.getCiudadesPK().getCiudadCve();
+			idAsentamiento = asentamientoHumanoSelect.getAsentamientoHumanoPK().getAsentamientoCve();
+			
+			planta.setIdPais(idPais);
+			planta.setIdEstado(idEstado);
+			planta.setIdMunicipio(idMunicipio);
+			planta.setIdCiudad(idCiudad);
+			planta.setIdAsentamiento(idAsentamiento);
+			planta.setTipoasentamiento(idTipoAsentamiento);
+			planta.setCodigopostal(codigopostalSelected);
+			planta.setIdEmisoresCFDIS(planta.getIdEmisoresCFDIS());
+			
+			if(planta.getPlantaCve() == null) {
+				log.info("Guardando información de la planta");
+				this.processSerieConstancia(planta);
+				result = daoPlanta.save(this.planta);
+				if(result != null)
+					throw new InventarioException("Ocurrió un problema al guardar la planta.");
+				list = daoPlanta.findall(false);
+				log.info("El usuario {} ha registrado la planta {}.", this.usuario.getUsuario(), this.planta);
+				mensaje = "La planta se registró correctamente";
 				
+			} else {
+				result = daoPlanta.update(planta);
+				if(result != null)
+					throw new InventarioException("Ocurrió un problema al guardar la planta.");
 				log.info("El usuario {} ha actualizado la planta {}.", this.usuario.getUsuario(), this.planta);
-				list = daoPlanta.findall(true);
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Planta Modificada" , planta.getPlantaDs()));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
+				list = daoPlanta.findall(false);
+				mensaje = "La planta se actualizó correctamente";
 			}
+			
+			this.planta = new Planta();
+			this.paisSelect = new Paises();
+			this.estadoSelect = new Estados();
+			this.municipioSelect = new Municipios();
+			this.ciudadSelect = new Ciudades();
+			this.tipoAsentamientoSelected = "";
+			this.codigopostalSelected = "";
+			
+			PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			log.error("Problema para registrar información de la planta...", ex);
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-planta");
 		}
-		
-		this.planta = new Planta();
-		this.paisSelect = new Paises();
-		this.estadoSelect = new Estados();
-		this.municipioSelect = new Municipios();
-		this.ciudadSelect = new Ciudades();
-		this.tipoAsentamientoSelected = "";
-		this.codigopostalSelected = "";
-	};
+	}
 	
 	public void processSerieConstancia(Planta planta) {
 		List<Cliente> clienteList = null;
@@ -776,31 +829,31 @@ public class PlantaBean implements Serializable {
 
 	public List<Planta> getList() {
 		return list;
-	};
+	}
 
 	public void setList(List<Planta> list) {
 		this.list = list;
-	};
+	}
 
 	public List<Usuario> getUsuarios() {
 		return usuarios;
-	};
+	}
 
 	public void setUsuarios(List<Usuario> usuarios) {
 		this.usuarios = usuarios;
-	};
+	}
 
 	public Planta getPlanta() {
 		return planta;
-	};
+	}
 
 	public void setPlanta(Planta planta) {
 		this.planta = planta;
-	};
+	}
 
 	public Planta getSeleccion() {
 		return seleccion;
-	};
+	}
 
 	public void setSeleccion(Planta seleccion) {
 		this.seleccion = seleccion;
@@ -820,6 +873,14 @@ public class PlantaBean implements Serializable {
 
 	public void setIdEmisoresCFDIS(EmisoresCFDIS idEmisoresCFDIS) {
 		this.idEmisoresCFDIS = idEmisoresCFDIS;
+	}
+
+	public List<SerieFactura> getListaSerieFactura() {
+		return listaSerieFactura;
+	}
+
+	public void setListaSerieFactura(List<SerieFactura> listaSerieFactura) {
+		this.listaSerieFactura = listaSerieFactura;
 	}
 
 

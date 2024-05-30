@@ -33,7 +33,8 @@
 FROM factura fac
 INNER JOIN cliente cli ON cli.cte_cve = fac.cliente
 INNER JOIN status_factura sf ON sf.id = fac.status 
-WHERE fac.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin}
+WHERE fac.status NOT IN (0,2)
+AND fac.fecha BETWEEN $P{fechaInicio} AND $P{fechaFin}
 AND (fac.status = $P{status} OR $P{status} IS NULL)
 AND (fac.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
 ORDER BY fac.fecha]]>

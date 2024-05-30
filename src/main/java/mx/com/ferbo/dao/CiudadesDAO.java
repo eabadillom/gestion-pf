@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Ciudades;
+import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
@@ -44,6 +45,22 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public Ciudades buscarPorId(CiudadesPK ciudadPK) {
+		Ciudades model = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			model = em.find(Ciudades.class, ciudadPK);
+		} catch(Exception ex) {
+			log.warn("Problema para obtener la información de la ciudad...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return model;
+	}
 
 	@Override
 	public List<Ciudades> buscarTodos() {
@@ -64,20 +81,45 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 	}
 
 	public List<Ciudades> buscarPorCriteriosCiudades(Ciudades e) {
-		
-		
 		EntityManager em = null;		
 		List<Ciudades> listado = null;
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class).setParameter("paisCve", e.getCiudadesPK().getPaisCve()).setParameter("estadoCve", e.getCiudadesPK().getEstadoCve()).setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve())
-			.getResultList();
-		} catch (Exception e2) {
-			// TODO: handle exception
+			listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class)
+					.setParameter("paisCve", e.getCiudadesPK().getPaisCve())
+					.setParameter("estadoCve", e.getCiudadesPK().getEstadoCve())
+					.setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve())
+					.getResultList()
+					;
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de ciudades...", ex);
 		}finally {
 			EntityManagerUtil.close(em);
 		}		
+		
+		return listado;
+	}
+	
+	public List<Ciudades> buscarPorPaisEstadoMunicipio(Integer idPais, Integer idEstado, Integer idMunicipio) {
+		EntityManager em = null;		
+		List<Ciudades> listado = null;
+		
+		try {
+			
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class)
+					.setParameter("paisCve", idPais)
+					.setParameter("estadoCve", idEstado)
+					.setParameter("municipioCve", idMunicipio)
+					.getResultList()
+					;
+			
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de ciudades...", ex);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
 		
 		return listado;
 	}
