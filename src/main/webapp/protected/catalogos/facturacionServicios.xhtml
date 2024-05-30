@@ -295,7 +295,7 @@
 				<p:toolbar>
 					<p:toolbarGroup>
 						<div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-							<p:commandButton icon="pi pi-save" process="@this" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary" actionListener="#{facturaServiciosBean.saveFactura}" update="form:serieFactura" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+							<p:commandButton icon="pi pi-save" process="@this" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary" actionListener="#{facturaServiciosBean.saveFactura}" update="form:serieFactura" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" async="false"/>
 						</div>
 						<div style="margin-top: 2rem;" align="center" class="col-2">
 					            <p:divider layout="vertical">
