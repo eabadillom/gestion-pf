@@ -241,8 +241,9 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					cajasTarima = cantidadT.divide(tarimas, 2, BigDecimal.ROUND_HALF_UP);
 					
 					log.debug("caja x tarima "+cajasTarima);
+					List<DetalleConstanciaSalida> salidasList = p.getDetalleConstanciaSalidaList();
 					
-					for(DetalleConstanciaSalida dcs: p.getDetalleConstanciaSalidaList()) {
+					for(DetalleConstanciaSalida dcs: salidasList) {
 						
 						ConstanciaSalida constanciaSalida = new ConstanciaSalida();
 						constanciaSalida = dcs.getConstanciaCve();//OBTENGO OBJETO SIMPLE
@@ -272,7 +273,10 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					
 					cantidadT = cantidadT.subtract(salidaCantidad);
 					pesoTotal = pesoTotal.subtract(salidaPeso);
-					noTarimas = cantidadT.divide(cajasTarima,0,RoundingMode.UP);
+					if(salidasList == null || salidasList.size() <= 0)
+						noTarimas = p.getNoTarimas();
+					else					
+						noTarimas = cantidadT.divide(cajasTarima,0,RoundingMode.UP);
 					
 					p.setCantidadTotal(cantidadT.intValue());
 					p.setPesoTotal(pesoTotal);
