@@ -39,9 +39,9 @@ public class ServiciosClienteBean implements Serializable {
 	private UnidadManejoDAO unidadManejoDAO;
 	private ServicioDAO servicioDAO;
 	private PrecioServicioDAO precioServicioDAO;
-
+	
 	private FacesContext faceContext;
-	private HttpServletRequest request;
+    private HttpServletRequest request;
 
 	public ServiciosClienteBean() {
 		unidadManejoDAO = new UnidadManejoDAO();
@@ -54,8 +54,8 @@ public class ServiciosClienteBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
-		request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
 		lstClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		lstUnidadManejo = unidadManejoDAO.buscarTodos();
 		lstServicio = servicioDAO.buscarTodos();

@@ -7,6 +7,11 @@
 	<ui:define name="content">
 		<h:form id="form">
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
+			<p:dialog modal="true" widgetVar="statusCfdiDialog" header="Generando timbrado..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i> 
+				</div>
+		    </p:dialog>
 			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
 				<div align="center">
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
@@ -15,27 +20,32 @@
 			<p:fieldset legend="Emisor">
 				<p:outputPanel id="emisor">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-6 p-md-6">
+						<div class="p-col-12 p-md-6">
 							<p:outputLabel value="Sucursal (Planta)"/>
 							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" required="true" requiredMessage="Selecciona una Planta" onchange="PF('statusInfoDialog').show();">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
 								<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-								<p:ajax update="emisor messages dt-vigencias serieFactura planta" listener="#{facturacionConstanciasBean.serieFactura}" process="@this" oncomplete="PF('statusInfoDialog').hide();"/>
+								<p:ajax update="selEmisor txtRFC messages dt-vigencias serieFactura planta" listener="#{facturacionConstanciasBean.serieFactura}" process="@this" oncomplete="PF('statusInfoDialog').hide();"/>
 							</p:selectOneMenu>
 						</div>
-						<div class="p-col-6 p-md-6">
+						<div class="p-col-12 p-md-6">
 							<p:outputLabel value="Razon Social"/>
-							<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_emisor}" readonly="true"/>
+							<p:selectOneMenu id="selEmisor" value="#{facturacionConstanciasBean.emisor}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
+								<f:selectItem itemLabel="---SELECCIONE UN EMISOR---" noSelectionOption="true" />
+								<f:selectItems value="#{facturacionConstanciasBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"></f:selectItems>
+								<p:ajax update="txtRFC serieFactura" process="@this" listener="#{facturacionConstanciasBean.filtraSeries}" />
+							</p:selectOneMenu>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="RFC"/>
-							<p:inputText value="#{facturacionConstanciasBean.plantaSelect.idEmisoresCFDIS.nb_rfc}" readonly="true"/>
+							<p:inputText id="txtRFC" value="#{facturacionConstanciasBean.emisor.nb_rfc}" readonly="true"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Serie-número (Factura)"/>
 							<p:selectOneMenu id="serieFactura" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.serieFacturaSelect}">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
 								<f:selectItems value="#{facturacionConstanciasBean.listaSerieFactura}" var="serieFactura" itemLabel="#{serieFactura.nomSerie}-#{serieFactura.numeroActual + 1}" />
+								<p:ajax process="@this" listener="#{facturacionConstanciasBean.seleccionaSerie}" />
 							</p:selectOneMenu>
 						</div>
 					</div>
@@ -167,7 +177,7 @@
 							</h:outputText>
 						</p:column>
 						<p:column headerText="Detalles de Factura" >
-						<p:commandButton value="Visualizar" onclick="PF('statusInfoDialog').show();" oncomplete="PF('dialogEntradas').show();"  update="form:Entradas" process="@this" >
+						<p:commandButton icon="pi pi-bars" value="Servicios" onclick="PF('statusInfoDialog').show();" oncomplete="PF('dialogEntradas').show();"  update="form:Entradas" process="@this" >
 							<f:setPropertyActionListener value="#{entrada}" target="#{facturacionConstanciasBean.entradaSelect}"  ></f:setPropertyActionListener>							
 						</p:commandButton>
 						</p:column>
@@ -184,45 +194,40 @@
 					</p:dataTable>
 				</p:fieldset>
 			</div>
-			
 			<p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogEntradas" responsive="true">
 				<p:ajax event="open"  oncomplete="PF('statusInfoDialog').hide();"  ></p:ajax>
 				<p:outputPanel id="Entradas">
-						
-						<p:dataTable id="dt-serviciosEntrada" value="#{facturacionConstanciasBean.entradaSelect.servicioConstanciaList}" var="servicioConstancia"  rows="5" reflow="true" 
-										paginator="true" paginatorPosition="bottom" lazy="true">
-										<p:column headerText="Servicio">
-											<h:outputText value="#{servicioConstancia.descripcion}" />
-										</p:column>
-										<p:column headerText="Cantidad">
-											<p:inputNumber value="#{servicioConstancia.baseCargo}" >
-												<p:ajax event="keyup" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosEntrada form:dt-constanciasE"/>
-											</p:inputNumber>
-										</p:column>
-										<p:column headerText="Unidad">
-											<h:outputText value="#{servicioConstancia.unidadMedida}" />
-										</p:column>
-										<p:column headerText="Precio Unitario">
-											<p:inputNumber value="#{servicioConstancia.tarifa}" >
-												<p:ajax event="keyup" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosEntrada form:dt-constanciasE"/>
-											</p:inputNumber>
-										</p:column>
-										<p:column headerText="Importe">
-											<h:outputText value="#{servicioConstancia.costo}">
-												<f:convertNumber pattern="$#,##0.00" />
-											</h:outputText>
-										</p:column>
-										<p:column headerText="Acción">
-											<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioEntrada()}"  icon="pi pi-times" styleClass="ui-button-danger">
-												<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioE}"></f:setPropertyActionListener>
-											</p:commandButton>
-										</p:column>
-									</p:dataTable>
-								
-							</p:outputPanel>
+					<p:dataTable id="dt-serviciosEntrada" value="#{facturacionConstanciasBean.entradaSelect.servicioConstanciaList}" var="servicioConstancia"  rows="5" reflow="true" 
+						paginator="true" paginatorPosition="bottom" lazy="true">
+						<p:column headerText="Servicio">
+							<h:outputText value="#{servicioConstancia.descripcion}" />
+						</p:column>
+						<p:column headerText="Cantidad">
+							<p:inputNumber value="#{servicioConstancia.baseCargo}" >
+								<p:ajax event="keyup" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosEntrada form:dt-constanciasE"/>
+							</p:inputNumber>
+						</p:column>
+						<p:column headerText="Unidad">
+							<h:outputText value="#{servicioConstancia.unidadMedida}" />
+						</p:column>
+						<p:column headerText="Precio Unitario">
+							<p:inputNumber value="#{servicioConstancia.tarifa}" >
+								<p:ajax event="keyup" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosEntrada form:dt-constanciasE"/>
+							</p:inputNumber>
+						</p:column>
+						<p:column headerText="Importe">
+							<h:outputText value="#{servicioConstancia.costo}">
+								<f:convertNumber pattern="$#,##0.00" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Acción">
+							<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioEntrada()}"  icon="pi pi-times" styleClass="ui-button-danger">
+								<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioE}"></f:setPropertyActionListener>
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
 			</p:dialog>
-			
-			
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Vigencias por facturar (Inventario)">
 					<p:outputLabel value="Fecha de corte"/>
@@ -230,11 +235,8 @@
 						<p:ajax listener="#{facturacionConstanciasBean.facturacionVigencias}" oncomplete="PF('statusInfoDialog').hide();"/>
 						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
-					
 					<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" value="#{facturacionConstanciasBean.listaVigencias}" var="vigencia" 
 							selection="#{facturacionConstanciasBean.selectedVigencias}" rowKey="#{vigencia.folio.folio}" rowSelectMode="add" paginator="true" paginatorPosition="bottom" rows="5" >
-
-
 						<p:ajax event="rowSelect" />
 						<p:ajax event="rowSelectCheckbox" listener="#{facturacionConstanciasBean.relacionConstanciaFacturaVigencias}" update="form:dt-vigencias"/>
 						<p:ajax event="rowUnselect" update="form:dt-vigencias form:dt-serviciosVigencia" />
@@ -255,7 +257,7 @@
 							</h:outputText>
 						</p:column>
 						<p:column headerText="Detalles de Factura" >
-						<p:commandButton value="Visualizar" onclick="PF('statusInfoDialog').show();"  oncomplete="PF('dialogVigencias').show();" 
+						<p:commandButton icon="pi pi-bars" value="Servicios" onclick="PF('statusInfoDialog').show();"  oncomplete="PF('dialogVigencias').show();" 
 															update="form:Vigencias" process="@this">
 						<f:setPropertyActionListener value="#{vigencia}" target="#{facturacionConstanciasBean.vigenciaSelect}" ></f:setPropertyActionListener>				
 						
@@ -274,195 +276,166 @@
 					</p:dataTable>
 				</p:fieldset>
 			</div>
-			
 			<p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogVigencias" responsive="true">
 			<p:ajax event="open"  oncomplete="PF('statusInfoDialog').hide();"  ></p:ajax>
 			<p:outputPanel id="Vigencias">
-
 			<p:dataTable id="dt-serviciosVigencia" value="#{facturacionConstanciasBean.vigenciaSelect.servicioConstanciaList}" var="servicioConstancia" lazy="true">
-			
-								<p:column headerText="Servicio">
-									<h:outputText value="#{servicioConstancia.descripcion}" />
-								</p:column>
-								<p:column headerText="Cantidad">
-									<p:inputNumber value="#{servicioConstancia.baseCargo}" >
-										<p:ajax event="keyup" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosVigencia form:dt-vigencias"/>
-									</p:inputNumber>
-								</p:column>
-								<p:column headerText="Unidad">
-									<h:outputText value="#{servicioConstancia.unidadMedida}" />
-								</p:column>
-								<p:column headerText="Precio Unitario">
-									<p:inputNumber value="#{servicioConstancia.tarifa}" >
-										<p:ajax event="keyup" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosVigencia form:dt-vigencias"/>
-									</p:inputNumber>
-								</p:column>
-								<p:column headerText="Importe">
-									<h:outputText value="#{servicioConstancia.costo}">
-										<f:convertNumber pattern="$#,##0.00" />
-									</h:outputText>
-								</p:column>
-								<p:column headerText="Acción">
-									<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioVigencia()}" update="form:dt-serviciosVigencia " icon="pi pi-times" styleClass="ui-button-danger">
-										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioV}"></f:setPropertyActionListener>
-									</p:commandButton>
-								</p:column>
-						
-							</p:dataTable>
-							
-							</p:outputPanel>
-			</p:dialog>
-			
-			
-			<div style="margin-top: 2rem;">
-				<p:fieldset legend="Constancias de servicio por facturar">
-					<p:dataTable id="dt-servicios" emptyMessage="No Hay Servicios Por Facturar" value="#{facturacionConstanciasBean.listaServicios}" 
-									var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}" paginator="true" paginatorPosition="bottom" rows="5" rowSelectMode="add" selection="#{facturacionConstanciasBean.selectedServicios}">
-						<p:ajax event="rowSelect" />
-						<p:ajax event="rowSelectCheckbox" listener="#{facturacionConstanciasBean.recalculoServicioDs}" update="form:dt-servicios"/>
-						<p:ajax event="rowUnselect" update="form:dt-servicios" />
-						<p:ajax event="rowUnselectCheckbox" update="form:dt-servicios" listener="#{facturacionConstanciasBean.recalculoServicioDs}"/>
-						<p:ajax event="toggleSelect" update="form:dt-servicios" listener="#{facturacionConstanciasBean.recalculoServicioDs}" />
-						<p:column selectionMode="multiple" exportable="false" />
-						<p:column headerText="Folio Cliente">
-							<h:outputText
-								value="#{servicio.constanciaDeServicio.folioCliente}" />
-						</p:column>
-						<p:column headerText="Fecha">
-							<h:outputText value="#{servicio.constanciaDeServicio.fecha}">
-								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
-							</h:outputText>
-						</p:column>
-						<p:column headerText="Detalles de Factura" >
-						<p:commandButton value="Visualizar" onclick="PF('statusInfoDialog').show();"  oncomplete="PF('dialogServicios').show();" 
-															update="form:serviciosConstancia" process="@this">
-						<f:setPropertyActionListener value="#{servicio}" target="#{facturacionConstanciasBean.servicioConstanciaSelect}" ></f:setPropertyActionListener>				
-						
+				<p:column headerText="Servicio">
+					<h:outputText value="#{servicioConstancia.descripcion}" />
+				</p:column>
+				<p:column headerText="Cantidad">
+					<p:inputNumber value="#{servicioConstancia.baseCargo}" >
+						<p:ajax event="keyup" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosVigencia form:dt-vigencias"/>
+					</p:inputNumber>
+				</p:column>
+				<p:column headerText="Unidad">
+					<h:outputText value="#{servicioConstancia.unidadMedida}" />
+				</p:column>
+				<p:column headerText="Precio Unitario">
+					<p:inputNumber value="#{servicioConstancia.tarifa}" >
+						<p:ajax event="keyup" listener="#{facturacionConstanciasBean.calcula(servicioConstancia)}" process="@this" update="dt-serviciosVigencia form:dt-vigencias"/>
+					</p:inputNumber>
+				</p:column>
+				<p:column headerText="Importe">
+					<h:outputText value="#{servicioConstancia.costo}">
+						<f:convertNumber pattern="$#,##0.00" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Acción">
+					<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioVigencia()}" update="form:dt-serviciosVigencia " icon="pi pi-times" styleClass="ui-button-danger">
+						<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioV}"></f:setPropertyActionListener>
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:outputPanel>
+	</p:dialog>
+		<div style="margin-top: 2rem;">
+			<p:fieldset legend="Constancias de servicio por facturar">
+				<p:dataTable id="dt-servicios" emptyMessage="No Hay Servicios Por Facturar" value="#{facturacionConstanciasBean.listaServicios}" var="servicio" rowKey="#{servicio.constanciaDeServicio.folio}" paginator="true" paginatorPosition="bottom" rows="5" rowSelectMode="add" selection="#{facturacionConstanciasBean.selectedServicios}">
+					<p:ajax event="rowSelect" />
+					<p:ajax event="rowSelectCheckbox" listener="#{facturacionConstanciasBean.recalculoServicioDs}" update="form:dt-servicios"/>
+					<p:ajax event="rowUnselect" update="form:dt-servicios" />
+					<p:ajax event="rowUnselectCheckbox" update="form:dt-servicios" listener="#{facturacionConstanciasBean.recalculoServicioDs}"/>
+					<p:ajax event="toggleSelect" update="form:dt-servicios" listener="#{facturacionConstanciasBean.recalculoServicioDs}" />
+					<p:column selectionMode="multiple" exportable="false" />
+					<p:column headerText="Folio Cliente">
+						<h:outputText
+							value="#{servicio.constanciaDeServicio.folioCliente}" />
+					</p:column>
+					<p:column headerText="Fecha">
+						<h:outputText value="#{servicio.constanciaDeServicio.fecha}">
+							<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Detalles de Factura" >
+						<p:commandButton icon="pi pi-bars" value="Servicios" onclick="PF('statusInfoDialog').show();"  oncomplete="PF('dialogServicios').show();" update="form:serviciosConstancia" process="@this">
+							<f:setPropertyActionListener value="#{servicio}" target="#{facturacionConstanciasBean.servicioConstanciaSelect}" ></f:setPropertyActionListener>				
 						</p:commandButton>
-						</p:column>
-						
-						<f:facet name="footer">
-							<div align="right">
-								Subtotal Servicios:
-								<h:outputText id="subServiciosDs" value="#{facturacionConstanciasBean.subTotalServicios}">
-									<f:convertNumber pattern=" $ #,##0.00" />
-								</h:outputText>
-							</div>
-						</f:facet>
-						
-					</p:dataTable>
-				</p:fieldset>
-			</div>
-			
+					</p:column>
+					
+					<f:facet name="footer">
+						<div align="right">
+							Subtotal Servicios:
+							<h:outputText id="subServiciosDs" value="#{facturacionConstanciasBean.subTotalServicios}">
+								<f:convertNumber pattern=" $ #,##0.00" />
+							</h:outputText>
+						</div>
+					</f:facet>
+				</p:dataTable>
+			</p:fieldset>
+		</div>
 			<p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogServicios" responsive="true">
 				<p:ajax event="open"  oncomplete="PF('statusInfoDialog').hide();"  ></p:ajax>
-			<p:outputPanel id="serviciosConstancia">
-			
-			<p:dataTable id="dt-serviciosDs" value="#{facturacionConstanciasBean.servicioConstanciaSelect.servicioConstanciaDsList}" var="servicioConstancia" rowIndexVar="row" lazy="true">
-								<p:column headerText="Servicio">
-									<h:outputText value="#{servicioConstancia.descripcion}" />
-								</p:column>
-								<p:column headerText="Cantidad">
-									<h:outputText value="#{servicioConstancia.cantidad}"></h:outputText>
-								</p:column>
-								<p:column headerText="Precio Unitario">
-									<h:outputText value="#{servicioConstancia.tarifa}" />
-								</p:column>
-								<p:column headerText="Importe">
-									<h:outputText value="#{servicioConstancia.costo}" />
-								</p:column>
-								<p:column headerText="Acción">
-									<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioDs()}" update="form:dt-serviciosDs " icon="pi pi-times" styleClass="ui-button-danger">
-										<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioDs}" />
-									</p:commandButton>
-								</p:column>
-							</p:dataTable>
-							</p:outputPanel>
+				<p:outputPanel id="serviciosConstancia">
+					<p:dataTable id="dt-serviciosDs" value="#{facturacionConstanciasBean.servicioConstanciaSelect.servicioConstanciaDsList}" var="servicioConstancia" rowIndexVar="row" lazy="true">
+						<p:column headerText="Servicio">
+							<h:outputText value="#{servicioConstancia.descripcion}" />
+						</p:column>
+						<p:column headerText="Cantidad">
+							<h:outputText value="#{servicioConstancia.cantidad}"></h:outputText>
+						</p:column>
+						<p:column headerText="Precio Unitario">
+							<h:outputText value="#{servicioConstancia.tarifa}" />
+						</p:column>
+						<p:column headerText="Importe">
+							<h:outputText value="#{servicioConstancia.costo}" />
+						</p:column>
+						<p:column headerText="Acción">
+							<p:commandButton value="Eliminar" action="#{facturacionConstanciasBean.eliminarServicioDs()}" update="form:dt-serviciosDs " icon="pi pi-times" styleClass="ui-button-danger">
+								<f:setPropertyActionListener value="#{servicioConstancia}" target="#{facturacionConstanciasBean.selectServicioDs}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
 			</p:dialog>
-			
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Resumen">
 					<div>
 						<p:outputLabel  value="Metodo de Pago:" styleClass="p-mr-2" />
-						<b><p:outputLabel id="metodo"
-								value="#{facturacionConstanciasBean.MPagoSelect.cdMetodoPago} - #{facturacionConstanciasBean.MPagoSelect.nbMetodoPago}" /></b>
+						<b><p:outputLabel id="metodo" value="#{facturacionConstanciasBean.MPagoSelect.cdMetodoPago} - #{facturacionConstanciasBean.MPagoSelect.nbMetodoPago}" /></b>
 					</div>
-
 					<div>
 						<p:outputLabel  value="Forma de Pago:" styleClass="p-mr-2" />
-						<b><p:outputLabel id="medio"
-								value="#{facturacionConstanciasBean.medioPagoSelect.formaPago} - #{facturacionConstanciasBean.medioPagoSelect.mpDescripcion}" /></b>
+						<b><p:outputLabel id="medio" value="#{facturacionConstanciasBean.medioPagoSelect.formaPago} - #{facturacionConstanciasBean.medioPagoSelect.mpDescripcion}" /></b>
 					</div>
-
 					<div style="text-align: right">
 						<p:outputLabel>Subtotal:</p:outputLabel>
-						<b><h:outputText id="subTotalGeneral"
-								value="#{facturacionConstanciasBean.subTotalGeneral}">
+						<b>
+							<h:outputText id="subTotalGeneral" value="#{facturacionConstanciasBean.subTotalGeneral}">
 								<f:convertNumber pattern=" $ ###,###,###.00" />
-							</h:outputText></b>
+							</h:outputText>
+						</b>
 					</div>
-
 					<div style="text-align: right">
 						<p:outputLabel>IVA:</p:outputLabel>
-						<b><h:outputText id="iva"
-								value="#{facturacionConstanciasBean.ivaTotal}">
+						<b>
+							<h:outputText id="iva" value="#{facturacionConstanciasBean.ivaTotal}">
 								<f:convertNumber pattern=" $ ###,###,###.00" />
-							</h:outputText> </b>
+							</h:outputText>
+						</b>
 					</div>
-
 					<div style="float: left;">
 						<p:outputLabel>Monto en letra:</p:outputLabel>
-						<b><h:outputText id="montoLetra"
-								value="#{facturacionConstanciasBean.montoLetra}"></h:outputText></b>
+						<b><h:outputText id="montoLetra" value="#{facturacionConstanciasBean.montoLetra}"></h:outputText></b>
 					</div>
-
 					<div style="text-align: right">
 						<p:outputLabel>Total:</p:outputLabel>
-						<b><h:outputText id="total"
-								value="#{facturacionConstanciasBean.total}">
+						<b>
+							<h:outputText id="total" value="#{facturacionConstanciasBean.total}">
 								<f:convertNumber pattern=" $ ###,###,###.00" />
-							</h:outputText> </b>
+							</h:outputText>
+						</b>
 					</div>
 				</p:fieldset>
 			</div>
-		
-			
 			<p:fieldset styleClass="p-mt-2">
-					 	 <p:toolbar>
-							<p:toolbarGroup>
-					         <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-								<p:commandButton icon="pi pi-save" process="@this" actionListener="#{facturacionConstanciasBean.saveFactura}" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary"  ajax="false"/>
-				     		 </div>
-				     		 
-				     		  <div style="margin-top: 2rem;" align="center" class="col-2">
-					            <p:divider layout="vertical">
-					            </p:divider>
-					         </div>
-					         
-				     		 <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-								<p:commandButton icon="pi pi-file-pdf"  process="@this" actionListener="#{facturacionConstanciasBean.jasper}" title="Imprimir" value="Imprimir" styleClass="ui-button-raised ui-button-secondary"  ajax="false"/>
-				     		 </div>
-							         
-					         <div style="margin-top: 2rem;" align="center" class="col-2">
-					            <p:divider layout="vertical">
-					            </p:divider>
-					         </div>
-       
-							 <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-								<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facturacionConstanciasBean.timbrado()}" title="Timbrar" value="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>
-				     		 </div>
-				     		 
-				     		 <div style="margin-top: 2rem;" align="center" class="col-2">
-					            <p:divider layout="vertical">
-					            </p:divider>
-					         </div>
-				     		 
-				     		 <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-								<p:commandButton icon="pi pi-refresh" process="@this" actionListener="#{facturacionConstanciasBean.reset()}" title="NuevaFactura" value="Nueva Factura" styleClass="ui-button-raised ui-button-secondary"  ajax="false"/>
-				     		 </div>
-							</p:toolbarGroup>
-						 </p:toolbar>
-						</p:fieldset>
+				<p:toolbar>
+					<p:toolbarGroup>
+						<div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+							<p:commandButton icon="pi pi-save" process="@this" actionListener="#{facturacionConstanciasBean.saveFactura}" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" async="false"/>
+						</div>
+					 	<div style="margin-top: 2rem;" align="center" class="col-2">
+							<p:divider layout="vertical"></p:divider>
+						</div>
+						<div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+							<p:commandButton icon="pi pi-file-pdf"  process="@this" actionListener="#{facturacionConstanciasBean.jasper}" title="Imprimir" value="Imprimir" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>
+						</div>
+						<div style="margin-top: 2rem;" align="center" class="col-2">
+							<p:divider layout="vertical">
+							</p:divider>
+						</div>
+						<div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+							<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facturacionConstanciasBean.timbrado()}" title="Timbrar" value="Timbrar" onclick="PF('statusCfdiDialog').show();" oncomplete="PF('statusCfdiDialog').hide();" styleClass="ui-button-raised ui-button-secondary"/>
+						</div>
+						<div style="margin-top: 2rem;" align="center" class="col-2">
+							<p:divider layout="vertical"></p:divider>
+						</div>
+						<div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+							<p:commandButton icon="pi pi-refresh" process="@this" actionListener="#{facturacionConstanciasBean.reset()}" title="NuevaFactura" value="Nueva Factura" styleClass="ui-button-raised ui-button-secondary"/>
+						</div>
+					</p:toolbarGroup>
+				</p:toolbar>
+			</p:fieldset>
 		</h:form>
 	</ui:define>
 </ui:composition>

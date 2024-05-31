@@ -28,88 +28,89 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "cancela_factura")
-@NamedQueries({ @NamedQuery(name = "CancelaFactura.findAll", query = "SELECT c FROM CancelaFactura c"),
-		@NamedQuery(name = "CancelaFactura.findById", query = "SELECT c FROM CancelaFactura c WHERE c.id = :id"),
-		@NamedQuery(name = "CancelaFactura.findByDescripcion", query = "SELECT c FROM CancelaFactura c WHERE c.descripcion = :descripcion") })
+@NamedQueries({
+    @NamedQuery(name = "CancelaFactura.findAll", query = "SELECT c FROM CancelaFactura c"),
+    @NamedQuery(name = "CancelaFactura.findById", query = "SELECT c FROM CancelaFactura c WHERE c.id = :id"),
+    @NamedQuery(name = "CancelaFactura.findByDescripcion", query = "SELECT c FROM CancelaFactura c WHERE c.descripcion = :descripcion")})
 public class CancelaFactura implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
+    
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 75)
+    @Column(name = "descripcion")
+    private String descripcion;
+    
+    @JoinColumn(name = "factura")
+    @OneToOne(optional = false, cascade = {CascadeType.MERGE})
+    private Factura factura;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Basic(optional = false)
-	@Column(name = "id")
-	private Integer id;
+    public CancelaFactura() {
+    }
 
-	@Basic(optional = false)
-	@NotNull
-	@Size(min = 1, max = 75)
-	@Column(name = "descripcion")
-	private String descripcion;
+    public CancelaFactura(Integer id) {
+        this.id = id;
+    }
 
-	@JoinColumn(name = "factura")
-	@OneToOne(optional = false, cascade = { CascadeType.MERGE })
-	private Factura factura;
+    public CancelaFactura(Integer id, String descripcion) {
+        this.id = id;
+        this.descripcion = descripcion;
+    }
 
-	public CancelaFactura() {
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public CancelaFactura(Integer id) {
-		this.id = id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public CancelaFactura(Integer id, String descripcion) {
-		this.id = id;
-		this.descripcion = descripcion;
-	}
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-	public Integer getId() {
-		return id;
-	}
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public Factura getFactura() {
+        return factura;
+    }
 
-	public String getDescripcion() {
-		return descripcion;
-	}
+    public void setFactura(Factura factura) {
+        this.factura = factura;
+    }
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
-	public Factura getFactura() {
-		return factura;
-	}
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof CancelaFactura)) {
+            return false;
+        }
+        CancelaFactura other = (CancelaFactura) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
 
-	public void setFactura(Factura factura) {
-		this.factura = factura;
-	}
-
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
-		return hash;
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
-		if (!(object instanceof CancelaFactura)) {
-			return false;
-		}
-		CancelaFactura other = (CancelaFactura) object;
-		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "mx.com.ferbo.model.CancelaFactura[ id=" + id + " ]";
-	}
-
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.CancelaFactura[ id=" + id + " ]";
+    }
+    
 }

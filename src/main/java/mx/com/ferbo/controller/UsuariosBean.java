@@ -28,10 +28,10 @@ import mx.com.ferbo.util.SecurityUtil;
 public class UsuariosBean implements Serializable {
 	private static final long serialVersionUID = 8438449261015571241L;
 	private static Logger log = LogManager.getLogger(UsuariosBean.class);
-
+	
 	private UsuarioDAO usuarioDAO;
 	private PlantaDAO plantaDAO;
-
+	
 	private List<Usuario> usuarios;
 	private List<TipoMail> lstTipoMail;
 	private List<Planta> lstPlanta;
@@ -51,10 +51,11 @@ public class UsuariosBean implements Serializable {
 	private String numEmpleado;
 	private boolean showPassword = false;
 	private String newPassword = null;
+	
 
 	public UsuariosBean() {
 		plantaDAO = new PlantaDAO();
-		usuarioDAO = new UsuarioDAO();
+		usuarioDAO= new UsuarioDAO();
 		usuario = new Usuario();
 	}
 
@@ -65,17 +66,16 @@ public class UsuariosBean implements Serializable {
 		lstPlanta = plantaDAO.findall();
 		this.showPassword = false;
 	}
-
+	
 	public void openNew() {
-		this.usuario = new Usuario();
+		this.usuario= new Usuario();
 		this.usuario.setStUsuario("R");
 		this.showPassword = false;
 		this.idstatus = "R";
 	}
-
+	
 	public void cargaUsuario() {
-		log.debug("Usuario: {}, Status: {}, StNtfSrvExt: {}", this.usuario.getUsuario(), this.usuario.getStUsuario(),
-				this.usuario.isStNtfSrvExt());
+		log.debug("Usuario: {}, Status: {}, StNtfSrvExt: {}", this.usuario.getUsuario(), this.usuario.getStUsuario(), this.usuario.isStNtfSrvExt());
 	}
 
 	public void guardar() {
@@ -86,12 +86,12 @@ public class UsuariosBean implements Serializable {
 		String mensaje = null;
 
 		String titulo = "Usuario";
-
+		
 		try {
 			securityBO = new SecurityUtil();
-
-			if (usuario.getId() == null) {
-				// Por seguridad, se salan las contraseñas.
+			
+			if(usuario.getId() == null) {
+				//Por seguridad, se salan las contraseñas.
 				sha512Password = securityBO.getSHA512("temporal" + usuario.getUsuario());
 				usuario.setPassword(sha512Password);
 				usuario.setStUsuario("R");
@@ -99,20 +99,18 @@ public class UsuariosBean implements Serializable {
 			}else {
 				mensaje = "El usuario se actualizo correctamente";
 			}
-
+			
 			log.debug("Usuario: {}", usuario);
-			usuario.setIdPlanta(this.idplanta);
 			String user = usuarioDAO.actualizar(usuario);
-
-			if (user != null)
-				throw new InventarioException(
-						"Ocurrió un problema al guardar el usuario.\r\nIntente nuevamente.\r\nSi el problema persiste, informe a su administrador de sistemas.");
-
+			
+			if(user != null)
+				throw new InventarioException("Ocurrió un problema al guardar el usuario.\r\nIntente nuevamente.\r\nSi el problema persiste, informe a su administrador de sistemas.");
+			
 			usuarios.clear();
 			usuarios = usuarioDAO.findall();
 			this.showPassword = false;
 			this.usuario = new Usuario();
-
+      
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
 		} catch (InventarioException ex) {
@@ -128,7 +126,7 @@ public class UsuariosBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-usuario");
 		}
 	}
-
+	
 	public boolean isShowPassword() {
 		return showPassword;
 	}
@@ -136,7 +134,7 @@ public class UsuariosBean implements Serializable {
 	public void setShowPassword(boolean showPassword) {
 		this.showPassword = showPassword;
 	}
-
+	
 	public void resetPassword() {
 		this.newPassword = null;
 	}
@@ -148,21 +146,20 @@ public class UsuariosBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Actualizar contraseña";
-
+		
 		try {
 			securityBO = new SecurityUtil();
 			securityBO.checkPassword(this.newPassword);
-
-			// Por seguridad, se salan las contraseñas.
+			
+			//Por seguridad, se salan las contraseñas.
 			sha512Password = securityBO.getSHA512(this.newPassword + usuario.getUsuario());
 			this.usuario.setPassword(sha512Password);
-
+			
 			String user = this.usuarioDAO.actualizar(usuario);
 			if (user != null) {
-				throw new InventarioException(
-						"La contraseña no se actualizó.\r\nIntente nuevamente.\r\nSi el problema persiste, informe a su administrador de sistemas.");
+				throw new InventarioException("La contraseña no se actualizó.\r\nIntente nuevamente.\r\nSi el problema persiste, informe a su administrador de sistemas.");
 			}
-
+			
 			this.usuarios.clear();
 			this.usuarios = this.usuarioDAO.findall();
 			this.usuario = new Usuario();
@@ -182,22 +179,20 @@ public class UsuariosBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-usuario");
 		}
 	}
-
+	
 	public void eliminar() {
 		PrimeFaces.current().executeScript("PF('deleteClienteDialog').hide()");
-		String user = usuarioDAO.eliminar(usuario);
+		String user= usuarioDAO.eliminar(usuario);
 		if (user == null) {
 			usuarios.remove(this.usuario);
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario Eliminado " + usuario.getUsuario(), null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario Eliminado " + usuario.getUsuario(), null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-usuario");
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Error al eliminar ", "El usuario no puede ser eliminado por dependecia con una planta"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al eliminar " , "El usuario no puede ser eliminado por dependecia con una planta"));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
-
+	
 	public List<TipoMail> getLstTipoMail() {
 		return lstTipoMail;
 	}
@@ -317,7 +312,7 @@ public class UsuariosBean implements Serializable {
 	public void setLogin(String login) {
 		this.login = login;
 	}
-
+	
 	public String getNewPassword() {
 		return newPassword;
 	}

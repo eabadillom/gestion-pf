@@ -14,7 +14,7 @@
 			<p:inputText id="txtFolio" value="#{altaConstanciaServicioBean.folio}" placeholder="Folio" />
 			<p:toolbar>
 				<p:toolbarGroup>
-						<p:selectOneMenu id="cliente-som" autoWidth="true" value="#{altaConstanciaServicioBean.idCliente}" filterMatchMode="startsWith">
+						<p:selectOneMenu id="cliente-som" autoWidth="true" value="#{altaConstanciaServicioBean.idCliente}" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Selecione Cliente" itemValue="" noSelectionOption="true" />
 							<f:selectItems var="cte" value="#{altaConstanciaServicioBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
 							<p:ajax listener="#{altaConstanciaServicioBean.filtrarCliente}" process="@this" update=":form:selProducto :form:selServicio :form:txtFolio"/>
@@ -30,20 +30,25 @@
 			<h5></h5>
 			<p:fieldset legend="Mercancía" >
 				<p:panel>
-					<p:inputNumber id="txtCantidadProd" value="#{altaConstanciaServicioBean.cantidad}" placeholder="Cantidad" minValue="1" decimalPlaces="0"/>
-					<p:selectOneMenu id="selUnidad" autoWidth="true" value="#{altaConstanciaServicioBean.idUnidadManejo}" filterMatchMode="startsWith">
+					<p:inputNumber id="txtCantidadProd" value="#{altaConstanciaServicioBean.partida.cantidadTotal}" placeholder="Cantidad" minValue="1" decimalPlaces="0">
+						<p:ajax process="@this" />
+					</p:inputNumber>
+					<p:selectOneMenu id="selUnidad" autoWidth="true" value="#{altaConstanciaServicioBean.partida.unidadDeCobro}" filter="true" filterMatchMode="contains" converter="entityConverter">
 						<f:selectItem itemLabel="Seleccione Unidad" itemValue="" noSelectionOption="true" />
-						<f:selectItems var="selectedUnidadManejo" value="#{altaConstanciaServicioBean.alUnidades}" itemLabel="#{selectedUnidadManejo.unidadDeManejoDs}"
-							itemValue="#{selectedUnidadManejo.unidadDeManejoCve}" />
+						<f:selectItems var="unidad" value="#{altaConstanciaServicioBean.alUnidades}" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
+						<p:ajax process="@this" />
 					</p:selectOneMenu>
-					<p:inputNumber id="txtPesoProd" value="#{altaConstanciaServicioBean.peso}" placeholder="Peso (kg)" minValue="0" decimalPlaces="3" />
-					<p:selectOneMenu id="selProducto" autoWidth="true" value="#{altaConstanciaServicioBean.idProducto}" filterMatchMode="startsWith">
-						<f:selectItem itemLabel="Seleccione Producto" itemValue="" noSelectionOption="true" />
-						<f:selectItems var="producto" value="#{altaConstanciaServicioBean.alProductosFiltered}" itemLabel="#{producto.productoCve.productoDs}" itemValue="#{producto.productoCve.productoCve}" />
+					<p:inputNumber id="txtPesoProd" value="#{altaConstanciaServicioBean.partida.cantidadDeCobro}" placeholder="Peso (kg)" minValue="0" decimalPlaces="3">
+						<p:ajax process="@this" />
+					</p:inputNumber>
+					<p:selectOneMenu id="selProducto" autoWidth="true" value="#{altaConstanciaServicioBean.partida.productoCve}" filter="true" filterMatchMode="contains" converter="entityConverter">
+						<f:selectItem itemLabel="Seleccione Producto" noSelectionOption="true" />
+						<f:selectItems var="producto" value="#{altaConstanciaServicioBean.alProductosFiltered}" itemLabel="#{producto.productoCve.productoDs}" itemValue="#{producto.productoCve}" />
+						<p:ajax process="@this" />
 					</p:selectOneMenu>
 					<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.agregarProducto}" update="dt-partidas"/>
 				</p:panel>
-		    	<p:dataTable id="dt-partidas" var="partida" selection="#{altaConstanciaServicioBean.selPartida}" value="#{altaConstanciaServicioBean.alPartidas}" scrollable="true" scrollHeight="9em" scrollRows="4" reflow="true">
+		    	<p:dataTable id="dt-partidas" var="partida" selection="#{altaConstanciaServicioBean.selPartida}" value="#{altaConstanciaServicioBean.alPartidas}" reflow="true">
 					<p:column width="6rem" style="text-align: right;" headerText="Cantidad"><h:outputText value="#{partida.cantidadTotal}"/></p:column>
 					<p:column width="8rem" style="text-align: center;" headerText="Unidad(es)"><h:outputText value="#{partida.unidadDeManejoCve.unidadDeManejoDs}" /></p:column>
 					<p:column style="text-align: left;" headerText="Producto(s)"><h:outputText value="#{partida.productoCve.productoDs}"/></p:column>
@@ -56,18 +61,21 @@
 			<h5></h5>
 	        <p:fieldset legend="Servicios">
 				<p:panel>
-					<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaConstanciaServicioBean.idPrecioServicio}" filterMatchMode="startsWith">
-						<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
-						<f:selectItems var="selectedPrecioServicio" value="#{altaConstanciaServicioBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
+					<p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaConstanciaServicioBean.servicio.servicioCve}" filterMatchMode="startsWith" converter="entityConverter">
+						<f:selectItem itemLabel="Seleccione Servicio" noSelectionOption="true" />
+						<f:selectItems var="ps" value="#{altaConstanciaServicioBean.alServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps.servicio}" />
+						<p:ajax process="@this"/>
 					</p:selectOneMenu>
 					<p:column>
-						<p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="3" style="width: 6em;"/>
+						<p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.servicio.servicioCantidad}" placeholder="Cantidad" minValue="1" decimalPlaces="3" style="width: 6em;">
+							<p:ajax process="@this"/>
+						</p:inputNumber>
 					</p:column>
 					<p:column>
 						<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.agregarServicio}" update="dt-servicios"/>
 					</p:column>
 				</p:panel>
-				<p:dataTable id="dt-servicios"	var="servicio" selection="#{altaConstanciaServicioBean.selServicio}" value="#{altaConstanciaServicioBean.alServiciosDetalle}" scrollable="true" scrollHeight="9em" scrollRows="2" reflow="true">	
+				<p:dataTable id="dt-servicios"	var="servicio" selection="#{altaConstanciaServicioBean.selServicio}" value="#{altaConstanciaServicioBean.alServiciosDetalle}" reflow="true">	
 					<p:column headerText="Servicio seleccionado"><h:outputText value="#{servicio.servicioCve.servicioDs}" /></p:column>
 					<p:column width="6rem" style="text-align: right;" headerText="Cantidad"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
 					<p:column width="2rem" style="text-align: right;">
@@ -81,8 +89,13 @@
 					<p:inputNumber id="txtValorDeclarado" value="#{altaConstanciaServicioBean.valorDeclarado}" placeholder="Valor declarado" minValue="1" decimalPlaces="2"/>
 					<p:inputText id="txtNombreTransportista" value="#{altaConstanciaServicioBean.nombreTransportista}" placeholder="Nombre del transportista." />
 				   	<p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." />
-					<p:panel><p:inputTextarea rows="3" cols="30" id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." style="width: 30em;"/></p:panel>
 				</div>
+				<div class="p-grid p-col-12 ui-fluid">
+					<div class="p-card p-col-12 p-md-6">
+						<p:inputText id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." />
+					</div>
+				</div>
+				
 				<div>
 			        <p:splitButton value="Guardar" actionListener="#{altaConstanciaServicioBean.guardar}" icon="pi pi-save">
 			            <p:menuitem value="Imprimir" actionListener="#{altaConstanciaServicioBean.jasper}" icon="pi pi-file-pdf" ajax="false" process="@this"/>

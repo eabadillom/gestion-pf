@@ -9,20 +9,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Embeddable
-public class NotaPorFacturaPK implements Serializable, Cloneable {
-
+public class NotaPorFacturaPK implements Serializable, Cloneable{
+	
 	private static final long serialVersionUID = 1L;
-
+	
 	@JoinColumn(name = "NOTA")
-	@ManyToOne(optional = false, cascade = { CascadeType.MERGE })
+    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
 	private NotaCredito nota;
-
+	
 	@JoinColumn(name = "FACTURA")
-	@ManyToOne(optional = false, cascade = { CascadeType.MERGE })
-	private Factura factura;
+    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
+    private Factura factura;
 
 	public NotaPorFacturaPK() {
-
+		
 	}
 
 	public NotaPorFacturaPK(NotaCredito nota, Factura factura) {
@@ -68,5 +68,7 @@ public class NotaPorFacturaPK implements Serializable, Cloneable {
 		NotaPorFacturaPK other = (NotaPorFacturaPK) obj;
 		return Objects.equals(factura, other.factura) && Objects.equals(nota, other.nota);
 	}
-
+	
+	
+	
 }

@@ -105,6 +105,6 @@
 			<property name="hibernate.connection.datasource" value="java:comp/env/jdbc/gestion"/>
 			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
-		</properties> 
+		</properties>
 	</persistence-unit>
 </persistence>

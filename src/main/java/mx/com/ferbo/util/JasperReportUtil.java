@@ -70,6 +70,8 @@ public class JasperReportUtil {
 			response.setHeader("Content-Disposition", disposition);
 			response.addHeader("Content-Disposition", disposition);
 			response.setContentType("application/pdf");
+			
+
 			design = JRXmlLoader.load(path);
 			report = JasperCompileManager.compileReport(design);
 			jasperPrint = JasperFillManager.fillReport(report, parameters);

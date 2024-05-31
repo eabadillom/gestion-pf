@@ -36,11 +36,11 @@ public class OrdenDeSalidas implements Cloneable {
 	public OrdenDeSalidas() {
 	}
 
+	
 	public OrdenDeSalidas(String folioSalida, String status, Date fechaSalida, Time horaSalida, Integer partidaCve,
 			Integer cantidad, BigDecimal peso, String codigo, String lote, Date fechaCaducidad, String sap,
 			String pedimento, String temperatura, String unidadManejo, String codigoProducto, String nombreProducto,
-			String nombrePlanta, String nombreCamara, Integer folioOrdenSalida, Integer productoCve,
-			Integer unidadManejoCve) {
+			String nombrePlanta, String nombreCamara, Integer folioOrdenSalida, Integer productoCve, Integer unidadManejoCve) {
 		this.folioSalida = folioSalida;
 		this.status = status;
 		this.fechaSalida = fechaSalida;
@@ -228,38 +228,48 @@ public class OrdenDeSalidas implements Cloneable {
 	public OrdenDeSalidas clone() throws CloneNotSupportedException {
 		return (OrdenDeSalidas) super.clone();
 	}
+	
+	
 
 	public Integer getId() {
 		return id;
 	}
 
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 
 	public String getSap() {
 		return sap;
 	}
 
+
 	public void setSap(String sap) {
 		this.sap = sap;
 	}
+
 
 	public Integer getProductoClave() {
 		return productoClave;
 	}
 
+
 	public void setProductoClave(Integer productoClave) {
 		this.productoClave = productoClave;
 	}
+
 
 	public Integer getUnidadManejoCve() {
 		return unidadManejoCve;
 	}
 
+
 	public void setUnidadManejoCve(Integer unidadManejoCve) {
 		this.unidadManejoCve = unidadManejoCve;
 	}
+
 
 	@Override
 	public String toString() {
@@ -272,4 +282,7 @@ public class OrdenDeSalidas implements Cloneable {
 				+ folioOrdenSalida + ", productoClave=" + productoClave + ", unidadManejoCve=" + unidadManejoCve + "]";
 	}
 
+
+
+	
 }

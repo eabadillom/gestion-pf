@@ -55,6 +55,7 @@ public class AvisosComercialBean implements Serializable {
 	private List<Cliente> lstClientes;
 	private Cliente clienteSelected;
 	private ClienteDAO clienteDAO;
+	
 
 	/**
 	 * Objetos para avisos
@@ -114,13 +115,13 @@ public class AvisosComercialBean implements Serializable {
 	private Integer categoriaSelected;
 	private CategoriaDAO categoriaDAO;
 	private List<Categoria> lstCategoria;
-
+	
 	/**
 	 * Objetos para Unidad de Cobro
 	 */
 	private UdCobro udCobroSelected;
 	private UdCobroDAO udCobroDAO;
-
+	
 	/**
 	 * Objetos para unidad de Manejo
 	 */
@@ -133,9 +134,9 @@ public class AvisosComercialBean implements Serializable {
 	private String renderAvisosTable;
 	private String avisoTipoFacturacion;
 	private Integer plantaCveSelected;
-
+	
 	private FacesContext faceContext;
-	private HttpServletRequest request;
+    private HttpServletRequest request;
 
 	/**
 	 * Constructores
@@ -157,10 +158,12 @@ public class AvisosComercialBean implements Serializable {
 		plantaDAO = new PlantaDAO();
 		precioServicioDAO = new PrecioServicioDAO();
 		lstPrecioServicio = new ArrayList<>();
-
+		
 		udCobroDAO = new UdCobroDAO();
 		unidadDeManejoDAO = new UnidadDeManejoDAO();
 		lstPrecioServicioSelected = new ArrayList<>();
+		
+
 
 	}
 
@@ -168,8 +171,8 @@ public class AvisosComercialBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
-		request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
 		lstClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		lstCategoria = categoriaDAO.buscarTodos();
 		categoriaSelected = 1;
@@ -189,19 +192,18 @@ public class AvisosComercialBean implements Serializable {
 		this.aviso = aviso;
 		this.avisoSelected = aviso;
 		System.out.println(this.avisoSelected.hashCode());
-		// this.avisoSelected = a;
+		//this.avisoSelected = a;
 		this.plantaCveSelected = avisoSelected.getPlantaCve().getPlantaCve();
-
+		
 		Aviso aviso_1 = new Aviso();
 		aviso_1.setAvisoCve(1);
 		PrecioServicio precioServicioAux = new PrecioServicio();
-
+		
 		precioServicioAux = new PrecioServicio();
 		precioServicioAux.setCliente(clienteSelected);
 		precioServicioAux.setAvisoCve(aviso_1);
-		lstPrecioServicio = precioServicioDAO.buscarDisponibles(clienteSelected.getCteCve(),
-				avisoSelected.getAvisoCve());
-
+		lstPrecioServicio = precioServicioDAO.buscarDisponibles(clienteSelected.getCteCve(), avisoSelected.getAvisoCve());
+		
 		precioServicioAux = new PrecioServicio();
 		precioServicioAux.setCliente(clienteSelected);
 		precioServicioAux.setAvisoCve(avisoSelected);
@@ -209,7 +211,7 @@ public class AvisosComercialBean implements Serializable {
 		PrimeFaces.current().ajax().update("soPlantaAct");
 
 	}
-
+	
 	public List<Servicio> getLstServiciosAviso() {
 		return lstServiciosAviso;
 	}
@@ -252,10 +254,10 @@ public class AvisosComercialBean implements Serializable {
 		}
 		return false;
 	}
-
+	
 	public void nuevoAviso() {
 		Categoria categoria = null;
-
+		
 		categoria = categoriaDAO.buscarPorId(this.categoriaSelected);
 		this.avisoSelected = new Aviso();
 		this.categoriaSelected = 1;
@@ -273,40 +275,38 @@ public class AvisosComercialBean implements Serializable {
 		avisoDAO.guardar(avisoSelected);
 		filtraAvisos();
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Agregado"));
-		PrimeFaces.current().ajax().update("form:messages", "dt-avisos");
+		PrimeFaces.current().ajax().update("form:messages","dt-avisos");
 	}
 
 	public void actualizaAviso() {
-		/*
-		 * PrecioServicio nPs = new PrecioServicio(); nPs.setCliente(clienteSelected);
-		 * nPs.setAvisoCve(avisoSelected); nPs.setServicio(servicioSelected);
-		 */
-		/*
-		 * for(PrecioServicio ps : lstPrecioServicioAviso) {//los precios servicios de
-		 * aviso A12 ps.setAvisoCve(avisoSelected); precioServicioDAO.actualizar(ps); }
-		 */
+		/*PrecioServicio nPs = new PrecioServicio();
+		nPs.setCliente(clienteSelected);
+		nPs.setAvisoCve(avisoSelected);
+		nPs.setServicio(servicioSelected);*/
+		/*for(PrecioServicio ps : lstPrecioServicioAviso) {//los precios servicios de aviso A12 
+			ps.setAvisoCve(avisoSelected);
+			precioServicioDAO.actualizar(ps);
+		}*/		
 		avisoSelected.setPrecioServicioList(lstPrecioServicioAviso);
 		Date fechaActual = new Date();
 		avisoSelected.setAvisoFecha(fechaActual);
-		/*
-		 * Categoria categoria = categoriaDAO.buscarPorId(categoriaSelected);
-		 * avisoSelected.setCategoriaCve(categoria);
-		 */
+		/*Categoria categoria = categoriaDAO.buscarPorId(categoriaSelected);
+		avisoSelected.setCategoriaCve(categoria);*/
 		Planta planta = plantaDAO.buscarPorId(this.plantaCveSelected);
 		avisoSelected.setPlantaCve(planta);
 		avisoSelected.setAvisoValSeg(avisoSelected.getAvisoValSeg());
 		avisoSelected.setAvisoTpFacturacion(avisoSelected.getAvisoTpFacturacion());
 		avisoSelected.setAvisoVigencia(avisoSelected.getAvisoVigencia());
 		avisoSelected.setAvisoPlazo(avisoSelected.getAvisoPlazo());
-		// nPs.getAvisoCve();
-		// precioServicioDAO.actualizar(nPs);
+		//nPs.getAvisoCve();
+		//precioServicioDAO.actualizar(nPs);
 		avisoDAO.actualizar(avisoSelected);
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Actualizado"));
 		PrimeFaces.current().executeScript("PF('addAvisoDialog').hide()");
-		PrimeFaces.current().ajax().update("form:messages", "form:dt-avisos");
+		PrimeFaces.current().ajax().update("form:messages","form:dt-avisos");
 		resetSelectedItems();
 	}
-
+	
 	public void resetSelectedItems() {
 		this.plantaCveSelected = null;
 		this.categoriaSelected = null;
@@ -315,39 +315,39 @@ public class AvisosComercialBean implements Serializable {
 	public void eliminaAviso() {
 		FacesMessage message = null;
 		Severity severity = null;
-		String mensaje = null;
-		int countCDD = 0, countPS = 0;
+		String mensaje = null;		
+		int countCDD = 0, countPS=0;
 		countCDD = avisoDAO.conteoConstanciaDeDeposito(avisoSelected);
 		countPS = avisoDAO.conteoPrecioServicio(avisoSelected);
-
-		if ((countCDD == 0) && (countPS == 0)) {
+		
+		if( (countCDD==0)&&(countPS == 0)) {
 			avisoDAO.eliminar(avisoSelected);
 			lstAvisos.remove(avisoSelected);
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "El aviso se elimino correctamente";
-		} else {
+		}else {
 			severity = FacesMessage.SEVERITY_ERROR;
 			mensaje = "El aviso no puede ser eliminado....";
 		}
-
+		
 		message = new FacesMessage(severity, "Avisos", mensaje);
-		FacesContext.getCurrentInstance().addMessage(null, message);
-		PrimeFaces.current().ajax().update("form:dt-avisos", "form:messages");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+		PrimeFaces.current().ajax().update("form:dt-avisos","form:messages");
 	}
-
+	
 	public void eliminaServicio(PrecioServicio ps) {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String eliminar = null;
-
+		
 		try {
 			eliminar = precioServicioDAO.eliminar(ps);
-			if (eliminar != null) {
+			if(eliminar != null) {
 				throw new InventarioException("Problema para eliminar el servicio seleccionado.");
 			}
 			this.lstPrecioServicioAviso = precioServicioDAO.buscarPorAviso(avisoSelected, clienteSelected);
-
+			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Servicio eliminado correctamente.";
 		} catch (InventarioException ex) {
@@ -358,50 +358,50 @@ public class AvisosComercialBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", "dt-servicioAviso");
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update(":form:messages", "dt-servicioAviso");
 		}
-
+		
 	}
-
+	
 	public void agregaServicio() {
 		FacesMessage message = null;
 		Severity severity = null;
-		String mensaje = null;
+		String mensaje = null;		
 		try {
-
-			for (PrecioServicio ps : lstPrecioServicioSelected) {
+			
+			for(PrecioServicio ps :lstPrecioServicioSelected) {
 				PrecioServicio precioServicio = new PrecioServicio();
 				precioServicio.setAvisoCve(this.avisoSelected);
 				precioServicio.setCliente(clienteSelected);
 				precioServicio.setPrecio(ps.getPrecio());
 				precioServicio.setServicio(ps.getServicio());
 				precioServicio.setUnidad(ps.getUnidad());
-
-				// TEST
-				ps.equals(precioServicio); // no importa
-				// verificar si el nuevo precio servicio ya existe en la tabla precio servicio
-				List<PrecioServicio> lstTmpPrecioS = lstPrecioServicioAviso.stream()
-						.filter(p -> precioServicio.equals(p)).collect(Collectors.toList());
-
-				if (lstTmpPrecioS.size() > 0) // La lista lstPrecioServicioAviso ya tiene el precioServicio? no contiene
-												// a precio servicio
-					continue; // entra pero sigue con la iteracion siguiente
-
-				if (precioServicioDAO.guardar(precioServicio) != null)
+				
+				//TEST
+				ps.equals(precioServicio); //no importa
+				//verificar si el nuevo precio servicio ya existe en la tabla precio servicio
+				List<PrecioServicio> lstTmpPrecioS =  lstPrecioServicioAviso.stream()
+						.filter(
+								p -> precioServicio.equals(p)
+						)
+						.collect(Collectors.toList());
+				
+				if(lstTmpPrecioS.size() > 0) //La lista lstPrecioServicioAviso ya tiene el precioServicio? no contiene a precio servicio
+					continue; //entra pero sigue con la iteracion siguiente 
+				
+				if(precioServicioDAO.guardar(precioServicio) != null)
 					throw new InventarioException("Problema para actualizar los servicios.");
-
+				
 				System.out.println(this.avisoSelected.hashCode());
-				// this.avisoSelected.add(precioServicio); //para que ?
+				//this.avisoSelected.add(precioServicio); //para que ?
 			}
-			// avisoDAO.actualizar(avisoSelected);
-			/*
-			 * if(precioServicioDAO.guardar(precioServicioSelected) != null) throw new
-			 * InventarioException("Problema para actualizar los servicios.");
-			 */
-
+			//avisoDAO.actualizar(avisoSelected);
+			/*if(precioServicioDAO.guardar(precioServicioSelected) != null)
+				throw new InventarioException("Problema para actualizar los servicios.");*/
+			
 			this.buscaPrecioServicioAviso(avisoSelected);
-
+			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Servicio agregado correctamente.";
 		} catch (InventarioException ex) {
@@ -413,19 +413,20 @@ public class AvisosComercialBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-			// PrimeFaces.current().ajax().update(":form:messages", "dt-servicioAviso");
-			PrimeFaces.current().ajax().update("form:dt-avisos", "form:panel-actAviso", "form:dt-servicioAviso",
-					"form:dt-servicioSinAviso", "messages");
+	        FacesContext.getCurrentInstance().addMessage(null, message);
+	        //PrimeFaces.current().ajax().update(":form:messages", "dt-servicioAviso");
+	        PrimeFaces.current().ajax().update("form:dt-avisos", "form:panel-actAviso", "form:dt-servicioAviso", "form:dt-servicioSinAviso", "messages");
 		}
-
+		
+		
 	}
-
-	public void remueveAviso() {
+	
+	public void remueveAviso() {		
 		precioServicioDAO.eliminarListado(lstPrecioServicioSelected);
 		PrimeFaces.current().ajax().update("form:dt-avisos", "form:panel-actAviso");
 
 	}
+	
 
 	/**
 	 * Getters & Setters
@@ -701,5 +702,6 @@ public class AvisosComercialBean implements Serializable {
 	public void setAviso(Aviso aviso) {
 		this.aviso = aviso;
 	}
+
 
 }

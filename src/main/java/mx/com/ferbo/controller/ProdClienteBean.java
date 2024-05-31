@@ -50,10 +50,10 @@ public class ProdClienteBean implements Serializable {
 	private List<Categoria> categoriaList;
 	private Categoria categoria;
 	private CategoriaDAO categoriaDAO;
-
+	
 	private FacesContext faceContext;
-	private HttpServletRequest request;
-	private HttpSession session;
+    private HttpServletRequest request;
+    private HttpSession session;
 
 	public ProdClienteBean() {
 		clienteDAO = new ClienteDAO();
@@ -68,46 +68,47 @@ public class ProdClienteBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
-		request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-		setSession(request.getSession(false));
-
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        session = request.getSession(false);
+        
 		lstClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		lstClientes = clienteDAO.buscarTodos();
 		categoriaList = categoriaDAO.buscarTodos();
 		try {
-			setCategoria(categoriaList.stream().filter(c -> c.getCategoriaCve() == 1).collect(Collectors.toList())
-					.get(0));
+			categoria = categoriaList.stream().filter(c -> c.getCategoriaCve() == 1)
+			.collect(Collectors.toList())
+			.get(0);
 		} catch (Exception e) {
 		}
-
+			
 	}
 
 	public void filtraListado() {
 		lstProductosClienteFiltered.clear();
 		lstProductosClienteFiltered = productoPorClienteDAO.buscarPorCliente(clienteSelected.getCteCve(), true);
-
-		if (listProducto == null)
+		
+		if(listProducto == null)
 			listProducto = new ArrayList<Producto>();
-
-		if (listProducto.isEmpty() == false)
+		
+		if(listProducto.isEmpty() == false)
 			listProducto.clear();
-
-		for (ProductoPorCliente ppc : lstProductosClienteFiltered) {
+		
+		for(ProductoPorCliente ppc : lstProductosClienteFiltered) {
 			listProducto.add(ppc.getProductoCve());
 		}
-
-		log.debug("Productos por cliente filtrados: {}", lstProductosClienteFiltered);
+		
+		log.debug("Productos por cliente filtrados: {}",lstProductosClienteFiltered);
 	}
 
 	public void nuevoProductoCliente() {
-
+		
 		productoSelected = new Producto();
-
+		
 		ppcSelected = new ProductoPorCliente();
 		ppcSelected.setCteCve(clienteSelected);
 		ppcSelected.setProductoCve(productoSelected);
 	}
-
+	
 	public void cargaProductoCliente() {
 		log.info("Cargando el producto {} para modificación.", ppcSelected.getProductoCve().getProductoDs());
 		this.productoSelected = ppcSelected.getProductoCve();
@@ -118,29 +119,29 @@ public class ProdClienteBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Producto";
-
+		
 		String resultado = null;
-
+		
 		try {
 			ppcSelected.setProductoCve(productoSelected);
-
-			if (productoSelected.getProductoPorClienteList() == null)
+			
+			if(productoSelected.getProductoPorClienteList() == null)
 				productoSelected.setProductoPorClienteList(new ArrayList<>());
-
+			
 			productoSelected.getProductoPorClienteList().add(ppcSelected);
-
-			if (ppcSelected.getProdXCteCve() == null)
+			
+			if(ppcSelected.getProdXCteCve() == null)
 				resultado = productoDAO.guardar(productoSelected);
 			else
 				resultado = productoDAO.actualizar(productoSelected);
-
-			if (resultado != null) {
+			
+			if(resultado != null) {
 				throw new InventarioException("Problema al guardar el producto del cliente.");
 			}
-
+			
 			filtraListado();
 			ppcSelected = new ProductoPorCliente();
-
+			
 			mensaje = "El producto se registró correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('productoClienteDialog').hide()");
@@ -162,20 +163,20 @@ public class ProdClienteBean implements Serializable {
 	 * Método para actualizar objeto tipo ProductoCliente
 	 */
 	public void actualizaProductoCliente() {
-
+		
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Producto";
-
+		
 		try {
-
+			
 			ppcSelected.setCteCve(clienteSelected);
 			ppcSelected.setProductoCve(productoSelected);
-
-			if (productoDAO.actualizar(productoSelected) != null)
+			
+			if(productoDAO.actualizar(productoSelected) != null)
 				throw new InventarioException("Problema al actualizar el producto del cliente.");
-
+			
 			mensaje = "El producto se actualizó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('productoClienteDialog').hide()");
@@ -192,6 +193,7 @@ public class ProdClienteBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-productosCliente");
 		}
 
+		
 	}
 
 	/**
@@ -286,21 +288,5 @@ public class ProdClienteBean implements Serializable {
 
 	public void setProductoPorClienteDAO(ProductoClienteDAO productoPorClienteDAO) {
 		this.productoPorClienteDAO = productoPorClienteDAO;
-	}
-
-	public Categoria getCategoria() {
-		return categoria;
-	}
-
-	public void setCategoria(Categoria categoria) {
-		this.categoria = categoria;
-	}
-
-	public HttpSession getSession() {
-		return session;
-	}
-
-	public void setSession(HttpSession session) {
-		this.session = session;
 	}
 }

@@ -31,42 +31,42 @@ import mx.com.ferbo.util.conexion;
 @Named
 @ViewScoped
 
-public class ReporteNotaCreditoBean implements Serializable {
-
+public class ReporteNotaCreditoBean implements Serializable{
+	
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(ReporteNotaCreditoBean.class);
-
+	
 	private Cliente clienteSelect;
 	private List<Cliente> listCliente;
-
+	
 	private Date fechaInicio;
 	private Date fechaFin;
 	private Date fechaActual;
 	private Date maxDate;
-
+	
 	private FacesContext faceContext;
-	private HttpServletRequest request;
-
-	public ReporteNotaCreditoBean() {
+    private HttpServletRequest request;
+	
+	public ReporteNotaCreditoBean(){
 		listCliente = new ArrayList<Cliente>();
 		clienteSelect = new Cliente();
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-
+		
 		faceContext = FacesContext.getCurrentInstance();
-		request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
 		listCliente = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
-
+		
 		fechaInicio = new Date();
 		fechaFin = new Date();
 		fechaActual = new Date();
 		Date today = new Date();
 
-		maxDate = new Date(today.getTime());
+		maxDate = new Date(today.getTime() );
 	}
 
 	public Cliente getClienteSelect() {
@@ -108,12 +108,12 @@ public class ReporteNotaCreditoBean implements Serializable {
 	public void setListCliente(List<Cliente> listCliente) {
 		this.listCliente = listCliente;
 	}
-
+	
 	public void exportarPdf() {
-
+		
 		log.info("exṕrtando a PDF");
 		String jasperPath = "/jasper/NotasCredito.jrxml";
-		String filename = "reporteNotasCredito" + fechaActual + ".pdf";
+		String filename = "reporteNotasCredito"+fechaActual+".pdf";
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
@@ -123,9 +123,9 @@ public class ReporteNotaCreditoBean implements Serializable {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
-
+		
 		try {
-
+		
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
@@ -133,17 +133,18 @@ public class ReporteNotaCreditoBean implements Serializable {
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
-
+		
 			Integer clienteCve = null;
-			if (clienteSelect == null) {
+			if(clienteSelect == null) {
 				clienteCve = null;
-			} else {
+			}else {
 				clienteCve = clienteSelect.getCteCve();
 			}
-
+			
+		
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("idCliente", clienteCve);
+			parameters.put("idCliente",clienteCve );
 			parameters.put("fechaInicio", fechaInicio);
 			parameters.put("fechaFin", fechaFin);
 			parameters.put("imagen", imgfile.getPath());
@@ -153,23 +154,23 @@ public class ReporteNotaCreditoBean implements Serializable {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
 			conexion.close((Connection) connection);
 		}
-
+		
+		
 	}
-
+	
 	public void sleep() throws InterruptedException {
-		TimeUnit.SECONDS.sleep(5);
-	}
-
+        TimeUnit.SECONDS.sleep(5);
+    }
+	
 	public void exportarExcel() {
 		log.info("exṕrtando a PDF");
 		String jasperPath = "/jasper/NotasCredito.jrxml";
-		String filename = "reporteNotasCredito" + fechaActual + ".xlsx";
+		String filename = "reporteNotasCredito"+fechaActual+".xlsx";
 		String images = "/images/logo.jpeg";
 		String message = null;
 		Severity severity = null;
@@ -179,9 +180,9 @@ public class ReporteNotaCreditoBean implements Serializable {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
-
+		
 		try {
-
+		
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
@@ -189,17 +190,18 @@ public class ReporteNotaCreditoBean implements Serializable {
 			reportFile = new File(file);
 			imgfile = new File(img);
 			log.info(reportFile.getPath());
-
+		
 			Integer clienteCve = null;
-			if (clienteSelect == null) {
+			if(clienteSelect == null) {
 				clienteCve = null;
-			} else {
+			}else {
 				clienteCve = clienteSelect.getCteCve();
 			}
-
+			
+		
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("idCliente", clienteCve);
+			parameters.put("idCliente",clienteCve );
 			parameters.put("fechaInicio", fechaInicio);
 			parameters.put("fechaFin", fechaFin);
 			parameters.put("imagen", imgfile.getPath());
@@ -209,13 +211,12 @@ public class ReporteNotaCreditoBean implements Serializable {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
 			conexion.close((Connection) connection);
 		}
-
+		
 	}
 
 	public Date getMaxDate() {
@@ -225,5 +226,7 @@ public class ReporteNotaCreditoBean implements Serializable {
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
 	}
+	
+	
 
 }

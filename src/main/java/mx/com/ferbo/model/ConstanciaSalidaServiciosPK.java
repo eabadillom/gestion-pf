@@ -8,22 +8,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Embeddable
-public class ConstanciaSalidaServiciosPK implements Serializable {
-
+public class ConstanciaSalidaServiciosPK implements Serializable{
+	
 	private static final long serialVersionUID = -7593443111857351832L;
 
-	@JoinColumn(name = "id_constancia", referencedColumnName = "ID")
+	@JoinColumn(name = "id_constancia",referencedColumnName = "ID")
 	@ManyToOne(optional = false)
 	private ConstanciaSalida constanciaSalidaCve;
-
-	@JoinColumn(name = "id_servicio", referencedColumnName = "SERVICIO_CVE")
+	
+	@JoinColumn(name = "id_servicio",referencedColumnName = "SERVICIO_CVE")
 	@ManyToOne(optional = false)
 	private Servicio servicioCve;
 
 	public ConstanciaSalidaServiciosPK() {
-
+		
 	}
-
+	
 	public ConstanciaSalidaServiciosPK(ConstanciaSalida constanciaSalidaCve, Servicio servicioCve) {
 		this.constanciaSalidaCve = constanciaSalidaCve;
 		this.servicioCve = servicioCve;

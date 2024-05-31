@@ -1,9 +1,5 @@
 package mx.com.ferbo.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -14,6 +10,10 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.TipoAsentamientoDAO;
 import mx.com.ferbo.model.TipoAsentamiento;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Named
 @ViewScoped
@@ -51,9 +51,9 @@ public class TipoAsentamientoBean implements Serializable {
 	public void guardarTipoAsentamiento() {
 		if (this.tipoAsentamientoSelect.getTipoasntmntoCve() == null) {
 			List<TipoAsentamiento> listaTmpTipoAsentamiento = tipoAsentamientoDAO.buscarTodos();
-			// listaTmpTipoAsentamiento.remove(listaTmpTipoAsentamiento.size()-2);
-			int tamanioListaTipoAsentamiento = listaTmpTipoAsentamiento.size() + 1;
-			tipoAsentamientoSelect.setTipoasntmntoCve((short) tamanioListaTipoAsentamiento);
+			//listaTmpTipoAsentamiento.remove(listaTmpTipoAsentamiento.size()-2);
+			int tamanioListaTipoAsentamiento = listaTmpTipoAsentamiento.size()+1;
+			tipoAsentamientoSelect.setTipoasntmntoCve((short)tamanioListaTipoAsentamiento);
 			if (tipoAsentamientoDAO.guardar(tipoAsentamientoSelect) == null) {
 				this.listaTipoAsentamiento.add(this.tipoAsentamientoSelect);
 				String ab = tipoAsentamientoSelect.getTipoasntmntoDsCorta();
@@ -65,8 +65,7 @@ public class TipoAsentamientoBean implements Serializable {
 			}
 		} else {
 			if (tipoAsentamientoDAO.actualizar(tipoAsentamientoSelect) == null) {
-				FacesContext.getCurrentInstance().addMessage(null,
-						new FacesMessage("Tipo de Asentamiento Actualizado"));
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Tipo de Asentamiento Actualizado"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", "Ocurrió un error al intentar actualizar el Tipo de Asentamiento"));

@@ -2,8 +2,12 @@ package mx.com.ferbo.controller;
 
 import java.io.File;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.time.Month;
+import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,15 +30,19 @@ import org.primefaces.model.charts.ChartData;
 import org.primefaces.model.charts.pie.PieChartDataSet;
 import org.primefaces.model.charts.pie.PieChartModel;
 
+import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.RepEstadoCuentaDAO;
+import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.EmisoresCFDIS;
+import mx.com.ferbo.ui.OcupacionCamara;
 import mx.com.ferbo.ui.RepEstadoCuenta;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
+import java.time.LocalDate;
 
 @Named
 @ViewScoped
@@ -71,6 +79,7 @@ public class ReporteEstadoResultadosBean implements Serializable {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@PostConstruct
 	public void init() {
 
@@ -81,6 +90,7 @@ public class ReporteEstadoResultadosBean implements Serializable {
 		listaEmisores = emisorDAO.buscarTodos();
 
 		Date today = new Date();
+		long oneDay = 24 * 60 * 60 * 1000;
 
 		maxDate = new Date(today.getTime());
 		consultaGrafica();
@@ -88,7 +98,6 @@ public class ReporteEstadoResultadosBean implements Serializable {
 
 	public void consultar() {
 		FacesMessage message = null;
-		@SuppressWarnings("unused")
 		Severity severity = null;
 		String mensaje = null;
 		Date finMes;
@@ -122,77 +131,68 @@ public class ReporteEstadoResultadosBean implements Serializable {
 	}
 
 	public void consultaGrafica() {
-		pieModel = new PieChartModel();
-		ChartData data = new ChartData();
-		Random rnd = new Random();
+		 pieModel = new PieChartModel();
+	        ChartData data = new ChartData();
+	        Random rnd = new Random();
 
-		PieChartDataSet dataSet = new PieChartDataSet();
-		List<Number> values = new ArrayList<>();
-
-		Integer size = listaestadoCuenta.size();
-		Integer i = 0;
-
-		List<String> labels = new ArrayList<>();
-
-		for (RepEstadoCuenta edc : listaestadoCuenta) {
-
-			if (i < size) {
-				values.add(edc.getVentas());
-				labels.add(edc.getFecha().toString());
-				i++;
-			}
-
-		}
-
-		dataSet.setData(values);
-
-		/*
-		 * values.add(300); values.add(50); values.add(100);
-		 */
-
-		List<Integer> rgb = null;
-		List<String> bgColors = new ArrayList<>();
-		Integer numero;
-
-		for (int bgcolor = 0; bgcolor < size; bgcolor++) { // repito las acciones la veces del tamaño de mi lista de
-															// ocupacionCamaras son los objetos que se van a crear de
-															// bgColors
-
-			rgb = new ArrayList<Integer>();
-
-			for (int color = 0; color < 3; color++) {// creo 3 numeros random tomando en cuenta el rango de valores RGB
-				numero = (int) (rnd.nextDouble() * 256);
-				rgb.add(numero);
-			}
-
-			bgColors.add(
-					"rgb(" + rgb.get(0).toString() + "," + rgb.get(1).toString() + "," + rgb.get(2).toString() + ")");// le
-																														// agrego
-																														// los
-																														// datos
-																														// a
-																														// la
-																														// lista
-																														// bgColors
-			log.info(bgColors.get(bgcolor));
-		}
-
-		dataSet.setBackgroundColor(bgColors);
-		data.addChartDataSet(dataSet);
-		data.setLabels(labels);
-
-		pieModel.setData(data);
-
-		/*
-		 * bgColors.add("rgb(255, 99, 132)"); bgColors.add("rgb(54, 162, 235)");
-		 * bgColors.add("rgb(255, 205, 86)");
-		 */
-
-		/*
-		 * labels.add("Red"); labels.add("Blue"); labels.add("Yellow");
-		 */
+	        PieChartDataSet dataSet = new PieChartDataSet();
+	        List<Number> values = new ArrayList<>();
+	        
+	        Integer size = listaestadoCuenta.size();
+	        Integer i = 0;
+	        
+	        List<String> labels = new ArrayList<>();
+	        
+	        for(RepEstadoCuenta edc: listaestadoCuenta) {
+	        	
+	        	if(i < size) {
+	        		values.add(edc.getVentas());
+	        		labels.add(edc.getFecha().toString());
+	        		i++;
+	        	}
+	        	
+	        }
+	        
+	        dataSet.setData(values);
+	        
+	        /*values.add(300);
+	        values.add(50);
+	        values.add(100);*/
+	        
+	        List<Integer> rgb = null;
+	        List<String> bgColors = new ArrayList<>();
+	        Integer numero;
+	        
+	        for(int bgcolor = 0 ; bgcolor < size;bgcolor++ ) { //repito las acciones la veces del tamaño de mi lista de ocupacionCamaras son los objetos que se van a crear de bgColors
+	        	
+	        	rgb = new ArrayList<Integer>();
+	        	
+	        	for(int color = 0; color < 3;color++) {//creo 3 numeros random tomando en cuenta el rango de valores RGB        		
+	        		numero = (int)(rnd.nextDouble()*256);
+	        		rgb.add(numero);
+	        	}
+	        	
+	        	bgColors.add("rgb("+rgb.get(0).toString()+","+rgb.get(1).toString()+","+rgb.get(2).toString()+")");//le agrego los datos a la lista bgColors
+	        	log.info(bgColors.get(bgcolor));
+	        }
+	        
+	        dataSet.setBackgroundColor(bgColors);
+	        data.addChartDataSet(dataSet);        
+	        data.setLabels(labels);
+	        
+	        pieModel.setData(data);
+	        
+	       /* bgColors.add("rgb(255, 99, 132)");
+	        bgColors.add("rgb(54, 162, 235)");
+	        bgColors.add("rgb(255, 205, 86)");*/
+	        
+	        
+	        /*labels.add("Red");
+	        labels.add("Blue");
+	        labels.add("Yellow");*/
 	}
 
+	@SuppressWarnings("deprecation")
 	public void exportarPdf() {
 		log.info("exportando a PDF");
 		String jasperPath = "/jasper/RepEstadoCuenta.jrxml";
@@ -220,7 +220,7 @@ public class ReporteEstadoResultadosBean implements Serializable {
 			log.info(reportFile.getPath());
 
 			String emi = null;
-			if (emisor == null) {
+			if (emisor == null ) {
 				emi = null;
 			} else {
 				emi = emisor.getNb_emisor();
@@ -228,7 +228,7 @@ public class ReporteEstadoResultadosBean implements Serializable {
 			finMes = DateUtil.getLastDayOfMonth(mesActual);
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("emisorN", emi);
+			parameters.put("emisorN",emi );
 			parameters.put("fechaIni", mesActual);
 			parameters.put("fechaFin", finMes);
 			parameters.put("imagen", imgfile.getPath());
@@ -274,7 +274,7 @@ public class ReporteEstadoResultadosBean implements Serializable {
 			log.info(reportFile.getPath());
 
 			String emi = null;
-			if (emisor == null) {
+			if (emisor == null ) {
 				emi = null;
 			} else {
 				emi = emisor.getNb_emisor();
@@ -282,7 +282,7 @@ public class ReporteEstadoResultadosBean implements Serializable {
 			finMes = DateUtil.getLastDayOfMonth(mesActual);
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("emisorN", emi);
+			parameters.put("emisorN",emi );
 			parameters.put("fechaIni", mesActual);
 			parameters.put("fechaFin", finMes);
 			parameters.put("imagen", imgfile.getPath());
