@@ -7,6 +7,7 @@ import javax.persistence.TypedQuery;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.Ciudades;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -72,19 +73,19 @@ public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer>
 		return null;
 	}
 
-	public List<AsentamientoHumano> buscaPorCP(String codigo) {
+	public List<AsentamientoHumano> buscaPorCP(String codigo){
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("AsentamientoHumano.findByCp", AsentamientoHumano.class).setParameter("cp", codigo)
-				.getResultList();
+			return em.createNamedQuery("AsentamientoHumano.findByCp", AsentamientoHumano.class)
+			.setParameter("cp", codigo).getResultList();	
 
 	}
-
-	public List<AsentamientoHumano> buscaPorDomicilio(Domicilios dom) {
+	
+	public List<AsentamientoHumano> buscaPorDomicilio(Domicilios dom){
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("AsentamientoHumano.findByDomicilio", AsentamientoHumano.class)
-				.setParameter("paisCve", dom.getCiudades().getMunicipios().getEstados().getPaises().getPaisCve())
-				.setParameter("estadoCve", dom.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
-				.setParameter("municipioCve", dom.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
-				.setParameter("ciudadCve", dom.getCiudades().getCiudadesPK().getCiudadCve()).getResultList();
+		.setParameter("paisCve", dom.getCiudades().getMunicipios().getEstados().getPaises().getPaisCve())
+		.setParameter("estadoCve", dom.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
+		.setParameter("municipioCve", dom.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
+		.setParameter("ciudadCve", dom.getCiudades().getCiudadesPK().getCiudadCve()).getResultList();	
 	}
 }
