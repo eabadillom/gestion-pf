@@ -45,7 +45,7 @@ public class SerieFacturaDAO {
 				return modelList;
 			
 			for(SerieFactura model : modelList) {
-				log.debug("Emisor: {}", model.getEmisor().getCd_emisor());
+				log.debug("Emisor: {}", model.getEmisor() == null ? null : model.getEmisor().getCd_emisor());
 			}
 			
 		}catch(Exception e) {
