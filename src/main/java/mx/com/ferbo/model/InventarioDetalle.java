@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import mx.com.ferbo.dao.CamaraDAO;
+import mx.com.ferbo.dao.PlantaDAO;
+import mx.com.ferbo.dao.PosicionCamaraDAO;
+
 public class InventarioDetalle extends Inventario {
 	private List<Planta> listaplanta;
 	private List<Camara> listacamara;
@@ -16,47 +20,53 @@ public class InventarioDetalle extends Inventario {
 		return posicionDestino;
 	}
 
+
 	public void setPosicionDestino(Posicion posicionDestino) {
 		this.posicionDestino = posicionDestino;
 	}
+
 
 	public Camara getCamaraDestino() {
 		return camaraDestino;
 	}
 
+
 	public void setCamaraDestino(Camara camaraDestino) {
 		this.camaraDestino = camaraDestino;
 	}
+
 
 	public Planta getPlantaDestino() {
 		return plantaDestino;
 	}
 
+
 	public void setPlantaDestino(Planta plantaDestino) {
 		this.plantaDestino = plantaDestino;
 	}
 
+
 	public InventarioDetalle() {
 
 	}
+	
 
-	public InventarioDetalle(Integer folio, Producto producto, Cliente cliente, Integer cantidad,
-			UnidadDeManejo unidadManejo, Planta planta, Integer plantad, Date caducidad, String codigo, String lote,
-			String sap, Camara camara, Integer camarad, Posicion posicion, Integer posiciond, Integer partidaCve,
-			BigDecimal peso, String inventarioCve, String detalleAnt, Integer detallePartidaAnterior,
-			Integer detallePadre, Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas,
-			String folioCliente, String observaciones, String descripcion, List<Planta> listaplanta,
-			List<Camara> listacamara, List<Posicion> listaposicion) {
-
+	public InventarioDetalle(
+			Integer folio, Producto producto, Cliente cliente, Integer cantidad, UnidadDeManejo unidadManejo,
+			Planta planta, Integer plantad, Date caducidad, String codigo, String lote, String sap, Camara camara,
+			Integer camarad, Posicion posicion, Integer posiciond, Integer partidaCve, BigDecimal peso,
+			String inventarioCve, String detalleAnt, Integer detallePartidaAnterior, Integer detallePadre,
+			Integer detallePartidaPadre, String po, String mp, String pedimento, String tarimas, String folioCliente,
+			String observaciones, String descripcion, List<Planta> listaplanta, List<Camara> listacamara, List<Posicion> listaposicion) {
+		
 		super(folio, producto, cliente, cantidad, unidadManejo, planta, plantad, caducidad, codigo, lote, sap, camara,
-				camarad, posicion, posiciond, partidaCve, peso, inventarioCve, detalleAnt, detallePartidaAnterior,
-				detallePadre, detallePartidaPadre, po, mp, pedimento, tarimas, folioCliente, observaciones,
-				descripcion);
+				camarad, posicion, posiciond, partidaCve, peso, inventarioCve, detalleAnt, detallePartidaAnterior, detallePadre,
+				detallePartidaPadre, po, mp, pedimento, tarimas, folioCliente, observaciones, descripcion);
 		this.listaplanta = listaplanta;
 		this.listacamara = listacamara;
 		this.listaposicion = listaposicion;
 	}
-
+	
 	public InventarioDetalle(Inventario inventario) {
 		this.folio = inventario.getFolio();
 		this.producto = inventario.getProducto();
@@ -87,6 +97,7 @@ public class InventarioDetalle extends Inventario {
 		this.Observaciones = inventario.getObservaciones();
 		this.descripcion = inventario.getDescripcion();
 	}
+
 
 	public List<Planta> getListaplanta() {
 		return listaplanta;

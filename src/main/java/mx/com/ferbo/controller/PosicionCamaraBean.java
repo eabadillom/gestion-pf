@@ -1,16 +1,16 @@
 package mx.com.ferbo.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.primefaces.PrimeFaces;
+
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-
-import org.primefaces.PrimeFaces;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.PlantaDAO;
@@ -41,6 +41,7 @@ public class PosicionCamaraBean implements Serializable {
 	private List<Posicion> listaPosiciones;
 	private Posicion checkHabilitado;
 
+
 	private Posicion nuevaPosicion;
 
 	public PosicionCamaraBean() {
@@ -55,15 +56,13 @@ public class PosicionCamaraBean implements Serializable {
 		listaPosiciones = posiciones;
 		checkHabilitado = new Posicion();
 	}
-
-	public void validar() {
-		if (plantaSelect == null) {
-			this.posiciones = result.findAll();
-			listaPosiciones = posiciones;
-		}
-		PrimeFaces.current().ajax().update("form:dt-posiciones");
+public void validar() {
+	if(plantaSelect == null ) {
+		this.posiciones = result.findAll();
+		listaPosiciones = posiciones;
 	}
-
+	PrimeFaces.current().ajax().update("form:dt-posiciones");
+}
 	public void filtraListado() {
 		camaraPorPlanta.clear();
 		camaraPorPlanta = camaras.stream()
@@ -71,8 +70,7 @@ public class PosicionCamaraBean implements Serializable {
 						? (ps.getPlantaCve().getPlantaCve().intValue() == plantaSelect.getPlantaCve().intValue())
 						: false)
 				.collect(Collectors.toList());
-		System.out.println("Productos Cliente Filtrados:" + camaraPorPlanta.toString()
-				+ "---------------------------------------------------------------------------------------");
+		System.out.println("Productos Cliente Filtrados:" + camaraPorPlanta.toString() + "---------------------------------------------------------------------------------------");
 	}
 
 	public void filtrarPosiciones() {
@@ -101,14 +99,15 @@ public class PosicionCamaraBean implements Serializable {
 		nuevaPosicion.setCamara(new Camara());
 		System.out.println(nuevaPosicion + "************************POSICION");
 	}
-
+	
 	public void filtrarAgregar() {
 		camaraPorPlantaAgregar.clear();
-		camaraPorPlantaAgregar = camaras.stream().filter(ps -> nuevaPosicion != null
+		camaraPorPlantaAgregar = camaras.stream()
+				.filter(ps -> nuevaPosicion != null
 				? (ps.getPlantaCve().getPlantaCve().intValue() == nuevaPosicion.getPlanta().getPlantaCve().intValue())
-				: false).collect(Collectors.toList());
-		System.out.println("Productos Cliente Filtrados:" + camaraPorPlantaAgregar.toString()
-				+ "---------------------------------------------------------------------------------------");
+						: false)
+				.collect(Collectors.toList());
+		System.out.println("Productos Cliente Filtrados:" + camaraPorPlantaAgregar.toString() + "---------------------------------------------------------------------------------------");
 	}
 
 	public void save() {
@@ -116,12 +115,10 @@ public class PosicionCamaraBean implements Serializable {
 		if (message == null) {
 			listaPosiciones.clear();
 			filtrarPosiciones();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Posicion agregada", null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Posicion agregada", null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-posiciones");
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar ", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar ", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 
@@ -129,39 +126,39 @@ public class PosicionCamaraBean implements Serializable {
 		this.nuevaPosicion.setPlanta(new Planta());
 		this.nuevaPosicion.setCamara(new Camara());
 		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
-		PrimeFaces.current().ajax().update("form:messages", "dt-posiciones", "dt-posicionesCamara");
+		PrimeFaces.current().ajax().update("form:messages", "dt-posiciones","dt-posicionesCamara");
 	}
-
+	
 	public void check() {
-		if (checkHabilitado.getHabilitada() == true) {
+		if(checkHabilitado.getHabilitada() == true) {
 			checkHabilitado.setHabilitada(false);
 			System.out.println(checkHabilitado.getHabilitada() + "cambio a true");
-		} else if (checkHabilitado.getHabilitada() == false) {
-			checkHabilitado.setHabilitada(true);
+		}else 
+			if(checkHabilitado.getHabilitada() == false){
+				checkHabilitado.setHabilitada(true);
 			System.out.println(checkHabilitado.getHabilitada() + "cambio a false");
 		}
 		String message = result.actualizar(checkHabilitado);
 		if (message == null) {
 			listaPosiciones.clear();
 			listaPosiciones = result.findAll();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Status actualizado ", null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Status actualizado ", null));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-posiciones");
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "No se pudo habilitar ", message));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No se pudo habilitar ", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
-		this.checkHabilitado = new Posicion();
+		this.checkHabilitado = new Posicion();	
 		this.checkHabilitado.setPlanta(new Planta());
 		this.checkHabilitado.setCamara(new Camara());
 		PrimeFaces.current().ajax().update("form:messages");
 	}
-
+	
+	
 	public Posicion getCheckHabilitado() {
 		return checkHabilitado;
 	}
-
+	
 	public void setCheckHabilitado(Posicion checkHabilitado) {
 		this.checkHabilitado = checkHabilitado;
 	}

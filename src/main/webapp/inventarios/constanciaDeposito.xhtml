@@ -49,9 +49,8 @@
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-2 p-md-2">
-						<p:datePicker id="fechaIngreso" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Ingreso" value="#{constanciaDeDepositoBean.fechaIngreso}" maxdate="#{constanciaDeDepositoBean.maxDate}" disabled="#{constanciaDeDepositoBean.restricted}">
+						<p:datePicker id="fechaIngreso" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Ingreso" value="#{constanciaDeDepositoBean.fechaIngreso}" maxdate="#{constanciaDeDepositoBean.maxDate}" disabled="#{constanciaDeDepositoBean.restricted}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 							<p:ajax update="@this" process="@this"/>
-							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</p:datePicker>
 					</div>
 					<div class="p-col-2 p-md-2">
@@ -136,7 +135,7 @@
 							</p:inputText>
 						</div>
 						<div class="p-col-2 p-md-2">
-							<p:datePicker id="fechaCaducidad" showIcon="true" value="#{constanciaDeDepositoBean.detalle.dtpCaducidad}" disabled="#{not constanciaDeDepositoBean.showCaducidad}" placeholder="Caducidad" title="Caducidad" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6:00">
+							<p:datePicker id="fechaCaducidad" showIcon="true" value="#{constanciaDeDepositoBean.detalle.dtpCaducidad}" disabled="#{not constanciaDeDepositoBean.showCaducidad}" placeholder="Caducidad" title="Caducidad" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6">
 								<p:ajax process="@this"></p:ajax>
 							</p:datePicker>
 						</div>
@@ -276,22 +275,22 @@
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-2 p-md-2">
 							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{constanciaDeDepositoBean.isCongelacion}">
-								<p:ajax process="@this"></p:ajax>
+								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
 						<div class="p-col-2 p-md-2">
 							<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{constanciaDeDepositoBean.isConservacion}">
-								<p:ajax process="@this"></p:ajax>
+								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
 						<div class="p-col-2 p-md-2">
 							<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{constanciaDeDepositoBean.isRefrigeracion}">
-								<p:ajax process="@this"></p:ajax>
+								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
 						<div class="p-col-2 p-md-2">
 							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{constanciaDeDepositoBean.isManiobras}">
-								<p:ajax process="@this"></p:ajax>
+								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
 					</div>

@@ -91,29 +91,28 @@ public class CiudadesBean implements Serializable {
 		this.ciudadSelect = new Ciudades();
 		this.ciudadPKSelect = new CiudadesPK();
 		ciudadSelect.setCiudadesPK(ciudadPKSelect);
-
-		if (idPais != 0 || idEstado != 0 || idMunicipio != 0) {
+		
+		if(idPais!=0 || idEstado !=0 || idMunicipio !=0) {
 			handleMunicipalitySelect();
 		}
-
+		
 	}
-
+	
 	public void guardarCiudad() {
 		if (this.ciudadSelect.getCiudadesPK().getCiudadCve() == 0) {
 			List<Ciudades> listaCiudadMunicipioEstadoPais = ciudadesDao.buscarPorCriteriosCiudades(ciudadSelect);
 			int tamanioListaCiudadMunicipioEstadoPais = listaCiudadMunicipioEstadoPais.size() + 1;
 			ciudadPKSelect.setCiudadCve(tamanioListaCiudadMunicipioEstadoPais);
 			ciudadSelect.setCiudadesPK(ciudadPKSelect);
-
+			
 			this.municipioPkSelect.setPaisCve(idPais);
 			this.municipioPkSelect.setEstadoCve(idEstado);
-			this.municipioSelect.setMunicipiosPK(municipioPkSelect);
-			List<Municipios> listaMunicipiosTmp = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
-			List<Municipios> municipioTmp = listaMunicipiosTmp.stream()
-					.filter(m -> m.getMunicipiosPK().getMunicipioCve() == idMunicipio).collect(Collectors.toList());
+			this.municipioSelect.setMunicipiosPK(municipioPkSelect);			
+			List<Municipios> listaMunicipiosTmp = municipiosDao.buscarPorPaisEstado(municipioSelect);
+			List<Municipios> municipioTmp = listaMunicipiosTmp.stream().filter(m ->m.getMunicipiosPK().getMunicipioCve()==idMunicipio).collect(Collectors.toList());
 			Municipios municipio = municipioTmp.get(0);
 			ciudadSelect.setMunicipios(municipio);
-			if (ciudadesDao.guardar(ciudadSelect) == null) {
+			if(ciudadesDao.guardar(ciudadSelect) == null) {
 				this.listaCiudades.add(this.ciudadSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Ciudad Agregada"));
 			} else {
@@ -121,19 +120,20 @@ public class CiudadesBean implements Serializable {
 						"Error", "Ocurrió un error al intentar guardar la Ciudad"));
 			}
 		} else {
-			if (ciudadesDao.actualizar(ciudadSelect) == null) {
+			if(ciudadesDao.actualizar(ciudadSelect) == null) {
 //				this.listaCiudades.add(this.ciudadSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Ciudad Actualizada"));
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", "Ocurrió un error al intentar actualizar la Ciudad"));
 			}
-		}
+		} 
 		listaCiudades = ciudadesDao.buscarPorCriterios(ciudadSelect);
 		PrimeFaces.current().executeScript("PF('nuevaCiudadDialog').hide()");
 		PrimeFaces.current().ajax().update("form:dt-Ciudades");
 	}
-
+	
+	
 	public void eliminandoCiudad() {
 		if (ciudadesDao.eliminar(ciudadSelect) == null) {
 			this.listaCiudades.remove(this.ciudadSelect);
@@ -154,16 +154,16 @@ public class CiudadesBean implements Serializable {
 			listaEstados = estadosDao.buscarPorCriteriosEstados(estadoSelect);
 		}
 	}
-
+	
 	public void handleStateSelect() {
 		if (this.idEstado != -1) {
 			this.municipioPkSelect.setPaisCve(idPais);
 			this.municipioPkSelect.setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);
-			listaMunicipios = municipiosDao.buscarPorCriteriosMunicipios(municipioSelect);
+			listaMunicipios = municipiosDao.buscarPorPaisEstado(municipioSelect);
 		}
 	}
-
+	
 	public void handleMunicipalitySelect() {
 		if (this.idMunicipio != -1) {
 			this.ciudadPKSelect.setPaisCve(idPais);
@@ -197,7 +197,7 @@ public class CiudadesBean implements Serializable {
 	public void setListaMunicipios(List<Municipios> listaMunicipios) {
 		this.listaMunicipios = listaMunicipios;
 	}
-
+	
 	public List<Ciudades> getListaCiudades() {
 		return listaCiudades;
 	}

@@ -6,7 +6,6 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,78 +23,79 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "status_constancia_servicio")
 @NamedQueries({
-		@NamedQuery(name = "StatusConstanciaServicio.findAll", query = "SELECT s FROM StatusConstanciaServicio s"),
-		@NamedQuery(name = "StatusConstanciaServicio.findById", query = "SELECT s FROM StatusConstanciaServicio s WHERE s.id = :id"),
-		@NamedQuery(name = "StatusConstanciaServicio.findByNombre", query = "SELECT s FROM StatusConstanciaServicio s WHERE s.nombre = :nombre"),
-		@NamedQuery(name = "StatusConstanciaServicio.findByDescripcion", query = "SELECT s FROM StatusConstanciaServicio s WHERE s.descripcion = :descripcion") })
+    @NamedQuery(name = "StatusConstanciaServicio.findAll", query = "SELECT s FROM StatusConstanciaServicio s"),
+    @NamedQuery(name = "StatusConstanciaServicio.findById", query = "SELECT s FROM StatusConstanciaServicio s WHERE s.id = :id"),
+    @NamedQuery(name = "StatusConstanciaServicio.findByNombre", query = "SELECT s FROM StatusConstanciaServicio s WHERE s.nombre = :nombre"),
+    @NamedQuery(name = "StatusConstanciaServicio.findByDescripcion", query = "SELECT s FROM StatusConstanciaServicio s WHERE s.descripcion = :descripcion")})
 public class StatusConstanciaServicio implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	@Id
-	@Basic(optional = false)
-	@NotNull
-	@Column(name = "ID")
-	private Integer id;
-	@Size(max = 20)
-	@Column(name = "NOMBRE")
-	private String nombre;
-	@Size(max = 50)
-	@Column(name = "DESCRIPCION")
-	private String descripcion;
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "ID")
+    private Integer id;
+    @Size(max = 20)
+    @Column(name = "NOMBRE")
+    private String nombre;
+    @Size(max = 50)
+    @Column(name = "DESCRIPCION")
+    private String descripcion;
 
-	public StatusConstanciaServicio() {
-	}
+    public StatusConstanciaServicio() {
+    }
 
-	public StatusConstanciaServicio(Integer id) {
-		this.id = id;
-	}
+    public StatusConstanciaServicio(Integer id) {
+        this.id = id;
+    }
 
-	public Integer getId() {
-		return id;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public String getNombre() {
-		return nombre;
-	}
+    public String getNombre() {
+        return nombre;
+    }
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-	public String getDescripcion() {
-		return descripcion;
-	}
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
-		return hash;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		if (!(object instanceof StatusConstanciaServicio)) {
-			return false;
-		}
-		StatusConstanciaServicio other = (StatusConstanciaServicio) object;
-		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof StatusConstanciaServicio)) {
+            return false;
+        }
+        StatusConstanciaServicio other = (StatusConstanciaServicio) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public String toString() {
-		return "mx.com.ferbo.model.StatusConstanciaServicio[ id=" + id + " ]";
-	}
-
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.StatusConstanciaServicio[ id=" + id + " ]";
+    }
+    
 }

@@ -37,28 +37,28 @@ public class ModPlazosPagoBean implements Serializable {
 	private Date actual = GregorianCalendar.getInstance().getTime();
 	private Date de;
 	private Date hasta;
-
+	
 	private FacesContext faceContext;
-	private HttpServletRequest request;
+    private HttpServletRequest request;
 
 	public ModPlazosPagoBean() {
 		modNumber = 1;
 		daoFac = new ModPlazosPagoDAO();
-
+		
 		facSelect = new ArrayList<Factura>();
 	};
-
+	
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
-		request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-
+        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		
 		listClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		de = new Date();
 		hasta = new Date();
 	}
-
+	
 	public boolean hasClient() {
 		return this.clienteSelect != null;
 	};
@@ -78,7 +78,7 @@ public class ModPlazosPagoBean implements Serializable {
 
 	public void update() {
 		String message = null;
-		for (Factura factura : facSelect) {
+		for(Factura factura : facSelect) {
 			message = daoFac.updatePlazo(factura, modNumber);
 		}
 

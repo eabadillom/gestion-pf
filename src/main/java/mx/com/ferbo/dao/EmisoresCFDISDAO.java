@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.model.Certificado;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -198,6 +199,33 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer> {
 		}
 
 		return null;
+	}
+
+	public List<EmisoresCFDIS> buscarTodos(boolean isFullInfo) {
+		List<EmisoresCFDIS> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			modelList = em.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class)
+					.getResultList()
+					;
+			if(isFullInfo == false)
+				return modelList;
+			
+			for(EmisoresCFDIS e : modelList) {
+				for(Certificado c : e.getListaCertificado()) {
+					log.info("Certificado: {}", c.getCdCertificado());
+				}
+			}
+			
+		} catch(Exception ex) {
+			
+		} finally {
+			
+		}
+		
+		return modelList;
 	}
 
 }

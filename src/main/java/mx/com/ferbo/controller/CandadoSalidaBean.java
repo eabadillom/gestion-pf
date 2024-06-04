@@ -28,7 +28,7 @@ public class CandadoSalidaBean implements Serializable {
 	private List<CandadoSalida> lista;
 	private CandadoSalida seleccion;
 	private CandadoSalidaDAO dao;
-
+	
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
@@ -38,13 +38,13 @@ public class CandadoSalidaBean implements Serializable {
 		lista = dao.findAll();
 		seleccion = new CandadoSalida();
 	};
-
+	
 	@PostConstruct
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-
+		
 		log.info("El usuario {} ingresa al mantenimiento de candados de salida...", this.usuario.getUsuario());
 	}
 

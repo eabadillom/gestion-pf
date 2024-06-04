@@ -14,6 +14,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -72,7 +73,7 @@ public class FacMantenimentoBean implements Serializable {
 	private FacturaDAO daoFac;
 	private Factura seleccion;
 	private FacturaMedioPagoDAO factMedioPagoDAO;
-
+	
 	private CancelaFactura cancelaFactura = null;
 	private CancelaFacturaDAO cancelaDAO = null;
 	private MetodoPagoDAO metodoPagoDAO;
@@ -117,7 +118,7 @@ public class FacMantenimentoBean implements Serializable {
 		byte bytes[] = {};
 		this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
 				.name("factura.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
-
+		
 	}
 
 	public void consultarPagos() {
@@ -140,49 +141,49 @@ public class FacMantenimentoBean implements Serializable {
 	}
 
 	public void updateFactura() {
-
+		
 		FacesMessage message = null;
 		String mensaje = null;
 		Severity severity = null;
-
-		MedioPago mp = medioPagoDAO.buscarPorId(idMedioPagoSelected);
-
+		
+		MedioPago mp = medioPagoDAO.buscarPorId(idMedioPagoSelected);			
+		
 		FacturaMedioPago factMedioPago;
 		try {
 			factMedioPago = factMedioPagoDAO.buscarPorFactura(seleccion.getId());
 			factMedioPago.setMpDescripcion(mp.getMpDescripcion());
 			factMedioPago.setMpId(mp);
-			// seleccion.setFecha(fechaModificada);
-
+			//seleccion.setFecha(fechaModificada);
+			
 			seleccion.setMetodoPago(cdMetodoPagoSelected);
-			if (factMedioPagoDAO.actualizar(factMedioPago) == null
-					&& daoFac.actualizarFechaFactura(seleccion) == null) {
-
+			if(factMedioPagoDAO.actualizar(factMedioPago ) == null && daoFac.actualizarFechaFactura(seleccion) == null) {
+				
 				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " actualizada";
-				severity = FacesMessage.SEVERITY_INFO;
-			} else {
+				severity = FacesMessage.SEVERITY_INFO;			
+			}else {
 				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " no actualizada";
 				severity = FacesMessage.SEVERITY_ERROR;
 			}
 		} catch (Exception e) {
 			log.error("Ocurrió un problema en la actualización de la factura...", e);
 		}
-
-		message = new FacesMessage(severity, "Actualizacion", mensaje);
+		
+		
+		message = new FacesMessage(severity, "Actualizacion", mensaje );
 		FacesContext.getCurrentInstance().addMessage(null, message);
 		PrimeFaces.current().ajax().update("form:messages");
-
+		
 	}
-
+	
 	public void datosCliente() {
-
+		
 		consultarPagos();
-
-		Factura fact = daoFac.buscarPorId(seleccion.getId(), true);
+		
+		Factura fact = daoFac.buscarPorId(seleccion.getId(), true);		
 		idMedioPagoSelected = fact.getFacturaMedioPagoList().get(0).getMpId().getMpId();
-
+		
 		cdMetodoPagoSelected = seleccion.getMetodoPago();
-
+		
 	}
 
 	public void cancelaFactura() {
@@ -325,7 +326,6 @@ public class FacMantenimentoBean implements Serializable {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	public void exportar() throws JRException, IOException, SQLException {
 		String jasperPath = null;
 		String filename = null;

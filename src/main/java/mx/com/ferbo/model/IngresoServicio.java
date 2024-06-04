@@ -17,30 +17,32 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "ingreso_servicio")
-@NamedQueries({ @NamedQuery(name = "IngresoServicio.findAll", query = "SELECT inS FROM IngresoServicio inS"),
-		@NamedQuery(name = "IngresoServicio.findByIngreso", query = "SELECT inS FROM IngresoServicio inS WHERE inS.ingreso.idIngreso = :idIngreso") })
+@NamedQueries({
+	@NamedQuery(name = "IngresoServicio.findAll", query = "SELECT inS FROM IngresoServicio inS"),
+	@NamedQuery(name = "IngresoServicio.findByIngreso", query = "SELECT inS FROM IngresoServicio inS WHERE inS.ingreso.idIngreso = :idIngreso")
+})
 
-public class IngresoServicio implements Serializable {
-
+public class IngresoServicio implements Serializable{
+	
 	private static final long serialVersionUID = 1L;
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "id_ingreso_servicio")
 	private Integer idIngresoServicio;
-
+	
 	@JoinColumn(name = "id_servicio", referencedColumnName = "SERVICIO_CVE")
 	@ManyToOne
 	private Servicio servicio;
-
+	
 	@Column(name = "cantidad")
 	private BigDecimal cantidad;
-
+	
 	@JoinColumn(name = "id_unidad", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
 	@ManyToOne
 	private UnidadDeManejo unidadDeManejo;
-
+	
 	@JoinColumn(name = "id_ingreso", referencedColumnName = "id_ingreso")
 	@ManyToOne
 	private Ingreso ingreso;
@@ -91,4 +93,6 @@ public class IngresoServicio implements Serializable {
 				+ cantidad + ", unidadDeManejo=" + unidadDeManejo + ", ingreso=" + ingreso + "]";
 	}
 
+	
+	
 }

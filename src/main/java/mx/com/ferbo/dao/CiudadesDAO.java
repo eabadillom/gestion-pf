@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Ciudades;
+import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
@@ -22,105 +23,141 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Ciudades> findall() {
-
+		
 		EntityManager entity = null;
-		List<Ciudades> ciudades = null;
-
+		List<Ciudades> ciudades= null;
+		
 		try {
-			entity = getEntityManager();
+			entity = getEntityManager();			
 			Query sql = entity.createNamedQuery("Ciudades.findAll", Ciudades.class);
 			ciudades = sql.getResultList();
 		} catch (Exception e) {
-			log.error("Problema al recuperar ciudades", e);
-		} finally {
+			log.error("Problema al recuperar ciudades",e);
+		}finally {
 			EntityManagerUtil.close(entity);
 		}
-
+		
 		return ciudades;
 	}
-
+	
 	@Override
 	public Ciudades buscarPorId(Integer id) {
-		
+		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public Ciudades buscarPorId(CiudadesPK ciudadPK) {
+		Ciudades model = null;
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			model = em.find(Ciudades.class, ciudadPK);
+		} catch(Exception ex) {
+			log.warn("Problema para obtener la información de la ciudad...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return model;
 	}
 
 	@Override
 	public List<Ciudades> buscarTodos() {
-
+		
 		EntityManager em = null;
 		List<Ciudades> listado = null;
-
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("Ciudades.findAll", Ciudades.class).getResultList();
 		} catch (Exception e) {
-			log.error("Problema al recuperar ciudades", e);
-		} finally {
+			log.error("Problema al recuperar ciudades",e);
+		}finally {
 			EntityManagerUtil.close(em);
 		}
-
+		
 		return listado;
 	}
 
 	public List<Ciudades> buscarPorCriteriosCiudades(Ciudades e) {
-
-		EntityManager em = null;
+		EntityManager em = null;		
 		List<Ciudades> listado = null;
-
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class)
 					.setParameter("paisCve", e.getCiudadesPK().getPaisCve())
 					.setParameter("estadoCve", e.getCiudadesPK().getEstadoCve())
-					.setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve()).getResultList();
-		} catch (Exception e2) {
+					.setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve())
+					.getResultList()
+					;
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de ciudades...", ex);
+		}finally {
+			EntityManagerUtil.close(em);
+		}		
+		
+		return listado;
+	}
+	
+	public List<Ciudades> buscarPorPaisEstadoMunicipio(Integer idPais, Integer idEstado, Integer idMunicipio) {
+		EntityManager em = null;		
+		List<Ciudades> listado = null;
+		
+		try {
 			
-		} finally {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class)
+					.setParameter("paisCve", idPais)
+					.setParameter("estadoCve", idEstado)
+					.setParameter("municipioCve", idMunicipio)
+					.getResultList()
+					;
+			
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de ciudades...", ex);
+		}finally {
 			EntityManagerUtil.close(em);
 		}
-
+		
 		return listado;
 	}
 
 	@Override
-	public List<Ciudades> buscarPorCriterios(Ciudades e) {// verificar que funcione correctamente
+	public List<Ciudades> buscarPorCriterios(Ciudades e) {//verificar que funcione correctamente
+		// TODO Auto-generated method stub
 		
-
 		EntityManager em = null;
 		List<Ciudades> listado = null;
-
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			if (e.getMunicipios().getMunicipiosPK().getMunicipioCve() > 0) {
-				TypedQuery<Ciudades> consEstados = em.createNamedQuery("Ciudades.findByEstadoMunicipioCve",
-						Ciudades.class);
+				TypedQuery<Ciudades> consEstados = em.createNamedQuery("Ciudades.findByEstadoMunicipioCve", Ciudades.class);
 				consEstados.setParameter("municipioCve", e.getMunicipios().getMunicipiosPK().getMunicipioCve())
 						.setParameter("estadoCve", e.getMunicipios().getEstados().getEstadosPK().getEstadoCve());
 				listado = consEstados.getResultList();
 			}
-			if (e.getCiudadesPK().getPaisCve() != -1 && e.getCiudadesPK().getEstadoCve() != -1
-					&& e.getCiudadesPK().getMunicipioCve() != -1) {
-				listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class)
-						.setParameter("paisCve", e.getCiudadesPK().getPaisCve())
-						.setParameter("estadoCve", e.getCiudadesPK().getEstadoCve())
-						.setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve()).getResultList();
-			}
-
-		} catch (Exception e2) {
+			if (e.getCiudadesPK().getPaisCve() != -1 && e.getCiudadesPK().getEstadoCve() != -1 && e.getCiudadesPK().getMunicipioCve() != -1){
+				listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class).setParameter("paisCve", e.getCiudadesPK().getPaisCve()).setParameter("estadoCve", e.getCiudadesPK().getEstadoCve()).setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve())
+						.getResultList();
+			} 
 			
-		} finally {
+		} catch (Exception e2) {
+			// TODO: handle exception
+		}finally {
 			EntityManagerUtil.close(em);
 		}
-
+		
 		return listado;
 	}
 
 	@Override
 	public String actualizar(Ciudades ciudades) {
-
+		
 		EntityManager em = null;
-
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -129,7 +166,7 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 		} catch (Exception e) {
 			System.out.println("ERROR guardando Municipio" + e.getMessage());
 			return "ERROR";
-		} finally {
+		}finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -137,18 +174,18 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 
 	@Override
 	public String guardar(Ciudades ciudades) {
-
+		
 		EntityManager em = null;
-
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(ciudades);
-			em.getTransaction().commit();
+			em.getTransaction().commit();			
 		} catch (Exception e) {
 			System.out.println("ERROR guardando Municipio" + e.getMessage());
 			return "ERROR";
-		} finally {
+		}finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -156,24 +193,23 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 
 	@Override
 	public String eliminar(Ciudades ciudades) {
-
+		
 		EntityManager em = null;
-
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 //			em.remove(em.merge(ciudades));
-			em.createQuery(
-					"DELETE FROM Ciudades c WHERE c.ciudadesPK.paisCve =:paisCve and c.ciudadesPK.estadoCve =:estadoCve and c.ciudadesPK.municipioCve =:municipioCve and c.ciudadesPK.ciudadCve =:ciudadCve")
-					.setParameter("paisCve", ciudades.getCiudadesPK().getPaisCve())
-					.setParameter("estadoCve", ciudades.getCiudadesPK().getEstadoCve())
-					.setParameter("municipioCve", ciudades.getCiudadesPK().getMunicipioCve())
-					.setParameter("ciudadCve", ciudades.getCiudadesPK().getCiudadCve()).executeUpdate();
+			em.createQuery("DELETE FROM Ciudades c WHERE c.ciudadesPK.paisCve =:paisCve and c.ciudadesPK.estadoCve =:estadoCve and c.ciudadesPK.municipioCve =:municipioCve and c.ciudadesPK.ciudadCve =:ciudadCve")
+			.setParameter("paisCve", ciudades.getCiudadesPK().getPaisCve())
+			.setParameter("estadoCve", ciudades.getCiudadesPK().getEstadoCve())
+			.setParameter("municipioCve", ciudades.getCiudadesPK().getMunicipioCve())
+			.setParameter("ciudadCve", ciudades.getCiudadesPK().getCiudadCve()).executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		} finally {
+		}finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -181,7 +217,7 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 
 	@Override
 	public String eliminarListado(List<Ciudades> listado) {
-		
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -190,12 +226,13 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 		return em.createNamedQuery("Ciudades.findByCiudadCve", Ciudades.class).setParameter("ciudadCve", id)
 				.getResultList();
 	}
-
-	public List<Ciudades> buscaPorAsentamiento(AsentamientoHumano as) {
+	
+	public List<Ciudades> buscaPorAsentamiento(AsentamientoHumano as){
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Ciudades.findByTodo", Ciudades.class)
 				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getMunicipioCve())
 				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getEstadoCve())
-				.setParameter("ciudadCve", as.getAsentamientoHumanoPK().getCiudadCve()).getResultList();
+				.setParameter("ciudadCve", as.getAsentamientoHumanoPK().getCiudadCve())
+				.getResultList();
 	}
 }
