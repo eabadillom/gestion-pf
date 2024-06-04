@@ -4,7 +4,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.List;
-import mx.com.ferbo.dao.chequesDevueltosDAO;
+import mx.com.ferbo.dao.ChequesDevueltosDAO;
 import mx.com.ferbo.model.ChequeDevuelto;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
@@ -15,7 +15,7 @@ public class ChequesDevueltosBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private chequesDevueltosDAO result;
+	private ChequesDevueltosDAO result;
 	private List<ChequeDevuelto> chequesDevueltos;
 	
 	private Cliente clienteSelect;
@@ -25,7 +25,7 @@ public class ChequesDevueltosBean implements Serializable {
 
 
 	public ChequesDevueltosBean() {
-		result = new chequesDevueltosDAO();
+		result = new ChequesDevueltosDAO();
 		this.chequesDevueltos = result.findAll();
 	}
 	
@@ -43,12 +43,12 @@ public class ChequesDevueltosBean implements Serializable {
 	}
 
 
-	public chequesDevueltosDAO getResult() {
+	public ChequesDevueltosDAO getResult() {
 		return result;
 	}
 
 
-	public void setResult(chequesDevueltosDAO result) {
+	public void setResult(ChequesDevueltosDAO result) {
 		this.result = result;
 	}
 
