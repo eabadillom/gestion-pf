@@ -10,10 +10,6 @@ import mx.com.ferbo.util.JPAEntity;
 import mx.com.ferbo.model.ChequeDevuelto;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
-import mx.com.ferbo.model.Planta;
-
-import mx.com.ferbo.util.JPAEntity;
-import mx.com.ferbo.model.Posicion;
 
 public class ChequesDevueltosDAO {
 	
