@@ -1,11 +1,14 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CamaraDAO;
@@ -68,7 +73,7 @@ import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
-import mx.com.ferbo.util.conexion;
+import net.sf.jasperreports.engine.JRException;
 
 @Named
 @ViewScoped
@@ -169,6 +174,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private SerieConstancia serie;
 	private Usuario usuario;
 	
+	private StreamedContent file;
+	
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
     
@@ -211,56 +218,65 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		Planta planta = null;
-		partidaEdit = new Partida();
-		faceContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
-        
-        this.setRestrictedAccess();
-		
-		if(restricted) {
-			log.info("Estableciendo solo la planta para el usuario de almacen...");
-			planta = plantaDAO.buscarPorId(usuario.getIdPlanta());
-			listadoPlanta = new ArrayList<Planta>();
-			listadoPlanta.add(planta);
-			plantaSelect = planta;
-			this.filtraCamaras();
-		} else {
-			log.info("Estableciendo todo el listado de plantas para usuarios de administración...");
-			listadoPlanta = plantaDAO.findall();
+		byte bytes[] = {};
+		try {
+			partidaEdit = new Partida();
+			faceContext = FacesContext.getCurrentInstance();
+	        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+	        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
+	        
+	        this.setRestrictedAccess();
+			
+			if(restricted) {
+				log.info("Estableciendo solo la planta para el usuario de almacen...");
+				planta = plantaDAO.buscarPorId(usuario.getIdPlanta());
+				listadoPlanta = new ArrayList<Planta>();
+				listadoPlanta.add(planta);
+				plantaSelect = planta;
+				this.filtraCamaras();
+			} else {
+				log.info("Estableciendo todo el listado de plantas para usuarios de administración...");
+				listadoPlanta = plantaDAO.findall();
+			}
+				 
+			listadoCliente = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+			this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
+			tipoMovimiento = tipoMovimientoDAO.buscarPorId(1);
+			estadoInventario = estadoInventarioDAO.buscarPorId(1);
+
+			constanciaDeDeposito = new ConstanciaDeDeposito();
+			partida = this.newPartida();
+			detalle = this.newDetallePartida();
+
+			cantidadTotal = null;
+			numTarimas = null;
+
+			isCongelacion = false;
+			isConservacion = false;
+			isRefrigeracion = false;
+			isManiobras = false;
+			fechaIngreso = new Date();
+
+			showCodigo = false;
+			showCaducidad = false;
+			showLote = false;
+			showOtro = false;
+			showPedimento = false;
+			showSAP = false;
+			
+			saved = false;
+			Date today = new Date();
+
+			maxDate = new Date(today.getTime() );
+			this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
+					.name("ticket.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
+		} catch(Exception ex) {
+			
+		} finally {
+			PrimeFaces.current().ajax().update(":form:planta", ":form:numeroC", ":form:cmdCambiarFolio");
 		}
-			 
-//		listadoCliente = clienteDAO.buscarHabilitados(true);
-		listadoCliente = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
-		this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
-		tipoMovimiento = tipoMovimientoDAO.buscarPorId(1);
-		estadoInventario = estadoInventarioDAO.buscarPorId(1);
-
-		constanciaDeDeposito = new ConstanciaDeDeposito();
-		partida = this.newPartida();
-		detalle = this.newDetallePartida();
-
-		cantidadTotal = null;
-		numTarimas = null;
-
-		isCongelacion = false;
-		isConservacion = false;
-		isRefrigeracion = false;
-		isManiobras = false;
-		fechaIngreso = new Date();
-
-		showCodigo = false;
-		showCaducidad = false;
-		showLote = false;
-		showOtro = false;
-		showPedimento = false;
-		showSAP = false;
 		
-		saved = false;
-		Date today = new Date();
-
-		maxDate = new Date(today.getTime() );
-		PrimeFaces.current().ajax().update(":form:planta", ":form:numeroC", ":form:cmdCambiarFolio");
+		
 	}
 	
 	public void totalesTarimas() {
@@ -693,6 +709,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		
+		String resultado = null;
+		
 		try {
 			log.info("El usuario {} intenta guardar una constancia de depósito...", this.usuario.getUsuario());
 			EstadoConstancia status = estadoConstanciaDAO.buscarPorId(1);
@@ -701,6 +719,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				folioCliente = this.noConstanciaSelect;
 			
 			ConstanciaDeDeposito constancia = constanciaDAO.buscarPorFolioCliente(folioCliente);
+			if(this.constanciaDeDeposito.equals(constancia))
+				throw new InventarioException(String.format("La constancia %s ya se encuentra registrada. Puede imprimirla.", folioCliente));
+			
 			
 			if(constancia != null)
 				throw new InventarioException(String.format("La constancia %s ya se encuentra registrada", folioCliente));
@@ -742,8 +763,16 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			}
 			
 			if((avisoSelect==null) ) {
-				 throw new InventarioException("Debe seleccionar un aviso");
+				throw new InventarioException("Debe seleccionar un aviso");
 			}
+			
+			if(clienteSelect == null)
+				throw new InventarioException("Debe seleccionar un cliente");
+			
+			if(fechaIngreso == null)
+				throw new InventarioException("Debe indicar una fecha de ingreso");
+			
+			
 			
 			if(plantaSelect == null) {
 				throw new InventarioException("Debe seleccionar una planta");
@@ -755,6 +784,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			if(constanciaDeDeposito.getFolioCliente() == null || "".equalsIgnoreCase(constanciaDeDeposito.getFolioCliente()) )
 				this.constanciaDeDeposito.setFolioCliente(this.noConstanciaSelect);
+			
+			if(listadoPartida == null)
+				throw new InventarioException("La lista de productos se encuentra vacía.");
+			
+			if(listadoPartida.size() == 0)
+				throw new InventarioException("La lista de productos se encuentra vacía.");
 			
 			constanciaDeDeposito.setNombreTransportista(nombreTransportista);
 			constanciaDeDeposito.setPlacasTransporte(placas);
@@ -771,10 +806,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			constanciaDeDeposito.setPartidaList(listadoPartida);
 			constanciaDeDeposito.setStatus(status);
-			String guardar = constanciaDAO.guardar(constanciaDeDeposito);
 			
-			if(guardar != null)
-				throw new InventarioException("Ocurrió un problema al guardar la constancia de depósito.");
+			resultado = constanciaDAO.guardar(constanciaDeDeposito);
+			if(resultado != null)
+				throw new InventarioException("Ocurrió un problema al guardar la constancia de depósito " + this.constanciaDeDeposito.getFolioCliente());
+			
+			log.info("Folio constancia: {}", this.constanciaDeDeposito.getFolio());
 			
 			Integer numeroSerie = this.serie.getNuSerie() + 1;
 			this.serie.setNuSerie(numeroSerie);
@@ -786,7 +823,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			mensaje = String.format("La constancia de depósito %s se registró correctamente.", folioCliente);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
-			severity = FacesMessage.SEVERITY_ERROR;
+			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception ex) {
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
@@ -849,40 +886,57 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		PrimeFaces.current().ajax().update("form:messages", "form:numeroC");
 	}
 	
-	public void imprimir() {
-		String jasperPath = "/jasper/GestionReport.jrxml";
-		String filename = String.format("Entrada_%s.pdf", constanciaDeDeposito.getFolioCliente());
-		String images = "/images/logo.jpeg";
+	public void jasper() throws JRException, IOException, SQLException {
+		String jasperPath = null;
+		String filename = null;
+		String images = null;
 		String message = null;
 		Severity severity = null;
-		File reportFile = new File(jasperPath);
+		File reportFile = null;
 		File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		Connection connection = null;
-		parameters = new HashMap<String, Object>();
-		
+		JasperReportUtil jasperReportUtil = null;
+		Map<String, Object> parameters = null;
+		Connection conn = null;
+
 		try {
+			
+			if(this.constanciaDeDeposito.getFolio() == null)
+				throw new InventarioException("La constancia de depósito no está registrada.");
+			
+			jasperPath = "/jasper/GestionReport.jrxml";
+			filename = String.format("Entrada_%s.pdf", constanciaDeDeposito.getFolioCliente());
+			images = "/images/logo.jpeg";
+			reportFile = new File(jasperPath);
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
 			String img = resourceimg.getFile();
 			reportFile = new File(file);
 			imgfile = new File(img);
-			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
+			log.debug("Ruta del reporte: {}", reportFile.getPath());
+
+			conn = EntityManagerUtil.getConnection();
+			parameters = new HashMap<String, Object>();
+			parameters.put("REPORT_CONNECTION", conn);
 			parameters.put("FOLIO", this.constanciaDeDeposito.getFolioCliente());
 			parameters.put("LogoPath", imgfile.getPath());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			log.debug("Parametros: {}", parameters.toString());
+
+			jasperReportUtil = new JasperReportUtil();
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename)
+					.stream(() -> input).build();
+			log.info("Ticket entrada generado {}...", filename);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.noConstanciaSelect);
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
-			conexion.close((Connection) connection);
+			EntityManagerUtil.close(conn);
 		}
 
 	}
@@ -1590,6 +1644,22 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	public void setTotalCajas(BigDecimal totalCajas) {
 		this.totalCajas = totalCajas;
+	}
+
+	public ConstanciaDeDeposito getConstanciaDeDeposito() {
+		return constanciaDeDeposito;
+	}
+
+	public void setConstanciaDeDeposito(ConstanciaDeDeposito constanciaDeDeposito) {
+		this.constanciaDeDeposito = constanciaDeDeposito;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 	
 	

@@ -1,6 +1,8 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -23,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
@@ -49,7 +53,6 @@ import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
-import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
@@ -60,7 +63,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private Date fechaInicial;
 	private Date fechaFinal;
-//	private Date fechaCaducidad;
 	private Date fechaIngreso;
 	private Date maxDate;
 	
@@ -112,6 +114,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private DetallePartida detallePartida = null;
 	
+	private StreamedContent file;
+	
 	public ConsultarConstanciaDeDepositoBean() {
 		
 		constanciaDeDepositoDAO = new ConstanciaDeDepositoDAO();
@@ -139,6 +143,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		byte bytes[] = {};
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
@@ -147,7 +152,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		if(listadoClientes.size() == 1)
 			this.cliente = listadoClientes.get(0);
 		
-//		fechaCaducidad = new Date();
 		folio = "";
 		
 		Date today = new Date();
@@ -156,6 +160,9 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		this.selectConstanciaDD = new ConstanciaDeDeposito();
 		this.selectConstanciaDD.setAvisoCve(new Aviso());
 		this.statusCancelada = statusDAO.buscarPorId(2);
+		
+		this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
+				.name("ticket.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
 	}
 	
 	@PreDestroy
@@ -486,42 +493,57 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	}
 	
 	public void imprimir() {
-		String jasperPath = "/jasper/GestionReport.jrxml";
-		String filename = "ticket.pdf";
-		String images = "/images/logo.jpeg";
+		String jasperPath = null;
+		String filename = null;
+		String images = null;
 		String message = null;
 		Severity severity = null;
-		ConstanciaDeDeposito constancia = null;
-		 File reportFile = new File(jasperPath);
-		 File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		Connection connection = null;
-		parameters = new HashMap<String, Object>();
+		File reportFile = null;
+		File imgfile = null;
+		JasperReportUtil jasperReportUtil = null;
+		Map<String, Object> parameters = null;
+		Connection conn = null;
+
 		try {
+			
+			if(this.selectConstanciaDD.getFolio() == null)
+				throw new InventarioException("La constancia de depósito no está registrada.");
+			
+			jasperPath = "/jasper/GestionReport.jrxml";
+			filename = String.format("Entrada_%s.pdf", selectConstanciaDD.getFolioCliente());
+			images = "/images/logo.jpeg";
+			reportFile = new File(jasperPath);
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
 			String img = resourceimg.getFile();
 			reportFile = new File(file);
 			imgfile = new File(img);
-			constancia = new ConstanciaDeDeposito();
-			constancia.setFolioCliente(this.selectConstanciaDD.getFolioCliente());
-			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("FOLIO", constancia.getFolioCliente());
-			parameters.put("LogoPath",imgfile.getPath());
-			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());		
+			log.debug("Ruta del reporte: {}", reportFile.getPath());
+
+			conn = EntityManagerUtil.getConnection();
+			parameters = new HashMap<String, Object>();
+			parameters.put("REPORT_CONNECTION", conn);
+			parameters.put("FOLIO", this.selectConstanciaDD.getFolioCliente());
+			parameters.put("LogoPath", imgfile.getPath());
+			log.debug("Parametros: {}", parameters.toString());
+
+			jasperReportUtil = new JasperReportUtil();
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename)
+					.stream(() -> input).build();
+			log.info("Ticket entrada generado {}...", filename);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.selectConstanciaDD.getFolioCliente());
 			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(severity, "Error en impresion", message));
 			PrimeFaces.current().ajax().update("form:messages");
 		} finally {
-			conexion.close((Connection) connection);
+			EntityManagerUtil.close(conn);
 		}
-		
 	}
 
 	public Date getFechaInicial() {
@@ -770,5 +792,13 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 
 	public void setDetallePartida(DetallePartida detallePartida) {
 		this.detallePartida = detallePartida;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 }
