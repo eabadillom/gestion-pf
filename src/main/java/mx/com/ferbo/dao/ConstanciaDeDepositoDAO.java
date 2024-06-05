@@ -168,7 +168,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public String guardar(ConstanciaDeDeposito constanciaDeDeposito) {
 		EntityManager em = null;
 		try {
-			 em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(constanciaDeDeposito);
 			em.getTransaction().commit();

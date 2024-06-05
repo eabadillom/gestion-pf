@@ -9,7 +9,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionMySQLDev.jrdax"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.concurrent.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -315,75 +315,75 @@ GROUP BY
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="50" splitType="Stretch">
+		<band height="100" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement x="0" y="0" width="139" height="12" uuid="54c46c0c-f65f-4f9d-ac05-c1f8a31ccb2f">
+				<reportElement x="0" y="0" width="211" height="12" uuid="54c46c0c-f65f-4f9d-ac05-c1f8a31ccb2f">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[CONSTANCIA DE DEPOSITO	]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="139" y="0" width="72" height="12" forecolor="#000000" uuid="f1317b82-c70f-4e35-a0be-b72cbb3ebbb2">
+				<reportElement x="0" y="12" width="211" height="12" forecolor="#000000" uuid="f1317b82-c70f-4e35-a0be-b72cbb3ebbb2">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<textElement markup="styled">
+				<textElement textAlignment="Center" markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{folio_cliente}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{folio_cliente}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="12" width="40" height="12" uuid="b7f83c49-e9cc-4ea3-883d-251c26b9aa7b">
+				<reportElement x="0" y="24" width="40" height="12" uuid="b7f83c49-e9cc-4ea3-883d-251c26b9aa7b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<text><![CDATA[Cliente:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="40" y="12" width="171" height="12" uuid="59a91f4c-1e80-42b4-99ec-3b018f74d729">
+				<reportElement x="40" y="24" width="171" height="41" uuid="59a91f4c-1e80-42b4-99ec-3b018f74d729">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{CTE_NOMBRE}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CTE_NOMBRE}.replace("\"","")]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="24" width="40" height="12" uuid="92f02d1b-5cb5-4c00-aa5e-280a66e5ec55">
+				<reportElement x="0" y="65" width="40" height="12" uuid="92f02d1b-5cb5-4c00-aa5e-280a66e5ec55">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<text><![CDATA[Planta:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="36" width="40" height="12" uuid="a6fe21b7-d1d1-4755-a1b3-9b0cab89c107">
+				<reportElement x="0" y="77" width="40" height="12" uuid="a6fe21b7-d1d1-4755-a1b3-9b0cab89c107">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<text><![CDATA[Fecha:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="40" y="24" width="171" height="12" uuid="41e6a00c-3356-4191-a7ae-b6648538c281">
+				<reportElement x="40" y="65" width="171" height="12" uuid="41e6a00c-3356-4191-a7ae-b6648538c281">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PLANTA_DS}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{PLANTA_DS}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="40" y="36" width="171" height="12" uuid="1ef10fdb-a2ca-4b38-a564-524442a825f2">
+				<reportElement x="40" y="77" width="171" height="12" uuid="1ef10fdb-a2ca-4b38-a564-524442a825f2">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{FECHA_INGRESO}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{FECHA_INGRESO}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="0" y="48" width="211" height="1" uuid="196c9cff-72b5-4463-b565-4ecbb2302621">
+				<reportElement x="0" y="89" width="211" height="1" uuid="196c9cff-72b5-4463-b565-4ecbb2302621">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<graphicElement>
@@ -393,68 +393,68 @@ GROUP BY
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="44" splitType="Stretch">
+		<band height="55" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
-				<reportElement x="0" y="0" width="211" height="12" uuid="6b42b6b6-59c2-47df-9060-2ff2c453b8c3">
+				<reportElement x="0" y="0" width="211" height="28" uuid="6b42b6b6-59c2-47df-9060-2ff2c453b8c3">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" + $F{PRODUCTO_DS}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{PRODUCTO_DS}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="12" width="50" height="12" uuid="46b48a69-055d-4d2c-86d1-a9422b351bd8">
+				<reportElement x="0" y="28" width="50" height="12" uuid="46b48a69-055d-4d2c-86d1-a9422b351bd8">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<text><![CDATA[Cantidad:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="50" y="12" width="47" height="12" forecolor="#000000" uuid="dc24797c-fed2-4077-82a3-27bc2b3cd38e">
+				<reportElement x="50" y="28" width="47" height="12" forecolor="#000000" uuid="dc24797c-fed2-4077-82a3-27bc2b3cd38e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$F{CANTIDAD_TOTAL} +"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CANTIDAD_TOTAL}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="97" y="12" width="114" height="12" forecolor="#000000" uuid="bf860db5-a0fb-480d-8b6d-8b72003057a1">
+				<reportElement x="97" y="28" width="114" height="12" forecolor="#000000" uuid="bf860db5-a0fb-480d-8b6d-8b72003057a1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$F{UNIDAD_DE_MANEJO_DS}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{UNIDAD_DE_MANEJO_DS}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="125" y="24" width="37" height="12" uuid="d8ce6372-1091-4545-9d44-cd2c31e81e53">
+				<reportElement x="125" y="40" width="37" height="12" uuid="d8ce6372-1091-4545-9d44-cd2c31e81e53">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<text><![CDATA[Peso U]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="24" width="50" height="12" uuid="72d20165-0489-486d-bbaf-9d7466e9456d">
+				<reportElement x="0" y="40" width="50" height="12" uuid="72d20165-0489-486d-bbaf-9d7466e9456d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<text><![CDATA[Peso:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="50" y="24" width="59" height="12" forecolor="#000000" uuid="75cbba95-9527-44c3-8e43-f9a97794461c">
+				<reportElement x="50" y="40" width="59" height="12" forecolor="#000000" uuid="75cbba95-9527-44c3-8e43-f9a97794461c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$F{PESO_TOTAL}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{PESO_TOTAL}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="162" y="24" width="34" height="12" forecolor="#000000" uuid="3e31ce54-428f-4725-8d83-184c0a5611ee">
+				<reportElement x="162" y="40" width="34" height="12" forecolor="#000000" uuid="3e31ce54-428f-4725-8d83-184c0a5611ee">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
@@ -464,7 +464,7 @@ GROUP BY
 				<textFieldExpression><![CDATA[$V{pesoUnitario}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="109" y="24" width="16" height="12" uuid="3c5428c3-84bd-4fc1-96a6-9a30d7dcfd02">
+				<reportElement x="109" y="40" width="16" height="12" uuid="3c5428c3-84bd-4fc1-96a6-9a30d7dcfd02">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled">
@@ -474,7 +474,7 @@ GROUP BY
 				<text><![CDATA[<style pdfFontName= 'Helvetica-Bold'>kg</style>]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="196" y="24" width="15" height="12" uuid="eaa8f29f-fb11-48b0-a363-a96e762ef5f8"/>
+				<reportElement x="196" y="40" width="15" height="12" uuid="eaa8f29f-fb11-48b0-a363-a96e762ef5f8"/>
 				<text><![CDATA[kg]]></text>
 			</staticText>
 		</band>
@@ -525,21 +525,21 @@ GROUP BY
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$F{temperatura}+ "°C"+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{temperatura}+ " °C"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="88" y="123" width="123" height="12" uuid="aa391e63-4364-4be1-a0ea-55cfeb7fb18b"/>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$V{CantidadTotal}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{CantidadTotal}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="88" y="135" width="123" height="12" uuid="5a2bf181-7352-4e85-b0ad-b4b77fdd40b2"/>
 				<textElement markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName= 'Helvetica-Bold'>" +$V{PesoTotal}+"</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{PesoTotal}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="13" width="211" height="110" forecolor="#000000" uuid="a442e697-0f70-4338-9d8d-d302bba606f1">

@@ -12,7 +12,7 @@
 	</style>
 	<ui:define name="title">Consultar Entradas</ui:define>
 	<ui:define name="content">
-		<h:form id="form">
+		<h:form id="form" enctype="multipart/form-data">
 			<p:growl id="messages" showDetail="true" />
 			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
 				<div align="center">
@@ -123,9 +123,10 @@
 					
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:splitButton value="Guardar" icon="pi pi-save" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura">
-						<p:menuitem value="Reimprimir Ticket" icon="pi pi-print" actionListener="#{consultarConstanciaDeDepositoBean.imprimir()}" ajax="false" process="@this"></p:menuitem>
-					</p:splitButton>
+					<p:commandButton id="cmdGuardar" value="Guardar" icon="pi pi-save" actionListener="#{consultarConstanciaDeDepositoBean.updateDatosGenerales()}" update="observacion temperatura"/>
+					<p:commandButton id="cmdImprimir" value="Imprimir" actionListener="#{consultarConstanciaDeDepositoBean.imprimir}" styleClass="edit-button" icon="pi pi-file-pdf" update="cmdGuardar cmdImprimir" ajax="false">
+						<p:fileDownload value="#{consultarConstanciaDeDepositoBean.file}" />
+					</p:commandButton>
 					<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dlgDatosG').hide()"></p:commandButton>
 				</f:facet>	
 			</p:dialog>
