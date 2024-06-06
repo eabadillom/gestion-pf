@@ -25,7 +25,7 @@
 							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" required="true" requiredMessage="Selecciona una Planta" onchange="PF('statusInfoDialog').show();">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
 								<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-								<p:ajax update="selEmisor txtRFC messages dt-vigencias serieFactura planta" listener="#{facturacionConstanciasBean.serieFactura}" process="@this" oncomplete="PF('statusInfoDialog').hide();"/>
+								<p:ajax update="selEmisor txtRFC messages form:dt-constanciasE form:dt-vigencias serieFactura planta" listener="#{facturacionConstanciasBean.serieFactura}" process="@this" oncomplete="PF('statusInfoDialog').hide();"/>
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-12 p-md-6">
@@ -61,7 +61,7 @@
 										onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
 									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
-									<p:ajax update="receptor factura messages medioPago medio metodo metodoPago" listener="#{facturacionConstanciasBean.cargaInfoCliente}" oncomplete="PF('statusInfoDialog').hide();"/>
+									<p:ajax update="receptor factura messages medioPago medio metodo metodoPago form:dt-constanciasE form:dt-vigencias" listener="#{facturacionConstanciasBean.cargaInfoCliente}" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-6 p-md-6">
@@ -412,7 +412,7 @@
 				<p:toolbar>
 					<p:toolbarGroup>
 						<div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
-							<p:commandButton icon="pi pi-save" process="@this" actionListener="#{facturacionConstanciasBean.saveFactura}" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" async="false"/>
+							<p:commandButton icon="pi pi-save" process="@this" actionListener="#{facturacionConstanciasBean.saveFactura}" title="Guardar" value="Guardar" styleClass="ui-button-raised ui-button-secondary" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" ajax="false"/>
 						</div>
 					 	<div style="margin-top: 2rem;" align="center" class="col-2">
 							<p:divider layout="vertical"></p:divider>

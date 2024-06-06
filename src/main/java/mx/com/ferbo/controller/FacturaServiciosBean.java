@@ -95,9 +95,6 @@ public class FacturaServiciosBean implements Serializable {
 	private FacesContext context;
 	private HttpServletRequest request;
 	private HttpSession session;
-
-	
-	
 	
 	private List<Cliente> clientes;
 	private List<ClienteDomicilios> listaClienteDom;    
@@ -593,7 +590,7 @@ public class FacturaServiciosBean implements Serializable {
 			
 			listaSerieFacturaBkp = serieFacturaDAO.buscarPorEmisor(this.emisor, true);
 			
-			if(factura.getId()!=null)
+			if(factura.getId() != null)
 				throw new InventarioException("La factura ya se encuentra registrada.");
 			
 			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
@@ -704,18 +701,16 @@ public class FacturaServiciosBean implements Serializable {
 			this.listaSerieFactura = listaSerieFacturaBkp;
 			
 			severity = FacesMessage.SEVERITY_INFO;
-			message = "La factura se guardo correctamente";
+			message = String.format("La factura %s-%s se guardo correctamente", this.factura.getNomSerie(), this.factura.getNumero());
 		} catch (InventarioException ex) {
-			log.error("Problema para obtener la información de los productos...", ex);
+			log.error("Problema para guardar la factura...", ex);
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception ex) {
 			log.error("Problema para obtener los servicios del cliente.", ex);
-			ex.printStackTrace();
-			message = "Problema con la información de servicios.";
+			message = "Existe un problema al guardar la factura.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			//serieFacturaSelect = new SerieFactura();
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Factura" , message));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-facturacionServicios", "form:serieFactura");
 		}
@@ -766,7 +761,6 @@ public class FacturaServiciosBean implements Serializable {
 			log.debug("Parametros: {}", parameters.toString());
 			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 		} catch (Exception ex) {
-			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.selServicio);
 			severity = FacesMessage.SEVERITY_INFO;

@@ -1165,7 +1165,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			this.listaSerieFactura = listaSerieFacturaBkp;
 			this.serieFacturaSelect = serieTmp;
 			
-			mensaje = String.format("La factura %s-%s se guardo correctamente", this.serieFacturaSelect.getNomSerie(), this.serieFacturaSelect.getNumeroActual());
+			mensaje = String.format("La factura %s-%s se guardo correctamente", this.serieFacturaSelect.getNomSerie(), this.serieFacturaSelect.getNumeroActual() + 1);
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(InventarioException ex) {
 			log.error("Problema para guardar la factura...", ex);
