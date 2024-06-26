@@ -392,4 +392,28 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	public void setEm(EntityManager em) {
 		this.em = em;
 	}
+        
+    public List<ConstanciaDeDeposito> buscarPorProducto(String nombreProducto) {
+		EntityManager em = null;
+		List<ConstanciaDeDeposito> constancias = null;
+		String parametro = null;
+		
+		try {
+			parametro = "%"+nombreProducto+"%";
+			em = EntityManagerUtil.getEntityManager();
+			constancias = em.createNamedQuery("ConstanciaDeDeposito.findByProducto",ConstanciaDeDeposito.class)
+					.setParameter("nombreProducto",parametro)
+					.getResultList()
+					;
+			for(ConstanciaDeDeposito c : constancias) {
+				log.debug("Cliente: {}", c.getCteCve().getCteCve());
+			}
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return constancias;
+	}
 }
