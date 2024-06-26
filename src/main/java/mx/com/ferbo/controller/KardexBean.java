@@ -149,6 +149,8 @@ public class KardexBean implements Serializable {
 	private Integer cantidadTotal;
 	private BigDecimal pesoTotal;
 	private boolean pintaTraspaso;
+        private String nombreProducto;
+        private ConstanciaDeDeposito constanciaProductoSelected;
 	
 	private ConstanciaDeDeposito entrada;
 	
@@ -180,6 +182,7 @@ public class KardexBean implements Serializable {
 		listContanciaTraspaso = new ArrayList<>();
 		listTraspasoPartida = new ArrayList<>();
 		pintaTraspaso = false;
+                this.nombreProducto = "";
 	}
 
 	public void buscaDatos() {
@@ -248,6 +251,22 @@ public class KardexBean implements Serializable {
 		}
 		
 	}
+        
+    public void buscaDatosProducto()
+    {
+        FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        this.listConstanciaDepositoFiltered = constanciaDeDepositoDAO.buscarPorProducto(nombreProducto);
+    }
+    
+    public void cargarFolioEncontrado(ConstanciaDeDeposito constancia)
+    {
+    	this.constanciaProductoSelected = constancia;
+    	log.info("Folio: {}", this.constanciaProductoSelected.getFolioCliente());
+        this.folioClienteSelected = this.constanciaProductoSelected.getFolioCliente();
+        this.buscaDatos();
+    }
 	
 	public void exportToPDF() {
 		String jasperPath = null;
@@ -679,8 +698,20 @@ public class KardexBean implements Serializable {
 		this.scKardexExcel = scKardexExcel;
 	}
 
-	
+        public String getNombreProducto() {
+            return nombreProducto;
+        }
 
-	
+        public void setNombreProducto(String nombreProducto) {
+            this.nombreProducto = nombreProducto;
+        }
 
+        public ConstanciaDeDeposito getConstanciaProductoSelected() {
+            return constanciaProductoSelected;
+        }
+
+        public void setConstanciaProductoSelected(ConstanciaDeDeposito constanciaProductoSelected) {
+            this.constanciaProductoSelected = constanciaProductoSelected;
+        }
+        
 }

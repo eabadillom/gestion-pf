@@ -43,7 +43,9 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaDeDeposito.findByFolioCliente", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.folioCliente = :folioCliente"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByValorDeclarado", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.valorDeclarado = :valorDeclarado"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByFolioClientePeriodo", query = "SELECT c FROM ConstanciaDeDeposito c WHERE (c.fechaIngreso BETWEEN :fechaInicio AND :fechaFin) AND ((c.folioCliente = :folioCliente OR :folioCliente IS NULL) OR (c.cteCve.cteCve = :idCliente OR :idCliente IS NULL)\t) "),
-    @NamedQuery(name = "ConstanciaDeDeposito.findByTemperatura", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.temperatura = :temperatura")})
+    @NamedQuery(name = "ConstanciaDeDeposito.findByTemperatura", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.temperatura = :temperatura"),
+    @NamedQuery(name = "ConstanciaDeDeposito.findByProducto", query = "SELECT distinct c from ConstanciaDeDeposito c INNER JOIN c.partidaList p INNER JOIN p.unidadDeProductoCve up INNER JOIN up.productoCve pr where pr.productoDs like :nombreProducto OR pr.numeroProd like :nombreProducto order by c.fechaIngreso DESC")
+})
 public class ConstanciaDeDeposito implements Serializable {
 
     private static final long serialVersionUID = 1L;
