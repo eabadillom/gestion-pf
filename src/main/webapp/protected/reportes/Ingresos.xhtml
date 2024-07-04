@@ -15,14 +15,12 @@
 	                <div class="card">
 	             		<p:fieldset legend="Periodo De Pago" styleClass="p-mt-4">
 	             			<p:outputLabel value="De:" styleClass="p-mr-2"></p:outputLabel>
-	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4" maxdate="#{reporteIngresosBean.maxDate}">
+	             			<p:datePicker id="fechaInicio" value="#{reporteIngresosBean.fechaInicio}" showIcon="true" styleClass="p-mr-4" maxdate="#{reporteIngresosBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 	             				<p:ajax process="@this" />
-	             				<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 	             			</p:datePicker>
 	             			<p:outputLabel value="A:" styleClass="p-mr-2"></p:outputLabel>
-	             			<p:datePicker id="fechaFin" value="#{reporteIngresosBean.fechaFin}" showIcon="true" maxdate="#{reporteIngresosBean.maxDate}">
+	             			<p:datePicker id="fechaFin" value="#{reporteIngresosBean.fechaFin}" showIcon="true" maxdate="#{reporteIngresosBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 	             				<p:ajax process="@this"/>
-	             				<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 	             			</p:datePicker>
 	             		</p:fieldset>
 	             		<p:fieldset legend="Banco" styleClass="p-mt-4">
@@ -32,7 +30,7 @@
 		             		</p:selectOneMenu>
 	             		</p:fieldset>
 	             		<p:fieldset legend="Cliente" styleClass="p-mt-4">
-		             		<p:selectOneMenu id="select-cte" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.clienteSelect}">
+		             		<p:selectOneMenu id="select-cte" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.clienteSelect}" filter="true" filterMatchMode="contains">
 		             			<f:selectItem itemLabel="Todos Los Clientes" Itemvalue="" />
 		             			<f:selectItems value="#{reporteIngresosBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 		             		</p:selectOneMenu>

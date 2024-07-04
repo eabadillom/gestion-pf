@@ -12,9 +12,8 @@
                 <div class="p-col-12">
                     <div class="card">
 						<p:fieldset legend="Fecha de corte">
-			                <p:datePicker id="minmax1" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" readonlyInput="true" showIcon="true">
+			                <p:datePicker id="minmax1" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 			                	<p:ajax process="@this" />
-			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 			                </p:datePicker>
 						</p:fieldset>
                         <p:fieldset legend="Cliente">
