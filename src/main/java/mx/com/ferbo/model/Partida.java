@@ -81,11 +81,11 @@ public class Partida implements Serializable, Cloneable {
     private List<DetallePartida> detallePartidaList;
     
     @JoinColumn(name = "CAMARA_CVE", referencedColumnName = "CAMARA_CVE")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Camara camaraCve;
     
     @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    @ManyToOne(optional = false, cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, cascade = CascadeType.DETACH)
     private ConstanciaDeDeposito folio;
     
     @JoinColumn(name = "unidad_de_cobro", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")

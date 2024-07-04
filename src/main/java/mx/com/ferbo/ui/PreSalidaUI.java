@@ -8,7 +8,9 @@ public class PreSalidaUI extends OrdenDeSalidas{
 
 	private static final long serialVersionUID = 1L;
 	
-	public boolean salidaSelected = false;
+	private boolean salidaSelected = false;
+	private String folioEntrada = null;
+	
 	
 	public PreSalidaUI(String folioSalida, String status, Date fechaSalida, Time horaSalida, Integer partidaCve, Integer cantidad, 
 			BigDecimal peso,  String codigo, String lote, Date fechaCaducidad, String sap, String pedimento, String temperatura, 
@@ -20,9 +22,6 @@ public class PreSalidaUI extends OrdenDeSalidas{
 				nombrePlanta, nombreCamara, folioOrdenSalida, productoCve, unidadManejoCve);
 				this.salidaSelected = false;
 	}
-	
-	
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -34,6 +33,10 @@ public class PreSalidaUI extends OrdenDeSalidas{
 	public void setSalidaSelected(boolean salidaSelected) {
 		this.salidaSelected = salidaSelected;
 	}
-	
-	
+	public String getFolioEntrada() {
+		return folioEntrada;
+	}
+	public void setFolioEntrada(String folioEntrada) {
+		this.folioEntrada = folioEntrada;
+	}
 }

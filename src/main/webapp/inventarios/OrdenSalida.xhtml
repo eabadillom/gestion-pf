@@ -10,26 +10,28 @@
 	<ui:define name="content">
 		<h:form id="form">
 			<p:growl id="messages" showDetail="true" life="2000"/>
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
 			<p:panel header="DATOS GENERALES">
 				<div class="p-grid ui-fluid p-col-12">
-				
 					<div class="p-col-6 p-md-6">
-						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}"  converter="entityConverter">
+						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();">
 							<f:selectItem itemLabel="Cliente..." itemValue="" noSelectionOption="true"/>
 							<f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
-							<p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:selServicio :form:folio-som " />
+							<p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:selServicio :form:folio-som " oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
-					
 					<div class="p-col-6 p-md-6">
-						<p:selectOneMenu id="folio-som" widgetVar="somFolios"  value="#{ordenSalidaBean.folioSelected}" converter="entityConverter" style="width:250px; heigth:1px" >
+						<p:selectOneMenu id="folio-som" widgetVar="somFolios"  value="#{ordenSalidaBean.folioSelected}" converter="entityConverter" style="width:250px; heigth:1px" onchange="PF('statusInfoDialog').show();">
 							<f:selectItem itemLabel="Ordenes confirmadas para hoy.." itemValue="" />
 							<f:selectItems value="#{ordenSalidaBean.listaFolios}" var="folio" itemLabel="#{folio}" itemValue="#{folio}"></f:selectItems>
-						<p:ajax listener="#{ordenSalidaBean.filtroPorPlanta}"  process ="@this" update=":form:txtfecha :form:txtHora :form:txtnomOperador :form:txtplacas :form:txtObservaciones :form:dt-salidas :form:dt-servicios" />
+						<p:ajax listener="#{ordenSalidaBean.filtroPorPlanta}"  process ="@this" update=":form:txtfecha :form:txtHora :form:txtnomOperador :form:txtplacas :form:txtObservaciones :form:dt-salidas :form:dt-servicios" oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
 					</div>
-					
 					<p:toolbar>
 							<p:toolbarGroup>
 							
@@ -89,6 +91,9 @@
 					<p:column headerText="Cod. Prod.">
 						<h:outputText value="#{salidas.codigoProducto}"/>
 					</p:column>
+					<p:column headerText="Folio ingreso">
+						<h:outputText value="#{salidas.folioEntrada}" />
+					</p:column>
 					<p:column headerText="Producto">
 						<h:outputText value="#{salidas.nombreProducto}"/>
 					</p:column>
@@ -103,8 +108,8 @@
 					<p:ajax process="@this" />
 					</p:inputText>
 					</p:column>
-			<p:rowExpansion>
-								<div class="orders-subtable">
+					<p:rowExpansion>
+						<div class="orders-subtable">
 							<p:dataTable id="dtDetallesSalida" widgetVar="wv-detalleSalida" var="detalleSalidas" value="#{ordenSalidaBean.listaPreSalidaUI}" reflow="true" rowKey="#{ordenSalidaBean.ordensalida.folioSalida}" lazy="true">
 									<p:column headerText="Unidad">
 									<h:outputText value="#{detalleSalidas.unidadManejo}"/>
@@ -121,42 +126,45 @@
 								<p:column headerText="SAP">
 									<h:outputText value="#{detalleSalidas.SAP}" />
 								</p:column>
-								
 							</p:dataTable>
 						</div>
-							</p:rowExpansion>
-		</p:dataTable>
+					</p:rowExpansion>
+				</p:dataTable>
 			</p:panel>
-			
-					 <p:fieldset legend="Servicios">
-			<p:panel>	
-				<p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.idServicio}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
-					<f:selectItem itemLabel="Seleccione Servicio" itemValue=""  />
-					<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps}" />
-				</p:selectOneMenu>
-				<p:column>
-				<p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/>
-				</p:column>
-				<p:column>
-				<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="dt-servicios"/>
-				</p:column>
+			<p:fieldset legend="Servicios">
+				<p:panel>	
+					<p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.idServicio}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
+						<f:selectItem itemLabel="Seleccione Servicio" itemValue=""  />
+						<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps}" />
+					</p:selectOneMenu>
+					<p:column>
+						<p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/>
+					</p:column>
+					<p:column>
+						<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="dt-servicios"/>
+					</p:column>
 				</p:panel>
-			
-			<p:dataTable id="dt-servicios" var="servicio" selection="#{ordenSalidaBean.pss}" value="#{ordenSalidaBean.listaPreSalidaServicio}" scrollable="true" scrollHeight="9em" scrollRows="2" reflow="true">	
-				<p:column headerText="Servicio " width="8em"><h:outputText value="#{servicio.idServicio.servicioDs}" /></p:column>
-				<p:column headerText="Cantidad(editable)" width="10em">
-				<p:inplace><h:inputText value="#{servicio.cantidad}" /> </p:inplace>
-				</p:column>
-				<p:column headerText="Unidad(editable)" width="10em">
-				<p:inplace><h:inputText value="#{servicio.idUnidadManejo.unidadDeManejoDs}"   /></p:inplace>
-				</p:column>
-				<p:column headerText="Observacion" width="10em"><h:outputText value="#{servicio.observacion}" /></p:column>
-				<p:column width="8em">
-					<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.deleteServicio(servicio)}" update="dt-servicios" process="@this"/>
-				</p:column>
-			</p:dataTable>
-	    </p:fieldset>
-	    
+				<p:dataTable id="dt-servicios" var="servicio" selection="#{ordenSalidaBean.pss}" value="#{ordenSalidaBean.listaPreSalidaServicio}" scrollable="true" scrollHeight="9em" scrollRows="2" reflow="true">	
+					<p:column headerText="Servicio " width="8em">
+						<h:outputText value="#{servicio.idServicio.servicioDs}" />
+					</p:column>
+					<p:column headerText="Cantidad(editable)" width="10em">
+						<p:inplace>
+							<h:inputText value="#{servicio.cantidad}" />
+						</p:inplace>
+					</p:column>
+					<p:column headerText="Unidad(editable)" width="10em">
+					<p:inplace>
+						<h:inputText value="#{servicio.idUnidadManejo.unidadDeManejoDs}"   />
+					</p:inplace>
+					</p:column>
+					<p:column headerText="Observacion" width="10em"><h:outputText value="#{servicio.observacion}" />
+					</p:column>
+					<p:column width="8em">
+						<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.deleteServicio(servicio)}" update="dt-servicios" process="@this"/>
+					</p:column>
+				</p:dataTable>
+			</p:fieldset>
 	    <p:divider>
         <p:splitButton id="btnguardar" value="Guardar" action="#{ordenSalidaBean.guardar}" process="@this" update="messages" icon="pi pi-save">
             <p:menuitem value="Nueva orden de salida" action="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh"/>

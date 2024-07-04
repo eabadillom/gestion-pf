@@ -182,7 +182,6 @@ public class OrdenSalidaBean implements Serializable {
 				.name("factura.pdf")
 				.stream(() -> new ByteArrayInputStream(bytes) )
 				.build();
-		
 	}
 
 	public void filtrarCliente() {
@@ -218,26 +217,45 @@ public class OrdenSalidaBean implements Serializable {
 
 	public void filtroPorPlanta() {
 		Integer folio = null;
-		System.out.println("Probando agregar producto...");
 		listaSalidasporPlantas = ordenSalidaDAO.buscarpoPlanta(folioSelected, fecha);
 		listaPreSalidaUI = new ArrayList<PreSalidaUI>();
 		try {
 			for (OrdenDeSalidas orden : listaSalidasporPlantas) {
-				PreSalidaUI preUI = new PreSalidaUI(orden.getFolioSalida(), orden.getStatus(), orden.getFechaSalida(),
-						orden.getHoraSalida(), orden.getPartidaCve(), orden.getCantidad(), orden.getPeso(),
-						orden.getCodigo(), orden.getLote(), orden.getFechaCaducidad(), orden.getSAP(),
-						orden.getPedimento(), orden.getTemperatura(), orden.getUnidadManejo(),
-						orden.getCodigoProducto(), orden.getNombreProducto(), orden.getNombrePlanta(),
-						orden.getNombreCamara(), orden.getFolioOrdenSalida(), orden.getProductoClave(), orden.getUnidadManejoCve());
+				Partida partida = partidaDAO.buscarPorIdConEntrada(orden.getPartidaCve());
+				
+				log.info("orden: {}", orden);
+				PreSalidaUI preUI = new PreSalidaUI(
+						orden.getFolioSalida(),
+						orden.getStatus(),
+						orden.getFechaSalida(),
+						orden.getHoraSalida(),
+						orden.getPartidaCve(),
+						orden.getCantidad(),
+						orden.getPeso(),
+						orden.getCodigo(),
+						orden.getLote(),
+						orden.getFechaCaducidad(),
+						orden.getSAP(),
+						orden.getPedimento(),
+						orden.getTemperatura(),
+						orden.getUnidadManejo(),
+						orden.getCodigoProducto(),
+						orden.getNombreProducto(),
+						partida.getCamaraCve().getPlantaCve().getPlantaAbrev(),
+						partida.getCamaraCve().getCamaraAbrev(),
+						orden.getFolioOrdenSalida(),
+						orden.getProductoClave(),
+						orden.getUnidadManejoCve());
 						preUI.setSalidaSelected(false);
-						Partida partida = partidaDAO.buscarPorId(preUI.getPartidaCve());
+						
 						
 						Integer cantidadInicial = partida.getCantidadTotal();
 						BigDecimal CantidadInicial = new BigDecimal(cantidadInicial);
 						BigDecimal pesoInicial = partida.getPesoTotal();
-						BigDecimal pesoPorUnidad = pesoInicial.divide(CantidadInicial);
+						BigDecimal pesoPorUnidad = pesoInicial.divide(CantidadInicial, 3, BigDecimal.ROUND_HALF_UP);
 						BigDecimal cantidadOrden = new BigDecimal(orden.getCantidad());
 						preUI.setPeso(pesoPorUnidad.multiply(cantidadOrden));
+						preUI.setFolioEntrada(partida.getFolio().getFolioCliente());
 
 				listaPreSalidaUI.add(preUI);
 				
@@ -261,9 +279,8 @@ public class OrdenSalidaBean implements Serializable {
 			UIInput inputComponent = (UIInput) component;
 			boolean value = (boolean) inputComponent.getValue();
 			String summary = value ? "Checked" : "Unchecked";
-			value = psu.salidaSelected;
-			System.out.println(psu.salidaSelected);
-			log.info(psu.salidaSelected);
+			value = psu.isSalidaSelected();
+			log.info(psu.isSalidaSelected());
 
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(summary));
 		}
@@ -279,7 +296,7 @@ public class OrdenSalidaBean implements Serializable {
 			log.info("Filtrando Producto...");
 			manager = EntityManagerUtil.getEntityManager();
 			for (PreSalidaUI ps : listaPreSalidaUI) {
-				if(ps.salidaSelected == true) {
+				if(ps.isSalidaSelected() == true) {
 					listapsU = new ArrayList<>();
 					ps.getPartidaCve();
 					ps.getNombreProducto();
@@ -338,7 +355,6 @@ public class OrdenSalidaBean implements Serializable {
 			}
 
 			if (coincidencias == 1) {
-				System.out.println("Servicio duplicado");
 				message = "Servicio duplicado, favor de modificar la cantidad y/o la unidad.";
 				severity = FacesMessage.SEVERITY_ERROR;
 			} else if (diferentes > 0) {
@@ -375,7 +391,7 @@ public class OrdenSalidaBean implements Serializable {
 		try {	
 			
 			for (PreSalidaUI preS : listaPreSalidaUI) {
-				if (preS.salidaSelected == true) {
+				if (preS.isSalidaSelected() == true) {
 					DetalleConstanciaSalida dcs = new DetalleConstanciaSalida();
 					Partida p = partidaDAO.buscarPorId(preS.getPartidaCve());
 					constancia.setFecha(fecha);
