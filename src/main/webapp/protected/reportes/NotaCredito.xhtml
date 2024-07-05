@@ -14,20 +14,18 @@
 	                <div class="card">
 	             		<p:fieldset legend="Periodo De Devolucion" styleClass="p-mt-4">
 	             		<p:outputLabel value="De:" styleClass="p-mr-2"></p:outputLabel>
-	             		<p:datePicker value="#{reporteNotaCreditoBean.fechaInicio}" showIcon="true" maxdate="#{reporteNotaCreditoBean.maxDate}">
+	             		<p:datePicker value="#{reporteNotaCreditoBean.fechaInicio}" showIcon="true" maxdate="#{reporteNotaCreditoBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 	             			<p:ajax process="@this" />
-	             			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 	             		</p:datePicker>
 	             		<p:outputLabel value="A:" styleClass="p-mr-2 p-ml-4"></p:outputLabel>
-	             		<p:datePicker value="#{reporteNotaCreditoBean.fechaFin}" showIcon="true" maxdate="#{reporteNotaCreditoBean.maxDate}">
+	             		<p:datePicker value="#{reporteNotaCreditoBean.fechaFin}" showIcon="true" maxdate="#{reporteNotaCreditoBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 	             			<p:ajax process="@this" />
-	             			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 	             		</p:datePicker>
 	             		</p:fieldset>
 	             		
 	             		<p:fieldset legend="Cliente" styleClass="p-mt-4" >
 	             		
-	             		<p:selectOneMenu id="select_cte" converter="entityConverter" autoWidth="true" value="#{reporteNotaCreditoBean.clienteSelect}" >
+	             		<p:selectOneMenu id="select_cte" converter="entityConverter" autoWidth="true" value="#{reporteNotaCreditoBean.clienteSelect}" filter="true" filterMatchMode="contains">
 	             			<f:selectItem itemLabel="Todos los clientes" itemValue="" />
 	             			<f:selectItems value="#{reporteNotaCreditoBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 	             		</p:selectOneMenu>

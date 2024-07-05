@@ -13,25 +13,23 @@
             <div class="p-grid crud-demo">
                 <div class="p-col-12">
                     <div class="card">
-						 <p:fieldset legend="Rangos de fechas">
+						 <p:fieldset legend="Periodo">
 			               <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionPorPlantaBean.fecha_ini}"  maxdate="#{reporteFacturacionPorPlantaBean.maxDate}" readonlyInput="true" showIcon="true">
+			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionPorPlantaBean.fecha_ini}"  maxdate="#{reporteFacturacionPorPlantaBean.maxDate}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 			                	<p:ajax process="@this" />
-			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 			                </p:datePicker>
 			                <p:outputLabel for="minmax1" value="Fecha de inicio "/>
 						</span>
 						 <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax2" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionPorPlantaBean.fecha_fin}"  maxdate="#{reporteFacturacionPorPlantaBean.maxDate}" readonlyInput="true" showIcon="true">
+			                <p:datePicker id="minmax2" styleClass="p-mr-4 p-mb-2" value="#{reporteFacturacionPorPlantaBean.fecha_fin}"  maxdate="#{reporteFacturacionPorPlantaBean.maxDate}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 			                	<p:ajax process="@this"/>
-			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 			                </p:datePicker>
 			                <p:outputLabel for="minmax2" value="Fecha  final "/>
 						</span>
 							</p:fieldset>
-                        <p:fieldset legend="Datos del emisor/receptor">
+                        <p:fieldset legend="Buscar por">
                        			 <span class="ui-float-label ui-input-icon-left">
-									<p:selectOneMenu id="Cliente" value="#{reporteFacturacionPorPlantaBean.clienteSelect}" converter="entityConverter" >
+									<p:selectOneMenu id="Cliente" value="#{reporteFacturacionPorPlantaBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
 									<f:selectItem itemLabel="Todos los clientes" itemValue=""  />
 									<f:selectItems value="#{reporteFacturacionPorPlantaBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
 									<p:ajax process ="@this" />

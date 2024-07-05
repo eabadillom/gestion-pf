@@ -20,9 +20,8 @@
                        		</p:selectOneMenu>
                         </p:fieldset>
                         <p:fieldset legend="Fecha de corte" styleClass="p-mt-4">
-                       		<p:datePicker id="fecha" showIcon="true" value="#{reporteCarteraClienteBean.fecha}"  maxdate="#{reporteCarteraClienteBean.maxDate}">
+                       		<p:datePicker id="fecha" showIcon="true" value="#{reporteCarteraClienteBean.fecha}"  maxdate="#{reporteCarteraClienteBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                        			<p:ajax process="@this" />
-                       			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
                        		</p:datePicker>                       	
 	                   	</p:fieldset>
 	                   	<p:fieldset legend="Cliente">
