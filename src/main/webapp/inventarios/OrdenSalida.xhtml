@@ -15,65 +15,47 @@
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 		    </p:dialog>
-			<p:panel header="DATOS GENERALES">
+			<p:panel header="Información de la solicitud">
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-col-6 p-md-6">
-						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();">
-							<f:selectItem itemLabel="Cliente..." itemValue="" noSelectionOption="true"/>
-							<f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
+						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="---SELECCIONE EL CLIENTE---" noSelectionOption="true"/>
+							<f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
 							<p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:selServicio :form:folio-som " oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-6 p-md-6">
-						<p:selectOneMenu id="folio-som" widgetVar="somFolios"  value="#{ordenSalidaBean.folioSelected}" converter="entityConverter" style="width:250px; heigth:1px" onchange="PF('statusInfoDialog').show();">
-							<f:selectItem itemLabel="Ordenes confirmadas para hoy.." itemValue="" />
+					<div class="p-col-2 p-md-2">
+						<p:selectOneMenu id="folio-som" widgetVar="somFolios"  value="#{ordenSalidaBean.folioSelected}" converter="entityConverter" onchange="PF('statusInfoDialog').show();">
+							<f:selectItem itemLabel="Ordenes del día..." itemValue="" />
 							<f:selectItems value="#{ordenSalidaBean.listaFolios}" var="folio" itemLabel="#{folio}" itemValue="#{folio}"></f:selectItems>
 						<p:ajax listener="#{ordenSalidaBean.filtroPorPlanta}"  process ="@this" update=":form:txtfecha :form:txtHora :form:txtnomOperador :form:txtplacas :form:txtObservaciones :form:dt-salidas :form:dt-servicios" oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
+					<div class="p-col-2 p-md-2">
+						<p:inputText id="txtfecha" value="#{ordenSalidaBean.ordensalida.fechaSalida}" placeholder="Fecha" readonly="true">
+		    				<f:convertDateTime pattern="dd/MM/yyyy"/>
+	    				</p:inputText>
 					</div>
-					<p:toolbar>
-							<p:toolbarGroup>
-							
-	             			<div class="col-5 flex align-items-center justify-content-center">
-			    			<p:inputText id="txtfecha" value="#{ordenSalidaBean.ordensalida.fechaSalida}" placeholder="Fecha" readonly="true" style="width:150px; heigth:1px" >
-			    				<f:convertDateTime pattern="dd/MM/yyyy"/>
-			    				</p:inputText>
-		   					</div>
-		   					
-		   					 <div class="col-2">
-					            <p:divider layout="vertical">
-					            </p:divider>
-					         </div>
-					         
-					      <div class="col-5 flex align-items-center justify-content-center">
-			    		<p:inputText id="txtHora" value="#{ordenSalidaBean.ordensalida.tmSalida}" placeholder="Hora" readonly="true" style="width:150px; heigth:1px"/>
-		    			</div>
-		    			
-		    			<p:divider />
-		    			
-		    			<div class="col-5 flex align-items-center justify-content-center">
-			    		<p:inputText id="txtnomOperador" value="#{ordenSalidaBean.ordensalida.nombreOperador}" placeholder="Nombre del operador" style="width:450px; heigth:1px"/>
-		    			</div>
-		    			
-		    			<div class="col-2">
-					            <p:divider layout="vertical">
-					            </p:divider>
-					         </div>
-					         
-		    			<div class="p-col-6 p-md-6">
-			    		<p:inputText id="txtplacas" value="#{ordenSalidaBean.ordensalida.nombrePlacas}" placeholder="Placas"  style="width:150px; heigth:1px"/>
-		    			</div>
-		    			
-		    			<div class="col-5 flex align-items-center justify-content-center">
-			    		<p:inputText id="txtObservaciones" value="#{ordenSalidaBean.observaciones}"  placeholder="Observaciones"  style="width:650px; heigth:1px"/>
-		    			</div>
-		    		</p:toolbarGroup>
-						 </p:toolbar>
-				</p:panel>
-			<p:panel >
+					<div class="p-col-2 p-md-2">
+						<p:inputText id="txtHora" value="#{ordenSalidaBean.ordensalida.tmSalida}" placeholder="Hora" readonly="true" />
+					</div>
+					<div class="p-col-6 p-md-6">
+						<p:inputText id="txtnomOperador" value="#{ordenSalidaBean.ordensalida.nombreOperador}" placeholder="Nombre del operador" />
+					</div>
+					<div class="p-col-2 p-md-2">
+						<p:inputText id="txtplacas" value="#{ordenSalidaBean.ordensalida.nombrePlacas}" placeholder="Placas"/>
+					</div>
+					<div class="p-col-12 p-md-12">
+						<p:inputText id="txtObservaciones" value="#{ordenSalidaBean.observaciones}"  placeholder="Observaciones"/>
+					</div>
+				</div>
+			</p:panel>
+			<div style="padding-top: 1rem;">
 				<p:dataTable id="dt-salidas" widgetVar="dtsalidas" value="#{ordenSalidaBean.listaPreSalidaUI}" var="salidas" paginator="false"
 							  rowSelectMode="add" rows="10" rowKey="#{salidas.folioSalida}" reflow="true" selection="#{salidas.folioSalida}" tableStyle="table-layout: auto;">
+					<f:facet name="header">
+						<p:outputLabel value="Productos solicitados" />
+					</f:facet>
 					<p:column exportable="false" width="3%">
 						<p:rowToggler />
 					</p:column>							
@@ -130,68 +112,62 @@
 						</div>
 					</p:rowExpansion>
 				</p:dataTable>
-			</p:panel>
-			<p:fieldset legend="Servicios">
-				<p:panel>	
-					<p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.idServicio}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
-						<f:selectItem itemLabel="Seleccione Servicio" itemValue=""  />
-						<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps}" />
-					</p:selectOneMenu>
-					<p:column>
-						<p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/>
-					</p:column>
-					<p:column>
-						<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="dt-servicios"/>
-					</p:column>
+			</div>
+			
+			<div style="padding-top: 1rem;">
+				<p:panel header="Agregar servicios">	
+					<div class="p-grid ui-fluid p-col-12">
+						<div class="p-col-6 p-md-6">
+							<p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.idServicio}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
+								<f:selectItem itemLabel="Seleccione Servicio" itemValue=""  />
+								<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="form:dt-servicios"/>
+						</div>
+					</div>
 				</p:panel>
-				<p:dataTable id="dt-servicios" var="servicio" selection="#{ordenSalidaBean.pss}" value="#{ordenSalidaBean.listaPreSalidaServicio}" scrollable="true" scrollHeight="9em" scrollRows="2" reflow="true">	
-					<p:column headerText="Servicio " width="8em">
+			</div>
+			
+			<div style="padding-top: 1rem;">
+				<p:dataTable id="dt-servicios" var="servicio" selection="#{ordenSalidaBean.pss}" value="#{ordenSalidaBean.listaPreSalidaServicio}" reflow="true">
+					<f:facet name="header">
+						<p:outputLabel value="Para los servicios de" />
+					</f:facet>	
+					<p:column headerText="Servicio">
 						<h:outputText value="#{servicio.idServicio.servicioDs}" />
 					</p:column>
-					<p:column headerText="Cantidad(editable)" width="10em">
+					<p:column headerText="Cantidad" width="10rem">
 						<p:inplace>
-							<h:inputText value="#{servicio.cantidad}" />
+							<h:inputText value="#{servicio.cantidad}"/>
 						</p:inplace>
+						<i class="pi pi-pencil" />
 					</p:column>
-					<p:column headerText="Unidad(editable)" width="10em">
-					<p:inplace>
-						<h:inputText value="#{servicio.idUnidadManejo.unidadDeManejoDs}"   />
-					</p:inplace>
+					<p:column headerText="Unidad" width="10rem">
+						<p:outputLabel value="#{servicio.idUnidadManejo.unidadDeManejoDs}"/>
 					</p:column>
-					<p:column headerText="Observacion" width="10em"><h:outputText value="#{servicio.observacion}" />
-					</p:column>
-					<p:column width="8em">
-						<p:commandButton icon="pi pi-times" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.deleteServicio(servicio)}" update="dt-servicios" process="@this"/>
+					<p:column width="2rem">
+						<p:commandButton icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{ordenSalidaBean.deleteServicio(servicio)}" update="dt-servicios" process="@this"/>
 					</p:column>
 				</p:dataTable>
-			</p:fieldset>
-	    <p:divider>
-        <p:splitButton id="btnguardar" value="Guardar" action="#{ordenSalidaBean.guardar}" process="@this" update="messages" icon="pi pi-save">
-            <p:menuitem value="Nueva orden de salida" action="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh"/>
-            <p:divider />
-            <p:divider />
-            <p:menuitem value="Homepage" url="http://localhost:8080/gestion/dashboard.xhtml" icon="pi pi-home"/>
-        </p:splitButton>
-        <p:divider/>
-       		<p:commandButton value="Ticket de Salida"
-						icon="pi pi-arrow-down"
-						styleClass="ui-button-outlined"
-						actionListener="#{ordenSalidaBean.imprimirTicketSalida}"
-						ajax="false">
-						<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
-					</p:commandButton>
+			</div>
 			
-			<p:commandButton value="Ticket de Servicio"
-						icon="pi pi-arrow-down"
-						styleClass="ui-button-outlined"
-						actionListener="#{ordenSalidaBean.imprimirTicketServicios}"
-						ajax="false">
-						<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
-					</p:commandButton>
-					
-        </p:divider>
-        
-    
+			<div align="center" style="padding: 1rem;">
+				<p:commandButton id="btnguardar" value="Guardar" actionListener="#{ordenSalidaBean.guardar()}" process="@this" update="messages" icon="pi pi-save">
+				</p:commandButton>
+				<p:commandButton value="Nueva orden" actionListener="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh">
+				</p:commandButton>
+				<p:commandButton value="Ticket de Salida" icon="pi pi-arrow-down" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" ajax="false">
+					<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
+				</p:commandButton>
+				<p:commandButton value="Ticket de Servicio" icon="pi pi-arrow-down" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketServicios}" ajax="false">
+					<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
+				</p:commandButton>
+			</div>
         </h:form>
 	</ui:define>
 </ui:composition>
