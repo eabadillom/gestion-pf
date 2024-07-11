@@ -21,7 +21,6 @@ import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
-import mx.com.ferbo.model.Saldo;
 import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 

@@ -39,4 +39,14 @@ public class PreSalidaUI extends OrdenDeSalidas{
 	public void setFolioEntrada(String folioEntrada) {
 		this.folioEntrada = folioEntrada;
 	}
+	@Override
+    public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+	
 }

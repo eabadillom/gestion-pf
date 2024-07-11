@@ -4,7 +4,6 @@
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:p="http://primefaces.org/ui">
-
     <div class="topbar">
         <div id="topbar-left">
             <a id="omega-menu-button" href="#">
@@ -13,11 +12,23 @@
 
             <span class="topbar-title"><ui:insert name="title"/></span>
         </div>
-
-        <a id="options-menu-button" href="#">
+		<a id="options-menu-button" href="#">
             <span class="pi pi-ellipsis-h"/>
         </a>
-
+        <div align="right">
+	        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+	        	<p:badge value="#{sideBarBean.numeroEntradas}" severity="danger" rendered="#{sideBarBean.numeroEntradas != null}">
+		       		<p:commandButton value="Ordenes de entrada" actionListener="#{sideBarBean.redirectOrdenEntrada()}" action="/inventarios/ordenEntrada.xhtml"/>
+		       	</p:badge>
+	        </span>
+	        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+		       	<p:badge id="numeroSalidas" value="#{sideBarBean.numeroSalidas}" severity="danger" rendered="#{sideBarBean.numeroSalidas != null}">
+		       		<p:autoUpdate on="eventNumeroSalidas"/>
+		       		<p:commandButton value="Ordenes de salida" actionListener="#{sideBarBean.redirectOrdenesSalida()}" action="/inventarios/OrdenSalida.xhtml">
+		       		</p:commandButton>
+		       	</p:badge>
+	        </span>
+        </div>
         <div id="topbar-icons">
             <a href="#">
                 <!-- <span class="topbar-item-text">User</span>
@@ -27,5 +38,4 @@
         </div>
         
     </div>
-    
 </ui:composition>

@@ -4,15 +4,25 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui"
 	template="/WEB-INF/template.xhtml">
-
 	<ui:define name="title">Ordenes de salida</ui:define>
-
 	<ui:define name="content">
+		<script>
+		    //<![CDATA[
+		    function start() {
+		        PF('statusInfoDialog').show();
+		    }
+		
+		    function stop() {
+		        PF('statusInfoDialog').hide();
+		    }
+		    //]]>
+		</script>
 		<h:form id="form">
 			<p:growl id="messages" showDetail="true" life="2000"/>
 			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
-				<div align="center">
-		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				<div align="center" style="background-color: rgba(120, 120, 120, 0.5); padding: 2rem;">
+					<p:graphicImage name="images/syncicon-small.gif" library="ferbo" style="width:100%;"/>
+					<!-- <i class="pi pi-spinner pi-spin" style="font-size:3rem;"/> -->
 				</div>
 		    </p:dialog>
 			<p:panel header="Información de la solicitud">
@@ -28,7 +38,7 @@
 						<p:selectOneMenu id="folio-som" widgetVar="somFolios"  value="#{ordenSalidaBean.folioSelected}" converter="entityConverter" onchange="PF('statusInfoDialog').show();">
 							<f:selectItem itemLabel="Ordenes del día..." itemValue="" />
 							<f:selectItems value="#{ordenSalidaBean.listaFolios}" var="folio" itemLabel="#{folio}" itemValue="#{folio}"></f:selectItems>
-						<p:ajax listener="#{ordenSalidaBean.filtroPorPlanta}"  process ="@this" update=":form:txtfecha :form:txtHora :form:txtnomOperador :form:txtplacas :form:txtObservaciones :form:dt-salidas :form:dt-servicios" oncomplete="PF('statusInfoDialog').hide();"/>
+						<p:ajax listener="#{ordenSalidaBean.filtroPorPlanta}"  process ="@this" update=":form:txtfecha :form:txtHora :form:txtnomOperador :form:txtplacas :form:txtObservaciones :form:dt-salidas :form:dt-servicios :form:folioSalida" oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-2 p-md-2">
@@ -45,8 +55,13 @@
 					<div class="p-col-2 p-md-2">
 						<p:inputText id="txtplacas" value="#{ordenSalidaBean.ordensalida.nombrePlacas}" placeholder="Placas"/>
 					</div>
+					<div class="p-col-2 p-md-2">
+						<p:inputText id="folioSalida" value="#{ordenSalidaBean.folioSalida}" placeholder="Folio Salida"/>
+					</div>
 					<div class="p-col-12 p-md-12">
-						<p:inputText id="txtObservaciones" value="#{ordenSalidaBean.observaciones}"  placeholder="Observaciones"/>
+						<p:inputText id="txtObservaciones" value="#{ordenSalidaBean.observaciones}"  placeholder="Observaciones">
+							<p:ajax process="@this" />
+						</p:inputText>
 					</div>
 				</div>
 			</p:panel>
@@ -56,39 +71,36 @@
 					<f:facet name="header">
 						<p:outputLabel value="Productos solicitados" />
 					</f:facet>
-					<p:column exportable="false" width="3%">
+					<p:column exportable="false" width="1rem">
 						<p:rowToggler />
-					</p:column>							
-					<p:column headerText="Confirmar">
+					</p:column>
+					<p:column width="2rem">
         				 <p:toggleSwitch value="#{salidas.salidaSelected}" required="true" requiredMessage="Selecciona almenos una orden">
         				 <p:ajax process="@this" listener="#{ordenSalidaBean.validarProducto}"/>
         				 </p:toggleSwitch>
 					</p:column>
-					<p:column headerText="Planta">
+					<p:column headerText="Planta" width="4rem">
 						<h:outputText value="#{salidas.nombrePlanta}"/>
 					</p:column>
-					<p:column headerText="Camara">
+					<p:column headerText="Camara" width="4rem">
 						<h:outputText value="#{salidas.nombreCamara}"/>
 					</p:column>
-					<p:column headerText="Cod. Prod.">
-						<h:outputText value="#{salidas.codigoProducto}"/>
-					</p:column>
-					<p:column headerText="Folio ingreso">
+					<p:column headerText="Folio ingreso" width="4rem">
 						<h:outputText value="#{salidas.folioEntrada}" />
 					</p:column>
 					<p:column headerText="Producto">
 						<h:outputText value="#{salidas.nombreProducto}"/>
 					</p:column>
-					<p:column headerText="Cant. Requerida">
+					<p:column headerText="Cantidad" width="4rem" style="text-align: right;">
 						<h:outputText value="#{salidas.cantidad}"/>
 					</p:column>
-					<p:column headerText="Peso aprox. (kg)">
+					<p:column headerText="Peso (kg)" width="5rem" style="text-align: right;">
 						<h:outputText value="#{salidas.peso}"/>
 					</p:column>
-					<p:column headerText="Temperatura °C" >
-					<p:inputText value="#{salidas.temperatura}" onblur="#{ordenSalidaBean.validaTemperatura(salidas)}" requiredMessage="Ingresar el grado de temperatura" >
-					<p:ajax process="@this" />
-					</p:inputText>
+					<p:column headerText="Temp. °C" width="4rem">
+						<p:inputText value="#{salidas.temperatura}" onblur="#{ordenSalidaBean.validaTemperatura(salidas)}" requiredMessage="Ingresar el grado de temperatura" style="width: 4rem!important;">
+							<p:ajax process="@this" />
+						</p:inputText>
 					</p:column>
 					<p:rowExpansion>
 						<div class="orders-subtable">
@@ -118,16 +130,16 @@
 				<p:panel header="Agregar servicios">	
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-6 p-md-6">
-							<p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.idServicio}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
-								<f:selectItem itemLabel="Seleccione Servicio" itemValue=""  />
-								<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps}" />
+							<p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.servicioSelect}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
+								<f:selectItem itemLabel="Seleccione Servicio" noSelectionOption="true"  />
+								<f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} - (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps}" />
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0"/>
 						</div>
 						<div class="p-col-3 p-md-3">
-							<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="form:dt-servicios"/>
+							<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="form:dt-servicios form:selServicio form:txtCantidadSrv"/>
 						</div>
 					</div>
 				</p:panel>
@@ -142,10 +154,9 @@
 						<h:outputText value="#{servicio.idServicio.servicioDs}" />
 					</p:column>
 					<p:column headerText="Cantidad" width="10rem">
-						<p:inplace>
-							<h:inputText value="#{servicio.cantidad}"/>
-						</p:inplace>
-						<i class="pi pi-pencil" />
+						<p:inputNumber value="#{servicio.cantidad}" decimalPlaces="0" minValue="1" style="width: 8rem!important;">
+							<p:ajax process="@this" />
+						</p:inputNumber>
 					</p:column>
 					<p:column headerText="Unidad" width="10rem">
 						<p:outputLabel value="#{servicio.idUnidadManejo.unidadDeManejoDs}"/>
@@ -157,17 +168,27 @@
 			</div>
 			
 			<div align="center" style="padding: 1rem;">
-				<p:commandButton id="btnguardar" value="Guardar" actionListener="#{ordenSalidaBean.guardar()}" process="@this" update="messages" icon="pi pi-save">
-				</p:commandButton>
-				<p:commandButton value="Nueva orden" actionListener="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh">
-				</p:commandButton>
-				<p:commandButton value="Ticket de Salida" icon="pi pi-arrow-down" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" ajax="false">
-					<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
-				</p:commandButton>
-				<p:commandButton value="Ticket de Servicio" icon="pi pi-arrow-down" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketServicios}" ajax="false">
-					<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
-				</p:commandButton>
+				<span style="padding-left: 0.5rem; padding-right: 1rem;">
+					<p:commandButton value="Guardar" process="@this" icon="pi pi-save" onclick="PF('confirmGuardar').show();"/>
+				</span>
+				<span style="padding-left: 0.5rem; padding-right: 1rem;">
+					<p:commandButton id="btnTicketSalida" value="Ticket de Salida" icon="pi pi-print" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+						<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
+					</p:commandButton>
+				</span>
+				<span style="padding-left: 0.5rem; padding-right: 1rem;">
+					<p:commandButton id="btnTicketServicio" value="Ticket de Servicio" icon="pi pi-print" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketServicios}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+						<p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
+					</p:commandButton>
+				</span>
+				<span style="padding-left: 0.5rem; padding-right: 1rem;">
+					<p:commandButton value="Nueva orden" actionListener="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh" />
+				</span>
 			</div>
+			<p:confirmDialog widgetVar="confirmGuardar" showEffect="fade" message="¿Está seguro que desea guardar la salida?" header="Guardar salida" severity="warn">
+				<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{ordenSalidaBean.guardar()}" process="@this" update="messages form:btnTicketSalida form:btnTicketServicio" onclick="PF('statusInfoDialog').show();" oncomplete="PF('confirmGuardar').hide();PF('statusInfoDialog').hide();"></p:commandButton>
+				<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-secondary" onclick="PF('confirmGuardar').hide();"></p:commandButton>
+			</p:confirmDialog>
         </h:form>
 	</ui:define>
 </ui:composition>

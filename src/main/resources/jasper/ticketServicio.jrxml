@@ -223,7 +223,7 @@ WHERE
 				<textElement verticalAlignment="Top" markup="styled">
 					<font fontName="SansSerif" size="9" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{CTE_NOMBRE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CTE_NOMBRE}.replace("\"","")]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="49" width="41" height="12" uuid="6f7cb688-3973-4a9c-9ba2-037eccce7159">

@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -32,6 +33,7 @@ public class SideBarBean implements Serializable {
 	private FacesContext context;
     private HttpServletRequest request;
     private HttpSession session;
+    private Integer numeroEntradas;
     private Integer numeroSalidas;
     
     public SideBarBean() {
@@ -56,8 +58,10 @@ public class SideBarBean implements Serializable {
 				log.info("Ordenes de salida pendientes: {}", numeroSalidas);
 			}
 			
-		} catch(Exception ex) {
+			this.numeroEntradas = null;
 			
+		} catch(Exception ex) {
+			log.error("Problema al iniciar la sesión del usuario.", ex);
 		} finally {
 			
 		}
@@ -77,8 +81,35 @@ public class SideBarBean implements Serializable {
     		context.getExternalContext().redirect(fullPath);
     		session.invalidate();
     	} catch(Exception ex) {
-    		log.error("Problema en el cierre de sesión del usuario...", ex);
+    		log.warn("Problema en el cierre de sesión del usuario...", ex);
+    	} finally {
     	}
+	}
+	
+	public void redirectOrdenesSalida() {
+		String contextPath = null;
+		String fullPath = null;
+		
+	    try {
+	    	contextPath = context.getExternalContext().getApplicationContextPath();
+			fullPath = contextPath + "/inventarios/OrdenSalida.xhtml";
+			this.context.getExternalContext().redirect(fullPath);
+		} catch (IOException e) {
+			log.warn("Problema para redirigir a las órdenes de salida...",e);
+		}
+	}
+	
+	public void redirectOrdenEntrada() {
+		String contextPath = null;
+		String fullPath = null;
+		
+	    try {
+	    	contextPath = context.getExternalContext().getApplicationContextPath();
+			fullPath = contextPath + "/inventarios/ordenEntrada.xhtml";
+			this.context.getExternalContext().redirect(fullPath);
+		} catch (IOException e) {
+			log.warn("Problema para redirigir a las órdenes de salida...",e);
+		}
 	}
 	
 	public Usuario getUsuario() {
@@ -94,5 +125,13 @@ public class SideBarBean implements Serializable {
 
 	public void setNumeroSalidas(Integer numeroSalidas) {
 		this.numeroSalidas = numeroSalidas;
+	}
+
+	public Integer getNumeroEntradas() {
+		return numeroEntradas;
+	}
+
+	public void setNumeroEntradas(Integer numeroEntradas) {
+		this.numeroEntradas = numeroEntradas;
 	}
 }

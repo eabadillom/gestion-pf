@@ -452,7 +452,7 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 					+ "	inner join partida p on ps.partida_cve = p.partida_cve "
 					+ "	inner join camara cam on p.camara_cve = cam.camara_cve "
 					+ "	inner join planta plt on cam.planta_cve = plt.planta_cve "
-					+ "	where fh_salida = :fechaSalida and plt.planta_cve = :idPlanta "
+					+ "	where ps.st_estado = 'A' and fh_salida = :fechaSalida and plt.planta_cve = :idPlanta "
 					+ "	group by ps.cd_folio_salida "
 					+ ") t ";
 			em = EntityManagerUtil.getEntityManager();
