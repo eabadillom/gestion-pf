@@ -59,6 +59,7 @@ public class Camara implements Serializable {
     @JoinColumn(name = "PLANTA_CVE", referencedColumnName = "PLANTA_CVE")
     @ManyToOne(fetch = FetchType.LAZY)
     private Planta plantaCve;
+    
     @OneToMany(mappedBy = "camaraCve", fetch = FetchType.LAZY)
     private List<Partida> partidaList;
     

@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -240,33 +241,35 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		
 	}
 	
-	public List<String> buscaFolios(Cliente cliente, Date fecha) {
+	public List<String> buscaFolios(Cliente cliente, Date fecha, Integer idPlanta) {
 		List<String> listaFolios = null;
 		EntityManager em = null;
 		String sql = null;
 		try {
-			 sql = "SELECT "
-					 +"distinct "
-					 +"cd_folio_salida, " 
-					 +"fh_salida, "
-					 +"tm_salida, "
-					 +"nb_placa_tte, "
-					 +"nb_operador_tte "
-					 +"FROM "
-					 +"pre_salida ps "
-					 +"INNER JOIN "
-					 +"partida p "
-					 +"ON "
-					 +"ps.partida_cve = p.PARTIDA_CVE "
-					 +"INNER JOIN "
-					 +"constancia_de_deposito cdd ON p.FOLIO = cdd.FOLIO "
-					 +"WHERE ps.st_estado = 'A' AND ps.fh_salida = :fecha AND cdd.CTE_CVE = :idCliente ";
+			 sql = "SELECT distinct \n"
+			 		+ "	cd_folio_salida,  \n"
+			 		+ "	fh_salida, \n"
+			 		+ "	tm_salida, \n"
+			 		+ "	nb_placa_tte, \n"
+			 		+ "	nb_operador_tte \n"
+			 		+ "FROM pre_salida ps \n"
+			 		+ "INNER JOIN partida p ON ps.partida_cve = p.PARTIDA_CVE\n"
+			 		+ "INNER JOIN camara cam ON p.CAMARA_CVE = cam.CAMARA_CVE\n"
+			 		+ "INNER JOIN planta plt ON cam.PLANTA_CVE = plt.PLANTA_CVE\n"
+			 		+ "INNER JOIN constancia_de_deposito cdd ON p.FOLIO = cdd.FOLIO \n"
+			 		+ "WHERE\n"
+			 		+ "	ps.st_estado = 'A' AND \n"
+			 		+ "	ps.fh_salida = :fecha AND \n"
+			 		+ "	cdd.CTE_CVE = :idCliente AND\n"
+			 		+ "	(plt.PLANTA_CVE = :idPlanta OR :idPlanta IS NULL)\n"
+			 		;
 			em = EntityManagerUtil.getEntityManager();
 			SimpleDateFormat formatoSimple = new SimpleDateFormat("yyyy-MM-dd");
 			String fech = formatoSimple.format(fecha);
 			Query query = em.createNativeQuery(sql)
 					.setParameter("fecha", fech)
-					.setParameter("idCliente", cliente.getCteCve())						
+					.setParameter("idCliente", cliente.getCteCve())
+					.setParameter("idPlanta", idPlanta)
 					;
 			@SuppressWarnings("unchecked")
 			List<Object[]> results = query.getResultList();
@@ -290,7 +293,7 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 		List<OrdenSalida> listaFolios = null;
 		EntityManager em = null;
 		Query query = null;
-		String sql = null;
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			query = em.createNamedQuery("OrdenSalida.findByFolioSalida", OrdenSalida.class)
@@ -433,6 +436,42 @@ public class OrdenSalidaDAO extends IBaseDAO<OrdenSalida, Integer>{
 			EntityManagerUtil.close(em);
 		}
 		return null;
+	}
+	
+	public Integer getCantidadPorClientePlanta(Date fechaSalida, Integer idPlanta) {
+		BigInteger temporal = null;
+		Integer cantidad = null;
+		EntityManager em = null;
+		String sql = null;
+		Query query = null;
+		try {
+			sql = "select count(*) as cta_salidas from ( "
+					+ "	select "
+					+ "		ps.cd_folio_salida "
+					+ "	from pre_salida ps "
+					+ "	inner join partida p on ps.partida_cve = p.partida_cve "
+					+ "	inner join camara cam on p.camara_cve = cam.camara_cve "
+					+ "	inner join planta plt on cam.planta_cve = plt.planta_cve "
+					+ "	where ps.st_estado = 'A' and fh_salida = :fechaSalida and plt.planta_cve = :idPlanta "
+					+ "	group by ps.cd_folio_salida "
+					+ ") t ";
+			em = EntityManagerUtil.getEntityManager();
+			query = em.createNativeQuery(sql)
+					.setParameter("fechaSalida", fechaSalida)
+					.setParameter("idPlanta", idPlanta)
+					;
+			
+			temporal = (BigInteger) query.getSingleResult();
+			cantidad = temporal.intValue() == 0 ? null : new Integer(temporal.intValue());
+			
+		} catch(Exception ex) {
+			cantidad = null;
+			log.error("Problema para obtener la cantidad de folios de salida...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return cantidad;
 	}
 
 
