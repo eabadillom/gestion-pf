@@ -53,6 +53,28 @@ public class PartidaDAO extends IBaseDAO<Partida, Integer>{
 		return p;
 	}
 	
+	public Partida buscarPorIdConEntrada(Integer partidaClave) {
+		EntityManager em = null;
+		Partida p = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			p = em.createNamedQuery("Partida.findByPartidaCve", Partida.class)
+				.setParameter("partidaCve", partidaClave)
+				.getSingleResult()
+				;
+			log.info("Constancia de deposito: {}", p.getFolio().getFolio());
+			log.info("Planta: {}", p.getCamaraCve().getPlantaCve().getPlantaAbrev());
+			log.info("Producto: {}", p.getUnidadDeProductoCve().getProductoCve().getProductoCve());
+			log.info("Unidad: {}", p.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la partida: " + partidaClave, ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return p;
+	}
+	
 	public Partida buscarPorId(Integer partidaCve, boolean isFullInfo) {
 		EntityManager em = null;
 		Partida p = null;

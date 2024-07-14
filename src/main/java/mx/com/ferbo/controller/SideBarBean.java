@@ -1,11 +1,12 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -13,7 +14,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.dao.OrdenSalidaDAO;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DateUtil;
 
 @Named
 @SessionScoped
@@ -21,40 +24,92 @@ public class SideBarBean implements Serializable {
 
 	private static final long serialVersionUID = 8802717839932668484L;
 	private static Logger log = LogManager.getLogger(SideBarBean.class);
+	
+	private OrdenSalidaDAO ordenSalidaDAO = null;
+	
 	private Usuario usuario;
 	
-	private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
+	
+	private FacesContext context;
+    private HttpServletRequest request;
     private HttpSession session;
+    private Integer numeroEntradas;
+    private Integer numeroSalidas;
     
     public SideBarBean() {
     	this.usuario = new Usuario();
+    	this.ordenSalidaDAO = new OrdenSalidaDAO();
     }
     
 	@PostConstruct
 	public void init() {
-		faceContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        session = httpServletRequest.getSession(false);
-        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
+		Date fecha = null;
+		
+		try {
+			fecha = new Date();
+			DateUtil.resetTime(fecha);
+			context = FacesContext.getCurrentInstance();
+			request = (HttpServletRequest) context.getExternalContext().getRequest();
+			session = request.getSession(false);
+			this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+			
+			if(this.usuario.getPerfil() == 1 || this.usuario.getPerfil() == 4) {
+				numeroSalidas = ordenSalidaDAO.getCantidadPorClientePlanta(fecha, this.usuario.getIdPlanta());
+				log.info("Ordenes de salida pendientes: {}", numeroSalidas);
+			}
+			
+			this.numeroEntradas = null;
+			
+		} catch(Exception ex) {
+			log.error("Problema al iniciar la sesión del usuario.", ex);
+		} finally {
+			
+		}
 	}
 	
 	public void logout() {
 		String contextPath = null;
 		String fullPath = null;
 		try {
-			contextPath = faceContext.getExternalContext().getApplicationContextPath();
+			contextPath = context.getExternalContext().getApplicationContextPath();
 			fullPath = contextPath + "/login.xhtml";
     		this.usuario = (Usuario)session.getAttribute("usuario");
     		log.info("El usuario intenta finalizar su sesión: " + this.usuario.getUsuario());
     		session.setAttribute("usuario", null);
     		session.setAttribute("idCliente", null);
     		log.info("Redirigiendo al usuario a {}", fullPath);
-    		faceContext.getExternalContext().redirect(fullPath);
+    		context.getExternalContext().redirect(fullPath);
     		session.invalidate();
     	} catch(Exception ex) {
-    		log.error("Problema en el cierre de sesión del usuario...", ex);
+    		log.warn("Problema en el cierre de sesión del usuario...", ex);
+    	} finally {
     	}
+	}
+	
+	public void redirectOrdenesSalida() {
+		String contextPath = null;
+		String fullPath = null;
+		
+	    try {
+	    	contextPath = context.getExternalContext().getApplicationContextPath();
+			fullPath = contextPath + "/inventarios/OrdenSalida.xhtml";
+			this.context.getExternalContext().redirect(fullPath);
+		} catch (IOException e) {
+			log.warn("Problema para redirigir a las órdenes de salida...",e);
+		}
+	}
+	
+	public void redirectOrdenEntrada() {
+		String contextPath = null;
+		String fullPath = null;
+		
+	    try {
+	    	contextPath = context.getExternalContext().getApplicationContextPath();
+			fullPath = contextPath + "/inventarios/ordenEntrada.xhtml";
+			this.context.getExternalContext().redirect(fullPath);
+		} catch (IOException e) {
+			log.warn("Problema para redirigir a las órdenes de salida...",e);
+		}
 	}
 	
 	public Usuario getUsuario() {
@@ -62,5 +117,21 @@ public class SideBarBean implements Serializable {
 	}
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
+	}
+
+	public Integer getNumeroSalidas() {
+		return numeroSalidas;
+	}
+
+	public void setNumeroSalidas(Integer numeroSalidas) {
+		this.numeroSalidas = numeroSalidas;
+	}
+
+	public Integer getNumeroEntradas() {
+		return numeroEntradas;
+	}
+
+	public void setNumeroEntradas(Integer numeroEntradas) {
+		this.numeroEntradas = numeroEntradas;
 	}
 }
