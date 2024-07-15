@@ -641,7 +641,10 @@ public class OrdenSalidaBean implements Serializable {
 			cds.setStatus(estadoConstancia);
 			
 			listaPartidaServicio = new ArrayList<>();
-			for(OrdenDeSalidas orden : ordenesDeSalida) {
+			for(PreSalidaUI orden : listaPreSalidaUI) {
+				if(orden.isSalidaSelected() == false)
+					continue;
+				
 				PartidaServicio ps = new PartidaServicio();
 				Producto pr = new Producto();
 				UnidadDeManejo udm = new UnidadDeManejo();
@@ -661,6 +664,26 @@ public class OrdenSalidaBean implements Serializable {
 				ps.setUnidadDeManejoCve(udm);
 				listaPartidaServicio.add(ps);
 			}
+//			for(OrdenDeSalidas orden : ordenesDeSalida) {
+//				PartidaServicio ps = new PartidaServicio();
+//				Producto pr = new Producto();
+//				UnidadDeManejo udm = new UnidadDeManejo();
+//				Integer cantidad = orden.getCantidad();
+//				BigDecimal Cantidad = new BigDecimal(cantidad);
+//				BigDecimal pso = orden.getPeso();
+//				BigDecimal psoPorProducto = pso.divide(Cantidad, 3, BigDecimal.ROUND_HALF_UP);
+//				BigDecimal cantidadOrdenSalida = new BigDecimal(orden.getCantidad());
+//
+//				pr = productoDAO.buscarPorId(orden.getProductoClave());
+//				udm = unidadDAO.buscarPorId(orden.getUnidadManejoCve());
+//				ps.setCantidadDeCobro(psoPorProducto.multiply(cantidadOrdenSalida));
+//				ps.setCantidadTotal(orden.getCantidad());
+//				ps.setFolio(cds);
+//				ps.setProductoCve(pr);
+//				ps.setUnidadDeCobro(udm);
+//				ps.setUnidadDeManejoCve(udm);
+//				listaPartidaServicio.add(ps);
+//			}
 			cds.setPartidaServicioList(listaPartidaServicio);
 		
 			listaConstanciaSrv = new ArrayList<>();
