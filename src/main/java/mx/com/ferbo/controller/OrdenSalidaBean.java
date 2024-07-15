@@ -648,7 +648,7 @@ public class OrdenSalidaBean implements Serializable {
 				Integer cantidad = orden.getCantidad();
 				BigDecimal Cantidad = new BigDecimal(cantidad);
 				BigDecimal pso = orden.getPeso();
-				BigDecimal psoPorProducto = pso.divide(Cantidad);
+				BigDecimal psoPorProducto = pso.divide(Cantidad, 3, BigDecimal.ROUND_HALF_UP);
 				BigDecimal cantidadOrdenSalida = new BigDecimal(orden.getCantidad());
 
 				pr = productoDAO.buscarPorId(orden.getProductoClave());

@@ -16,14 +16,12 @@
 			<p:toolbar>
 				<p:toolbarGroup>
 					<p:outputLabel for="startDateSelected" value="Fecha Inicio" />
-					<p:datePicker id="startDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.startDate}">
+					<p:datePicker id="startDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.startDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" process="@this"/>
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 					<p:outputLabel for="endDateSelected" value="Fecha Fin" />
 					<p:datePicker id="endDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.endDate}">
-						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this" />
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 					</p:datePicker>
 					
 					<p:divider></p:divider>
@@ -54,7 +52,7 @@
 					</p:column>
 					<p:column headerText="Fecha" width="6rem" style="text-align: center;">
 						<h:outputText value="#{pPago.fecha}">
-							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 						</h:outputText>
 					</p:column>
 					<p:column headerText="Tipo de Pago">
@@ -100,8 +98,7 @@
 						</div>
 						<div class="p-md-3 p-lg-3">
 							<p:outputLabel for="@next" value="Fecha de pago" />
-							<p:datePicker value="#{ingresosActualizacionBean.pagoSelected.fecha}" showIcon="true">
-								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+							<p:datePicker value="#{ingresosActualizacionBean.pagoSelected.fecha}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 								<p:ajax process="@this"/>
 							</p:datePicker>
 						</div>
