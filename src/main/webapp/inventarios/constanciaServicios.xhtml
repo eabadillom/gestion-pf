@@ -57,23 +57,15 @@
 					</h:outputText>
 				</p:column>
 				<p:column width="7rem" style="text-align: center;">
-					<p:commandButton update=":form:constanciaDetalle" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlg-constancia').show()" icon="pi pi-bars" value="Detalle" styleClass="edit-button ui-button-info" action="#{constanciaServicioBean.cargaDetalle}">
-						<f:setPropertyActionListener value="#{constancia}" target="#{constanciaServicioBean.seleccion}"/>
-					</p:commandButton>
-				</p:column>
-				<p:column width="7rem" style="text-align: center;">
-					<p:commandButton update=":form:dlg-partidas" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgProductos').show()" icon="pi pi-bars" value="Productos" styleClass="edit-button ui-button-info" action="#{constanciaServicioBean.cargaDetalle}">
-						<f:setPropertyActionListener value="#{constancia}" target="#{constanciaServicioBean.seleccion}"/>
-					</p:commandButton>
-				</p:column>
-				<p:column width="7rem" style="text-align: center;">
-					<p:commandButton update=":form:dlg-servicios :form:precioServicio" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgServicios').show()" icon="pi pi-bars" value="Servicios" styleClass="edit-button ui-button-info" action="#{constanciaServicioBean.cargaDetalle}">
+					<p:commandButton update=":form:constanciaServicio" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('constanciaServicio').show()" icon="pi pi-bars" value="Detalle" styleClass="edit-button ui-button-info" action="#{constanciaServicioBean.cargaDetalle}">
 						<f:setPropertyActionListener value="#{constancia}" target="#{constanciaServicioBean.seleccion}"/>
 					</p:commandButton>
 				</p:column>
 			</p:dataTable>
-			<p:dialog header="Constancia de servicio" showEffect="fade" modal="true" widgetVar="dlg-constancia" responsive="true" style="max-width:80em !important;" resizable="true">
-				<p:outputPanel id="constanciaDetalle" class="ui-fluid" rendered="#{constanciaServicioBean.seleccion != null}">
+			<p:dialog id="constanciaServicio" header="Constancia de Servicio: #{constanciaServicioBean.seleccion.folioCliente}" showEffect="fade" modal="true" widgetVar="constanciaServicio" responsive="true" style="max-width:80em !important;" resizable="true">
+                            <p:tabView id="datosGenerales" dynamic="true" cache="false">
+                                <p:tab id="tabGeneral" title="Datos Generales">
+                                    <p:outputPanel id="constanciaDetalle" class="ui-fluid" rendered="#{constanciaServicioBean.seleccion != null}">
 					<div class="p-grid">
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 							<p:outputLabel for="@next">Folio:</p:outputLabel>
@@ -109,25 +101,32 @@
 							<p:inputText value="#{constanciaServicioBean.seleccion.observaciones}" readonly="true" />
 						</div>
 					</div>
-				</p:outputPanel>
-				<f:facet name="footer">
-					<p:commandButton value="Cancelar Constancia" icon="pi pi-times"
-						class="ui-button-danger"
-						actionListener="#{constanciaServicioBean.cancelar}"
-						update="constanciaDetalle"
-						process="constanciaDetalle @this" rendered="#{(constanciaServicioBean.usuario.perfil != 4) and (constanciaServicioBean.usuario.perfil != 1)}"/>
-					<p:commandButton value="Guardar cambios" icon="pi pi-save" actionListener="#{constanciaServicioBean.guardaDetalle}" update="constanciaDetalle" process="constanciaDetalle @this"
-						rendered="#{(constanciaServicioBean.usuario.perfil != 4) and (constanciaServicioBean.usuario.perfil != 1)}" >
-					</p:commandButton>
-					<p:commandButton value="Imprimir" icon="pi pi-print" actionListener="#{constanciaServicioBean.jasper}" ajax="false">
-						<p:fileDownload value="#{constanciaServicioBean.file}" />
-					</p:commandButton>
-					<p:commandButton value="Cerrar" icon="pi pi-times"
-						oncomplete="PF('dlg-constancia').hide()" />
-				</f:facet>
-			</p:dialog>
-			<p:dialog id="productos" widgetVar="dlgProductos" header="Productos" width="auto">
-				<p:outputPanel id="dlg-partidas" class="ui-fluid">
+                                    </p:outputPanel>
+                                    <div class="p-field p-col-12 p-md-12" style="text-align: right; padding-left: 0.5rem!important;">
+                                        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                                            <p:commandButton value="Cancelar Constancia" icon="pi pi-times"
+                                                    class="ui-button-danger" 
+                                                    actionListener="#{constanciaServicioBean.cancelar}"
+                                                    update="constanciaDetalle"
+                                                    process="constanciaDetalle @this" rendered="#{(constanciaServicioBean.usuario.perfil != 4) and (constanciaServicioBean.usuario.perfil != 1)}"/>
+                                        </span>
+                                        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                                            <p:commandButton value="Guardar cambios" icon="pi pi-save" actionListener="#{constanciaServicioBean.guardaDetalle}" update="constanciaDetalle" process="constanciaDetalle @this"
+                                                    rendered="#{(constanciaServicioBean.usuario.perfil != 4) and (constanciaServicioBean.usuario.perfil != 1)}" >
+                                            </p:commandButton>
+                                        </span>
+                                        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                                            <p:commandButton value="Imprimir" icon="pi pi-print" actionListener="#{constanciaServicioBean.jasper}" ajax="false" >
+                                                    <p:fileDownload value="#{constanciaServicioBean.file}" />
+                                            </p:commandButton>
+                                        </span>
+                                        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                                            <p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('constanciaServicio').hide()" />
+                                        </span>
+                                    </div>
+                                </p:tab>
+                                <p:tab id="tabProductos" title="Productos">
+                                    <p:outputPanel id="dlg-partidas" class="ui-fluid">
 					<p:dataTable value="#{constanciaServicioBean.seleccion.partidaServicioList}" var="partida" rendered="#{not empty constanciaServicioBean.seleccion.partidaServicioList}"
 						paginator="true" rows="5" paginatorPosition="bottom">
 						<p:column headerText="Producto" style="text-align: left;" width="auto">
@@ -143,10 +142,15 @@
 							<h:outputText value="#{partida.cantidadDeCobro}" />
 						</p:column>
 					</p:dataTable>
-				</p:outputPanel>
-			</p:dialog>
-			<p:dialog id="servicios" widgetVar="dlgServicios" header="Servicios" width="auto">
-				<p:outputPanel id="dlg-servicios" class="ui-fluid" rendered="#{constanciaServicioBean.seleccion != null}">
+                                    </p:outputPanel>
+                                    <div class="p-field p-col-12 p-md-12" style="text-align: right; padding-left: 0.5rem!important;">
+                                        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                                            <p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('constanciaServicio').hide()" />
+                                        </span>
+                                    </div>
+                                </p:tab>
+                                <p:tab id="tabServicios" title="Servicios">
+                                    <p:outputPanel id="dlg-servicios" class="ui-fluid" rendered="#{constanciaServicioBean.seleccion != null}">
 					<p:dataTable id="dt-servicios" value="#{constanciaServicioBean.seleccion.constanciaServicioDetalleList}" var="servicio" rendered="#{not empty constanciaServicioBean.seleccion.constanciaServicioDetalleList}"
 						paginator="true" rows="5" paginatorPosition="bottom">
 						<p:column headerText="Servicio" width="auto">
@@ -180,7 +184,14 @@
 							<p:commandButton value="Agregar" actionListener="#{constanciaServicioBean.agregaServicio}" update="dt-servicios" disabled="#{(constanciaServicioBean.usuario.perfil == 1) or (constanciaServicioBean.usuario.perfil == 4)}" />
 						</div>
 					</div>
-				</p:outputPanel>
+                                    </p:outputPanel>
+                                    <div class="p-field p-col-12 p-md-12" style="text-align: right; padding-left: 0.5rem!important;">
+                                        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                                            <p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('constanciaServicio').hide()" />
+                                        </span>
+                                    </div>
+                                </p:tab>
+                            </p:tabView>
 			</p:dialog>
 			<p:confirmDialog widgetVar="dlgModificarServicio" showEffect="fade" width="400" message="Desea modificar el servicio?" header="Modificar" severity="warn">
                  <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{constanciaServicioBean.actualizaServicio}" process="@this" oncomplete="PF('dlgModificarServicio').hide()"/>
