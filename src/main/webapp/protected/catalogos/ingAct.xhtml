@@ -20,8 +20,8 @@
 						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" process="@this"/>
 					</p:datePicker>
 					<p:outputLabel for="endDateSelected" value="Fecha Fin" />
-					<p:datePicker id="endDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.endDate}">
-						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+					<p:datePicker id="endDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.endDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this"/>
 					</p:datePicker>
 					
 					<p:divider></p:divider>
