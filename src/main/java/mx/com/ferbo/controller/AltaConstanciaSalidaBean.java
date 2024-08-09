@@ -328,7 +328,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 		if(saldoVencido.compareTo(BigDecimal.ZERO) > 0) {
 			this.saldoVencido = true;
-			log.info("El cliente {} presenta un saldo vencido: {}", this.clienteSelect.getCteNombre(), this.saldo.getSaldo());
+			log.info("El cliente {} presenta un saldo vencido: {}", this.clienteSelect.getNombre(), this.saldo.getSaldo());
 		}
 		
 		isHabilitarSalida = candadoSalida.getHabilitado();
@@ -356,7 +356,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		}
 		
 		if(isHabilitarSalida && candadoSalida.getNumSalidas() > 0) {
-			log.info("El cliente {} presenta un saldo vencido ({}), pero tiene permitidas las salidas", this.clienteSelect.getCteNombre(), this.saldo.getSaldo());
+			log.info("El cliente {} presenta un saldo vencido ({}), pero tiene permitidas las salidas", this.clienteSelect.getNombre(), this.saldo.getSaldo());
 			return;
 		}
 		
@@ -808,7 +808,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			constancia.setFecha(fechaSalida);
 			constancia.setNumero(numFolio);
 			constancia.setClienteCve(clienteSelect);
-			constancia.setNombreCte(clienteSelect.getCteNombre());
+			constancia.setNombreCte(clienteSelect.getNombre());
 			constancia.setStatus(status);
 			constancia.setObservaciones(observaciones);
 			constancia.setNombreTransportista(nombreTransportista);

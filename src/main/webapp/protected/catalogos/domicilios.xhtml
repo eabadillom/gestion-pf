@@ -24,13 +24,9 @@
 								<div class="ui-fluid p-formgrid p-grid">
 									<div class="p-field p-col-12 p-md-6">
 										<p:outputLabel for="soClientes" value="Cliente" />
-										<p:selectOneMenu id="soClientes" converter="entityConverter"
-											value="#{domiciliosBean.clienteSelected}" required="true"
-											requiredMessage="Campo requerido" filter="true" filterMatchMode="contains">
+										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{domiciliosBean.clienteSelected}" required="true" requiredMessage="Campo requerido" filter="true" filterMatchMode="contains" autoWidth="false">
 											<f:selectItem itemLabel="--Selecciona--" />
-											<f:selectItems value="#{domiciliosBean.lstClientes}"
-												var="cliente" itemLabel="#{cliente.cteNombre}"
-												itemValue="#{cliente}" />
+											<f:selectItems value="#{domiciliosBean.lstClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 											<p:ajax listener="#{domiciliosBean.filtraListado()}" event="change" update="soClienteTipoDom btnAdd dt-domiciliosCliente" />
 										</p:selectOneMenu>
 									</div>

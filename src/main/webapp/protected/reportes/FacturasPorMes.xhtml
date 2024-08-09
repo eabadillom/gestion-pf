@@ -28,9 +28,9 @@
             
                         <p:fieldset legend="Elección de cliente">
                        			 <span class="ui-float-label ui-input-icon-left">
-									<p:selectOneMenu id="Cliente" value="#{reporteFacturacionPorMesBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith">
-									<f:selectItem itemLabel="Todos los clientes"  itemValue=""  />
-									<f:selectItems value="#{reporteFacturacionPorMesBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+									<p:selectOneMenu id="Cliente" value="#{reporteFacturacionPorMesBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+									<f:selectItem itemLabel="Todos los clientes" />
+									<f:selectItems value="#{reporteFacturacionPorMesBean.listaClientes}" var="cliente"  itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 									<p:ajax process ="@this" />
 									</p:selectOneMenu>
 								<p:outputLabel for="Cliente" value="Cliente" />

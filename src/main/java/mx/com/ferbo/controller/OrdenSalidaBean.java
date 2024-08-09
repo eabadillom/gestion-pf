@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.component.UIComponent;
@@ -115,9 +116,9 @@ public class OrdenSalidaBean implements Serializable {
 	private SerieConstanciaDAO serieConstanciaDAO;
 
 	
-	private boolean confirmacion;
-	private boolean pdf;
-	private boolean excel;
+	private boolean confirmacion = false;
+	private boolean pdf = false;
+	private boolean excel = false;
 	private String folioSelected;
 	private Date fecha;
 	private Time tmSalida;
@@ -181,6 +182,10 @@ public class OrdenSalidaBean implements Serializable {
 		listaPreSalidaUI = new ArrayList<>();
 		listaServicios = new ArrayList<PrecioServicio>();
 		ordenesDeSalida = new ArrayList<OrdenDeSalidas>();
+		listaPreSalidaServicio = new ArrayList<>();
+		listaFolios = new ArrayList<>();
+		listaSalidasporFolio = new ArrayList<>();
+		listaPreSalidaUI = new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -193,8 +198,9 @@ public class OrdenSalidaBean implements Serializable {
 			
 			this.usuario = (Usuario) session.getAttribute("usuario");
 			this.serie = new SerieConstancia();
-			
-			listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+			log.info("cargando lista de clientes en orden de salidas...");
+			listaClientes = sideBar.getListaClientesActivos();
+			log.info("lista de clientes cargada en orden de salidas.");
 			fecha = new Date();
 			DateUtil.setTime(fecha, 0, 0, 0, 0);
 			estadoInventarioActual = estadoInventarioDAO.buscarPorId(1);
@@ -213,6 +219,11 @@ public class OrdenSalidaBean implements Serializable {
 		} finally {
 			
 		}
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		log.info("Saliendo del alta de constancias de depósito.");
 	}
 
 	public void filtrarCliente() {
@@ -539,7 +550,7 @@ public class OrdenSalidaBean implements Serializable {
 			constancia.setNombreTransportista(ordensalida.getNombreOperador());
 			constancia.setNumero(this.folioSalida);
 			constancia.setClienteCve(clienteSelect);
-			constancia.setNombreCte(clienteSelect.getCteNombre());
+			constancia.setNombreCte(clienteSelect.getNombre());
 			statusConstancia = statusConstanciaSalidaDAO.buscarPorId(1);
 			constancia.setStatus(statusConstancia);
 			constancia.setObservaciones(String.format("Orden salida: %s - %s",this.ordensalida.getFolioSalida(),  this.observaciones));

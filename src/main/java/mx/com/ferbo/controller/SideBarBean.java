@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.OrdenSalidaDAO;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 
@@ -26,7 +28,8 @@ public class SideBarBean implements Serializable {
 	private static Logger log = LogManager.getLogger(SideBarBean.class);
 	
 	private OrdenSalidaDAO ordenSalidaDAO = null;
-	
+	private List<Cliente> listaClientesActivos;
+	private List<Cliente> listaClientesTodos;
 	private Usuario usuario;
 	
 	
@@ -41,6 +44,7 @@ public class SideBarBean implements Serializable {
     	this.ordenSalidaDAO = new OrdenSalidaDAO();
     }
     
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		Date fecha = null;
@@ -52,6 +56,9 @@ public class SideBarBean implements Serializable {
 			request = (HttpServletRequest) context.getExternalContext().getRequest();
 			session = request.getSession(false);
 			this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+			
+			listaClientesActivos = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+			listaClientesTodos = (List<Cliente>) request.getSession(false).getAttribute("clientesTodosList");
 			
 			if(this.usuario.getPerfil() == 1 || this.usuario.getPerfil() == 4) {
 				numeroSalidas = ordenSalidaDAO.getCantidadPorClientePlanta(fecha, this.usuario.getIdPlanta());
@@ -133,5 +140,21 @@ public class SideBarBean implements Serializable {
 
 	public void setNumeroEntradas(Integer numeroEntradas) {
 		this.numeroEntradas = numeroEntradas;
+	}
+
+	public List<Cliente> getListaClientesActivos() {
+		return listaClientesActivos;
+	}
+
+	public void setListaClientesActivos(List<Cliente> listaClientes) {
+		this.listaClientesActivos = listaClientes;
+	}
+
+	public List<Cliente> getListaClientesTodos() {
+		return listaClientesTodos;
+	}
+
+	public void setListaClientesTodos(List<Cliente> listaClientesTodos) {
+		this.listaClientesTodos = listaClientesTodos;
 	}
 }

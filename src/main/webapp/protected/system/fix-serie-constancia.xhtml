@@ -12,7 +12,7 @@
 		    	<p:toolbarGroup>
 		    		<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{fixSerieConstanciaBean.clienteSelect}" onchange="PF('statusDialog').show();" filter="true" filterMatchMode="contains">
 				    	<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
-				    	<f:selectItems value="#{fixSerieConstanciaBean.clienteList}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+				    	<f:selectItems value="#{fixSerieConstanciaBean.clienteList}" var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}" />
 				    	<p:ajax listener="#{fixSerieConstanciaBean.cargaInfo()}" update="dt-serie-constancia cmd-crear-series cmd-clonar-todo" oncomplete="PF('statusDialog').hide();"/>
 				    </p:selectOneMenu>
 				    <p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{fixSerieConstanciaBean.plantaSelect}" onchange="PF('statusDialog').show();" filter="true" filterMatchMode="contains">
@@ -36,7 +36,7 @@
 		    <p:dialog id="dgserie" widgetVar="dg-serie" header="Serie" showEffect="hide" modal="true">
 		    	<p:outputPanel id="pnl-serie" class="ui-fluid">
 		    		<div class="p-field">
-				    	<p:outputLabel value="#{fixSerieConstanciaBean.clienteSelect.cteNombre}" />
+				    	<p:outputLabel value="#{fixSerieConstanciaBean.clienteSelect.nombre}" />
 		    		</div>
 		    		<div class="p-field">
 			    		<p:outputLabel value="#{fixSerieConstanciaBean.plantaSelect.plantaDs}" />
@@ -60,7 +60,7 @@
 		    </p:dialog>
 			<p:dataTable id="dt-serie-constancia" widgetVar="dtSerieConstancia" var="serie" value="#{fixSerieConstanciaBean.serieConstanciaList}">
 				<p:column headerText="Cliente">
-					<h:outputText value="#{serie.serieConstanciaPK.cliente.cteNombre}" />
+					<h:outputText value="#{serie.serieConstanciaPK.cliente.nombre}" />
 				</p:column>
 				<p:column headerText="Planta">
 					<h:outputText value="#{serie.serieConstanciaPK.planta.plantaDs}" />
@@ -80,7 +80,7 @@
 			<p:dialog widgetVar="dgEditSerie" header="Serie" showEffect="hide" modal="true">
 		    	<p:outputPanel id="pnl-edit-serie" class="ui-fluid">
 		    		<div class="p-field">
-				    	<p:outputLabel value="#{fixSerieConstanciaBean.clienteSelect.cteNombre}" />
+				    	<p:outputLabel value="#{fixSerieConstanciaBean.clienteSelect.nombre}" />
 		    		</div>
 		    		<div class="p-field">
 			    		<p:outputLabel value="#{fixSerieConstanciaBean.plantaSelect.plantaDs}" />

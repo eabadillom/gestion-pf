@@ -109,6 +109,8 @@ public class ConstanciaServicioBean implements Serializable{
 		listaEstadosConstancias = ecDAO.buscarTodos();
 		folio = "";
 		seleccion = new ConstanciaDeServicio();
+		this.fechaInicio = null;
+		this.fechaFinal = null;
 	}
 	
 	public void buscarConstancia() {

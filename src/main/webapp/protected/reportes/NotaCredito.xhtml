@@ -27,7 +27,7 @@
 	             		
 	             		<p:selectOneMenu id="select_cte" converter="entityConverter" autoWidth="true" value="#{reporteNotaCreditoBean.clienteSelect}" filter="true" filterMatchMode="contains">
 	             			<f:selectItem itemLabel="Todos los clientes" itemValue="" />
-	             			<f:selectItems value="#{reporteNotaCreditoBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+	             			<f:selectItems value="#{reporteNotaCreditoBean.listCliente}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 	             		</p:selectOneMenu>
 	             		
 	             		</p:fieldset>

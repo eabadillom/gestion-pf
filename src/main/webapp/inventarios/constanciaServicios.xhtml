@@ -35,7 +35,7 @@
 		    	<div class="p-field p-col-6 p-md-6">
 		    		<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{constanciaServicioBean.idCliente}" filter="true" filterMatchMode="contains">
 		    			<f:selectItem itemLabel="Selecione Cliente" noSelectionOption="true" />
-						<f:selectItems var="selectedCliente" value="#{constanciaServicioBean.listaClientes}" itemLabel="#{selectedCliente.cteNombre}" itemValue="#{selectedCliente.cteCve}" />
+						<f:selectItems var="cliente" value="#{constanciaServicioBean.listaClientes}" itemLabel="#{cliente.alias eq null ? cliente.nombre : cliente.alias}" itemValue="#{cliente.cteCve}" />
 					</p:selectOneMenu>
 		    	</div>
 		    	<div class="p-field p-col-2 p-md-2">
@@ -49,7 +49,7 @@
 				</p:column>
 				<p:column headerText="Cliente" style="text-align: center;">
 					<h:outputText style="vertical-align: middle; margin-left: .5rem"
-						value="#{constancia.cteCve.cteNombre}" />
+						value="#{constancia.cteCve.nombre}" />
 				</p:column>
 				<p:column headerText="Fecha" style="text-align: center;" width="7rem">
 					<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{constancia.fecha}">
@@ -80,7 +80,7 @@
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 40em;">
 							<p:outputLabel for="@next">Cliente</p:outputLabel>
-							<p:inputText value="#{constanciaServicioBean.seleccion.cteCve.cteNombre}" readonly="true" />
+							<p:inputText value="#{constanciaServicioBean.seleccion.cteCve.nombre}" readonly="true" />
 						</div>
 						<div class="p-col-12 p-md-6 p-lg-4" style="width: 10em;">
 							<p:outputLabel>Estado</p:outputLabel>

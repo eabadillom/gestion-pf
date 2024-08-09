@@ -619,7 +619,7 @@ public class FacturaServiciosBean implements Serializable {
 			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
 			factura.setMoneda(this.moneda);
 			factura.setRfc(cliente.getCteRfc());
-			factura.setNombreCliente(cliente.getCteNombre());
+			factura.setNombreCliente(cliente.getNombre());
 			factura.setFecha(this.fechaFactura);
 			factura.setObservacion(this.Obervaciones == null ? "" : this.Obervaciones);
 			factura.setSubtotal(subtotal);

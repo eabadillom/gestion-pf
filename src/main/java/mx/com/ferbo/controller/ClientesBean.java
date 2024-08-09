@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,6 +57,9 @@ public class ClientesBean implements Serializable {
 
 	private static final long serialVersionUID = 8438449261015571241L;
 	private static Logger log = LogManager.getLogger(ClientesBean.class);
+	
+	@Inject
+    private SideBarBean sideBar;
 
 	private List<Cliente> lstClientes;
 	private List<Cliente> lstClientesSelected;
@@ -67,13 +72,14 @@ public class ClientesBean implements Serializable {
 	private List<MedioPago> lstMedioPago; //lista forma de pago
 	
 	private Cliente clienteSelected;
+	private Cliente clonarCliente;
 	private ClienteContacto clienteContactoSelected;
 	private MedioCnt medioContactoSelected;
 	private String cdRegimenFiscalSelected;
 	private String cdUsoCfdiSelected;
 	private String cdMetodoPagoSelected;
 	private Integer idMedioPagoSelected;
-		
+	private Integer longitudRFC;
 
 	private ClienteDAO clienteDAO;
 	private TipoMailDAO tipoMailDAO;
@@ -88,8 +94,8 @@ public class ClientesBean implements Serializable {
 	private String confirmPassword;
 	private PlantaDAO plantaDAO;
 	private Usuario usuario;
-	private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
+	private FacesContext context;
+    private HttpServletRequest request;
 	
 	
 	SecurityUtil util;
@@ -113,19 +119,24 @@ public class ClientesBean implements Serializable {
 		clienteContactoDAO = new ClienteContactoDAO();
 		medioCntDAO = new MedioCntDAO();
 		plantaDAO = new PlantaDAO();
+		
+		consultaClientes();
 	}
 
 	@PostConstruct
 	public void init() {
-		faceContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
-		
+		context = FacesContext.getCurrentInstance();
+        request = (HttpServletRequest) context.getExternalContext().getRequest();
+        this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
         log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
-        
-		consultaClientes();
+		
 		consultaCatalogos();
-		log.info("");
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		log.info("Saliendo del catálogo de clientes.");
+		this.lstClientes = new ArrayList<>();
 	}
 
 	private void consultaClientes() {
@@ -201,6 +212,7 @@ public class ClientesBean implements Serializable {
 		this.cdUsoCfdiSelected = null;
 		this.cdMetodoPagoSelected = null;
 		this.idMedioPagoSelected = null;
+		log.info("Nuevo cliente creado.");
 	}
 
 	public void nuevoContacto(Cliente clienteSel) {
@@ -712,7 +724,7 @@ public class ClientesBean implements Serializable {
 			
 			util.checkPassword(this.newPassword);
 			
-			//TODO Por seguridad, se deben salar las contraseñas.
+			//Por seguridad, se deben salar las contraseñas.
 			newPasswordSHA512 = util.getSHA512(this.newPassword);
 			
 			this.clienteContactoSelected.setNbPassword(newPasswordSHA512);
@@ -890,6 +902,30 @@ public class ClientesBean implements Serializable {
 
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
+	}
+
+	public Integer getLongitudRFC() {
+		return longitudRFC;
+	}
+
+	public void setLongitudRFC(Integer longitudRFC) {
+		this.longitudRFC = longitudRFC;
+	}
+
+	public Cliente getClonarCliente() {
+		return clonarCliente;
+	}
+
+	public void setClonarCliente(Cliente clonarCliente) {
+		this.clonarCliente = clonarCliente;
+	}
+
+	public SideBarBean getSideBar() {
+		return sideBar;
+	}
+
+	public void setSideBar(SideBarBean sideBar) {
+		this.sideBar = sideBar;
 	}
 
 }

@@ -10,9 +10,9 @@
 			<p:toolbar>
 				<p:toolbarGroup>
 					<span class="ui-float-label ui-input-icon-left">
-						<p:selectOneMenu id="Cliente" autoWidth="true" value="#{ingresosCrudBean.idCte}" filter="true" filterMatchMode="contains">
+						<p:selectOneMenu id="Cliente" autoWidth="false" value="#{ingresosCrudBean.idCte}" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="SELECCIONE UN CLIENTE" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="cte" value="#{ingresosCrudBean.listaCtes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
+							<f:selectItems var="cliente" value="#{ingresosCrudBean.listaCtes}" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente.cteCve}" />
 							<p:ajax listener="#{ingresosCrudBean.filtroCte}" process="@this" update="dt-Factura"/>
 						</p:selectOneMenu>
 					</span>

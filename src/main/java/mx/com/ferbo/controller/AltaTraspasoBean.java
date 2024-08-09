@@ -20,6 +20,7 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
@@ -74,6 +75,9 @@ public class AltaTraspasoBean implements Serializable {
 
 	private static final long serialVersionUID = -3109002730694247052L;
 	private static Logger log = LogManager.getLogger(AltaTraspasoBean.class);
+	
+	@Inject
+    private SideBarBean sideBar;
 
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;
@@ -131,8 +135,8 @@ public class AltaTraspasoBean implements Serializable {
 	private SerieConstancia serie;
 	
 	private Usuario usuario;
-	private FacesContext faceContext;
-	private HttpServletRequest httpServletRequest;
+	private FacesContext context;
+	private HttpServletRequest request;
 	
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
@@ -171,13 +175,13 @@ public class AltaTraspasoBean implements Serializable {
 	public void init() {
 		log.debug("Entrando a Init de alta Traspaso...");
 		
-		faceContext = FacesContext.getCurrentInstance();
-		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		context = FacesContext.getCurrentInstance();
+		request = (HttpServletRequest) context.getExternalContext().getRequest();
+		usuario = (Usuario) request.getSession(false).getAttribute("usuario");
 		
 		log.debug("Buscando lista de clientes...");
-//		clientes = clienteDAO.buscarHabilitados(true, false);
-		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+//		clientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+		clientes = sideBar.getListaClientesActivos();
 		fecha = new Date();
 		
 		log.debug("Buscando lista de unidades de medida");
@@ -446,7 +450,7 @@ public class AltaTraspasoBean implements Serializable {
 			constancia.setNumero(this.numero);
 			constancia.setCliente(this.selCliente);
 			constancia.setObservacion(this.observaciones);
-			constancia.setNombreCliente(this.selCliente.getCteNombre());
+			constancia.setNombreCliente(this.selCliente.getNombre());
 			constancia.setFechaCadena(DateUtil.getString(this.fecha, DateUtil.FORMATO_FECHA_CADENA));
 			List<TraspasoPartida> listaTraspasoPartida = new ArrayList<TraspasoPartida>();
 			
