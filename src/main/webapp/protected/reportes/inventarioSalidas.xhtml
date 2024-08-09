@@ -35,9 +35,9 @@
 						</p:fieldset>
 						<p:fieldset>
 							<span class="ui-float-label ui-input-icon-left">
-								<p:selectOneMenu id="Cliente" value="#{reporteSalidasBean.clienteSelect}" converter="entityConverter">
+								<p:selectOneMenu id="Cliente" value="#{reporteSalidasBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
 									<f:selectItem itemLabel="Todos los clientes	" itemValue="" />
-									<f:selectItems value="#{reporteSalidasBean.listaClientes}" var="cte" itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+									<f:selectItems value="#{reporteSalidasBean.listaClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 									<p:ajax process="@this" />
 								</p:selectOneMenu> <p:outputLabel for="Cliente" value="Cliente" />
 							</span>

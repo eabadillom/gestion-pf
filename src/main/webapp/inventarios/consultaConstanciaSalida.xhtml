@@ -41,7 +41,7 @@
 				<div class="p-field p-col-6 p-md-6">
 					<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaSalidaBean.cliente}" filter="true" filterMatchMode="contains">
 						<f:selectItem itemLabel="Seleccione un Cliente" itemValue="" noSelectionOption="true" />
-						<f:selectItems value="#{consultarConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+						<f:selectItems value="#{consultarConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.alias eq null ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
 					</p:selectOneMenu>
 				</div>
 				<div class="p-field p-col-2 p-md-2">
@@ -55,7 +55,7 @@
 					<h:outputText value="#{constanciaSalida.numero}" class="#{constanciaSalida.status.id == 2 ? 'product-badge status-outofstock' : null}" />
 				</p:column>
 				<p:column headerText="Cliente">
-					<h:outputText value="#{constanciaSalida.clienteCve.cteNombre}" />
+					<h:outputText value="#{constanciaSalida.clienteCve.nombre}" />
 				</p:column>
 				<p:column headerText="Ingreso" width="6rem" style="text-align: center;">
 					<h:outputText value="#{constanciaSalida.fecha}" />
@@ -85,7 +85,7 @@
                                                             </div>
                                                             <div class="p-md-6 p-lg-6">
                                                                     <p:outputLabel value="Cliente"/>
-                                                                    <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.clienteCve.cteNombre}" disabled="true" />
+                                                                    <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.clienteCve.nombre}" disabled="true" />
                                                             </div>
                                                     </div>
                                                     <div class="p-grid p-col-12">

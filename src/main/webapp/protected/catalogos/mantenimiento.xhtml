@@ -39,7 +39,7 @@
 										<p:selectOneMenu value="#{null}" converter="entityConverter"
 											required="true" filter="true" filterMatchMode="startsWith">
 											<f:selectItem itemLabel="--Seleccione--" />
-											<f:selectItems value="#{clientesBean.lstClientes}" var="client" itemLabel="#{client.cteNombre}" itemValue="#{client}" />
+											<f:selectItems value="#{clientesBean.lstClientes}" var="client" itemLabel="#{client.nombre}" itemValue="#{client}" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field p-col-12 p-md-2 p-mr-4">

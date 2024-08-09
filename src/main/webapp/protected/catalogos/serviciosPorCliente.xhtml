@@ -15,7 +15,7 @@
 										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{serviciosClienteBean.clienteSelected}" filter="true"
 											filterMatchMode="contains">
 											<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" />
-											<f:selectItems value="#{serviciosClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+											<f:selectItems value="#{serviciosClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 											<p:ajax listener="#{serviciosClienteBean.filtaListado()}" update="dt-servicios dt-servicios:btnAdd" />
 										</p:selectOneMenu>
 									</div>
@@ -63,7 +63,7 @@
 								<p:outputPanel>
 									<div class="p-field">
 										<p:outputLabel>Cliente</p:outputLabel>
-										<p:inputText value="#{serviciosClienteBean.clienteSelected.cteNombre}" disabled="true" />
+										<p:inputText value="#{serviciosClienteBean.clienteSelected.nombre}" disabled="true" />
 									</div>
 									<div class="p-field">
 										<p:outputLabel>Servicio</p:outputLabel>

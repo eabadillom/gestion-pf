@@ -9,30 +9,19 @@
 	<ui:define name="content">
 
 		<h:form id="form">
-			<p:breadCrumb>
-	            <p:menuitem value="Home" outcome="/dashboard"/>
-	            <p:menuitem value="Reportes"/>
-	            <p:menuitem value="Inventarios"/>
-	            <p:menuitem value="Ocupacion Camaras" outcome="/protected/reportes/InventarioOcupacionCamara"/>
-       		</p:breadCrumb>
-
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
-
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
-					
-					
-					<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="false" value="#{reporteInventarioOcupacionCamaraBean.fecha}">
+					<p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" disabled="false" value="#{reporteInventarioOcupacionCamaraBean.fecha}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						<p:ajax process="@this" />
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 					</p:datePicker>
-						
                         <p:fieldset legend="Datos del emisor/receptor">
                        			 <span class="ui-float-label ui-input-icon-left">
-									<p:selectOneMenu id="Cliente" value="#{reporteInventarioOcupacionCamaraBean.clienteSelect}" converter="entityConverter" >
-									<f:selectItem itemLabel="Todos los clientes" itemValue=""  />
-									<f:selectItems value="#{reporteInventarioOcupacionCamaraBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+									<p:selectOneMenu id="Cliente" value="#{reporteInventarioOcupacionCamaraBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+									<f:selectItem itemLabel="Todos los clientes" noSelectionOption="true" />
+									<f:selectItems value="#{reporteInventarioOcupacionCamaraBean.listaClientes}" var="cliente"  itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 									<p:ajax process ="@this" update="dt-OcupacionCamara" listener="#{reporteInventarioOcupacionCamaraBean.ocupacionCamara}"/>
 									</p:selectOneMenu>
 								<p:outputLabel for="Cliente" value="Cliente" />

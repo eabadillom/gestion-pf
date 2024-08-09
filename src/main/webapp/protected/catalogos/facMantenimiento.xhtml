@@ -27,9 +27,9 @@
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-col-6 p-md-6">
 						<p:outputLabel for="@next" value="Clientes"/>
-						<p:selectOneMenu value="#{facMantenimentoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+						<p:selectOneMenu value="#{facMantenimentoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
 							<f:selectItem itemLabel="---TODOS LOS CLIENTES---" />
-							<f:selectItems value="#{facMantenimentoBean.listClientes}" var="client" itemLabel="#{client.cteNombre}" itemValue="#{client}" />
+							<f:selectItems value="#{facMantenimentoBean.listClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 							<p:ajax update="form:bottomConsulta" />
 						</p:selectOneMenu>
 					</div>
@@ -137,7 +137,7 @@
 				<p:outputPanel id="frm-Descarga" class="ui-fluid">
 				<div class="p-field p-col-10 p-md-3" >
 						<p:outputLabel>Cliente</p:outputLabel>
-						<p:inputText id="cliente" value="#{facMantenimentoBean.seleccion.cliente.cteNombre}"   readonly="true" style="width: 23em"></p:inputText>
+						<p:inputText id="cliente" value="#{facMantenimentoBean.seleccion.cliente.nombre}"   readonly="true" style="width: 23em"></p:inputText>
 					</div>
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-field p-col-4 p-md-6">

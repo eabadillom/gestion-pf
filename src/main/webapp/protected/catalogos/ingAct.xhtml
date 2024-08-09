@@ -29,7 +29,7 @@
 						<p:outputLabel for="soClientes" value="Clientes" />
 						<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{ingresosActualizacionBean.cteSelect}" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" />
-							<f:selectItems value="#{ingresosActualizacionBean.listaCtes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+							<f:selectItems value="#{ingresosActualizacionBean.listaCtes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 							<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" />
 						</p:selectOneMenu>
 					</span>
@@ -90,7 +90,7 @@
 				<p:outputPanel id="panel-actualizaPago" class="ui-fluid">
 					<div class="p-grid p-col-12">
 						<div class="p-md-12 p-lg-12">
-							<p:outputLabel value="#{ingresosActualizacionBean.pagoSelected.factura.cliente.cteNombre}" class="font-bold"/>
+							<p:outputLabel value="#{ingresosActualizacionBean.pagoSelected.factura.cliente.nombre}" class="font-bold"/>
 						</div>
 						<div class="p-md-3 p-lg-3">
 							<p:outputLabel for="@next" value="Factura" />

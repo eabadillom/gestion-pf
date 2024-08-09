@@ -19,6 +19,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,6 +61,9 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	
 	private static final long serialVersionUID = -3109002730694247052L;
 	private static Logger log = LogManager.getLogger(ConsultarConstanciaDeDepositoBean.class);
+	
+	@Inject
+    private SideBarBean sideBar;
 	
 	private Date fechaInicial;
 	private Date fechaFinal;
@@ -147,7 +151,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-		listadoClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+		
+		listadoClientes = sideBar.getListaClientesActivos();
 		
 		if(listadoClientes.size() == 1)
 			this.cliente = listadoClientes.get(0);

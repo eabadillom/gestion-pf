@@ -26,13 +26,13 @@
 	                   	</p:fieldset>
 	                   	<p:fieldset legend="Cliente">
                        		<p:selectOneMenu id="cliente" autoWidth="true" converter="entityConverter" value="#{reporteCarteraClienteBean.clienteSelect}" filter="true" filterMatchMode="contains">
-                       			<f:selectItem itemLabel="Todos los Clientes" itemValue="" />
-                       			<f:selectItems value="#{reporteCarteraClienteBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+                       			<f:selectItem itemLabel="Todos los Clientes" />
+                       			<f:selectItems value="#{reporteCarteraClienteBean.listCliente}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
                        		</p:selectOneMenu>                       	
 	                   	</p:fieldset>
 	                   	<p:fieldset legend="Emisor">
 							<p:selectOneMenu id="Emisor" value="#{reporteCarteraClienteBean.emisorSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
-								<f:selectItem itemLabel="Todos los emisores" itemValue="" />
+								<f:selectItem itemLabel="Todos los emisores" itemValue=""/>
 								<f:selectItems value="#{reporteCarteraClienteBean.emisorList}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"/>
 								<p:ajax process="@this" />
 							</p:selectOneMenu>

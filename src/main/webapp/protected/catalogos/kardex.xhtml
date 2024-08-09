@@ -51,7 +51,7 @@
 				<div class="p-grid ui-fluid">
 					<div class="p-col-6 p-md-6">
 						<p:outputLabel for="@next" value="Cliente" />
-						<p:inputText id="nombreCliente" value="#{kardexBean.entrada.cteCve.cteNombre}" readonly="true"/>
+						<p:inputText id="nombreCliente" value="#{kardexBean.entrada.cteCve.alias eq null ? kardexBean.entrada.cteCve.nombre : kardexBean.entrada.cteCve.alias}" readonly="true"/>
 					</div>
 					<div class="p-col-2 p-md-2">
 						<p:outputLabel for="@next" value="Folio"/>
@@ -59,8 +59,8 @@
 					</div>
 					<div class="p-col-2 p-md-2">
 						<p:outputLabel for="@next" value="Ingreso" />
-						<p:datePicker id="fechaIngreso" value="#{kardexBean.entrada.fechaIngreso}" readonly="true" >
-							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						<p:datePicker id="fechaIngreso" value="#{kardexBean.entrada.fechaIngreso}" readonly="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+							<f:convertDateTime />
 						</p:datePicker>
 					</div>
 				</div>
@@ -177,8 +177,8 @@
 			                    	<f:convertDateTime pattern="dd/MM/yyyy" />
 			                    </h:outputText>
 			                </p:column>
-			                <p:column headerText="Cliente" sortBy="#{constancia.cteCve.cteNombre}">
-			                	<h:outputText value="#{constancia.cteCve.cteNombre}" />
+			                <p:column headerText="Cliente" sortBy="#{constancia.cteCve.nombre}">
+			                	<h:outputText value="#{constancia.cteCve.nombre}" />
 			                </p:column>
 			                <p:column width="2rem">
 			                    <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary ui-button-flat" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgBuscarProducto').hide();" update="form:folioSelected form:nombreCliente form:fechaIngreso form:folioCliente" process="@this" actionListener="#{kardexBean.cargarFolioEncontrado(constancia)}" >

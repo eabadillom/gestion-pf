@@ -13,11 +13,9 @@
 			<div class="p-grid ui-fluid p-col-12">
 				<div class="p-col-6 p-md-6">
 					<p:outputLabel for="@next" value="Cliente"/>
-					<p:selectOneMenu value="#{modPlazosPagoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith">
-						<f:selectItem itemLabel="--Selecciona--" />
-						<f:selectItems value="#{modPlazosPagoBean.listClientes}"
-							var="client" itemLabel="#{client.cteNombre}"
-							itemValue="#{client}" />
+					<p:selectOneMenu value="#{modPlazosPagoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="startsWith" autoWidth="false">
+						<f:selectItem itemLabel="--Selecciona--" noSelectionOption="true"/>
+						<f:selectItems value="#{modPlazosPagoBean.listClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 						<p:ajax update="form:bottomConsulta" />
 					</p:selectOneMenu>
 				</div>

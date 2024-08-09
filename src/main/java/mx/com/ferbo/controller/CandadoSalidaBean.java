@@ -37,7 +37,7 @@ public class CandadoSalidaBean implements Serializable {
 		dao = new CandadoSalidaDAO();
 		lista = dao.findAll();
 		seleccion = new CandadoSalida();
-	};
+	}
 	
 	@PostConstruct
 	public void init() {
@@ -64,22 +64,22 @@ public class CandadoSalidaBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 		this.seleccion = new CandadoSalida();
-	};
+	}
 
-	public List<?> getLista() {
+	public List<CandadoSalida> getLista() {
 		return lista;
-	};
+	}
 
 	public void setLista(List<CandadoSalida> lista) {
 		this.lista = lista;
-	};
+	}
 
 	public CandadoSalida getSeleccion() {
 		return seleccion;
-	};
+	}
 
 	public void setSeleccion(CandadoSalida seleccion) {
 		this.seleccion = seleccion;
-	};
+	}
 
 }
