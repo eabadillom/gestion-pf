@@ -91,7 +91,7 @@ public class ClienteBL extends Thread {
 						.collect(Collectors.toList()).get(0);
 				
 				clientesActivos.add(cliente);
-				log.info("Aplicando regla para restricción de clientes (cliente unico): {}", cliente.getCteNombre());
+				log.info("Aplicando regla para restricción de clientes (cliente unico): {}", cliente.getNombre());
 			} else {
 				this.doNoConfig();
 			}

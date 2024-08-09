@@ -19,9 +19,7 @@
 											value="#{avisosComercialBean.clienteSelected}" filter="true"
 											filterMatchMode="contains">
 											<f:selectItem itemLabel="--Seleccione un cliente--" />
-											<f:selectItems value="#{avisosComercialBean.lstClientes}"
-												var="cliente" itemLabel="#{cliente.cteNombre}"
-												itemValue="#{cliente}" />
+											<f:selectItems value="#{avisosComercialBean.lstClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 											<p:ajax listener="#{avisosComercialBean.filtraAvisos()}" update="form:soClientes" />
 										</p:selectOneMenu>
 									</div>

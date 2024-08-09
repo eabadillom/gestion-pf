@@ -317,7 +317,7 @@ public class AltaNotasCredito implements Serializable{
 			
 			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual() + 1));
 			notaCredito.setIdcliente(clienteSelect.getCteCve());
-			notaCredito.setCliente(clienteSelect.getCteNombre());
+			notaCredito.setCliente(clienteSelect.getNombre());
 			notaCredito.setDomicilio(domicilio);
 			notaCredito.setRfc(clienteSelect.getCteRfc());
 			notaCredito.setSubtotal(sumaSubtotal);

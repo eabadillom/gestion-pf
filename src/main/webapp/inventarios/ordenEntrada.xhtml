@@ -25,15 +25,15 @@
 			<p:panel>
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-col-6 p-md-6">
-						<p:selectOneMenu id="cliente" value="#{ordenEntradaBean.cliente}" converter="entityConverter">
-							<f:selectItem itemLabel="Selecciona al cliente" noSelectionOption="true" />
-							<f:selectItems value="#{ordenEntradaBean.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+						<p:selectOneMenu id="cliente" value="#{ordenEntradaBean.cliente}" converter="entityConverter" autoWidth="false" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Selecciona al cliente" noSelectionOption="true"/>
+							<f:selectItems value="#{ordenEntradaBean.listaClientes}" var="cliente" itemLabel="#{cliente.alias eq null ? cliente.nombre : cliente.alias}" itemValue="#{cliente}"/>
 							<p:ajax listener="#{ordenEntradaBean.cargaInfoCliente}" process="@this" update="form:ingreso form:productoCte"/>
 						</p:selectOneMenu>
 					</div>
 					
 					<div class="p-col-6 p-md-4">
-						<p:selectOneMenu id="ingreso" value="#{ordenEntradaBean.ingreso}" converter="entityConverter">
+						<p:selectOneMenu id="ingreso" value="#{ordenEntradaBean.ingreso}" converter="entityConverter" autoWidth="false">
 							<f:selectItem itemLabel="Ordenes confirmadas para hoy" noSelectionOption="true" />
 							<f:selectItems value="#{ordenEntradaBean.listaIngreso}" var="ingreso" itemLabel="#{ingreso.folio}" itemValue="#{ingreso}" />
 							<p:ajax process="@this" update="form:dato-general  form:dt-ingresoProducto form:dt-ingresoServicios" listener="#{ordenEntradaBean.cargaIngresoOrden}" />									
@@ -49,7 +49,7 @@
 					</div>
 					
 					<div class="p-col-2 p-md-4" >
-						<p:selectOneMenu id="planta" value="#{ordenEntradaBean.planta}" converter="entityConverter" rendered="#{(usuario.perfil != 1) and (usuario.perfil != 4)}" >
+						<p:selectOneMenu id="planta" value="#{ordenEntradaBean.planta}" converter="entityConverter" rendered="#{(usuario.perfil != 1) and (usuario.perfil != 4)}" autoWidth="false">
 							<f:selectItem itemLabel="Selecciona planta" noSelectionOption="true" />
 							<f:selectItems value="#{ordenEntradaBean.listaPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
 							<p:ajax listener="#{ordenEntradaBean.camaraDisponible}" update="camara" />						
@@ -57,7 +57,7 @@
 					</div>
 					
 					<div class="p-col-2 p-md-4" >
-						<p:selectOneMenu id="camara" value="#{ordenEntradaBean.camara}" converter="entityConverter" >
+						<p:selectOneMenu id="camara" value="#{ordenEntradaBean.camara}" converter="entityConverter" autoWidth="false">
 							<f:selectItem itemLabel="Selecciona camara" noSelectionOption="true" />
 							<f:selectItems value="#{ordenEntradaBean.listaCamara}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />
 							<p:ajax listener="#{ordenEntradaBean.camaraDisponible}" />						

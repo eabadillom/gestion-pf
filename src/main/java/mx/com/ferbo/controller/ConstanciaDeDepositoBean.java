@@ -17,12 +17,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.component.UISelectItems;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
@@ -81,6 +83,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	private static final long serialVersionUID = -1785488265380235016L;
 	private static Logger log = LogManager.getLogger(ConstanciaDeDepositoBean.class);
+	
+	@Inject
+    private SideBarBean sideBar;
 
 	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
@@ -176,8 +181,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	
 	private StreamedContent file;
 	
-	private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
+	private FacesContext context;
+    private HttpServletRequest request;
     
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
@@ -221,9 +226,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		byte bytes[] = {};
 		try {
 			partidaEdit = new Partida();
-			faceContext = FacesContext.getCurrentInstance();
-	        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-	        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
+			context = FacesContext.getCurrentInstance();
+	        request = (HttpServletRequest) context.getExternalContext().getRequest();
+	        this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
 	        
 	        this.setRestrictedAccess();
 			
@@ -239,7 +244,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				listadoPlanta = plantaDAO.findall();
 			}
 				 
-			listadoCliente = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+			listadoCliente = sideBar.getListaClientesActivos();
+			
 			this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 			tipoMovimiento = tipoMovimientoDAO.buscarPorId(1);
 			estadoInventario = estadoInventarioDAO.buscarPorId(1);
@@ -277,6 +283,11 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		}
 		
 		
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		log.info("Saliendo del alta de constancias de depósito.");
 	}
 	
 	public void totalesTarimas() {

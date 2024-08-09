@@ -31,8 +31,8 @@
 	             		</p:fieldset>
 	             		<p:fieldset legend="Cliente" styleClass="p-mt-4">
 		             		<p:selectOneMenu id="select-cte" autoWidth="true" converter="entityConverter" value="#{reporteIngresosBean.clienteSelect}" filter="true" filterMatchMode="contains">
-		             			<f:selectItem itemLabel="Todos Los Clientes" Itemvalue="" />
-		             			<f:selectItems value="#{reporteIngresosBean.listCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+		             			<f:selectItem itemLabel="Todos Los Clientes" />
+		             			<f:selectItems value="#{reporteIngresosBean.listCliente}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 		             		</p:selectOneMenu>
 	             		</p:fieldset>
 	             		<p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">

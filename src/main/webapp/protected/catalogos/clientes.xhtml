@@ -21,8 +21,11 @@
 					<p:column exportable="false" width="2rem" style="text-align: center;">
 						<p:rowToggler />
 					</p:column>
-					<p:column headerText="Nombre" sortBy="#{cliente.cteNombre}" filterBy="#{cliente.cteNombre}" filterMatchMode="contains">
-						<h:outputText value="#{cliente.cteNombre}" />
+					<p:column headerText="Nombre" sortBy="#{cliente.nombre}" filterBy="#{cliente.nombre}" filterMatchMode="contains">
+						<h:outputText value="#{cliente.nombre}" />
+					</p:column>
+					<p:column headerText="Alias" sortBy="#{cliente.alias}" filterBy="#{cliente.alias}">
+						<h:outputText value="#{cliente.alias}" />
 					</p:column>
 					<p:column headerText="RFC" width="7rem" style="text-align: center;">
 						<h:outputText value="#{cliente.cteRfc}" />
@@ -31,7 +34,7 @@
 						<h:outputText value="#{cliente.habilitado ? 'Sí' : 'No'}" />
 					</p:column>
 					<p:column width="2rem" style="text-align: center;">
-						<p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show();" process="@this" update="form:dialogCliente :form:regimenFiscal :form:usoCFDI :form:metodoPago :form:formaPago" action="#{clientesBean.cargaInfoCliente}">
+						<p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();" process="@this" update="form:dialogCliente :form:regimenFiscal :form:usoCFDI :form:metodoPago :form:formaPago" action="#{clientesBean.cargaInfoCliente}" onclick="PF('statusInfoDialog').show();">
 							<f:setPropertyActionListener value="#{cliente}" target="#{clientesBean.clienteSelected}"/>
 						</p:commandButton>
 					</p:column>
@@ -40,7 +43,6 @@
 							<f:setPropertyActionListener value="#{cliente}" target="#{clientesBean.clienteSelected}" />
 						</p:commandButton>
 					</p:column>
-
 					<p:rowExpansion>
 						<div class="orders-subtable">
 							<p:dataTable id="dtContactos" widgetVar="dtContactos" var="contacto" value="#{cliente.clienteContactoList}" reflow="true" rowKey="#{contaco.idContacto.idContacto}" lazy="true">
@@ -85,69 +87,73 @@
 			<p:dialog id="dialogCliente" header="Información del cliente" widgetVar="dialogCliente" showEffect="fade" modal="true" responsive="true">
 				<p:outputPanel id="pnlCliente" class="ui-fluid">
 					<p:outputPanel class="p-grid p-col-12">
-						<div class="p-field p-col-4 p-md-4">
+						<div class="p-field p-col-12 p-md-4">
 							<p:outputLabel>Tipo persona</p:outputLabel>
 							<p:selectOneRadio id="tP" value="#{clientesBean.clienteSelected.tipoPersona}" layout="grid" columns="3" styleClass="grid-radio" required="true" requiredMessage="Debe indicar el tipo de persona">
 							    <f:selectItem itemLabel="Persona Moral" itemValue="M"/>
 		           				<f:selectItem itemLabel="Persona Fisica" itemValue="F"/>
-						        <p:ajax listener="#{clientesBean.regimenSelect}" process="@this txtRFC" update="regimenFiscal usoCFDI txtRegimenCapital" />
+						        <p:ajax listener="#{clientesBean.regimenSelect}" process="@this txtRFC" update="pnlCliente" />
 					        </p:selectOneRadio>
 						</div>
-						<div class="p-field p-col-2 p-md-2">
+						<div class="p-field p-col-12 p-md-2">
 							<p:outputLabel for="txtRFC">RFC</p:outputLabel>
-							<p:inputText id="txtRFC" value="#{clientesBean.clienteSelected.cteRfc}">
+							<p:inputText id="txtRFC" value="#{clientesBean.clienteSelected.cteRfc}" maxlength="13">
 								<p:ajax event="blur" listener="#{clientesBean.validarRFC()}" update="txtCodigo"/>
 							</p:inputText>
 						</div>
-						<div class="p-field p-col-2 p-md-2">
+						<div class="p-field p-col-12 p-md-2">
 							<p:outputLabel>Número cliente</p:outputLabel>
 							<p:inputText value="#{clientesBean.clienteSelected.numeroCte}" maxlength="15" />
 						</div>
-						<div class="p-field p-col-4 p-md-4">
+						<div class="p-field p-col-12 p-md-2">
+							<p:outputLabel for="txtCodigo">Código único</p:outputLabel>
+							<p:inputText id="txtCodigo" value="#{clientesBean.clienteSelected.codUnico}" maxlength="4" />
+						</div>
+						<div class="p-field p-col-12 p-md-4">
 							<p:outputLabel for="txtNombre">Nombre</p:outputLabel>
-							<p:inputText id="txtNombre" value="#{clientesBean.clienteSelected.cteNombre}" required="true" requiredMessage="Debe indicar el nombre" rows="2" />
+							<p:inputText id="txtNombre" value="#{clientesBean.clienteSelected.nombre}" required="true" requiredMessage="Debe indicar el nombre" maxlength="150"/>
 						</div>
-						<div class="p-field p-col-4 p-md-4">
+						<div class="p-field p-col-12 p-md-4">
+							<p:outputLabel for="txtAlias">Alias</p:outputLabel>
+							<p:inputText id="txtAlias" value="#{clientesBean.clienteSelected.alias}" required="false" maxlength="150" readonly="#{clientesBean.clienteSelected.tipoPersona != 'M'}"/>
+						</div>
+						<div class="p-field p-col-12 p-md-4">
 							<p:outputLabel for="txtRegimenCapital">Régimen capital</p:outputLabel>
-							<p:inputText id="txtRegimenCapital" value="#{clientesBean.clienteSelected.regimenCapital}" readonly="#{clientesBean.clienteSelected.tipoPersona eq 'F'}" />
+							<p:inputText id="txtRegimenCapital" value="#{clientesBean.clienteSelected.regimenCapital}" readonly="#{clientesBean.clienteSelected.tipoPersona eq 'F'}" maxlength="150"/>
 						</div>
-						<div class="p-field p-col-6 p-md-6">
+						<div class="p-field p-col-12 p-md-4">
 							<p:outputLabel>Régimen Fiscal</p:outputLabel>
-							<p:selectOneMenu id="regimenFiscal" value="#{clientesBean.clienteSelected.regimenFiscal}" required="true" requiredMessage="Debe indicar el régimen fiscal" widgetVar="selectRegimenFiscal" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<p:selectOneMenu id="regimenFiscal" value="#{clientesBean.clienteSelected.regimenFiscal}" required="true" requiredMessage="Debe indicar el régimen fiscal" widgetVar="selectRegimenFiscal" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
 								<f:selectItem itemLabel="---Regimen Fiscal---" noSelectionOption="true" />
 								<f:selectItems value="#{clientesBean.lstRegimenFiscal}" var="regimen" itemLabel="#{regimen.cd_regimen} - #{regimen.nb_regimen}" itemValue="#{regimen}" />
 							</p:selectOneMenu>
 						</div>
-						<div class="p-field p-col-6 p-md-6">
+						<div class="p-field p-col-12 p-md-4">
 							<p:outputLabel>Uso del CFDI</p:outputLabel>
-							<p:selectOneMenu id="usoCFDI" value="#{clientesBean.clienteSelected.usoCfdi}" converter="entityConverter" required="true" requiredMessage="Debe indicar el uso del CFDI" filter="true" filterMatchMode="contains">
+							<p:selectOneMenu id="usoCFDI" value="#{clientesBean.clienteSelected.usoCfdi}" converter="entityConverter" required="true" requiredMessage="Debe indicar el uso del CFDI" filter="true" filterMatchMode="contains" autoWidth="false">
 								<f:selectItem itemLabel="---Uso del CFDI---" noSelectionOption="true" />
 								<f:selectItems value="#{clientesBean.lstUsoCfdi}" var="usoCFDI" itemLabel="#{usoCFDI.cdUsoCfdi} - #{usoCFDI.usoCfdi}" itemValue="#{usoCFDI}" />
 							</p:selectOneMenu>
 						</div>
-						<div class="p-field p-col-6 p-md-6">
+						<div class="p-field p-col-12 p-md-4">
 							<p:outputLabel>Método de pago</p:outputLabel>
-							<p:selectOneMenu id="metodoPago" value="#{clientesBean.clienteSelected.metodoPago}" converter="entityConverter" required="true" requiredMessage="Debe indicar el método de pago" filter="true" filterMatchMode="contains">
+							<p:selectOneMenu id="metodoPago" value="#{clientesBean.clienteSelected.metodoPago}" converter="entityConverter" required="true" requiredMessage="Debe indicar el método de pago" filter="true" filterMatchMode="contains" autoWidth="false">
 								<f:selectItem itemLabel="---Método de pago---" noSelectionOption="true" />
 								<f:selectItems value="#{clientesBean.lstMetodoPago}" var="metodoPago" itemLabel="#{metodoPago.cdMetodoPago} - #{metodoPago.nbMetodoPago}" itemValue="#{metodoPago}" />
 							</p:selectOneMenu>
 						</div>
-						<div class="p-field p-col-6 p-md-6">
+						<div class="p-field p-col-12 p-md-4">
 							<p:outputLabel>Forma de pago</p:outputLabel>
-							<p:selectOneMenu id="formaPago" value="#{clientesBean.clienteSelected.formaPago}" required="true" requiredMessage="Debe indicar la forma de pago" filter="true" filterMatchMode="contains">
+							<p:selectOneMenu id="formaPago" value="#{clientesBean.clienteSelected.formaPago}" required="true" requiredMessage="Debe indicar la forma de pago" filter="true" filterMatchMode="contains" autoWidth="false">
 								<f:selectItem itemLabel="---Forma de pago---" noSelectionOption="true" />
 								<f:selectItems value="#{clientesBean.lstMedioPago}" var="medioPago" itemLabel="#{medioPago.formaPago} - #{medioPago.mpDescripcion}" itemValue="#{medioPago.formaPago}" />
 							</p:selectOneMenu>
 						</div>
-						<div class="p-field p-col-2 p-md-2">
+						<div class="p-field p-col-12 p-md-4">
 							<p:outputLabel>Correo</p:outputLabel>
-							<p:inputText value="#{clientesBean.clienteSelected.cteMail}" required="true" requiredMessage="Debe indicar un correo electrónico"/>
+							<p:inputText value="#{clientesBean.clienteSelected.cteMail}" required="true" requiredMessage="Debe indicar un correo electrónico" maxlength="255"/>
 						</div>
-						<div class="p-field p-col-2 p-md-2">
-							<p:outputLabel for="txtCodigo">Código único</p:outputLabel>
-							<p:inputText id="txtCodigo" value="#{clientesBean.clienteSelected.codUnico}" maxlength="4" />
-						</div>
-						<div class="p-field p-col-2 p-md-2">
+						<div class="p-field p-col-2 p-md-4">
 							<p:outputLabel for="chkHabilitado" value="Habilitado" />
 							<p:selectOneMenu id="chkHabilitado" value="#{clientesBean.clienteSelected.habilitado}">
 								<f:selectItem itemLabel="Sí" itemValue="true" />
@@ -160,6 +166,15 @@
 					<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{clientesBean.guardarCliente()}" process="@this pnlCliente" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" resetValues="pnlCliente" process=" @this pnlCliente"/>
 				</f:facet>
+			</p:dialog>
+			
+			<p:dialog id="dialogClonar" header="Copiar información del cliente" widgetVar="dialogClonar" showEffect="fade" modal="true" responsive="true">
+				<p:outputPanel>
+					<h:outputLabel value="Seleccione el cliente" />
+					<p:selectOneMenu id="selClonarCliente" value="#{clientesBean.clonarCliente}">
+						<f:selectItem itemLabel="--SELECCIONE EL CLIENTE--" 	/>
+					</p:selectOneMenu>
+				</p:outputPanel>
 			</p:dialog>
 
 			<p:dialog id="dialogAddContacto" widgetVar="dialogAddContacto" header="Agregar contacto" showEffect="fade" modal="true" responsive="true" resizable="false" cache="false">

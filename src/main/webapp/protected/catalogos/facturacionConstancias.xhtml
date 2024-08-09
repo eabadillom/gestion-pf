@@ -60,7 +60,7 @@
 								<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="false" value="#{facturacionConstanciasBean.clienteSelect}" required="true" requiredMessage="Seleccione un Cliente" 
 										onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
 									<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
-									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+									<f:selectItems value="#{facturacionConstanciasBean.listaCliente}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 									<p:ajax update="receptor factura messages medioPago medio metodo metodoPago form:dt-constanciasE form:dt-vigencias" listener="#{facturacionConstanciasBean.cargaInfoCliente}" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:selectOneMenu>
 							</div>

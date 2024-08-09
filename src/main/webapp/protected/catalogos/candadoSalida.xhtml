@@ -11,15 +11,12 @@
 			<p:growl id="messages" showDetail="true" />
 			<div class="p-col-12">
 				<div class="card">
-					<p:dataTable id="dtCandado" widgetVar="dtCandado" var="lista"
-						value="#{candadoSalidaBean.lista}" rowKey="#{lista.id}"
-						reflow="true" selection="#{candadoSalidaBean.seleccion}"
-						paginator="true" rows="10" paginatorPosition="bottom">
+					<p:dataTable id="dtCandado" widgetVar="dtCandado" var="lista" value="#{candadoSalidaBean.lista}" rowKey="#{lista.id}" reflow="true" selection="#{candadoSalidaBean.seleccion}" paginator="true" rows="10" paginatorPosition="bottom">
 						<p:column headerText="Núm." width="3rem" style="text-alignment: center;">
 							<h:outputText value="#{lista.cliente.cteCve}" />
 						</p:column>
-						<p:column headerText="Nombre">
-							<h:outputText value="#{lista.cliente.cteNombre}" />
+						<p:column headerText="Nombre" filterBy="#{lista.cliente.nombre}" filterMatchMode="contains">
+							<h:outputText value="#{lista.cliente.nombre}#{lista.cliente.alias eq null ? '' : ' ('.concat(lista.cliente.alias).concat(')')}" />
 						</p:column>
 						<p:column headerText="Permitir Salida" width="10rem" style="text-alignment: center;">
 							<h:outputText value="#{lista.habilitado ? 'Si' : 'No'}" />
@@ -50,7 +47,7 @@
 					<div class="p-field">
 						<p:outputLabel for="@next" value="Nombre Cliente:" />
 						<p:inputText
-							value="#{candadoSalidaBean.seleccion.cliente.cteNombre}"
+							value="#{candadoSalidaBean.seleccion.cliente.nombre}"
 							required="true" disabled="true" />
 					</div>
 					<div class="p-field">

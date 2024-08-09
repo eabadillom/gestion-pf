@@ -25,7 +25,7 @@
 					<div class="p-card p-col-6 p-md-6">
 						<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{altaConstanciaSalidaBean.clienteSelect}" onchange="PF('statusDialog').show();" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true" />
-							<f:selectItems value="#{altaConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+							<f:selectItems value="#{altaConstanciaSalidaBean.listadoClientes}" var="cliente" itemLabel="#{cliente.alias eq null ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
 							<p:ajax listener="#{altaConstanciaSalidaBean.cargaInfoCliente}"
 								update="s-servicio dt-inventario s-planta dt-salidas dt-servicio cmdGuardar"
 								oncomplete="PF('statusDialog').hide();"/>

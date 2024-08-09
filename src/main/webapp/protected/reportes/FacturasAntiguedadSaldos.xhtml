@@ -19,7 +19,7 @@
                         <p:fieldset legend="Cliente">
                         	<p:selectOneMenu id="Cliente" value="#{reporteFacturacionAntiguedadSaldosBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Todos los clientes"  itemValue=""  />
-								<f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.listaClientes}" var="cte"  itemLabel="#{cte.cteNombre}" itemValue="#{cte}" />
+								<f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.listaClientes}" var="cliente"  itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 								<p:ajax process ="@this" />
 							</p:selectOneMenu>
 						</p:fieldset>

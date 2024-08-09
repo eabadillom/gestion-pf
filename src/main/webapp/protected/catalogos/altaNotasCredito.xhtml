@@ -15,7 +15,7 @@
 				<div class="p-col-6 p-md-6">
 					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.clienteSelect}" filter="true" filterMatchMode="contains" >
 						<f:selectItem itemLabel="---Seleccione un cliente ---" noSelectionOption="true" />
-						<f:selectItems value="#{altaNotasCredito.listaClientes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+						<f:selectItems value="#{altaNotasCredito.listaClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 						<p:ajax listener="#{altaNotasCredito.filtroFactura()}" process="@this" update="emisor rfc domicilio" />
 					</p:selectOneMenu>	
 				</div>

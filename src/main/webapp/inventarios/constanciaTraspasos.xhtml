@@ -38,7 +38,7 @@
 				<div class="p-field p-col-6 p-md-6">
 					<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{consultaTraspasosBean.idCliente}" filter="true" filterMatchMode="contains" >
 						<f:selectItem itemLabel="Selecione Cliente" itemValue="" noSelectionOption="true" />
-						<f:selectItems var="cte" value="#{consultaTraspasosBean.clientes}" itemLabel="#{cte.cteNombre}" itemValue="#{cte.cteCve}" />
+						<f:selectItems var="cte" value="#{consultaTraspasosBean.clientes}" itemLabel="#{cte.alias eq null ? cte.nombre : cte.alias}" itemValue="#{cte.cteCve}" />
 						<p:ajax process="@this"/>
 					</p:selectOneMenu>
 				</div>
@@ -51,7 +51,7 @@
 					<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.numero}" />
 				</p:column>
 				<p:column headerText="Cliente">
-					<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.cliente.cteNombre}" />
+					<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.cliente.nombre}" />
 				</p:column>
 				<p:column headerText="Fecha" width="7rem">
 					<h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{trasp.fecha}" />
@@ -70,7 +70,7 @@
 					<div class="p-grid p-col-12">
                                             <div class="p-md-6 p-lg-6">
                                                     <h:outputLabel for="cliente-new" value="Cliente" styleClass="ml-4" />
-                                                    <p:inputText widgetVar="cliente-new" id="cliente-new" value="#{consultaTraspasosBean.selectedconstancia.cliente.cteNombre}" readonly="true" />
+                                                    <p:inputText widgetVar="cliente-new" id="cliente-new" value="#{consultaTraspasosBean.selectedconstancia.cliente.nombre}" readonly="true" />
                                             </div>
                                             <div class="p-md-3 p-lg-3">
                                                     <h:outputLabel for="folio-new" value="Folio" styleClass="ml-4" />

@@ -996,7 +996,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setCliente(clienteSelect);
 		factura.setMoneda(moneda);
 		factura.setRfc(clienteSelect.getCteRfc());
-		factura.setNombreCliente(clienteSelect.getCteNombre());
+		factura.setNombreCliente(clienteSelect.getNombre());
 		factura.setFecha(fechaCorte);
 		if(observaciones == null)
 			factura.setObservacion("");
