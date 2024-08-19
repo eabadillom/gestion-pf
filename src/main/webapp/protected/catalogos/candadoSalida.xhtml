@@ -16,7 +16,7 @@
 							<h:outputText value="#{lista.cliente.cteCve}" />
 						</p:column>
 						<p:column headerText="Nombre" filterBy="#{lista.cliente.nombre}" filterMatchMode="contains">
-							<h:outputText value="#{lista.cliente.nombre}#{lista.cliente.alias eq null ? '' : ' ('.concat(lista.cliente.alias).concat(')')}" />
+							<h:outputText value="#{lista.cliente.nombre}#{lista.cliente.alias eq null or cliente.alias eq '' ? '' : ' ('.concat(lista.cliente.alias).concat(')')}" />
 						</p:column>
 						<p:column headerText="Permitir Salida" width="10rem" style="text-alignment: center;">
 							<h:outputText value="#{lista.habilitado ? 'Si' : 'No'}" />
