@@ -30,7 +30,7 @@
 					<div class="p-col-6 p-md-6">
 						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="---SELECCIONE EL CLIENTE---" noSelectionOption="true"/>
-							<f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.alias eq null ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
+							<f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
 							<p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:selServicio :form:folio-som " oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
