@@ -27,7 +27,7 @@
 					<div class="p-col-6 p-md-6">
 						<p:selectOneMenu id="cliente" value="#{ordenEntradaBean.cliente}" converter="entityConverter" autoWidth="false" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Selecciona al cliente" noSelectionOption="true"/>
-							<f:selectItems value="#{ordenEntradaBean.listaClientes}" var="cliente" itemLabel="#{cliente.alias eq null ? cliente.nombre : cliente.alias}" itemValue="#{cliente}"/>
+							<f:selectItems value="#{ordenEntradaBean.listaClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}"/>
 							<p:ajax listener="#{ordenEntradaBean.cargaInfoCliente}" process="@this" update="form:ingreso form:productoCte"/>
 						</p:selectOneMenu>
 					</div>

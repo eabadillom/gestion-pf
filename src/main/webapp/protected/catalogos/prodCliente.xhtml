@@ -18,7 +18,7 @@
 										<span class="ui-float-label ui-input-icon-left">
 										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{prodClienteBean.clienteSelected}" filter="true" filterMatchMode="contains">
 											<f:selectItem itemLabel="" />
-											<f:selectItems value="#{prodClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.alias eq null ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
+											<f:selectItems value="#{prodClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
 											<p:ajax listener="#{prodClienteBean.filtraListado()}" update="dt-productosCliente" />
 										</p:selectOneMenu>
 										<p:outputLabel for="soClientes" value="Clientes" />

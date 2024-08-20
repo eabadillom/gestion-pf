@@ -41,7 +41,7 @@
 				<div class="p-field p-col-6 p-md-6">
 					<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.cliente}" styleClass="p-ml-2 p-mr-4" filter="true" filterMatchMode="contains">
 						<f:selectItem itemLabel="Seleccione un Cliente" itemValue="" noSelectionOption="true"/>
-						<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoClientes}" var="cliente" itemLabel="#{cliente.alias eq null ? cliente.nombre : cliente.alias}" />
+						<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" />
 					</p:selectOneMenu>
 				</div>
 				<div class="p-field p-col-2 p-md-2">
