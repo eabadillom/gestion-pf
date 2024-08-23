@@ -231,9 +231,8 @@
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Vigencias por facturar (Inventario)">
 					<p:outputLabel value="Fecha de corte"/>
-					<p:datePicker id="FechaCorte" showIcon="true" styleClass="p-ml-2" placeholder="Fecha de Corte" value="#{facturacionConstanciasBean.fechaCorte}" onchange="PF('statusInfoDialog').show();" >
-						<p:ajax listener="#{facturacionConstanciasBean.facturacionVigencias}" oncomplete="PF('statusInfoDialog').hide();"/>
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+					<p:datePicker id="FechaCorte" showIcon="true" styleClass="p-ml-2" placeholder="Fecha de Corte" value="#{facturacionConstanciasBean.fechaCorte}" onchange="PF('statusInfoDialog').show();" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+						<p:ajax listener="#{facturacionConstanciasBean.facturarVigencias}" oncomplete="PF('statusInfoDialog').hide();" update="dt-vigencias"/>
 					</p:datePicker>
 					<p:dataTable id="dt-vigencias" emptyMessage="No Hay Vigencias Por Facturar" value="#{facturacionConstanciasBean.listaVigencias}" var="vigencia" 
 							selection="#{facturacionConstanciasBean.selectedVigencias}" rowKey="#{vigencia.folio.folio}" rowSelectMode="add" paginator="true" paginatorPosition="bottom" rows="5" >

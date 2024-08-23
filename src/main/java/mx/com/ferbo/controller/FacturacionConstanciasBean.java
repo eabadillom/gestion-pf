@@ -394,19 +394,29 @@ public class FacturacionConstanciasBean implements Serializable{
 			return;
 		}
 		
+		if(clienteSelect.getCteCve() == null)
+			return;
+		
 		if(plantaSelect == null) {
 			return;
 		}
 		
+		if(plantaSelect.getPlantaCve() == null)
+			return;
+		
 		this.facturacionEntradas();
 		procesarEntradas();
-		this.facturacionVigencias();
-		procesarVigencias();
+		this.facturarVigencias();
 		this.facturacionServicios();
 		procesarServicios();
 		
 		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios");
 		
+	}
+	
+	public void facturarVigencias() {
+		this.facturacionVigencias();
+		this.procesarVigencias();
 	}
 	
 	public void calcula(ServicioConstancia sc) {
