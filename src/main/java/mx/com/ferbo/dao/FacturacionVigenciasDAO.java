@@ -220,8 +220,6 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				final Date vigenciaIni = cf.getVigenciaInicio();
 				final Date vigenciaFin = cf.getVigenciaFin();
 				
-				log.debug("folio: {}, vigencia ini: {}, vigencia fin: {}", cf.getFolioCliente(), cf.getVigenciaInicio(), cf.getVigenciaFin());
-				
 				List<ConstanciaFactura> lCFFacturadas = lConstanciaFactura.stream()
 						.filter(c -> (c.getVigenciaInicio().equals(vigenciaIni) || c.getVigenciaFin().equals(vigenciaFin)))
 						.collect(Collectors.toList());
@@ -229,6 +227,8 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				log.debug("Constancias facturadas: {}", lCFFacturadas.size());
 				if(lCFFacturadas.size() > 0)
 					continue;
+				
+				log.info("folio: {}, vigencia ini: {}, vigencia fin: {}", cf.getFolioCliente(), cf.getVigenciaInicio(), cf.getVigenciaFin());
 				
 				for(Partida p : constancia.getPartidaList()) {
 					BigDecimal cantidadT = new BigDecimal(p.getCantidadTotal());
