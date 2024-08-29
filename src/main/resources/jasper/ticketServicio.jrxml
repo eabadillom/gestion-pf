@@ -277,7 +277,7 @@ WHERE
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{CANTIDAD_DE_COBRO} == null ? "---" : ($F{CANTIDAD_DE_COBRO} + "  " +$F{UNIDAD_DE_MANEJO_DS})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CANTIDAD_TOTAL} == null ? "---" : ($F{CANTIDAD_TOTAL} + "  " +$F{UNIDAD_DE_MANEJO_DS})]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="54" y="24" width="135" height="12" uuid="baec77bf-04a5-4136-b80b-d92ac74386f4">
@@ -287,7 +287,7 @@ WHERE
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{CANTIDAD_TOTAL} == null ? "---" : $F{CANTIDAD_TOTAL} + "kg"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CANTIDAD_DE_COBRO} == null ? "---" : $F{CANTIDAD_DE_COBRO} + "kg"]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="0" y="53" width="189" height="1" forecolor="#111212" backcolor="#0C0E0F" uuid="2da25a69-fe52-45e6-b3c5-dfff133d6ebe">
