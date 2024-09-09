@@ -79,8 +79,9 @@
 					<f:facet name="footer">
 						<div align="right">
 							Total de pagos:
-							<h:outputText value="#{ingresosActualizacionBean.totalPagos}">
-								<f:convertNumber pattern="$##,###.00" />
+							<!-- <h:outputText value="#{ingresosActualizacionBean.totalPagos}"> -->
+							<h:outputText value="#{ingresosActualizacionBean.listaPago.stream().filter(p -> p.tipo.id != 5).map(item -> item.monto).sum()}">
+								<f:convertNumber pattern="$ #,###,##0.00" />
 							</h:outputText>
 						</div>
 					</f:facet>
