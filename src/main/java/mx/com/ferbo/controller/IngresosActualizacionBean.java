@@ -62,32 +62,28 @@ public class IngresosActualizacionBean implements Serializable{
 	
 	private BigDecimal totalPagos;
 	
-	private FacesContext faceContext;
-	private HttpServletRequest httpServletRequest;
+	private FacesContext context;
+	private HttpServletRequest request;
 	
 	public IngresosActualizacionBean() {
 		listaPago = new ArrayList<Pago>();
 		listaCtes = new ArrayList<Cliente>();
-		
 		pagoSelected = new Pago();
 		cteSelect = new Cliente();
-		
-		
 	}
 	
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init(){
-		
-		faceContext = FacesContext.getCurrentInstance();
-		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		context = FacesContext.getCurrentInstance();
+		request = (HttpServletRequest) context.getExternalContext().getRequest();
 		pagoDAO = new PagoDAO();
 		tipoPagoDAO = new TipoPagoDAO();
 		bancoDAO = new BancoDAO();
 		sfDAO = new StatusFacturaDAO();
 		facturaDAO = new FacturaDAO();
 		
-		listaCtes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+		listaCtes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		listaBancos = bancoDAO.buscarTodos();
 		listatipoPago = tipoPagoDAO.buscarTodos();
 		this.startDate = new Date();
@@ -102,6 +98,8 @@ public class IngresosActualizacionBean implements Serializable{
 		listaPago = pagoDAO.buscaPorClienteFechas(cteSelect, startDate, endDate);
 		this.totalPagos = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 		for(Pago pago : listaPago) {
+			if(pago.getTipo().getId() == 5)
+				continue;
 			this.totalPagos = this.totalPagos.add(pago.getMonto());
 		}
 	}

@@ -47,10 +47,10 @@
 						<h:outputText
 							value="#{pPago.factura.nomSerie.concat('-').concat(pPago.factura.numero)}" />
 					</p:column>
-					<p:column headerText="Status" width="6rem" style="text-align: center;">
+					<p:column headerText="Status" width="5rem" style="text-align: center;">
 						<h:outputText value="#{pPago.factura.status.nombre}" />
 					</p:column>
-					<p:column headerText="Fecha" width="6rem" style="text-align: center;">
+					<p:column headerText="Fecha" width="5rem" style="text-align: center;">
 						<h:outputText value="#{pPago.fecha}">
 							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 						</h:outputText>
@@ -58,8 +58,8 @@
 					<p:column headerText="Tipo de Pago">
 						<h:outputText value="#{pPago.tipo.nombre}" />
 					</p:column>
-					<p:column headerText="Banco" width="6rem" style="text-align: center;">
-						<h:outputText value="#{pPago.banco.nombre}" />
+					<p:column headerText="Cliente" width="auto" style="text-align: left;">
+						<h:outputText value="#{pPago.factura.nombreCliente}" />
 					</p:column>
 					<p:column headerText="Importe" width="6rem" style="text-align: right;">
 						<h:outputText value="#{pPago.monto}">
@@ -79,8 +79,8 @@
 					<f:facet name="footer">
 						<div align="right">
 							Total de pagos:
-							<h:outputText value="#{ingresosActualizacionBean.totalPagos}">
-								<f:convertNumber pattern="$##,###.00" />
+							<h:outputText value="#{ingresosActualizacionBean.listaPago.stream().filter(p -> p.tipo.id != 5).map(item -> item.monto).sum()}">
+								<f:convertNumber pattern="$ #,###,##0.00" />
 							</h:outputText>
 						</div>
 					</f:facet>

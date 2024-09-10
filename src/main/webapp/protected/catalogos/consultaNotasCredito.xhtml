@@ -20,15 +20,13 @@
 				</div>
 				<div class="p-col-3 p-md-3">
 					<p:outputLabel value="Fecha Inicio:" styleClass="p-mr-2 p-ml-3" />
-					<p:datePicker id="fechaInicio" value="#{consultaNotasCreditoBean.fechaInicio}" showIcon="true">
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+					<p:datePicker id="fechaInicio" value="#{consultaNotasCreditoBean.fechaInicio}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						<p:ajax process="@this" />
 					</p:datePicker>
 				</div>
 				<div class="p-col-3 p-md-3">
 					<p:outputLabel value="Fecha Fin:" styleClass="p-mr-2 p-ml-3"/>
-					<p:datePicker id="fechaFin" value="#{consultaNotasCreditoBean.fechaFin}" showIcon="true">
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+					<p:datePicker id="fechaFin" value="#{consultaNotasCreditoBean.fechaFin}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						<p:ajax process="@this" />
 					</p:datePicker>
 				</div>
@@ -43,32 +41,32 @@
 					<h:outputText value="#{notaCredito.numero}" />
 				</p:column>
 				
-				<p:column headerText="Fecha" width="6rem" style="text-align: center;">
+				<p:column headerText="Fecha" width="5rem" style="text-align: center;">
 					<h:outputText value="#{notaCredito.fecha}">
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="Subtotal" width="6rem" style="text-align: right;">
+				<p:column headerText="Subtotal" width="5rem" style="text-align: right;">
 					<h:outputText value="#{notaCredito.subtotal}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="IVA" width="6rem" style="text-align: right;">
+				<p:column headerText="IVA" width="5rem" style="text-align: right;">
 					<h:outputText value="#{notaCredito.iva}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="Total" width="6rem" style="text-align: right;">
+				<p:column headerText="Total" width="5rem" style="text-align: right;">
 					<h:outputText value="#{notaCredito.total}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="Cajero" style="text-align: center;">
-					<h:outputText value="#{notaCredito.cajero}" />
+				<p:column headerText="Cliente" style="text-align: center;">
+					<h:outputText value="#{notaCredito.cliente}" />
 				</p:column>
 				<p:column width="2rem" style="text-align: center;">
 					<p:commandButton icon="pi pi-bars" oncomplete="PF('dlg-General').show()" update="form:dlg-notaCredito" process="@this" >
@@ -105,8 +103,7 @@
 							</div>
 							<div class="p-col-4 p-md-4">
 								<p:outputLabel value="Fecha"/>
-								<p:datePicker value="#{consultaNotasCreditoBean.notaCreditoSelect.fecha}" showIcon="true">
-									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+								<p:datePicker value="#{consultaNotasCreditoBean.notaCreditoSelect.fecha}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00">
 								</p:datePicker>
 							</div>
 							<div class="p-col-8 p-md-8">

@@ -17,7 +17,7 @@
 									<div class="p-field p-col-12 p-md-6">
 										<span class="ui-float-label ui-input-icon-left">
 										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{prodClienteBean.clienteSelected}" filter="true" filterMatchMode="contains">
-											<f:selectItem itemLabel="" />
+											<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" noSelectionOption="true" />
 											<f:selectItems value="#{prodClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
 											<p:ajax listener="#{prodClienteBean.filtraListado()}" update="dt-productosCliente" />
 										</p:selectOneMenu>
@@ -41,10 +41,10 @@
 									</span>
 								</div>
 							</f:facet>
-							<p:column headerText="Código" sortBy="#{pProducto.productoCve.numeroProd}" width="7rem" style="text-align:center">
+							<p:column headerText="Código" sortBy="#{pProducto.productoCve.numeroProd}" width="7rem" style="text-align:center" filterBy="#{pProducto.productoCve.numeroProd}" filterMatchMode="contains">
 								<h:outputText value="#{pProducto.productoCve.numeroProd}" />
 							</p:column>
-							<p:column headerText="Descripción" sortBy="#{pProducto.productoCve.productoDs}" style="text-align:center">
+							<p:column headerText="Descripción" sortBy="#{pProducto.productoCve.productoDs}" style="text-align:center" filterBy="#{pProducto.productoCve.productoDs}" filterMatchMode="contains">
 								<h:outputText value="#{pProducto.productoCve.productoDs}" />
 							</p:column>
 							<p:column exportable="false" style="text-align:center" width="2rem">
