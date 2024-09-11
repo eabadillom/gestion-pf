@@ -97,6 +97,14 @@
 							target="#{facMantenimentoBean.seleccion}" />
 					</p:commandButton>
 				</p:column>
+				<f:facet name="footer">
+					<div align="right">
+						Total de facturas:
+						<h:outputText value="#{facMantenimentoBean.listFac.stream().filter(f -> (f.status.id != 0 and f.status.id != 2)).map(item -> item.total).sum()}">
+							<f:convertNumber pattern="$ #,###,##0.00" />
+						</h:outputText>
+					</div>
+				</f:facet>
 			</p:dataTable>
 			<p:dialog modal="true" widgetVar="statusDialog" header="Generando CFDI..." draggable="false" closable="false" resizable="false">
 				<div align="center">

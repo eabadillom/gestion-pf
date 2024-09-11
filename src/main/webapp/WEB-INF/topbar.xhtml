@@ -30,11 +30,12 @@
 	        </span>
         </div>
         <div id="topbar-icons">
-            <a href="#">
-                <!-- <span class="topbar-item-text">User</span>
-                <span class="topbar-icon pi pi-user"/> -->
-                <p:graphicImage name="images/user.png" library="omega-layout" height="30"/>
-            </a>
+			<p:graphicImage name="images/user.png" library="omega-layout" height="30" rendered="#{empty sideBarBean.fotografia}"/>
+			<h:graphicImage value="#{sideBarBean.fotografia}" style="border-radius: 30%;width: auto; height: 30px;" rendered="#{not empty sideBarBean.fotografia}"/>
+            <!-- <a href="#">
+                <span class="topbar-item-text">User</span>
+                <span class="topbar-icon pi pi-user"/>
+            </a> -->
         </div>
         
     </div>

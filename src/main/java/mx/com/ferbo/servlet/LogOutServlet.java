@@ -27,9 +27,11 @@ public class LogOutServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String path = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+		String basePath = path +"/login.xhtml";
 		HttpSession session= request.getSession(false);
 		session.invalidate();
-		response.sendRedirect(request.getContextPath() +"/login.xhtml");
+		response.sendRedirect(basePath);
 	}
 
 }
