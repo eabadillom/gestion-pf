@@ -1,39 +1,42 @@
 package mx.com.ferbo.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.concurrent.TimeUnit;
+//import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Properties;
+//import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
+//import org.apache.hc.client5.http.classic.methods.HttpGet;
+//import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+//import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+//import org.apache.hc.client5.http.impl.classic.HttpClients;
+//import org.apache.hc.core5.http.HttpEntity;
+//import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+//import com.google.gson.Gson;
+//import com.google.gson.GsonBuilder;
+//import com.google.gson.reflect.TypeToken;
 
+import mx.com.ferbo.business.BiometricoSgpApiBL;
 import mx.com.ferbo.business.ClienteBL;
+import mx.com.ferbo.business.FotografiaSgpApiBL;
 import mx.com.ferbo.dao.UsuarioDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.response.BiometricoResponse;
 import mx.com.ferbo.response.DetBiometricoResponse;
+import mx.com.ferbo.response.FotografiaResponse;
 import mx.com.ferbo.util.SecurityUtil;
 
 
@@ -50,6 +53,7 @@ public class LoginBean implements Serializable  {
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
+	private FotografiaSgpApiBL fotografiaBO;
 	
 	private List<Cliente> clientesList = null;
     private List<Cliente> clientesActivosList = null;
@@ -59,6 +63,7 @@ public class LoginBean implements Serializable  {
 
 	public LoginBean() {
 		usuarioDAO = new UsuarioDAO();
+		fotografiaBO = new FotografiaSgpApiBL();
 	}
 
 	@PostConstruct
@@ -69,21 +74,25 @@ public class LoginBean implements Serializable  {
 	public void login() {
 		FacesMessage message = null;
 		DetBiometricoResponse bean = null;
-		HttpGet request = null;
-		String url = null;
-		CloseableHttpResponse response = null;
-		CloseableHttpClient httpClient = null;
-		int httpStatus;
-		String jsonResponse = null;
-		String bodyResponse = null;
-		HttpEntity entity = null;
-		String resultContent;
-		Gson prettyJson = null;
-		Type type = null;
+//		HttpGet request = null;
+//		String url = null;
+//		CloseableHttpResponse response = null;
+//		CloseableHttpClient httpClient = null;
+//		int httpStatus;
+//		String jsonResponse = null;
+//		String bodyResponse = null;
+//		HttpEntity entity = null;
+//		String resultContent;
+//		Gson prettyJson = null;
+//		Type type = null;
 
 		String shaPassword = null;
 		String nextPage = null;
-
+		String numeroEmpleado = null;
+		
+		BiometricoSgpApiBL biometricoBL = new BiometricoSgpApiBL();
+		BiometricoResponse biometrico = null;
+		
 		try {
 			if (this.username == null) {
 				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Usuario o contraseña incorrecto.", null);
@@ -146,62 +155,60 @@ public class LoginBean implements Serializable  {
 
 			faceContext = FacesContext.getCurrentInstance();
 			httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+			numeroEmpleado = usr.getNumEmpleado();
 
 			if (usr.getHuella()) {
-
-				// ---- PETICION GET ----- para mi Microservicio Biometrico
-				String numeroEmpleado = usr.getNumEmpleado();
-
-				Properties prop = new Properties();
-				InputStream in = getClass().getResourceAsStream("/config/gestion.properties");
-				prop.load(in);
-				log.info(prop.get("sgp.url"));
-				String ip = prop.getProperty("sgp.url");
-
-				// le mandamos la url de nuestro microservicio
-				url = ip + "/detEmpleado/empleadoBio?numEmp=" + numeroEmpleado;
-				url = String.format(url);
-				log.info("Realizando la peticion GET al microServicio: " + url);
-
-				// Hacemos la peticion GET por HTTP
-				request = new HttpGet(url);
-				request.addHeader("Accept-Charset", "UTF-8");
-				httpClient = HttpClients.createDefault();
-				response = httpClient.execute(request);
-				httpStatus = response.getCode();
-
-				log.info("La respuesta de la peticion get es: " + httpStatus);
-
-				if (httpStatus < 200 || httpStatus >= 300)// es erronea la respuesta por el microservicio ?
-					throw new Exception("Respuesta no satisfactoria del MicroServicio.");
-
-				// status correcto
-				// recuperando el body de la respuesta
-				entity = response.getEntity();
-				resultContent = EntityUtils.toString(entity);
-				bodyResponse = new String(resultContent.getBytes(), "UTF-8");
-
-				jsonResponse = bodyResponse;
-
-				// conviertiendo a formato json
-				log.info("Respuesta del MicroServicio:\n" + jsonResponse);
-				prettyJson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
-
-				type = new TypeToken<DetBiometricoResponse>() {
-				}.getType();
-
-				bean = prettyJson.fromJson(jsonResponse, type);
-
-				log.info("Su primer bio es: " + bean.getHuella());
-
-				log.info("json:\n" + bean);
+//				// ---- PETICION GET ----- para mi Microservicio Biometrico
+//				
+//				Properties prop = new Properties();
+//				InputStream in = getClass().getResourceAsStream("/config/gestion.properties");
+//				prop.load(in);
+//				log.info(prop.get("sgp-api.url"));
+//				String ip = prop.getProperty("sgp.url");
+//
+//				// le mandamos la url de nuestro microservicio
+//				url = ip + "/detEmpleado/empleadoBio?numEmp=" + numeroEmpleado;
+//				url = String.format(url);
+//				log.info("Realizando la peticion GET al microServicio: " + url);
+//
+//				// Hacemos la peticion GET por HTTP
+//				request = new HttpGet(url);
+//				request.addHeader("Accept-Charset", "UTF-8");
+//				httpClient = HttpClients.createDefault();
+//				response = httpClient.execute(request);
+//				httpStatus = response.getCode();
+//
+//				log.info("La respuesta de la peticion get es: " + httpStatus);
+//
+//				if (httpStatus < 200 || httpStatus >= 300)// es erronea la respuesta por el microservicio ?
+//					throw new Exception("Respuesta no satisfactoria del MicroServicio.");
+//
+//				// status correcto
+//				// recuperando el body de la respuesta
+//				entity = response.getEntity();
+//				resultContent = EntityUtils.toString(entity);
+//				bodyResponse = new String(resultContent.getBytes(), "UTF-8");
+//
+//				jsonResponse = bodyResponse;
+//
+//				// conviertiendo a formato json
+//				log.info("Respuesta del MicroServicio:\n" + jsonResponse);
+//				prettyJson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+//
+//				type = new TypeToken<DetBiometricoResponse>() {
+//				}.getType();
+//
+//				bean = prettyJson.fromJson(jsonResponse, type);
+				
+				biometrico = biometricoBL.getBiometrico(numeroEmpleado);
+				log.info("Biometrico: {}", biometrico);
 
 				httpServletRequest.getSession(true).setAttribute("json", bean);
 
 			}
-
+			
 			httpServletRequest.getSession(true).setAttribute("usuario", usr);
-
+			this.getFotografia(numeroEmpleado);
 			this.setUsuario(usr);
 			message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Acceso correcto", null);
 			FacesContext.getCurrentInstance().addMessage(null, message);
@@ -231,6 +238,20 @@ public class LoginBean implements Serializable  {
 		} finally {
 			this.username = null;
 			this.password = null;
+		}
+	}
+	
+	public void getFotografia(String numeroEmpleado) {
+		FotografiaResponse fotografia = null;
+		try {
+			if(numeroEmpleado != null && "".equalsIgnoreCase(numeroEmpleado.trim()) == false) {
+				fotografia = this.fotografiaBO.getFotografia(numeroEmpleado);
+			}
+			
+			if(fotografia != null)
+				httpServletRequest.getSession(false).setAttribute("fotografia", fotografia.getFotografia());
+		} catch(Exception ex) {
+			log.warn("No se puede recuperar la fotografia del empleado {}", numeroEmpleado);
 		}
 	}
 
