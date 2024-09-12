@@ -39,7 +39,17 @@ public class SideBarBean implements Serializable {
     private Integer numeroEntradas;
     private Integer numeroSalidas;
     
-    public SideBarBean() {
+    private String fotografia;
+    
+    public String getFotografia() {
+		return fotografia;
+	}
+
+	public void setFotografia(String fotografia) {
+		this.fotografia = fotografia;
+	}
+
+	public SideBarBean() {
     	this.usuario = new Usuario();
     	this.ordenSalidaDAO = new OrdenSalidaDAO();
     }
@@ -59,6 +69,7 @@ public class SideBarBean implements Serializable {
 			
 			listaClientesActivos = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 			listaClientesTodos = (List<Cliente>) request.getSession(false).getAttribute("clientesTodosList");
+			fotografia = (String) request.getSession(false).getAttribute("fotografia");
 			
 			if(this.usuario.getPerfil() == 1 || this.usuario.getPerfil() == 4) {
 				numeroSalidas = ordenSalidaDAO.getCantidadPorClientePlanta(fecha, this.usuario.getIdPlanta());
