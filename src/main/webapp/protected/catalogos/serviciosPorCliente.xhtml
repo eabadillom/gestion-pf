@@ -5,6 +5,11 @@
 	<ui:define name="content">
 		<h:form id="form">
 			<p:growl id="messages" showDetail="true" />
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
 			<div class="p-grid crud-demo">
 				<div class="p-col-12">
 					<div class="card">
@@ -13,10 +18,10 @@
 								<div class="ui-fluid p-formgrid p-grid">
 									<div class="p-field p-col-12 p-md-6">
 										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{serviciosClienteBean.clienteSelected}" filter="true"
-											filterMatchMode="contains">
+											filterMatchMode="contains" onchange="PF('statusInfoDialog').show();">
 											<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" />
 											<f:selectItems value="#{serviciosClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
-											<p:ajax listener="#{serviciosClienteBean.filtaListado()}" update="dt-servicios dt-servicios:btnAdd" />
+											<p:ajax listener="#{serviciosClienteBean.filtaListado()}" update="dt-servicios dt-servicios:btnAdd" oncomplete="PF('statusInfoDialog').hide();"/>
 										</p:selectOneMenu>
 									</div>
 								</div>
@@ -58,7 +63,7 @@
 						</p:dataTable>
 
 
-						<p:dialog header="Agregar/Editar registro" showEffect="fade" modal="true" widgetVar="servicioClienteDialog" responsive="true">
+						<p:dialog header="Detalle del servicio" showEffect="fade" modal="true" widgetVar="servicioClienteDialog" responsive="true" position="center center" width="100%" resizable="false">
 							<p:outputPanel id="panel-servicio" class="ui-fluid">
 								<p:outputPanel>
 									<div class="p-field">
@@ -68,7 +73,7 @@
 									<div class="p-field">
 										<p:outputLabel>Servicio</p:outputLabel>
 										<p:selectOneMenu value="#{serviciosClienteBean.precioServicioSelected.servicio}" filter="true" filterMatchMode="contains"
-											converter="entityConverter" required="true" requiredMessage="Seleccione servicio"
+											converter="entityConverter" required="true" requiredMessage="Seleccione servicio" autoWidth="false"
 											disabled="#{serviciosClienteBean.precioServicioSelected.id ne null}">
 											<f:selectItem itemLabel="--Selecciona--" />
 											<f:selectItems value="#{serviciosClienteBean.lstServicio}" var="serv" itemLabel="#{serv.servicioDs}" />
