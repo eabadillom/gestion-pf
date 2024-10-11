@@ -342,11 +342,6 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 	}
 
 	@Override
-	public String actualizar(Inventario e) {
-		return null;
-}
-
-	@Override
 	public String guardar(ConstanciaDeDeposito e) {
 		return null;
 	}

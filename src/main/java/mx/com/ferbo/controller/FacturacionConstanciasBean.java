@@ -838,6 +838,30 @@ public class FacturacionConstanciasBean implements Serializable{
 	public BigDecimal getCantidadPartidas(List<Partida> listaPartidas, String tipoFacturacion) {
 
 		BigDecimal cantidad = new BigDecimal(0).setScale(3, BigDecimal.ROUND_HALF_UP);
+		
+		if(tipoFacturacion.equals("T")) {
+			BigDecimal fraccionTarimas = null;
+			cantidad = listaPartidas.stream()
+					.filter(p -> p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) >= 0 )
+					.map(item -> item.getNoTarimas())
+					.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+					;
+			
+			fraccionTarimas = listaPartidas.stream()
+					.filter(p -> p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) < 0 )
+					.map(item -> item.getNoTarimas())
+					.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+					;
+			fraccionTarimas = fraccionTarimas.setScale(0, BigDecimal.ROUND_CEILING);
+			cantidad = cantidad.add(fraccionTarimas);
+			
+		} else {
+			cantidad = listaPartidas.stream()
+					.map(item -> item.getPesoTotal())
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+					;
+		}
+		log.info("Cantidad: {} {}", cantidad, tipoFacturacion);
 
 		for (Partida p : listaPartidas) {
 
@@ -850,6 +874,8 @@ public class FacturacionConstanciasBean implements Serializable{
 			}
 
 		}
+		
+		log.info("Cantidad: {} {}", cantidad, tipoFacturacion);
 
 		return cantidad;
 	}

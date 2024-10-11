@@ -47,6 +47,7 @@ import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.ServicioDAO;
+import mx.com.ferbo.dao.TarimaDAO;
 import mx.com.ferbo.dao.TipoMovimientoDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
@@ -68,6 +69,7 @@ import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.SerieConstanciaPK;
 import mx.com.ferbo.model.Servicio;
+import mx.com.ferbo.model.Tarima;
 import mx.com.ferbo.model.TipoMovimiento;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
@@ -104,9 +106,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private EstadoInventario estadoInventario;
 	private EstadoInventarioDAO estadoInventarioDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
+	private TarimaDAO tarimaDAO;
 	private BigDecimal numTarimas;
 	private Boolean restricted = null;
 	private Boolean saved = null;
+	private Integer idTarima = null;
+	
 	private List<Cliente> listadoCliente;
 	private List<Planta> listadoPlanta;
 	private List<Camara> camaras;
@@ -126,7 +131,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private List<PrecioServicio> listaServicioUnidad;
 	private List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle;
 	private List<Partida> selectedPartidas;
+	private List<Tarima> tarimas;
 
+	private Tarima tarima;
 	private Planta plantaSelect;
 	private Cliente clienteSelect;
 	private ProductoPorCliente productoPorCliente;// nueva
@@ -200,6 +207,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		tipoMovimientoDAO = new TipoMovimientoDAO();
 		estadoInventarioDAO = new EstadoInventarioDAO();
 		serieConstanciaDAO = new SerieConstanciaDAO();
+		estadoConstanciaDAO = new EstadoConstanciaDAO();
+		tarimaDAO = new TarimaDAO();
 
 		listadoPlanta = new ArrayList<>();
 		listadoCliente = new ArrayList<>();
@@ -215,11 +224,10 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		listadoConstanciaDepositoDetalle = new ArrayList<ConstanciaDepositoDetalle>();
 		selectedPartidas = new ArrayList<Partida>();
 		selectedConstanciaDD = new ArrayList<>();
-		estadoConstanciaDAO = new EstadoConstanciaDAO();
 		totalTarimas = new BigDecimal(0);
+		tarimas = new ArrayList<>();
 	}
 
-	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		Planta planta = null;
@@ -251,8 +259,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			estadoInventario = estadoInventarioDAO.buscarPorId(1);
 
 			constanciaDeDeposito = new ConstanciaDeDeposito();
-			partida = this.newPartida();
-			detalle = this.newDetallePartida();
+			this.resetPartida();
 
 			cantidadTotal = null;
 			numTarimas = null;
@@ -291,23 +298,18 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	}
 	
 	public void totalesTarimas() {
-		BigDecimal sumaTotalTarimas;
+//		BigDecimal sumaTotalTarimas;
 		BigDecimal sumaTotalKilos;
 		BigDecimal sumaTotalCajas;
 		
-		sumaTotalTarimas =TotalTarimas(listadoPartida);
-		totalTarimas = totalTarimas.add(sumaTotalTarimas); 	
-		//selectedPartida.add(sumaTotalTarimas);
-		//subtotal.add(sumaTotalTarimas);
-	
+//		sumaTotalTarimas =TotalTarimas(listadoPartida);
+//		totalTarimas = totalTarimas.add(sumaTotalTarimas); 	
 		
 		sumaTotalKilos = TotalKilos(listadoPartida);
 		totalKilos = totalKilos.add(sumaTotalKilos);
 		
 		sumaTotalCajas = TotalCajas(listadoPartida);
 		totalCajas = totalCajas.add(sumaTotalCajas);
-		
-		
 	}
 	
 	public BigDecimal TotalTarimas(List<Partida> lista) {
@@ -439,6 +441,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private Partida newPartida() {
 		Partida partida = null;
 		UnidadDeProducto udp = null;
+		DetallePartida detalle = null;
 
 		partida = new Partida();
 		partida.setCantidadTotal(0);
@@ -448,6 +451,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		udp.setUnidadDeManejoCve(new UnidadDeManejo());
 		udp.setProductoCve(new Producto());
 		partida.setUnidadDeProductoCve(udp);
+		detalle = new DetallePartida(1, partida);
+		partida.add(detalle);
 
 		return partida;
 
@@ -573,6 +578,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		DetallePartida dp = null;
 		Integer intNumTarimas = null;
 		BigDecimal parcialTarima = null;
+		
+		Tarima tarima = null;
 
 		try {
 			udp = partida.getUnidadDeProductoCve();
@@ -616,84 +623,136 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				udp.setUnidadDeManejoCve(udm);
 				unidadDeProductoDAO.guardar(udp);
 			}
+			
 			partida.setUnidadDeProductoCve(udp);
 			partida.setFolio(constanciaDeDeposito);
 			partida.setUnidadDeCobro(udm);
 			partida.setCantidadDeCobro(partida.getPesoTotal());
 			partida.setCamaraCve(this.camaraSelect);
-			partida.setNoTarimas(BigDecimal.ONE);
-			detalle.setCantidadUManejo(partida.getCantidadTotal());
-			detalle.setCantidadUMedida(partida.getPesoTotal());
+			partida.setNoTarimas(null);
+			partida.getDetallePartidaList().get(0).setCantidadUManejo(partida.getCantidadTotal());
+			partida.getDetallePartidaList().get(0).setCantidadUMedida(partida.getPesoTotal());
 			
+			if(this.tarima != null) {
+				p = (Partida) partida.clone();
+				p.setNoTarimas(null);
+				p.setTarima(this.tarima);
+				
+				this.tarima.getPartidas().add(p);
+				this.listadoPartida.add(p);
+				
+				severity = FacesMessage.SEVERITY_INFO;
+				mensaje = "Agregado a la tarima " + this.tarima.getNombre();
+				log.info("Producto {} agregado a la tarima {}", p.getUnidadDeProductoCve().getProductoCve().getProductoDs(), this.tarima.getNombre());
+				
+				this.tarima = null;
+				
+				PrimeFaces.current().executeScript("PF('noTarimasDlg').hide()");
+				PrimeFaces.current().executeScript("PF('dlgAddProducto').hide()");
+				
+				log.info("Partida agregada a la tarima {}", p.getTarima().getNombre());
+				return;
+			}
+			
+			//Obtenemos la parte entera del número de tarimas.
+			//Por ejemplo. Si se indicó 3.5 tarimas, se toma 3 tarimas.
 			intNumTarimas = this.numTarimas.intValue();
 			parcialTarima = this.numTarimas.subtract(new BigDecimal(intNumTarimas).setScale(2, BigDecimal.ROUND_HALF_UP));
 			
-			if(intNumTarimas > 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
-				throw new InventarioException("Debe indicar sólo tarimas completas o una tarima parcial.");
-			} else if(intNumTarimas == 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
+			//Se evalúa si se indicaron tarimas completas y además fracción de tarima
+			//Por ejemplo, 3.5 tarimas. En caso afirmativo, se lanza una excepción, ya que
+			//sólo se deberían indicar tarimas completas (1, 2, 3, etc) o bien, sólo una
+			//fracción de tarima (0.1, 0.2, 0.3, ... , 0.9999...)
+			if(intNumTarimas > 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0)
+				throw new InventarioException("Debe indicar sólo tarimas completas.");
+			
+			//En caso contrario, se evalúa si se indicó sólo una fracción de tarima y se procede a agregarla
+			//a la lista de tarimas.
+			if(intNumTarimas == 0 && parcialTarima.compareTo(BigDecimal.ZERO) > 0) {
 				p = (Partida) partida.clone();
 				p.setNoTarimas(parcialTarima);
-				dp = (DetallePartida) detalle.clone();
-				
-				DetallePartidaPK detallePk = new DetallePartidaPK();
-				detallePk.setDetPartCve(1);
-				detallePk.setPartidaCve(p);
-				dp.setDetallePartidaPK(detallePk);
-				
-				p.add(dp);
 				this.listadoPartida.add(p);
-				
+				tarima = this.asignarTarima(p);
+				this.tarimas.add(tarima);
 			}
-			if(validaCarga == true) {
-				partida.setNoTarimas(numTarimas);
-				DetallePartidaPK detallePk = new DetallePartidaPK();
-				detallePk.setDetPartCve(1);
-				detallePk.setPartidaCve(partida);
-				detalle.setDetallePartidaPK(detallePk);
-				
-				partida.add(detalle);
-				this.listadoPartida.add(partida);
-				log.info("Partida agregada: {}", partida);
-			} else {
-				for(int i = 0; i < intNumTarimas; i++) {
-					p = (Partida) partida.clone();
-					dp = (DetallePartida) detalle.clone();
-					
-					DetallePartidaPK detallePk = new DetallePartidaPK();
-					detallePk.setDetPartCve(1);
-					detallePk.setPartidaCve(p);
-					dp.setDetallePartidaPK(detallePk);
-					
-					p.add(dp);
-					this.listadoPartida.add(p);
-					log.info("Partida agregada: {}", p);
-				}
+			
+			for(int i = 0; i < intNumTarimas; i++) {
+				log.info("Agregando partida: {}", p);
+				p = (Partida) partida.clone();
+				this.listadoPartida.add(p);
+				log.info("Partida agregada: {}", p);
+				tarima = this.asignarTarima(p);
+				this.tarimas.add(tarima);
 			}
+			
+			this.numTarimas = null;
 			totalTarimas = new BigDecimal(0);
 			totalCajas = new BigDecimal(0);
 			totalKilos = new BigDecimal(0);
 			
-			totalesTarimas();
-			this.partida = this.newPartida();
-			this.detalle = this.newDetallePartida();
-			this.numTarimas = null;
-			this.validaCarga = false;
+			this.totalesTarimas();
+			
+			this.resetPartida();
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Agregado correctamente";
+			PrimeFaces.current().executeScript("PF('noTarimasDlg').hide()");
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 		} catch (Exception ex) {
+			log.error("Problema al agregar una nueva partida...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos");
-			
+			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
 		}
 	}
 	
+	public DetallePartida getDetallePartida(Partida partida) {
+		DetallePartida dp = null;
+		
+		
+		
+		return dp;
+	}
+	
+	private Tarima asignarTarima(Partida p) {
+		Tarima tarima = null;
+		
+		if(this.idTarima == null)
+			this.idTarima = new Integer(0);
+		
+		tarima = new Tarima();
+		tarima.setId(idTarima++);
+		tarima.setNombre(String.format("%s-%s", this.constanciaDeDeposito.getFolioCliente(), idTarima));
+		
+		if(tarima.getPartidas() == null)
+			tarima.setPartidas(new ArrayList<>());
+		
+		tarima.getPartidas().add(p);
+		p.setTarima(tarima);
+		
+		return tarima;
+	}
+	
+	public void resetPartida() {
+		
+		try {
+			log.info("Reiniciando el objeto partida...");
+			this.partida = this.newPartida();
+			this.numTarimas = null;
+			this.validaCarga = false;
+			
+			PrimeFaces.current().ajax().update("form:dlg-add-producto");
+			log.info("Partida reiniciada.");
+		} catch(Exception ex) {
+			log.error("Problema para actualizar la información de la nueva partida...", ex);
+		}
+		
+	}
+
 	public void partidaEditada() {
 		log.info("Partida editada.");
 	}
@@ -818,6 +877,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			constanciaDeDeposito.setPartidaList(listadoPartida);
 			constanciaDeDeposito.setStatus(status);
 			
+			for(Tarima t : this.tarimas) {
+				t.setId(null);
+//				tarimaDAO.guardar(t);
+			}
+			
+//			resultado = constanciaDAO.actualizar(constanciaDeDeposito);
 			resultado = constanciaDAO.guardar(constanciaDeDeposito);
 			if(resultado != null)
 				throw new InventarioException("Ocurrió un problema al guardar la constancia de depósito " + this.constanciaDeDeposito.getFolioCliente());
@@ -841,7 +906,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-partidas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto");
+			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-tarimas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto");
 		}
 	}
 	
@@ -852,22 +917,66 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaDD");
 	}
 	
+	public void deleteTarima(Tarima tarima) {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		try {
+			log.info("Eliminando tarima: {}", tarima);
+			
+			for(Partida p : tarima.getPartidas()) {
+				this.listadoPartida.remove(p);
+			}
+			this.tarimas.remove(tarima);
+			
+			mensaje = "Tarima eliminada.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(Exception ex) {
+			log.warn("Problema para eliminar la tarima...", ex);
+			mensaje = "Hay un problema para eliminar la tarima.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Eliminado", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-tarimas");
+		}
+	
+	}
+	
 	public void deleteSelectedPartidas() {
-
-		for (Partida p : listadoPartida) {
-			if (p == selectedPartida) {
+		Tarima tarima = null;
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		try {
+			for (Partida p : listadoPartida) {
+				if(p != selectedPartida)
+					continue;
+				
 				p.setPartidaCve(1);
 				selectedPartida.setPartidaCve(1);
-				System.out.println(p);
-				System.out.println(selectedPartida);
+				log.info(p);
+				log.info(selectedPartida);
 			}
+			tarima = this.selectedPartida.getTarima();
+			tarima.getPartidas().remove(this.selectedPartida);
+			
+			listadoPartida.remove(this.selectedPartida);// remueve todos los elementos de listadoPartida ERROR
+			this.selectedPartidas = null;
+			mensaje = "Producto eliminado";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(Exception ex) {
+			log.warn("Problema para eliminar la partida...", ex);
+			mensaje = "Hay un problema para eliminar el producto.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Eliminado", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-tarimas");
 		}
-
-		listadoPartida.remove(this.selectedPartida);// remueve todos los elementos de listadoPartida ERROR
-		this.selectedPartidas = null;
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado", "Se elimino el registro correctamente"));
-		PrimeFaces.current().ajax().update("form:messages", "form:dt-partidas");
+		
+		
 	}
 
 	public void filtraCamaras() {
@@ -876,25 +985,36 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	}
 
 	public void validar() {
-
-		String constanciaE = noConstanciaSelect.trim();
-		constanciaE.trim();
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String constanciaE = null;
 		ConstanciaDeDeposito constancia = null;
 
-		constancia = constanciaDAO.buscarPorFolioCliente(constanciaE);
-
-		if (constancia == null) {
+		try {
+			constanciaE = noConstanciaSelect.trim();
+			constanciaE.trim();
+	
+			constancia = constanciaDAO.buscarPorFolioCliente(constanciaE);
+	
+			if (constancia != null)
+				throw new InventarioException("Digite un nuevo folio.");
+			
 			constanciaDeDeposito.setFolioCliente(constanciaE);
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Folio correcto", "Capture sus productos."));
+			mensaje = "Capture sus productos.";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			this.noConstanciaSelect = null;
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch (Exception ex) {
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Folio", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages", "form:numeroC");
-			return;
 		}
-
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_ERROR, "Folio Existente", "Digite un nuevo folio"));
-		this.noConstanciaSelect = null;
-		PrimeFaces.current().ajax().update("form:messages", "form:numeroC");
 	}
 	
 	public void jasper() throws JRException, IOException, SQLException {
@@ -1672,7 +1792,20 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	public void setFile(StreamedContent file) {
 		this.file = file;
 	}
+
+	public List<Tarima> getTarimas() {
+		return tarimas;
+	}
+
+	public void setTarimas(List<Tarima> tarimas) {
+		this.tarimas = tarimas;
+	}
 	
-	
-	
+	public Tarima getTarima() {
+		return tarima;
+	}
+
+	public void setTarima(Tarima tarima) {
+		this.tarima = tarima;
+	}
 }
