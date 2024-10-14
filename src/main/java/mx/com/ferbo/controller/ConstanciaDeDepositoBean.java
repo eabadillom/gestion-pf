@@ -47,7 +47,7 @@ import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.ServicioDAO;
-import mx.com.ferbo.dao.TarimaDAO;
+//import mx.com.ferbo.dao.TarimaDAO;
 import mx.com.ferbo.dao.TipoMovimientoDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
@@ -57,7 +57,7 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
-import mx.com.ferbo.model.DetallePartidaPK;
+//import mx.com.ferbo.model.DetallePartidaPK;
 import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.EstadoInventario;
 import mx.com.ferbo.model.Partida;
@@ -106,7 +106,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private EstadoInventario estadoInventario;
 	private EstadoInventarioDAO estadoInventarioDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
-	private TarimaDAO tarimaDAO;
+//	private TarimaDAO tarimaDAO;
 	private BigDecimal numTarimas;
 	private Boolean restricted = null;
 	private Boolean saved = null;
@@ -208,7 +208,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		estadoInventarioDAO = new EstadoInventarioDAO();
 		serieConstanciaDAO = new SerieConstanciaDAO();
 		estadoConstanciaDAO = new EstadoConstanciaDAO();
-		tarimaDAO = new TarimaDAO();
+//		tarimaDAO = new TarimaDAO();
 
 		listadoPlanta = new ArrayList<>();
 		listadoCliente = new ArrayList<>();
@@ -444,27 +444,29 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		DetallePartida detalle = null;
 
 		partida = new Partida();
-		partida.setCantidadTotal(0);
-		partida.setPesoTotal(new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP));
+		partida.setCantidadTotal(null);
+		partida.setPesoTotal(null);
 		partida.setNoTarimas(new BigDecimal("0").setScale(1, BigDecimal.ROUND_HALF_UP));
 		udp = new UnidadDeProducto();
 		udp.setUnidadDeManejoCve(new UnidadDeManejo());
 		udp.setProductoCve(new Producto());
 		partida.setUnidadDeProductoCve(udp);
 		detalle = new DetallePartida(1, partida);
+		detalle.setEdoInvCve(estadoInventario);
+		detalle.setTipoMovCve(tipoMovimiento);
 		partida.add(detalle);
 
 		return partida;
 
 	}
 
-	private DetallePartida newDetallePartida() {
-		DetallePartida detalle = null;
-		detalle = new DetallePartida();
-		detalle.setTipoMovCve(tipoMovimiento);
-		detalle.setEdoInvCve(estadoInventario);
-		return detalle;
-	}
+//	private DetallePartida newDetallePartida() {
+//		DetallePartida detalle = null;
+//		detalle = new DetallePartida();
+//		detalle.setTipoMovCve(tipoMovimiento);
+//		detalle.setEdoInvCve(estadoInventario);
+//		return detalle;
+//	}
 	
 	public void verDatosPartida() {
 		log.info("Cantidad: " + partida.getCantidadTotal());
@@ -575,7 +577,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		Integer idProducto = null;
 		
 		Partida p = null;
-		DetallePartida dp = null;
+//		DetallePartida dp = null;
 		Integer intNumTarimas = null;
 		BigDecimal parcialTarima = null;
 		
@@ -647,6 +649,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				
 				this.tarima = null;
 				
+				this.totalesTarimas();
+				this.resetPartida();
+				
 				PrimeFaces.current().executeScript("PF('noTarimasDlg').hide()");
 				PrimeFaces.current().executeScript("PF('dlgAddProducto').hide()");
 				
@@ -710,14 +715,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		}
 	}
 	
-	public DetallePartida getDetallePartida(Partida partida) {
-		DetallePartida dp = null;
-		
-		
-		
-		return dp;
-	}
-	
 	private Tarima asignarTarima(Partida p) {
 		Tarima tarima = null;
 		
@@ -752,7 +749,23 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		}
 		
 	}
-
+	
+	public void cargaDetalle(Partida partida) {
+		if(partida == null)
+			return;
+		
+		if(partida.getDetallePartidaList() == null)
+			return;
+		
+		if(partida.getDetallePartidaList().size() <= 0)
+			return;
+		
+		this.partida = partida;
+		this.detalle = partida.getDetallePartidaList().get(0);
+		
+		log.info("Detalle partida: {}", this.detalle);
+	}
+	
 	public void partidaEditada() {
 		log.info("Partida editada.");
 	}

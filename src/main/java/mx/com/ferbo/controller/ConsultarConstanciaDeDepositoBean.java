@@ -222,7 +222,8 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			for(Partida partida : this.selectConstanciaDD.getPartidaList()) {
 				this.cantidadTotal = Integer.sum(this.cantidadTotal, partida.getCantidadTotal());
 				this.pesoTotal = this.pesoTotal.add(partida.getPesoTotal());
-				this.tarimasTotal = this.tarimasTotal.add(partida.getNoTarimas());
+//				this.tarimasTotal = this.tarimasTotal.add(partida.getNoTarimas());
+				this.tarimasTotal = partida.getNoTarimas() == null ? this.tarimasTotal.add(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) : this.tarimasTotal.add(partida.getNoTarimas());
 			}
 			
 			log.debug("{} tarimas, {} unidades, {} kg", this.tarimasTotal, this.pesoTotal);
