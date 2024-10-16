@@ -295,7 +295,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.avisoCliente();
 		
 		//carga de constancias si existe un cambio de cliente
-		cargarConstancias();
+		this.cargarConstancias();
 		
 		//PrimeFaces.current().ajax().update("form:medioPago","form:metodoPago");
 	}

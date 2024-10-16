@@ -298,18 +298,25 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	}
 	
 	public void totalesTarimas() {
-//		BigDecimal sumaTotalTarimas;
-		BigDecimal sumaTotalKilos;
-		BigDecimal sumaTotalCajas;
+//		BigDecimal sumaTotalKilos;
+		Integer sumaTotalCajas = null;
+//		sumaTotalKilos = TotalKilos(listadoPartida);
+//		totalKilos = totalKilos.add(sumaTotalKilos);
 		
-//		sumaTotalTarimas =TotalTarimas(listadoPartida);
-//		totalTarimas = totalTarimas.add(sumaTotalTarimas); 	
+		totalKilos = listadoPartida.stream()
+				.map(item -> item.getPesoTotal())
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				;
 		
-		sumaTotalKilos = TotalKilos(listadoPartida);
-		totalKilos = totalKilos.add(sumaTotalKilos);
+//		sumaTotalCajas = TotalCajas(listadoPartida);
+//		totalCajas = totalCajas.add(sumaTotalCajas);
 		
-		sumaTotalCajas = TotalCajas(listadoPartida);
-		totalCajas = totalCajas.add(sumaTotalCajas);
+		sumaTotalCajas = listadoPartida.stream()
+				.mapToInt(Partida::getCantidadTotal)
+				.sum()
+				;
+		
+		totalCajas = new BigDecimal(sumaTotalCajas).setScale(0, BigDecimal.ROUND_HALF_UP);
 	}
 	
 	public BigDecimal TotalTarimas(List<Partida> lista) {
@@ -438,7 +445,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		posiciones = posicionCamaraDAO.buscarPorCriterios(posicion);
 	}
 
-	private Partida newPartida() {
+	public Partida newPartida() {
 		Partida partida = null;
 		UnidadDeProducto udp = null;
 		DetallePartida detalle = null;
@@ -565,6 +572,65 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				":form:conservacion", ":form:refrigeracion", ":form:maniobras","form:txtCodigo");
 	}
 	
+	public void addTarima() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		
+		Tarima tarima = null;
+		
+		try {
+			if(this.numTarimas.compareTo(BigDecimal.ONE) <= 0)
+				throw new InventarioException("El número de tarimas indicado es incorrecto.");
+			
+			if(   this.partida.getUnidadDeProductoCve().getProductoCve() != null
+			   && this.partida.getUnidadDeProductoCve().getProductoCve().getProductoCve() != null) {
+				this.addPartida();
+				return;
+			}
+			
+			if(this.idTarima == null)
+				this.idTarima = new Integer(0);
+			
+			if(this.tarimas == null)
+				this.tarimas = new ArrayList<Tarima>();
+			
+			for(int i = 0; i < this.numTarimas.intValue(); i++) {
+				
+				tarima = new Tarima();
+				tarima.setId(idTarima++);
+				tarima.setNombre(String.format("%s-%s", this.constanciaDeDeposito.getFolioCliente(), idTarima));
+				tarima.setPartidas(new ArrayList<Partida>());
+				this.tarimas.add(tarima);	
+			}
+			
+			this.resetPartida();
+			
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "Agregado correctamente";
+			PrimeFaces.current().executeScript("PF('noTarimasDlg').hide()");
+			
+			message = new FacesMessage(severity, "Tarima", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+		} catch (InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, "Tarima", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+		} catch (Exception ex) {
+			log.error("Problema al agregar una nueva partida...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, "Tarima", mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+		}
+	}
+	
 	public void addPartida() {
 		FacesMessage message = null;
 		Severity severity = null;
@@ -643,14 +709,14 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				this.tarima.getPartidas().add(p);
 				this.listadoPartida.add(p);
 				
+				this.totalesTarimas();
+				this.resetPartida();
+				
 				severity = FacesMessage.SEVERITY_INFO;
 				mensaje = "Agregado a la tarima " + this.tarima.getNombre();
 				log.info("Producto {} agregado a la tarima {}", p.getUnidadDeProductoCve().getProductoCve().getProductoDs(), this.tarima.getNombre());
 				
 				this.tarima = null;
-				
-				this.totalesTarimas();
-				this.resetPartida();
 				
 				PrimeFaces.current().executeScript("PF('noTarimasDlg').hide()");
 				PrimeFaces.current().executeScript("PF('dlgAddProducto').hide()");
@@ -764,6 +830,10 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		this.detalle = partida.getDetallePartidaList().get(0);
 		
 		log.info("Detalle partida: {}", this.detalle);
+	}
+	
+	public void quitaDetalle() {
+		this.resetPartida();
 	}
 	
 	public void partidaEditada() {
@@ -919,7 +989,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-tarimas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto");
+			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-tarimas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto", ":form:dlg-add-producto");
 		}
 	}
 	

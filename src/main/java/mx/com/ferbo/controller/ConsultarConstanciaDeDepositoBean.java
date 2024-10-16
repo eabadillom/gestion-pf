@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -48,6 +49,7 @@ import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.Servicio;
+import mx.com.ferbo.model.Tarima;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
@@ -144,7 +146,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		statusDAO = new EstadoConstanciaDAO();
 	}
 
-	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		byte bytes[] = {};
@@ -222,9 +223,9 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			for(Partida partida : this.selectConstanciaDD.getPartidaList()) {
 				this.cantidadTotal = Integer.sum(this.cantidadTotal, partida.getCantidadTotal());
 				this.pesoTotal = this.pesoTotal.add(partida.getPesoTotal());
-//				this.tarimasTotal = this.tarimasTotal.add(partida.getNoTarimas());
-				this.tarimasTotal = partida.getNoTarimas() == null ? this.tarimasTotal.add(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) : this.tarimasTotal.add(partida.getNoTarimas());
 			}
+			
+			this.tarimasTotal = this.totalTarimas(this.selectConstanciaDD.getPartidaList());
 			
 			log.debug("{} tarimas, {} unidades, {} kg", this.tarimasTotal, this.pesoTotal);
 			
@@ -244,6 +245,45 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			PrimeFaces.current().ajax().update("form:messages","form:dlg-constancia", "form:dlg-partidas", "form:dlg-servicios");
 			
 		}
+	}
+	
+	public BigDecimal totalTarimas(List<Partida> partidas) {
+		BigDecimal totalTarimas = null;
+		List<Tarima> tarimas = null;
+		List<Partida> partidasConTarima = null;
+		List<Partida> partidasSinTarima = null;
+		
+		try {
+			partidasConTarima = partidas.stream().filter(p -> p.getTarima() != null)
+					.collect(Collectors.toList())
+					;
+			
+			partidasSinTarima = partidas.stream().filter(p -> p.getTarima() == null && p.getNoTarimas() != null)
+					.collect(Collectors.toList())
+					;
+			
+			if(partidasConTarima == null)
+				throw new InventarioException("Las partidas de la constancia no están asociadas a una tarima.");
+			
+			tarimas = new ArrayList<Tarima>();
+			
+			for(Partida p : partidasConTarima) {
+				if(tarimas.contains(p.getTarima()))
+					continue;
+				tarimas.add(p.getTarima());
+			}
+			
+			totalTarimas = new BigDecimal(tarimas.size()).setScale(3, BigDecimal.ROUND_HALF_UP);
+			
+			totalTarimas = totalTarimas.add(
+					partidasSinTarima.stream().map(item -> item.getNoTarimas())
+					.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+					);
+		} catch(Exception ex) {
+			totalTarimas = BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP);
+		}
+		
+		return totalTarimas;
 	}
 	
 	public void updateConstanciaDD() {
