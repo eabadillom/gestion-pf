@@ -816,6 +816,29 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		
 	}
 	
+	public void clonarPartida(Partida partida) {
+		Partida p = null;
+		Tarima tarima = null;
+		try {
+			log.info("Clonando partida {}", partida);
+			tarima = partida.getTarima();
+			p = partida.clone();
+			p.setNoTarimas(null);
+			p.setTarima(tarima);
+			tarima.getPartidas().add(p);
+			this.listadoPartida.add(p);
+			
+			this.totalesTarimas();
+			this.resetPartida();
+			
+			log.info("Producto {} agregado a la tarima {}", p.getUnidadDeProductoCve().getProductoCve().getProductoDs(), tarima.getNombre());
+			
+			this.tarima = null;
+		} catch(Exception ex) {
+			log.error("Problema para clonar la partida seleccionada...", ex);
+		}
+	}
+	
 	public void cargaDetalle(Partida partida) {
 		if(partida == null)
 			return;
@@ -962,10 +985,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			for(Tarima t : this.tarimas) {
 				t.setId(null);
-//				tarimaDAO.guardar(t);
 			}
 			
-//			resultado = constanciaDAO.actualizar(constanciaDeDeposito);
 			resultado = constanciaDAO.guardar(constanciaDeDeposito);
 			if(resultado != null)
 				throw new InventarioException("Ocurrió un problema al guardar la constancia de depósito " + this.constanciaDeDeposito.getFolioCliente());
@@ -977,6 +998,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			serieConstanciaDAO.actualizar(this.serie);
 			
 			saved = true;
+			
 			log.info("El usuario {} guardó la constancia de depósito {} correctamente.", this.usuario.getUsuario(), this.constanciaDeDeposito.getFolioCliente());
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = String.format("La constancia de depósito %s se registró correctamente.", folioCliente);
@@ -1047,6 +1069,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			listadoPartida.remove(this.selectedPartida);// remueve todos los elementos de listadoPartida ERROR
 			this.selectedPartidas = null;
+			
+			this.resetPartida();
+			
 			mensaje = "Producto eliminado";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(Exception ex) {
