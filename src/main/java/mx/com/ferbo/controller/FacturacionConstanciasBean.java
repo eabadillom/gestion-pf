@@ -33,6 +33,7 @@ import org.primefaces.PrimeFaces;
 
 import com.ferbo.facturama.tools.FacturamaException;
 
+import mx.com.ferbo.business.FacturacionConstanciasBL;
 import mx.com.ferbo.business.FacturamaBL;
 import mx.com.ferbo.dao.AsentamientoHumandoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
@@ -98,6 +99,8 @@ public class FacturacionConstanciasBean implements Serializable{
 	private static final long serialVersionUID = -1785488265380235016L;
 	
 	private static Logger log = LogManager.getLogger(FacturacionConstanciasBean.class);
+	
+	private FacturacionConstanciasBL facturaEntradasBO = null;
 	
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
@@ -176,6 +179,8 @@ public class FacturacionConstanciasBean implements Serializable{
     
 	
 	public FacturacionConstanciasBean() {
+		
+		facturaEntradasBO = new FacturacionConstanciasBL();
 		clienteDAO = new ClienteDAO();
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		plantaDAO = new PlantaDAO();
@@ -261,9 +266,9 @@ public class FacturacionConstanciasBean implements Serializable{
 		metodoPagoSelect = new MetodoPago();
 		MPagoSelect = new MetodoPago();
 		if((clienteSelect!=null)&&(plantaSelect!=null)) {
-			facturacionEntradas();
-			facturacionServicios();
-			facturacionVigencias();
+			this.facturacionEntradas();
+			this.facturacionServicios();
+			this.facturacionVigencias();
 		}
 		
 		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios","form:medioPago");
@@ -405,10 +410,10 @@ public class FacturacionConstanciasBean implements Serializable{
 			return;
 		
 		this.facturacionEntradas();
-		procesarEntradas();
+		this.procesarEntradas();
 		this.facturarVigencias();
 		this.facturacionServicios();
-		procesarServicios();
+		this.procesarServicios();
 		
 		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios");
 		
@@ -539,6 +544,8 @@ public class FacturacionConstanciasBean implements Serializable{
 			Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
 			String tipoFacturacion = aviso.getAvisoTpFacturacion();
 			cf.setServicioConstanciaList(new ArrayList<>());
+			
+			log.info("Inventario de Entrada: {}", cdd.getFolioCliente());
 
 			for (ConstanciaDepositoDetalle cs : cdd.getConstanciaDepositoDetalleList()) {
 
@@ -570,7 +577,7 @@ public class FacturacionConstanciasBean implements Serializable{
 				case 3:
 				case 4:
 
-					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
+					cantidad = this.facturaEntradasBO.getCantidad(cdd.getPartidaList(), tipoFacturacion);
 
 					importe = cantidad.multiply(precioServicio.getPrecio());
 					sc.setCosto(importe.setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -684,7 +691,7 @@ public class FacturacionConstanciasBean implements Serializable{
 					break;
 				case 4:
 					
-					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
+					cantidad = this.facturaEntradasBO.getCantidad(cdd.getPartidaList(), tipoFacturacion);
 					importe = cantidad.multiply(precioServicio.getPrecio()).setScale(2, BigDecimal.ROUND_HALF_UP);
 					log.debug("El tipo de cobro es 3 o 4 y su importe es: " + importe);
 					sc.setCosto(importe);
@@ -838,9 +845,19 @@ public class FacturacionConstanciasBean implements Serializable{
 	public BigDecimal getCantidadPartidas(List<Partida> listaPartidas, String tipoFacturacion) {
 
 		BigDecimal cantidad = new BigDecimal(0).setScale(3, BigDecimal.ROUND_HALF_UP);
+		List<Partida> tmpPartidas = null;
 		
 		if(tipoFacturacion.equals("T")) {
 			BigDecimal fraccionTarimas = null;
+			
+			//Primero se verifica si hay partidas asociadas a una tarima y se realiza el conteo de tarimas.
+			log.info("Contando partidas por tarima...");
+			tmpPartidas = listaPartidas.stream()
+					.filter(p -> p.getTarima() != null)
+					.collect(Collectors.toList())
+					;
+			
+			log.info("Contando tarimas a partir del atrubuto no_tarima.");
 			cantidad = listaPartidas.stream()
 					.filter(p -> p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) >= 0 )
 					.map(item -> item.getNoTarimas())

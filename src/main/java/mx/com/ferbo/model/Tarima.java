@@ -10,13 +10,22 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
  
 @Entity
 @Table(name = "tarima")
+@NamedQueries({
+	@NamedQuery(name = "Tarima.findByFolio", query = 
+			  "SELECT t FROM Tarima t "
+			+ "JOIN t.partidas p "
+			+ "JOIN p.folio cdd "
+			+ "WHERE cdd.folio = :folio")
+})
 public class Tarima implements Serializable {
 	
 	private static final long serialVersionUID = 7674317677823854599L;
@@ -32,7 +41,7 @@ public class Tarima implements Serializable {
 	@Size(max = 50)
 	private String nombre;
 
-	@Transient
+	@OneToMany(mappedBy = "tarima")
 	private List<Partida> partidas;
 	
 	public Tarima() {
@@ -46,6 +55,8 @@ public class Tarima implements Serializable {
 	public Tarima(String nombre) {
 		this.nombre = nombre;
 	}
+
+	
 
 	@Override
 	public int hashCode() {

@@ -142,8 +142,6 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 
 	@Override
 	public String actualizar(ConstanciaDeDeposito constanciaDeDeposito) {
-		// TODO Auto-generated method stub
-		
 		EntityManager em = null;
 		
 		try {
@@ -159,8 +157,6 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		}finally {
 			EntityManagerUtil.close(em);
 		}
-		
-		
 		return null;
 	}
 

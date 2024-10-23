@@ -2,6 +2,8 @@ package mx.com.ferbo.dao;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,6 +16,25 @@ public class TarimaDAO extends IBaseDAO<Tarima, Integer>{
 	
 	public TarimaDAO() {
 		this.modelClass = Tarima.class;
+	}
+	
+	public List<Tarima> buscarPorFolio(Integer folio) {
+		List<Tarima> tarimas = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			tarimas = em.createNamedQuery("Tarima.findByFolio", modelClass)
+			.setParameter("folio", folio)
+			.getResultList()
+			;
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de tarimas por folio...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return tarimas;
 	}
 
 	@Override
