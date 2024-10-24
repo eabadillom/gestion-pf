@@ -19,30 +19,18 @@ public class FacturacionConstanciasBL {
 		BigDecimal cantidad = new BigDecimal(0).setScale(3, BigDecimal.ROUND_HALF_UP);
 		
 		if(tipoFacturacion.equals("T")) {
-			this.contarTarimas(partidas);
+			cantidad = this.contarTarimas(partidas);
 		} else if(tipoFacturacion.equals("K")) {
-			this.contarPeso(partidas);
+			cantidad = this.contarPeso(partidas);
 		}
 		log.info("Cantidad: {} {}", cantidad, tipoFacturacion);
-
-		for (Partida p : partidas) {
-
-			if (tipoFacturacion.equals("T")) {
-				cantidad = cantidad.add(p.getNoTarimas());
-			} else {
-				cantidad = cantidad.add(p.getPesoTotal());
-				log.debug("Peso total: {}" + p.getPesoTotal());
-				log.debug("Cantidad: " + cantidad);
-			}
-		}
-		
-		log.info("Cantidad: {} {}", cantidad, tipoFacturacion);
-
 		return cantidad;
 	}
 	
 	private BigDecimal contarTarimas(List<Partida> partidas) {
 		BigDecimal cantidad = new BigDecimal(0).setScale(3, BigDecimal.ROUND_HALF_UP);
+		BigDecimal cantidadTarimas = null;
+		BigDecimal noTarimas = null;
 		BigDecimal fraccionTarimas = null;
 		List<Tarima> tarimas = null;
 		
@@ -50,31 +38,34 @@ public class FacturacionConstanciasBL {
 		log.info("Contando partidas por tarima...");
 		
 		tarimas = partidas.stream()
-				.filter(p -> p.getTarima() != null)
+				.filter(p -> (p.getTarima() != null) && (p.getCantidadTotal().compareTo(new Integer(0) ) > 0) )
 				.map(Partida::getTarima)
 				.distinct()
 				.collect(Collectors.toList())
 				;
+		tarimas.forEach(tarima -> log.debug("Tarima: {}", tarima));
 		
-		tarimas.forEach(tarima -> log.info("Tarima: {}", tarima));
-		
-		cantidad = cantidad.add(new BigDecimal(tarimas.size()).setScale(3, BigDecimal.ROUND_HALF_UP));
+		cantidadTarimas = new BigDecimal(tarimas.size()).setScale(3, BigDecimal.ROUND_HALF_UP);
+		cantidad = cantidad.add(cantidadTarimas).setScale(3, BigDecimal.ROUND_HALF_UP);
+		log.info("Cantidad: {} tarimas", cantidadTarimas);
 		
 		log.info("Contando tarimas a partir del atrubuto no_tarima.");
-		cantidad = partidas.stream()
-				.filter(p -> p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) >= 0 )
+		noTarimas = partidas.stream()
+				.filter(p -> (p.getTarima() == null) && (p.getNoTarimas() != null) && (p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) >= 0) )
 				.map(item -> item.getNoTarimas())
 				.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
 				;
+		cantidad = cantidad.add(noTarimas);
+		log.info("Cantidad: {} tarimas", noTarimas);
 		
 		fraccionTarimas = partidas.stream()
-				.filter(p -> p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) < 0 )
+				.filter(p -> (p.getTarima() == null) && (p.getNoTarimas() != null) && (p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) < 0) )
 				.map(item -> item.getNoTarimas())
 				.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
 				;
-		
 		fraccionTarimas = fraccionTarimas.setScale(0, BigDecimal.ROUND_CEILING);
 		cantidad = cantidad.add(fraccionTarimas);
+		log.info("Cantidad: {} tarimas", fraccionTarimas);
 		
 		return cantidad;
 	}

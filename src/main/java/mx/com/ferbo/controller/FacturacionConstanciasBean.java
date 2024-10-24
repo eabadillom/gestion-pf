@@ -766,8 +766,9 @@ public class FacturacionConstanciasBean implements Serializable{
 			
 			cdd.setConstanciaFacturaList(new ArrayList<>());
 			cdd.getConstanciaFacturaList().addAll(selectedVigencias);
-			
 		}
+		log.info("Vigencias seleccionadas: {}", selectedVigencias.size());
+		log.info("Subtotal vigencias: {}", subTotalVigencias);
 		sumaGeneral();
 	}
 	

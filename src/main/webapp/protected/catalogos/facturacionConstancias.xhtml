@@ -176,7 +176,12 @@
 								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
-						<p:column headerText="Detalles de Factura" >
+						<p:column headerText="Importe" style="text-align: right;">
+							<h:outputText value="#{entrada.servicioConstanciaList.stream().map(item -> item.costo).sum()}">
+								<f:convertNumber pattern=" $ #,##0.00" />
+							</h:outputText>
+						</p:column>
+						<p:column>
 						<p:commandButton icon="pi pi-bars" value="Servicios" onclick="PF('statusInfoDialog').show();" oncomplete="PF('dialogEntradas').show();"  update="form:Entradas" process="@this" >
 							<f:setPropertyActionListener value="#{entrada}" target="#{facturacionConstanciasBean.entradaSelect}"  ></f:setPropertyActionListener>							
 						</p:commandButton>
@@ -255,7 +260,12 @@
 								<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 							</h:outputText>
 						</p:column>
-						<p:column headerText="Detalles de Factura" >
+						<p:column headerText="Importe" style="text-align: right;">
+							<h:outputText value="#{vigencia.servicioConstanciaList.stream().map(item -> item.costo).sum()}">
+								<f:convertNumber pattern=" $ #,##0.00" />
+							</h:outputText>
+						</p:column>
+						<p:column>
 						<p:commandButton icon="pi pi-bars" value="Servicios" onclick="PF('statusInfoDialog').show();"  oncomplete="PF('dialogVigencias').show();" 
 															update="form:Vigencias" process="@this">
 						<f:setPropertyActionListener value="#{vigencia}" target="#{facturacionConstanciasBean.vigenciaSelect}" ></f:setPropertyActionListener>				
@@ -326,7 +336,12 @@
 							<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						</h:outputText>
 					</p:column>
-					<p:column headerText="Detalles de Factura" >
+					<p:column headerText="Importe" style="text-align: right;">
+							<h:outputText value="#{servicio.servicioConstanciaDsList.stream().map(item -> item.costo).sum()}">
+								<f:convertNumber pattern=" $ #,##0.00" />
+							</h:outputText>
+						</p:column>
+					<p:column>
 						<p:commandButton icon="pi pi-bars" value="Servicios" onclick="PF('statusInfoDialog').show();"  oncomplete="PF('dialogServicios').show();" update="form:serviciosConstancia" process="@this">
 							<f:setPropertyActionListener value="#{servicio}" target="#{facturacionConstanciasBean.servicioConstanciaSelect}" ></f:setPropertyActionListener>				
 						</p:commandButton>
