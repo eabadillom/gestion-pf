@@ -10,6 +10,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<owb.version>2.0.20</owb.version>
 		<mojarra.version>2.3.14</mojarra.version>
 		<open-pdf.version>1.3.24</open-pdf.version>
@@ -214,12 +215,6 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
-		
-		<!--<dependency>
-		    <groupId>org.hibernate</groupId>
-		    <artifactId>hibernate-java8</artifactId>
-		    <version>${hibernate.version}</version>
-		</dependency>-->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
@@ -271,21 +266,6 @@
 			<name>github</name>
 			<url>https://maven.pkg.github.com/eabadillom/*</url>
 		</repository>
-		<!-- <repository>
-			<id>Facturama-client</id>
-			<name>Cliente no oficial de facturama</name>
-			<url>https://maven.pkg.github.com/eabadillom/FacturamaClient</url>
-		</repository> -->
-		<!-- <repository>
-			<id>gestion-mail</id>
-			<name>Gestion mail api</name>
-			<url>https://maven.pkg.github.com/eabadillom/gestion-mail</url>
-		</repository> -->
-		<!-- <repository>
-			<id>FP-client</id>
-			<name>FP-client</name>
-			<url>https://maven.pkg.github.com/eabadillom/gestion-fp</url>
-		</repository> -->
 	</repositories>
 
 	<build>

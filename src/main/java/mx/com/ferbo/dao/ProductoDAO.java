@@ -33,6 +33,25 @@ public class ProductoDAO extends IBaseDAO<Producto, Integer> {
 		
 		return producto;
 	}
+	
+	public List<Producto> buscarPorCliente(Integer idCliente) {
+		List<Producto> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("Producto.findByCliente", Producto.class)
+					.setParameter("idCliente", idCliente)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de productos por cliente...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
 
 	@Override
 	public List<Producto> buscarTodos() {

@@ -18,7 +18,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -97,9 +96,6 @@ public class DetallePartida implements Serializable, Cloneable {
     @Column(name = "dtp_tarimas")
     private String dtpTarimas;
     
-//    @OneToOne(cascade = CascadeType.ALL, mappedBy = "detallePartida")
-//    private DetalleConstanciaSalida detalleConstanciaSalida;
-    
     @JoinColumns({
         @JoinColumn(name = "det_anterior", referencedColumnName = "DET_PART_CVE"),
         @JoinColumn(name = "det_part_anterior", referencedColumnName = "PARTIDA_CVE")})
@@ -118,10 +114,6 @@ public class DetallePartida implements Serializable, Cloneable {
     @ManyToOne(cascade = CascadeType.DETACH)
     private EstadoInventario edoInvCve;
     
-    public DetallePartida clone() throws CloneNotSupportedException {
-    	return (DetallePartida) super.clone();
-    }
-
     public DetallePartida() {
     }
 
@@ -237,14 +229,6 @@ public class DetallePartida implements Serializable, Cloneable {
         this.dtpTarimas = dtpTarimas;
     }
 
-//    public DetalleConstanciaSalida getDetalleConstanciaSalida() {
-//        return detalleConstanciaSalida;
-//    }
-//
-//    public void setDetalleConstanciaSalida(DetalleConstanciaSalida detalleConstanciaSalida) {
-//        this.detalleConstanciaSalida = detalleConstanciaSalida;
-//    }
-
     public DetallePartida getDetallePartida() {
         return detallePartida;
     }
@@ -300,5 +284,34 @@ public class DetallePartida implements Serializable, Cloneable {
     public String toString() {
         return "mx.com.ferbo.model.DetallePartida[ detallePartidaPK=" + detallePartidaPK + " ]";
     }
-    
+
+	@Override
+	public DetallePartida clone() throws CloneNotSupportedException {
+		DetallePartida dp = null;
+		
+		dp = new DetallePartida();
+		dp.setDetPadre(this.detPadre == null ? null : new Integer(this.detPadre));
+		dp.setDetPartPadre(this.detPartPadre == null ? null : new Integer(this.detPartPadre));
+		dp.setCantidadUManejo(this.cantidadUManejo == null ? null : new Integer(this.cantidadUManejo));
+		dp.setCantidadUMedida(this.cantidadUMedida);
+		dp.setDtpCodigo(this.dtpCodigo);
+		dp.setDtpLote(this.dtpLote);
+		dp.setDtpCaducidad(this.dtpCaducidad == null ? null : new Date(this.dtpCaducidad.getTime()));
+		dp.setDtpPO(this.getDtpPO());
+		dp.setDtpMP(this.dtpMP);
+		dp.setDtpPedimento(this.dtpPedimento);
+		dp.setDtpSAP(this.dtpSAP);
+		dp.setDtpTarimas(this.dtpTarimas);
+		dp.setDetallePartida(this.detallePartida);
+		if(this.getTipoMovCve() != null)
+			dp.setTipoMovCve(this.tipoMovCve);
+		
+		if(this.uMedidaCve != null)
+			dp.setUMedidaCve( this.uMedidaCve );
+		
+		if(this.edoInvCve != null)
+			dp.setEdoInvCve(this.edoInvCve);
+		
+		return dp;
+	}
 }

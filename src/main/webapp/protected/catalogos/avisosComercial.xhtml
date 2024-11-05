@@ -49,13 +49,13 @@
 							<p:column headerText="Pedimento">
 								<h:outputText value="#{pAviso.avisoPedimento eq true ? 'Si':'No'}" />
 							</p:column>
-							<p:column headerText="S.A.P.">
+							<p:column headerText="Contenedor">
 								<h:outputText value="#{pAviso.avisoSap eq true ? 'Si':'No'}" />
 							</p:column>
 							<p:column headerText="LOTE">
 								<h:outputText value="#{pAviso.avisoLote eq true ? 'Si':'No'}" />
 							</p:column>
-							<p:column headerText="C.A.D.">
+							<p:column headerText="Caducidad">
 								<h:outputText value="#{pAviso.avisoCaducidad eq true ? 'Si':'No'}" />
 							</p:column>
 							<p:column headerText="Tarima">
@@ -87,10 +87,11 @@
 										<div class="p-field p-col-12 p-md-12">
 											<p:selectBooleanCheckbox itemLabel="P.O." value="#{avisosComercialBean.avisoSelected.avisoPo}"/>
 											<p:selectBooleanCheckbox itemLabel="Pedimento" value="#{avisosComercialBean.avisoSelected.avisoPedimento}"/>
-											<p:selectBooleanCheckbox itemLabel="SAP" value="#{avisosComercialBean.avisoSelected.avisoSap}"/>
+											<p:selectBooleanCheckbox itemLabel="Contenedor" value="#{avisosComercialBean.avisoSelected.avisoSap}"/>
 											<p:selectBooleanCheckbox itemLabel="Lote" value="#{avisosComercialBean.avisoSelected.avisoLote}"/>
 											<p:selectBooleanCheckbox itemLabel="Caducidad" value="#{avisosComercialBean.avisoSelected.avisoCaducidad}"/>
 											<p:selectBooleanCheckbox itemLabel="Tarima" value="#{avisosComercialBean.avisoSelected.avisoTarima}"/>
+											<p:selectBooleanCheckbox itemLabel="Código" value="#{avisosComercialBean.avisoSelected.avisoCodigo}"/>
 											<p:selectBooleanCheckbox itemLabel="Otro" value="#{avisosComercialBean.avisoSelected.avisoOtro}"/>
 										</div>
 										<div class="p-field p-col-5 p-md-6">
@@ -142,15 +143,16 @@
 
 						<p:dialog id="dialogActualiza" header="Actualizar Aviso" showEffect="fade" modal="true" widgetVar="actAvisoDialog" responsive="true" width="900px">
 							<p:outputPanel id="panel-actAviso" class="ui-fluid">
-								<p:outputPanel rendered="#{not empty avisosComercialBean.avisoSelected}">
+								<p:outputPanel rendered="#{avisosComercialBean.avisoSelected ne null}">
 									<div class="p-formgrid p-grid">
 										<div class="p-field p-col-12 p-md-12">
 											<p:selectBooleanCheckbox id="aviso-po-m" itemLabel="P.O." value="#{avisosComercialBean.avisoSelected.avisoPo}"/>
 											<p:selectBooleanCheckbox id="aviso-ped-m" itemLabel="Pedimento" value="#{avisosComercialBean.avisoSelected.avisoPedimento}"/>
-											<p:selectBooleanCheckbox id="aviso-sap-m" itemLabel="SAP" value="#{avisosComercialBean.avisoSelected.avisoSap}"/>
+											<p:selectBooleanCheckbox id="aviso-sap-m" itemLabel="Contenedor" value="#{avisosComercialBean.avisoSelected.avisoSap}"/>
 											<p:selectBooleanCheckbox id="aviso-lote-m" itemLabel="Lote" value="#{avisosComercialBean.avisoSelected.avisoLote}"/>
 											<p:selectBooleanCheckbox id="aviso-cad-m" itemLabel="Caducidad" value="#{avisosComercialBean.avisoSelected.avisoCaducidad}"/>
 											<p:selectBooleanCheckbox id="aviso-tarima-m" itemLabel="Tarima" value="#{avisosComercialBean.avisoSelected.avisoTarima}"/>
+											<p:selectBooleanCheckbox id="aviso-codigo-m" itemLabel="Código" value="#{avisosComercialBean.avisoSelected.avisoCodigo}"/>
 											<p:selectBooleanCheckbox id="aviso-otro-m" itemLabel="Otro" value="#{avisosComercialBean.avisoSelected.avisoOtro}"/>
 										</div>
 										<div class="p-field p-col-12 p-md-6">

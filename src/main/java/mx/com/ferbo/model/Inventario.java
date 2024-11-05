@@ -36,6 +36,14 @@ public class Inventario {
 	protected ConstanciaDeDeposito constanciaDeDeposito;
 	protected Servicio srv;
 	protected BigDecimal numeroTarimas;
+	protected String tarima;
+	
+	public String getTarima() {
+		return tarima;
+	}
+	public void setTarima(String tarima) {
+		this.tarima = tarima;
+	}
 	public Inventario() {
 
 	}
