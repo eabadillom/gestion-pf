@@ -20,7 +20,6 @@ public class SaldoDAO {
 	public Saldo getSaldo(Cliente cliente, Date fecha, String emisorRFC) {
 		Saldo saldo = null;
 		Object[] obj = null;
-		BigDecimal bSaldo = null;
 		EntityManager em = null;
 		Query query = null;
 		
@@ -106,7 +105,7 @@ public class SaldoDAO {
 					+ "    ) b WHERE b.saldo > 0\n"
 					+ ")\n"
 					+ "SELECT\n"
-					+ "	numero_cliente, nombre_cliente, emi_rfc, emi_nombre,\n"
+					+ "	numero_cliente, nombre_cliente,\n"
 					+ "	sum(saldo) as saldo,\n"
 					+ "	sum(COALESCE(en_plazo, 0)) as en_plazo,\n"
 					+ "	sum(COALESCE(d_8, 0)) as d_8,\n"
@@ -212,8 +211,8 @@ public class SaldoDAO {
 					+ "	GROUP BY emi_rfc, emi_nombre, numero_cliente, nombre_cliente\n"
 					+ ") x\n"
 					+ "GROUP BY\n"
-					+ "	emi_rfc, emi_nombre, numero_cliente, nombre_cliente\n"
-					+ "ORDER BY x.emi_nombre, x.nombre_cliente")
+					+ "	numero_cliente, nombre_cliente\n"
+					+ "ORDER BY x.nombre_cliente")
 					.setParameter("idCliente", cliente.getCteCve())
 					.setParameter("fecha", fecha)
 					.setParameter("emisorRFC", emisorRFC)
@@ -226,8 +225,8 @@ public class SaldoDAO {
 			
 			saldo.setNumeroCliente( (String) obj[idx++]  );
 			saldo.setNombreCliente((String) obj[idx++]);
-			saldo.setEmisorRFC((String) obj[idx++]);
-			saldo.setEmisorNombre((String) obj[idx++]);
+//			saldo.setEmisorRFC((String) obj[idx++]);
+//			saldo.setEmisorNombre((String) obj[idx++]);
 			saldo.setSaldo((BigDecimal) obj[idx++]);
 			saldo.setEnPlazo((BigDecimal) obj[idx++]);
 			saldo.setAtraso8dias((BigDecimal) obj[idx++]);
