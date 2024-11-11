@@ -197,6 +197,8 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					inventario.setPedimento(dp.getDtpPedimento());
 					inventario.setPo(dp.getDtpPO());
 					inventario.setCliente(c.getCteCve());
+					inventario.setTarima(p.getTarima() == null ? null : p.getTarima().getNombre());
+					
 					inventarioList.add(inventario);
 					log.debug("Inventario agregado: folio: {}, folioCliente: {}, partidaCve: {}", inventario.getFolio(), inventario.getFolioCliente(), inventario.getPartidaCve());
 				}
@@ -340,11 +342,6 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 		entity.close();
 		return listaInventario;
 	}
-
-	@Override
-	public String actualizar(Inventario e) {
-		return null;
-}
 
 	@Override
 	public String guardar(ConstanciaDeDeposito e) {

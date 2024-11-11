@@ -5,11 +5,15 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
+	private static Logger log = LogManager.getLogger(UnidadDeProducto.class);
 
 	@Override
 	public UnidadDeProducto buscarPorId(Integer id) {
@@ -30,17 +34,30 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 		}
 		return bean;
 	}
+	
+	public List<UnidadDeProducto> buscarPorCliente(Integer idCliente) {
+		List<UnidadDeProducto> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de Unidades de producto por cliente...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
 
 	@Override
 	public List<UnidadDeProducto> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Esta función no está disponible.");
 	}
 
 	@Override
 	public List<UnidadDeProducto> buscarPorCriterios(UnidadDeProducto e) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Esta función no está disponible.");
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -33,7 +33,9 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Producto.findByProductoCve", query = "SELECT p FROM Producto p WHERE p.productoCve = :productoCve"),
     @NamedQuery(name = "Producto.findByProductoDs", query = "SELECT p FROM Producto p WHERE p.productoDs = :productoDs"),
     @NamedQuery(name = "Producto.findByNumeroProd", query = "SELECT p FROM Producto p WHERE p.numeroProd = :numeroProd"),
-    @NamedQuery(name = "Producto.findByCategoria", query = "SELECT p FROM Producto p WHERE p.categoria = :categoria")})
+    @NamedQuery(name = "Producto.findByCategoria", query = "SELECT p FROM Producto p WHERE p.categoria = :categoria"),
+    @NamedQuery(name = "Producto.findByCliente", query = "SELECT p FROM Producto p JOIN p.productoPorClienteList ppc WHERE ppc.cteCve.cteCve = :idCliente ORDER BY p.productoDs ASC")
+})
 public class Producto implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -54,46 +54,58 @@ public class ConstanciaDeDeposito implements Serializable {
     @Basic(optional = false)
     @Column(name = "FOLIO")
     private Integer folio;
+    
     @Column(name = "FECHA_INGRESO")
     @Temporal(TemporalType.DATE)
     private Date fechaIngreso;
+    
     @Size(max = 100)
     @Column(name = "NOMBRE_TRANSPORTISTA")
     private String nombreTransportista;
+    
     @Size(max = 10)
     @Column(name = "PLACAS_TRANSPORTE")
     private String placasTransporte;
+    
     @Size(max = 200)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 8)
     @Column(name = "folio_cliente")
     private String folioCliente;
+    
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "valor_declarado")
     private BigDecimal valorDeclarado;
+    
     @Size(max = 50)
     @Column(name = "temperatura")
     private String temperatura;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
     private List<Partida> partidaList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
     private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
+    
     @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente cteCve;
+    
     @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve")
     @ManyToOne
     private Aviso avisoCve;
+    
     @JoinColumn(name = "status", referencedColumnName = "edo_cve")
     @ManyToOne
     private EstadoConstancia status;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
     private List<ConstanciaFactura> constanciaFacturaList;
-
+    
     public ConstanciaDeDeposito() {
     }
 
