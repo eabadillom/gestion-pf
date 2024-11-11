@@ -580,7 +580,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		Tarima tarima = null;
 		
 		try {
-			if(this.numTarimas.compareTo(BigDecimal.ONE) <= 0)
+			if(this.numTarimas.compareTo(BigDecimal.ONE) < 0)
 				throw new InventarioException("El número de tarimas indicado es incorrecto.");
 			
 			if(   this.partida.getUnidadDeProductoCve().getProductoCve() != null
