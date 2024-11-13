@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioAlmacen" pageWidth="851" pageHeight="611" columnWidth="761" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="2f361463-f417-4104-8c12-7ab1c04e4a00">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_Azure.jrdax"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -120,7 +120,7 @@
 		) salidas ON parEnt.partida_cve = salidas.partida_cve
 		where
 			cddEnt.status <> 4
-			and parEnt.no_tarimas >= 1.000
+			and parEnt.no_tarimas >= 1.000 and parEnt.cd_tarima is null
 			AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
 			AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
 	
@@ -250,7 +250,7 @@
 		) salidas ON parEnt.partida_cve = salidas.partida_cve
 		where
 			cddEnt.status <> 4
-			and parEnt.no_tarimas < 1.000
+			and parEnt.no_tarimas < 1.000 and parEnt.cd_tarima is null
 			AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
 			AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
 	
@@ -378,6 +378,7 @@
 		) salidas ON parEnt.partida_cve = salidas.partida_cve
 		where
 			cddEnt.status <> 4
+			and parEnt.cd_tarima is not null
 			AND (cam.camara_cve = $P{Camara} OR $P{Camara} IS NULL )
 			AND (plt.planta_cve  = $P{Planta} OR $P{Planta} IS NULL )
 	
@@ -1078,7 +1079,7 @@ ORDER BY cliente,numero_cte, producto, nb_tarima]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{nb_tarima}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{nb_tarima} == null || "".equalsIgnoreCase($F{nb_tarima}.trim()) ? $F{tarima} : $F{nb_tarima}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="480" y="0" width="61" height="11" uuid="e3bf0f2a-8f21-4065-b14f-143265a02adf"/>
