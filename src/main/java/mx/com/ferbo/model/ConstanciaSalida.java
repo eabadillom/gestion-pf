@@ -6,8 +6,10 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -50,37 +52,55 @@ public class ConstanciaSalida implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "FECHA")
     @Temporal(TemporalType.DATE)
     private Date fecha;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "NUMERO")
     private String numero;
+    
     @Size(max = 150)
     @Column(name = "NOMBRE_CTE")
     private String nombreCte;
+    
     @JoinColumn(name = "STATUS", referencedColumnName = "ID")
     @ManyToOne
     private StatusConstanciaSalida status;
+    
     @Size(max = 75)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
+    
     @NotNull
     @Size(max = 100)
     @Column(name = "nombre_transportista")
     private String nombreTransportista;
+    
     @NotNull
     @Size(max = 10)
     @Column(name = "placas_transporte")
     private  String placasTransporte;
+    
+    @NotNull
+    @Column(name = "status_termo")
+    private Boolean statusTermo;
+    
+    @NotNull
+    @Column(name = "temp_transporte")
+    private BigDecimal temperaturaTransporte;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaCve")
     private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idConstancia")
     private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
+    
     @JoinColumn(name = "CLIENTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente clienteCve;
@@ -210,5 +230,21 @@ public class ConstanciaSalida implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.ConstanciaSalida[ id=" + id + " ]";
     }
+
+	public Boolean getStatusTermo() {
+		return statusTermo;
+	}
+
+	public void setStatusTermo(Boolean statusTermo) {
+		this.statusTermo = statusTermo;
+	}
+
+	public BigDecimal getTemperaturaTransporte() {
+		return temperaturaTransporte;
+	}
+
+	public void setTemperaturaTransporte(BigDecimal temperaturaTransporte) {
+		this.temperaturaTransporte = temperaturaTransporte;
+	}
 
 }

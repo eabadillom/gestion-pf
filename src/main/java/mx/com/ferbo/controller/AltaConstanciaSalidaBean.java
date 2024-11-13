@@ -122,7 +122,13 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private ConstanciaDeServicio constanciaDeServicio;
 	private ConstanciaServicioDAO constanciaServicioDAO;
 	
-	private String numFolio,nombreTransportista,placas,observaciones,temperatura;
+	private String numFolio;
+	private String nombreTransportista;
+	private String placas;
+	private String observaciones;
+	private String temperatura;
+	private Boolean statusTermo;
+	private BigDecimal temperaturaTransporte;
 	private BigDecimal cantidadServicio;
 	private Date fechaSalida;
 	private int cantidadTotal;
@@ -228,6 +234,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 		this.cantidadTotal = 0;
 		this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
+		
+		this.statusTermo = new Boolean(true);
 		
 		log.info("El usuario {} entra a Inventarios / Salidas / Alta.", this.usuario.getUsuario());
 	}
@@ -765,6 +773,10 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		}
 	}
 	
+	public void resetTemperaturaTransporte() {
+		this.temperaturaTransporte = null;
+	}
+	
 	public void resetCantidadServicio() {
 		this.cantidadServicio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 		log.debug("Reiniciando el valor de cantidad total (servicio)");
@@ -805,6 +817,24 @@ public class AltaConstanciaSalidaBean implements Serializable{
 				&& this.candadoSalida.isSalidaTotal() == false && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
 				throw new InventarioException("El cliente no puede sacar toda su mercancía hasta liquidar sus adeudos.");
 			
+			if(placas == null)
+				throw new InventarioException("Debe indicar las placas del vehículo");
+			
+			if(placas.trim().equalsIgnoreCase(""))
+				throw new InventarioException("Debe indicar las placas del vehículo.");
+			
+			if(nombreTransportista == null)
+				throw new InventarioException("Debe indicar el nombre del transportista.");
+			
+			if(nombreTransportista.trim().equalsIgnoreCase(""))
+				throw new InventarioException("Debe indicar el nombre del transportista.");
+			
+			if(statusTermo == null)
+				throw new InventarioException("Debe indicar si el transporte cuenta con equipo térmico.");
+			
+			if(statusTermo == true && temperaturaTransporte == null)
+				throw new InventarioException("Debe indicar la temperatura del transporte.");
+			
 			constancia.setFecha(fechaSalida);
 			constancia.setNumero(numFolio);
 			constancia.setClienteCve(clienteSelect);
@@ -813,6 +843,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			constancia.setObservaciones(observaciones);
 			constancia.setNombreTransportista(nombreTransportista);
 			constancia.setPlacasTransporte(placas);
+			constancia.setStatusTermo(statusTermo);
+			constancia.setTemperaturaTransporte(temperaturaTransporte);
 			constancia.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
 			constancia.setDetalleConstanciaSalidaList(listadoTemp);
 			log.info("Constancia salida: (numero = {}), (fecha = {}), (cliente = {})", constancia.getNumero(), constancia.getFecha(), constancia.getNombreCte());
@@ -1292,5 +1324,21 @@ public class AltaConstanciaSalidaBean implements Serializable{
 
 	public void setSaldoVencido(boolean saldoVencido) {
 		this.saldoVencido = saldoVencido;
+	}
+
+	public Boolean getStatusTermo() {
+		return statusTermo;
+	}
+
+	public void setStatusTermo(Boolean statusTermo) {
+		this.statusTermo = statusTermo;
+	}
+
+	public BigDecimal getTemperaturaTransporte() {
+		return temperaturaTransporte;
+	}
+
+	public void setTemperaturaTransporte(BigDecimal temperaturaTransporte) {
+		this.temperaturaTransporte = temperaturaTransporte;
 	}
 }
