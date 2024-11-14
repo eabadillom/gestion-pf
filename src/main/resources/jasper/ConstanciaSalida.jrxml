@@ -456,7 +456,7 @@ GROUP BY
 				<textElement textAlignment="Center" markup="styled">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{status_termo} == true) ? ("TEMPERATURA DEL TRANSPORTE: " + $F{temp_transporte}) + " °C" : "TRANSPORTE SIN EQUIPO TERMICO"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{status_termo} == true) ? ("TEMPERATURA DEL TRANSPORTE: " + $F{temp_transporte}) + " °C" : "TRANSPORTE SIN THERMO KING"]]></textFieldExpression>
 			</textField>
 		</band>
 	</lastPageFooter>
