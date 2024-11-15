@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConstanciaSalida" pageWidth="229" pageHeight="660" columnWidth="189" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="c5c48a35-06c6-47f9-8382-ea6bb2ea082e">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion Dev"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_local.jrdax"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -60,7 +60,9 @@ WHERE
 	SUM(dcs.CANTIDAD) AS CANTIDAD, 
 	dcs.UNIDAD, 
 	SUM(dcs.PESO) AS PESO,
-	e.nb_emisor
+	e.nb_emisor,
+	cs.status_termo,
+	cs.temp_transporte
 FROM
 	constancia_salida cs
 	INNER JOIN cliente c ON cs.CLIENTE_CVE = c.CTE_CVE 
@@ -84,7 +86,9 @@ GROUP BY
 	dcs.FOLIO_ENTRADA, 
 	dcs.TEMPERATURA, 
 	dcs.UNIDAD,
-	e.nb_emisor]]>
+	e.nb_emisor,
+	status_termo,
+	temp_transporte]]>
 	</queryString>
 	<field name="CTE_NOMBRE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
@@ -160,6 +164,16 @@ GROUP BY
 		<property name="com.jaspersoft.studio.field.name" value="nb_emisor"/>
 		<property name="com.jaspersoft.studio.field.label" value="nb_emisor"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="emisor"/>
+	</field>
+	<field name="status_termo" class="java.lang.Boolean">
+		<property name="com.jaspersoft.studio.field.name" value="status_termo"/>
+		<property name="com.jaspersoft.studio.field.label" value="status_termo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_salida"/>
+	</field>
+	<field name="temp_transporte" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="temp_transporte"/>
+		<property name="com.jaspersoft.studio.field.label" value="temp_transporte"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="constancia_salida"/>
 	</field>
 	<variable name="Peso_Unitario" class="java.math.BigDecimal">
 		<variableExpression><![CDATA[$F{PESO}.divide($F{CANTIDAD},2,RoundingMode.HALF_UP)]]></variableExpression>
@@ -245,7 +259,7 @@ GROUP BY
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PLANTA_DS}]]></textFieldExpression>
 			</textField>
-			<textField pattern="yyyy-MM-dd">
+			<textField pattern="dd/MM/yyyy">
 				<reportElement x="39" y="65" width="150" height="12" uuid="db039c12-98e8-498a-a368-0e60b198ec59"/>
 				<textElement markup="styled">
 					<font isBold="true"/>
@@ -400,7 +414,7 @@ GROUP BY
 		</band>
 	</columnFooter>
 	<lastPageFooter>
-		<band height="37">
+		<band height="68">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
 				<reportElement x="0" y="1" width="189" height="12" uuid="67d5eb81-2b7a-4ac1-a933-5ab338133e15">
@@ -437,6 +451,13 @@ GROUP BY
 					<pen lineWidth="1.5"/>
 				</graphicElement>
 			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="37" width="189" height="31" uuid="055cda65-bd39-473a-b5c5-3af34c866512"/>
+				<textElement textAlignment="Center" markup="styled">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{status_termo} == true) ? ("TEMPERATURA DEL TRANSPORTE: " + $F{temp_transporte}) + " °C" : "TRANSPORTE SIN THERMO KING"]]></textFieldExpression>
+			</textField>
 		</band>
 	</lastPageFooter>
 	<summary>

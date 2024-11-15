@@ -584,32 +584,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 	}
 	
-//	public void updateDatosGenerales() {
-//		
-//		FacesMessage message = null;
-//		Severity severity = null;
-//		String mensaje = null;
-//		
-//		try {
-//			
-//			if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
-//				throw new Exception("No esta autorizado para modificar esta información.");
-//			}
-//			constanciaDeDepositoDAO.actualizar(this.selectConstanciaDD);
-//				
-//			severity = FacesMessage.SEVERITY_INFO;
-//			mensaje = "La información se guardó correctamente.";
-//		}catch (Exception e) {
-//			mensaje = "No esta autorizado para modificar";
-//			severity = FacesMessage.SEVERITY_WARN;
-//		}finally {
-//			message = new FacesMessage(severity,"Corrección de información." , mensaje);
-//			FacesContext.getCurrentInstance().addMessage(null, message);
-//			PrimeFaces.current().ajax().update("form:messages");
-//		}
-//		
-//	}
-	
 	public void cancelarConstancia() {
 		FacesMessage message = null;
 		Severity severity = null;
@@ -631,7 +605,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			this.selectConstanciaDD.setStatus(statusCancelada);
 			this.selectConstanciaDD.setObservaciones("CONSTANCIA CANCELADA EL DIA " + DateUtil.getString(this.selectConstanciaDD.getFechaIngreso(), DateUtil.FORMATO_DD_MM_YYYY));
 			constanciaDeDepositoDAO.actualizar(selectConstanciaDD);
-			
+			this.buscarConstancias();
 			mensaje = "Constancia cancelada correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('cancelDialog').hide()");

@@ -306,7 +306,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		try {
 			sql = "select cdd.FOLIO, dcs.ID "
 					+ "from constancia_de_deposito cdd "
-					+ "inner join PARTIDA p ON cdd.FOLIO = p.FOLIO "
+					+ "inner join partida p ON cdd.FOLIO = p.FOLIO "
 					+ "left outer join detalle_constancia_salida dcs ON dcs.PARTIDA_CVE = p.PARTIDA_CVE "
 					+ "where cdd.FOLIO = :folio "
 					+ "GROUP BY cdd.FOLIO, dcs.ID "

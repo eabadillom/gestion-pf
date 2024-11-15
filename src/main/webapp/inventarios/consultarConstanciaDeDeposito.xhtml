@@ -66,7 +66,7 @@
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem" style="text-align: center;">
-					<p:commandButton icon="pi pi-times" process="@this" actionListener="#{consultarConstanciaDeDepositoBean.cargaDetalle}" update="form:dt-constanciaDeDeposito" onclick="PF('cancelDialog').show();" disabled="#{constanciaDD.status.edoCve == 2}" class="ui-button-danger">
+					<p:commandButton icon="pi pi-times" process="@this" action="#{consultarConstanciaDeDepositoBean.cargaDetalle}" update="form:dt-constanciaDeDeposito" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('cancelDialog').show();" disabled="#{constanciaDD.status.edoCve == 2}" class="ui-button-danger">
 						<f:setPropertyActionListener value="#{constanciaDD}" target="#{consultarConstanciaDeDepositoBean.selectConstanciaDD}"></f:setPropertyActionListener>
 					</p:commandButton>
 				</p:column>
@@ -361,7 +361,7 @@
 				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarServicio').hide()" />
 			</p:confirmDialog>
 			<p:confirmDialog widgetVar="cancelDialog" showEffect="fade" width="400" message="¿Desea cancelar la constancia?" header="Cancelar constancia" severity="warn">
-				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.cancelarConstancia}" process="@this"/>
+				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.cancelarConstancia}" process="@this" update="form:dt-constanciaDeDeposito"/>
 				<p:commandButton value="No" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('cancelDialog').hide()" />
 			</p:confirmDialog>
 		</h:form>

@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -27,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.CandadoSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
@@ -115,6 +119,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private List<Inventario> filteredInventario;
 	private List<String> listaEntradas;
 	private List<Date> listaIngresos;
+	private List<String> listaProductos;
+	private List<String> listaTarimas;
 
 	private InventarioDAO inventarioDAO;
 	private Inventario inventarioSelected;
@@ -122,7 +128,13 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private ConstanciaDeServicio constanciaDeServicio;
 	private ConstanciaServicioDAO constanciaServicioDAO;
 	
-	private String numFolio,nombreTransportista,placas,observaciones,temperatura;
+	private String numFolio;
+	private String nombreTransportista;
+	private String placas;
+	private String observaciones;
+	private String temperatura;
+	private Boolean statusTermo;
+	private BigDecimal temperaturaTransporte;
 	private BigDecimal cantidadServicio;
 	private Date fechaSalida;
 	private int cantidadTotal;
@@ -154,6 +166,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private boolean saldoVencido = false;
 	
 	private boolean saved = false;
+	private StreamedContent file;
 	
 	private Usuario usuario;
 	private FacesContext faceContext;
@@ -229,6 +242,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		this.cantidadTotal = 0;
 		this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
 		
+		this.statusTermo = new Boolean(true);
+		
 		log.info("El usuario {} entra a Inventarios / Salidas / Alta.", this.usuario.getUsuario());
 	}
 	
@@ -294,6 +309,23 @@ public class AltaConstanciaSalidaBean implements Serializable{
 					continue;
 				listaIngresos.add(i.getFechaIngreso());
 			}
+			
+			listaProductos = new ArrayList<String>();
+			for(Inventario i : listaInventario) {
+				if(listaProductos.contains(i.getProducto().getProductoDs()))
+					continue;
+				listaProductos.add(i.getProducto().getProductoDs());
+			}
+			
+			listaTarimas = new ArrayList<String>();
+			for(Inventario i : listaInventario) {
+				if(i.getTarima() == null)
+					continue;
+				if(listaTarimas.contains(i.getTarima()))
+					continue;
+				listaTarimas.add(i.getTarima());
+			}
+			
 			log.debug("Lista fechas de ingreso: {}", listaIngresos);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
@@ -765,6 +797,10 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		}
 	}
 	
+	public void resetTemperaturaTransporte() {
+		this.temperaturaTransporte = null;
+	}
+	
 	public void resetCantidadServicio() {
 		this.cantidadServicio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 		log.debug("Reiniciando el valor de cantidad total (servicio)");
@@ -805,6 +841,24 @@ public class AltaConstanciaSalidaBean implements Serializable{
 				&& this.candadoSalida.isSalidaTotal() == false && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
 				throw new InventarioException("El cliente no puede sacar toda su mercancía hasta liquidar sus adeudos.");
 			
+			if(placas == null)
+				throw new InventarioException("Debe indicar las placas del vehículo");
+			
+			if(placas.trim().equalsIgnoreCase(""))
+				throw new InventarioException("Debe indicar las placas del vehículo.");
+			
+			if(nombreTransportista == null)
+				throw new InventarioException("Debe indicar el nombre del transportista.");
+			
+			if(nombreTransportista.trim().equalsIgnoreCase(""))
+				throw new InventarioException("Debe indicar el nombre del transportista.");
+			
+			if(statusTermo == null)
+				throw new InventarioException("Debe indicar si el transporte cuenta con equipo térmico.");
+			
+			if(statusTermo == true && temperaturaTransporte == null)
+				throw new InventarioException("Debe indicar la temperatura del transporte.");
+			
 			constancia.setFecha(fechaSalida);
 			constancia.setNumero(numFolio);
 			constancia.setClienteCve(clienteSelect);
@@ -813,6 +867,8 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			constancia.setObservaciones(observaciones);
 			constancia.setNombreTransportista(nombreTransportista);
 			constancia.setPlacasTransporte(placas);
+			constancia.setStatusTermo(statusTermo);
+			constancia.setTemperaturaTransporte(temperaturaTransporte);
 			constancia.setConstanciaSalidaServiciosList(listadoConstanciaSalidaServicios);
 			constancia.setDetalleConstanciaSalidaList(listadoTemp);
 			log.info("Constancia salida: (numero = {}), (fecha = {}), (cliente = {})", constancia.getNumero(), constancia.getFecha(), constancia.getNombreCte());
@@ -941,7 +997,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	public void imprimirTicket() {
 		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-		String filename = String.format("ticket-salida-%s.pdf", this.numFolio);
+		String filename = String.format("Salida-%s.pdf", this.numFolio);
 		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
@@ -967,8 +1023,11 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("NUMERO", numFolio);
 			parameters.put("LogoPath", imgFile.getPath());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			   
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename)
+					.stream(() -> input).build();
+			log.info("Ticket salida generado {}...", filename);
 		} catch (Exception e) {
 			log.error("Ocurrió un problema al imprimir el ticket de la constancia de salida...", e);
 			message = String.format("No se pudo imprimir el folio %s", this.numFolio);
@@ -978,8 +1037,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		}finally {
 			conexion.close((Connection) connection);
 		}
-		
-		
 	}
 
 	public List<Cliente> getListadoClientes() {
@@ -1292,5 +1349,45 @@ public class AltaConstanciaSalidaBean implements Serializable{
 
 	public void setSaldoVencido(boolean saldoVencido) {
 		this.saldoVencido = saldoVencido;
+	}
+
+	public Boolean getStatusTermo() {
+		return statusTermo;
+	}
+
+	public void setStatusTermo(Boolean statusTermo) {
+		this.statusTermo = statusTermo;
+	}
+
+	public BigDecimal getTemperaturaTransporte() {
+		return temperaturaTransporte;
+	}
+
+	public void setTemperaturaTransporte(BigDecimal temperaturaTransporte) {
+		this.temperaturaTransporte = temperaturaTransporte;
+	}
+
+	public List<String> getListaProductos() {
+		return listaProductos;
+	}
+
+	public void setListaProductos(List<String> listaProductos) {
+		this.listaProductos = listaProductos;
+	}
+
+	public List<String> getListaTarimas() {
+		return listaTarimas;
+	}
+
+	public void setListaTarimas(List<String> listaTarimas) {
+		this.listaTarimas = listaTarimas;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 }
