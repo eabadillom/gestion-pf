@@ -3,11 +3,11 @@ package mx.com.ferbo.commons.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.util.EntityManagerUtil;
 
 
 public abstract class IBaseDAO<MODEL, PK> {
@@ -25,11 +25,8 @@ public abstract class IBaseDAO<MODEL, PK> {
 	
 	public EntityManager getEntityManager() {
 		EntityManager em = null;
-		EntityManagerFactory emf = null;
-		String PERSIST_UNIT = "gestionPU";
 		try {
-			emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
-			em = emf.createEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 		} catch(Exception ex) {
 			log.error("Problema para obtener el entity manager...", ex);
 		}
