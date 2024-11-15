@@ -13,10 +13,9 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Posicion;
 import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.JPAEntity;
 
 public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
-	EntityManager entity = JPAEntity.getEntity().createEntityManager();
+	EntityManager entity = EntityManagerUtil.getEntityManager();
 	private static Logger log = LogManager.getLogger(PosicionCamaraDAO.class);
 	
 	@SuppressWarnings("unchecked")

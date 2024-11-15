@@ -7,7 +7,6 @@ import javax.persistence.TypedQuery;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
-import mx.com.ferbo.model.Ciudades;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.util.EntityManagerUtil;
 
