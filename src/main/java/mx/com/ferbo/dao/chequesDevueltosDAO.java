@@ -17,7 +17,7 @@ import mx.com.ferbo.model.Posicion;
 
 public class chequesDevueltosDAO {
 	
-	EntityManager entity = JPAEntity.getEntity().createEntityManager();
+	EntityManager entity = EntityManagerUtil.getEntityManager();
 	
 	@SuppressWarnings("unchecked")
 	public List<ChequeDevuelto> findAll(){
