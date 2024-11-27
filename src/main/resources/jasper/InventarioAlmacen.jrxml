@@ -409,10 +409,7 @@
 	
 ) I
 WHERE I.cantidad > 0
-ORDER BY cliente,numero_cte, nb_tarima, producto
-
-
-]]>
+ORDER BY cliente,numero_cte, nb_tarima, producto]]>
 	</queryString>
 	<field name="folio" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="folio"/>
@@ -534,6 +531,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 	</field>
 	<variable name="SumaTarimas" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{tarima}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
 	</variable>
 	<variable name="SumaCantidadProducto" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="Sum">
 		<variableExpression><![CDATA[$F{cantidad}]]></variableExpression>
@@ -575,13 +573,17 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 	<variable name="SumaGlobalProducto" class="java.lang.String" calculation="Count">
 		<variableExpression><![CDATA[$F{producto}]]></variableExpression>
 	</variable>
-	<variable name="tarimasCount" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupCliente" calculation="DistinctCount">
+	<variable name="tarimasCountCliente" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupCliente" calculation="DistinctCount">
 		<variableExpression><![CDATA[$F{nb_tarima}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
 	</variable>
 	<variable name="tarimasCountGlobal" class="java.math.BigDecimal" calculation="DistinctCount">
 		<variableExpression><![CDATA[$F{nb_tarima}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)]]></initialValueExpression>
+	</variable>
+	<variable name="tarimasCountProducto" class="java.math.BigDecimal" resetType="Group" resetGroup="GroupProducto" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{nb_tarima}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
 	</variable>
 	<group name="GroupCliente">
 		<groupExpression><![CDATA[$F{cliente}]]></groupExpression>
@@ -600,7 +602,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 			<band height="50">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<staticText>
-					<reportElement key="" mode="Transparent" x="0" y="16" width="113" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="32b0253c-145f-4f3e-a96f-0ca3a7e73931">
+					<reportElement key="" mode="Transparent" x="0" y="16" width="121" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="32b0253c-145f-4f3e-a96f-0ca3a7e73931">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -617,7 +619,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 					<text><![CDATA[TOTAL CLIENTE]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" mode="Transparent" x="345" y="16" width="77" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="5d6ec033-c23f-49be-9103-bbe014d0fcd0">
+					<reportElement key="" mode="Transparent" x="353" y="16" width="77" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="5d6ec033-c23f-49be-9103-bbe014d0fcd0">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -635,7 +637,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 					<text><![CDATA[Tarimas]]></text>
 				</staticText>
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Transparent" x="422" y="16" width="50" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="85024531-aa83-4bc0-a2b8-ea491c85ea51">
+					<reportElement mode="Transparent" x="430" y="16" width="50" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="85024531-aa83-4bc0-a2b8-ea491c85ea51">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -643,11 +645,11 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 					</textElement>
 					<textFieldExpression><![CDATA[BigDecimal.ZERO
 .add($V{SumaTarimasPorCte} == null ? BigDecimal.ZERO : $V{SumaTarimasPorCte})
-.add($V{tarimasCount} == null ? BigDecimal.ZERO : $V{tarimasCount})
+.add($V{tarimasCountCliente} == null ? BigDecimal.ZERO : $V{tarimasCountCliente})
 .setScale(2, BigDecimal.ROUND_HALF_UP)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Transparent" x="472" y="16" width="61" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="475b6a83-23f2-4d3b-8adb-0f8f2790360e">
+					<reportElement mode="Transparent" x="480" y="16" width="61" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="475b6a83-23f2-4d3b-8adb-0f8f2790360e">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -656,7 +658,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 					<textFieldExpression><![CDATA[$V{SumaCantidadPorCte}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement key="" mode="Transparent" x="533" y="16" width="50" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="a4392d93-f72e-4d26-bd89-90b096226fc2">
+					<reportElement key="" mode="Transparent" x="541" y="16" width="50" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="a4392d93-f72e-4d26-bd89-90b096226fc2">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -673,7 +675,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 					<text><![CDATA[Unidades]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Transparent" x="661" y="16" width="40" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="7a3f5557-d0fe-47ed-8091-0f951cf04294">
+					<reportElement mode="Transparent" x="661" y="16" width="50" height="13" forecolor="#030000" backcolor="#FFFFFF" uuid="7a3f5557-d0fe-47ed-8091-0f951cf04294">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -730,7 +732,10 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 					<textElement textAlignment="Center" verticalAlignment="Bottom">
 						<font fontName="SansSerif" size="8" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{SumaTarimas}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[BigDecimal.ZERO
+.add($V{SumaTarimas} == null ? BigDecimal.ZERO : $V{SumaTarimas})
+.add($V{tarimasCountProducto} == null ? BigDecimal.ZERO : $V{tarimasCountProducto})
+.setScale(2, BigDecimal.ROUND_HALF_UP)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
 					<reportElement x="480" y="0" width="61" height="11" uuid="aef21b7d-b767-40b6-9f6c-0ed79eabc08e"/>
@@ -787,22 +792,19 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="0" y="21" width="350" height="12" uuid="78eb317b-93ff-4fe2-ab33-46533534b497"/>
+				<reportElement x="0" y="21" width="353" height="12" uuid="78eb317b-93ff-4fe2-ab33-46533534b497"/>
 				<textElement textAlignment="Right">
 					<font fontName="SansSerif" isBold="true"/>
 				</textElement>
-				<text><![CDATA[al día  ]]></text>
+				<text><![CDATA[al día ]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="358" y="21" width="403" height="12" uuid="94348fda-af14-4356-ac60-49af12db7961"/>
+				<reportElement x="353" y="21" width="408" height="12" uuid="94348fda-af14-4356-ac60-49af12db7961"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{Fecha}]]></textFieldExpression>
 			</textField>
-			<rectangle>
-				<reportElement x="350" y="21" width="8" height="12" forecolor="#F7F0F0" uuid="a36f4b9e-a678-419a-b31c-6b6c8d6c770d"/>
-			</rectangle>
 		</band>
 	</title>
 	<pageHeader>
@@ -1130,14 +1132,14 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 		<band height="8" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement x="0" y="0" width="113" height="8" uuid="5f009e6e-5661-456f-b910-d083dbe51902"/>
+				<reportElement x="0" y="0" width="121" height="8" uuid="5f009e6e-5661-456f-b910-d083dbe51902"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="113" y="0" width="548" height="8" uuid="e3d8a092-83d1-42de-9bcf-f200435c52d0"/>
+				<reportElement x="121" y="0" width="540" height="8" uuid="e3d8a092-83d1-42de-9bcf-f200435c52d0"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
@@ -1156,7 +1158,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 		<band height="22">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="0" y="0" width="113" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="7a2f629c-d4eb-4901-a3cc-5029ea938b82">
+				<reportElement key="" mode="Opaque" x="0" y="0" width="121" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="7a2f629c-d4eb-4901-a3cc-5029ea938b82">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -1174,7 +1176,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 				<text><![CDATA[TOTAL GENERAL]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="113" y="0" width="232" height="13" forecolor="#FCFCFC" backcolor="#2196F3" uuid="5685d377-08ac-477b-87cf-670a83d88dee">
+				<reportElement mode="Opaque" x="121" y="0" width="232" height="13" forecolor="#FCFCFC" backcolor="#2196F3" uuid="5685d377-08ac-477b-87cf-670a83d88dee">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
@@ -1183,7 +1185,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 				</textElement>
 			</textField>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="345" y="0" width="77" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="161086ba-18ae-4e45-8666-c90b0ee1fdfb">
+				<reportElement key="" mode="Opaque" x="353" y="0" width="77" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="161086ba-18ae-4e45-8666-c90b0ee1fdfb">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -1201,7 +1203,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 				<text><![CDATA[Tarimas]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="422" y="0" width="50" height="13" forecolor="#FCFAFA" backcolor="#2196F3" uuid="b8dabb68-79a9-4300-ae16-745248b76886">
+				<reportElement mode="Opaque" x="430" y="0" width="50" height="13" forecolor="#FCFAFA" backcolor="#2196F3" uuid="b8dabb68-79a9-4300-ae16-745248b76886">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
@@ -1211,7 +1213,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 				<textFieldExpression><![CDATA[$V{SumaGlobalTarimas}.add($V{tarimasCountGlobal}).setScale(2, BigDecimal.ROUND_HALF_UP)]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="472" y="0" width="61" height="13" forecolor="#FAF7F7" backcolor="#2196F3" uuid="45398072-5993-4f14-99d7-1650423dd275">
+				<reportElement mode="Opaque" x="480" y="0" width="61" height="13" forecolor="#FAF7F7" backcolor="#2196F3" uuid="45398072-5993-4f14-99d7-1650423dd275">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
@@ -1221,7 +1223,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 				<textFieldExpression><![CDATA[$V{SumaGlobalCantidad}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="533" y="0" width="58" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="57a821e5-7553-4443-b44a-a41ce02126ec">
+				<reportElement key="" mode="Opaque" x="541" y="0" width="50" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="57a821e5-7553-4443-b44a-a41ce02126ec">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -1267,14 +1269,14 @@ ORDER BY cliente,numero_cte, nb_tarima, producto
 				<textFieldExpression><![CDATA[" "  + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement x="0" y="13" width="113" height="9" uuid="0ba51749-37ac-4ee9-87fd-edc729cdbefc"/>
+				<reportElement x="0" y="13" width="121" height="9" uuid="0ba51749-37ac-4ee9-87fd-edc729cdbefc"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="113" y="13" width="548" height="9" uuid="e4195d56-0159-4961-8f5e-2f8ed3069282"/>
+				<reportElement x="121" y="13" width="540" height="9" uuid="e4195d56-0159-4961-8f5e-2f8ed3069282"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
 				</textElement>
