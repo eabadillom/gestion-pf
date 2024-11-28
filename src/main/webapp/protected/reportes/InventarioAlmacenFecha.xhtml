@@ -6,76 +6,61 @@
 	<ui:define name="title">Inventario</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
+			<p:growl id="messages" showDetail="true" />
 			<p:dialog modal="true" widgetVar="statusDialog" header="Generando reporte..." draggable="false" closable="false" resizable="false">
 				<div align="center">
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 		    </p:dialog>
-			<div class="p-grid crud-demo">
-				<div class="p-col-12">
-					<div class="card">
-						<p:growl id="messages" showDetail="true" />
-						<p:fieldset>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:datePicker id="minmax" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteAlmacenFechaBean.fecha}" maxdate="#{reporteAlmacenFechaBean.maxDate}" readonlyInput="true">
-									<p:ajax process="@this" />
-								</p:datePicker>
-								<p:outputLabel for="minmax" value="Fecha de corte" />
-							</span>
-						</p:fieldset>
-						<p:fieldset>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:selectOneMenu id="Cliente" value="#{reporteAlmacenFechaBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
-									<f:selectItem itemLabel="Todos los clientes" itemValue="" />
-									<f:selectItems value="#{reporteAlmacenFechaBean.listaClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
-									<p:ajax process="@this" />
-								</p:selectOneMenu>
-								<p:outputLabel for="Cliente" value="Cliente" />
-							</span>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:selectOneMenu id="so-planta" value="#{reporteAlmacenFechaBean.plantaSelect}" converter="entityConverter">
-									<f:selectItem itemLabel="Todas las plantas" itemValue="" />
-									<f:selectItems value="#{reporteAlmacenFechaBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
-									<p:ajax listener="#{reporteAlmacenFechaBean.filtradoCamara()}" process=" @this" update=":form:so-camara" />
-								</p:selectOneMenu>
-								<p:outputLabel for="so-planta" value="Planta" />
-							</span>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:selectOneMenu id="so-camara" value="#{reporteAlmacenFechaBean.camaraSelect}" converter="entityConverter">
-									<f:selectItem itemLabel="Todas las camaras" itemValue="" />
-									<f:selectItems value="#{reporteAlmacenFechaBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}" itemValue="#{c}" />
-									<p:ajax process="@this" />
-								</p:selectOneMenu>
-								<p:outputLabel for="so-camara" value="Camara " />
-							</span>
-						</p:fieldset>
-						<p:fieldset styleClass="p-mt-2">
-							<p:toolbar>
-								<p:toolbarGroup>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".pdf" actionListener="#{reporteAlmacenFechaBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" />
-									</div>
-									<div class="col-2">
-										<p:divider layout="vertical">
-										</p:divider>
-									</div>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".xlsx" actionListener="#{reporteAlmacenFechaBean.exportarExcel}" action="#{reporteAlmacenFechaBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" />
-									</div>
-									<div class="col-2">
-										<p:divider layout="vertical">
-											<b>OR</b>
-										</p:divider>
-									</div>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value="Consultar" actionListener="#{reporteAlmacenFechaBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
-									</div>
-								</p:toolbarGroup>
-							</p:toolbar>
-						</p:fieldset>
+		    <p:panel>
+				<div class="p-grid ui-fluid p-col-12">
+					<div class="p-col-3 p-md-3">
+						<p:outputLabel for="minmax" value="Fecha de corte" />
+						<p:datePicker id="minmax" showIcon="true" value="#{reporteAlmacenFechaBean.fecha}" maxdate="#{reporteAlmacenFechaBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+							<p:ajax process="@this" />
+						</p:datePicker>
 					</div>
 				</div>
-			</div>
+				<div class="p-grid ui-fluid p-col-12">
+					<div class="p-col-6 p-md-6">
+						<p:outputLabel for="Cliente" value="Cliente" />
+						<p:selectOneMenu id="Cliente" value="#{reporteAlmacenFechaBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
+							<f:selectItem itemLabel="Todos los clientes" itemValue="" />
+							<f:selectItems value="#{reporteAlmacenFechaBean.listaClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
+							<p:ajax process="@this" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-3 p-md-3">
+						<p:outputLabel for="so-planta" value="Planta" />
+						<p:selectOneMenu id="so-planta" value="#{reporteAlmacenFechaBean.plantaSelect}" converter="entityConverter" autoWidth="false">
+							<f:selectItem itemLabel="Todas las plantas" itemValue="" />
+							<f:selectItems value="#{reporteAlmacenFechaBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
+							<p:ajax listener="#{reporteAlmacenFechaBean.filtradoCamara()}" process=" @this" update=":form:so-camara" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-3 p-md-3">
+						<p:outputLabel for="so-camara" value="Camara " />
+						<p:selectOneMenu id="so-camara" value="#{reporteAlmacenFechaBean.camaraSelect}" converter="entityConverter" autoWidth="false">
+							<f:selectItem itemLabel="Todas las camaras" itemValue="" />
+							<f:selectItems value="#{reporteAlmacenFechaBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}" itemValue="#{c}" />
+							<p:ajax process="@this" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-4 p-md-4">
+						<p:commandButton value="PDF" icon="pi pi-file-pdf" actionListener="#{reporteAlmacenFechaBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+							<p:fileDownload value="#{reporteAlmacenFechaBean.file}" />
+						</p:commandButton>
+					</div>
+					<div class="p-col-4 p-md-4">
+						<p:commandButton value="Excel" icon="pi pi-file-excel" actionListener="#{reporteAlmacenFechaBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+							<p:fileDownload value="#{reporteAlmacenFechaBean.file}" />
+						</p:commandButton>
+					</div>
+					<div class="p-col-4 p-md-4">
+						<p:commandButton value="Consultar" icon="pi pi-search" actionListener="#{reporteAlmacenFechaBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
+					</div>
+				</div>
+			</p:panel>
 			<p:dataTable id="dt-reporte" widgetVar="dtReporte" value="#{reporteAlmacenFechaBean.reporte}" var="r" rowKey="#{r.numeroCliente}">
 				<p:column width="1rem">
             		<p:rowToggler/>
