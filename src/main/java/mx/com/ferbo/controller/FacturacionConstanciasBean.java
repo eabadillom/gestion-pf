@@ -663,24 +663,26 @@ public class FacturacionConstanciasBean implements Serializable{
 			
 		
 		
-		ConstanciaDeDeposito cdd = cf.getFolio();
-		Aviso aviso = cdd.getAvisoCve();
-		Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
-		String tipoFacturacion = aviso.getAvisoTpFacturacion();
-		cf.setServicioConstanciaList(new ArrayList<>());
-		
-		for (ConstanciaDepositoDetalle cs : cdd.getConstanciaDepositoDetalleList()) {
+			ConstanciaDeDeposito cdd = cf.getFolio();
+			Aviso aviso = cdd.getAvisoCve();
+			Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
+			String tipoFacturacion = aviso.getAvisoTpFacturacion();
+			cf.setServicioConstanciaList(new ArrayList<>());
 			
-			Servicio servicio = cs.getServicioCve();
-			TipoCobro tipoCobro = servicio.getCobro();
-			ServicioConstancia sc = new ServicioConstancia();
-			
-			BigDecimal cantidad = null;
-			
-			List<PrecioServicio> listaPrecioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
-					clienteSelect.getCteCve(), servicio.getServicioCve());
-			
-			if(!listaPrecioServicio.isEmpty()) {
+			for (ConstanciaDepositoDetalle cs : cdd.getConstanciaDepositoDetalleList()) {
+				
+				Servicio servicio = cs.getServicioCve();
+				TipoCobro tipoCobro = servicio.getCobro();
+				ServicioConstancia sc = new ServicioConstancia();
+				
+				BigDecimal cantidad = null;
+				
+				List<PrecioServicio> listaPrecioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
+						clienteSelect.getCteCve(), servicio.getServicioCve());
+				
+				if(listaPrecioServicio.isEmpty())
+					continue;
+				
 				PrecioServicio precioServicio = listaPrecioServicio.get(0);
 				
 				switch (tipoCobro.getId()) {
@@ -733,20 +735,32 @@ public class FacturacionConstanciasBean implements Serializable{
 					cf.getServicioConstanciaList().add(sc);					
 					id++;
 				}
+				
 			}
-		}
-		
-		cf.setFactura(factura);
-		cf.setPlantaCve(plantaSelect.getPlantaCve());
-		cf.setPlantaDs(plantaSelect.getPlantaDs());
-		cf.setPlantaAbrev(plantaSelect.getPlantaAbrev());
-		cf.setCamaraCve(camara.getCamaraCve());
-		cf.setCamaraDs(camara.getCamaraDs());
-		cf.setCamaraAbrev(camara.getCamaraAbrev());
-		
-		cdd.setConstanciaFacturaList(new ArrayList<>());
-		cdd.getConstanciaFacturaList().addAll(listaEntradas);
-		cdd.getConstanciaFacturaList().addAll(listaVigencias);
+			
+			cf.setFactura(factura);
+			cf.setPlantaCve(plantaSelect.getPlantaCve());
+			cf.setPlantaDs(plantaSelect.getPlantaDs());
+			cf.setPlantaAbrev(plantaSelect.getPlantaAbrev());
+			cf.setCamaraCve(camara.getCamaraCve());
+			cf.setCamaraDs(camara.getCamaraDs());
+			cf.setCamaraAbrev(camara.getCamaraAbrev());
+			
+			cdd.setConstanciaFacturaList(new ArrayList<>());
+			cdd.getConstanciaFacturaList().addAll(listaEntradas);
+			cdd.getConstanciaFacturaList().addAll(listaVigencias);
+			
+			BigDecimal totalConstancia = cf.getServicioConstanciaList().stream()
+				.map(ServicioConstancia::getCosto)
+				.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+				;
+			
+			log.info("Constancia {} - Total por cobrar: {}", cdd.getFolioCliente(), totalConstancia);
+			
+			if(totalConstancia.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0) {
+				log.info("Eliminando constancia {} debido a que no hay servicios por facturar.", cdd.getFolioCliente());
+				this.listaVigencias.remove(cf);
+			}
 		}
 		
 		PrimeFaces.current().ajax().update("form:dt-serviciosVigencia");

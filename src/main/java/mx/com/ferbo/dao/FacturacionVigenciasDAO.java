@@ -158,9 +158,11 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					BigDecimal tarimas = p.getNoTarimas();//cantidad_total
 					BigDecimal salidaCantidad = new BigDecimal(0),salidaPeso = new BigDecimal(0);
 					
-					cajasTarima = cantidadT.divide(tarimas, 2, BigDecimal.ROUND_HALF_UP);
+					if(tarimas != null) {
+						cajasTarima = cantidadT.divide(tarimas, 2, BigDecimal.ROUND_HALF_UP);
+						log.debug("caja x tarima "+cajasTarima);
+					}
 					
-					log.debug("caja x tarima "+cajasTarima);
 					List<DetalleConstanciaSalida> salidasList = p.getDetalleConstanciaSalidaList();
 					
 					for(DetalleConstanciaSalida dcs: salidasList) {
@@ -179,7 +181,7 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 								(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) > 0)
 								);
 						
-						if(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) >= 0)
+ 						if(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) >= 0)
 							continue;
 						
 						BigDecimal cantidad = new BigDecimal(dcs.getCantidad());
@@ -195,8 +197,12 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					pesoTotal = pesoTotal.subtract(salidaPeso);
 					if(salidasList == null || salidasList.size() <= 0)
 						noTarimas = p.getNoTarimas();
-					else					
+					else if(salidasList != null && salidasList.size() > 0 && tarimas != null) {
 						noTarimas = cantidadT.divide(cajasTarima,0,RoundingMode.UP);
+					} else if(salidasList != null && salidasList.size() > 0 && tarimas == null) {
+						//TODO
+						log.info("FALTA CALCULO DE TARIMAS POR REGISTRO DE TARIMA...");
+					}
 					
 					p.setCantidadTotal(cantidadT.intValue());
 					p.setPesoTotal(pesoTotal);
