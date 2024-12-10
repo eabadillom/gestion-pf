@@ -347,7 +347,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.serieFacturaSelect = this.plantaSelect.getSerieFacturaDefault();
 		
 		log.info("Planta seleccionada: {}", this.plantaSelect);
-		log.info("Emisor seleccionado: {}", this.emisor);
 		log.info("Serie factura seleccionada: {}", this.serieFacturaSelect);
 		
 		//Carga de constancias si existe cambio en planta 
@@ -366,7 +365,6 @@ public class FacturacionConstanciasBean implements Serializable{
 			this.listaSerieFactura = serieFacturaDAO.buscarPorEmisor(this.emisor, true);
 			
 			log.info("Planta seleccionada: {}", this.plantaSelect);
-			log.info("Emisor seleccionado: {}", this.emisor);
 			log.info("Serie factura seleccionada: {}", this.serieFacturaSelect);
 			
 			mensaje = "Debe seleccionar una serie";
@@ -659,6 +657,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		Integer id = 0;
 		BigDecimal importe = new BigDecimal(0);
 		
+		List<ConstanciaFactura> listaVigenciasFiltrada = new ArrayList<ConstanciaFactura>();
+		
 		for(ConstanciaFactura cf :listaVigencias) {
 			
 		
@@ -759,9 +759,14 @@ public class FacturacionConstanciasBean implements Serializable{
 			
 			if(totalConstancia.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0) {
 				log.info("Eliminando constancia {} debido a que no hay servicios por facturar.", cdd.getFolioCliente());
-				this.listaVigencias.remove(cf);
+				continue;
 			}
+			
+			listaVigenciasFiltrada.add(cf);
 		}
+		
+		this.listaVigencias.clear();
+		this.listaVigencias.addAll(listaVigenciasFiltrada);
 		
 		PrimeFaces.current().ajax().update("form:dt-serviciosVigencia");
 	}
