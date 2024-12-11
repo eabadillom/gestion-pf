@@ -218,10 +218,9 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 			}
 			
 		} catch(Exception ex) {
-			ex.printStackTrace();
+			log.error("Problema para obtener las vigencias por facturar...", ex);
 		} finally {
-			if(em != null)
-				em.close();
+			EntityManagerUtil.close(em);
 		}
 		return list;
 	}
