@@ -53,7 +53,7 @@
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-6 p-md-6">
 							<p:outputLabel value="Cliente" />
-							<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="true" value="#{facturaServiciosBean.clienteSelect}" filter="true" filterMatchMode="contains" onchange="PF('statusInfoDialog').show();">
+							<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="false" value="#{facturaServiciosBean.clienteSelect}" filter="true" filterMatchMode="contains" onchange="PF('statusInfoDialog').show();">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 								<f:selectItems var="cliente" value="#{facturaServiciosBean.listaCliente}" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 								<p:ajax listener="#{facturaServiciosBean.cargaInfoCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago domicilio metodoPago" oncomplete="PF('statusInfoDialog').hide();"/>
