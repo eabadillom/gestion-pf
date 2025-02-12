@@ -232,6 +232,22 @@ public class ClientesBean implements Serializable {
 	public boolean clienteSeleccionado() {
 		return this.lstClientesSelected != null && !this.lstClientesSelected.isEmpty();
 	}
+	
+	public void validarCodigoUnico() throws InventarioException {
+		if(this.clienteSelected == null)
+			return;
+		
+		if(this.clienteSelected.getCodUnico() == null)
+			return;
+		
+		Cliente cliente = clienteDAO.buscarPorCodigoUnico(this.clienteSelected.getCodUnico());
+		
+		if(cliente != null) {
+			String mensaje = String.format("El código único %s ya está registrado para el cliente %s",
+					this.clienteSelected.getCodUnico(), cliente.getNombre());
+			throw new InventarioException(mensaje);
+		}
+	}
 
 	public void guardarCliente() {
 		FacesMessage message = null;
@@ -247,6 +263,8 @@ public class ClientesBean implements Serializable {
 					&& (this.clienteSelected.getRegimenCapital() == null || this.clienteSelected.getRegimenCapital().trim().equalsIgnoreCase(""))) {
 				throw new InventarioException("Debe indicar un régimen capital");
 			}
+			
+			this.validarCodigoUnico();
 			
 			if (clienteSelected.getCteCve() == null) {
 				//CANDADO SALIDA

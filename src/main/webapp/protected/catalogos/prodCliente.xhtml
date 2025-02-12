@@ -7,6 +7,11 @@
 
 	<ui:define name="content">
 		<h:form id="form">
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
 			<div class="p-grid productosClientes">
 				<div class="p-col-12">
 					<div class="card">
@@ -18,8 +23,8 @@
 										<span class="ui-float-label ui-input-icon-left">
 										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{prodClienteBean.clienteSelected}" filter="true" filterMatchMode="contains">
 											<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" noSelectionOption="true" />
-											<f:selectItems value="#{prodClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
-											<p:ajax listener="#{prodClienteBean.filtraListado()}" update="dt-productosCliente" />
+											<f:selectItems value="#{prodClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre)}" itemValue="#{cliente}" />
+											<p:ajax listener="#{prodClienteBean.filtraListado()}" update="dt-productosCliente" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
 										</p:selectOneMenu>
 										<p:outputLabel for="soClientes" value="Clientes" />
 										</span>

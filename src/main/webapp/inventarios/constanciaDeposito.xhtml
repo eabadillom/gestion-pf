@@ -28,7 +28,7 @@
 					<div class="p-col-6 p-md-6">
 						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{constanciaDeDepositoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains" onchange="PF('statusInfoDialog').show();">
 							<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true"/>
-							<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}"></f:selectItems>
+							<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre) }" itemValue="#{cliente}"></f:selectItems>
 							<p:ajax listener="#{constanciaDeDepositoBean.cargaInfoCliente()}" update="claveProducto aviso precioServicio congelacion conservacion refrigeracion maniobras dlg-add-producto" oncomplete="PF('statusInfoDialog').hide();"/>		
 						</p:selectOneMenu>
 					</div>

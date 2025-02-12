@@ -40,8 +40,8 @@
 			<div class="p-grid ui-fluid">
 				<div class="p-field p-col-6 p-md-6">
 					<p:selectOneMenu id="s-cliente" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.cliente}" filter="true" filterMatchMode="contains">
-						<f:selectItem itemLabel="Seleccione un Cliente" itemValue="" noSelectionOption="true"/>
-						<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" />
+						<f:selectItem itemLabel="Seleccione un Cliente" noSelectionOption="true"/>
+						<f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre) }" itemValue="#{cliente}" />
 					</p:selectOneMenu>
 				</div>
 				<div class="p-field p-col-2 p-md-2">

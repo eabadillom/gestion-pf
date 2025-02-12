@@ -504,4 +504,23 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		
 		return cliente;
 	}
+	
+	public Cliente buscarPorCodigoUnico(String codigoUnico) {
+		Cliente model = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("Cliente.findByCodUnico", this.modelClass)
+					.setParameter("codUnico", codigoUnico)
+					.getSingleResult()
+					;
+		} catch(Exception ex) {
+			log.warn("Problema para obtener el cliente por codigo unico: {}", ex.getMessage());
+		} finally {
+			this.close(em);
+		}
+		
+		return model;
+	}
 }
