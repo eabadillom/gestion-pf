@@ -22,9 +22,9 @@
 		    <p:panel header="DATOS DEL CLIENTE">
 		    	<div class="p-grid ui-fluid p-col-12">
 		    		<div class="p-card p-col-6 p-md-6">
-		    			<p:selectOneMenu id="Cliente" autoWidth="false" value="#{altaTraspasoBean.idCliente}" filter="true" filterMatchMode="startsWith" onchange="PF('statusDialog').show();">
+		    			<p:selectOneMenu id="Cliente" autoWidth="false" value="#{altaTraspasoBean.idCliente}" filter="true" filterMatchMode="contains" onchange="PF('statusDialog').show();">
 							<f:selectItem itemLabel="Seleccione Cliente" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.alias eq null ? cte.nombre : cte.alias}" itemValue="#{cte.cteCve}" />
+							<f:selectItems var="cte" value="#{altaTraspasoBean.clientes}" itemLabel="#{cte.alias eq null ? cte.nombre : cte.alias.concat(' - ').concat(cte.nombre)}" itemValue="#{cte.cteCve}" />
 							<p:ajax listener="#{altaTraspasoBean.filtrarCliente}" process="@this" update=":form:traspaso :form:selServicio" oncomplete="PF('statusDialog').hide();"/>
 						</p:selectOneMenu>
 		    		</div>
