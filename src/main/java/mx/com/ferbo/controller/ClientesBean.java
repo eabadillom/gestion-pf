@@ -242,11 +242,16 @@ public class ClientesBean implements Serializable {
 		
 		Cliente cliente = clienteDAO.buscarPorCodigoUnico(this.clienteSelected.getCodUnico());
 		
-		if(cliente != null) {
-			String mensaje = String.format("El código único %s ya está registrado para el cliente %s",
-					this.clienteSelected.getCodUnico(), cliente.getNombre());
-			throw new InventarioException(mensaje);
-		}
+		
+		if(cliente == null)
+			return;
+		
+		if(cliente.equals(this.clienteSelected))
+			return;
+		
+		String mensaje = String.format("El código único %s ya está registrado para el cliente %s",
+				this.clienteSelected.getCodUnico(), cliente.getNombre());
+		throw new InventarioException(mensaje);
 	}
 
 	public void guardarCliente() {
@@ -267,6 +272,7 @@ public class ClientesBean implements Serializable {
 			this.validarCodigoUnico();
 			
 			if (clienteSelected.getCteCve() == null) {
+				
 				//CANDADO SALIDA
 				plantaList = plantaDAO.findall(true);
 				
