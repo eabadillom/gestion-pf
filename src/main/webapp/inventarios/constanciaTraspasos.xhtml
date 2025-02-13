@@ -38,7 +38,7 @@
 				<div class="p-field p-col-6 p-md-6">
 					<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{consultaTraspasosBean.idCliente}" filter="true" filterMatchMode="contains" >
 						<f:selectItem itemLabel="Selecione Cliente" itemValue="" noSelectionOption="true" />
-						<f:selectItems var="cte" value="#{consultaTraspasosBean.clientes}" itemLabel="#{cte.alias eq null ? cte.nombre : cte.alias}" itemValue="#{cte.cteCve}" />
+						<f:selectItems var="cte" value="#{consultaTraspasosBean.clientes}" itemLabel="#{cte.alias eq null ? cte.nombre : cte.alias.concat(' - ').concat(cte.nombre)}" itemValue="#{cte.cteCve}" />
 						<p:ajax process="@this"/>
 					</p:selectOneMenu>
 				</div>

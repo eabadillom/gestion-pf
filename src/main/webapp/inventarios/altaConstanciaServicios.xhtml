@@ -16,7 +16,7 @@
 				<p:toolbarGroup>
 						<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{altaConstanciaServicioBean.idCliente}" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Selecione Cliente" itemValue="" noSelectionOption="true" />
-							<f:selectItems var="cte" value="#{altaConstanciaServicioBean.clientes}" itemLabel="#{cte.alias eq null ? cte.nombre : cte.alias}" itemValue="#{cte.cteCve}" />
+							<f:selectItems var="cte" value="#{altaConstanciaServicioBean.clientes}" itemLabel="#{cte.alias eq null ? cte.nombre : cte.alias.concat(' - ').concat(cte.nombre)}" itemValue="#{cte.cteCve}" />
 							<p:ajax listener="#{altaConstanciaServicioBean.filtrarCliente}" process="@this" update=":form:selProducto :form:selServicio :form:txtFolio"/>
 						</p:selectOneMenu>
 						<p:selectOneMenu id="s-planta" autoWidth="false" converter="entityConverter" value="#{altaConstanciaServicioBean.plantaSelect}"

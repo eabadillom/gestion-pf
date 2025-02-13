@@ -35,7 +35,7 @@
 		    	<div class="p-field p-col-6 p-md-6">
 		    		<p:selectOneMenu id="cliente-som" autoWidth="false" value="#{constanciaServicioBean.idCliente}" filter="true" filterMatchMode="contains">
 		    			<f:selectItem itemLabel="Selecione Cliente" noSelectionOption="true" />
-						<f:selectItems var="cliente" value="#{constanciaServicioBean.listaClientes}" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente.cteCve}" />
+						<f:selectItems var="cliente" value="#{constanciaServicioBean.listaClientes}" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre)}" itemValue="#{cliente.cteCve}" />
 					</p:selectOneMenu>
 		    	</div>
 		    	<div class="p-field p-col-2 p-md-2">

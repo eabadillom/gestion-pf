@@ -31,6 +31,7 @@ public class SideBarBean implements Serializable {
 	private List<Cliente> listaClientesActivos;
 	private List<Cliente> listaClientesTodos;
 	private Usuario usuario;
+	private Integer idCliente = null;
 	
 	
 	private FacesContext context;
@@ -89,18 +90,38 @@ public class SideBarBean implements Serializable {
 		String contextPath = null;
 		String fullPath = null;
 		try {
+			log.info("El usuario {} intenta finalizar su sesión...", this.usuario.getUsuario());
+			
 			contextPath = context.getExternalContext().getApplicationContextPath();
 			fullPath = contextPath + "/login.xhtml";
+			
     		this.usuario = (Usuario)session.getAttribute("usuario");
-    		log.info("El usuario intenta finalizar su sesión: " + this.usuario.getUsuario());
+    		this.idCliente = (Integer) session.getAttribute("idCliente");
+    		
+    		if(this.usuario != null) {
+    			session.removeAttribute("usuario");
+    			log.info("Información del usuario eliminada de la sesión.");
+    		}
+    		if(this.idCliente != null) {
+    			session.removeAttribute("idCliente");
+    			log.info("Información del id de cliente eliminada de la sesión.");
+    		}
+    		
     		session.setAttribute("usuario", null);
     		session.setAttribute("idCliente", null);
+    		
+    		log.info("Invalidando sesión...");
+    		session.invalidate();
+    		
+    		log.info("Obteniendo un nuevo objeto de sesión...");
+    		session = request.getSession(true);
+    		
     		log.info("Redirigiendo al usuario a {}", fullPath);
     		context.getExternalContext().redirect(fullPath);
-    		session.invalidate();
+    		
+    		log.info("Fin del proceso de cierre de sesión.");
     	} catch(Exception ex) {
     		log.warn("Problema en el cierre de sesión del usuario...", ex);
-    	} finally {
     	}
 	}
 	
