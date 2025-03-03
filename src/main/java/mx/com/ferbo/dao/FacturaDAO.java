@@ -213,8 +213,7 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 			em.persist(factura);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR al guardar factura" + e.getStackTrace());
-			System.out.println("ERROR al guardar factura" + e.getLocalizedMessage());
+			log.error("Problema al guardar la factura...", e);
 			return "ERROR";
 		}finally{
 			EntityManagerUtil.close(em);
