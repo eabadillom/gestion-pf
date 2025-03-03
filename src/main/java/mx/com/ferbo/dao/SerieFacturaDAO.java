@@ -102,6 +102,7 @@ public class SerieFacturaDAO {
 			entity.getTransaction().commit();
 			entity.close();
 		} catch (Exception e) {
+			log.error("Problema al guardar la información de serie-factura...",e);
 			return e.getMessage();
 		}finally {
 			EntityManagerUtil.close(entity);
@@ -117,6 +118,7 @@ public class SerieFacturaDAO {
 			entity.merge(sF);
 			entity.getTransaction().commit();
 		} catch (Exception e) {
+			log.error("Problema al actualizar la serie-factura...", e);
 			return e.getMessage();
 		}finally {
 			EntityManagerUtil.close(entity);
