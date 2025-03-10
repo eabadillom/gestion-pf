@@ -1174,7 +1174,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		List<Factura> buscaFacturasList = null;
 		SerieFactura serieTmp = null;
 		List<SerieFactura> listaSerieFacturaBkp = null;
-		String resultado = null;
 		
 		try {
 			listaSerieFacturaBkp = new ArrayList<SerieFactura>();
@@ -1227,13 +1226,10 @@ public class FacturacionConstanciasBean implements Serializable{
 			factura.setEmisorCdRegimen(this.emisor.getCd_regimen().getCd_regimen());
 			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
 			factura.setNomSerie(this.serieFacturaSelect.getNomSerie());
-			resultado = facturaDAO.guardar(factura);
-			
-			if(resultado != null && "".equalsIgnoreCase(resultado.trim()))
-				throw new InventarioException("Ocurrió un problema al guardar la factura.");
+			facturaDAO.save(factura);
 			
 			this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
-			serieFacturaDAO.update(this.serieFacturaSelect);
+			serieFacturaDAO.actualizar(this.serieFacturaSelect);
 			
 			this.listaSerieFactura = listaSerieFacturaBkp;
 			this.serieFacturaSelect = serieTmp;
