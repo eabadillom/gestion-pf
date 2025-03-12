@@ -24,6 +24,7 @@ import mx.com.ferbo.model.ServicioConstanciaDs;
 import mx.com.ferbo.model.ServicioFactura;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 
 public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 	
@@ -204,8 +205,26 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		return null;
 	}
 	
+	public void save(Factura factura)
+	throws InventarioException {
+		
+		EntityManager em =null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			em.getTransaction().begin();
+			em.persist(factura);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			log.error("Problema al guardar la factura...", e);
+			throw new InventarioException("Ocurrió un problema al guardar la factura. Vuelva a intentar.\r\n"
+					+ "Si el problema persiste, contacte a su administrador de sistemas.");
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+	}
+	
 	@Override
-	public String guardar(Factura factura) {
+	public String guardar(Factura factura){
 		EntityManager em =null;
 		try {
 			 em = EntityManagerUtil.getEntityManager();

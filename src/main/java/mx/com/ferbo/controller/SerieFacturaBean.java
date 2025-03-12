@@ -125,10 +125,7 @@ public class SerieFacturaBean implements Serializable {
 		String result = null;
 		
 		try {
-			result = daoSerie.update(seleccion);
-			
-			if(result != null)
-				throw new InventarioException("Ocurrió un problema al guardar la información.");
+			daoSerie.actualizar(seleccion);
 			
 			log.info("El usuario {} actualiza la serie factura {}", this.usuario.getUsuario(), this.seleccion);
 			

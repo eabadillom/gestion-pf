@@ -684,21 +684,15 @@ public class FacturaServiciosBean implements Serializable {
 				sef.setFactura(factura);
 			}
 			
-			String resultado = facturaDAO.guardar(factura);
-			if(resultado != null)
-				throw new InventarioException("Ocurrió un problema al guardar la factura.");
+			facturaDAO.save(factura);
 			
+			serieFacturaDAO.actualizar(serieFacturaSelect);
 			
-			
-			String resultadoSerie = serieFacturaDAO.update(serieFacturaSelect);
 			listaSerieFactura.clear();
 			listaSerieFactura.add(serieFacturaSelect);
 			serieFacturaSelect = listaSerieFactura.get(0);
 			
-			if(resultadoSerie != null)
-				throw new InventarioException("Ocurrió un problema al guardar la serie de la factura.");
-			
-			this.listaSerieFactura = listaSerieFacturaBkp;
+			listaSerieFactura = listaSerieFacturaBkp;
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = String.format("La factura %s-%s se guardo correctamente", this.factura.getNomSerie(), this.factura.getNumero());
