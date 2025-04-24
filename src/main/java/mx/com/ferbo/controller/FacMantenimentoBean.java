@@ -14,7 +14,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -129,11 +128,11 @@ public class FacMantenimentoBean implements Serializable {
 	public void findFacture() {
 
 		if (clienteSelect == null) {
-			listFac = daoFac.buscaFacturas(de, actual, true);
+			listFac = daoFac.buscaFacturas(de, this.hasta, true);
 		} else {
-			listFac = daoFac.buscaFacturas(clienteSelect, de, actual, true);
+			listFac = daoFac.buscaFacturas(clienteSelect, de, this.hasta, true);
 		}
-	};
+	}
 
 	public void preparaCancelacion() {
 		this.cancelaFactura = new CancelaFactura();
@@ -329,11 +328,9 @@ public class FacMantenimentoBean implements Serializable {
 	public void exportar() throws JRException, IOException, SQLException {
 		String jasperPath = null;
 		String filename = null;
-		String images = null;
 		String message = null;
 		Severity severity = null;
 		File reportFile = null;
-		File imgfile = null;
 		JasperReportUtil jasperReportUtil = null;
 		Map<String, Object> parameters = null;
 		Connection conn = null;
@@ -349,14 +346,10 @@ public class FacMantenimentoBean implements Serializable {
 
 			jasperPath = "/jasper/consulta_facturacion.jrxml";
 			filename = String.format("consulta_facturacion.xls");
-			images = "/images/logo.jpeg";
 			reportFile = new File(jasperPath);
 			URL resource = getClass().getResource(jasperPath);
-			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
-			String img = resourceimg.getFile();
 			reportFile = new File(file);
-			imgfile = new File(img);
 			log.debug("Ruta del reporte: {}", reportFile.getPath());
 
 			conn = EntityManagerUtil.getConnection();
@@ -368,14 +361,7 @@ public class FacMantenimentoBean implements Serializable {
 			log.debug("Parametros: {}", parameters.toString());
 
 			jasperReportUtil = new JasperReportUtil();
-			// jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 			this.file = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
-			// InputStream input = new ByteArrayInputStream(bytes);
-//			this.file = DefaultStreamedContent.builder()
-//					.contentType("application/vnd.ms-excel")
-//					.name(filename)
-//					.stream(() -> input )
-//					.build();
 			log.info("Factura generada {}...", filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
