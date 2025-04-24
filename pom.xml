@@ -95,37 +95,6 @@
 			<version>${poi.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>${poi.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.xmlgraphics</groupId>
-					<artifactId>batik-all</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>de.rototor.pdfbox</groupId>
-					<artifactId>graphics2d</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.santuario</groupId>
-					<artifactId>xmlsec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcpkix-jdk15on</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.github.virtuald</groupId>
-					<artifactId>curvesapi</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk15on</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>com.github.librepdf</groupId>
 			<artifactId>openpdf</artifactId>
 			<version>${open-pdf.version}</version>
