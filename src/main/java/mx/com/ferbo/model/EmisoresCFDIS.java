@@ -74,6 +74,11 @@ private static final long serialVersionUID = 1L;
 		 @ManyToOne
 		 private RegimenFiscal cd_regimen;
 		
+		@Column(name = "nu_cp")
+		@Size(min = 0, max = 5)
+		@Basic(optional = true)
+		private String codigoPostal;
+		
 		@Column(name = "uuid")
 		@Size(min = 1, max = 50)
 		private String uuid = null;
@@ -214,6 +219,14 @@ private static final long serialVersionUID = 1L;
 			this.cd_regimen = cd_regimen;
 			this.uuid = uuid;
 			this.listaCertificado = listaCertificado;
+		}
+
+		public String getCodigoPostal() {
+			return codigoPostal;
+		}
+
+		public void setCodigoPostal(String codigoPostal) {
+			this.codigoPostal = codigoPostal;
 		}
 
 				

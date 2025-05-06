@@ -1224,12 +1224,13 @@ public class FacturacionConstanciasBean implements Serializable{
 			factura.setEmisorNombre(this.emisor.getNb_emisor());
 			factura.setEmisorRFC(this.emisor.getNb_rfc());
 			factura.setEmisorCdRegimen(this.emisor.getCd_regimen().getCd_regimen());
+			factura.setLugarExpedicion(this.emisor.getCodigoPostal());
 			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
 			factura.setNomSerie(this.serieFacturaSelect.getNomSerie());
 			facturaDAO.save(factura);
 			
-			this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
-			serieFacturaDAO.actualizar(this.serieFacturaSelect);
+			this.serieFacturaSelect.setNumeroActual(this.serieFacturaSelect.getNumeroActual() + 1);
+			this.serieFacturaDAO.actualizar(this.serieFacturaSelect);
 			
 			this.listaSerieFactura = listaSerieFacturaBkp;
 			this.serieFacturaSelect = serieTmp;

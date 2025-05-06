@@ -32,12 +32,16 @@
 						<p:selectOneMenu id="selEmisor" value="#{facturaServiciosBean.emisor}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
 							<f:selectItem itemLabel="---SELECCIONE UN EMISOR---" noSelectionOption="true" />
 							<f:selectItems value="#{facturaServiciosBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"></f:selectItems>
-							<p:ajax update="txtRFC serieFactura" process="@this" listener="#{facturaServiciosBean.filtraSeries}" />
+							<p:ajax update="emisor" process="@this" listener="#{facturaServiciosBean.filtraSeries}" />
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-3 p-md-3">
 						<p:outputLabel value="RFC"/>
 						<p:inputText id="txtRFC" value="#{facturaServiciosBean.emisor.nb_rfc}" readonly="true" /> 
+					</div>
+					<div class="p-col-3 p-md-3">
+						<p:outputLabel value="Código Postal"/>
+						<p:inputText id="emisorCP" value="#{facturaServiciosBean.emisor.codigoPostal}"/>
 					</div>
 					<div class="p-col-3 p-md-3">
 						<p:outputLabel value="Serie-número (Factura)"/>
