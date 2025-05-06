@@ -306,7 +306,7 @@ public class FacMantenimentoBean implements Serializable {
 			facturamaBO.timbrar();
 			facturamaBO.sendMail();
 			log.info("Timbrado completado correctamente.");
-
+			// this.findFacture();
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se generó correctamente";
 		} catch (FacturamaException e) {

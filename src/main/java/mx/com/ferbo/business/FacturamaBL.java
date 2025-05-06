@@ -76,11 +76,11 @@ public class FacturamaBL {
 		tasaIva = factura.getPorcentajeIva().divide(new BigDecimal("100.00"), BigDecimal.ROUND_HALF_UP);
 		
 		// Datos de emisor
-		IssuerBindingModel is = new IssuerBindingModel();
-		is.setName(factura.getEmisorNombre());
-		is.setFiscalRegime(factura.getEmisorCdRegimen());
-		is.setRfc(factura.getEmisorRFC());
-		cfdi.setIssuer(is);
+		IssuerBindingModel emisor = new IssuerBindingModel();
+		emisor.setName(factura.getEmisorNombre());
+		emisor.setFiscalRegime(factura.getEmisorCdRegimen());
+		emisor.setRfc(factura.getEmisorRFC());
+		cfdi.setIssuer(emisor);
 		
 		// Datos de receptor
 		ReceiverBindingModel receptor = new ReceiverBindingModel();
@@ -98,72 +98,72 @@ public class FacturamaBL {
 		cfdi.setCfdiType("I");
 		FacturaMedioPago facturaMedioPago = factura.getFacturaMedioPagoList().get(0);
 		cfdi.setPaymentForm(facturaMedioPago.getMpId().getFormaPago());
-		cfdi.setExpeditionPlace(factura.getPlanta().getCodigopostal().toString());
+		cfdi.setExpeditionPlace(factura.getLugarExpedicion());
 		cfdi.setPaymentMethod(factura.getMetodoPago());
 		cfdi.setObservations(factura.getObservacion());
 		
 		// Productos/Servicios a facturar
-		List<ItemFullBindingModel> listaItems = new ArrayList<ItemFullBindingModel>();
+		List<ItemFullBindingModel> conceptos = new ArrayList<ItemFullBindingModel>();
 		List<ServicioFactura> alServiciosDetalle = factura.getServicioFacturaList();
 		for (ServicioFactura sf : alServiciosDetalle) {
-			ItemFullBindingModel item = new ItemFullBindingModel();
-			item.setProductCode(sf.getCodigo().getClave());
+			ItemFullBindingModel concepto = new ItemFullBindingModel();
+			concepto.setProductCode(sf.getCodigo().getClave());
 			String descripcion = String.format("%s - VIGENCIA %s AL %s", sf.getDescripcion(), DateUtil.getString(factura.getInicioServicios(), DateUtil.FORMATO_DD_MM_YYYY), DateUtil.getString(factura.getFinServicios(), DateUtil.FORMATO_DD_MM_YYYY));
-			item.setDescription(descripcion);
-			item.setUnitCode(sf.getCdUnidad().getcdUnidad());
+			concepto.setDescription(descripcion);
+			concepto.setUnitCode(sf.getCdUnidad().getcdUnidad());
 			ClaveUnidad claveUnidad = claveDAO.buscarPorId(sf.getCdUnidad().getcdUnidad());
-			item.setUnit(claveUnidad.getNbUnidad());
+			concepto.setUnit(claveUnidad.getNbUnidad());
 			// item.setUnit(claveUnidad.getNombre());
-			item.setQuantity(sf.getCantidad());
-			item.setUnitPrice(sf.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
-			item.setSubtotal(sf.getCosto()); // importe
-			item.setTaxObject("02");
+			concepto.setQuantity(sf.getCantidad());
+			concepto.setUnitPrice(sf.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
+			concepto.setSubtotal(sf.getCosto()); // importe
+			concepto.setTaxObject("02");
 			
-			Tax tx = new Tax();
-			tx.setBase(sf.getCosto());
+			Tax impuesto = new Tax();
+			impuesto.setBase(sf.getCosto());
 			BigDecimal ivaServicio = sf.getCosto().multiply(tasaIva);
-			tx.setTotal(ivaServicio);
-			tx.setName("IVA");
-			tx.setRate(tasaIva);
-			tx.setIsRetention(false);
-			item.setTaxes(new ArrayList<Tax>());
-			item.setTotal(sf.getCosto().add(ivaServicio));
-			item.getTaxes().add(tx);
-			listaItems.add(item);
+			impuesto.setTotal(ivaServicio);
+			impuesto.setName("IVA");
+			impuesto.setRate(tasaIva);
+			impuesto.setIsRetention(false);
+			concepto.setTaxes(new ArrayList<Tax>());
+			concepto.setTotal(sf.getCosto().add(ivaServicio));
+			concepto.getTaxes().add(impuesto);
+			conceptos.add(concepto);
 		}
 		
 		
 		for(ConstanciaFactura cf: factura.getConstanciaFacturaList()) {
 			for(ServicioConstancia sc: cf.getServicioConstanciaList()) {
-				ItemFullBindingModel item = new ItemFullBindingModel();
+				ItemFullBindingModel concepto = new ItemFullBindingModel();
 				
 				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");//formateo de vigenciafin
 				String fechaVigencia = format.format(cf.getVigenciaFin());
 				
 				String descripcion = sc.getDescripcion() + " - " + "CONSTANCIA " + cf.getFolioCliente() + " - " + "VIGENCIA " + cf.getVigenciaInicio() + " AL " + fechaVigencia + " - " + "Tipo de cobro: " + sc.getUnidadMedida();
 				
-				item.setProductCode(sc.getCodigo());
-				item.setDescription(descripcion);//modificar leyenda 
+				concepto.setProductCode(sc.getCodigo());
+				concepto.setDescription(descripcion);//modificar leyenda 
 				ClaveUnidad claveUnidad = claveDAO.buscarPorId(sc.getCdUnidad());
-				item.setUnit(claveUnidad.getNbUnidad());
-				item.setUnitCode(sc.getCdUnidad());
-				item.setUnitPrice(sc.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
-				item.setQuantity(sc.getBaseCargo());
-				item.setSubtotal(sc.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
-				item.setTaxObject("02");
+				concepto.setUnit(claveUnidad.getNbUnidad());
+				concepto.setUnitCode(sc.getCdUnidad());
+				concepto.setUnitPrice(sc.getTarifa().setScale(2, BigDecimal.ROUND_HALF_UP));
+				concepto.setQuantity(sc.getBaseCargo());
+				concepto.setSubtotal(sc.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
+				concepto.setTaxObject("02");
 				
-				Tax tx = new Tax();
+				Tax impuesto = new Tax();
 				
 				BigDecimal ivaTotal = sc.getCosto().multiply(tasaIva);
-				tx.setTotal(ivaTotal.setScale(2, BigDecimal.ROUND_HALF_UP));
-				tx.setName("IVA");
-				tx.setBase(sc.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
-				tx.setRate(tasaIva);
-				tx.setIsRetention(false);
-				item.setTaxes(new ArrayList<Tax>());
-				item.setTotal(sc.getCosto().add(ivaTotal).setScale(2, BigDecimal.ROUND_HALF_UP));
-				item.getTaxes().add(tx);
-				listaItems.add(item);
+				impuesto.setTotal(ivaTotal.setScale(2, BigDecimal.ROUND_HALF_UP));
+				impuesto.setName("IVA");
+				impuesto.setBase(sc.getCosto().setScale(2, BigDecimal.ROUND_HALF_UP));
+				impuesto.setRate(tasaIva);
+				impuesto.setIsRetention(false);
+				concepto.setTaxes(new ArrayList<Tax>());
+				concepto.setTotal(sc.getCosto().add(ivaTotal).setScale(2, BigDecimal.ROUND_HALF_UP));
+				concepto.getTaxes().add(impuesto);
+				conceptos.add(concepto);
 			}
 		}
 		
@@ -200,11 +200,11 @@ public class FacturamaBL {
 				BigDecimal bdTotalItem = sc.getCosto().add(ivaTotal);
 				item.setTotal(bdTotalItem.setScale(2, BigDecimal.ROUND_HALF_UP));
 				item.getTaxes().add(tx);
-				listaItems.add(item);
+				conceptos.add(item);
 			}
 		}
 		
-		cfdi.setItems(listaItems);
+		cfdi.setItems(conceptos);
 		
 		CfdiInfoModel registra = cfdiBL.registra(cfdi);
 		factura.setUuid(registra.getId());
