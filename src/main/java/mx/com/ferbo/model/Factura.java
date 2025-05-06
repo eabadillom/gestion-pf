@@ -28,10 +28,6 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "factura")
 @NamedQueries({
@@ -285,6 +281,11 @@ public class Factura implements Serializable {
     @Column(name = "emi_cd_regimen")
     private String emisorCdRegimen;
     
+    @Column(name = "nb_lugar_exp")
+    @Size(max = 5)
+    @Basic(optional = true)
+    private String lugarExpedicion;
+    
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, mappedBy = "factura")
     private List<Pago> pagoList;
     
@@ -314,7 +315,7 @@ public class Factura implements Serializable {
     public Factura(Integer id, String numero,String moneda, String rfc, String nombreCliente, Date fecha, String observacion, BigDecimal subtotal, BigDecimal iva, BigDecimal total, String pais, String estado,
     		String municipio, String ciudad, String colonia, String cp,String calle, String numExt,String numInt, String telefono,String fax, BigDecimal porcentajeIva, String numeroCliente, BigDecimal valorDeclarado, 
     		Date inicioServicios, Date finServicios, String montoLetra,TipoFacturacion tipoFacturacion, Planta planta, int plazo, BigDecimal retencion,String nomSerie, Cliente cliente, 
-    		StatusFactura status,	String metodoPago, String tipoPersona, String cdRegimen, String cdUsoCfdi, String uuid, String emisorNombre, String emisorRFC,String emisorCdRegimen) {
+    		StatusFactura status,	String metodoPago, String tipoPersona, String cdRegimen, String cdUsoCfdi, String uuid, String emisorNombre, String emisorRFC,String emisorCdRegimen, String emisorCodigoPostal) {
 		this.id = id;
 		this.numero = numero;
 		this.moneda = moneda;
@@ -768,4 +769,12 @@ public class Factura implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
     }
+
+	public String getLugarExpedicion() {
+		return lugarExpedicion;
+	}
+
+	public void setLugarExpedicion(String emisorCodigoPostal) {
+		this.lugarExpedicion = emisorCodigoPostal;
+	}
 }

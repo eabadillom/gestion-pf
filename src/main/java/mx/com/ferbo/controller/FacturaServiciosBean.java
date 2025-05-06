@@ -677,6 +677,7 @@ public class FacturaServiciosBean implements Serializable {
 			factura.setEmisorNombre(this.emisor.getNb_emisor());
 			factura.setEmisorRFC(this.emisor.getNb_rfc());
 			factura.setEmisorCdRegimen(this.emisor.getCd_regimen().getCd_regimen());
+			factura.setLugarExpedicion(this.emisor.getCodigoPostal());
 			factura.setServicioFacturaList(alServiciosDetalle);
 			
 			for (ServicioFactura sef : alServiciosDetalle) {

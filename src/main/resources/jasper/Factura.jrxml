@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteFacturaServicios" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="aca071e1-4e54-4cc7-9e4e-105bc8dbbad9">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_Desarrollo.jrdax"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#FAF0F0"/>
@@ -170,8 +170,8 @@ WHERE
     ucfdi.nb_uso_cfdi,
     tFactura.emi_nombre,
     tFactura.emi_rfc,
-    tFactura.emi_cd_regimen
-	
+    tFactura.emi_cd_regimen,
+	tFactura.nb_lugar_exp
 from (
 	
 	select
@@ -217,7 +217,8 @@ from (
 	    fac.cd_uso_cfdi,
 	    fac.emi_nombre,
 	    fac.emi_rfc,
-	    fac.emi_cd_regimen
+	    fac.emi_cd_regimen,
+	    fac.nb_lugar_exp
 	from  factura fac
 	inner join constancia_factura cf on cf.factura = fac.id
 	inner join servicio_constancia sc on sc.constancia = cf.id 
@@ -261,7 +262,8 @@ from (
 	    fac.cd_uso_cfdi,
 	    fac.emi_nombre,
 	    fac.emi_rfc,
-	    fac.emi_cd_regimen
+	    fac.emi_cd_regimen,
+	    fac.nb_lugar_exp
 	
 	union all
 	    
@@ -306,7 +308,9 @@ from (
 	    f.cd_uso_cfdi,
 	    f.emi_nombre,
 	    f.emi_rfc,
-	    f.emi_cd_regimen
+	    f.emi_cd_regimen,
+	    f.nb_lugar_exp
+	    
 	from factura f
 	inner join constancia_factura_ds cf on cf.factura = f.id
 	inner join constancia_de_servicio csrv ON cf.folio = csrv.folio 
@@ -350,7 +354,8 @@ from (
 	    f.cd_uso_cfdi,
 	    f.emi_nombre,
 	    f.emi_rfc,
-	    f.emi_cd_regimen
+	    f.emi_cd_regimen,
+	    f.nb_lugar_exp
 	    
 	union all
 	
@@ -392,12 +397,13 @@ from (
 	    f.cd_uso_cfdi,
 	    f.emi_nombre,
 	    f.emi_rfc,
-	    f.emi_cd_regimen
+	    f.emi_cd_regimen,
+	    f.nb_lugar_exp
     FROM factura f
     INNER JOIN servicio_factura sf ON sf.factura = f.id
     inner join cliente cl on cl.cte_cve = f.cliente
     WHERE
-    	f.id = $P{idFactura}    
+    	f.id = $P{idFactura}
 ) tFactura
 inner join planta plt ON tFactura.planta = plt.planta_cve
 inner join metodo_pago mp ON tFactura.metodo_pago = mp.cd_metodo_pago 
@@ -609,6 +615,10 @@ inner join uso_cfdi ucfdi ON tFactura.cd_uso_cfdi = ucfdi.cd_uso_cfdi]]>
 		<property name="com.jaspersoft.studio.field.name" value="emi_cd_regimen"/>
 		<property name="com.jaspersoft.studio.field.label" value="emi_cd_regimen"/>
 	</field>
+	<field name="nb_lugar_exp" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nb_lugar_exp"/>
+		<property name="com.jaspersoft.studio.field.label" value="nb_lugar_exp"/>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -706,15 +716,6 @@ inner join uso_cfdi ucfdi ON tFactura.cd_uso_cfdi = ucfdi.cd_uso_cfdi]]>
 				<text><![CDATA[RFC: ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="staticText-30" x="431" y="38" width="48" height="12" uuid="657b0ef4-c06f-4dbe-930a-7942c68ff0c9">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[CP: ]]></text>
-			</staticText>
-			<staticText>
 				<reportElement x="99" y="50" width="284" height="12" uuid="f38501ce-f9cf-46cf-9265-674181b4860d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -809,7 +810,7 @@ inner join uso_cfdi ucfdi ON tFactura.cd_uso_cfdi = ucfdi.cd_uso_cfdi]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{planta_ds}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{nb_lugar_exp} == null ? $F{nb_cp} : $F{nb_lugar_exp}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="481" y="14" width="91" height="12" uuid="6cb54345-9a42-4c44-8f02-ef451d0fe11f">
@@ -822,15 +823,6 @@ inner join uso_cfdi ucfdi ON tFactura.cd_uso_cfdi = ucfdi.cd_uso_cfdi]]>
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{emi_rfc}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="481" y="38" width="91" height="12" uuid="dab16542-fb3e-429d-83f7-d24681f6ae3b">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{nb_cp}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="99" y="91" width="284" height="12" uuid="7ccce237-20b8-4f65-9fba-7db77de44e80">
@@ -868,7 +860,9 @@ $F{municipio}+ " ," +$F{estado}]]></textFieldExpression>
 				<textFieldExpression><![CDATA[$F{cd_regimen} + " - " + $F{nb_regimen}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="481" y="91" width="91" height="11" uuid="280c03e4-e48b-4804-99ad-9269504709da"/>
+				<reportElement x="481" y="91" width="91" height="12" uuid="280c03e4-e48b-4804-99ad-9269504709da">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>

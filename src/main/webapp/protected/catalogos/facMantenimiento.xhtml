@@ -85,7 +85,7 @@
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false"/>
+					<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false" update="dtSerieFac"/>
 				</p:column>
 				<p:column width="2rem">
 					<p:commandButton icon="pi pi-times" title="Cancelar factura" process="@this" 

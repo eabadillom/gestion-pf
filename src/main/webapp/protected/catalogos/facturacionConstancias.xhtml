@@ -25,7 +25,7 @@
 							<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturacionConstanciasBean.plantaSelect}" required="true" requiredMessage="Selecciona una Planta" onchange="PF('statusInfoDialog').show();">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
 								<f:selectItems value="#{facturacionConstanciasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-								<p:ajax update="selEmisor txtRFC messages form:dt-constanciasE form:dt-vigencias serieFactura planta" listener="#{facturacionConstanciasBean.serieFactura}" process="@this" oncomplete="PF('statusInfoDialog').hide();"/>
+								<p:ajax update="selEmisor txtRFC messages form:dt-constanciasE form:dt-vigencias serieFactura planta emisorCP" listener="#{facturacionConstanciasBean.serieFactura}" process="@this" oncomplete="PF('statusInfoDialog').hide();"/>
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-12 p-md-6">
@@ -33,12 +33,16 @@
 							<p:selectOneMenu id="selEmisor" value="#{facturacionConstanciasBean.emisor}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
 								<f:selectItem itemLabel="---SELECCIONE UN EMISOR---" noSelectionOption="true" />
 								<f:selectItems value="#{facturacionConstanciasBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"></f:selectItems>
-								<p:ajax update="txtRFC serieFactura" process="@this" listener="#{facturacionConstanciasBean.filtraSeries}" />
+								<p:ajax update="txtRFC emisorCP serieFactura" process="@this" listener="#{facturacionConstanciasBean.filtraSeries}" />
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="RFC"/>
 							<p:inputText id="txtRFC" value="#{facturacionConstanciasBean.emisor.nb_rfc}" readonly="true"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Código Postal"/>
+							<p:inputText id="emisorCP" value="#{facturacionConstanciasBean.emisor.codigoPostal}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Serie-número (Factura)"/>
