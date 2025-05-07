@@ -13,25 +13,35 @@ import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class UsoCfdiDAO extends IBaseDAO<UsoCfdi, String> {
+
+	public UsoCfdiDAO() {
+		super(UsoCfdi.class);
+	}
 	
 	Logger log = LogManager.getLogger(UsoCfdiDAO.class);
 
 	@Override
-	public UsoCfdi buscarPorId(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<UsoCfdi> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
+		List<UsoCfdi> modelList = null;
+		EntityManager em = null;
+
+		try {
+			em = this.getEntityManager();
+
+			modelList = em.createNamedQuery("UsoCfdi.findAll", this.modelClass)
+				.getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de usos de CFDI...", ex);
+		} finally {
+			this.close(em);
+		}
+
+		return modelList;
 	}
 
 	@Override
 	public List<UsoCfdi> buscarPorCriterios(UsoCfdi e) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -73,29 +83,7 @@ public class UsoCfdiDAO extends IBaseDAO<UsoCfdi, String> {
 	}
 
 	@Override
-	public String actualizar(UsoCfdi e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String guardar(UsoCfdi e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String eliminar(UsoCfdi e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String eliminarListado(List<UsoCfdi> listado) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'eliminarListado'");
 	}
-
-	
-
 }
