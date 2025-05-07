@@ -6,17 +6,9 @@
 	xmlns:pe="http://primefaces.org/ui/extensions"
 	xmlns:jsf="http://xmlns.jcp.org/jsf"
 	template="/WEB-INF/template.xhtml">
-	<script>
-	    //<![CDATA[
-	    
-	        PF('statusDialog').show();
-	
-	        PF('statusDialog').hide();
-	    //]]>
-	</script>
 	<ui:define name="title">Mantenimiento</ui:define>
 	<ui:define name="content">
-		<h:form id="form">
+		<h:form id="form" enctype="multipart/form-data">
 			<p:growl id="messages" showDetail="true" />
 			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
 				<div align="center">
@@ -80,7 +72,7 @@
 					<h:outputText value="#{(empty lista.uuid) ? '--' : 'SI'}"/>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-bars" class="ui-button-info" process="@this" oncomplete="PF('dg-factura').show()" title="Descargar PDF" action="#{facMantenimentoBean.datosCliente}" update="dgDescarga " >
+					<p:commandButton icon="pi pi-bars" class="ui-button-info" process="@this" oncomplete="PF('dg-factura').show();" title="Descargar PDF" action="#{facMantenimentoBean.datosCliente}" update="form:dgDescarga " >
 						<f:setPropertyActionListener value="#{lista}" target="#{facMantenimentoBean.seleccion}" />
 					</p:commandButton>
 				</p:column>
@@ -88,11 +80,7 @@
 					<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false" update="dtSerieFac"/>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-times" title="Cancelar factura" process="@this" 
-						class="ui-button-danger" update="form:frm-cancel"
-						oncomplete="PF('dg-delete').show()"
-						actionListener="#{facMantenimentoBean.preparaCancelacion}"
-						disabled="#{lista.status.id eq 0 or lista.status.id eq 2}">
+					<p:commandButton icon="pi pi-times" title="Cancelar factura" process="@this" class="ui-button-danger" update="form:frm-cancel" oncomplete="PF('dg-delete').show()" actionListener="#{facMantenimentoBean.preparaCancelacion}" disabled="#{lista.status.id eq 0 or lista.status.id eq 2}">
 						<f:setPropertyActionListener value="#{lista}"
 							target="#{facMantenimentoBean.seleccion}" />
 					</p:commandButton>
@@ -111,10 +99,9 @@
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 		    </p:dialog>
-			<p:dialog header="Cancelar Factura" widgetVar="dg-delete"
-				modal="true" showEffect="fade" responsive="true">
+			<p:dialog header="Cancelar Factura" widgetVar="dg-delete" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-cancel" class="ui-fluid">
-					<p:outputPanel rendered="#{not empty facMantenimentoBean.cancelaFactura}">
+					<p:outputPanel rendered="#{facMantenimentoBean.cancelaFactura ne null}">
 						<div class="p-field">
 							<p:outputLabel>¿Desea cancelar la factura?</p:outputLabel>
 						</div>
@@ -126,12 +113,8 @@
 				</p:outputPanel>
 
 				<f:facet name="footer">
-					<p:commandButton value="Sí" icon="pi pi-check"
-						actionListener="#{facMantenimentoBean.cancelaFactura()}"
-						update="frm-cancel" process="frm-cancel @this" />
-					<p:commandButton value="No" type="button"
-						styleClass="ui-button-danger" icon="pi pi-times"
-						onclick="PF('dg-delete').hide()" />
+					<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{facMantenimentoBean.cancelaFactura()}" update="frm-cancel" process="frm-cancel @this" />
+					<p:commandButton value="No" type="button" styleClass="ui-button-danger" icon="pi pi-times" onclick="PF('dg-delete').hide()" />
 				</f:facet>
 			</p:dialog>
 			<div style="padding-top: 2rem;" align="center">
@@ -139,75 +122,121 @@
 					<p:fileDownload value="#{facMantenimentoBean.file}"></p:fileDownload>
 				</p:commandButton>
 			</div>
-		</h:form>
-		<p:dialog header="Descargar de archivos" widgetVar="dg-factura" id="dgDescarga" showEffect="fade"  responsive="true" modal="true" style="text-align:center"> 
-			<h:form enctype="multipart/form-data" id="frmDescarga">
-				<p:outputPanel id="frm-Descarga" class="ui-fluid">
-				<div class="p-field p-col-10 p-md-3" >
-						<p:outputLabel>Cliente</p:outputLabel>
-						<p:inputText id="cliente" value="#{facMantenimentoBean.seleccion.cliente.nombre}"   readonly="true" style="width: 23em"></p:inputText>
+			<p:dialog id="dgDescarga" header="Factura #{facMantenimentoBean.seleccion.nomSerie}-#{facMantenimentoBean.seleccion.numero}" widgetVar="dg-factura" modal="true" responsive="true" position="center top" width="100%" resizable="false" showEffect="fade" hideEffect="fade">
+				<p:outputPanel id="frm-Descarga" styleClass="ui-fluid">
+					<div class="p-grid ui-fluid p-col-12">
+						<div class="p-col-5 p-md-5">
+							<p:outputLabel value="Emisor" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.emisorNombre}" readonly="true" />
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="RFC" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.emisorRFC}" readonly="true" />
+						</div>
+						<div class="p-col-2 p-md-2">
+							<p:outputLabel value="Régimen fiscal" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.emisorCdRegimen}" readonly="true" />
+						</div>
+						<div class="p-col-2 p-md-2">
+							<p:outputLabel value="Lugar de expedición" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.lugarExpedicion}" readonly="true" />
+						</div>
 					</div>
-				<div class="p-grid ui-fluid p-col-12">
-					<div class="p-field p-col-4 p-md-6">
-					<p:outputLabel>Número de serie</p:outputLabel>
-											<p:inputText id="numSerie" value="#{facMantenimentoBean.seleccion.nomSerie}-#{facMantenimentoBean.seleccion.numero}"  readonly="true"></p:inputText>
+					<p:separator />
+					<div class="p-grid ui-fluid p-col-12">
+						<div class="p-col-4 p-md-4">
+							<p:outputLabel value="Receptor" />
+							<p:inputText id="cliente" value="#{facMantenimentoBean.seleccion.nombreCliente}" readonly="true" />
+						</div>
+						<div class="p-col-2 p-md-2">
+							<p:outputLabel value="RFC" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.rfc}" readonly="true" />
+						</div>
+						<div class="p-col-2 p-md-2">
+							<p:outputLabel value="Régimen fiscal" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.cdRegimen}" readonly="true" />
+						</div>
+						<div class="p-col-4 p-md-4">
+							<p:outputLabel value="Domicilio" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.calle} Num. ext. #{facMantenimentoBean.seleccion.numExt} Num. Int. #{facMantenimentoBean.seleccion.numInt}" readonly="true"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Estado" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.estado}" readonly="true"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Municipio" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.municipio}" readonly="true"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Localidad o Ciudad" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.ciudad}" readonly="true"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel value="Colonia" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.cp} - #{facMantenimentoBean.seleccion.colonia}" readonly="true"/>
+						</div>
 					</div>
-					
-					<div class="p-field p-col-6 p-md-6">
-						<p:outputLabel>Fecha</p:outputLabel>
-						<p:datePicker value="#{facMantenimentoBean.seleccion.fecha}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true">
-							<p:ajax process="@this"/>
-						</p:datePicker>
+					<p:separator />
+					<div class="p-grid ui-fluid p-col-12">
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel>Fecha emisión</p:outputLabel>
+							<p:datePicker value="#{facMantenimentoBean.seleccion.fecha}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true">
+								<p:ajax process="@this" />
+							</p:datePicker>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel>Uso del CFDI</p:outputLabel>
+							<p:selectOneMenu value="#{facMantenimentoBean.usoCFDI}" converter="entityConverter" autoWidth="false">
+								<f:selectItem itemLabel="---Uso del CFDI---" itemValue="" />
+								<f:selectItems value="#{facMantenimentoBean.usosCFDI}" var="usoCfdi" itemLabel="#{usoCfdi.cdUsoCfdi} - #{usoCfdi.usoCfdi}" itemValue="#{usoCfdi}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel>Método de pago</p:outputLabel>
+							<p:selectOneMenu id="metodoPago" value="#{facMantenimentoBean.cdMetodoPagoSelected}" converter="entityConverter" autoWidth="false">
+								<f:selectItem itemLabel="---Método de pago---" itemValue="" />
+								<f:selectItems value="#{facMantenimentoBean.listaMetodoPago}" var="metodoPago" itemLabel="#{metodoPago.cdMetodoPago} - #{metodoPago.nbMetodoPago}" itemValue="#{metodoPago.cdMetodoPago}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel>Forma de pago</p:outputLabel>
+							<p:selectOneMenu id="formaPago" value="#{facMantenimentoBean.idMedioPagoSelected}" converter="entityConverter" autoWidth="false">
+								<f:selectItem itemLabel="---Forma de pago---" itemValue="" />
+								<f:selectItems value="#{facMantenimentoBean.listaMedioPago}" var="medioPago" itemLabel="#{medioPago.formaPago} - #{medioPago.mpDescripcion}" itemValue="#{medioPago.mpId}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel>Moneda</p:outputLabel>
+							<p:inputText value="#{facMantenimentoBean.seleccion.moneda}" readonly="true"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel>Subtotal:</p:outputLabel>
+							<p:inputNumber value="#{facMantenimentoBean.seleccion.subtotal}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel>IVA:</p:outputLabel>
+							<p:inputNumber value="#{facMantenimentoBean.seleccion.iva}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+						</div>
+						<div class="p-col-3 p-md-3">
+							<p:outputLabel>Total:</p:outputLabel>
+							<p:inputNumber value="#{facMantenimentoBean.seleccion.total}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+						</div>
+						<div class="p-col-12 p-md-12">
+							<p:outputLabel>Importe con letra</p:outputLabel>
+							<p:inputText value="#{facMantenimentoBean.seleccion.montoLetra}" readonly="true" inputStyle="text-align: right"/>
+						</div>
 					</div>
-				</div>
-				<div class="p-field p-col-10 p-md-6">
-				<p:outputLabel>Método de pago</p:outputLabel>
-										<p:selectOneMenu id="metodoPago" value="#{facMantenimentoBean.cdMetodoPagoSelected}"  converter="entityConverter"  rendered="true">
-											<f:selectItem itemLabel="---Método de pago---" itemValue="" />
-											<f:selectItems value="#{facMantenimentoBean.listaMetodoPago}" var="metodoPago" itemLabel="#{metodoPago.cdMetodoPago} - #{metodoPago.nbMetodoPago}" itemValue="#{metodoPago.cdMetodoPago}" />
-										</p:selectOneMenu>
-				</div>
-										
-				<div class="p-field p-col-10 p-md-6">
-				<p:outputLabel>Forma de pago</p:outputLabel>
-										<p:selectOneMenu id="formaPago" value="#{facMantenimentoBean.idMedioPagoSelected}"  converter="entityConverter" rendered="true">
-											<f:selectItem itemLabel="---Forma de pago---" itemValue="" />
-											<f:selectItems value="#{facMantenimentoBean.listaMedioPago}" var="medioPago" itemLabel="#{medioPago.formaPago} - #{medioPago.mpDescripcion}" itemValue="#{medioPago.mpId}" />
-										</p:selectOneMenu>
-				</div>
-				<div class="p-grid ui-fluid p-col-12">
-					<div class="p-field p-col-3 p-md-3">				
-						<p:outputLabel>Subtotal:</p:outputLabel>
-						<p:inputNumber value="#{facMantenimentoBean.seleccion.subtotal}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true"/>
-						
-					</div>
-					
-					<div class="p-field p-col-3 p-md-3">			
-						<p:outputLabel>IVA:</p:outputLabel>
-						<p:inputNumber value="#{facMantenimentoBean.seleccion.iva}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true"/>
-					</div>
-					
-					<div class="p-field p-col-3 p-md-3">			
-						<p:outputLabel>Total:</p:outputLabel>
-						<p:inputNumber value="#{facMantenimentoBean.seleccion.total}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true"/>
-					</div>
-					
-				</div>
-				
-				<div class="p-field p-col-6 p-md-6" style="margin: auto;">
-				<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}"/>
-				</div>
-				<div class="p-field p-col-6 p-md-6" style="margin: auto;">
-					<p:commandButton value="Descargar factura"
-						icon="pi pi-arrow-down"
-						styleClass="ui-button-outlined"
-						actionListener="#{facMantenimentoBean.jasper}"
-						ajax="false">
+
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}" />
+					<p:commandButton value="Pre-factura" icon="pi pi-arrow-down" styleClass="ui-button-outlined" actionListener="#{facMantenimentoBean.jasper}" ajax="false">
 						<p:fileDownload value="#{facMantenimentoBean.file}" />
 					</p:commandButton>
-						</div>
-				</p:outputPanel>
-			</h:form>
-		</p:dialog>
+					<p:commandButton value="Cerrar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" onclick="PF('dg-factura').hide();" />
+				</f:facet>
+			</p:dialog>
+		</h:form>
 	</ui:define>
 </ui:composition>
