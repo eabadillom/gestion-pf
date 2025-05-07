@@ -86,9 +86,9 @@ public abstract class IBaseDAO<MODEL, PK> {
 			em.getTransaction().commit();
 			log.info("Objeto actualizado correctamente: {}", model);
 		} catch(Exception ex) {
+			log.error("Problema para actualizar el objeto: " + model, ex);
 			respuesta = ex.getMessage();
 			rollback(em);
-			log.error("Problema para actualizar el objeto: " + model, ex);
 		} finally {
 			close(em);
 		}
@@ -111,9 +111,9 @@ public abstract class IBaseDAO<MODEL, PK> {
 			em.getTransaction().commit();
 			log.info("Objeto guardado correctamente: {}", model);
 		} catch(Exception ex) {
+			log.error("Problema para guardar el objeto: " + model, ex);
 			respuesta = ex.getMessage();
 			rollback(em);
-			log.error("Problema para guardar el objeto: " + model, ex);
 		} finally {
 			close(em);
 		}
