@@ -230,7 +230,7 @@
 
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}" />
+					<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}" update="form:dtSerieFac"/>
 					<p:commandButton value="Pre-factura" icon="pi pi-arrow-down" styleClass="ui-button-outlined" actionListener="#{facMantenimentoBean.jasper}" ajax="false">
 						<p:fileDownload value="#{facMantenimentoBean.file}" />
 					</p:commandButton>
