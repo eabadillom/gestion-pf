@@ -149,12 +149,11 @@ public class FacMantenimentoBean implements Serializable {
 			
 			seleccion.setMetodoPago(cdMetodoPagoSelected);
 			if(factMedioPagoDAO.actualizar(factMedioPago ) == null && daoFac.actualizarFechaFactura(seleccion) == null) {
-				
-				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " actualizada";
+				mensaje = String.format("Factura %s-%s actualizada correctamente", seleccion.getNomSerie(), seleccion.getNumero());
 				severity = FacesMessage.SEVERITY_INFO;
-				PrimeFaces.current().executeScript("PF('dgDescarga').hide()");
+				PrimeFaces.current().executeScript("PF('dg-factura').hide()");
 			}else {
-				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " no actualizada";
+				mensaje = "Problema para actualizar la factura";
 				severity = FacesMessage.SEVERITY_ERROR;
 			}
 		} catch (Exception e) {
