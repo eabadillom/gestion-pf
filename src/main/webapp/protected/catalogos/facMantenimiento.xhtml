@@ -27,13 +27,13 @@
 					</div>
 					<div class="p-col-3 p-md-3">
 						<p:outputLabel value="del"/>
-						<p:datePicker value="#{facMantenimentoBean.de}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true">
+						<p:datePicker value="#{facMantenimentoBean.de}" monthNavigator="true" yearNavigator="true" showWeek="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true">
 							<p:ajax process="@this"/>
 						</p:datePicker>
 					</div>
 					<div class="p-col-3 p-md-3">
 						<p:outputLabel value="al" />
-						<p:datePicker value="#{facMantenimentoBean.hasta}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true">
+						<p:datePicker value="#{facMantenimentoBean.hasta}" monthNavigator="true" yearNavigator="true" showWeek="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true">
 							<p:ajax process="@this"/>
 						</p:datePicker>
 					</div>
@@ -77,7 +77,7 @@
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" ajax="false" update="dtSerieFac"/>
+					<p:commandButton icon="pi pi-qrcode" class="ui-button-info" process="@this" actionListener="#{facMantenimentoBean.timbrar(lista)}" title="Timbrar" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" update="dtSerieFac"/>
 				</p:column>
 				<p:column width="2rem">
 					<p:commandButton icon="pi pi-times" title="Cancelar factura" process="@this" class="ui-button-danger" update="form:frm-cancel" oncomplete="PF('dg-delete').show()" actionListener="#{facMantenimentoBean.preparaCancelacion}" disabled="#{lista.status.id eq 0 or lista.status.id eq 2}">
@@ -118,7 +118,7 @@
 				</f:facet>
 			</p:dialog>
 			<div style="padding-top: 2rem;" align="center">
-				<p:commandButton id="exportar" value="Descargar" icon="pi pi-file-excel" ajax="false" actionListener="#{facMantenimentoBean.exportar}">
+				<p:commandButton id="exportar" value="Descargar" icon="pi pi-file-excel" actionListener="#{facMantenimentoBean.exportar}" ajax="false">
 					<p:fileDownload value="#{facMantenimentoBean.file}"></p:fileDownload>
 				</p:commandButton>
 			</div>
@@ -127,110 +127,110 @@
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-5 p-md-5">
 							<p:outputLabel value="Emisor" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.emisorNombre}" readonly="true" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.emisorNombre}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="RFC" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.emisorRFC}" readonly="true" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.emisorRFC}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-2 p-md-2">
 							<p:outputLabel value="Régimen fiscal" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.emisorCdRegimen}" readonly="true" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.emisorCdRegimen}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-2 p-md-2">
 							<p:outputLabel value="Lugar de expedición" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.lugarExpedicion}" readonly="true" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.lugarExpedicion}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 					</div>
 					<p:separator />
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-4 p-md-4">
 							<p:outputLabel value="Receptor" />
-							<p:inputText id="cliente" value="#{facMantenimentoBean.seleccion.nombreCliente}" readonly="true" />
+							<p:inputText id="cliente" value="#{facMantenimentoBean.seleccion.nombreCliente}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-2 p-md-2">
 							<p:outputLabel value="RFC" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.rfc}" readonly="true" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.rfc}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-2 p-md-2">
 							<p:outputLabel value="Régimen fiscal" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.cdRegimen}" readonly="true" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.cdRegimen}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-4 p-md-4">
 							<p:outputLabel value="Domicilio" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.calle} Num. ext. #{facMantenimentoBean.seleccion.numExt} Num. Int. #{facMantenimentoBean.seleccion.numInt}" readonly="true"/>
+							<p:inputText value="#{facMantenimentoBean.seleccion.calle} Num. ext. #{facMantenimentoBean.seleccion.numExt} Num. Int. #{facMantenimentoBean.seleccion.numInt}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Estado" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.estado}" readonly="true"/>
+							<p:inputText value="#{facMantenimentoBean.seleccion.estado}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Municipio" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.municipio}" readonly="true"/>
+							<p:inputText value="#{facMantenimentoBean.seleccion.municipio}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Localidad o Ciudad" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.ciudad}" readonly="true"/>
+							<p:inputText value="#{facMantenimentoBean.seleccion.ciudad}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel value="Colonia" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.cp} - #{facMantenimentoBean.seleccion.colonia}" readonly="true"/>
+							<p:inputText value="#{facMantenimentoBean.seleccion.cp} - #{facMantenimentoBean.seleccion.colonia}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 					</div>
 					<p:separator />
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel>Fecha emisión</p:outputLabel>
-							<p:datePicker value="#{facMantenimentoBean.seleccion.fecha}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true">
+							<p:datePicker value="#{facMantenimentoBean.seleccion.fecha}" monthNavigator="true" yearNavigator="true" showWeek="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}">
 								<p:ajax process="@this" />
 							</p:datePicker>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel>Uso del CFDI</p:outputLabel>
-							<p:selectOneMenu value="#{facMantenimentoBean.usoCFDI}" converter="entityConverter" autoWidth="false">
+							<p:selectOneMenu value="#{facMantenimentoBean.usoCFDI}" converter="entityConverter" autoWidth="false" disabled="#{facMantenimentoBean.seleccion.uuid ne null}">
 								<f:selectItem itemLabel="---Uso del CFDI---" itemValue="" />
 								<f:selectItems value="#{facMantenimentoBean.usosCFDI}" var="usoCfdi" itemLabel="#{usoCfdi.cdUsoCfdi} - #{usoCfdi.usoCfdi}" itemValue="#{usoCfdi}" />
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel>Método de pago</p:outputLabel>
-							<p:selectOneMenu id="metodoPago" value="#{facMantenimentoBean.cdMetodoPagoSelected}" converter="entityConverter" autoWidth="false">
+							<p:selectOneMenu id="metodoPago" value="#{facMantenimentoBean.cdMetodoPagoSelected}" converter="entityConverter" autoWidth="false" disabled="#{facMantenimentoBean.seleccion.uuid ne null}">
 								<f:selectItem itemLabel="---Método de pago---" itemValue="" />
 								<f:selectItems value="#{facMantenimentoBean.listaMetodoPago}" var="metodoPago" itemLabel="#{metodoPago.cdMetodoPago} - #{metodoPago.nbMetodoPago}" itemValue="#{metodoPago.cdMetodoPago}" />
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel>Forma de pago</p:outputLabel>
-							<p:selectOneMenu id="formaPago" value="#{facMantenimentoBean.idMedioPagoSelected}" converter="entityConverter" autoWidth="false">
+							<p:selectOneMenu id="formaPago" value="#{facMantenimentoBean.idMedioPagoSelected}" converter="entityConverter" autoWidth="false" disabled="#{facMantenimentoBean.seleccion.uuid ne null}">
 								<f:selectItem itemLabel="---Forma de pago---" itemValue="" />
 								<f:selectItems value="#{facMantenimentoBean.listaMedioPago}" var="medioPago" itemLabel="#{medioPago.formaPago} - #{medioPago.mpDescripcion}" itemValue="#{medioPago.mpId}" />
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel>Moneda</p:outputLabel>
-							<p:inputText value="#{facMantenimentoBean.seleccion.moneda}" readonly="true"/>
+							<p:inputText value="#{facMantenimentoBean.seleccion.moneda}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel>Subtotal:</p:outputLabel>
-							<p:inputNumber value="#{facMantenimentoBean.seleccion.subtotal}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							<p:inputNumber value="#{facMantenimentoBean.seleccion.subtotal}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel>IVA:</p:outputLabel>
-							<p:inputNumber value="#{facMantenimentoBean.seleccion.iva}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							<p:inputNumber value="#{facMantenimentoBean.seleccion.iva}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-3 p-md-3">
 							<p:outputLabel>Total:</p:outputLabel>
-							<p:inputNumber value="#{facMantenimentoBean.seleccion.total}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							<p:inputNumber value="#{facMantenimentoBean.seleccion.total}" symbol="$" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-12 p-md-12">
 							<p:outputLabel>Importe con letra</p:outputLabel>
-							<p:inputText value="#{facMantenimentoBean.seleccion.montoLetra}" readonly="true" inputStyle="text-align: right"/>
+							<p:inputText value="#{facMantenimentoBean.seleccion.montoLetra}" readonly="true" inputStyle="text-align: right" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 					</div>
 
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}" />
+					<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}" />
 					<p:commandButton value="Pre-factura" icon="pi pi-arrow-down" styleClass="ui-button-outlined" actionListener="#{facMantenimentoBean.jasper}" ajax="false">
 						<p:fileDownload value="#{facMantenimentoBean.file}" />
 					</p:commandButton>
