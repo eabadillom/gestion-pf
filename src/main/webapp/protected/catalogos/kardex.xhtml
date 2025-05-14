@@ -20,9 +20,6 @@
 				</div>
 	    	</p:dialog>
 			<p:panel>
-				<!-- <div class="p-grid ui-fluid p-col-12">
-				    <p:outputLabel value="#{kardexBean.constanciaProductoSelected.folioCliente}" />   
-				</div> -->
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-col-2 p-md-2">
 						<p:inputText id="folioSelected" value="#{kardexBean.folioClienteSelected}" placeholder="FOLIO (entrada)" />
@@ -59,8 +56,7 @@
 					</div>
 					<div class="p-col-2 p-md-2">
 						<p:outputLabel for="@next" value="Ingreso" />
-						<p:datePicker id="fechaIngreso" value="#{kardexBean.entrada.fechaIngreso}" readonly="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
-							<f:convertDateTime />
+						<p:datePicker id="fechaIngreso" value="#{kardexBean.entrada.fechaIngreso}" readonly="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
 						</p:datePicker>
 					</div>
 				</div>
