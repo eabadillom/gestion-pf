@@ -128,7 +128,6 @@ public class AltaTraspasoBean implements Serializable {
 	private CamaraDAO camaraDAO;
 	private PosicionCamaraDAO posicionDAO;
 	private ConstanciaTraspasoDAO constanciaTDAO;
-//	private partidasAfectadasDAO partidasAfectadasDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
 	private Planta plantaSelect;
 	
@@ -170,7 +169,6 @@ public class AltaTraspasoBean implements Serializable {
 		listaposicion = posicionDAO.findAll();
 	}
 
-	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		log.debug("Entrando a Init de alta Traspaso...");
@@ -180,7 +178,6 @@ public class AltaTraspasoBean implements Serializable {
 		usuario = (Usuario) request.getSession(false).getAttribute("usuario");
 		
 		log.debug("Buscando lista de clientes...");
-//		clientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		clientes = sideBar.getListaClientesActivos();
 		fecha = new Date();
 		
@@ -426,7 +423,6 @@ public class AltaTraspasoBean implements Serializable {
 		Severity severity = null;
 		ConstanciaTraspaso constancia = null;
 		List<ConstanciaTraspaso> alConstancias = null;
-		EstadoConstancia estado = null;
 		
 		try {
 			if (this.isSaved)
@@ -443,7 +439,6 @@ public class AltaTraspasoBean implements Serializable {
 			if (alConstancias != null && alConstancias.size() > 0)
 				throw new InventarioException(String.format("El folio %s ya se encuentra registrado.", this.numero));
 
-			estado = estados.stream().filter(e -> e.getEdoCve() == 1).collect(Collectors.toList()).get(0);
 			constancia = new ConstanciaTraspaso();
 			constancia.setFecha(this.fecha);
 			
@@ -469,8 +464,10 @@ public class AltaTraspasoBean implements Serializable {
 				traspasoPartida.setPartida(partida);
 				traspasoPartida.setDescripcion(pr.getProductoDs());
 				traspasoPartida.setCantidad(i.getCantidad());
-				traspasoPartida.setOrigen(i.getCamara().getCamaraDs());
-				traspasoPartida.setDestino(i.getCamaraDestino().getCamaraDs());
+				String sOrigen = String.format("%s - %s", i.getPlanta().getPlantaDs(), i.getCamara().getCamaraDs());
+				traspasoPartida.setOrigen(sOrigen);
+				String sDestino = String.format("%s - %s", i.getPlantaDestino().getPlantaDs(), i.getCamaraDestino().getCamaraDs());
+				traspasoPartida.setDestino(sDestino);
 				
 				PartidasAfectadas pa = new PartidasAfectadas();
 				pa.setPartidatraspaso(traspasoPartida);
