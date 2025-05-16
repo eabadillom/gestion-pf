@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardex" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="425b1dc8-4308-471e-971a-1434e451f548">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_Azure.jrdax"/>
 	<parameter name="folio" class="java.lang.String"/>
 	<parameter name="imagen" class="java.lang.String"/>
 	<queryString language="SQL">
@@ -47,7 +47,7 @@ LEFT OUTER JOIN (
 		null as DESTINO
 	FROM detalle_constancia_salida dcs
 	INNER JOIN constancia_salida cs ON cs.ID = dcs.CONSTANCIA_CVE
-	WHERE cs.STATUS IN (1) AND dcs.FOLIO_ENTRADA = $P{folio}
+	WHERE cs.STATUS IN (1)
 	UNION ALL
 	select
 		tp.partida AS PARTIDA_CVE,
@@ -61,8 +61,6 @@ LEFT OUTER JOIN (
 	from
 		constancia_traspaso ct
 	INNER JOIN traspaso_partida tp ON ct.id = tp.traspaso
-	WHERE tp.constancia = $P{folio}
-	
 ) sal ON p.PARTIDA_CVE = sal.PARTIDA_CVE
 WHERE cdd.folio_cliente = $P{folio}
 ORDER BY partida_cve, fecha_ingreso, movimiento, fecha]]>
