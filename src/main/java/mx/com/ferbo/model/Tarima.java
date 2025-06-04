@@ -14,6 +14,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
  
@@ -40,6 +41,9 @@ public class Tarima implements Serializable {
 	@Basic(optional = false)
 	@Size(max = 50)
 	private String nombre;
+        
+        @Column(name = "st_excedente")
+        private Boolean excedente = Boolean.FALSE;
 
 	@OneToMany(mappedBy = "tarima")
 	private List<Partida> partidas;
@@ -95,6 +99,14 @@ public class Tarima implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+
+        public Boolean getExcedente() {
+            return excedente;
+        }
+
+        public void setExcedente(Boolean excedente) {
+            this.excedente = excedente;
+        }
 	
 	public List<Partida> getPartidas() {
 		return partidas;

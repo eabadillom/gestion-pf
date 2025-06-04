@@ -185,11 +185,14 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private Date maxDate;
 	private SerieConstancia serie;
 	private Usuario usuario;
-	
+        
 	private StreamedContent file;
 	
 	private FacesContext context;
     private HttpServletRequest request;
+    
+        private Integer tarimasPermitidas;
+        private Integer tarimasInventario;
     
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
@@ -282,7 +285,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 			maxDate = new Date(today.getTime() );
 			this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
-					.name("ticket.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
+					.name("ticket.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();                        
 		} catch(Exception ex) {
 			
 		} finally {
@@ -570,6 +573,14 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		PrimeFaces.current().ajax().update(":form:txtPedimento", ":form:txtSAP", ":form:txtLote",
 				":form:fechaCaducidad", ":form:txtOtro", ":form:precioServicio", "form:congelacion",
 				":form:conservacion", ":form:refrigeracion", ":form:maniobras","form:txtCodigo");
+                
+                
+                    /*Si el aviso contine contienen como propiedad un maximo de tarimas:
+                        this.tarimasPermitidas = el dato extraido de la base de datos
+                        this.tarimasInventario = el dato calculado desde un dao
+                      Si no, simplemente no hacer nada
+                    */
+                
 	}
 	
 	public void addTarima() {
@@ -601,6 +612,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				tarima.setId(idTarima++);
 				tarima.setNombre(String.format("%s-%s", this.constanciaDeDeposito.getFolioCliente(), idTarima));
 				tarima.setPartidas(new ArrayList<Partida>());
+                                /*if(i > (this.tarimasPermitidas - this.tarimasInventario)){
+                                    tarima.setExcedente(Boolean.TRUE);
+                                }*/
 				this.tarimas.add(tarima);	
 			}
 			
@@ -1915,5 +1929,5 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	public void setTarima(Tarima tarima) {
 		this.tarima = tarima;
-	}
+	}        
 }
