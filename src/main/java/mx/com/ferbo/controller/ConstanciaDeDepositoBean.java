@@ -191,9 +191,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private FacesContext context;
     private HttpServletRequest request;
     
-        private Integer tarimasPermitidas;
-        private Integer tarimasInventario;
-    
 	public ConstanciaDeDepositoBean() {
 		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
@@ -575,11 +572,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				":form:conservacion", ":form:refrigeracion", ":form:maniobras","form:txtCodigo");
                 
                 
-                    /*Si el aviso contine contienen como propiedad un maximo de tarimas:
-                        this.tarimasPermitidas = el dato extraido de la base de datos
-                        this.tarimasInventario = el dato calculado desde un dao
-                      Si no, simplemente no hacer nada
-                    */
                 
 	}
 	
@@ -612,9 +604,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				tarima.setId(idTarima++);
 				tarima.setNombre(String.format("%s-%s", this.constanciaDeDeposito.getFolioCliente(), idTarima));
 				tarima.setPartidas(new ArrayList<Partida>());
-                                /*if(i > (this.tarimasPermitidas - this.tarimasInventario)){
-                                    tarima.setExcedente(Boolean.TRUE);
-                                }*/
 				this.tarimas.add(tarima);	
 			}
 			
