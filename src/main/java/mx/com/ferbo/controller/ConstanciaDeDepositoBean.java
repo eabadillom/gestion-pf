@@ -185,7 +185,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private Date maxDate;
 	private SerieConstancia serie;
 	private Usuario usuario;
-	
+        
 	private StreamedContent file;
 	
 	private FacesContext context;
@@ -282,7 +282,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 			maxDate = new Date(today.getTime() );
 			this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
-					.name("ticket.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
+					.name("ticket.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();                        
 		} catch(Exception ex) {
 			
 		} finally {
@@ -570,6 +570,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		PrimeFaces.current().ajax().update(":form:txtPedimento", ":form:txtSAP", ":form:txtLote",
 				":form:fechaCaducidad", ":form:txtOtro", ":form:precioServicio", "form:congelacion",
 				":form:conservacion", ":form:refrigeracion", ":form:maniobras","form:txtCodigo");
+                
+                
+                
 	}
 	
 	public void addTarima() {
@@ -1915,5 +1918,5 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	public void setTarima(Tarima tarima) {
 		this.tarima = tarima;
-	}
+	}        
 }

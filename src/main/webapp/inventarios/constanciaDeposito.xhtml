@@ -161,6 +161,11 @@
 									<span style="padding-left: 1rem; padding-right: 1rem;">
 										<p:outputLabel value="TARIMA #{tarima.nombre}"></p:outputLabel>
 									</span>	
+                                                                        <span>
+                                                                            <p:selectBooleanCheckbox id="excedente" itemLabel="Excedente" value="#{tarima.excedente}">
+                                                                                        <p:ajax process="@this"></p:ajax>
+                                                                                </p:selectBooleanCheckbox>
+                                                                        </span>
 									<span style="padding-left: 1rem; padding-right: 1rem;">
 										<p:commandButton icon="pi pi-trash" value="Eliminar tarima" styleClass="ui-button-danger" action="#{constanciaDeDepositoBean.deleteTarima(tarima)}">
 											<p:confirm header="Eliminar tarima" message="¿Está seguro que quiere eliminar la tarima?" icon="pi pi-exclamation-triangle" />
