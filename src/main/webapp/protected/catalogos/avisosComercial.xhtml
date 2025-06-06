@@ -23,12 +23,18 @@
 											<p:ajax listener="#{avisosComercialBean.filtraAvisos()}" update="form:soClientes" />
 										</p:selectOneMenu>
 									</div>
+                                                                    <div class="field col-12 md:col-3">
+                                                                        <p:selectBooleanButton id="idVigentes" value="#{avisosComercialBean.avisoVigente}" onIcon="pi pi-check" offIcon="pi pi-times" widgetVar="idVacaciones" style="width:2rem">
+                                                                            <p:ajax event="change" update="form:dt-avisos" process="@this" />
+                                                                        </p:selectBooleanButton>
+                                                                        <p:outputLabel value=" Avisos Vigentes" />
+                                                                    </div>
 								</div>
 							</div>
 						</div>
 
-						<p:dataTable id="dt-avisos" widgetVar="dtAvisos" var="pAviso" value="#{avisosComercialBean.lstAvisos}" reflow="true"
-							styleClass="avisos-table" rowKey="#{pAviso.avisoCve}" paginator="true" rows="10" rowSelectMode="add" responsive="true"
+                                                <p:dataTable id="dt-avisos" widgetVar="dtAvisos" var="pAviso" value="#{avisosComercialBean.filtraAvisosVigentes()}" selection="#{avisosComercialBean.lstAvisosVigentes}" 
+                                                             reflow="true" styleClass="avisos-table" rowKey="#{pAviso.avisoCve}" paginator="true" rows="10" rowSelectMode="add" responsive="true"
 							paginatorPosition="bottom" lazy="true">
 							<f:facet name="header">
 								<div class="avisos-table-header">
@@ -61,6 +67,9 @@
 							<p:column headerText="Tarima">
 								<h:outputText value="#{pAviso.avisoTarima eq true ? 'Si':'No'}" />
 							</p:column>
+                                                        <p:column headerText="Vigente">
+                                                                <h:outputText value="#{pAviso.vigente eq true ? 'Si':'No'}" />
+							</p:column>
 							<p:column headerText="Vigencia">
 								<h:outputText value="#{pAviso.avisoVigencia}" />
 							</p:column>
@@ -91,6 +100,7 @@
 											<p:selectBooleanCheckbox itemLabel="Lote" value="#{avisosComercialBean.avisoSelected.avisoLote}"/>
 											<p:selectBooleanCheckbox itemLabel="Caducidad" value="#{avisosComercialBean.avisoSelected.avisoCaducidad}"/>
 											<p:selectBooleanCheckbox itemLabel="Tarima" value="#{avisosComercialBean.avisoSelected.avisoTarima}"/>
+                                                                                        <p:selectBooleanCheckbox itemLabel="Vigente" value="#{avisosComercialBean.avisoSelected.vigente}"/>
 											<p:selectBooleanCheckbox itemLabel="Código" value="#{avisosComercialBean.avisoSelected.avisoCodigo}"/>
 											<p:selectBooleanCheckbox itemLabel="Otro" value="#{avisosComercialBean.avisoSelected.avisoOtro}"/>
 										</div>
@@ -152,6 +162,7 @@
 											<p:selectBooleanCheckbox id="aviso-lote-m" itemLabel="Lote" value="#{avisosComercialBean.avisoSelected.avisoLote}"/>
 											<p:selectBooleanCheckbox id="aviso-cad-m" itemLabel="Caducidad" value="#{avisosComercialBean.avisoSelected.avisoCaducidad}"/>
 											<p:selectBooleanCheckbox id="aviso-tarima-m" itemLabel="Tarima" value="#{avisosComercialBean.avisoSelected.avisoTarima}"/>
+                                                                                        <p:selectBooleanCheckbox id="aviso-vigente-m" itemLabel="Vigente" value="#{avisosComercialBean.avisoSelected.vigente}"/>
 											<p:selectBooleanCheckbox id="aviso-codigo-m" itemLabel="Código" value="#{avisosComercialBean.avisoSelected.avisoCodigo}"/>
 											<p:selectBooleanCheckbox id="aviso-otro-m" itemLabel="Otro" value="#{avisosComercialBean.avisoSelected.avisoOtro}"/>
 										</div>

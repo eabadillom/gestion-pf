@@ -61,9 +61,11 @@ public class AvisosComercialBean implements Serializable {
 	 * Objetos para avisos
 	 */
 	private List<Aviso> lstAvisos;
+        private List<Aviso> lstAvisosVigentes;
 	private Aviso avisoSelected;
 	private Aviso aviso;
 	private AvisoDAO avisoDAO;
+        private boolean avisoVigente;
 
 	/**
 	 * Objetos para Domicilios
@@ -177,6 +179,7 @@ public class AvisosComercialBean implements Serializable {
 		lstCategoria = categoriaDAO.buscarTodos();
 		categoriaSelected = 1;
 		lstPlanta = plantaDAO.findall();
+                avisoVigente = true;
 	}
 
 	public void filtraAvisos() {
@@ -184,6 +187,24 @@ public class AvisosComercialBean implements Serializable {
 		this.setRenderAvisosTable("true");
 		PrimeFaces.current().ajax().update("form:dt-avisos");
 	}
+        
+        public List<Aviso> filtraAvisosVigentes()
+        {
+            List<Aviso> avisos = new ArrayList();
+            
+            if(avisoVigente)
+            {
+                avisos = lstAvisos.stream()
+                    .filter(objeto -> Boolean.TRUE.equals(objeto.getVigente()))
+                    .collect(Collectors.toList());
+            }else{
+                avisos = lstAvisos.stream()
+                    .filter(objeto -> objeto.getVigente() == null || Boolean.FALSE.equals(objeto.getVigente()))
+                    .collect(Collectors.toList());
+            }
+            
+            return avisos;
+        }
 
 	public void buscaPrecioServicioAviso(Aviso a) {
 		Aviso aviso = avisoDAO.buscarPorId(a.getAvisoCve(), true);
@@ -326,6 +347,8 @@ public class AvisosComercialBean implements Serializable {
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "El aviso se elimino correctamente";
 		}else {
+                        avisoSelected.setVigente(false);
+                        avisoDAO.actualizar(avisoSelected);
 			severity = FacesMessage.SEVERITY_ERROR;
 			mensaje = "El aviso no puede ser eliminado....";
 		}
@@ -702,6 +725,22 @@ public class AvisosComercialBean implements Serializable {
 	public void setAviso(Aviso aviso) {
 		this.aviso = aviso;
 	}
+
+        public List<Aviso> getLstAvisosVigentes() {
+            return lstAvisosVigentes;
+        }
+
+        public void setLstAvisosVigentes(List<Aviso> lstAvisosVigentes) {
+            this.lstAvisosVigentes = lstAvisosVigentes;
+        }
+
+        public boolean isAvisoVigente() {
+            return avisoVigente;
+        }
+
+        public void setAvisoVigente(boolean avisoVigente) {
+            this.avisoVigente = avisoVigente;
+        }
 
 
 }

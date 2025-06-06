@@ -97,6 +97,10 @@ public class Aviso implements Serializable {
     @Column(name = "aviso_tarima")
     private boolean avisoTarima;
     
+    @Basic(optional = true)
+    @Column(name = "st_vigente")
+    private Boolean vigente;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_otro")
@@ -243,6 +247,14 @@ public class Aviso implements Serializable {
 
     public void setAvisoTarima(boolean avisoTarima) {
         this.avisoTarima = avisoTarima;
+    }
+
+    public Boolean getVigente() {
+        return vigente;
+    }
+
+    public void setVigente(Boolean vigente) {
+        this.vigente = vigente;
     }
 
     public boolean getAvisoOtro() {
