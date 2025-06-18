@@ -73,10 +73,11 @@ public class RepSalidasDAO extends IBaseDAO<RepSalidas, Integer> {
 					+ "	AND (plt.planta_cve = :idPlanta OR :idPlanta IS NULL) "
 					+ "	AND (cam.camara_cve = :idCamara OR :idCamara IS NULL) "
 					+ "ORDER BY "
-					+ "	c.cte_nombre ASC, "
-					+ "	p.PARTIDA_CVE ASC, "
-					+ "	cdd.folio_cliente ASC, "
-					+ "	cs.fecha ASC ";
+					+ "	c.cte_nombre ASC,"
+					+ "	cdd.FECHA_INGRESO ASC,"
+					+ "	cdd.folio_cliente asc,"
+					+ "	p.PARTIDA_CVE ASC,"
+					+ "	cs.fecha ASC";
 			entity = EntityManagerUtil.getEntityManager();
 			
 			List<Object[]> results = entity.createNativeQuery(sql)
