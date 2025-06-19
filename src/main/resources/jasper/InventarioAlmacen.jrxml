@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioAlmacen" pageWidth="851" pageHeight="611" columnWidth="761" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="2f361463-f417-4104-8c12-7ab1c04e4a00">
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioAlmacen" language="groovy" pageWidth="851" pageHeight="611" columnWidth="761" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="2f361463-f417-4104-8c12-7ab1c04e4a00">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_Azure.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionLocal"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -23,13 +23,14 @@
 	<parameter name="Fecha" class="java.util.Date"/>
 	<queryString language="SQL">
 		<![CDATA[select * from (
-	select
+	select 
 		folio,
 		cliente,
 		numero_cte,
 		folio_cliente,
 		ingreso,
 		nb_tarima,
+		st_excedente,
 		sum(cantidad) as cantidad,
 		unidad_cobro,
 		sum(tarima) as tarima,
@@ -57,6 +58,7 @@
 		    cddEnt.folio_cliente    as folio_cliente,
 		    cddEnt.fecha_ingreso    as ingreso,
 		    t.nb_tarima             as nb_tarima,
+		    t.st_excedente          as st_excedente,
 		    parEnt.PARTIDA_CVE,
 		    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
 		    udm.unidad_de_manejo_ds as unidad_cobro,
@@ -132,6 +134,7 @@
 		folio_cliente,
 		ingreso,
 		nb_tarima,
+		st_excedente,
 		unidad_cobro,
 		producto_cve,
 		producto,
@@ -160,6 +163,7 @@
 		folio_cliente,
 		ingreso,
 		nb_tarima,
+		st_excedente,
 		sum(cantidad) as cantidad,
 		unidad_cobro,
 		sum(tarima) as tarima,
@@ -187,6 +191,7 @@
 		    cddEnt.folio_cliente    as folio_cliente,
 		    cddEnt.fecha_ingreso    as ingreso,
 		    t.nb_tarima             as nb_tarima,
+		    t.st_excedente          as st_excedente,
 		    parEnt.PARTIDA_CVE,
 		    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
 		    udm.unidad_de_manejo_ds as unidad_cobro,
@@ -262,6 +267,7 @@
 		folio_cliente,
 		ingreso,
 		nb_tarima,
+		st_excedente,
 		unidad_cobro,
 		producto_cve,
 		producto,
@@ -288,6 +294,7 @@
 		folio_cliente,
 		ingreso,
 		nb_tarima,
+		st_excedente,
 		sum(cantidad) as cantidad,
 		unidad_cobro,
 		sum(tarima) as tarima,
@@ -315,6 +322,7 @@
 		    cddEnt.folio_cliente    as folio_cliente,
 		    cddEnt.fecha_ingreso    as ingreso,
 		    t.nb_tarima             as nb_tarima,
+		    t.st_excedente          as st_excedente,
 		    parEnt.PARTIDA_CVE,
 		    (parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) as cantidad,
 		    udm.unidad_de_manejo_ds as unidad_cobro,
@@ -390,6 +398,7 @@
 		folio_cliente,
 		ingreso,
 		nb_tarima,
+		st_excedente,
 		unidad_cobro,
 		producto_cve,
 		producto,
@@ -404,12 +413,9 @@
 		lote,
 		valor,
 		cod_posicion
-	
-	
-	
 ) I
 WHERE I.cantidad > 0
-ORDER BY cliente,numero_cte, nb_tarima, producto]]>
+ORDER BY cliente, numero_cte, nb_tarima, producto]]>
 	</queryString>
 	<field name="folio" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="folio"/>
@@ -439,6 +445,10 @@ ORDER BY cliente,numero_cte, nb_tarima, producto]]>
 	<field name="nb_tarima" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="nb_tarima"/>
 		<property name="com.jaspersoft.studio.field.label" value="nb_tarima"/>
+	</field>
+	<field name="st_excedente" class="java.lang.Boolean">
+		<property name="com.jaspersoft.studio.field.label" value="st_excedente"/>
+		<property name="com.jaspersoft.studio.field.name" value="st_excedente"/>
 	</field>
 	<field name="cantidad" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="cantidad"/>
@@ -1023,7 +1033,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Camara]]></text>
+				<text><![CDATA[Excedente]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
@@ -1105,7 +1115,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{camara}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{st_excedente} == null ? "No" : ($F{st_excedente} ? "Sí" : "No")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="591" y="0" width="70" height="11" uuid="f890be89-77ec-49f6-9037-7d04f0e264de">
