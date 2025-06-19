@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
@@ -23,9 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.CamaraDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.PlantaDAO;
 import mx.com.ferbo.dao.RepSalidasDAO;
 import mx.com.ferbo.model.Camara;
@@ -49,7 +52,7 @@ public class ReporteSalidasBean implements Serializable {
 	private Date fecha;
 	private Date fecha_ini;
 	private Date fecha_fin;
-	private Date maxDate;;
+	private Date maxDate;
 	private Integer plantaN = null; 
 	private Integer camaraN = null;
 	private Integer clienteN = null;
@@ -62,7 +65,6 @@ public class ReporteSalidasBean implements Serializable {
 	private List<Planta> listaPlanta;
 	private List<Camara> listaCamara;
 
-	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
 	
@@ -71,11 +73,11 @@ public class ReporteSalidasBean implements Serializable {
 	private HttpServletRequest httpServletRequest;
 	
 	private List<RepSalidas> reporte;
+	private StreamedContent file;
 
 	public ReporteSalidasBean() {
 		fecha = new Date();
 
-		clienteDAO = new ClienteDAO();
 		plantaDAO = new PlantaDAO();
 		camaraDAO = new CamaraDAO();
 
@@ -97,7 +99,6 @@ public class ReporteSalidasBean implements Serializable {
 		camaraSelect = new Camara();
 		clienteSelect = new Cliente();
 		
-//		listaClientes = clienteDAO.buscarHabilitados(true);
 		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		
 		if((usuario.getPerfil()==1)||(usuario.getPerfil()==4)) {
@@ -106,14 +107,20 @@ public class ReporteSalidasBean implements Serializable {
 			listaPlanta = plantaDAO.buscarTodos();
 		}
 		
-		//plantaSelect = listaPlanta.get(0);
 		filtradoCamara();
-		//listaCamara = camaraDAO.buscarTodos();
 		Date today = new Date();
 
 		maxDate = new Date(today.getTime() );
 		this.fecha_ini = new Date();
 		this.fecha_fin = new Date();
+		
+		byte bytes[] = {};
+		this.file = DefaultStreamedContent.builder()
+				.contentType("application/pdf")
+				.contentLength(bytes.length)
+				.name("InventarioSalidas.pdf")
+				.stream(() -> new ByteArrayInputStream(bytes))
+				.build();
 	}
 	
 	public void filtradoCamara() {
@@ -125,7 +132,7 @@ public class ReporteSalidasBean implements Serializable {
 		log.info("Exportando reporte de salidas a PDF...");
 		String jasperPath = "/jasper/InventarioSalidas.jrxml";
 		String filename = "InventarioSalidas"+fecha+".pdf";
-		String images = "/images/logo.jpeg";
+		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
 		File reportFile = new File(jasperPath);
@@ -174,8 +181,16 @@ public class ReporteSalidasBean implements Serializable {
 			parameters.put("planta", plantaCve);
 			parameters.put("camara", camaraCve);
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			byte[] bytes =jasperReportUtil.createPDF(parameters, reportFile.getPath());
 			
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentEncoding("application/pdf")
+					.contentLength(bytes.length)
+					.name(filename)
+					.stream(() -> input)
+					.build();
+			log.info("El usuario {} descargo el reporte de salidas {}", this.usuario.getUsuario(), filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
@@ -192,7 +207,7 @@ public class ReporteSalidasBean implements Serializable {
 		log.info("Exportando reporte de salidas a excel...");
 		String jasperPath = "/jasper/InventarioSalidas.jrxml";
 		String filename = "InventarioSalidas" +fecha+".xlsx";
-		String images = "/images/logo.jpeg";
+		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
 		File reportFile = new File(jasperPath);
@@ -242,7 +257,15 @@ public class ReporteSalidasBean implements Serializable {
 			parameters.put("planta", plantaCve);
 			parameters.put("camara", camaraCve);
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
+			byte[] bytes = jasperReportUtil.createXLSX(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentType("application/vnd.ms-excel")
+					.contentLength(bytes.length)
+					.name(filename)
+					.stream(() -> input)
+					.build();
+			log.info("El usuario {} descargo el reporte de salidas {}", this.usuario.getUsuario(), filename); 
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
@@ -267,29 +290,26 @@ public class ReporteSalidasBean implements Serializable {
 		
 		try {
 			
-			if(clienteSelect == null) {
+			if(clienteSelect == null)
 				throw new InventarioException("Debe seleccionar un cliente.");
-			} else {
-				clienteCve =clienteSelect.getCteCve();
-			}
+			
+			clienteCve =clienteSelect.getCteCve();
 			
 			if(clienteCve == null)
 				throw new InventarioException("Debe seleccionar un cliente.");
 			
-			if(plantaSelect == null) {
+			if(plantaSelect == null)
 				throw new InventarioException("Debe seleccionar una planta.");
-			} else {
-				plantaCve= plantaSelect.getPlantaCve();
-			}
+			
+			plantaCve= plantaSelect.getPlantaCve();
 			
 			if(plantaCve == null)
 				throw new InventarioException("Debe seleccionar una planta.");
 			
-			if(camaraSelect == null) {
+			if(camaraSelect == null)
 				camaraCve = null;
-			} else {
-				camaraCve= camaraSelect.getCamaraCve();
-			}
+			
+			camaraCve= camaraSelect.getCamaraCve();
 			
 			reporteDAO = new RepSalidasDAO();
 			reporte = reporteDAO.buscar(fecha_ini, fecha_fin, clienteCve, plantaCve, camaraCve);
@@ -407,6 +427,12 @@ public class ReporteSalidasBean implements Serializable {
 		this.reporte = reporte;
 	}
 
+	public StreamedContent getFile() {
+		return file;
+	}
 
+	public void setFile(StreamedContent file) {
+		this.file = file;
+	}
 
 }
