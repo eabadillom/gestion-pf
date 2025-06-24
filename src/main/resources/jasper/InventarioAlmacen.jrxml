@@ -1033,7 +1033,7 @@ ORDER BY cliente, numero_cte, nb_tarima, producto]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Excedente]]></text>
+				<text><![CDATA[]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
@@ -1115,7 +1115,7 @@ ORDER BY cliente, numero_cte, nb_tarima, producto]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{st_excedente} == null ? "No" : ($F{st_excedente} ? "Sí" : "No")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{st_excedente} == null ? "" : ($F{st_excedente} ? "Excedente" : "")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="591" y="0" width="70" height="11" uuid="f890be89-77ec-49f6-9037-7d04f0e264de">
