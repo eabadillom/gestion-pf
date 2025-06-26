@@ -14,7 +14,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
  
@@ -60,7 +59,13 @@ public class Tarima implements Serializable {
 		this.nombre = nombre;
 	}
 
-	
+        public boolean isExcedente() {
+            return excedente;
+        }
+
+        public void setExcedente(boolean excedente) {
+            this.excedente = excedente;
+        }
 
 	@Override
 	public int hashCode() {

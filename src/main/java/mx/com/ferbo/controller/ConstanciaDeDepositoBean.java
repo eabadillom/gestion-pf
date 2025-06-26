@@ -132,6 +132,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private List<ConstanciaDepositoDetalle> listadoConstanciaDepositoDetalle;
 	private List<Partida> selectedPartidas;
 	private List<Tarima> tarimas;
+        private List<Boolean> tarimaExcendente;
 
 	private Tarima tarima;
 	private Planta plantaSelect;
@@ -600,7 +601,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			for(int i = 0; i < this.numTarimas.intValue(); i++) {
 				
-				tarima = new Tarima();
+				tarima = new Tarima();//Aqui se agregan la tarimas
 				tarima.setId(idTarima++);
 				tarima.setNombre(String.format("%s-%s", this.constanciaDeDeposito.getFolioCliente(), idTarima));
 				tarima.setPartidas(new ArrayList<Partida>());
