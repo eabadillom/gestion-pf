@@ -40,6 +40,9 @@ public class Tarima implements Serializable {
 	@Basic(optional = false)
 	@Size(max = 50)
 	private String nombre;
+        
+        @Column(name = "st_excedente")
+        private Boolean excedente = Boolean.FALSE;
 
 	@OneToMany(mappedBy = "tarima")
 	private List<Partida> partidas;
@@ -56,7 +59,13 @@ public class Tarima implements Serializable {
 		this.nombre = nombre;
 	}
 
-	
+        public boolean isExcedente() {
+            return excedente;
+        }
+
+        public void setExcedente(boolean excedente) {
+            this.excedente = excedente;
+        }
 
 	@Override
 	public int hashCode() {
@@ -95,6 +104,14 @@ public class Tarima implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+
+        public Boolean getExcedente() {
+            return excedente;
+        }
+
+        public void setExcedente(Boolean excedente) {
+            this.excedente = excedente;
+        }
 	
 	public List<Partida> getPartidas() {
 		return partidas;

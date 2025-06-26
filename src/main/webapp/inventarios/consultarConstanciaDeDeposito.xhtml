@@ -200,9 +200,14 @@
 				    <p:tab id="tabTarimas" title="Tarimas">
 				    	<div class="col-12 md:col-6 lg:col-4 xl:col-3">
 				    		<p:dataTable value="#{consultarConstanciaDeDepositoBean.tarimas}" var="tarima" rows="5" paginator="true" paginatorPosition="bottom" emptyMessage="No hay tarimas registradas">
-				    			<p:column>
+                                                        <p:column>
 					    			<p:outputLabel value="#{tarima.nombre}"></p:outputLabel>
 					    		</p:column>
+                                                        <p:column>
+                                                            <p:selectBooleanCheckbox id="excedente" itemLabel="Excedente" value="#{tarima.excedente}">
+                                                                                        <p:ajax process="@this"></p:ajax>
+                                                            </p:selectBooleanCheckbox>
+                                                        </p:column>
 					    		<p:column>
 					    			<p:outputLabel value="#{tarima.partidas.size()} producto(s)"></p:outputLabel>
 					    		</p:column>

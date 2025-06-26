@@ -1,0 +1,111 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Reporte de Tarimas</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
+            <p:panel>
+                <div class="p-grid ui-fluid p-col-8">
+                    <div class="p-col-6 p-md-6">
+                        <p:outputLabel for="Cliente" value="Cliente" />
+                        <p:selectOneMenu id="Cliente" converter="entityConverter" autoWidth="false" value="#{reportesTarimasBean.clienteSelected}" 
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="----- TODOS LOS CLIENTES -----" itemValue="" />
+                            <f:selectItems value="#{reportesTarimasBean.listaClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
+                            <p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-6 p-md-6">
+                        <p:outputLabel for="Planta" value="Planta" />
+                        <p:selectOneMenu id="Planta" converter="entityConverter" autoWidth="false" value="#{reportesTarimasBean.plantaSelected}"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="----- TODAS LAS PLANTAS -----" itemValue="" />
+                            <f:selectItems value="#{reportesTarimasBean.listaPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
+                            <p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-3 p-md-3">
+                        <p:commandButton value="Consultar" icon="pi pi-search" process="@this" style="margin-left: .5rem" styleClass="ui-button-raised ui-button-primary" 
+                                         actionListener="#{reportesTarimasBean.cargarDetalleCliente()}" update="form:dt-reporteTarima"/>
+                    </div>
+                    <div class="p-col-3 p-md-3">
+                        <p:commandButton value="PDF"
+                                         icon="pi pi-file-pdf"
+                                         process="@this"
+                                         style="margin-left: .5rem"
+                                         ajax="false"
+                                         styleClass="ui-button-raised ui-button-secondary" actionListener="#{reportesTarimasBean.exportarPdf()}">
+                            <p:fileDownload value="#{reportesTarimasBean.file}"/>
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-3 p-md-3">
+                        <p:commandButton value="EXCEL"
+                                         icon="pi pi-file-excel"
+                                         process="@this"
+                                         style="margin-left: .5rem"
+                                         ajax="false"
+                                         styleClass="ui-button-raised ui-button-secondary" actionListener="#{reportesTarimasBean.exportarExcel()}">
+                            <p:fileDownload value="#{reportesTarimasBean.file}"/>
+                        </p:commandButton>
+                    </div>
+                </div>
+            </p:panel>
+            <div style="padding-top: 2rem;">
+                <f:facet name="header">
+                    <p:outputLabel value="Detalle de tarimas"/>
+                </f:facet>
+                <p:dataTable id="dt-reporteTarima" widgetVar="dtReporteTarima" var="reporteTarima" value="#{reportesTarimasBean.modeloTabla}" rowIndexVar="rowIndex"
+                             paginator="true" rows="10" paginatorPosition="bottom" scrollable="true" resizableColumns="true" liveResize="true" scrollHeight="400" showGridlines="true" >
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="Cliente" style="text-align: center;" />
+                            <p:column colspan="#{reportesTarimasBean.columnasPlantas.size()}" headerText="Posiciones ocupadas" style="text-align: center;" />
+                            <p:column rowspan="1" headerText="# Tarimas X cliente" style="text-align: center;" />
+                        </p:row>
+                        <p:row>
+                            <p:columns value="#{reportesTarimasBean.columnasPlantas}" var="columna" style="white-space: normal; word-wrap: break-word; text-align: center;" >
+                                <f:facet name="header">
+                                    <h:outputText value="#{columna}" />
+                                </f:facet>
+                            </p:columns>
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:column>
+                        <h:outputText value="#{reporteTarima['cliente']}" style="white-space: normal; word-wrap: break-word; text-align: center;" />
+                    </p:column>
+
+                    <p:columns rowspan="1" value="#{reportesTarimasBean.columnasPlantas}" var="columna" style="text-align: center;" >
+                        <h:outputText value="#{reporteTarima[columna]}" >
+                            <f:convertNumber groupingUsed="true" maxFractionDigits="0" locale="es_MX" />
+                        </h:outputText>
+                    </p:columns>
+
+                    <p:column rowspan="1" style="text-align: center;">
+                        <h:outputText value="#{reporteTarima['totalTarimas']}" style="text-align: center;">
+                            <f:convertNumber pattern="#,##0" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:columnGroup type="footer">
+                        <p:row>
+                            <p:column footerText="# Tarimas X planta" />
+                            <p:columns value="#{reportesTarimasBean.columnasPlantas}" var="col" columnIndexVar="i" style="white-space: normal; text-align: center;">
+                                <f:facet name="footer">
+                                    <h:outputText value="#{reportesTarimasBean.totalesTarimasPlantas[i]}" style="white-space: normal; text-align: center;" >
+                                        <f:convertNumber pattern="#,##0" />
+                                    </h:outputText>
+                                </f:facet>
+                            </p:columns>
+                            <p:column footerText="" />
+                        </p:row>
+                    </p:columnGroup>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
