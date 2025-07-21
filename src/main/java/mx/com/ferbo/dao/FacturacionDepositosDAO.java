@@ -72,7 +72,7 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 					+ "	SELECT cf.* FROM constancia_factura cf "
 					+ "	INNER JOIN factura f ON cf.factura = f.id "
 					+ "	WHERE f.status NOT IN (0,2) "
-					+ ") tCF ON cdd.FOLIO = tCF.folio "
+					+ ") tCF ON cdd.FOLIO = tCF.folio AND cdd.FECHA_INGRESO = tCF.vigencia_inicio "
 					+ "INNER JOIN ( "
 					+ "	select DISTINCT p.FOLIO, plt.PLANTA_CVE, plt.PLANTA_DS from partida p "
 					+ "	INNER JOIN camara cam ON p.CAMARA_CVE = cam.CAMARA_CVE  "
