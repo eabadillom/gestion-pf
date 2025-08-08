@@ -27,8 +27,7 @@ public class RepOcupacionCamaraDAO {
 
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-
+                        
 			listaOcupacionCamara = new ArrayList<OcupacionCamara>();
 
 			sql = "SELECT " + "gen.camaraCve, " + "gen.camaraAbrev, " + "gen.camaraDs, " + "gen.plantaDs, "
@@ -181,7 +180,7 @@ public class RepOcupacionCamaraDAO {
 		} catch (Exception e) {
 			log.info("Error al obtener Ocupacion de Camaras " + e.getMessage());
 		} finally {
-			em.close();
+			EntityManagerUtil.close(em);
 		}
 
 		return listaOcupacionCamara;

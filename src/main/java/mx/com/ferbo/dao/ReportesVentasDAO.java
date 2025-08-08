@@ -67,8 +67,8 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		String sql = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			listaVentas = new ArrayList<>();
+			
+                        listaVentas = new ArrayList<>();
 
 			sql = "select COALESCE(a.ventas_totales, 0) ,\n" + 
 					"COALESCE((a.ventas_totales - a.egresos),0) as ganancias,\n" + 
@@ -107,7 +107,9 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+                    EntityManagerUtil.close(em);
+                }
 
 	}
 
@@ -118,7 +120,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		String sql = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
+			
 			listaFacturacion = new ArrayList<>();
 
 			sql = "select combined.fecha, sum(combined.total_facturas),SUM(combined.total_efectivo_por_dia) from\n"
@@ -151,7 +153,9 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+                    EntityManagerUtil.close(em);
+                }
 
 	}
 
@@ -163,7 +167,6 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			entity.getTransaction().begin();
 
 			lista = new ArrayList<>();
 
@@ -204,7 +207,9 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		} finally{
+                    EntityManagerUtil.close(entity);
+                }
 		return lista;
 	}   
   
@@ -216,7 +221,6 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
     
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			entity.getTransaction().begin();
 
 			lista = new ArrayList<>();
 
@@ -270,7 +274,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			entity.close();
+			EntityManagerUtil.close(entity);
 		}
 		return lista;
 	}
@@ -284,7 +288,6 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			entity.getTransaction().begin();
 
 			lista = new ArrayList<>();
 
@@ -317,7 +320,7 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			entity.close();
+			EntityManagerUtil.close(entity);
 		}
 		return lista;
 	}

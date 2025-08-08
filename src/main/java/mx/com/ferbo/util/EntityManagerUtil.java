@@ -20,9 +20,11 @@ public class EntityManagerUtil {
 	private static Logger log = LogManager.getLogger(EntityManagerUtil.class);
 
 	protected static String PERSIST_UNIT = "gestionPU";
-    protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
+    protected static EntityManagerFactory emf = null;
 
     public static EntityManager getEntityManager() {
+        if(emf == null)
+    		emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
         return emf.createEntityManager();
     }
     public static Connection getConnection() {
