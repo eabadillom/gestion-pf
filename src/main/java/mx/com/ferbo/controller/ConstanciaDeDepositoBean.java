@@ -622,9 +622,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				log.info("El cliente tiene preconfigurado el servicio de *MANIOBRAS");
 			}
 			
-			PrimeFaces.current().ajax().update("form:txtPedimento", "form:txtSAP", "form:txtLote",
-					"form:fechaCaducidad", "form:txtOtro", "form:precioServicio", "form:congelacion",
-					"form:conservacion", "form:refrigeracion", "form:maniobras","form:txtCodigo");
+//			PrimeFaces.current().ajax().update("form:txtPedimento", "form:txtSAP", "form:txtLote",
+//					"form:fechaCaducidad", "form:txtOtro", "form:precioServicio", "form:congelacion",
+//					"form:conservacion", "form:refrigeracion", "form:maniobras","form:txtCodigo");
 			
 			log.info("Seleccion de aviso terminada.");
 		} catch(Exception ex) {

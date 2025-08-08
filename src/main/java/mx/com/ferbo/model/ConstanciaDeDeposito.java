@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -238,9 +240,9 @@ public class ConstanciaDeDeposito implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (folio != null ? folio.hashCode() : 0);
-        return hash;
+    	if(this.folio == null)
+    		return System.identityHashCode(this);
+        return Objects.hash(this.folio);
     }
 
     @Override

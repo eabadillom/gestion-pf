@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -71,9 +72,9 @@ public class EstadoConstancia implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (edoCve != null ? edoCve.hashCode() : 0);
-        return hash;
+    	if(this.edoCve == null)
+    		return System.identityHashCode(this);
+        return Objects.hash(this.edoCve);
     }
 
     @Override
