@@ -60,7 +60,9 @@ public class Tarima implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		if(this.id == null)
+    		return System.identityHashCode(this);
+        return Objects.hash(this.id);
 	}
 
 	@Override

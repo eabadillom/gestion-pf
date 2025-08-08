@@ -105,6 +105,9 @@ public class Partida implements Serializable, Cloneable {
     
     @Override
     public int hashCode() {
+    	if(this.partidaCve == null)
+    		return System.identityHashCode(this);
+    	
         int hash = 0;
         hash += (partidaCve != null ? partidaCve.hashCode() : 0);
         return hash;
