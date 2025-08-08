@@ -291,7 +291,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} catch(Exception ex) {
 			log.error("Problema al ejecutar el proceso PostConstruct...", ex);
 		} finally {
-			PrimeFaces.current().ajax().update(":form:planta", ":form:numeroC", ":form:cmdCambiarFolio");
+			PrimeFaces.current().ajax().update("form:planta", "form:numeroC", "form:cmdCambiarFolio");
 		}
 		
 		
@@ -410,7 +410,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			log.error("Problema al extraer información del cliente...", ex);
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
 
@@ -464,7 +464,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
-			PrimeFaces.current().ajax().update(":form:messages", ":form:numeroC");
+			PrimeFaces.current().ajax().update("form:messages", "form:numeroC");
 		}
 	}
 
@@ -622,9 +622,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				log.info("El cliente tiene preconfigurado el servicio de *MANIOBRAS");
 			}
 			
-			PrimeFaces.current().ajax().update(":form:txtPedimento", ":form:txtSAP", ":form:txtLote",
-					":form:fechaCaducidad", ":form:txtOtro", ":form:precioServicio", "form:congelacion",
-					":form:conservacion", ":form:refrigeracion", ":form:maniobras","form:txtCodigo");
+			PrimeFaces.current().ajax().update("form:txtPedimento", "form:txtSAP", "form:txtLote",
+					"form:fechaCaducidad", "form:txtOtro", "form:precioServicio", "form:congelacion",
+					"form:conservacion", "form:refrigeracion", "form:maniobras","form:txtCodigo");
 			
 			log.info("Seleccion de aviso terminada.");
 		} catch(Exception ex) {
@@ -673,7 +673,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			message = new FacesMessage(severity, "Tarima", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
 			log.info("Tarima agregada.");
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
@@ -682,7 +682,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			message = new FacesMessage(severity, "Tarima", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
 		} catch (Exception ex) {
 			log.error("Problema al agregar una nueva partida...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
@@ -690,7 +690,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			message = new FacesMessage(severity, "Tarima", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
 		}
 	}
 	
@@ -843,7 +843,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:seleccion-mercancia", ":form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
 		}
 	}
 	
@@ -1079,7 +1079,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages", ":form:dt-tarimas", ":form:dt-constanciaDD", ":form:seleccion-mercancia", ":form:seleccion-producto", ":form:dlg-add-producto");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-tarimas", "form:dt-constanciaDD", "form:seleccion-mercancia", "form:seleccion-producto", "form:dlg-add-producto");
 		}
 	}
 	
