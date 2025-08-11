@@ -7,11 +7,11 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -39,26 +39,32 @@ import javax.validation.constraints.Size;
 public class Producto implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "PRODUCTO_CVE")
     private Integer productoCve;
+    
     @Size(max = 80)
     @Column(name = "PRODUCTO_DS")
     private String productoDs;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "NUMERO_PROD")
     private String numeroProd;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "categoria")
     private int categoria;
+    
     @OneToMany(mappedBy = "productoCve")
     private List<PartidaServicio> partidaServicioList;
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST}, mappedBy = "productoCve", fetch = FetchType.LAZY)
+    
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST}, mappedBy = "productoCve")
     private List<ProductoPorCliente> productoPorClienteList;
 
     public Producto() {

@@ -51,21 +51,26 @@ public class PrecioServicio implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
     // consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "precio")
     private BigDecimal precio;
+    
     @JoinColumn(name = "cliente", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente cliente;
+    
     @JoinColumn(name = "servicio", referencedColumnName = "SERVICIO_CVE")
     @ManyToOne(optional = false)
     private Servicio servicio;
+    
     @JoinColumn(name = "unidad", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
     @ManyToOne(optional = false)
     private UnidadDeManejo unidad;
+    
     @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve")
     @ManyToOne(optional = false)
     private Aviso avisoCve;
