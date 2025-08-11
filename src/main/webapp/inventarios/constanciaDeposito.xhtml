@@ -4,7 +4,7 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui"
 	template="/WEB-INF/template.xhtml">
-	<ui:define name="title">Constancia de Deposito</ui:define>
+	<ui:define name="title">Entrada</ui:define>
 	<ui:define name="content">
 		<h:outputStylesheet>
 			.ui-datatable-header{
@@ -328,7 +328,7 @@
 			</p:dialog >
 			<p:dialog widgetVar="dlgAddProducto" header="Agregar producto a la tarima #{constanciaDeDepositoBean.tarima.nombre}" showEffect="hide" modal="true" width="100%" focus="sel-producto" closeOnEscape="true">
 				<p:outputPanel id="dlg-add-producto" styleClass="p-grid ui-fluid p-col-12">
-					<div class="p-col-6 p-md-6">
+					<div class="p-col-12 p-md-6">
 						<p:outputLabel value="Producto"/>
 						<p:selectOneMenu id="sel-producto" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.productoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Selecciona Producto" noSelectionOption="true"/>
@@ -336,13 +336,13 @@
 							<p:ajax process="@this"></p:ajax>
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-2 p-md-2">
+					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Cantidad"/>
 						<p:inputNumber value="#{constanciaDeDepositoBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="empty" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" decimalPlaces="0">
 							<p:ajax process="@this"></p:ajax>
 						</p:inputNumber>
 					</div>
-					<div class="p-col-2 p-md-2">
+					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Unidad"/>
 						<p:selectOneMenu autoWidth="false" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
@@ -350,43 +350,43 @@
 							<p:ajax process="@this" update="form:cantidad"></p:ajax>
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-2 p-md-2">
+					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Peso"/>
 						<p:inputNumber value="#{constanciaDeDepositoBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" modifyValueOnWheel="true" title="Peso (kg)" symbol=" kg" symbolPosition="s">
 							<p:ajax process="@this"></p:ajax>
 						</p:inputNumber>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Código" />
 						<p:inputText maxlength="13" value="#{constanciaDeDepositoBean.partida.detallePartidaList.get(0).dtpCodigo}" disabled="#{not constanciaDeDepositoBean.showCodigo}" placeholder="Codigo" title="Codigo">
 							<p:ajax process="@this"></p:ajax>
 						</p:inputText>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Pedimento" />
 						<p:inputText maxlength="13" value="#{constanciaDeDepositoBean.partida.detallePartidaList.get(0).dtpPedimento}" disabled="#{not constanciaDeDepositoBean.showPedimento}" placeholder="Pedimento" title="Pedimento">
 							<p:ajax process="@this"></p:ajax>
 						</p:inputText>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Contenedor" />
 						<p:inputText maxlength="20" value="#{constanciaDeDepositoBean.partida.detallePartidaList.get(0).dtpSAP}" disabled="#{not constanciaDeDepositoBean.showSAP}" placeholder="Contenedor" title="Contenedor">
 							<p:ajax process="@this"></p:ajax>
 						</p:inputText>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Lote" />
 						<p:inputText maxlength="20" value="#{constanciaDeDepositoBean.partida.detallePartidaList.get(0).dtpLote}" disabled="#{not constanciaDeDepositoBean.showLote}" placeholder="Lote" title="Lote">
 							<p:ajax process="@this"></p:ajax>
 						</p:inputText>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Caducidad" />
 						<p:datePicker showIcon="true" value="#{constanciaDeDepositoBean.partida.detallePartidaList.get(0).dtpCaducidad}" disabled="#{not constanciaDeDepositoBean.showCaducidad}" placeholder="Caducidad" title="Caducidad" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6">
 							<p:ajax process="@this"></p:ajax>
 						</p:datePicker>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Otro" />
 						<p:inputText maxlength="12" value="#{constanciaDeDepositoBean.partida.detallePartidaList.get(0).dtpMP}" disabled="#{not constanciaDeDepositoBean.showOtro}" placeholder="Otro" title="Otro">
 							<p:ajax process="@this"></p:ajax>
@@ -405,41 +405,41 @@
 			<div style="padding-top: 2rem;">
 				<p:panel id="seleccion-servicio" header="PARA LOS SERVICIOS DE">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-2">
 							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{constanciaDeDepositoBean.isCongelacion}">
 								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-2">
 							<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{constanciaDeDepositoBean.isConservacion}">
 								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-2">
 							<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{constanciaDeDepositoBean.isRefrigeracion}">
 								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-2">
 							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{constanciaDeDepositoBean.isManiobras}">
 								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
 					</div>
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-6 p-md-6">
+						<div class="p-col-12 p-md-6">
 							<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.precioServicioSelect}" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
 								<f:selectItems value="#{constanciaDeDepositoBean.listaServicioUnidad}" var="precioServicio" itemLabel="#{precioServicio.servicio.servicioDs} (Cobro por #{precioServicio.unidad.unidadDeManejoDs})" itemValue="#{precioServicio}" />	
 								<p:ajax process="@this"></p:ajax>
 							</p:selectOneMenu>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-2">
 							<p:spinner id="cantidadServicio" min="1" value="#{constanciaDeDepositoBean.cantidadServicio}" placeholder="Cantidad">
 								<p:ajax process="@this"></p:ajax>
 							</p:spinner>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-2">
 							<p:commandButton id="cmd-agregar-servicio" icon="pi pi-plus" value="Agregar" process="@this" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" update="form:dt-constanciaDD" styleClass="edit-button" rendered="#{not constanciaDeDepositoBean.saved}"/>
 						</div>
 					</div>
@@ -463,19 +463,19 @@
 			<div style="padding-top: 2rem;">
 				<p:panel id="datos-adicionales" header="DATOS ADICIONALES">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-3 p-md-3">
+						<div class="p-col-12 p-md-3">
 							<p:outputLabel value="Temp. mercancía (°C)"/>
 							<p:spinner stepFactor=".01" value="#{constanciaDeDepositoBean.temperatura}" >
 								<p:ajax process="@this" />
 							</p:spinner>
 						</div>
-						<div class="p-col-4 p-md-4">
+						<div class="p-col-12 p-md-4">
 							<p:outputLabel value="Nombre transportista"/>
 							<p:inputText value="#{constanciaDeDepositoBean.nombreTransportista}" maxlength="100" >
 								<p:ajax process="@this"></p:ajax>
 							</p:inputText>
 						</div>
-						<div class="p-col-3 p-md-3">
+						<div class="p-col-12 p-md-3">
 							<p:outputLabel value="Placas vehiculo"/>
 							<p:inputText value="#{constanciaDeDepositoBean.placas}" maxlength="10">
 								<p:ajax process="@this"></p:ajax>
