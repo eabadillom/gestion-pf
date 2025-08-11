@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
@@ -86,9 +85,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private static final long serialVersionUID = -1785488265380235016L;
 	private static Logger log = LogManager.getLogger(ConstanciaDeDepositoBean.class);
 	
-	@Inject
-    private SideBarBean sideBar;
-
 	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
 	private AvisoDAO avisoDAO;
@@ -106,7 +102,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private EstadoInventario estadoInventario;
 	private EstadoInventarioDAO estadoInventarioDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
-//	private TarimaDAO tarimaDAO;
 	private BigDecimal numTarimas;
 	private Boolean restricted = null;
 	private Boolean saved = null;
@@ -191,6 +186,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private FacesContext context;
     private HttpServletRequest request;
     
+	@SuppressWarnings("unchecked")
 	public ConstanciaDeDepositoBean() {
 		log.info("Entrando a constructor...");
 		clienteDAO = new ClienteDAO();
@@ -209,10 +205,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		estadoInventarioDAO = new EstadoInventarioDAO();
 		serieConstanciaDAO = new SerieConstanciaDAO();
 		estadoConstanciaDAO = new EstadoConstanciaDAO();
-//		tarimaDAO = new TarimaDAO();
 
 		listadoPlanta = new ArrayList<>();
-		listadoCliente = new ArrayList<>();
+		
 		camaraPorPlanta = new ArrayList<Camara>();
 		productoC = new ArrayList<Producto>();
 		posiciones = new ArrayList<Posicion>();
@@ -227,15 +222,15 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		selectedConstanciaDD = new ArrayList<>();
 		totalTarimas = new BigDecimal(0);
 		tarimas = new ArrayList<>();
-		log.info("Terminando constructor.");
-	}
-
-	@PostConstruct
-	public void init() {
+		
+		
 		Planta planta = null;
 		byte bytes[] = {};
+		
 		try {
-			log.info("Iniciando proceso PostConstruct...");
+			this.context = FacesContext.getCurrentInstance();
+			this.request = (HttpServletRequest) context.getExternalContext().getRequest();
+			listadoCliente = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 			partidaEdit = new Partida();
 			context = FacesContext.getCurrentInstance();
 	        request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -255,7 +250,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				listadoPlanta = plantaDAO.findall();
 			}
 				 
-			listadoCliente = sideBar.getListaClientesActivos();
+			
+			
 			
 			this.listadoUnidadDeManejo = unidadDeManejoDAO.buscarTodos();
 			tipoMovimiento = tipoMovimientoDAO.buscarPorId(1);
@@ -287,16 +283,15 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
 					.name("ticket.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
 			
-			log.info("Proceso PostConstruct terminado.");
 		} catch(Exception ex) {
 			log.error("Problema al ejecutar el proceso PostConstruct...", ex);
 		} finally {
 			PrimeFaces.current().ajax().update("form:planta", "form:numeroC", "form:cmdCambiarFolio");
 		}
 		
-		
+		log.info("Terminando constructor.");
 	}
-	
+
 	@PreDestroy
 	public void destroy() {
 		log.info("Saliendo del alta de constancias de depósito.");
@@ -1079,7 +1074,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-tarimas", "form:dt-constanciaDD", "form:seleccion-mercancia", "form:seleccion-producto", "form:dlg-add-producto");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-tarimas", "form:dt-constanciaDD", "form:seleccion-mercancia", "form:seleccion-servicio", "form:dlg-add-producto");
 		}
 	}
 	
