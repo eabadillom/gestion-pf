@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
@@ -86,9 +85,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private static final long serialVersionUID = -1785488265380235016L;
 	private static Logger log = LogManager.getLogger(ConstanciaDeDepositoBean.class);
 	
-	@Inject
-    private SideBarBean sideBar;
-
 	private ClienteDAO clienteDAO;
 	private PlantaDAO plantaDAO;
 	private AvisoDAO avisoDAO;
@@ -106,7 +102,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private EstadoInventario estadoInventario;
 	private EstadoInventarioDAO estadoInventarioDAO;
 	private SerieConstanciaDAO serieConstanciaDAO;
-//	private TarimaDAO tarimaDAO;
 	private BigDecimal numTarimas;
 	private Boolean restricted = null;
 	private Boolean saved = null;
@@ -210,7 +205,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		estadoInventarioDAO = new EstadoInventarioDAO();
 		serieConstanciaDAO = new SerieConstanciaDAO();
 		estadoConstanciaDAO = new EstadoConstanciaDAO();
-//		tarimaDAO = new TarimaDAO();
 
 		listadoPlanta = new ArrayList<>();
 		
