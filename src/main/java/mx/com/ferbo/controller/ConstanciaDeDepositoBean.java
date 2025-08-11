@@ -23,7 +23,6 @@ import javax.faces.component.UISelectItems;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
@@ -396,7 +395,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				productoC.add(p);
 			}
 
-			avisoPorCliente.clear();
 			avisoPorCliente = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
 			log.info("Terminando carga de información del cliente.");
 		} catch (Exception ex) {
@@ -838,7 +836,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Producto", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:numTarimas", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
 		}
 	}
 	
