@@ -14,9 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.component.UISelectItems;
@@ -45,7 +43,6 @@ import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.ProductoDAO;
 import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.ServicioDAO;
-//import mx.com.ferbo.dao.TarimaDAO;
 import mx.com.ferbo.dao.TipoMovimientoDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
@@ -55,7 +52,6 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
-//import mx.com.ferbo.model.DetallePartidaPK;
 import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.EstadoInventario;
 import mx.com.ferbo.model.Partida;
@@ -118,6 +114,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private List<Posicion> listaPosiciones;
 	private List<Posicion> posiciones;
 	private List<Aviso> avisoPorCliente;
+	private List<Aviso> avisos;
 	private List<Partida> listadoPartida;
 	private List<DetallePartida> listadoDetallePartida;
 	private List<Servicio> listadoServicio;
@@ -138,6 +135,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private UnidadDeManejo unidadDeManejoSelect;
 	private Posicion posicionCamaraSelect;
 	private Aviso avisoSelect;
+	private Aviso aviso;
 	private PrecioServicio precioServicioSelect;
 	private ConstanciaDepositoDetalle selectedConstanciasDD;
 	private Partida selectedPartida;
@@ -291,26 +289,15 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		log.info("Terminando constructor.");
 	}
 
-	@PreDestroy
-	public void destroy() {
-		log.info("Saliendo del alta de constancias de depósito.");
-	}
-	
 	public void totalesTarimas() {
 		log.info("Ejecutando totalTarimas...");
 		try {
-//		BigDecimal sumaTotalKilos;
 			Integer sumaTotalCajas = null;
-//		sumaTotalKilos = TotalKilos(listadoPartida);
-//		totalKilos = totalKilos.add(sumaTotalKilos);
 			
 			totalKilos = listadoPartida.stream()
 					.map(item -> item.getPesoTotal())
 					.reduce(BigDecimal.ZERO, BigDecimal::add)
 					;
-			
-//		sumaTotalCajas = TotalCajas(listadoPartida);
-//		totalCajas = totalCajas.add(sumaTotalCajas);
 			
 			sumaTotalCajas = listadoPartida.stream()
 					.mapToInt(Partida::getCantidadTotal)
@@ -396,6 +383,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			}
 
 			avisoPorCliente = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
+			avisoSelect = null;
+			
+			
+			avisos = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
+			aviso = null;
+			
 			log.info("Terminando carga de información del cliente.");
 			mensaje = "Seleccione un aviso";
 			severity = FacesMessage.SEVERITY_INFO;
@@ -551,22 +544,22 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		}
 	}
 	
-	public void cargaAviso() {
-		log.info("Aviso seleccionado: {}", this.avisoSelect);
+	public void loadAviso() {
+		log.info("Aviso seleccionado: {}", this.aviso);
 		
-		this.showCodigo    = avisoSelect.getAvisoCodigo();
-		this.showPedimento = avisoSelect.getAvisoPedimento();
-		this.showSAP       = avisoSelect.getAvisoSap();
-		this.showLote      = avisoSelect.getAvisoLote();
-		this.showCaducidad = avisoSelect.getAvisoCaducidad();
-		this.showOtro      = avisoSelect.getAvisoOtro();
+		this.showCodigo    = aviso.getAvisoCodigo();
+		this.showPedimento = aviso.getAvisoPedimento();
+		this.showSAP       = aviso.getAvisoSap();
+		this.showLote      = aviso.getAvisoLote();
+		this.showCaducidad = aviso.getAvisoCaducidad();
+		this.showOtro      = aviso.getAvisoOtro();
 		
-		PrecioServicio psCongelacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.avisoSelect.getAvisoCve(), this.congelacion, true);;
-		PrecioServicio psConservacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.avisoSelect.getAvisoCve(), this.conservacion, true);;
-		PrecioServicio psRefrigeracion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.avisoSelect.getAvisoCve(), this.refrigeracion, true);
-		PrecioServicio psManiobras = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.avisoSelect.getAvisoCve(), this.maniobras, true);
+		PrecioServicio psCongelacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.congelacion, true);;
+		PrecioServicio psConservacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.conservacion, true);;
+		PrecioServicio psRefrigeracion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.refrigeracion, true);
+		PrecioServicio psManiobras = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.maniobras, true);
 		
-		this.listaServicioUnidad = this.precioServicioDAO.buscarPorAviso(this.avisoSelect, this.clienteSelect);
+		this.listaServicioUnidad = this.precioServicioDAO.buscarPorAviso(this.aviso, this.clienteSelect);
 		
 		if(psCongelacion == null)
 			this.isCongelacion = false;
@@ -598,75 +591,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		log.info("Aviso cargado.");
 	}
 
-	@Deprecated
-	public void renderConstanciaDeDeposito() {
-		List<PrecioServicio> l = null;
-		List<PrecioServicio> serviciosBasicos = null;
-		
-		try {
-			log.info("Aviso seleccionado: " + avisoSelect);
-			
-			this.showCodigo = avisoSelect.getAvisoCodigo();
-			this.showPedimento = avisoSelect.getAvisoPedimento();
-			this.showSAP = avisoSelect.getAvisoSap();
-			this.showLote = avisoSelect.getAvisoLote();
-			this.showCaducidad = avisoSelect.getAvisoCaducidad();
-			this.showOtro = avisoSelect.getAvisoOtro();
-			
-			// -------------- PRECIO SERVICIO -----------------
-			listaServicioUnidad = precioServicioDAO.buscarPorAviso(avisoSelect, clienteSelect);
-			
-			// Remover servicios (*)
-			isCongelacion = false;
-			isRefrigeracion = false;
-			isConservacion = false;
-			isManiobras = false;
-			
-			serviciosBasicos = listaServicioUnidad.stream()
-					.filter(p -> (
-							p.getServicio().getServicioCve() == congelacion ||
-							p.getServicio().getServicioCve() == conservacion ||
-							p.getServicio().getServicioCve() == refrigeracion ||
-							p.getServicio().getServicioCve() == maniobras
-							))
-					.collect(Collectors.toList());
-			
-			listaServicioUnidad.removeAll(serviciosBasicos);
-			
-			l = serviciosBasicos.stream().filter(ps -> ps.getServicio().getServicioCve() == 619) //*CONGELACION
-					.collect(Collectors.toList());
-			if(l.size() > 0) {
-				this.isCongelacion = true;
-				log.info("El cliente tiene preconfigurado el servicio de *CONGELACION");
-			}
-			
-			l = serviciosBasicos.stream().filter(ps -> ps.getServicio().getServicioCve() == 620) //*CONSERVACION
-					.collect(Collectors.toList());
-			if(l.size() > 0) {
-				this.isConservacion = true;
-				log.info("El cliente tiene preconfigurado el servicio de *CONSERVACION");
-			}
-			
-			l = serviciosBasicos.stream().filter(ps -> ps.getServicio().getServicioCve() == 621) //*REFRIGERACION
-					.collect(Collectors.toList());
-			if(l.size() > 0) {
-				this.isRefrigeracion = true;
-				log.info("El cliente tiene preconfigurado el servicio de *REFRIGERACION");
-			}
-			
-			l = serviciosBasicos.stream().filter(ps -> ps.getServicio().getServicioCve() == 622) //*MANIOBRAS
-					.collect(Collectors.toList());
-			if(l.size() > 0) {
-				this.isManiobras = true;
-				log.info("El cliente tiene preconfigurado el servicio de *MANIOBRAS");
-			}
-			
-			log.info("Seleccion de aviso terminada.");
-		} catch(Exception ex) {
-			log.error("Problema con la selección del aviso...", ex);
-		}
-	}
-	
 	public void addTarima() {
 		FacesMessage message = null;
 		Severity severity = null;
@@ -1041,7 +965,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				listadoConstanciaDepositoDetalle.add(srvManiobras);
 			}
 			
-			if((avisoSelect==null) ) {
+			if((avisoSelect==null && aviso == null) ) {
 				throw new InventarioException("Debe seleccionar un aviso");
 			}
 			
@@ -1076,7 +1000,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			constanciaDeDeposito.setTemperatura(temperatura);
 			constanciaDeDeposito.setCteCve(clienteSelect);
 			constanciaDeDeposito.setFechaIngreso(fechaIngreso);
-			constanciaDeDeposito.setAvisoCve(avisoSelect);
+			constanciaDeDeposito.setAvisoCve(avisoSelect == null ? aviso : avisoSelect);
 			constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
 			
 			for(Partida p: listadoPartida) {
@@ -2031,5 +1955,21 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	public void setTarima(Tarima tarima) {
 		this.tarima = tarima;
+	}
+	
+	public Aviso getAviso() {
+		return aviso;
+	}
+
+	public void setAviso(Aviso aviso) {
+		this.aviso = aviso;
+	}
+
+	public List<Aviso> getAvisos() {
+		return avisos;
+	}
+
+	public void setAvisos(List<Aviso> avisos) {
+		this.avisos = avisos;
 	}
 }
