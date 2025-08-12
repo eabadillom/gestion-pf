@@ -60,6 +60,7 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 		String namedQuery = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
+			
 			if(isFullInfo)
 				namedQuery = "ProductoPorCliente.findByCteCveOrderByProductoDs";
 			else

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
@@ -19,8 +20,9 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
+	
 	private static Logger log = LogManager.getLogger(PrecioServicioDAO.class);
-
+	
 	@Override
 	public PrecioServicio buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
@@ -38,7 +40,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		}
 		return listado;
 	}
-
+	
 	@Override
 	public List<PrecioServicio> buscarPorCriterios(PrecioServicio e) {
 		if(e.getCliente().getCteCve() == null)
@@ -53,24 +55,33 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	}
 	
 	public PrecioServicio buscar(Integer cteCve, Integer avisoCve, Integer servicioCve, boolean isFullInfo) {
+		
 		PrecioServicio precio = null;
 		EntityManager em = null;
 		Query query = null;
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			query = em.createNamedQuery("PrecioServicio.findByClienteAvisoServicio", PrecioServicio.class);
 			precio = (PrecioServicio) query
 					.setParameter("cteCve", cteCve)
 					.setParameter("avisoCve", avisoCve)
+					.setParameter("servicioCve", servicioCve)
 					.getSingleResult();
+			
 			if(isFullInfo == false)
 				return precio;
 			precio.getServicio().getServicioCve();
+			
+		} catch(NoResultException ex){
+			log.warn("PrecioServicio no encontrado: cteCve = {}, avisoCve = {}, servicioCve = {}",
+					cteCve, avisoCve, servicioCve);
 		} catch(Exception ex) {
 			log.error("Problema para obtener el precio-servicio...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
+		
 		return precio;
 	}
 	
@@ -81,7 +92,8 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			entity = EntityManagerUtil.getEntityManager();
 			listaPrecioServicio = entity.createNamedQuery("PrecioServicio.findByAvisoAndCliente", PrecioServicio.class)
 					.setParameter("cteCve", cliente.getCteCve())
-					.setParameter("avisoCve", aviso.getAvisoCve()).getResultList();
+					.setParameter("avisoCve", aviso.getAvisoCve())
+					.getResultList();
 		} catch (Exception e) {
 			log.error("Problema para obtener el PrecioServicio...", e);
 		} finally {
