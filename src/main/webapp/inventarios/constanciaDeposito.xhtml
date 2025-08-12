@@ -33,10 +33,10 @@
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
-						<p:selectOneMenu id="aviso" autoWidth="false" converter="entityConverter" value="#{entradaBean.avisoSelect}">
-							<f:selectItem itemLabel="Seleccione un aviso" noSelectionOption="true"/>
-							<f:selectItems value="#{entradaBean.avisoPorCliente}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.categoriaCve.categoriaDs}-#{aviso.avisoVigencia}" itemValue="#{aviso}"/>
-							<p:ajax event="change" process="@this" listener="#{entradaBean.cargaAviso()}" update="form:seleccion-mercancia form:seleccion-servicio" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+						<p:selectOneMenu autoWidth="false" converter="entityConverter" value="#{entradaBean.aviso}">
+							<f:selectItem itemLabel="Seleccione un aviso" noSelectionOption="true" />
+							<f:selectItems value="#{entradaBean.avisos}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.categoriaCve.categoriaDs}-#{aviso.avisoVigencia}" />
+							<p:ajax event="change" process="@this" listener="#{entradaBean.loadAviso()}" update="form:pnl-datos-generales form:seleccion-mercancia form:seleccion-servicio" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
@@ -51,7 +51,6 @@
 							<f:selectItem itemLabel="Seleccione una camara" noSelectionOption="true"/>
 							<f:selectItems value="#{entradaBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />
 							<p:ajax event="change" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />	
-							<!-- <p:ajax event="change" process="@this" listener="#{entradaBean.filtrarPosicion()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" /> -->		
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
@@ -75,13 +74,12 @@
 							<p:selectOneMenu id="claveProducto" value="#{entradaBean.partida.unidadDeProductoCve.productoCve}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
 								<f:selectItem itemLabel="Selecciona Producto" noSelectionOption="true"/>
 								<f:selectItems value="#{entradaBean.productos}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto}"/>
-								<!-- <p:ajax event="change" process="@this" /> -->
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Cantidad"/>
 							<p:inputNumber id="cantidad" value="#{entradaBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="always" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" decimalPlaces="0">
-								<!-- <p:ajax event="blur" process="@this" /> -->
+								
 							</p:inputNumber>
 						</div>
 						<div class="p-col-12 p-md-2">
@@ -89,13 +87,11 @@
 							<p:selectOneMenu autoWidth="false" value="#{entradaBean.partida.unidadDeProductoCve.unidadDeManejoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
 								<f:selectItems value="#{entradaBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
-								<!-- <p:ajax event="change" process="@this"></p:ajax> -->
 							</p:selectOneMenu>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Peso (kg)" />
 							<p:inputNumber id="pesoTotal" value="#{entradaBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" modifyValueOnWheel="true" title="Peso (kg)" symbol=" kg" symbolPosition="s">
-								<!-- <p:ajax event="blur" process="@this"></p:ajax> -->
 							</p:inputNumber>
 						</div>
 					</div>
@@ -103,37 +99,31 @@
 					    <div class="p-col-12 p-md-2">
 					    	<p:outputLabel value="Código" />
 							<p:inputText id="txtCodigo" maxlength="13" value="#{entradaBean.partida.detallePartidaList.get(0).dtpCodigo}" disabled="#{not entradaBean.showCodigo}" placeholder="Codigo" title="Codigo">
-								<!-- <p:ajax event="blur" process="@this"></p:ajax> -->
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Pedimento" />
 							<p:inputText id="txtPedimento" maxlength="13" value="#{entradaBean.partida.detallePartidaList.get(0).dtpPedimento}" disabled="#{not entradaBean.showPedimento}" placeholder="Pedimento" title="Pedimento">
-								<!-- <p:ajax event="blur" process="@this"></p:ajax> -->
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Contenedor" />
 							<p:inputText id="txtSAP" maxlength="20" value="#{entradaBean.partida.detallePartidaList.get(0).dtpSAP}" disabled="#{not entradaBean.showSAP}" placeholder="Contenedor" title="Contenedor">
-								<!-- <p:ajax event="" process="@this"></p:ajax> -->
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Lote" />
 							<p:inputText id="txtLote" maxlength="20" value="#{entradaBean.partida.detallePartidaList.get(0).dtpLote}" disabled="#{not entradaBean.showLote}" placeholder="Lote" title="Lote">
-								<!-- <p:ajax process="@this"></p:ajax> -->
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Caducidad" />
 							<p:datePicker id="fechaCaducidad" showIcon="true" value="#{entradaBean.partida.detallePartidaList.get(0).dtpCaducidad}" disabled="#{not entradaBean.showCaducidad}" placeholder="Caducidad" title="Caducidad" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6">
-								<!-- <p:ajax process="@this"></p:ajax> -->
 							</p:datePicker>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Otro" />
 							<p:inputText id="txtOtro" maxlength="12" value="#{entradaBean.partida.detallePartidaList.get(0).dtpMP}" disabled="#{not entradaBean.showOtro}" placeholder="Otro" title="Otro">
-								<!-- <p:ajax process="@this"></p:ajax> -->
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-6">
@@ -334,13 +324,11 @@
 						<p:selectOneMenu id="sel-producto" value="#{entradaBean.partida.unidadDeProductoCve.productoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Selecciona Producto" noSelectionOption="true"/>
 							<f:selectItems value="#{entradaBean.productos}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto}"/>
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Cantidad"/>
 						<p:inputNumber value="#{entradaBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="empty" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" decimalPlaces="0">
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:inputNumber>
 					</div>
 					<div class="p-col-12 p-md-2">
@@ -348,49 +336,41 @@
 						<p:selectOneMenu autoWidth="false" value="#{entradaBean.partida.unidadDeProductoCve.unidadDeManejoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
 							<f:selectItems value="#{entradaBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
-							<!-- <p:ajax process="@this" update="form:cantidad"></p:ajax> -->
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Peso"/>
 						<p:inputNumber value="#{entradaBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" modifyValueOnWheel="true" title="Peso (kg)" symbol=" kg" symbolPosition="s">
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:inputNumber>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Código" />
 						<p:inputText maxlength="13" value="#{entradaBean.partida.detallePartidaList.get(0).dtpCodigo}" disabled="#{not entradaBean.showCodigo}" placeholder="Codigo" title="Codigo">
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:inputText>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Pedimento" />
 						<p:inputText maxlength="13" value="#{entradaBean.partida.detallePartidaList.get(0).dtpPedimento}" disabled="#{not entradaBean.showPedimento}" placeholder="Pedimento" title="Pedimento">
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:inputText>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Contenedor" />
 						<p:inputText maxlength="20" value="#{entradaBean.partida.detallePartidaList.get(0).dtpSAP}" disabled="#{not entradaBean.showSAP}" placeholder="Contenedor" title="Contenedor">
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:inputText>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Lote" />
 						<p:inputText maxlength="20" value="#{entradaBean.partida.detallePartidaList.get(0).dtpLote}" disabled="#{not entradaBean.showLote}" placeholder="Lote" title="Lote">
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:inputText>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Caducidad" />
 						<p:datePicker showIcon="true" value="#{entradaBean.partida.detallePartidaList.get(0).dtpCaducidad}" disabled="#{not entradaBean.showCaducidad}" placeholder="Caducidad" title="Caducidad" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6">
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:datePicker>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Otro" />
 						<p:inputText maxlength="12" value="#{entradaBean.partida.detallePartidaList.get(0).dtpMP}" disabled="#{not entradaBean.showOtro}" placeholder="Otro" title="Otro">
-							<!-- <p:ajax process="@this"></p:ajax> -->
 						</p:inputText>
 					</div>
 				</p:outputPanel>
@@ -453,7 +433,6 @@
 						</p:column>
 						<p:column exportable="false" style="text-align:center">
 						    <p:commandButton class="ui-button-danger" icon="pi pi-times" actionListener="#{entradaBean.deleteConstanciaDD()}" rendered="#{not entradaBean.saved}">
-						      
 						    </p:commandButton>
 						</p:column>
 					</p:dataTable>
@@ -523,7 +502,6 @@
 							<div class="p-field">¿Cuantas tarimas se agregarán?</div>
 							<div class="p-field">
 								<p:inputNumber id="numTarimas" widgetVar="numTarimas" value="#{entradaBean.numTarimas}" placeholder="No. Tarimas" minValue="0" maxValue="1000000" decimalPlaces="0" decimalSeparator="." emptyValue="empty" modifyValueOnWheel="true" title="Tarimas">
-									<!-- <p:ajax process="@this"/> -->
 								</p:inputNumber>
 							</div>
 							<div class="p-field">
