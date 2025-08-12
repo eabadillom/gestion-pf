@@ -77,7 +77,7 @@ import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import net.sf.jasperreports.engine.JRException;
 
-@Named
+@Named(value = "entradaBean")
 @ViewScoped
 public class ConstanciaDeDepositoBean implements Serializable {
 
@@ -113,7 +113,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private List<ConstanciaDeDeposito> listadoConstancia;
 	private List<ProductoPorCliente> productoCliente;
 	private List<Producto> listadoProducto;// nueva
-	private List<Producto> productoC;
+	private List<Producto> productos;
 	private List<UnidadDeManejo> listadoUnidadDeManejo;
 	private List<Posicion> listaPosiciones;
 	private List<Posicion> posiciones;
@@ -146,7 +146,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private DetallePartida detalle;
 	private TipoMovimiento tipoMovimiento;
 	
-	private String noConstanciaSelect;
+	private String folioCliente;
 	private BigDecimal unidadesPorTarima;
 	private BigDecimal cantidadTotal;
 	private BigDecimal pesoTotal;
@@ -208,7 +208,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		listadoPlanta = new ArrayList<>();
 		
 		camaraPorPlanta = new ArrayList<Camara>();
-		productoC = new ArrayList<Producto>();
+		productos = new ArrayList<Producto>();
 		posiciones = new ArrayList<Posicion>();
 		listadoPartida = new ArrayList<Partida>();
 		listadoUnidadDeManejo = new ArrayList<>();
@@ -387,78 +387,83 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			log.info("Iniciando carga de información del cliente...");
 			this.generaFolioEntrada();
 
-			productoC.clear();
+			productos.clear();
 			productoPorCliente = new ProductoPorCliente(clienteSelect);
 			productoCliente = productoClienteDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
 			for (ProductoPorCliente pc : productoCliente) {
 				Producto p = pc.getProductoCve();
-				productoC.add(p);
+				productos.add(p);
 			}
 
 			avisoPorCliente = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
 			log.info("Terminando carga de información del cliente.");
+			mensaje = "Seleccione un aviso";
+			severity = FacesMessage.SEVERITY_INFO;
 		} catch (Exception ex) {
+			log.error("Problema al extraer información del cliente...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
-			log.error("Problema al extraer información del cliente...", ex);
+		} finally {
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
-
 	
-	public void generaFolioEntrada() {
+	public void generaFolioEntrada()
+	throws InventarioException {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
 		SerieConstancia sConstancia = null;
-		FacesMessage message = null;
-		Severity severity = null;
-		String mensaje = null;
+//		FacesMessage message = null;
+//		Severity severity = null;
+//		String mensaje = null;
 
-		try {
-			log.info("Generando folio de entrada...");
-			if (this.clienteSelect == null)
-				throw new InventarioException("Debe seleccionar un cliente");
-
-			if (this.plantaSelect == null)
-				throw new InventarioException("Debe seleccionar una planta");
-			sConstancia = new SerieConstancia();
-			seriePK = new SerieConstanciaPK();
-			seriePK.setCliente(this.clienteSelect);
-			seriePK.setPlanta(plantaSelect);
-			seriePK.setTpSerie("I");
-			sConstancia.setSerieConstanciaPK(seriePK);
-			serie = serieConstanciaDAO.buscarPorClienteAndPlanta(sConstancia);
-			
-			if (serie == null) {
-				this.noConstanciaSelect = "";
-				throw new InventarioException(
-						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
-			}
-
-			this.noConstanciaSelect = String.format("%s%s%s%d", serie.getSerieConstanciaPK().getTpSerie(), plantaSelect.getPlantaSufijo(),
-					clienteSelect.getCodUnico(), serie.getNuSerie());
-			
-			this.constanciaDeDeposito.setFolioCliente(this.noConstanciaSelect);
-			this.serie = serie;
-			log.info("Folio de entrada generado.");
-		} catch (InventarioException ex) {
-			mensaje = ex.getMessage();
-			severity = FacesMessage.SEVERITY_WARN;
-			log.warn(mensaje);
-			message = new FacesMessage(severity, "Aviso", mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-		} catch (Exception ex) {
-			log.error("Problema para generar el folio de entrada...", ex);
-			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
-			severity = FacesMessage.SEVERITY_ERROR;
-			
-			message = new FacesMessage(severity, "Aviso", mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-		} finally {
-			PrimeFaces.current().ajax().update("form:messages", "form:numeroC");
+		log.info("Generando folio de entrada...");
+		if (this.clienteSelect == null)
+			return;
+//			throw new InventarioException("Debe seleccionar un cliente");
+		
+		if (this.plantaSelect == null)
+			return;
+//			throw new InventarioException("Debe seleccionar una planta");
+		sConstancia = new SerieConstancia();
+		seriePK = new SerieConstanciaPK();
+		seriePK.setCliente(this.clienteSelect);
+		seriePK.setPlanta(plantaSelect);
+		seriePK.setTpSerie("I");
+		sConstancia.setSerieConstanciaPK(seriePK);
+		serie = serieConstanciaDAO.buscarPorClienteAndPlanta(sConstancia);
+		
+		if (serie == null) {
+			this.folioCliente = "";
+			throw new InventarioException(
+					"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
 		}
+		
+		this.folioCliente = String.format("%s%s%s%d", serie.getSerieConstanciaPK().getTpSerie(), plantaSelect.getPlantaSufijo(),
+				clienteSelect.getCodUnico(), serie.getNuSerie());
+		
+		this.constanciaDeDeposito.setFolioCliente(this.folioCliente);
+		this.serie = serie;
+		log.info("Folio de entrada generado.");
+//		try {
+//		} catch (InventarioException ex) {
+//			mensaje = ex.getMessage();
+//			severity = FacesMessage.SEVERITY_WARN;
+//			log.warn(mensaje);
+//			message = new FacesMessage(severity, "Aviso", mensaje);
+//			FacesContext.getCurrentInstance().addMessage(null, message);
+//		} catch (Exception ex) {
+//			log.error("Problema para generar el folio de entrada...", ex);
+//			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+//			severity = FacesMessage.SEVERITY_ERROR;
+//			
+//			message = new FacesMessage(severity, "Aviso", mensaje);
+//			FacesContext.getCurrentInstance().addMessage(null, message);
+//		} finally {
+//			PrimeFaces.current().ajax().update("form:messages", "form:numeroC");
+//		}
 	}
 
 	
@@ -505,21 +510,13 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	}
 
-//	private DetallePartida newDetallePartida() {
-//		DetallePartida detalle = null;
-//		detalle = new DetallePartida();
-//		detalle.setTipoMovCve(tipoMovimiento);
-//		detalle.setEdoInvCve(estadoInventario);
-//		return detalle;
-//	}
-	
 	public void verDatosPartida() {
 		log.info("Cantidad: " + partida.getCantidadTotal());
 		log.info("ProductoCve: " + partida.getUnidadDeProductoCve().getProductoCve().getProductoCve());
 		log.info("UnidadDeManejoCve: " + partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
 		log.info("Peso: " + partida.getCantidadTotal());
 		log.info("Num. Tarimas: " + partida.getNoTarimas());
-		log.info("Folio: " + this.noConstanciaSelect);
+		log.info("Folio: " + this.folioCliente);
 	}
 
 	public void addProducto(Producto producto) {
@@ -532,8 +529,9 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		log.info("ProductoCve: " + productoSelect);
 	}
 
-	public void saveConstanciaDepositoDetalle() {
+	public void agregaServicio() {
 		ConstanciaDepositoDetalle constanciaDD = new ConstanciaDepositoDetalle();
+		
 		try {
 			log.info("Agregando un servicio a la entrada...");
 			constanciaDD.setServicioCve(precioServicioSelect.getServicio());
@@ -541,16 +539,66 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			constanciaDD.setServicioCantidad(cantidadServicio);
 			listadoConstanciaDepositoDetalle.add(constanciaDD);
 			
+			this.precioServicioSelect = null;
+			this.cantidadServicio = null;
+			
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregado", "Se agrego el registro correctamente"));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaDD");
+			PrimeFaces.current().ajax().update("form:messages");
 			log.info("Nuevo servicio agregado a la entrada.");
 		} catch(Exception ex) {
 			log.error("Problema para agregar un servicio a la entrada...", ex);
 		}
-
+	}
+	
+	public void cargaAviso() {
+		log.info("Aviso seleccionado: {}", this.avisoSelect);
+		
+		this.showCodigo    = avisoSelect.getAvisoCodigo();
+		this.showPedimento = avisoSelect.getAvisoPedimento();
+		this.showSAP       = avisoSelect.getAvisoSap();
+		this.showLote      = avisoSelect.getAvisoLote();
+		this.showCaducidad = avisoSelect.getAvisoCaducidad();
+		this.showOtro      = avisoSelect.getAvisoOtro();
+		
+		PrecioServicio psCongelacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.avisoSelect.getAvisoCve(), this.congelacion, true);;
+		PrecioServicio psConservacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.avisoSelect.getAvisoCve(), this.conservacion, true);;
+		PrecioServicio psRefrigeracion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.avisoSelect.getAvisoCve(), this.refrigeracion, true);
+		PrecioServicio psManiobras = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.avisoSelect.getAvisoCve(), this.maniobras, true);
+		
+		this.listaServicioUnidad = this.precioServicioDAO.buscarPorAviso(this.avisoSelect, this.clienteSelect);
+		
+		if(psCongelacion == null)
+			this.isCongelacion = false;
+		else {
+			this.isCongelacion = true;
+			this.listaServicioUnidad.remove(psCongelacion);
+		}
+		
+		if(psConservacion == null)
+			this.isConservacion = false;
+		else {
+			this.isConservacion = true;
+			this.listaServicioUnidad.remove(psConservacion);
+		}
+		
+		if(psRefrigeracion == null)
+			this.isRefrigeracion = false;
+		else {
+			this.isRefrigeracion = true;
+			this.listaServicioUnidad.remove(psRefrigeracion);
+		}
+		
+		if(psManiobras == null)
+			this.isManiobras = false;
+		else {
+			this.isManiobras = true;
+			this.listaServicioUnidad.remove(psManiobras);			
+		}
+		log.info("Aviso cargado.");
 	}
 
+	@Deprecated
 	public void renderConstanciaDeDeposito() {
 		List<PrecioServicio> l = null;
 		List<PrecioServicio> serviciosBasicos = null;
@@ -574,8 +622,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			isConservacion = false;
 			isManiobras = false;
 			
-//		serviciosBasicos = new ArrayList<PrecioServicio>();
-//		serviciosBasicos.clear();
 			serviciosBasicos = listaServicioUnidad.stream()
 					.filter(p -> (
 							p.getServicio().getServicioCve() == congelacion ||
@@ -614,10 +660,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				this.isManiobras = true;
 				log.info("El cliente tiene preconfigurado el servicio de *MANIOBRAS");
 			}
-			
-//			PrimeFaces.current().ajax().update("form:txtPedimento", "form:txtSAP", "form:txtLote",
-//					"form:fechaCaducidad", "form:txtOtro", "form:precioServicio", "form:congelacion",
-//					"form:conservacion", "form:refrigeracion", "form:maniobras","form:txtCodigo");
 			
 			log.info("Seleccion de aviso terminada.");
 		} catch(Exception ex) {
@@ -953,7 +995,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			EstadoConstancia status = estadoConstanciaDAO.buscarPorId(1);
 			String folioCliente = this.constanciaDeDeposito.getFolioCliente();
 			if(folioCliente == null)
-				folioCliente = this.noConstanciaSelect;
+				folioCliente = this.folioCliente;
 			
 			ConstanciaDeDeposito constancia = constanciaDAO.buscarPorFolioCliente(folioCliente);
 			if(this.constanciaDeDeposito.equals(constancia))
@@ -1020,7 +1062,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			}
 			
 			if(constanciaDeDeposito.getFolioCliente() == null || "".equalsIgnoreCase(constanciaDeDeposito.getFolioCliente()) )
-				this.constanciaDeDeposito.setFolioCliente(this.noConstanciaSelect);
+				this.constanciaDeDeposito.setFolioCliente(this.folioCliente);
 			
 			if(listadoPartida == null)
 				throw new InventarioException("La lista de productos se encuentra vacía.");
@@ -1169,7 +1211,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 		try {
 			log.info("Validando folio del cliente...");
-			constanciaE = noConstanciaSelect.trim();
+			constanciaE = folioCliente.trim();
 			constanciaE.trim();
 	
 			constancia = constanciaDAO.buscarPorFolioCliente(constanciaE);
@@ -1182,7 +1224,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			severity = FacesMessage.SEVERITY_INFO;
 			log.info("Folio del cliente validado.");
 		} catch (InventarioException ex) {
-			this.noConstanciaSelect = null;
+			this.folioCliente = null;
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 			log.warn(mensaje);
@@ -1241,7 +1283,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			log.info("Ticket entrada generado {}...", filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
-			message = String.format("No se pudo imprimir el folio %s", this.noConstanciaSelect);
+			message = String.format("No se pudo imprimir el folio %s", this.folioCliente);
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(severity, "Error en impresion", message));
@@ -1527,12 +1569,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		this.precioServicioDAO = precioServicioDAO;
 	}
 
-	public String getNoConstanciaSelect() {
-		return noConstanciaSelect;
+	public String getFolioCliente() {
+		return folioCliente;
 	}
 
-	public void setNoConstanciaSelect(String noConstanciaSelect) {
-		this.noConstanciaSelect = noConstanciaSelect;
+	public void setFolioCliente(String folioCliente) {
+		this.folioCliente = folioCliente;
 	}
 
 	public Planta getPlantaSelect() {
@@ -1559,12 +1601,12 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		this.productoDAO = productoDAO;
 	}
 
-	public List<Producto> getProductoC() {
-		return productoC;
+	public List<Producto> getProductos() {
+		return productos;
 	}
 
-	public void setProductoC(List<Producto> productoC) {
-		this.productoC = productoC;
+	public void setProductos(List<Producto> productos) {
+		this.productos = productos;
 	}
 
 	public Camara getCamaraSelect() {
