@@ -41,9 +41,11 @@ public class ProductoPorCliente implements Serializable {
     @Basic(optional = false)
     @Column(name = "PROD_X_CTE_CVE")
     private Integer prodXCteCve;
+    
     @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente cteCve;
+    
     @JoinColumn(name = "PRODUCTO_CVE", referencedColumnName = "PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private Producto productoCve;
