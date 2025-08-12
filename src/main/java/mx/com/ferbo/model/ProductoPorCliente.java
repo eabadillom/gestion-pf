@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -88,9 +89,9 @@ public class ProductoPorCliente implements Serializable {
 
 	@Override
     public int hashCode() {
-        int hash = 0;
-        hash += (prodXCteCve != null ? prodXCteCve.hashCode() : 0);
-        return hash;
+		if(this.prodXCteCve == null)
+			return System.identityHashCode(this);
+		return Objects.hash(this.prodXCteCve);
     }
 
     @Override
