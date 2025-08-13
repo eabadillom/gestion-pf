@@ -26,14 +26,6 @@ public class NotaPorFactura implements Serializable, Cloneable{
 	@EmbeddedId
 	private NotaPorFacturaPK notaPorFacturaPK;
 	
-//	@JoinColumn(name = "NOTA", referencedColumnName = "ID",insertable = false, updatable = false)
-//    @ManyToOne(optional = false, cascade = CascadeType.ALL)
-//	private NotaCredito nota;
-//	
-//	@JoinColumn(name = "FACTURA", referencedColumnName = "id", insertable = false, updatable = false)
-//    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
-//    private Factura factura;
-	
 	@Column(name = "CANTIDAD")
 	private BigDecimal cantidad;
 	
@@ -48,22 +40,6 @@ public class NotaPorFactura implements Serializable, Cloneable{
 	public void setNotaPorFacturaPK(NotaPorFacturaPK notaPorFacturaPK) {
 		this.notaPorFacturaPK = notaPorFacturaPK;
 	}
-
-//	public NotaCredito getNota() {
-//		return nota;
-//	}
-//
-//	public void setNota(NotaCredito nota) {
-//		this.nota = nota;
-//	}
-//
-//	public Factura getFactura() {
-//		return factura;
-//	}
-//
-//	public void setFactura(Factura factura) {
-//		this.factura = factura;
-//	}
 
 	public BigDecimal getCantidad() {
 		return cantidad;

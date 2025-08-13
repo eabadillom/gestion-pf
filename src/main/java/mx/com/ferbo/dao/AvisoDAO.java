@@ -65,7 +65,7 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 				return aviso;
 			log.debug(aviso.getPlantaCve().getPlantaCve());
 			log.debug(aviso.getCteCve().getCteCve());
-			log.debug(aviso.getCategoriaCve().getCategoriaCve());
+//			log.debug(aviso.getCategoriaCve().getCategoriaCve());
 			log.debug(aviso.getPrecioServicioList().size());
 			for(PrecioServicio ps : aviso.getPrecioServicioList()) {
 				log.debug("ID Precio Servicio: " + ps.getId());
@@ -108,9 +108,9 @@ public class AvisoDAO extends IBaseDAO<Aviso,Integer>{
 			if(isFullInfo == false)
 				return lista;
 			
-			for(Aviso aviso : lista) {
-				aviso.getCategoriaCve().getCategoriaCve();
-			}
+//			for(Aviso aviso : lista) {
+//				aviso.getCategoriaCve().getCategoriaCve();
+//			}
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de avisos...", ex);

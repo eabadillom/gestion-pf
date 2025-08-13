@@ -1,20 +1,15 @@
 package mx.com.ferbo.dao;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
@@ -83,58 +78,6 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	public List<ConstanciaSalida> buscarPorCriterios(ConstanciaSalida e) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<ConstanciaSalida> buscarPorCriterios(String folioCliente, Date fechaInico, Date fechaFin, int idCliente) {
-		Cliente cliente = new Cliente();
-		Map<String, Object> paramaterMap = new HashMap<String, Object>();
-		List<String> whereCause = new ArrayList<String>();
-		StringBuilder queryBuilder = new StringBuilder();
-		
-		try {
-			
-			Query q = null;
-			queryBuilder.append("SELECT c FROM ConstanciaSalida c");
-
-			if (fechaInico != null && fechaFin != null) {
-				whereCause.add("(c.fecha BETWEEN :fechaInicio AND :fechaFinal)");
-				paramaterMap.put("fechaInicio", fechaInico);
-				paramaterMap.put("fechaFinal", fechaFin);
-			}
-			if (folioCliente != null && !"".equalsIgnoreCase(folioCliente.trim())) {
-				whereCause.add("c.numero = :folioCliente");
-				paramaterMap.put("folioCliente", folioCliente);
-			}
-			if (idCliente != 0) {
-				cliente.setCteCve(idCliente);
-				whereCause.add("c.clienteCve = :idCliente");
-				paramaterMap.put("idCliente", cliente);
-			}
-
-			queryBuilder.append(" WHERE " + StringUtils.join(whereCause, " AND "));
-
-			q = em.createQuery(queryBuilder.toString());
-
-			for (String key : paramaterMap.keySet()) {
-				q.setParameter(key, paramaterMap.get(key));
-			}
-
-			List<ConstanciaSalida> listado = (List<ConstanciaSalida>) q.getResultList();
-			
-			for(ConstanciaSalida cs: listado) {
-				List<DetalleConstanciaSalida> listaDetalle = cs.getDetalleConstanciaSalidaList();
-				listaDetalle.size();
-				for(DetalleConstanciaSalida dcs: listaDetalle) {
-					log.debug(dcs.getPartidaCve());
-				}
-			}
-			
-			return listado;
-		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return null;
-		}
 	}
 	
 	@SuppressWarnings("unchecked")

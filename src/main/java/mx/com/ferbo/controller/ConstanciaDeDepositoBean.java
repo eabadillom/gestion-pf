@@ -113,7 +113,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private List<UnidadDeManejo> listadoUnidadDeManejo;
 	private List<Posicion> listaPosiciones;
 	private List<Posicion> posiciones;
-	private List<Aviso> avisoPorCliente;
 	private List<Aviso> avisos;
 	private List<Partida> listadoPartida;
 	private List<DetallePartida> listadoDetallePartida;
@@ -134,7 +133,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	private UISelectItems productoItems;
 	private UnidadDeManejo unidadDeManejoSelect;
 	private Posicion posicionCamaraSelect;
-	private Aviso avisoSelect;
 	private Aviso aviso;
 	private PrecioServicio precioServicioSelect;
 	private ConstanciaDepositoDetalle selectedConstanciasDD;
@@ -210,7 +208,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		posiciones = new ArrayList<Posicion>();
 		listadoPartida = new ArrayList<Partida>();
 		listadoUnidadDeManejo = new ArrayList<>();
-		avisoPorCliente = new ArrayList<Aviso>();
 		listadoDetallePartida = new ArrayList<>();
 		listadoPrecioServicio = new ArrayList<>();//
 		listaServicioUnidad = new ArrayList<PrecioServicio>();//
@@ -382,10 +379,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				productos.add(p);
 			}
 
-			avisoPorCliente = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
-			avisoSelect = null;
-			
-			
 			avisos = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
 			aviso = null;
 			
@@ -399,7 +392,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("form:messages");
+			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:pnl-datos-generales", "form:dlg-add-producto", "form:seleccion-servicio");
 		}
 	}
 	
@@ -545,50 +538,57 @@ public class ConstanciaDeDepositoBean implements Serializable {
 	}
 	
 	public void loadAviso() {
-		log.info("Aviso seleccionado: {}", this.aviso);
-		
-		this.showCodigo    = aviso.getAvisoCodigo();
-		this.showPedimento = aviso.getAvisoPedimento();
-		this.showSAP       = aviso.getAvisoSap();
-		this.showLote      = aviso.getAvisoLote();
-		this.showCaducidad = aviso.getAvisoCaducidad();
-		this.showOtro      = aviso.getAvisoOtro();
-		
-		PrecioServicio psCongelacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.congelacion, true);;
-		PrecioServicio psConservacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.conservacion, true);;
-		PrecioServicio psRefrigeracion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.refrigeracion, true);
-		PrecioServicio psManiobras = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.maniobras, true);
-		
-		this.listaServicioUnidad = this.precioServicioDAO.buscarPorAviso(this.aviso, this.clienteSelect);
-		
-		if(psCongelacion == null)
-			this.isCongelacion = false;
-		else {
-			this.isCongelacion = true;
-			this.listaServicioUnidad.remove(psCongelacion);
+		try {
+			log.info("Aviso seleccionado: {}", this.aviso);
+			
+			this.showCodigo    = aviso.getAvisoCodigo();
+			this.showPedimento = aviso.getAvisoPedimento();
+			this.showSAP       = aviso.getAvisoSap();
+			this.showLote      = aviso.getAvisoLote();
+			this.showCaducidad = aviso.getAvisoCaducidad();
+			this.showOtro      = aviso.getAvisoOtro();
+			
+			PrecioServicio psCongelacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.congelacion, true);;
+			PrecioServicio psConservacion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.conservacion, true);;
+			PrecioServicio psRefrigeracion = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.refrigeracion, true);
+			PrecioServicio psManiobras = precioServicioDAO.buscar(this.clienteSelect.getCteCve(), this.aviso.getAvisoCve(), this.maniobras, true);
+			
+			this.listaServicioUnidad = this.precioServicioDAO.buscarPorAviso(this.aviso, this.clienteSelect);
+			
+			if(psCongelacion == null)
+				this.isCongelacion = false;
+			else {
+				this.isCongelacion = true;
+				this.listaServicioUnidad.remove(psCongelacion);
+			}
+			
+			if(psConservacion == null)
+				this.isConservacion = false;
+			else {
+				this.isConservacion = true;
+				this.listaServicioUnidad.remove(psConservacion);
+			}
+			
+			if(psRefrigeracion == null)
+				this.isRefrigeracion = false;
+			else {
+				this.isRefrigeracion = true;
+				this.listaServicioUnidad.remove(psRefrigeracion);
+			}
+			
+			if(psManiobras == null)
+				this.isManiobras = false;
+			else {
+				this.isManiobras = true;
+				this.listaServicioUnidad.remove(psManiobras);			
+			}
+			log.info("Aviso cargado.");
+		} catch(Exception ex) {
+			log.error("Problema para cargar el aviso...", ex);
+		} finally {
+			PrimeFaces.current().ajax().update("form:pnl-datos-generales", "form:seleccion-mercancia", "form:seleccion-servicio");
 		}
 		
-		if(psConservacion == null)
-			this.isConservacion = false;
-		else {
-			this.isConservacion = true;
-			this.listaServicioUnidad.remove(psConservacion);
-		}
-		
-		if(psRefrigeracion == null)
-			this.isRefrigeracion = false;
-		else {
-			this.isRefrigeracion = true;
-			this.listaServicioUnidad.remove(psRefrigeracion);
-		}
-		
-		if(psManiobras == null)
-			this.isManiobras = false;
-		else {
-			this.isManiobras = true;
-			this.listaServicioUnidad.remove(psManiobras);			
-		}
-		log.info("Aviso cargado.");
 	}
 
 	public void addTarima() {
@@ -632,7 +632,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			
 			message = new FacesMessage(severity, "Tarima", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:numTarimas", "form:id-validaCarga", "form:totalTarimas","form:totalCajas","form:totalKilos", "form:dt-tarimas");
+			PrimeFaces.current().ajax().update("form:messages", "form:seleccion-mercancia", "form:numTarimas", "form:dt-tarimas");
 			log.info("Tarima agregada.");
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
@@ -965,7 +965,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 				listadoConstanciaDepositoDetalle.add(srvManiobras);
 			}
 			
-			if((avisoSelect==null && aviso == null) ) {
+			if( aviso == null ) {
 				throw new InventarioException("Debe seleccionar un aviso");
 			}
 			
@@ -1000,7 +1000,7 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			constanciaDeDeposito.setTemperatura(temperatura);
 			constanciaDeDeposito.setCteCve(clienteSelect);
 			constanciaDeDeposito.setFechaIngreso(fechaIngreso);
-			constanciaDeDeposito.setAvisoCve(avisoSelect == null ? aviso : avisoSelect);
+			constanciaDeDeposito.setAvisoCve(aviso);
 			constanciaDeDeposito.setConstanciaDepositoDetalleList(listadoConstanciaDepositoDetalle);
 			
 			for(Partida p: listadoPartida) {
@@ -1123,6 +1123,8 @@ public class ConstanciaDeDepositoBean implements Serializable {
 			log.info("Termina el filtrado de camaras para la planta seleccionada.");
 		} catch(Exception ex) {
 			log.error("Problema en la funcion de filtrado de camaras...", ex);
+		} finally {
+			PrimeFaces.current().ajax().update("form:pnl-datos-generales");
 		}
 	}
 
@@ -1349,14 +1351,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 		this.listadoPartida = listadoPartida;
 	}
 
-	public List<Aviso> getAvisoPorCliente() {
-		return avisoPorCliente;
-	}
-
-	public void setAvisoPorCliente(List<Aviso> avisoPorCliente) {
-		this.avisoPorCliente = avisoPorCliente;
-	}
-
 	public List<DetallePartida> getListadoDetallePartida() {
 		return listadoDetallePartida;
 	}
@@ -1555,14 +1549,6 @@ public class ConstanciaDeDepositoBean implements Serializable {
 
 	public void setPosicionCamaraSelect(Posicion posicionCamaraSelect) {
 		this.posicionCamaraSelect = posicionCamaraSelect;
-	}
-
-	public Aviso getAvisoSelect() {
-		return avisoSelect;
-	}
-
-	public void setAvisoSelect(Aviso avisoSelect) {
-		this.avisoSelect = avisoSelect;
 	}
 
 	public String getPedimento() {
