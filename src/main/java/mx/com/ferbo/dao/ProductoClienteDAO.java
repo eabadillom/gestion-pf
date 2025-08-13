@@ -75,9 +75,9 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 			if(isFullInfo == false)
 				return listado;
 			
-			for(ProductoPorCliente ppc : listado) {
-				log.debug("Producto: {}", ppc.getProductoCve().getProductoCve());
-			}
+//			for(ProductoPorCliente ppc : listado) {
+//				log.debug("Producto: {}", ppc.getProductoCve().getProductoCve());
+//			}
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de productos por cliente...", ex);

@@ -8,6 +8,8 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -128,9 +130,6 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<Aviso> avisoList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
-    private List<CuotaMensualServicio> cuotaMensualServicioList;
-    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<PrecioServicio> precioServicioList;
     
@@ -157,6 +156,30 @@ public class Cliente implements Serializable {
     
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "serieConstanciaPK.cliente", orphanRemoval = true)
     private List<SerieConstancia> serieConstanciaList;
+    
+    @Override
+    public int hashCode() {
+        if(this.cteCve == null)
+        	return System.identityHashCode(this);
+        return Objects.hash(this.cteCve);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Cliente)) {
+            return false;
+        }
+        Cliente other = (Cliente) object;
+        if ((this.cteCve == null && other.cteCve != null) || (this.cteCve != null && !this.cteCve.equals(other.cteCve))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Cliente[ cteCve=" + cteCve + " ]";
+    }
     
     public Cliente() {
     }
@@ -314,14 +337,6 @@ public class Cliente implements Serializable {
         this.avisoList = avisoList;
     }
 
-    public List<CuotaMensualServicio> getCuotaMensualServicioList() {
-        return cuotaMensualServicioList;
-    }
-
-    public void setCuotaMensualServicioList(List<CuotaMensualServicio> cuotaMensualServicioList) {
-        this.cuotaMensualServicioList = cuotaMensualServicioList;
-    }
-
     public List<PrecioServicio> getPrecioServicioList() {
         return precioServicioList;
     }
@@ -376,31 +391,6 @@ public class Cliente implements Serializable {
 
     public void setConstanciaTraspasoList(List<ConstanciaTraspaso> constanciaTraspasoList) {
         this.constanciaTraspasoList = constanciaTraspasoList;
-    }
-
-
-	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (cteCve != null ? cteCve.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof Cliente)) {
-            return false;
-        }
-        Cliente other = (Cliente) object;
-        if ((this.cteCve == null && other.cteCve != null) || (this.cteCve != null && !this.cteCve.equals(other.cteCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Cliente[ cteCve=" + cteCve + " ]";
     }
 
 	public String getRegimenCapital() {

@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,10 +29,6 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "aviso")
 @NamedQueries({
@@ -120,8 +118,7 @@ public class Aviso implements Serializable {
     @NotNull
     @Column(name = "aviso_vigencia")
     private int avisoVigencia;
-    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
-    // consider using these annotations to enforce field validation
+    
     @Column(name = "aviso_val_seg")
     private BigDecimal avisoValSeg;
     
@@ -148,15 +145,9 @@ public class Aviso implements Serializable {
     @ManyToOne
     private Categoria categoriaCve;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve")
-    private List<CuotaMensualServicio> cuotaMensualServicioList;
-    
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE}, mappedBy = "avisoCve", orphanRemoval = true)
     private List<PrecioServicio> precioServicioList;
     
-    @OneToMany(mappedBy = "avisoCve")
-    private List<ConstanciaDeDeposito> constanciaDeDepositoList;
-
     public Aviso() {
     }
 
@@ -333,14 +324,6 @@ public class Aviso implements Serializable {
         this.categoriaCve = categoriaCve;
     }
 
-    public List<CuotaMensualServicio> getCuotaMensualServicioList() {
-        return cuotaMensualServicioList;
-    }
-
-    public void setCuotaMensualServicioList(List<CuotaMensualServicio> cuotaMensualServicioList) {
-        this.cuotaMensualServicioList = cuotaMensualServicioList;
-    }
-
     public List<PrecioServicio> getPrecioServicioList() {
         return precioServicioList;
     }
@@ -349,14 +332,6 @@ public class Aviso implements Serializable {
         this.precioServicioList = precioServicioList;
     }
 
-    public List<ConstanciaDeDeposito> getConstanciaDeDepositoList() {
-        return constanciaDeDepositoList;
-    }
-
-    public void setConstanciaDeDepositoList(List<ConstanciaDeDeposito> constanciaDeDepositoList) {
-        this.constanciaDeDepositoList = constanciaDeDepositoList;
-    }
-    
     public void add(PrecioServicio ps) {
     	precioServicioList.add(ps);
     	ps.setAvisoCve(this);
@@ -373,9 +348,9 @@ public class Aviso implements Serializable {
     
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (avisoCve != null ? avisoCve.hashCode() : 0);
-        return hash;
+    	if(this.avisoCve == null)
+    		return System.identityHashCode(this);
+    	return Objects.hash(this.avisoCve);
     }
 
     @Override
