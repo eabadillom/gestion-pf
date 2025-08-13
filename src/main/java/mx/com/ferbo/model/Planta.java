@@ -63,16 +63,13 @@ public class Planta implements Serializable {
 	@ManyToOne
 	private Usuario idUsuario;
 	
-	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "plantaCve")
 	private List<Camara> camaraList;
 	
 	@OneToMany(mappedBy = "serieConstanciaPK.planta", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	private List<SerieConstancia> serieConstanciaList;
 	
-	@OneToMany(mappedBy = "plantaCve", fetch = FetchType.LAZY)
-	private List<Aviso> avisoList;
-	
-	@OneToMany(mappedBy = "planta", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "planta")
     private List<Factura> facturaList;
 	
 	@Column(name = " id_pais")
@@ -117,7 +114,7 @@ public class Planta implements Serializable {
 	@ManyToOne(optional = true)
 	private SerieFactura serieFacturaDefault;
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta", fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planta")
 	private List<Posicion> posicionList;
 	
 	public Planta() {
@@ -272,14 +269,6 @@ public class Planta implements Serializable {
 		this.camaraList = camaraList;
 	}
 
-	public List<Aviso> getAvisoList() {
-		return avisoList;
-	}
-
-	public void setAvisoList(List<Aviso> avisoList) {
-		this.avisoList = avisoList;
-	}
-	
 	public List<Factura> getFacturaList() {
         return facturaList;
     }

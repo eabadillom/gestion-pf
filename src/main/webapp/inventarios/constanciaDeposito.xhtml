@@ -26,7 +26,7 @@
 		    <p:panel header="DATOS GENERALES">
 				<p:outputPanel id="pnl-datos-generales" styleClass="p-grid ui-fluid p-col-12">
 					<div class="p-col-12 p-md-6">
-						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{entradaBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+						<p:selectOneMenu autoWidth="false"  value="#{entradaBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="Seleccione un cliente" noSelectionOption="true"/>
 							<f:selectItems value="#{entradaBean.listadoCliente}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre) }" itemValue="#{cliente}"></f:selectItems>
 							<p:ajax event="change" process="@this" listener="#{entradaBean.cargaInfoCliente()}" update="form:seleccion-mercancia form:pnl-datos-generales form:dlg-add-producto form:seleccion-servicio" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>		
@@ -78,7 +78,7 @@
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Cantidad"/>
-							<p:inputNumber id="cantidad" value="#{entradaBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="always" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" decimalPlaces="0">
+							<p:inputNumber id="cantidad" value="#{entradaBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="always" placeholder="Cantidad" title="Cantidad" decimalPlaces="0">
 								
 							</p:inputNumber>
 						</div>
@@ -91,7 +91,7 @@
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Peso (kg)" />
-							<p:inputNumber id="pesoTotal" value="#{entradaBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" modifyValueOnWheel="true" title="Peso (kg)" symbol=" kg" symbolPosition="s">
+							<p:inputNumber id="pesoTotal" value="#{entradaBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" title="Peso (kg)" symbol=" kg" symbolPosition="s">
 							</p:inputNumber>
 						</div>
 					</div>
@@ -127,7 +127,7 @@
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-6">
-							<p:commandButton id="cmd-agregar-producto" value="Agregar tarimas" styleClass="edit-button" icon="pi pi-plus" process="form:seleccion-mercancia" update="form:NoTarimas" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('noTarimasDlg').show();" rendered="#{not entradaBean.saved}"/>
+							<p:commandButton id="cmd-agregar-producto" value="Agregar tarimas" styleClass="edit-button" icon="pi pi-plus" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('noTarimasDlg').show();" rendered="#{not entradaBean.saved}"/>
 						</div>
 						<div class="p-col-12 p-md-6">
 							<p:commandButton id="cmd-reiniciar-producto" value="Reiniciar" styleClass="edit-button" icon="pi pi-replay" process="@this" update="form:seleccion-mercancia" rendered="#{not entradaBean.saved}" actionListener="#{entradaBean.resetPartida}"/>
@@ -256,7 +256,7 @@
 							<p:outputLabel value="Código"/>
 						</div>
 						<div>
-							<p:inputText value="#{entradaBean.detalle.dtpCodigo}" disabled="#{not entradaBean.avisoSelect.avisoCodigo}">
+							<p:inputText value="#{entradaBean.detalle.dtpCodigo}" disabled="#{not entradaBean.aviso.avisoCodigo}">
 								<p:ajax process="@this"/>
 							</p:inputText>
 						</div>
@@ -266,7 +266,7 @@
 							<p:outputLabel value="Pedimento"/>
 						</div>
 						<div>
-							<p:inputText value="#{entradaBean.detalle.dtpPedimento}" disabled="#{not entradaBean.avisoSelect.avisoPedimento}">
+							<p:inputText value="#{entradaBean.detalle.dtpPedimento}" disabled="#{not entradaBean.aviso.avisoPedimento}">
 								<p:ajax process="@this"/>
 							</p:inputText>
 						</div>
@@ -276,7 +276,7 @@
 							<p:outputLabel value="Contenedor"/>
 						</div>
 						<div>
-							<p:inputText value="#{entradaBean.detalle.dtpSAP}" disabled="#{not entradaBean.avisoSelect.avisoSap}">
+							<p:inputText value="#{entradaBean.detalle.dtpSAP}" disabled="#{not entradaBean.aviso.avisoSap}">
 								<p:ajax process="@this"/>
 							</p:inputText>
 						</div>
@@ -286,7 +286,7 @@
 							<p:outputLabel value="Lote"/>
 						</div>
 						<div>
-							<p:inputText value="#{entradaBean.detalle.dtpLote}" disabled="#{not entradaBean.avisoSelect.avisoLote}">
+							<p:inputText value="#{entradaBean.detalle.dtpLote}" disabled="#{not entradaBean.aviso.avisoLote}">
 								<p:ajax process="@this"/>
 							</p:inputText>
 						</div>
@@ -296,7 +296,7 @@
 							<p:outputLabel value="Caducidad"/>
 						</div>
 						<div>
-							<p:datePicker value="#{entradaBean.detalle.dtpCaducidad}" placeholder="caducidad (dd/mm/yyyy)" locale="es" format="dd/MM/YYYY" timeZone="GMT-6" showIcon="true" disabled="#{not entradaBean.avisoSelect.avisoCaducidad}">
+							<p:datePicker value="#{entradaBean.detalle.dtpCaducidad}" placeholder="caducidad (dd/mm/yyyy)" locale="es" format="dd/MM/YYYY" timeZone="GMT-6" showIcon="true" disabled="#{not entradaBean.aviso.avisoCaducidad}">
 								<p:ajax process="@this" />
 							</p:datePicker>
 						</div>
@@ -306,7 +306,7 @@
 							<p:outputLabel value="Otro"/>
 						</div>
 						<div>
-							<p:inputText value="#{entradaBean.detalle.dtpMP}" disabled="#{not entradaBean.avisoSelect.avisoOtro}">
+							<p:inputText value="#{entradaBean.detalle.dtpMP}" disabled="#{not entradaBean.aviso.avisoOtro}">
 								<p:ajax process="@this"/>
 							</p:inputText>
 						</div>
@@ -505,7 +505,7 @@
 								</p:inputNumber>
 							</div>
 							<div class="p-field">
-								<p:commandButton value="Agregar" icon="pi pi-check" process="form:NoTarimas @this" actionListener="#{entradaBean.addTarima()}" update="form:dt-tarimas form:seleccion-mercancia" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+								<p:commandButton value="Agregar" icon="pi pi-check" process="form:seleccion-mercancia form:NoTarimas @this" actionListener="#{entradaBean.addTarima()}" update="form:dt-tarimas form:seleccion-mercancia form:NoTarimas" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 							</div>
 							<div class="p-field">
 								<p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('noTarimasDlg').hide();" class="ui-button-secondary"/>

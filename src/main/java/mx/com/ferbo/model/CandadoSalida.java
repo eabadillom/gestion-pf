@@ -6,6 +6,8 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -74,6 +76,31 @@ public class CandadoSalida implements Serializable {
 	@JoinColumn(name = "cte_cve", referencedColumnName = "CTE_CVE")
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Cliente cliente;
+	
+	@Override
+	public int hashCode() {
+		if(this.id == null)
+			return System.identityHashCode(this);
+		return Objects.hash(this.id);
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		// TODO: Warning - this method won't work in the case the id fields are not set
+		if (!(object instanceof CandadoSalida)) {
+			return false;
+		}
+		CandadoSalida other = (CandadoSalida) object;
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "mx.com.ferbo.model.CandadoSalida[ id=" + id + " ]";
+	}
 
 	public CandadoSalida() {
 	}
@@ -119,30 +146,4 @@ public class CandadoSalida implements Serializable {
 	public void setNumSalidas(int numSalidas) {
 		this.numSalidas = numSalidas;
 	}
-
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
-		return hash;
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
-		if (!(object instanceof CandadoSalida)) {
-			return false;
-		}
-		CandadoSalida other = (CandadoSalida) object;
-		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "mx.com.ferbo.model.CandadoSalida[ id=" + id + " cliente: " + cliente + " ]";
-	}
-
 }

@@ -7,6 +7,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -83,6 +85,31 @@ public class SerieFactura implements Serializable {
     @JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
     @ManyToOne(optional = true)
     private EmisoresCFDIS emisor;
+    
+    @Override
+    public int hashCode() {
+        if(this.id == null)
+        	return System.identityHashCode(this);
+        return Objects.hash(this.id);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof SerieFactura)) {
+            return false;
+        }
+        SerieFactura other = (SerieFactura) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.SerieFactura[ id=" + id + " ]";
+    }
 
     public SerieFactura() {
     }
@@ -163,31 +190,4 @@ public class SerieFactura implements Serializable {
 	public void setEmisor(EmisoresCFDIS emisor) {
 		this.emisor = emisor;
 	}
-	
-	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SerieFactura)) {
-            return false;
-        }
-        SerieFactura other = (SerieFactura) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.SerieFactura[ id=" + id + " ]";
-    }
-
-    
 }
