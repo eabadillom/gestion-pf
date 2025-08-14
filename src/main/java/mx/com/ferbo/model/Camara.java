@@ -7,11 +7,12 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -57,12 +58,8 @@ public class Camara implements Serializable {
     private Integer totalPosicion;
     
     @JoinColumn(name = "PLANTA_CVE", referencedColumnName = "PLANTA_CVE")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Planta plantaCve;
-    
-    @OneToMany(mappedBy = "camaraCve", fetch = FetchType.LAZY)
-    private List<Partida> partidaList;
-    
     
     public Camara() {
     }
@@ -111,24 +108,15 @@ public class Camara implements Serializable {
 		this.totalPosicion = totalPosicion;
 	}
 
-	public List<Partida> getPartidaList() {
-        return partidaList;
-    }
-
-    public void setPartidaList(List<Partida> partidaList) {
-        this.partidaList = partidaList;
-    }
-
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (camaraCve != null ? camaraCve.hashCode() : 0);
-        return hash;
+    	if(this.camaraCve == null)
+    		return System.identityHashCode(this);
+    	return Objects.hash(this.camaraCve);
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Camara)) {
             return false;
         }

@@ -1,0 +1,88 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+	<ui:define name="title">Entrada</ui:define>
+	<ui:define name="content">
+		<h:form id="form" enctype="multipart/form-data">
+			<p:growl id="messages" showDetail="true" life="2000" />
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
+			<p:panel header="DATOS GENERALES">
+				<p:outputPanel id="pnl-datos-generales" styleClass="p-grid ui-fluid p-col-12">
+					<div class="p-col-12 p-md-6">
+						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.entrada.cteCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<f:selectItem noSelectionOption="true" itemLabel="---Seleccione un cliente---"></f:selectItem>
+							<f:selectItems value="#{ingresoBean.clientes}" var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}"></f:selectItems>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.entrada.avisoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<f:selectItem noSelectionOption="true" itemLabel="---Seleccione un aviso---"></f:selectItem>
+							<f:selectItems value="#{ingresoBean.avisos}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.avisoVigencia}"></f:selectItems>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.planta}" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<f:selectItem noSelectionOption="true" itemLabel="---Seleccione una planta---"></f:selectItem>
+							<f:selectItems value="#{ingresoBean.plantas}" var="planta" itemLabel="#{planta.plantaDs}"></f:selectItems>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.camara}" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<f:selectItem noSelectionOption="true" itemLabel="---Seleccione una camara---"></f:selectItem>
+							<f:selectItems value="#{ingresoBean.camaras}" var="camara" itemLabel="#{camara.camaraDs}"></f:selectItems>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-3">
+						<p:datePicker value="#{ingresoBean.entrada.fechaIngreso}" showIcon="true" readonly="true" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6">
+						</p:datePicker>
+					</div>
+					<div class="p-col-12 p-md-3">
+						<p:inputText value="#{ingresoBean.entrada.folioCliente}" readonly="true" placeholder="Folio no asignado">
+						</p:inputText>
+					</div>
+				</p:outputPanel>
+			</p:panel>
+			<div style="padding-top: 1rem;">
+				<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+			</div>
+			<p:panel id="pnl-config-tarima" header="CONFIGURE SU TARIMA">
+				<div class="p-grid ui-fluid">
+					<div class="p-col-12 p-md-6">
+						<p:outputLabel value="Producto"/>
+						
+						<p:selectOneMenu value="#{ingresoBean.partida.unidadDeProductoCve.productoCve}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
+							<f:selectItem noSelectionOption="true" itemLabel="Selecciona un producto" />
+							<f:selectItems value="#{ingresoBean.productos}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Cantidad" />
+						<p:inputNumber value="#{ingresoBean.partida.cantidadTotal}" minValue="0" maxValue="100000" placeholder="Cantidad" decimalPlaces="0" ></p:inputNumber>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Unidad"/>
+						<p:selectOneMenu value="#{ingresoBean.partida.unidadDeProductoCve.unidadDeManejoCve}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
+							<f:selectItem noSelectionOption="true" itemLabel="--Unidad--" />
+							<f:selectItems value="#{ingresoBean.unidades}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Peso (kg)" />
+						<p:inputNumber  value="#{ingresoBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" symbol=" kg" symbolPosition="s"/>
+					</div>
+				</div>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>
