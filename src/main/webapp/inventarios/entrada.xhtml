@@ -13,34 +13,34 @@
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 			</p:dialog>
-			<p:panel header="DATOS GENERALES">
-				<p:outputPanel id="pnl-datos-generales" styleClass="p-grid ui-fluid p-col-12">
+			<p:panel id="pnl-datos-generales" header="DATOS GENERALES" toggleable="true">
+				<div class="p-grid ui-fluid">
 					<div class="p-col-12 p-md-6">
 						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.entrada.cteCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem noSelectionOption="true" itemLabel="---Seleccione un cliente---"></f:selectItem>
 							<f:selectItems value="#{ingresoBean.clientes}" var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}"></f:selectItems>
-							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales form:pnl-config-tarima" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.entrada.avisoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem noSelectionOption="true" itemLabel="---Seleccione un aviso---"></f:selectItem>
-							<f:selectItems value="#{ingresoBean.avisos}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.avisoVigencia}"></f:selectItems>
-							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+							<f:selectItems value="#{ingresoBean.avisos}" var="aviso" itemLabel="#{aviso.avisoCve}-ALL-#{aviso.avisoVigencia}"></f:selectItems>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales form:pnl-config-tarima" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.planta}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem noSelectionOption="true" itemLabel="---Seleccione una planta---"></f:selectItem>
 							<f:selectItems value="#{ingresoBean.plantas}" var="planta" itemLabel="#{planta.plantaDs}"></f:selectItems>
-							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales form:pnl-config-tarima" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.camara}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem noSelectionOption="true" itemLabel="---Seleccione una camara---"></f:selectItem>
 							<f:selectItems value="#{ingresoBean.camaras}" var="camara" itemLabel="#{camara.camaraDs}"></f:selectItems>
-							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales form:pnl-config-tarima" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-3">
@@ -48,19 +48,17 @@
 						</p:datePicker>
 					</div>
 					<div class="p-col-12 p-md-3">
-						<p:inputText value="#{ingresoBean.entrada.folioCliente}" readonly="true" placeholder="Folio no asignado">
-						</p:inputText>
+						<p:inputText value="#{ingresoBean.entrada.folioCliente}" readonly="true" placeholder="Folio no asignado" />
 					</div>
-				</p:outputPanel>
+				</div>
 			</p:panel>
 			<div style="padding-top: 1rem;">
 				<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
 			</div>
-			<p:panel id="pnl-config-tarima" header="CONFIGURE SU TARIMA">
+			<p:panel id="pnl-config-tarima" header="CONFIGURE SU TARIMA" toggleable="true">
 				<div class="p-grid ui-fluid">
 					<div class="p-col-12 p-md-6">
 						<p:outputLabel value="Producto"/>
-						
 						<p:selectOneMenu value="#{ingresoBean.partida.unidadDeProductoCve.productoCve}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
 							<f:selectItem noSelectionOption="true" itemLabel="Selecciona un producto" />
 							<f:selectItems value="#{ingresoBean.productos}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto}" />
@@ -81,8 +79,48 @@
 						<p:outputLabel value="Peso (kg)" />
 						<p:inputNumber  value="#{ingresoBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" symbol=" kg" symbolPosition="s"/>
 					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Código"/>
+						<p:inputText maxlength="13" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpCodigo}" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}" placeholder="Código" title="Código"/>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Pedimento" />
+						<p:inputText maxlength="13" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpPedimento}" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}" placeholder="Pedimento" title="Pedimento"/>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Contenedor" />
+						<p:inputText maxlength="20" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpSAP}" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}" placeholder="Contenedor" title="Contenedor"/>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Lote" />
+						<p:inputText maxlength="20" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpLote}" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}" placeholder="Lote" title="Lote"/>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Caducidad" />
+						<p:datePicker showIcon="true" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpCaducidad}" disabled="#{not ingresoBean.entrada.avisoCve.avisoCaducidad}" placeholder="dia/mes/año" title="Caducidad" pattern="d/MM/yyyy" timeZone="GMT-6" locale="es_MX" />
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Otro" />
+						<p:inputText maxlength="12" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpMP}" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}" placeholder="Otro" title="Otro"/>
+					</div>
+					<f:facet name="footer">
+						<div class="p-grid ui-fluid">
+							<div class="p-col-12 p-md-2">
+								<p:commandButton value="Agregar" icon="pi pi-plus" onclick="PF('dlgAddTarima').show();" />
+							</div>
+							<div class="p-col-12 p-md-2">
+								<p:commandButton value="Reiniciar" icon="pi pi-replay" />
+							</div>
+						</div>
+					</f:facet>
 				</div>
 			</p:panel>
+			<p:dialog widgetVar="dlgAddTarima" header="Agregar producto a la tarima ..." showEffect="fade" modal="true" width="100%" closeOnEscape="true">
+			</p:dialog>
+			<div style="padding-top: 1rem;">
+				<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+			</div>
+			
 		</h:form>
 	</ui:define>
 </ui:composition>
