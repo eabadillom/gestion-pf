@@ -8,7 +8,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.util.EntityManagerUtil;
 
@@ -22,6 +21,7 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 		return null;
 	}
 
+	@Deprecated
 	@Override
 	public List<ProductoPorCliente> buscarTodos() {
 		List<ProductoPorCliente> listado = null;
@@ -75,10 +75,6 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 			if(isFullInfo == false)
 				return listado;
 			
-//			for(ProductoPorCliente ppc : listado) {
-//				log.debug("Producto: {}", ppc.getProductoCve().getProductoCve());
-//			}
-			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de productos por cliente...", ex);
 		} finally {
@@ -88,7 +84,7 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 		return listado;
 	}
 	
-	public List<ProductoPorCliente> buscarPorCteCve(Cliente cliente) {
+	public List<ProductoPorCliente> buscarPorCteCve(Integer idCliente) {
 		List<ProductoPorCliente> alProductos = null;
 		boolean entityManagerInternal = false;
 		EntityManager em = null;
@@ -98,7 +94,7 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 				em = EntityManagerUtil.getEntityManager();
 			}
 			alProductos = em.createNamedQuery("ProductoPorCliente.findByCteCve", ProductoPorCliente.class)
-					.setParameter("cteCve", cliente)
+					.setParameter("cteCve", idCliente)
 					.getResultList();
 		} finally {
 			if(entityManagerInternal) {
