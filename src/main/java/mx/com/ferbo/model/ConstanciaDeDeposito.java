@@ -93,15 +93,15 @@ public class ConstanciaDeDeposito implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
     private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
     
-    @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
+    @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE", nullable = false)
     @ManyToOne(optional = false)
     private Cliente cteCve;
     
-    @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve")
+    @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve", nullable = false)
     @ManyToOne
     private Aviso avisoCve;
     
-    @JoinColumn(name = "status", referencedColumnName = "edo_cve")
+    @JoinColumn(name = "status", referencedColumnName = "edo_cve", nullable = false)
     @ManyToOne
     private EstadoConstancia status;
     

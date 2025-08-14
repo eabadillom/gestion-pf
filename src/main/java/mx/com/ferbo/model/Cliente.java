@@ -139,9 +139,6 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ConstanciaDeServicio> constanciaDeServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
-    private List<ConstanciaDeDeposito> constanciaDeDepositoList;
-    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaSalida> constanciaSalidaList;
     
@@ -359,14 +356,6 @@ public class Cliente implements Serializable {
 
     public void setConstanciaDeServicioList(List<ConstanciaDeServicio> constanciaDeServicioList) {
         this.constanciaDeServicioList = constanciaDeServicioList;
-    }
-
-    public List<ConstanciaDeDeposito> getConstanciaDeDepositoList() {
-        return constanciaDeDepositoList;
-    }
-
-    public void setConstanciaDeDepositoList(List<ConstanciaDeDeposito> constanciaDeDepositoList) {
-        this.constanciaDeDepositoList = constanciaDeDepositoList;
     }
 
     public List<ConstanciaSalida> getConstanciaSalidaList() {

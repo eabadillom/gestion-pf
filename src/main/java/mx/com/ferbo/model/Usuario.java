@@ -6,10 +6,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,10 +16,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
-
 
 @Entity
 @Table(name = "usuario")
@@ -85,14 +82,6 @@ public class Usuario implements Serializable {
     @Column(name = "st_ntf_srv_ext")
     private boolean stNtfSrvExt;
     
-    public boolean isStNtfSrvExt() {
-		return stNtfSrvExt;
-	}
-
-	public void setStNtfSrvExt(boolean stNtfSrvExt) {
-		this.stNtfSrvExt = stNtfSrvExt;
-	}
-
 	@Size(min = 1, max = 1)
     @Column(name = "st_usuario")
     private String stUsuario;
@@ -105,10 +94,29 @@ public class Usuario implements Serializable {
     @Column(name = "huella")
     private boolean huella;
     
-    @OneToMany(mappedBy = "idUsuario")
-    private List<Planta> plantaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
-    private List<LogSeguridad> logSeguridadList;
+    @Override
+    public int hashCode() {
+        if(this.id == null)
+        	return System.identityHashCode(this);
+        return Objects.hash(this.id);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Usuario)) {
+            return false;
+        }
+        Usuario other = (Usuario) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Usuario[ id=" + id + " ]";
+    }
 
     public Usuario() {
     }
@@ -226,22 +234,6 @@ public class Usuario implements Serializable {
         this.stUsuario = stUsuario;
     }
 
-    public List<Planta> getPlantaList() {
-        return plantaList;
-    }
-
-    public void setPlantaList(List<Planta> plantaList) {
-        this.plantaList = plantaList;
-    }
-
-    public List<LogSeguridad> getLogSeguridadList() {
-        return logSeguridadList;
-    }
-
-    public void setLogSeguridadList(List<LogSeguridad> logSeguridadList) {
-        this.logSeguridadList = logSeguridadList;
-    }
-
 	public boolean getHuella() {
 		return huella;
 	}
@@ -249,30 +241,15 @@ public class Usuario implements Serializable {
 	public void setHuella(boolean huella) {
 		this.huella = huella;
 	}
+	
+	public boolean isStNtfSrvExt() {
+		return stNtfSrvExt;
+	}
 
-	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
+	public void setStNtfSrvExt(boolean stNtfSrvExt) {
+		this.stNtfSrvExt = stNtfSrvExt;
+	}
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Usuario)) {
-            return false;
-        }
-        Usuario other = (Usuario) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Usuario[ id=" + id + " ]";
-    }
+	
     
 }

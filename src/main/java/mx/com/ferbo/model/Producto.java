@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -61,11 +62,32 @@ public class Producto implements Serializable {
     @Column(name = "categoria")
     private int categoria;
     
-    @OneToMany(mappedBy = "productoCve")
-    private List<PartidaServicio> partidaServicioList;
-    
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST}, mappedBy = "productoCve")
     private List<ProductoPorCliente> productoPorClienteList;
+    
+    @Override
+    public int hashCode() {
+        if(this.productoCve == null)
+        	return System.identityHashCode(this);
+        return Objects.hash(this.productoCve);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Producto)) {
+            return false;
+        }
+        Producto other = (Producto) object;
+        if ((this.productoCve == null && other.productoCve != null) || (this.productoCve != null && !this.productoCve.equals(other.productoCve))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Producto[ productoCve=" + productoCve + " ]";
+    }
 
     public Producto() {
     }
@@ -112,16 +134,6 @@ public class Producto implements Serializable {
         this.categoria = categoria;
     }
 
-    public List<PartidaServicio> getPartidaServicioList() {
-        return partidaServicioList;
-    }
-
-    public void setPartidaServicioList(List<PartidaServicio> partidaServicioList) {
-        this.partidaServicioList = partidaServicioList;
-    }
-    
-    
-
     public List<ProductoPorCliente> getProductoPorClienteList() {
 		return productoPorClienteList;
 	}
@@ -129,30 +141,4 @@ public class Producto implements Serializable {
 	public void setProductoPorClienteList(List<ProductoPorCliente> productoPorClienteList) {
 		this.productoPorClienteList = productoPorClienteList;
 	}
-
-	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (productoCve != null ? productoCve.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Producto)) {
-            return false;
-        }
-        Producto other = (Producto) object;
-        if ((this.productoCve == null && other.productoCve != null) || (this.productoCve != null && !this.productoCve.equals(other.productoCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Producto[ productoCve=" + productoCve + " ]";
-    }
-    
 }
