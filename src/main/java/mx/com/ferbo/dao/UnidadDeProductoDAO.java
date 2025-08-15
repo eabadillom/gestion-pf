@@ -108,16 +108,20 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 
 	@Override
 	public String guardar(UnidadDeProducto unidadDeProducto) {
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = this.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(unidadDeProducto);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Al guardar la unidad de producto...", e);
 			return "ERROR";
+		} finally {
+			this.close(em);
 		}
+		
 		return null;
 	}
 
