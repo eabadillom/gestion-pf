@@ -44,20 +44,6 @@ public class Tarima implements Serializable {
 	@OneToMany(mappedBy = "tarima")
 	private List<Partida> partidas;
 	
-	public Tarima() {
-	}
-	
-	public Tarima(Integer id, String nombre) {
-		this.id = id;
-		this.nombre = nombre;
-	}
-	
-	public Tarima(String nombre) {
-		this.nombre = nombre;
-	}
-
-	
-
 	@Override
 	public int hashCode() {
 		if(this.id == null)
@@ -74,6 +60,10 @@ public class Tarima implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Tarima other = (Tarima) obj;
+		
+		if(this.id == null || other.id == null)
+			return Objects.equals(this.hashCode(), other.hashCode());
+		
 		return Objects.equals(id, other.id);
 	}
 
@@ -81,7 +71,19 @@ public class Tarima implements Serializable {
 	public String toString() {
 		return "Tarima [id=" + id + ", nombre=" + nombre + "]";
 	}
-
+	
+	public Tarima() {
+	}
+	
+	public Tarima(Integer id, String nombre) {
+		this.id = id;
+		this.nombre = nombre;
+	}
+	
+	public Tarima(String nombre) {
+		this.nombre = nombre;
+	}
+	
 	public Integer getId() {
 		return id;
 	}

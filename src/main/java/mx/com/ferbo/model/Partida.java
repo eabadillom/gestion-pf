@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -107,15 +108,11 @@ public class Partida implements Serializable, Cloneable {
     public int hashCode() {
     	if(this.partidaCve == null)
     		return System.identityHashCode(this);
-    	
-        int hash = 0;
-        hash += (partidaCve != null ? partidaCve.hashCode() : 0);
-        return hash;
+        return Objects.hash(this.partidaCve);
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Partida)) {
             return false;
         }
@@ -131,8 +128,6 @@ public class Partida implements Serializable, Cloneable {
     public String toString() {
         return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + " ]";
     }
-    
-    
     
     public void add(DetallePartida detalle) {
     	if(this.detallePartidaList == null)

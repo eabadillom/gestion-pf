@@ -27,6 +27,7 @@ import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Producto;
+import mx.com.ferbo.model.Tarima;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.InventarioException;
@@ -49,12 +50,16 @@ public class IngresoBean implements Serializable {
 	private List<Camara>         camaras    = null;
 	private List<Producto>       productos  = null;
 	private List<UnidadDeManejo> unidades   = null;
+	private List<Tarima>         tarimas    = null;
 	
 	private Usuario              usuario = null;
 	private ConstanciaDeDeposito entrada = null;
 	private Planta               planta  = null;
 	private Camara               camara  = null;
 	private Partida              partida = null;
+	private Tarima               tarima  = null;
+	
+	private Integer              numTarimas = null;
 	
 	private FacesContext context = null;
 	private HttpServletRequest request = null;
@@ -118,10 +123,8 @@ public class IngresoBean implements Serializable {
 			
 			folio = EntradaBL.crearFolio(this.entrada, this.planta);
 			this.entrada.setFolioCliente(folio);
-			
 			this.productos = EntradaBL.productosPorCliente(this.entrada.getCteCve());
-			
-			this.partida = EntradaBL.crearPartida(this.entrada, this.camara);
+			this.partida = EntradaBL.crearPartida(this.camara);
 			
 			this.capturar = true;
 			PrimeFaces.current().ajax().update("form:pnl-config-tarima");
@@ -139,6 +142,49 @@ public class IngresoBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, message);
             PrimeFaces.current().ajax().update("form:messages");
 		}
+	}
+	
+	public void agregarTarimas() {
+		FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Configuración de la tarima";
+		
+		try {
+			if(this.numTarimas == null)
+				throw new InventarioException("Debe indicar el número de tarimas.");
+			
+			if(this.numTarimas <= 0)
+				throw new InventarioException("El número de tarimas indicado es incorrecto");
+			
+			log.info("Agregando {} tarima(s)", this.numTarimas);
+			
+			this.tarimas = EntradaBL.crearTarimas(this.entrada, this.numTarimas, this.partida, this.tarimas);
+			
+			this.numTarimas = null;
+			this.partida = EntradaBL.crearPartida(this.camara);
+			
+			log.info("{} tarimas agregadas.", this.tarimas.size());
+			PrimeFaces.current().executeScript("ṔF('dlgAddTarima').hide()");
+			
+			mensaje = String.format("Se agregaron %d tarima(s)", this.tarimas.size());
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			log.error("Problema para generar las tarimas...", ex);
+			mensaje = "Ocurrió un problema al generar la(s) tarima(s).";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("form:messages");
+		}
+	}
+	
+	public void addToTarima() {
+		
 	}
 	
 	public List<Cliente> getClientes() {
@@ -227,6 +273,30 @@ public class IngresoBean implements Serializable {
 
 	public void setUnidades(List<UnidadDeManejo> unidades) {
 		this.unidades = unidades;
+	}
+
+	public Integer getNumTarimas() {
+		return numTarimas;
+	}
+
+	public void setNumTarimas(Integer numTarimas) {
+		this.numTarimas = numTarimas;
+	}
+
+	public List<Tarima> getTarimas() {
+		return tarimas;
+	}
+
+	public void setTarimas(List<Tarima> tarimas) {
+		this.tarimas = tarimas;
+	}
+
+	public Tarima getTarima() {
+		return tarima;
+	}
+
+	public void setTarima(Tarima tarima) {
+		this.tarima = tarima;
 	}
 	
 
