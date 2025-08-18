@@ -210,10 +210,31 @@ public class EntradaBL {
 		String nombreTarima = null;
 		for(Tarima tarima : tarimas) {
 			Integer index = tarimas.indexOf(tarima);
-			log.info("hashcode tarima: {}", tarima.hashCode());
 			nombreTarima = String.format("%s-%s", folioCliente, (index + 1));
 			tarima.setNombre(nombreTarima);
 		}
+	}
+	
+	public static synchronized void eliminarTarima(ConstanciaDeDeposito constancia, List<Tarima> tarimas, Tarima tarima)
+	throws InventarioException {
+		
+		if(constancia == null)
+			throw new InventarioException("Debe indicar una entrada.");
+		
+		if(tarimas.size() <= 0)
+			throw new InventarioException("La lista de tarimas está vacía.");
+		
+		if(tarima == null)
+			throw new InventarioException("Debe indicar una tarima.");
+		
+		for(Partida partida : tarima.getPartidas()) {
+			constancia.getPartidaList().remove(partida);
+		}
+		
+		tarimas.remove(tarima);
+		
+		EntradaBL.nombrarTarimas(constancia.getFolioCliente(), tarimas);
+		
 	}
 
 }
