@@ -165,8 +165,6 @@ public class IngresoBean implements Serializable {
 			this.partida = EntradaBL.crearPartida(this.camara);
 			
 			log.info("{} tarimas agregadas.", this.tarimas.size());
-			PrimeFaces.current().executeScript("ṔF('dlgAddTarima').hide()");
-			
 			mensaje = String.format("Se agregaron %d tarima(s)", this.tarimas.size());
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(InventarioException ex) {
@@ -183,8 +181,42 @@ public class IngresoBean implements Serializable {
 		}
 	}
 	
+	public void eliminarTarima(Tarima tarima) {
+		FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Eliminartarima";
+        
+        try {
+        	EntradaBL.eliminarTarima(this.entrada, this.tarimas, tarima);
+        	log.info("Tarima eliminada: {}", tarima);
+        	
+        	mensaje= "Tarima eliminada";
+        	severity = FacesMessage.SEVERITY_INFO;
+        } catch(InventarioException ex ) {
+        	mensaje = ex.getMessage();
+        	severity = FacesMessage.SEVERITY_WARN;
+        } catch(Exception ex) {
+        	log.error("Problema para eliminar la tarima...");
+        	mensaje = "Ocurrió un problema al eliminar la tarima.";
+        	severity = FacesMessage.SEVERITY_ERROR;
+        } finally {
+        	message = new FacesMessage(severity, titulo, mensaje);
+        	FacesContext.getCurrentInstance().addMessage(null, message);
+        	PrimeFaces.current().ajax().update("form:messages");
+        }
+	}
+	
+	public void cargarDetalle(Partida partida) {
+		log.info("Cargando detalle de la partida {}", partida);
+	}
+	
 	public void addToTarima() {
-		
+		log.info("Nada por el momento...");
+	}
+	
+	public void agregarProducto(Tarima tarima) {
+		log.info("Agregando producto a tarima {}...", tarima);
 	}
 	
 	public List<Cliente> getClientes() {
