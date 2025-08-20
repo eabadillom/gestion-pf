@@ -1,12 +1,16 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.business.ClienteBL;
 import mx.com.ferbo.business.EntradaBL;
 import mx.com.ferbo.business.UsuarioBL;
 import mx.com.ferbo.dao.AvisoDAO;
@@ -26,6 +31,7 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.Tarima;
 import mx.com.ferbo.model.UnidadDeManejo;
@@ -44,26 +50,38 @@ public class IngresoBean implements Serializable {
 	private CamaraDAO         camaraDAO = null;
 	private UnidadDeManejoDAO unidadDAO = null;
 	
-	private List<Cliente>        clientes   = null;
-	private List<Aviso>          avisos     = null;
-	private List<Planta>         plantas    = null;
-	private List<Camara>         camaras    = null;
-	private List<Producto>       productos  = null;
-	private List<UnidadDeManejo> unidades   = null;
-	private List<Tarima>         tarimas    = null;
+	private List<Cliente>        clientes         = null;
+	private List<Aviso>          avisos           = null;
+	private List<Planta>         plantas          = null;
+	private List<Camara>         camaras          = null;
+	private List<Producto>       productos        = null;
+	private List<UnidadDeManejo> unidades         = null;
+	private List<Tarima>         tarimas          = null;
+	private List<PrecioServicio> serviciosCliente = null;
 	
-	private Usuario              usuario = null;
-	private ConstanciaDeDeposito entrada = null;
-	private Planta               planta  = null;
-	private Camara               camara  = null;
-	private Partida              partida = null;
-	private Tarima               tarima  = null;
-	
-	private Integer              numTarimas = null;
+	private Usuario              usuario          = null;
+	private ConstanciaDeDeposito entrada          = null;
+	private Planta               planta           = null;
+	private Camara               camara           = null;
+	private Partida              partida          = null;
+	private Partida              partidaEdit      = null;
+	private Tarima               tarima           = null;
+	private PrecioServicio       servicio         = null;
+	private BigDecimal           cantidadServicio = null;
+	private Integer              numTarimas       = null;
+	private Boolean              isCongelacion    = Boolean.FALSE;
+	private Boolean              isConservacion   = Boolean.FALSE;
+	private Boolean              isRefrigeracion  = Boolean.FALSE;
+	private Boolean              isManiobras      = Boolean.FALSE;
 	
 	private FacesContext context = null;
 	private HttpServletRequest request = null;
 	private boolean capturar = false;
+	
+	private static final Integer SRV_CONGELACION   = 619;
+	private static final Integer SRV_CONSERVACION  = 620;
+	private static final Integer SRV_REFRIGERACION = 621;
+	private static final Integer SRV_MANIOBRAS     = 622;
 	
 	@SuppressWarnings("unchecked")
 	public IngresoBean() {
@@ -123,7 +141,15 @@ public class IngresoBean implements Serializable {
 			
 			folio = EntradaBL.crearFolio(this.entrada, this.planta);
 			this.entrada.setFolioCliente(folio);
-			this.productos = EntradaBL.productosPorCliente(this.entrada.getCteCve());
+			
+			this.productos        = ClienteBL.productosPorCliente(this.entrada.getCteCve());
+			this.serviciosCliente = ClienteBL.getServicios(this.entrada.getCteCve(), this.entrada.getAvisoCve());
+			
+			this.isCongelacion   = ClienteBL.isServicio(this.serviciosCliente, SRV_CONGELACION);
+			this.isConservacion  = ClienteBL.isServicio(this.serviciosCliente, SRV_CONSERVACION);
+			this.isRefrigeracion = ClienteBL.isServicio(this.serviciosCliente, SRV_REFRIGERACION);
+			this.isManiobras     = ClienteBL.isServicio(this.serviciosCliente, SRV_MANIOBRAS);
+			
 			this.partida = EntradaBL.crearPartida(this.camara);
 			
 			this.capturar = true;
@@ -161,12 +187,14 @@ public class IngresoBean implements Serializable {
 			
 			this.tarimas = EntradaBL.crearTarimas(this.entrada, this.numTarimas, this.partida, this.tarimas);
 			
-			this.numTarimas = null;
 			this.partida = EntradaBL.crearPartida(this.camara);
 			
-			log.info("{} tarimas agregadas.", this.tarimas.size());
-			mensaje = String.format("Se agregaron %d tarima(s)", this.tarimas.size());
+			log.info("{} tarimas agregadas.", this.numTarimas);
+			
+			mensaje = String.format("Se agregaron %d tarima(s)", this.numTarimas);
 			severity = FacesMessage.SEVERITY_INFO;
+			
+			this.numTarimas = null;
 		} catch(InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -207,16 +235,77 @@ public class IngresoBean implements Serializable {
         }
 	}
 	
-	public void cargarDetalle(Partida partida) {
-		log.info("Cargando detalle de la partida {}", partida);
+	public void cargarDetalle(ActionEvent e) {
+		try {
+			log.info("Cargando partida: {}", this.partida);
+			log.info("Producto: {}", this.partida.getUnidadDeProductoCve().getProductoCve().getProductoDs());
+		} catch(Exception ex ) {
+			log.error("Problema para cargar el detalle de la partida...", ex);
+		}
+	}
+	
+	public void prepararPartida() {
+		try {
+			this.partida = EntradaBL.crearPartida(camara);
+		} catch(Exception ex) {
+			log.warn("Problema para crear la tarima...", ex);
+		}
 	}
 	
 	public void addToTarima() {
-		log.info("Nada por el momento...");
+		log.info("Agregando producto a la tarima {}", this.tarima);
+		
+		try {
+			EntradaBL.agregarATarima(this.entrada, this.tarima, this.partida);
+		} catch (InventarioException ex) {
+			log.error("Problema para agregar la partida a la tarima...", ex);
+		}
+		
 	}
 	
 	public void agregarProducto(Tarima tarima) {
 		log.info("Agregando producto a tarima {}...", tarima);
+	}
+	
+	public void eliminarProducto(Partida partida) {
+		try {
+			EntradaBL.eliminarProducto(entrada, tarima, partida);
+		} catch(Exception ex) {
+			log.error("Problema para eliminar la partida...", ex);
+		}
+	}
+	
+	public Integer cantidadTarima(Tarima tarima) {
+		Integer cantidad = tarima.getPartidas().stream()
+				.mapToInt(Partida::getCantidadTotal)
+				.sum();
+		
+		return cantidad;
+	}
+	
+	public BigDecimal pesoTarima(Tarima tarima) {
+		BigDecimal peso = tarima.getPartidas().stream()
+				.map(Partida::getPesoTotal)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				;
+		return peso;
+	}
+	
+	public List<PrecioServicio> serviciosElegibles() {
+		List<PrecioServicio> servicios = null;
+		
+		if(this.serviciosCliente == null)
+			return new ArrayList<PrecioServicio>();
+		
+		servicios = this.serviciosCliente.stream()
+				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_CONGELACION)   == false) )
+				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_CONGELACION)   == false) )
+				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_REFRIGERACION) == false) )
+				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_MANIOBRAS)     == false) )
+				.collect(Collectors.toList())
+				;
+		
+		return servicios;
 	}
 	
 	public List<Cliente> getClientes() {
@@ -330,6 +419,68 @@ public class IngresoBean implements Serializable {
 	public void setTarima(Tarima tarima) {
 		this.tarima = tarima;
 	}
-	
 
+	public Partida getPartidaEdit() {
+		return partidaEdit;
+	}
+
+	public void setPartidaEdit(Partida partidaEdit) {
+		this.partidaEdit = partidaEdit;
+	}
+
+	public List<PrecioServicio> getServiciosCliente() {
+		return serviciosCliente;
+	}
+
+	public void setServiciosCliente(List<PrecioServicio> serviciosCliente) {
+		this.serviciosCliente = serviciosCliente;
+	}
+
+	public Boolean getIsCongelacion() {
+		return isCongelacion;
+	}
+
+	public void setIsCongelacion(Boolean isCongelacion) {
+		this.isCongelacion = isCongelacion;
+	}
+
+	public Boolean getIsConservacion() {
+		return isConservacion;
+	}
+
+	public void setIsConservacion(Boolean isConservacion) {
+		this.isConservacion = isConservacion;
+	}
+
+	public Boolean getIsRefrigeracion() {
+		return isRefrigeracion;
+	}
+
+	public void setIsRefrigeracion(Boolean isRefrigeracion) {
+		this.isRefrigeracion = isRefrigeracion;
+	}
+
+	public Boolean getIsManiobras() {
+		return isManiobras;
+	}
+
+	public void setIsManiobras(Boolean isManiobras) {
+		this.isManiobras = isManiobras;
+	}
+
+	public PrecioServicio getServicio() {
+		return servicio;
+	}
+
+	public void setServicio(PrecioServicio servicio) {
+		this.servicio = servicio;
+	}
+
+	public BigDecimal getCantidadServicio() {
+		return cantidadServicio;
+	}
+
+	public void setCantidadServicio(BigDecimal cantidadServicio) {
+		this.cantidadServicio = cantidadServicio;
+	}
 }

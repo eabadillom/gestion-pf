@@ -3,19 +3,16 @@ package mx.com.ferbo.business;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.EstadoConstanciaDAO;
 import mx.com.ferbo.dao.EstadoInventarioDAO;
-import mx.com.ferbo.dao.ProductoClienteDAO;
 import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.TipoMovimientoDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
 import mx.com.ferbo.model.Camara;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
@@ -24,8 +21,6 @@ import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.model.EstadoInventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
-import mx.com.ferbo.model.Producto;
-import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.Tarima;
 import mx.com.ferbo.model.TipoMovimiento;
@@ -157,22 +152,6 @@ public class EntradaBL {
 		
 	}
 	
-	public static synchronized List<Producto> productosPorCliente(Cliente cliente) {
-		List<Producto> productos = null;
-		List<ProductoPorCliente> productosPorCliente = null;
-		ProductoClienteDAO ppcDAO = null;
-		
-		ppcDAO = new ProductoClienteDAO();
-		productosPorCliente = ppcDAO.buscarPorCteCve(cliente.getCteCve());
-		
-		productos = productosPorCliente.stream()
-				.map(ProductoPorCliente::getProductoCve)
-				.collect(Collectors.toList())
-				;
-		
-		return productos;
-	}
-	
 	public static synchronized List<Tarima> crearTarimas(ConstanciaDeDeposito constancia, Integer numeroTarimas, Partida partida, List<Tarima> tarimas)
 	throws InventarioException, CloneNotSupportedException {
 		Tarima t = null;
@@ -206,6 +185,22 @@ public class EntradaBL {
 		return tarimas;
 	}
 	
+	public static synchronized void agregarATarima(ConstanciaDeDeposito constancia, Tarima tarima, Partida partida)
+	throws InventarioException {
+		if(constancia == null)
+			throw new InventarioException("Debe indicar una entrada.");
+		
+		if(tarima == null)
+			throw new InventarioException("Debe indicar una tarima.");
+		
+		if(partida == null)
+			throw new InventarioException("Debe indicar una partida.");
+		
+		constancia.getPartidaList().add(partida);
+		partida.setFolio(constancia);
+		tarima.getPartidas().add(partida);
+	}
+	
 	public static synchronized void nombrarTarimas(String folioCliente, List<Tarima> tarimas) {
 		String nombreTarima = null;
 		for(Tarima tarima : tarimas) {
@@ -221,11 +216,14 @@ public class EntradaBL {
 		if(constancia == null)
 			throw new InventarioException("Debe indicar una entrada.");
 		
-		if(tarimas.size() <= 0)
-			throw new InventarioException("La lista de tarimas está vacía.");
-		
 		if(tarima == null)
 			throw new InventarioException("Debe indicar una tarima.");
+		
+		if(tarimas == null)
+			throw new InventarioException("Debe indicar una lista de tarimas");
+		
+		if(tarimas.size() <= 0)
+			throw new InventarioException("La lista de tarimas está vacía.");
 		
 		for(Partida partida : tarima.getPartidas()) {
 			constancia.getPartidaList().remove(partida);
@@ -235,6 +233,22 @@ public class EntradaBL {
 		
 		EntradaBL.nombrarTarimas(constancia.getFolioCliente(), tarimas);
 		
+	}
+	
+	public static synchronized void eliminarProducto(ConstanciaDeDeposito constancia, Tarima tarima, Partida partida)
+	throws InventarioException {
+		if(constancia == null)
+			throw new InventarioException("Debe indicar una entrdad.");
+		
+		if(tarima == null)
+			throw new InventarioException("Debe indicar una tarima.");
+		
+		if(partida == null)
+			throw new InventarioException("Debe indicar una partida.");
+		
+		partida.setFolio(null);
+		constancia.getPartidaList().remove(partida);
+		tarima.getPartidas().remove(partida);
 	}
 
 }
