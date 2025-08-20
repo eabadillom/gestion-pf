@@ -3,9 +3,6 @@ package mx.com.ferbo.ui;
 import java.util.List;
 
 import mx.com.ferbo.model.ClaveUnidad;
-import mx.com.ferbo.model.ConstanciaDepositoDetalle;
-import mx.com.ferbo.model.ConstanciaServicioDetalle;
-import mx.com.ferbo.model.CuotaMensualServicio;
 import mx.com.ferbo.model.DetalleConstanciaServicios;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
@@ -25,10 +22,7 @@ public class ServicioUI {
 	private TipoCobro cobro;
 	private ClaveUnidad claveUnit;
 	
-	private List<CuotaMensualServicio> cuotaMensualServicioList;
 	private List<PrecioServicio> precioServicioList;
-	private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
-	private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
     
     
     public ServicioUI() {
@@ -43,10 +37,7 @@ public class ServicioUI {
 		this.setUuId(servicio.getUuId());
 		this.cobro = servicio.getCobro();
 		this.claveUnit = servicio.getClaveUnit();
-		this.cuotaMensualServicioList = servicio.getCuotaMensualServicioList();
 		this.precioServicioList = servicio.getPrecioServicioList();
-		this.constanciaDepositoDetalleList = servicio.getConstanciaDepositoDetalleList();
-		this.constanciaServicioDetalleList = servicio.getConstanciaServicioDetalleList();
 		
 		if(this.uuId == null || this.uuId.equalsIgnoreCase("")) {
 			valor = false;
@@ -122,36 +113,11 @@ public class ServicioUI {
 		this.claveUnit = claveUnit;
 	}
 
-	
-	public List<CuotaMensualServicio> getCuotaMensualServicioList() {
-		return cuotaMensualServicioList;
-	}
-	public void setCuotaMensualServicioList(List<CuotaMensualServicio> cuotaMensualServicioList) {
-		this.cuotaMensualServicioList = cuotaMensualServicioList;
-	}
-	
-	
 	public List<PrecioServicio> getPrecioServicioList() {
 		return precioServicioList;
 	}
 	public void setPrecioServicioList(List<PrecioServicio> precioServicioList) {
 		this.precioServicioList = precioServicioList;
-	}
-	
-	
-	public List<ConstanciaDepositoDetalle> getConstanciaDepositoDetalleList() {
-		return constanciaDepositoDetalleList;
-	}
-	public void setConstanciaDepositoDetalleList(List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList) {
-		this.constanciaDepositoDetalleList = constanciaDepositoDetalleList;
-	}
-	
-	
-	public List<ConstanciaServicioDetalle> getConstanciaServicioDetalleList() {
-		return constanciaServicioDetalleList;
-	}
-	public void setConstanciaServicioDetalleList(List<ConstanciaServicioDetalle> constanciaServicioDetalleList) {
-		this.constanciaServicioDetalleList = constanciaServicioDetalleList;
 	}
 	
 	public boolean isValor() {
@@ -160,7 +126,4 @@ public class ServicioUI {
 	public void setValor(boolean valor) {
 		this.valor = valor;
 	}
-    
-    
-
 }

@@ -6,14 +6,13 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -39,9 +38,7 @@ public class TipoMovimiento implements Serializable {
     @Size(max = 50)
     @Column(name = "TIPO")
     private String tipo;
-    @OneToMany(mappedBy = "tipoMovCve")
-    private List<DetallePartida> detallePartidaList;
-
+    
     public TipoMovimiento() {
     }
 
@@ -63,14 +60,6 @@ public class TipoMovimiento implements Serializable {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
-    }
-
-    public List<DetallePartida> getDetallePartidaList() {
-        return detallePartidaList;
-    }
-
-    public void setDetallePartidaList(List<DetallePartida> detallePartidaList) {
-        this.detallePartidaList = detallePartidaList;
     }
 
     @Override

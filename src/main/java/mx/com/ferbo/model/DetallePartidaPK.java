@@ -34,7 +34,7 @@ public class DetallePartidaPK implements Serializable, Cloneable {
     }
     
     public DetallePartidaPK clone() throws CloneNotSupportedException {
-    	return (DetallePartidaPK) super.clone();
+    	return new DetallePartidaPK(1, null);
     }
 
 	public DetallePartidaPK(@NotNull int detPartCve, Partida partidaCve) {
