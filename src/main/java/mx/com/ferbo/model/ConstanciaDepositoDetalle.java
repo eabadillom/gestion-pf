@@ -51,6 +51,30 @@ public class ConstanciaDepositoDetalle implements Serializable {
     @JoinColumn(name = "SERVICIO_CVE", referencedColumnName = "SERVICIO_CVE")
     @ManyToOne
     private Servicio servicioCve;
+    
+    @Override
+    public int hashCode() {
+    	if(this.constanciaDepositoDetalleCve == null)
+    		return System.identityHashCode(this);
+    	return Objects.hash(this.constanciaDepositoDetalleCve);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof ConstanciaDepositoDetalle)) {
+            return false;
+        }
+        ConstanciaDepositoDetalle other = (ConstanciaDepositoDetalle) object;
+        if ((this.constanciaDepositoDetalleCve == null && other.constanciaDepositoDetalleCve != null) || (this.constanciaDepositoDetalleCve != null && !this.constanciaDepositoDetalleCve.equals(other.constanciaDepositoDetalleCve))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.ConstanciaDepositoDetalle[ constanciaDepositoDetalleCve=" + constanciaDepositoDetalleCve + " ]";
+    }
 
     public ConstanciaDepositoDetalle() {
     }
@@ -90,30 +114,4 @@ public class ConstanciaDepositoDetalle implements Serializable {
     public void setServicioCve(Servicio servicioCve) {
         this.servicioCve = servicioCve;
     }
-
-    @Override
-    public int hashCode() {
-    	if(this.constanciaDepositoDetalleCve == null)
-    		return System.identityHashCode(this);
-    	return Objects.hash(this.constanciaDepositoDetalleCve);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ConstanciaDepositoDetalle)) {
-            return false;
-        }
-        ConstanciaDepositoDetalle other = (ConstanciaDepositoDetalle) object;
-        if ((this.constanciaDepositoDetalleCve == null && other.constanciaDepositoDetalleCve != null) || (this.constanciaDepositoDetalleCve != null && !this.constanciaDepositoDetalleCve.equals(other.constanciaDepositoDetalleCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.ConstanciaDepositoDetalle[ constanciaDepositoDetalleCve=" + constanciaDepositoDetalleCve + " ]";
-    }
-    
 }

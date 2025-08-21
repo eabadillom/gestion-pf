@@ -10,28 +10,28 @@
 						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.entrada.cteCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem noSelectionOption="true" itemLabel="---Cliente---"></f:selectItem>
 							<f:selectItems value="#{ingresoBean.clientes}" var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}"></f:selectItems>
-							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales form:pnl-config-tarima form:pnl-servicios" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.entrada.avisoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem noSelectionOption="true" itemLabel="---Aviso---"></f:selectItem>
 							<f:selectItems value="#{ingresoBean.avisos}" var="aviso" itemLabel="#{aviso.avisoCve}-ALL-#{aviso.avisoVigencia}"></f:selectItems>
-							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales form:pnl-config-tarima form:pnl-servicios" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.planta}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem noSelectionOption="true" itemLabel="---Planta---"></f:selectItem>
 							<f:selectItems value="#{ingresoBean.plantas}" var="planta" itemLabel="#{planta.plantaDs}"></f:selectItems>
-							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales form:pnl-config-tarima form:pnl-servicios" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:selectOneMenu autoWidth="false" value="#{ingresoBean.camara}" converter="entityConverter" filter="true" filterMatchMode="contains">
 							<f:selectItem noSelectionOption="true" itemLabel="---Camara---"></f:selectItem>
 							<f:selectItems value="#{ingresoBean.camaras}" var="camara" itemLabel="#{camara.camaraDs}"></f:selectItems>
-							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales form:pnl-config-tarima form:pnl-servicios" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+							<p:ajax event="change" process="@this" listener="#{ingresoBean.crearEntrada()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
 					<div class="p-col-12 p-md-2">

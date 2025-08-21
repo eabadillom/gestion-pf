@@ -11,36 +11,65 @@
 			<ui:include src="/protected/common/status-info.xhtml" />
 			<ui:include src="/protected/common/confirm-dialog.xhtml" />
 			
+			<!-- DATOS GENERALES -->
 			<!-- id: form:pnl-datos-generales -->
 			<ui:include src="/inventarios/entrada/alta/alta-datos-generales.xhtml" />
 			
 			<p:spacer style="height: 2rem;"/>
-
+			
+			<!-- CONFIGURE SU TARIMA -->
 			<!-- id: form:pnl-config-tarima -->
 			<!-- Panel de configuración principal de tarimas y sus productos. -->			
 			<ui:include src="/inventarios/entrada/alta/alta-config-tarima.xhtml" />
 			
 			<p:spacer style="height: 2rem;"/>
 			
+			<!-- nn TARIMAS -->
 			<!-- id: dl-tarimas -->
 			<!-- Lista de tarimas agregadas a la constancia de depósito. -->
 			<ui:include src="/inventarios/entrada/alta/alta-tarimas.xhtml" />
 			
 			<p:spacer style="height: 2rem;"/>
 			
+			<!-- INFORMACIÓN DEL PRODUCTO -->
 			<!-- id: pnl-det-partida, widgetVar: dlgDetPartida-->
 			<!-- Dialogo para mostrar el detalle de una partida (datos). -->
 			<ui:include src="/inventarios/entrada/alta/alta-det-partida.xhtml" />
 			
+			<!-- AGREGAR PRODUCTO A LA TARIMA -->
 			<!-- id: pnl-add-producto, widgetVar: dlgAddProducto -->
 			<!-- Dialogo para agregar una partida a una tarima -->
 			<ui:include src="/inventarios/entrada/alta/alta-agregar-producto.xhtml" />
 			
 			<p:spacer style="height: 2rem;"/>
 			
+			<!-- PARA LOS SERVICIOS DE -->
 			<!-- id: pnl-servicios -->
 			<!-- Panel de configuración de servicios -->
 			<ui:include src="/inventarios/entrada/alta/alta-servicios.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- DATOS ADICIONALES -->
+			<!-- id: pnl-datos-adicionales -->
+			<!-- Panel de captura de información para temperatura, transportista y placas del vehículo -->
+			<ui:include src="/inventarios/entrada/alta/alta-datos-adicionales.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<p:toolbar id="tb-acciones">
+				<p:toolbarGroup>
+					<p:commandButton icon="pi pi-save" value="Guardar" process="@this" update="form:tb-acciones" actionListener="#{ingresoBean.guardar}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" disabled="#{not ingresoBean.editar}">
+					</p:commandButton>
+					<p:spacer style="width: 0.5rem;"/>
+					<p:commandButton icon="pi pi-print" value="Imprimir" process="@this" update="form:tb-acciones" disabled="#{ingresoBean.editar}">
+						<p:fileDownload value="#{ingresoBean.file}"></p:fileDownload>
+					</p:commandButton>
+					<p:spacer style="width: 0.5rem;"/>
+					<p:commandButton icon="pi pi-refresh" value="Nueva" process="@this" update="form:tb-acciones" disabled="#{ingresoBean.editar}">
+					</p:commandButton>
+				</p:toolbarGroup>
+			</p:toolbar>
 			
 			
 		</h:form>
