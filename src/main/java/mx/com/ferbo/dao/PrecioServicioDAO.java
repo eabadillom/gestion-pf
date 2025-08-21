@@ -24,6 +24,12 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	private static Logger log = LogManager.getLogger(PrecioServicioDAO.class);
 	
 	@Override
+	public PrecioServicio buscarPorId(Integer id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public List<PrecioServicio> buscarTodos() {
 		List<PrecioServicio> listado = new ArrayList<>();
 		try {
@@ -87,22 +93,6 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			listaPrecioServicio = entity.createNamedQuery("PrecioServicio.findByAvisoAndCliente", PrecioServicio.class)
 					.setParameter("cteCve", cliente.getCteCve())
 					.setParameter("avisoCve", aviso.getAvisoCve())
-					.getResultList();
-		} catch (Exception e) {
-			log.error("Problema para obtener el PrecioServicio...", e);
-		} finally {
-			EntityManagerUtil.close(entity);
-		}
-		return listaPrecioServicio;
-	}
-	
-	public List<PrecioServicio> buscarPorAviso(Integer idAviso) {
-		List<PrecioServicio> listaPrecioServicio = new ArrayList<>();
-		EntityManager entity = null;
-		try {
-			entity = EntityManagerUtil.getEntityManager();
-			listaPrecioServicio = entity.createNamedQuery("PrecioServicio.findByAviso", PrecioServicio.class)
-					.setParameter("idAviso", idAviso)
 					.getResultList();
 		} catch (Exception e) {
 			log.error("Problema para obtener el PrecioServicio...", e);
@@ -327,7 +317,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 			EntityManagerUtil.close(em);
 		}
 		return lista;
-	}
+	}	
 	
 	public int obtenFinal() {
 		int valorFinal=0;
