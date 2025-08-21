@@ -6,22 +6,18 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "estado_inventario")
 @NamedQueries({
@@ -31,18 +27,18 @@ import javax.validation.constraints.Size;
 public class EstadoInventario implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "edo_inv_cve")
     private Integer edoInvCve;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "edo_descripcion")
     private String edoDescripcion;
-    @OneToMany(mappedBy = "edoInvCve")
-    private List<DetallePartida> detallePartidaList;
 
     public EstadoInventario() {
     }
@@ -71,25 +67,16 @@ public class EstadoInventario implements Serializable {
     public void setEdoDescripcion(String edoDescripcion) {
         this.edoDescripcion = edoDescripcion;
     }
-
-    public List<DetallePartida> getDetallePartidaList() {
-        return detallePartidaList;
-    }
-
-    public void setDetallePartidaList(List<DetallePartida> detallePartidaList) {
-        this.detallePartidaList = detallePartidaList;
-    }
-
+    
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (edoInvCve != null ? edoInvCve.hashCode() : 0);
-        return hash;
+    	if(this.edoInvCve == null)
+    		return System.identityHashCode(this);
+    	return Objects.hash(this.edoInvCve);
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof EstadoInventario)) {
             return false;
         }

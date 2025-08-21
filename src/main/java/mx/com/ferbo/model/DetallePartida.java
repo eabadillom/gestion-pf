@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -23,10 +24,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "detalle_partida")
 @NamedQueries({
@@ -290,19 +287,21 @@ public class DetallePartida implements Serializable, Cloneable {
 		DetallePartida dp = null;
 		
 		dp = new DetallePartida();
+		dp.setDetallePartidaPK(new DetallePartidaPK(1, null));
 		dp.setDetPadre(this.detPadre == null ? null : new Integer(this.detPadre));
 		dp.setDetPartPadre(this.detPartPadre == null ? null : new Integer(this.detPartPadre));
 		dp.setCantidadUManejo(this.cantidadUManejo == null ? null : new Integer(this.cantidadUManejo));
-		dp.setCantidadUMedida(this.cantidadUMedida);
-		dp.setDtpCodigo(this.dtpCodigo);
-		dp.setDtpLote(this.dtpLote);
+		dp.setCantidadUMedida(this.cantidadUMedida == null ? null : this.cantidadUMedida.setScale(3, RoundingMode.HALF_UP));
+		dp.setDtpCodigo(this.dtpCodigo == null ? null : new String(this.dtpCodigo));
+		dp.setDtpLote(this.dtpLote == null ? null : new String(this.dtpLote));
 		dp.setDtpCaducidad(this.dtpCaducidad == null ? null : new Date(this.dtpCaducidad.getTime()));
-		dp.setDtpPO(this.getDtpPO());
-		dp.setDtpMP(this.dtpMP);
-		dp.setDtpPedimento(this.dtpPedimento);
-		dp.setDtpSAP(this.dtpSAP);
-		dp.setDtpTarimas(this.dtpTarimas);
-		dp.setDetallePartida(this.detallePartida);
+		dp.setDtpPO(this.dtpPO == null ? null : new String(this.getDtpPO()));
+		dp.setDtpMP(this.dtpMP == null ? null : new String(this.dtpMP));
+		dp.setDtpPedimento(this.dtpPedimento == null ? null : new String(this.dtpPedimento));
+		dp.setDtpSAP(this.dtpSAP == null ? null : new String(this.dtpSAP));
+		dp.setDtpTarimas(this.dtpTarimas == null ? null : new String(this.dtpTarimas));
+		dp.setDetallePartida(null);
+		
 		if(this.getTipoMovCve() != null)
 			dp.setTipoMovCve(this.tipoMovCve);
 		

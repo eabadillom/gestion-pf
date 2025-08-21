@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+	<ui:define name="title">Entrada</ui:define>
+	<ui:define name="content">
+		<h:form id="form" enctype="multipart/form-data">
+			<ui:include src="/protected/common/messages.xhtml" />
+			<ui:include src="/protected/common/status-info.xhtml" />
+			<ui:include src="/protected/common/confirm-dialog.xhtml" />
+			
+			<!-- id: form:pnl-datos-generales -->
+			<ui:include src="/inventarios/entrada/alta/alta-datos-generales.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+
+			<!-- id: form:pnl-config-tarima -->
+			<!-- Panel de configuración principal de tarimas y sus productos. -->			
+			<ui:include src="/inventarios/entrada/alta/alta-config-tarima.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- id: dl-tarimas -->
+			<!-- Lista de tarimas agregadas a la constancia de depósito. -->
+			<ui:include src="/inventarios/entrada/alta/alta-tarimas.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- id: pnl-det-partida, widgetVar: dlgDetPartida-->
+			<!-- Dialogo para mostrar el detalle de una partida (datos). -->
+			<ui:include src="/inventarios/entrada/alta/alta-det-partida.xhtml" />
+			
+			<!-- id: pnl-add-producto, widgetVar: dlgAddProducto -->
+			<!-- Dialogo para agregar una partida a una tarima -->
+			<ui:include src="/inventarios/entrada/alta/alta-agregar-producto.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- id: pnl-servicios -->
+			<!-- Panel de configuración de servicios -->
+			<ui:include src="/inventarios/entrada/alta/alta-servicios.xhtml" />
+			
+			
+		</h:form>
+	</ui:define>
+</ui:composition>
