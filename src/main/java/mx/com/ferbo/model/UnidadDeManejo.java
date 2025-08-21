@@ -46,9 +46,9 @@ public class UnidadDeManejo implements Serializable {
     
     @Override
     public int hashCode() {
-    	if(this.unidadDeManejoCve == null)
-    		return System.identityHashCode(this);
-    	return Objects.hash(this.unidadDeManejoCve);
+        if(this.unidadDeManejoCve == null)
+        	return System.identityHashCode(this);
+        return Objects.hash(this.unidadDeManejoCve);
     }
 
     @Override
@@ -73,11 +73,6 @@ public class UnidadDeManejo implements Serializable {
 
     public UnidadDeManejo(Integer unidadDeManejoCve) {
         this.unidadDeManejoCve = unidadDeManejoCve;
-    }
-    
-    public UnidadDeManejo(UnidadDeManejo other) {
-    	this.unidadDeManejoCve = other.unidadDeManejoCve;
-    	this.unidadDeManejoDs = other.unidadDeManejoDs;
     }
 
     public Integer getUnidadDeManejoCve() {

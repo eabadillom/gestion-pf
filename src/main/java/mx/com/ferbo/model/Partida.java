@@ -126,7 +126,7 @@ public class Partida implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.Partida[ hash=" + this.hashCode() + ", partidaCve=" + this.partidaCve + " ]";
+        return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + " ]";
     }
     
     public void add(DetallePartida detalle) {
@@ -323,9 +323,8 @@ public class Partida implements Serializable, Cloneable {
     	//Se omite la lista de DetalleConstanciaSalida
     	partida.setDetalleConstanciaSalidaList(null);
     	
-    	if(this.unidadDeProductoCve != null) {
-    		partida.setUnidadDeProductoCve(new UnidadDeProducto(this.unidadDeProductoCve));
-    	}
+    	if(this.unidadDeProductoCve != null)
+    		partida.setUnidadDeProductoCve(this.unidadDeProductoCve);
     	
     	//Se omite la lista de TraspasoPartida
     	partida.setTraspasoPartidaList(null);
