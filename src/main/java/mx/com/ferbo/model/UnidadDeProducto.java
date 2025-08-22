@@ -36,7 +36,10 @@ public class UnidadDeProducto implements Serializable {
     @Basic(optional = false)
     @Column(name = "UNIDAD_DE_PRODUCTO_CVE")
     private Integer unidadDeProductoCve;
-    
+    // @Basic(optional = false)
+    // @NotNull
+    // @Column(name = "PRODUCTO_CVE")
+    // private int productoCve;
     @JoinColumn(name = "UNIDAD_DE_MANEJO_CVE", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
     @ManyToOne(optional = false)
     private UnidadDeManejo unidadDeManejoCve;
@@ -44,31 +47,6 @@ public class UnidadDeProducto implements Serializable {
     @JoinColumn(name = "PRODUCTO_CVE", referencedColumnName = "PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private Producto productoCve;
-    
-    @Override
-    public int hashCode() {
-    	if(this.unidadDeProductoCve == null)
-    		return System.identityHashCode(this);
-        return Objects.hash(this.unidadDeProductoCve);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof UnidadDeProducto)) {
-            return false;
-        }
-        UnidadDeProducto other = (UnidadDeProducto) object;
-        if ((this.unidadDeProductoCve == null && other.unidadDeProductoCve != null)
-                || (this.unidadDeProductoCve != null && !this.unidadDeProductoCve.equals(other.unidadDeProductoCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.UnidadDeProducto[ hashCode=" + this.hashCode() + ", unidadDeProductoCve=" + unidadDeProductoCve + " ]";
-    }
 
     public UnidadDeProducto() {
     }
@@ -80,12 +58,7 @@ public class UnidadDeProducto implements Serializable {
     public UnidadDeProducto(Integer unidadDeProductoCve, int productoCve) {
         this.unidadDeProductoCve = unidadDeProductoCve;
         this.productoCve = new Producto();
-    }
-    
-    public UnidadDeProducto(UnidadDeProducto other) {
-    	this.unidadDeProductoCve = other.unidadDeProductoCve;
-    	this.productoCve         = other.productoCve == null ? null : new Producto(other.productoCve);
-    	this.unidadDeManejoCve   = other.unidadDeManejoCve == null ? null : new UnidadDeManejo(other.unidadDeManejoCve);
+
     }
 
     public Integer getUnidadDeProductoCve() {
@@ -111,4 +84,31 @@ public class UnidadDeProducto implements Serializable {
     public void setProductoCve(Producto productoCve) {
         this.productoCve = productoCve;
     }
+
+    @Override
+    public int hashCode() {
+    	if(this.unidadDeProductoCve == null)
+    		return System.identityHashCode(this);
+        return Objects.hash(this.unidadDeProductoCve);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof UnidadDeProducto)) {
+            return false;
+        }
+        UnidadDeProducto other = (UnidadDeProducto) object;
+        if ((this.unidadDeProductoCve == null && other.unidadDeProductoCve != null)
+                || (this.unidadDeProductoCve != null && !this.unidadDeProductoCve.equals(other.unidadDeProductoCve))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.UnidadDeProducto[ unidadDeProductoCve=" + unidadDeProductoCve + " ]";
+    }
+
 }
