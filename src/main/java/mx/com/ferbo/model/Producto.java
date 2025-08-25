@@ -101,13 +101,6 @@ public class Producto implements Serializable {
         this.numeroProd = numeroProd;
         this.categoria = categoria;
     }
-    
-    public Producto(Producto other) {
-    	this.productoCve = other.productoCve;
-    	this.productoDs = other.productoDs;
-    	this.numeroProd = other.numeroProd;
-    	this.categoria = other.categoria;
-    }
 
     public Integer getProductoCve() {
         return productoCve;
