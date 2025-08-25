@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +16,7 @@ import mx.com.ferbo.dao.SerieConstanciaDAO;
 import mx.com.ferbo.dao.TipoMovimientoDAO;
 import mx.com.ferbo.dao.UnidadDeProductoDAO;
 import mx.com.ferbo.model.Camara;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
 import mx.com.ferbo.model.ConstanciaDepositoDetalle;
 import mx.com.ferbo.model.DetallePartida;
@@ -81,6 +83,37 @@ public class EntradaBL {
 				planta.getPlantaSufijo(), constancia.getCteCve().getCodUnico(), serie.getNuSerie());
 		
 		return folio;
+	}
+	
+	public static synchronized void actualizarFolio(Cliente cliente, Planta planta)
+	throws InventarioException {
+		String resultado = null;
+		SerieConstanciaDAO serieDAO = null;
+		SerieConstancia serie = null;
+		
+		serieDAO = new SerieConstanciaDAO();
+		
+		if(cliente == null)
+			throw new InventarioException("Debe proporcionar un cliente");
+		
+		if(planta == null)
+			throw new InventarioException("Debe proporcionar una planta");
+		
+		log.info("Actualizando Serie-Constancia...");
+		serie = serieDAO.buscarPorClienteTipoSerieAndPlanta(cliente.getCteCve(), "I", planta.getPlantaCve())
+				.orElseThrow(() -> new InventarioException("No es posible generar el folio de la constancia de depósito."));
+		
+		Integer consecutivo = serie.getNuSerie() + 1;
+		
+		serie.setNuSerie(consecutivo);
+		log.info("Consecutivo: {}", consecutivo);
+		
+		resultado = serieDAO.actualizar(serie);
+		
+		if(resultado != null)
+			throw new InventarioException("Ocurrió un problema con la actualización del folio.");
+		
+		log.info("La serie de la constancia de depósito se actualizó correctamente.");
 	}
 	
 	public static synchronized Partida crearPartida(Camara camara)
@@ -294,6 +327,13 @@ public class EntradaBL {
 		servicio.setServicioCantidad(cantidad);
 		servicio.setServicioCve(ps.getServicio());
 		
+		Optional<ConstanciaDepositoDetalle> isServicio = constancia.getConstanciaDepositoDetalleList().stream()
+			.filter(item -> item.getServicioCve().equals(ps.getServicio()))
+			.findFirst();
+		
+		if(isServicio.isPresent())
+			throw new InventarioException("El servicio ya se encuentra registrado en la constancia");
+		
 		constancia.getConstanciaDepositoDetalleList().add(servicio);
 	}
 	
@@ -317,6 +357,8 @@ public class EntradaBL {
 		constanciaServicio.setFolio(constancia);
 		constanciaServicio.setServicioCantidad(cantidad);
 		constanciaServicio.setServicioCve(servicio);
+		
+		constancia.getConstanciaDepositoDetalleList().add(constanciaServicio);
 	}
 	
 	public static synchronized void eliminarServicio(ConstanciaDeDeposito constancia, ConstanciaDepositoDetalle servicio)
@@ -359,28 +401,45 @@ public class EntradaBL {
 			throw new InventarioException("Debe proporcionar uno o más servicios.");
 		
 		constanciaDAO = new ConstanciaDeDepositoDAO();
-		
+		log.info("Verificando si ya existe la constancia de deposito {}", constancia.getFolioCliente());
 		existeConstancia = constanciaDAO.buscarPorFolioCliente(constancia.getFolioCliente());
 		
 		if(existeConstancia != null)
 			throw new InventarioException("La constancia de depósito ya se encuentra registrada.");
 		
+		log.info("La constancia de depósito {} se encuentra disponible, procediendo con el guardado...");
 		udpDAO = new UnidadDeProductoDAO();
 		
-		for(Partida item : constancia.getPartidaList()) {
-			unidadDeProducto = udpDAO
-					.buscarPorProductoUnidad(item.getUnidadDeProductoCve().getProductoCve().getProductoCve(), item.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
+		for(Partida partida : constancia.getPartidaList()) {
+			Integer idProducto = partida.getUnidadDeProductoCve().getProductoCve().getProductoCve();
+			Integer idUnidad = partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve();
 			
-			if(unidadDeProducto == null)
-				udpDAO.guardar(item.getUnidadDeProductoCve());
-			else
-				item.setUnidadDeProductoCve(unidadDeProducto);
-			item.setUnidadDeCobro(item.getUnidadDeProductoCve().getUnidadDeManejoCve());
+			unidadDeProducto = udpDAO.buscarPorProductoUnidad(idProducto, idUnidad);
+			
+			if(unidadDeProducto == null) {
+				unidadDeProducto = partida.getUnidadDeProductoCve();
+				udpDAO.guardar(unidadDeProducto);
+			}
+			
+			partida.setUnidadDeProductoCve(unidadDeProducto);
+			partida.setFolio(constancia);
+			partida.setCantidadDeCobro(partida.getPesoTotal());
+			partida.setUnidadDeCobro(partida.getUnidadDeProductoCve().getUnidadDeManejoCve());
+			partida.getDetallePartidaList().forEach(detallePartida -> {
+				detallePartida.setCantidadUManejo(partida.getCantidadTotal());
+				detallePartida.setCantidadUMedida(partida.getPesoTotal());
+			});
+		}
+		
+		for(ConstanciaDepositoDetalle cDetalle : constancia.getConstanciaDepositoDetalleList()) {
+			cDetalle.setFolio(constancia);
 		}
 		
 		respuesta = constanciaDAO.guardar(constancia);
 		
 		if(respuesta != null)
     		throw new InventarioException("Ocurrió un problema para guardar la constancia de depósito.");
+		
+		log.info("La constancia de depósito {} se guardó correctamente.", constancia.getFolioCliente());
 	}
 }

@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.util.EntityManagerUtil;
 
-
+@Deprecated
 public abstract class IBaseDAO<MODEL, PK> {
 	
 	private static Logger log = LogManager.getLogger(IBaseDAO.class);
