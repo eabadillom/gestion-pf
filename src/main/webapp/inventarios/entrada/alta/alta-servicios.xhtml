@@ -4,7 +4,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-			<p:panel id="pnl-servicios" header="PARA LOS SERVICIOS DE">
+			<p:panel id="pnl-servicios" header="PARA LOS SERVICIOS DE" toggleable="true">
 				<div class="p-grid ui-fluid">
 					<div class="p-col-12 p-md-3">
 						<p:selectBooleanButton value="#{ingresoBean.isCongelacion}" onIcon="pi pi-check" onLabel="Congelación" offIcon="pi pi-times" offLabel="Congelación" disabled="#{not ingresoBean.capturar}">
@@ -27,7 +27,7 @@
 						</p:selectBooleanButton>
 					</div>
 				</div>
-				<p:spacer style="height: 2rem;"/>
+				<p:separator />
 				<div class="p-grid ui-fluid">	
 					<div class="p-col-12 p-md-6">
 						<p:selectOneMenu value="#{ingresoBean.servicio}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">

@@ -3,7 +3,14 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-
+			<h:outputStylesheet>
+				.ui-datalist-header {
+					background-color: #d4d4d4 !important;
+				}
+				.ui-datalist-footer {
+					background-color: #d4d4d4 !important;
+				}
+			</h:outputStylesheet>
 			<p:dataList id="dl-tarimas" value="#{ingresoBean.tarimas}" var="tarima" emptyMessage="No se han agregado tarimas" type="definition">
 				<f:facet name="header">
 					<p:outputLabel value="#{ingresoBean.tarimas.size()} TARIMA(S)"></p:outputLabel>
@@ -75,6 +82,23 @@
 				</p:dataList>
 				<p:spacer style="height: 2rem;"/>
 				<f:facet name="footer">
+					<div class="p-grid ui-fluid">
+						<div class="p-col-12 p-md-6">
+							<div style="text-align: left;">
+								<p:outputLabel value="#{ingresoBean.totalTarimas()} Tarima(s)"></p:outputLabel>
+							</div>
+						</div>
+						<div class="p-col-12 p-md-2">
+							<div style="text-align: right;">
+								<p:outputLabel value="#{ingresoBean.totalCantidad()} Unidad(es)"></p:outputLabel>
+							</div>
+						</div>
+						<div class="p-col-12 p-md-2">
+							<div style="text-align: right;">
+								<p:outputLabel value="#{ingresoBean.totalPeso()} kg"></p:outputLabel>
+							</div>
+						</div>
+					</div>
 					<p:outputLabel value="Totales:"></p:outputLabel>
 				</f:facet>
 			</p:dataList>

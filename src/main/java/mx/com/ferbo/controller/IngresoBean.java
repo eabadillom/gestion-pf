@@ -1,6 +1,8 @@
 package mx.com.ferbo.controller;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
@@ -43,6 +46,7 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.Tarima;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.reports.TicketEntradaReport;
 import mx.com.ferbo.util.InventarioException;
 
 
@@ -133,7 +137,7 @@ public class IngresoBean implements Serializable {
 			
 			this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(this.bytes.length)
 					.name("ticket.pdf").stream(() -> new ByteArrayInputStream(this.bytes)).build();
-			
+			log.info("El usuario {} entra a la captura de constancias de depósito", this.usuario.getUsuario());
 		} catch(Exception ex) {
 			log.error("Ocurrió un problema al iniciar el módulo de registro de constancias de depósito...", ex);
 		}
@@ -192,7 +196,9 @@ public class IngresoBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:pnl-config-tarima", "form:pnl-add-producto", "form:pnl-servicios");
 			mensaje = "Configure sus tarimas";
 			severity = FacesMessage.SEVERITY_INFO;
+			log.info("Creación de constancia de depósito terminada, procediendo con captura de productos.");
 		} catch(InventarioException ex) {
+			log.warn(ex.getMessage());
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 		} catch(Exception ex) {
@@ -234,6 +240,7 @@ public class IngresoBean implements Serializable {
 		} catch(InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
+			log.warn(ex.getMessage());
 		} catch(Exception ex) {
 			log.error("Problema para generar las tarimas...", ex);
 			mensaje = "Ocurrió un problema al generar la(s) tarima(s).";
@@ -258,6 +265,7 @@ public class IngresoBean implements Serializable {
         	mensaje= "Tarima eliminada";
         	severity = FacesMessage.SEVERITY_INFO;
         } catch(InventarioException ex ) {
+        	log.warn(ex.getMessage());
         	mensaje = ex.getMessage();
         	severity = FacesMessage.SEVERITY_WARN;
         } catch(Exception ex) {
@@ -282,17 +290,19 @@ public class IngresoBean implements Serializable {
 	
 	public void prepararPartida() {
 		try {
+			log.info("Preparando partida...");
 			this.partida = EntradaBL.crearPartida(camara);
+			log.info("Partida: {}", partida);
 		} catch(Exception ex) {
 			log.warn("Problema para crear la tarima...", ex);
 		}
 	}
 	
 	public void addToTarima() {
-		log.info("Agregando producto a la tarima {}", this.tarima);
-		
 		try {
+			log.info("Agregando producto a la tarima {}", this.tarima);
 			EntradaBL.agregarATarima(this.entrada, this.tarima, this.partida);
+			log.info("Producto agregado a la tarima.");
 		} catch (InventarioException ex) {
 			log.error("Problema para agregar la partida a la tarima...", ex);
 		}
@@ -304,9 +314,10 @@ public class IngresoBean implements Serializable {
 	}
 	
 	public void eliminarProducto(Partida partida) {
-		log.info("Eliminando partida: {}", partida);
 		try {
+			log.info("Eliminando partida: {}", partida);
 			EntradaBL.eliminarProducto(entrada, tarima, partida);
+			log.info("Partida eliminada.");
 		} catch(Exception ex) {
 			log.error("Problema para eliminar la partida...", ex);
 		}
@@ -328,6 +339,48 @@ public class IngresoBean implements Serializable {
 		return peso;
 	}
 	
+	public Integer totalTarimas() {
+		if(tarimas == null)
+			return 0;
+		
+		return tarimas.size();
+	}
+	
+	public Integer totalCantidad() {
+		Integer totalCantidad;
+		
+		try {
+			totalCantidad = tarimas.stream()
+					.mapToInt(tarima -> tarima.getPartidas().stream().mapToInt(Partida::getCantidadTotal).sum())
+					.sum()
+					;
+		} catch(Exception ex) {
+			totalCantidad = 0;
+		}
+		
+		return totalCantidad;
+	}
+	
+	public BigDecimal totalPeso() {
+		BigDecimal totalPeso = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+		
+		try {
+			for(Tarima t : this.tarimas) {
+				BigDecimal subtotal = t.getPartidas()
+						.stream()
+						.map(Partida::getPesoTotal)
+						.reduce(BigDecimal.ZERO, BigDecimal::add)
+						;
+				
+				totalPeso = totalPeso.add(subtotal);
+			}
+		} catch(Exception ex) {
+			totalPeso = BigDecimal.ZERO.setScale(3, RoundingMode.HALF_EVEN);
+		}
+		
+		return totalPeso;
+	}
+	
 	public List<PrecioServicio> serviciosElegibles() {
 		List<PrecioServicio> servicios = null;
 		
@@ -336,7 +389,7 @@ public class IngresoBean implements Serializable {
 		
 		servicios = this.serviciosCliente.stream()
 				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_CONGELACION)   == false) )
-				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_CONGELACION)   == false) )
+				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_CONSERVACION)  == false) )
 				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_REFRIGERACION) == false) )
 				.filter(item -> (item.getServicio().getServicioCve().equals(SRV_MANIOBRAS)     == false) )
 				.collect(Collectors.toList())
@@ -346,20 +399,41 @@ public class IngresoBean implements Serializable {
 	}
 	
 	public void agregarServicio() {
-		log.info("Agregando servicio a la entrada: {}", servicio);
+		FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Agregar servicio";
+		
 		try {
+			log.info("Agregando servicio a la entrada: {}", servicio);
 			EntradaBL.agregarServicio(entrada, servicio, cantidadServicio);
 			this.servicio = null;
 			this.cantidadServicio = null;
+			log.info("Precio servicio agregado: {}", this.servicio);
+		} catch(InventarioException ex) {
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+        	FacesContext.getCurrentInstance().addMessage(null, message);
+        	PrimeFaces.current().ajax().update("form:messages");
 		} catch (Exception ex) {
 			log.error("Problema para agregar el servicio...", ex);
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+        	FacesContext.getCurrentInstance().addMessage(null, message);
+        	PrimeFaces.current().ajax().update("form:messages");
+			
 		}
 	}
 	
 	public void eliminarServicio(ConstanciaDepositoDetalle constanciaServicio) {
-		log.info("Eliminando servicio de la entrada: {}", constanciaServicio);
 		try {
+			log.info("Eliminando servicio de la entrada: {}", constanciaServicio);
 			EntradaBL.eliminarServicio(entrada, constanciaServicio);
+			log.info("Servicio eliminado.");
 		} catch(Exception ex) {
 			log.error("Problema para eliminar el servicio...", ex);
 		}
@@ -372,23 +446,38 @@ public class IngresoBean implements Serializable {
         String titulo = "Guardar tarima";
         
         try {
-        	if(this.isCongelacion)
+        	log.info("El usuario {} se prepara para guardar la constancia de depósito {}...",
+        			this.usuario.getUsuario(), this.entrada.getFolioCliente());
+        	
+        	if(this.isCongelacion) {
         		EntradaBL.agregarServicio(this.entrada, this.congelacion, BigDecimal.ONE.setScale(2, RoundingMode.HALF_UP));
+        		log.info("Servicio de congelación agregado.");
+        	}
         	
-        	if(this.isConservacion)
+        	if(this.isConservacion) {
         		EntradaBL.agregarServicio(this.entrada, this.conservacion, BigDecimal.ONE.setScale(2, RoundingMode.HALF_UP));
+        		log.info("Servicio de conservación agregado.");
+        	}
         	
-        	if(this.isRefrigeracion)
+        	if(this.isRefrigeracion) {
         		EntradaBL.agregarServicio(this.entrada, this.refrigeracion, BigDecimal.ONE.setScale(2, RoundingMode.HALF_UP));
+        		log.info("Servicio de refrigeración agregado.");
+        	}
         	
-        	if(this.isManiobras)
+        	if(this.isManiobras) {
         		EntradaBL.agregarServicio(this.entrada, this.maniobras, BigDecimal.ONE.setScale(2, RoundingMode.HALF_UP));
+        		log.info("Servicio de maniobras agregado.");
+        	}
         	
-        	EntradaBL.guardar(entrada);
+        	EntradaBL.guardar(this.entrada);
+        	EntradaBL.actualizarFolio(this.entrada.getCteCve(), this.planta);
         	
         	this.editar = false;
         	
+        	mensaje = "La entrada se registró correctamente";
+        	severity = FacesMessage.SEVERITY_INFO;
         } catch(InventarioException ex ) {
+        	log.warn(ex.getMessage());
         	mensaje = ex.getMessage();
         	severity = FacesMessage.SEVERITY_WARN;
         } catch(Exception ex) {
@@ -400,6 +489,36 @@ public class IngresoBean implements Serializable {
         	FacesContext.getCurrentInstance().addMessage(null, message);
         	PrimeFaces.current().ajax().update("form:messages");
         }
+	}
+	
+	public void imprimir() {
+		InputStream input;
+		byte[] bytes = null;
+		String fileName = null;
+		
+		try {
+			fileName = String.format("Entrada_%s.pdf", entrada.getFolioCliente());
+			
+			bytes = TicketEntradaReport.getPDF(this.entrada.getFolioCliente());
+			input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentType("application/pdf")
+					.name(fileName)
+					.stream(() -> input)
+					.contentLength(bytes.length)
+					.build()
+					;
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el ticket de entrada...", ex);
+		}
+	}
+	
+	public void nueva()
+	throws IOException {
+		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+		String requestURI = ((HttpServletRequest) context.getRequest()).getRequestURI();
+		context.redirect(requestURI);
 	}
 	
 	public List<Cliente> getClientes() {

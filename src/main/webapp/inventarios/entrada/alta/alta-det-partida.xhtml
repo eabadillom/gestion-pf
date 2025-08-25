@@ -21,22 +21,22 @@
 					<div class="p-grid ui-fluid">
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Código" />
-							<p:inputText value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpCodigo}" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}">
+							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpCodigo}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Pedimento" />
-							<p:inputText value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpPedimento}" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}">
+							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpPedimento}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Contenedor" />
-							<p:inputText value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpSAP}" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}">
+							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpSAP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Lote" />
-							<p:inputText value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpLote}" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}">
+							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpLote}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
@@ -46,7 +46,7 @@
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Otro" />
-							<p:inputText value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpMP}" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}">
+							<p:inputText maxlength="12" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpMP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}">
 							</p:inputText>
 						</div>
 					</div>

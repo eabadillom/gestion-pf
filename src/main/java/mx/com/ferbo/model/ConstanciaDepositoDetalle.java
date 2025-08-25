@@ -65,9 +65,15 @@ public class ConstanciaDepositoDetalle implements Serializable {
             return false;
         }
         ConstanciaDepositoDetalle other = (ConstanciaDepositoDetalle) object;
-        if ((this.constanciaDepositoDetalleCve == null && other.constanciaDepositoDetalleCve != null) || (this.constanciaDepositoDetalleCve != null && !this.constanciaDepositoDetalleCve.equals(other.constanciaDepositoDetalleCve))) {
-            return false;
-        }
+        if(this.hashCode() != other.hashCode())
+        	return false;
+        
+        if ((this.constanciaDepositoDetalleCve == null && other.constanciaDepositoDetalleCve != null) || (this.constanciaDepositoDetalleCve != null && !this.constanciaDepositoDetalleCve.equals(other.constanciaDepositoDetalleCve)))
+        	return false;
+        
+        if(this.servicioCve != other.servicioCve)
+        	return false;
+        
         return true;
     }
 
