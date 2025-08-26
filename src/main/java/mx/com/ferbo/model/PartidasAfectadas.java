@@ -20,99 +20,103 @@ import javax.validation.constraints.Null;
 @Entity
 @Table(name = "partidas_afectadas")
 @NamedQueries({
-		@NamedQuery(name = "PartidasAfectadas.findAll", query = "SELECT pa FROM PartidasAfectadas pa"),
-		@NamedQuery(name = "PartidasAfectadas.findByID", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.id= :id"),
-		@NamedQuery(name = "PartidasAfectadas.findByTraspaso", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.traspaso = :traspaso"),
-		@NamedQuery(name = "PartidasAfectadas.findByPartida", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.partida = :partida"),
-		@NamedQuery(name = "PartidasAfectadas.findByPartidaTraspaso", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.partidatraspaso = :partidatraspaso")})
-		
+    @NamedQuery(name = "PartidasAfectadas.findAll", query = "SELECT pa FROM PartidasAfectadas pa"),
+    @NamedQuery(name = "PartidasAfectadas.findByID", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.id= :id"),
+    @NamedQuery(name = "PartidasAfectadas.findByTraspaso", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.traspaso = :traspaso"),
+    @NamedQuery(name = "PartidasAfectadas.findByPartida", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.partida = :partida"),
+    @NamedQuery(name = "PartidasAfectadas.findByPartidaTraspaso", query = "SELECT pa FROM PartidasAfectadas pa WHERE pa.partidatraspaso = :partidatraspaso"
+)})
 public class PartidasAfectadas implements Serializable{
-private static final long serialVersionUID = 1L;
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-@Basic(optional = false)
-@Column(name = "id")
-private Integer id;
+    private static final long serialVersionUID = 1L;    
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
 
-@Basic(optional = true)
-@Null
-@Column(name = "traspaso")
- private String traspaso;
-
-
-@ManyToOne(optional = false)
-@JoinColumn(name = "partida", referencedColumnName = "PARTIDA_CVE")
-private Partida partida;
-
-@OneToOne (optional = false)
-@JoinColumn(name = "PARTIDA_TRASPASO", referencedColumnName = "id")
-private TraspasoPartida partidatraspaso;
-
-public PartidasAfectadas() {
-	
-}
-
-public PartidasAfectadas(String traspaso,Partida partida, TraspasoPartida partidatraspaso) {
-	this.traspaso = traspaso;
-	this.partida = partida;
-	this.partidatraspaso = partidatraspaso;
-}
+    @Basic(optional = true)
+    @Null
+    @Column(name = "traspaso")
+    private String traspaso;
 
 
-public String getTraspaso() {
-	return traspaso;
-}
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "partida", referencedColumnName = "PARTIDA_CVE")
+    private Partida partida;
 
-public void setTraspaso(String traspaso) {
-	this.traspaso = traspaso;
-}
+    @OneToOne (optional = false)
+    @JoinColumn(name = "PARTIDA_TRASPASO", referencedColumnName = "id")
+    private TraspasoPartida partidatraspaso;
 
-public Partida getPartida() {
-	return partida;
-}
+    public PartidasAfectadas() {
 
-public void setPartida(Partida partida) {
-	this.partida = partida;
-}
+    }
 
-public TraspasoPartida getPartidatraspaso() {
-	return partidatraspaso;
-}
+    public PartidasAfectadas(String traspaso,Partida partida, TraspasoPartida partidatraspaso) {
+        this.traspaso = traspaso;
+        this.partida = partida;
+        this.partidatraspaso = partidatraspaso;
+    }
 
-public void setPartidatraspaso(TraspasoPartida partidatraspaso) {
-	this.partidatraspaso = partidatraspaso;
-}
 
-public Integer getId() {
-	return id;
-}
+    public String getTraspaso() {
+        return traspaso;
+    }
 
-public void setId(Integer id) {
-	this.id = id;
-}
+    public void setTraspaso(String traspaso) {
+        this.traspaso = traspaso;
+    }
 
-@Override
-public String toString() {
-	return "PartidasAfectadas [id=" + id + ", traspaso=" + traspaso + ", partida=" + partida + ", partidatraspaso="
-			+ partidatraspaso + "]";
-}
+    public Partida getPartida() {
+        return partida;
+    }
 
-@Override
-public int hashCode() {
-	return Objects.hash(id, partida, partidatraspaso, traspaso);
-}
+    public void setPartida(Partida partida) {
+        this.partida = partida;
+    }
 
-@Override
-public boolean equals(Object obj) {
-	if (this == obj)
-		return true;
-	if (obj == null)
-		return false;
-	if (getClass() != obj.getClass())
-		return false;
-	PartidasAfectadas other = (PartidasAfectadas) obj;
-	return Objects.equals(id, other.id) && Objects.equals(partida, other.partida)
-			&& Objects.equals(partidatraspaso, other.partidatraspaso) && Objects.equals(traspaso, other.traspaso);
-}
+    public TraspasoPartida getPartidatraspaso() {
+        return partidatraspaso;
+    }
+
+    public void setPartidatraspaso(TraspasoPartida partidatraspaso) {
+        this.partidatraspaso = partidatraspaso;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "PartidasAfectadas [id=" + id + ", traspaso=" + traspaso + ", partida=" + partida + ", partidatraspaso="
+                + partidatraspaso + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, partida, partidatraspaso, traspaso);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        PartidasAfectadas other = (PartidasAfectadas) obj;
+        return Objects.equals(id, other.id) && Objects.equals(partida, other.partida)
+                && Objects.equals(partidatraspaso, other.partidatraspaso) && Objects.equals(traspaso, other.traspaso);
+    }
 
 }

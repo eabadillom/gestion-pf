@@ -7,8 +7,6 @@ import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.donut.DonutChartOptions;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import java.util.Date;
 import java.util.ArrayList;
@@ -29,6 +27,9 @@ public class VentasRazonSocialDonutChart implements Serializable
 {
     private static final Logger log = LogManager.getLogger(UtilidadPorMesMensualStackedBar.class);
     private static final long serialVersionUID = 1L;
+    
+    private static final String TITULO_GRAFICA = "Ventas Por Razón Social";
+    private static final String CHART_EXTENDER = "charExtenderDonut";
     
     public static DonutChartModel construirModeloVentasRazonSocial()
     {
@@ -70,11 +71,11 @@ public class VentasRazonSocialDonutChart implements Serializable
         // Título
         Title title = new Title();
         title.setDisplay(true);
-        title.setText("Ventas Por Razón Social");
+        title.setText(TITULO_GRAFICA);
         options.setTitle(title);
 
         donutModel.setData(data);
-        donutModel.setExtender("charExtenderDonut");
+        donutModel.setExtender(CHART_EXTENDER);
 
         return donutModel;
     }

@@ -3,6 +3,9 @@ package mx.com.ferbo.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -662,4 +665,28 @@ public class DateUtil {
 			log.error("Problema para obtener el vencimiento...", ex);
 		}
 	}
+        
+        public static Date[] obtenerRango(Date fechaSeleccionada) 
+        {
+            ZoneId ZONE = ZoneId.of("Etc/GMT+6");
+            LocalDate fecha = fechaSeleccionada.toInstant().atZone(ZONE).toLocalDate();
+            LocalDate hoy = LocalDate.now();
+
+            LocalDate inicio = fecha.withDayOfMonth(1);
+
+            // último día depende si es mes actual o no
+            LocalDate fin;
+            if (fecha.getMonth() == hoy.getMonth() && fecha.getYear() == hoy.getYear()) {
+                fin = hoy; // mes actual → hasta hoy
+            } else {
+                YearMonth ym = YearMonth.of(fecha.getYear(), fecha.getMonth());
+                fin = ym.atEndOfMonth(); // mes pasado/futuro → último día del mes
+            }
+
+            // convertir de LocalDate a java.util.Date
+            Date inicioDate = Date.from(inicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date finDate = Date.from(fin.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            return new Date[]{inicioDate, finDate};
+        }
 }

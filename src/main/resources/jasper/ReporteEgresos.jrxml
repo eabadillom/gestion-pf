@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteEgresos" language="groovy" pageWidth="851" pageHeight="611" columnWidth="761" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="11111111-2222-3333-4444-555555555555">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionLocal"/>
+	<parameter name="fechaini" class="java.util.Date"/>
+	<parameter name="fechafin" class="java.util.Date"/>
+	<parameter name="emisor" class="java.lang.String">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="image" class="java.lang.String">
+		<defaultValueExpression><![CDATA[new String ("resources/logo_square.gif")]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[select ie.fecha, em.nb_emisor, ce.nombre_egreso, cate.nombre_categoria, 
+                   ie.subTotal, ie.IVA, ie.IEPS, ie.importe
+            from emisor em
+            inner join importe_egreso ie on em.cd_emisor = ie.cd_emisor
+            inner join concepto_egreso ce on ce.id_egreso = ie.id_egreso
+            inner join categoria_egreso cate on cate.id_categoria_egreso = ce.categoria_egreso
+            where ie.fecha between $P{fechaini} and $P{fechafin}
+              and ($P{emisor} IS NULL OR em.nb_emisor = $P{emisor})
+            order by em.nb_emisor, ie.fecha asc]]>
+	</queryString>
+	<field name="fecha" class="java.sql.Date"/>
+	<field name="nb_emisor" class="java.lang.String"/>
+	<field name="nombre_egreso" class="java.lang.String"/>
+	<field name="nombre_categoria" class="java.lang.String"/>
+	<field name="subTotal" class="java.math.BigDecimal"/>
+	<field name="IVA" class="java.math.BigDecimal"/>
+	<field name="IEPS" class="java.math.BigDecimal"/>
+	<field name="importe" class="java.math.BigDecimal"/>
+	<variable name="SUM_subTotal" class="java.math.BigDecimal" resetType="Group" resetGroup="GrupoEmisor" calculation="Sum">
+		<variableExpression><![CDATA[$F{subTotal}]]></variableExpression>
+	</variable>
+	<variable name="SUM_iva" class="java.math.BigDecimal" resetType="Group" resetGroup="GrupoEmisor" calculation="Sum">
+		<variableExpression><![CDATA[$F{IVA}]]></variableExpression>
+	</variable>
+	<variable name="SUM_ieps" class="java.math.BigDecimal" resetType="Group" resetGroup="GrupoEmisor" calculation="Sum">
+		<variableExpression><![CDATA[$F{IEPS}]]></variableExpression>
+	</variable>
+	<variable name="SUM_importe" class="java.math.BigDecimal" resetType="Group" resetGroup="GrupoEmisor" calculation="Sum">
+		<variableExpression><![CDATA[$F{importe}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_subtotal" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{subTotal}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_iva" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{IVA}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_ieps" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{IEPS}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_importe" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{importe}]]></variableExpression>
+	</variable>
+	<group name="GrupoEmisor">
+		<groupExpression><![CDATA[$F{nb_emisor}]]></groupExpression>
+		<groupHeader>
+			<band height="25">
+				<textField>
+					<reportElement x="0" y="5" width="760" height="20" uuid="ae10a087-8b34-4410-9e37-1e079f7cb477"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nb_emisor}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="21">
+				<staticText>
+					<reportElement x="0" y="0" width="360" height="20" uuid="e6aa5aea-6d79-407c-9e94-b81a5ad166c8"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Totales:]]></text>
+				</staticText>
+				<textField pattern="$#,##0.00">
+					<reportElement x="660" y="0" width="100" height="20" uuid="4936fc79-5413-4efb-90bc-9c2eb60e97cf">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{SUM_importe}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00">
+					<reportElement x="360" y="0" width="100" height="20" uuid="062659b4-f3c6-449e-b83f-342121a89bf7">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{SUM_subTotal}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00">
+					<reportElement x="460" y="0" width="100" height="20" uuid="a78f377d-0138-40af-b2d2-b39ea704ef72">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{SUM_iva}]]></textFieldExpression>
+				</textField>
+				<textField pattern="$#,##0.00">
+					<reportElement x="560" y="0" width="100" height="20" uuid="3272aa3b-37f4-4809-aec7-cf8a7ce1e6f5">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{SUM_ieps}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="20" width="760" height="1" forecolor="#1696F7" backcolor="#1696F7" uuid="6e4d4b90-d772-4d0d-b9ef-a3e0fa047674"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="54">
+			<image>
+				<reportElement x="0" y="0" width="170" height="54" uuid="bdb8261a-bb21-4c70-8040-7c30c6004b28">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{image}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="0" width="760" height="21" forecolor="#2196F3" uuid="5444765a-976e-44b2-9eb3-c0c87e44cc26">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE DE EGRESOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="289" y="21" width="20" height="12" uuid="fb25276f-679b-4647-9bfd-acebba0d6d75"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Del]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="309" y="21" width="70" height="12" uuid="1eba65ad-019f-4836-b615-686de40b5062"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{fechaini}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="379" y="21" width="20" height="12" uuid="fb25276f-679b-4647-9bfd-acebba0d6d75"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ al ]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="399" y="21" width="74" height="12" uuid="49db223e-c468-40dc-987d-1402a69f257e"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{fechafin}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="25">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="60" height="20" forecolor="#F7EEED" backcolor="#2196F3" uuid="0c6b19b3-3415-4370-a028-1f5d308f4a1d">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Fecha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="60" y="0" width="100" height="20" forecolor="#F7EEED" backcolor="#2196F3" uuid="d382d933-fec1-4e82-8ba8-656d5e754d6e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Concepto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="160" y="0" width="200" height="20" forecolor="#F7EEED" backcolor="#2196F3" uuid="daa7888a-7105-437f-ad04-bd57745bc85a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Categoría]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="360" y="0" width="100" height="20" forecolor="#F7EEED" backcolor="#2196F3" uuid="2c2e83cb-abb7-4b3e-8c11-3d4f1b238c3d">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Subtotal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="460" y="0" width="100" height="20" forecolor="#F7EEED" backcolor="#2196F3" uuid="a4fa2472-1d77-4c93-ae9b-f4d348eaa4ac">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[IVA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="560" y="0" width="100" height="20" forecolor="#F7EEED" backcolor="#2196F3" uuid="2e8e9ec1-cc74-46d8-bd7a-e60418d01905">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[IEPS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="660" y="0" width="100" height="20" forecolor="#F7EEED" backcolor="#2196F3" uuid="d7bfbcb0-2601-4ad0-bc24-055d1a772931"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Importe]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<textField>
+				<reportElement x="0" y="0" width="60" height="20" uuid="6252733d-acf5-4d67-94da-5f17f6af10ad"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{fecha})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="60" y="0" width="100" height="20" uuid="4ff742b6-f819-4d75-9eff-e98307fbcc69"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nombre_egreso}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="0" width="200" height="20" uuid="3e7c889c-6069-4128-893d-c856798bde17">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nombre_categoria}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00">
+				<reportElement x="360" y="0" width="100" height="20" uuid="3460e4ae-897d-467b-b46b-5c8468a2e33f">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{subTotal}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00">
+				<reportElement x="460" y="0" width="100" height="20" uuid="150cd19e-4488-42d0-8977-f26376445d50">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{IVA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00">
+				<reportElement x="560" y="0" width="100" height="20" uuid="6d697d99-ffe0-4e69-aafc-2ee606d39d3c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{IEPS}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00">
+				<reportElement x="660" y="0" width="100" height="20" uuid="1e75e49f-f66a-43ad-abc6-48be162eb4e5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{importe}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="34">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="0" width="160" height="9" uuid="b04bf93f-96ba-4776-8ae1-684e4b3de196"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="5" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="" mode="Opaque" x="0" y="9" width="360" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="f6873bc3-7f64-452d-a425-6489a603357a">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL GENERAL: ]]></text>
+			</staticText>
+			<textField pattern="$#,##0.00">
+				<reportElement mode="Opaque" x="360" y="9" width="100" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="0331afe4-daed-4570-b897-08b704a4fd52"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_subtotal}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00">
+				<reportElement mode="Opaque" x="460" y="9" width="100" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="8b814c4f-0e9f-42a6-a649-378a36491138"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_iva}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00">
+				<reportElement mode="Opaque" x="560" y="9" width="100" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="c2aeb922-eeaa-41ef-b491-fc1578576f39"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_ieps}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$#,##0.00">
+				<reportElement mode="Opaque" x="660" y="9" width="100" height="13" forecolor="#F7EEED" backcolor="#2196F3" uuid="37bdc978-9414-42b8-958d-067d87f59f30"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_importe}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="0" width="600" height="9" uuid="930b1733-2fb0-414b-98c2-b13ed99af4da"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="5" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+	<noData>
+		<band height="100">
+			<staticText>
+				<reportElement x="0" y="0" width="760" height="21" forecolor="#2196F3" uuid="7a2ace02-11e0-45f2-aaec-107d979b60d4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE DE EGRESOS]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="170" height="50" uuid="208334b2-c61f-4083-b7f6-5b6a3d4e776b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{image}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="71" width="760" height="29" uuid="53e60681-d2ac-4408-823c-d84ee70d8abf">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NO SE ENCONTRO INFORMACION DEL EGRESO]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>
