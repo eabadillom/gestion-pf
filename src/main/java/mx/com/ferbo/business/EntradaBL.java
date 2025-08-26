@@ -230,6 +230,9 @@ public class EntradaBL {
 			t = new Tarima();
 			t.setPartidas(new ArrayList<Partida>());
 			t.getPartidas().add(p);
+			
+			p.setTarima(t);
+			p.setUnidadDeCobro(partida.getUnidadDeProductoCve().getUnidadDeManejoCve());
 			constancia.getPartidaList().add(p);
 			
 			tarimas.add(t);
@@ -306,7 +309,7 @@ public class EntradaBL {
 		tarima.getPartidas().remove(partida);
 	}
 	
-	public static void agregarServicio(ConstanciaDeDeposito constancia, PrecioServicio ps, BigDecimal cantidad)
+	public static synchronized void agregarServicio(ConstanciaDeDeposito constancia, PrecioServicio ps, BigDecimal cantidad)
 	throws InventarioException {
 		ConstanciaDepositoDetalle servicio = null;
 		
@@ -337,7 +340,7 @@ public class EntradaBL {
 		constancia.getConstanciaDepositoDetalleList().add(servicio);
 	}
 	
-	public static void agregarServicio(ConstanciaDeDeposito constancia, Servicio servicio, BigDecimal cantidad)
+	public static synchronized void agregarServicio(ConstanciaDeDeposito constancia, Servicio servicio, BigDecimal cantidad)
 	throws InventarioException {
 		ConstanciaDepositoDetalle constanciaServicio = null;
 		
