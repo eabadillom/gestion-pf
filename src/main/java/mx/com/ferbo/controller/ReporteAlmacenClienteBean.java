@@ -87,6 +87,7 @@ public class ReporteAlmacenClienteBean implements Serializable {
 				URL resource = getClass().getResource(jasperPath);
 				URL resourceimg = getClass().getResource(images);
 				String file = resource.getFile();
+                                log.info("Path info: {}", file);
 				String img = resourceimg.getFile();
 				reportFile = new File(file);
 				imgfile = new File(img);
