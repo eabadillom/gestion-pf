@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class VentasRazonSocialDonutChart implements Serializable
 {
-    private static final Logger log = LogManager.getLogger(UtilidadPorMesMensualStackedBar.class);
+    private static final Logger log = LogManager.getLogger(VentasRazonSocialDonutChart.class);
     private static final long serialVersionUID = 1L;
     
     private static final String TITULO_GRAFICA = "Ventas Por Razón Social";

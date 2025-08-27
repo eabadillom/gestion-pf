@@ -216,16 +216,8 @@ public class EgresosBean implements Serializable
         String titulo = null;
         log.info("Iniciando la actualización de un egreso");
         
-        /*BigDecimal porcentajeIVA = new BigDecimal(0).setScale(2);
-		BigDecimal porcentajeIESP = new BigDecimal(0).setScale(2);*/
-        try {
-
-            /*porcentajeIVA = importeSelected.getSubTotal().multiply(new BigDecimal(parametro.getValor()));
-			porcentajeIESP = importeSelected.getSubTotal().multiply(iepsSelect);
-						
-			importeSelected.setIva(porcentajeIVA);
-			importeSelected.setIeps(porcentajeIESP);
-			importeSelected.setImporte(porcentajeIVA.add(porcentajeIESP).add(importeSelected.getSubTotal()));*/
+        try 
+        {
             String msj = importeEgresosDAO.guardar(importeSelected);
             if (msj == null) {
                 listaImporteEgreso = importeEgresosDAO.buscarTodos();
@@ -294,15 +286,6 @@ public class EgresosBean implements Serializable
             byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
             InputStream input = new ByteArrayInputStream(bytes);
             this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
-            // egresoPDF = jasperReportUtil.getPdf(filename, parameters,
-            // reportFile.getPath());
-            /*
-			 * jasperReportUtil = new JasperReportUtil(); byte[] bytes =
-			 * jasperReportUtil.createPDF(parameters, reportFile.getPath()); InputStream
-			 * input = new ByteArrayInputStream(bytes); this.egresoPDF =
-			 * DefaultStreamedContent.builder() .contentType("application/pdf")
-			 * .name(filename) .stream(() -> input ) .build();
-             */
             log.info("Reporte generado {}...", filename);
         } catch (Exception ex) {
             log.error("Problema general...", ex);
@@ -357,15 +340,6 @@ public class EgresosBean implements Serializable
             byte[] bytes = jasperReportUtil.createXLSX(parameters, reportFile.getPath());
             InputStream input = new ByteArrayInputStream(bytes);
             this.file = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").name(filename).stream(() -> input).build();
-            // egresoPDF = jasperReportUtil.getPdf(filename, parameters,
-            // reportFile.getPath());
-            /*
-			 * jasperReportUtil = new JasperReportUtil(); byte[] bytes =
-			 * jasperReportUtil.createPDF(parameters, reportFile.getPath()); InputStream
-			 * input = new ByteArrayInputStream(bytes); this.egresoPDF =
-			 * DefaultStreamedContent.builder() .contentType("application/pdf")
-			 * .name(filename) .stream(() -> input ) .build();
-             */
             log.info("Reporte generado {}...", filename);
         } catch (Exception ex) {
             log.error("Problema general...", ex);

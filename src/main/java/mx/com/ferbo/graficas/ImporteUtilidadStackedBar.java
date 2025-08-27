@@ -7,8 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
-import mx.com.ferbo.dao.ImporteEgresosDAO;
 
+import mx.com.ferbo.dao.ImporteEgresosDAO;
 import mx.com.ferbo.ui.ImporteUtilidad;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +28,7 @@ import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
  */
 public class ImporteUtilidadStackedBar implements Serializable
 {
-    private static final Logger log = LogManager.getLogger(UtilidadPorMesMensualStackedBar.class);
+    private static final Logger log = LogManager.getLogger(ImporteUtilidadStackedBar.class);
     private static final long serialVersionUID = 1L;
     
     private static final String INGRESOS = "Ingresos";
