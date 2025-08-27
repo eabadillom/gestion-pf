@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+			<p:dataTable id="dt-salidas" value="#{altaConstanciaSalidaBean.listadoTemp}" var="salida">
+				<f:facet name="header">
+					<div>
+						<span>SUS PRODUCTOS</span>
+					</div>
+				</f:facet>
+				<p:column headerText="Entrada" width="5rem">
+					<h:outputText value="#{salida.folioEntrada}" />
+				</p:column>
+				<p:column headerText="Producto">
+					<h:outputText value="#{salida.producto}" />
+				</p:column>
+				<p:column headerText="Cantidad" width="4rem">
+					<h:outputText value="#{salida.cantidad}" />
+				</p:column>
+				<p:column headerText="Unidad" width="5rem">
+					<h:outputText value="#{salida.unidad}" />
+				</p:column>
+				<p:column headerText="Peso (kg)" width="5rem">
+					<h:outputText value="#{salida.peso}" />
+				</p:column>
+				<p:column headerText="Temp.(°C)" width="4rem">
+					<h:outputText value="#{salida.temperatura}" />
+				</p:column>
+				<p:column width="2rem">
+					<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" actionListener="#{altaConstanciaSalidaBean.deleteDetalleConstanciaSalida(salida)}" update="form:dt-inventario">
+						<f:setPropertyActionListener value="#{salida}" target="#{altaConstanciaSalidaBean.detalleSalida}" />
+					</p:commandButton>
+				</p:column>
+				<f:facet name="footer">
+		            <span class="font-bold">En total hay #{altaConstanciaSalidaBean.cantidadTotal} unidades con #{altaConstanciaSalidaBean.pesoTotal} kg.</span>
+		        </f:facet>
+			</p:dataTable>
+
+</ui:composition>
