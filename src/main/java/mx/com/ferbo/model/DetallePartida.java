@@ -290,6 +290,7 @@ public class DetallePartida implements Serializable, Cloneable {
 		DetallePartida dp = null;
 		
 		dp = new DetallePartida();
+		dp.setDetallePartidaPK(new DetallePartidaPK());
 		dp.setDetPadre(this.detPadre == null ? null : new Integer(this.detPadre));
 		dp.setDetPartPadre(this.detPartPadre == null ? null : new Integer(this.detPartPadre));
 		dp.setCantidadUManejo(this.cantidadUManejo == null ? null : new Integer(this.cantidadUManejo));

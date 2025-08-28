@@ -1,3 +1,4 @@
+
 package mx.com.ferbo.controller;
 
 import java.io.ByteArrayInputStream;
@@ -6,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Connection;
 import java.text.DateFormat;
@@ -70,6 +72,7 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.TipoMovimiento;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -77,7 +80,6 @@ import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
-
 public class AltaConstanciaSalidaBean implements Serializable{
 	
 	private static final long serialVersionUID = -1785488265380235016L;
@@ -177,6 +179,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	     return dateFormat.format(date);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public AltaConstanciaSalidaBean() {
 		constanciaDeServicio = new ConstanciaDeServicio();
 		constanciaServicioDAO = new ConstanciaServicioDAO();
@@ -214,11 +217,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		
 		saldoDAO = new SaldoDAO();
 		candadoDAO = new CandadoSalidaDAO();
-	}
-	
-	@SuppressWarnings("unchecked")
-	@PostConstruct
-	public void init() {
 		
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
@@ -243,7 +241,10 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		this.pesoTotal = new BigDecimal("0.000").setScale(3, BigDecimal.ROUND_HALF_UP);
 		
 		this.statusTermo = new Boolean(true);
-		
+	}
+	
+	@PostConstruct
+	public void init() {
 		log.info("El usuario {} entra a Inventarios / Salidas / Alta.", this.usuario.getUsuario());
 	}
 	
@@ -289,11 +290,15 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			this.validaSaldo();
 			this.generaFolioSalida();//si el folio existe no ejecutar lo demas y mandar a llamar a validar 
 			serviciosCliente = preciosServicioDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
+			log.info("Calculando inventario...");
+			Date tmInicio = new Date();
 			listaInventario = inventarioDAO.buscar(clienteSelect, plantaSelect);
+			listaInventarioCopy = new ArrayList<Inventario>(listaInventario);
 			listadoTemp = new ArrayList<DetalleConstanciaSalida>();
 			listadoConstanciaSalidaServicios = new ArrayList<ConstanciaSalidaServicios>();
 			partidaList = new ArrayList<Partida>();
-			listaInventarioCopy = inventarioDAO.buscar(clienteSelect, plantaSelect);
+			Date tmFin = new Date();
+			log.info("Tiempo de ejecución (búsqueda de inventario: {}", DateUtil.formatElapsedTime(tmFin.getTime() - tmInicio.getTime()));
 			
 			listaEntradas = new ArrayList<String>();
 			for(Inventario i : listaInventario) {
@@ -364,9 +369,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		}
 		
 		isHabilitarSalida = candadoSalida.getHabilitado();
-		
-//		if(candadoSalida.getNumSalidas() <= 0)
-//			throw new InventarioException("El cliente no tiene permitida la salida de mercancía. Por favor, comuníquese con el área de Facturación.");
 		
 		if(this.saldoVencido && isHabilitarSalida && candadoSalida.getNumSalidas() > 0) {
 			log.info("El cliente tiene un saldo vencido, pero tiene {} salidas permitidas.", candadoSalida.getNumSalidas());
@@ -472,24 +474,36 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		ConstanciaSalidaServiciosPK constanciaSalidaServiciosPK = null;
 		
 		try {
+			
 			constanciaSalidaServicios = new ConstanciaSalidaServicios();
 			constanciaSalidaServiciosPK = new ConstanciaSalidaServiciosPK();
 			
-			if(servicioClienteSelect == null)
+			if(this.servicioClienteSelect == null)
 				throw new InventarioException("Debe indicar un servicio.");
 			
-			if(cantidadServicio == null)
+			if(this.cantidadServicio == null)
 				throw new InventarioException("Debe indicar la cantidad del servicio solicitado.");
 			
-			if(cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
+			if(this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
 				throw new InventarioException("La cantidad del servicio indicada es incorrecta.");
 			
-			constanciaSalidaServiciosPK.setServicioCve(servicioClienteSelect.getServicio());
-			constanciaSalidaServicios.setConstanciaSalidaServiciosPK(constanciaSalidaServiciosPK);
-			constanciaSalidaServicios.setNumCantidad(cantidadServicio);
+			Boolean isServicioPresent = this.listadoConstanciaSalidaServicios.stream()
+					.filter(item -> 
+					item.getConstanciaSalidaServiciosPK().getServicioCve().getServicioCve().equals(this.servicioClienteSelect.getServicio().getServicioCve()))
+					.findFirst().isPresent();
 			
-			listadoConstanciaSalidaServicios.add(constanciaSalidaServicios);
-			log.debug(listadoConstanciaSalidaServicios);
+			if(isServicioPresent)
+				throw new InventarioException("El servicio ya se encuentra registrado.");
+			
+			constanciaSalidaServiciosPK.setServicioCve(this.servicioClienteSelect.getServicio());
+			constanciaSalidaServicios.setConstanciaSalidaServiciosPK(constanciaSalidaServiciosPK);
+			constanciaSalidaServicios.setNumCantidad(this.cantidadServicio);
+			
+			this.listadoConstanciaSalidaServicios.add(constanciaSalidaServicios);
+			log.debug(this.listadoConstanciaSalidaServicios);
+			
+			this.servicioClienteSelect = null;
+			this.cantidadServicio = null;
 			
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
@@ -520,7 +534,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		List<DetallePartida> detallePartidaList = null;
 		DetallePartida detallePartidaAnterior = null;
 		DetallePartidaPK dpPK = null;
-		DetallePartida detallePartida = null;
+		DetallePartida detallePartidaNuevo = null;
 		Integer detPartCve = null;
 		
 		try {
@@ -540,23 +554,23 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			detallePartidaList = partida.getDetallePartidaList();
 			detallePartidaAnterior = detallePartidaList.get(detallePartidaList.size() - 1);
 			detPartCve = detallePartidaAnterior.getDetallePartidaPK().getDetPartCve() + 1;
-
-			detallePartida = detallePartidaAnterior.clone();
+			detallePartidaNuevo = detallePartidaAnterior.clone();
 			detallePartidaAnterior.setEdoInvCve(edoInventarioHistorico);
 			
 			dpPK = detallePartidaAnterior.getDetallePartidaPK().clone();
+			dpPK.setPartidaCve(detallePartidaAnterior.getDetallePartidaPK().getPartidaCve());
 			dpPK.setDetPartCve(detPartCve);
-			detallePartida.setDetallePartidaPK(dpPK);
-			detallePartida.getDetallePartidaPK().setDetPartCve(detPartCve);
-			detallePartida.setDetallePartida(detallePartidaAnterior);
-			detallePartida.setTipoMovCve(tpMovimientoSalida);
-			detallePartida.setEdoInvCve(edoInventarioActual);
+			detallePartidaNuevo.setDetallePartidaPK(dpPK);
+			detallePartidaNuevo.getDetallePartidaPK().setDetPartCve(detPartCve);
+			detallePartidaNuevo.setDetallePartida(detallePartidaAnterior);
+			detallePartidaNuevo.setTipoMovCve(tpMovimientoSalida);
+			detallePartidaNuevo.setEdoInvCve(edoInventarioActual);
 			
-			partida.add(detallePartida);
+			partida.add(detallePartidaNuevo);
 			
 			this.detalleSalida = new DetalleConstanciaSalida();                                                                                 
 			this.detalleSalida.setPartidaCve(partida);
-			this.detalleSalida.setDetPartCve(detallePartida.getDetallePartidaPK().getDetPartCve());
+			this.detalleSalida.setDetPartCve(detallePartidaNuevo.getDetallePartidaPK().getDetPartCve());
 			//this.detalleSalida.setDetallePartida(detallePartida);
 			this.detalleSalida.setCantidad(inventario.getCantidad());
 			this.detalleSalida.setPeso(inventario.getPeso());
@@ -626,7 +640,6 @@ public class AltaConstanciaSalidaBean implements Serializable{
 		String titulo = "Producto";
 		List<DetalleConstanciaSalida> lista = null;
 		
-		
 		try {
 			if(this.detalleSalida.getTemperatura() == null)
 				throw new InventarioException("Debe indicar una temperatura.");
@@ -639,6 +652,14 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			
 			if(this.detalleSalida.getCantidad() > this.inventarioSelected.getCantidad())
 				throw new InventarioException("La cantidad indicada es mayor al inventario disponible.");
+			
+			BigDecimal pesoEntrada = this.detalleSalida.getPartidaCve().getPesoTotal();
+			BigDecimal cantidadEntrada = new BigDecimal(this.detalleSalida.getPartidaCve().getCantidadTotal()).setScale(0, RoundingMode.HALF_UP);
+			BigDecimal cantidadSalida = new BigDecimal(this.detalleSalida.getCantidad()).setScale(0, RoundingMode.HALF_UP);
+			
+			BigDecimal pesoUnitario = pesoEntrada.divide(cantidadEntrada, RoundingMode.HALF_UP);
+			BigDecimal pesoSalida = cantidadSalida.multiply(pesoUnitario).setScale(3, RoundingMode.HALF_UP);
+			this.detalleSalida.setPeso(pesoSalida);
 			
 			if(listadoTemp == null)
 				this.listadoTemp = new ArrayList<DetalleConstanciaSalida>();
@@ -742,12 +763,10 @@ public class AltaConstanciaSalidaBean implements Serializable{
 			
 			Inventario inventarioTemp = new Inventario();
 			
-			for(Inventario i: listaInventarioCopy) {				
-				if((i.getProducto().getProductoDs().equals(detalleSalida.getProducto())) && (i.getFolioCliente().equals(detalleSalida.getFolioEntrada()))   ) {
-					inventarioTemp = i;
-					break;
-				}				
-			}
+			inventarioTemp = listaInventarioCopy.stream()
+					.filter(item -> item.getPartidaCve().equals(detalleSalida.getPartidaCve().getPartidaCve()))
+					.findFirst().orElseThrow(() -> new InventarioException(
+							"Ocurrió un problema con la extracción del objeto inventario."));
 			
 			listaInventario.add(inventarioTemp);
 			
@@ -802,7 +821,7 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	}
 	
 	public void resetCantidadServicio() {
-		this.cantidadServicio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		this.cantidadServicio = null;
 		log.debug("Reiniciando el valor de cantidad total (servicio)");
 	}
 	

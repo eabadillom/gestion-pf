@@ -69,7 +69,7 @@ public class Tarima implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Tarima [id=" + (this.id == null ? this.hashCode() :  this.id) + ", nombre=" + nombre + "]";
+		return "Tarima [hashCode=" + this.hashCode() + " id=" + this.id + ", nombre=" + nombre + "]";
 	}
 	
 	public Tarima() {

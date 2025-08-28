@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+	<ui:define name="title">Salida</ui:define>
+	<ui:define name="content">
+		<h:outputScript>
+		    function disableEnterKey(event) {
+		        if (event.key === "Enter") {
+		            event.preventDefault();
+		            return false;
+		        }
+		        return true;
+		    }
+		</h:outputScript>
+		<h:form id="form" onkeydown="return disableEnterKey(event)" enctype="multipart/form-data">
+			<ui:include src="/protected/common/status-info.xhtml" />
+		    
+			<ui:include src="/inventarios/salida/alta/alta-datos-generales.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<ui:include src="/inventarios/salida/alta/alta-inventario.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<ui:include src="/inventarios/salida/alta/alta-dlg-cantidad-peso.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<ui:include src="/inventarios/salida/alta/alta-sus-productos.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<ui:include src="/inventarios/salida/alta/alta-servicios.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<ui:include src="/inventarios/salida/alta/alta-datos-adicionales.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<ui:include src="/inventarios/salida/alta/alta-acciones.xhtml" />
+			
+		</h:form>
+	</ui:define>
+</ui:composition>

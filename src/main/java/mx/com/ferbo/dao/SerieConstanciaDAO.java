@@ -165,6 +165,7 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 		} catch(Exception ex) {
 			log.error("Problema para actualizar la serie-constancia", ex);
 			EntityManagerUtil.rollback(em);
+			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
 		}
