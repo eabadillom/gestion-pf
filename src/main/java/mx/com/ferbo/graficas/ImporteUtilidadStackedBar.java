@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import mx.com.ferbo.dao.ImporteEgresosDAO;
 import mx.com.ferbo.ui.ImporteUtilidad;
@@ -78,7 +79,7 @@ public class ImporteUtilidadStackedBar implements Serializable
         // Labels (emisores)
         List<String> listaEmisores = listaImporteUtilidad.stream()
                 .map(ImporteUtilidad::getEmiNombre)
-                .toList();
+                .collect(Collectors.toList());
 
         data.setLabels(listaEmisores);
         stackedGroupBarModel.setData(data);
@@ -95,7 +96,7 @@ public class ImporteUtilidadStackedBar implements Serializable
         barDataSet.setLabel(label);
         barDataSet.setBackgroundColor(color);
         barDataSet.setStack(stack);
-        barDataSet.setData(lista.stream().map(getter).toList());
+        barDataSet.setData(lista.stream().map(getter).collect(Collectors.toList()));
         
         return barDataSet;
     }

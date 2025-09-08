@@ -76,12 +76,11 @@ public class UtilidadPorMesMensualStackedBar implements Serializable
         List<ImporteUtilidad> utilidadMesAnual = obtenerUtilidadPorMesAnual();
 
         // Configuración dinámica de datasets
-        List<DataSetConfig> configuraciones = List.of(
-                new DataSetConfig(LBL_INGRESOS, RGB_INGRESOS, "Stack 0", u -> u.getPagos()),
-                new DataSetConfig(LBL_EGRESOS, RGB_EGRESOS, "Stack 1", u -> u.getEgresos()),
-                new DataSetConfig(LBL_UTILIDAD, RGB_UTILIDAD, "Stack 2", u -> u.getUtilidadPerdida()),
-                new DataSetConfig(LBL_EFECTIVO, RGB_EFECTIVO, "Stack 3", u -> u.getIzq())
-        );
+        List<DataSetConfig> configuraciones = new ArrayList<>();
+        configuraciones.add(new DataSetConfig(LBL_INGRESOS, RGB_INGRESOS, "Stack 0", u -> u.getPagos()));
+        configuraciones.add(new DataSetConfig(LBL_EGRESOS, RGB_EGRESOS, "Stack 1", u -> u.getEgresos()));
+        configuraciones.add(new DataSetConfig(LBL_UTILIDAD, RGB_UTILIDAD, "Stack 2", u -> u.getUtilidadPerdida()));
+        configuraciones.add(new DataSetConfig(LBL_EFECTIVO, RGB_EFECTIVO, "Stack 3", u -> u.getIzq()));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM", Locale.getDefault());
         List<String> etiquetas = new ArrayList<>();
