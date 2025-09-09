@@ -15,8 +15,8 @@
  */
 package org.primefaces.omega.view;
 
-import org.primefaces.event.ScheduleEntryMoveEvent;
-import org.primefaces.event.ScheduleEntryResizeEvent;
+import org.primefaces.event.schedule.ScheduleEntryMoveEvent;
+import org.primefaces.event.schedule.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
