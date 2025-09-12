@@ -334,6 +334,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.merge(cliente);
 			em.getTransaction().commit();
 		} catch (Exception e) {
+			EntityManagerUtil.rollback(em);
 			log.error("Problema en la actualización del cliente: " + cliente.getCteCve(), e);
 			return "ERROR";
 		}finally {
