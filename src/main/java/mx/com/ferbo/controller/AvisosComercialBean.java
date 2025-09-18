@@ -42,6 +42,7 @@ import mx.com.ferbo.model.UdCobro;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.InventarioException;
 
+@Deprecated
 @Named
 @ViewScoped
 public class AvisosComercialBean implements Serializable {

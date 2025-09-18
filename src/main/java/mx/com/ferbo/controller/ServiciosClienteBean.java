@@ -22,6 +22,7 @@ import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 
+@Deprecated
 @Named
 @ViewScoped
 public class ServiciosClienteBean implements Serializable {

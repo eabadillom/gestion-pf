@@ -17,25 +17,25 @@
 							<div class="card">
 								<div class="ui-fluid p-formgrid p-grid">
 									<div class="p-field p-col-12 p-md-6">
-										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{serviciosClienteBean.clienteSelected}" filter="true"
+										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{serviciosCliente.clienteSelected}" filter="true"
 											filterMatchMode="contains" onchange="PF('statusInfoDialog').show();">
 											<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" />
-											<f:selectItems value="#{serviciosClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
-											<p:ajax listener="#{serviciosClienteBean.filtaListado()}" update="dt-servicios dt-servicios:btnAdd" oncomplete="PF('statusInfoDialog').hide();"/>
+											<f:selectItems value="#{serviciosCliente.lstClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
+											<p:ajax listener="#{serviciosCliente.filtaListado()}" update="dt-servicios dt-servicios:btnAdd" oncomplete="PF('statusInfoDialog').hide();"/>
 										</p:selectOneMenu>
 									</div>
 								</div>
 							</div>
 						</div>
 
-						<p:dataTable id="dt-servicios" widgetVar="dtServicios" value="#{serviciosClienteBean.lstPrecioServicioFiltered}" rowKey="#{pServicio.id}"
-							var="pServicio" selection="#{serviciosClienteBean.precioServicioSelected}" reflow="true" lazy="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+						<p:dataTable id="dt-servicios" widgetVar="dtServicios" value="#{serviciosCliente.lstPrecioServicioFiltered}" rowKey="#{pServicio.id}"
+							var="pServicio" selection="#{serviciosCliente.precioServicioSelected}" reflow="true" lazy="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
 							<f:facet name="header">
 								<div class="products-table-header">
 									<span style="font-weight: bold">Servicios por cliente</span> <span class="filter-container ui-input-icon-left"> 
-									<p:commandButton id="btnAdd" icon="pi pi-plus" value="Agregar nuevo servicio" actionListener="#{serviciosClienteBean.nuevoServicioCliente()}" process="@this"
+									<p:commandButton id="btnAdd" icon="pi pi-plus" value="Agregar nuevo servicio" actionListener="#{serviciosCliente.nuevoServicioCliente()}" process="@this"
 											styleClass="ui-button-raised" style="margin-right: .5rem" update="form:panel-servicio" oncomplete="PF('servicioClienteDialog').show()"
-											disabled="#{serviciosClienteBean.clienteSelected eq null and serviciosClienteBean.clienteSelected.cteCve eq null}"/>
+											disabled="#{serviciosCliente.clienteSelected eq null and serviciosCliente.clienteSelected.cteCve eq null}"/>
 									</span>
 								</div>
 							</f:facet>
@@ -52,12 +52,12 @@
 							</p:column>
 							<p:column width="2rem" style="text-align: center;">
 								<p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button" oncomplete="PF('servicioClienteDialog').show()" update="form:panel-servicio">
-									<f:setPropertyActionListener value="#{pServicio}" target="#{serviciosClienteBean.precioServicioSelected}" />
+									<f:setPropertyActionListener value="#{pServicio}" target="#{serviciosCliente.precioServicioSelected}" />
 								</p:commandButton>
 							</p:column>
 							<p:column width="2rem" style="text-align: center;">
 								<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" oncomplete="PF('deleteServicioDialog').show()">
-									<f:setPropertyActionListener value="#{pServicio}" target="#{serviciosClienteBean.precioServicioSelected}" />
+									<f:setPropertyActionListener value="#{pServicio}" target="#{serviciosCliente.precioServicioSelected}" />
 								</p:commandButton>
 							</p:column>
 						</p:dataTable>
@@ -68,43 +68,43 @@
 								<p:outputPanel>
 									<div class="p-field">
 										<p:outputLabel>Cliente</p:outputLabel>
-										<p:inputText value="#{serviciosClienteBean.clienteSelected.nombre}" disabled="true" />
+										<p:inputText value="#{serviciosCliente.clienteSelected.nombre}" disabled="true" />
 									</div>
 									<div class="p-field">
 										<p:outputLabel>Servicio</p:outputLabel>
-										<p:selectOneMenu value="#{serviciosClienteBean.precioServicioSelected.servicio}" filter="true" filterMatchMode="contains"
+										<p:selectOneMenu value="#{serviciosCliente.precioServicioSelected.servicio}" filter="true" filterMatchMode="contains"
 											converter="entityConverter" required="true" requiredMessage="Seleccione servicio" autoWidth="false"
-											disabled="#{serviciosClienteBean.precioServicioSelected.id ne null}">
+											disabled="#{serviciosCliente.precioServicioSelected.id ne null}">
 											<f:selectItem itemLabel="--Selecciona--" />
-											<f:selectItems value="#{serviciosClienteBean.lstServicio}" var="serv" itemLabel="#{serv.servicioDs}" />
+											<f:selectItems value="#{serviciosCliente.lstServicio}" var="serv" itemLabel="#{serv.servicioDs}" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field">
 										<p:outputLabel>Unidad</p:outputLabel>
-										<p:selectOneMenu value="#{serviciosClienteBean.precioServicioSelected.unidad}" filter="true" filterMatchMode="contains"
+										<p:selectOneMenu value="#{serviciosCliente.precioServicioSelected.unidad}" filter="true" filterMatchMode="contains"
 											converter="entityConverter" required="true" requiredMessage="Seleccione unidad"
-											disabled="#{serviciosClienteBean.precioServicioSelected.id ne null}">
+											disabled="#{serviciosCliente.precioServicioSelected.id ne null}">
 											<f:selectItem itemLabel="--Selecciona--" />
-											<f:selectItems value="#{serviciosClienteBean.lstUnidadManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
+											<f:selectItems value="#{serviciosCliente.lstUnidadManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
 										</p:selectOneMenu>
 									</div>
 									<div class="p-field">
 										<p:outputLabel>Precio</p:outputLabel>
-										<p:inputNumber value="#{serviciosClienteBean.precioServicioSelected.precio}" emptyValue="0" symbol="$" symbolPosition="p" thousandSeparator=","
+										<p:inputNumber value="#{serviciosCliente.precioServicioSelected.precio}" emptyValue="0" symbol="$" symbolPosition="p" thousandSeparator=","
 											minValue="0" required="true" requiredMessage="Campo requerido" />
 									</div>
 								</p:outputPanel>
 							</p:outputPanel>
 
 							<f:facet name="footer">
-								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{serviciosClienteBean.guardarPrecioServicio()}" update="panel-servicio messages" process="panel-servicio @this" />
+								<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{serviciosCliente.guardarPrecioServicio()}" update="panel-servicio messages" process="panel-servicio @this" />
 								<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('servicioClienteDialog').hide()" class="ui-button-secondary"
 									update="panel-servicio" resetValues="true" />
 							</f:facet>
 						</p:dialog>
 						<p:confirmDialog widgetVar="deleteServicioDialog" showEffect="fade" width="400" message="Desea eliminar el servicio?" header="Eliminar"
 							severity="warn">
-							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{serviciosClienteBean.eliminarPrecioServicio()}" update=""
+							<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{serviciosCliente.eliminarPrecioServicio()}" update=""
 								oncomplete="PF('deleteServicioDialog').hide()" />
 							<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteServicioDialog').hide()" />
 						</p:confirmDialog>
