@@ -19,10 +19,12 @@ import javax.validation.constraints.NotNull;
 public class EstadosPK implements Serializable {
 
     private static final long serialVersionUID = -4501534761783764337L;
-	@Basic(optional = false)
+    
+    @Basic(optional = false)
     @NotNull
     @Column(name = "pais_cve")
     private int paisCve;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "estado_cve")

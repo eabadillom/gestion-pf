@@ -230,9 +230,9 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 	public List<Ciudades> buscaPorAsentamiento(AsentamientoHumano as){
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Ciudades.findByTodo", Ciudades.class)
-				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getMunicipioCve())
-				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getEstadoCve())
-				.setParameter("ciudadCve", as.getAsentamientoHumanoPK().getCiudadCve())
+				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
+				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getEstadoCve())
+				.setParameter("ciudadCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
 				.getResultList();
 	}
 }

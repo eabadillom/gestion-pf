@@ -22,10 +22,12 @@ public class MunicipiosPK implements Serializable {
     @NotNull
     @Column(name = "pais_cve")
     private int paisCve;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "estado_cve")
     private int estadoCve;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "municipio_cve")

@@ -17,7 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.AsentamientoHumandoDAO;
+import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
@@ -58,7 +58,7 @@ public class PlantaBean implements Serializable {
 	private CiudadesDAO ciudadesDao;
 	private TipoAsentamiento tipoAsentamientoSelect; 
 	private TipoAsentamientoDAO tipoAsentamientoDao;
-	private AsentamientoHumandoDAO asentamientoHumanoDao;
+	private AsentamientoHumanoDAO asentamientoHumanoDao;
 	private ClienteDAO clienteDAO;
 	private SerieFacturaDAO sfDAO;
 	private EmisoresCFDISDAO emisorDAO;
@@ -109,7 +109,7 @@ public class PlantaBean implements Serializable {
 		daoMunicipios = new MunicipiosDAO();
 		ciudadesDao = new CiudadesDAO();
 		tipoAsentamientoDao = new TipoAsentamientoDAO();
-		asentamientoHumanoDao = new AsentamientoHumandoDAO();
+		asentamientoHumanoDao = new AsentamientoHumanoDAO();
 		clienteDAO = new ClienteDAO();
 		sfDAO = new SerieFacturaDAO();
 		emisorDAO = new EmisoresCFDISDAO();
@@ -379,10 +379,10 @@ public class PlantaBean implements Serializable {
 		codigopostalSelected = null;
 		AsentamientoHumano ah = new AsentamientoHumano();
 		if(planta.getIdAsentamiento()!=null||paisSelect!=null) {
-			this.asentamientoHumanoPKSelect.setPaisCve(paisSelect.getPaisCve());
-			this.asentamientoHumanoPKSelect.setEstadoCve(estadoSelect.getEstadosPK().getEstadoCve());
-			this.asentamientoHumanoPKSelect.setMunicipioCve(municipioSelect.getMunicipiosPK().getMunicipioCve());
-			this.asentamientoHumanoPKSelect.setCiudadCve(ciudadSelect.getCiudadesPK().getCiudadCve());
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getEstados().getPaises().setPaisCve(paisSelect.getPaisCve());
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().setEstadoCve(estadoSelect.getEstadosPK().getEstadoCve());
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getMunicipiosPK().setMunicipioCve(municipioSelect.getMunicipiosPK().getMunicipioCve());
+			this.asentamientoHumanoPKSelect.getCiudades().getCiudadesPK().setCiudadCve(ciudadSelect.getCiudadesPK().getCiudadCve());
 			this.asentamientoHumanoPKSelect.setAsentamientoCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getAsentamientoCve());
 			//asentamientoHumanoSelect = new AsentamientoHumano();
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
@@ -411,20 +411,20 @@ public class PlantaBean implements Serializable {
 			return;
 		
 		aPK = new AsentamientoHumanoPK();
-		aPK.setPaisCve(this.planta.getIdPais());
-		aPK.setEstadoCve(this.planta.getIdEstado());
-		aPK.setMunicipioCve(this.planta.getIdMunicipio());
-		aPK.setCiudadCve(this.planta.getIdCiudad());
+		aPK.getCiudades().getMunicipios().getEstados().getPaises().setPaisCve(this.planta.getIdPais());
+		aPK.getCiudades().getMunicipios().getEstados().getEstadosPK().setEstadoCve(this.planta.getIdEstado());
+		aPK.getCiudades().getMunicipios().getMunicipiosPK().setMunicipioCve(this.planta.getIdMunicipio());
+		aPK.getCiudades().getCiudadesPK().setCiudadCve(this.planta.getIdCiudad());
 		aPK.setAsentamientoCve(this.planta.getIdAsentamiento());
 		
-		paisSelect = daoPaises.buscarPorId(aPK.getPaisCve());
+		paisSelect = daoPaises.buscarPorId(aPK.getCiudades().getMunicipios().getEstados().getPaises().getPaisCve());
 		log.info("Pais: {}", this.paisSelect.getPaisCve());
 		
-		estadoSelect = daoEstados.buscarPorId(aPK.getPaisCve(), aPK.getEstadoCve());
+		estadoSelect = daoEstados.buscarPorId(aPK.getCiudades().getMunicipios().getEstados().getPaises().getPaisCve(), aPK.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve());
 		log.info("Estado: {}", this.estadoSelect.getEstadosPK());
 		
 		
-		MunicipiosPK municipioPK = new MunicipiosPK(aPK.getPaisCve(), aPK.getEstadoCve(), aPK.getMunicipioCve());
+		MunicipiosPK municipioPK = new MunicipiosPK(aPK.getCiudades().getMunicipios().getEstados().getPaises().getPaisCve(), aPK.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(), aPK.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve());
 		this.municipioSelect = daoMunicipios.buscarPorId(municipioPK);
 		log.info("Municipio: {}", this.municipioSelect.getMunicipiosPK());
 		

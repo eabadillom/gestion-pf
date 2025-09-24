@@ -8,7 +8,7 @@ import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.AsentamientoHumandoDAO;
+import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.EntidadPostalDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.EntidadPostal;
@@ -33,7 +33,7 @@ public class EntidadPostalBean implements Serializable {
 	private EntidadPostal entidadPostalSelect;
 
 	private EntidadPostalDAO entidadPostalDAO;
-	private AsentamientoHumandoDAO asentamientoDAO;
+	private AsentamientoHumanoDAO asentamientoDAO;
 
 	/**
 	 * Se inicializan las variables
@@ -42,7 +42,7 @@ public class EntidadPostalBean implements Serializable {
 		entidadPostalDAO = new EntidadPostalDAO();
 		listaEntidadPostalSelected = new ArrayList<>();
 		
-		asentamientoDAO = new AsentamientoHumandoDAO();
+		asentamientoDAO = new AsentamientoHumanoDAO();
 		listaAsentamientoHumano = new ArrayList<AsentamientoHumano>();
 	}
 
@@ -86,7 +86,7 @@ public class EntidadPostalBean implements Serializable {
 		
 		listaAsentamientoHumano = asentamientoDAO.buscarPorEntidadPostal(entidadPostalSelect);
 		
-		List<AsentamientoHumano> listaTmpAsentamientoH = listaAsentamientoHumano.stream().filter(ah -> ah.getAsentamientoHumanoPK().getEntidadpostalCve()==entidadPostalSelect.getEntidadpostalCve())
+		List<AsentamientoHumano> listaTmpAsentamientoH = listaAsentamientoHumano.stream().filter(ah -> ah.getEntidadPostal().getEntidadpostalCve()==entidadPostalSelect.getEntidadpostalCve())
 				.collect(Collectors.toList());
 		
 		if(listaTmpAsentamientoH.isEmpty()) {

@@ -207,9 +207,9 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		try {
 		em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Municipios.findByTodo", Municipios.class)
-				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getMunicipioCve())
-				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getEstadoCve())
-				.setParameter("paisCve", as.getAsentamientoHumanoPK().getPaisCve())
+				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
+				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
+				.setParameter("paisCve", as.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve())
 				.getResultList();
 		}catch(Exception e ) {
 			log.error("Problemas para obtener informacion",e);

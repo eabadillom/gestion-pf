@@ -164,8 +164,9 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	public List<Estados> buscaPorAsentamiento(AsentamientoHumano as) {
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Estados.findByCriterios", Estados.class)
-				.setParameter("paisCve", as.getAsentamientoHumanoPK().getPaisCve())
-				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getEstadoCve()).getResultList();
+				.setParameter("paisCve", as.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve())
+				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
+                                .getResultList();
 	}
 	
 	public List<Estados> buscarPorPais(Paises pais) {

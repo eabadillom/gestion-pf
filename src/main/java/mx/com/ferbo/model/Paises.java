@@ -33,19 +33,23 @@ import javax.validation.constraints.Size;
 public class Paises implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "pais_cve")
     private Integer paisCve;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "pais_desc")
     private String paisDesc;
+    
     @Size(max = 4)
     @Column(name = "pais_ds_corta")
     private String paisDsCorta;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paises")
     private List<Estados> estadosList;
 

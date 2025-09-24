@@ -41,15 +41,16 @@ import javax.validation.constraints.Size;
 public class Ciudades implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
     protected CiudadesPK ciudadesPK;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "ciudad_ds")
     private String ciudadDs;
-    @OneToMany(mappedBy = "ciudades")
-    private List<Domicilios> domiciliosList;
+    
     @JoinColumns({
         @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false),
         @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve", insertable = false, updatable = false),
@@ -87,14 +88,6 @@ public class Ciudades implements Serializable {
 
     public void setCiudadDs(String ciudadDs) {
         this.ciudadDs = ciudadDs;
-    }
-
-    public List<Domicilios> getDomiciliosList() {
-        return domiciliosList;
-    }
-
-    public void setDomiciliosList(List<Domicilios> domiciliosList) {
-        this.domiciliosList = domiciliosList;
     }
 
     public Municipios getMunicipios() {

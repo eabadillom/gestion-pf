@@ -38,20 +38,25 @@ import javax.validation.constraints.Size;
 public class Estados implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
     protected EstadosPK estadosPK;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 4)
     @Column(name = "estado_ds_corta")
     private String estadoDsCorta;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "estado_desc")
     private String estadoDesc;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "estados")
     private List<Municipios> municipiosList;
+    
     @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Paises paises;

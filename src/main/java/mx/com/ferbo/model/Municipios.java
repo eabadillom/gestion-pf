@@ -41,18 +41,22 @@ import javax.validation.constraints.Size;
 public class Municipios implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
     protected MunicipiosPK municipiosPK;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "municipio_ds")
     private String municipioDs;
+    
     @JoinColumns({
         @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false),
         @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve", insertable = false, updatable = false)})
     @ManyToOne(optional = false)
     private Estados estados;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "municipios")
     private List<Ciudades> ciudadesList;
 

@@ -73,7 +73,7 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 			
 			for(ClienteDomicilios cd : listado) {
 				log.debug("Domicilio cve: {}", cd.getDomicilios().getDomCve());
-				log.debug("PaisCve: {}", cd.getDomicilios().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve() );
+				log.debug("PaisCve: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve() );
 			}
 			
 		} catch(Exception ex) {
@@ -149,9 +149,30 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 	}
 
 	public List<ClienteDomicilios> buscaPorCliente(Cliente c) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("ClienteDomicilios.findByCliente", ClienteDomicilios.class)
-				.setParameter("cteCve", c.getCteCve()).getResultList();
+                List<ClienteDomicilios> listado = null;
+		EntityManager em = null;
+                
+                try {
+                    em = EntityManagerUtil.getEntityManager();
+                    listado = em.createNamedQuery("ClienteDomicilios.findByCliente", ClienteDomicilios.class)
+                        .setParameter("cteCve", c.getCteCve())
+                        .getResultList();
+                    
+                    for(ClienteDomicilios cd : listado){
+                        log.debug("Asentamiento: {}", cd.getDomicilios().getAsentamiento().toString());
+                        log.debug("Ciudad: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().toString());
+                        log.debug("Municipios: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().toString());
+                        log.debug("Estado: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().toString());
+                        log.debug("Pais: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().toString());
+                    }
+                    
+                }catch(Exception ex) {
+                    log.error("Problema para obtener el listado de domicilios por cliente...", ex);
+		} finally {
+                    EntityManagerUtil.close(em);
+		}
+                
+		return listado;
 	}
 
 }

@@ -28,35 +28,40 @@ import javax.validation.constraints.Size;
 //    															+ "INNER JOIN municipios m ON p.pais_cve = m.pais_cve AND e.estado_cve = m.estado_cve\r\n"
 //    															+ "INNER JOIN ciudades c ON p.pais_cve = c.pais_cve AND e.estado_cve = c.estado_cve AND m.municipio_cve = c.municipio_cve\r\n"
 //    															+ "INNER JOIN asentamiento_humano a ON p.pais_cve = a.pais_cve AND e.estado_cve = a.estado_cve AND m.municipio_cve = a.municipio_cve AND c.ciudad_cve = a.ciudad_cve"),
-    @NamedQuery(name = "AsentamientoHumano.findByPaisCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.paisCve = :paisCve"),
-    @NamedQuery(name = "AsentamientoHumano.findByEstadoCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.estadoCve = :estadoCve"),
-    @NamedQuery(name = "AsentamientoHumano.findByMunicipioCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.municipioCve = :municipioCve"),
-    @NamedQuery(name = "AsentamientoHumano.findByCiudadCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudadCve = :ciudadCve"),
-    @NamedQuery(name = "AsentamientoHumano.findByTipoasntmntoCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.tipoasntmntoCve = :tipoasntmntoCve"),
-    @NamedQuery(name = "AsentamientoHumano.findByEntidadpostalCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.entidadpostalCve = :entidadpostalCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByPaisCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudades.municipios.estados.paises.paisCve = :paisCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByEstadoCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByMunicipioCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudades.municipios.municipiosPK.municipioCve = :municipioCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByCiudadCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByTipoasntmntoCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.tipoAsentamiento.tipoasntmntoCve = :tipoasntmntoCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByEntidadpostalCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.entidadPostal.entidadpostalCve = :entidadpostalCve"),
     @NamedQuery(name = "AsentamientoHumano.findByAsentamientoCve", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.asentamientoCve = :asentamientoCve"),
     @NamedQuery(name = "AsentamientoHumano.findByAsentamientoDs", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoDs = :asentamientoDs"),
     @NamedQuery(name = "AsentamientoHumano.findByCp", query = "SELECT a FROM AsentamientoHumano a WHERE a.cp = :cp"),
-    @NamedQuery(name = "AsentamientoHumano.findByDomicilio", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.paisCve = :paisCve and a.asentamientoHumanoPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudadCve = :ciudadCve"),
-    @NamedQuery(name = "AsentamientoHumano.findByDomicilioCompleto", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.paisCve = :paisCve and a.asentamientoHumanoPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudadCve = :ciudadCve and a.asentamientoHumanoPK.tipoasntmntoCve = :tipoasntmntoCve and a.asentamientoHumanoPK.entidadpostalCve = :entidadpostalCve"),
-	@NamedQuery(name = "AsentamientoHumano.findAsentamiento", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.paisCve = :paisCve and a.asentamientoHumanoPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudadCve = :ciudadCve and a.asentamientoHumanoPK.asentamientoCve =:asentamientoCve"),
-    @NamedQuery(name = "AsentamientoHumano.findByPaisEstadoMunicipioCiudad", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.paisCve = :paisCve and a.asentamientoHumanoPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudadCve = :ciudadCve")}
+    @NamedQuery(name = "AsentamientoHumano.findByDomicilio", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudades.municipios.estados.paises.paisCve = :paisCve and a.asentamientoHumanoPK.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.ciudades.municipios.municipiosPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve and a.asentamientoHumanoPK.asentamientoCve = :asentamientoCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByDomicilioCompleto", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudades.municipios.estados.paises.paisCve = :paisCve and a.asentamientoHumanoPK.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.ciudades.municipios.municipiosPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve and a.tipoAsentamiento.tipoasntmntoCve = :tipoasntmntoCve and a.entidadPostal.entidadpostalCve = :entidadpostalCve"),
+	@NamedQuery(name = "AsentamientoHumano.findAsentamiento", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudades.municipios.estados.paises.paisCve = :paisCve and a.asentamientoHumanoPK.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.ciudades.municipios.municipiosPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve and a.asentamientoHumanoPK.asentamientoCve =:asentamientoCve"),
+    @NamedQuery(name = "AsentamientoHumano.findByPaisEstadoMunicipioCiudad", query = "SELECT a FROM AsentamientoHumano a WHERE a.asentamientoHumanoPK.ciudades.municipios.estados.paises.paisCve = :paisCve and a.asentamientoHumanoPK.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve and a.asentamientoHumanoPK.ciudades.municipios.municipiosPK.municipioCve = :municipioCve and a.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve")}
 		)
 
 public class AsentamientoHumano implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
     protected AsentamientoHumanoPK asentamientoHumanoPK;
+    
     @Size(max = 150)
     @Column(name = "asentamiento_ds")
     private String asentamientoDs;
+    
     @Size(max = 5)
     @Column(name = "cp")
     private String cp;
+    
     @JoinColumn(name = "entidadpostal_cve", referencedColumnName = "entidadpostal_cve", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private EntidadPostal entidadPostal;
+    
     @JoinColumn(name = "tipoasntmnto_cve", referencedColumnName = "tipoasntmnto_cve", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private TipoAsentamiento tipoAsentamiento;
@@ -68,8 +73,8 @@ public class AsentamientoHumano implements Serializable {
         this.asentamientoHumanoPK = asentamientoHumanoPK;
     }
 
-    public AsentamientoHumano(int paisCve, int estadoCve, int municipioCve, int ciudadCve, short tipoasntmntoCve, int entidadpostalCve, int asentamientoCve) {
-        this.asentamientoHumanoPK = new AsentamientoHumanoPK(paisCve, estadoCve, municipioCve, ciudadCve, tipoasntmntoCve, entidadpostalCve, asentamientoCve);
+    public AsentamientoHumano(Ciudades ciudades, int asentamientoCve) {
+        this.asentamientoHumanoPK = new AsentamientoHumanoPK(ciudades, asentamientoCve);
     }
 
     public AsentamientoHumanoPK getAsentamientoHumanoPK() {

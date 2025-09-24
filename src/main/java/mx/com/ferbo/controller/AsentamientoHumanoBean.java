@@ -13,7 +13,7 @@ import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.AsentamientoHumandoDAO;
+import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.CiudadesDAO;
 import mx.com.ferbo.dao.EntidadPostalDAO;
 import mx.com.ferbo.dao.EstadosDAO;
@@ -66,7 +66,7 @@ public class AsentamientoHumanoBean implements Serializable {
 	private CiudadesDAO ciudadesDao;
 	private TipoAsentamientoDAO tipoAsentamientoDao;
 	private EntidadPostalDAO entidadPostalDao;
-	private AsentamientoHumandoDAO asentamientoHumandoDao;
+	private AsentamientoHumanoDAO asentamientoHumandoDao;
 
 	private int idPais;
 	private int idEstado;
@@ -84,7 +84,7 @@ public class AsentamientoHumanoBean implements Serializable {
 		ciudadesDao = new CiudadesDAO();
 		tipoAsentamientoDao = new TipoAsentamientoDAO();
 		entidadPostalDao = new EntidadPostalDAO();
-		asentamientoHumandoDao = new AsentamientoHumandoDAO();
+		asentamientoHumandoDao = new AsentamientoHumanoDAO();
 		
 		listaPaises = new ArrayList<>();
 		listaEstados = new ArrayList<>();
@@ -143,8 +143,8 @@ public class AsentamientoHumanoBean implements Serializable {
 			List<AsentamientoHumano> listaAsentamientoCiudadMunicipioEstadoPais = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
 			int tamanioListaAsentamientoCiudadMunicipioEstadoPais = listaAsentamientoCiudadMunicipioEstadoPais.size() + 1;
 			asentamientoHumanoPKSelect.setAsentamientoCve(tamanioListaAsentamientoCiudadMunicipioEstadoPais);
-			asentamientoHumanoPKSelect.setEntidadpostalCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getEntidadpostalCve());
-			asentamientoHumanoPKSelect.setTipoasntmntoCve(asentamientoHumanoSelect.getAsentamientoHumanoPK().getTipoasntmntoCve());
+			asentamientoHumanoSelect.setEntidadPostal(asentamientoHumanoSelect.getEntidadPostal());
+			asentamientoHumanoSelect.setTipoAsentamiento(asentamientoHumanoSelect.getTipoAsentamiento());
 			asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			if(asentamientoHumandoDao.guardar(asentamientoHumanoSelect) == null) {
 				this.listaAsentamientoHumano.add(this.asentamientoHumanoSelect);
@@ -186,10 +186,10 @@ public class AsentamientoHumanoBean implements Serializable {
 	
 	public void filtroAsentamientoHumano() {
 		if(asentamientoHumanoSelect.getAsentamientoHumanoPK()!=null) {
-			idPais = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getPaisCve();
-			idEstado =  this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getEstadoCve();
-			idMunicipio =  this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getMunicipioCve();
-			idCiudad = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getCiudadCve();
+			idPais = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve();
+			idEstado =  this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve();
+			idMunicipio =  this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve();
+			idCiudad = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve();
 			//tipoasntmntoCve = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getTipoasntmntoCve();
 			//entidadpostalCve = this.asentamientoHumanoSelect.getAsentamientoHumanoPK().getEntidadpostalCve();
 		}
@@ -227,10 +227,10 @@ public class AsentamientoHumanoBean implements Serializable {
 	public void handleCitySelect() {
 		filtroAsentamientoHumano();
 		if (this.idCiudad != -1) {
-			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
-			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
-			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
-			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getEstados().getPaises().setPaisCve(idPais);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().setEstadoCve(idEstado);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getMunicipiosPK().setMunicipioCve(idMunicipio);
+			this.asentamientoHumanoPKSelect.getCiudades().getCiudadesPK().setCiudadCve(idCiudad);
 			//this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterios(asentamientoHumanoSelect);
 			listaTipoAsentamiento = tipoAsentamientoDao.buscarTodos();
@@ -241,11 +241,11 @@ public class AsentamientoHumanoBean implements Serializable {
 	public void handletypeAsn() {
 		filtroAsentamientoHumano();
 		if(this.tipoasntmntoCve != -1) {
-			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
-			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
-			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);	
-			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
-			this.asentamientoHumanoPKSelect.setTipoasntmntoCve((short) tipoasntmntoCve);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getEstados().getPaises().setPaisCve(idPais);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().setEstadoCve(idEstado);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getMunicipiosPK().setMunicipioCve(idMunicipio);	
+			this.asentamientoHumanoPKSelect.getCiudades().getCiudadesPK().setCiudadCve(idCiudad);
+			this.asentamientoHumanoSelect.getTipoAsentamiento().setTipoasntmntoCve((short) tipoasntmntoCve);
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterioEspecial(asentamientoHumanoSelect);	
 			
@@ -256,12 +256,12 @@ public class AsentamientoHumanoBean implements Serializable {
 	public void handleEntidadPostal() {
 		filtroAsentamientoHumano();
 		if(this.entidadpostalCve != -1) {
-			this.asentamientoHumanoPKSelect.setPaisCve(idPais);
-			this.asentamientoHumanoPKSelect.setEstadoCve(idEstado);
-			this.asentamientoHumanoPKSelect.setMunicipioCve(idMunicipio);
-			this.asentamientoHumanoPKSelect.setCiudadCve(idCiudad);
-			this.asentamientoHumanoPKSelect.setTipoasntmntoCve((short) tipoasntmntoCve);
-			this.asentamientoHumanoPKSelect.setEntidadpostalCve(entidadpostalCve);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getEstados().getPaises().setPaisCve(idPais);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().setEstadoCve(idEstado);
+			this.asentamientoHumanoPKSelect.getCiudades().getMunicipios().getMunicipiosPK().setMunicipioCve(idMunicipio);
+			this.asentamientoHumanoPKSelect.getCiudades().getCiudadesPK().setCiudadCve(idCiudad);
+			this.asentamientoHumanoSelect.getTipoAsentamiento().setTipoasntmntoCve((short) tipoasntmntoCve);
+			this.asentamientoHumanoSelect.getEntidadPostal().setEntidadpostalCve(entidadpostalCve);
 			this.asentamientoHumanoSelect.setAsentamientoHumanoPK(asentamientoHumanoPKSelect);
 			listaAsentamientoHumano = asentamientoHumandoDao.buscarPorCriterioEspecial(asentamientoHumanoSelect);
 		}
@@ -467,11 +467,11 @@ public class AsentamientoHumanoBean implements Serializable {
 		this.entidadPostalDao = entidadPostalDao;
 	}
 
-	public AsentamientoHumandoDAO getAsentamientoHumandoDao() {
+	public AsentamientoHumanoDAO getAsentamientoHumandoDao() {
 		return asentamientoHumandoDao;
 	}
 
-	public void setAsentamientoHumandoDao(AsentamientoHumandoDAO asentamientoHumandoDao) {
+	public void setAsentamientoHumandoDao(AsentamientoHumanoDAO asentamientoHumandoDao) {
 		this.asentamientoHumandoDao = asentamientoHumandoDao;
 	}
 

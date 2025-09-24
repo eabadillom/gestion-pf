@@ -32,7 +32,7 @@ import org.primefaces.PrimeFaces;
 import com.ferbo.facturama.tools.FacturamaException;
 
 import mx.com.ferbo.business.FacturamaBL;
-import mx.com.ferbo.dao.AsentamientoHumandoDAO;
+import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.ClienteDAO;
@@ -141,7 +141,7 @@ public class FacturaServiciosBean implements Serializable {
 	private ParametroDAO parametroDAO;
 	private SerieFacturaDAO serieFacturaDAO;
 	private FacturaDAO facturaDAO;
-	private AsentamientoHumandoDAO asnDAO;
+	private AsentamientoHumanoDAO asnDAO;
 	private StatusFacturaDAO statusDAO;
 	private TipoFacturacionDAO tipoDAO;
 	private PrecioServicioDAO psDAO;
@@ -204,7 +204,7 @@ public class FacturaServiciosBean implements Serializable {
 		medioPagoDAO = new MedioPagoDAO();
 		parametroDAO = new ParametroDAO();
 		serieFacturaDAO = new SerieFacturaDAO();
-		asnDAO = new AsentamientoHumandoDAO();
+		asnDAO = new AsentamientoHumanoDAO();
 		statusDAO = new StatusFacturaDAO();
 		tipoDAO = new TipoFacturacionDAO();
 		facturaDAO = new FacturaDAO();
@@ -626,14 +626,14 @@ public class FacturaServiciosBean implements Serializable {
 			factura.setIva(bdIva);
 			factura.setTotal(total);
 			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
-			factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
-			factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
-			factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
-			factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
-			AsentamientoHumano asentamiento = asnDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
-					domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
-					domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
-					domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
+			factura.setPais(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisDesc());
+			factura.setEstado(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadoDesc());
+			factura.setMunicipio(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipioDs());
+			factura.setCiudad(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadDs());
+			AsentamientoHumano asentamiento = asnDAO.buscarPorAsentamiento(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve(),
+					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
+					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve(),
 					domicilioSelect.getDomicilioColonia());
 			factura.setColonia(asentamiento.getAsentamientoDs());
 			factura.setCp(domicilioSelect.getDomicilioCp());

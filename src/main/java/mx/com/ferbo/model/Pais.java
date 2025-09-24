@@ -41,9 +41,7 @@ public class Pais implements Serializable {
     @Size(min = 1, max = 150)
     @Column(name = "pais_desc")
     private String paisDesc;
-    @OneToMany(mappedBy = "paisCved")
-    private List<Domicilios> domiciliosList;
-
+    
     public Pais() {
     }
 
@@ -70,14 +68,6 @@ public class Pais implements Serializable {
 
     public void setPaisDesc(String paisDesc) {
         this.paisDesc = paisDesc;
-    }
-
-    public List<Domicilios> getDomiciliosList() {
-        return domiciliosList;
-    }
-
-    public void setDomiciliosList(List<Domicilios> domiciliosList) {
-        this.domiciliosList = domiciliosList;
     }
 
     @Override
