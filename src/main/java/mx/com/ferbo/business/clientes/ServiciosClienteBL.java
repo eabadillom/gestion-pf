@@ -1,13 +1,15 @@
 package mx.com.ferbo.business.clientes;
 
-import java.util.ArrayList;
 import java.util.List;
 import mx.com.ferbo.dao.PrecioServicioDAO;
+import mx.com.ferbo.dao.ServicioDAO;
+import mx.com.ferbo.dao.UnidadManejoDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.util.InventarioException;
 
 /**
  *
@@ -15,35 +17,64 @@ import mx.com.ferbo.model.UnidadDeManejo;
  */
 public class ServiciosClienteBL {
 
-    public static List<PrecioServicio> obtenerPorCliente(Integer clienteCve, PrecioServicioDAO dao) {
-        if (clienteCve == null || dao == null) return new ArrayList<>();
-        return dao.buscarPorCliente(clienteCve, false);
+    private UnidadManejoDAO unidadManejoDAO;
+    private ServicioDAO servicioDAO;
+    private PrecioServicioDAO precioServicioDAO;
+
+    public ServiciosClienteBL() {
+        this.unidadManejoDAO = new UnidadManejoDAO();
+        this.servicioDAO = new ServicioDAO();
+        this.precioServicioDAO = new PrecioServicioDAO();
     }
 
-    public static PrecioServicio crearNuevoServicio(Cliente cliente) {
-        PrecioServicio nuevo = new PrecioServicio();
-        nuevo.setCliente(cliente);
-        nuevo.setServicio(new Servicio());
-        nuevo.setUnidad(new UnidadDeManejo());
-        return nuevo;
+    public PrecioServicio crearNuevoPrecioServicio(Cliente cliente) throws Exception {
+        if(cliente == null){
+            throw new Exception("Error inesperado"); 
+        }
+        PrecioServicio ps = new PrecioServicio();
+        ps.setCliente(cliente);
+        ps.setServicio(new Servicio());
+        ps.setUnidad(new UnidadDeManejo());
+        return ps;
     }
 
-    public static boolean guardar(PrecioServicio ps, PrecioServicioDAO dao) {
-        if (ps == null || dao == null) return false;
+    public void guardarOActualizar(PrecioServicio ps) throws InventarioException {
+        ps.setAvisoCve(new Aviso(1)); // Esto es parte del negocio
 
-        ps.setAvisoCve(new Aviso(1));
-        return dao.guardar(ps) == null;
+        if (ps.getId() == null) {
+            if (precioServicioDAO.guardar(ps) != null) {
+                throw new InventarioException("No se guardo el servicio");
+            }
+        } else {
+            if (precioServicioDAO.actualizar(ps) != null) {
+                throw new InventarioException("No se actualizo el servicio");
+            }
+        }
     }
 
-    public static boolean actualizar(PrecioServicio ps, PrecioServicioDAO dao) {
-        if (ps == null || dao == null) return false;
-
-        return dao.actualizar(ps) == null;
+    public void eliminarPrecioServicio(PrecioServicio ps) throws InventarioException {
+        if (precioServicioDAO.eliminar(ps) != null) {
+            throw new InventarioException("No se elimino el servicio");
+        }
     }
 
-    public static boolean eliminar(PrecioServicio ps, PrecioServicioDAO dao) {
-        if (ps == null || dao == null) return false;
-
-        return dao.eliminar(ps) == null;
+    public List<UnidadDeManejo> obtenerUnidadesDeManejo() {
+        return unidadManejoDAO.buscarTodos();
     }
+
+    public List<Servicio> obtenerServicios() {
+        return servicioDAO.buscarTodos();
+    }
+
+    public List<PrecioServicio> buscarPreciosPorCliente(Cliente cliente) throws InventarioException {
+        if (cliente == null) {
+            throw new InventarioException("El cliente esta vacío.");
+        }
+        List<PrecioServicio> precios = precioServicioDAO.buscarPorCliente(cliente.getCteCve(), false);
+        if (precios.isEmpty()){
+            throw new InventarioException("El cliente no tiene precios definidos.");
+        }
+        return precios ;
+    }
+
 }
