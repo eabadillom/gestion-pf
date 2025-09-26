@@ -400,9 +400,6 @@ public class EntradaBL {
 		if(constancia.getConstanciaDepositoDetalleList() == null)
 			throw new InventarioException("Debe proporcionar uno o más servicios.");
 		
-		if(constancia.getConstanciaDepositoDetalleList().size() <= 0)
-			throw new InventarioException("Debe proporcionar uno o más servicios.");
-		
 		constanciaDAO = new ConstanciaDeDepositoDAO();
 		log.info("Verificando si ya existe la constancia de deposito {}", constancia.getFolioCliente());
 		existeConstancia = constanciaDAO.buscarPorFolioCliente(constancia.getFolioCliente());
