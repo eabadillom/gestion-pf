@@ -9,11 +9,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.business.clientes.ServiciosClienteBL;
+import mx.com.ferbo.business.clientes.ServiciosBL;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.PrecioServicio;
@@ -41,35 +39,41 @@ public class ServiciosClienteBean implements Serializable {
 
     private PrecioServicio precioServicioSelected;
 
-    private ServiciosClienteBL serviciosClienteBL;
+    private ServiciosBL serviciosClienteBL;
 
-    @PostConstruct
-    public void init() {
-        serviciosClienteBL = new ServiciosClienteBL();
-
+    public ServiciosClienteBean() {
+        serviciosClienteBL = new ServiciosBL();
         FacesContext faceContext = FacesContext.getCurrentInstance();
-
         lstUnidadManejo = serviciosClienteBL.obtenerUnidadesDeManejo();
         lstServicio = serviciosClienteBL.obtenerServicios();
         lstPrecioServicioFiltered = new ArrayList<>();
+        lstClientes = new ArrayList<Cliente>();
+        clienteSelected = new Cliente();
+        clienteDAO = new ClienteDAO();
+
+    }
+
+    @PostConstruct
+    public void init() {
         lstClientes = clienteDAO.buscarTodos();
     }
 
-    public void filtrarListadoServicios() throws Throwable {
-        try{
+    public void filtrarListadoServicios(Cliente cliente) throws Throwable {
+        try {
+            this.clienteSelected = cliente;
             this.lstPrecioServicioFiltered = serviciosClienteBL.buscarPreciosPorCliente(clienteSelected);
         } catch (InventarioException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw ex;   
-        } 
+            throw ex;
+        }
     }
 
     public void nuevoServicioCliente() {
         try {
             precioServicioSelected = serviciosClienteBL.crearNuevoPrecioServicio(clienteSelected);
         } catch (Exception ex) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Servicio", "Contacte con el admistrador del sistema.");   
+            addMessage(FacesMessage.SEVERITY_ERROR, "Servicio", "Contacte con el admistrador del sistema.");
         } finally {
             PrimeFaces.current().ajax().update("form:messages");
         }
@@ -92,7 +96,7 @@ public class ServiciosClienteBean implements Serializable {
         } catch (InventarioException ex) {
             addMessage(FacesMessage.SEVERITY_WARN, "Servicio", ex.getMessage());
         } catch (Exception ex) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Servicio", "Contacte con el admistrador del sistema.");   
+            addMessage(FacesMessage.SEVERITY_ERROR, "Servicio", "Contacte con el admistrador del sistema.");
         } finally {
             PrimeFaces.current().ajax().update("form:messages", "form:tabView:dt-servicios");
         }
@@ -104,13 +108,13 @@ public class ServiciosClienteBean implements Serializable {
             lstPrecioServicioFiltered.remove(precioServicioSelected);
             precioServicioSelected = null;
 
-            addMessage(FacesMessage.SEVERITY_INFO, "Servicio","Servicio Eliminado");
+            addMessage(FacesMessage.SEVERITY_INFO, "Servicio", "Servicio Eliminado");
             PrimeFaces.current().ajax().update("form:messages", "form:tabView:dt-servicios");
 
         } catch (InventarioException ex) {
             addMessage(FacesMessage.SEVERITY_WARN, "Servicio", ex.getMessage());
         } catch (Exception ex) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Servicio", "Contacte con el admistrador del sistema.");   
+            addMessage(FacesMessage.SEVERITY_ERROR, "Servicio", "Contacte con el admistrador del sistema.");
         } finally {
             PrimeFaces.current().ajax().update("form:messages", "form:tabView:dt-servicios");
         }
@@ -169,11 +173,11 @@ public class ServiciosClienteBean implements Serializable {
         this.precioServicioSelected = precioServicioSelected;
     }
 
-    public ServiciosClienteBL getServiciosClienteBL() {
+    public ServiciosBL getServiciosClienteBL() {
         return serviciosClienteBL;
     }
 
-    public void setServiciosClienteBL(ServiciosClienteBL serviciosClienteBL) {
+    public void setServiciosClienteBL(ServiciosBL serviciosClienteBL) {
         this.serviciosClienteBL = serviciosClienteBL;
     }
 

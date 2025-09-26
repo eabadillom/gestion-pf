@@ -13,6 +13,7 @@ import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 	
 	private static Logger log = LogManager.getLogger(ClienteContactoDAO.class);

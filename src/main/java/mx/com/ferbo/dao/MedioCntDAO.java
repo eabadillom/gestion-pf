@@ -12,6 +12,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 	private static Logger log = LogManager.getLogger(MedioCntDAO.class);
 

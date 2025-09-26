@@ -15,13 +15,13 @@ import mx.com.ferbo.util.InventarioException;
  *
  * @author julio
  */
-public class ServiciosClienteBL {
+public class ServiciosBL {
 
     private UnidadManejoDAO unidadManejoDAO;
     private ServicioDAO servicioDAO;
     private PrecioServicioDAO precioServicioDAO;
 
-    public ServiciosClienteBL() {
+    public ServiciosBL() {
         this.unidadManejoDAO = new UnidadManejoDAO();
         this.servicioDAO = new ServicioDAO();
         this.precioServicioDAO = new PrecioServicioDAO();
@@ -70,7 +70,8 @@ public class ServiciosClienteBL {
         if (cliente == null) {
             throw new InventarioException("El cliente esta vacío.");
         }
-        List<PrecioServicio> precios = precioServicioDAO.buscarPorCliente(cliente.getCteCve(), false);
+        Integer claveCliente = cliente.getCteCve();
+        List<PrecioServicio> precios = precioServicioDAO.buscarPorCliente(claveCliente, false);
         if (precios.isEmpty()){
             throw new InventarioException("El cliente no tiene precios definidos.");
         }

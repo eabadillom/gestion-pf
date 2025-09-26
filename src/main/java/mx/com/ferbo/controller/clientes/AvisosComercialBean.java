@@ -14,7 +14,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import mx.com.ferbo.business.clientes.AvisosClienteBL;
+import mx.com.ferbo.business.clientes.AvisosBL;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.CategoriaDAO;
 import mx.com.ferbo.dao.ClienteDAO;
@@ -166,7 +166,7 @@ public class AvisosComercialBean implements Serializable {
     public void filtraAvisos() {
 
         if (clienteSelected != null) {
-            lstAvisos = AvisosClienteBL.obtenerAvisosPorCliente(clienteSelected.getCteCve());
+            lstAvisos = AvisosBL.obtenerAvisosPorCliente(clienteSelected.getCteCve());
             this.setRenderAvisosTable("true");
             PrimeFaces.current().ajax().update("form:dt-avisos");
         }
@@ -174,14 +174,14 @@ public class AvisosComercialBean implements Serializable {
 
     public void buscaPrecioServicioAviso(Aviso a) {
         // Cargar aviso con detalles
-        Aviso avisoCompleto = AvisosClienteBL.cargarAvisoCompleto(a.getAvisoCve());
+        Aviso avisoCompleto = AvisosBL.cargarAvisoCompleto(a.getAvisoCve());
 
         this.aviso = avisoCompleto;
         this.avisoSelected = avisoCompleto;
         this.plantaCveSelected = avisoCompleto.getPlantaCve().getPlantaCve();
 
         // Buscar servicios disponibles sin aviso asignado
-        lstPrecioServicio = AvisosClienteBL.buscarServiciosDisponibles(
+        lstPrecioServicio = AvisosBL.buscarServiciosDisponibles(
                 clienteSelected.getCteCve(),
                 avisoCompleto.getAvisoCve()
         );
@@ -191,13 +191,13 @@ public class AvisosComercialBean implements Serializable {
         criterio.setCliente(clienteSelected);
         criterio.setAvisoCve(avisoCompleto);
 
-        lstPrecioServicioAviso = AvisosClienteBL.buscarServiciosPorCriterio(criterio);
+        lstPrecioServicioAviso = AvisosBL.buscarServiciosPorCriterio(criterio);
 
         PrimeFaces.current().ajax().update("soPlantaAct");
     }
 
     public void estableceCuotaMinima() {
-        cuotaMinimaSelected = AvisosClienteBL.establecerCuotaMinima(
+        cuotaMinimaSelected = AvisosBL.establecerCuotaMinima(
                 cuotaMinimaSelected,
                 clienteSelected,
                 hasCuotaMinima
@@ -209,7 +209,7 @@ public class AvisosComercialBean implements Serializable {
     }
 
     public boolean buscaCuotaMinima() {
-        Optional<CuotaMinima> resultado = AvisosClienteBL.buscarCuotaMinima(cuotaMinimaSelected, clienteSelected);
+        Optional<CuotaMinima> resultado = AvisosBL.buscarCuotaMinima(cuotaMinimaSelected, clienteSelected);
 
         if (resultado.isPresent()) {
             cuotaMinimaSelected = resultado.get();
@@ -229,11 +229,11 @@ public class AvisosComercialBean implements Serializable {
 
     public void nuevoAviso() {
         this.categoriaSelected = 1;
-        this.avisoSelected = AvisosClienteBL.crearNuevoAviso(clienteSelected, this.categoriaSelected);
+        this.avisoSelected = AvisosBL.crearNuevoAviso(clienteSelected, this.categoriaSelected);
     }
 
     public void guardaAviso() {
-        AvisosClienteBL.guardarAviso(avisoSelected, categoriaSelected, plantaCveSelected);
+        AvisosBL.guardarAviso(avisoSelected, categoriaSelected, plantaCveSelected);
         filtraAvisos(); // se queda aquí porque es parte del flujo de UI
 
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Agregado"));
@@ -241,7 +241,7 @@ public class AvisosComercialBean implements Serializable {
     }
 
     public void actualizaAviso() {
-        AvisosClienteBL.actualizarAviso(avisoSelected, lstPrecioServicioAviso, plantaCveSelected);
+        AvisosBL.actualizarAviso(avisoSelected, lstPrecioServicioAviso, plantaCveSelected);
 
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Servicio Actualizado"));
         PrimeFaces.current().executeScript("PF('addAvisoDialog').hide()");
@@ -251,7 +251,7 @@ public class AvisosComercialBean implements Serializable {
     }
 
     public void eliminaAviso() {
-        String resultado = AvisosClienteBL.eliminarAviso(avisoSelected);
+        String resultado = AvisosBL.eliminarAviso(avisoSelected);
         FacesMessage message;
 
         if ("OK".equals(resultado)) {
@@ -271,7 +271,7 @@ public class AvisosComercialBean implements Serializable {
         String mensaje;
 
         try {
-            lstPrecioServicioAviso = AvisosClienteBL.eliminarServicioDeAviso(ps, avisoSelected, clienteSelected);
+            lstPrecioServicioAviso = AvisosBL.eliminarServicioDeAviso(ps, avisoSelected, clienteSelected);
             severity = FacesMessage.SEVERITY_INFO;
             mensaje = "Servicio eliminado correctamente.";
         } catch (InventarioException ex) {
@@ -288,7 +288,7 @@ public class AvisosComercialBean implements Serializable {
     }
 
     public void remueveAviso() {
-        AvisosClienteBL.eliminarListadoPrecioServicios(lstPrecioServicioSelected);
+        AvisosBL.eliminarListadoPrecioServicios(lstPrecioServicioSelected);
         PrimeFaces.current().ajax().update("form:dt-avisos", "form:panel-actAviso");
     }
 
@@ -298,7 +298,7 @@ public class AvisosComercialBean implements Serializable {
         String mensaje;
 
         try {
-            AvisosClienteBL.agregarServiciosAAviso(
+            AvisosBL.agregarServiciosAAviso(
                     lstPrecioServicioSelected,
                     lstPrecioServicioAviso,
                     avisoSelected,

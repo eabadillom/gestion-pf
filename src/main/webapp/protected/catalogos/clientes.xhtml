@@ -33,7 +33,7 @@
                         <h:outputText value="#{cliente.habilitado ? 'Sí' : 'No'}" />
                     </p:column>
                     <p:column width="2rem" style="text-align: center;">
-                        <p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();" process="@this" update="form:dialogCliente form:tabView" onclick="PF('statusInfoDialog').show();" actionListener="#{serviciosCliente.filtraListado()}">
+                        <p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();" process="@this" update="form:dialogCliente form:tabView" onclick="PF('statusInfoDialog').show();" actionListener="#{serviciosCliente.filtrarListadoServicios(cliente)}">
                             <f:setPropertyActionListener value="#{cliente}" target="#{serviciosCliente.clienteSelected}"/>
                         </p:commandButton>
                     </p:column>

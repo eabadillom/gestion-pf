@@ -11,6 +11,7 @@ import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 
 	@Override

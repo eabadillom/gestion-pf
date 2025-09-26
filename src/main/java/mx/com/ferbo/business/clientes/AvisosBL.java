@@ -22,7 +22,7 @@ import mx.com.ferbo.util.InventarioException;
  *
  * @author julio
  */
-public class AvisosClienteBL {
+public class AvisosBL {
 
     private static final AvisoDAO avisoDAO = new AvisoDAO();
     private static final PrecioServicioDAO precioServicioDAO = new PrecioServicioDAO();
