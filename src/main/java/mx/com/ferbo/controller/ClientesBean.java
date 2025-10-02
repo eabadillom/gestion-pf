@@ -51,6 +51,7 @@ import mx.com.ferbo.util.ClienteUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.SecurityUtil;
 
+@Deprecated
 @Named
 @ViewScoped
 public class ClientesBean implements Serializable {

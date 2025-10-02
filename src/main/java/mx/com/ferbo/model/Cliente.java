@@ -133,7 +133,7 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<PrecioServicio> precioServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true)
     private List<ClienteContacto> clienteContactoList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
