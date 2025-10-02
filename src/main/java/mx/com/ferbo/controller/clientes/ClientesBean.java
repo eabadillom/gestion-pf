@@ -3,9 +3,14 @@ package mx.com.ferbo.controller.clientes;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.business.clientes.ContactoBL;
 import mx.com.ferbo.controller.SideBarBean;
@@ -19,10 +24,14 @@ import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.model.TipoTelefono;
 import mx.com.ferbo.util.InventarioException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Named
 @ViewScoped
 public class ClientesBean implements Serializable {
+
+    private static final Logger log = LogManager.getLogger(ClientesBean.class);
 
     // Side bar
     @Inject
@@ -69,19 +78,16 @@ public class ClientesBean implements Serializable {
      * 
      */
 
-    // Metodos exclusivos de servicios
-
-    // Metodos exclusivos de domicilios
+     private void addMessage(FacesMessage.Severity severity, String title, String msg) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,
+                title, msg));
+    }
 
     // Metodos exclusivos para contactos
     public void nuevoClienteContacto() {
         this.editandoContacto = null;
         this.editandoContacto = Boolean.TRUE;
         this.clienteContactoSelected = new ClienteContacto();
-    }
-
-    public void actualizarCliente() {
-        this.clienteDAO.actualizar(this.clienteSelected);
     }
 
     public void nuevoContacto() {
@@ -95,48 +101,49 @@ public class ClientesBean implements Serializable {
     }
 
     public void copiarClienteContacto(ClienteContacto clienteContacto) {
-        try {
             this.editandoContacto = null;
             this.editandoContacto = Boolean.FALSE;
             this.clienteContactoSelected = clienteContacto;
-        } catch (Exception ex) {
-
-        } finally {
-
-        }
     }
 
     public void operarContactos(String operacion) {
+        String mensaje = null;
         try {
 
             switch (operacion) {
 
                 case "agregarcontacto":
                     contactoBL.agregarContacto(this.clienteSelected, this.clienteContactoSelected);
+                    mensaje = "Contacto Agregado";
                     break;
 
                 case "agregarmedio":
                     contactoBL.agregarMedioContacto(this.clienteContactoSelected, this.medioCntSelected);
+                    mensaje = "Medio de contacto Agregado";
                     break;
 
                 case "eliminarmedio":
                     contactoBL.eliminarMedioContacto(this.clienteContactoSelected, this.medioCntSelected);
+                    mensaje = "Medio de contacto eliminado";
                     break;
 
                 case "eliminarcontacto":
                     contactoBL.eliminarContacto(this.clienteSelected, this.clienteContactoSelected);
+                    mensaje = "Contacto eliminado";
                     break;
 
                 default:
                     throw new InventarioException("Sin operación valida para contactos");
             }
-
+            addMessage(FacesMessage.SEVERITY_INFO, "Contacto", mensaje);
         } catch (InventarioException ex) {
-
+            log.warn(ex);
+            addMessage(FacesMessage.SEVERITY_WARN, "Contacto", ex.getMessage());
         } catch (Exception ex) {
-
+            log.error(ex);
+            addMessage(FacesMessage.SEVERITY_ERROR, "Contacto", "Contacte con el admistrador del sistema.");
         } finally {
-
+            PrimeFaces.current().ajax().update();
         }
     }
 
@@ -144,11 +151,13 @@ public class ClientesBean implements Serializable {
         try {
             contactoBL.seleccionarMedioContacto(this.medioCntSelected);
         } catch (InventarioException ex) {
-
+            log.warn(ex);
+            addMessage(FacesMessage.SEVERITY_WARN, "Contacto", ex.getMessage());
         } catch (Exception ex) {
-
+            log.error(ex);
+            addMessage(FacesMessage.SEVERITY_ERROR, "Contacto", "Contacte con el admistrador del sistema.");
         } finally {
-
+            PrimeFaces.current().ajax().update();
         }
     }
 
