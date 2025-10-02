@@ -152,19 +152,18 @@ public class ClientesBean implements Serializable {
         }
     }
 
-    // Getter y setter para sidebar
-    public Cliente getClienteSelected() {
-        return clienteSelected;
-    }
-
+    // Getters y setters para sidebar
     public SideBarBean getSideBar() {
         return sideBar;
     }
 
-    // Getter y Setter para Cliente
-
     public void setSideBar(SideBarBean sideBar) {
         this.sideBar = sideBar;
+    }
+
+    // Getters y Setters para Cliente
+     public Cliente getClienteSelected() {
+        return clienteSelected;
     }
 
     public void setClienteSelected(Cliente clienteSelected) {
