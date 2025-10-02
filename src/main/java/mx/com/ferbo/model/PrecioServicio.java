@@ -29,6 +29,15 @@ import javax.validation.constraints.NotNull;
 @NamedQuery(name = "PrecioServicio.findByClienteAviso", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.avisoCve.avisoCve = :avisoCve")
 @NamedQuery(name = "PrecioServicio.findByServicioAndAvisoAndCliente", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.avisoCve.avisoCve = :avisoCve and p.servicio.servicioCve = :servicioCve")
 @NamedQuery(name = "PrecioServicio.findByAviso", query = "SELECT p FROM PrecioServicio p WHERE p.avisoCve.avisoCve = :idAviso ORDER BY p.servicio.servicioDs ASC")
+@NamedQuery(
+    name = "PrecioServicio.findByIdClienteConRelaciones",
+    query = "SELECT ps FROM PrecioServicio ps " +
+            "JOIN FETCH ps.cliente " +
+            "JOIN FETCH ps.servicio " +
+            "JOIN FETCH ps.unidad " +
+            "JOIN FETCH ps.avisoCve " +
+            "WHERE ps.cliente.cteCve = :idCliente"
+)
 public class PrecioServicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
