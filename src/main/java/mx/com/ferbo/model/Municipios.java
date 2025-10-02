@@ -7,14 +7,12 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -30,14 +28,13 @@ import javax.validation.constraints.Size;
 @Table(name = "municipios")
 @NamedQueries({
     @NamedQuery(name = "Municipios.findAll", query = "SELECT m FROM Municipios m"),
-    @NamedQuery(name = "Municipios.findByPaisCve", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.paisCve = :paisCve"),
-    @NamedQuery(name = "Municipios.findByEstadoCve", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.estadoCve = :estadoCve"),
+    @NamedQuery(name = "Municipios.findByPaisCve", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.estados.estadosPK.pais.paisCve = :paisCve"),
+    @NamedQuery(name = "Municipios.findByEstadoCve", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.estados.estadosPK.estadoCve = :estadoCve"),
     @NamedQuery(name = "Municipios.findByMunicipioCve", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.municipioCve = :municipioCve"),
     @NamedQuery(name = "Municipios.findByMunicipioDs", query = "SELECT m FROM Municipios m WHERE m.municipioDs = :municipioDs"),
-	@NamedQuery(name = "Municipios.findByPaisCveEstadoCve", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.paisCve = :paisCve AND m.municipiosPK.estadoCve = :estadoCve"),
-    //@NamedQuery(name = "Municipios.findByMunicipioDs", query = "SELECT m FROM Municipios m WHERE m.municipioDs = :municipioDs"),
-    @NamedQuery(name = "Municipios.findByTodo", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.municipioCve = :municipioCve AND m.municipiosPK.estadoCve = :estadoCve AND m.municipiosPK.paisCve = :paisCve")})
-
+    @NamedQuery(name = "Municipios.findByPaisCveEstadoCve", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.estados.estadosPK.pais.paisCve = :paisCve AND m.municipiosPK.estados.estadosPK.estadoCve = :estadoCve"),
+    @NamedQuery(name = "Municipios.findByTodo", query = "SELECT m FROM Municipios m WHERE m.municipiosPK.municipioCve = :municipioCve AND m.municipiosPK.estados.estadosPK.estadoCve = :estadoCve AND m.municipiosPK.estados.estadosPK.pais.paisCve = :paisCve")
+})
 public class Municipios implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,29 +48,19 @@ public class Municipios implements Serializable {
     @Column(name = "municipio_ds")
     private String municipioDs;
     
-    @JoinColumns({
-        @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false),
-        @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve", insertable = false, updatable = false)})
-    @ManyToOne(optional = false)
-    private Estados estados;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "municipios")
+    @OneToMany(mappedBy = "ciudadesPK.municipios")
     private List<Ciudades> ciudadesList;
 
     public Municipios() {
     }
 
-    public Municipios(MunicipiosPK municipiosPK) {
-        this.municipiosPK = municipiosPK;
+    public Municipios(Estados estados, int municipioCve) {
+        this.municipiosPK = new MunicipiosPK(estados, municipioCve);
     }
 
-    public Municipios(MunicipiosPK municipiosPK, String municipioDs) {
-        this.municipiosPK = municipiosPK;
+    public Municipios(Estados estados, int municipioCve, String municipioDs) {
+        this.municipiosPK = new MunicipiosPK(estados, municipioCve);
         this.municipioDs = municipioDs;
-    }
-
-    public Municipios(int paisCve, int estadoCve, int municipioCve) {
-        this.municipiosPK = new MunicipiosPK(paisCve, estadoCve, municipioCve);
     }
 
     public MunicipiosPK getMunicipiosPK() {
@@ -92,14 +79,6 @@ public class Municipios implements Serializable {
         this.municipioDs = municipioDs;
     }
 
-    public Estados getEstados() {
-        return estados;
-    }
-
-    public void setEstados(Estados estados) {
-        this.estados = estados;
-    }
-
     public List<Ciudades> getCiudadesList() {
         return ciudadesList;
     }
@@ -110,27 +89,29 @@ public class Municipios implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (municipiosPK != null ? municipiosPK.hashCode() : 0);
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.municipiosPK.getMunicipioCve());
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Municipios)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        Municipios other = (Municipios) object;
-        if ((this.municipiosPK == null && other.municipiosPK != null) || (this.municipiosPK != null && !this.municipiosPK.equals(other.municipiosPK))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        return true;
+        final Municipios other = (Municipios) obj;
+        return Objects.equals(this.municipiosPK.getMunicipioCve(), other.municipiosPK.getMunicipioCve());
     }
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.Municipios[ municipiosPK=" + municipiosPK + " ]";
+        return "mx.com.ferbo.model.Municipios[ municipiosPK=" + municipiosPK.getMunicipioCve() + ", municipioDs=" + municipioDs + " ]";
     }
     
 }

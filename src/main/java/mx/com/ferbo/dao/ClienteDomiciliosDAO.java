@@ -12,6 +12,7 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 	
 	private static Logger log = LogManager.getLogger(ClienteDomiciliosDAO.class);
@@ -73,7 +74,7 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 			
 			for(ClienteDomicilios cd : listado) {
 				log.debug("Domicilio cve: {}", cd.getDomicilios().getDomCve());
-				log.debug("PaisCve: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve() );
+				log.debug("PaisCve: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve() );
 			}
 			
 		} catch(Exception ex) {
@@ -161,9 +162,9 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
                     for(ClienteDomicilios cd : listado){
                         log.debug("Asentamiento: {}", cd.getDomicilios().getAsentamiento().toString());
                         log.debug("Ciudad: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().toString());
-                        log.debug("Municipios: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().toString());
-                        log.debug("Estado: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().toString());
-                        log.debug("Pais: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().toString());
+                        log.debug("Municipios: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().toString());
+                        log.debug("Estado: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().toString());
+                        log.debug("Pais: {}", cd.getDomicilios().getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().toString());
                     }
                     
                 }catch(Exception ex) {

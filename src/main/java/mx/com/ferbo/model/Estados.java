@@ -7,13 +7,12 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -29,12 +28,12 @@ import javax.validation.constraints.Size;
 @Table(name = "estados")
 @NamedQueries({
     @NamedQuery(name = "Estados.findAll", query = "SELECT e FROM Estados e"),
-    @NamedQuery(name = "Estados.findByPaisCve", query = "SELECT e FROM Estados e WHERE e.estadosPK.paisCve = :paisCve"),
+    @NamedQuery(name = "Estados.findByPaisCve", query = "SELECT e FROM Estados e WHERE e.estadosPK.pais.paisCve = :paisCve"),
     @NamedQuery(name = "Estados.findByEstadoCve", query = "SELECT e FROM Estados e WHERE e.estadosPK.estadoCve = :estadoCve"),
     @NamedQuery(name = "Estados.findByEstadoDsCorta", query = "SELECT e FROM Estados e WHERE e.estadoDsCorta = :estadoDsCorta"),
     @NamedQuery(name = "Estados.findByEstadoDesc", query = "SELECT e FROM Estados e WHERE e.estadoDesc = :estadoDesc"),
-    @NamedQuery(name = "Estados.findByCriterios", query = "SELECT e FROM Estados e WHERE e.estadosPK.paisCve = :paisCve AND e.estadosPK.estadoCve = :estadoCve")})
-
+    @NamedQuery(name = "Estados.findByCriterios", query = "SELECT e FROM Estados e WHERE e.estadosPK.pais.paisCve = :paisCve AND e.estadosPK.estadoCve = :estadoCve")
+})
 public class Estados implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -54,12 +53,8 @@ public class Estados implements Serializable {
     @Column(name = "estado_desc")
     private String estadoDesc;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "estados")
+    @OneToMany(mappedBy = "municipiosPK.estados")
     private List<Municipios> municipiosList;
-    
-    @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private Paises paises;
 
     public Estados() {
     }
@@ -67,15 +62,14 @@ public class Estados implements Serializable {
     public Estados(EstadosPK estadosPK) {
         this.estadosPK = estadosPK;
     }
-
-    public Estados(EstadosPK estadosPK, String estadoDsCorta, String estadoDesc) {
-        this.estadosPK = estadosPK;
-        this.estadoDsCorta = estadoDsCorta;
-        this.estadoDesc = estadoDesc;
+    
+    public Estados(Paises pais, int estadoCve) {
+        this.estadosPK = new EstadosPK(pais, estadoCve);
     }
 
-    public Estados(int paisCve, int estadoCve) {
-        this.estadosPK = new EstadosPK(paisCve, estadoCve);
+    public Estados(Paises pais, int estadoCve, String estadoDesc) {
+        this.estadosPK = new EstadosPK(pais, estadoCve);
+        this.estadoDesc = estadoDesc;
     }
 
     public EstadosPK getEstadosPK() {
@@ -110,37 +104,31 @@ public class Estados implements Serializable {
         this.municipiosList = municipiosList;
     }
 
-    public Paises getPaises() {
-        return paises;
-    }
-
-    public void setPaises(Paises paises) {
-        this.paises = paises;
-    }
-
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (estadosPK != null ? estadosPK.hashCode() : 0);
+        int hash = 5;
+        hash = 29 * hash + Objects.hashCode(this.estadosPK.getEstadoCve());
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Estados)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        Estados other = (Estados) object;
-        if ((this.estadosPK == null && other.estadosPK != null) || (this.estadosPK != null && !this.estadosPK.equals(other.estadosPK))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        return true;
+        final Estados other = (Estados) obj;
+        return Objects.equals(this.estadosPK.getEstadoCve(), other.estadosPK.getEstadoCve());
     }
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.Estados[ estadosPK=" + estadosPK + " ]";
+        return "mx.com.ferbo.model.Estados[ estadosPK=" + estadosPK.getEstadoCve() + ", estadoDesc=" + estadoDesc + " ]";
     }
     
 }

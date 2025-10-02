@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -29,7 +30,8 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Paises.findAll", query = "SELECT p FROM Paises p"),
     @NamedQuery(name = "Paises.findByPaisCve", query = "SELECT p FROM Paises p WHERE p.paisCve = :paisCve"),
     @NamedQuery(name = "Paises.findByPaisDesc", query = "SELECT p FROM Paises p WHERE p.paisDesc = :paisDesc"),
-    @NamedQuery(name = "Paises.findByPaisDsCorta", query = "SELECT p FROM Paises p WHERE p.paisDsCorta = :paisDsCorta")})
+    @NamedQuery(name = "Paises.findByPaisDsCorta", query = "SELECT p FROM Paises p WHERE p.paisDsCorta = :paisDsCorta")
+})
 public class Paises implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,7 +52,7 @@ public class Paises implements Serializable {
     @Column(name = "pais_ds_corta")
     private String paisDsCorta;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "paises")
+    @OneToMany(mappedBy = "estadosPK.pais")
     private List<Estados> estadosList;
 
     public Paises() {
@@ -99,27 +101,29 @@ public class Paises implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (paisCve != null ? paisCve.hashCode() : 0);
+        int hash = 5;
+        hash = 83 * hash + Objects.hashCode(this.paisCve);
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Paises)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        Paises other = (Paises) object;
-        if ((this.paisCve == null && other.paisCve != null) || (this.paisCve != null && !this.paisCve.equals(other.paisCve))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        return true;
+        final Paises other = (Paises) obj;
+        return Objects.equals(this.paisCve, other.paisCve);
     }
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.Paises[ paisCve=" + paisCve + " ]";
+        return "mx.com.ferbo.model.Paises[ paisCve=" + paisCve + ", paisDesc=" + paisDesc + " ]";
     }
     
 }

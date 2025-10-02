@@ -17,6 +17,7 @@ import mx.com.ferbo.dao.EstadosDAO;
 import mx.com.ferbo.dao.PaisesDAO;
 import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.EstadosPK;
+import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.Paises;
 
 @Named
@@ -58,20 +59,20 @@ public class EstadosBean implements Serializable {
 		this.paisSelect = new Paises();
 		this.estadoSelect = new Estados();
 		this.estadoPkSelect = new EstadosPK();
-		estadoSelect.setPaises(paisSelect);
-		estadoSelect.setEstadosPK(estadoPkSelect);
+		this.estadoPkSelect.setPais(new Paises());
+                estadoSelect.setEstadosPK(estadoPkSelect);
 	}
 
 	public void guardarEstado() {
 		if (this.estadoSelect.getEstadosPK().getEstadoCve() == 0) {
-			this.estadoPkSelect.setPaisCve(idPais);
+			this.estadoPkSelect.getPais().setPaisCve(idPais);
 			this.estadoSelect.setEstadosPK(estadoPkSelect);
 			List<Estados> listaEstadosPais = estadosDao.buscarPorCriteriosEstados(estadoSelect);
 			int tamanioListaEstadosPais = listaEstadosPais.size() + 1;
 			this.estadoPkSelect.setEstadoCve(tamanioListaEstadosPais);
 			this.estadoSelect.setEstadosPK(estadoPkSelect);
 			this.paisSelect.setPaisCve(idPais);
-			this.estadoSelect.setPaises(paisSelect);
+			this.estadoSelect.getEstadosPK().getPais().setPaisCve(paisSelect.getPaisCve());
 			if (estadosDao.guardar(estadoSelect) == null) {
 				listaEstados = estadosDao.buscarPorCriteriosEstados(estadoSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Estado Agregado"));
@@ -82,7 +83,7 @@ public class EstadosBean implements Serializable {
 		} else {
 			int idEstado = this.estadoSelect.getEstadosPK().getEstadoCve();
 			this.estadoPkSelect = new EstadosPK();
-			this.estadoPkSelect.setPaisCve(idPais);
+			this.estadoPkSelect.getPais().setPaisCve(idPais);
 			this.estadoPkSelect.setEstadoCve(idEstado);
 			this.estadoSelect.setEstadosPK(estadoPkSelect);
 			if (estadosDao.actualizar(estadoSelect) == null) {
@@ -101,7 +102,7 @@ public class EstadosBean implements Serializable {
 		estadoSelect = new Estados();
 		estadoPkSelect = new EstadosPK();
 		estadoPkSelect.setEstadoCve(idEstado);
-		estadoPkSelect.setPaisCve(idPais);
+		estadoPkSelect.getPais().setPaisCve(idPais);
 		estadoSelect.setEstadosPK(estadoPkSelect);
 		if (estadosDao.eliminar(estadoSelect) == null) {
 			this.listaEstados.remove(this.estadoSelect);
@@ -116,7 +117,7 @@ public class EstadosBean implements Serializable {
 
 	public void handleContrySelect() {
 		if (this.idPais != -1) {
-			this.estadoPkSelect.setPaisCve(idPais);
+			this.estadoPkSelect.getPais().setPaisCve(idPais);
 			this.estadoSelect.setEstadosPK(estadoPkSelect);
 			listaEstados = estadosDao.buscarPorCriteriosEstados(estadoSelect);
 		}

@@ -11,6 +11,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,12 +38,12 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Domicilios.findByDomicilioCalle", query = "SELECT d FROM Domicilios d WHERE d.domicilioCalle = :domicilioCalle"),
     @NamedQuery(name = "Domicilios.findByDomicilioNumExt", query = "SELECT d FROM Domicilios d WHERE d.domicilioNumExt = :domicilioNumExt"),
     @NamedQuery(name = "Domicilios.findByDomicilioNumInt", query = "SELECT d FROM Domicilios d WHERE d.domicilioNumInt = :domicilioNumInt"),
-    @NamedQuery(name = "Domicilios.findByDomicilioColonia", query = "SELECT d FROM Domicilios d WHERE d.domicilioColonia = :domicilioColonia"),
-    @NamedQuery(name = "Domicilios.findByDomicilioCp", query = "SELECT d FROM Domicilios d WHERE d.domicilioCp = :domicilioCp"),
+    @NamedQuery(name = "Domicilios.findByDomicilioCp", query = "SELECT d FROM Domicilios d WHERE d.asentamiento.cp = :domicilioCp"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel1", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel1 = :domicilioTel1"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel2", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel2 = :domicilioTel2"),
     @NamedQuery(name = "Domicilios.findByDomicilioFax", query = "SELECT d FROM Domicilios d WHERE d.domicilioFax = :domicilioFax"),
-    @NamedQuery(name = "Domicilios.findByAsentamiento", query = "SELECT d FROM Domicilios d WHERE d.asentamiento.asentamientoHumanoPK.ciudades.municipios.estados.paises.paisCve = :paisCve AND d.asentamiento.asentamientoHumanoPK.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve AND d.asentamiento.asentamientoHumanoPK.ciudades.municipios.municipiosPK.municipioCve = :municipioCve AND d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve AND d.asentamiento.asentamientoHumanoPK.asentamientoCve = :domicilioColonia" )})
+    @NamedQuery(name = "Domicilios.findByAsentamiento", query = "SELECT d FROM Domicilios d WHERE d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisCve = :paisCve AND d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.estadoCve = :estadoCve AND d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.municipioCve = :municipioCve AND d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve AND d.asentamiento.asentamientoHumanoPK.asentamientoCve = :asentamientoCve" )
+})
 public class Domicilios implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -65,13 +66,6 @@ public class Domicilios implements Serializable {
     @Column(name = "domicilio_num_int")
     private String domicilioNumInt;
     
-    @Column(name = "domicilio_colonia")
-    private Integer domicilioColonia;
-    
-    @Size(max = 5)
-    @Column(name = "domicilio_cp")
-    private String domicilioCp;
-    
     @Size(max = 10)
     @Column(name = "domicilio_tel1")
     private String domicilioTel1;
@@ -84,17 +78,14 @@ public class Domicilios implements Serializable {
     @Column(name = "domicilio_fax")
     private String domicilioFax;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "domicilios")
-    private List<ClienteDomicilios> clienteDomiciliosList;
-    
     @Null
     @JoinColumns(value = {
-        @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false),
-        @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve", insertable = false, updatable = false),
-        @JoinColumn(name = "municipio_cve", referencedColumnName = "municipio_cve", insertable = false, updatable = false),
-        @JoinColumn(name = "ciudad_cve", referencedColumnName = "ciudad_cve", insertable = false, updatable = false),
-        @JoinColumn(name = "asentamiento_cve", referencedColumnName = "asentamiento_cve", insertable = false, updatable = false)
-    })
+        @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve"),
+        @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve"),
+        @JoinColumn(name = "municipio_cve", referencedColumnName = "municipio_cve"),
+        @JoinColumn(name = "ciudad_cve", referencedColumnName = "ciudad_cve"),
+        @JoinColumn(name = "asentamiento_cve", referencedColumnName = "asentamiento_cve")
+    }, foreignKey = @ForeignKey(name = "FR_Domicilio_Asentamiento"))
     @OneToOne
     private AsentamientoHumano asentamiento;
     
@@ -141,22 +132,6 @@ public class Domicilios implements Serializable {
         this.domicilioNumInt = domicilioNumInt;
     }
 
-    public Integer getDomicilioColonia() {
-        return domicilioColonia;
-    }
-
-    public void setDomicilioColonia(Integer domicilioColonia) {
-        this.domicilioColonia = domicilioColonia;
-    }
-
-    public String getDomicilioCp() {
-        return domicilioCp;
-    }
-
-    public void setDomicilioCp(String domicilioCp) {
-        this.domicilioCp = domicilioCp;
-    }
-
     public String getDomicilioTel1() {
         return domicilioTel1;
     }
@@ -179,14 +154,6 @@ public class Domicilios implements Serializable {
 
     public void setDomicilioFax(String domicilioFax) {
         this.domicilioFax = domicilioFax;
-    }
-
-    public List<ClienteDomicilios> getClienteDomiciliosList() {
-        return clienteDomiciliosList;
-    }
-
-    public void setClienteDomiciliosList(List<ClienteDomicilios> clienteDomiciliosList) {
-        this.clienteDomiciliosList = clienteDomiciliosList;
     }
 
     public AsentamientoHumano getAsentamiento() {

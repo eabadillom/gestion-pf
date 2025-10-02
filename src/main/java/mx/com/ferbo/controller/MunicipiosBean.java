@@ -81,10 +81,10 @@ public class MunicipiosBean implements Serializable {
 	public void guardarMunicipio() {
 		int tamanioListaMunicipioEstadoPais = 0;
 		if (this.municipioSelect.getMunicipiosPK().getMunicipioCve() == 0) {
-			municipioPkSelect.setPaisCve(idPais);
-			municipioPkSelect.setEstadoCve(idEstado);
+			municipioPkSelect.getEstados().getEstadosPK().getPais().setPaisCve(idPais);
+			municipioPkSelect.getEstados().getEstadosPK().setEstadoCve(idEstado);
 			List<Municipios> listaMunicipioEstadoPais = municipiosDao.buscarPorPaisEstado(municipioSelect);
-			if (municipioSelect.getMunicipiosPK().getEstadoCve() == 9) {
+			if (municipioSelect.getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve() == 9) {
 				tamanioListaMunicipioEstadoPais = listaMunicipioEstadoPais.size() + 2;
 			} else {
 				tamanioListaMunicipioEstadoPais = listaMunicipioEstadoPais.size() + 1;
@@ -115,8 +115,8 @@ public class MunicipiosBean implements Serializable {
 		int idMunicipio = this.municipioSelect.getMunicipiosPK().getMunicipioCve();
 		municipioSelect = new Municipios();
 		municipioPkSelect = new MunicipiosPK();
-		municipioPkSelect.setPaisCve(idPais);
-		municipioPkSelect.setEstadoCve(idEstado);
+		municipioPkSelect.getEstados().getEstadosPK().getPais().setPaisCve(idPais);
+		municipioPkSelect.getEstados().getEstadosPK().setEstadoCve(idEstado);
 		municipioPkSelect.setMunicipioCve(idMunicipio);
 		municipioSelect.setMunicipiosPK(municipioPkSelect);
 		if (municipiosDao.eliminar(municipioSelect) == null ) {
@@ -131,7 +131,7 @@ public class MunicipiosBean implements Serializable {
 
 	public void handleContrySelect() {
 		if (this.idPais != -1) {
-			this.estadoPkSelect.setPaisCve(idPais);
+			this.estadoPkSelect.getPais().setPaisCve(idPais);
 			this.estadoSelect.setEstadosPK(estadoPkSelect);
 			listaEstados = estadosDao.buscarPorCriteriosEstados(estadoSelect);
 		}
@@ -139,8 +139,8 @@ public class MunicipiosBean implements Serializable {
 	
 	public void handleStateSelect() {
 		if (this.idEstado != -1) {
-			this.municipioPkSelect.setPaisCve(idPais);
-			this.municipioPkSelect.setEstadoCve(idEstado);
+			this.municipioPkSelect.getEstados().getEstadosPK().getPais().setPaisCve(idPais);
+			this.municipioPkSelect.getEstados().getEstadosPK().setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);
 			listaMunicipios = municipiosDao.buscarPorPaisEstado(municipioSelect);
 		}

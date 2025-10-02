@@ -23,13 +23,14 @@ public class AsentamientoHumanoPK implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
+    @ManyToOne()
+    @NotNull
     @JoinColumns({
-        @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false),
-        @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve", insertable = false, updatable = false),
-        @JoinColumn(name = "municipio_cve", referencedColumnName = "municipio_cve", insertable = false, updatable = false),
-        @JoinColumn(name = "ciudad_cve", referencedColumnName = "ciudad_cve", insertable = false, updatable = false)
+        @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve"),
+        @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve"),
+        @JoinColumn(name = "municipio_cve", referencedColumnName = "municipio_cve"),
+        @JoinColumn(name = "ciudad_cve", referencedColumnName = "ciudad_cve")
     })
-    @ManyToOne(optional = false)
     private Ciudades ciudades;
     
     @Basic(optional = false)

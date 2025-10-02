@@ -6,14 +6,13 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -27,15 +26,18 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "Pais.findAll", query = "SELECT p FROM Pais p"),
     @NamedQuery(name = "Pais.findByPaisCve", query = "SELECT p FROM Pais p WHERE p.paisCve = :paisCve"),
-    @NamedQuery(name = "Pais.findByPaisDesc", query = "SELECT p FROM Pais p WHERE p.paisDesc = :paisDesc")})
+    @NamedQuery(name = "Pais.findByPaisDesc", query = "SELECT p FROM Pais p WHERE p.paisDesc = :paisDesc")
+})
 public class Pais implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "pais_cve")
     private Integer paisCve;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 150)
@@ -72,22 +74,24 @@ public class Pais implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (paisCve != null ? paisCve.hashCode() : 0);
+        int hash = 3;
+        hash = 11 * hash + Objects.hashCode(this.paisCve);
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Pais)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        Pais other = (Pais) object;
-        if ((this.paisCve == null && other.paisCve != null) || (this.paisCve != null && !this.paisCve.equals(other.paisCve))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        return true;
+        final Pais other = (Pais) obj;
+        return Objects.equals(this.paisCve, other.paisCve);
     }
 
     @Override

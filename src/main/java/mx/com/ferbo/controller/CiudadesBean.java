@@ -105,13 +105,13 @@ public class CiudadesBean implements Serializable {
 			ciudadPKSelect.setCiudadCve(tamanioListaCiudadMunicipioEstadoPais);
 			ciudadSelect.setCiudadesPK(ciudadPKSelect);
 			
-			this.municipioPkSelect.setPaisCve(idPais);
-			this.municipioPkSelect.setEstadoCve(idEstado);
+			this.municipioPkSelect.getEstados().getEstadosPK().getPais().setPaisCve(idPais);
+			this.municipioPkSelect.getEstados().getEstadosPK().setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);			
 			List<Municipios> listaMunicipiosTmp = municipiosDao.buscarPorPaisEstado(municipioSelect);
 			List<Municipios> municipioTmp = listaMunicipiosTmp.stream().filter(m ->m.getMunicipiosPK().getMunicipioCve()==idMunicipio).collect(Collectors.toList());
 			Municipios municipio = municipioTmp.get(0);
-			ciudadSelect.setMunicipios(municipio);
+			ciudadSelect.getCiudadesPK().setMunicipios(municipio);
 			if(ciudadesDao.guardar(ciudadSelect) == null) {
 				this.listaCiudades.add(this.ciudadSelect);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Ciudad Agregada"));
@@ -149,7 +149,7 @@ public class CiudadesBean implements Serializable {
 
 	public void handleContrySelect() {
 		if (this.idPais != -1) {
-			this.estadoPkSelect.setPaisCve(idPais);
+			this.estadoPkSelect.getPais().setPaisCve(idPais);
 			this.estadoSelect.setEstadosPK(estadoPkSelect);
 			listaEstados = estadosDao.buscarPorCriteriosEstados(estadoSelect);
 		}
@@ -157,8 +157,8 @@ public class CiudadesBean implements Serializable {
 	
 	public void handleStateSelect() {
 		if (this.idEstado != -1) {
-			this.municipioPkSelect.setPaisCve(idPais);
-			this.municipioPkSelect.setEstadoCve(idEstado);
+			this.municipioPkSelect.getEstados().getEstadosPK().getPais().setPaisCve(idPais);
+			this.municipioPkSelect.getEstados().getEstadosPK().setEstadoCve(idEstado);
 			this.municipioSelect.setMunicipiosPK(municipioPkSelect);
 			listaMunicipios = municipiosDao.buscarPorPaisEstado(municipioSelect);
 		}
@@ -166,9 +166,9 @@ public class CiudadesBean implements Serializable {
 	
 	public void handleMunicipalitySelect() {
 		if (this.idMunicipio != -1) {
-			this.ciudadPKSelect.setPaisCve(idPais);
-			this.ciudadPKSelect.setEstadoCve(idEstado);
-			this.ciudadPKSelect.setMunicipioCve(idMunicipio);
+			this.ciudadPKSelect.getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().setPaisCve(idPais);
+			this.ciudadPKSelect.getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().setEstadoCve(idEstado);
+			this.ciudadPKSelect.getMunicipios().getMunicipiosPK().setMunicipioCve(idMunicipio);
 			this.ciudadSelect.setCiudadesPK(ciudadPKSelect);
 			listaCiudades = ciudadesDao.buscarPorCriteriosCiudades(ciudadSelect);
 		}

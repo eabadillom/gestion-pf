@@ -9,6 +9,8 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -20,10 +22,10 @@ public class EstadosPK implements Serializable {
 
     private static final long serialVersionUID = -4501534761783764337L;
     
-    @Basic(optional = false)
+    @ManyToOne
     @NotNull
-    @Column(name = "pais_cve")
-    private int paisCve;
+    @JoinColumn(name = "pais_cve")
+    private Paises pais;
     
     @Basic(optional = false)
     @NotNull
@@ -33,17 +35,17 @@ public class EstadosPK implements Serializable {
     public EstadosPK() {
     }
 
-    public EstadosPK(int paisCve, int estadoCve) {
-        this.paisCve = paisCve;
+    public EstadosPK(Paises pais, int estadoCve) {
+        this.pais = pais;
         this.estadoCve = estadoCve;
     }
 
-    public int getPaisCve() {
-        return paisCve;
+    public Paises getPais() {
+        return pais;
     }
 
-    public void setPaisCve(int paisCve) {
-        this.paisCve = paisCve;
+    public void setPais(Paises pais) {
+        this.pais = pais;
     }
 
     public int getEstadoCve() {
@@ -56,31 +58,29 @@ public class EstadosPK implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (int) paisCve;
-        hash += (int) estadoCve;
+        int hash = 3;
+        hash = 53 * hash + this.estadoCve;
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof EstadosPK)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        EstadosPK other = (EstadosPK) object;
-        if (this.paisCve != other.paisCve) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        if (this.estadoCve != other.estadoCve) {
-            return false;
-        }
-        return true;
+        final EstadosPK other = (EstadosPK) obj;
+        return this.estadoCve == other.estadoCve;
     }
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.EstadosPK[ paisCve=" + paisCve + ", estadoCve=" + estadoCve + " ]";
+        return "mx.com.ferbo.model.EstadosPK[ paisCve=" + pais.getPaisCve() + ", estadoCve=" + estadoCve + " ]";
     }
     
 }

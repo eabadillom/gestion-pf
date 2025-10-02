@@ -294,6 +294,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 		if(listaClienteDomicilio.size() > 0) {
 			domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
+                        log.info("Info domicilio: {}", domicilioSelect.toString());
 		}
 		
 		//llenado de select plazo de pago
@@ -1078,21 +1079,21 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setSubtotal(null);//duda*
 		factura.setIva(null);//duda*
 		factura.setTotal(null);//duda*
-		factura.setPais(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisDesc());
-		factura.setEstado(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadoDesc());
-		factura.setMunicipio(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipioDs());
+		factura.setPais(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisDesc());
+		factura.setEstado(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadoDesc());
+		factura.setMunicipio(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipioDs());
 		factura.setCiudad(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadDs());
 		
 		AsentamientoHumanoDAO asentamientoDAO = new AsentamientoHumanoDAO();
 		
-		AsentamientoHumano asentamiento = asentamientoDAO.buscarPorAsentamiento(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve(),
-				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
-				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+		AsentamientoHumano asentamiento = asentamientoDAO.buscarPorAsentamiento(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve(),
+				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve(),
+				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve(),
 				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve(),
 				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getAsentamientoCve());
-		
+		log.info("Info asentamiento: {}", asentamiento.toString());
 		factura.setColonia(asentamiento.getAsentamientoDs());
-		factura.setCp(domicilioSelect.getDomicilioCp());
+		factura.setCp(domicilioSelect.getAsentamiento().getCp());
 		factura.setCalle(domicilioSelect.getDomicilioCalle());
 		factura.setNumExt(domicilioSelect.getDomicilioNumExt());
 		factura.setNumInt(domicilioSelect.getDomicilioNumInt());

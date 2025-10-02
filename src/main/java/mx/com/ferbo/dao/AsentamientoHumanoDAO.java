@@ -1,6 +1,5 @@
 package mx.com.ferbo.dao;
 
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -15,6 +14,7 @@ import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.EntidadPostal;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer> {
 	Logger log = LogManager.getLogger(AsentamientoHumanoDAO.class);
 	
@@ -98,9 +98,9 @@ public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer>
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("AsentamientoHumano.findByDomicilio", AsentamientoHumano.class)
-					.setParameter("paisCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve())
-					.setParameter("estadoCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
-					.setParameter("municipioCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
+					.setParameter("paisCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+					.setParameter("estadoCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+					.setParameter("municipioCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
 					.setParameter("ciudadCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
                                         .setParameter("asentamientoCve", a.getAsentamientoHumanoPK().getAsentamientoCve())
 					.getResultList();
@@ -118,20 +118,20 @@ public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer>
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery( "AsentamientoHumano.findByDomicilioCompleto", AsentamientoHumano.class)
-                            .setParameter("paisCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve())
-                            .setParameter("estadoCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
-                            .setParameter("municipioCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
+                            .setParameter("paisCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+                            .setParameter("estadoCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+                            .setParameter("municipioCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
                             .setParameter("ciudadCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
                             .setParameter("tipoasntmntoCve", a.getTipoAsentamiento().getTipoasntmntoCve())
                             .setParameter("entidadpostalCve", a.getEntidadPostal().getEntidadpostalCve())
                             .getResultList();
                         
                         for(AsentamientoHumano aux : listado){
-                            log.info("Asentamiento: {}", aux.getAsentamientoDs());
-                            log.info("Ciudad: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadDs());
-                            log.info("Municipio: {}", aux.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipioDs());
-                            log.info("Estado: {}", aux.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadoDesc());
-                            log.info("Pais: {}", aux.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisDesc());
+                            log.debug("Asentamiento: {}", aux.getAsentamientoDs());
+                            log.debug("Ciudad: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadDs());
+                            log.debug("Municipio: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipioDs());
+                            log.debug("Estado: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadoDesc());
+                            log.debug("Pais: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisDesc());
                         }
                         
 		}catch(Exception e) {
@@ -153,11 +153,11 @@ public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer>
                     .setParameter("cp", codigo).getResultList();
                 
                 for(AsentamientoHumano aux : listado){
-                    log.info("Asentamiento: {}", aux.getAsentamientoDs());
-                    log.info("Ciudad: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadDs());
-                    log.info("Municipio: {}", aux.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipioDs());
-                    log.info("Estado: {}", aux.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadoDesc());
-                    log.info("Pais: {}", aux.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisDesc());
+                    log.debug("Asentamiento: {}", aux.getAsentamientoDs());
+                    log.debug("Ciudad: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadDs());
+                    log.debug("Municipio: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipioDs());
+                    log.debug("Estado: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadoDesc());
+                    log.debug("Pais: {}", aux.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisDesc());
                 }
             } catch(Exception ex) {
                 log.error("Problemas para obtener informacion", ex);
@@ -224,9 +224,9 @@ public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer>
 		try {
 			 em = EntityManagerUtil.getEntityManager();
 			 listado = em.createNamedQuery("AsentamientoHumano.findAsentamiento", AsentamientoHumano.class)
-					 .setParameter("paisCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve())
-					 .setParameter("estadoCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
-					 .setParameter("municipioCve", a.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
+					 .setParameter("paisCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+					 .setParameter("estadoCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+					 .setParameter("municipioCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
 					 .setParameter("ciudadCve", a.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
 					 .setParameter("asentamientoCve", a.getAsentamientoHumanoPK().getAsentamientoCve())
 					 .getSingleResult();
@@ -277,10 +277,10 @@ public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer>
 			 em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 //			em.remove(em.merge(asentamientoHumano));
-			em.createQuery("DELETE FROM AsentamientoHumano ah WHERE ah.asentamientoHumanoPK.ciudades.municipios.estados.paises.paisCve =:paisCve and ah.asentamientoHumanoPK.ciudades.municipios.estados.estadosPK.estadoCve =:estadoCve and ah.asentamientoHumanoPK.ciudades.municipios.municipiosPK.municipioCve =:municipioCve and ah.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve =:ciudadCve and ah.tipoAsentamiento.tipoasntmntoCve =:tipoasntmntoCve and ah.entidadPostal.entidadpostalCve =:entidadpostalCve and ah.asentamientoHumanoPK.asentamientoCve =:asentamientoCve")
-			.setParameter("paisCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getPaises().getPaisCve())
-			.setParameter("estadoCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
-			.setParameter("municipioCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
+			em.createQuery("DELETE FROM AsentamientoHumano ah WHERE ah.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisCve =:paisCve and ah.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.estadoCve =:estadoCve and ah.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.municipioCve =:municipioCve and ah.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve =:ciudadCve and ah.tipoAsentamiento.tipoasntmntoCve =:tipoasntmntoCve and ah.entidadPostal.entidadpostalCve =:entidadpostalCve and ah.asentamientoHumanoPK.asentamientoCve =:asentamientoCve")
+			.setParameter("paisCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+			.setParameter("estadoCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+			.setParameter("municipioCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
 			.setParameter("ciudadCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
 			.setParameter("tipoasntmntoCve", asentamientoHumano.getTipoAsentamiento().getTipoasntmntoCve())
 			.setParameter("entidadpostalCve", asentamientoHumano.getEntidadPostal().getEntidadpostalCve())
