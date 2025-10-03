@@ -1,24 +1,18 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core"
-                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:jsf="http://xmlns.jcp.org/jsf">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <div class="products-table-header" style="background-color: #CCCCCC;">
+        <p:commandButton icon="pi pi-user-plus" styleClass="ui-button-success" style="margin-right: .5rem"
+            actionListener="#{clientesBean.nuevoClienteContacto()}" process="@this"
+            oncomplete="PF('dialogContacto').show();" resetValues="true" update="form:tabView:pnlContacto" />
+    </div>
 
     <div class="orders-subtable">
-        <p:dataTable id="dtContactos" widgetVar="dtContactos" var="clienteContacto" value="#{clientesBean.clienteSelected.clienteContactoList}" reflow="true" rowKey="#{contacto.idContacto.idContacto}" lazy="false">
+        <p:dataTable id="dtContactos" widgetVar="dtContactos" var="clienteContacto"
+            value="#{clientesBean.clienteSelected.clienteContactoList}" reflow="true"
+            rowKey="#{contacto.idContacto.idContacto}" lazy="false">
 
-            <f:facet name="header">
-                <div class="products-table-header" style="background-color: #CCCCCC;">
-                    <span style="font-weight: bold">Contactos del cliente</span> <span class="filter-container ui-input-icon-left"> </span>
-                    <span class="filter-container ui-input-icon-left">
-                        <p:commandButton icon="pi pi-user-plus" styleClass="ui-button-success" style="margin-right: .5rem"
-                                         actionListener="#{clientesBean.nuevoClienteContacto()}" process="@this" oncomplete="PF('dialogContacto').show();"
-                                         resetValues="true" update="form:tabView:pnlContacto" />
-                    </span>
-                </div>
-            </f:facet>d
-            
             <p:column headerText="Nombre" sortBy="#{contacto.idContacto.nbNombre}">
                 <h:outputText value="#{clienteContacto.idContacto.nbNombre}" />
             </p:column>
@@ -29,18 +23,21 @@
                 <h:outputText value="#{clienteContacto.idContacto.nbApellido2}" />
             </p:column>
             <p:column width="2rem;" style="text-align:right;">
-                <p:commandButton icon="pi pi-user-edit" process="@this" actionListener="#{clientesBean.copiarClienteContacto(clienteContacto)}" resetValues="true" oncomplete="PF('dialogContacto').show()" update="form:tabView:dialogContacto"/>
+                <p:commandButton icon="pi pi-user-edit" process="@this"
+                    actionListener="#{clientesBean.copiarClienteContacto(clienteContacto)}" resetValues="true"
+                    oncomplete="PF('dialogContacto').show()" update="form:tabView:dialogContacto" />
             </p:column>
             <p:column width="2rem;" style="text-align:right;">
-                <p:commandButton icon="pi pi-user-minus" styleClass="ui-button-danger" process="@this" actionListener="#{clientesBean.copiarClienteContacto(clienteContacto)}" oncomplete="PF('deleteContactoDialog').show(); $('.ui-widget-overlay').remove(); "/>
+                <p:commandButton icon="pi pi-user-minus" styleClass="ui-button-danger" process="@this"
+                    actionListener="#{clientesBean.copiarClienteContacto(clienteContacto)}"
+                    oncomplete="PF('deleteContactoDialog').show(); $('.ui-widget-overlay').remove(); " />
             </p:column>
         </p:dataTable>
     </div>
 
-    <p:dialog id="dialogContacto" widgetVar="dialogContacto" 
-              header="#{clientesBean.editandoContacto eq true ? 'Nuevo Contacto' : 'Editar Contacto'}"
-              showEffect="fade" modal="false" responsive="true" resizable="false" cache="false"
-              style="max-width:80em !important;">
+    <p:dialog id="dialogContacto" widgetVar="dialogContacto"
+        header="#{clientesBean.editandoContacto eq true ? 'Nuevo Contacto' : 'Editar Contacto'}" showEffect="fade"
+        modal="false" responsive="true" resizable="false" cache="false" style="max-width:80em !important;">
 
         <p:outputPanel id="pnlContacto" class="ui-fluid">
             <p:scrollPanel mode="native" style="height: 500px; overflow:auto;">
@@ -48,8 +45,8 @@
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Nombre</p:outputLabel>
-                            <p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" required="true"
-                                         requiredMessage="Debe indicar el nombre del contacto." />
+                            <p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}"
+                                required="true" requiredMessage="Debe indicar el nombre del contacto." />
                         </div>
                     </div>
                     <div class="p-col-12 p-md-6 p-lg-4">
@@ -68,7 +65,7 @@
                         <div class="p-field">
                             <p:outputLabel>Usuario</p:outputLabel>
                             <p:inputText value="#{clientesBean.clienteContactoSelected.nbUsuario}" required="true"
-                                         requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto." />
+                                requiredMessage="Debe indicar un usuario del módulo de clientes para el contacto." />
                         </div>
                     </div>
                     <div class="p-col-12 p-md-6 p-lg-4">
@@ -78,7 +75,7 @@
                                 <f:selectItem itemLabel="--Seleccione--" />
                                 <f:selectItem itemLabel="Activo" itemValue="A" />
                                 <f:selectItem itemLabel="#{clientesBean.editandoContacto ? 'Inactivo' : 'Baja'}"
-                                              itemValue="#{clientesBean.editandoContacto ? 'I' : 'B'}" />
+                                    itemValue="#{clientesBean.editandoContacto ? 'I' : 'B'}" />
                                 <f:selectItem itemLabel="Bloqueado" itemValue="L" />
                             </p:selectOneMenu>
                         </div>
@@ -109,43 +106,50 @@
 
                 <h:panelGroup>
                     <p:dataTable id="dtMedioContacto" lazy="false"
-                                 value="#{clientesBean.clienteContactoSelected.idContacto.medioCntList}"
-                                 var="medio" rowKey="#{medio.idMedio}">
+                        value="#{clientesBean.clienteContactoSelected.idContacto.medioCntList}" var="medio"
+                        rowKey="#{medio.idMedio}">
                         <f:facet name="header">
                             <div class="products-table-header">
                                 <span style="font-weight: bold"></span>
                                 <span class="filter-container ui-input-icon-left">
-                                    <p:commandButton actionListener="#{clientesBean.nuevoMedioContacto()}" value="Agregar medio"
-                                                     icon="pi pi-envelope" styleClass="ui-button-success" style="margin-right: .5rem"
-                                                     process="@this" resetValues="true" update="form:tabView:pnlMedio"
-                                                     oncomplete="PF('dialogMedioContacto').show()" />
+                                    <p:commandButton actionListener="#{clientesBean.nuevoMedioContacto()}"
+                                        value="Agregar medio" icon="pi pi-envelope" styleClass="ui-button-success"
+                                        style="margin-right: .5rem" process="@this" resetValues="true"
+                                        update="form:tabView:pnlMedio" oncomplete="PF('dialogMedioContacto').show()" />
                                 </span>
                             </div>
                         </f:facet>
 
                         <p:column headerText="Tipo medio" width="10%">
-                            <h:outputText value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? 'MAIL' : 'TELÉFONO'}" />
+                            <h:outputText
+                                value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? 'MAIL' : 'TELÉFONO'}" />
                         </p:column>
                         <p:column headerText="Mail">
-                            <h:outputText value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? medio.idMail.nbMail : ''}" />
+                            <h:outputText
+                                value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? medio.idMail.nbMail : ''}" />
                         </p:column>
                         <p:column headerText="Tipo mail">
-                            <h:outputText value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? medio.idMail.tpMail.nbTipo : ''}" />
+                            <h:outputText
+                                value="#{medio.tpMedio eq 'm' or medio.tpMedio eq 'M' ? medio.idMail.tpMail.nbTipo : ''}" />
                         </p:column>
                         <p:column headerText="Teléfono">
-                            <h:outputText value="#{medio.tpMedio eq 't' or medio.tpMedio eq 'T' ? medio.idTelefono.nbTelefono : ''}" />
+                            <h:outputText
+                                value="#{medio.tpMedio eq 't' or medio.tpMedio eq 'T' ? medio.idTelefono.nbTelefono : ''}" />
                         </p:column>
                         <p:column headerText="Tipo teléfono">
-                            <h:outputText value="#{medio.tpMedio eq 't' or medio.tpMedio eq 'T' ? medio.idTelefono.tpTelefono.nbTelefono : ''}" />
+                            <h:outputText
+                                value="#{medio.tpMedio eq 't' or medio.tpMedio eq 'T' ? medio.idTelefono.tpTelefono.nbTelefono : ''}" />
                         </p:column>
                         <p:column headerText="Estatus" width="10%">
                             <h:outputText value="#{medio.stMedio eq true ? 'ACTIVO' : 'INACTIVO'}" />
                         </p:column>
                         <p:column width="5%" style="text-align: right !important;">
                             <p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this"
-                                             oncomplete="PF('deleteMedioContactoDialog').show(); $('.ui-widget-overlay').remove();" update="form:tabView:dtMedioContacto">
-                                            <f:setPropertyActionListener value="#{medio}" target="#{clientesBean.medioCntSelected}"/>
-                                            </p:commandButton>
+                                oncomplete="PF('deleteMedioContactoDialog').show(); $('.ui-widget-overlay').remove();"
+                                update="form:tabView:dtMedioContacto">
+                                <f:setPropertyActionListener value="#{medio}"
+                                    target="#{clientesBean.medioCntSelected}" />
+                            </p:commandButton>
                         </p:column>
                     </p:dataTable>
                 </h:panelGroup>
@@ -155,25 +159,23 @@
 
         <f:facet name="footer">
             <p:commandButton value="Agregar" icon="pi pi-check"
-                             actionListener="#{clientesBean.operarContactos('agregarcontacto')}"
-                             update="form:tabView"
-                             process="pnlContacto @this"
-                             oncomplete="PF('dialogContacto').hide();" />
-            <p:commandButton value="Eliminar"
-                             icon="pi pi-times"
-                             onclick="PF('dialogContacto').hide()"
-                             class="ui-button-secondary" />
+                actionListener="#{clientesBean.operarContactos('agregarcontacto')}" update="form:tabView"
+                process="pnlContacto @this" oncomplete="PF('dialogContacto').hide();" />
+            <p:commandButton value="Eliminar" icon="pi pi-times" onclick="PF('dialogContacto').hide()"
+                class="ui-button-secondary" />
         </f:facet>
     </p:dialog>
 
 
-    <p:dialog id="dialogMedioContacto" widgetVar="dialogMedioContacto" header="Medio de contacto" showEffect="fade" modal="false" responsive="true">
+    <p:dialog id="dialogMedioContacto" widgetVar="dialogMedioContacto" header="Medio de contacto" showEffect="fade"
+        modal="false" responsive="true">
         <p:outputPanel id="pnlMedio" class="ui-fluid">
             <p:outputPanel>
                 <div class="p-field">
                     <p:outputLabel>Tipo de medio</p:outputLabel>
                     <p:selectOneMenu id="tpMedio" value="#{clientesBean.medioCntSelected.tpMedio}">
-                        <p:ajax process="@this tpMedio" update="pnlMedio" listener="#{clientesBean.seleccionarMedioContacto()}" />
+                        <p:ajax process="@this tpMedio" update="pnlMedio"
+                            listener="#{clientesBean.seleccionarMedioContacto()}" />
                         <f:selectItem itemLabel="--Seleccione--" />
                         <f:selectItem itemLabel="Teléfono" itemValue="t" />
                         <f:selectItem itemLabel="Mail" itemValue="m" />
@@ -181,29 +183,34 @@
                 </div>
                 <div class="p-field">
                     <p:outputLabel>Estatus</p:outputLabel>
-                    <p:selectOneMenu id="soEstatusMedio" value="#{clientesBean.medioCntSelected.stMedio}" required="true" requiredMessage="Campo requerido">
+                    <p:selectOneMenu id="soEstatusMedio" value="#{clientesBean.medioCntSelected.stMedio}"
+                        required="true" requiredMessage="Campo requerido">
                         <f:selectItem itemLabel="Activo" itemValue="true" />
                         <f:selectItem itemLabel="Inactivo" itemValue="false" />
-                        <p:ajax process="@this soEstatusMedio"/>
+                        <p:ajax process="@this soEstatusMedio" />
                     </p:selectOneMenu>
                 </div>
                 <div class="p-field" jsf:rendered="#{clientesBean.medioCntSelected.tpMedio eq 'm'}">
                     <p:outputLabel>Tipo de mail</p:outputLabel>
                     <p:selectOneMenu value="#{clientesBean.medioCntSelected.idMail.tpMail}" converter="entityConverter">
                         <f:selectItem itemLabel="--Seleccione--" />
-                        <f:selectItems value="#{clientesBean.lstTipoMail}" var="mail" itemLabel="#{mail.nbTipo}" itemValue="#{mail}" />
+                        <f:selectItems value="#{clientesBean.lstTipoMail}" var="mail" itemLabel="#{mail.nbTipo}"
+                            itemValue="#{mail}" />
                     </p:selectOneMenu>
                 </div>
                 <div class="p-field" jsf:rendered="#{clientesBean.medioCntSelected.tpMedio eq 't'}">
                     <p:outputLabel>Tipo de teléfono</p:outputLabel>
-                    <p:selectOneMenu value="#{clientesBean.medioCntSelected.idTelefono.tpTelefono}" converter="entityConverter">
+                    <p:selectOneMenu value="#{clientesBean.medioCntSelected.idTelefono.tpTelefono}"
+                        converter="entityConverter">
                         <f:selectItem itemLabel="--Seleccione--" />
-                        <f:selectItems value="#{clientesBean.lstTipoTelefono}" var="telefono" itemLabel="#{telefono.nbTelefono}" itemValue="#{telefono}" />
+                        <f:selectItems value="#{clientesBean.lstTipoTelefono}" var="telefono"
+                            itemLabel="#{telefono.nbTelefono}" itemValue="#{telefono}" />
                     </p:selectOneMenu>
                 </div>
                 <div class="p-field" jsf:rendered="#{clientesBean.medioCntSelected.tpMedio eq 't'}">
                     <p:outputLabel>Descripción</p:outputLabel>
-                    <p:inputText value="#{clientesBean.medioCntSelected.idTelefono.nbTelefono}" required="true" requiredMessage="Campo requerido" />
+                    <p:inputText value="#{clientesBean.medioCntSelected.idTelefono.nbTelefono}" required="true"
+                        requiredMessage="Campo requerido" />
                 </div>
                 <div class="p-field" jsf:rendered="#{clientesBean.medioCntSelected.tpMedio eq 't'}">
                     <p:panelGrid columns="2" style="width:100%" styleClass="border-none">
@@ -213,7 +220,8 @@
                 </div>
                 <div class="p-field" jsf:rendered="#{clientesBean.medioCntSelected.tpMedio eq 'm'}">
                     <p:outputLabel>Descripción</p:outputLabel>
-                    <p:inputText value="#{clientesBean.medioCntSelected.idMail.nbMail}" required="true" requiredMessage="Campo requerido" />
+                    <p:inputText value="#{clientesBean.medioCntSelected.idMail.nbMail}" required="true"
+                        requiredMessage="Campo requerido" />
                 </div>
                 <div class="p-field" jsf:rendered="#{clientesBean.medioCntSelected.tpMedio eq 'm'}">
                     <p:panelGrid columns="2" style="width:100%" styleClass="border-none">
@@ -224,24 +232,42 @@
             </p:outputPanel>
         </p:outputPanel>
         <f:facet name="footer">
-            <p:commandButton value="Agregar" icon="pi pi-check" process="@this pnlMedio" actionListener="#{clientesBean.operarContactos('agregarmedio')}" update="dtMedioContacto" oncomplete="PF('dialogMedioContacto').hide()" />
-            <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogMedioContacto').hide()" class="ui-button-secondary" />
+            <p:commandButton value="Agregar" icon="pi pi-check" process="@this pnlMedio"
+                actionListener="#{clientesBean.operarContactos('agregarmedio')}" update="dtMedioContacto"
+                oncomplete="PF('dialogMedioContacto').hide()" />
+            <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogMedioContacto').hide()"
+                class="ui-button-secondary" />
         </f:facet>
     </p:dialog>
 
-    <p:confirmDialog global="true" showEffect="fade" width="400" header="Eliminar">
-        <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
-    </p:confirmDialog>
+    <p:dialog id="deleteContactoDialog" widgetVar="deleteContactoDialog" modal="false" closable="false"
+        header="Eliminar" width="400" showEffect="fade" draggable="false">
 
-    <p:confirmDialog widgetVar="deleteContactoDialog" showEffect="fade" width="400" message="¿Desea eliminar el contacto?" header="Eliminar" severity="warn" modal="false">
-        <p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.operarContactos('eliminarcontacto')}" oncomplete="PF('deleteContactoDialog').hide()" update="dtContactos"/>
-        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteContactoDialog').hide()" update="dtContactos" />
-    </p:confirmDialog>
+        <h:outputText value="¿Desea eliminar el contacto?" />
 
-    <p:confirmDialog widgetVar="deleteMedioContactoDialog" showEffect="fade" width="400" message="Desea eliminar el medio de contacto?" header="Eliminar" severity="warn" modal="false">
-        <p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.operarContactos('eliminarmedio')}" oncomplete="PF('deleteMedioContactoDialog').hide()" update="dtMedioContacto" />
-        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteMedioContactoDialog').hide()" />
-    </p:confirmDialog>
+        <f:facet name="footer">
+            <p:commandButton value="Sí" icon="pi pi-check"
+                actionListener="#{clientesBean.operarContactos('eliminarcontacto')}"
+                oncomplete="PF('deleteMedioContactoDialog').hide()" update="dtContactos" process="@this" />
+
+            <p:commandButton value="No" type="button" icon="pi pi-times" styleClass="ui-button-secondary"
+                oncomplete="PF('deleteMedioContactoDialog').hide()" immediate="true" />
+        </f:facet>
+    </p:dialog>
+
+    <p:dialog id="deleteMedioContactoDialog" widgetVar="deleteMedioContactoDialog" modal="false" closable="false"
+        header="Eliminar" width="400" showEffect="fade" draggable="false">
+
+        <h:outputText value="¿Desea eliminar el contacto?" />
+
+        <f:facet name="footer">
+            <p:commandButton value="Sí" icon="pi pi-check"
+                actionListener="#{clientesBean.operarContactos('eliminarmedio')}"
+                oncomplete="PF('deleteMedioContactoDialog').hide()" update="dtContactos" process="@this" />
+
+            <p:commandButton value="No" type="button" icon="pi pi-times" styleClass="ui-button-secondary"
+                oncomplete="PF('deleteMedioContactoDialog').hide()" immediate="true" />
+        </f:facet>
+    </p:dialog>
 
 </ui:composition>

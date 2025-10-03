@@ -1,8 +1,10 @@
 package mx.com.ferbo.controller.clientes;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
@@ -26,6 +28,7 @@ import mx.com.ferbo.model.TipoTelefono;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.hpsf.Array;
 
 @Named
 @ViewScoped
@@ -53,6 +56,40 @@ public class ClientesBean implements Serializable {
     private List<TipoMail> lstTipoMail;
     private List<TipoTelefono> lstTipoTelefono;
 
+    public ClientesBean(){
+        clienteSelected = new Cliente();
+        lstClientes = new ArrayList<>();
+        clienteDAO = new ClienteDAO();
+    }
+
+    @PostConstruct
+    public void init(){
+        lstClientes = clienteDAO.buscarTodos(false);
+    }
+
+    public void cargaInfoCliente(Cliente cliente){
+    
+        try{
+        this.clienteSelected = cliente;
+        
+        this.lstTipoMail = contactoBL.obtenerTiposMail();
+        this.lstTipoTelefono = contactoBL.obtenerTiposTelefono();
+        
+        this.clienteSelected.setClienteContactoList(contactoBL.obtenerListaContactos(this.clienteSelected));
+        } catch(InventarioException ex){
+        
+        } catch (Exception ex){
+        
+        } finally {
+        
+        }
+    }
+    
+    public void nuevoCliente(){
+    }
+    
+    public void eliminarCliente(){}
+    
     // Ejemplo de estrucutura de una funcion
 
     /*
@@ -143,7 +180,7 @@ public class ClientesBean implements Serializable {
             log.error(ex);
             addMessage(FacesMessage.SEVERITY_ERROR, "Contacto", "Contacte con el admistrador del sistema.");
         } finally {
-            PrimeFaces.current().ajax().update();
+            PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -157,7 +194,7 @@ public class ClientesBean implements Serializable {
             log.error(ex);
             addMessage(FacesMessage.SEVERITY_ERROR, "Contacto", "Contacte con el admistrador del sistema.");
         } finally {
-            PrimeFaces.current().ajax().update();
+            PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
