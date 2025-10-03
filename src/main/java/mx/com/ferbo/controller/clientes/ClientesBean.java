@@ -2,8 +2,10 @@ package mx.com.ferbo.controller.clientes;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -13,7 +15,6 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
-import org.primefaces.component.sidebar.Sidebar;
 
 import mx.com.ferbo.business.clientes.ServiciosBL;
 import mx.com.ferbo.dao.ClienteDAO;
@@ -29,9 +30,6 @@ import mx.com.ferbo.util.InventarioException;
 public class ClientesBean implements Serializable {
 
     private static final Logger log = LogManager.getLogger(ClientesBean.class);
-
-    @Inject
-    private Sidebar sidebar;
 
     // Objetos de clientes
     private Cliente clienteSelected;
@@ -49,6 +47,50 @@ public class ClientesBean implements Serializable {
     private UnidadDeManejo unidadDeManejoSelected;
     private List<UnidadDeManejo> lstUnidadManejo;
 
+    public ClientesBean() {
+        clienteSelected = new Cliente();
+        lstCliente = new ArrayList<>();
+        clienteDAO = new ClienteDAO();
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            lstCliente = clienteDAO.buscarTodos(false);
+            lstServicio = serviciosBL.obtenerServicios();
+            lstUnidadManejo = serviciosBL.obtenerUnidadesMenjo();
+
+        } catch (InventarioException ex) {
+            log.warn(ex);
+            addMessage(FacesMessage.SEVERITY_WARN, "Cargar clientes", ex.getMessage());
+        } catch (Exception e) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Cargar clientes",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+
+    public void cargaInfoCliente(){
+        try {
+            this.clienteSelected.setPrecioServicioList(serviciosBL.obtenerPrecioServiciosPorCliente(this.clienteSelected));
+        } catch (InventarioException ex) {
+            log.warn(ex);
+            addMessage(FacesMessage.SEVERITY_WARN, "Cargar informacion", ex.getMessage());
+        } catch (Exception e) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Cargar informacion",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public void clonarCliente(){}
+    
+    public void eliminarCliente(){}
+    
+    public void nuevoCliente(){}
+    
     // Ejemplo de estrucutura de una funcion
 
     /*
@@ -75,7 +117,7 @@ public class ClientesBean implements Serializable {
      */
 
     // Metodos exclusivos de servicios
-    public void nuevoPrecioServicio(){
+    public void nuevoPrecioServicio() {
         this.precioServicioSelected = new PrecioServicio();
         this.precioServicioSelected.setCliente(this.clienteSelected);
         this.precioServicioSelected.setPrecio(BigDecimal.ZERO);
@@ -92,7 +134,7 @@ public class ClientesBean implements Serializable {
         String mensaje = null;
         try {
             switch (operacion) {
-                case "agregaprecioservicio":
+                case "agregarprecioservicio":
                     serviciosBL.agregarOActulizarPrecioServicio(this.clienteSelected, this.precioServicioSelected);
                     mensaje = "Servicio agregado";
                     break;
@@ -110,8 +152,7 @@ public class ClientesBean implements Serializable {
             addMessage(FacesMessage.SEVERITY_ERROR, "Servicio",
                     "Contacte con el admistrador del sistema.");
         } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form:tabView:dt-servicios");
+            PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -120,16 +161,7 @@ public class ClientesBean implements Serializable {
                 title, msg));
     }
 
-    // Getters y Setter para sidebar
-    public Sidebar getSidebar() {
-        return sidebar;
-    }
-
-    public void setSidebar(Sidebar sidebar) {
-        this.sidebar = sidebar;
-    }
-
-    // Getter y Setter para Cliente
+    // Getters y Setters para Cliente
     public Cliente getClienteSelected() {
         return clienteSelected;
     }
@@ -154,7 +186,7 @@ public class ClientesBean implements Serializable {
         this.clienteDAO = clienteDAO;
     }
 
-    // Metodos exclusivos para Precio servicios
+    // Getters y Setters para Precio servicios
     public PrecioServicio getPrecioServicioSelected() {
         return precioServicioSelected;
     }
