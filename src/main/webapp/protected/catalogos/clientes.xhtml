@@ -35,7 +35,7 @@
 						<h:outputText value="#{cliente.habilitado ? 'Sí' : 'No'}" />
 					</p:column>
 					<p:column width="2rem" style="text-align: center;">
-                                            <p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show(); PF('statusInfoDialog').hide();" process="@this" update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoFiscalCliente(cliente)}"/>
+                                            <p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show(); PF('statusInfoDialog').hide();" process="@this" update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoCliente(cliente)}"/>
 					</p:column>
 					<p:column width="2rem" style="text-align: center;">
 						<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this"
@@ -52,6 +52,14 @@
                                 <p:tab title="Fiscal">
                                     <ui:include src="infoclientes/fiscalTab.xhtml" />
                                 </p:tab>
+
+								<p:tab title="Contactos">
+									<ui:include src="infoclientes/contactosTab.xhtml"/>
+								</p:tab>
+
+								<p:tab title="Servicios">
+									<ui:include src="infoclientes/serviciosTab.xhtml" />
+								</p:tab>
                                
                             </p:tabView>
 			</p:dialog>

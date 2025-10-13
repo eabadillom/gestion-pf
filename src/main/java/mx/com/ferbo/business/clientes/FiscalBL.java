@@ -1,5 +1,6 @@
 package mx.com.ferbo.business.clientes;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -114,13 +115,25 @@ public class FiscalBL {
 		}
 	}
 
-	public List<MedioPago> obtenerMediosPago() throws InventarioException {
+	public List<MedioPago> obtenerMediosPago() {
+		List<MedioPago> lista =   medioPagoDAO.buscarVigentes(new Date());
+	
+		if (lista == null){
+			return new ArrayList<>();
+		}
 
-		return medioPagoDAO.buscarVigentes(new Date());
+		return lista;
 	}
 
-	public List<MetodoPago> obtenerMetodosPago() throws InventarioException {
-		return metodoPagoDAO.buscarVigentes(new Date());
+	public List<MetodoPago> obtenerMetodosPago() {
+
+		List<MetodoPago> lista = metodoPagoDAO.buscarVigentes(new Date()); 
+
+		if (lista == null) {
+			return new ArrayList<>();
+		}
+
+		return lista;
 	}
 
 	private <T> T requireNonNull(T obj, String mensaje) throws InventarioException {

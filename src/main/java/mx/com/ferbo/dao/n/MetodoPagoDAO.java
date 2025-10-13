@@ -25,7 +25,7 @@ public class MetodoPagoDAO extends BaseDAO<MetodoPago, Integer> {
         super(MetodoPago.class);
     }
 
-    public List<MetodoPago> buscarVigentes(Date fecha) throws InventarioException {
+    public List<MetodoPago> buscarVigentes(Date fecha) {
         List<MetodoPago> list = new ArrayList<>();
         EntityManager em = null;
 
@@ -33,9 +33,6 @@ public class MetodoPagoDAO extends BaseDAO<MetodoPago, Integer> {
             em = super.getEntityManager();
             list = em.createNamedQuery("MetodoPago.buscarVigentes", MetodoPago.class)
                     .setParameter("fecha", fecha).getResultList();
-        } catch (Exception ex) {
-            log.error("Problema para obtener información del catálogo metodo_pago", ex);
-            throw new InventarioException("Problema para obtener los métodos de pago.");
         } finally {
             super.close(em);
         }

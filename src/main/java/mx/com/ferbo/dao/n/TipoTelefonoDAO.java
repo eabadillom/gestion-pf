@@ -15,7 +15,7 @@ import mx.com.ferbo.model.TipoTelefono;
  */
 @Named
 @ApplicationScoped
-public class TipoTelefonoDAO extends BaseDAO {
+public class TipoTelefonoDAO extends BaseDAO <TipoTelefono, Integer>{
     
     public TipoTelefonoDAO() {
         super(TipoTelefono.class);

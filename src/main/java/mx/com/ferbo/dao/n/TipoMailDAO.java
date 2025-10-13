@@ -15,7 +15,7 @@ import mx.com.ferbo.model.TipoMail;
  */
 @Named
 @ApplicationScoped
-public class TipoMailDAO extends BaseDAO {
+public class TipoMailDAO extends BaseDAO <TipoMail, Integer>{
 
     public TipoMailDAO() {
         super(TipoMail.class);

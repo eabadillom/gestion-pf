@@ -1,65 +1,18 @@
 package mx.com.ferbo.controller.clientes;
 
 import java.io.Serializable;
-<<<<<<< HEAD
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-=======
->>>>>>> feature/gestion-95-fiscal
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-<<<<<<< HEAD
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.application.FacesMessage.Severity;
-import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.primefaces.PrimeFaces;
-
-import mx.com.ferbo.business.clientes.ServiciosBL;
-import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.model.Servicio;
-import mx.com.ferbo.model.UnidadDeManejo;
-import mx.com.ferbo.util.InventarioException;
-
-import org.primefaces.PrimeFaces;
-
-import mx.com.ferbo.business.clientes.ContactoBL;
-import mx.com.ferbo.controller.SideBarBean;
-import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.ClienteContacto;
-import mx.com.ferbo.model.Contacto;
-import mx.com.ferbo.model.Mail;
-import mx.com.ferbo.model.MedioCnt;
-import mx.com.ferbo.model.Telefono;
-import mx.com.ferbo.model.TipoMail;
-import mx.com.ferbo.model.TipoTelefono;
-import mx.com.ferbo.util.InventarioException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.poi.hpsf.Array;
-
-=======
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jfree.util.Log;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.business.clientes.FiscalBL;
@@ -71,12 +24,28 @@ import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.InventarioException;
 
->>>>>>> feature/gestion-95-fiscal
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.business.clientes.ServiciosBL;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.Servicio;
+import mx.com.ferbo.model.UnidadDeManejo;
+
+import mx.com.ferbo.business.clientes.ContactoBL;
+import mx.com.ferbo.controller.SideBarBean;
+import mx.com.ferbo.model.ClienteContacto;
+import mx.com.ferbo.model.Contacto;
+import mx.com.ferbo.model.Mail;
+import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.Telefono;
+import mx.com.ferbo.model.TipoMail;
+import mx.com.ferbo.model.TipoTelefono;
+
 @Named
 @ViewScoped
 public class ClientesBean implements Serializable {
-
-    private static final Logger log = LogManager.getLogger(ClientesBean.class);
 
     private static final Logger log = LogManager.getLogger(ClientesBean.class);
 
@@ -86,85 +55,6 @@ public class ClientesBean implements Serializable {
 
     // Objetos de clientes
     private Cliente clienteSelected;
-<<<<<<< HEAD
-    private List<Cliente> lstCliente;
-    private ClienteDAO clienteDAO;
-
-    // Objetos para Servicios
-    @Inject
-    private ServiciosBL serviciosBL;
-
-    private PrecioServicio precioServicioSelected;
-    private List<PrecioServicio> lstPrecioServicios;
-    private Servicio servicioSelected;
-    private List<Servicio> lstServicio;
-    private UnidadDeManejo unidadDeManejoSelected;
-    private List<UnidadDeManejo> lstUnidadManejo;
-
-    public ClientesBean() {
-        clienteSelected = new Cliente();
-        lstCliente = new ArrayList<>();
-        clienteDAO = new ClienteDAO();
-    }
-
-    @PostConstruct
-    public void init() {
-        try {
-            lstCliente = clienteDAO.buscarTodos(false);
-            lstServicio = serviciosBL.obtenerServicios();
-            lstUnidadManejo = serviciosBL.obtenerUnidadesMenjo();
-
-        } catch (InventarioException ex) {
-            log.warn(ex);
-            addMessage(FacesMessage.SEVERITY_WARN, "Cargar clientes", ex.getMessage());
-        } catch (Exception e) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Cargar clientes",
-                    "Contacte con el admistrador del sistema.");
-        } finally {
-            PrimeFaces.current().ajax().update("form:messages");
-        }
-    }
-
-    public void cargaInfoCliente(){
-        try {
-            this.clienteSelected.setPrecioServicioList(serviciosBL.obtenerPrecioServiciosPorCliente(this.clienteSelected));
-        } catch (InventarioException ex) {
-            log.warn(ex);
-            addMessage(FacesMessage.SEVERITY_WARN, "Cargar informacion", ex.getMessage());
-        } catch (Exception e) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Cargar informacion",
-                    "Contacte con el admistrador del sistema.");
-        } finally {
-            PrimeFaces.current().ajax().update("form:messages");
-        }
-    }
-    
-    public void clonarCliente(){}
-    
-    public void eliminarCliente(){}
-    
-    public void nuevoCliente(){}
-    
-    private Cliente clienteSelected;
-    private List<Cliente> lstClientes;
-    private ClienteDAO clienteDAO;
-
-    // Objetos para contactos
-    @Inject
-    ContactoBL contactoBL;
-
-    private ClienteContacto clienteContactoSelected;
-    private Contacto contactoSelected;
-    private MedioCnt medioCntSelected;
-    private Boolean editandoContacto;
-    private List<TipoMail> lstTipoMail;
-    private List<TipoTelefono> lstTipoTelefono;
-
-    public ClientesBean(){
-        clienteSelected = new Cliente();
-        lstClientes = new ArrayList<>();
-        clienteDAO = new ClienteDAO();
-=======
     private List<Cliente> lstClientes;
 
     @Inject
@@ -179,70 +69,113 @@ public class ClientesBean implements Serializable {
     private List<MetodoPago> lstMetodoPago;
     private List<MedioPago> lstMedioPago;
 
+    // Objetos para contactos
+    @Inject
+    ContactoBL contactoBL;
+
+    private ClienteContacto clienteContactoSelected;
+    private Contacto contactoSelected;
+    private MedioCnt medioCntSelected;
+    private Boolean editandoContacto;
+    private List<TipoMail> lstTipoMail;
+    private List<TipoTelefono> lstTipoTelefono;
+
+    // Objetos para Servicios
+    @Inject
+    private ServiciosBL serviciosBL;
+
+    private PrecioServicio precioServicioSelected;
+    private List<PrecioServicio> lstPrecioServicios;
+    private Servicio servicioSelected;
+    private List<Servicio> lstServicio;
+    private UnidadDeManejo unidadDeManejoSelected;
+    private List<UnidadDeManejo> lstUnidadManejo;
+
+    // Constructuctor
     public ClientesBean() {
-        clienteSelected = new Cliente();
-        lstClientes = new ArrayList<>();
-        clienteDAO = new ClienteDAO();
-        lstUsoCfdi = new ArrayList<>();
-        lstRegimenFiscal = new ArrayList<>();
-        lstMetodoPago = new ArrayList<>();
-        lstMedioPago = new ArrayList<>();
->>>>>>> feature/gestion-95-fiscal
+        this.lstClientes = new ArrayList<>();
+        this.clienteSelected = new Cliente();
     }
 
     @PostConstruct
-    public void init(){
-<<<<<<< HEAD
-        lstClientes = clienteDAO.buscarTodos(false);
-    }
-
-    public void cargaInfoCliente(Cliente cliente){
-    
-        try{
-        this.clienteSelected = cliente;
-        
+    public void init() {
+        this.lstClientes = clienteDAO.buscarTodos();
+        this.lstMedioPago = fiscalBL.obtenerMediosPago();
+        this.lstMetodoPago = fiscalBL.obtenerMetodosPago();
         this.lstTipoMail = contactoBL.obtenerTiposMail();
         this.lstTipoTelefono = contactoBL.obtenerTiposTelefono();
-        
-        this.clienteSelected.setClienteContactoList(contactoBL.obtenerListaContactos(this.clienteSelected));
-        } catch(InventarioException ex){
-        
-        } catch (Exception ex){
-        
+        this.lstServicio = serviciosBL.obtenerServicios();
+        this.lstUnidadManejo = serviciosBL.obtenerUnidadesMenjo();
+    }
+
+    public void cargarInfoCliente(Cliente cliente) {
+        try {
+            if (cliente == null) {
+                throw new InventarioException("El cliente no puede ser vacío");
+            }
+
+            if (cliente.getCteCve() == null) {
+                throw new InventarioException("El cliente no tiene datos todavida");
+            }
+            this.clienteSelected = clienteDAO.obtenerPorId(cliente.getCteCve(), true);
+            fiscalBL.validarInfoFiscal(this.clienteSelected);
+            lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales(this.clienteSelected);
+            lstUsoCfdi = fiscalBL.obtenerUsoCfdis(this.clienteSelected);
+            addMessage(FacesMessage.SEVERITY_INFO, "Fiscal", "Información fiscal cargada");
+        } catch (InventarioException ex) {
+            log.warn(ex);
+            addMessage(FacesMessage.SEVERITY_WARN, "Cargar informacion", ex.getMessage());
+        } catch (Exception e) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Cargar informacion",
+                    "Contacte con el admistrador del sistema.");
         } finally {
-        
+            PrimeFaces.current().ajax().update("form:messages");
         }
     }
-    
-    public void nuevoCliente(){
-    }
-    
-    public void eliminarCliente(){}
-    
-    // Ejemplo de estrucutura de una funcion
 
-    /*
-     * public tipo numbreFuncion(Parametros si lleva){
-     * try {
-     * addMessage(FacesMessage.SEVERITY_INFO, "Servicio", "Servicio Eliminado");
-     * } catch (IneventatioException ex) {
-     * addMessage(FacesMessage.SEVERITY_WARN, "Servicio", ex.getMessage());
-     * } catch (exception){
-     * addMessage(FacesMessage.SEVERITY_ERROR, "Servicio",
-     * "Contacte con el admistrador del sistema.");
-     * } finally {
-     * PrimeFaces.current().ajax().update("form:messages",
-     * "form:tabView:dt-servicios");
-     * }
-     * }
-     * 
-     * private void addMessage(FacesMessage.Severity severity, String title, String
-     * msg) {
-     * FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,
-     * title, msg));
-     * }
-     * 
-     */
+    public void clonarCliente() {
+    }
+
+    public void eliminarCliente() {
+    }
+
+    public void nuevoCliente() {
+    }
+
+    public void validarCodigoUnico(Cliente cliente) {
+        try {
+            this.clienteSelected = cliente;
+            Cliente cliente2 = clienteDAO.buscarPorCodigoUnico(this.clienteSelected.getCodUnico());
+            fiscalBL.validarCodigoUnico(this.clienteSelected, cliente2);
+        } catch (InventarioException ex) {
+            log.warn(ex.getMessage(), ex);
+            addMessage(FacesMessage.SEVERITY_WARN, "Fiscal", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Error inesperado. Causado por: ", ex);
+            addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages",
+                    "form");
+        }
+    }
+
+    public void validarRFC(Cliente cliente) {
+        try {
+            this.clienteSelected = cliente;
+            fiscalBL.validarRFC(this.clienteSelected);
+        } catch (InventarioException ex) {
+            log.warn(ex.getMessage(), ex);
+            addMessage(FacesMessage.SEVERITY_WARN, "Fiscal", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Error inesperado. Causado por: ", ex);
+            addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages",
+                    "form");
+        }
+    }
 
     // Metodos exclusivos de servicios
     public void nuevoPrecioServicio() {
@@ -284,40 +217,6 @@ public class ClientesBean implements Serializable {
         }
     }
 
-    private void addMessage(FacesMessage.Severity severity, String title, String msg) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,
-                title, msg));
-    }
-
-    // Getters y Setters para Cliente
-    public Cliente getClienteSelected() {
-        return clienteSelected;
-    }
-
-    public void setClienteSelected(Cliente clienteSelected) {
-        this.clienteSelected = clienteSelected;
-    }
-
-    public List<Cliente> getLstCliente() {
-        return lstCliente;
-    }
-
-    public void setLstCliente(List<Cliente> lstCliente) {
-        this.lstCliente = lstCliente;
-    }
-
-    public ClienteDAO getClienteDAO() {
-        return clienteDAO;
-    }
-
-    public void setClienteDAO(ClienteDAO clienteDAO) {
-        this.clienteDAO = clienteDAO;
-    }
-     private void addMessage(FacesMessage.Severity severity, String title, String msg) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,
-                title, msg));
-    }
-
     // Metodos exclusivos para contactos
     public void nuevoClienteContacto() {
         this.editandoContacto = null;
@@ -336,9 +235,9 @@ public class ClientesBean implements Serializable {
     }
 
     public void copiarClienteContacto(ClienteContacto clienteContacto) {
-            this.editandoContacto = null;
-            this.editandoContacto = Boolean.FALSE;
-            this.clienteContactoSelected = clienteContacto;
+        this.editandoContacto = null;
+        this.editandoContacto = Boolean.FALSE;
+        this.clienteContactoSelected = clienteContacto;
     }
 
     public void operarContactos(String operacion) {
@@ -396,6 +295,11 @@ public class ClientesBean implements Serializable {
         }
     }
 
+    private void addMessage(FacesMessage.Severity severity, String title, String msg) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,
+                title, msg));
+    }
+
     // Getters y setters para sidebar
     public SideBarBean getSideBar() {
         return sideBar;
@@ -403,6 +307,105 @@ public class ClientesBean implements Serializable {
 
     public void setSideBar(SideBarBean sideBar) {
         this.sideBar = sideBar;
+    }
+
+    // Getters y Setters para Cliente
+    public Cliente getClienteSelected() {
+        return clienteSelected;
+    }
+
+    public void setClienteSelected(Cliente clienteSelected) {
+        this.clienteSelected = clienteSelected;
+    }
+
+    public List<Cliente> getLstClientes() {
+        return lstClientes;
+    }
+
+    public void setLstClientes(List<Cliente> lstClientes) {
+        this.lstClientes = lstClientes;
+    }
+
+    // Getter y Setter para Fiscal
+    public List<UsoCfdi> getLstUsoCfdi() {
+        return lstUsoCfdi;
+    }
+
+    public void setLstUsoCfdi(List<UsoCfdi> lstUsoCfdi) {
+        this.lstUsoCfdi = lstUsoCfdi;
+    }
+
+    public List<RegimenFiscal> getLstRegimenFiscal() {
+        return lstRegimenFiscal;
+    }
+
+    public void setLstRegimenFiscal(List<RegimenFiscal> lstRegimenFiscal) {
+        this.lstRegimenFiscal = lstRegimenFiscal;
+    }
+
+    public List<MetodoPago> getLstMetodoPago() {
+        return lstMetodoPago;
+    }
+
+    public void setLstMetodoPago(List<MetodoPago> lstMetodoPago) {
+        this.lstMetodoPago = lstMetodoPago;
+    }
+
+    public List<MedioPago> getLstMedioPago() {
+        return lstMedioPago;
+    }
+
+    public void setLstMedioPago(List<MedioPago> lstMedioPago) {
+        this.lstMedioPago = lstMedioPago;
+    }
+
+    // Getters y Setters para Contactos
+    public ClienteContacto getClienteContactoSelected() {
+        return clienteContactoSelected;
+    }
+
+    public void setClienteContactoSelected(ClienteContacto clienteContactoSelected) {
+        this.clienteContactoSelected = clienteContactoSelected;
+    }
+
+    public Contacto getContactoSelected() {
+        return contactoSelected;
+    }
+
+    public void setContactoSelected(Contacto contactoSelected) {
+        this.contactoSelected = contactoSelected;
+    }
+
+    public MedioCnt getMedioCntSelected() {
+        return medioCntSelected;
+    }
+
+    public void setMedioCntSelected(MedioCnt medioCntSelected) {
+        this.medioCntSelected = medioCntSelected;
+    }
+
+    public Boolean getEditandoContacto() {
+        return editandoContacto;
+    }
+
+    public void setEditandoContacto(Boolean editandoContacto) {
+        this.editandoContacto = editandoContacto;
+    }
+
+    public List<TipoMail> getLstTipoMail() {
+        return lstTipoMail;
+    }
+
+    public void setLstTipoMail(List<TipoMail> lstTipoMail) {
+        this.lstTipoMail = lstTipoMail;
+    }
+
+    public List<TipoTelefono> getLstTipoTelefono() {
+        return lstTipoTelefono;
+    }
+
+    public void setLstTipoTelefono(List<TipoTelefono> lstTipoTelefono) {
+        this.lstTipoTelefono = lstTipoTelefono;
     }
 
     // Getters y Setters para Precio servicios
@@ -452,225 +455,5 @@ public class ClientesBean implements Serializable {
 
     public void setLstUnidadManejo(List<UnidadDeManejo> lstUnidadManejo) {
         this.lstUnidadManejo = lstUnidadManejo;
-    }
-
-    // Getters y Setters para Cliente
-     public Cliente getClienteSelected() {
-        return clienteSelected;
-    }
-
-    public void setClienteSelected(Cliente clienteSelected) {
-        this.clienteSelected = clienteSelected;
-    }
-
-    public List<Cliente> getLstClientes() {
-        return lstClientes;
-    }
-
-    public void setLstClientes(List<Cliente> lstClientes) {
-        this.lstClientes = lstClientes;
-    }
-
-    public ClienteDAO getClienteDAO() {
-        return clienteDAO;
-    }
-
-    public void setClienteDAO(ClienteDAO clienteDAO) {
-        this.clienteDAO = clienteDAO;
-    }
-
-    // Getters y Setters para Contactos
-    public ClienteContacto getClienteContactoSelected() {
-        return clienteContactoSelected;
-    }
-
-    public void setClienteContactoSelected(ClienteContacto clienteContactoSelected) {
-        this.clienteContactoSelected = clienteContactoSelected;
-    }
-
-    public Contacto getContactoSelected() {
-        return contactoSelected;
-    }
-
-    public void setContactoSelected(Contacto contactoSelected) {
-        this.contactoSelected = contactoSelected;
-    }
-
-    public MedioCnt getMedioCntSelected() {
-        return medioCntSelected;
-    }
-
-    public void setMedioCntSelected(MedioCnt medioCntSelected) {
-        this.medioCntSelected = medioCntSelected;
-    }
-
-    public Boolean getEditandoContacto() {
-        return editandoContacto;
-    }
-
-    public void setEditandoContacto(Boolean editandoContacto) {
-        this.editandoContacto = editandoContacto;
-    }
-
-    public List<TipoMail> getLstTipoMail() {
-        return lstTipoMail;
-    }
-
-    public void setLstTipoMail(List<TipoMail> lstTipoMail) {
-        this.lstTipoMail = lstTipoMail;
-=======
-        try {
-            lstClientes = clienteDAO.buscarTodos();
-            if(lstClientes == null){
-                throw new InventarioException("Problema al obtener los datos de clientes");
-            }
-        } catch (InventarioException ex) {
-            Log.info("Error: " + ex.getMessage(), ex);
-            addMessage(FacesMessage.SEVERITY_ERROR, "Cargar información", ex.getMessage());
-        } catch (Exception ex) {
-            Log.error("Error inesperado. Causado por: ", ex);
-            addMessage(FacesMessage.SEVERITY_ERROR, "Cargar información",
-                    "Contacte con el admistrador del sistema.");
-        } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
-        }
-    }
-
-    // Metodos exclusivos para contactos
-    public void cargarInfoFiscalCliente(Cliente cliente) {
-        try {
-            if (cliente == null){
-                throw new InventarioException("El cliente no puede ser vacío");
-            }
-
-            if (cliente.getCteCve() == null) {
-                throw new InventarioException("El cliente no tiene datos todavida");
-            }
-            this.clienteSelected = clienteDAO.obtenerPorId(cliente.getCteCve(), true);
-            fiscalBL.validarInfoFiscal(this.clienteSelected);
-            lstMedioPago = fiscalBL.obtenerMediosPago();
-            lstMetodoPago = fiscalBL.obtenerMetodosPago();
-            lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales(this.clienteSelected);
-            lstUsoCfdi = fiscalBL.obtenerUsoCfdis(this.clienteSelected);
-            addMessage(FacesMessage.SEVERITY_INFO, "Fiscal", "Información fiscal cargada");
-        } catch (InventarioException ex) {
-            addMessage(FacesMessage.SEVERITY_WARN, "Fiscal", ex.getMessage());
-        } catch (Exception ex) {
-            Log.error("Error inesperado. Causado por: ", ex);
-            addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
-                    "Contacte con el admistrador del sistema.");
-        } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
-        }
-    }
-
-    public void validarCodigoUnico(Cliente cliente){
-        try {
-            this.clienteSelected = cliente;
-            Cliente cliente2 = clienteDAO.buscarPorCodigoUnico(this.clienteSelected.getCodUnico());
-            fiscalBL.validarCodigoUnico(this.clienteSelected, cliente2);
-        } catch (InventarioException ex) {
-            Log.warn(ex.getMessage(), ex);
-            addMessage(FacesMessage.SEVERITY_WARN, "Fiscal", ex.getMessage());
-        }catch (Exception ex) {
-           Log.error("Error inesperado. Causado por: ", ex);
-            addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
-                    "Contacte con el admistrador del sistema.");
-        } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
-        }
-    }
-
-    public void validarRFC(Cliente cliente){
-        try {
-            this.clienteSelected = cliente;
-            fiscalBL.validarRFC(this.clienteSelected);
-        } catch (InventarioException ex) {
-            Log.warn(ex.getMessage(), ex);
-            addMessage(FacesMessage.SEVERITY_WARN, "Fiscal", ex.getMessage());
-        }catch (Exception ex) {
-           Log.error("Error inesperado. Causado por: ", ex);
-            addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
-                    "Contacte con el admistrador del sistema.");
-        } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
-        }
-    }
-    
-    public void eliminarCliente() {
-    }
-
-    public void clonarCliente() {
-    }
-
-    public void nuevoCliente() {
-    }
-
-    // Getter y Setter para Cliente
-    private void addMessage(FacesMessage.Severity severity, String title, String msg) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,
-                title, msg));
-    }
-
-    public Cliente getClienteSelected() {
-        return clienteSelected;
-    }
-
-    public void setClienteSelected(Cliente clienteSelected) {
-        this.clienteSelected = clienteSelected;
-    }
-
-    public List<Cliente> getLstClientes() {
-        return lstClientes;
-    }
-
-    public void setLstClientes(List<Cliente> lstClientes) {
-        this.lstClientes = lstClientes;
-    }
-
-    // Getter y Setter para Fiscal
-    public List<UsoCfdi> getLstUsoCfdi() {
-        return lstUsoCfdi;
-    }
-
-    public void setLstUsoCfdi(List<UsoCfdi> lstUsoCfdi) {
-        this.lstUsoCfdi = lstUsoCfdi;
-    }
-
-    public List<RegimenFiscal> getLstRegimenFiscal() {
-        return lstRegimenFiscal;
-    }
-
-    public void setLstRegimenFiscal(List<RegimenFiscal> lstRegimenFiscal) {
-        this.lstRegimenFiscal = lstRegimenFiscal;
-    }
-
-    public List<MetodoPago> getLstMetodoPago() {
-        return lstMetodoPago;
-    }
-
-    public void setLstMetodoPago(List<MetodoPago> lstMetodoPago) {
-        this.lstMetodoPago = lstMetodoPago;
-    }
-
-    public List<MedioPago> getLstMedioPago() {
-        return lstMedioPago;
-    }
-
-    public void setLstMedioPago(List<MedioPago> lstMedioPago) {
-        this.lstMedioPago = lstMedioPago;
->>>>>>> feature/gestion-95-fiscal
-    }
-
-    public List<TipoTelefono> getLstTipoTelefono() {
-        return lstTipoTelefono;
-    }
-
-    public void setLstTipoTelefono(List<TipoTelefono> lstTipoTelefono) {
-        this.lstTipoTelefono = lstTipoTelefono;
     }
 }
