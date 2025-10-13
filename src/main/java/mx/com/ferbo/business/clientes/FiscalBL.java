@@ -1,7 +1,7 @@
 package mx.com.ferbo.business.clientes;
 
+import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -19,6 +19,7 @@ import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.util.ClienteUtil;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -39,37 +40,94 @@ public class FiscalBL {
 	@Inject
 	private UsoCfdiDAO usoCfdiDAO;
 
-	public void cargaInfoCliente(Cliente cliente, List<UsoCfdi> lstUsoCfdi, List<RegimenFiscal> lstRegimenFiscal) {
+	public List<UsoCfdi> obtenerUsoCfdis(Cliente cliente) throws InventarioException {
 
-		log.info("Cargando información del cliente: " + cliente);
+		requireNonNull(cliente, "El cliente no puede estar vacío");
 
-		lstRegimenFiscal = regimenFiscalDAO.buscarPorTipoPersona(cliente.getTipoPersona());
-		lstUsoCfdi = usoCfdiDAO.buscarUsoCfdiPorTipoPersona(cliente.getTipoPersona());
+		requireNonNull(cliente.getTipoPersona(), "El tipo de persona del cliente esta vacío");
 
+		return usoCfdiDAO.buscarUsoCfdiPorTipoPersona(cliente.getTipoPersona());
 
-		if (cliente.getRegimenFiscal() != null) {
-			throw new InventarioException("El cliente no tiene ningun regimen fiscal");
+	}
+
+	public List<RegimenFiscal> obtenerRegimenesFiscales(Cliente cliente) throws InventarioException {
+		requireNonNull(cliente, "El cliente no puede estar vacío");
+
+		requireNonNull(cliente.getTipoPersona(), "El tipo de persona del cliente esta vacío");
+
+		return regimenFiscalDAO.buscarPorTipoPersona(cliente.getTipoPersona());
+	}
+
+	public void validarInfoFiscal(Cliente cliente) throws InventarioException {
+
+		log.info("Validando información del cliente: " + cliente);
+
+		if (cliente.getRegimenFiscal() == null) {
+			cliente.setRegimenFiscal(new RegimenFiscal());
 		}
 
-		if (cliente.getUsoCfdi() != null) {
-			throw new InventarioException("El cliente no tiene ningun uso de CFDI");
+		if (cliente.getUsoCfdi() == null) {
+			cliente.setUsoCfdi(new UsoCfdi());
 		}
 
-		if (cliente.getMetodoPago() != null) {
-			throw new InventarioException("El cliente no tiene ningun metodo de pago");
+		if (cliente.getMetodoPago() == null) {
+			cliente.setMetodoPago(new MetodoPago());
 		}
 
-		this.idMedioPagoSelected = null;
-		if (this.clienteSelected.getFormaPago() != null) {
+		if (cliente.getFormaPago() == null) {
+			cliente.setFormaPago(new String());
+		}
 
-			final String fp = this.clienteSelected.getFormaPago();
+	}
 
-			List<MedioPago> lst = this.lstMedioPago.stream().filter(c -> fp.equals(c.getFormaPago()))
-					.collect(Collectors.toList());
-			if (lst != null && lst.size() > 0) {
-				this.idMedioPagoSelected = lst.get(0).getMpId();
+	public void validarCodigoUnico(Cliente cliente1, Cliente cliente2) throws InventarioException {
+		if (cliente2 != null) {
+			if (cliente1 == null) {
+				throw new InventarioException("El cliente1 está vacío");
+			}
+
+			if (cliente1.equals(cliente2)) {
+
+				throw new InventarioException("El código único " + cliente1.getCodUnico()
+						+ " ya está registrado para el cliente " + cliente1.getNombre());
 			}
 		}
+	}
+
+	public void validarRFC(Cliente cliente) throws InventarioException {
+		if (ClienteUtil.validarRFC(cliente.getTipoPersona(), cliente.getCteRfc()) == false) {
+			throw new InventarioException("El RFC es incorrecto");
+		}
+
+		String codigoUnico = cliente.getCteRfc();
+		if ("F".equalsIgnoreCase(cliente.getTipoPersona())) {
+			codigoUnico = codigoUnico.substring(0, 4);
+		} else if ("M".equalsIgnoreCase(cliente.getTipoPersona())) {
+			codigoUnico = codigoUnico.substring(0, 3);
+		}
+
+		if (cliente.getCteCve() == null &&
+				(ClienteUtil.RFC_GENERICO_NACIONAL.equalsIgnoreCase(cliente.getCteRfc()) == false
+						|| ClienteUtil.RFC_GENERICO_EXTRANJERO
+								.equalsIgnoreCase(cliente.getCteRfc()) == false)) {
+			cliente.setCodUnico(codigoUnico);
+		}
+	}
+
+	public List<MedioPago> obtenerMediosPago() throws InventarioException {
+
+		return medioPagoDAO.buscarVigentes(new Date());
+	}
+
+	public List<MetodoPago> obtenerMetodosPago() throws InventarioException {
+		return metodoPagoDAO.buscarVigentes(new Date());
+	}
+
+	private <T> T requireNonNull(T obj, String mensaje) throws InventarioException {
+		if (obj == null) {
+			throw new InventarioException(mensaje);
+		}
+		return obj;
 	}
 
 }
