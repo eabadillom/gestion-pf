@@ -11,13 +11,18 @@
 				<div align="center">
 					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
-			</p:dialog>
+		    </p:dialog>
+		    <p:toolbar styleClass="p-mb-4">
+				<p:toolbarGroup>
+					<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-raised" style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}"
+                                                         process="@this" update="form:tabView:pnlCliente" oncomplete="PF('dialogCliente').show();" >
+                                            <p:resetInput target="form:tabView:pnlCliente"/>
+                                        </p:commandButton>
+				</p:toolbarGroup>
+			</p:toolbar>
 			<div style="padding-top: 1rem;">
-                            <p:dataTable id="dt-clientes" widgetVar="dtClientes" value="#{clientesBean.lstCliente}" var="cliente"
-                                         rowKey="#{cliente.cteCve}" selection="#{clientesBean.lstCliente}" reflow="true"
-					paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
-					<p:column headerText="Nombre" sortBy="#{cliente.nombre}" filterBy="#{cliente.nombre}"
-						filterMatchMode="contains">
+				<p:dataTable id="dt-clientes" widgetVar="dtClientes" value="#{clientesBean.lstClientes}" var="cliente" rowKey="#{cliente.cteCve}"  reflow="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+					<p:column headerText="Nombre" sortBy="#{cliente.nombre}" filterBy="#{cliente.nombre}" filterMatchMode="contains">
 						<h:outputText value="#{cliente.nombre}" />
 					</p:column>
 					<p:column headerText="Alias" sortBy="#{cliente.alias}" filterBy="#{cliente.alias}">
@@ -30,12 +35,7 @@
 						<h:outputText value="#{cliente.habilitado ? 'Sí' : 'No'}" />
 					</p:column>
 					<p:column width="2rem" style="text-align: center;">
-						<p:commandButton icon="pi pi-pencil" styleClass="edit-button"
-							oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();" process="@this"
-							update="form:dialogCliente"
-							action="#{clientesBean.cargaInfoCliente()}" onclick="PF('statusInfoDialog').show();">
-							<f:setPropertyActionListener value="#{cliente}" target="#{clientesBean.clienteSelected}" />
-						</p:commandButton>
+                                            <p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show(); PF('statusInfoDialog').hide();" process="@this" update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoFiscalCliente(cliente)}"/>
 					</p:column>
 					<p:column width="2rem" style="text-align: center;">
 						<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this"
@@ -45,15 +45,15 @@
 					</p:column>
 				</p:dataTable>
 			</div>
-
-
-			<p:dialog id="dialogCliente" header="Información del cliente" widgetVar="dialogCliente" showEffect="fade"
-				modal="true" responsive="true">
-				<p:tabView id="tabView" class="ui-fluid" dynamic="true" effect="drop">
-					<p:tab title="Servicios">
-						<ui:include src="infoclientes/serviciosTab.xhtml" />
-					</p:tab>
-				</p:tabView>
+			
+			
+			<p:dialog id="dialogCliente" header="Información del cliente" widgetVar="dialogCliente" showEffect="fade" modal="true" responsive="true">
+                            <p:tabView id="tabView" class="ui-fluid" dynamic="true" effect="drop">
+                                <p:tab title="Fiscal">
+                                    <ui:include src="infoclientes/fiscalTab.xhtml" />
+                                </p:tab>
+                               
+                            </p:tabView>
 			</p:dialog>
 
 			<p:dialog id="dialogClonar" header="Copiar información del cliente" widgetVar="dialogClonar"
@@ -61,24 +61,21 @@
 				<p:outputPanel>
 					<h:outputLabel value="Seleccione el cliente" />
 					<p:selectOneMenu id="selClonarCliente" value="#{clientesBean.clonarCliente()}">
-						<f:selectItem itemLabel="--SELECCIONE EL CLIENTE--" />
+						<f:selectItem itemLabel="--SELECCIONE EL CLIENTE--" 	/>
 					</p:selectOneMenu>
 				</p:outputPanel>
 			</p:dialog>
 
-			<p:confirmDialog widgetVar="deleteClienteDialog" showEffect="fade" width="400"
-				message="Desea eliminar el cliente?" header="Eliminar" severity="warn">
-				<p:commandButton value="Sí" icon="pi pi-check" process="@this"
-					actionListener="#{clientesBean.eliminarCliente()}" oncomplete="PF('deleteClienteDialog').hide()" />
-				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
-					onclick="PF('deleteClienteDialog').hide()" />
+			<p:confirmDialog widgetVar="deleteClienteDialog" showEffect="fade" width="400" message="Desea eliminar el cliente?" header="Eliminar" severity="warn">
+				<p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarCliente()}" oncomplete="PF('deleteClienteDialog').hide()" />
+				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteClienteDialog').hide()" />
 			</p:confirmDialog>
 
 			<p:confirmDialog global="true" showEffect="fade" width="400" header="Eliminar">
 				<p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
-					icon="pi pi-times" />
+				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
 			</p:confirmDialog>
+
 			<style>
 				body .ui-panelgrid .ui-panelgrid-cell {
 					border: none !important;
