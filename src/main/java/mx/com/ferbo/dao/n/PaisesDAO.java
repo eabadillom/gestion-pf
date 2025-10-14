@@ -4,7 +4,9 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -77,6 +79,28 @@ public class PaisesDAO extends BaseDAO<Paises, Integer>
             EntityManagerUtil.close(em);
         }
         return listado;
+    }
+    
+    public Paises buscarUltimoPais(){
+        Paises pais = null;
+        EntityManager em = null;
+        try {
+            em = EntityManagerUtil.getEntityManager();
+            TypedQuery<Paises> query = em.createQuery(
+                "SELECT p FROM Paises p ORDER BY p.paisCve DESC", Paises.class
+            );
+            
+            query.setMaxResults(1);
+            pais = query.getSingleResult();
+        } catch(NoResultException ex) {
+            log.error("No se encontraron paises: {}", ex.getMessage());
+        } catch (Exception e) {
+            log.error("Problemas para obtener informacion", e);
+        } finally {
+            EntityManagerUtil.close(em);
+        }
+        
+        return pais;
     }
 
 }

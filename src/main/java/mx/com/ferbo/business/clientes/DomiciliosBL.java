@@ -18,6 +18,7 @@ import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Domicilios;
+import mx.com.ferbo.dto.ClientesDomiciliosOperacion;
 import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.EstadosPK;
 import mx.com.ferbo.model.Municipios;
@@ -194,42 +195,39 @@ public class DomiciliosBL implements Serializable
         //domiciliosDAO.actualizar(auxDomicilios);
         auxClienteDomicilios.setCteCve(clienteSelected);
         auxClienteDomicilios.setDomicilios(auxDomicilios);
-        clienteDomiciliosDAO.actualizar(auxClienteDomicilios);
+        //clienteDomiciliosDAO.actualizar(auxClienteDomicilios);
         log.info("Se actualizo correctamente el domicilio del cliente");
         
         return auxClienteDomicilios;
     }
     
-    public List<ClienteDomicilios> guardarClienteDomicilio(List<ClienteDomicilios> listClienteDomicilios, ClienteDomicilios clienteDomicilioSelected) throws InventarioException 
+    public void persistirCambios(List<ClientesDomiciliosOperacion> listaOperaciones) throws InventarioException 
     {
-        List<ClienteDomicilios> auxListClienteDomicilios = listClienteDomicilios;
-        
-        clienteDomiciliosDAO.guardar(clienteDomicilioSelected);
-        auxListClienteDomicilios.add(clienteDomicilioSelected);
-        log.info("Domicilio agregado correctamente");
-        
-        return auxListClienteDomicilios;
-    }
-    
-    public List<ClienteDomicilios> eliminarClienteDomicilio(List<ClienteDomicilios> listClienteDomicilios, ClienteDomicilios clienteDomicilioSelected, Cliente clienteSelected) throws InventarioException 
-    {
-        List<ClienteDomicilios> auxListClienteDomicilios = listClienteDomicilios;
-        
-        ClienteDomicilios auxClienteDomicilios = clienteDomicilioSelected;
+        for (ClientesDomiciliosOperacion domOp : listaOperaciones) {
+            log.info("Operaciones Dom: {} y estado: {}", domOp.getClienteDomicilios().toString(), domOp.getEstado());
+            ClienteDomicilios cd = domOp.getClienteDomicilios();
 
-        if(auxClienteDomicilios.getDomicilios() == null){
-            throw new InventarioException("Error al querer eliminar el domicilio, contacte al administrador de sistemas");
+            switch (domOp.getEstado()) {
+                case NUEVO:
+                    clienteDomiciliosDAO.guardar(cd); 
+                    log.info("Domicilios guardados: {}", cd.toString());
+                    break;
+
+                case ACTUALIZADO:
+                    clienteDomiciliosDAO.actualizar(cd); 
+                    log.info("Domicilios actualizado: {}", cd.toString());
+                    break;
+
+                case ELIMINADO_TEMP:
+                    clienteDomiciliosDAO.eliminar(cd); 
+
+                    log.info("Domicilios eliminados: {}", cd.getDomicilios());
+                    break;
+                default:
+                    // No hacer nada
+                    break;
+            }
         }
-
-        auxClienteDomicilios.setCteCve(clienteSelected);
-
-        clienteDomiciliosDAO.eliminar(auxClienteDomicilios);
-
-        //domiciliosDAO.eliminar(auxClienteDomicilios.getDomicilios());
-        auxListClienteDomicilios.remove(auxClienteDomicilios);
-        log.info("Se elimino correctamente el domicilio del cliente");
-        
-        return auxListClienteDomicilios;
     }
 
 }

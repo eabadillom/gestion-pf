@@ -4,12 +4,15 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.Ciudades;
 import mx.com.ferbo.model.EntidadPostal;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,17 +70,17 @@ public class AsentamientoHumanoDAO extends BaseDAO<AsentamientoHumano, Integer>
         return asn;
     }
 
-    public List<AsentamientoHumano> buscarPorPaisEstadoMunicipioCiudad(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idCiudad) {
+    public List<AsentamientoHumano> buscarPorCiudad(Ciudades ciudad) {
         EntityManager entity = null;
         List<AsentamientoHumano> modelList = null;
 
         try {
             entity = EntityManagerUtil.getEntityManager();
             modelList = entity.createNamedQuery("AsentamientoHumano.findByPaisEstadoMunicipioCiudad", AsentamientoHumano.class)
-                    .setParameter("paisCve", idPais)
-                    .setParameter("estadoCve", idEstado)
-                    .setParameter("municipioCve", idMunicipio)
-                    .setParameter("ciudadCve", idCiudad)
+                    .setParameter("paisCve", ciudad.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+                    .setParameter("estadoCve", ciudad.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+                    .setParameter("municipioCve", ciudad.getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
+                    .setParameter("ciudadCve", ciudad.getCiudadesPK().getCiudadCve())
                     .getResultList();
         } catch (Exception e) {
             log.error("Problemas para obtener informacion", e);
@@ -246,6 +249,52 @@ public class AsentamientoHumanoDAO extends BaseDAO<AsentamientoHumano, Integer>
             EntityManagerUtil.close(em);
         }
         return listado;
+    }
+    
+    public AsentamientoHumano buscarUltimoAsentamiento(){
+        AsentamientoHumano asentamientoHumano = null;
+        EntityManager em = null;
+
+        try {
+            em = EntityManagerUtil.getEntityManager();
+            TypedQuery<AsentamientoHumano> query = em.createQuery(
+                "SELECT ah FROM AsentamientoHumano ah ORDER BY ah.asentamientoHumanoPK.asentamientoCve DESC", AsentamientoHumano.class
+            );
+            
+            query.setMaxResults(1);
+            asentamientoHumano = query.getSingleResult();
+        } catch(NoResultException ex) {
+            log.warn("No se encontraron asentamientos: {} ", ex.getMessage());
+        } catch (Exception e) {
+            log.error("Problemas para obtener informacion", e);
+        } finally {
+            EntityManagerUtil.close(em);
+        }
+        return asentamientoHumano;
+    }
+    
+    @Override
+    public synchronized void eliminar(AsentamientoHumano asentamientoHumano) throws InventarioException{
+        EntityManager em = null;
+        try {
+            log.info("Eliminando objeto: {}", asentamientoHumano.toString());
+            
+            em = getEntityManager();
+            em.getTransaction().begin();
+            em.createQuery("DELETE FROM AsentamientoHumano ah WHERE ah.asentamientoHumanoPK.asentamientoCve = :asentamientoCve AND ah.cp = :cp")
+                .setParameter("asentamientoCve", asentamientoHumano.getAsentamientoHumanoPK().getAsentamientoCve())
+                .setParameter("cp", asentamientoHumano.getCp())
+                .executeUpdate();
+            em.getTransaction().commit();
+            
+            log.info("Objeto eliminado correctamente: {}", asentamientoHumano.toString());
+        } catch (Exception e) {
+            this.rollback(em);
+            log.error("Problemas para eliminar el objeto: "+ asentamientoHumano.toString(), e);
+            throw new InventarioException("Error al eliminar en la basede datos");
+        } finally {
+            EntityManagerUtil.close(em);
+        }
     }
 
 }

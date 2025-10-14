@@ -120,9 +120,10 @@ public class AsentamientoHumano implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.asentamientoHumanoPK.getAsentamientoCve());
-        return hash;
+        if(this.asentamientoHumanoPK.getAsentamientoCve() == null){
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(this.asentamientoHumanoPK.getAsentamientoCve());
     }
 
     @Override
@@ -142,7 +143,7 @@ public class AsentamientoHumano implements Serializable {
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.AsentamientoHumano[ asentamientoHumanoPK=" + asentamientoHumanoPK.getAsentamientoCve() + ", asentamientoDs=" + asentamientoDs + " ]";
+        return "mx.com.ferbo.model.AsentamientoHumano[ asentamientoHumanoPK=" + asentamientoHumanoPK.getAsentamientoCve() + ", asentamientoDs=" + asentamientoDs + ", cp=" + cp + " ]";
     }
     
 }

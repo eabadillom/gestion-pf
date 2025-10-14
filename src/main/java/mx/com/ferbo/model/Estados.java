@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -106,9 +105,10 @@ public class Estados implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 29 * hash + Objects.hashCode(this.estadosPK.getEstadoCve());
-        return hash;
+        if(this.estadosPK.getEstadoCve() == null){
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(this.estadosPK.getEstadoCve());
     }
 
     @Override

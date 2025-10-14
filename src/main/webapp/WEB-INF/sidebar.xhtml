@@ -64,18 +64,7 @@
 								<p:menuitem id="frb_facturacion_sm122" value="Emisores CFDI" icon="pi pi-building " outcome="/protected/catalogos/EmisoresCFDIS" />							
 								<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" icon="pi pi-fw pi-user" />
 								<p:menuitem id="frb_facturacion_sm113" value="Banco" icon="pi pi-fw pi-money-bill" outcome="/protected/catalogos/bancos" />
-								<p:submenu id="frb_facturacionsm2" label="Domicilios" icon="pi pi-fw pi-building">
-									<p:menuitem id="frb_facturacion_domicilioCliente" value="Domicilios por Cliente" icon="pi pi-fw pi-home" outcome="/protected/catalogos/domicilios" />
-									<p:submenu id="frb_facturacion_sm21" label="Cambios" icon="pi pi-fw pi-pencil">
-										<p:menuitem id="frb_facturacion_sm211" value="País" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/paises" />
-										<p:menuitem id="frb_facturacion_sm212" value="Estado" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/estados" />
-										<p:menuitem id="frb_facturacion_sm213" value="Municipio / Alcadía" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/municipios" />
-										<p:menuitem id="frb_facturacion_sm214" value="Ciudad" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/ciudades" />
-										<p:menuitem id="frb_facturacion_sm215" value="Tipo de Asentamiento" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/tipoAsentamiento" />
-										<p:menuitem id="frb_facturacion_sm216" value="Entidad Postal" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/entidadPostal" />
-										<p:menuitem id="frb_facturacion_sm217" value="Colonia" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/asentamientoHumano" />
-									</p:submenu>
-								</p:submenu>
+								<p:menuitem id="frb_facturacionsm2" value="Domicilios por Cliente" icon="pi pi-fw pi-home" outcome="/protected/catalogos/domicilios" />
 								<p:menuitem id="frb_facturacion_sm15" value="Tipos de Pago" icon="pi pi-fw pi-credit-card" outcome="/protected/catalogos/tipoPago" />
 								<p:menuitem value="Formas de Pago (SAT)" icon="pi pi-fw pi-credit-card" outcome="/protected/catalogos/tiposPago" />
 								<p:submenu label="Series" icon="pi pi-ellipsis-h">
@@ -135,7 +124,8 @@
 						<p:menuitem value="Usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
-						<p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
+						<p:menuitem value="Ajustes" outcome="/protected/settings/ajustes" icon="pi pi-cog"/>
+                                                <p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
 					</po:menu>
 				</div>
 			</div>

@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -89,9 +88,10 @@ public class Municipios implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 79 * hash + Objects.hashCode(this.municipiosPK.getMunicipioCve());
-        return hash;
+        if(this.municipiosPK.getMunicipioCve() == null){
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(this.municipiosPK.getMunicipioCve());
     }
 
     @Override

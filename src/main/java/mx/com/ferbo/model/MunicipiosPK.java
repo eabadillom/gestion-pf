@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -30,21 +31,21 @@ public class MunicipiosPK implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "municipio_cve")
-    private int municipioCve;
+    private Integer municipioCve;
 
     public MunicipiosPK() {
     }
 
-    public MunicipiosPK(Estados estados, int municipioCve) {
+    public MunicipiosPK(Estados estados, Integer municipioCve) {
         this.estados = estados;
         this.municipioCve = municipioCve;
     }
 
-    public int getMunicipioCve() {
+    public Integer getMunicipioCve() {
         return municipioCve;
     }
 
-    public void setMunicipioCve(int municipioCve) {
+    public void setMunicipioCve(Integer municipioCve) {
         this.municipioCve = municipioCve;
     }
 
@@ -75,7 +76,7 @@ public class MunicipiosPK implements Serializable {
             return false;
         }
         final MunicipiosPK other = (MunicipiosPK) obj;
-        return this.municipioCve == other.municipioCve;
+        return Objects.equals(this.municipioCve, other.municipioCve);
     }
 
     @Override

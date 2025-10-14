@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -101,9 +100,10 @@ public class Paises implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 83 * hash + Objects.hashCode(this.paisCve);
-        return hash;
+        if(this.paisCve == null){
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(this.paisCve);
     }
 
     @Override

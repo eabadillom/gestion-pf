@@ -4,6 +4,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import mx.com.ferbo.commons.dao.BaseDAO;
@@ -163,6 +164,30 @@ public class EstadosDAO extends BaseDAO<Estados, Integer>
         }
 
         return list;
+    }
+    
+    public Estados buscarUltimoEstado(Paises pais){
+        Estados estado = null;
+        EntityManager em = null;
+        
+        try {
+            em = EntityManagerUtil.getEntityManager();
+            TypedQuery<Estados> query = em.createQuery(
+                "SELECT e FROM Estados e WHERE e.estadosPK.pais.paisCve = :idPais ORDER BY e.estadosPK.estadoCve DESC", Estados.class
+            );
+            
+            query.setParameter("idPais", pais.getPaisCve());
+            query.setMaxResults(1);
+            estado = query.getSingleResult();
+        } catch(NoResultException ex) {
+            log.warn("No se encontro estados asociados al pais ({}): {}", pais.getPaisDesc(), ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Problema al obtener la información de estado.", ex);
+        } finally {
+            EntityManagerUtil.close(em);
+        }
+        
+        return estado;
     }
 
 }

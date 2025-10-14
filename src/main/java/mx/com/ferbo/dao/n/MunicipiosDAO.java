@@ -4,10 +4,12 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.Municipios;
 import mx.com.ferbo.model.MunicipiosPK;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -79,15 +81,15 @@ public class MunicipiosDAO extends BaseDAO<Municipios, Integer>
         return listado;
     }
 
-    public List<Municipios> buscarPorPaisEstado(Integer idPais, Integer idEstado) {
+    public List<Municipios> buscarPorPaisEstado(Estados estado) {
         List<Municipios> modelList = null;
         EntityManager em = null;
 
         try {
             em = EntityManagerUtil.getEntityManager();
             modelList = em.createNamedQuery("Municipios.findByPaisCveEstadoCve", Municipios.class)
-                    .setParameter("paisCve", idPais)
-                    .setParameter("estadoCve", idEstado)
+                    .setParameter("paisCve", estado.getEstadosPK().getPais().getPaisCve())
+                    .setParameter("estadoCve", estado.getEstadosPK().getEstadoCve())
                     .getResultList();
         } catch (Exception ex) {
             log.warn("Problema para obtener la lista de municipios...", ex);
@@ -172,6 +174,32 @@ public class MunicipiosDAO extends BaseDAO<Municipios, Integer>
             EntityManagerUtil.close(em);
         }
         return listado;
+    }
+    
+    public Municipios buscarUltimoMunicipio(Estados estado){
+        Municipios municipio = null;
+        EntityManager em = null;
+        
+        try {
+            em = EntityManagerUtil.getEntityManager();
+            
+            TypedQuery<Municipios> query = em.createQuery(
+                "SELECT m FROM Municipios m WHERE m.municipiosPK.estados.estadosPK.pais.paisCve = :idPais AND m.municipiosPK.estados.estadosPK.estadoCve = :idEstado AND m.municipiosPK.municipioCve < 998 ORDER BY m.municipiosPK.municipioCve DESC", Municipios.class
+            );
+            query.setParameter("idPais", estado.getEstadosPK().getPais().getPaisCve());
+            query.setParameter("idEstado", estado.getEstadosPK().getEstadoCve());
+            query.setMaxResults(1);
+            
+            municipio = query.getSingleResult();
+        } catch(NoResultException ex) {
+            log.warn("No se encontraron municipios asociados al estado ({}): {}", estado.getEstadoDesc(), ex.getMessage());
+        } catch (Exception e) {
+            log.error("Problemas para obtener informacion", e);
+        } finally {
+            EntityManagerUtil.close(em);
+        }
+        
+        return municipio;
     }
 
 }

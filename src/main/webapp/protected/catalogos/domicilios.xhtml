@@ -21,13 +21,13 @@
             <div class="p-grid domiciliosCliente">
                 <p:toolbar styleClass="p-mb-4">
                     <p:toolbarGroup>
-                        <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-raised" style="margin-right: .5rem" actionListener="#{domiciliosBean.nuevoCliente()}"
+                        <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-raised" style="margin-right: .5rem" actionListener="#{clientesDomiciliosBean.nuevoCliente()}"
                                          process="@this" >
                         </p:commandButton>
                     </p:toolbarGroup>
                 </p:toolbar>
                 <div style="padding-top: 1rem;">
-                    <p:dataTable id="dt-clientes" widgetVar="dtClientes" value="#{domiciliosBean.lstClientes}" var="cliente" rowKey="#{cliente.cteCve}" selection="#{domiciliosBean.lstClientesSelected}" reflow="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                    <p:dataTable id="dt-clientes" widgetVar="dtClientes" value="#{clientesDomiciliosBean.lstClientes}" var="cliente" rowKey="#{cliente.cteCve}" selection="#{clientesDomiciliosBean.lstClientesSelected}" reflow="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
                         <p:column headerText="Nombre" sortBy="#{cliente.nombre}" filterBy="#{cliente.nombre}" filterMatchMode="contains">
                             <h:outputText value="#{cliente.nombre}" />
                         </p:column>
@@ -43,15 +43,15 @@
                         <p:column width="2rem" style="text-align: center;">
                             <p:commandButton icon="pi pi-pencil" styleClass="edit-button" process="@this" 
                                              oncomplete="PF('dialogCliente').show()"
-                                             update="form:dialogCliente form:tabView form:tabView:dt-domiciliosCliente form:panel-actClienteDireccion" 
-                                             action="#{domiciliosBean.cargaInfoCliente()}" >
-                                <f:setPropertyActionListener value="#{cliente}" target="#{domiciliosBean.clienteSelected}" />
-                                <p:resetInput target="form:dialogCliente form:tabView form:tabView:dt-domiciliosCliente" />
+                                             update="form:tabView form:tabView:dt-domiciliosCliente form:panel-actClienteDireccion" 
+                                             action="#{clientesDomiciliosBean.cargaInfoCliente()}" >
+                                <f:setPropertyActionListener value="#{cliente}" target="#{clientesDomiciliosBean.clienteSelected}" />
+                                <p:resetInput target="form:tabView form:tabView:dt-domiciliosCliente" />
                             </p:commandButton>
                         </p:column>
                         <p:column width="2rem" style="text-align: center;">
                             <p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" >
-                                <f:setPropertyActionListener value="#{cliente}" target="#{domiciliosBean.clienteSelected}" />
+                                <f:setPropertyActionListener value="#{cliente}" target="#{clientesDomiciliosBean.clienteSelected}" />
                             </p:commandButton>
                         </p:column>
                     </p:dataTable>
@@ -61,6 +61,14 @@
                     <p:tabView id="tabView" class="ui-fluid" dynamic="true" cache="true" effect="drop">
                         <ui:include src="/protected/catalogos/infoclientes/domiciliosClienteTab.xhtml" />
                     </p:tabView>
+                    
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesDomiciliosBean.guardarCliente()}" 
+                                         onclick="PF('dialogCliente').hide();" process="@this" >
+                        </p:commandButton>
+                        <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" type="button">
+                        </p:commandButton>
+                    </f:facet>
                 </p:dialog>
                 
                 <ui:include src="/protected/catalogos/infoclientes/dlgDomiciliosClienteTab.xhtml" />
