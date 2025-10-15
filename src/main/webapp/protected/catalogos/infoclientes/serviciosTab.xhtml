@@ -1,0 +1,125 @@
+<!-- servicios-tab.xhtml -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <div>
+        <p:commandButton id="btnAdd"
+                         icon="pi pi-plus"
+                         value="Agregar nuevo servicio"
+                         actionListener="#{clientesBean.nuevoPrecioServicio()}"
+                         process="@this"
+                         update="form:tabView:panel-servicio"
+                         oncomplete="PF('servicioClienteDialog').show()"
+                         styleClass="ui-button-raised"
+                         style="margin-right: .5rem; width: auto;"
+                         disabled="#{clientesBean.clienteSelected == null or clientesBean.clienteSelected.cteCve == null}" />
+    </div>
+
+
+
+    <p:dataTable id="dt-servicios" widgetVar="dtServicios" value="#{clientesBean.clienteSelected.precioServicioList}" rowKey="#{pServicio.id}"
+                 var="pServicio" reflow="true" lazy="false" paginator="true"
+                 rows="5" paginatorPosition="bottom">
+
+        <p:column headerText="Servicio" sortBy="#{pServicio.servicio.servicioDs}">
+            <h:outputText value="#{pServicio.servicio.servicioDs}" />
+        </p:column>
+        <p:column headerText="Unidad" sortBy="#{pServicio.unidad.unidadDeManejoDs}" width="7rem" style="text-align: center;">
+            <h:outputText value="#{pServicio.unidad.unidadDeManejoDs}" />
+        </p:column>
+        <p:column headerText="Precio" sortBy="#{pServicio.precio}" width="6rem" style="text-align: right;">
+            <h:outputText value="#{pServicio.precio}">
+                <f:convertNumber type="currency" maxFractionDigits="2" />
+            </h:outputText>
+        </p:column>
+        <p:column width="2rem" style="text-align: center;">
+            <p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button" oncomplete="PF('servicioClienteDialog').show()"
+                             update="form:tabView:panel-servicio">
+                <f:setPropertyActionListener value="#{pServicio}" target="#{clientesBean.precioServicioSelected}" />
+            </p:commandButton>
+        </p:column>
+        <p:column width="2rem" style="text-align: center;">
+            <p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" oncomplete="PF('deleteServicioDialog').show()">
+                <f:setPropertyActionListener value="#{pServicio}" target="#{clientesBean.precioServicioSelected}" />
+            </p:commandButton>
+        </p:column>
+    </p:dataTable>
+
+    <!-- Diálogo para agregar/editar -->
+    <p:dialog header="Detalle del servicio" showEffect="fade" modal="false" widgetVar="servicioClienteDialog" responsive="true" position="center center"
+              width="100%" resizable="false">
+        <p:outputPanel id="panel-servicio" class="ui-fluid">
+            <p:outputPanel>
+                <div class="p-field">
+                    <p:outputLabel>Cliente</p:outputLabel>
+                    <p:inputText value="#{clientesBean.clienteSelected.nombre}" disabled="true" />
+                </div>
+                <div class="p-field">
+                    <p:outputLabel>Servicio</p:outputLabel>
+                    <p:selectOneMenu value="#{clientesBean.precioServicioSelected.servicio}" filter="true" filterMatchMode="contains"
+                                     converter="entityConverter" required="true" requiredMessage="Seleccione servicio" autoWidth="false"
+                                     disabled="#{clientesBean.precioServicioSelected.id ne null}">
+                        <f:selectItem itemLabel="--Selecciona--" />
+                        <f:selectItems value="#{clientesBean.lstServicio}" var="serv" itemLabel="#{serv.servicioDs}" />
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-field">
+                    <p:outputLabel>Unidad</p:outputLabel>
+                    <p:selectOneMenu value="#{clientesBean.precioServicioSelected.unidad}" filter="true" filterMatchMode="contains"
+                                     converter="entityConverter" required="true" requiredMessage="Seleccione unidad"
+                                     disabled="#{clientesBean.precioServicioSelected.id ne null}">
+                        <f:selectItem itemLabel="--Selecciona--" />
+                        <f:selectItems value="#{clientesBean.lstUnidadManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-field">
+                    <p:outputLabel>Precio</p:outputLabel>
+                    <p:inputNumber value="#{clientesBean.precioServicioSelected.precio}" emptyValue="0" symbol="$" symbolPosition="p" thousandSeparator=","
+                                   minValue="0" required="true" requiredMessage="Campo requerido" />
+                </div>
+            </p:outputPanel>
+        </p:outputPanel>
+
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.OperarServicios('agregarprecioservicio')}"
+                             update="form:tabView:dt-servicios" process="panel-servicio @this" oncomplete="PF('servicioClienteDialog').hide()" />
+            <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('servicioClienteDialog').hide()" class="ui-button-secondary"
+                             update="form:tabView:dt-servicios" resetValues="true" />
+        </f:facet>
+    </p:dialog>
+
+    <!-- Diálogo general personalizado -->
+    <p:dialog header="Confirmar eliminación"
+              widgetVar="deleteServicioDialog"
+              modal="false"
+              closable="false"
+              resizable="false"
+              draggable="false"
+              width="400"
+              showEffect="fade"
+              hideEffect="fade">
+
+        <h:outputText value="¿Desea eliminar el servicio?" style="font-size: 16px;" />
+
+        <p:spacer height="20" />
+
+        <!-- Contenedor de botones en fila, alineados a la derecha sin ocupar todo el ancho -->
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+            <p:commandButton value="Sí"
+                             icon="pi pi-check"
+                             styleClass="ui-button-danger"
+                             actionListener="#{clientesBean.OperarServicios('eliminarprecioservicio')}"
+                             update="form:tabView:dt-servicios"
+                             oncomplete="PF('deleteServicioDialog').hide()" />
+
+            <p:commandButton value="No"
+                             type="button"
+                             icon="pi pi-times"
+                             styleClass="ui-button-secondary"
+                             onclick="PF('deleteServicioDialog').hide()" />
+        </div>
+    </p:dialog>
+</ui:composition>

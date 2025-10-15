@@ -1,74 +1,202 @@
 package mx.com.ferbo.business.clientes;
 
-import java.io.Serializable;
+import javax.inject.Named;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import mx.com.ferbo.model.ClienteContacto;
-import mx.com.ferbo.model.Contacto;
-import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.SecurityUtil;
-
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.dao.n.ClienteContactoDAO;
+import mx.com.ferbo.dao.n.ContactoDAO;
+import mx.com.ferbo.dao.n.MedioCntDAO;
+import mx.com.ferbo.dao.n.TipoMailDAO;
+import mx.com.ferbo.dao.n.TipoTelefonoDAO;
+import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.ClienteContacto;
+import mx.com.ferbo.model.Contacto;
+import mx.com.ferbo.model.Mail;
+import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.Telefono;
+import mx.com.ferbo.model.TipoMail;
+import mx.com.ferbo.model.TipoTelefono;
+import mx.com.ferbo.util.InventarioException;
 
 /**
  *
  * @author alberto
  */
-public class ContactoBL implements Serializable 
-{
-    private static final long serialVersionUID = 1L;
-    private static Logger log = LogManager.getLogger(ContactoBL.class);
-    
-    public static ClienteContacto nuevoContacto(List<ClienteContacto> listClienteContacto) 
-    {
+
+@Named
+@RequestScoped
+public class ContactoBL {
+
+    private static final Logger log = LogManager.getLogger(ContactoBL.class);
+
+    @Inject
+    private MedioCntDAO medioCntDAO;
+
+    @Inject
+    private ClienteContactoDAO clienteContactoDAO;
+
+    @Inject
+    private ContactoDAO contactoDAO;
+
+    @Inject
+    private TipoTelefonoDAO tipoTelefonoDAO;
+
+    @Inject
+    private TipoMailDAO tipoMailDAO;
+
+    public List<ClienteContacto> obtenerListaContactos(Cliente cliente) throws InventarioException {
+
+        requireNonNull(cliente, "El cliente no puede ser vacío.");
+
+        List<ClienteContacto> lista = clienteContactoDAO.obtenerPorClienteId(cliente);
+
+        if (lista == null) {
+            return new ArrayList<>();
+        }
+
+        return lista;
+    }
+
+    public List<TipoMail> obtenerTiposMail() {
+        List<TipoMail> lista = tipoMailDAO.buscarTodos();
+
+        if (lista == null) {
+            return new ArrayList<>();
+        }
+
+        return lista;
+    }
+
+    public List<TipoTelefono> obtenerTiposTelefono() {
+        List<TipoTelefono> lista = tipoTelefonoDAO.buscarTodos();
+
+        if (lista == null) {
+            return new ArrayList<>();
+        }
+
+        return lista;
+    }
+
+    public ClienteContacto nuevoClienteContacto() {
         ClienteContacto clienteContacto = new ClienteContacto();
+        clienteContacto.setIdContacto(new Contacto());
         clienteContacto.setFhAlta(new Date());
         clienteContacto.setStHabilitado(true);
-        clienteContacto.setStUsuario("A");
-        Contacto contacto = new Contacto();
-        contacto.setClienteContactoList(listClienteContacto);
-        clienteContacto.setIdContacto(contacto);
-        
+        clienteContacto.setStUsuario("A"); // Asumimos valor por defecto
         return clienteContacto;
     }
-    
-    public static void validateNewPassword(String newPassword, String confirmPassword) throws InventarioException
-    {
-        if (newPassword == null) {
-            throw new InventarioException("Debe indicar una contraseña nueva.");
+
+    public void agregarContacto(Cliente cliente, ClienteContacto clienteContacto)
+            throws InventarioException {
+
+        requireNonNull(cliente, "El cliente no puede ser vacío.");
+        requireNonNull(clienteContacto, "El contacto del cliente no puede ser vacío.");
+
+        List<ClienteContacto> clienteContactos = cliente.getClienteContactoList();
+
+        if (clienteContactos == null) {
+            clienteContactos = new ArrayList<>();
+            cliente.setClienteContactoList(clienteContactos);
         }
 
-        if (confirmPassword == null) {
-            throw new InventarioException("Debe confirmar su contraseña nueva.");
-        }
-
-        if (newPassword.equals(confirmPassword) == false) {
-            throw new InventarioException("Su nueva contraseña no coincide en los dos campos.");
+        Optional<ClienteContacto> existente = clienteContactos.stream()
+                .filter(cc -> normalizar(cc.getIdContacto().getNbNombre())
+                        .equals(normalizar(clienteContacto.getIdContacto().getNbNombre()))
+                        && normalizar(cc.getIdContacto().getNbApellido1())
+                                .equals(normalizar(clienteContacto.getIdContacto().getNbApellido1()))
+                        && normalizar(cc.getIdContacto().getNbApellido2())
+                                .equals(normalizar(clienteContacto.getIdContacto().getNbApellido2())))
+                .findFirst();
+        if (existente.isPresent()) {
+            int index = clienteContactos.indexOf(existente.get());
+            clienteContactos.set(index, clienteContacto);
+        } else {
+            clienteContactos.add(clienteContacto);
         }
     }
-    
-    public static ClienteContacto changePassword(ClienteContacto clienteContacto, String newPassword, String confirmPassword) throws InventarioException
-    {
-        SecurityUtil util = new SecurityUtil();
-        ClienteContacto auxClienteContacto = clienteContacto;
-        
-        if (newPassword == null || "".equalsIgnoreCase(newPassword.trim())) {
-            throw new InventarioException("Debe indicar su nueva contraseña");
+
+    public void agregarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt) throws InventarioException {
+
+        requireNonNull(clienteContacto, "El contacto del cliente no puede ser vacío.");
+        requireNonNull(medioCnt, "El medio de contacto no puede ser vacío.");
+
+        Contacto contacto = clienteContacto.getIdContacto();
+        if (contacto == null) {
+            contacto = new Contacto(); // Si estás creando nuevo
+            clienteContacto.setIdContacto(contacto);
         }
 
-        if (confirmPassword == null || "".equalsIgnoreCase(confirmPassword.trim())) {
-            throw new InventarioException("Debe confirmar su nueva contraseña");
+        List<MedioCnt> medioCnts = contacto.getMedioCntList();
+        if (medioCnts == null) {
+            medioCnts = new ArrayList<>();
+            contacto.setMedioCntList(medioCnts);
         }
 
-        util.checkPassword(newPassword);
-        
-        String newPasswordSHA512 = util.getSHA512(newPassword);
-        
-        auxClienteContacto.setNbPassword(newPasswordSHA512);
-        auxClienteContacto.setStUsuario("A");
-        
-        return auxClienteContacto;
+        medioCnts.add(medioCnt);
+    }
+
+    public void eliminarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt) throws InventarioException {
+        requireNonNull(clienteContacto, "El contacto del cliente no puede estar vacío.");
+        requireNonNull(medioCnt, "Debe proporcionar un medio de contacto para eliminar.");
+
+        clienteContacto.getIdContacto().getMedioCntList().remove(medioCnt);
+
+        if (medioCnt.getIdMedio() != null) {
+            medioCntDAO.eliminar(medioCnt);
+        }
+    }
+
+    public void eliminarContacto(Cliente cliente, ClienteContacto clienteContacto) throws InventarioException {
+        requireNonNull(cliente, "El cliente no puede estar vacío.");
+        requireNonNull(clienteContacto, "Debe proporcionar un ClienteContacto para eliminar.");
+
+        if (clienteContacto.getId() == null) {
+            cliente.getClienteContactoList().remove(clienteContacto);
+        } else {
+            List<MedioCnt> medioCnts = new ArrayList<>(clienteContacto.getIdContacto().getMedioCntList());
+            for (MedioCnt medioCnt : medioCnts) {
+                eliminarMedioContacto(clienteContacto, medioCnt);
+            }
+
+            contactoDAO.eliminar(clienteContacto.getIdContacto());
+            clienteContactoDAO.eliminar(clienteContacto);
+            cliente.getClienteContactoList().remove(clienteContacto);
+        }
+    }
+
+    public void seleccionarMedioContacto(MedioCnt medioCnt) throws InventarioException {
+        if ("t".equalsIgnoreCase(medioCnt.getTpMedio())) {
+            Telefono telefono = new Telefono();
+            medioCnt.setIdTelefono(telefono);
+            medioCnt.setIdMail(null);
+            log.info("Agregando tipo de medio Telefono.");
+        } else if ("m".equalsIgnoreCase(medioCnt.getTpMedio())) {
+            Optional<TipoMail> tipo = tipoMailDAO.buscarPorId(1);
+            Mail mail = new Mail();
+            mail.setStPrincipal(true);
+            mail.setTpMail(tipo.orElseThrow(() -> new InventarioException("TipoMail con ID 1 no encontrado")));
+            medioCnt.setIdMail(mail);
+            medioCnt.setIdTelefono(null);
+            log.info("Agregando tipo de medio Mail.");
+        }
+    }
+
+    private <T> T requireNonNull(T obj, String mensaje) throws InventarioException {
+        if (obj == null) {
+            throw new InventarioException(mensaje);
+        }
+        return obj;
+    }
+
+    private String normalizar(String valor) {
+        return valor == null ? "" : valor.trim().toLowerCase(); // o toUpperCase()
     }
     
 }
