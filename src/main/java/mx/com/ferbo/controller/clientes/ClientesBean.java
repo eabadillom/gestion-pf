@@ -3,19 +3,13 @@ package mx.com.ferbo.controller.clientes;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import java.math.BigDecimal;
 
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,23 +24,16 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.InventarioException;
 
-import org.primefaces.PrimeFaces;
-
 import mx.com.ferbo.business.clientes.FiscalBL;
-import mx.com.ferbo.dao.n.ClienteDAO;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
-import mx.com.ferbo.util.InventarioException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.clientes.ServiciosBL;
-import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 
@@ -182,6 +169,10 @@ public class ClientesBean implements Serializable {
         this.tituloDialogAviso = "Editar Aviso";
         this.avisoSelected = aviso;
     }
+    
+    public void copiarServicioAviso(PrecioServicio servicio){
+        this.precioAvisoSelected = servicio;
+    }
 
     public void operarAvisos(String operacion) {
         String mensaje = null;
@@ -271,7 +262,7 @@ public class ClientesBean implements Serializable {
         this.precioServicioSelected = precioServicio;
     }
 
-    public void OperarServicios(String operacion) {
+    public void operarServicios(String operacion) {
         String mensaje = null;
         try {
             switch (operacion) {
