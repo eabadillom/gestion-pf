@@ -3,15 +3,32 @@ package mx.com.ferbo.controller.clientes;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import java.math.BigDecimal;
 
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
+import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.primefaces.PrimeFaces;
+
+import mx.com.ferbo.business.clientes.AvisoBL;
+import mx.com.ferbo.dao.n.ClienteDAO;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Categoria;
+import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.util.InventarioException;
 
 import org.primefaces.PrimeFaces;
 
@@ -60,14 +77,15 @@ public class ClientesBean implements Serializable {
     @Inject
     private ClienteDAO clienteDAO;
 
-    // Objetos para Fiscal
+    // Objetos para Avisos
     @Inject
-    private FiscalBL fiscalBL;
+    private AvisoBL avisoBL;
 
-    private List<UsoCfdi> lstUsoCfdi;
-    private List<RegimenFiscal> lstRegimenFiscal;
-    private List<MetodoPago> lstMetodoPago;
-    private List<MedioPago> lstMedioPago;
+    private Aviso avisoSelected;
+    private PrecioServicio precioAvisoSelected;
+    private String tituloDialogAviso;
+    private List<Planta> lstPlanta;
+    private List<Categoria> lstCategoria;
 
     // Objetos para contactos
     @Inject
@@ -80,6 +98,15 @@ public class ClientesBean implements Serializable {
     private List<TipoMail> lstTipoMail;
     private List<TipoTelefono> lstTipoTelefono;
 
+    // Objetos para Fiscal
+    @Inject
+    private FiscalBL fiscalBL;
+
+    private List<UsoCfdi> lstUsoCfdi;
+    private List<RegimenFiscal> lstRegimenFiscal;
+    private List<MetodoPago> lstMetodoPago;
+    private List<MedioPago> lstMedioPago;
+
     // Objetos para Servicios
     @Inject
     private ServiciosBL serviciosBL;
@@ -91,7 +118,6 @@ public class ClientesBean implements Serializable {
     private UnidadDeManejo unidadDeManejoSelected;
     private List<UnidadDeManejo> lstUnidadManejo;
 
-    // Constructuctor
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
         this.clienteSelected = new Cliente();
@@ -133,6 +159,7 @@ public class ClientesBean implements Serializable {
         }
     }
 
+    // Funciones para clientes
     public void clonarCliente() {
     }
 
@@ -140,6 +167,59 @@ public class ClientesBean implements Serializable {
     }
 
     public void nuevoCliente() {
+    }
+
+    // Funciones para Avisos
+    public void nuevoAviso() {
+        this.tituloDialogAviso = null;
+        this.tituloDialogAviso = "Nuevo Aviso";
+        this.avisoSelected = avisoBL.nueAviso();
+        this.avisoSelected.setCteCve(clienteSelected);
+    }
+
+    public void copiarAviso(Aviso aviso) {
+        this.tituloDialogAviso = null;
+        this.tituloDialogAviso = "Editar Aviso";
+        this.avisoSelected = aviso;
+    }
+
+    public void operarAvisos(String operacion) {
+        String mensaje = null;
+        try {
+            switch (operacion) {
+                case "agregaraviso":
+                    avisoBL.agregarAviso(clienteSelected, avisoSelected);
+                    mensaje = "Aviso agregado exitosamente";
+                    break;
+
+                case "agregarservicio":
+                    avisoBL.agregarServicioAviso(avisoSelected, precioAvisoSelected);
+                    mensaje = "Servico agregado a aviso exitosamente";
+                    break;
+
+                case "eliminaraviso":
+                    avisoBL.eliminaAviso(clienteSelected, avisoSelected);
+                    mensaje = "Aviso eliminado exitosamente";
+                    break;
+
+                case "eliminarservicio":
+                    avisoBL.eliminaServicioAviso(avisoSelected, precioAvisoSelected);
+                    mensaje = "Servicio eliminado de aviso exitosamente";
+                    break;
+
+                default:
+                    throw new InventarioException("Operación sobre avisos no válida");
+            }
+            addMessage(FacesMessage.SEVERITY_INFO, "Aviso", mensaje);
+        } catch (InventarioException ex) {
+            addMessage(FacesMessage.SEVERITY_WARN, "Aviso", ex.getMessage());
+        } catch (Exception ex) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Aviso",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages",
+                    "form");
+        }
     }
 
     public void validarCodigoUnico(Cliente cliente) {
@@ -324,6 +404,47 @@ public class ClientesBean implements Serializable {
 
     public void setLstClientes(List<Cliente> lstClientes) {
         this.lstClientes = lstClientes;
+    }
+
+    // Getters y Setters para Avisos
+    public Aviso getAvisoSelected() {
+        return avisoSelected;
+    }
+
+    public void setAvisoSelected(Aviso avisoSelected) {
+        this.avisoSelected = avisoSelected;
+    }
+
+    public PrecioServicio getPrecioAvisoSelected() {
+        return precioAvisoSelected;
+    }
+
+    public void setPrecioAvisoSelected(PrecioServicio precioAvisoSelected) {
+        this.precioAvisoSelected = precioAvisoSelected;
+    }
+
+    public String getTituloDialogAviso() {
+        return tituloDialogAviso;
+    }
+
+    public void setTituloDialogAviso(String tituloDialogAviso) {
+        this.tituloDialogAviso = tituloDialogAviso;
+    }
+
+    public List<Planta> getLstPlanta() {
+        return lstPlanta;
+    }
+
+    public void setLstPlanta(List<Planta> lstPlanta) {
+        this.lstPlanta = lstPlanta;
+    }
+
+    public List<Categoria> getLstCategoria() {
+        return lstCategoria;
+    }
+
+    public void setLstCategoria(List<Categoria> lstCategoria) {
+        this.lstCategoria = lstCategoria;
     }
 
     // Getter y Setter para Fiscal

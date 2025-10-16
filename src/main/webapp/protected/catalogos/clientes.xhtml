@@ -1,5 +1,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:jsf="http://xmlns.jcp.org/jsf">
 	<ui:define name="title">Clientes</ui:define>
 
@@ -8,7 +10,10 @@
 			<p:growl id="messages" showDetail="true" />
 			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false"
 				closable="false" resizable="false">
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false"
+				closable="false" resizable="false">
 				<div align="center">
+					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 		    </p:dialog>
@@ -18,9 +23,13 @@
                                                          process="@this" update="form:tabView:pnlCliente" oncomplete="PF('dialogCliente').show();" >
                                             <p:resetInput target="form:tabView:pnlCliente"/>
                                         </p:commandButton>
+                                                         process="@this" update="form:tabView:pnlCliente" oncomplete="PF('dialogCliente').show();" >
+                                            <p:resetInput target="form:tabView:pnlCliente"/>
+                                        </p:commandButton>
 				</p:toolbarGroup>
 			</p:toolbar>
 			<div style="padding-top: 1rem;">
+				<p:dataTable id="dt-clientes" widgetVar="dtClientes" value="#{clientesBean.lstClientes}" var="cliente" rowKey="#{cliente.cteCve}"  reflow="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
 				<p:dataTable id="dt-clientes" widgetVar="dtClientes" value="#{clientesBean.lstClientes}" var="cliente" rowKey="#{cliente.cteCve}"  reflow="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
 					<p:column headerText="Nombre" sortBy="#{cliente.nombre}" filterBy="#{cliente.nombre}" filterMatchMode="contains">
 						<h:outputText value="#{cliente.nombre}" />
@@ -36,8 +45,11 @@
 					</p:column>
 					<p:column width="2rem" style="text-align: center;">
                                             <p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show(); PF('statusInfoDialog').hide();" process="@this" update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoCliente(cliente)}"/>
+                                            <p:commandButton icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('dialogCliente').show(); PF('statusInfoDialog').hide();" process="@this" update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoCliente(cliente)}"/>
 					</p:column>
 					<p:column width="2rem" style="text-align: center;">
+						<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this"
+							oncomplete="PF('deleteClienteDialog').show()">
 						<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this"
 							oncomplete="PF('deleteClienteDialog').show()">
 							<f:setPropertyActionListener value="#{cliente}" target="#{clientesBean.clienteSelected}" />
@@ -66,8 +78,12 @@
 
 			<p:dialog id="dialogClonar" header="Copiar información del cliente" widgetVar="dialogClonar"
 				showEffect="fade" modal="true" responsive="true">
+
+			<p:dialog id="dialogClonar" header="Copiar información del cliente" widgetVar="dialogClonar"
+				showEffect="fade" modal="true" responsive="true">
 				<p:outputPanel>
 					<h:outputLabel value="Seleccione el cliente" />
+					<p:selectOneMenu id="selClonarCliente" value="#{clientesBean.clonarCliente()}">
 					<p:selectOneMenu id="selClonarCliente" value="#{clientesBean.clonarCliente()}">
 						<f:selectItem itemLabel="--SELECCIONE EL CLIENTE--" 	/>
 					</p:selectOneMenu>
@@ -85,6 +101,23 @@
 			</p:confirmDialog>
 
 			<style>
+				body .ui-panelgrid .ui-panelgrid-cell {
+					border: none !important;
+					padding: 0px;
+				}
+
+				.ui-fluid .ui-password {
+					width: 90% !important;
+					display: inline-block !important;
+				}
+
+				body .ui-input-icon-right>i:last-of-type {
+					right: 1rem;
+				}
+
+				body .ui-input-icon-right>.ui-inputfield {
+					width: 100%;
+				}
 				body .ui-panelgrid .ui-panelgrid-cell {
 					border: none !important;
 					padding: 0px;

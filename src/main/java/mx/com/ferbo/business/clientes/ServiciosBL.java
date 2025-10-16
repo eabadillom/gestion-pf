@@ -53,25 +53,24 @@ public class ServiciosBL {
         } 
     }
 
-    public List<UnidadDeManejo> obtenerUnidadesMenjo()  {
+    public List<UnidadDeManejo> obtenerUnidadesMenjo() throws InventarioException {
 
-        List<UnidadDeManejo> lista = unidadManejoDAO.buscarTodos();
-
-        if (lista == null){
-            return new ArrayList<>();
+        try {
+            return unidadManejoDAO.buscarTodos();
+        } catch (InventarioException ex) {
+            log.info(ex.getMessage());
+            return Collections.emptyList();
         }
 
-        return lista;
     }
 
-    public List<Servicio> obtenerServicios() {
-        List<Servicio> lista = servicioDAO.buscarTodos();
-
-        if(lista == null){
-            return new ArrayList<>();
-        }
-    
-        return lista;
+    public List<Servicio> obtenerServicios() throws InventarioException {
+        try {
+            return servicioDAO.buscarTodos();
+        } catch (InventarioException ex) {
+            log.info(ex.getMessage());
+            return Collections.emptyList();
+        } 
     }
 
     public void agregarOActulizarPrecioServicio(Cliente cliente, PrecioServicio precioServicio)

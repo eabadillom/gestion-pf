@@ -10,11 +10,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.Telefono;
@@ -62,43 +65,83 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
 
                 List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
                 List<PrecioServicio> clientePrecioServicios = cliente.getPrecioServicioList();
+                List<Aviso> clienteAvisos = cliente.getAvisoList();
                 log.info(cliente.getRegimenFiscal().getCd_regimen());
                 log.info(cliente.getRegimenFiscal().getNb_regimen());
                 log.info(cliente.getUsoCfdi().getUsoCfdi());
                 log.info(cliente.getMetodoPago().getNbMetodoPago());
                 log.info(cliente.getMetodoPago().getCdMetodoPago());
 
-                for (ClienteContacto clienteContacto : clienteContactoList) {
+                if (!clienteContactoList.isEmpty()) {
+                    for (ClienteContacto clienteContacto : clienteContactoList) {
 
-                    Contacto contacto = clienteContacto.getIdContacto();
+                        Contacto contacto = clienteContacto.getIdContacto();
 
-                    List<MedioCnt> medioCntList = contacto.getMedioCntList();
+                        List<MedioCnt> medioCntList = contacto.getMedioCntList();
 
-                    for (MedioCnt medioContacto : medioCntList) {
+                        for (MedioCnt medioContacto : medioCntList) {
 
-                        Mail idMail = medioContacto.getIdMail();
-                        Telefono idTelefono = medioContacto.getIdTelefono();
+                            Mail idMail = medioContacto.getIdMail();
+                            Telefono idTelefono = medioContacto.getIdTelefono();
 
-                        if (idMail != null)
-                            idMail.getTpMail().getNbTipo();
+                            if (idMail != null)
+                                idMail.getTpMail().getNbTipo();
 
-                        if (idTelefono != null)
-                            idTelefono.getTpTelefono().getNbTelefono();
+                            if (idTelefono != null)
+                                idTelefono.getTpTelefono().getNbTelefono();
+
+                        }
 
                     }
+                }
+                if (!clientePrecioServicios.isEmpty()) {
+                    for (PrecioServicio precioServicio : clientePrecioServicios) {
+                        Servicio servicio = precioServicio.getServicio();
+                        if (servicio != null) {
+                            precioServicio.getServicio().getServicioCve();
+                        }
 
+                        UnidadDeManejo unidadManejo = precioServicio.getUnidad();
+                        if (unidadManejo != null) {
+                            precioServicio.getUnidad().getUnidadDeManejoCve();
+                        }
+                    }
                 }
 
-                for (PrecioServicio precioServicio : clientePrecioServicios) {
-                    Servicio servicio = precioServicio.getServicio();
-                    if (servicio != null) {
-                        precioServicio.getServicio().getServicioCve();
-                        ;
-                    }
+                if (!clienteAvisos.isEmpty()) {
+                    for (Aviso clienteAviso : clienteAvisos) {
+                        if (clienteAviso.getAvisoCve() != null) {
 
-                    UnidadDeManejo unidadManejo = precioServicio.getUnidad();
-                    if (unidadManejo != null) {
-                        precioServicio.getUnidad().getUnidadDeManejoCve();
+                            Categoria categoria = clienteAviso.getCategoriaCve();
+                            if (categoria != null) {
+                                categoria.getCategoriaCve();
+                            }
+
+                            Planta planta = clienteAviso.getPlantaCve();
+
+                            if (planta != null) {
+                                planta.getPlantaCve();
+                            }
+
+                            List<PrecioServicio> precioServicios = clienteAviso.getPrecioServicioList();
+
+                            if (!precioServicios.isEmpty()) {
+                                for (PrecioServicio ps : precioServicios) {
+                                    Servicio servicio = ps.getServicio();
+                                    if (servicio != null){
+                                        servicio.getServicioCve();
+                                    }
+
+                                    UnidadDeManejo unidadDeManejo = ps.getUnidad();
+
+                                    if (unidadDeManejo != null) {
+                                        unidadDeManejo.getUnidadDeManejoCve();
+                                    }
+                                    
+                                }
+                            }
+
+                        }
                     }
                 }
             }
@@ -117,21 +160,20 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
     }
 
     public Cliente buscarPorCodigoUnico(String codigoUnico) {
-		Cliente model = null;
-		EntityManager em = null;
-		
-		try {
-			em = super.getEntityManager();
-			model = em.createNamedQuery("Cliente.findByCodUnico", this.modelClass)
-					.setParameter("codUnico", codigoUnico)
-					.getSingleResult()
-					;
-		} catch(Exception ex) {
-			log.warn("Problema para obtener el cliente por codigo unico: {}", ex.getMessage());
-		} finally {
-			super.close(em);
-		}
-		
-		return model;
-	}
+        Cliente model = null;
+        EntityManager em = null;
+
+        try {
+            em = super.getEntityManager();
+            model = em.createNamedQuery("Cliente.findByCodUnico", this.modelClass)
+                    .setParameter("codUnico", codigoUnico)
+                    .getSingleResult();
+        } catch (Exception ex) {
+            log.warn("Problema para obtener el cliente por codigo unico: {}", ex.getMessage());
+        } finally {
+            super.close(em);
+        }
+
+        return model;
+    }
 }
