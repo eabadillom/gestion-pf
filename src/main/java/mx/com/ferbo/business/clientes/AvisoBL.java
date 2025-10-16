@@ -1,11 +1,15 @@
 package mx.com.ferbo.business.clientes;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.AvisoDAO;
 import mx.com.ferbo.dao.n.CategoriaDAO;
@@ -24,6 +28,8 @@ import mx.com.ferbo.util.InventarioException;
 @RequestScoped
 public class AvisoBL {
 
+    private static Logger log = LogManager.getLogger(AvisoBL.class);
+
     @Inject
     private CategoriaDAO categoriaDAO;
 
@@ -38,6 +44,15 @@ public class AvisoBL {
 
     @Inject
     private PrecioServicioDAO precioServicioDAO;
+
+    public Aviso nueAviso(){
+        Aviso aviso =  new Aviso();
+        aviso.setPlantaCve(new Planta());
+        aviso.setAvisoValSeg(BigDecimal.ZERO);
+        aviso.setCategoriaCve(new Categoria());
+        aviso.setPrecioServicioList(new ArrayList<>());
+        return aviso;
+    }
 
     public List<Categoria> obtenerCategorias() {
         List<Categoria> list = categoriaDAO.buscarTodos();
@@ -84,7 +99,7 @@ public class AvisoBL {
         avisos.add(aviso);
     }
 
-    public void agregarServicio(Aviso aviso, PrecioServicio ps) throws InventarioException {
+    public void agregarServicioAviso(Aviso aviso, PrecioServicio ps) throws InventarioException {
 
         requireNonNull(aviso, "El aviso no puede ser vacío");
         requireNonNull(aviso, "El servicio no puede ser vacío");
@@ -108,7 +123,7 @@ public class AvisoBL {
 
         if (precioServicios != null) {
             for (PrecioServicio precio : new ArrayList<>(precioServicios)) { // evitar ConcurrentModificationException
-                eliminaServicio(aviso, precio);
+                eliminaServicioAviso(aviso, precio);
             }
         }
 
@@ -116,7 +131,7 @@ public class AvisoBL {
         avisoDAO.eliminar(aviso);
     }
 
-    public void eliminaServicio(Aviso aviso, PrecioServicio ps) throws InventarioException {
+    public void eliminaServicioAviso(Aviso aviso, PrecioServicio ps) throws InventarioException {
         requireNonNull(aviso, "El aviso no puede ser vacío");
         requireNonNull(ps, "El servicio no puede ser vacío");
 
