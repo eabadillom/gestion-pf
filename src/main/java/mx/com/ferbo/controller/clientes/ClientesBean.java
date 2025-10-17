@@ -119,6 +119,8 @@ public class ClientesBean implements Serializable {
         this.lstTipoTelefono = contactoBL.obtenerTiposTelefono();
         this.lstServicio = serviciosBL.obtenerServicios();
         this.lstUnidadManejo = serviciosBL.obtenerUnidadesMenjo();
+        this.lstPlanta = avisoBL.obtenerPlantas();
+        this.lstCategoria = avisoBL.obtenerCategorias();
     }
 
     public void cargarInfoCliente(Cliente cliente) {
@@ -170,8 +172,16 @@ public class ClientesBean implements Serializable {
         this.avisoSelected = aviso;
     }
     
-    public void copiarServicioAviso(PrecioServicio servicio){
-        this.precioAvisoSelected = servicio;
+    public void nuevoPrecioAviso(){
+        this.precioAvisoSelected = new PrecioServicio();
+        this.precioAvisoSelected.setAvisoCve(avisoSelected);
+        this.precioAvisoSelected.setServicio(new Servicio());
+        this.precioAvisoSelected.setUnidad(new UnidadDeManejo());
+        this.precioAvisoSelected.setPrecio(BigDecimal.ZERO);
+    }
+    
+    public void copiarPrcioAviso(PrecioServicio precioServicio){
+        this.precioAvisoSelected = precioServicio;
     }
 
     public void operarAvisos(String operacion) {
@@ -208,8 +218,7 @@ public class ClientesBean implements Serializable {
             addMessage(FacesMessage.SEVERITY_ERROR, "Aviso",
                     "Contacte con el admistrador del sistema.");
         } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
+             PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -226,8 +235,7 @@ public class ClientesBean implements Serializable {
             addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
                     "Contacte con el admistrador del sistema.");
         } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
+             PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -243,8 +251,7 @@ public class ClientesBean implements Serializable {
             addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
                     "Contacte con el admistrador del sistema.");
         } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
+             PrimeFaces.current().ajax().update("form:messages");
         }
     }
 

@@ -3,6 +3,8 @@ package mx.com.ferbo.business.clientes;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -95,11 +97,18 @@ public class AvisoBL {
             avisos = new ArrayList<>();
             cliente.setAvisoList(avisos);
         }
+        
+        Optional<Aviso> existente = avisos.stream().filter(a -> Objects.equals(a.getAvisoCve(), aviso.getAvisoCve())).findFirst();
 
-        avisos.add(aviso);
+        if (existente.isPresent()){
+            int index = avisos.indexOf(existente.get());
+            avisos.set(index, aviso);
+        } else {
+            avisos.add(aviso);
+        }
     }
 
-    public void agregarServicioAviso(Aviso aviso, PrecioServicio ps) throws InventarioException {
+    public void agregarServicioAviso(Aviso aviso, PrecioServicio precioServicio) throws InventarioException {
 
         requireNonNull(aviso, "El aviso no puede ser vacío");
         requireNonNull(aviso, "El servicio no puede ser vacío");
@@ -110,8 +119,15 @@ public class AvisoBL {
             precioServicios = new ArrayList<>();
             aviso.setPrecioServicioList(precioServicios);
         }
-
-        precioServicios.add(ps);
+        
+        Optional<PrecioServicio> existente = precioServicios.stream().filter(ps -> Objects.equals(ps.getId(), precioServicio.getId())).findFirst();
+        
+        if (existente.isPresent()){
+            int index = precioServicios.indexOf(existente.get());
+            precioServicios.set(index, precioServicio);
+        } else {
+            precioServicios.add(precioServicio);
+        }
     }
 
     public void eliminaAviso(Cliente cliente, Aviso aviso) throws InventarioException {

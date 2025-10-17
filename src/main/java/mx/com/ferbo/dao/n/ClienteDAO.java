@@ -115,12 +115,16 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                             Categoria categoria = clienteAviso.getCategoriaCve();
                             if (categoria != null) {
                                 categoria.getCategoriaCve();
+                            } else {
+                                clienteAviso.setCategoriaCve(new Categoria());
                             }
 
                             Planta planta = clienteAviso.getPlantaCve();
 
                             if (planta != null) {
                                 planta.getPlantaCve();
+                            } else {
+                                clienteAviso.setPlantaCve(new Planta());
                             }
 
                             List<PrecioServicio> precioServicios = clienteAviso.getPrecioServicioList();
@@ -130,6 +134,8 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                                     Servicio servicio = ps.getServicio();
                                     if (servicio != null){
                                         servicio.getServicioCve();
+                                    } else {
+                                        // Terminar de asignar para esta propiedad y las que faltan
                                     }
 
                                     UnidadDeManejo unidadDeManejo = ps.getUnidad();
