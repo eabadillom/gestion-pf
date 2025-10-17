@@ -23,6 +23,7 @@ import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.model.TipoTelefono;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 
 /**
@@ -53,7 +54,7 @@ public class ContactoBL {
 
     public List<ClienteContacto> obtenerListaContactos(Cliente cliente) throws InventarioException {
 
-        requireNonNull(cliente, "El cliente no puede ser vacío.");
+        FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío.");
 
         List<ClienteContacto> lista = clienteContactoDAO.obtenerPorClienteId(cliente);
 
@@ -96,8 +97,8 @@ public class ContactoBL {
     public void agregarContacto(Cliente cliente, ClienteContacto clienteContacto)
             throws InventarioException {
 
-        requireNonNull(cliente, "El cliente no puede ser vacío.");
-        requireNonNull(clienteContacto, "El contacto del cliente no puede ser vacío.");
+        FacesUtils.requireNonNullWithReturn(cliente, "El cliente no puede ser vacío.");
+        FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede ser vacío.");
 
         List<ClienteContacto> clienteContactos = cliente.getClienteContactoList();
 
@@ -107,12 +108,12 @@ public class ContactoBL {
         }
 
         Optional<ClienteContacto> existente = clienteContactos.stream()
-                .filter(cc -> normalizar(cc.getIdContacto().getNbNombre())
-                        .equals(normalizar(clienteContacto.getIdContacto().getNbNombre()))
-                        && normalizar(cc.getIdContacto().getNbApellido1())
-                                .equals(normalizar(clienteContacto.getIdContacto().getNbApellido1()))
-                        && normalizar(cc.getIdContacto().getNbApellido2())
-                                .equals(normalizar(clienteContacto.getIdContacto().getNbApellido2())))
+                .filter(cc -> FacesUtils.normalizar(cc.getIdContacto().getNbNombre())
+                        .equals(FacesUtils.normalizar(clienteContacto.getIdContacto().getNbNombre()))
+                        && FacesUtils.normalizar(cc.getIdContacto().getNbApellido1())
+                                .equals(FacesUtils.normalizar(clienteContacto.getIdContacto().getNbApellido1()))
+                        && FacesUtils.normalizar(cc.getIdContacto().getNbApellido2())
+                                .equals(FacesUtils.normalizar(clienteContacto.getIdContacto().getNbApellido2())))
                 .findFirst();
         if (existente.isPresent()) {
             int index = clienteContactos.indexOf(existente.get());
@@ -124,8 +125,8 @@ public class ContactoBL {
 
     public void agregarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt) throws InventarioException {
 
-        requireNonNull(clienteContacto, "El contacto del cliente no puede ser vacío.");
-        requireNonNull(medioCnt, "El medio de contacto no puede ser vacío.");
+        FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede ser vacío.");
+        FacesUtils.requireNonNullWithReturn(medioCnt, "El medio de contacto no puede ser vacío.");
 
         Contacto contacto = clienteContacto.getIdContacto();
         if (contacto == null) {
@@ -143,8 +144,8 @@ public class ContactoBL {
     }
 
     public void eliminarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt) throws InventarioException {
-        requireNonNull(clienteContacto, "El contacto del cliente no puede estar vacío.");
-        requireNonNull(medioCnt, "Debe proporcionar un medio de contacto para eliminar.");
+        FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede estar vacío.");
+        FacesUtils.requireNonNullWithReturn(medioCnt, "Debe proporcionar un medio de contacto para eliminar.");
 
         clienteContacto.getIdContacto().getMedioCntList().remove(medioCnt);
 
@@ -154,8 +155,8 @@ public class ContactoBL {
     }
 
     public void eliminarContacto(Cliente cliente, ClienteContacto clienteContacto) throws InventarioException {
-        requireNonNull(cliente, "El cliente no puede estar vacío.");
-        requireNonNull(clienteContacto, "Debe proporcionar un ClienteContacto para eliminar.");
+        FacesUtils.requireNonNullWithReturn(cliente, "El cliente no puede estar vacío.");
+        FacesUtils.requireNonNullWithReturn(clienteContacto, "Debe proporcionar un ClienteContacto para eliminar.");
 
         if (clienteContacto.getId() == null) {
             cliente.getClienteContactoList().remove(clienteContacto);
@@ -186,17 +187,6 @@ public class ContactoBL {
             medioCnt.setIdTelefono(null);
             log.info("Agregando tipo de medio Mail.");
         }
-    }
-
-    private <T> T requireNonNull(T obj, String mensaje) throws InventarioException {
-        if (obj == null) {
-            throw new InventarioException(mensaje);
-        }
-        return obj;
-    }
-
-    private String normalizar(String valor) {
-        return valor == null ? "" : valor.trim().toLowerCase(); // o toUpperCase()
     }
     
 }

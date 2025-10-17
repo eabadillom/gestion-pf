@@ -8,31 +8,32 @@
         <div class="p-field p-col">
             <p:outputLabel for="soClienteTipoDom" value="Tipo de domicilio" />
             <p:selectOneMenu id="soClienteTipoDom" converter="entityConverter"
-                    disabled="#{clientesDomiciliosBean.clienteSelected eq null and clientesDomiciliosBean.clienteSelected.cteCve eq null}"
-                    value="#{clientesDomiciliosBean.tipoDomicilioSelected}" required="true" requiredMessage="Campo requerido" >
+                    disabled="#{clientesBean.clienteSelected eq null and clientesBean.clienteSelected.cteCve eq null}"
+                    value="#{clientesBean.tipoDomicilioSelected}" required="true" requiredMessage="Campo requerido" >
                     <f:selectItem itemLabel="--Selecciona--" itemValue="#{null}"/>
-                    <f:selectItems value="#{clientesDomiciliosBean.lstTiposDomicilio}" var="tipoDomicilio"
+                    <f:selectItems value="#{clientesBean.lstTiposDomicilio}" var="tipoDomicilio"
                             itemLabel="#{tipoDomicilio.domicilioTipoDesc}" itemValue="#{tipoDomicilio}" />
-                    <p:ajax listener="#{clientesDomiciliosBean.filtraListadoDomicilio()}" event="change" update="form:tabView:btnAdd form:tabView:dt-domiciliosCliente"/>
+                    <p:ajax listener="#{clientesBean.filtraListadoDomicilioFiltered()}" event="change" 
+                            update="form:tabView:btnAddClienteDireccion form:tabView:dt-domiciliosCliente"/>
             </p:selectOneMenu>
         </div>
         <div class="p-field p-col-3 p-md-6">
             <span class="filter-container ui-input-icon-left"> <p:commandButton
-                    id="btnAdd" icon="pi pi-plus" value="Agregar" process="@this"
+                    id="btnAddClienteDireccion" icon="pi pi-plus" value="Agregar" process="@this"
                     update="form:panel-addClienteDireccion"
                     styleClass="ui-button-primary" style="margin-right: .5rem"
-                    actionListener="#{clientesDomiciliosBean.limpiaClienteDomicilio()}"
+                    actionListener="#{clientesBean.limpiaClienteDomicilio()}"
                     oncomplete="PF('clienteDireccionesAddDialog').show()"
-                    disabled="#{clientesDomiciliosBean.clienteSelected eq null or clientesDomiciliosBean.tipoDomicilioSelected eq null}"
+                    disabled="#{clientesBean.clienteSelected eq null or clientesBean.tipoDomicilioSelected eq null}"
                     resetValues="panel-addClienteDireccion" />
             </span>
         </div>
         <p:dataTable id="dt-domiciliosCliente"
             widgetVar="dtDomiciliosCliente"
-            value="#{clientesDomiciliosBean.lstClienteDomiciliosFiltered}"
+            value="#{clientesBean.lstClienteDomiciliosFiltered}"
             var="pClienteDomicilios"
             rowKey="#{pClienteDomicilios.domicilios.domCve}"
-            selection="#{clientesDomiciliosBean.clienteDomicilioSelected}"
+            selection="#{clientesBean.clienteDomicilioSelected}"
             reflow="true" lazy="false" paginator="true" rows="10"
             selectionMode="single" rowSelectMode="add"
             paginatorPosition="bottom" >
@@ -77,15 +78,15 @@
                 <p:commandButton icon="pi pi-pencil" process="@this"
                     styleClass="edit-button ui-button-primary"
                     oncomplete="PF('clienteDireccionesActDialog').show()"
-                    update="form:panel-actClienteDireccion" action="#{clientesDomiciliosBean.cargaInfoCliente()}" >
+                    update="form:panel-actClienteDireccion" action="#{clientesBean.cargaInfoDomicilio()}" >
                     <f:setPropertyActionListener value="#{pClienteDomicilios}"
-                        target="#{clientesDomiciliosBean.clienteDomicilioSelected}" />
+                        target="#{clientesBean.clienteDomicilioSelected}" />
                 </p:commandButton>
                 <p:commandButton class="ui-button-danger" icon="pi pi-trash"
                     process="@this"
                     oncomplete="PF('deleteClienteDireccionesDialog').show()">
                     <f:setPropertyActionListener value="#{pClienteDomicilios}"
-                        target="#{clientesDomiciliosBean.clienteDomicilioSelected}" />
+                        target="#{clientesBean.clienteDomicilioSelected}" />
                 </p:commandButton>
             </p:column>
         </p:dataTable>

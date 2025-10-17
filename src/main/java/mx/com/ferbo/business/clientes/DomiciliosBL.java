@@ -11,6 +11,7 @@ import mx.com.ferbo.dao.n.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.n.DomiciliosDAO;
 import mx.com.ferbo.dao.n.TiposDomicilioDAO;
 
+import mx.com.ferbo.dto.ClientesDomiciliosOperacion;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Ciudades;
@@ -18,13 +19,13 @@ import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Domicilios;
-import mx.com.ferbo.dto.ClientesDomiciliosOperacion;
 import mx.com.ferbo.model.Estados;
 import mx.com.ferbo.model.EstadosPK;
 import mx.com.ferbo.model.Municipios;
 import mx.com.ferbo.model.MunicipiosPK;
 import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.model.TiposDomicilio;
+import mx.com.ferbo.util.FacesUtils;
 
 import mx.com.ferbo.util.InventarioException;
 
@@ -94,6 +95,25 @@ public class DomiciliosBL implements Serializable
         return auxListDomiciliosCliente;
     }
     
+    public ClienteDomicilios nuevoClienteDomicilio(Cliente clienteSelected, Domicilios domicilioSelected) throws InventarioException 
+    {
+        FacesUtils.requireNonNull(clienteSelected, "Debe seleccionar un cliente");
+        if( clienteSelected.getCteCve() <= 0) {
+            throw new InventarioException("Debe seleccionar un tipo de domicilio");
+        }
+        
+        FacesUtils.requireNonNull(domicilioSelected, "Debe seleccionar un domicilio");
+        if(domicilioSelected.getDomCve() <= 0) {
+            throw new InventarioException("Debe seleccionar un domicilio");
+        }
+        
+        ClienteDomicilios clienteDomicilios = new ClienteDomicilios();
+        clienteDomicilios.setCteCve(clienteSelected);
+        clienteDomicilios.setDomicilios(domicilioSelected);
+        
+        return clienteDomicilios;
+    }
+    
     public Domicilios nuevoDomicilio()
     {
         Domicilios domicilio = new Domicilios();
@@ -113,47 +133,25 @@ public class DomiciliosBL implements Serializable
         return domicilio;
     }
     
-    public Domicilios guardaDomicilio(Domicilios domicilioSelected, TiposDomicilio tipoDomicilioSelected) throws InventarioException 
+    public Domicilios agregarDomicilio(Domicilios domicilioSelected, TiposDomicilio tipoDomicilioSelected) throws InventarioException 
     {
         Domicilios auxDomicilio = domicilioSelected;
         
-        if(tipoDomicilioSelected == null || tipoDomicilioSelected.getDomicilioTipoCve() <= 0) {
+        FacesUtils.requireNonNull(tipoDomicilioSelected == null, "Debe seleccionar un tipo de domicilio");
+        if(tipoDomicilioSelected.getDomicilioTipoCve() <= 0) {
             throw new InventarioException("Debe seleccionar un tipo de domicilio");
         }
-
-        if(auxDomicilio.getAsentamiento() == null){
-            throw new InventarioException("Debe debe haber seleccionado un asentamiento.");
-        }
-
-        if(auxDomicilio.getDomicilioCalle() == null){
-            throw new InventarioException("Debe debe haber ingresado una calle.");
-        }
-
-        if(auxDomicilio.getDomicilioNumExt() == null){
-            throw new InventarioException("Debe debe haber ingresado un numero exterior.");
-        }
-
-        if(auxDomicilio.getDomicilioNumInt() == null){
-            throw new InventarioException("Debe debe haber ingresado un numero interior.");
-        }
-
-        if(auxDomicilio.getDomicilioTel1() == null){
-            throw new InventarioException("Debe debe haber ingresado un telefono 1.");
-        }
-
-        if(auxDomicilio.getDomicilioTel2() == null){
-            throw new InventarioException("Debe debe haber ingresado un telefono 2.");
-        }
-
-        if(auxDomicilio.getDomicilioFax() == null){
-            throw new InventarioException("Debe debe haber ingresado un fax.");
-        }
+        
+        FacesUtils.requireNonNull(auxDomicilio.getAsentamiento(), "Debe debe haber seleccionado un asentamiento.");
+        FacesUtils.requireNonNull(auxDomicilio.getDomicilioCalle(), "Debe debe haber ingresado una calle.");
+        FacesUtils.requireNonNull(auxDomicilio.getDomicilioNumExt(), "Debe debe haber ingresado un numero exterior.");
+        FacesUtils.requireNonNull(auxDomicilio.getDomicilioNumInt(), "Debe debe haber ingresado un numero interior.");
+        FacesUtils.requireNonNull(auxDomicilio.getDomicilioTel1(), "Debe debe haber ingresado un telefono 1.");
+        FacesUtils.requireNonNull(auxDomicilio.getDomicilioTel2(), "Debe debe haber ingresado un telefono 2.");
+        FacesUtils.requireNonNull(auxDomicilio.getDomicilioFax(), "Debe debe haber ingresado un fax.");
 
         auxDomicilio.setDomicilioTipoCve(tipoDomicilioSelected);
 
-        //domiciliosDAO.guardar(domicilioSelected);
-        log.info("Se guardo corretamente el domicilio del cliente");
-        
         return auxDomicilio;
     }
     
@@ -164,39 +162,16 @@ public class DomiciliosBL implements Serializable
         Domicilios auxDomicilios = domicilioSelected;
         auxDomicilios.setDomicilioTipoCve(tipoDomicilioSelected);
 
-        if(auxDomicilios.getAsentamiento() == null){
-            throw new InventarioException("Debe debe haber seleccionado un asentamiento.");
-        }
-
-        if(auxDomicilios.getDomicilioCalle() == null){
-            throw new InventarioException("Debe debe haber ingresado una calle.");
-        }
-
-        if(auxDomicilios.getDomicilioNumExt() == null){
-            throw new InventarioException("Debe debe haber ingresado un numero exterior.");
-        }
-
-        if(auxDomicilios.getDomicilioNumInt() == null){
-            throw new InventarioException("Debe debe haber ingresado un numero interior.");
-        }
-
-        if(auxDomicilios.getDomicilioTel1() == null){
-            throw new InventarioException("Debe debe haber ingresado un telefono 1.");
-        }
-
-        if(auxDomicilios.getDomicilioTel2() == null){
-            throw new InventarioException("Debe debe haber ingresado un telefono 2.");
-        }
-
-        if(auxDomicilios.getDomicilioFax() == null){
-            throw new InventarioException("Debe debe haber ingresado un fax.");
-        }
-
-        //domiciliosDAO.actualizar(auxDomicilios);
+        FacesUtils.requireNonNull(auxDomicilios.getAsentamiento(), "Debe debe haber seleccionado un asentamiento.");
+        FacesUtils.requireNonNull(auxDomicilios.getDomicilioCalle(), "Debe debe haber ingresado una calle.");
+        FacesUtils.requireNonNull(auxDomicilios.getDomicilioNumExt(), "Debe debe haber ingresado un numero exterior.");
+        FacesUtils.requireNonNull(auxDomicilios.getDomicilioNumInt(), "Debe debe haber ingresado un numero interior.");
+        FacesUtils.requireNonNull(auxDomicilios.getDomicilioTel1(), "Debe debe haber ingresado un telefono 1.");
+        FacesUtils.requireNonNull(auxDomicilios.getDomicilioTel2(), "Debe debe haber ingresado un telefono 2.");
+        FacesUtils.requireNonNull(auxDomicilios.getDomicilioFax(), "Debe debe haber ingresado un fax.");
+        
         auxClienteDomicilios.setCteCve(clienteSelected);
         auxClienteDomicilios.setDomicilios(auxDomicilios);
-        //clienteDomiciliosDAO.actualizar(auxClienteDomicilios);
-        log.info("Se actualizo correctamente el domicilio del cliente");
         
         return auxClienteDomicilios;
     }
@@ -204,24 +179,22 @@ public class DomiciliosBL implements Serializable
     public void persistirCambios(List<ClientesDomiciliosOperacion> listaOperaciones) throws InventarioException 
     {
         for (ClientesDomiciliosOperacion domOp : listaOperaciones) {
-            log.info("Operaciones Dom: {} y estado: {}", domOp.getClienteDomicilios().toString(), domOp.getEstado());
             ClienteDomicilios cd = domOp.getClienteDomicilios();
 
             switch (domOp.getEstado()) {
                 case NUEVO:
                     clienteDomiciliosDAO.guardar(cd); 
-                    log.info("Domicilios guardados: {}", cd.toString());
+                    log.info("Se guardo corretamente el domicilio: {}", cd.toString());
                     break;
 
                 case ACTUALIZADO:
                     clienteDomiciliosDAO.actualizar(cd); 
-                    log.info("Domicilios actualizado: {}", cd.toString());
+                    log.info("Se actualizo correctamente el domicilio: {}", cd.toString());
                     break;
 
                 case ELIMINADO_TEMP:
                     clienteDomiciliosDAO.eliminar(cd); 
-
-                    log.info("Domicilios eliminados: {}", cd.getDomicilios());
+                    log.info("Se elimino correctamente el domicilio: {}", cd.getDomicilios());
                     break;
                 default:
                     // No hacer nada

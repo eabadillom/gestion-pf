@@ -13,8 +13,8 @@
                     <div class="p-field p-col">
                         <p:outputLabel for="@next">Código Postal</p:outputLabel>
                         <p:autoComplete id="autocomplete" placeholder="Escribe el codigo postal..."
-                                        value="#{clientesDomiciliosBean.domicilioSelected.asentamiento}"
-                                        completeMethod="#{clientesDomiciliosBean.sugerenciasCodigoPostal}" 
+                                        value="#{clientesBean.domicilioSelected.asentamiento}"
+                                        completeMethod="#{clientesBean.sugerenciasCodigoPostal}" 
                                         var="sugerencia"
                                         itemLabel="#{sugerencia.cp}"
                                         itemValue="#{sugerencia}" 
@@ -22,7 +22,7 @@
                                         minQueryLength="5"
                                         maxlength="5"
                                         converter="entityConverter">
-                            <p:ajax process="@this" event="itemSelect" listener="#{clientesDomiciliosBean.asignarDomicilio}" update="form:panel-addClienteDireccion" />
+                            <p:ajax process="@this" event="itemSelect" listener="#{clientesBean.asignarDomicilio}" update="form:panel-addClienteDireccion" />
                             <p:column>
                                 <p:outputLabel value="#{sugerencia.cp}"/>
                             </p:column>
@@ -33,13 +33,13 @@
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Pais" />
-                        <p:inputText id="pais" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisDesc}" >
+                        <p:inputText id="pais" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisDesc}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Estados" />
-                        <p:inputText id="estados" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadoDesc}" >
+                        <p:inputText id="estados" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadoDesc}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
@@ -47,19 +47,19 @@
                 <div class="p-formgrid p-grid">
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Municipio" />
-                        <p:inputText id="municipio" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipioDs}" >
+                        <p:inputText id="municipio" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipioDs}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Ciudad" />
-                        <p:inputText id="ciudad" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadDs}" >
+                        <p:inputText id="ciudad" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadDs}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Colonia" />
-                        <p:inputText id="colonia" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoDs}" >
+                        <p:inputText id="colonia" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoDs}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
@@ -67,29 +67,29 @@
                 <div class="p-formgrid p-grid">
                     <div class="p-field p-col">
                         <p:outputLabel>Calle</p:outputLabel>
-                        <p:inputText value="#{clientesDomiciliosBean.domicilioSelected.domicilioCalle}" />
+                        <p:inputText value="#{clientesBean.domicilioSelected.domicilioCalle}" />
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel>Número Exterior</p:outputLabel>
-                        <p:inputText value="#{clientesDomiciliosBean.domicilioSelected.domicilioNumExt}" />
+                        <p:inputText value="#{clientesBean.domicilioSelected.domicilioNumExt}" />
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel>Número Interior</p:outputLabel>
-                        <p:inputText value="#{clientesDomiciliosBean.domicilioSelected.domicilioNumInt}" />
+                        <p:inputText value="#{clientesBean.domicilioSelected.domicilioNumInt}" />
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel>Teléfono 1</p:outputLabel>
-                        <p:inputText value="#{clientesDomiciliosBean.domicilioSelected.domicilioTel1}" placeholder="Maximo de 10 caracteres" maxlength="10"/>
+                        <p:inputText value="#{clientesBean.domicilioSelected.domicilioTel1}" placeholder="Maximo de 10 caracteres" maxlength="10"/>
                     </div>
                 </div>
                 <div class="p-formgrid p-grid">
                     <div class="p-field p-col">
                         <p:outputLabel>Teléfono 2</p:outputLabel>
-                        <p:inputText value="#{clientesDomiciliosBean.domicilioSelected.domicilioTel2}" placeholder="Maximo de 10 caracteres" maxlength="10"/>
+                        <p:inputText value="#{clientesBean.domicilioSelected.domicilioTel2}" placeholder="Maximo de 10 caracteres" maxlength="10"/>
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel>Fax</p:outputLabel>
-                        <p:inputText value="#{clientesDomiciliosBean.domicilioSelected.domicilioFax}" placeholder="Maximo de 10 caracteres" maxlength="10"/>
+                        <p:inputText value="#{clientesBean.domicilioSelected.domicilioFax}" placeholder="Maximo de 10 caracteres" maxlength="10"/>
                     </div>
                 </div>
             </p:outputPanel>
@@ -97,7 +97,7 @@
 
         <f:facet name="footer">
             <p:commandButton value="Guardar" icon="pi pi-check" 
-                             actionListener="#{clientesDomiciliosBean.guardaClienteDomicilio()}" 
+                             actionListener="#{clientesBean.agregarClienteDomicilio()}" 
                              onclick="PF('clienteDireccionesAddDialog').hide()" 
                              update="form:tabView:dt-domiciliosCliente" 
                              process="panel-addClienteDireccion @this" />
@@ -116,8 +116,8 @@
                     <div class="p-field p-col">
                         <p:outputLabel for="@next">Código Postal</p:outputLabel>
                         <p:autoComplete id="autocompleteAct" placeholder="Escribe el codigo postal..."
-                                        value="#{clientesDomiciliosBean.domicilioSelected.asentamiento}"
-                                        completeMethod="#{clientesDomiciliosBean.sugerenciasCodigoPostal}" 
+                                        value="#{clientesBean.domicilioSelected.asentamiento}"
+                                        completeMethod="#{clientesBean.sugerenciasCodigoPostal}" 
                                         var="sugerencia"
                                         itemLabel="#{sugerencia.cp}"
                                         itemValue="#{sugerencia}" 
@@ -125,7 +125,7 @@
                                         minQueryLength="5"
                                         maxlength="5"
                                         converter="entityConverter">
-                            <p:ajax process="@this" event="itemSelect" listener="#{clientesDomiciliosBean.asignarDomicilio}" update="form:panel-actClienteDireccion" />
+                            <p:ajax process="@this" event="itemSelect" listener="#{clientesBean.asignarDomicilio}" update="form:panel-actClienteDireccion" />
                             <p:column>
                                 <p:outputLabel value="#{sugerencia.cp}"/>
                             </p:column>
@@ -136,13 +136,13 @@
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Pais" />
-                        <p:inputText id="pais1" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisDesc}" >
+                        <p:inputText id="pais1" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisDesc}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Estados" />
-                        <p:inputText id="estados1" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadoDesc}" >
+                        <p:inputText id="estados1" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadoDesc}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
@@ -150,19 +150,19 @@
                 <div class="p-formgrid p-grid">
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Municipio" />
-                        <p:inputText id="municipio1" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipioDs}" >
+                        <p:inputText id="municipio1" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipioDs}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Ciudad" />
-                        <p:inputText id="ciudad1" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadDs}" >
+                        <p:inputText id="ciudad1" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoHumanoPK.ciudades.ciudadDs}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="@next" value="Colonia" />
-                        <p:inputText id="colonia1" value="#{clientesDomiciliosBean.domicilioSelected.asentamiento.asentamientoDs}" >
+                        <p:inputText id="colonia1" value="#{clientesBean.domicilioSelected.asentamiento.asentamientoDs}" >
                             <p:ajax process="@this" />
                         </p:inputText>
                     </div>
@@ -171,34 +171,34 @@
                     <div class="p-field p-col">
                         <p:outputLabel for="actCalle" value="Calle" />
                         <p:inputText id="actCalle"
-                                     value="#{clientesDomiciliosBean.domicilioSelected.domicilioCalle}" />
+                                     value="#{clientesBean.domicilioSelected.domicilioCalle}" />
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="actNumExt" value="Número Exterior" />
                         <p:inputText id="actNumExt"
-                                     value="#{clientesDomiciliosBean.domicilioSelected.domicilioNumExt}" />
+                                     value="#{clientesBean.domicilioSelected.domicilioNumExt}" />
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="actNumInt" value="Número Interior" />
                         <p:inputText id="actNumInt"
-                                     value="#{clientesDomiciliosBean.domicilioSelected.domicilioNumInt}" />
+                                     value="#{clientesBean.domicilioSelected.domicilioNumInt}" />
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="actTel1" value="Teléfono 1" />
                         <p:inputText maxlength="10" id="actTel1"
-                                     value="#{clientesDomiciliosBean.domicilioSelected.domicilioTel1}" />
+                                     value="#{clientesBean.domicilioSelected.domicilioTel1}" />
                     </div>
                 </div>
                 <div class="p-formgrid p-grid">
                     <div class="p-field p-col">
                         <p:outputLabel for="actTel2" value="Teléfono 2" />
                         <p:inputText maxlength="10" id="actTel2"
-                                     value="#{clientesDomiciliosBean.domicilioSelected.domicilioTel2}" />
+                                     value="#{clientesBean.domicilioSelected.domicilioTel2}" />
                     </div>
                     <div class="p-field p-col">
                         <p:outputLabel for="actFax" value="Fax" />
                         <p:inputText id="actFax" maxlength="10"
-                                     value="#{clientesDomiciliosBean.domicilioSelected.domicilioFax}" />
+                                     value="#{clientesBean.domicilioSelected.domicilioFax}" />
                     </div>
                 </div>
             </p:outputPanel>
@@ -206,7 +206,7 @@
 
         <f:facet name="footer">
             <p:commandButton value="Actualizar" icon="pi pi-refresh"
-                             actionListener="#{clientesDomiciliosBean.actualizaClienteDomicilio()}"
+                             actionListener="#{clientesBean.actualizaClienteDomicilio()}"
                              onclick="PF('clienteDireccionesActDialog').hide()"
                              update="form:tabView:dt-domiciliosCliente"
                              process="panel-actClienteDireccion @this" />
@@ -221,7 +221,7 @@
                      showEffect="fade" width="400" message="¿Desea eliminar esta dirección?" 
                      header="Eliminar" severity="warn">
         <p:commandButton value="Sí" icon="pi pi-check" process="@this"
-                         actionListener="#{clientesDomiciliosBean.eliminaClienteDomicilio()}"
+                         actionListener="#{clientesBean.eliminaClienteDomicilio()}"
                          update="form:tabView:dt-domiciliosCliente"
                          oncomplete="PF('deleteClienteDireccionesDialog').hide()" />
         <p:commandButton value="No" type="button"

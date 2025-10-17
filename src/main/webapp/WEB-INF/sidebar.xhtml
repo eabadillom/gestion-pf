@@ -64,7 +64,6 @@
 								<p:menuitem id="frb_facturacion_sm122" value="Emisores CFDI" icon="pi pi-building " outcome="/protected/catalogos/EmisoresCFDIS" />							
 								<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" icon="pi pi-fw pi-user" />
 								<p:menuitem id="frb_facturacion_sm113" value="Banco" icon="pi pi-fw pi-money-bill" outcome="/protected/catalogos/bancos" />
-								<p:menuitem id="frb_facturacionsm2" value="Domicilios por Cliente" icon="pi pi-fw pi-home" outcome="/protected/catalogos/domicilios" />
 								<p:menuitem id="frb_facturacion_sm15" value="Tipos de Pago" icon="pi pi-fw pi-credit-card" outcome="/protected/catalogos/tipoPago" />
 								<p:menuitem value="Formas de Pago (SAT)" icon="pi pi-fw pi-credit-card" outcome="/protected/catalogos/tiposPago" />
 								<p:submenu label="Series" icon="pi pi-ellipsis-h">
@@ -124,7 +123,7 @@
 						<p:menuitem value="Usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
-						<p:menuitem value="Ajustes" outcome="/protected/settings/ajustes" icon="pi pi-cog"/>
+						<p:menuitem value="Ajustes" outcome="/protected/settings/ajustes" icon="pi pi-cog" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
                                                 <p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
 					</po:menu>
 				</div>
