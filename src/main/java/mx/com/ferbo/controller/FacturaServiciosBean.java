@@ -315,7 +315,6 @@ public class FacturaServiciosBean implements Serializable {
 			
 			if (listaClienteDomicilio.size() > 0) {
 				domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
-                                log.info("Info domicilio: {}", domicilioSelect.toString());
 			}
 			
 			precioServicioList = psDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
@@ -636,8 +635,7 @@ public class FacturaServiciosBean implements Serializable {
 					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve(),
 					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve(),
 					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getAsentamientoCve());
-			log.info("Info asentamiento: {} ", asentamiento.toString());
-                        factura.setColonia(asentamiento.getAsentamientoDs());
+			factura.setColonia(asentamiento.getAsentamientoDs());
 			factura.setCp(domicilioSelect.getAsentamiento().getCp());
 			factura.setCalle(domicilioSelect.getDomicilioCalle());
 			factura.setNumExt(domicilioSelect.getDomicilioNumExt());

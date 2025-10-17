@@ -281,9 +281,13 @@ public class AsentamientoHumanoDAO extends BaseDAO<AsentamientoHumano, Integer>
             
             em = getEntityManager();
             em.getTransaction().begin();
-            em.createQuery("DELETE FROM AsentamientoHumano ah WHERE ah.asentamientoHumanoPK.asentamientoCve = :asentamientoCve AND ah.cp = :cp")
+            em.createQuery("DELETE FROM AsentamientoHumano ah WHERE ah.asentamientoHumanoPK.asentamientoCve = :asentamientoCve AND ah.cp = :cp AND ah.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve AND ah.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.municipioCve = :municipioCve AND ah.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.estadoCve = :estadoCve AND ah.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisCve = :paisCve")
                 .setParameter("asentamientoCve", asentamientoHumano.getAsentamientoHumanoPK().getAsentamientoCve())
                 .setParameter("cp", asentamientoHumano.getCp())
+                .setParameter("ciudadCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
+                .setParameter("municipioCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
+                .setParameter("estadoCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+                .setParameter("paisCve", asentamientoHumano.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
                 .executeUpdate();
             em.getTransaction().commit();
             

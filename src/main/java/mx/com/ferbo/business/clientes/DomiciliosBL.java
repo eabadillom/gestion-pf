@@ -103,10 +103,7 @@ public class DomiciliosBL implements Serializable
         }
         
         FacesUtils.requireNonNull(domicilioSelected, "Debe seleccionar un domicilio");
-        if(domicilioSelected.getDomCve() <= 0) {
-            throw new InventarioException("Debe seleccionar un domicilio");
-        }
-        
+                
         ClienteDomicilios clienteDomicilios = new ClienteDomicilios();
         clienteDomicilios.setCteCve(clienteSelected);
         clienteDomicilios.setDomicilios(domicilioSelected);
@@ -184,17 +181,13 @@ public class DomiciliosBL implements Serializable
             switch (domOp.getEstado()) {
                 case NUEVO:
                     clienteDomiciliosDAO.guardar(cd); 
-                    log.info("Se guardo corretamente el domicilio: {}", cd.toString());
                     break;
-
                 case ACTUALIZADO:
                     clienteDomiciliosDAO.actualizar(cd); 
-                    log.info("Se actualizo correctamente el domicilio: {}", cd.toString());
                     break;
-
                 case ELIMINADO_TEMP:
-                    clienteDomiciliosDAO.eliminar(cd); 
-                    log.info("Se elimino correctamente el domicilio: {}", cd.getDomicilios());
+                    clienteDomiciliosDAO.eliminar(cd);
+                    domiciliosDAO.eliminar(cd.getDomicilios());
                     break;
                 default:
                     // No hacer nada

@@ -20,7 +20,7 @@ import org.jfree.util.Log;
 @ApplicationScoped
 public class DomiciliosDAO extends BaseDAO<Domicilios, Integer> 
 {
-    Logger log = LogManager.getLogger(Domicilios.class);
+    Logger log = LogManager.getLogger(DomiciliosDAO.class);
 
     public DomiciliosDAO(Class<Domicilios> modelClass) {
         super(modelClass);
@@ -98,12 +98,33 @@ public class DomiciliosDAO extends BaseDAO<Domicilios, Integer>
                     .setParameter("domicilioTipoCve", dom.getDomicilioTipoCve().getDomicilioTipoCve())
                     .setParameter("domCve", dom.getDomCve()).executeUpdate();
             em.getTransaction().commit();
-            em.close();
         } catch (Exception e) {
+            this.rollback(em);
             log.info("Problema para actualizar el objeto: ", e);
             throw new InventarioException("Error al actualizar en la base de datos.");
         } finally{
-            close(em);
+            EntityManagerUtil.close(em);
+        }
+    }
+    
+    @Override
+    public synchronized void eliminar(Domicilios dom) throws InventarioException{
+        EntityManager em = null;
+        try {
+            log.info("Eliminando objeto: {}", dom.toString());
+            em = EntityManagerUtil.getEntityManager();
+            em.getTransaction().begin();
+            em.createQuery("DELETE FROM Domicilios d WHERE d.domCve = :domCve")
+                .setParameter("domCve", dom.getDomCve())
+                .executeUpdate();
+            em.getTransaction().commit();
+            log.info("Objeto eliminado correctamente: {}", dom.toString());
+        } catch (Exception e) {
+            this.rollback(em);
+            log.info("Problema para actualizar el objeto: ", e);
+            throw new InventarioException("Error al actualizar en la base de datos.");
+        } finally{
+            EntityManagerUtil.close(em);
         }
     }
     

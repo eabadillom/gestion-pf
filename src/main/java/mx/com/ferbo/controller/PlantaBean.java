@@ -152,7 +152,6 @@ public class PlantaBean implements Serializable {
             return;
         }
         
-        log.info("Asentamiento encontrado: {}", auxAsentamiento.toString());
         this.asentamientoHumanoSelect = auxAsentamiento;
     }
     

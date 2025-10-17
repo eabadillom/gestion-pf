@@ -327,7 +327,7 @@ public class ClientesBean implements Serializable {
         }
     }
     
-    //Métodos para domicilios de los clientes
+    //Método para domicilios del cliente
     public void cargaInfoDomicilio(){
         if (clienteDomicilioSelected != null && clienteDomicilioSelected.getDomicilios() != null) {
             domicilioSelected = clienteDomicilioSelected.getDomicilios();
@@ -393,6 +393,7 @@ public class ClientesBean implements Serializable {
             }
             
             domicilioSelected = domicilios.agregarDomicilio(domicilioSelected, tipoDomicilioSelected);
+            log.info("Domicilio agregado: {}", domicilioSelected.toString());
             clienteDomicilioSelected = domicilios.nuevoClienteDomicilio(clienteSelected, domicilioSelected);
             
             lstClienteDomicilios.add(clienteDomicilioSelected);
@@ -414,10 +415,6 @@ public class ClientesBean implements Serializable {
     }
     
     public void actualizaClienteDomicilio(){
-        FacesMessage message = null;
-        FacesMessage.Severity severity = null;
-        String mensaje = null;
-        String titulo = "Domicilios";
         try{
             log.info("Iniciando la actualizacion de un domicilio");
             
@@ -444,19 +441,14 @@ public class ClientesBean implements Serializable {
                 .map(aux -> aux.getDomicilios().getDomCve().equals(clienteDomicilioSelected.getDomicilios().getDomCve()) ? clienteDomicilioSelected : aux)
                 .collect(Collectors.toList());
             
-            mensaje = "Se actualizo correctamente";
-            severity = FacesMessage.SEVERITY_INFO;
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Domicilios", "Se actualizo correctamente");
         } catch (InventarioException ex) {
             log.error("Problema para actualizar la información de domicilios...", ex);
-            mensaje = ex.getMessage();
-            severity = FacesMessage.SEVERITY_WARN;
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Domicilios", ex.getMessage());
         } catch (Exception ex) {
             log.error("Problema para actualizar la información de domicilios...", ex);
-            mensaje = "Hay un problema para actualizar la información de domicilios.";
-            severity = FacesMessage.SEVERITY_ERROR;
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Domicilios", "Hay un problema para actualizar la información de domicilios.");
         } finally {
-            message = new FacesMessage(severity != null ? FacesMessage.SEVERITY_INFO : FacesMessage.SEVERITY_ERROR, titulo, mensaje);
-            FacesContext.getCurrentInstance().addMessage(null, message);
             this.filtraListadoDomicilioFiltered();
             PrimeFaces.current().ajax().update("form:messages", "form:tabView:dt-domiciliosCliente");
         }
@@ -474,7 +466,6 @@ public class ClientesBean implements Serializable {
                 .filter(domOp -> domOp.getClienteDomicilios().getId().equals(clienteDomicilioSelected.getId()))
                 .findFirst()
                 .ifPresent(wrapper -> {
-                    log.info("Domicilio encontrado: {}", wrapper.toString());
                     if (wrapper.getEstado() == ClientesDomiciliosOperacion.EstadoOperacion.NUEVO) {
                         log.info("Domicilio nuevo marcado para ser removido.");
                     } else {
@@ -503,18 +494,18 @@ public class ClientesBean implements Serializable {
         }
     }
     
-    public void guardarClienteDomicilios(){
+    public void guardarCliente(){
         try{
-            log.info("Iniciando con los cambios en los domicilios");
+            log.info("Iniciando con los cambios del cliente {}", this.clienteSelected.toString());
             
             domicilios.persistirCambios(lstDomiciliosOperacion);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Domicilios", "Actualizando domicilios del cliente");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Cliente", "Actualizando datos del cliente");
         } catch (InventarioException ex) {
-            log.error("Problema para actualizar la información de domicilios del cliente...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Domicilios", ex.getMessage());
+            log.error("Problema para actualizar la información del cliente...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cliente", ex.getMessage());
         } catch (Exception ex) {
-            log.error("Problema para actualizar la información de domicilios del cliente...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Domicilios", "Hay un problema para actualizar la información de domicilios.");
+            log.error("Problema para actualizar la información del cliente...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Cliente", "Hay un problema para actualizar la información del cliente.");
         } finally {
             lstDomiciliosOperacion = new ArrayList<>();
             this.actualizarListasDomicilios();

@@ -6,7 +6,10 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
@@ -18,6 +21,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Null;
@@ -171,22 +175,21 @@ public class Domicilios implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (domCve != null ? domCve.hashCode() : 0);
-        return hash;
+        if(this.domCve == null)
+            return System.identityHashCode(this);
+        return Objects.hash(domCve);
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Domicilios)) {
+        if (this == object)
+            return true;
+        if (object == null)
             return false;
-        }
+        if (getClass() != object.getClass())
+            return false;
         Domicilios other = (Domicilios) object;
-        if ((this.domCve == null && other.domCve != null) || (this.domCve != null && !this.domCve.equals(other.domCve))) {
-            return false;
-        }
-        return true;
+        return Objects.equals(domCve, other.domCve);
     }
 
     @Override
