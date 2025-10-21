@@ -9,11 +9,11 @@
             <p:outputLabel for="soClienteTipoDom" value="Tipo de domicilio" />
             <p:selectOneMenu id="soClienteTipoDom" converter="entityConverter"
                     disabled="#{clientesBean.clienteSelected eq null and clientesBean.clienteSelected.cteCve eq null}"
-                    value="#{clientesBean.tipoDomicilioSelected}" required="true" requiredMessage="Campo requerido" >
+                    value="#{clientesBean.tipoDomicilioSelected}" requiredMessage="Campo requerido" >
                     <f:selectItem itemLabel="--Selecciona--" itemValue="#{null}"/>
                     <f:selectItems value="#{clientesBean.lstTiposDomicilio}" var="tipoDomicilio"
                             itemLabel="#{tipoDomicilio.domicilioTipoDesc}" itemValue="#{tipoDomicilio}" />
-                    <p:ajax listener="#{clientesBean.filtraListadoDomicilioFiltered()}" event="change" 
+                    <p:ajax listener="#{clientesBean.filtraListadoDomicilioFiltered()}" event="valueChange" 
                             update="form:tabView:btnAddClienteDireccion form:tabView:dt-domiciliosCliente"/>
             </p:selectOneMenu>
         </div>

@@ -15,8 +15,8 @@
 		    <p:toolbar styleClass="p-mb-4">
 				<p:toolbarGroup>
 					<p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-raised" style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}"
-                                                         process="@this" update="form:tabView:pnlCliente" oncomplete="PF('dialogCliente').show();" >
-                                            <p:resetInput target="form:tabView:pnlCliente"/>
+                                                         process="@this" update="form:tabView:pnlCliente form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente" oncomplete="PF('dialogCliente').show();" >
+                                            <p:resetInput target="form:tabView:pnlCliente form:tabView:dt-domiciliosCliente"/>
                                         </p:commandButton>
 				</p:toolbarGroup>
 			</p:toolbar>

@@ -172,6 +172,11 @@ public class ClientesBean implements Serializable {
     }
 
     public void nuevoCliente() {
+        tipoDomicilioSelected = new TiposDomicilio();
+        lstTiposDomicilio = domicilios.buscarTiposDomicilios();
+        lstClienteDomicilios.clear();
+        lstClienteDomiciliosFiltered.clear();
+        lstDomiciliosOperacion.clear();
     }
 
     public void validarCodigoUnico(Cliente cliente) {
@@ -353,7 +358,13 @@ public class ClientesBean implements Serializable {
         if (tipoDomicilioSelected != null) {
             lstClienteDomiciliosFiltered = domicilios.filtrarListadoDomicilio(lstClienteDomicilios, tipoDomicilioSelected, clienteSelected);
         } else {
-            lstClienteDomiciliosFiltered = new ArrayList<>(lstClienteDomicilios);
+            tipoDomicilioSelected = null;
+            
+            if (lstClienteDomiciliosFiltered != null) {
+                lstClienteDomiciliosFiltered.clear();
+            } else {
+                lstClienteDomiciliosFiltered = new ArrayList<>();
+            }
         }
         
         PrimeFaces.current().ajax().update("form:dt-domiciliosCliente");
