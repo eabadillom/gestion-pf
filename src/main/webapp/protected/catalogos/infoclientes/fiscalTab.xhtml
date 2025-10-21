@@ -10,7 +10,7 @@
                     styleClass="grid-radio" required="true" requiredMessage="Debe indicar el tipo de persona">
                     <f:selectItem itemLabel="Persona Moral" itemValue="M" />
                     <f:selectItem itemLabel="Persona Fisica" itemValue="F" />
-                    <p:ajax listener="#{clientesBean.regimenSelect}" process="@this txtRFC" update="pnlCliente" />
+                    <p:ajax listener="#{clientesBean.filtrarRegimenesFiscales()}" process="@this txtRFC" update="form:tabView:pnlCliente form:tabView:regimenFiscal form:tabView:usoCFDI" />
                 </p:selectOneRadio>
             </div>
             <div class="p-field p-col-12 p-md-2">
@@ -48,7 +48,7 @@
                     required="true" requiredMessage="Debe indicar el régimen fiscal" widgetVar="selectRegimenFiscal"
                     converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
                     <f:selectItem itemLabel="---Regimen Fiscal---" noSelectionOption="true" />
-                    <f:selectItems value="#{clientesBean.lstRegimenFiscal}" var="regimen"
+                    <f:selectItems value="#{clientesBean.lstRegimenFiscalFiltered}" var="regimen"
                         itemLabel="#{regimen.cd_regimen} - #{regimen.nb_regimen}" itemValue="#{regimen}" />
                 </p:selectOneMenu>
             </div>
@@ -58,7 +58,7 @@
                     converter="entityConverter" required="true" requiredMessage="Debe indicar el uso del CFDI"
                     filter="true" filterMatchMode="contains" autoWidth="false">
                     <f:selectItem itemLabel="---Uso del CFDI---" noSelectionOption="true" />
-                    <f:selectItems value="#{clientesBean.lstUsoCfdi}" var="usoCFDI"
+                    <f:selectItems value="#{clientesBean.lstUsoCfdiFiltered}" var="usoCFDI"
                         itemLabel="#{usoCFDI.cdUsoCfdi} - #{usoCFDI.usoCfdi}" itemValue="#{usoCFDI}" />
                 </p:selectOneMenu>
             </div>

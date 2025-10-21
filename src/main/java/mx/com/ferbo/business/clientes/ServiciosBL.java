@@ -53,11 +53,11 @@ public class ServiciosBL {
         } 
     }
 
-    public List<UnidadDeManejo> obtenerUnidadesMenjo()  {
+    public List<UnidadDeManejo> obtenerUnidadesMenjo() {
 
         List<UnidadDeManejo> lista = unidadManejoDAO.buscarTodos();
-
-        if (lista == null){
+        
+        if (lista == null) {
             return new ArrayList<>();
         }
 
@@ -67,10 +67,10 @@ public class ServiciosBL {
     public List<Servicio> obtenerServicios() {
         List<Servicio> lista = servicioDAO.buscarTodos();
 
-        if(lista == null){
+         if (lista == null) {
             return new ArrayList<>();
         }
-    
+
         return lista;
     }
 

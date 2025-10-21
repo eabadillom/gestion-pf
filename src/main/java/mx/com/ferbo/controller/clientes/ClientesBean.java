@@ -16,21 +16,25 @@ import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.business.clientes.FiscalBL;
+import mx.com.ferbo.business.clientes.AvisoBL;
 import mx.com.ferbo.dao.n.ClienteDAO;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.util.InventarioException;
+
+import mx.com.ferbo.business.clientes.FiscalBL;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
-import mx.com.ferbo.util.InventarioException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.clientes.ServiciosBL;
-import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 
@@ -69,14 +73,15 @@ public class ClientesBean implements Serializable {
     @Inject
     private ClienteDAO clienteDAO;
 
-    // Objetos para Fiscal
+    // Objetos para Avisos
     @Inject
-    private FiscalBL fiscalBL;
+    private AvisoBL avisoBL;
 
-    private List<UsoCfdi> lstUsoCfdi;
-    private List<RegimenFiscal> lstRegimenFiscal;
-    private List<MetodoPago> lstMetodoPago;
-    private List<MedioPago> lstMedioPago;
+    private Aviso avisoSelected;
+    private PrecioServicio precioAvisoSelected;
+    private String tituloDialogAviso;
+    private List<Planta> lstPlanta;
+    private List<Categoria> lstCategoria;
 
     // Objetos para contactos
     @Inject
@@ -88,6 +93,17 @@ public class ClientesBean implements Serializable {
     private Boolean editandoContacto;
     private List<TipoMail> lstTipoMail;
     private List<TipoTelefono> lstTipoTelefono;
+
+    // Objetos para Fiscal
+    @Inject
+    private FiscalBL fiscalBL;
+
+    private List<UsoCfdi> lstUsoCfdi;
+    private List<UsoCfdi> lstUsoCfdiFiltered;
+    private List<RegimenFiscal> lstRegimenFiscal;
+    private List<RegimenFiscal> lstRegimenFiscalFiltered;
+    private List<MetodoPago> lstMetodoPago;
+    private List<MedioPago> lstMedioPago;
 
     // Objetos para Servicios
     @Inject
@@ -115,7 +131,6 @@ public class ClientesBean implements Serializable {
     private TiposDomicilio tipoDomicilioSelected;
     private Domicilios domicilioSelected;
 
-    // Constructuctor
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
         this.clienteSelected = new Cliente();
@@ -123,6 +138,8 @@ public class ClientesBean implements Serializable {
         this.lstClienteDomiciliosFiltered = new ArrayList<>();
         this.lstDomiciliosOperacion = new ArrayList<>();
         this.lstTiposDomicilio = new ArrayList<>();
+        this.lstRegimenFiscalFiltered = new ArrayList<>();
+        this.lstUsoCfdiFiltered = new ArrayList<>();
     }
 
     @PostConstruct
@@ -134,6 +151,10 @@ public class ClientesBean implements Serializable {
         this.lstTipoTelefono = contactoBL.obtenerTiposTelefono();
         this.lstServicio = serviciosBL.obtenerServicios();
         this.lstUnidadManejo = serviciosBL.obtenerUnidadesMenjo();
+        this.lstPlanta = avisoBL.obtenerPlantas();
+        this.lstCategoria = avisoBL.obtenerCategorias();
+        this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
+        this.lstUsoCfdi = fiscalBL.obtenerCfdis();
     }
 
     public void cargarInfoCliente(Cliente cliente) {
@@ -148,8 +169,8 @@ public class ClientesBean implements Serializable {
             }
             this.clienteSelected = clienteDAO.obtenerPorId(cliente.getCteCve(), true);
             fiscalBL.validarInfoFiscal(this.clienteSelected);
-            lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales(this.clienteSelected);
-            lstUsoCfdi = fiscalBL.obtenerUsoCfdis(this.clienteSelected);
+            lstRegimenFiscalFiltered = fiscalBL.filtrarRegimenesFiscales(this.lstRegimenFiscal, this.clienteSelected);
+            lstUsoCfdiFiltered = fiscalBL.filtrarCfdis(this.lstUsoCfdi, this.clienteSelected);
             
             this.actualizarListasDomicilios();
             
@@ -174,9 +195,74 @@ public class ClientesBean implements Serializable {
     public void nuevoCliente() {
         tipoDomicilioSelected = new TiposDomicilio();
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
+        lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
         lstDomiciliosOperacion.clear();
+    }
+
+    // Funciones para Avisos
+    public void nuevoAviso() {
+        this.tituloDialogAviso = null;
+        this.tituloDialogAviso = "Nuevo Aviso";
+        this.avisoSelected = avisoBL.nueAviso();
+        this.avisoSelected.setCteCve(clienteSelected);
+    }
+
+    public void copiarAviso(Aviso aviso) {
+        this.tituloDialogAviso = null;
+        this.tituloDialogAviso = "Editar Aviso";
+        this.avisoSelected = aviso;
+    }
+    
+    public void nuevoPrecioAviso(){
+        this.precioAvisoSelected = new PrecioServicio();
+        this.precioAvisoSelected.setAvisoCve(avisoSelected);
+        this.precioAvisoSelected.setServicio(new Servicio());
+        this.precioAvisoSelected.setUnidad(new UnidadDeManejo());
+        this.precioAvisoSelected.setPrecio(BigDecimal.ZERO);
+    }
+    
+    public void copiarPrcioAviso(PrecioServicio precioServicio){
+        this.precioAvisoSelected = precioServicio;
+    }
+
+    public void operarAvisos(String operacion) {
+        String mensaje = null;
+        try {
+            switch (operacion) {
+                case "agregaraviso":
+                    avisoBL.agregarAviso(clienteSelected, avisoSelected);
+                    mensaje = "Aviso agregado exitosamente";
+                    break;
+
+                case "agregarservicio":
+                    avisoBL.agregarServicioAviso(avisoSelected, precioAvisoSelected);
+                    mensaje = "Servico agregado a aviso exitosamente";
+                    break;
+
+                case "eliminaraviso":
+                    avisoBL.eliminaAviso(clienteSelected, avisoSelected);
+                    mensaje = "Aviso eliminado exitosamente";
+                    break;
+
+                case "eliminarservicio":
+                    avisoBL.eliminaServicioAviso(avisoSelected, precioAvisoSelected);
+                    mensaje = "Servicio eliminado de aviso exitosamente";
+                    break;
+
+                default:
+                    throw new InventarioException("Operación sobre avisos no válida");
+            }
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Aviso", mensaje);
+        } catch (InventarioException ex) {
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Aviso", ex.getMessage());
+        } catch (Exception ex) {
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Aviso",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+             PrimeFaces.current().ajax().update("form:messages");
+        }
     }
 
     public void validarCodigoUnico(Cliente cliente) {
@@ -192,8 +278,7 @@ public class ClientesBean implements Serializable {
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
                     "Contacte con el admistrador del sistema.");
         } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
+             PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -209,8 +294,26 @@ public class ClientesBean implements Serializable {
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
                     "Contacte con el admistrador del sistema.");
         } finally {
-            PrimeFaces.current().ajax().update("form:messages",
-                    "form");
+             PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public void filtrarRegimenesFiscales(){
+        try {
+            this.lstRegimenFiscalFiltered.clear();
+            this.lstUsoCfdiFiltered.clear();
+            
+            this.lstRegimenFiscalFiltered = fiscalBL.filtrarRegimenesFiscales(this.lstRegimenFiscal, this.clienteSelected);
+            this.lstUsoCfdiFiltered = fiscalBL.filtrarCfdis(this.lstUsoCfdi, this.clienteSelected);
+        } catch (InventarioException ex) {
+            log.warn(ex.getMessage(), ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Fiscal", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Error inesperado. Causado por: ", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+             PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -228,7 +331,7 @@ public class ClientesBean implements Serializable {
         this.precioServicioSelected = precioServicio;
     }
 
-    public void OperarServicios(String operacion) {
+    public void operarServicios(String operacion) {
         String mensaje = null;
         try {
             switch (operacion) {
@@ -577,6 +680,47 @@ public class ClientesBean implements Serializable {
         this.lstClientes = lstClientes;
     }
 
+    // Getters y Setters para Avisos
+    public Aviso getAvisoSelected() {
+        return avisoSelected;
+    }
+
+    public void setAvisoSelected(Aviso avisoSelected) {
+        this.avisoSelected = avisoSelected;
+    }
+
+    public PrecioServicio getPrecioAvisoSelected() {
+        return precioAvisoSelected;
+    }
+
+    public void setPrecioAvisoSelected(PrecioServicio precioAvisoSelected) {
+        this.precioAvisoSelected = precioAvisoSelected;
+    }
+
+    public String getTituloDialogAviso() {
+        return tituloDialogAviso;
+    }
+
+    public void setTituloDialogAviso(String tituloDialogAviso) {
+        this.tituloDialogAviso = tituloDialogAviso;
+    }
+
+    public List<Planta> getLstPlanta() {
+        return lstPlanta;
+    }
+
+    public void setLstPlanta(List<Planta> lstPlanta) {
+        this.lstPlanta = lstPlanta;
+    }
+
+    public List<Categoria> getLstCategoria() {
+        return lstCategoria;
+    }
+
+    public void setLstCategoria(List<Categoria> lstCategoria) {
+        this.lstCategoria = lstCategoria;
+    }
+
     // Getter y Setter para Fiscal
     public List<UsoCfdi> getLstUsoCfdi() {
         return lstUsoCfdi;
@@ -586,12 +730,28 @@ public class ClientesBean implements Serializable {
         this.lstUsoCfdi = lstUsoCfdi;
     }
 
+    public List<UsoCfdi> getLstUsoCfdiFiltered() {
+        return lstUsoCfdiFiltered;
+    }
+
+    public void setLstUsoCfdiFiltered(List<UsoCfdi> lstUsoCfdiFiltered) {
+        this.lstUsoCfdiFiltered = lstUsoCfdiFiltered;
+    }
+
     public List<RegimenFiscal> getLstRegimenFiscal() {
         return lstRegimenFiscal;
     }
 
     public void setLstRegimenFiscal(List<RegimenFiscal> lstRegimenFiscal) {
         this.lstRegimenFiscal = lstRegimenFiscal;
+    }
+
+    public List<RegimenFiscal> getLstRegimenFiscalFiltered() {
+        return lstRegimenFiscalFiltered;
+    }
+
+    public void setLstRegimenFiscalFiltered(List<RegimenFiscal> lstRegimenFiscalFiltered) {
+        this.lstRegimenFiscalFiltered = lstRegimenFiscalFiltered;
     }
 
     public List<MetodoPago> getLstMetodoPago() {

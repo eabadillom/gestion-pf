@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.util.EntityManagerUtil;
 
 @Named
 @ApplicationScoped
@@ -24,8 +25,8 @@ public class UnidadManejoDAO extends BaseDAO<UnidadDeManejo, Integer>{
 		try {
 			em = super.getEntityManager();
 			lista = em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class).getResultList();
-		}  finally {
-			super.close(em);
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		
 		return lista;

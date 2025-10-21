@@ -19,6 +19,25 @@ public class UsoCfdiDAO extends BaseDAO<UsoCfdi, Integer>{
     public UsoCfdiDAO(){
         super(UsoCfdi.class);
     }
+    
+    public List<UsoCfdi> buscarTodos(){
+        List<UsoCfdi> listCFDIS = null;
+        EntityManager em = null;
+        
+        try{
+            em = super.getEntityManager();
+            
+            String namedQuery = "UsoCfdi.findAll";
+            listCFDIS = em.createNamedQuery(namedQuery, UsoCfdi.class)
+                .getResultList();
+        } catch (Exception ex) {
+            log.error("Problema para obtener el listado de Usos del CFDI", ex);
+        } finally {
+            super.close(em);
+        }
+        
+        return listCFDIS;
+    }
 
     public List<UsoCfdi> buscarUsoCfdiPorTipoPersona(String tipoPersona) throws InventarioException {
     List<UsoCfdi> list = new ArrayList<>();

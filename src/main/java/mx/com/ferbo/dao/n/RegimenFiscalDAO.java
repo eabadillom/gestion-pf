@@ -23,6 +23,25 @@ public class RegimenFiscalDAO extends BaseDAO<RegimenFiscal, Integer> {
     public RegimenFiscalDAO() {
         super(RegimenFiscal.class);
     }
+    
+    public List<RegimenFiscal> buscarTodos(){
+        List<RegimenFiscal> listRegimen = null;
+        EntityManager em = null;
+        
+        try {
+            em = super.getEntityManager();
+            
+            String namedQuery = "RegimenFiscal.findAll";
+            listRegimen = em.createNamedQuery(namedQuery, RegimenFiscal.class)
+                .getResultList();
+        } catch (Exception ex) {
+            log.error("Problema al traer la lista de regimen fiscal: ", ex);
+        } finally {
+            super.close(em);
+        }
+        
+        return listRegimen;
+    }
 
     public List<RegimenFiscal> buscarPorTipoPersona(String tipoPersona) throws InventarioException {
         EntityManager em = null;

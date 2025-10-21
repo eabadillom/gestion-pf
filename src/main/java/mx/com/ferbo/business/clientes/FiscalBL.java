@@ -3,6 +3,7 @@ package mx.com.ferbo.business.clientes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -40,6 +41,28 @@ public class FiscalBL {
 
 	@Inject
 	private UsoCfdiDAO usoCfdiDAO;
+        
+        public List<UsoCfdi> obtenerCfdis() {
+            return usoCfdiDAO.buscarTodos();
+        }
+        
+        public List<UsoCfdi> filtrarCfdis(List<UsoCfdi> listCfdi, Cliente cliente) throws InventarioException {
+            requireNonNull(cliente, "El cliente no puede estar vacio");
+            
+            List<UsoCfdi> listAux = new ArrayList<>();
+            
+            if(cliente.getTipoPersona().equals("F")) {
+                listAux = listCfdi.stream()
+                    .filter(uso -> Boolean.TRUE.equals(uso.getAplicaPersonaFisica()))
+                    .collect(Collectors.toList());
+            } else if (cliente.getTipoPersona().equals("M")) {
+                listAux = listCfdi.stream()
+                    .filter(uso -> Boolean.TRUE.equals(uso.getAplicaPersonaMoral()))
+                    .collect(Collectors.toList());
+            }
+            
+            return listAux;
+        }
 
 	public List<UsoCfdi> obtenerUsoCfdis(Cliente cliente) throws InventarioException {
 
@@ -50,6 +73,28 @@ public class FiscalBL {
 		return usoCfdiDAO.buscarUsoCfdiPorTipoPersona(cliente.getTipoPersona());
 
 	}
+        
+        public List<RegimenFiscal> obtenerRegimenesFiscales() {
+            return regimenFiscalDAO.buscarTodos();
+        }
+        
+        public List<RegimenFiscal> filtrarRegimenesFiscales(List<RegimenFiscal> listRegimenes, Cliente cliente) throws InventarioException{
+            requireNonNull(cliente, "El cliente no puede estar vacio");
+            
+            List<RegimenFiscal> listAux = new ArrayList<>();
+            
+            if(cliente.getTipoPersona().equals("F")) {
+                listAux = listRegimenes.stream()
+                    .filter(RegimenFiscal::isPersonaFisica)
+                    .collect(Collectors.toList());
+            } else if (cliente.getTipoPersona().equals("M")) {
+                listAux = listRegimenes.stream()
+                    .filter(RegimenFiscal::isPersonaMoral)
+                    .collect(Collectors.toList());
+            }
+            
+            return listAux;
+        }
 
 	public List<RegimenFiscal> obtenerRegimenesFiscales(Cliente cliente) throws InventarioException {
 		requireNonNull(cliente, "El cliente no puede estar vacío");

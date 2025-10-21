@@ -84,7 +84,7 @@
         </p:outputPanel>
 
         <f:facet name="footer">
-            <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.OperarServicios('agregarprecioservicio')}"
+            <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.operarServicios('agregarprecioservicio')}"
                              update="form:tabView:dt-servicios" process="panel-servicio @this" oncomplete="PF('servicioClienteDialog').hide()" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('servicioClienteDialog').hide()" class="ui-button-secondary"
                              update="form:tabView:dt-servicios" resetValues="true" />
@@ -111,7 +111,7 @@
             <p:commandButton value="Sí"
                              icon="pi pi-check"
                              styleClass="ui-button-danger"
-                             actionListener="#{clientesBean.OperarServicios('eliminarprecioservicio')}"
+                             actionListener="#{clientesBean.operarServicios('eliminarprecioservicio')}"
                              update="form:tabView:dt-servicios"
                              oncomplete="PF('deleteServicioDialog').hide()" />
 
