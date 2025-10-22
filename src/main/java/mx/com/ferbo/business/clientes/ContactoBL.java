@@ -138,7 +138,36 @@ public class ContactoBL {
             contacto.setMedioCntList(medioCnts);
         }
 
-        medioCnts.add(medioCnt);
+        Optional<MedioCnt> existente = medioCnts.stream()
+                .filter(m -> {
+                    boolean telefonoCoincide = false;
+                    boolean mailCoincide = false;
+
+                    if (m.getIdTelefono() != null && medioCnt.getIdTelefono() != null) {
+                        telefonoCoincide = (m.getIdTelefono().getIdTelefono() != null
+                                && m.getIdTelefono().getIdTelefono().equals(medioCnt.getIdTelefono().getIdTelefono()))
+                                ||
+                                (m.getIdTelefono().getNbTelefono() != null && m.getIdTelefono().getNbTelefono()
+                                        .equals(medioCnt.getIdTelefono().getNbTelefono()));
+                    }
+
+                    if (m.getIdMail() != null && medioCnt.getIdMail() != null) {
+                        mailCoincide = (m.getIdMail().getIdMail() != null
+                                && m.getIdMail().getIdMail().equals(medioCnt.getIdMail().getIdMail())) ||
+                                (m.getIdMail().getNbMail() != null
+                                        && m.getIdMail().getNbMail().equals(medioCnt.getIdMail().getNbMail()));
+                    }
+
+                    return telefonoCoincide || mailCoincide;
+                })
+                .findFirst();
+
+        if (existente.isPresent()) {
+            int index = medioCnts.indexOf(existente.get());
+            medioCnts.set(index, medioCnt);
+        } else {
+            medioCnts.add(medioCnt);
+        }
     }
 
     public void eliminarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt) throws InventarioException {

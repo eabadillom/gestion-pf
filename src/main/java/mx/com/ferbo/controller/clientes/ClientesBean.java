@@ -79,9 +79,7 @@ public class ClientesBean implements Serializable {
     ContactoBL contactoBL;
 
     private ClienteContacto clienteContactoSelected;
-    private Contacto contactoSelected;
     private MedioCnt medioCntSelected;
-    private Boolean editandoContacto;
     private List<TipoMail> lstTipoMail;
     private List<TipoTelefono> lstTipoTelefono;
 
@@ -278,13 +276,8 @@ public class ClientesBean implements Serializable {
 
     // Metodos exclusivos para contactos
     public void nuevoClienteContacto() {
-        this.editandoContacto = null;
-        this.editandoContacto = Boolean.TRUE;
         this.clienteContactoSelected = new ClienteContacto();
-    }
-
-    public void nuevoContacto() {
-        this.contactoSelected = new Contacto();
+        this.clienteContactoSelected.setIdContacto(new Contacto());
     }
 
     public void nuevoMedioContacto() {
@@ -462,28 +455,12 @@ public class ClientesBean implements Serializable {
         this.clienteContactoSelected = clienteContactoSelected;
     }
 
-    public Contacto getContactoSelected() {
-        return contactoSelected;
-    }
-
-    public void setContactoSelected(Contacto contactoSelected) {
-        this.contactoSelected = contactoSelected;
-    }
-
     public MedioCnt getMedioCntSelected() {
         return medioCntSelected;
     }
 
     public void setMedioCntSelected(MedioCnt medioCntSelected) {
         this.medioCntSelected = medioCntSelected;
-    }
-
-    public Boolean getEditandoContacto() {
-        return editandoContacto;
-    }
-
-    public void setEditandoContacto(Boolean editandoContacto) {
-        this.editandoContacto = editandoContacto;
     }
 
     public List<TipoMail> getLstTipoMail() {

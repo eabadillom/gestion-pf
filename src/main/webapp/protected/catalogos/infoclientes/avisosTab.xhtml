@@ -106,7 +106,7 @@
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Planta</p:outputLabel>
-                            <p:selectOneMenu id="soPlantaAct" value="#{clientesBean.avisoSelected.plantaCve}">
+                            <p:selectOneMenu id="soPlantaAct" converter="entityConverter" value="#{clientesBean.avisoSelected.plantaCve}">
                                 <f:selectItem itemLabel="--Seleccione--" />
                                 <f:selectItems value="#{clientesBean.lstPlanta}" var="planta"
                                                itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
@@ -117,7 +117,7 @@
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Observaciones</p:outputLabel>
-                            <p:inputText disabled="true" value="#{clientesBean.avisoSelected.avisoObservaciones}" />
+                            <p:inputText value="#{clientesBean.avisoSelected.avisoObservaciones}" />
                         </div>
                     </div>
 
@@ -148,14 +148,22 @@
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Vigencia en días</p:outputLabel>
-                            <p:inputText value="#{clientesBean.avisoSelected.avisoVigencia}" />
+                            <p:inputNumber
+                                value="#{clientesBean.avisoSelected.avisoVigencia}"
+                                decimal="false"
+                                minValue="0"
+                                maxValue="365" />
                         </div>
                     </div>
 
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Plazo de pago en días</p:outputLabel>
-                            <p:inputText value="#{clientesBean.avisoSelected.avisoPlazo}" />
+                            <p:inputNumber
+                                value="#{clientesBean.avisoSelected.avisoPlazo}"
+                                decimal="false"
+                                minValue="0"
+                                maxValue="365" />
                         </div>
                     </div>
                 </div>

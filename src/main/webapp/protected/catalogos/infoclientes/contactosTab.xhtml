@@ -3,23 +3,18 @@
     xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf">
 
     <div>
-        <p:commandButton id="contactoAdd"
-                         icon="pi pi-user-plus"
-                         value="Nuevo Contacto"
-                         actionListener="#{clientesBean.nuevoClienteContacto()}" 
-                         process="@this"
-                         update="form:tabView:pnlContacto"
-                         oncomplete="PF('dialogContacto').show();"
-                         styleClass="ui-button-raised"
-                         style="margin-right: .5rem; width: auto;"
-                         disabled="#{clientesBean.clienteSelected == null or clientesBean.clienteSelected.cteCve == null}"/>
+        <p:commandButton id="contactoAdd" icon="pi pi-user-plus" value="Nuevo Contacto"
+            actionListener="#{clientesBean.nuevoClienteContacto()}" process="@this" update="form:tabView:pnlContacto"
+            oncomplete="PF('dialogContacto').show();" styleClass="ui-button-raised"
+            style="margin-right: .5rem; width: auto;"
+            disabled="#{clientesBean.clienteSelected == null or clientesBean.clienteSelected.cteCve == null}" />
     </div>
 
     <div class="orders-subtable">
         <p:dataTable id="dtContactos" widgetVar="dtContactos" var="clienteContacto"
             value="#{clientesBean.clienteSelected.clienteContactoList}" reflow="true"
-            rowKey="#{contacto.idContacto.idContacto}" lazy="false"
-            paginator="true" rows="5" paginatorPosition="bottom">
+            rowKey="#{contacto.idContacto.idContacto}" lazy="false" paginator="true" rows="5"
+            paginatorPosition="bottom">
 
             <p:column headerText="Nombre" sortBy="#{contacto.idContacto.nbNombre}">
                 <h:outputText value="#{clienteContacto.idContacto.nbNombre}" />
@@ -30,24 +25,32 @@
             <p:column headerText="Segundo apellido" sortBy="#{contacto.idContacto.nbApellido2}">
                 <h:outputText value="#{clienteContacto.idContacto.nbApellido2}" />
             </p:column>
+            <p:column>
+                <p:commandButton icon="pi pi-key" process="@this" update="form:pnlPassword"
+                    oncomplete="PF('dlgPassword').show();">
+                    <f:setPropertyActionListener value="#{clienteContacto}"
+                        target="#{clientesBean.clienteContactoSelected}" />
+                </p:commandButton>
+            </p:column>
             <p:column width="2rem;" style="text-align:right;">
-                <p:commandButton icon="pi pi-pencil" process="@this"
-                    oncomplete="PF('dialogContacto').show()" update="form:tabView:pnlContacto">
-                    <f:setPropertyActionListener value="#{clienteContacto}" target="#{clientesBean.clienteContactoSelected}" />
+                <p:commandButton icon="pi pi-pencil" process="@this" oncomplete="PF('dialogContacto').show()"
+                    update="form:tabView:pnlContacto">
+                    <f:setPropertyActionListener value="#{clienteContacto}"
+                        target="#{clientesBean.clienteContactoSelected}" />
                 </p:commandButton>
             </p:column>
             <p:column width="2rem;" style="text-align:right;">
                 <p:commandButton icon="pi pi-trash" styleClass="ui-button-danger" process="@this"
                     oncomplete="PF('deleteContactoDialog').show()">
-                    <f:setPropertyActionListener value="#{clienteContacto}" target="#{clientesBean.clienteContactoSelected}" />
+                    <f:setPropertyActionListener value="#{clienteContacto}"
+                        target="#{clientesBean.clienteContactoSelected}" />
                 </p:commandButton>
             </p:column>
         </p:dataTable>
     </div>
 
-    <p:dialog id="dialogContacto" widgetVar="dialogContacto"
-        header="Contacto" showEffect="fade"
-        modal="false" responsive="true" resizable="false" cache="false" style="max-width:80em !important;" dynamic="true">
+    <p:dialog id="dialogContacto" widgetVar="dialogContacto" header="Contacto" showEffect="fade" modal="false"
+        responsive="true" resizable="false" cache="false" style="max-width:80em !important;" dynamic="true">
 
         <p:outputPanel id="pnlContacto" class="ui-fluid">
             <p:scrollPanel mode="native" style="height: 500px; overflow:auto;">
@@ -115,19 +118,16 @@
                 </div>
 
                 <div>
-                    <p:commandButton actionListener="#{clientesBean.nuevoMedioContacto()}"
-                                        value="Nuevo medio contacto" icon="pi pi-envelope"
-                                        process="@this" resetValues="true"
-                                        update="form:tabView:pnlMedio" oncomplete="PF('dialogMedioContacto').show()" 
-                                        styleClass="ui-button-raised"
-                                        style="margin-right: .5rem; width: auto;"/>
+                    <p:commandButton actionListener="#{clientesBean.nuevoMedioContacto()}" value="Nuevo medio contacto"
+                        icon="pi pi-envelope" process="@this" resetValues="true" update="form:tabView:pnlMedio"
+                        oncomplete="PF('dialogMedioContacto').show()" styleClass="ui-button-raised"
+                        style="margin-right: .5rem; width: auto;" />
                 </div>
-                
+
                 <h:panelGroup>
                     <p:dataTable id="dtMedioContacto" lazy="false"
                         value="#{clientesBean.clienteContactoSelected.idContacto.medioCntList}" var="medio"
-                        rowKey="#{medio.idMedio}" paginator="true"
-                        rows="5" paginatorPosition="bottom">
+                        rowKey="#{medio.idMedio}" paginator="true" rows="5" paginatorPosition="bottom">
 
                         <p:column headerText="Tipo medio" width="10%">
                             <h:outputText
@@ -153,6 +153,14 @@
                             <h:outputText value="#{medio.stMedio eq true ? 'ACTIVO' : 'INACTIVO'}" />
                         </p:column>
                         <p:column width="5%" style="text-align: right !important;">
+                            <p:commandButton class="ui-button-primary" icon="pi pi-pencil" process="@this"
+                                oncomplete="PF('dialogMedioContacto').show(); $('.ui-widget-overlay').remove();"
+                                update="form:tabView:pnlMedio">
+                                <f:setPropertyActionListener value="#{medio}"
+                                    target="#{clientesBean.medioCntSelected}" />
+                            </p:commandButton>
+                        </p:column>
+                        <p:column width="5%" style="text-align: right !important;">
                             <p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this"
                                 oncomplete="PF('deleteMedioContactoDialog').show(); $('.ui-widget-overlay').remove();"
                                 update="form:tabView:dtMedioContacto">
@@ -170,14 +178,14 @@
             <p:commandButton value="Agregar" icon="pi pi-check"
                 actionListener="#{clientesBean.operarContactos('agregarcontacto')}" update="form:tabView"
                 process="pnlContacto @this" oncomplete="PF('dialogContacto').hide();" />
-            <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogContacto').hide()" immediate="true"
-                class="ui-button-secondary" resetValues="true"/>
+            <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogContacto').hide()"
+                immediate="true" class="ui-button-secondary" resetValues="true" />
         </f:facet>
     </p:dialog>
 
 
     <p:dialog id="dialogMedioContacto" widgetVar="dialogMedioContacto" header="Medio de contacto" showEffect="fade"
-              modal="false" responsive="true" dynamic="true">
+        modal="false" responsive="true" dynamic="true">
         <p:outputPanel id="pnlMedio" class="ui-fluid">
             <p:outputPanel>
                 <div class="p-field">
@@ -244,13 +252,13 @@
             <p:commandButton value="Agregar" icon="pi pi-check" process="@this pnlMedio"
                 actionListener="#{clientesBean.operarContactos('agregarmedio')}" update="dtMedioContacto"
                 oncomplete="PF('dialogMedioContacto').hide()" />
-            <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogMedioContacto').hide()" immediate="true"
-                class="ui-button-secondary" resetValues="true"/>
+            <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogMedioContacto').hide()"
+                immediate="true" class="ui-button-secondary" resetValues="true" />
         </f:facet>
     </p:dialog>
 
     <p:dialog id="deleteContactoDialog" widgetVar="deleteContactoDialog" modal="false" closable="false"
-              header="Eliminar" width="400" showEffect="fade" draggable="false" dynamic="true">
+        header="Eliminar" width="400" showEffect="fade" draggable="false" dynamic="true">
 
         <h:outputText value="¿Desea eliminar el contacto?" />
 
@@ -265,18 +273,57 @@
     </p:dialog>
 
     <p:dialog id="deleteMedioContactoDialog" widgetVar="deleteMedioContactoDialog" modal="false" closable="false"
-              header="Eliminar" width="400" showEffect="fade" draggable="false" dynamic="true">
+        header="Eliminar" width="400" showEffect="fade" draggable="false" dynamic="true">
 
         <h:outputText value="¿Desea eliminar el contacto?" />
 
         <f:facet name="footer">
             <p:commandButton value="Sí" icon="pi pi-check"
                 actionListener="#{clientesBean.operarContactos('eliminarmedio')}"
-                oncomplete="PF('deleteMedioContactoDialog').hide()" update="dtContactos" process="@this" />
+                oncomplete="PF('deleteMedioContactoDialog').hide()" update="dtMedioContacto" process="@this" />
 
             <p:commandButton value="No" type="button" icon="pi pi-times" styleClass="ui-button-secondary"
                 oncomplete="PF('deleteMedioContactoDialog').hide()" immediate="true" />
         </f:facet>
+    </p:dialog>
+
+    <p:dialog id="dlgPassword" header="Establecer contraseña" widgetVar="dlgPassword" showEffect="fade" modal="false"
+        responsive="true">
+        <p:outputPanel id="pnlPassword" class="ui-fluid">
+            <div class="p-grid p-col-12">
+                <p:panel>
+                    <h5>Para cambiar su contraseña, debe considerar lo siguiente</h5>
+                    <div>La contraseña debe tener entre 8 y 16 caracteres.</div>
+                    <div>No debe tener espacios en blanco</div>
+                    <div>Debe tener al menos una letra mayúscula</div>
+                    <div>Debe tener al menos una letra minúscula</div>
+                    <div>Debe tener al menos un número</div>
+                    <div>Debe tener al menos un carácter especial: , . : * + - # $ % @ etc.</div>
+                </p:panel>
+            </div>
+            <div class="card" align="center">
+                <div class="field grid">
+                    <p:outputLabel for="@next" value="Indique su nueva contraseña" styleClass="col-fixed" />
+                    <div class="col">
+                        <p:password id="newPassword" value="#{clientesBean.newPassword}" toggleMask="true">
+                        </p:password>
+                    </div>
+                </div>
+                <div class="field grid">
+                    <p:outputLabel for="@next" value="Confirme su nueva contraseña" styleClass="col-fixed" />
+                    <div class="col">
+                        <p:password id="confirmPassword" value="#{clientesBean.confirmPassword}" toggleMask="true">
+                        </p:password>
+                    </div>
+                </div>
+            </div>
+            <p:panel>
+                <div class="card" align="center">
+                    <p:commandButton id="change-password" value="Cambiar contraseña" icon="pi pi-check"
+                        actionListener="#{clientesBean.changePassword()}" process="@this" />
+                </div>
+            </p:panel>
+        </p:outputPanel>
     </p:dialog>
 
 </ui:composition>
