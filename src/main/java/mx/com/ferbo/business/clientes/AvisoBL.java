@@ -47,7 +47,7 @@ public class AvisoBL {
     @Inject
     private PrecioServicioDAO precioServicioDAO;
 
-    public Aviso nueAviso(){
+    public Aviso nuevoAviso(){
         Aviso aviso =  new Aviso();
         aviso.setPlantaCve(new Planta());
         aviso.setAvisoValSeg(BigDecimal.ZERO);

@@ -6,12 +6,12 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <div>
-        <p:commandButton id="btnAdd"
+        <p:commandButton id="sevicioAdd"
                          icon="pi pi-plus"
-                         value="Agregar nuevo servicio"
+                         value="Nuevo servicio"
                          actionListener="#{clientesBean.nuevoPrecioServicio()}"
                          process="@this"
-                         update="form:tabView:panel-servicio"
+                         update="form:tabView:pnlServicio"
                          oncomplete="PF('servicioClienteDialog').show()"
                          styleClass="ui-button-raised"
                          style="margin-right: .5rem; width: auto;"
@@ -37,21 +37,20 @@
         </p:column>
         <p:column width="2rem" style="text-align: center;">
             <p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button" oncomplete="PF('servicioClienteDialog').show()"
-                             update="form:tabView:panel-servicio">
+                             update="form:tabView:pnlServicio">
                 <f:setPropertyActionListener value="#{pServicio}" target="#{clientesBean.precioServicioSelected}" />
             </p:commandButton>
         </p:column>
         <p:column width="2rem" style="text-align: center;">
-            <p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" oncomplete="PF('deleteServicioDialog').show()">
+            <p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteServicioDialog').show()">
                 <f:setPropertyActionListener value="#{pServicio}" target="#{clientesBean.precioServicioSelected}" />
             </p:commandButton>
         </p:column>
     </p:dataTable>
 
-    <!-- Diálogo para agregar/editar -->
-    <p:dialog header="Detalle del servicio" showEffect="fade" modal="false" widgetVar="servicioClienteDialog" responsive="true" position="center center"
-              width="100%" resizable="false">
-        <p:outputPanel id="panel-servicio" class="ui-fluid">
+    <p:dialog header="Precio Servicio" showEffect="fade" modal="false" widgetVar="servicioClienteDialog" responsive="true" position="center center"
+              width="100%" resizable="false" dynamic="true">
+        <p:outputPanel id="pnlServicio" class="ui-fluid">
             <p:outputPanel>
                 <div class="p-field">
                     <p:outputLabel>Cliente</p:outputLabel>
@@ -85,13 +84,12 @@
 
         <f:facet name="footer">
             <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.operarServicios('agregarprecioservicio')}"
-                             update="form:tabView:dt-servicios" process="panel-servicio @this" oncomplete="PF('servicioClienteDialog').hide()" />
+                             update="form:tabView:dt-servicios" process="pnlServicio @this" oncomplete="PF('servicioClienteDialog').hide()" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('servicioClienteDialog').hide()" class="ui-button-secondary"
                              update="form:tabView:dt-servicios" resetValues="true" />
         </f:facet>
     </p:dialog>
 
-    <!-- Diálogo general personalizado -->
     <p:dialog header="Confirmar eliminación"
               widgetVar="deleteServicioDialog"
               modal="false"
@@ -100,13 +98,13 @@
               draggable="false"
               width="400"
               showEffect="fade"
-              hideEffect="fade">
+              hideEffect="fade"
+              dynamic="true">
 
         <h:outputText value="¿Desea eliminar el servicio?" style="font-size: 16px;" />
 
         <p:spacer height="20" />
 
-        <!-- Contenedor de botones en fila, alineados a la derecha sin ocupar todo el ancho -->
         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
             <p:commandButton value="Sí"
                              icon="pi pi-check"

@@ -135,13 +135,15 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                                     if (servicio != null){
                                         servicio.getServicioCve();
                                     } else {
-                                        // Terminar de asignar para esta propiedad y las que faltan
+                                        ps.setServicio(new Servicio());
                                     }
 
                                     UnidadDeManejo unidadDeManejo = ps.getUnidad();
 
                                     if (unidadDeManejo != null) {
                                         unidadDeManejo.getUnidadDeManejoCve();
+                                    } else {
+                                        ps.setUnidad(new UnidadDeManejo());
                                     }
                                     
                                 }

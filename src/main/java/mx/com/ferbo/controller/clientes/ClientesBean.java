@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
@@ -44,6 +43,7 @@ import mx.com.ferbo.controller.SideBarBean;
 import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
 import mx.com.ferbo.dto.ClientesDomiciliosOperacion;
 import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Contacto;
@@ -68,6 +68,7 @@ public class ClientesBean implements Serializable {
 
     // Objetos de clientes
     private Cliente clienteSelected;
+    private Cliente clonarCliente;
     private List<Cliente> lstClientes;
 
     @Inject
@@ -79,7 +80,6 @@ public class ClientesBean implements Serializable {
 
     private Aviso avisoSelected;
     private PrecioServicio precioAvisoSelected;
-    private String tituloDialogAviso;
     private List<Planta> lstPlanta;
     private List<Categoria> lstCategoria;
 
@@ -189,13 +189,18 @@ public class ClientesBean implements Serializable {
     public void clonarCliente() {
     }
 
+    // Funciones para clientes
     public void eliminarCliente() {
     }
 
     public void nuevoCliente() {
+        clienteSelected = new Cliente();
+        clienteSelected.setMetodoPago(new MetodoPago());
+        clienteSelected.setRegimenFiscal(new RegimenFiscal());
+        clienteSelected.setUsoCfdi(new UsoCfdi());
+        clienteSelected.setCandadoSalida(new CandadoSalida());
         tipoDomicilioSelected = new TiposDomicilio();
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
-        lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
         lstDomiciliosOperacion.clear();
@@ -203,28 +208,16 @@ public class ClientesBean implements Serializable {
 
     // Funciones para Avisos
     public void nuevoAviso() {
-        this.tituloDialogAviso = null;
-        this.tituloDialogAviso = "Nuevo Aviso";
-        this.avisoSelected = avisoBL.nueAviso();
+        this.avisoSelected = avisoBL.nuevoAviso();
         this.avisoSelected.setCteCve(clienteSelected);
     }
 
-    public void copiarAviso(Aviso aviso) {
-        this.tituloDialogAviso = null;
-        this.tituloDialogAviso = "Editar Aviso";
-        this.avisoSelected = aviso;
-    }
-    
-    public void nuevoPrecioAviso(){
+    public void nuevoPrecioAviso() {
         this.precioAvisoSelected = new PrecioServicio();
         this.precioAvisoSelected.setAvisoCve(avisoSelected);
         this.precioAvisoSelected.setServicio(new Servicio());
         this.precioAvisoSelected.setUnidad(new UnidadDeManejo());
         this.precioAvisoSelected.setPrecio(BigDecimal.ZERO);
-    }
-    
-    public void copiarPrcioAviso(PrecioServicio precioServicio){
-        this.precioAvisoSelected = precioServicio;
     }
 
     public void operarAvisos(String operacion) {
@@ -261,7 +254,7 @@ public class ClientesBean implements Serializable {
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Aviso",
                     "Contacte con el admistrador del sistema.");
         } finally {
-             PrimeFaces.current().ajax().update("form:messages");
+            PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -278,7 +271,7 @@ public class ClientesBean implements Serializable {
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
                     "Contacte con el admistrador del sistema.");
         } finally {
-             PrimeFaces.current().ajax().update("form:messages");
+            PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -313,7 +306,7 @@ public class ClientesBean implements Serializable {
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Fiscal",
                     "Contacte con el admistrador del sistema.");
         } finally {
-             PrimeFaces.current().ajax().update("form:messages");
+            PrimeFaces.current().ajax().update("form:messages");
         }
     }
 
@@ -325,10 +318,6 @@ public class ClientesBean implements Serializable {
         this.precioServicioSelected.setServicio(new Servicio());
         this.precioServicioSelected.setUnidad(new UnidadDeManejo());
         this.precioServicioSelected.setAvisoCve(new Aviso());
-    }
-
-    public void copiarPrecioServicio(PrecioServicio precioServicio) {
-        this.precioServicioSelected = precioServicio;
     }
 
     public void operarServicios(String operacion) {
@@ -372,12 +361,6 @@ public class ClientesBean implements Serializable {
         this.medioCntSelected = new MedioCnt();
         this.medioCntSelected.setIdMail(new Mail());
         this.medioCntSelected.setIdTelefono(new Telefono());
-    }
-
-    public void copiarClienteContacto(ClienteContacto clienteContacto) {
-        this.editandoContacto = null;
-        this.editandoContacto = Boolean.FALSE;
-        this.clienteContactoSelected = clienteContacto;
     }
 
     public void operarContactos(String operacion) {
@@ -672,6 +655,14 @@ public class ClientesBean implements Serializable {
         this.clienteSelected = clienteSelected;
     }
 
+    public Cliente getClonarCliente() {
+        return clonarCliente;
+    }
+
+    public void setClonarCliente(Cliente clonarCliente) {
+        this.clonarCliente = clonarCliente;
+    }
+
     public List<Cliente> getLstClientes() {
         return lstClientes;
     }
@@ -695,14 +686,6 @@ public class ClientesBean implements Serializable {
 
     public void setPrecioAvisoSelected(PrecioServicio precioAvisoSelected) {
         this.precioAvisoSelected = precioAvisoSelected;
-    }
-
-    public String getTituloDialogAviso() {
-        return tituloDialogAviso;
-    }
-
-    public void setTituloDialogAviso(String tituloDialogAviso) {
-        this.tituloDialogAviso = tituloDialogAviso;
     }
 
     public List<Planta> getLstPlanta() {
