@@ -25,8 +25,8 @@
             <p:column headerText="Segundo apellido" sortBy="#{contacto.idContacto.nbApellido2}">
                 <h:outputText value="#{clienteContacto.idContacto.nbApellido2}" />
             </p:column>
-            <p:column>
-                <p:commandButton icon="pi pi-key" process="@this" update="form:pnlPassword"
+            <p:column width="2rem;" style="text-align:right;">
+                <p:commandButton icon="pi pi-key" process="@this" update="form:tabView:pnlPassword"
                     oncomplete="PF('dlgPassword').show();">
                     <f:setPropertyActionListener value="#{clienteContacto}"
                         target="#{clientesBean.clienteContactoSelected}" />
@@ -305,14 +305,14 @@
                 <div class="field grid">
                     <p:outputLabel for="@next" value="Indique su nueva contraseña" styleClass="col-fixed" />
                     <div class="col">
-                        <p:password id="newPassword" value="#{clientesBean.newPassword}" toggleMask="true">
+                        <p:password id="newPassword" value="#{clientesBean.nuevaContrasenia}" toggleMask="true">
                         </p:password>
                     </div>
                 </div>
                 <div class="field grid">
                     <p:outputLabel for="@next" value="Confirme su nueva contraseña" styleClass="col-fixed" />
                     <div class="col">
-                        <p:password id="confirmPassword" value="#{clientesBean.confirmPassword}" toggleMask="true">
+                        <p:password id="confirmPassword" value="#{clientesBean.contraseniaConfirmacion}" toggleMask="true">
                         </p:password>
                     </div>
                 </div>
@@ -320,7 +320,7 @@
             <p:panel>
                 <div class="card" align="center">
                     <p:commandButton id="change-password" value="Cambiar contraseña" icon="pi pi-check"
-                        actionListener="#{clientesBean.changePassword()}" process="@this" />
+                                     actionListener="#{clientesBean.operarContactos('cambiarcontrasenia')}" process="@this pnlPassword" update="form:tabView:dtContactos" oncomplete="PF('dlgPassword').hide()"/>
                 </div>
             </p:panel>
         </p:outputPanel>

@@ -19,11 +19,16 @@ public class SeguridadBL {
     }
 
     public void validarContrasenia(String nuevaContrasenia, String contraseniaConfirmacion) throws InventarioException {
-        if (nuevaContrasenia == null)
+        if (nuevaContrasenia.equals("")) {
             throw new InventarioException("Debe indicar una contraseña nueva.");
+        }
 
-        if (contraseniaConfirmacion == null)
+        if (contraseniaConfirmacion.equals("")) {
             throw new InventarioException("Debe confirmar su contraseña nueva.");
+        }
+
+        nuevaContrasenia = nuevaContrasenia.trim();
+        contraseniaConfirmacion = contraseniaConfirmacion.trim();
 
         if (nuevaContrasenia.equals(contraseniaConfirmacion) == false)
             throw new InventarioException("Su nueva contraseña no coincide en los dos campos.");
@@ -35,9 +40,6 @@ public class SeguridadBL {
         util = new SecurityUtil();
 
         String nuevaContrseniaSHA512 = null;
-
-        nuevaContrasenia = nuevaContrasenia.trim();
-        contraseniaConfirmacion = contraseniaConfirmacion.trim();
 
         validarContrasenia(nuevaContrasenia, contraseniaConfirmacion);
 

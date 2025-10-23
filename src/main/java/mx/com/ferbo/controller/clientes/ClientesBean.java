@@ -38,6 +38,7 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 
 import mx.com.ferbo.business.clientes.ContactoBL;
+import mx.com.ferbo.business.clientes.SeguridadBL;
 import mx.com.ferbo.controller.SideBarBean;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
@@ -79,6 +80,7 @@ public class ClientesBean implements Serializable {
     ContactoBL contactoBL;
 
     private ClienteContacto clienteContactoSelected;
+    private Boolean editandoContacto;
     private MedioCnt medioCntSelected;
     private List<TipoMail> lstTipoMail;
     private List<TipoTelefono> lstTipoTelefono;
@@ -102,6 +104,13 @@ public class ClientesBean implements Serializable {
     private List<Servicio> lstServicio;
     private UnidadDeManejo unidadDeManejoSelected;
     private List<UnidadDeManejo> lstUnidadManejo;
+
+    // Objetos para seguridad
+    @Inject
+    private SeguridadBL seguridadBL;
+
+    String nuevaContrasenia;
+    String contraseniaConfirmacion;
 
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
@@ -147,10 +156,39 @@ public class ClientesBean implements Serializable {
     }
 
     // Funciones para clientes
-    public void eliminarCliente() {
-    }
+    public void nuevoCliente(){}
+    
+    public void operarCliente(String operacion) {
+        String mensaje = null;
+        try {
+            switch (operacion) {
+                case "guardarcliente":
+                    if (this.clienteSelected.getCteCve() == null){
+                        clienteDAO.guardar(this.clienteSelected);
+                        mensaje = "Cliente guardado exitosamente";
+                    } else {
+                        this.clienteDAO.actualizar(this.clienteSelected);
+                        mensaje = "Cliente actualizado exitosamente";
+                    }
+                    break;
+                
+                case "eliminarcliente":
+                    // Verificar que hacer en este caso
+                    mensaje = "Cliente eliminado exitosamente";
+                    break;
 
-    public void nuevoCliente() {
+                default:
+                    throw new InventarioException("Operación sobre cliente no válida");
+            }
+            addMessage(FacesMessage.SEVERITY_INFO, "Cliente", mensaje);
+        } catch (InventarioException ex) {
+            addMessage(FacesMessage.SEVERITY_WARN, "Cliente", ex.getMessage());
+        } catch (Exception ex) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Cliente",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
     }
 
     // Funciones para Avisos
@@ -312,6 +350,12 @@ public class ClientesBean implements Serializable {
                     mensaje = "Contacto eliminado";
                     break;
 
+                case "cambiarcontrasenia":
+                    String contransenia = seguridadBL.cambiarContrasenia(nuevaContrasenia, contraseniaConfirmacion);
+                    this.clienteContactoSelected.setNbPassword(contransenia);
+                    mensaje = "Contraseña guardada exitosamente";
+                    break;
+
                 default:
                     throw new InventarioException("Sin operación valida para contactos");
             }
@@ -455,6 +499,14 @@ public class ClientesBean implements Serializable {
         this.clienteContactoSelected = clienteContactoSelected;
     }
 
+    public Boolean getEditandoContacto() {
+        return editandoContacto;
+    }
+
+    public void setEditandoContacto(Boolean editandoContacto) {
+        this.editandoContacto = editandoContacto;
+    }
+
     public MedioCnt getMedioCntSelected() {
         return medioCntSelected;
     }
@@ -527,4 +579,22 @@ public class ClientesBean implements Serializable {
     public void setLstUnidadManejo(List<UnidadDeManejo> lstUnidadManejo) {
         this.lstUnidadManejo = lstUnidadManejo;
     }
+
+    // Getters y Setter para seguridad
+    public String getNuevaContrasenia() {
+        return nuevaContrasenia;
+    }
+
+    public void setNuevaContrasenia(String nuevaContrasenia) {
+        this.nuevaContrasenia = nuevaContrasenia;
+    }
+
+    public String getContraseniaConfirmacion() {
+        return contraseniaConfirmacion;
+    }
+
+    public void setContraseniaConfirmacion(String contraseniaConfirmacion) {
+        this.contraseniaConfirmacion = contraseniaConfirmacion;
+    }
+
 }

@@ -117,6 +117,7 @@ public class ContactoBL {
             int index = clienteContactos.indexOf(existente.get());
             clienteContactos.set(index, clienteContacto);
         } else {
+            clienteContacto.setFhAlta(new Date());
             clienteContactos.add(clienteContacto);
         }
     }

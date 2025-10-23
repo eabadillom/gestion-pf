@@ -14,14 +14,14 @@
             </p:dialog>
             <p:toolbar styleClass="p-mb-4">
                 <p:toolbarGroup>
-                    <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-raised" style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}"
+                    <p:commandButton value="Nuevo Cliente" icon="pi pi-plus" styleClass="ui-button-raised" style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}"
                                      process="@this" update="form:tabView:pnlCliente" oncomplete="PF('dialogCliente').show();" >
                         <p:resetInput target="form:tabView:pnlCliente"/>
                     </p:commandButton>
                 </p:toolbarGroup>
             </p:toolbar>
             <div style="padding-top: 1rem;">
-                <p:dataTable id="dt-clientes" widgetVar="dtClientes" value="#{clientesBean.lstClientes}" var="cliente" rowKey="#{cliente.cteCve}"  reflow="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                <p:dataTable id="dtClientes" widgetVar="dtClientes" value="#{clientesBean.lstClientes}" var="cliente" rowKey="#{cliente.cteCve}"  reflow="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
                     <p:column headerText="Nombre" sortBy="#{cliente.nombre}" filterBy="#{cliente.nombre}" filterMatchMode="contains">
                         <h:outputText value="#{cliente.nombre}" />
                     </p:column>
@@ -64,6 +64,11 @@
                     </p:tab>
 
                 </p:tabView>
+                <p:commandButton value="Agregar" icon="pi pi-check" process="@this"
+                                 actionListener="#{clientesBean.operarCliente('agregarcliente')}" update="dtClientes"
+                                 oncomplete="PF('dialogCliente').hide()" />
+                <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogCliente').hide()"
+                                 immediate="true" class="ui-button-secondary" resetValues="true" />
             </p:dialog>
 
             <p:dialog id="dialogClonar" header="Copiar información del cliente" widgetVar="dialogClonar"
@@ -77,7 +82,7 @@
             </p:dialog>
 
             <p:confirmDialog widgetVar="deleteClienteDialog" showEffect="fade" width="400" message="Desea eliminar el cliente?" header="Eliminar" severity="warn">
-                <p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.eliminarCliente()}" oncomplete="PF('deleteClienteDialog').hide()" />
+                <p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.operarCliente('eliminarcliente')}" oncomplete="PF('deleteClienteDialog').hide()" />
                 <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteClienteDialog').hide()" />
             </p:confirmDialog>
 
