@@ -1,0 +1,56 @@
+package mx.com.ferbo.business.clientes;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Named;
+
+import mx.com.ferbo.model.ClienteContacto;
+import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.SecurityUtil;
+
+@Named
+@RequestScoped
+public class SeguridadBL {
+
+    SecurityUtil util;
+
+    public void generaPassword(ClienteContacto clienteContacto) {
+        util = new SecurityUtil();
+        clienteContacto.setNbPassword(util.getRandomString());
+    }
+
+    public void validarContrasenia(String nuevaContrasenia, String contraseniaConfirmacion) throws InventarioException {
+        if (nuevaContrasenia.equals("")) {
+            throw new InventarioException("Debe indicar una contraseña nueva.");
+        }
+
+        if (contraseniaConfirmacion.equals("")) {
+            throw new InventarioException("Debe confirmar su contraseña nueva.");
+        }
+
+        nuevaContrasenia = nuevaContrasenia.trim();
+        contraseniaConfirmacion = contraseniaConfirmacion.trim();
+
+        if (nuevaContrasenia.equals(contraseniaConfirmacion) == false)
+            throw new InventarioException("Su nueva contraseña no coincide en los dos campos.");
+    }
+
+    public String cambiarContrasenia(String nuevaContrasenia, String contraseniaConfirmacion)
+            throws InventarioException {
+
+        util = new SecurityUtil();
+
+        String nuevaContrseniaSHA512 = null;
+
+        validarContrasenia(nuevaContrasenia, contraseniaConfirmacion);
+
+        util.checkPassword(nuevaContrasenia);
+
+        nuevaContrseniaSHA512 = util.getSHA512(nuevaContrasenia);
+
+        nuevaContrasenia = null;
+        contraseniaConfirmacion = null;
+
+        return nuevaContrseniaSHA512;
+
+    }
+}

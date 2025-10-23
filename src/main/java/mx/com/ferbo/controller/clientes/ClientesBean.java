@@ -39,6 +39,7 @@ import mx.com.ferbo.model.UnidadDeManejo;
 
 import mx.com.ferbo.business.clientes.ContactoBL;
 import mx.com.ferbo.business.clientes.DomiciliosBL;
+import mx.com.ferbo.business.clientes.SeguridadBL;
 import mx.com.ferbo.controller.SideBarBean;
 import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
 import mx.com.ferbo.dto.ClientesDomiciliosOperacion;
@@ -88,9 +89,8 @@ public class ClientesBean implements Serializable {
     ContactoBL contactoBL;
 
     private ClienteContacto clienteContactoSelected;
-    private Contacto contactoSelected;
-    private MedioCnt medioCntSelected;
     private Boolean editandoContacto;
+    private MedioCnt medioCntSelected;
     private List<TipoMail> lstTipoMail;
     private List<TipoTelefono> lstTipoTelefono;
 
@@ -130,6 +130,13 @@ public class ClientesBean implements Serializable {
     private ClienteDomicilios clienteDomicilioSelected;
     private TiposDomicilio tipoDomicilioSelected;
     private Domicilios domicilioSelected;
+
+    // Objetos para seguridad
+    @Inject
+    private SeguridadBL seguridadBL;
+
+    String nuevaContrasenia;
+    String contraseniaConfirmacion;
 
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
@@ -190,20 +197,55 @@ public class ClientesBean implements Serializable {
     }
 
     // Funciones para clientes
-    public void eliminarCliente() {
-    }
-
-    public void nuevoCliente() {
+    public void nuevoCliente(){
         clienteSelected = new Cliente();
         clienteSelected.setMetodoPago(new MetodoPago());
         clienteSelected.setRegimenFiscal(new RegimenFiscal());
         clienteSelected.setUsoCfdi(new UsoCfdi());
         clienteSelected.setCandadoSalida(new CandadoSalida());
+        clienteSelected.setClienteContactoList(new ArrayList());
+        clienteSelected.setAvisoList(new ArrayList());
         tipoDomicilioSelected = new TiposDomicilio();
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
         lstDomiciliosOperacion.clear();
+    }
+    
+    public void operarCliente(String operacion) {
+        String mensaje = null;
+        try {
+            switch (operacion) {
+                case "guardarcliente":
+                    if (this.clienteSelected.getCteCve() == null){
+                        clienteDAO.guardar(this.clienteSelected);
+                        domicilios.persistirCambios(lstDomiciliosOperacion);
+                        mensaje = "Cliente guardado exitosamente";
+                    } else {
+                        this.clienteDAO.actualizar(this.clienteSelected);
+                        domicilios.persistirCambios(lstDomiciliosOperacion);
+                        mensaje = "Cliente actualizado exitosamente";
+                    }
+                    break;
+                
+                case "eliminarcliente":
+                    // Verificar que hacer en este caso
+                    mensaje = "Cliente eliminado exitosamente";
+                    break;
+
+
+                default:
+                    throw new InventarioException("Operación sobre cliente no válida");
+            }
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Cliente", mensaje);
+        } catch (InventarioException ex) {
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cliente", ex.getMessage());
+        } catch (Exception ex) {
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Cliente",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
     }
 
     // Funciones para Avisos
@@ -348,13 +390,8 @@ public class ClientesBean implements Serializable {
 
     // Metodos exclusivos para contactos
     public void nuevoClienteContacto() {
-        this.editandoContacto = null;
-        this.editandoContacto = Boolean.TRUE;
         this.clienteContactoSelected = new ClienteContacto();
-    }
-
-    public void nuevoContacto() {
-        this.contactoSelected = new Contacto();
+        this.clienteContactoSelected.setIdContacto(new Contacto());
     }
 
     public void nuevoMedioContacto() {
@@ -387,6 +424,12 @@ public class ClientesBean implements Serializable {
                 case "eliminarcontacto":
                     contactoBL.eliminarContacto(this.clienteSelected, this.clienteContactoSelected);
                     mensaje = "Contacto eliminado";
+                    break;
+
+                case "cambiarcontrasenia":
+                    String contransenia = seguridadBL.cambiarContrasenia(nuevaContrasenia, contraseniaConfirmacion);
+                    this.clienteContactoSelected.setNbPassword(contransenia);
+                    mensaje = "Contraseña guardada exitosamente";
                     break;
 
                 default:
@@ -762,12 +805,12 @@ public class ClientesBean implements Serializable {
         this.clienteContactoSelected = clienteContactoSelected;
     }
 
-    public Contacto getContactoSelected() {
-        return contactoSelected;
+    public Boolean getEditandoContacto() {
+        return editandoContacto;
     }
 
-    public void setContactoSelected(Contacto contactoSelected) {
-        this.contactoSelected = contactoSelected;
+    public void setEditandoContacto(Boolean editandoContacto) {
+        this.editandoContacto = editandoContacto;
     }
 
     public MedioCnt getMedioCntSelected() {
@@ -776,14 +819,6 @@ public class ClientesBean implements Serializable {
 
     public void setMedioCntSelected(MedioCnt medioCntSelected) {
         this.medioCntSelected = medioCntSelected;
-    }
-
-    public Boolean getEditandoContacto() {
-        return editandoContacto;
-    }
-
-    public void setEditandoContacto(Boolean editandoContacto) {
-        this.editandoContacto = editandoContacto;
     }
 
     public List<TipoMail> getLstTipoMail() {
@@ -906,6 +941,23 @@ public class ClientesBean implements Serializable {
 
     public void setDomicilioSelected(Domicilios domicilioSelected) {
         this.domicilioSelected = domicilioSelected;
+    }
+
+    // Getters y Setter para seguridad
+    public String getNuevaContrasenia() {
+        return nuevaContrasenia;
+    }
+
+    public void setNuevaContrasenia(String nuevaContrasenia) {
+        this.nuevaContrasenia = nuevaContrasenia;
+    }
+
+    public String getContraseniaConfirmacion() {
+        return contraseniaConfirmacion;
+    }
+
+    public void setContraseniaConfirmacion(String contraseniaConfirmacion) {
+        this.contraseniaConfirmacion = contraseniaConfirmacion;
     }
     //</editor-fold>
     
