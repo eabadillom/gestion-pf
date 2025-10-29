@@ -6,11 +6,14 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
 import java.util.stream.Collectors;
 
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.primefaces.PrimeFaces;
 
@@ -28,6 +31,7 @@ import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.model.Usuario;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -136,6 +140,10 @@ public class ClientesBean implements Serializable {
     String nuevaContrasenia;
     String contraseniaConfirmacion;
 
+    private Usuario usuario;
+    private FacesContext context;
+    private HttpServletRequest request;
+
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
         this.clienteSelected = new Cliente();
@@ -149,6 +157,9 @@ public class ClientesBean implements Serializable {
 
     @PostConstruct
     public void init() {
+        request = (HttpServletRequest) context.getExternalContext().getRequest();
+        this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+        log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
         this.lstClientes = clienteBL.obtenerTodos();
         this.lstMedioPago = fiscalBL.obtenerMediosPago();
         this.lstMetodoPago = fiscalBL.obtenerMetodosPago();
