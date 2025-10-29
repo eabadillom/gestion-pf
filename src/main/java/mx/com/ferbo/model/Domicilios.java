@@ -6,8 +6,10 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
@@ -19,6 +21,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Null;
@@ -75,6 +78,9 @@ public class Domicilios implements Serializable {
     @Size(max = 10)
     @Column(name = "domicilio_fax")
     private String domicilioFax;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "domicilios", orphanRemoval = true)
+    private List<ClienteDomicilios> clienteDomiciliosList;
     
     @Null
     @JoinColumns(value = {
@@ -153,6 +159,14 @@ public class Domicilios implements Serializable {
     public void setDomicilioFax(String domicilioFax) {
         this.domicilioFax = domicilioFax;
     }
+    
+    public List<ClienteDomicilios> getClienteDomiciliosList() {
+        return clienteDomiciliosList;
+    }
+
+    public void setClienteDomiciliosList(List<ClienteDomicilios> clienteDomiciliosList) {
+        this.clienteDomiciliosList = clienteDomiciliosList;
+    }
 
     public AsentamientoHumano getAsentamiento() {
         return asentamiento;
@@ -186,6 +200,8 @@ public class Domicilios implements Serializable {
         if (getClass() != object.getClass())
             return false;
         Domicilios other = (Domicilios) object;
+        if(this.domCve == null || other.domCve == null)
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
         return Objects.equals(domCve, other.domCve);
     }
 

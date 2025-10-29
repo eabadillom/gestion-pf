@@ -121,6 +121,9 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ProductoPorCliente> productoPorClienteList;
     
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<ClienteDomicilios> clienteDomiciliosList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<DetalleFacturacion> detalleFacturacionList;
     
@@ -305,6 +308,14 @@ public class Cliente implements Serializable {
 
     public void setProductoPorClienteList(List<ProductoPorCliente> productoPorClienteList) {
         this.productoPorClienteList = productoPorClienteList;
+    }
+    
+    public List<ClienteDomicilios> getClienteDomiciliosList() {
+        return clienteDomiciliosList;
+    }
+
+    public void setClienteDomiciliosList(List<ClienteDomicilios> clienteDomiciliosList) {
+        this.clienteDomiciliosList = clienteDomiciliosList;
     }
 
     public List<DetalleFacturacion> getDetalleFacturacionList() {

@@ -105,6 +105,8 @@ public class TiposDomicilio implements Serializable {
         if (getClass() != object.getClass())
             return false;
         TiposDomicilio other = (TiposDomicilio) object;
+        if(this.domicilioTipoCve == null || other.domicilioTipoCve == null)
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
         return Objects.equals(domicilioTipoCve, other.domicilioTipoCve);
     }
 
