@@ -8,6 +8,8 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -158,24 +160,22 @@ public class Contacto implements Serializable {
         this.medioCntList = medioCntList;
     }
 
+    @Override 
+    public boolean equals(Object o) {
+        if(this == o) return true;
+        if (!(o instanceof Contacto)) return false;
+        Contacto that = (Contacto) o;
+
+        if (this.idContacto != null && that.idContacto != null) {
+            return Objects.equals(this.idContacto, that.idContacto);
+        } else {
+            return this == that;
+        }
+    }
+     
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (idContacto != null ? idContacto.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Contacto)) {
-            return false;
-        }
-        Contacto other = (Contacto) object;
-        if ((this.idContacto == null && other.idContacto != null) || (this.idContacto != null && !this.idContacto.equals(other.idContacto))) {
-            return false;
-        }
-        return true;
+        return (idContacto != null) ? idContacto.hashCode() : System.identityHashCode(this);
     }
 
     @Override

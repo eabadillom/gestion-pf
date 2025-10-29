@@ -7,7 +7,7 @@
             actionListener="#{clientesBean.nuevoClienteContacto()}" process="@this" update="form:tabView:pnlContacto"
             oncomplete="PF('dialogContacto').show();" styleClass="ui-button-raised"
             style="margin-right: .5rem; width: auto;"
-            disabled="#{clientesBean.clienteSelected == null or clientesBean.clienteSelected.cteCve == null}" />
+            disabled="#{clientesBean.clienteSelected == null}" />
     </div>
 
     <div class="orders-subtable">
@@ -265,10 +265,10 @@
         <f:facet name="footer">
             <p:commandButton value="Sí" icon="pi pi-check"
                 actionListener="#{clientesBean.operarContactos('eliminarcontacto')}"
-                oncomplete="PF('deleteMedioContactoDialog').hide()" update="dtContactos" process="@this" />
+                oncomplete="PF('deleteContactoDialog').hide()" update="dtContactos" process="@this" />
 
             <p:commandButton value="No" type="button" icon="pi pi-times" styleClass="ui-button-secondary"
-                oncomplete="PF('deleteMedioContactoDialog').hide()" immediate="true" />
+                oncomplete="PF('deleteContactoDialog').hide()" immediate="true" />
         </f:facet>
     </p:dialog>
 

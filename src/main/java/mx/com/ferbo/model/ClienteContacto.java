@@ -7,6 +7,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -199,23 +201,24 @@ public class ClienteContacto implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ClienteContacto))
+            return false;
+
+        ClienteContacto that = (ClienteContacto) o;
+
+        if (this.id != null && that.id != null) {
+            return Objects.equals(this.id, that.id);
+        } else {
+            return this == that;
+        }
     }
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ClienteContacto)) {
-            return false;
-        }
-        ClienteContacto other = (ClienteContacto) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+    @Override 
+    public int hashCode(){
+        return (id != null) ? id.hashCode() : System.identityHashCode(this);    
     }
 
     @Override

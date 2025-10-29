@@ -1,10 +1,10 @@
 package mx.com.ferbo.business.clientes;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.IntStream;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -13,6 +13,7 @@ import javax.inject.Named;
 import mx.com.ferbo.dao.n.PrecioServicioDAO;
 import mx.com.ferbo.dao.n.ServicioDAO;
 import mx.com.ferbo.dao.n.UnidadManejoDAO;
+import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
@@ -40,6 +41,16 @@ public class ServiciosBL {
     @Inject
     private PrecioServicioDAO precioServicioDAO;
 
+    public PrecioServicio nuevoPrecioServicio(Cliente cliente) {
+        PrecioServicio precioServicio = new PrecioServicio();
+        precioServicio.setCliente(cliente);
+        precioServicio.setPrecio(BigDecimal.ZERO);
+        precioServicio.setServicio(new Servicio());
+        precioServicio.setUnidad(new UnidadDeManejo());
+        precioServicio.setAvisoCve(new Aviso());
+        return precioServicio;
+    }
+
     public List<PrecioServicio> obtenerPrecioServiciosPorCliente(Cliente cliente) throws InventarioException {
         requireNonNull(cliente, "El cliente no puede estar vacío");
 
@@ -50,13 +61,13 @@ public class ServiciosBL {
         } catch (InventarioException ex) {
             log.info(ex.getMessage());
             return Collections.emptyList();
-        } 
+        }
     }
 
     public List<UnidadDeManejo> obtenerUnidadesMenjo() {
 
         List<UnidadDeManejo> lista = unidadManejoDAO.buscarTodos();
-        
+
         if (lista == null) {
             return new ArrayList<>();
         }
@@ -67,36 +78,36 @@ public class ServiciosBL {
     public List<Servicio> obtenerServicios() {
         List<Servicio> lista = servicioDAO.buscarTodos();
 
-         if (lista == null) {
+        if (lista == null) {
             return new ArrayList<>();
         }
 
         return lista;
     }
 
-    public void agregarOActulizarPrecioServicio(Cliente cliente, PrecioServicio precioServicio)
+    public void agregarOActualizarPrecioServicio(Cliente cliente, PrecioServicio precioServicio)
             throws InventarioException {
 
         requireNonNull(cliente, "El cliente no puede ser vacío");
         requireNonNull(precioServicio, "El precio de servicio no puede ser vacío");
 
         List<PrecioServicio> preciosServicios = cliente.getPrecioServicioList();
-
         if (preciosServicios == null) {
             preciosServicios = new ArrayList<>();
             cliente.setPrecioServicioList(preciosServicios);
         }
 
-        Optional<PrecioServicio> existente = preciosServicios.stream()
-                .filter(ps -> Objects.equals(ps.getId(), precioServicio.getId())).findFirst();
+        final List<PrecioServicio> lista = preciosServicios;
+        int index = IntStream.range(0, lista.size())
+                .filter(i -> lista.get(i).equals(precioServicio))
+                .findFirst()
+                .orElse(-1);
 
-        if (existente.isPresent()) {
-            int index = preciosServicios.indexOf(existente.get());
+        if (index >= 0) {
             preciosServicios.set(index, precioServicio);
         } else {
             preciosServicios.add(precioServicio);
         }
-
     }
 
     public void eliminarPrecioServicio(Cliente cliente, PrecioServicio precioServicio) throws InventarioException {

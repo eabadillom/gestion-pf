@@ -6,7 +6,8 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.IntStream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,7 +31,6 @@ import mx.com.ferbo.util.InventarioException;
  *
  * @author alberto
  */
-
 @Named
 @RequestScoped
 public class ContactoBL {
@@ -51,6 +51,20 @@ public class ContactoBL {
 
     @Inject
     private TipoMailDAO tipoMailDAO;
+
+    public ClienteContacto nuevoContacto() {
+        ClienteContacto clienteContacto = new ClienteContacto();
+        Contacto contacto = new Contacto();
+        contacto.setMedioCntList(new ArrayList<>());
+        clienteContacto.setIdContacto(contacto);
+        clienteContacto.setFhAlta(new Date());
+        return clienteContacto;
+    }
+
+    public MedioCnt nuevoMedio() {
+        MedioCnt medio = new MedioCnt();
+        return medio;
+    }
 
     public List<ClienteContacto> obtenerListaContactos(Cliente cliente) throws InventarioException {
 
@@ -87,14 +101,16 @@ public class ContactoBL {
 
     public ClienteContacto nuevoClienteContacto() {
         ClienteContacto clienteContacto = new ClienteContacto();
-        clienteContacto.setIdContacto(new Contacto());
+        Contacto contacto = new Contacto();
+        contacto.setMedioCntList(new ArrayList<>());
+        clienteContacto.setIdContacto(contacto);
         clienteContacto.setFhAlta(new Date());
         clienteContacto.setStHabilitado(true);
-        clienteContacto.setStUsuario("A"); // Asumimos valor por defecto
+        clienteContacto.setStUsuario("A");
         return clienteContacto;
     }
 
-    public void agregarContacto(Cliente cliente, ClienteContacto clienteContacto)
+    public void agregarOActualizarContacto(Cliente cliente, ClienteContacto clienteContacto)
             throws InventarioException {
 
         FacesUtils.requireNonNullWithReturn(cliente, "El cliente no puede ser vacío.");
@@ -107,66 +123,34 @@ public class ContactoBL {
             cliente.setClienteContactoList(clienteContactos);
         }
 
-        Optional<ClienteContacto> existente = clienteContactos.stream()
-                .filter(cc -> FacesUtils.normalizar(cc.getIdContacto().getNbNombre())
-                        .equals(FacesUtils.normalizar(clienteContacto.getIdContacto().getNbNombre()))
-                        && FacesUtils.normalizar(cc.getIdContacto().getNbApellido1())
-                                .equals(FacesUtils.normalizar(clienteContacto.getIdContacto().getNbApellido1()))
-                        && FacesUtils.normalizar(cc.getIdContacto().getNbApellido2())
-                                .equals(FacesUtils.normalizar(clienteContacto.getIdContacto().getNbApellido2())))
-                .findFirst();
-        if (existente.isPresent()) {
-            int index = clienteContactos.indexOf(existente.get());
+        final List<ClienteContacto> lista = clienteContactos;
+
+        int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(clienteContacto)).findFirst()
+                .orElse(-1);
+
+        if (index >= 0) {
             clienteContactos.set(index, clienteContacto);
         } else {
-            clienteContacto.setFhAlta(new Date());
             clienteContactos.add(clienteContacto);
         }
     }
 
-    public void agregarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt) throws InventarioException {
+    public void agregarOActualizarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt)
+            throws InventarioException {
 
         FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede ser vacío.");
         FacesUtils.requireNonNullWithReturn(medioCnt, "El medio de contacto no puede ser vacío.");
 
-        Contacto contacto = clienteContacto.getIdContacto();
-        if (contacto == null) {
-            contacto = new Contacto(); // Si estás creando nuevo
-            clienteContacto.setIdContacto(contacto);
-        }
-
-        List<MedioCnt> medioCnts = contacto.getMedioCntList();
+        List<MedioCnt> medioCnts = clienteContacto.getIdContacto().getMedioCntList();
         if (medioCnts == null) {
             medioCnts = new ArrayList<>();
-            contacto.setMedioCntList(medioCnts);
         }
 
-        Optional<MedioCnt> existente = medioCnts.stream()
-                .filter(m -> {
-                    boolean telefonoCoincide = false;
-                    boolean mailCoincide = false;
+        final List<MedioCnt> lista = medioCnts;
 
-                    if (m.getIdTelefono() != null && medioCnt.getIdTelefono() != null) {
-                        telefonoCoincide = (m.getIdTelefono().getIdTelefono() != null
-                                && m.getIdTelefono().getIdTelefono().equals(medioCnt.getIdTelefono().getIdTelefono()))
-                                ||
-                                (m.getIdTelefono().getNbTelefono() != null && m.getIdTelefono().getNbTelefono()
-                                        .equals(medioCnt.getIdTelefono().getNbTelefono()));
-                    }
+        int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(medioCnt)).findFirst().orElse(-1);
 
-                    if (m.getIdMail() != null && medioCnt.getIdMail() != null) {
-                        mailCoincide = (m.getIdMail().getIdMail() != null
-                                && m.getIdMail().getIdMail().equals(medioCnt.getIdMail().getIdMail())) ||
-                                (m.getIdMail().getNbMail() != null
-                                        && m.getIdMail().getNbMail().equals(medioCnt.getIdMail().getNbMail()));
-                    }
-
-                    return telefonoCoincide || mailCoincide;
-                })
-                .findFirst();
-
-        if (existente.isPresent()) {
-            int index = medioCnts.indexOf(existente.get());
+        if (index >= 0) {
             medioCnts.set(index, medioCnt);
         } else {
             medioCnts.add(medioCnt);
@@ -191,32 +175,38 @@ public class ContactoBL {
         if (clienteContacto.getId() == null) {
             cliente.getClienteContactoList().remove(clienteContacto);
         } else {
-            List<MedioCnt> medioCnts = new ArrayList<>(clienteContacto.getIdContacto().getMedioCntList());
-            for (MedioCnt medioCnt : medioCnts) {
-                eliminarMedioContacto(clienteContacto, medioCnt);
+
+            List<MedioCnt> medioCnts = clienteContacto.getIdContacto().getMedioCntList();
+
+            if (!medioCnts.isEmpty()) {
+                do {
+                    eliminarMedioContacto(clienteContacto, medioCnts.get(0));
+                } while (!medioCnts.isEmpty());
             }
+
+            cliente.getClienteContactoList().remove(clienteContacto);
 
             contactoDAO.eliminar(clienteContacto.getIdContacto());
             clienteContactoDAO.eliminar(clienteContacto);
-            cliente.getClienteContactoList().remove(clienteContacto);
+
         }
     }
 
     public void seleccionarMedioContacto(MedioCnt medioCnt) throws InventarioException {
-        if ("t".equalsIgnoreCase(medioCnt.getTpMedio())) {
-            Telefono telefono = new Telefono();
-            medioCnt.setIdTelefono(telefono);
-            medioCnt.setIdMail(null);
-            log.info("Agregando tipo de medio Telefono.");
-        } else if ("m".equalsIgnoreCase(medioCnt.getTpMedio())) {
-            Optional<TipoMail> tipo = tipoMailDAO.buscarPorId(1);
-            Mail mail = new Mail();
-            mail.setStPrincipal(true);
-            mail.setTpMail(tipo.orElseThrow(() -> new InventarioException("TipoMail con ID 1 no encontrado")));
-            medioCnt.setIdMail(mail);
-            medioCnt.setIdTelefono(null);
-            log.info("Agregando tipo de medio Mail.");
+
+        switch (medioCnt.getTpMedio()) {
+
+            case "m":
+                medioCnt.setIdMail(new Mail());
+                break;
+
+            case "t":
+                medioCnt.setIdTelefono(new Telefono());
+                break;
+
+            default:
+                throw new InventarioException("Tipo de medio de contacto no valido");
         }
     }
-    
+
 }

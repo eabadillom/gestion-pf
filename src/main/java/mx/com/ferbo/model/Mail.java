@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -31,36 +32,36 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "mail")
 @NamedQueries({
-    @NamedQuery(name = "Mail.findAll", query = "SELECT m FROM Mail m"),
-    @NamedQuery(name = "Mail.findByIdMail", query = "SELECT m FROM Mail m WHERE m.idMail = :idMail"),
-    @NamedQuery(name = "Mail.findByNbMail", query = "SELECT m FROM Mail m WHERE m.nbMail = :nbMail"),
-    @NamedQuery(name = "Mail.findByStPrincipal", query = "SELECT m FROM Mail m WHERE m.stPrincipal = :stPrincipal")})
+        @NamedQuery(name = "Mail.findAll", query = "SELECT m FROM Mail m"),
+        @NamedQuery(name = "Mail.findByIdMail", query = "SELECT m FROM Mail m WHERE m.idMail = :idMail"),
+        @NamedQuery(name = "Mail.findByNbMail", query = "SELECT m FROM Mail m WHERE m.nbMail = :nbMail"),
+        @NamedQuery(name = "Mail.findByStPrincipal", query = "SELECT m FROM Mail m WHERE m.stPrincipal = :stPrincipal") })
 public class Mail implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_mail")
     private Integer idMail;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "nb_mail")
     private String nbMail;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "st_principal")
     private boolean stPrincipal;
-    
+
     @JoinColumn(name = "tp_mail", referencedColumnName = "tp_mail")
     @ManyToOne(optional = false)
     private TipoMail tpMail;
-    
-    @OneToMany(mappedBy = "idMail", cascade=CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "idMail", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MedioCnt> medioCntList;
 
     public Mail() {
@@ -117,28 +118,28 @@ public class Mail implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idMail != null ? idMail.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Mail))
+            return false;
+        Mail that = (Mail) o;
+
+        if (this.idMail != null && that.idMail != null) {
+            return Objects.equals(this.idMail, that.idMail);
+        } else {
+            return this == that;
+        }
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Mail)) {
-            return false;
-        }
-        Mail other = (Mail) object;
-        if ((this.idMail == null && other.idMail != null) || (this.idMail != null && !this.idMail.equals(other.idMail))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return (idMail != null) ? idMail.hashCode() : System.identityHashCode(this);
     }
 
     @Override
     public String toString() {
         return "mx.com.ferbo.model.Mail[ idMail=" + idMail + " ]";
     }
-    
+
 }
