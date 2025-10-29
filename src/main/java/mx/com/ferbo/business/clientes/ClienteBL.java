@@ -1,83 +1,92 @@
 package mx.com.ferbo.business.clientes;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.util.ClienteUtil;
-import mx.com.ferbo.util.InventarioException;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.dao.n.ClienteDAO;
+import mx.com.ferbo.model.CandadoSalida;
+import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.RegimenFiscal;
+import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.util.InventarioException;
 
 /**
  *
  * @author alberto
  */
-public class ClienteBL implements Serializable
-{
-    private static final long serialVersionUID = 8438449261015571241L;
+@Named
+@RequestScoped
+public class ClienteBL {
+
     private static Logger log = LogManager.getLogger(ClienteBL.class);
-    
-    public static Cliente nuevoCliente() 
-    {
-        Cliente clienteSelected;
-        clienteSelected = new Cliente();
-        clienteSelected.setHabilitado(true);
-        clienteSelected.setClienteContactoList(new ArrayList<>());
+
+    @Inject
+    private ClienteDAO clienteDAO;
+
+    public List<Cliente>  obtenerTodos(){
+        List<Cliente> lista = clienteDAO.buscarTodos();
         
-        return clienteSelected;
-    }
-    
-    public static Cliente cargaInfoCliente() 
-    {
-        return null;
-    }
-    
-    public static void validarCodigoUnico(Cliente cliente) throws InventarioException 
-    {
-        ClienteDAO clienteDAO = new ClienteDAO();
-        
-        if(cliente == null)
-            return;
-
-        if(cliente.getCodUnico() == null)
-                return;
-
-        Cliente auxcliente = clienteDAO.buscarPorCodigoUnico(cliente.getCodUnico());
-
-
-        if(auxcliente == null)
-                return;
-
-        if(auxcliente.equals(cliente))
-                return;
-
-        String mensaje = String.format("El código único %s ya está registrado para el cliente %s",
-                        cliente.getCodUnico(), auxcliente.getNombre());
-        throw new InventarioException(mensaje);
-    }
-    
-    public static void validarRFC(Cliente cliente) throws InventarioException
-    {
-        String codigoUnico = null;
-        
-        if (ClienteUtil.validarRFC(cliente.getTipoPersona(), cliente.getCteRfc()) == false) {
-            throw new InventarioException("El RFC es incorrecto");
+        if(lista == null){
+            return new ArrayList<>();
         }
 
-        codigoUnico = cliente.getCteRfc();
-        if ("F".equalsIgnoreCase(cliente.getTipoPersona())) {
-            codigoUnico = codigoUnico.substring(0, 4);
-        } else if ("M".equalsIgnoreCase(cliente.getTipoPersona())) {
-            codigoUnico = codigoUnico.substring(0, 3);
+        return lista;
+    }
+
+    public Cliente obtenerTodoCliente(Integer id, Boolean isFullInfo) throws InventarioException{
+
+        return clienteDAO.obtenerPorId(id, isFullInfo);
+
+    }
+
+    public Cliente obtenerPorCodigoUnico(String codigo){
+
+        return clienteDAO.buscarPorCodigoUnico(codigo);
+        
+    }
+
+    public Cliente nuevoCliente() {
+        Cliente cliente = new Cliente();
+        cliente = new Cliente();
+        cliente.setMetodoPago(new MetodoPago());
+        cliente.setRegimenFiscal(new RegimenFiscal());
+        cliente.setUsoCfdi(new UsoCfdi());
+        cliente.setCandadoSalida(new CandadoSalida());
+        cliente.setClienteContactoList(new ArrayList());
+        cliente.setAvisoList(new ArrayList());
+
+        return cliente;
+    }
+
+    public String guardarOActualizar(Cliente cliente) throws InventarioException {
+        String mensaje;
+        if (cliente.getCteCve() == null) {
+            clienteDAO.guardar(cliente);
+            mensaje = "Cliente guardado exitosamente";
+        } else {
+            clienteDAO.actualizar(cliente);
+            mensaje = "Cliente actualizado exitosamente";
+        }
+        return mensaje;
+    }
+
+    public List<Cliente> filtrarPorEstatus(List<Cliente> original, Boolean estado) {
+        if (original == null) {
+            return Collections.emptyList();
         }
 
-        if (cliente.getCteCve() == null
-                && (ClienteUtil.RFC_GENERICO_NACIONAL.equalsIgnoreCase(cliente.getCteRfc()) == false
-                || ClienteUtil.RFC_GENERICO_EXTRANJERO.equalsIgnoreCase(cliente.getCteRfc()) == false)) {
-            cliente.setCodUnico(codigoUnico);
-        }
+        return original.stream()
+                .filter(cliente -> estado.equals(cliente.getHabilitado())).collect(Collectors.toList());
     }
-    
+
 }

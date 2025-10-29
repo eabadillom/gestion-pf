@@ -2,9 +2,9 @@ package mx.com.ferbo.business.clientes;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.IntStream;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -23,7 +23,9 @@ import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UdCobro;
+import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -47,13 +49,23 @@ public class AvisoBL {
     @Inject
     private PrecioServicioDAO precioServicioDAO;
 
-    public Aviso nuevoAviso(){
-        Aviso aviso =  new Aviso();
+    public Aviso nuevoAviso() {
+        Aviso aviso = new Aviso();
         aviso.setPlantaCve(new Planta());
         aviso.setAvisoValSeg(BigDecimal.ZERO);
+        aviso.setAvisoFecha(new Date());
         aviso.setCategoriaCve(new Categoria());
         aviso.setPrecioServicioList(new ArrayList<>());
         return aviso;
+    }
+
+    public PrecioServicio nuevoServicioAviso(Aviso aviso) {
+        PrecioServicio pServicio = new PrecioServicio();
+        pServicio.setAvisoCve(aviso);
+        pServicio.setServicio(new Servicio());
+        pServicio.setUnidad(new UnidadDeManejo());
+        pServicio.setPrecio(BigDecimal.ZERO);
+        return pServicio;
     }
 
     public List<Categoria> obtenerCategorias() {
@@ -97,11 +109,12 @@ public class AvisoBL {
             avisos = new ArrayList<>();
             cliente.setAvisoList(avisos);
         }
-        
-        Optional<Aviso> existente = avisos.stream().filter(a -> Objects.equals(a.getAvisoCve(), aviso.getAvisoCve())).findFirst();
 
-        if (existente.isPresent()){
-            int index = avisos.indexOf(existente.get());
+        final List<Aviso> lista = avisos;
+
+        int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(aviso)).findFirst().orElse(-1);
+
+        if (index >= 0) {
             avisos.set(index, aviso);
         } else {
             avisos.add(aviso);
@@ -113,20 +126,22 @@ public class AvisoBL {
         requireNonNull(aviso, "El aviso no puede ser vacío");
         requireNonNull(aviso, "El servicio no puede ser vacío");
 
-        List<PrecioServicio> precioServicios = aviso.getPrecioServicioList();
+        List<PrecioServicio> preciosServicios = aviso.getPrecioServicioList();
 
-        if (precioServicios == null) {
-            precioServicios = new ArrayList<>();
-            aviso.setPrecioServicioList(precioServicios);
+        if (preciosServicios == null) {
+            preciosServicios = new ArrayList<>();
+            aviso.setPrecioServicioList(preciosServicios);
         }
-        
-        Optional<PrecioServicio> existente = precioServicios.stream().filter(ps -> Objects.equals(ps.getId(), precioServicio.getId())).findFirst();
-        
-        if (existente.isPresent()){
-            int index = precioServicios.indexOf(existente.get());
-            precioServicios.set(index, precioServicio);
+
+        final List<PrecioServicio> lista = preciosServicios;
+
+        int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(precioServicio)).findFirst()
+                .orElse(-1);
+
+        if (index >= 0) {
+            preciosServicios.set(index, precioServicio);
         } else {
-            precioServicios.add(precioServicio);
+            preciosServicios.add(precioServicio);
         }
     }
 
@@ -135,16 +150,19 @@ public class AvisoBL {
         requireNonNull(aviso, "El aviso no puede ser vacío");
 
         List<Aviso> avisos = cliente.getAvisoList();
-        List<PrecioServicio> precioServicios = aviso.getPrecioServicioList();
+        List<PrecioServicio> preciosServicios = aviso.getPrecioServicioList();
 
-        if (precioServicios != null) {
-            for (PrecioServicio precio : new ArrayList<>(precioServicios)) { // evitar ConcurrentModificationException
+        if (preciosServicios != null) {
+            for (PrecioServicio precio : preciosServicios) {
                 eliminaServicioAviso(aviso, precio);
             }
         }
 
         avisos.remove(aviso);
-        avisoDAO.eliminar(aviso);
+
+        if (aviso.getAvisoCve() != null) {
+            avisoDAO.eliminar(aviso);
+        }
     }
 
     public void eliminaServicioAviso(Aviso aviso, PrecioServicio ps) throws InventarioException {

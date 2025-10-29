@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -29,40 +30,40 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "medio_cnt")
 @NamedQueries({
-    @NamedQuery(name = "MedioCnt.findAll", query = "SELECT m FROM MedioCnt m"),
-    @NamedQuery(name = "MedioCnt.findByIdMedio", query = "SELECT m FROM MedioCnt m WHERE m.idMedio = :idMedio"),
-    @NamedQuery(name = "MedioCnt.findByTpMedio", query = "SELECT m FROM MedioCnt m WHERE m.tpMedio = :tpMedio"),
-    @NamedQuery(name = "MedioCnt.findByStMedio", query = "SELECT m FROM MedioCnt m WHERE m.stMedio = :stMedio"),
-    @NamedQuery(name = "MedioCnt.findByIdContacto", query = "SELECT m FROM MedioCnt m WHERE m.idContacto.idContacto = :idContacto")})
+        @NamedQuery(name = "MedioCnt.findAll", query = "SELECT m FROM MedioCnt m"),
+        @NamedQuery(name = "MedioCnt.findByIdMedio", query = "SELECT m FROM MedioCnt m WHERE m.idMedio = :idMedio"),
+        @NamedQuery(name = "MedioCnt.findByTpMedio", query = "SELECT m FROM MedioCnt m WHERE m.tpMedio = :tpMedio"),
+        @NamedQuery(name = "MedioCnt.findByStMedio", query = "SELECT m FROM MedioCnt m WHERE m.stMedio = :stMedio"),
+        @NamedQuery(name = "MedioCnt.findByIdContacto", query = "SELECT m FROM MedioCnt m WHERE m.idContacto.idContacto = :idContacto") })
 public class MedioCnt implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_medio")
     private Integer idMedio;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 1)
     @Column(name = "tp_medio")
     private String tpMedio;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "st_medio")
     private boolean stMedio;
-    
+
     @JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
-    @ManyToOne(optional = false, cascade = CascadeType.DETACH)//Cambie por ALL
+    @ManyToOne(optional = false, cascade = CascadeType.DETACH) // Cambie por ALL
     private Contacto idContacto;
-    
+
     @JoinColumn(name = "id_mail", referencedColumnName = "id_mail")
     @ManyToOne(cascade = CascadeType.ALL)
     private Mail idMail;
-    
+
     @JoinColumn(name = "id_telefono", referencedColumnName = "id_telefono")
     @ManyToOne(cascade = CascadeType.ALL)
     private Telefono idTelefono;
@@ -129,28 +130,28 @@ public class MedioCnt implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idMedio != null ? idMedio.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof MedioCnt))
+            return false;
+        MedioCnt that = (MedioCnt) o;
+
+        if (this.idMedio != null && that.idMedio != null) {
+            return Objects.equals(this.idMedio, that.idMedio);
+        } else {
+            return this == that;
+        }
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof MedioCnt)) {
-            return false;
-        }
-        MedioCnt other = (MedioCnt) object;
-        if ((this.idMedio == null && other.idMedio != null) || (this.idMedio != null && !this.idMedio.equals(other.idMedio))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return (idMedio != null) ? idMedio.hashCode() : System.identityHashCode(this);
     }
 
     @Override
     public String toString() {
         return "mx.com.ferbo.model.MedioCnt[ idMedio=" + idMedio + " ]";
     }
-    
+
 }
