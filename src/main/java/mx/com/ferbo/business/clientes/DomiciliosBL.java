@@ -11,7 +11,6 @@ import mx.com.ferbo.dao.n.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.n.DomiciliosDAO;
 import mx.com.ferbo.dao.n.TiposDomicilioDAO;
 
-import mx.com.ferbo.dto.ClientesDomiciliosOperacion;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Ciudades;
@@ -98,10 +97,6 @@ public class DomiciliosBL implements Serializable
     public ClienteDomicilios nuevoClienteDomicilio(Cliente clienteSelected, Domicilios domicilioSelected) throws InventarioException 
     {
         FacesUtils.requireNonNull(clienteSelected, "Debe seleccionar un cliente");
-        if( clienteSelected.getCteCve() <= 0) {
-            throw new InventarioException("Debe seleccionar un tipo de domicilio");
-        }
-        
         FacesUtils.requireNonNull(domicilioSelected, "Debe seleccionar un domicilio");
                 
         ClienteDomicilios clienteDomicilios = new ClienteDomicilios();
@@ -171,29 +166,6 @@ public class DomiciliosBL implements Serializable
         auxClienteDomicilios.setDomicilios(auxDomicilios);
         
         return auxClienteDomicilios;
-    }
-    
-    public void persistirCambios(List<ClientesDomiciliosOperacion> listaOperaciones) throws InventarioException 
-    {
-        for (ClientesDomiciliosOperacion domOp : listaOperaciones) {
-            ClienteDomicilios cd = domOp.getClienteDomicilios();
-
-            switch (domOp.getEstado()) {
-                case NUEVO:
-                    clienteDomiciliosDAO.guardar(cd); 
-                    break;
-                case ACTUALIZADO:
-                    clienteDomiciliosDAO.actualizar(cd); 
-                    break;
-                case ELIMINADO_TEMP:
-                    clienteDomiciliosDAO.eliminar(cd);
-                    domiciliosDAO.eliminar(cd.getDomicilios());
-                    break;
-                default:
-                    // No hacer nada
-                    break;
-            }
-        }
     }
 
 }

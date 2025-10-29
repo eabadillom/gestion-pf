@@ -3,6 +3,7 @@ package mx.com.ferbo.controller.clientes;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -45,7 +46,6 @@ import mx.com.ferbo.business.clientes.DomiciliosBL;
 import mx.com.ferbo.business.clientes.SeguridadBL;
 import mx.com.ferbo.controller.SideBarBean;
 import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
-import mx.com.ferbo.dto.ClientesDomiciliosOperacion;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.ClienteDomicilios;
@@ -127,7 +127,6 @@ public class ClientesBean implements Serializable {
 
     private List<ClienteDomicilios> lstClienteDomicilios;
     private List<ClienteDomicilios> lstClienteDomiciliosFiltered;
-    private List<ClientesDomiciliosOperacion> lstDomiciliosOperacion;
     private List<TiposDomicilio> lstTiposDomicilio;
     private ClienteDomicilios clienteDomicilioSelected;
     private TiposDomicilio tipoDomicilioSelected;
@@ -143,16 +142,18 @@ public class ClientesBean implements Serializable {
     private Usuario usuario;
     private FacesContext context;
     private HttpServletRequest request;
+    private String agregadoOActualizado;
 
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
         this.clienteSelected = new Cliente();
         this.lstClienteDomicilios = new ArrayList<>();
         this.lstClienteDomiciliosFiltered = new ArrayList<>();
-        this.lstDomiciliosOperacion = new ArrayList<>();
         this.lstTiposDomicilio = new ArrayList<>();
         this.lstRegimenFiscalFiltered = new ArrayList<>();
         this.lstUsoCfdiFiltered = new ArrayList<>();
+        this.context = FacesContext.getCurrentInstance();
+
     }
 
     @PostConstruct
@@ -202,20 +203,24 @@ public class ClientesBean implements Serializable {
     }
 
     // Funciones para clientes
-    public void nuevoCliente() {
-        clienteSelected = clienteBL.nuevoCliente();
+    public void nuevoCliente(){
+        clienteSelected = new Cliente();
+        clienteSelected.setMetodoPago(new MetodoPago());
+        clienteSelected.setRegimenFiscal(new RegimenFiscal());
+        clienteSelected.setUsoCfdi(new UsoCfdi());
+        clienteSelected.setClienteContactoList(new ArrayList());
+        clienteSelected.setAvisoList(new ArrayList());
+        clienteSelected.setClienteDomiciliosList(new ArrayList());
         tipoDomicilioSelected = new TiposDomicilio();
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
-        lstDomiciliosOperacion.clear();
     }
 
     public void guardarOActualizarCliente() {
         String mensaje = null;
         try {
             mensaje = clienteBL.guardarOActualizar(clienteSelected);
-            domicilios.persistirCambios(lstDomiciliosOperacion);
             this.lstClientes = null;
             this.lstClientes = clienteBL.obtenerTodos();
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Cliente", mensaje);
@@ -231,6 +236,10 @@ public class ClientesBean implements Serializable {
 
     public List<Cliente> filtrarPorEstatus(){
         return clienteBL.filtrarPorEstatus(lstClientes, estatusClientes);
+    }
+    
+    public void verificarAgregadoOActualizado(Integer id) {
+        agregadoOActualizado = (id != null) ? "actualizado" : "agregado";
     }
 
     // Funciones para Avisos
@@ -248,13 +257,15 @@ public class ClientesBean implements Serializable {
         try {
             switch (operacion) {
                 case "agregaraviso":
+                    verificarAgregadoOActualizado(avisoSelected.getAvisoCve()); 
                     avisoBL.agregarAviso(clienteSelected, avisoSelected);
-                    mensaje = "Aviso agregado exitosamente";
+                    mensaje = "Aviso "+ agregadoOActualizado +" exitosamente";
                     break;
 
                 case "agregarservicio":
+                    verificarAgregadoOActualizado(precioAvisoSelected.getId());
                     avisoBL.agregarServicioAviso(avisoSelected, precioAvisoSelected);
-                    mensaje = "Servico agregado a aviso exitosamente";
+                    mensaje = "Servico "+ agregadoOActualizado + " a aviso exitosamente";
                     break;
 
                 case "eliminaraviso":
@@ -318,8 +329,7 @@ public class ClientesBean implements Serializable {
             this.lstRegimenFiscalFiltered.clear();
             this.lstUsoCfdiFiltered.clear();
 
-            this.lstRegimenFiscalFiltered = fiscalBL.filtrarRegimenesFiscales(this.lstRegimenFiscal,
-                    this.clienteSelected);
+            this.lstRegimenFiscalFiltered = fiscalBL.filtrarRegimenesFiscales(this.lstRegimenFiscal, this.clienteSelected);
             this.lstUsoCfdiFiltered = fiscalBL.filtrarCfdis(this.lstUsoCfdi, this.clienteSelected);
         } catch (InventarioException ex) {
             log.warn(ex.getMessage(), ex);
@@ -343,12 +353,13 @@ public class ClientesBean implements Serializable {
         try {
             switch (operacion) {
                 case "agregarprecioservicio":
+                    verificarAgregadoOActualizado(precioServicioSelected.getId()); 
                     serviciosBL.agregarOActualizarPrecioServicio(clienteSelected, precioServicioSelected);
-                    mensaje = "Servicio agregado";
+                    mensaje = "Servicio " + agregadoOActualizado + " exitosamente";
                     break;
                 case "eliminarprecioservicio":
                     serviciosBL.eliminarPrecioServicio(this.clienteSelected, this.precioServicioSelected);
-                    mensaje = "Servicio eliminado";
+                    mensaje = "Servicio eliminado exitosamente";
                     break;
             }
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Servicio", mensaje);
@@ -380,23 +391,25 @@ public class ClientesBean implements Serializable {
             switch (operacion) {
 
                 case "agregarcontacto":
+                    verificarAgregadoOActualizado(clienteContactoSelected.getId()); 
                     contactoBL.agregarOActualizarContacto(this.clienteSelected, this.clienteContactoSelected);
-                    mensaje = "Contacto Agregado";
+                    mensaje = "Contacto " + agregadoOActualizado + " exitosamente";
                     break;
 
                 case "agregarmedio":
+                    verificarAgregadoOActualizado(medioCntSelected.getIdMedio());
                     contactoBL.agregarOActualizarMedioContacto(this.clienteContactoSelected, this.medioCntSelected);
-                    mensaje = "Medio de contacto Agregado";
+                    mensaje = "Medio de contacto " + agregadoOActualizado +" exitosamente";
                     break;
 
                 case "eliminarmedio":
                     contactoBL.eliminarMedioContacto(this.clienteContactoSelected, this.medioCntSelected);
-                    mensaje = "Medio de contacto eliminado";
+                    mensaje = "Medio de contacto eliminado exitosamente";
                     break;
 
                 case "eliminarcontacto":
                     contactoBL.eliminarContacto(this.clienteSelected, this.clienteContactoSelected);
-                    mensaje = "Contacto eliminado";
+                    mensaje = "Contacto eliminado exitosamente";
                     break;
 
                 case "cambiarcontrasenia":
@@ -442,41 +455,28 @@ public class ClientesBean implements Serializable {
     }
 
     public void actualizarListasDomicilios() {
-        lstClienteDomicilios = domicilios.buscarDomiciliosPorCliente(clienteSelected);
-
-        lstDomiciliosOperacion = lstClienteDomicilios.stream()
-                .map(cd -> new ClientesDomiciliosOperacion(cd, ClientesDomiciliosOperacion.EstadoOperacion.EXISTENTE))
-                .collect(Collectors.toList());
-
+        lstClienteDomicilios = new ArrayList<>(clienteSelected.getClienteDomiciliosList());
+        
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
     }
-
-    public void filtraListadoDomicilio() {
-        lstClienteDomicilios = domicilios.filtrarListado(lstClienteDomicilios, clienteSelected);
-        PrimeFaces.current().ajax().update("form:soClienteTipoDom", "form:dt-domiciliosCliente");
-    }
-
+    
     public void filtraListadoDomicilioFiltered() {
-        if (tipoDomicilioSelected != null) {
-            lstClienteDomiciliosFiltered = domicilios.filtrarListadoDomicilio(lstClienteDomicilios,
-                    tipoDomicilioSelected, clienteSelected);
+        if (tipoDomicilioSelected.getDomicilioTipoCve() != null) {
+            lstClienteDomiciliosFiltered = domicilios.filtrarListadoDomicilio(lstClienteDomicilios, tipoDomicilioSelected, clienteSelected);
         } else {
-            tipoDomicilioSelected = null;
-
-            if (lstClienteDomiciliosFiltered != null) {
+            tipoDomicilioSelected = null;    
+            
+            if (!lstClienteDomiciliosFiltered.isEmpty()) {
                 lstClienteDomiciliosFiltered.clear();
-            } else {
-                lstClienteDomiciliosFiltered = new ArrayList<>();
             }
         }
-
-        PrimeFaces.current().ajax().update("form:dt-domiciliosCliente");
+        
+        PrimeFaces.current().ajax().update("form:tabView:soClienteTipoDom", "form:tabView:dt-domiciliosCliente");
     }
 
     public void limpiarListasDomicilios() {
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
-        lstDomiciliosOperacion.clear();
         lstTiposDomicilio.clear();
         tipoDomicilioSelected = null;
     }
@@ -511,10 +511,8 @@ public class ClientesBean implements Serializable {
             log.info("Domicilio agregado: {}", domicilioSelected.toString());
             clienteDomicilioSelected = domicilios.nuevoClienteDomicilio(clienteSelected, domicilioSelected);
 
-            lstClienteDomicilios.add(clienteDomicilioSelected);
-            ClientesDomiciliosOperacion nuevo = new ClientesDomiciliosOperacion(clienteDomicilioSelected,
-                    ClientesDomiciliosOperacion.EstadoOperacion.NUEVO);
-            lstDomiciliosOperacion.add(nuevo);
+            lstClienteDomiciliosFiltered.add(clienteDomicilioSelected);
+            clienteSelected.setClienteDomiciliosList(lstClienteDomiciliosFiltered);
             limpiaClienteDomicilio();
 
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Domicilios", "Se agrego correctamente");
@@ -523,10 +521,8 @@ public class ClientesBean implements Serializable {
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Domicilios", ex.getMessage());
         } catch (Exception ex) {
             log.error("Problema para guardar la información de domicilios...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Domicilios",
-                    "Hay un problema para guardar la información de domicilios.");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Domicilios", "Hay un problema para guardar la información de domicilios.");
         } finally {
-            this.filtraListadoDomicilioFiltered();
             PrimeFaces.current().ajax().update("form:messages", "form:tabView:dt-domiciliosCliente");
         }
     }
@@ -538,39 +534,22 @@ public class ClientesBean implements Serializable {
             if (clienteDomicilioSelected == null) {
                 throw new InventarioException("Error al actualizar el domicilio de la lista.");
             }
-
-            clienteDomicilioSelected = domicilios.actualizarDomicilios(clienteSelected, clienteDomicilioSelected,
-                    domicilioSelected, tipoDomicilioSelected);
-
-            this.lstDomiciliosOperacion.stream()
-                    .filter(domOp -> domOp.getClienteDomicilios().equals(clienteDomicilioSelected)) // Encuentra el
-                                                                                                    // wrapper
-                    .findFirst()
-                    .ifPresent(wrapper -> {
-                        if (wrapper.getEstado() == ClientesDomiciliosOperacion.EstadoOperacion.EXISTENTE) {
-                            wrapper.setEstado(ClientesDomiciliosOperacion.EstadoOperacion.ACTUALIZADO);
-                            wrapper.setClienteDomicilios(clienteDomicilioSelected);
-                        }
-                        if (wrapper.getEstado() == ClientesDomiciliosOperacion.EstadoOperacion.NUEVO) {
-                            wrapper.setClienteDomicilios(clienteDomicilioSelected);
-                        }
-                    });
-
-            lstClienteDomicilios = lstClienteDomicilios.stream()
-                    .map(aux -> aux.getDomicilios().getDomCve().equals(
-                            clienteDomicilioSelected.getDomicilios().getDomCve()) ? clienteDomicilioSelected : aux)
-                    .collect(Collectors.toList());
-
+            
+            clienteDomicilioSelected = domicilios.actualizarDomicilios(clienteSelected, clienteDomicilioSelected, domicilioSelected, tipoDomicilioSelected);
+            
+            lstClienteDomiciliosFiltered = lstClienteDomiciliosFiltered.stream()
+                .map(aux -> aux.getDomicilios().getDomCve().equals(clienteDomicilioSelected.getDomicilios().getDomCve()) ? clienteDomicilioSelected : aux)
+                .collect(Collectors.toList());
+            
+            clienteSelected.setClienteDomiciliosList(lstClienteDomiciliosFiltered);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Domicilios", "Se actualizo correctamente");
         } catch (InventarioException ex) {
             log.error("Problema para actualizar la información de domicilios...", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Domicilios", ex.getMessage());
         } catch (Exception ex) {
             log.error("Problema para actualizar la información de domicilios...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Domicilios",
-                    "Hay un problema para actualizar la información de domicilios.");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Domicilios", "Hay un problema para actualizar la información de domicilios.");
         } finally {
-            this.filtraListadoDomicilioFiltered();
             PrimeFaces.current().ajax().update("form:messages", "form:tabView:dt-domiciliosCliente");
         }
     }
@@ -582,61 +561,32 @@ public class ClientesBean implements Serializable {
             if (clienteDomicilioSelected == null) {
                 throw new InventarioException("Error al eliminar el domicilio de la lista.");
             }
-
-            lstDomiciliosOperacion.stream()
-                    .filter(domOp -> domOp.getClienteDomicilios().getId().equals(clienteDomicilioSelected.getId()))
-                    .findFirst()
-                    .ifPresent(wrapper -> {
-                        if (wrapper.getEstado() == ClientesDomiciliosOperacion.EstadoOperacion.NUEVO) {
-                            log.info("Domicilio nuevo marcado para ser removido.");
-                        } else {
-                            wrapper.setEstado(ClientesDomiciliosOperacion.EstadoOperacion.ELIMINADO_TEMP);
-                            log.info("Domicilio existente marcado para eliminación temporal.");
-                        }
-                    });
-
-            lstDomiciliosOperacion = lstDomiciliosOperacion.stream()
-                    .filter(wrapper -> !(wrapper.getEstado() == ClientesDomiciliosOperacion.EstadoOperacion.NUEVO &&
-                            wrapper.getClienteDomicilios().getId().equals(clienteDomicilioSelected.getId())))
-                    .collect(Collectors.toList());
-
-            lstClienteDomicilios.remove(clienteDomicilioSelected);
-
+            
+            if (lstClienteDomiciliosFiltered == null || lstClienteDomiciliosFiltered.isEmpty()) {
+                throw new InventarioException("El cliente no tiene domicilios registrados.");
+            }
+            
+            // Buscar el domicilio en la lista y eliminarlo
+            boolean eliminado = lstClienteDomiciliosFiltered.removeIf(dom -> Objects.equals(dom.getId(), clienteDomicilioSelected.getId()));
+            
+            if (!eliminado) {
+                log.info("Elemento no eliminado: {}", eliminado);
+                throw new InventarioException("No se encontró el domicilio seleccionado en la lista.");
+            }
+            
+            clienteSelected.setClienteDomiciliosList(lstClienteDomiciliosFiltered);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Domicilios", "Se elimino correctamente");
         } catch (InventarioException ex) {
             log.error("Problema para actualizar la información de domicilios...", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Domicilios", ex.getMessage());
         } catch (Exception ex) {
             log.error("Problema para eliminar 1 domicilios...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Domicilios",
-                    "Hay un problema para eliminar 1 domicilios.");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Domicilios", "Hay un problema para eliminar 1 domicilios.");
         } finally {
-            this.filtraListadoDomicilioFiltered();
-            PrimeFaces.current().ajax().update("form:messages", "form:tabView:dt-domiciliosCliente");
+            PrimeFaces.current().ajax().update("form:messages", "form:tabView:dt-domiciliosCliente");	
         }
     }
-
-    public void guardarCliente() {
-        try {
-            log.info("Iniciando con los cambios del cliente {}", this.clienteSelected.toString());
-
-            domicilios.persistirCambios(lstDomiciliosOperacion);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Cliente", "Actualizando datos del cliente");
-        } catch (InventarioException ex) {
-            log.error("Problema para actualizar la información del cliente...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cliente", ex.getMessage());
-        } catch (Exception ex) {
-            log.error("Problema para actualizar la información del cliente...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Cliente",
-                    "Hay un problema para actualizar la información del cliente.");
-        } finally {
-            lstDomiciliosOperacion = new ArrayList<>();
-            this.actualizarListasDomicilios();
-            this.filtraListadoDomicilioFiltered();
-            PrimeFaces.current().ajax().update("form:messages");
-        }
-    }
-
+    
     public void asignarDomicilio() {
         try {
             if (domicilioSelected.getAsentamiento() == null) {
@@ -900,14 +850,6 @@ public class ClientesBean implements Serializable {
 
     public void setLstClienteDomiciliosFiltered(List<ClienteDomicilios> lstClienteDomiciliosFiltered) {
         this.lstClienteDomiciliosFiltered = lstClienteDomiciliosFiltered;
-    }
-
-    public List<ClientesDomiciliosOperacion> getLstDomiciliosOperacion() {
-        return lstDomiciliosOperacion;
-    }
-
-    public void setLstDomiciliosOperacion(List<ClientesDomiciliosOperacion> lstDomiciliosOperacion) {
-        this.lstDomiciliosOperacion = lstDomiciliosOperacion;
     }
 
     public List<TiposDomicilio> getLstTiposDomicilio() {

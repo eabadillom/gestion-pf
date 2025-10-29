@@ -71,6 +71,7 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                 log.info(cliente.getUsoCfdi().getUsoCfdi());
                 log.info(cliente.getMetodoPago().getNbMetodoPago());
                 log.info(cliente.getMetodoPago().getCdMetodoPago());
+                log.info(cliente.getClienteDomiciliosList());
 
                 if (!clienteContactoList.isEmpty()) {
                     for (ClienteContacto clienteContacto : clienteContactoList) {

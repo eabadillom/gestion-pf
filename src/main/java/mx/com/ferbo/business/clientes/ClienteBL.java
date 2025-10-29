@@ -69,15 +69,13 @@ public class ClienteBL {
     }
 
     public String guardarOActualizar(Cliente cliente) throws InventarioException {
-        String mensaje;
+        String status = (cliente.getCteCve() != null) ? "actualizado" : "agregado";
         if (cliente.getCteCve() == null) {
             clienteDAO.guardar(cliente);
-            mensaje = "Cliente guardado exitosamente";
         } else {
             clienteDAO.actualizar(cliente);
-            mensaje = "Cliente actualizado exitosamente";
         }
-        return mensaje;
+        return "Cliente " + status + " exitosamente";
     }
 
     public List<Cliente> filtrarPorEstatus(List<Cliente> original, Boolean estado) {

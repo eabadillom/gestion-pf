@@ -16,9 +16,8 @@
                 <p:toolbarGroup>
                     <p:commandButton value="Nuevo Cliente" icon="pi pi-plus" styleClass="ui-button-raised"
                         style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}" process="@this"
-                        update="form:tabView:pnlCliente form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente"
+                        update="form:dialogCliente form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente"
                         oncomplete="PF('dialogCliente').show();">
-                        <p:resetInput target="form:tabView:pnlCliente" />
                     </p:commandButton>
                     <p:outputLabel value="Habilitados:" style="margin-right:8px" />
                     <p:inputSwitch value="#{clientesBean.estatusClientes}">
@@ -73,7 +72,7 @@
 
                 </p:tabView>
                 <f:facet name="footer">
-                    <p:commandButton value="Agregar" icon="pi pi-check" process="@this"
+                    <p:commandButton value="#{(clientesBean.clienteSelected.cteCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" process="@this"
                         actionListener="#{clientesBean.guardarOActualizarCliente()}" update="dtClientes"
                         oncomplete="PF('dialogCliente').hide()" />
                     <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogCliente').hide()"

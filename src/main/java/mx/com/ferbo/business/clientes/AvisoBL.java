@@ -103,21 +103,18 @@ public class AvisoBL {
         requireNonNull(cliente, "El cliente no puede ser vacío");
         requireNonNull(aviso, "El aviso no puede ser vacío");
 
-        List<Aviso> avisos = cliente.getAvisoList();
-
-        if (avisos == null) {
-            avisos = new ArrayList<>();
-            cliente.setAvisoList(avisos);
+        if (cliente.getAvisoList() == null) {
+            cliente.setAvisoList(new ArrayList<>());
         }
 
-        final List<Aviso> lista = avisos;
+        final List<Aviso> lista = cliente.getAvisoList();
 
         int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(aviso)).findFirst().orElse(-1);
 
         if (index >= 0) {
-            avisos.set(index, aviso);
+            cliente.getAvisoList().set(index, aviso);
         } else {
-            avisos.add(aviso);
+            cliente.getAvisoList().add(aviso);
         }
     }
 

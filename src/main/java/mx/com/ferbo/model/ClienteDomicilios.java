@@ -51,7 +51,7 @@ public class ClienteDomicilios implements Serializable {
     @JoinColumns({
             @JoinColumn(name = "domicilio_tipo_cve", referencedColumnName = "domicilio_tipo_cve"),
             @JoinColumn(name = "dom_cve", referencedColumnName = "dom_cve") })
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE}, optional = false)
     private Domicilios domicilios;
 
     public ClienteDomicilios() {
@@ -102,6 +102,8 @@ public class ClienteDomicilios implements Serializable {
         if (getClass() != object.getClass())
             return false;
         ClienteDomicilios other = (ClienteDomicilios) object;
+        if(this.id == null || other.id == null)
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
         return Objects.equals(id, other.id);
     }
 

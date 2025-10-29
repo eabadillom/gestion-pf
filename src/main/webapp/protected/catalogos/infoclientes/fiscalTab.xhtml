@@ -21,7 +21,9 @@
             </div>
             <div class="p-field p-col-12 p-md-2">
                 <p:outputLabel>Número cliente</p:outputLabel>
-                <p:inputText value="#{clientesBean.clienteSelected.numeroCte}" maxlength="15" />
+                <p:inputText value="#{clientesBean.clienteSelected.numeroCte}" maxlength="15" > 
+                    <p:ajax process="@this" />
+                </p:inputText>
             </div>
             <div class="p-field p-col-12 p-md-2">
                 <p:outputLabel for="txtCodigo">Código único</p:outputLabel>
@@ -30,7 +32,9 @@
             <div class="p-field p-col-12 p-md-4">
                 <p:outputLabel for="txtNombre">Nombre</p:outputLabel>
                 <p:inputText id="txtNombre" value="#{clientesBean.clienteSelected.nombre}" required="true"
-                             requiredMessage="Debe indicar el nombre" maxlength="150" />
+                             requiredMessage="Debe indicar el nombre" maxlength="150" > 
+                    <p:ajax process="@this"/>
+                </p:inputText>
             </div>
             <div class="p-field p-col-12 p-md-4">
                 <p:outputLabel for="txtAlias">Alias</p:outputLabel>
@@ -90,7 +94,9 @@
             <div class="p-field p-col-12 p-md-4">
                 <p:outputLabel>Correo</p:outputLabel>
                 <p:inputText value="#{clientesBean.clienteSelected.cteMail}" required="true"
-                             requiredMessage="Debe indicar un correo electrónico" maxlength="255" />
+                             requiredMessage="Debe indicar un correo electrónico" maxlength="255" >
+                    <p:ajax process="@this" />
+                </p:inputText>
             </div>
             <div class="p-field p-col-2 p-md-4">
                 <p:outputLabel for="chkHabilitado" value="Habilitado" />
