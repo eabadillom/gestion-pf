@@ -72,7 +72,6 @@
 								</p:submenu>
 								<p:menuitem id="frb_facturacion_sm121" value="Ud de Medida" icon="pi pi-fw pi-tags" outcome="/protected/catalogos/unidadManejo" />
 								<p:menuitem value="Servicios" outcome="/protected/catalogos/servicios" icon="pi pi-fw pi-list" />
-								<p:menuitem value="Servicios por cliente" outcome="/protected/catalogos/serviciosPorCliente" icon="pi pi-fw pi-user-edit" />
 								<p:menuitem value="Candado Salida" outcome="/protected/catalogos/candadoSalida" icon="pi pi-lock" />
 							</p:submenu>
 						</p:submenu>
@@ -84,7 +83,6 @@
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />
 							<p:menuitem value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/consultaNotasCredito"></p:menuitem>
 						</p:submenu>
-						<p:menuitem value="Comercial" outcome="/protected/catalogos/avisosComercial" icon="pi pi-fw pi-dollar" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}" />
 						<p:submenu id="frb_reportes" label="Reportes" icon="pi pi-fw pi-file-o">
 							<p:submenu id="frb_inventario_reporte" label="Inventarios" icon="pi pi-fw pi-table">
 								<p:menuitem value="Entradas" icon="pi pi-file" outcome="/protected/reportes/inventarioEntradas" />
