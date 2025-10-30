@@ -51,7 +51,7 @@ public class ClienteDomicilios implements Serializable {
     @JoinColumns({
             @JoinColumn(name = "domicilio_tipo_cve", referencedColumnName = "domicilio_tipo_cve"),
             @JoinColumn(name = "dom_cve", referencedColumnName = "dom_cve") })
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE}, optional = false)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     private Domicilios domicilios;
 
     public ClienteDomicilios() {

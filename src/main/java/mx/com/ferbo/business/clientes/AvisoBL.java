@@ -88,8 +88,8 @@ public class AvisoBL {
         return list;
     }
 
-    public List<Planta> obtenerPlantas() {
-        List<Planta> list = plantaDAO.buscarTodos();
+    public List<Planta> obtenerPlantas(Boolean isFullInfo) {
+        List<Planta> list = plantaDAO.buscarTodos(isFullInfo);
 
         if (list == null) {
             return new ArrayList<>();

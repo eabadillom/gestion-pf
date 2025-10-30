@@ -14,6 +14,7 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
+import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
@@ -66,12 +67,12 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                 List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
                 List<PrecioServicio> clientePrecioServicios = cliente.getPrecioServicioList();
                 List<Aviso> clienteAvisos = cliente.getAvisoList();
+                List<ClienteDomicilios> clienteDomicilios =  cliente.getClienteDomiciliosList();
                 log.info(cliente.getRegimenFiscal().getCd_regimen());
                 log.info(cliente.getRegimenFiscal().getNb_regimen());
                 log.info(cliente.getUsoCfdi().getUsoCfdi());
                 log.info(cliente.getMetodoPago().getNbMetodoPago());
                 log.info(cliente.getMetodoPago().getCdMetodoPago());
-                log.info(cliente.getClienteDomiciliosList());
 
                 if (!clienteContactoList.isEmpty()) {
                     for (ClienteContacto clienteContacto : clienteContactoList) {
@@ -151,6 +152,11 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                             }
 
                         }
+                    }
+                }
+                if(!clienteDomicilios.isEmpty()){
+                    for(ClienteDomicilios clienteDomicilio : clienteDomicilios){
+                        log.info(clienteDomicilio.getDomicilios());
                     }
                 }
             }

@@ -4,7 +4,7 @@
 
     <div>
         <p:commandButton id="contactoAdd" icon="pi pi-user-plus" value="Nuevo Contacto"
-            actionListener="#{clientesBean.nuevoClienteContacto()}" process="@this" update="form:tabView:pnlContacto"
+            actionListener="#{clientesBean.nuevoClienteContacto()}" process="@this" update="form:tabView:dialogContacto form:tabView:pnlContacto"
             oncomplete="PF('dialogContacto').show();" styleClass="ui-button-raised"
             style="margin-right: .5rem; width: auto;"
             disabled="#{clientesBean.clienteSelected == null}" />
@@ -34,7 +34,7 @@
             </p:column>
             <p:column width="2rem;" style="text-align:right;">
                 <p:commandButton icon="pi pi-pencil" process="@this" oncomplete="PF('dialogContacto').show()"
-                    update="form:tabView:pnlContacto">
+                    update="form:tabView:dialogContacto form:tabView:pnlContacto">
                     <f:setPropertyActionListener value="#{clienteContacto}"
                         target="#{clientesBean.clienteContactoSelected}" />
                 </p:commandButton>
@@ -49,7 +49,7 @@
         </p:dataTable>
     </div>
 
-    <p:dialog id="dialogContacto" widgetVar="dialogContacto" header="Contacto" showEffect="fade" modal="false"
+    <p:dialog id="dialogContacto" widgetVar="dialogContacto" header="#{(clientesBean.clienteContactoSelected.id != null) ? 'Actualizar' : 'Agregar'} Contacto" showEffect="fade" modal="false"
         responsive="true" resizable="false" cache="false" style="max-width:80em !important;" dynamic="true">
 
         <p:outputPanel id="pnlContacto" class="ui-fluid">
@@ -119,7 +119,7 @@
 
                 <div>
                     <p:commandButton actionListener="#{clientesBean.nuevoMedioContacto()}" value="Nuevo medio contacto"
-                        icon="pi pi-envelope" process="@this" resetValues="true" update="form:tabView:pnlMedio"
+                        icon="pi pi-envelope" process="@this" resetValues="true" update="form:tabView:dialogMedioContacto form:tabView:pnlMedio"
                         oncomplete="PF('dialogMedioContacto').show()" styleClass="ui-button-raised"
                         style="margin-right: .5rem; width: auto;" />
                 </div>
@@ -155,7 +155,7 @@
                         <p:column width="5%" style="text-align: right !important;">
                             <p:commandButton class="ui-button-primary" icon="pi pi-pencil" process="@this"
                                 oncomplete="PF('dialogMedioContacto').show(); $('.ui-widget-overlay').remove();"
-                                update="form:tabView:pnlMedio">
+                                update="form:tabView:dialogMedioContacto form:tabView:pnlMedio">
                                 <f:setPropertyActionListener value="#{medio}"
                                     target="#{clientesBean.medioCntSelected}" />
                             </p:commandButton>
@@ -175,8 +175,8 @@
         </p:outputPanel>
 
         <f:facet name="footer">
-            <p:commandButton value="Agregar" icon="pi pi-check"
-                actionListener="#{clientesBean.operarContactos('agregarcontacto')}" update="form:tabView"
+            <p:commandButton value="#{(clientesBean.clienteContactoSelected.id != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
+                actionListener="#{clientesBean.operarContactos('agregarcontacto')}" update="form:tabView:dialogMedioContacto form:tabView:pnlMedio"
                 process="pnlContacto @this" oncomplete="PF('dialogContacto').hide();" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogContacto').hide()"
                 immediate="true" class="ui-button-secondary" resetValues="true" />
@@ -184,7 +184,7 @@
     </p:dialog>
 
 
-    <p:dialog id="dialogMedioContacto" widgetVar="dialogMedioContacto" header="Medio de contacto" showEffect="fade"
+    <p:dialog id="dialogMedioContacto" widgetVar="dialogMedioContacto" header="#{(clientesBean.medioCntSelected.idMedio != null) ? 'Actualizar' : 'Agregar'} Medio de contacto" showEffect="fade"
         modal="false" responsive="true" dynamic="true">
         <p:outputPanel id="pnlMedio" class="ui-fluid">
             <p:outputPanel>
@@ -249,7 +249,7 @@
             </p:outputPanel>
         </p:outputPanel>
         <f:facet name="footer">
-            <p:commandButton value="Agregar" icon="pi pi-check" process="@this pnlMedio"
+            <p:commandButton value="#{(clientesBean.medioCntSelected.idMedio != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" process="@this pnlMedio"
                 actionListener="#{clientesBean.operarContactos('agregarmedio')}" update="dtMedioContacto"
                 oncomplete="PF('dialogMedioContacto').hide()" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogMedioContacto').hide()"

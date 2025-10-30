@@ -41,28 +41,28 @@ public class FiscalBL {
 
 	@Inject
 	private UsoCfdiDAO usoCfdiDAO;
-        
-        public List<UsoCfdi> obtenerCfdis() {
-            return usoCfdiDAO.buscarTodos();
-        }
-        
-        public List<UsoCfdi> filtrarCfdis(List<UsoCfdi> listCfdi, Cliente cliente) throws InventarioException {
-            requireNonNull(cliente, "El cliente no puede estar vacio");
-            
-            List<UsoCfdi> listAux = new ArrayList<>();
-            
-            if(cliente.getTipoPersona().equals("F")) {
-                listAux = listCfdi.stream()
-                    .filter(uso -> Boolean.TRUE.equals(uso.getAplicaPersonaFisica()))
-                    .collect(Collectors.toList());
-            } else if (cliente.getTipoPersona().equals("M")) {
-                listAux = listCfdi.stream()
-                    .filter(uso -> Boolean.TRUE.equals(uso.getAplicaPersonaMoral()))
-                    .collect(Collectors.toList());
-            }
-            
-            return listAux;
-        }
+
+	public List<UsoCfdi> obtenerCfdis() {
+		return usoCfdiDAO.buscarTodos();
+	}
+
+	public List<UsoCfdi> filtrarCfdis(List<UsoCfdi> listCfdi, Cliente cliente) throws InventarioException {
+		requireNonNull(cliente, "El cliente no puede estar vacio");
+
+		List<UsoCfdi> listAux = new ArrayList<>();
+
+		if (cliente.getTipoPersona().equals("F")) {
+			listAux = listCfdi.stream()
+					.filter(uso -> Boolean.TRUE.equals(uso.getAplicaPersonaFisica()))
+					.collect(Collectors.toList());
+		} else if (cliente.getTipoPersona().equals("M")) {
+			listAux = listCfdi.stream()
+					.filter(uso -> Boolean.TRUE.equals(uso.getAplicaPersonaMoral()))
+					.collect(Collectors.toList());
+		}
+
+		return listAux;
+	}
 
 	public List<UsoCfdi> obtenerUsoCfdis(Cliente cliente) throws InventarioException {
 
@@ -73,28 +73,29 @@ public class FiscalBL {
 		return usoCfdiDAO.buscarUsoCfdiPorTipoPersona(cliente.getTipoPersona());
 
 	}
-        
-        public List<RegimenFiscal> obtenerRegimenesFiscales() {
-            return regimenFiscalDAO.buscarTodos();
-        }
-        
-        public List<RegimenFiscal> filtrarRegimenesFiscales(List<RegimenFiscal> listRegimenes, Cliente cliente) throws InventarioException{
-            requireNonNull(cliente, "El cliente no puede estar vacio");
-            
-            List<RegimenFiscal> listAux = new ArrayList<>();
-            
-            if(cliente.getTipoPersona().equals("F")) {
-                listAux = listRegimenes.stream()
-                    .filter(RegimenFiscal::isPersonaFisica)
-                    .collect(Collectors.toList());
-            } else if (cliente.getTipoPersona().equals("M")) {
-                listAux = listRegimenes.stream()
-                    .filter(RegimenFiscal::isPersonaMoral)
-                    .collect(Collectors.toList());
-            }
-            
-            return listAux;
-        }
+
+	public List<RegimenFiscal> obtenerRegimenesFiscales() {
+		return regimenFiscalDAO.buscarTodos();
+	}
+
+	public List<RegimenFiscal> filtrarRegimenesFiscales(List<RegimenFiscal> listRegimenes, Cliente cliente)
+			throws InventarioException {
+		requireNonNull(cliente, "El cliente no puede estar vacio");
+
+		List<RegimenFiscal> listAux = new ArrayList<>();
+
+		if (cliente.getTipoPersona().equals("F")) {
+			listAux = listRegimenes.stream()
+					.filter(RegimenFiscal::isPersonaFisica)
+					.collect(Collectors.toList());
+		} else if (cliente.getTipoPersona().equals("M")) {
+			listAux = listRegimenes.stream()
+					.filter(RegimenFiscal::isPersonaMoral)
+					.collect(Collectors.toList());
+		}
+
+		return listAux;
+	}
 
 	public List<RegimenFiscal> obtenerRegimenesFiscales(Cliente cliente) throws InventarioException {
 		requireNonNull(cliente, "El cliente no puede estar vacío");
@@ -126,7 +127,15 @@ public class FiscalBL {
 
 	}
 
+	public void validarRegimenCapital(Cliente cliente) throws InventarioException {
+		if ("M".equalsIgnoreCase(cliente.getCteRfc())
+				&& (cliente.getRegimenCapital() == null || cliente.getRegimenCapital().trim().equalsIgnoreCase(""))) {
+			throw new InventarioException("Debe indicar un régimen capital");
+		}
+	}
+
 	public void validarCodigoUnico(Cliente cliente1, Cliente cliente2) throws InventarioException {
+
 		if (cliente2 != null) {
 			if (cliente1 == null) {
 				throw new InventarioException("El cliente1 está vacío");
@@ -161,9 +170,9 @@ public class FiscalBL {
 	}
 
 	public List<MedioPago> obtenerMediosPago() {
-		List<MedioPago> lista =   medioPagoDAO.buscarVigentes(new Date());
-	
-		if (lista == null){
+		List<MedioPago> lista = medioPagoDAO.buscarVigentes(new Date());
+
+		if (lista == null) {
 			return new ArrayList<>();
 		}
 
@@ -172,7 +181,7 @@ public class FiscalBL {
 
 	public List<MetodoPago> obtenerMetodosPago() {
 
-		List<MetodoPago> lista = metodoPagoDAO.buscarVigentes(new Date()); 
+		List<MetodoPago> lista = metodoPagoDAO.buscarVigentes(new Date());
 
 		if (lista == null) {
 			return new ArrayList<>();

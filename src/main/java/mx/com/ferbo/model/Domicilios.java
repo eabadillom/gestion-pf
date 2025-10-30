@@ -79,7 +79,7 @@ public class Domicilios implements Serializable {
     @Column(name = "domicilio_fax")
     private String domicilioFax;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "domicilios", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "domicilios")
     private List<ClienteDomicilios> clienteDomiciliosList;
     
     @Null

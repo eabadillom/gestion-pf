@@ -17,7 +17,8 @@
                     <p:commandButton value="Nuevo Cliente" icon="pi pi-plus" styleClass="ui-button-raised"
                         style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}" process="@this"
                         update="form:dialogCliente form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente"
-                        oncomplete="PF('dialogCliente').show();">
+                        onstart="PF('statusInfoDialog').show();"
+                        oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();">
                     </p:commandButton>
                     <p:outputLabel value="Habilitados:" style="margin-right:8px" />
                     <p:inputSwitch value="#{clientesBean.estatusClientes}">
@@ -41,7 +42,8 @@
                     </p:column>
                     <p:column width="2rem" style="text-align: center;">
                         <p:commandButton icon="pi pi-pencil" styleClass="edit-button"
-                            oncomplete="PF('dialogCliente').show(); PF('statusInfoDialog').hide();" process="@this"
+                            onstart="PF('statusInfoDialog').show();"
+                            oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();" process="@this"
                             update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoCliente(cliente)}"
                             resetValues="form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente" />
                     </p:column>
@@ -74,7 +76,8 @@
                 <f:facet name="footer">
                     <p:commandButton value="#{(clientesBean.clienteSelected.cteCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" process="@this"
                         actionListener="#{clientesBean.guardarOActualizarCliente()}" update="dtClientes"
-                        oncomplete="PF('dialogCliente').hide()" />
+                        onstart="PF('dialogCliente').hide(); PF('statusInfoDialog').show();"
+                        oncomplete="PF('statusInfoDialog').hide();"/>
                     <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogCliente').hide()"
                         immediate="true" class="ui-button-secondary" resetValues="true" />
                 </f:facet>

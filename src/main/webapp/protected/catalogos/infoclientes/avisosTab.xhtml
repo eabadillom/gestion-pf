@@ -8,7 +8,7 @@
                          value="Nuevo Aviso"
                          actionListener="#{clientesBean.nuevoAviso()}" 
                          process="@this"
-                         update="form:tabView:pnlAviso"
+                         update="form:tabView:dialogAviso form:tabView:pnlAviso"
                          oncomplete="PF('dialogAviso').show();"
                          styleClass="ui-button-raised"
                          style="margin-right: .5rem; width: auto;"
@@ -50,7 +50,7 @@
             </p:column>
             <p:column width="2rem" style="text-align: center;">
                 <p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button" oncomplete="PF('dialogAviso').show()"
-                                 update="form:tabView:pnlAviso">
+                                 update="form:tabView:dialogAviso form:tabView:pnlAviso">
                     <f:setPropertyActionListener value="#{pAviso}" target="#{clientesBean.avisoSelected}" />
                 </p:commandButton>
             </p:column>
@@ -63,7 +63,7 @@
     </div>
 
     <p:dialog id="dialogAviso" widgetVar="dialogAviso" 
-              header="Aviso" showEffect="fade"
+              header="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'} Aviso" showEffect="fade"
               modal="false" responsive="true" resizable="false" cache="false" style="max-width:80em !important;" dynamic="true">
 
         <p:outputPanel id="pnlAviso" class="ui-fluid">
@@ -170,7 +170,7 @@
 
                 <div>
                     <p:commandButton value="Nuevo Precio Servicio" icon="pi pi-plus"
-                                     action="#{clientesBean.nuevoPrecioAviso()}" update="form:tabView:pnlSerAviso"
+                                     action="#{clientesBean.nuevoPrecioAviso()}" update="form:tabView:dialogServicioAviso form:tabView:pnlSerAviso"
                                      process="@this" oncomplete="PF('dialogServicioAviso').show()" styleClass="ui-button-raised"
                                      style="margin-right: .5rem; width: auto;" />
                 </div>
@@ -194,7 +194,7 @@
                         <p:column width="5%" style="text-align: right !important;">
                             <p:commandButton class="ui-button-primary" icon="pi pi-pencil" process="@this"
                                              oncomplete="PF('dialogServicioAviso').show(); $('.ui-widget-overlay').remove();"
-                                             update="form:tabView:pnlSerAviso">
+                                             update="form:tabView:dialogServicioAviso form:tabView:pnlSerAviso">
                                 <f:setPropertyActionListener value="#{pServicioAviso}" target="#{clientesBean.precioAvisoSelected}" />
                             </p:commandButton>
                         </p:column>
@@ -210,8 +210,8 @@
         </p:outputPanel>
 
         <f:facet name="footer">
-            <p:commandButton value="Agregar" icon="pi pi-check"
-                             actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="form:tabView"
+            <p:commandButton value="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
+                             actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="dtAvisos"
                              process="pnlAviso @this" oncomplete="PF('dialogAviso').hide()" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogAviso').hide()"
                              class="ui-button-secondary"
@@ -219,7 +219,7 @@
         </f:facet>
     </p:dialog>
 
-    <p:dialog header="Precio Servicio" id="dialogServicioAviso" showEffect="fade" modal="false" widgetVar="dialogServicioAviso" responsive="true" position="center center"
+    <p:dialog header="#{(clientesBean.precioAvisoSelected.id != null) ? 'Actualizar' : 'Agregar'} Precio Servicio" id="dialogServicioAviso" showEffect="fade" modal="false" widgetVar="dialogServicioAviso" responsive="true" position="center center"
               width="50%" resizable="false" dynamic="true">
         <p:outputPanel id="pnlSerAviso" class="ui-fluid">
             <p:outputPanel>
@@ -253,7 +253,7 @@
             </p:outputPanel>
         </p:outputPanel>
         <f:facet name="footer">
-            <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{clientesBean.operarAvisos('agregarservicio')}"
+            <p:commandButton value="#{(clientesBean.precioAvisoSelected.id != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" actionListener="#{clientesBean.operarAvisos('agregarservicio')}"
                              update="dtServicioAviso" process="pnlSerAviso @this" oncomplete="PF('dialogServicioAviso').hide()" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogServicioAviso').hide()" class="ui-button-secondary"
                              resetValues="true" immediate="true" />

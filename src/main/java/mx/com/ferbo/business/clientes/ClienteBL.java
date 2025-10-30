@@ -16,7 +16,10 @@ import mx.com.ferbo.dao.n.ClienteDAO;
 import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.RegimenFiscal;
+import mx.com.ferbo.model.SerieConstancia;
+import mx.com.ferbo.model.SerieConstanciaPK;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.InventarioException;
 
@@ -33,26 +36,26 @@ public class ClienteBL {
     @Inject
     private ClienteDAO clienteDAO;
 
-    public List<Cliente>  obtenerTodos(){
+    public List<Cliente> obtenerTodos() {
         List<Cliente> lista = clienteDAO.buscarTodos();
-        
-        if(lista == null){
+
+        if (lista == null) {
             return new ArrayList<>();
         }
 
         return lista;
     }
 
-    public Cliente obtenerTodoCliente(Integer id, Boolean isFullInfo) throws InventarioException{
+    public Cliente obtenerTodoCliente(Integer id, Boolean isFullInfo) throws InventarioException {
 
         return clienteDAO.obtenerPorId(id, isFullInfo);
 
     }
 
-    public Cliente obtenerPorCodigoUnico(String codigo){
+    public Cliente obtenerPorCodigoUnico(String codigo) {
 
         return clienteDAO.buscarPorCodigoUnico(codigo);
-        
+
     }
 
     public Cliente nuevoCliente() {
@@ -66,6 +69,59 @@ public class ClienteBL {
         cliente.setAvisoList(new ArrayList());
 
         return cliente;
+    }
+
+    public void asignarCandadoSalida(List<Planta> plantas, Cliente cliente) {
+
+        CandadoSalida candadoSalida = new CandadoSalida();
+        candadoSalida.setHabilitado(true);
+        candadoSalida.setCliente(cliente);
+        candadoSalida.setNumSalidas(1);
+
+        cliente.setCandadoSalida(candadoSalida);
+
+        for (Planta planta : plantas) {
+
+            SerieConstanciaPK serieConstanciaPK_I = new SerieConstanciaPK();
+            serieConstanciaPK_I.setCliente(cliente);
+            serieConstanciaPK_I.setPlanta(planta);
+            serieConstanciaPK_I.setTpSerie("I");
+            SerieConstancia serieConstanciaI = new SerieConstancia();
+            serieConstanciaI.setSerieConstanciaPK(serieConstanciaPK_I);
+            serieConstanciaI.setNuSerie(1);
+            cliente.addSerieConstancia(serieConstanciaI);
+            planta.add(serieConstanciaI);
+
+            SerieConstanciaPK serieConstanciaPK_O = new SerieConstanciaPK();
+            serieConstanciaPK_O.setCliente(cliente);
+            serieConstanciaPK_O.setPlanta(planta);
+            serieConstanciaPK_O.setTpSerie("O");
+            SerieConstancia serieConstanciaO = new SerieConstancia();
+            serieConstanciaO.setSerieConstanciaPK(serieConstanciaPK_O);
+            serieConstanciaO.setNuSerie(1);
+            cliente.addSerieConstancia(serieConstanciaO);
+            planta.add(serieConstanciaO);
+
+            SerieConstanciaPK serieConstanciaPK_T = new SerieConstanciaPK();
+            serieConstanciaPK_T.setCliente(cliente);
+            serieConstanciaPK_T.setPlanta(planta);
+            serieConstanciaPK_T.setTpSerie("T");
+            SerieConstancia serieConstanciaT = new SerieConstancia();
+            serieConstanciaT.setSerieConstanciaPK(serieConstanciaPK_T);
+            serieConstanciaT.setNuSerie(1);
+            cliente.addSerieConstancia(serieConstanciaT);
+            planta.add(serieConstanciaT);
+
+            SerieConstanciaPK serieConstanciaPK_S = new SerieConstanciaPK();
+            serieConstanciaPK_S.setCliente(cliente);
+            serieConstanciaPK_S.setPlanta(planta);
+            serieConstanciaPK_S.setTpSerie("S");
+            SerieConstancia serieConstanciaS = new SerieConstancia();
+            serieConstanciaS.setSerieConstanciaPK(serieConstanciaPK_S);
+            serieConstanciaS.setNuSerie(1);
+            cliente.addSerieConstancia(serieConstanciaS);
+            planta.add(serieConstanciaS);
+        }
     }
 
     public String guardarOActualizar(Cliente cliente) throws InventarioException {
