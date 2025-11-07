@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
@@ -24,36 +24,57 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
         super(PrecioServicio.class);
     }
 
-    public List<PrecioServicio> buscarPorCliente(Integer idCliente) throws InventarioException {
-        EntityManager em = super.getEntityManager();
-        List<PrecioServicio> precios = new ArrayList<>();
+    private List<PrecioServicio> buscarPorClienteServicio(PrecioServicio ps) throws DAOException {
+        List<PrecioServicio> lista = null;
+        EntityManager em = null;
 
         try {
-            precios = em
-                    .createNamedQuery("PrecioServicio.findByIdClienteConRelaciones", PrecioServicio.class)
-                    .setParameter("idCliente", idCliente)
+            em = super.getEntityManager();
+            lista = em.createNamedQuery("PrecioServicio.findByClienteServicio", PrecioServicio.class)
+                    .setParameter("cteCve", ps.getCliente().getCteCve())
+                    .setParameter("servicioCve", ps.getServicio())
                     .getResultList();
         } catch (Exception ex) {
-            throw new InventarioException("No existen datos relacionados con el identificador " + idCliente);
+            log.error("Error al obtener la lista de PrecioServicio (cteCve={}, servicio={})",
+                    ps.getCliente().getCteCve(), ps.getServicio(), ex);
+            throw new DAOException("Error al consultar los precios de los servicios para el cliente", ex);
         } finally {
             super.close(em);
         }
-        return precios;
+        return lista;
     }
 
-    public List<PrecioServicio> buscarDisponiblesPorClienteYAviso(Integer cteCve, Integer avisoCve) throws InventarioException {
-		List<PrecioServicio> list = null;
-		EntityManager em = null;
-		try {
-			em = super.getEntityManager();
-			list = em.createNamedQuery("PrecioServicio.findActivosByClienteYAviso", PrecioServicio.class)
-					.setParameter("cteCve", cteCve)
-					.setParameter("avisoCve", avisoCve).getResultList();
-		} catch(Exception ex) {
-			throw new InventarioException("Problema para obtener los servicios activos del aviso");
-		} finally {
-			super.close(em);
-		}
-		return list;
-	}
+    private List<PrecioServicio> buscarPorClienteAviso(PrecioServicio ps) throws DAOException {
+        List<PrecioServicio> lista = null;
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+            lista = em.createNamedQuery("PrecioServicio.findByClienteAviso", PrecioServicio.class)
+                    .setParameter("cteCve", ps.getCliente().getCteCve())
+                    .setParameter("avisoCve", ps.getAvisoCve().getAvisoCve())
+                    .getResultList();
+        } catch (Exception ex) {
+            log.error("Problema para obtener el listado de precio servicio...", ex);
+            throw new DAOException("Error al consultar los precios de los servicios para el cliente", ex);
+        } finally {
+            super.close(em);
+        }
+        return lista;
+    }
+
+    private List<PrecioServicio> buscarPorCliente(PrecioServicio ps) {
+        List<PrecioServicio> list = null;
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+            list = em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
+                    .setParameter("cteCve", ps.getCliente().getCteCve()).getResultList();
+        } catch (Exception ex) {
+            log.error("Problema para obtener la lista de precio servicio...", ex);
+        } finally {
+            super.close(em);
+        }
+
+        return list;
+    }
 }

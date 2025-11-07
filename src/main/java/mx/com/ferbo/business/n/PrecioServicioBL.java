@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.clientes;
+package mx.com.ferbo.business.n;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,16 +28,11 @@ import org.apache.logging.log4j.Logger;
  */
 @Named
 @RequestScoped
-public class ServiciosBL {
+public class PrecioServicioBL {
 
-    private static final Logger log = LogManager.getLogger(ServiciosBL.class);
+    private static Logger log = LogManager.getLogger(PrecioServicioBL.class);
 
-    @Inject
-    private UnidadManejoDAO unidadManejoDAO;
-
-    @Inject
-    private ServicioDAO servicioDAO;
-
+    
     @Inject
     private PrecioServicioDAO precioServicioDAO;
 
@@ -64,26 +59,18 @@ public class ServiciosBL {
         }
     }
 
-    public List<UnidadDeManejo> obtenerUnidadesMenjo() {
-
-        List<UnidadDeManejo> lista = unidadManejoDAO.buscarTodos();
-
-        if (lista == null) {
-            return new ArrayList<>();
-        }
-
-        return lista;
-    }
-
-    public List<Servicio> obtenerServicios() {
-        List<Servicio> lista = servicioDAO.buscarTodos();
-
-        if (lista == null) {
-            return new ArrayList<>();
-        }
-
-        return lista;
-    }
+    public List<PrecioServicio> buscarPorCriterios(PrecioServicio e) {
+		if(e.getCliente().getCteCve() == null)
+			return null;
+		if(e.getServicio()!=null) {
+			return precioServicioDAO.buscarPorClienteServicio(e);
+		}
+		if(e.getAvisoCve()!=null) {
+			return precioServicioDAO.buscarPorClienteAviso(e);
+		}
+		return precioServicioDAO.buscarPorCliente(e);
+	}
+    
 
     public void agregarOActualizarPrecioServicio(Cliente cliente, PrecioServicio precioServicio)
             throws InventarioException {

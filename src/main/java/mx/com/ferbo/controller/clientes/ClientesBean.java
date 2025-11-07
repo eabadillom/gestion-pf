@@ -18,16 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.business.clientes.AvisoBL;
-import mx.com.ferbo.business.clientes.ClienteBL;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.InventarioException;
-
-import mx.com.ferbo.business.clientes.FiscalBL;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
@@ -37,13 +33,15 @@ import mx.com.ferbo.model.Usuario;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.clientes.ServiciosBL;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
-
-import mx.com.ferbo.business.clientes.ContactoBL;
-import mx.com.ferbo.business.clientes.DomiciliosBL;
-import mx.com.ferbo.business.clientes.SeguridadBL;
+import mx.com.ferbo.business.n.AvisoBL;
+import mx.com.ferbo.business.n.ClienteBL;
+import mx.com.ferbo.business.n.ClienteContactoBL;
+import mx.com.ferbo.business.n.DomiciliosBL;
+import mx.com.ferbo.business.n.FiscalBL;
+import mx.com.ferbo.business.n.PrecioServicioBL;
+import mx.com.ferbo.business.n.SeguridadBL;
 import mx.com.ferbo.controller.SideBarBean;
 import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
@@ -87,7 +85,7 @@ public class ClientesBean implements Serializable {
 
     // Objetos para contactos
     @Inject
-    ContactoBL contactoBL;
+    ClienteContactoBL contactoBL;
 
     private ClienteContacto clienteContactoSelected;
     private Contacto contactoSelected;
@@ -109,7 +107,7 @@ public class ClientesBean implements Serializable {
 
     // Objetos para Servicios
     @Inject
-    private ServiciosBL serviciosBL;
+    private PrecioServicioBL serviciosBL;
 
     private PrecioServicio precioServicioSelected;
     private List<PrecioServicio> lstPrecioServicios;
@@ -220,15 +218,6 @@ public class ClientesBean implements Serializable {
     public void guardarOActualizarCliente() {
         String mensaje = null;
         try {
-            if (clienteSelected.getCteCve() == null) {
-                if ("m".equalsIgnoreCase(clienteSelected.getRegimenCapital())) {
-                    fiscalBL.validarRegimenCapital(clienteSelected);
-                }
-                Cliente clientAux = clienteBL.obtenerPorCodigoUnico(clienteSelected.getCodUnico());
-                fiscalBL.validarCodigoUnico(clientAux, clienteSelected);
-                List<Planta> plantas = avisoBL.obtenerPlantas(Boolean.TRUE);
-                clienteBL.asignarCandadoSalida(plantas, clienteSelected);
-            }
             mensaje = clienteBL.guardarOActualizar(clienteSelected);
             this.lstClientes = null;
             this.lstClientes = clienteBL.obtenerTodos();

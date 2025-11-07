@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.clientes;
+package mx.com.ferbo.business.n;
 
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
@@ -14,16 +14,11 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.dao.n.ClienteContactoDAO;
 import mx.com.ferbo.dao.n.ContactoDAO;
 import mx.com.ferbo.dao.n.MedioCntDAO;
-import mx.com.ferbo.dao.n.TipoMailDAO;
-import mx.com.ferbo.dao.n.TipoTelefonoDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
-import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
-import mx.com.ferbo.model.Telefono;
-import mx.com.ferbo.model.TipoMail;
-import mx.com.ferbo.model.TipoTelefono;
+import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 
@@ -33,9 +28,9 @@ import mx.com.ferbo.util.InventarioException;
  */
 @Named
 @RequestScoped
-public class ContactoBL {
+public class ClienteContactoBL {
 
-    private static final Logger log = LogManager.getLogger(ContactoBL.class);
+    private static final Logger log = LogManager.getLogger(ClienteContactoBL.class);
 
     @Inject
     private MedioCntDAO medioCntDAO;
@@ -46,12 +41,6 @@ public class ContactoBL {
     @Inject
     private ContactoDAO contactoDAO;
 
-    @Inject
-    private TipoTelefonoDAO tipoTelefonoDAO;
-
-    @Inject
-    private TipoMailDAO tipoMailDAO;
-
     public ClienteContacto nuevoContacto() {
         ClienteContacto clienteContacto = new ClienteContacto();
         Contacto contacto = new Contacto();
@@ -61,42 +50,15 @@ public class ContactoBL {
         return clienteContacto;
     }
 
-    public MedioCnt nuevoMedio() {
-        MedioCnt medio = new MedioCnt();
-        return medio;
-    }
-
     public List<ClienteContacto> obtenerListaContactos(Cliente cliente) throws InventarioException {
 
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío.");
-
-        List<ClienteContacto> lista = clienteContactoDAO.obtenerPorClienteId(cliente);
-
-        if (lista == null) {
-            return new ArrayList<>();
+        try {
+            return clienteContactoDAO.obtenerPorClienteId(cliente);
+        } catch (DAOException ex) {
+            log.error("Error al obtener los contactos del cliente: " + cliente.getNombre(), ex);
+            throw new InventarioException("Ocurrió un error al obtener  los contactos del cliente: " + cliente.getNombre(), ex);
         }
-
-        return lista;
-    }
-
-    public List<TipoMail> obtenerTiposMail() {
-        List<TipoMail> lista = tipoMailDAO.buscarTodos();
-
-        if (lista == null) {
-            return new ArrayList<>();
-        }
-
-        return lista;
-    }
-
-    public List<TipoTelefono> obtenerTiposTelefono() {
-        List<TipoTelefono> lista = tipoTelefonoDAO.buscarTodos();
-
-        if (lista == null) {
-            return new ArrayList<>();
-        }
-
-        return lista;
     }
 
     public ClienteContacto nuevoClienteContacto() {
@@ -189,23 +151,6 @@ public class ContactoBL {
             contactoDAO.eliminar(clienteContacto.getIdContacto());
             clienteContactoDAO.eliminar(clienteContacto);
 
-        }
-    }
-
-    public void seleccionarMedioContacto(MedioCnt medioCnt) throws InventarioException {
-
-        switch (medioCnt.getTpMedio()) {
-
-            case "m":
-                medioCnt.setIdMail(new Mail());
-                break;
-
-            case "t":
-                medioCnt.setIdTelefono(new Telefono());
-                break;
-
-            default:
-                throw new InventarioException("Tipo de medio de contacto no valido");
         }
     }
 

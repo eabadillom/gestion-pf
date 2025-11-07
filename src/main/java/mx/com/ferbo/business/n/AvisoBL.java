@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.clientes;
+package mx.com.ferbo.business.n;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -14,18 +14,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.AvisoDAO;
-import mx.com.ferbo.dao.n.CategoriaDAO;
-import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.dao.n.PrecioServicioDAO;
-import mx.com.ferbo.dao.n.UdCobroDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
-import mx.com.ferbo.model.UdCobro;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -33,15 +30,6 @@ import mx.com.ferbo.util.InventarioException;
 public class AvisoBL {
 
     private static Logger log = LogManager.getLogger(AvisoBL.class);
-
-    @Inject
-    private CategoriaDAO categoriaDAO;
-
-    @Inject
-    private UdCobroDAO udCobroDAO;
-
-    @Inject
-    private PlantaDAO plantaDAO;
 
     @Inject
     private AvisoDAO avisoDAO;
@@ -68,40 +56,11 @@ public class AvisoBL {
         return pServicio;
     }
 
-    public List<Categoria> obtenerCategorias() {
-        List<Categoria> list = categoriaDAO.buscarTodos();
-
-        if (list == null) {
-            return new ArrayList<>();
-        }
-
-        return list;
-    }
-
-    public List<UdCobro> obtenerUnidadesCobro() {
-        List<UdCobro> list = udCobroDAO.buscarTodos();
-
-        if (list == null) {
-            return new ArrayList<>();
-        }
-
-        return list;
-    }
-
-    public List<Planta> obtenerPlantas(Boolean isFullInfo) {
-        List<Planta> list = plantaDAO.buscarTodos(isFullInfo);
-
-        if (list == null) {
-            return new ArrayList<>();
-        }
-
-        return list;
-    }
-
     public void agregarAviso(Cliente cliente, Aviso aviso) throws InventarioException {
 
-        requireNonNull(cliente, "El cliente no puede ser vacío");
-        requireNonNull(aviso, "El aviso no puede ser vacío");
+        log.info("Se verifica información de cliente y aviso");
+        FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
+        FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
 
         if (cliente.getAvisoList() == null) {
             cliente.setAvisoList(new ArrayList<>());
@@ -109,19 +68,23 @@ public class AvisoBL {
 
         final List<Aviso> lista = cliente.getAvisoList();
 
+        log.info("Se busca el aviso dentro de la lista de avisos del cliente");
         int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(aviso)).findFirst().orElse(-1);
 
         if (index >= 0) {
+            log.info("Se actualizo temporalmente el aviso del cliente");
             cliente.getAvisoList().set(index, aviso);
         } else {
+            log.info("Se agrego temporalmente el nuevo aviso a la lista de avisos del cliente");
             cliente.getAvisoList().add(aviso);
         }
     }
 
     public void agregarServicioAviso(Aviso aviso, PrecioServicio precioServicio) throws InventarioException {
 
-        requireNonNull(aviso, "El aviso no puede ser vacío");
-        requireNonNull(aviso, "El servicio no puede ser vacío");
+        log.info("Se verifica información de aviso y precioservicio");
+        FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
+        FacesUtils.requireNonNull(aviso, "El servicio no puede ser vacío");
 
         List<PrecioServicio> preciosServicios = aviso.getPrecioServicioList();
 
@@ -132,6 +95,7 @@ public class AvisoBL {
 
         final List<PrecioServicio> lista = preciosServicios;
 
+        log.info("Se busca el aviso dentro de la lista de avisos del cliente");
         int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(precioServicio)).findFirst()
                 .orElse(-1);
 
@@ -143,8 +107,8 @@ public class AvisoBL {
     }
 
     public void eliminaAviso(Cliente cliente, Aviso aviso) throws InventarioException {
-        requireNonNull(cliente, "El cliente no puede ser vacío");
-        requireNonNull(aviso, "El aviso no puede ser vacío");
+        FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
+        FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
 
         List<Aviso> avisos = cliente.getAvisoList();
         List<PrecioServicio> preciosServicios = aviso.getPrecioServicioList();
@@ -163,23 +127,16 @@ public class AvisoBL {
     }
 
     public void eliminaServicioAviso(Aviso aviso, PrecioServicio ps) throws InventarioException {
-        requireNonNull(aviso, "El aviso no puede ser vacío");
-        requireNonNull(ps, "El servicio no puede ser vacío");
+        FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
+        FacesUtils.requireNonNull(ps, "El servicio no puede ser vacío");
 
         List<PrecioServicio> precioServicios = aviso.getPrecioServicioList();
-        requireNonNull(precioServicios, "El aviso no tiene servicios para eliminar");
+        FacesUtils.requireNonNull(precioServicios, "El aviso no tiene servicios para eliminar");
 
         precioServicios.remove(ps);
 
         if (ps.getId() != null) {
             precioServicioDAO.eliminar(ps);
         }
-    }
-
-    private <T> T requireNonNull(T obj, String mensaje) throws InventarioException {
-        if (obj == null) {
-            throw new InventarioException(mensaje);
-        }
-        return obj;
     }
 }

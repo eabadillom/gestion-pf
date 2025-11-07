@@ -1,7 +1,6 @@
-package mx.com.ferbo.business.clientes;
+package mx.com.ferbo.business.n;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,17 +10,14 @@ import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import mx.com.ferbo.dao.n.MedioPagoDAO;
-import mx.com.ferbo.dao.n.MetodoPagoDAO;
 import mx.com.ferbo.dao.n.RegimenFiscalDAO;
 import mx.com.ferbo.dao.n.UsoCfdiDAO;
 import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.util.ClienteUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -29,12 +25,6 @@ import mx.com.ferbo.util.InventarioException;
 public class FiscalBL {
 
 	private static Logger log = LogManager.getLogger(FiscalBL.class);
-
-	@Inject
-	private MedioPagoDAO medioPagoDAO;
-
-	@Inject
-	private MetodoPagoDAO metodoPagoDAO;
 
 	@Inject
 	private RegimenFiscalDAO regimenFiscalDAO;
@@ -47,7 +37,7 @@ public class FiscalBL {
 	}
 
 	public List<UsoCfdi> filtrarCfdis(List<UsoCfdi> listCfdi, Cliente cliente) throws InventarioException {
-		requireNonNull(cliente, "El cliente no puede estar vacio");
+		FacesUtils.requireNonNull(cliente, "El cliente no puede estar vacio");
 
 		List<UsoCfdi> listAux = new ArrayList<>();
 
@@ -66,9 +56,9 @@ public class FiscalBL {
 
 	public List<UsoCfdi> obtenerUsoCfdis(Cliente cliente) throws InventarioException {
 
-		requireNonNull(cliente, "El cliente no puede estar vacío");
+		FacesUtils.requireNonNull(cliente, "El cliente no puede estar vacío");
 
-		requireNonNull(cliente.getTipoPersona(), "El tipo de persona del cliente esta vacío");
+		FacesUtils.requireNonNull(cliente.getTipoPersona(), "El tipo de persona del cliente esta vacío");
 
 		return usoCfdiDAO.buscarUsoCfdiPorTipoPersona(cliente.getTipoPersona());
 
@@ -80,7 +70,7 @@ public class FiscalBL {
 
 	public List<RegimenFiscal> filtrarRegimenesFiscales(List<RegimenFiscal> listRegimenes, Cliente cliente)
 			throws InventarioException {
-		requireNonNull(cliente, "El cliente no puede estar vacio");
+		FacesUtils.requireNonNull(cliente, "El cliente no puede estar vacio");
 
 		List<RegimenFiscal> listAux = new ArrayList<>();
 
@@ -98,9 +88,9 @@ public class FiscalBL {
 	}
 
 	public List<RegimenFiscal> obtenerRegimenesFiscales(Cliente cliente) throws InventarioException {
-		requireNonNull(cliente, "El cliente no puede estar vacío");
+		FacesUtils.requireNonNull(cliente, "El cliente no puede estar vacío");
 
-		requireNonNull(cliente.getTipoPersona(), "El tipo de persona del cliente esta vacío");
+		FacesUtils.requireNonNull(cliente.getTipoPersona(), "El tipo de persona del cliente esta vacío");
 
 		return regimenFiscalDAO.buscarPorTipoPersona(cliente.getTipoPersona());
 	}
@@ -134,17 +124,17 @@ public class FiscalBL {
 		}
 	}
 
-	public void validarCodigoUnico(Cliente cliente1, Cliente cliente2) throws InventarioException {
+	public void validarCodigoUnico(Cliente cliente, Cliente clienteBuscado) throws InventarioException {
 
-		if (cliente2 != null) {
-			if (cliente1 == null) {
-				throw new InventarioException("El cliente1 está vacío");
+		if (clienteBuscado != null) {
+			if (cliente == null) {
+				throw new InventarioException("El cliente a agregar está vacío");
 			}
 
-			if (cliente1.equals(cliente2)) {
+			if (cliente.equals(clienteBuscado)) {
 
-				throw new InventarioException("El código único " + cliente1.getCodUnico()
-						+ " ya está registrado para el cliente " + cliente1.getNombre());
+				throw new InventarioException("El código único " + cliente.getCodUnico()
+						+ " ya está registrado para el cliente " + clienteBuscado.getNombre());
 			}
 		}
 	}
@@ -167,34 +157,6 @@ public class FiscalBL {
 								.equalsIgnoreCase(cliente.getCteRfc()) == false)) {
 			cliente.setCodUnico(codigoUnico);
 		}
-	}
-
-	public List<MedioPago> obtenerMediosPago() {
-		List<MedioPago> lista = medioPagoDAO.buscarVigentes(new Date());
-
-		if (lista == null) {
-			return new ArrayList<>();
-		}
-
-		return lista;
-	}
-
-	public List<MetodoPago> obtenerMetodosPago() {
-
-		List<MetodoPago> lista = metodoPagoDAO.buscarVigentes(new Date());
-
-		if (lista == null) {
-			return new ArrayList<>();
-		}
-
-		return lista;
-	}
-
-	private <T> T requireNonNull(T obj, String mensaje) throws InventarioException {
-		if (obj == null) {
-			throw new InventarioException(mensaje);
-		}
-		return obj;
 	}
 
 }

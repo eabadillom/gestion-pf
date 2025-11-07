@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.Categoria;
+import mx.com.ferbo.util.DAOException;
 
 public class CategoriaDAO extends BaseDAO<Categoria, Integer> {
 
@@ -18,12 +19,15 @@ public class CategoriaDAO extends BaseDAO<Categoria, Integer> {
         super(Categoria.class);
     }
 
-    public List<Categoria> buscarTodos() {
+    public List<Categoria> buscarTodos() throws DAOException {
         EntityManager em = null;
         List<Categoria> list = null;
         try {
             em = super.getEntityManager();
             list = em.createNamedQuery("Categoria.findAll", Categoria.class).getResultList();
+        } catch (Exception ex){
+            log.error("Error al obtener las categorias", ex);
+            throw new DAOException("Ocurrió un error al obtener las categorias", ex);
         } finally {
             super.close(em);
         }

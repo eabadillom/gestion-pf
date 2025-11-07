@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.clientes;
+package mx.com.ferbo.business.n;
 
 import java.io.Serializable;
 import java.util.List;

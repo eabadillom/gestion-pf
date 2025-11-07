@@ -6,30 +6,35 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.UnidadDeManejo;
-import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
-public class UnidadManejoDAO extends BaseDAO<UnidadDeManejo, Integer>{
+public class UnidadManejoDAO extends BaseDAO<UnidadDeManejo, Integer> {
 
-    public UnidadManejoDAO() {
-        super(UnidadDeManejo.class);
-    }
+	private static Logger log = LogManager.getLogger(UnidadManejoDAO.class);
 
-    public List<UnidadDeManejo> buscarTodos() {
-		List<UnidadDeManejo> lista = null;
+	public UnidadManejoDAO() {
+		super(UnidadDeManejo.class);
+	}
+
+	public List<UnidadDeManejo> buscarTodos() throws DAOException {
 		EntityManager em = null;
-
 		try {
 			em = super.getEntityManager();
-			lista = em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class).getResultList();
+			return em.createNamedQuery("UnidadDeManejo.findAll", UnidadDeManejo.class)
+					.getResultList();
+		} catch (Exception ex) {
+			log.error("Error al listar unidades de manejo", ex);
+			throw new DAOException("No fue posible listar las unidades de manejo", ex);
 		} finally {
-			EntityManagerUtil.close(em);
+			super.close(em);
 		}
-		
-		return lista;
 	}
 
 }

@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.clientes;
+package mx.com.ferbo.business.n;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +35,12 @@ public class ClienteBL {
 
     @Inject
     private ClienteDAO clienteDAO;
+
+    @Inject
+    private FiscalBL fiscalBL;
+
+    @Inject
+    private PlantaBL plantaBL;
 
     public List<Cliente> obtenerTodos() {
         List<Cliente> lista = clienteDAO.buscarTodos();
@@ -125,11 +131,21 @@ public class ClienteBL {
     }
 
     public String guardarOActualizar(Cliente cliente) throws InventarioException {
-        String status = (cliente.getCteCve() != null) ? "actualizado" : "agregado";
+
+        String status = null;
         if (cliente.getCteCve() == null) {
+            if ("m".equalsIgnoreCase(cliente.getRegimenCapital())) {
+                fiscalBL.validarRegimenCapital(cliente);
+            }
+            Cliente clientAux = obtenerPorCodigoUnico(cliente.getCodUnico());
+            fiscalBL.validarCodigoUnico(clientAux, cliente);
+            List<Planta> plantas = plantaBL.obtenerPlantas(Boolean.TRUE);
+            asignarCandadoSalida(plantas, cliente); 
             clienteDAO.guardar(cliente);
+            status = "agregado";
         } else {
             clienteDAO.actualizar(cliente);
+            status = "actualizado";
         }
         return "Cliente " + status + " exitosamente";
     }

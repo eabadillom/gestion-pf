@@ -1,7 +1,10 @@
-package mx.com.ferbo.business.clientes;
+package mx.com.ferbo.business.n;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.util.InventarioException;
@@ -10,6 +13,8 @@ import mx.com.ferbo.util.SecurityUtil;
 @Named
 @RequestScoped
 public class SeguridadBL {
+
+    private static final Logger log = LogManager.getLogger(SeguridadBL.class);
 
     SecurityUtil util;
 
