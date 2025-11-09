@@ -30,6 +30,7 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import mx.com.ferbo.business.constancias.ConstanciaDepositoBL;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ConstanciaDeDepositoDAO;
 import mx.com.ferbo.dao.ConstanciaDepositoDetalleDAO;
@@ -53,8 +54,8 @@ import mx.com.ferbo.model.Tarima;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.model.Usuario;
-import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 
@@ -112,7 +113,6 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private HttpServletRequest httpServletRequest;
 	private Usuario usuario;
 	
-	private EstadoConstancia statusCancelada;
 	private EstadoConstanciaDAO statusDAO;
 	
 	private Integer cantidadTotal = null;
@@ -127,6 +127,10 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private Integer idTarima = null;
 	
 	private StreamedContent file;
+
+	// Objetos de ConstanciaDeposito
+        @Inject
+	private ConstanciaDepositoBL constanciaDepositoBL;
 	
 	public ConsultarConstanciaDeDepositoBean() {
 		
@@ -169,7 +173,7 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		
 		this.selectConstanciaDD = new ConstanciaDeDeposito();
 		this.selectConstanciaDD.setAvisoCve(new Aviso());
-		this.statusCancelada = statusDAO.buscarPorId(2);
+		statusDAO.buscarPorId(2);
 		
 		this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
 				.name("ticket.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
@@ -583,49 +587,24 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 		PrimeFaces.current().ajax().update("form:messages","form:dt-ConstanciaDepositoDetalle");
 		
 	}
-	
-	public void cancelarConstancia() {
-		FacesMessage message = null;
-		Severity severity = null;
-		String mensaje = null;
-		String titulo = "Producto";
-		
+
+	public void cancelarConstancia(){
 		try {
-			
-			if(this.selectConstanciaDD.getStatus().getEdoCve() == 2)
-				throw new InventarioException("La constancia solicitada ya está cancelada.");
-			
-			if(constanciaDeDepositoDAO.tieneSalidas(this.selectConstanciaDD.getFolio()))
-				throw new InventarioException("La entrada solicitada ya tiene movimientos de salida. No es posible cancelarla.");
-			
-			if(constanciaDeDepositoDAO.tieneFacturas(this.selectConstanciaDD.getFolio()))
-				throw new InventarioException("La entrada solicitada ya tiene movimientos de facturación. No es posible cancelarla.");
-			
-			log.info("Cancelando constancia {}", this.selectConstanciaDD.getFolioCliente());
-			this.selectConstanciaDD.setStatus(statusCancelada);
-			this.selectConstanciaDD.setObservaciones("CONSTANCIA CANCELADA EL DIA " + DateUtil.getString(this.selectConstanciaDD.getFechaIngreso(), DateUtil.FORMATO_DD_MM_YYYY));
-			constanciaDeDepositoDAO.actualizar(selectConstanciaDD);
+			log.info("Inicia proceso para cancelar la constancia de deposito con folio: " + selectConstanciaDD.getFolioCliente() );
+			constanciaDepositoBL.cancelarConstanciaDeposito(selectConstanciaDD);
 			this.buscarConstancias();
-			mensaje = "Constancia cancelada correctamente.";
-			severity = FacesMessage.SEVERITY_INFO;
-			PrimeFaces.current().executeScript("PF('cancelDialog').hide()");
+			log.info("Finaliza proceso para cancelar la constancia de deposito con folio: " + selectConstanciaDD.getFolioCliente() );
+			FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Cancelar Constancia", "La constancia fue cancelada exitosamente");
 		} catch (InventarioException ex) {
-			log.error("Problema para cancelar la entrada...", ex);
-			mensaje = ex.getMessage();
-			severity = FacesMessage.SEVERITY_WARN;
+			log.warn("Error: {}", ex);
+			FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cancelar Constancia", ex.getMessage());
 		} catch (Exception ex) {
-			log.error("Problema para cancelar la entrada...", ex);
-			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
-			severity = FacesMessage.SEVERITY_ERROR;
-		} finally {
-			message = new FacesMessage(severity, titulo, mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("form:messages","form:dt-constanciaDeDeposito");
+			log.error("Error: {}", ex);
+			FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Cancelar Constancia", "Contacte con el admistrador del sistema.");
 		}
-		
-		
-		
-		
+		finally{
+			PrimeFaces.current().ajax().update("form:messages");
+		}
 	}
 	
 	public void imprimir() {
