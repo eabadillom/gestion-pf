@@ -56,4 +56,56 @@
 					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlgDetPartida').hide();" styleClass="ui-button-outlined ui-button-secondary"/>
 				</f:facet>
 			</p:dialog>
+                        <p:dialog widgetVar="dlgDetPartidaCompleta" header="Información del producto" modal="true" responsive="true">
+				<p:outputPanel id="pnl-det-partida-completa">
+					<div class="p-grid ui-fluid">
+						<div class="p-col-12 p-md-6">
+							<p:outputLabel value="#{ingresoBean.partidaEdit.unidadDeProductoCve.productoCve.productoDs}" />
+						</div>
+						<div class="p-col-12 p-md-3">
+							<p:outputLabel value="#{ingresoBean.partidaEdit.cantidadTotal} #{ingresoBean.partidaEdit.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
+						</div>
+						<div class="p-col-12 p-md-3">
+							<p:outputLabel value="#{ingresoBean.partidaEdit.pesoTotal} kg" />
+						</div>
+					</div>
+					<p:separator />
+					<div class="p-grid ui-fluid">
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Código" />
+							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpCodigo}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}">
+							</p:inputText>
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Pedimento" />
+							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpPedimento}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}">
+							</p:inputText>
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Contenedor" />
+							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpSAP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}">
+							</p:inputText>
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Lote" />
+							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpLote}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}">
+							</p:inputText>
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Caducidad"/>
+							<p:datePicker value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpCaducidad}" placeholder="dd / mm / yyyy" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" showIcon="true" disabled="#{not ingresoBean.entrada.avisoCve.avisoCaducidad}">
+							</p:datePicker>
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Otro" />
+							<p:inputText maxlength="12" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpMP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}">
+							</p:inputText>
+						</div>
+					</div>
+				</p:outputPanel>
+				<f:facet name="footer">
+                                        <p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{ingresoBean.editarPartida()}" process="@this form:pnl-det-partida-completa" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetPartidaCompleta').hide();" styleClass="ui-button-outlined" />
+					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlgDetPartidaCompleta').hide();" styleClass="ui-button-outlined ui-button-secondary"/>
+				</f:facet>
+			</p:dialog>
 </ui:composition>

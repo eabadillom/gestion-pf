@@ -10,96 +10,169 @@
 				.ui-datalist-footer {
 					background-color: #d4d4d4 !important;
 				}
+                                .encabezados-partidas {
+                                        position: sticky;
+                                        top: 0;
+                                        background: #d4d4d4 !important;
+                                        z-index: 10;
+                                        padding-bottom: 4px;
+                                }
+                                .encabezados-partidas > div {
+                                        display: flex;
+                                        justify-content: left;
+                                        align-items: left;
+                                }
+                                .item-con-linea:not(:first-child) {
+                                        border-top: 1px solid #ccc;
+                                        padding-top: 2rem;
+                                        margin-top: 2rem;
+                                }
 			</h:outputStylesheet>
-			<p:dataList id="dl-tarimas" value="#{ingresoBean.tarimas}" var="tarima" emptyMessage="No se han agregado tarimas" type="definition">
-				<f:facet name="header">
-					<p:outputLabel value="#{ingresoBean.tarimas.size()} TARIMA(S)"></p:outputLabel>
-				</f:facet>
-				<p:dataList widgetVar="dtPartidas" value="#{tarima.partidas}" var="partida" emptyMessage="No hay productos registrados en esta tarima." type="definition">
-					<f:facet name="header">
-						<div class="p-grid ui-fluid">
-							<div class="p-col-12 p-md-10">
-								TARIMA #{tarima.nombre}
-							</div>
-							<div class="p-col-12 p-md-2">
-								<div align="right">
-									<p:commandButton icon="pi pi-plus" title="Agregar producto" actionListener="#{ingresoBean.prepararPartida}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgAddProducto').show();" process="@this" update="form:pnl-add-producto" styleClass="ui-button-outlined">
-										<f:setPropertyActionListener value="#{tarima}" target="#{ingresoBean.tarima}" />
-									</p:commandButton>
-									<p:spacer width="10"/>
-									<p:commandButton icon="pi pi-trash" title="Eliminar tarima" actionListener="#{ingresoBean.eliminarTarima(tarima)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" process="@this" update="form:dl-tarimas" styleClass="ui-button-danger ui-button-outlined">
-										<p:confirm header="Eliminar tarima" message="¿Está seguro que quiere eliminar esta tarima?" icon="pi pi-exclamation-triangle" />
-									</p:commandButton>
-								</div>
-							</div>
-						</div>
-					</f:facet>
-					<div class="p-grid ui-fluid">
-						<div class="p-col-12 p-md-6" style="vertical-align: middle !important;">
-							<p:inputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}" readonly="true" />
-						</div>
-						<div class="p-col-12 p-md-2">
-							<p:inputNumber value="#{partida.cantidadTotal}" minValue="0" maxValue="100000" placeholder="Cantidad" decimalPlaces="0" inputStyle="text-align: right;" symbol=" #{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" symbolPosition="s">
-								<p:ajax event="blur" process="@this" update="form:dl-tarimas" />
-							</p:inputNumber>
-						</div>
-						<div class="p-col-12 p-md-2">
-							<p:inputNumber value="#{partida.pesoTotal}" minValue="0" maxValue="10000000" placeholder="Peso (kg)" decimalPlaces="3" inputStyle="text-align: right;" symbol=" kg" symbolPosition="s">
-								<p:ajax event="blur" process="@this" update="form:dl-tarimas" />
-							</p:inputNumber>
-						</div>
-						<div class="p-col-12 p-md-2">
-							<div align="right">
-								<p:commandButton icon="pi pi-search" process="@this" update=":form:pnl-det-partida" oncomplete="PF('dlgDetPartida').show();" styleClass="ui-button-outlined">
-									<f:setPropertyActionListener value="#{partida}" target="#{ingresoBean.partidaEdit}"></f:setPropertyActionListener>
-								</p:commandButton>
-								<p:spacer width="10"/>
-								<p:commandButton icon="pi pi-times" process="@this" update="form:dl-tarimas" actionListener="#{ingresoBean.eliminarProducto(partida)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" styleClass="ui-button-outlined ui-button-danger">
-									<p:confirm header="Eliminar producto" message="¿Está seguro que quiere eliminar este producto?" icon="pi pi-exclamation-triangle" />
-								</p:commandButton>
-							</div>
-						</div>
-					</div>
-					<f:facet name="footer">
-						<div class="p-grid ui-fluid">
-							<div class="p-col-12 p-md-6">
-								<div style="text-align: left;">
-									<p:outputLabel value="#{tarima.partidas.size()} producto(s)"></p:outputLabel>
-								</div>
-							</div>
-							<div class="p-col-12 p-md-2">
-								<div style="text-align: right;">
-									<p:outputLabel value="#{ingresoBean.cantidadTarima(tarima)} unidades"></p:outputLabel>
-								</div>
-							</div>
-							<div class="p-col-12 p-md-2">
-								<div style="text-align: right;">
-									<p:outputLabel value="#{ingresoBean.pesoTarima(tarima)} kg"></p:outputLabel>
-								</div>
-							</div>
-						</div>
-					</f:facet>
-				</p:dataList>
-				<p:spacer style="height: 2rem;"/>
-				<f:facet name="footer">
-					<div class="p-grid ui-fluid">
-						<div class="p-col-12 p-md-6">
-							<div style="text-align: left;">
-								<p:outputLabel value="#{ingresoBean.totalTarimas()} Tarima(s)"></p:outputLabel>
-							</div>
-						</div>
-						<div class="p-col-12 p-md-2">
-							<div style="text-align: right;">
-								<p:outputLabel value="#{ingresoBean.totalCantidad()} Unidad(es)"></p:outputLabel>
-							</div>
-						</div>
-						<div class="p-col-12 p-md-2">
-							<div style="text-align: right;">
-								<p:outputLabel value="#{ingresoBean.totalPeso()} kg"></p:outputLabel>
-							</div>
-						</div>
-					</div>
-					<p:outputLabel value="Totales:"></p:outputLabel>
-				</f:facet>
-			</p:dataList>
+                        <p:outputPanel id="pnl-tarimas" styleClass="ui-fluid">
+                            <p:tabView id="tabViewPartidas" class="ui-fluid" dynamic="true" effect="drop">
+                                <p:tab title="CARGA POR TARIMA">
+                                            <p:dataList id="dl-tarimas" value="#{ingresoBean.tarimas}" var="tarima" emptyMessage="No se han agregado tarimas" type="definition">
+                                            <f:facet name="header">
+                                                    <p:outputLabel value="#{ingresoBean.tarimas.size()} TARIMA(S)"></p:outputLabel>
+                                            </f:facet>
+                                            <p:dataList widgetVar="dtPartidas" value="#{tarima.partidas}" var="partida" emptyMessage="No hay productos registrados en esta tarima." type="definition">
+                                                    <f:facet name="header">
+                                                            <div class="p-grid ui-fluid">
+                                                                    <div class="p-col-12 p-md-10">
+                                                                            TARIMA #{tarima.nombre}
+                                                                    </div>
+                                                                    <div class="p-col-12 p-md-2">
+                                                                            <div align="right">
+                                                                                    <p:commandButton icon="pi pi-plus" title="Agregar producto" actionListener="#{ingresoBean.prepararPartida}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgAddProducto').show();" process="@this" update="form:pnl-add-producto" styleClass="ui-button-outlined">
+                                                                                            <f:setPropertyActionListener value="#{tarima}" target="#{ingresoBean.tarima}" />
+                                                                                    </p:commandButton>
+                                                                                    <p:spacer width="10"/>
+                                                                                    <p:commandButton icon="pi pi-trash" title="Eliminar tarima" actionListener="#{ingresoBean.eliminarTarima(tarima)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" process="@this" update="form:tabViewPartidas:dl-tarimas" styleClass="ui-button-danger ui-button-outlined">
+                                                                                            <p:confirm header="Eliminar tarima" message="¿Está seguro que quiere eliminar esta tarima?" icon="pi pi-exclamation-triangle" />
+                                                                                    </p:commandButton>
+                                                                            </div>
+                                                                    </div>
+                                                            </div>
+                                                    </f:facet>
+                                                    <div class="p-grid ui-fluid">
+                                                            <div class="p-col-12 p-md-6" style="vertical-align: middle !important;">
+                                                                    <p:inputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}" readonly="true" />
+                                                            </div>
+                                                            <div class="p-col-12 p-md-2">
+                                                                    <p:inputNumber value="#{partida.cantidadTotal}" minValue="0" maxValue="100000" placeholder="Cantidad" decimalPlaces="0" inputStyle="text-align: right;" symbol=" #{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" symbolPosition="s">
+                                                                            <p:ajax event="blur" process="@this" update="form:tabViewPartidas:dl-tarimas" />
+                                                                    </p:inputNumber>
+                                                            </div>
+                                                            <div class="p-col-12 p-md-2">
+                                                                    <p:inputNumber value="#{partida.pesoTotal}" minValue="0" maxValue="10000000" placeholder="Peso (kg)" decimalPlaces="3" inputStyle="text-align: right;" symbol=" kg" symbolPosition="s">
+                                                                            <p:ajax event="blur" process="@this" update="form:tabViewPartidas:dl-tarimas" />
+                                                                    </p:inputNumber>
+                                                            </div>
+                                                            <div class="p-col-12 p-md-2">
+                                                                    <div align="right">
+                                                                            <p:commandButton icon="pi pi-search" process="@this" update=":form:pnl-det-partida" oncomplete="PF('dlgDetPartida').show();" styleClass="ui-button-outlined">
+                                                                                    <f:setPropertyActionListener value="#{partida}" target="#{ingresoBean.partidaEdit}"></f:setPropertyActionListener>
+                                                                            </p:commandButton>
+                                                                            <p:spacer width="10"/>
+                                                                            <p:commandButton icon="pi pi-times" process="@this" update="form:tabViewPartidas:dl-tarimas" actionListener="#{ingresoBean.eliminarProducto(partida)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" styleClass="ui-button-outlined ui-button-danger">
+                                                                                    <p:confirm header="Eliminar producto" message="¿Está seguro que quiere eliminar este producto?" icon="pi pi-exclamation-triangle" />
+                                                                            </p:commandButton>
+                                                                    </div>
+                                                            </div>
+                                                    </div>
+                                                    <f:facet name="footer">
+                                                            <div class="p-grid ui-fluid">
+                                                                    <div class="p-col-12 p-md-6">
+                                                                            <div style="text-align: left;">
+                                                                                    <p:outputLabel value="#{tarima.partidas.size()} producto(s)"></p:outputLabel>
+                                                                            </div>
+                                                                    </div>
+                                                                    <div class="p-col-12 p-md-2">
+                                                                            <div style="text-align: right;">
+                                                                                    <p:outputLabel value="#{ingresoBean.cantidadTarima(tarima)} unidades"></p:outputLabel>
+                                                                            </div>
+                                                                    </div>
+                                                                    <div class="p-col-12 p-md-2">
+                                                                            <div style="text-align: right;">
+                                                                                    <p:outputLabel value="#{ingresoBean.pesoTarima(tarima)} kg"></p:outputLabel>
+                                                                            </div>
+                                                                    </div>
+                                                            </div>
+                                                    </f:facet>
+                                            </p:dataList>
+                                            <p:spacer style="height: 2rem;"/>
+                                            <f:facet name="footer">
+                                                    <div class="p-grid ui-fluid">
+                                                            <div class="p-col-12 p-md-6">
+                                                                    <div style="text-align: left;">
+                                                                            <p:outputLabel value="#{ingresoBean.totalTarimas()} Tarima(s)"></p:outputLabel>
+                                                                    </div>
+                                                            </div>
+                                                            <div class="p-col-12 p-md-2">
+                                                                    <div style="text-align: right;">
+                                                                            <p:outputLabel value="#{ingresoBean.totalCantidad()} Unidad(es)"></p:outputLabel>
+                                                                    </div>
+                                                            </div>
+                                                            <div class="p-col-12 p-md-2">
+                                                                    <div style="text-align: right;">
+                                                                            <p:outputLabel value="#{ingresoBean.totalPeso()}" >
+                                                                                <f:convertNumber maxFractionDigits="3" />
+                                                                            </p:outputLabel>
+                                                                    </div>
+                                                            </div>
+                                                    </div>
+                                                    <p:outputLabel value="Totales:"></p:outputLabel>
+                                            </f:facet>
+                                    </p:dataList>
+                                </p:tab>
+                                <p:tab title="CARGA COMPLETA">
+                                    <p:dataList id="dl-completa" value="#{ingresoBean.partidas}" var="partidaCompleta" varStatus="st" emptyMessage="No se han agregado partidas" type="definition" 
+                                                itemStyleClass="item-con-linea" >
+                                            <f:facet name="header">
+                                                <div class="p-grid ui-fluid">
+                                                    <div class="p-col-12">
+                                                        <p:outputLabel value="Carga Completa"></p:outputLabel>
+                                                    </div>
+                                                    <div class="p-col-12 p-grid ui-fluid encabezados-partidas">
+                                                        <div class="p-col-12 p-md-4"><strong>Producto</strong></div>
+                                                        <div class="p-col-12 p-md-2"><strong>Cantidad</strong></div>
+                                                        <div class="p-col-12 p-md-2"><strong>Peso Total</strong></div>
+                                                        <div class="p-col-12 p-md-2"><strong>Tarimas</strong></div>
+                                                        <div class="p-col-12 p-md-2"></div>
+                                                    </div>
+                                                </div>
+                                            </f:facet>
+                                            
+                                            <div class="p-grid ui-fluid">
+                                                <div class="p-col-12 p-md-4" style="vertical-align: middle !important;">
+                                                    <p:outputLabel value="#{st.index + 1}. #{partidaCompleta.unidadDeProductoCve.productoCve.productoDs}"></p:outputLabel>
+                                                </div>
+                                                <div class="p-col-12 p-md-2">
+                                                    <p:outputLabel value="#{partidaCompleta.cantidadTotal} #{tarimaCompleta.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
+                                                </div>
+                                                <div class="p-col-12 p-md-2">
+                                                    <p:outputLabel value="#{partidaCompleta.pesoTotal} KG"></p:outputLabel>
+                                                </div>
+                                                <div class="p-col-12 p-md-2">
+                                                    <p:outputLabel value="#{partidaCompleta.noTarimas} TARIMA(S)">
+                                                        <f:convertNumber maxFractionDigits="0" />
+                                                    </p:outputLabel>
+                                                </div>
+                                                <div class="p-col-12 p-md-2">
+                                                    <div align="right">
+                                                        <p:commandButton icon="pi pi-bars" process="@this" update="form:pnl-det-partida-completa" oncomplete="PF('dlgDetPartidaCompleta').show();" styleClass="ui-button-outlined" >
+                                                            <f:setPropertyActionListener value="#{partidaCompleta}" target="#{ingresoBean.partidaEdit}" />
+                                                        </p:commandButton>
+                                                        <p:spacer width="10"/>
+                                                        <p:commandButton icon="pi pi-trash" process="@this" update="form:tabViewPartidas:dl-completa" styleClass="ui-button-outlined ui-button-danger" 
+                                                                         actionListener="#{ingresoBean.eliminarPartida(partidaCompleta)}">
+                                                            <p:confirm header="Eliminar partida completa" message="¿Está seguro que quiere eliminar esta partida completa?" icon="pi pi-exclamation-triangle" />
+                                                        </p:commandButton>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </p:dataList>
+                                </p:tab>
+                            </p:tabView>
+                        </p:outputPanel>
 </ui:composition>

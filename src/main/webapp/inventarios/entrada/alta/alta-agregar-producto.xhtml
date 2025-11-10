@@ -54,7 +54,7 @@
 					</div>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton icon="pi pi-check" value="Agregar" process="@this form:pnl-add-producto" update="form:dl-tarimas" actionListener="#{ingresoBean.addToTarima}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgAddProducto').hide();" styleClass="ui-button-outlined">
+					<p:commandButton icon="pi pi-check" value="Agregar" process="@this form:pnl-add-producto" update="form:tabViewPartidas:dl-tarimas" actionListener="#{ingresoBean.addToTarima}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgAddProducto').hide();" styleClass="ui-button-outlined">
 					</p:commandButton>
 					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlgAddProducto').hide();">
 					</p:commandButton>

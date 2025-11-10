@@ -68,6 +68,7 @@ public class IngresoBean implements Serializable {
 	private List<Camara>         camaras          = null;
 	private List<Producto>       productos        = null;
 	private List<UnidadDeManejo> unidades         = null;
+        private List<Partida>        partidas         = null;
 	private List<Tarima>         tarimas          = null;
 	private List<PrecioServicio> serviciosCliente = null;
 	
@@ -81,6 +82,7 @@ public class IngresoBean implements Serializable {
 	private PrecioServicio            servicio           = null;
 	private BigDecimal                cantidadServicio   = null;
 	private Integer                   numTarimas         = null;
+        private BigDecimal                noTarimas          = null;
 	private Boolean                   isCongelacion      = Boolean.FALSE;
 	private Boolean                   isConservacion     = Boolean.FALSE;
 	private Boolean                   isRefrigeracion    = Boolean.FALSE;
@@ -88,6 +90,8 @@ public class IngresoBean implements Serializable {
 	
 	private boolean capturar = false;
 	private boolean editar   = true;
+        private boolean cargaTarimas = false;
+        private int activeTabIndex;
 	
 	private FacesContext       context = null;
 	private HttpServletRequest request = null;
@@ -129,6 +133,7 @@ public class IngresoBean implements Serializable {
 			//Se crea una partida vacía, solo para que no provoque problemas con el renderizado
 			//de los objetos en la pantalla.
 			this.partida = EntradaBL.crearPartida(new Camara());
+                        this.partidas = new ArrayList();
 			
 			this.congelacion   = this.servicioDAO.buscarPorId(SRV_CONGELACION);
 			this.conservacion  = this.servicioDAO.buscarPorId(SRV_CONSERVACION);
@@ -138,6 +143,7 @@ public class IngresoBean implements Serializable {
 			this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(this.bytes.length)
 					.name("ticket.pdf").stream(() -> new ByteArrayInputStream(this.bytes)).build();
 			log.info("El usuario {} entra a la captura de constancias de depósito", this.usuario.getUsuario());
+                        this.activeTabIndex = this.cargaTarimas ? 2 : 0;
 		} catch(Exception ex) {
 			log.error("Ocurrió un problema al iniciar el módulo de registro de constancias de depósito...", ex);
 		}
@@ -219,7 +225,7 @@ public class IngresoBean implements Serializable {
         String titulo = "Configuración de la tarima";
 		
 		try {
-			if(this.numTarimas == null)
+                        if(this.numTarimas == null)
 				throw new InventarioException("Debe indicar el número de tarimas.");
 			
 			if(this.numTarimas <= 0)
@@ -237,6 +243,7 @@ public class IngresoBean implements Serializable {
 			severity = FacesMessage.SEVERITY_INFO;
 			
 			this.numTarimas = null;
+                        this.partida = EntradaBL.crearPartida(camara);
 		} catch(InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -278,6 +285,105 @@ public class IngresoBean implements Serializable {
         	PrimeFaces.current().ajax().update("form:messages");
         }
 	}
+        
+        public void agregarPartidaCompleta(){
+            FacesMessage message = null;
+            Severity severity = null;
+            String mensaje = null;
+            String titulo = "Carga completa";
+            try {
+                log.info("Agregando una partida con carga completa");
+                EntradaBL.agregarPartidaCompleta(this.entrada, this.noTarimas, this.partida);
+                log.info("Carga completa configurada");
+                this.cargaPartidas();
+                this.partida = EntradaBL.crearPartida(camara);
+                this.noTarimas = null;
+                
+                mensaje = "Se termino de configurar la partida con carga completa";
+        	severity = FacesMessage.SEVERITY_INFO;
+            } catch(InventarioException ex ) {
+                log.warn(ex.getMessage());
+        	mensaje = ex.getMessage();
+        	severity = FacesMessage.SEVERITY_WARN;
+            } catch(Exception ex) {
+                log.error("Problema para configurar la carga completa...");
+        	mensaje = "Ocurrió un problema para configurar la carga completa.";
+        	severity = FacesMessage.SEVERITY_ERROR;
+            } finally {
+                message = new FacesMessage(severity, titulo, mensaje);
+        	FacesContext.getCurrentInstance().addMessage(null, message);
+                PrimeFaces.current().ajax().update("form:messages");
+            }
+        }
+        
+        public void editarPartida(){
+            FacesMessage message = null;
+            Severity severity = null;
+            String mensaje = null;
+            String titulo = "Carga completa";
+            try {
+                log.info("Editando una partida con carga completa");
+                EntradaBL.editarPartidaCompleta(this.entrada, partidaEdit);
+                log.info("Se edito la partida con carga completa");
+                this.cargaPartidas();
+                
+                mensaje = "Se termino de editar una partida con carga completa";
+        	severity = FacesMessage.SEVERITY_INFO;
+            } catch(InventarioException ex ) {
+                log.warn(ex.getMessage());
+        	mensaje = ex.getMessage();
+        	severity = FacesMessage.SEVERITY_WARN;
+            } catch(Exception ex) {
+                log.error("Problema para editar la carga completa...", ex);
+        	mensaje = "Ocurrió un problema para configurar la carga completa.";
+        	severity = FacesMessage.SEVERITY_ERROR;
+            } finally {
+                message = new FacesMessage(severity, titulo, mensaje);
+        	FacesContext.getCurrentInstance().addMessage(null, message);
+                PrimeFaces.current().ajax().update("form:messages");
+            }
+        }
+        
+        public void eliminarPartida(Partida partida){
+            FacesMessage message = null;
+            Severity severity = null;
+            String mensaje = null;
+            String titulo = "Carga completa";
+            try {
+                if(partida == null) 
+                    throw new InventarioException("Error al eliminar una partida");
+                
+                log.info("Eliminando una partida con carga completa");
+                EntradaBL.eliminarPartidaCompleta(this.entrada, partida);
+                log.info("Se elimino la partida con carga completa");
+                this.cargaPartidas();
+                
+                mensaje= "Se termino de eliminar una partida con carga completa";
+        	severity = FacesMessage.SEVERITY_INFO;
+            } catch(InventarioException ex ) {
+                log.warn(ex.getMessage());
+        	mensaje = ex.getMessage();
+        	severity = FacesMessage.SEVERITY_WARN;
+            } catch(Exception ex) {
+                log.error("Problema para eliminar la carga completa...", ex);
+        	mensaje = "Ocurrió un problema para eliminar una carga completa.";
+        	severity = FacesMessage.SEVERITY_ERROR;
+            } finally {
+                message = new FacesMessage(severity, titulo, mensaje);
+        	FacesContext.getCurrentInstance().addMessage(null, message);
+                PrimeFaces.current().ajax().update("form:messages");
+            }
+        }
+        
+        public void cargaPartidas(){
+                try {
+                    this.partidas = this.entrada.getPartidaList().stream()
+                        .filter(p -> (p.getNoTarimas() != null && p.getNoTarimas().compareTo(BigDecimal.ONE) > 0) && (p.getTarima() == null))
+                        .collect(Collectors.toList());
+                } catch(Exception ex ) {
+			log.error("Problema para cargar la lista de partidas...", ex);
+		}
+        }
 	
 	public void cargarDetalle(ActionEvent e) {
 		try {
@@ -303,6 +409,7 @@ public class IngresoBean implements Serializable {
 			log.info("Agregando producto a la tarima {}", this.tarima);
 			EntradaBL.agregarATarima(this.entrada, this.tarima, this.partida);
 			log.info("Producto agregado a la tarima.");
+                        this.partida = EntradaBL.crearPartida(camara);
 		} catch (InventarioException ex) {
 			log.error("Problema para agregar la partida a la tarima...", ex);
 		}
@@ -520,6 +627,12 @@ public class IngresoBean implements Serializable {
 		String requestURI = ((HttpServletRequest) context.getRequest()).getRequestURI();
 		context.redirect(requestURI);
 	}
+        
+        public void onToggleCargaTarimas() {
+            // Si cargaTarimas = false → pestaña 0, 1 (Tarima completa y Agregar a tarima)
+            // Si cargaTarimas = true → pestaña 2 (Carga Complete)
+            this.activeTabIndex = this.cargaTarimas ? 2 : 0;
+        }
 	
 	public List<Cliente> getClientes() {
 		return clientes;
@@ -601,6 +714,14 @@ public class IngresoBean implements Serializable {
 		this.partida = partida;
 	}
 
+        public List<Partida> getPartidas() {
+            return partidas;
+        }
+
+        public void setPartidas(List<Partida> partidas) {
+            this.partidas = partidas;
+        }
+
 	public List<UnidadDeManejo> getUnidades() {
 		return unidades;
 	}
@@ -616,6 +737,14 @@ public class IngresoBean implements Serializable {
 	public void setNumTarimas(Integer numTarimas) {
 		this.numTarimas = numTarimas;
 	}
+
+        public BigDecimal getNoTarimas() {
+            return noTarimas;
+        }
+
+        public void setNoTarimas(BigDecimal noTarimas) {
+            this.noTarimas = noTarimas;
+        }
 
 	public List<Tarima> getTarimas() {
 		return tarimas;
@@ -664,6 +793,22 @@ public class IngresoBean implements Serializable {
 	public void setIsConservacion(Boolean isConservacion) {
 		this.isConservacion = isConservacion;
 	}
+        
+        public boolean isCargaTarimas() {
+            return cargaTarimas;
+        }
+
+        public void setCargaTarimas(boolean cargaTarimas) {
+            this.cargaTarimas = cargaTarimas;
+        }
+
+        public int getActiveTabIndex() {
+            return activeTabIndex;
+        }
+
+        public void setActiveTabIndex(int activeTabIndex) {
+            this.activeTabIndex = activeTabIndex;
+        }
 
 	public Boolean getIsRefrigeracion() {
 		return isRefrigeracion;
