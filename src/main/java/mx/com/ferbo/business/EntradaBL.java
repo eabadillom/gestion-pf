@@ -325,7 +325,8 @@ public class EntradaBL {
 		
 		constancia.getPartidaList().add(partida);
 		partida.setFolio(constancia);
-		tarima.getPartidas().add(partida);
+		partida.setTarima(tarima);
+                tarima.getPartidas().add(partida);
 	}
         
         public static synchronized void nombrarTarimas(String folioCliente, List<Tarima> tarimas) {
@@ -361,6 +362,26 @@ public class EntradaBL {
 		EntradaBL.nombrarTarimas(constancia.getFolioCliente(), tarimas);
 		
 	}
+        
+        public static synchronized Integer totalPartidasEliminadas(List<Tarima> tarimas, Tarima tarima)
+        throws InventarioException {
+                Integer totalEliminadas = 0;
+                
+                if(tarima == null)
+			throw new InventarioException("Debe indicar una tarima.");
+		
+		if(tarimas == null)
+			throw new InventarioException("Debe indicar una lista de tarimas");
+		
+		if(tarimas.size() <= 0)
+			throw new InventarioException("La lista de tarimas está vacía.");
+		
+		for(Partida partida : tarima.getPartidas()) {
+			totalEliminadas = totalEliminadas + 1;
+		}
+                
+                return totalEliminadas;
+        }
 	
 	public static synchronized void eliminarProducto(ConstanciaDeDeposito constancia, Tarima tarima, Partida partida)
 	throws InventarioException {

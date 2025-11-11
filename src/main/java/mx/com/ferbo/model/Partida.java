@@ -113,15 +113,19 @@ public class Partida implements Serializable, Cloneable {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof Partida)) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null) {
             return false;
         }
-        Partida other = (Partida) object;
-        if ((this.partidaCve == null && other.partidaCve != null)
-                || (this.partidaCve != null && !this.partidaCve.equals(other.partidaCve))) {
+        if (getClass() != object.getClass()) {
             return false;
         }
-        return true;
+        final Partida other = (Partida) object;
+        if (this.partidaCve == null && other.partidaCve == null) 
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+        return Objects.equals(this.partidaCve, other.partidaCve);
     }
 
     @Override

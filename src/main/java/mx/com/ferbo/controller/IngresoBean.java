@@ -82,6 +82,7 @@ public class IngresoBean implements Serializable {
 	private PrecioServicio            servicio           = null;
 	private BigDecimal                cantidadServicio   = null;
 	private Integer                   numTarimas         = null;
+        private Integer                   totalPartidasTarima= 0;
         private BigDecimal                noTarimas          = null;
 	private Boolean                   isCongelacion      = Boolean.FALSE;
 	private Boolean                   isConservacion     = Boolean.FALSE;
@@ -234,8 +235,9 @@ public class IngresoBean implements Serializable {
 			log.info("Agregando {} tarima(s)", this.numTarimas);
 			
 			this.tarimas = EntradaBL.crearTarimas(this.entrada, this.numTarimas, this.partida, this.tarimas);
-			
-			this.partida = EntradaBL.crearPartida(this.camara);
+			this.totalPartidasTarima = this.totalPartidasTarima + this.numTarimas;
+                        
+                        this.partida = EntradaBL.crearPartida(this.camara);
 			
 			log.info("{} tarimas agregadas.", this.numTarimas);
 			
@@ -266,8 +268,9 @@ public class IngresoBean implements Serializable {
         String titulo = "Eliminar tarima";
         
         try {
+                this.totalPartidasTarima = this.totalPartidasTarima - EntradaBL.totalPartidasEliminadas(this.tarimas, tarima);
         	EntradaBL.eliminarTarima(this.entrada, this.tarimas, tarima);
-        	log.info("Tarima eliminada: {}", tarima);
+                log.info("Tarima eliminada: {}", tarima);
         	
         	mensaje= "Tarima eliminada";
         	severity = FacesMessage.SEVERITY_INFO;
@@ -350,9 +353,6 @@ public class IngresoBean implements Serializable {
             String mensaje = null;
             String titulo = "Carga completa";
             try {
-                if(partida == null) 
-                    throw new InventarioException("Error al eliminar una partida");
-                
                 log.info("Eliminando una partida con carga completa");
                 EntradaBL.eliminarPartidaCompleta(this.entrada, partida);
                 log.info("Se elimino la partida con carga completa");
@@ -408,6 +408,7 @@ public class IngresoBean implements Serializable {
 		try {
 			log.info("Agregando producto a la tarima {}", this.tarima);
 			EntradaBL.agregarATarima(this.entrada, this.tarima, this.partida);
+                        this.totalPartidasTarima++;
 			log.info("Producto agregado a la tarima.");
                         this.partida = EntradaBL.crearPartida(camara);
 		} catch (InventarioException ex) {
@@ -424,6 +425,7 @@ public class IngresoBean implements Serializable {
 		try {
 			log.info("Eliminando partida: {}", partida);
 			EntradaBL.eliminarProducto(entrada, tarima, partida);
+                        this.totalPartidasTarima--;
 			log.info("Partida eliminada.");
 		} catch(Exception ex) {
 			log.error("Problema para eliminar la partida...", ex);
@@ -729,6 +731,14 @@ public class IngresoBean implements Serializable {
 	public void setUnidades(List<UnidadDeManejo> unidades) {
 		this.unidades = unidades;
 	}
+
+        public Integer getTotalPartidasTarima() {
+            return totalPartidasTarima;
+        }
+
+        public void setTotalPartidasTarima(Integer totalPartidasTarima) {
+            this.totalPartidasTarima = totalPartidasTarima;
+        }
 
 	public Integer getNumTarimas() {
 		return numTarimas;
