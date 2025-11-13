@@ -3,7 +3,9 @@ package mx.com.ferbo.business;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -255,6 +257,7 @@ public class EntradaBL {
                 if(partida == null)
 			throw new InventarioException("Debe indicar una partida.");
                 
+                log.info("Producto eliminado: {}", partida);
                 constancia.getPartidaList().remove(partida);
         }
 	
@@ -311,8 +314,8 @@ public class EntradaBL {
 		
 		return tarimas;
 	}
-	
-	public static synchronized void agregarATarima(ConstanciaDeDeposito constancia, Tarima tarima, Partida partida)
+        
+        public static synchronized void agregarATarima(ConstanciaDeDeposito constancia, Tarima tarima, Partida partida)
 	throws InventarioException {
 		if(constancia == null)
 			throw new InventarioException("Debe indicar una entrada.");
@@ -398,6 +401,32 @@ public class EntradaBL {
 		constancia.getPartidaList().remove(partida);
 		tarima.getPartidas().remove(partida);
 	}
+        
+        public static synchronized void eliminarPartidaEnListaTarimas(List<Tarima> tarimas, Partida partida)
+        throws InventarioException {
+            if(tarimas == null)
+                        throw new InventarioException("Debe indicar una lista de tarimas");
+            
+            if(tarimas.size() <= 0)
+			throw new InventarioException("La lista de tarimas está vacía.");
+            
+            if(partida == null)
+			throw new InventarioException("Debe indicar una partida.");
+            
+            for (Tarima t : tarimas) {
+                List<Partida> partidas = t.getPartidas();
+                if (partidas == null || partidas.isEmpty()) continue;
+                
+                Iterator<Partida> it = partidas.iterator();
+                while (it.hasNext()) {
+                    Partida p = it.next();
+                    if (p.equals(partida)) {
+                        it.remove();
+                        return;
+                    }
+                }
+            }
+        }
 	
 	public static synchronized void agregarServicio(ConstanciaDeDeposito constancia, PrecioServicio ps, BigDecimal cantidad)
 	throws InventarioException {

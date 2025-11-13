@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -245,7 +246,6 @@ public class IngresoBean implements Serializable {
 			severity = FacesMessage.SEVERITY_INFO;
 			
 			this.numTarimas = null;
-                        this.partida = EntradaBL.crearPartida(camara);
 		} catch(InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -425,9 +425,12 @@ public class IngresoBean implements Serializable {
 		try {
 			log.info("Eliminando partida: {}", partida);
 			EntradaBL.eliminarProducto(entrada, tarima, partida);
+                        EntradaBL.eliminarPartidaEnListaTarimas(tarimas, partida);
                         this.totalPartidasTarima--;
 			log.info("Partida eliminada.");
-		} catch(Exception ex) {
+                } catch(InventarioException e){
+                        log.error("Problema para eliminar la partida...", e);
+                } catch(Exception ex) {
 			log.error("Problema para eliminar la partida...", ex);
 		}
 	}
@@ -489,6 +492,51 @@ public class IngresoBean implements Serializable {
 		
 		return totalPeso;
 	}
+        
+        public Integer totalCantidadCompleto(){
+            Integer totalCantidad;
+            
+            try {
+                    totalCantidad = partidas.stream()
+                            .mapToInt(Partida::getCantidadTotal).sum()
+                            ;
+            } catch(Exception ex) {
+                    totalCantidad = 0;
+            }
+            
+            return totalCantidad;
+        }
+        
+        public BigDecimal totalPesoCompleto() {
+            BigDecimal totalPeso = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+		
+            try {
+                totalPeso = partidas.stream()
+                            .map(Partida::getPesoTotal)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add)
+                            ;
+            } catch(Exception ex) {
+                totalPeso = BigDecimal.ZERO.setScale(3, RoundingMode.HALF_EVEN);
+            }
+		
+            return totalPeso;
+	}
+        
+        public BigDecimal totalTarimasCompleto(){
+            BigDecimal numTarimas;
+            
+            try {
+                numTarimas = partidas.stream()
+                            .map(Partida::getNoTarimas)
+                            .filter(Objects::nonNull)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add)
+                            ;
+            } catch(Exception ex) {
+                numTarimas = BigDecimal.valueOf(0.0);
+            }
+            
+            return numTarimas;
+        }
 	
 	public List<PrecioServicio> serviciosElegibles() {
 		List<PrecioServicio> servicios = null;

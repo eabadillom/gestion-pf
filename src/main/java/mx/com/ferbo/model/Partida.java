@@ -130,7 +130,7 @@ public class Partida implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + " ]";
+        return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + ", productoDs=" + unidadDeProductoCve.getProductoCve().getProductoDs() + " ]";
     }
     
     public void add(DetallePartida detalle) {

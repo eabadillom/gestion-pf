@@ -89,7 +89,7 @@
                                         <i class="fa fa-pallet" style="font-size: 1.3rem; color: #4caf50;"></i>
                                         <p:outputLabel value="Carga por Tarima" style="min-width:120px; text-align:right;" />
                                         <p:toggleSwitch value="#{ingresoBean.cargaTarimas}" style="margin: 0 1rem;" styleClass="always-on">
-                                            <p:ajax listener="#{ingresoBean.onToggleCargaTarimas}" update="pnl-no-tarimas pnl-tarimas @this" />
+                                            <p:ajax listener="#{ingresoBean.onToggleCargaTarimas}" update="pnl-no-tarimas @this" />
                                         </p:toggleSwitch>
                                         <p:outputLabel value="Carga Completa" style="min-width:120px;" />
                                         <i class="fa fa-boxes" style="font-size: 1.3rem; color: #007bff;" ></i>
@@ -101,14 +101,14 @@
 						<p:tab title="Tarima" disabled="#{ingresoBean.cargaTarimas eq true}">
 							<div class="p-field">¿Cuantas tarimas se agregarán?</div>
 							<div class="p-field">
-								<p:focus context="@next"></p:focus>
-								<p:inputNumber value="#{ingresoBean.numTarimas}" placeholder="No. Tarimas" minValue="1" maxValue="1000" decimalPlaces="0" decimalSeparator="." emptyValue="empty" inputStyle="text-align: right"></p:inputNumber>
+								<p:focus context="@next" />
+								<p:inputNumber value="#{ingresoBean.numTarimas}" placeholder="No. Tarimas" minValue="1" maxValue="1000" decimalPlaces="0" decimalSeparator="." emptyValue="empty" inputStyle="text-align: right" />
 							</div>
 							<div class="p-field">
-								<p:commandButton value="Agregar" icon="pi pi-plus" process="form:pnl-config-tarima form:pnl-no-tarimas @this" actionListener="#{ingresoBean.agregarTarimas()}" update="form:pnl-config-tarima form:pnl-no-tarimas form:tabViewPartidas:dl-tarimas form:tabViewPartidas:cargaPorTarima" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgAddTarima').hide();"/>
+								<p:commandButton value="Agregar" icon="pi pi-plus" process="form:pnl-config-tarima form:pnl-no-tarimas @this" actionListener="#{ingresoBean.agregarTarimas()}" update="form:pnl-config-tarima form:pnl-no-tarimas form:tabViewPartidas:dl-tarimas form:tabViewPartidas:cargaPorTarima" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgAddTarima').hide();" />
 							</div>
 							<div class="p-field">
-								<p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('dlgAddTarima').hide();" styleClass="" />
+								<p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('dlgAddTarima').hide();" styleClass="ui-button-secondary" />
 							</div>
 						</p:tab>
 						<p:tab title="Agregar a tarima" disabled="#{ingresoBean.cargaTarimas eq true}">
@@ -116,24 +116,24 @@
 							<div class="p-field">
 								<p:selectOneMenu value="#{ingresoBean.tarima}" converter="entityConverter">
 									<f:selectItem itemLabel="--Seleccione la tarima--" noSelectionOption="true" />
-									<f:selectItems value="#{ingresoBean.tarimas}" var="tarima" itemLabel="#{tarima.nombre}" itemValue="#{tarima}"></f:selectItems>
+									<f:selectItems value="#{ingresoBean.tarimas}" var="tarima" itemLabel="#{tarima.nombre}" itemValue="#{tarima}" />
 								</p:selectOneMenu>
 							</div>
 							<div class="p-field">
 								<p:commandButton value="Agregar" icon="pi pi-plus" process="form:pnl-config-tarima form:pnl-no-tarimas @this" actionListener="#{ingresoBean.addToTarima()}" update="form:pnl-config-tarima form:pnl-no-tarimas form:tabViewPartidas:dl-tarimas form:tabViewPartidas:cargaPorTarima" oncomplete="PF('dlgAddTarima').hide();" />
 							</div>
 							<div class="p-field">
-								<p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dlgAddTarima').hide();" styleClass="ui-button-secondary"></p:commandButton>
+								<p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dlgAddTarima').hide();" styleClass="ui-button-secondary" />
 							</div>
 						</p:tab>
                                                 <p:tab title="Completa" disabled="#{ingresoBean.cargaTarimas eq false}">
                                                     <div class="p-field">¿Cuantas tarimas se agregarán?</div>
                                                     <div class="p-field">
                                                             <p:focus context="@next"></p:focus>
-                                                            <p:inputNumber value="#{ingresoBean.noTarimas}" placeholder="No. Tarimas" minValue="1" maxValue="1000" decimalPlaces="0" decimalSeparator="." emptyValue="empty" inputStyle="text-align: right"></p:inputNumber>
+                                                            <p:inputNumber value="#{ingresoBean.noTarimas}" placeholder="No. Tarimas" minValue="1" maxValue="1000" decimalPlaces="0" decimalSeparator="." emptyValue="empty" inputStyle="text-align: right" />
                                                     </div>
                                                     <div class="p-field">
-                                                            <p:commandButton value="Agregar" icon="pi pi-plus" process="form:pnl-config-tarima form:pnl-no-tarimas @this" actionListener="#{ingresoBean.agregarPartidaCompleta()}" update="form:pnl-config-tarima form:pnl-no-tarimas form:pnl-tarimas form:tabViewPartidas:dl-completa form:tabViewPartidas:cargaCompleta" oncomplete="PF('dlgAddTarima').hide();" />
+                                                            <p:commandButton value="Agregar" icon="pi pi-plus" process="form:pnl-config-tarima form:pnl-no-tarimas @this" actionListener="#{ingresoBean.agregarPartidaCompleta()}" update="form:pnl-config-tarima form:pnl-no-tarimas form:tabViewPartidas:dl-completa form:tabViewPartidas:cargaCompleta" oncomplete="PF('dlgAddTarima').hide();" />
                                                     </div>
                                                     <div class="p-field">
                                                             <p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('dlgAddTarima').hide();" styleClass="ui-button-secondary" />
