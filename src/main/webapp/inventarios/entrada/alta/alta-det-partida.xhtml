@@ -56,7 +56,7 @@
 					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlgDetPartida').hide();" styleClass="ui-button-outlined ui-button-secondary"/>
 				</f:facet>
 			</p:dialog>
-                        <p:dialog widgetVar="dlgDetPartidaCompleta" header="Información del producto" modal="true" responsive="true">
+                        <ui:remove> <p:dialog widgetVar="dlgDetPartidaCompleta" header="Información del producto" modal="true" responsive="true">
 				<p:outputPanel id="pnl-det-partida-completa">
 					<div class="p-grid ui-fluid">
 						<div class="p-col-12 p-md-6">
@@ -107,5 +107,5 @@
                                         <p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{ingresoBean.editarPartida()}" process="@this form:pnl-det-partida-completa" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetPartidaCompleta').hide();" styleClass="ui-button-outlined" />
 					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlgDetPartidaCompleta').hide();" styleClass="ui-button-outlined ui-button-secondary"/>
 				</f:facet>
-			</p:dialog>
+			</p:dialog> </ui:remove>
 </ui:composition>
