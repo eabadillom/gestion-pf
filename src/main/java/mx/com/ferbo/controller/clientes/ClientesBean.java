@@ -4,56 +4,59 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
-import java.util.stream.Collectors;
-
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.primefaces.PrimeFaces;
-
-import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.Categoria;
-import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.Planta;
-import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.model.MedioPago;
-import mx.com.ferbo.model.MetodoPago;
-import mx.com.ferbo.model.RegimenFiscal;
-import mx.com.ferbo.model.UsoCfdi;
-import mx.com.ferbo.model.Usuario;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import mx.com.ferbo.model.Servicio;
-import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.business.n.AvisoBL;
+import mx.com.ferbo.business.n.CategoriaBL;
 import mx.com.ferbo.business.n.ClienteBL;
 import mx.com.ferbo.business.n.ClienteContactoBL;
 import mx.com.ferbo.business.n.DomiciliosBL;
 import mx.com.ferbo.business.n.FiscalBL;
+import mx.com.ferbo.business.n.MedioContactoBL;
+import mx.com.ferbo.business.n.MedioPagoBL;
+import mx.com.ferbo.business.n.MetodoPagoBL;
+import mx.com.ferbo.business.n.PlantaBL;
 import mx.com.ferbo.business.n.PrecioServicioBL;
 import mx.com.ferbo.business.n.SeguridadBL;
+import mx.com.ferbo.business.n.ServicioBL;
+import mx.com.ferbo.business.n.UnidadManejoBL;
 import mx.com.ferbo.controller.SideBarBean;
 import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Categoria;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.RegimenFiscal;
+import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.model.TipoTelefono;
 import mx.com.ferbo.model.TiposDomicilio;
+import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.FacesUtils;
+import mx.com.ferbo.util.InventarioException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
 
 @Named
 @ViewScoped
@@ -80,17 +83,29 @@ public class ClientesBean implements Serializable {
 
     private Aviso avisoSelected;
     private PrecioServicio precioAvisoSelected;
+    
+    @Inject
+    private PlantaBL plantaBL;
+    
     private List<Planta> lstPlanta;
+    
+    @Inject
+    private CategoriaBL categoriaBL;
+    
     private List<Categoria> lstCategoria;
 
     // Objetos para contactos
     @Inject
-    ClienteContactoBL contactoBL;
+    private ClienteContactoBL contactoBL;
 
     private ClienteContacto clienteContactoSelected;
     private Contacto contactoSelected;
     private Boolean editandoContacto;
     private MedioCnt medioCntSelected;
+    
+    @Inject
+    private MedioContactoBL medioContactoBL;
+    
     private List<TipoMail> lstTipoMail;
     private List<TipoTelefono> lstTipoTelefono;
 
@@ -102,7 +117,15 @@ public class ClientesBean implements Serializable {
     private List<UsoCfdi> lstUsoCfdiFiltered;
     private List<RegimenFiscal> lstRegimenFiscal;
     private List<RegimenFiscal> lstRegimenFiscalFiltered;
+    
+    @Inject
+    private MetodoPagoBL metodoPagoBL;
+    
     private List<MetodoPago> lstMetodoPago;
+    
+    @Inject
+    private MedioPagoBL medioPagoBl;
+    
     private List<MedioPago> lstMedioPago;
 
     // Objetos para Servicios
@@ -112,8 +135,16 @@ public class ClientesBean implements Serializable {
     private PrecioServicio precioServicioSelected;
     private List<PrecioServicio> lstPrecioServicios;
     private Servicio servicioSelected;
+    
+    @Inject
+    private ServicioBL servicioBL;
+    
     private List<Servicio> lstServicio;
     private UnidadDeManejo unidadDeManejoSelected;
+    
+    @Inject
+    private UnidadManejoBL unidadManejoBL;
+    
     private List<UnidadDeManejo> lstUnidadManejo;
 
     // Objetos para domicilios
@@ -159,17 +190,25 @@ public class ClientesBean implements Serializable {
         request = (HttpServletRequest) context.getExternalContext().getRequest();
         this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
         log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
-        this.lstClientes = clienteBL.obtenerTodos();
-        this.lstMedioPago = fiscalBL.obtenerMediosPago();
-        this.lstMetodoPago = fiscalBL.obtenerMetodosPago();
-        this.lstTipoMail = contactoBL.obtenerTiposMail();
-        this.lstTipoTelefono = contactoBL.obtenerTiposTelefono();
-        this.lstServicio = serviciosBL.obtenerServicios();
-        this.lstUnidadManejo = serviciosBL.obtenerUnidadesMenjo();
-        this.lstPlanta = avisoBL.obtenerPlantas(Boolean.FALSE);
-        this.lstCategoria = avisoBL.obtenerCategorias();
-        this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
-        this.lstUsoCfdi = fiscalBL.obtenerCfdis();
+        try{
+            this.lstClientes = clienteBL.obtenerTodos();
+            this.lstMedioPago = medioPagoBl.obtenerMediosPago();
+            this.lstMetodoPago = metodoPagoBL.obtenerMetodosPago();
+            this.lstTipoMail = medioContactoBL.obtenerTiposMail();
+            this.lstTipoTelefono = medioContactoBL.obtenerTiposTelefono();
+            this.lstServicio = servicioBL.obtenerServicios();
+            this.lstUnidadManejo = unidadManejoBL.obtenerUnidadesManejo();
+            this.lstPlanta = plantaBL.obtenerPlantas(Boolean.FALSE);
+            this.lstCategoria = categoriaBL.obtenerCategorias();
+            this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
+            this.lstUsoCfdi = fiscalBL.obtenerCfdis();
+        } catch (InventarioException ex){
+            log.error(ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Cliente",
+                    "Contacte con el admistrador del sistema.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
     }
 
     public void cargarInfoCliente(Cliente cliente) {
@@ -182,7 +221,8 @@ public class ClientesBean implements Serializable {
             this.clienteSelected = clienteBL.obtenerTodoCliente(cliente.getCteCve(), true);
             lstRegimenFiscalFiltered = fiscalBL.filtrarRegimenesFiscales(this.lstRegimenFiscal, this.clienteSelected);
             lstUsoCfdiFiltered = fiscalBL.filtrarCfdis(this.lstUsoCfdi, this.clienteSelected);
-
+            lstPrecioServicios = new ArrayList();
+            
             this.actualizarListasDomicilios();
 
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Fiscal", "Información fiscal cargada");
@@ -213,6 +253,7 @@ public class ClientesBean implements Serializable {
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
+        lstPrecioServicios.clear();
     }
 
     public void guardarOActualizarCliente() {
@@ -373,6 +414,11 @@ public class ClientesBean implements Serializable {
             PrimeFaces.current().ajax().update("form:messages");
         }
     }
+    
+    public void filtraPrecioServicios(Aviso avisoSelected){
+        this.lstPrecioServicios = serviciosBL.filtrarPrecioServicios(avisoSelected, clienteSelected);
+        PrimeFaces.current().ajax().update("form:messages");
+    }
 
     // Metodos exclusivos para contactos
     public void nuevoClienteContacto() {
@@ -380,7 +426,7 @@ public class ClientesBean implements Serializable {
     }
 
     public void nuevoMedioContacto() {
-        this.medioCntSelected = contactoBL.nuevoMedio();
+        this.medioCntSelected = medioContactoBL.nuevoMedio();
     }
 
     public void operarContactos(String operacion) {
@@ -434,7 +480,7 @@ public class ClientesBean implements Serializable {
 
     public void seleccionarMedioContacto() {
         try {
-            contactoBL.seleccionarMedioContacto(this.medioCntSelected);
+            medioContactoBL.seleccionarMedioContacto(this.medioCntSelected);
         } catch (InventarioException ex) {
             log.warn(ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Contacto", ex.getMessage());

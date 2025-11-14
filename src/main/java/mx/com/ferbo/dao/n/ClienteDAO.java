@@ -113,7 +113,7 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                 if (!clienteAvisos.isEmpty()) {
                     for (Aviso clienteAviso : clienteAvisos) {
                         if (clienteAviso.getAvisoCve() != null) {
-
+                            
                             Categoria categoria = clienteAviso.getCategoriaCve();
                             if (categoria != null) {
                                 categoria.getCategoriaCve();
@@ -156,7 +156,7 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                 }
                 if(!clienteDomicilios.isEmpty()){
                     for(ClienteDomicilios clienteDomicilio : clienteDomicilios){
-                        log.info(clienteDomicilio.getDomicilios());
+                        log.info(clienteDomicilio.getId());
                     }
                 }
             }

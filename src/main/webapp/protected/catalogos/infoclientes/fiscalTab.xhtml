@@ -98,14 +98,16 @@
                     <p:ajax process="@this" />
                 </p:inputText>
             </div>
-            <div class="p-field p-col-2 p-md-4">
-                <p:outputLabel for="chkHabilitado" value="Habilitado" />
-                <p:selectOneMenu id="chkHabilitado" value="#{clientesBean.clienteSelected.habilitado}">
-                    <f:selectItem itemLabel="Sí" itemValue="#{true}" />
-                    <f:selectItem itemLabel="No" itemValue="#{false}" />
-                    <p:ajax process="@this"/>
-                </p:selectOneMenu>
-            </div>
+            <ui:fragment rendered="#{clientesBean.clienteSelected.cteCve != null}">
+                <div class="p-field p-col-2 p-md-4" rendered="${clientesBean.clienteSelected.cteCve != null}">
+                    <p:outputLabel for="chkHabilitado" value="Habilitado" />
+                    <p:selectOneMenu id="chkHabilitado" value="#{clientesBean.clienteSelected.habilitado}">
+                        <f:selectItem itemLabel="Sí" itemValue="#{true}" />
+                        <f:selectItem itemLabel="No" itemValue="#{false}" />
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
+            </ui:fragment>
         </p:outputPanel>
     </p:outputPanel>
 

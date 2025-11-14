@@ -52,6 +52,7 @@
                 <p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button" oncomplete="PF('dialogAviso').show()"
                                  update="form:tabView:dialogAviso form:tabView:pnlAviso">
                     <f:setPropertyActionListener value="#{pAviso}" target="#{clientesBean.avisoSelected}" />
+                    <p:ajax listener="#{clientesBean.filtraPrecioServicios(pAviso)}" />
                 </p:commandButton>
             </p:column>
             <p:column width="2rem" style="text-align: center;">
@@ -178,7 +179,7 @@
                 <h:panelGroup>
                     <p:dataTable id="dtServicioAviso" 
                                  widgetVar="dtServicioAviso" var="pServicioAviso"
-                                 value="#{clientesBean.avisoSelected.precioServicioList}" reflow="true"
+                                 value="#{clientesBean.lstPrecioServicios}" reflow="true"
                                  rowKey="#{pServicioAviso.id}" lazy="false" paginator="true"
                                  rows="5" paginatorPosition="bottom">
 

@@ -138,9 +138,10 @@ public class ClienteBL {
                 fiscalBL.validarRegimenCapital(cliente);
             }
             Cliente clientAux = obtenerPorCodigoUnico(cliente.getCodUnico());
-            fiscalBL.validarCodigoUnico(clientAux, cliente);
+            fiscalBL.validarCodigoUnico(cliente, clientAux);
             List<Planta> plantas = plantaBL.obtenerPlantas(Boolean.TRUE);
             asignarCandadoSalida(plantas, cliente); 
+            cliente.setHabilitado(true);
             clienteDAO.guardar(cliente);
             status = "agregado";
         } else {

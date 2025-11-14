@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.DAOException;
 
@@ -23,8 +24,29 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
     public PrecioServicioDAO() {
         super(PrecioServicio.class);
     }
+    
+    public List<PrecioServicio> buscarServiciosPorCliente(Cliente cliente) throws DAOException {
+        List<PrecioServicio> lista = null;
+        EntityManager em = null;
+        
+        try {
+            em = super.getEntityManager();
+            lista = em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
+                    .setParameter("cteCve", cliente.getCteCve())
+                    .getResultList()
+                    ;
+        } catch (Exception ex) {
+            log.error("Error al obtener la lista de PrecioServicio del cliente: {}",
+                    cliente.toString(), ex);
+            throw new DAOException("Error al consultar los precios de los servicios para el cliente", ex);
+        } finally {
+            super.close(em);
+        }
+        
+        return lista;
+    }
 
-    private List<PrecioServicio> buscarPorClienteServicio(PrecioServicio ps) throws DAOException {
+    public List<PrecioServicio> buscarPorClienteServicio(PrecioServicio ps) throws DAOException {
         List<PrecioServicio> lista = null;
         EntityManager em = null;
 
@@ -44,7 +66,7 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
         return lista;
     }
 
-    private List<PrecioServicio> buscarPorClienteAviso(PrecioServicio ps) throws DAOException {
+    public List<PrecioServicio> buscarPorClienteAviso(PrecioServicio ps) throws DAOException {
         List<PrecioServicio> lista = null;
         EntityManager em = null;
         try {
@@ -62,7 +84,7 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
         return lista;
     }
 
-    private List<PrecioServicio> buscarPorCliente(PrecioServicio ps) {
+    public List<PrecioServicio> buscarPorCliente(PrecioServicio ps) {
         List<PrecioServicio> list = null;
         EntityManager em = null;
         try {
