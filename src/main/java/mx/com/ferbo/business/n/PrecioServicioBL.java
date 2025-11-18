@@ -93,6 +93,7 @@ public class PrecioServicioBL {
         if (index >= 0) {
             preciosServicios.set(index, precioServicio);
         } else {
+            precioServicio.setCliente(cliente);
             preciosServicios.add(precioServicio);
         }
     }

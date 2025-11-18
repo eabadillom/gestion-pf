@@ -102,6 +102,8 @@ public class AvisoBL {
         if (index >= 0) {
             preciosServicios.set(index, precioServicio);
         } else {
+            precioServicio.setCliente(aviso.getCteCve());
+            precioServicio.setAvisoCve(aviso);
             preciosServicios.add(precioServicio);
         }
     }

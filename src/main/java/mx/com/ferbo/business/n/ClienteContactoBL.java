@@ -93,6 +93,7 @@ public class ClienteContactoBL {
         if (index >= 0) {
             clienteContactos.set(index, clienteContacto);
         } else {
+            clienteContacto.setIdCliente(cliente);
             clienteContactos.add(clienteContacto);
         }
     }
@@ -115,6 +116,7 @@ public class ClienteContactoBL {
         if (index >= 0) {
             medioCnts.set(index, medioCnt);
         } else {
+            medioCnt.setIdContacto(clienteContacto.getIdContacto());
             medioCnts.add(medioCnt);
         }
     }

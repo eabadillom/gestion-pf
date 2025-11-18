@@ -176,7 +176,7 @@
 
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.clienteContactoSelected.id != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
-                actionListener="#{clientesBean.operarContactos('agregarcontacto')}" update="form:tabView:dialogMedioContacto form:tabView:pnlMedio"
+                actionListener="#{clientesBean.operarContactos('agregarcontacto')}" update="form:tabView:dialogMedioContacto form:tabView:pnlMedio form:tabView:dtContactos"
                 process="pnlContacto @this" oncomplete="PF('dialogContacto').hide();" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogContacto').hide()"
                 immediate="true" class="ui-button-secondary" resetValues="true" />

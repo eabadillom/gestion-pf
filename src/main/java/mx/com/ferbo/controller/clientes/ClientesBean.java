@@ -304,6 +304,7 @@ public class ClientesBean implements Serializable {
                 case "agregarservicio":
                     verificarAgregadoOActualizado(precioAvisoSelected.getId());
                     avisoBL.agregarServicioAviso(avisoSelected, precioAvisoSelected);
+                    lstPrecioServicios.add(precioAvisoSelected);
                     mensaje = "Servico " + agregadoOActualizado + " a aviso exitosamente";
                     break;
 
@@ -314,6 +315,7 @@ public class ClientesBean implements Serializable {
 
                 case "eliminarservicio":
                     avisoBL.eliminaServicioAviso(avisoSelected, precioAvisoSelected);
+                    lstPrecioServicios.remove(precioAvisoSelected);
                     mensaje = "Servicio de aviso eliminado exitosamente";
                     break;
 
