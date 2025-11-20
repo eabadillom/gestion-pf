@@ -138,7 +138,7 @@
         	
         	<div class="p-grid ui-fluid">
             	<div class="p-col-12 p-md-9">
-            		<p:panel header="Ventas por mes" toggleable="true">
+            		<p:panel header="Ventas por mes" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 		            	<div class="p-grid ui-fluid">
 		            		<div class="p-col-12 p-md-3">
 		                        <p:datePicker id="yearMonth" view="month" value="#{dashboardBean.mesActual}" pattern="MM/yyyy" yearNavigator="true" 
@@ -186,7 +186,7 @@
 		            </p:panel>
             	</div>
             	<div class="p-col-12 p-md-3">
-            		<p:panel header="Ventas totales del mes" toggleable="true">
+            		<p:panel header="Ventas totales del mes" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 		                <p:panel header="Ventas Totales" styleClass="text-center">
 		                    <h:outputText value="#{dashboardBean.ventasGlobales.ventasTotales}">
 		                        <f:convertNumber currencySymbol="$" type="currency" />
@@ -210,7 +210,7 @@
             
             <p:spacer style="height: 2rem;"/>
             
-            <p:dialog id="dlg-Desglose" widgetVar="dlgDesglose" modal="true" responsive="true" style="max-width:95vw !important; width:95vw;" appendTo="@(body)">
+            <p:dialog id="dlg-Desglose" widgetVar="dlgDesglose" modal="true" responsive="true" style="max-width:95vw !important; width:95vw;" appendTo="@(body)" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
                 <p:outputPanel style="overflow-x:auto;">
                     <p:dataTable id="dt-facturacionGeneral" widgetVar="dtFacturacion" var="ventas" value="#{dashboardBean.listaFacturacionGeneral}"
                                  reflow="true" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add" style="min-width:600px">
@@ -253,7 +253,7 @@
             
             <p:spacer style="height: 2rem;"/>
             
-            <p:panel header="Ventas por mes" toggleable="true">
+            <p:panel header="Ventas por mes" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
                     <p:dataTable id="dt-ventasMes" widgetVar="dtVM" var="ventasM"
                                  value="#{dashboardBean.listaImporteGlobal}" reflow="true"
                                  style="width:100%;">
@@ -276,7 +276,7 @@
             
             <div class="p-grid ui-fluid">
             	<div class="p-col-12 p-md-6">
-            		<p:panel header="Ventas del mes por razón social" toggleable="true">
+            		<p:panel header="Ventas del mes por razón social" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
             			<p:dataTable id="dt-ventaRS" widgetVar="dtVRS" var="ventaRS"
                                  value="#{dashboardBean.listaVentaRazonSocial}" reflow="true">
 	
@@ -305,7 +305,7 @@
             		</p:panel>
             	</div>
             	<div class="p-col-12 p-md-6">
-            		<p:panel header="Ganancia por razón social" toggleable="true">
+            		<p:panel header="Ganancia por razón social" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
                     	<p:dataTable id="dt-gananciaRS" widgetVar="dtGananciaRS" var="gananciaRS"
                                  value="#{dashboardBean.listaGananciaRazonSocial}" reflow="true">
 	
@@ -339,12 +339,12 @@
             
             <div class="p-grid ui-fluid">
             	<div class="p-col-12 p-md-6">
-            		<p:panel header="Ventas">
+            		<p:panel header="Ventas" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
                     	<p:donutChart model="#{dashboardBean.donutModel}" style="width:100%; height:400px;" />
             		</p:panel>
             	</div>
             	<div class="p-col-12 p-md-6">
-            		<p:panel header="Ingresos">
+            		<p:panel header="Ingresos" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 						<p:barChart model="#{dashboardBean.smVentasFormaPago}" style="width:100%; height:400px;" />
             		</p:panel>
             	</div>
