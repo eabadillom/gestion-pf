@@ -24,6 +24,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.bouncycastle.util.Objects;
+
 /**
  *
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
@@ -62,6 +64,30 @@ public class Mail implements Serializable {
     
     @OneToMany(mappedBy = "idMail", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<MedioCnt> medioCntList;
+    
+    @Override
+    public int hashCode() {
+    	if(this.idMail == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.idMail);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Mail)) {
+            return false;
+        }
+        Mail other = (Mail) object;
+        if ((this.idMail == null && other.idMail != null) || (this.idMail != null && !this.idMail.equals(other.idMail))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Mail[ idMail=" + idMail + " ]";
+    }
 
     public Mail() {
     }
@@ -115,30 +141,4 @@ public class Mail implements Serializable {
     public void setMedioCntList(List<MedioCnt> medioCntList) {
         this.medioCntList = medioCntList;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idMail != null ? idMail.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Mail)) {
-            return false;
-        }
-        Mail other = (Mail) object;
-        if ((this.idMail == null && other.idMail != null) || (this.idMail != null && !this.idMail.equals(other.idMail))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Mail[ idMail=" + idMail + " ]";
-    }
-    
 }

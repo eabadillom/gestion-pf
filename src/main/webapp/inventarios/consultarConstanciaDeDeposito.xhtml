@@ -361,7 +361,7 @@
 				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarServicio').hide()" />
 			</p:confirmDialog>
 			<p:confirmDialog widgetVar="cancelDialog" showEffect="fade" width="400" message="¿Desea cancelar la constancia?" header="Cancelar constancia" severity="warn">
-				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.cancelarConstancia}" process="@this" update="form:dt-constanciaDeDeposito"/>
+				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.cancelarConstancia}" process="@this" update="form:dt-constanciaDeDeposito" oncomplete="PF('cancelDialog').hide()"/>
 				<p:commandButton value="No" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('cancelDialog').hide()" />
 			</p:confirmDialog>
 		</h:form>

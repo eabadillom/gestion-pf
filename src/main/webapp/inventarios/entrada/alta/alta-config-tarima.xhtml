@@ -1,0 +1,145 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+                        <h:outputStylesheet>
+                            .always-on .ui-toggleswitch-slider {
+                                background-color: #4CAF50 !important;
+                                border-color: #4CAF50 !important;
+                            }
+
+                            .always-on.ui-toggleswitch-checked .ui-toggleswitch-slider {
+                                background-color: #2196F3 !important;
+                                border-color: #2196F3 !important;
+                            }
+
+                            .always-on .ui-toggleswitch-handle {
+                                background-color: white !important;
+                                border: 1px solid #ccc;
+                            }
+
+                            .always-on:hover .ui-toggleswitch-slider {
+                                filter: brightness(1.05);
+                            }
+                        </h:outputStylesheet>
+			<p:panel id="pnl-config-tarima" header="CONFIGURE SU TARIMA" toggleable="true">
+				<div class="p-grid ui-fluid">
+					<div class="p-col-12 p-md-6">
+						<p:outputLabel value="Producto"/>
+						<p:selectOneMenu value="#{ingresoBean.partida.unidadDeProductoCve.productoCve}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
+							<f:selectItem noSelectionOption="true" itemLabel="---Selecciona un producto---" />
+							<f:selectItems value="#{ingresoBean.productos}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Cantidad" />
+						<p:inputNumber value="#{ingresoBean.partida.cantidadTotal}" minValue="0" maxValue="100000" placeholder="Cantidad" decimalPlaces="0" inputStyle="text-align: right" />
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Unidad"/>
+						<p:selectOneMenu value="#{ingresoBean.partida.unidadDeProductoCve.unidadDeManejoCve}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
+							<f:selectItem noSelectionOption="true" itemLabel="---Unidad---" />
+							<f:selectItems value="#{ingresoBean.unidades}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Peso" />
+						<p:inputNumber  value="#{ingresoBean.partida.pesoTotal}" placeholder="Peso total (kg)" minValue="0" maxValue="1000000" symbol=" kg" symbolPosition="s" inputStyle="text-align: right" decimalPlaces="3" decimalSeparator="." />
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Código"/>
+						<p:inputText maxlength="13" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpCodigo}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}" placeholder="Código" title="Código"/>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Pedimento" />
+						<p:inputText maxlength="13" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpPedimento}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}" placeholder="Pedimento" title="Pedimento"/>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Contenedor" />
+						<p:inputText maxlength="20" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpSAP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}" placeholder="Contenedor" title="Contenedor"/>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Lote" />
+						<p:inputText maxlength="20" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpLote}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}" placeholder="Lote" title="Lote"/>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Caducidad" />
+						<p:datePicker showIcon="true" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpCaducidad}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoCaducidad}" placeholder="dd / mm / yyyy" title="Caducidad" pattern="d/MM/yyyy" timeZone="GMT-6" locale="es_MX" />
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Otro" />
+						<p:inputText maxlength="12" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpMP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}" placeholder="Otro" title="Otro"/>
+					</div>
+				</div>
+				<f:facet name="footer">
+					<div class="p-grid ui-fluid">
+						<div class="p-col-12 p-md-2">
+							<p:commandButton value="Agregar" icon="pi pi-plus" onclick="PF('dlgAddTarima').show();" disabled="#{not ingresoBean.capturar}"/>
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:commandButton value="Reiniciar" icon="pi pi-replay" disabled="#{not ingresoBean.capturar}"/>
+						</div>
+					</div>
+				</f:facet>
+			</p:panel>
+			<p:dialog widgetVar="dlgAddTarima" header="Configuración de la tarima..." showEffect="fade" responsive="true" modal="true">
+                                <ui:remove> <div class="p-col-12 p-md-6" style="display: flex; flex-direction: column; align-items: flex-start;">
+                                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                                        <i class="fa fa-pallet" style="font-size: 1.3rem; color: #4caf50;"></i>
+                                        <p:outputLabel value="Carga por Tarima" style="min-width:120px; text-align:right;" />
+                                        <p:toggleSwitch value="#{ingresoBean.cargaTarimas}" style="margin: 0 1rem;" styleClass="always-on">
+                                            <p:ajax listener="#{ingresoBean.onToggleCargaTarimas}" update="pnl-no-tarimas @this" />
+                                        </p:toggleSwitch>
+                                        <p:outputLabel value="Carga Completa" style="min-width:120px;" />
+                                        <i class="fa fa-boxes" style="font-size: 1.3rem; color: #007bff;" ></i>
+                                    </div>
+                                </div> 
+                                <p:separator /> </ui:remove>
+				<p:outputPanel id="pnl-no-tarimas" styleClass="ui-fluid">
+					<p:tabView dynamic="true" effect="drop" activeIndex="#{ingresoBean.activeTabIndex}">
+						<p:tab title="Tarima" disabled="#{ingresoBean.cargaTarimas eq true}">
+							<div class="p-field">¿Cuantas tarimas se agregarán?</div>
+							<div class="p-field">
+								<p:focus context="@next" />
+								<p:inputNumber value="#{ingresoBean.numTarimas}" placeholder="No. Tarimas" minValue="1" maxValue="1000" decimalPlaces="0" decimalSeparator="." emptyValue="empty" inputStyle="text-align: right" />
+							</div>
+							<div class="p-field">
+								<p:commandButton value="Agregar" icon="pi pi-plus" process="form:pnl-config-tarima form:pnl-no-tarimas @this" actionListener="#{ingresoBean.agregarTarimas()}" update="form:pnl-config-tarima form:pnl-no-tarimas form:tabViewPartidas:dl-tarimas form:tabViewPartidas:cargaPorTarima" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgAddTarima').hide();" />
+							</div>
+							<div class="p-field">
+								<p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('dlgAddTarima').hide();" styleClass="ui-button-secondary" />
+							</div>
+						</p:tab>
+						<p:tab title="Agregar a tarima" disabled="#{ingresoBean.cargaTarimas eq true}">
+							<div class="p-field">¿A que tarima pertenece el producto?</div>
+							<div class="p-field">
+								<p:selectOneMenu value="#{ingresoBean.tarima}" converter="entityConverter">
+									<f:selectItem itemLabel="--Seleccione la tarima--" noSelectionOption="true" />
+									<f:selectItems value="#{ingresoBean.tarimas}" var="tarima" itemLabel="#{tarima.nombre}" itemValue="#{tarima}" />
+								</p:selectOneMenu>
+							</div>
+							<div class="p-field">
+								<p:commandButton value="Agregar" icon="pi pi-plus" process="form:pnl-config-tarima form:pnl-no-tarimas @this" actionListener="#{ingresoBean.addToTarima()}" update="form:pnl-config-tarima form:pnl-no-tarimas form:tabViewPartidas:dl-tarimas form:tabViewPartidas:cargaPorTarima" oncomplete="PF('dlgAddTarima').hide();" />
+							</div>
+							<div class="p-field">
+								<p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dlgAddTarima').hide();" styleClass="ui-button-secondary" />
+							</div>
+						</p:tab>
+                                                <ui:remove> <p:tab title="Completa" disabled="#{ingresoBean.cargaTarimas eq false}">
+                                                    <div class="p-field">¿Cuantas tarimas se agregarán?</div>
+                                                    <div class="p-field">
+                                                            <p:focus context="@next"></p:focus>
+                                                            <p:inputNumber value="#{ingresoBean.noTarimas}" placeholder="No. Tarimas" minValue="1" maxValue="1000" decimalPlaces="0" decimalSeparator="." emptyValue="empty" inputStyle="text-align: right" />
+                                                    </div>
+                                                    <div class="p-field">
+                                                            <p:commandButton value="Agregar" icon="pi pi-plus" process="form:pnl-config-tarima form:pnl-no-tarimas @this" actionListener="#{ingresoBean.agregarPartidaCompleta()}" update="form:pnl-config-tarima form:pnl-no-tarimas form:tabViewPartidas:dl-completa form:tabViewPartidas:cargaCompleta" oncomplete="PF('dlgAddTarima').hide();" />
+                                                    </div>
+                                                    <div class="p-field">
+                                                            <p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('dlgAddTarima').hide();" styleClass="ui-button-secondary" />
+                                                    </div>
+                                                </p:tab> </ui:remove>
+					</p:tabView>
+				</p:outputPanel>
+			</p:dialog>
+</ui:composition>

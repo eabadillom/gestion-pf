@@ -7,6 +7,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -96,6 +98,31 @@ public class ClienteContacto implements Serializable {
     
     @Column(name="st_inventario")
     private Boolean recibeInventario;
+    
+    @Override
+    public int hashCode() {
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+        
+        return Objects.hashCode(this.id);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof ClienteContacto)) {
+            return false;
+        }
+        ClienteContacto other = (ClienteContacto) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.ClienteContacto[ id=" + id + " ]";
+    }
 
     public ClienteContacto() {
     	idCliente = new Cliente();
@@ -192,32 +219,7 @@ public class ClienteContacto implements Serializable {
     public void setIdContacto(Contacto idContacto) {
         this.idContacto = idContacto;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ClienteContacto)) {
-            return false;
-        }
-        ClienteContacto other = (ClienteContacto) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.ClienteContacto[ id=" + id + " ]";
-    }
-
+    
 	public Boolean getRecibeFacturacion() {
 		return recibeFacturacion;
 	}

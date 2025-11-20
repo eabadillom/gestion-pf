@@ -2,8 +2,10 @@ package mx.com.ferbo.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 public class Inventario {
+	protected Integer partidaCve;
 	protected Integer folio;
 	protected Date fechaIngreso;
 	protected Producto producto;
@@ -19,7 +21,6 @@ public class Inventario {
 	protected Camara camara;
 	protected Integer camarad;
 	protected Posicion posicion;
-	protected Integer partidaCve;
 	protected BigDecimal peso;
 	protected String inventarioCve;
 	protected String detalleAnt;
@@ -38,6 +39,40 @@ public class Inventario {
 	protected BigDecimal numeroTarimas;
 	protected String tarima;
 	
+	@Override
+	public int hashCode() {
+		if(partidaCve == null)
+			System.identityHashCode(this);
+		return Objects.hash(partidaCve);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Inventario other = (Inventario) obj;
+		return Objects.equals(partidaCve, other.partidaCve);
+	}
+	
+	@Override
+	public String toString() {
+		return "Inventario [folio=" + folio + ", producto=" + producto + ", cliente=" + cliente + ", cantidad="
+				+ cantidad + ", unidadManejo=" + unidadManejo + ", planta=" + planta + ", plantad=" + plantad
+				+ ", caducidad=" + caducidad + ", codigo=" + codigo + ", lote=" + lote + ", sap=" + sap + ", camara="
+				+ camara + ", camarad=" + camarad + ", posicion=" + posicion + ", partidaCve=" + partidaCve + ", peso="
+				+ peso + ", inventarioCve=" + inventarioCve + ", detalleAnt=" + detalleAnt + ", detallePartidaAnterior="
+				+ detallePartidaAnterior + ", detallePadre=" + detallePadre + ", detallePartidaPadre="
+				+ detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento=" + pedimento + ", tarimas="
+				+ tarimas + ", folioCliente=" + folioCliente + ", Observaciones=" + Observaciones + ", descripcion="
+				+ descripcion + ", constanciaDeDeposito=" + constanciaDeDeposito + ", srv=" + srv + "]";
+	}
+	
+	
+	
 	public String getTarima() {
 		return tarima;
 	}
@@ -47,9 +82,7 @@ public class Inventario {
 	public Inventario() {
 
 	}
-	public void listas() {
-	}
-
+	
 	public Inventario(Integer folio, Producto producto, Cliente cliente, Integer cantidad, UnidadDeManejo unidadManejo,
 			Planta planta, Integer plantad, Date caducidad, String codigo, String lote, String sap, Camara camara,
 			Integer camarad, Posicion posicion, Integer posiciond, Integer partidaCve, BigDecimal peso,
@@ -72,7 +105,6 @@ public class Inventario {
 		this.folioCliente = folioCliente;
 		this.Observaciones = observaciones;
 		this.descripcion = descripcion;
-		
 	}
 
 	public Inventario(Integer folio, Producto producto, Integer cantidad, UnidadDeManejo unidadManejo, Planta planta,
@@ -345,18 +377,7 @@ public class Inventario {
 	public void setPosicion(Posicion posicion) {
 		this.posicion = posicion;
 	}
-	@Override
-	public String toString() {
-		return "Inventario [folio=" + folio + ", producto=" + producto + ", cliente=" + cliente + ", cantidad="
-				+ cantidad + ", unidadManejo=" + unidadManejo + ", planta=" + planta + ", plantad=" + plantad
-				+ ", caducidad=" + caducidad + ", codigo=" + codigo + ", lote=" + lote + ", sap=" + sap + ", camara="
-				+ camara + ", camarad=" + camarad + ", posicion=" + posicion + ", partidaCve=" + partidaCve + ", peso="
-				+ peso + ", inventarioCve=" + inventarioCve + ", detalleAnt=" + detalleAnt + ", detallePartidaAnterior="
-				+ detallePartidaAnterior + ", detallePadre=" + detallePadre + ", detallePartidaPadre="
-				+ detallePartidaPadre + ", po=" + po + ", mp=" + mp + ", pedimento=" + pedimento + ", tarimas="
-				+ tarimas + ", folioCliente=" + folioCliente + ", Observaciones=" + Observaciones + ", descripcion="
-				+ descripcion + ", constanciaDeDeposito=" + constanciaDeDeposito + ", srv=" + srv + "]";
-	}
+	
 	public Date getFechaIngreso() {
 		return fechaIngreso;
 	}

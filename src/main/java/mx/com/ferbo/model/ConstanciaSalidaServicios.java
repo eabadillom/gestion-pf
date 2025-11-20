@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -37,6 +38,29 @@ public class ConstanciaSalidaServicios implements Serializable{
 	
 	@Column(name = "nu_cantidad")
 	private BigDecimal numCantidad;
+	
+	@Override
+	public int hashCode() {
+		return constanciaSalidaServiciosPK.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConstanciaSalidaServicios other = (ConstanciaSalidaServicios) obj;
+		return Objects.equals(constanciaSalidaServiciosPK, other.constanciaSalidaServiciosPK);
+	}
+	
+	@Override
+	public String toString() {
+		return "ConstanciaSalidaServicios [constanciaSalidaServiciosPK=" + constanciaSalidaServiciosPK
+				+ ", numCantidad=" + numCantidad + "]";
+	}
 	
 	public ConstanciaSalidaServicios() {
 	}
@@ -79,11 +103,5 @@ public class ConstanciaSalidaServicios implements Serializable{
 
 	public void setServicioCve(Servicio servicioCve) {
 		this.servicioCve = servicioCve;
-	}
-
-	@Override
-	public String toString() {
-		return "ConstanciaSalidaServicios [constanciaSalidaServiciosPK=" + constanciaSalidaServiciosPK
-				+ ", numCantidad=" + numCantidad + "]";
 	}
 }

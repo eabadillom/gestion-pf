@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template.xhtml">
+	<ui:define name="title">Entrada</ui:define>
+	<ui:define name="content">
+		<h:form id="form" enctype="multipart/form-data">
+		
+			<!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+			<ui:include src="/protected/common/status-info.xhtml" />
+			
+			<!-- DATOS GENERALES -->
+			<!-- id: form:pnl-datos-generales -->
+			<ui:include src="/inventarios/entrada/alta/alta-datos-generales.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- CONFIGURE SU TARIMA -->
+			<!-- id: form:pnl-config-tarima -->
+			<!-- Panel de configuración principal de tarimas y sus productos. -->			
+			<ui:include src="/inventarios/entrada/alta/alta-config-tarima.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- nn TARIMAS -->
+			<!-- id: dl-tarimas -->
+			<!-- Lista de tarimas agregadas a la constancia de depósito. -->
+			<ui:include src="/inventarios/entrada/alta/alta-tarimas.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- INFORMACIÓN DEL PRODUCTO -->
+			<!-- id: pnl-det-partida, widgetVar: dlgDetPartida-->
+			<!-- Dialogo para mostrar el detalle de una partida (datos). -->
+			<ui:include src="/inventarios/entrada/alta/alta-det-partida.xhtml" />
+			
+			<!-- AGREGAR PRODUCTO A LA TARIMA -->
+			<!-- id: pnl-add-producto, widgetVar: dlgAddProducto -->
+			<!-- Dialogo para agregar una partida a una tarima -->
+			<ui:include src="/inventarios/entrada/alta/alta-agregar-producto.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- PARA LOS SERVICIOS DE -->
+			<!-- id: pnl-servicios -->
+			<!-- Panel de configuración de servicios -->
+			<ui:include src="/inventarios/entrada/alta/alta-servicios.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- DATOS ADICIONALES -->
+			<!-- id: pnl-datos-adicionales -->
+			<!-- Panel de captura de información para temperatura, transportista y placas del vehículo -->
+			<ui:include src="/inventarios/entrada/alta/alta-datos-adicionales.xhtml" />
+			
+			<p:spacer style="height: 2rem;"/>
+			
+			<!-- ACCIONES -->
+			<!-- ID: tb-acciones -->
+			<!-- Barra de botones con acciones: "GUARDAR", "IMPRIMIR" Y "NUEVA" -->
+			<ui:include src="/inventarios/entrada/alta/alta-acciones.xhtml" />
+			
+		</h:form>
+	</ui:define>
+</ui:composition>

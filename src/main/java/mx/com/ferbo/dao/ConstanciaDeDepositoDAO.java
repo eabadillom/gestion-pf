@@ -99,10 +99,8 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 			em.getTransaction().begin();
 			em.merge(constanciaDeDeposito);
 			em.getTransaction().commit();			
-		}catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			e.printStackTrace();
-			e.getCause();
+		}catch (Exception ex) {
+			log.error("Problema en la actualización de la constancia de depósito...",  ex);
 			return "ERROR";
 		}finally {
 			EntityManagerUtil.close(em);
@@ -111,7 +109,7 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	}
 
 	@Override
-	public String guardar(ConstanciaDeDeposito constanciaDeDeposito) {
+	public String guardar(ConstanciaDeDeposito constanciaDeDeposito){
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();

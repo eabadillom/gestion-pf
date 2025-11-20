@@ -116,13 +116,11 @@ public class SerieFacturaBean implements Serializable {
 		} 
 	}
 
-	public void update() {
+	public synchronized void update() {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Serie de factura";
-		
-		String result = null;
 		
 		try {
 			daoSerie.actualizar(seleccion);
