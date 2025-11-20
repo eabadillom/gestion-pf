@@ -3,7 +3,9 @@ package mx.com.ferbo.business;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -184,10 +186,80 @@ public class EntradaBL {
 		if(partida == null)
 			throw new InventarioException("No se ha indicado la partida");
 		
-		constancia.getPartidaList().add(partida);
+                constancia.getPartidaList().add(partida);
 		partida.setFolio(constancia);
-		
+                
 	}
+        
+        public static synchronized void agregarPartidaCompleta(ConstanciaDeDeposito constancia, BigDecimal numTarimas, Partida partida)
+	throws InventarioException, CloneNotSupportedException {
+                Partida p = null;
+                UnidadDeProductoDAO udpDAO = null;
+                
+                if(numTarimas == null)
+			throw new InventarioException("Debe indicar el número de tarimas.");
+                
+                if(numTarimas.compareTo(BigDecimal.ZERO) <= 0)
+                        throw new InventarioException("El número de tarimas indicado es incorrecto");
+                
+		if(constancia == null)
+			throw new InventarioException("No se ha indicado la constancia de depósito.");
+		
+		if(partida == null)
+			throw new InventarioException("No se ha indicado la partida.");
+                
+                Integer idProducto = partida.getUnidadDeProductoCve().getProductoCve().getProductoCve();
+		Integer idUnidadManejo = partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve();
+                
+                udpDAO = new UnidadDeProductoDAO();
+		
+		UnidadDeProducto unidadDeProducto = udpDAO.buscarPorProductoUnidad(idProducto, idUnidadManejo);
+		
+		if(unidadDeProducto == null) {
+			log.info("Agregando unidad de producto: {}");
+			unidadDeProducto = partida.getUnidadDeProductoCve();
+			udpDAO.guardar(unidadDeProducto);
+			partida.setUnidadDeProductoCve(unidadDeProducto);
+		}
+                
+                unidadDeProducto = partida.getUnidadDeProductoCve();
+                
+                p = partida.clone();
+                
+                p.setNoTarimas(numTarimas);
+                p.setUnidadDeCobro(unidadDeProducto.getUnidadDeManejoCve());
+                constancia.getPartidaList().add(p);
+	}
+        
+        public static synchronized void editarPartidaCompleta(ConstanciaDeDeposito constancia, Partida partida) 
+        throws InventarioException{
+                
+                if(constancia == null)
+			throw new InventarioException("No se ha indicado la constancia de depósito.");
+                
+                if(partida == null)
+			throw new InventarioException("Debe indicar una partida.");
+                
+                for(int i = 0; i < constancia.getPartidaList().size(); i++){
+                    if (constancia.getPartidaList().get(i).equals(partida)) {
+                        constancia.getPartidaList().set(i, partida);
+                        break;
+                    }
+                }
+        }
+        
+        public static synchronized void eliminarPartidaCompleta(ConstanciaDeDeposito constancia, Partida partida) 
+        throws InventarioException{
+                
+                if(constancia == null)
+			throw new InventarioException("No se ha indicado la constancia de depósito.");
+                
+                if(partida == null)
+			throw new InventarioException("Debe indicar una partida.");
+                
+                log.info("Producto eliminado: {}", partida);
+                constancia.getPartidaList().remove(partida);
+        }
 	
 	public static synchronized List<Tarima> crearTarimas(ConstanciaDeDeposito constancia, Integer numeroTarimas, Partida partida, List<Tarima> tarimas)
 	throws InventarioException, CloneNotSupportedException {
@@ -226,8 +298,8 @@ public class EntradaBL {
 		for(int i = 0; i < numeroTarimas; i++) {
 			
 			p = partida.clone();
-			
-			t = new Tarima();
+                        
+                        t = new Tarima();
 			t.setPartidas(new ArrayList<Partida>());
 			t.getPartidas().add(p);
 			
@@ -242,8 +314,8 @@ public class EntradaBL {
 		
 		return tarimas;
 	}
-	
-	public static synchronized void agregarATarima(ConstanciaDeDeposito constancia, Tarima tarima, Partida partida)
+        
+        public static synchronized void agregarATarima(ConstanciaDeDeposito constancia, Tarima tarima, Partida partida)
 	throws InventarioException {
 		if(constancia == null)
 			throw new InventarioException("Debe indicar una entrada.");
@@ -256,10 +328,11 @@ public class EntradaBL {
 		
 		constancia.getPartidaList().add(partida);
 		partida.setFolio(constancia);
-		tarima.getPartidas().add(partida);
+		partida.setTarima(tarima);
+                tarima.getPartidas().add(partida);
 	}
-	
-	public static synchronized void nombrarTarimas(String folioCliente, List<Tarima> tarimas) {
+        
+        public static synchronized void nombrarTarimas(String folioCliente, List<Tarima> tarimas) {
 		String nombreTarima = null;
 		for(Tarima tarima : tarimas) {
 			Integer index = tarimas.indexOf(tarima);
@@ -292,6 +365,26 @@ public class EntradaBL {
 		EntradaBL.nombrarTarimas(constancia.getFolioCliente(), tarimas);
 		
 	}
+        
+        public static synchronized Integer totalPartidasEliminadas(List<Tarima> tarimas, Tarima tarima)
+        throws InventarioException {
+                Integer totalEliminadas = 0;
+                
+                if(tarima == null)
+			throw new InventarioException("Debe indicar una tarima.");
+		
+		if(tarimas == null)
+			throw new InventarioException("Debe indicar una lista de tarimas");
+		
+		if(tarimas.size() <= 0)
+			throw new InventarioException("La lista de tarimas está vacía.");
+		
+		for(Partida partida : tarima.getPartidas()) {
+			totalEliminadas = totalEliminadas + 1;
+		}
+                
+                return totalEliminadas;
+        }
 	
 	public static synchronized void eliminarProducto(ConstanciaDeDeposito constancia, Tarima tarima, Partida partida)
 	throws InventarioException {
@@ -308,6 +401,32 @@ public class EntradaBL {
 		constancia.getPartidaList().remove(partida);
 		tarima.getPartidas().remove(partida);
 	}
+        
+        public static synchronized void eliminarPartidaEnListaTarimas(List<Tarima> tarimas, Partida partida)
+        throws InventarioException {
+            if(tarimas == null)
+                        throw new InventarioException("Debe indicar una lista de tarimas");
+            
+            if(tarimas.size() <= 0)
+			throw new InventarioException("La lista de tarimas está vacía.");
+            
+            if(partida == null)
+			throw new InventarioException("Debe indicar una partida.");
+            
+            for (Tarima t : tarimas) {
+                List<Partida> partidas = t.getPartidas();
+                if (partidas == null || partidas.isEmpty()) continue;
+                
+                Iterator<Partida> it = partidas.iterator();
+                while (it.hasNext()) {
+                    Partida p = it.next();
+                    if (p.equals(partida)) {
+                        it.remove();
+                        return;
+                    }
+                }
+            }
+        }
 	
 	public static synchronized void agregarServicio(ConstanciaDeDeposito constancia, PrecioServicio ps, BigDecimal cantidad)
 	throws InventarioException {
@@ -411,7 +530,7 @@ public class EntradaBL {
 		udpDAO = new UnidadDeProductoDAO();
 		
 		for(Partida partida : constancia.getPartidaList()) {
-			Integer idProducto = partida.getUnidadDeProductoCve().getProductoCve().getProductoCve();
+                        Integer idProducto = partida.getUnidadDeProductoCve().getProductoCve().getProductoCve();
 			Integer idUnidad = partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve();
 			
 			unidadDeProducto = udpDAO.buscarPorProductoUnidad(idProducto, idUnidad);
