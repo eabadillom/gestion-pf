@@ -1165,7 +1165,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		PrimeFaces.current().ajax().update("form:metodoPago");
 	}
 	
-	public void saveFactura() throws InventarioException {
+	public synchronized void saveFactura() throws InventarioException {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;

@@ -36,13 +36,20 @@ import javax.validation.constraints.Size;
 @Table(name = "constancia_salida")
 @NamedQueries({
 
-    @NamedQuery(name = "ConstanciaSalida.findAll", query = "SELECT c FROM ConstanciaSalida c"),
-    @NamedQuery(name = "ConstanciaSalida.findById", query = "SELECT c FROM ConstanciaSalida c WHERE c.id = :id"),
-    @NamedQuery(name = "ConstanciaSalida.findByFecha", query = "SELECT c FROM ConstanciaSalida c WHERE c.fecha = :fecha"),
-    @NamedQuery(name = "ConstanciaSalida.findByNumero", query = "SELECT c FROM ConstanciaSalida c WHERE c.numero = :numero"),
-    @NamedQuery(name = "ConstanciaSalida.findByNombreCte", query = "SELECT c FROM ConstanciaSalida c WHERE c.nombreCte = :nombreCte"),
-    @NamedQuery(name = "ConstanciaSalida.findByStatus", query = "SELECT c FROM ConstanciaSalida c WHERE c.status = :status"),
-    @NamedQuery(name = "ConstanciaSalida.findByObservaciones", query = "SELECT c FROM ConstanciaSalida c WHERE c.observaciones = :observaciones")})
+        @NamedQuery(name = "ConstanciaSalida.findAll", query = "SELECT c FROM ConstanciaSalida c"),
+        @NamedQuery(name = "ConstanciaSalida.findById", query = "SELECT c FROM ConstanciaSalida c WHERE c.id = :id"),
+        @NamedQuery(name = "ConstanciaSalida.findByFecha", query = "SELECT c FROM ConstanciaSalida c WHERE c.fecha = :fecha"),
+        @NamedQuery(name = "ConstanciaSalida.findByNumero", query = "SELECT c FROM ConstanciaSalida c WHERE c.numero = :numero"),
+        @NamedQuery(name = "ConstanciaSalida.findByNombreCte", query = "SELECT c FROM ConstanciaSalida c WHERE c.nombreCte = :nombreCte"),
+        @NamedQuery(name = "ConstanciaSalida.findByStatus", query = "SELECT c FROM ConstanciaSalida c WHERE c.status = :status"),
+        @NamedQuery(name = "ConstanciaSalida.findByObservaciones", query = "SELECT c FROM ConstanciaSalida c WHERE c.observaciones = :observaciones"),
+        @NamedQuery(name = "ConstanciaSalida.findByFolioDeposito", query = "SELECT cs " +
+                "FROM ConstanciaDeDeposito cdd " +
+                "INNER JOIN cdd.partidaList p " +
+                "INNER JOIN p.detalleConstanciaSalidaList dcs " +
+                "INNER JOIN dcs.constanciaCve cs " +
+                "WHERE cdd.folio = :folio")
+})
 
 public class ConstanciaSalida implements Serializable {
 
@@ -52,55 +59,55 @@ public class ConstanciaSalida implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID")
     private Integer id;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "FECHA")
     @Temporal(TemporalType.DATE)
     private Date fecha;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "NUMERO")
     private String numero;
-    
+
     @Size(max = 150)
     @Column(name = "NOMBRE_CTE")
     private String nombreCte;
-    
+
     @JoinColumn(name = "STATUS", referencedColumnName = "ID")
     @ManyToOne
     private StatusConstanciaSalida status;
-    
+
     @Size(max = 75)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
-    
+
     @NotNull
     @Size(max = 100)
     @Column(name = "nombre_transportista")
     private String nombreTransportista;
-    
+
     @NotNull
     @Size(max = 10)
     @Column(name = "placas_transporte")
-    private  String placasTransporte;
-    
+    private String placasTransporte;
+
     @NotNull
     @Column(name = "status_termo")
     private Boolean statusTermo;
-    
+
     @NotNull
     @Column(name = "temp_transporte")
     private BigDecimal temperaturaTransporte;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaCve")
     private List<DetalleConstanciaSalida> detalleConstanciaSalidaList;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idConstancia")
     private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList;
-    
+
     @JoinColumn(name = "CLIENTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente clienteCve;
@@ -165,24 +172,24 @@ public class ConstanciaSalida implements Serializable {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
-    
+
     public String getNombreTransportista() {
-		return nombreTransportista;
-	}
+        return nombreTransportista;
+    }
 
-	public void setNombreTransportista(String nombreTransportista) {
-		this.nombreTransportista = nombreTransportista;
-	}
+    public void setNombreTransportista(String nombreTransportista) {
+        this.nombreTransportista = nombreTransportista;
+    }
 
-	public String getPlacasTransporte() {
-		return placasTransporte;
-	}
+    public String getPlacasTransporte() {
+        return placasTransporte;
+    }
 
-	public void setPlacasTransporte(String placasTransporte) {
-		this.placasTransporte = placasTransporte;
-	}
+    public void setPlacasTransporte(String placasTransporte) {
+        this.placasTransporte = placasTransporte;
+    }
 
-	public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
+    public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList() {
         return detalleConstanciaSalidaList;
     }
 
@@ -191,14 +198,14 @@ public class ConstanciaSalida implements Serializable {
     }
 
     public List<ConstanciaSalidaServicios> getConstanciaSalidaServiciosList() {
-		return constanciaSalidaServiciosList;
-	}
+        return constanciaSalidaServiciosList;
+    }
 
-	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
-		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
-	}
+    public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
+        this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
+    }
 
-	public Cliente getClienteCve() {
+    public Cliente getClienteCve() {
         return clienteCve;
     }
 
@@ -231,20 +238,20 @@ public class ConstanciaSalida implements Serializable {
         return "mx.com.ferbo.model.ConstanciaSalida[ id=" + id + " ]";
     }
 
-	public Boolean getStatusTermo() {
-		return statusTermo;
-	}
+    public Boolean getStatusTermo() {
+        return statusTermo;
+    }
 
-	public void setStatusTermo(Boolean statusTermo) {
-		this.statusTermo = statusTermo;
-	}
+    public void setStatusTermo(Boolean statusTermo) {
+        this.statusTermo = statusTermo;
+    }
 
-	public BigDecimal getTemperaturaTransporte() {
-		return temperaturaTransporte;
-	}
+    public BigDecimal getTemperaturaTransporte() {
+        return temperaturaTransporte;
+    }
 
-	public void setTemperaturaTransporte(BigDecimal temperaturaTransporte) {
-		this.temperaturaTransporte = temperaturaTransporte;
-	}
+    public void setTemperaturaTransporte(BigDecimal temperaturaTransporte) {
+        this.temperaturaTransporte = temperaturaTransporte;
+    }
 
 }

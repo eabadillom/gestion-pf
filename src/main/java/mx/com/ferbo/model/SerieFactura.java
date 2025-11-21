@@ -95,15 +95,25 @@ public class SerieFactura implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+    	if(this == object)
+    		return true;
+    	
+    	if(object == null)
+    		return false;
+    	
         if (!(object instanceof SerieFactura)) {
             return false;
         }
-        SerieFactura other = (SerieFactura) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        
+        final SerieFactura other = (SerieFactura) object;
+        
+        if(this.id == null || other.id == null)
+        	return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+        
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)))
             return false;
-        }
-        return true;
+        
+        return Objects.equals(this.id, other.id);
     }
 
     @Override
