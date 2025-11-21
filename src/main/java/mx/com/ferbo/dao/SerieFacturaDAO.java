@@ -109,7 +109,7 @@ public class SerieFacturaDAO {
 		return null;
 	}
 	
-	public void actualizar(SerieFactura serie)
+	public synchronized void actualizar(SerieFactura serie)
 	throws InventarioException {
 		EntityManager entity = null;
 		

@@ -24,6 +24,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.bouncycastle.util.Objects;
+
 /**
  *
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
@@ -69,6 +71,30 @@ public class Contacto implements Serializable {
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto", orphanRemoval = true)//removi ophanremovel
     private List<MedioCnt> medioCntList;
+    
+    @Override
+    public int hashCode() {
+    	if(this.idContacto == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.idContacto);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Contacto)) {
+            return false;
+        }
+        Contacto other = (Contacto) object;
+        if ((this.idContacto == null && other.idContacto != null) || (this.idContacto != null && !this.idContacto.equals(other.idContacto))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Contacto[ idContacto=" + idContacto + " ]";
+    }
 
     public Contacto() {
     }
