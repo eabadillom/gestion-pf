@@ -36,12 +36,19 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.business.n.AvisoBL;
+import mx.com.ferbo.business.n.CategoriaBL;
 import mx.com.ferbo.business.n.ClienteBL;
 import mx.com.ferbo.business.n.ClienteContactoBL;
 import mx.com.ferbo.business.n.DomiciliosBL;
 import mx.com.ferbo.business.n.FiscalBL;
+import mx.com.ferbo.business.n.MedioContactoBL;
+import mx.com.ferbo.business.n.MedioPagoBL;
+import mx.com.ferbo.business.n.MetodoPagoBL;
+import mx.com.ferbo.business.n.PlantaBL;
 import mx.com.ferbo.business.n.PrecioServicioBL;
 import mx.com.ferbo.business.n.SeguridadBL;
+import mx.com.ferbo.business.n.ServicioBL;
+import mx.com.ferbo.business.n.UnidadManejoBL;
 import mx.com.ferbo.controller.SideBarBean;
 import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
@@ -142,6 +149,28 @@ public class ClientesBean implements Serializable {
     private HttpServletRequest request;
     private String agregadoOActualizado;
 
+    // Otros objetos para obtener listas
+    @Inject
+    private PlantaBL plantaBL;
+
+    @Inject
+    private MedioPagoBL medioPagoBL;
+
+    @Inject
+    private MetodoPagoBL metodoPagoBL;
+
+    @Inject
+    private CategoriaBL categoriaBL;
+
+    @Inject
+    private MedioContactoBL medioContactoBL;
+
+    @Inject
+    private UnidadManejoBL unidadManejoBL;
+
+    @Inject
+    private ServicioBL servicioBL;
+
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
         this.clienteSelected = new Cliente();
@@ -156,20 +185,27 @@ public class ClientesBean implements Serializable {
 
     @PostConstruct
     public void init() {
-        request = (HttpServletRequest) context.getExternalContext().getRequest();
-        this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
-        log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
-        this.lstClientes = clienteBL.obtenerTodos();
-        this.lstMedioPago = fiscalBL.obtenerMediosPago();
-        this.lstMetodoPago = fiscalBL.obtenerMetodosPago();
-        this.lstTipoMail = contactoBL.obtenerTiposMail();
-        this.lstTipoTelefono = contactoBL.obtenerTiposTelefono();
-        this.lstServicio = serviciosBL.obtenerServicios();
-        this.lstUnidadManejo = serviciosBL.obtenerUnidadesMenjo();
-        this.lstPlanta = avisoBL.obtenerPlantas(Boolean.FALSE);
-        this.lstCategoria = avisoBL.obtenerCategorias();
-        this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
-        this.lstUsoCfdi = fiscalBL.obtenerCfdis();
+        try {
+            request = (HttpServletRequest) context.getExternalContext().getRequest();
+            this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+            log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
+            this.lstClientes = clienteBL.obtenerTodos();
+            this.lstMedioPago = medioPagoBL.obtenerMediosPago();
+            this.lstMetodoPago = metodoPagoBL.obtenerMetodosPago();
+            this.lstTipoMail = medioContactoBL.obtenerTiposMail();
+            this.lstTipoTelefono = medioContactoBL.obtenerTiposTelefono();
+            this.lstServicio = servicioBL.obtenerServicios();
+            this.lstUnidadManejo = unidadManejoBL.obtenerUnidadesManejo();
+            this.lstPlanta = plantaBL.obtenerPlantas(Boolean.FALSE);
+            this.lstCategoria = categoriaBL.obtenerCategorias();
+            this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
+            this.lstUsoCfdi = fiscalBL.obtenerCfdis();
+        } catch (InventarioException ex) {
+            log.warn("Error: " ,ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cargar Información", ex.getMessage());
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
     }
 
     public void cargarInfoCliente(Cliente cliente) {
@@ -380,7 +416,7 @@ public class ClientesBean implements Serializable {
     }
 
     public void nuevoMedioContacto() {
-        this.medioCntSelected = contactoBL.nuevoMedio();
+        this.medioCntSelected = medioContactoBL.nuevoMedio();
     }
 
     public void operarContactos(String operacion) {
@@ -434,7 +470,7 @@ public class ClientesBean implements Serializable {
 
     public void seleccionarMedioContacto() {
         try {
-            contactoBL.seleccionarMedioContacto(this.medioCntSelected);
+            medioContactoBL.seleccionarMedioContacto(this.medioCntSelected);
         } catch (InventarioException ex) {
             log.warn(ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Contacto", ex.getMessage());

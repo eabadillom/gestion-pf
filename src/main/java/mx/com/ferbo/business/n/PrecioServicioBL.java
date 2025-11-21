@@ -49,10 +49,8 @@ public class PrecioServicioBL {
     public List<PrecioServicio> obtenerPrecioServiciosPorCliente(Cliente cliente) throws InventarioException {
         requireNonNull(cliente, "El cliente no puede estar vacío");
 
-        Integer id = cliente.getCteCve();
-
         try {
-            return precioServicioDAO.buscarPorCliente(id);
+            return precioServicioDAO.buscarPorCliente(cliente);
         } catch (InventarioException ex) {
             log.info(ex.getMessage());
             return Collections.emptyList();

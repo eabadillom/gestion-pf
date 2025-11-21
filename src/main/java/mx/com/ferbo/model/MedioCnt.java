@@ -23,8 +23,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.bouncycastle.util.Objects;
-
 /**
  *
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
@@ -70,30 +68,6 @@ public class MedioCnt implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private Telefono idTelefono;
     
-    @Override
-    public int hashCode() {
-    	if(this.idMedio == null)
-    		return System.identityHashCode(this);
-    	return Objects.hashCode(this.idMedio);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof MedioCnt)) {
-            return false;
-        }
-        MedioCnt other = (MedioCnt) object;
-        if ((this.idMedio == null && other.idMedio != null) || (this.idMedio != null && !this.idMedio.equals(other.idMedio))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.MedioCnt[ idMedio=" + idMedio + " ]";
-    }
-
     public MedioCnt() {
     }
 

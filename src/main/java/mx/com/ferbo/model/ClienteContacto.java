@@ -106,31 +106,7 @@ public class ClienteContacto implements Serializable {
     @Column(name = "st_inventario")
     private Boolean recibeInventario;
     
-    @Override
-    public int hashCode() {
-    	if(this.id == null)
-    		return System.identityHashCode(this);
-        
-        return Objects.hashCode(this.id);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof ClienteContacto)) {
-            return false;
-        }
-        ClienteContacto other = (ClienteContacto) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.ClienteContacto[ id=" + id + " ]";
-    }
-
+  
     public ClienteContacto() {
         idCliente = new Cliente();
         idContacto = new Contacto();
