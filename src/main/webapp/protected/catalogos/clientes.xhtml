@@ -76,9 +76,9 @@
                 <f:facet name="footer">
                     <p:commandButton value="#{(clientesBean.clienteSelected.cteCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" process="@this"
                         actionListener="#{clientesBean.guardarOActualizarCliente()}" update="dtClientes"
-                        onstart="PF('dialogCliente').hide(); PF('statusInfoDialog').show();"
+                        onstart="PF('statusInfoDialog').show();"
                         oncomplete="PF('statusInfoDialog').hide();"/>
-                    <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogCliente').hide()"
+                    <p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('dialogCliente').hide()"
                         immediate="true" class="ui-button-secondary" resetValues="true" />
                 </f:facet>
             </p:dialog>

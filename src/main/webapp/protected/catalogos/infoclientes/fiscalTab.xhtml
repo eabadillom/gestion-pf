@@ -44,7 +44,9 @@
             <div class="p-field p-col-12 p-md-4">
                 <p:outputLabel for="txtRegimenCapital">Régimen capital</p:outputLabel>
                 <p:inputText id="txtRegimenCapital" value="#{clientesBean.clienteSelected.regimenCapital}"
-                             readonly="#{clientesBean.clienteSelected.tipoPersona eq 'F'}" maxlength="150" />
+                             readonly="#{clientesBean.clienteSelected.tipoPersona eq 'F'}" maxlength="150">
+                    <p:ajax process="@this"/>
+                </p:inputText>
             </div>
             <div class="p-field p-col-12 p-md-4">
                 <p:outputLabel>Régimen Fiscal</p:outputLabel>

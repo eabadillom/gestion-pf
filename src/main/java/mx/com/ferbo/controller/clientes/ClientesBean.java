@@ -8,10 +8,10 @@ import java.util.Objects;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 
 import java.util.stream.Collectors;
 
-import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -66,6 +66,7 @@ import mx.com.ferbo.util.FacesUtils;
 @ViewScoped
 public class ClientesBean implements Serializable {
 
+    private static final long serialVersionUID = 8438449261015571241L;
     private static final Logger log = LogManager.getLogger(ClientesBean.class);
 
     // Side bar
@@ -242,10 +243,11 @@ public class ClientesBean implements Serializable {
         clienteSelected.setMetodoPago(new MetodoPago());
         clienteSelected.setRegimenFiscal(new RegimenFiscal());
         clienteSelected.setUsoCfdi(new UsoCfdi());
-        clienteSelected.setClienteContactoList(new ArrayList());
-        clienteSelected.setAvisoList(new ArrayList());
-        clienteSelected.setClienteDomiciliosList(new ArrayList());
+        clienteSelected.setClienteContactoList(new ArrayList<>());
+        clienteSelected.setAvisoList(new ArrayList<>());
+        clienteSelected.setClienteDomiciliosList(new ArrayList<>());
         tipoDomicilioSelected = new TiposDomicilio();
+        clienteSelected.setHabilitado(true);
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
@@ -254,6 +256,7 @@ public class ClientesBean implements Serializable {
     public void guardarOActualizarCliente() {
         String mensaje = null;
         try {
+            fiscalBL.validarInfoFiscal(clienteSelected);
             mensaje = clienteBL.guardarOActualizar(clienteSelected);
             this.lstClientes = null;
             this.lstClientes = clienteBL.obtenerTodos();

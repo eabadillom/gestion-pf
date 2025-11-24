@@ -80,7 +80,7 @@ public class ClienteContactoBL {
 
         List<ClienteContacto> clienteContactos = cliente.getClienteContactoList();
 
-        if (clienteContactos == null) {
+        if (clienteContactos == null || clienteContactos.isEmpty()) {
             clienteContactos = new ArrayList<>();
             cliente.setClienteContactoList(clienteContactos);
         }
@@ -93,6 +93,7 @@ public class ClienteContactoBL {
         if (index >= 0) {
             clienteContactos.set(index, clienteContacto);
         } else {
+            clienteContacto.setIdCliente(cliente);
             clienteContactos.add(clienteContacto);
         }
     }
@@ -104,8 +105,9 @@ public class ClienteContactoBL {
         FacesUtils.requireNonNullWithReturn(medioCnt, "El medio de contacto no puede ser vacío.");
 
         List<MedioCnt> medioCnts = clienteContacto.getIdContacto().getMedioCntList();
-        if (medioCnts == null) {
+        if (medioCnts == null || medioCnts.isEmpty()) {
             medioCnts = new ArrayList<>();
+            clienteContacto.getIdContacto().setMedioCntList(medioCnts);
         }
 
         final List<MedioCnt> lista = medioCnts;
@@ -115,6 +117,7 @@ public class ClienteContactoBL {
         if (index >= 0) {
             medioCnts.set(index, medioCnt);
         } else {
+            medioCnt.setIdContacto(clienteContacto.getIdContacto());
             medioCnts.add(medioCnt);
         }
     }

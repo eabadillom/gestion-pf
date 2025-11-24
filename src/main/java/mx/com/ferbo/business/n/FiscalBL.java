@@ -97,22 +97,44 @@ public class FiscalBL {
 
 	public void validarInfoFiscal(Cliente cliente) throws InventarioException {
 
-		log.info("Validando información del cliente: " + cliente);
+		log.info("Validando información del cliente");
 
-		if (cliente.getRegimenFiscal() == null) {
-			cliente.setRegimenFiscal(new RegimenFiscal());
+		if (cliente.getTipoPersona() == null || cliente.getTipoPersona().equalsIgnoreCase("")){
+			throw new InventarioException("El cliente debe esta asociado a un tipo de persona");
 		}
 
-		if (cliente.getUsoCfdi() == null) {
-			cliente.setUsoCfdi(new UsoCfdi());
+		if (cliente.getCteRfc() == null || cliente.getCteRfc().equalsIgnoreCase( "")){
+			throw new InventarioException("El RFC del cliente no puede estar vacío");
 		}
 
-		if (cliente.getMetodoPago() == null) {
-			cliente.setMetodoPago(new MetodoPago());
+		if (cliente.getNumeroCte() == null || cliente.getNumeroCte().equalsIgnoreCase("")){
+			throw new InventarioException("El cliente de debe tener asignado un número");
 		}
 
-		if (cliente.getFormaPago() == null) {
-			cliente.setFormaPago(new String());
+		if (cliente.getNombre() == null || cliente.getNombre().equalsIgnoreCase("")){
+			throw new InventarioException("El cliente debe tener un nombre");
+		}
+
+		if (cliente.getTipoPersona().equalsIgnoreCase("m")){
+			if(cliente.getRegimenCapital() == null || cliente.getRegimenCapital().equalsIgnoreCase("")){
+				throw new InventarioException("El cliente debe tener un régimen capital");
+			}
+		}
+
+		if (cliente.getRegimenFiscal() == null || cliente.getRegimenFiscal().getNb_regimen() == null || cliente.getRegimenFiscal().getNb_regimen().equalsIgnoreCase("")) {
+			throw new InventarioException("El cliente debe tener un régimen fiscal");
+		}
+
+		if (cliente.getUsoCfdi() == null || cliente.getUsoCfdi().getUsoCfdi() == null || cliente.getUsoCfdi().getUsoCfdi().equalsIgnoreCase("")) {
+			throw new InventarioException("El cliente debe tener un uso de CFDI");
+		}
+
+		if (cliente.getMetodoPago() == null || cliente.getMetodoPago().getNbMetodoPago() == null || cliente.getMetodoPago().getNbMetodoPago().equalsIgnoreCase("")) {
+			throw new InventarioException("El cliente debe tener un metodo de pago");
+		}
+
+		if (cliente.getFormaPago() == null || cliente.getFormaPago().equalsIgnoreCase("")) {
+			throw new InventarioException("El cliente debe tener una forma de pago"); 
 		}
 
 	}

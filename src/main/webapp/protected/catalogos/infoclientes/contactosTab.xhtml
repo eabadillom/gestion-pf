@@ -163,7 +163,7 @@
                         <p:column width="5%" style="text-align: right !important;">
                             <p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this"
                                 oncomplete="PF('deleteMedioContactoDialog').show(); $('.ui-widget-overlay').remove();"
-                                update="form:tabView:dtMedioContacto">
+                                update="dtMedioContacto">
                                 <f:setPropertyActionListener value="#{medio}"
                                     target="#{clientesBean.medioCntSelected}" />
                             </p:commandButton>
@@ -176,7 +176,7 @@
 
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.clienteContactoSelected.id != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
-                actionListener="#{clientesBean.operarContactos('agregarcontacto')}" update="form:tabView:dialogMedioContacto form:tabView:pnlMedio"
+                actionListener="#{clientesBean.operarContactos('agregarcontacto')}" update="dtContactos"
                 process="pnlContacto @this" oncomplete="PF('dialogContacto').hide();" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogContacto').hide()"
                 immediate="true" class="ui-button-secondary" resetValues="true" />
@@ -249,8 +249,8 @@
             </p:outputPanel>
         </p:outputPanel>
         <f:facet name="footer">
-            <p:commandButton value="#{(clientesBean.medioCntSelected.idMedio != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" process="@this pnlMedio"
-                actionListener="#{clientesBean.operarContactos('agregarmedio')}" update="dtMedioContacto"
+            <p:commandButton value="#{(clientesBean.medioCntSelected.idMedio != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" process="pnlMedio @this"
+                actionListener="#{clientesBean.operarContactos('agregarmedio')}" update="form:tabView:dtMedioContacto"
                 oncomplete="PF('dialogMedioContacto').hide()" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogMedioContacto').hide()"
                 immediate="true" class="ui-button-secondary" resetValues="true" />

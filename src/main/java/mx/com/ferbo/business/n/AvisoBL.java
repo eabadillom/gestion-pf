@@ -62,8 +62,11 @@ public class AvisoBL {
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
 
-        if (cliente.getAvisoList() == null) {
-            cliente.setAvisoList(new ArrayList<>());
+        List<Aviso> avisos = cliente.getAvisoList();
+
+        if (avisos == null || avisos.isEmpty()) {
+            avisos = new ArrayList<>();
+            cliente.setAvisoList(avisos);
         }
 
         final List<Aviso> lista = cliente.getAvisoList();
@@ -76,6 +79,7 @@ public class AvisoBL {
             cliente.getAvisoList().set(index, aviso);
         } else {
             log.info("Se agrego temporalmente el nuevo aviso a la lista de avisos del cliente");
+            aviso.setCteCve(cliente);
             cliente.getAvisoList().add(aviso);
         }
     }
@@ -102,6 +106,7 @@ public class AvisoBL {
         if (index >= 0) {
             preciosServicios.set(index, precioServicio);
         } else {
+            precioServicio.setAvisoCve(aviso);
             preciosServicios.add(precioServicio);
         }
     }

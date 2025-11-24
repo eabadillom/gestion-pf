@@ -9,8 +9,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-import java.util.Objects;
-
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

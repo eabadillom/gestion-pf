@@ -71,8 +71,8 @@ public class ClienteBL {
         cliente.setRegimenFiscal(new RegimenFiscal());
         cliente.setUsoCfdi(new UsoCfdi());
         cliente.setCandadoSalida(new CandadoSalida());
-        cliente.setClienteContactoList(new ArrayList());
-        cliente.setAvisoList(new ArrayList());
+        cliente.setClienteContactoList(new ArrayList<>());
+        cliente.setAvisoList(new ArrayList<>());
 
         return cliente;
     }
@@ -134,11 +134,11 @@ public class ClienteBL {
 
         String status = null;
         if (cliente.getCteCve() == null) {
-            if ("m".equalsIgnoreCase(cliente.getRegimenCapital())) {
+            if ("m".equalsIgnoreCase(cliente.getTipoPersona())) {
                 fiscalBL.validarRegimenCapital(cliente);
             }
-            Cliente clientAux = obtenerPorCodigoUnico(cliente.getCodUnico());
-            fiscalBL.validarCodigoUnico(clientAux, cliente);
+            Cliente clienteBuscado = obtenerPorCodigoUnico(cliente.getCodUnico());
+            fiscalBL.validarCodigoUnico(cliente, clienteBuscado);
             List<Planta> plantas = plantaBL.obtenerPlantas(Boolean.TRUE);
             asignarCandadoSalida(plantas, cliente); 
             clienteDAO.guardar(cliente);

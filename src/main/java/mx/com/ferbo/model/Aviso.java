@@ -119,7 +119,7 @@ public class Aviso implements Serializable {
     @Column(name = "aviso_vigencia")
     private int avisoVigencia;
 
-    @Column(name = "aviso_val_seg")
+    @Column(name = "aviso_val_seg", precision = 15, scale = 4)
     private BigDecimal avisoValSeg;
 
     @Basic(optional = false)
