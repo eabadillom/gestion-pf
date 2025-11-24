@@ -408,8 +408,7 @@ public class IngresoBean implements Serializable {
 		try {
 			log.info("Agregando producto a la tarima {}", this.tarima);
 			EntradaBL.agregarATarima(this.entrada, this.tarima, this.partida);
-                        this.totalPartidasTarima++;
-			log.info("Producto agregado a la tarima.");
+                        log.info("Producto agregado a la tarima.");
                         this.partida = EntradaBL.crearPartida(camara);
 		} catch (InventarioException ex) {
 			log.error("Problema para agregar la partida a la tarima...", ex);
@@ -426,8 +425,7 @@ public class IngresoBean implements Serializable {
 			log.info("Eliminando partida: {}", partida);
 			EntradaBL.eliminarProducto(entrada, tarima, partida);
                         EntradaBL.eliminarPartidaEnListaTarimas(tarimas, partida);
-                        this.totalPartidasTarima--;
-			log.info("Partida eliminada.");
+                        log.info("Partida eliminada.");
                 } catch(InventarioException e){
                         log.error("Problema para eliminar la partida...", e);
                 } catch(Exception ex) {
