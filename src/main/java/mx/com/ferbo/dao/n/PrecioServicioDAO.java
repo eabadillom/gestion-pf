@@ -10,6 +10,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.DAOException;
 
@@ -21,6 +23,27 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
 
     public PrecioServicioDAO() {
         super(PrecioServicio.class);
+    }
+    
+    public List<PrecioServicio> buscarServiciosPorCliente(Cliente cliente) throws DAOException {
+        List<PrecioServicio> lista = null;
+        EntityManager em = null;
+        
+        try {
+            em = super.getEntityManager();
+            lista = em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
+                    .setParameter("cteCve", cliente.getCteCve())
+                    .getResultList()
+                    ;
+        } catch (Exception ex) {
+            log.error("Error al obtener la lista de PrecioServicio del cliente: {}",
+                    cliente.toString(), ex);
+            throw new DAOException("Error al consultar los precios de los servicios para el cliente", ex);
+        } finally {
+            super.close(em);
+        }
+        
+        return lista;
     }
 
     public List<PrecioServicio> buscarPorClienteServicio(PrecioServicio ps) throws DAOException {
@@ -70,7 +93,7 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
                     .setParameter("cteCve", ps.getCliente().getCteCve()).getResultList();
         } catch (Exception ex) {
             log.error("Problema para obtener la lista de precio servicio...", ex);
-            throw new DAOException("Error al consultar los precios de los servicios para el cliente", ex);
+            throw new DAOException("Hubo un problema al obtener los servicios del cliente");
         } finally {
             super.close(em);
         }
@@ -102,5 +125,24 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
 			super.close(em);
 		}
 		return list;
+	}
+
+    public List<PrecioServicio> buscarDisponibles(Cliente cliente, Aviso aviso) throws DAOException {
+		List<PrecioServicio> lista = null;
+		EntityManager em = null;
+		try {
+			em = super.getEntityManager();
+            lista = em.createNamedQuery("PrecioServicio.findAllByClienteAviso", PrecioServicio.class)
+					.setParameter("idCliente", cliente.getCteCve())
+					.setParameter("avisoCve", aviso.getAvisoCve())
+                    .getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para obtener los precios de servcio relacionados con el aviso " + aviso + " del cliente: " + cliente, ex);
+            throw new DAOException("No se encontraron precios de servicios relacionados con el aviso y cliente seleccionados");
+		} finally {
+			super.close(em);
+		}
+		return lista;
 	}
 }

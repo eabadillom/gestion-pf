@@ -22,6 +22,7 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 
@@ -84,64 +85,86 @@ public class AvisoBL {
         }
     }
 
-    public void agregarServicioAviso(Aviso aviso, PrecioServicio precioServicio) throws InventarioException {
+    public void agregarServicioAviso(
+            Aviso aviso,
+            Cliente cliente,
+            List<PrecioServicio> serviciosDisponibles,
+            List<PrecioServicio> serviciosPorAgregar,
+            List<PrecioServicio> serviciosAviso) throws InventarioException {
 
         log.info("Se verifica información de aviso y precioservicio");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
-        FacesUtils.requireNonNull(aviso, "El servicio no puede ser vacío");
+        FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
 
-        List<PrecioServicio> preciosServicios = aviso.getPrecioServicioList();
-
-        if (preciosServicios == null) {
-            preciosServicios = new ArrayList<>();
-            aviso.setPrecioServicioList(preciosServicios);
+        if (serviciosPorAgregar == null || serviciosPorAgregar.isEmpty()) {
+            return;
         }
 
-        final List<PrecioServicio> lista = preciosServicios;
+        for (PrecioServicio ps : serviciosPorAgregar) {
 
-        log.info("Se busca el aviso dentro de la lista de avisos del cliente");
-        int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(precioServicio)).findFirst()
-                .orElse(-1);
+            PrecioServicio nuevo = new PrecioServicio();
+            nuevo.setAvisoCve(aviso);
+            nuevo.setCliente(cliente);
+            nuevo.setPrecio(ps.getPrecio());
+            nuevo.setServicio(ps.getServicio());
+            nuevo.setUnidad(ps.getUnidad());
 
-        if (index >= 0) {
-            preciosServicios.set(index, precioServicio);
-        } else {
-            precioServicio.setAvisoCve(aviso);
-            preciosServicios.add(precioServicio);
+            boolean existe = serviciosAviso.stream()
+                    .anyMatch(p -> p.equals(nuevo));
+
+            if (existe) {
+                continue; 
+            }
+
+            precioServicioDAO.guardar(nuevo);
+
+            serviciosAviso.add(nuevo);
+            serviciosDisponibles.remove(ps);
         }
+
+        serviciosPorAgregar.clear();
     }
 
-    public void eliminaAviso(Cliente cliente, Aviso aviso) throws InventarioException {
+    public void eliminaAviso(Cliente cliente, Aviso aviso, List<PrecioServicio> preciosServicios)
+            throws InventarioException, DAOException {
+
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
 
-        List<Aviso> avisos = cliente.getAvisoList();
-        List<PrecioServicio> preciosServicios = aviso.getPrecioServicioList();
-
-        if (preciosServicios != null) {
-            for (PrecioServicio precio : preciosServicios) {
-                eliminaServicioAviso(aviso, precio);
+        if (preciosServicios != null && !preciosServicios.isEmpty()) {
+            for (PrecioServicio ps : new ArrayList<>(preciosServicios)) {
+                eliminarServicioAviso(aviso, ps, preciosServicios, null);
             }
         }
 
-        avisos.remove(aviso);
+        aviso.setCteCve(null);
+
+        cliente.getAvisoList().removeIf(a
+                -> a.getAvisoCve().equals(aviso.getAvisoCve())
+        );
 
         if (aviso.getAvisoCve() != null) {
             avisoDAO.eliminar(aviso);
         }
     }
 
-    public void eliminaServicioAviso(Aviso aviso, PrecioServicio ps) throws InventarioException {
+    public void eliminarServicioAviso(
+            Aviso aviso,
+            PrecioServicio servicioAEliminar,
+            List<PrecioServicio> serviciosAviso,
+            List<PrecioServicio> serviciosDisponibles) throws InventarioException {
+
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
-        FacesUtils.requireNonNull(ps, "El servicio no puede ser vacío");
+        FacesUtils.requireNonNull(servicioAEliminar, "El servicio a eliminar no puede ser vacío");
 
-        List<PrecioServicio> precioServicios = aviso.getPrecioServicioList();
-        FacesUtils.requireNonNull(precioServicios, "El aviso no tiene servicios para eliminar");
+        precioServicioDAO.eliminar(servicioAEliminar);
 
-        precioServicios.remove(ps);
+        serviciosAviso.remove(servicioAEliminar);
 
-        if (ps.getId() != null) {
-            precioServicioDAO.eliminar(ps);
+        if (serviciosDisponibles != null && !serviciosDisponibles.contains(servicioAEliminar)) {
+            serviciosDisponibles.add(servicioAEliminar);
         }
+
+        aviso.setPrecioServicioList(serviciosAviso);
     }
 }

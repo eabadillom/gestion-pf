@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.enterprise.context.RequestScoped;
@@ -76,7 +77,20 @@ public class PrecioServicioBL {
             throw new InventarioException();
         }
     }
-
+    
+    public List<PrecioServicio> buscarServiciosDisponibles(Cliente cliente, Aviso aviso) throws InventarioException {
+        
+        FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
+        FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
+        
+        try {
+            return precioServicioDAO.buscarDisponibles(cliente, aviso);
+        } catch (DAOException ex) {
+            log.error("Error al obtener los servicios relacionados con el aviso y cliente seleccionados");
+            throw new InventarioException("Hubo un problema al obtener los los servicios relacionados con el aviso y cliente seleccionado");
+        }
+    }
+    
     public void agregarOActualizarPrecioServicio(Cliente cliente, PrecioServicio precioServicio)
             throws InventarioException {
 
@@ -114,5 +128,15 @@ public class PrecioServicioBL {
             precioServicioDAO.eliminar(precioServicio);
         }
     }
-
+    
+    public List<PrecioServicio> filtrarPrecioServicios(Aviso avisoSelected, Cliente clienteSelected) {
+        List<PrecioServicio> lista = avisoSelected.getPrecioServicioList()
+                .stream()
+                .filter(p -> p.getAvisoCve() != null && p.getAvisoCve().equals(avisoSelected))
+                .filter(p -> p.getCliente() != null && p.getCliente().getCteCve().equals(clienteSelected.getCteCve()))
+                .collect(Collectors.toList());
+        
+        return lista;
+    }
+    
 }

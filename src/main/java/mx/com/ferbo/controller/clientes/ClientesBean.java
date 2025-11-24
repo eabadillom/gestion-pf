@@ -123,6 +123,8 @@ public class ClientesBean implements Serializable {
     private List<Servicio> lstServicio;
     private UnidadDeManejo unidadDeManejoSelected;
     private List<UnidadDeManejo> lstUnidadManejo;
+    private List<PrecioServicio> lstPrecioServiciosDisponibles;
+    private List<PrecioServicio> seleccionadosParaAgregar;
 
     // Objetos para domicilios
     @Inject
@@ -219,6 +221,7 @@ public class ClientesBean implements Serializable {
             this.clienteSelected = clienteBL.obtenerTodoCliente(cliente.getCteCve(), true);
             lstRegimenFiscalFiltered = fiscalBL.filtrarRegimenesFiscales(this.lstRegimenFiscal, this.clienteSelected);
             lstUsoCfdiFiltered = fiscalBL.filtrarCfdis(this.lstUsoCfdi, this.clienteSelected);
+            lstPrecioServicios = new ArrayList<>();
 
             this.actualizarListasDomicilios();
 
@@ -251,6 +254,7 @@ public class ClientesBean implements Serializable {
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
+        lstPrecioServicios.clear();
     }
 
     public void guardarOActualizarCliente() {
@@ -289,6 +293,26 @@ public class ClientesBean implements Serializable {
         this.precioAvisoSelected = avisoBL.nuevoServicioAviso(avisoSelected);
     }
 
+    public void cargarServiciosAviso(Aviso aviso) {
+        try {
+            avisoSelected = aviso;
+            this.lstPrecioServiciosDisponibles = serviciosBL.buscarServiciosDisponibles(clienteSelected, avisoSelected);
+            PrecioServicio precioServicioAux = new PrecioServicio();
+            precioServicioAux.setCliente(clienteSelected);
+            precioServicioAux.setAvisoCve(avisoSelected);
+            this.lstPrecioServicios = serviciosBL.buscarPorCriterios(precioServicioAux);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Avisos", "La información cargo exitosamente");
+        } catch (InventarioException ex) {
+            log.warn("No se pudo extraer la información de los precios de servicios...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Avisos", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Error desconocido al momento de cargar la información...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Avisos", "Contacte con el administrador del sistema");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+
     public void operarAvisos(String operacion) {
         String mensaje = null;
         try {
@@ -300,18 +324,21 @@ public class ClientesBean implements Serializable {
                     break;
 
                 case "agregarservicio":
-                    verificarAgregadoOActualizado(precioAvisoSelected.getId());
-                    avisoBL.agregarServicioAviso(avisoSelected, precioAvisoSelected);
-                    mensaje = "Servico " + agregadoOActualizado + " a aviso exitosamente";
+                    avisoBL.agregarServicioAviso(avisoSelected, clienteSelected, lstPrecioServiciosDisponibles, seleccionadosParaAgregar, lstPrecioServicios);
+                    mensaje = "Servico agregado al aviso exitosamente";
                     break;
 
                 case "eliminaraviso":
-                    avisoBL.eliminaAviso(clienteSelected, avisoSelected);
+                    PrecioServicio precioServicioAux = new PrecioServicio();
+                    precioServicioAux.setCliente(clienteSelected);
+                    precioServicioAux.setAvisoCve(avisoSelected);
+                    lstPrecioServicios = serviciosBL.buscarPorCriterios(precioServicioAux);
+                    avisoBL.eliminaAviso(clienteSelected, avisoSelected, lstPrecioServicios);
                     mensaje = "Aviso eliminado exitosamente";
                     break;
 
                 case "eliminarservicio":
-                    avisoBL.eliminaServicioAviso(avisoSelected, precioAvisoSelected);
+                    avisoBL.eliminarServicioAviso(avisoSelected, precioAvisoSelected, lstPrecioServicios, lstPrecioServiciosDisponibles);
                     mensaje = "Servicio de aviso eliminado exitosamente";
                     break;
 
@@ -411,6 +438,11 @@ public class ClientesBean implements Serializable {
         } finally {
             PrimeFaces.current().ajax().update("form:messages");
         }
+    }
+
+    public void filtraPrecioServicios(Aviso avisoSelected) {
+        this.lstPrecioServicios = serviciosBL.filtrarPrecioServicios(avisoSelected, clienteSelected);
+        PrimeFaces.current().ajax().update("form:messages");
     }
 
     // Metodos exclusivos para contactos
@@ -529,17 +561,20 @@ public class ClientesBean implements Serializable {
         try {
             log.info("Iniciando el guardando de un domicilio");
 
-            if (tipoDomicilioSelected == null)
+            if (tipoDomicilioSelected == null) {
                 throw new InventarioException("Error, no se ha agregado un tipo domicilio.");
+            }
 
-            if (domicilioSelected.getAsentamiento().getCp() == null)
+            if (domicilioSelected.getAsentamiento().getCp() == null) {
                 throw new InventarioException("Error, no se ha agregado un domicilio.");
+            }
 
             List<ClienteDomicilios> domicilioFiscal = domicilios
                     .filtrarListadoDomicilioFiscal(lstClienteDomiciliosFiltered);
 
-            for (ClienteDomicilios aux : domicilioFiscal)
+            for (ClienteDomicilios aux : domicilioFiscal) {
                 log.info("Domicilio Fiscal: {}", aux.toString());
+            }
 
             if (domicilioFiscal != null && !domicilioFiscal.isEmpty()) {
                 clienteDomicilioSelected = domicilios.nuevoClienteDomicilio(clienteSelected, domicilioSelected);
@@ -580,7 +615,7 @@ public class ClientesBean implements Serializable {
 
             lstClienteDomiciliosFiltered = lstClienteDomiciliosFiltered.stream()
                     .map(aux -> aux.getDomicilios().getDomCve().equals(
-                            clienteDomicilioSelected.getDomicilios().getDomCve()) ? clienteDomicilioSelected : aux)
+                    clienteDomicilioSelected.getDomicilios().getDomCve()) ? clienteDomicilioSelected : aux)
                     .collect(Collectors.toList());
 
             clienteSelected.setClienteDomiciliosList(lstClienteDomiciliosFiltered);
@@ -731,6 +766,22 @@ public class ClientesBean implements Serializable {
 
     public void setLstCategoria(List<Categoria> lstCategoria) {
         this.lstCategoria = lstCategoria;
+    }
+
+    public List<PrecioServicio> getLstPrecioServiciosDisponibles() {
+        return lstPrecioServiciosDisponibles;
+    }
+
+    public void setLstPrecioServiciosDisponibles(List<PrecioServicio> lstPrecioServiciosDisponibles) {
+        this.lstPrecioServiciosDisponibles = lstPrecioServiciosDisponibles;
+    }
+
+    public List<PrecioServicio> getSeleccionadosParaAgregar() {
+        return seleccionadosParaAgregar;
+    }
+
+    public void setSeleccionadosParaAgregar(List<PrecioServicio> seleccionadosParaAgregar) {
+        this.seleccionadosParaAgregar = seleccionadosParaAgregar;
     }
 
     // Getter y Setter para Fiscal
