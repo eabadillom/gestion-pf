@@ -17,7 +17,7 @@
 
     <div class="orders-subtable">
         <p:dataTable id="dtAvisos" widgetVar="dtAvisos" var="pAviso" 
-                     value="#{clientesBean.clienteSelected.avisoList}" reflow="true" 
+                     value="#{clientesBean.lstAvisos}" reflow="true" 
                      rowKey="#{pAviso.avisoCve}" lazy="false"
                      paginator="true" rows="5" paginatorPosition="bottom">
 
@@ -172,7 +172,8 @@
                              columnClasses="ui-g-6 ui-md-6 ui-lg-6, ui-g-6 ui-md-6 ui-lg-6">
 
                     <p:panel header="Servicios disponibles">
-                        <p:dataTable id="dtServiciosDisponibles"
+                        <p:dataTable id="dtServiciosSinAviso"
+                                     widgetVar="dtServiciosSinAviso"
                                      value="#{clientesBean.lstPrecioServiciosDisponibles}"
                                      var="srv"
                                      selection="#{clientesBean.seleccionadosParaAgregar}"
@@ -193,15 +194,15 @@
                             <p:commandButton value="Agregar seleccionados al aviso"
                                              icon="pi pi-plus"
                                              actionListener="#{clientesBean.operarAvisos('agregarservicio')}"
-                                             update="dtServiciosDisponibles dtServicioAviso pnlAviso"
-                                             process="@this dtServiciosDisponibles" />
+                                             update="pnlAviso"
+                                             process="@this dtServiciosSinAviso" />
                         </div>
                     </p:panel>
 
                     <p:panel header="Servicios con este aviso">
                         <p:dataTable id="dtServicioAviso" 
                                      widgetVar="dtServicioAviso" var="pServicioAviso"
-                                     value="#{clientesBean.lstPrecioServicios}" reflow="true"
+                                     value="#{clientesBean.lstPrecioServicioAviso}" reflow="true"
                                      rowKey="#{pServicioAviso.id}" lazy="false" paginator="true"
                                      rows="5" paginatorPosition="bottom">
 
@@ -209,7 +210,9 @@
                                 <h:outputText value="#{pServicioAviso.servicio.servicioDs}" />
                             </p:column>
                             <p:column headerText="Precio">
-                                <p:inputText value="#{pServicioAviso.precio}" />
+                                <p:inputText value="#{pServicioAviso.precio}">
+                                    <p:ajax process="@this"/>
+                                </p:inputText>
                             </p:column>
                             <p:column headerText="Unidad">
                                 <h:outputText value="#{pServicioAviso.unidad.unidadDeManejoDs}" />
@@ -229,7 +232,9 @@
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
                              actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="dtAvisos"
-                             process="pnlAviso @this" oncomplete="PF('dialogAviso').hide()" />
+                             process="pnlAviso @this" oncomplete="PF('dialogAviso').hide()">
+                <f:setPropertyActionListener value="#{pServicioAviso}" target="#{clientesBean.precioAvisoSelected}" />
+            </p:commandButton>
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogAviso').hide()"
                              class="ui-button-secondary"
                              resetValues="true" immediate="true" />

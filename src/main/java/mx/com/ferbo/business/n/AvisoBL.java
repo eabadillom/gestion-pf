@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.enterprise.context.RequestScoped;
@@ -57,31 +59,39 @@ public class AvisoBL {
         return pServicio;
     }
 
-    public void agregarAviso(Cliente cliente, Aviso aviso) throws InventarioException {
+    public List<Aviso> obtnerAvisoPorCliente(Cliente cliente) throws InventarioException {
+        try {
+            return avisoDAO.buscarPorCliente(cliente.getCteCve());
+        } catch (DAOException ex) {
+            throw new InventarioException("Error al obtener los avisos del cliente: " + cliente.getNombre());
+        }
+    }
+
+    public void agregarAviso(Cliente cliente, Aviso aviso, List<Aviso> avisos) throws InventarioException {
 
         log.info("Se verifica información de cliente y aviso");
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
 
-        List<Aviso> avisos = cliente.getAvisoList();
-
         if (avisos == null || avisos.isEmpty()) {
             avisos = new ArrayList<>();
-            cliente.setAvisoList(avisos);
         }
 
-        final List<Aviso> lista = cliente.getAvisoList();
+        final List<Aviso> lista = avisos;
 
         log.info("Se busca el aviso dentro de la lista de avisos del cliente");
         int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(aviso)).findFirst().orElse(-1);
 
         if (index >= 0) {
             log.info("Se actualizo temporalmente el aviso del cliente");
-            cliente.getAvisoList().set(index, aviso);
+            avisos.set(index, aviso);
+            avisoDAO.actualizar(aviso);
+
         } else {
             log.info("Se agrego temporalmente el nuevo aviso a la lista de avisos del cliente");
             aviso.setCteCve(cliente);
-            cliente.getAvisoList().add(aviso);
+            avisos.add(aviso);
+            avisoDAO.guardar(aviso);
         }
     }
 
@@ -110,10 +120,12 @@ public class AvisoBL {
             nuevo.setUnidad(ps.getUnidad());
 
             boolean existe = serviciosAviso.stream()
-                    .anyMatch(p -> p.equals(nuevo));
+                    .anyMatch(p -> Objects.equals(p.getAvisoCve(), aviso) &&
+                            Objects.equals(p.getServicio(), ps.getServicio()) &&
+                            Objects.equals(p.getUnidad(), ps.getUnidad()));
 
             if (existe) {
-                continue; 
+                continue;
             }
 
             precioServicioDAO.guardar(nuevo);
@@ -125,23 +137,28 @@ public class AvisoBL {
         serviciosPorAgregar.clear();
     }
 
-    public void eliminaAviso(Cliente cliente, Aviso aviso, List<PrecioServicio> preciosServicios)
+    public void eliminaAviso(Cliente cliente, Aviso aviso, List<Aviso> avisos)
             throws InventarioException, DAOException {
 
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
 
-        if (preciosServicios != null && !preciosServicios.isEmpty()) {
-            for (PrecioServicio ps : new ArrayList<>(preciosServicios)) {
-                eliminarServicioAviso(aviso, ps, preciosServicios, null);
-            }
+        Integer constancias = avisoDAO.conteoConstanciaDeDeposito(aviso);
+        Integer servicios = avisoDAO.conteoPrecioServicio(aviso);
+
+        if (constancias > 0) {
+            throw new InventarioException(
+                    "No se puede eliminar el aviso por tener " + constancias + " constancias de deposito");
         }
 
-        aviso.setCteCve(null);
+        if (servicios > 0) {
+            throw new InventarioException(
+                    "No se puede eliminar el aviso por tener " + servicios + " precios de servicios");
+        }
 
-        cliente.getAvisoList().removeIf(a
-                -> a.getAvisoCve().equals(aviso.getAvisoCve())
-        );
+        avisos.remove(aviso);
+
+        aviso.setCteCve(null);
 
         if (aviso.getAvisoCve() != null) {
             avisoDAO.eliminar(aviso);
@@ -149,22 +166,20 @@ public class AvisoBL {
     }
 
     public void eliminarServicioAviso(
-            Aviso aviso,
-            PrecioServicio servicioAEliminar,
-            List<PrecioServicio> serviciosAviso,
-            List<PrecioServicio> serviciosDisponibles) throws InventarioException {
+            List<PrecioServicio> precioServicios, PrecioServicio precioServicio) throws InventarioException {
 
-        FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
-        FacesUtils.requireNonNull(servicioAEliminar, "El servicio a eliminar no puede ser vacío");
+        if (precioServicios == null || precioServicios.isEmpty()) {
+            throw new InventarioException("La lista de precios de servicio esta vacía");
+        }
+        FacesUtils.requireNonNull(precioServicio, "El servicio a eliminar no puede ser vacío");
 
-        precioServicioDAO.eliminar(servicioAEliminar);
+        precioServicios.remove(precioServicio);
 
-        serviciosAviso.remove(servicioAEliminar);
+        precioServicio.setAvisoCve(null);
 
-        if (serviciosDisponibles != null && !serviciosDisponibles.contains(servicioAEliminar)) {
-            serviciosDisponibles.add(servicioAEliminar);
+        if (precioServicio.getId() != null) {
+            precioServicioDAO.eliminar(precioServicio);
         }
 
-        aviso.setPrecioServicioList(serviciosAviso);
     }
 }

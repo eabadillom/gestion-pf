@@ -20,7 +20,7 @@
 
 
 
-    <p:dataTable id="dt-servicios" widgetVar="dtServicios" value="#{clientesBean.clienteSelected.precioServicioList}" rowKey="#{pServicio.id}"
+    <p:dataTable id="dtPreciosServicios" widgetVar="dtPreciosServicios" value="#{clientesBean.lstPrecioServicios}" rowKey="#{pServicio.id}"
                  var="pServicio" reflow="true" lazy="false" paginator="true"
                  rows="5" paginatorPosition="bottom">
 
@@ -84,9 +84,9 @@
 
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.precioServicioSelected.id != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" actionListener="#{clientesBean.operarServicios('agregarprecioservicio')}"
-                             update="form:tabView:dt-servicios" process="pnlServicio @this" oncomplete="PF('dialogPrecioServicio').hide()" />
+                             update="dtPreciosServicios" process="pnlServicio @this" oncomplete="PF('dialogPrecioServicio').hide()" />
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogPrecioServicio').hide()" class="ui-button-secondary"
-                             update="form:tabView:dt-servicios" resetValues="true" />
+                             resetValues="true" />
         </f:facet>
     </p:dialog>
 
@@ -110,8 +110,8 @@
                              icon="pi pi-check"
                              styleClass="ui-button-danger"
                              actionListener="#{clientesBean.operarServicios('eliminarprecioservicio')}"
-                             update="form:tabView:dt-servicios"
-                             oncomplete="PF('deleteServicioDialog').hide()" />
+                             update="dtPreciosServicios"
+                             oncomplete="PF('deleteServicioDialog').hide()" process="@this" />
 
             <p:commandButton value="No"
                              type="button"

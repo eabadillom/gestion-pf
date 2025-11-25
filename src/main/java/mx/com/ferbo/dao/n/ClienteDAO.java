@@ -23,6 +23,7 @@ import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -49,7 +50,7 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
         return clientes;
     }
 
-    public Cliente obtenerPorId(Integer cteCve, Boolean isFullInfo) throws InventarioException {
+    public Cliente obtenerPorId(Integer cteCve, Boolean isFullInfo) throws InventarioException, DAOException {
 
         Cliente cliente = null;
         EntityManager em = null;
@@ -96,64 +97,7 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
 
                     }
                 }
-                if (!clientePrecioServicios.isEmpty()) {
-                    for (PrecioServicio precioServicio : clientePrecioServicios) {
-                        Servicio servicio = precioServicio.getServicio();
-                        if (servicio != null) {
-                            precioServicio.getServicio().getServicioCve();
-                        }
-
-                        UnidadDeManejo unidadManejo = precioServicio.getUnidad();
-                        if (unidadManejo != null) {
-                            precioServicio.getUnidad().getUnidadDeManejoCve();
-                        }
-                    }
-                }
-
-                if (!clienteAvisos.isEmpty()) {
-                    for (Aviso clienteAviso : clienteAvisos) {
-                        if (clienteAviso.getAvisoCve() != null) {
-
-                            Categoria categoria = clienteAviso.getCategoriaCve();
-                            if (categoria != null) {
-                                categoria.getCategoriaCve();
-                            } else {
-                                clienteAviso.setCategoriaCve(new Categoria());
-                            }
-
-                            Planta planta = clienteAviso.getPlantaCve();
-
-                            if (planta != null) {
-                                planta.getPlantaCve();
-                            } else {
-                                clienteAviso.setPlantaCve(new Planta());
-                            }
-
-                            List<PrecioServicio> precioServicios = clienteAviso.getPrecioServicioList();
-
-                            if (!precioServicios.isEmpty()) {
-                                for (PrecioServicio ps : precioServicios) {
-                                    Servicio servicio = ps.getServicio();
-                                    if (servicio != null){
-                                        servicio.getServicioCve();
-                                    } else {
-                                        ps.setServicio(new Servicio());
-                                    }
-
-                                    UnidadDeManejo unidadDeManejo = ps.getUnidad();
-
-                                    if (unidadDeManejo != null) {
-                                        unidadDeManejo.getUnidadDeManejoCve();
-                                    } else {
-                                        ps.setUnidad(new UnidadDeManejo());
-                                    }
-                                    
-                                }
-                            }
-
-                        }
-                    }
-                }
+                
                 if(!clienteDomicilios.isEmpty()){
                     for(ClienteDomicilios clienteDomicilio : clienteDomicilios){
                         log.info(clienteDomicilio.getDomicilios());
@@ -162,19 +106,15 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
             }
 
             return cliente;
-
-        } catch (NoResultException ex) {
-            log.warn("No se encontro ningun cliente con ese identifiador " + cteCve, ex);
-            throw new InventarioException("No se encontro ningun cliente con el identifiador " + cteCve);
         } catch (Exception ex) {
             log.error("No se encontro ningun cliente con ese identifiador " + cteCve, ex);
-            throw new InventarioException("No se encontro ningun cliente con el identifiador " + cteCve);
+            throw new DAOException("No se encontro ningun cliente con el identifiador " + cteCve);
         } finally {
             super.close(em);
         }
     }
 
-    public Cliente buscarPorCodigoUnico(String codigoUnico) {
+    public Cliente buscarPorCodigoUnico(String codigoUnico) throws DAOException {
         Cliente model = null;
         EntityManager em = null;
 
@@ -185,6 +125,7 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                     .getSingleResult();
         } catch (Exception ex) {
             log.warn("Problema para obtener el cliente por codigo unico: {}", ex.getMessage());
+            throw new DAOException("Hubo un problema al buscar el cliente");
         } finally {
             super.close(em);
         }

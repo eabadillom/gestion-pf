@@ -21,6 +21,7 @@ import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.SerieConstancia;
 import mx.com.ferbo.model.SerieConstanciaPK;
 import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
 
 /**
@@ -54,13 +55,23 @@ public class ClienteBL {
 
     public Cliente obtenerTodoCliente(Integer id, Boolean isFullInfo) throws InventarioException {
 
-        return clienteDAO.obtenerPorId(id, isFullInfo);
+        try {
+            return clienteDAO.obtenerPorId(id, isFullInfo);
+        } catch (DAOException ex) {
+            log.info("Error al obtener la información del cliente", ex);
+            throw new InventarioException("Hubo un problema al obtener la información del cliente");
+        }
 
     }
 
-    public Cliente obtenerPorCodigoUnico(String codigo) {
+    public Cliente obtenerPorCodigoUnico(String codigo) throws InventarioException {
 
-        return clienteDAO.buscarPorCodigoUnico(codigo);
+        try {
+            return clienteDAO.buscarPorCodigoUnico(codigo);
+        } catch (DAOException ex) {
+            log.warn("Error: " + ex.getMessage());
+            throw new InventarioException("Error al buscar el cliente con código unico: " + codigo);
+        }
 
     }
 
@@ -140,7 +151,7 @@ public class ClienteBL {
             Cliente clienteBuscado = obtenerPorCodigoUnico(cliente.getCodUnico());
             fiscalBL.validarCodigoUnico(cliente, clienteBuscado);
             List<Planta> plantas = plantaBL.obtenerPlantas(Boolean.TRUE);
-            asignarCandadoSalida(plantas, cliente); 
+            asignarCandadoSalida(plantas, cliente);
             clienteDAO.guardar(cliente);
             status = "agregado";
         } else {

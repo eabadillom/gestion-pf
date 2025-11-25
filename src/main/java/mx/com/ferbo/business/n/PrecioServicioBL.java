@@ -91,52 +91,46 @@ public class PrecioServicioBL {
         }
     }
     
-    public void agregarOActualizarPrecioServicio(Cliente cliente, PrecioServicio precioServicio)
+    public void agregarOActualizarPrecioServicio(Cliente cliente, PrecioServicio precioServicio, List<PrecioServicio> precioServicios)
             throws InventarioException {
 
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(precioServicio, "El precio de servicio no puede ser vacío");
 
-        List<PrecioServicio> preciosServicios = cliente.getPrecioServicioList();
-        if (preciosServicios == null || preciosServicios.isEmpty()) {
-            preciosServicios = new ArrayList<>();
-            cliente.setPrecioServicioList(preciosServicios);
+        if (precioServicios == null || precioServicios.isEmpty()) {
+            precioServicios = new ArrayList<>();
         }
 
-        final List<PrecioServicio> lista = preciosServicios;
+        final List<PrecioServicio> lista = precioServicios;
         int index = IntStream.range(0, lista.size())
                 .filter(i -> lista.get(i).equals(precioServicio))
                 .findFirst()
                 .orElse(-1);
 
         if (index >= 0) {
-            preciosServicios.set(index, precioServicio);
+            precioServicios.set(index, precioServicio);
+            precioServicioDAO.actualizar(precioServicio);
         } else {
             precioServicio.setAvisoCve(new Aviso(1));
             precioServicio.setCliente(cliente);
-            preciosServicios.add(precioServicio);
+            precioServicios.add(precioServicio);
+            precioServicioDAO.guardar(precioServicio);
         }
     }
 
-    public void eliminarPrecioServicio(Cliente cliente, PrecioServicio precioServicio) throws InventarioException {
-        FacesUtils.requireNonNull(cliente, "El contacto del cliente no puede estar vacío.");
+    public void eliminarPrecioServicio(List<PrecioServicio> precioServicios, PrecioServicio precioServicio) throws InventarioException {
+        if (precioServicios.isEmpty()){
+            throw new InventarioException("Los precios de servicio no puede estar vacia");
+        }
         FacesUtils.requireNonNull(precioServicio, "El precio de servicio no puede ser vacío");
 
-        cliente.getPrecioServicioList().remove(precioServicio);
+        precioServicios.remove(precioServicio);
+
+        precioServicio.setCliente(null);
 
         if (precioServicio.getId() != null) {
             precioServicioDAO.eliminar(precioServicio);
         }
-    }
-    
-    public List<PrecioServicio> filtrarPrecioServicios(Aviso avisoSelected, Cliente clienteSelected) {
-        List<PrecioServicio> lista = avisoSelected.getPrecioServicioList()
-                .stream()
-                .filter(p -> p.getAvisoCve() != null && p.getAvisoCve().equals(avisoSelected))
-                .filter(p -> p.getCliente() != null && p.getCliente().getCteCve().equals(clienteSelected.getCteCve()))
-                .collect(Collectors.toList());
-        
-        return lista;
     }
     
 }
