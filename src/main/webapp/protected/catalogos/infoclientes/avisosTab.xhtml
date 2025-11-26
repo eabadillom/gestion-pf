@@ -91,8 +91,19 @@
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Valor del seguro</p:outputLabel>
-                            <p:inputNumber value="#{clientesBean.avisoSelected.avisoValSeg}" emptyValue="0" symbol="$" symbolPosition="p" thousandSeparator=","
-                                           minValue="0" required="true" requiredMessage="Campo requerido" />
+                            <p:inputNumber
+                                value="#{clientesBean.avisoSelected.avisoValSeg}"
+                                symbol="%"
+                                symbolPosition="s"
+                                thousandSeparator=","
+                                decimalSeparator="."
+                                decimalPlaces="4"
+                                minValue="0"
+                                maxValue="99.9999"
+                                required="true"
+                                emptyValue="0"
+                                requiredMessage="Campo requerido"
+                                />
                         </div>
                     </div>  
                     <div class="p-col-12 p-md-6 p-lg-4">
