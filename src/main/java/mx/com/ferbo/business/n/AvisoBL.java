@@ -41,35 +41,29 @@ public class AvisoBL {
     private PrecioServicioDAO precioServicioDAO;
 
     public Aviso nuevoAviso() {
+        log.info("Inicia el proceso para crear un nuevo aviso");
         Aviso aviso = new Aviso();
         aviso.setPlantaCve(new Planta());
         aviso.setAvisoValSeg(BigDecimal.ZERO);
         aviso.setAvisoFecha(new Date());
         aviso.setCategoriaCve(new Categoria());
         aviso.setPrecioServicioList(new ArrayList<>());
+        log.info("Finaliza el proceso para crear un nuevo aviso");
         return aviso;
     }
 
-    public PrecioServicio nuevoServicioAviso(Aviso aviso) {
-        PrecioServicio pServicio = new PrecioServicio();
-        pServicio.setAvisoCve(aviso);
-        pServicio.setServicio(new Servicio());
-        pServicio.setUnidad(new UnidadDeManejo());
-        pServicio.setPrecio(BigDecimal.ZERO);
-        return pServicio;
-    }
-
-    public List<Aviso> obtnerAvisoPorCliente(Cliente cliente) throws InventarioException {
+    public List<Aviso> obtenerAvisosPorCliente(Cliente cliente) throws InventarioException {
         try {
+            log.info("Inicia proceso para obtener los avisos del cliente: " + cliente.getNombre());
             return avisoDAO.buscarPorCliente(cliente.getCteCve());
         } catch (DAOException ex) {
             throw new InventarioException("Error al obtener los avisos del cliente: " + cliente.getNombre());
         }
     }
 
-    public void agregarAviso(Cliente cliente, Aviso aviso, List<Aviso> avisos) throws InventarioException {
+    public void agregarOActualizarAviso(Cliente cliente, Aviso aviso, List<Aviso> avisos) throws InventarioException {
 
-        log.info("Se verifica información de cliente y aviso");
+        log.info("Inicia proceso para agregar o actualizar el aviso del cliente: " + cliente.getNombre());
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
 
@@ -79,20 +73,20 @@ public class AvisoBL {
 
         final List<Aviso> lista = avisos;
 
-        log.info("Se busca el aviso dentro de la lista de avisos del cliente");
         int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(aviso)).findFirst().orElse(-1);
 
         if (index >= 0) {
-            log.info("Se actualizo temporalmente el aviso del cliente");
             avisos.set(index, aviso);
             avisoDAO.actualizar(aviso);
+            log.info("El aviso del cliente " + cliente.getNombre() + " se actualizo correctamente.");
 
         } else {
-            log.info("Se agrego temporalmente el nuevo aviso a la lista de avisos del cliente");
             aviso.setCteCve(cliente);
             avisos.add(aviso);
             avisoDAO.guardar(aviso);
+            log.info("El aviso del cliente " + cliente.getNombre() + " se agrego correctamente.");
         }
+        log.info("Finaliza proceso para agregar o actualizar el aviso del cliente: " + cliente.getNombre());
     }
 
     public void agregarServicioAviso(
@@ -102,7 +96,7 @@ public class AvisoBL {
             List<PrecioServicio> serviciosPorAgregar,
             List<PrecioServicio> serviciosAviso) throws InventarioException {
 
-        log.info("Se verifica información de aviso y precioservicio");
+        log.info("Inicia proceso para agregar el servicio son su precio al aviso");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
 
@@ -135,11 +129,13 @@ public class AvisoBL {
         }
 
         serviciosPorAgregar.clear();
+        log.info("Finaliza proceso para agregar el servicio son su precio al aviso");
     }
 
     public void eliminaAviso(Cliente cliente, Aviso aviso, List<Aviso> avisos)
             throws InventarioException, DAOException {
 
+        log.info("Inicia porceso para eliminar el aviso del cliente: " + cliente.getNombre());
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
 
@@ -163,6 +159,7 @@ public class AvisoBL {
         if (aviso.getAvisoCve() != null) {
             avisoDAO.eliminar(aviso);
         }
+        log.info("Finaliza porceso para eliminar el aviso del cliente: " + cliente.getNombre());
     }
 
     public void eliminarServicioAviso(
@@ -171,6 +168,9 @@ public class AvisoBL {
         if (precioServicios == null || precioServicios.isEmpty()) {
             throw new InventarioException("La lista de precios de servicio esta vacía");
         }
+        
+        log.info("Inicia proceso para eliminar el servicio del aviso");
+        
         FacesUtils.requireNonNull(precioServicio, "El servicio a eliminar no puede ser vacío");
 
         precioServicios.remove(precioServicio);
@@ -181,6 +181,7 @@ public class AvisoBL {
         if (precioServicio.getId() != null) {
             precioServicioDAO.eliminar(precioServicio);
         }
+        log.info("Finaliza proceso para eliminar el servicio del aviso");
 
     }
 }

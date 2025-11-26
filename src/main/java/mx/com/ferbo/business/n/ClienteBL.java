@@ -44,18 +44,22 @@ public class ClienteBL {
     private PlantaBL plantaBL;
 
     public List<Cliente> obtenerTodos() {
+        
+        log.info("Inicia el proceso para obtener todos los clientes");
         List<Cliente> lista = clienteDAO.buscarTodos();
 
         if (lista == null) {
             return new ArrayList<>();
         }
 
+        log.info("Finaliza el proceso para obtener todos los clientes");
         return lista;
     }
 
     public Cliente obtenerTodoCliente(Integer id, Boolean isFullInfo) throws InventarioException {
 
         try {
+            log.info("Inicia proceso para extraer la información minima del cliente con ide: {}", id);
             return clienteDAO.obtenerPorId(id, isFullInfo);
         } catch (DAOException ex) {
             log.info("Error al obtener la información del cliente", ex);
@@ -67,6 +71,7 @@ public class ClienteBL {
     public Cliente obtenerPorCodigoUnico(String codigo) throws InventarioException {
 
         try {
+            log.info("Inicia proceso para buscar un cliente con código unico: {}", codigo);
             return clienteDAO.buscarPorCodigoUnico(codigo);
         } catch (DAOException ex) {
             log.warn("Error: " + ex.getMessage());
@@ -76,6 +81,7 @@ public class ClienteBL {
     }
 
     public Cliente nuevoCliente() {
+        log.info("Inicia proceso para crear un nuevo cliente");
         Cliente cliente = new Cliente();
         cliente = new Cliente();
         cliente.setMetodoPago(new MetodoPago());
@@ -84,12 +90,13 @@ public class ClienteBL {
         cliente.setCandadoSalida(new CandadoSalida());
         cliente.setClienteContactoList(new ArrayList<>());
         cliente.setAvisoList(new ArrayList<>());
-
+        log.info("Finaliaza proceso para crear un nuevo cliente");
         return cliente;
     }
 
     public void asignarCandadoSalida(List<Planta> plantas, Cliente cliente) {
-
+        
+        log.info("Inicia proceso para asignar candado de salida al cliente: {}", cliente.getNombre());
         CandadoSalida candadoSalida = new CandadoSalida();
         candadoSalida.setHabilitado(true);
         candadoSalida.setCliente(cliente);
@@ -139,10 +146,12 @@ public class ClienteBL {
             cliente.addSerieConstancia(serieConstanciaS);
             planta.add(serieConstanciaS);
         }
+        log.info("Finaliza proceso para asignar candado de salida al cliente: {}", cliente.getNombre());
     }
 
     public String guardarOActualizar(Cliente cliente) throws InventarioException {
 
+        log.info("Inicia proceso para guardar o actualizar al cliente:_{}", cliente.getNombre());
         String status = null;
         if (cliente.getCteCve() == null) {
             if ("m".equalsIgnoreCase(cliente.getTipoPersona())) {
@@ -154,9 +163,11 @@ public class ClienteBL {
             asignarCandadoSalida(plantas, cliente);
             clienteDAO.guardar(cliente);
             status = "agregado";
+            log.info("El cliente {} se agrego satisfactoriamente", cliente.getNombre());
         } else {
             clienteDAO.actualizar(cliente);
             status = "actualizado";
+            log.info("El cliente {} se actualizo satisfactoriamente", cliente.getNombre());
         }
         return "Cliente " + status + " exitosamente";
     }

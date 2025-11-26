@@ -25,6 +25,7 @@ public class CategoriaBL {
 
     public List<Categoria> obtenerCategorias() throws InventarioException {
         try {
+            log.info("Incia proceso para obtener todas las categorias");
             return categoriaDAO.buscarTodos();
         } catch (DAOException ex) {
             log.error("Error al obtener las categorias", ex);

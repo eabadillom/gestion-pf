@@ -23,6 +23,10 @@ public class PlantaBL {
     private PlantaDAO plantaDAO;
     
     public List<Planta> obtenerPlantas(Boolean isFullInfo) {
+        
+        String tipo = (isFullInfo) ? "completa": "incompleta";
+        
+        log.info("Inicia proceso para obtener todas las plantas con información {}", tipo);
         List<Planta> list = plantaDAO.buscarTodos(isFullInfo);
 
         if (list == null) {

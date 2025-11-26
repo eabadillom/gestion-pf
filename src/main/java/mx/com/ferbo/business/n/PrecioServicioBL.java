@@ -38,16 +38,22 @@ public class PrecioServicioBL {
     private PrecioServicioDAO precioServicioDAO;
 
     public PrecioServicio nuevoPrecioServicio(Cliente cliente) {
+        log.info("Incia proceso para crear un nuevo precio de servicio");
         PrecioServicio precioServicio = new PrecioServicio();
         precioServicio.setCliente(cliente);
         precioServicio.setPrecio(BigDecimal.ZERO);
         precioServicio.setServicio(new Servicio());
         precioServicio.setUnidad(new UnidadDeManejo());
-        precioServicio.setAvisoCve(new Aviso());
+        precioServicio.setAvisoCve(new Aviso(1));
+        log.info("Finaliza proceso para crear un nuevo precio de servicio");
         return precioServicio;
     }
 
     public List<PrecioServicio> obtenerPrecioServiciosPorCliente(Cliente cliente, Boolean isFullInfo) throws InventarioException {
+        
+        String tipo = (isFullInfo) ? "completa": "incompleta";
+        
+        log.info("Inicia proceso para obtener todos los precios de servicio con información {} del cliente {}", tipo, cliente.getNombre());
         FacesUtils.requireNonNull(cliente, "El cliente no puede estar vacío");
 
         try {
@@ -59,18 +65,22 @@ public class PrecioServicioBL {
     }
 
     public List<PrecioServicio> buscarPorCriterios(PrecioServicio e) throws InventarioException {
+        log.info("Inicia proceso para obtener los precios de servicio por el critierio de: ");
         try {
             if (e.getCliente().getCteCve() == null)
                 return null;
 
             if (e.getServicio() != null) {
+                log.info("servicio");
                 return precioServicioDAO.buscarPorClienteServicio(e);
             }
 
             if (e.getAvisoCve() != null) {
+                log.info("aviso");
                 return precioServicioDAO.buscarPorClienteAviso(e);
             }
-
+            
+            log.info("cliente");
             return precioServicioDAO.buscarPorCliente(e);
         } catch (DAOException ex) {
             log.info("Error al consultar los precios de servicios por cliente", ex);
@@ -80,6 +90,7 @@ public class PrecioServicioBL {
     
     public List<PrecioServicio> buscarServiciosDisponibles(Cliente cliente, Aviso aviso) throws InventarioException {
         
+        log.info("Inicia proceso para obtener los precios de servicio disponibles");
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
         
@@ -94,6 +105,7 @@ public class PrecioServicioBL {
     public void agregarOActualizarPrecioServicio(Cliente cliente, PrecioServicio precioServicio, List<PrecioServicio> precioServicios)
             throws InventarioException {
 
+        log.info("Inicia proceso de actualización o agregado del precio de servicio del cliente", cliente.getNombre());
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
         FacesUtils.requireNonNull(precioServicio, "El precio de servicio no puede ser vacío");
 
@@ -110,15 +122,18 @@ public class PrecioServicioBL {
         if (index >= 0) {
             precioServicios.set(index, precioServicio);
             precioServicioDAO.actualizar(precioServicio);
+            log.info("Se ha actualizado el precio del servicio de forma correcta");
         } else {
             precioServicio.setAvisoCve(new Aviso(1));
             precioServicio.setCliente(cliente);
             precioServicios.add(precioServicio);
             precioServicioDAO.guardar(precioServicio);
+            log.info("Se ha agregado el precio del servicio de forma correcta");
         }
     }
 
     public void eliminarPrecioServicio(List<PrecioServicio> precioServicios, PrecioServicio precioServicio) throws InventarioException {
+        log.info("Inicia el proceso de eliminacion del precio de servicio del cliente");
         if (precioServicios.isEmpty()){
             throw new InventarioException("Los precios de servicio no puede estar vacia");
         }
@@ -131,6 +146,7 @@ public class PrecioServicioBL {
         if (precioServicio.getId() != null) {
             precioServicioDAO.eliminar(precioServicio);
         }
+        log.info("Finaliza el proceso de eliminacion del precio de servicio del cliente");
     }
     
 }

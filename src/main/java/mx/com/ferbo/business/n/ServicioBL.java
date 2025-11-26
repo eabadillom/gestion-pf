@@ -23,6 +23,7 @@ public class ServicioBL {
     private ServicioDAO servicioDAO;
     
     public List<Servicio> obtenerServicios() {
+        log.info("Inicia proceso de obteneción de todos los servicios");
         List<Servicio> lista = servicioDAO.buscarTodos();
 
         if (lista == null) {

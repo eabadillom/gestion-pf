@@ -25,6 +25,7 @@ public class MedioPagoBL {
 	private MedioPagoDAO medioPagoDAO;
 
 	public List<MedioPago> obtenerMediosPago() throws InventarioException {
+            log.info("Inicia proceso para obtener todos los medios de pago");
 		Date fecha = new Date();
 		try {
 

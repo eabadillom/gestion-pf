@@ -51,6 +51,8 @@ public class ClienteContactoBL {
     }
 
     public List<ClienteContacto> obtenerListaContactos(Cliente cliente) throws InventarioException {
+        
+        log.info("Inicia proceso para obtener la lista de contactos del cliente: {}", cliente.getNombre());
 
         FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío.");
         try {
@@ -62,6 +64,7 @@ public class ClienteContactoBL {
     }
 
     public ClienteContacto nuevoClienteContacto() {
+        log.info("Inicia proceso para crear nuevo contacto");
         ClienteContacto clienteContacto = new ClienteContacto();
         Contacto contacto = new Contacto();
         contacto.setMedioCntList(new ArrayList<>());
@@ -69,12 +72,14 @@ public class ClienteContactoBL {
         clienteContacto.setFhAlta(new Date());
         clienteContacto.setStHabilitado(true);
         clienteContacto.setStUsuario("A");
+        log.info("Finaliza proceso para crear nuevo contacto");
         return clienteContacto;
     }
 
     public void agregarOActualizarContacto(Cliente cliente, ClienteContacto clienteContacto)
             throws InventarioException {
 
+        log.info("Inicia proceso para actualizar o agregar el contacto del cliente: {}", cliente.getNombre());
         FacesUtils.requireNonNullWithReturn(cliente, "El cliente no puede ser vacío.");
         FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede ser vacío.");
 
@@ -92,15 +97,18 @@ public class ClienteContactoBL {
 
         if (index >= 0) {
             clienteContactos.set(index, clienteContacto);
+            log.info("Se ha actualizado exitosamente el contacto del cliente: {}", cliente.getNombre());
         } else {
             clienteContacto.setIdCliente(cliente);
             clienteContactos.add(clienteContacto);
+            log.info("Se ha agregado exitosamente el contacto del cliente: {}", cliente.getNombre());
         }
     }
 
     public void agregarOActualizarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt)
             throws InventarioException {
 
+        log.info("Inicia el proceso para agregar o actualizar el medio de contacto para el contacto: {} {}", clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
         FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede ser vacío.");
         FacesUtils.requireNonNullWithReturn(medioCnt, "El medio de contacto no puede ser vacío.");
 
@@ -116,13 +124,16 @@ public class ClienteContactoBL {
 
         if (index >= 0) {
             medioCnts.set(index, medioCnt);
+            log.info("Se ha actualizado el medio de contacto para el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
         } else {
             medioCnt.setIdContacto(clienteContacto.getIdContacto());
             medioCnts.add(medioCnt);
+            log.info("Se ha agregado el medio de contacto para el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
         }
     }
 
     public void eliminarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt) throws InventarioException {
+        log.info("Inicia el proceso de eliminar el medio de contacto del el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
         FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede estar vacío.");
         FacesUtils.requireNonNullWithReturn(medioCnt, "Debe proporcionar un medio de contacto para eliminar.");
 
@@ -131,9 +142,12 @@ public class ClienteContactoBL {
         if (medioCnt.getIdMedio() != null) {
             medioCntDAO.eliminar(medioCnt);
         }
+        log.info("Finaliza el proceso de eliminar el medio de contacto del el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
     }
 
     public void eliminarContacto(Cliente cliente, ClienteContacto clienteContacto) throws InventarioException {
+        
+        log.info("Inicia el proceso de eliminar al contacto {} {} del cliente {}", clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1(), cliente.getNombre());
         FacesUtils.requireNonNullWithReturn(cliente, "El cliente no puede estar vacío.");
         FacesUtils.requireNonNullWithReturn(clienteContacto, "Debe proporcionar un ClienteContacto para eliminar.");
 
@@ -155,6 +169,7 @@ public class ClienteContactoBL {
             clienteContactoDAO.eliminar(clienteContacto);
 
         }
+        log.info("Finaliza el proceso de eliminar al contacto {} {} del cliente {}", clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1(), cliente.getNombre());
     }
 
 }

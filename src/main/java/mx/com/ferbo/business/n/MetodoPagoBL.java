@@ -25,7 +25,7 @@ public class MetodoPagoBL {
     private MetodoPagoDAO metodoPagoDAO;
 
     public List<MetodoPago> obtenerMetodosPago() throws InventarioException {
-
+        log.info("Inicia proceso para obtener todos los metodos de pago");
         Date fecha = new Date();
 
         try {

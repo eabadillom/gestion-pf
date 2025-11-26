@@ -19,11 +19,13 @@ public class SeguridadBL {
     SecurityUtil util;
 
     public void generaPassword(ClienteContacto clienteContacto) {
+        log.info("Inicia proceso el proceso de generar una contrasenia");
         util = new SecurityUtil();
         clienteContacto.setNbPassword(util.getRandomString());
     }
 
     public void validarContrasenia(String nuevaContrasenia, String contraseniaConfirmacion) throws InventarioException {
+        log.info("Inicia proceso de validación de la contrasenia");
         if (nuevaContrasenia.equals("")) {
             throw new InventarioException("Debe indicar una contraseña nueva.");
         }
@@ -35,13 +37,17 @@ public class SeguridadBL {
         nuevaContrasenia = nuevaContrasenia.trim();
         contraseniaConfirmacion = contraseniaConfirmacion.trim();
 
-        if (nuevaContrasenia.equals(contraseniaConfirmacion) == false)
+        if (nuevaContrasenia.equals(contraseniaConfirmacion) == false) {
             throw new InventarioException("Su nueva contraseña no coincide en los dos campos.");
+        }
+        
+        log.info("Finaliza proceso de validación de la contrasenia");
     }
 
     public String cambiarContrasenia(String nuevaContrasenia, String contraseniaConfirmacion)
             throws InventarioException {
 
+        log.info("Inicia proceso para cambio de contrasenia");
         util = new SecurityUtil();
 
         String nuevaContrseniaSHA512 = null;
@@ -55,6 +61,7 @@ public class SeguridadBL {
         nuevaContrasenia = null;
         contraseniaConfirmacion = null;
 
+        log.info("Finaliza proceso para cambio de contrasenia");
         return nuevaContrseniaSHA512;
 
     }

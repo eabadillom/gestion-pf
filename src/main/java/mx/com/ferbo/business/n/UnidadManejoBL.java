@@ -24,6 +24,7 @@ public class UnidadManejoBL {
     private UnidadManejoDAO unidadManejoDAO;
 
     public List<UnidadDeManejo> obtenerUnidadesManejo() throws InventarioException {
+        log.info("Inicia proceso de obtención de todos las unidades de manejo");
         try {
             return unidadManejoDAO.buscarTodos();
         } catch (DAOException ex) {

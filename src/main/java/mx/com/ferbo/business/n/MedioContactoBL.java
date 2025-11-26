@@ -32,7 +32,7 @@ public class MedioContactoBL {
     private TipoMailDAO tipoMailDAO;
 
     public List<TipoMail> obtenerTiposMail() throws InventarioException {
-
+        log.info("Inicia proceso para obtener todos los tipos de mail");
         try {
             return tipoMailDAO.buscarTodos();
         } catch (DAOException ex) {
@@ -42,6 +42,7 @@ public class MedioContactoBL {
     }
 
     public List<TipoTelefono> obtenerTiposTelefono() throws InventarioException {
+        log.info("Inicia proceso para obtener todos los tipos de teléfono");
         try {
             return tipoTelefonoDAO.buscarTodos();
         } catch (DAOException ex) {
@@ -51,20 +52,24 @@ public class MedioContactoBL {
     }
 
     public MedioCnt nuevoMedio() {
+        log.info("Inicia proceso para crear un nuevo medio de contacto");
         MedioCnt medio = new MedioCnt();
         return medio;
     }
 
     public void seleccionarMedioContacto(MedioCnt medioCnt) throws InventarioException {
 
+        log.info("Inicia proceso para seleccionar un medio de contaco");
         switch (medioCnt.getTpMedio()) {
 
             case "m":
                 medioCnt.setIdMail(new Mail());
+                log.info("Se selecciono email como medio de contacto");
                 break;
 
             case "t":
                 medioCnt.setIdTelefono(new Telefono());
+                log.info("Se selecciono telefono como medio de contacto");
                 break;
 
             default:

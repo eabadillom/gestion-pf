@@ -19,6 +19,7 @@ public class UnidadCobroBL {
     private UdCobroDAO udCobroDAO;
 
     public List<UdCobro> obtenerUnidadesCobro() {
+        log.info("Inicia proceso para obtener todas las unidades de cobro");
         List<UdCobro> list = udCobroDAO.buscarTodos();
 
         if (list == null) {
