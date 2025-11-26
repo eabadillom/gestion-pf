@@ -166,7 +166,7 @@ public class AvisoBL {
     }
 
     public void eliminarServicioAviso(
-            List<PrecioServicio> precioServicios, PrecioServicio precioServicio) throws InventarioException {
+            List<PrecioServicio> precioServicios, PrecioServicio precioServicio, List<PrecioServicio> serviciosDisponibles) throws InventarioException {
 
         if (precioServicios == null || precioServicios.isEmpty()) {
             throw new InventarioException("La lista de precios de servicio esta vacía");
@@ -174,6 +174,7 @@ public class AvisoBL {
         FacesUtils.requireNonNull(precioServicio, "El servicio a eliminar no puede ser vacío");
 
         precioServicios.remove(precioServicio);
+        serviciosDisponibles.add(precioServicio);
 
         precioServicio.setAvisoCve(null);
 

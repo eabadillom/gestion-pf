@@ -90,7 +90,6 @@ public class ClientesBean implements Serializable {
     private PrecioServicio precioAvisoSelected;
     private List<Planta> lstPlanta;
     private List<Categoria> lstCategoria;
-    private List<PrecioServicio> lstPrecioServicioAviso;
     private List<Aviso> lstAvisos;
 
     // Objetos para contactos
@@ -311,7 +310,7 @@ public class ClientesBean implements Serializable {
             precioServicioAux = new PrecioServicio();
             precioServicioAux.setCliente(clienteSelected);
             precioServicioAux.setAvisoCve(avisoSelected);
-            this.lstPrecioServicioAviso = precioServicioBL.buscarPorCriterios(precioServicioAux);
+            avisoSelected.setPrecioServicioList(precioServicioBL.buscarPorCriterios(precioServicioAux));
             
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Avisos", "La información cargo exitosamente");
         } catch (InventarioException ex) {
@@ -332,11 +331,12 @@ public class ClientesBean implements Serializable {
                 case "agregaraviso":
                     verificarAgregadoOActualizado(avisoSelected.getAvisoCve());
                     avisoBL.agregarAviso(clienteSelected, avisoSelected, lstAvisos);
+                    lstPrecioServicios = precioServicioBL.obtenerPrecioServiciosPorCliente(clienteSelected, false);
                     mensaje = "Aviso " + agregadoOActualizado + " exitosamente";
                     break;
 
                 case "agregarservicio":
-                    avisoBL.agregarServicioAviso(avisoSelected, clienteSelected, lstPrecioServiciosDisponibles, seleccionadosParaAgregar, lstPrecioServicioAviso);
+                    avisoBL.agregarServicioAviso(avisoSelected, clienteSelected, lstPrecioServiciosDisponibles, seleccionadosParaAgregar, avisoSelected.getPrecioServicioList());
                     mensaje = "Servico agregado al aviso exitosamente";
                     break;
 
@@ -346,7 +346,7 @@ public class ClientesBean implements Serializable {
                     break;
 
                 case "eliminarservicio":
-                    avisoBL.eliminarServicioAviso(lstPrecioServicioAviso, precioAvisoSelected);
+                    avisoBL.eliminarServicioAviso(avisoSelected.getPrecioServicioList(), precioAvisoSelected,  lstPrecioServiciosDisponibles);
                     mensaje = "Servicio de aviso eliminado exitosamente";
                     break;
 
@@ -787,14 +787,6 @@ public class ClientesBean implements Serializable {
 
     public void setSeleccionadosParaAgregar(List<PrecioServicio> seleccionadosParaAgregar) {
         this.seleccionadosParaAgregar = seleccionadosParaAgregar;
-    }
-
-    public List<PrecioServicio> getLstPrecioServicioAviso() {
-        return lstPrecioServicioAviso;
-    }
-
-    public void setLstPrecioServicioAviso(List<PrecioServicio> lstPrecioServicioAviso) {
-        this.lstPrecioServicioAviso = lstPrecioServicioAviso;
     }
 
     public List<Aviso> getLstAvisos() {

@@ -202,7 +202,7 @@
                     <p:panel header="Servicios con este aviso">
                         <p:dataTable id="dtServicioAviso" 
                                      widgetVar="dtServicioAviso" var="pServicioAviso"
-                                     value="#{clientesBean.lstPrecioServicioAviso}" reflow="true"
+                                     value="#{clientesBean.avisoSelected.precioServicioList}" reflow="true"
                                      rowKey="#{pServicioAviso.id}" lazy="false" paginator="true"
                                      rows="5" paginatorPosition="bottom">
 
@@ -231,10 +231,8 @@
 
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
-                             actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="dtAvisos"
-                             process="pnlAviso @this" oncomplete="PF('dialogAviso').hide()">
-                <f:setPropertyActionListener value="#{pServicioAviso}" target="#{clientesBean.precioAvisoSelected}" />
-            </p:commandButton>
+                             actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="dtAvisos form:tabView:dtPreciosServicios"
+                             process="pnlAviso @this" oncomplete="PF('dialogAviso').hide()"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogAviso').hide()"
                              class="ui-button-secondary"
                              resetValues="true" immediate="true" />
@@ -262,7 +260,7 @@
                              styleClass="ui-button-danger"
                              action="#{clientesBean.operarAvisos('eliminarservicio')}"
                              process="@this"
-                             update="form:tabView:dtServiciosDisponibles form:tabView:dtServicioAviso"
+                             update="form:tabView:dtServiciosSinAviso form:tabView:dtServicioAviso"
                              oncomplete="PF('deleteServicioDialog').hide()" />
 
             <p:commandButton value="No"

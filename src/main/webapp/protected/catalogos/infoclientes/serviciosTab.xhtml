@@ -77,7 +77,7 @@
                 <div class="p-field">
                     <p:outputLabel>Precio</p:outputLabel>
                     <p:inputNumber value="#{clientesBean.precioServicioSelected.precio}" emptyValue="0" symbol="$" symbolPosition="p" thousandSeparator=","
-                                   minValue="0" required="true" requiredMessage="Campo requerido" />
+                                   minValue="0" required="true" requiredMessage="Campo requerido" disabled="#{clientesBean.precioServicioSelected.avisoCve.avisoCve != 1}"/>
                 </div>
             </p:outputPanel>
         </p:outputPanel>

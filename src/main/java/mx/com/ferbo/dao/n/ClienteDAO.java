@@ -62,13 +62,14 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
 
             if (isFullInfo) {
 
-                if (cliente.getCandadoSalida() != null)
+                if (cliente.getCandadoSalida() != null) {
                     cliente.getCandadoSalida().getId();
+                }
 
                 List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
                 List<PrecioServicio> clientePrecioServicios = cliente.getPrecioServicioList();
                 List<Aviso> clienteAvisos = cliente.getAvisoList();
-                List<ClienteDomicilios> clienteDomicilios =  cliente.getClienteDomiciliosList();
+                List<ClienteDomicilios> clienteDomicilios = cliente.getClienteDomiciliosList();
                 log.info(cliente.getRegimenFiscal().getCd_regimen());
                 log.info(cliente.getRegimenFiscal().getNb_regimen());
                 log.info(cliente.getUsoCfdi().getUsoCfdi());
@@ -87,19 +88,21 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                             Mail idMail = medioContacto.getIdMail();
                             Telefono idTelefono = medioContacto.getIdTelefono();
 
-                            if (idMail != null)
+                            if (idMail != null) {
                                 idMail.getTpMail().getNbTipo();
+                            }
 
-                            if (idTelefono != null)
+                            if (idTelefono != null) {
                                 idTelefono.getTpTelefono().getNbTelefono();
+                            }
 
                         }
 
                     }
                 }
-                
-                if(!clienteDomicilios.isEmpty()){
-                    for(ClienteDomicilios clienteDomicilio : clienteDomicilios){
+
+                if (!clienteDomicilios.isEmpty()) {
+                    for (ClienteDomicilios clienteDomicilio : clienteDomicilios) {
                         log.info(clienteDomicilio.getDomicilios());
                     }
                 }
@@ -123,6 +126,9 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
             model = em.createNamedQuery("Cliente.findByCodUnico", this.modelClass)
                     .setParameter("codUnico", codigoUnico)
                     .getSingleResult();
+        } catch (NoResultException ex) {
+            log.info("No se encontró cliente con código único: {}", codigoUnico);
+            return null;
         } catch (Exception ex) {
             log.warn("Problema para obtener el cliente por codigo unico: {}", ex.getMessage());
             throw new DAOException("Hubo un problema al buscar el cliente");
