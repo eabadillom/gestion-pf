@@ -22,6 +22,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import mx.com.ferbo.business.GestionApiClientBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +39,7 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.ui.RepInventario;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -314,6 +316,32 @@ public class ReporteInventarioBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:dt-reporte", "form:dtReporte", "form:messages");
 		}
 	}
+        
+        public void enviarInventario(){
+            GestionApiClientBL gestionApi = new GestionApiClientBL();
+            String numeroCliente = null;
+            try {
+                if (clienteSelect == null) {
+                    throw new InventarioException("Debe seleccionar un cliente.");
+                } else {
+                    numeroCliente = clienteSelect.getNumeroCte();
+                }
+
+                if (numeroCliente == null || numeroCliente.isEmpty())
+                    throw new InventarioException("Debe seleccionar un cliente.");
+                
+                gestionApi.enviarCorreoCliente(numeroCliente);
+                FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Inventario", "El reporte se envió al cliente");
+            } catch (InventarioException ex) {
+                log.error("Problema para enviar por correo el reporte: {}", ex.getMessage());
+                FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Inventario", ex.getMessage());
+            } catch (Exception ex) {
+                log.error("Problema para consultar el reporte de salidas...", ex);
+                FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Inventario", "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.");
+            } finally {
+                PrimeFaces.current().ajax().update("form:messages");
+            }
+        }
 
 	public Usuario getUsuario() {
 		return usuario;
