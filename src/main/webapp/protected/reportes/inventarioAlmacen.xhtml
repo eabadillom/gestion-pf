@@ -11,7 +11,8 @@
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 		    </p:dialog>
-			<p:growl id="messages" showDetail="true" />
+			<!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+                        <ui:include src="/protected/common/status-info.xhtml" />
 			<p:panel>
 				<div class="p-grid ui-fluid p-col-12">
 					<div class="p-col-6 p-md-6">
@@ -110,6 +111,10 @@
             		</div>
             	</p:rowExpansion>
 			</p:dataTable>
+                        <h:panelGroup style="margin-top:10px; text-align:right; display:block;">
+                            <p:commandButton value="Enviar PDF" icon="pi pi-send" action="#{reporteInventarioBean.enviarInventario()}" 
+                                             onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+                        </h:panelGroup>
 		</h:form>
 	</ui:define>
 </ui:composition>
