@@ -42,7 +42,8 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 					.setParameter("estadoCve", idEstado)
 					.setParameter("municipioCve", idMunicipio)
 					.setParameter("ciudadCve", idCiudad)
-					.setParameter("domicilioColonia", idAsentamiento).getSingleResult();
+					.setParameter("asentamientoCve", idAsentamiento)
+                            .getSingleResult();
 			
 		} catch (Exception e) {
 			Log.error("Problema al encontrar domicilio", e);
@@ -60,18 +61,15 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery(
-					"update domicilios set ciudad_cve = :ciudadCve, estado_cve = :estadoCve, municipio_cve = :municipioCve, pais_cve = :paisCve,"
-							+ "domicilio_calle= :domicilioCalle, domicilio_colonia=:domicilioColonia, domicilio_cp=:domicilioCp, domicilio_fax=:domicilioFax"
-							+ ", domicilio_num_ext = :domicilioNumExt , domicilio_num_int = :domicilioNumInt , domicilio_tel1 = :domicilioTel1,"
-							+ "domicilio_tel2= :domicilioTel2, domicilio_tipo_cve = :domicilioTipoCve where dom_cve = :domCve")
-					.setParameter("ciudadCve", dom.getCiudades().getCiudadesPK().getCiudadCve())
-					.setParameter("estadoCve",
-							dom.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve())
-					.setParameter("municipioCve", dom.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve())
-					.setParameter("paisCve", dom.getPaisCved().getPaisCve())
+					"update domicilios set asentamiento_cve = :asentamientoCve, ciudad_cve = :ciudadCve, estado_cve = :estadoCve, municipio_cve = :municipioCve, pais_cve = :paisCve,"
+                                            + "domicilio_calle = :domicilioCalle, domicilio_fax = :domicilioFax, domicilio_num_ext = :domicilioNumExt, domicilio_num_int = :domicilioNumInt, "
+                                            + "domicilio_tel1 = :domicilioTel1, domicilio_tel2= :domicilioTel2, domicilio_tipo_cve = :domicilioTipoCve where dom_cve = :domCve")
+					.setParameter("asentamientoCve", dom.getAsentamiento().getAsentamientoHumanoPK().getAsentamientoCve())
+                                        .setParameter("ciudadCve", dom.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
+                                        .setParameter("municipioCve", dom.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
+                                        .setParameter("estadoCve",dom.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+					.setParameter("paisCve", dom.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
 					.setParameter("domicilioCalle", dom.getDomicilioCalle())
-					.setParameter("domicilioColonia", dom.getDomicilioColonia())
-					.setParameter("domicilioCp", dom.getDomicilioCp())
 					.setParameter("domicilioFax", dom.getDomicilioFax())
 					.setParameter("domicilioNumExt", dom.getDomicilioNumExt())
 					.setParameter("domicilioNumInt", dom.getDomicilioNumInt())

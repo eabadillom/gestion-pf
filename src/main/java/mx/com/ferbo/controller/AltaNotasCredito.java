@@ -21,7 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.AsentamientoHumandoDAO;
+import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.FacturaDAO;
@@ -68,7 +68,7 @@ public class AltaNotasCredito implements Serializable{
 	private ClienteDAO clienteDAO;
 	private FacturaDAO facturaDAO;
 	private ClienteDomiciliosDAO clienteDomicilioDAO;
-	private AsentamientoHumandoDAO asentamientoHumanoDAO;
+	private AsentamientoHumanoDAO asentamientoHumanoDAO;
 	private NotaCreditoDAO notaCreditoDAO;
 	private SerieNotaDAO serieNotaDAO;
 	//private NotaPorFacturaDAO notaFactDAO;
@@ -136,7 +136,7 @@ public class AltaNotasCredito implements Serializable{
 		this.clienteDAO = new ClienteDAO();
 		this.facturaDAO = new FacturaDAO();
 		this.clienteDomicilioDAO = new ClienteDomiciliosDAO();
-		this.asentamientoHumanoDAO = new AsentamientoHumandoDAO();
+		this.asentamientoHumanoDAO = new AsentamientoHumanoDAO();
 		this.notaCreditoDAO = new NotaCreditoDAO();
 		this.serieNotaDAO = new SerieNotaDAO();
 		this.tipoPagoDAO = new TipoPagoDAO();
@@ -306,12 +306,13 @@ public class AltaNotasCredito implements Serializable{
 			domicilioCliente(clienteSelect);
 			
 			asentamientoCliente = asentamientoHumanoDAO.buscarPorAsentamiento(
-					domicilioSelect.getPaisCved().getPaisCve(),
-					domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
-					domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve() ,
-					domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
-					domicilioSelect.getDomicilioColonia()
+					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve(),
+					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve(),
+					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve() ,
+					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve(),
+					domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getAsentamientoCve()
 				);
+                        log.info("Info asentamiento: {}", asentamientoCliente.toString());
 			domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
 			
 			

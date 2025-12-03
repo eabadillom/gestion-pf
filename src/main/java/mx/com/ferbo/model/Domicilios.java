@@ -7,10 +7,12 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,7 +22,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
 /**
@@ -35,55 +39,60 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Domicilios.findByDomicilioCalle", query = "SELECT d FROM Domicilios d WHERE d.domicilioCalle = :domicilioCalle"),
     @NamedQuery(name = "Domicilios.findByDomicilioNumExt", query = "SELECT d FROM Domicilios d WHERE d.domicilioNumExt = :domicilioNumExt"),
     @NamedQuery(name = "Domicilios.findByDomicilioNumInt", query = "SELECT d FROM Domicilios d WHERE d.domicilioNumInt = :domicilioNumInt"),
-    @NamedQuery(name = "Domicilios.findByDomicilioColonia", query = "SELECT d FROM Domicilios d WHERE d.domicilioColonia = :domicilioColonia"),
-    @NamedQuery(name = "Domicilios.findByDomicilioCp", query = "SELECT d FROM Domicilios d WHERE d.domicilioCp = :domicilioCp"),
+    @NamedQuery(name = "Domicilios.findByDomicilioCp", query = "SELECT d FROM Domicilios d WHERE d.asentamiento.cp = :domicilioCp"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel1", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel1 = :domicilioTel1"),
     @NamedQuery(name = "Domicilios.findByDomicilioTel2", query = "SELECT d FROM Domicilios d WHERE d.domicilioTel2 = :domicilioTel2"),
     @NamedQuery(name = "Domicilios.findByDomicilioFax", query = "SELECT d FROM Domicilios d WHERE d.domicilioFax = :domicilioFax"),
-    @NamedQuery(name = "Domicilios.findByAsentamiento", query = "SELECT d FROM Domicilios d WHERE d.ciudades.municipios.estados.paises.paisCve = :paisCve AND d.ciudades.municipios.estados.estadosPK.estadoCve = :estadoCve AND d.ciudades.municipios.municipiosPK.municipioCve = :municipioCve AND d.ciudades.ciudadesPK.ciudadCve = :ciudadCve AND d.domicilioColonia = :domicilioColonia" )})
+    @NamedQuery(name = "Domicilios.findByAsentamiento", query = "SELECT d FROM Domicilios d WHERE d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisCve = :paisCve AND d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.estadoCve = :estadoCve AND d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.municipioCve = :municipioCve AND d.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.ciudadCve = :ciudadCve AND d.asentamiento.asentamientoHumanoPK.asentamientoCve = :asentamientoCve" )
+})
 public class Domicilios implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "dom_cve")
     private Integer domCve;
+    
     @Size(max = 100)
     @Column(name = "domicilio_calle")
     private String domicilioCalle;
+    
     @Size(max = 50)
     @Column(name = "domicilio_num_ext")
     private String domicilioNumExt;
+    
     @Size(max = 50)
     @Column(name = "domicilio_num_int")
     private String domicilioNumInt;
-    @Column(name = "domicilio_colonia")
-    private Integer domicilioColonia;
-    @Size(max = 5)
-    @Column(name = "domicilio_cp")
-    private String domicilioCp;
+    
     @Size(max = 10)
     @Column(name = "domicilio_tel1")
     private String domicilioTel1;
+    
     @Size(max = 10)
     @Column(name = "domicilio_tel2")
     private String domicilioTel2;
+    
     @Size(max = 10)
     @Column(name = "domicilio_fax")
     private String domicilioFax;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "domicilios")
     private List<ClienteDomicilios> clienteDomiciliosList;
-    @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve", insertable = false, updatable = false)
-    @ManyToOne
-    private Paises paisCved;
-    @JoinColumns({
+    
+    @Null
+    @JoinColumns(value = {
         @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve"),
         @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve"),
         @JoinColumn(name = "municipio_cve", referencedColumnName = "municipio_cve"),
-        @JoinColumn(name = "ciudad_cve", referencedColumnName = "ciudad_cve")})
-    @ManyToOne
-    private Ciudades ciudades;
+        @JoinColumn(name = "ciudad_cve", referencedColumnName = "ciudad_cve"),
+        @JoinColumn(name = "asentamiento_cve", referencedColumnName = "asentamiento_cve")
+    }, foreignKey = @ForeignKey(name = "FR_Domicilio_Asentamiento"))
+    @OneToOne
+    private AsentamientoHumano asentamiento;
+    
     @JoinColumn(name = "domicilio_tipo_cve", referencedColumnName = "domicilio_tipo_cve")
     @ManyToOne(optional = false)
     private TiposDomicilio domicilioTipoCve;
@@ -127,22 +136,6 @@ public class Domicilios implements Serializable {
         this.domicilioNumInt = domicilioNumInt;
     }
 
-    public Integer getDomicilioColonia() {
-        return domicilioColonia;
-    }
-
-    public void setDomicilioColonia(Integer domicilioColonia) {
-        this.domicilioColonia = domicilioColonia;
-    }
-
-    public String getDomicilioCp() {
-        return domicilioCp;
-    }
-
-    public void setDomicilioCp(String domicilioCp) {
-        this.domicilioCp = domicilioCp;
-    }
-
     public String getDomicilioTel1() {
         return domicilioTel1;
     }
@@ -166,7 +159,7 @@ public class Domicilios implements Serializable {
     public void setDomicilioFax(String domicilioFax) {
         this.domicilioFax = domicilioFax;
     }
-
+    
     public List<ClienteDomicilios> getClienteDomiciliosList() {
         return clienteDomiciliosList;
     }
@@ -175,20 +168,12 @@ public class Domicilios implements Serializable {
         this.clienteDomiciliosList = clienteDomiciliosList;
     }
 
-    public Paises getPaisCved() {
-        return paisCved;
+    public AsentamientoHumano getAsentamiento() {
+        return asentamiento;
     }
 
-    public void setPaisCved(Paises paisCved) {
-        this.paisCved = paisCved;
-    }
-
-    public Ciudades getCiudades() {
-        return ciudades;
-    }
-
-    public void setCiudades(Ciudades ciudades) {
-        this.ciudades = ciudades;
+    public void setAsentamiento(AsentamientoHumano asentamiento) {
+        this.asentamiento = asentamiento;
     }
 
     public TiposDomicilio getDomicilioTipoCve() {
@@ -201,22 +186,23 @@ public class Domicilios implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (domCve != null ? domCve.hashCode() : 0);
-        return hash;
+        if(this.domCve == null)
+            return System.identityHashCode(this);
+        return Objects.hash(domCve);
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Domicilios)) {
+        if (this == object)
+            return true;
+        if (object == null)
             return false;
-        }
+        if (getClass() != object.getClass())
+            return false;
         Domicilios other = (Domicilios) object;
-        if ((this.domCve == null && other.domCve != null) || (this.domCve != null && !this.domCve.equals(other.domCve))) {
-            return false;
-        }
-        return true;
+        if(this.domCve == null || other.domCve == null)
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+        return Objects.equals(domCve, other.domCve);
     }
 
     @Override

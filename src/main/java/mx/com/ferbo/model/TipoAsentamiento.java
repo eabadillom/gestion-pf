@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -29,21 +30,26 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "TipoAsentamiento.findAll", query = "SELECT t FROM TipoAsentamiento t"),
     @NamedQuery(name = "TipoAsentamiento.findByTipoasntmntoCve", query = "SELECT t FROM TipoAsentamiento t WHERE t.tipoasntmntoCve = :tipoasntmntoCve"),
     @NamedQuery(name = "TipoAsentamiento.findByTipoasntmntoDs", query = "SELECT t FROM TipoAsentamiento t WHERE t.tipoasntmntoDs = :tipoasntmntoDs"),
-    @NamedQuery(name = "TipoAsentamiento.findByTipoasntmntoDsCorta", query = "SELECT t FROM TipoAsentamiento t WHERE t.tipoasntmntoDsCorta = :tipoasntmntoDsCorta")})
+    @NamedQuery(name = "TipoAsentamiento.findByTipoasntmntoDsCorta", query = "SELECT t FROM TipoAsentamiento t WHERE t.tipoasntmntoDsCorta = :tipoasntmntoDsCorta")
+})
 public class TipoAsentamiento implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "tipoasntmnto_cve")
     private Short tipoasntmntoCve;
+    
     @Size(max = 100)
     @Column(name = "tipoasntmnto_ds")
     private String tipoasntmntoDs;
+    
     @Size(max = 4)
     @Column(name = "tipoasntmnto_ds_corta")
     private String tipoasntmntoDsCorta;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tipoAsentamiento")
     private List<AsentamientoHumano> asentamientoHumanoList;
 
@@ -88,22 +94,25 @@ public class TipoAsentamiento implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (tipoasntmntoCve != null ? tipoasntmntoCve.hashCode() : 0);
-        return hash;
+        if(this.tipoasntmntoCve == null) {
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(this.tipoasntmntoCve);
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof TipoAsentamiento)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        TipoAsentamiento other = (TipoAsentamiento) object;
-        if ((this.tipoasntmntoCve == null && other.tipoasntmntoCve != null) || (this.tipoasntmntoCve != null && !this.tipoasntmntoCve.equals(other.tipoasntmntoCve))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        return true;
+        final TipoAsentamiento other = (TipoAsentamiento) obj;
+        return Objects.equals(this.tipoasntmntoCve, other.tipoasntmntoCve);
     }
 
     @Override

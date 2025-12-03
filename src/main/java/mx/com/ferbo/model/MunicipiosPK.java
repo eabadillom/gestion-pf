@@ -6,9 +6,13 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -18,83 +22,66 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class MunicipiosPK implements Serializable {
 
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "pais_cve")
-    private int paisCve;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "estado_cve")
-    private int estadoCve;
+    @JoinColumns({
+        @JoinColumn(name = "pais_cve", referencedColumnName = "pais_cve"),
+        @JoinColumn(name = "estado_cve", referencedColumnName = "estado_cve")})
+    @ManyToOne
+    private Estados estados;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "municipio_cve")
-    private int municipioCve;
+    private Integer municipioCve;
 
     public MunicipiosPK() {
     }
 
-    public MunicipiosPK(int paisCve, int estadoCve, int municipioCve) {
-        this.paisCve = paisCve;
-        this.estadoCve = estadoCve;
+    public MunicipiosPK(Estados estados, Integer municipioCve) {
+        this.estados = estados;
         this.municipioCve = municipioCve;
     }
 
-    public int getPaisCve() {
-        return paisCve;
-    }
-
-    public void setPaisCve(int paisCve) {
-        this.paisCve = paisCve;
-    }
-
-    public int getEstadoCve() {
-        return estadoCve;
-    }
-
-    public void setEstadoCve(int estadoCve) {
-        this.estadoCve = estadoCve;
-    }
-
-    public int getMunicipioCve() {
+    public Integer getMunicipioCve() {
         return municipioCve;
     }
 
-    public void setMunicipioCve(int municipioCve) {
+    public void setMunicipioCve(Integer municipioCve) {
         this.municipioCve = municipioCve;
+    }
+
+    public Estados getEstados() {
+        return estados;
+    }
+
+    public void setEstados(Estados estados) {
+        this.estados = estados;
     }
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (int) paisCve;
-        hash += (int) estadoCve;
-        hash += (int) municipioCve;
+        int hash = 7;
+        hash = 59 * hash + this.municipioCve;
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof MunicipiosPK)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        MunicipiosPK other = (MunicipiosPK) object;
-        if (this.paisCve != other.paisCve) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        if (this.estadoCve != other.estadoCve) {
-            return false;
-        }
-        if (this.municipioCve != other.municipioCve) {
-            return false;
-        }
-        return true;
+        final MunicipiosPK other = (MunicipiosPK) obj;
+        return Objects.equals(this.municipioCve, other.municipioCve);
     }
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.MunicipiosPK[ paisCve=" + paisCve + ", estadoCve=" + estadoCve + ", municipioCve=" + municipioCve + " ]";
+        return "mx.com.ferbo.model.MunicipiosPK[ municipioCve=" + municipioCve + " ]";
     }
     
 }

@@ -12,6 +12,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class PaisesDAO extends IBaseDAO<Paises, Integer> {
 	Logger log = LogManager.getLogger(PaisesDAO.class);
 	

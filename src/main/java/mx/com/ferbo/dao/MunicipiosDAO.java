@@ -15,6 +15,7 @@ import mx.com.ferbo.model.Municipios;
 import mx.com.ferbo.model.MunicipiosPK;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 	Logger log = LogManager.getLogger(MunicipiosDAO.class);
 	
@@ -98,10 +99,9 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		try {
 		em = EntityManagerUtil.getEntityManager();
 		listado = em.createNamedQuery("Municipios.findByPaisCveEstadoCve", Municipios.class)
-				.setParameter("estadoCve", m.getMunicipiosPK().getEstadoCve())
-				.setParameter("paisCve", m.getMunicipiosPK().getPaisCve())
-				.getResultList()
-				;
+				.setParameter("estadoCve", m.getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+				.setParameter("paisCve", m.getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+				.getResultList();
 		
 		}catch(Exception e) {
 			log.error("Problemas para obtener informacion",e);
@@ -117,13 +117,16 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		List<Municipios> listado = null;
 		try {
 			 em = EntityManagerUtil.getEntityManager();
-			 if (m.getEstados().getEstadosPK().getEstadoCve() > 0) {
+			 if (m.getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve() > 0) {
 				 TypedQuery<Municipios> consEstados = em.createNamedQuery("Municipios.findByEstadoCve", Municipios.class);
-				 consEstados.setParameter("estadoCve", m.getEstados().getEstadosPK().getEstadoCve());
+				 consEstados.setParameter("estadoCve", m.getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve());
 				 listado = consEstados.getResultList();
 				 return listado;
-			 } else if(m.getMunicipiosPK().getEstadoCve() != -1 && m.getMunicipiosPK().getPaisCve() != -1){
-				 listado = em.createNamedQuery("Municipios.findByPaisCveEstadoCve", Municipios.class).setParameter("estadoCve", m.getMunicipiosPK().getEstadoCve()).setParameter("paisCve", m.getMunicipiosPK().getPaisCve()).getResultList();
+			 } else if(m.getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve() != -1 && m.getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve() != -1){
+				 listado = em.createNamedQuery("Municipios.findByPaisCveEstadoCve", Municipios.class)
+                                    .setParameter("estadoCve", m.getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+                                    .setParameter("paisCve", m.getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+                                    .getResultList();
 				 return listado;
 			 } 
 		}catch(Exception e) {
@@ -169,10 +172,11 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createQuery("DELETE FROM Municipios m WHERE m.municipiosPK.paisCve =:paisCve and m.municipiosPK.estadoCve =:estadoCve and m.municipiosPK.municipioCve =:municipioCve")
-			.setParameter("paisCve", municipios.getMunicipiosPK().getPaisCve())
-			.setParameter("estadoCve", municipios.getMunicipiosPK().getEstadoCve())
-			.setParameter("municipioCve", municipios.getMunicipiosPK().getMunicipioCve()).executeUpdate();
+			em.createQuery("DELETE FROM Municipios m WHERE m.municipiosPK.estados.estadosPK.pais.paisCve =:paisCve and m.municipiosPK.estados.estadosPK.estadoCve =:estadoCve and m.municipiosPK.municipioCve =:municipioCve")
+			.setParameter("paisCve", municipios.getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+			.setParameter("estadoCve", municipios.getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+			.setParameter("municipioCve", municipios.getMunicipiosPK().getMunicipioCve())
+                        .executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
@@ -207,9 +211,9 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 		try {
 		em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Municipios.findByTodo", Municipios.class)
-				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getMunicipioCve())
-				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getEstadoCve())
-				.setParameter("paisCve", as.getAsentamientoHumanoPK().getPaisCve())
+				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
+				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+				.setParameter("paisCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
 				.getResultList();
 		}catch(Exception e ) {
 			log.error("Problemas para obtener informacion",e);

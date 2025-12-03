@@ -7,6 +7,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,10 +31,10 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "telefono")
 @NamedQueries({
-    @NamedQuery(name = "Telefono.findAll", query = "SELECT t FROM Telefono t"),
-    @NamedQuery(name = "Telefono.findByIdTelefono", query = "SELECT t FROM Telefono t WHERE t.idTelefono = :idTelefono"),
-    @NamedQuery(name = "Telefono.findByNbTelefono", query = "SELECT t FROM Telefono t WHERE t.nbTelefono = :nbTelefono"),
-    @NamedQuery(name = "Telefono.findByStPrincipal", query = "SELECT t FROM Telefono t WHERE t.stPrincipal = :stPrincipal")})
+        @NamedQuery(name = "Telefono.findAll", query = "SELECT t FROM Telefono t"),
+        @NamedQuery(name = "Telefono.findByIdTelefono", query = "SELECT t FROM Telefono t WHERE t.idTelefono = :idTelefono"),
+        @NamedQuery(name = "Telefono.findByNbTelefono", query = "SELECT t FROM Telefono t WHERE t.nbTelefono = :nbTelefono"),
+        @NamedQuery(name = "Telefono.findByStPrincipal", query = "SELECT t FROM Telefono t WHERE t.stPrincipal = :stPrincipal") })
 public class Telefono implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -110,28 +112,28 @@ public class Telefono implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idTelefono != null ? idTelefono.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Telefono))
+            return false;
+        Telefono that = (Telefono) o;
+
+        if (this.idTelefono != null && that.idTelefono != null) {
+            return Objects.equals(this.idTelefono, that.idTelefono);
+        } else {
+            return this == that;
+        }
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Telefono)) {
-            return false;
-        }
-        Telefono other = (Telefono) object;
-        if ((this.idTelefono == null && other.idTelefono != null) || (this.idTelefono != null && !this.idTelefono.equals(other.idTelefono))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return (idTelefono != null) ? idTelefono.hashCode() : System.identityHashCode(this);
     }
 
     @Override
     public String toString() {
         return "mx.com.ferbo.model.Telefono[ idTelefono=" + idTelefono + " ]";
     }
-    
+
 }

@@ -8,6 +8,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.TiposDomicilio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class TiposDomicilioDAO extends IBaseDAO<TiposDomicilio, Integer> {
 
 	@Override

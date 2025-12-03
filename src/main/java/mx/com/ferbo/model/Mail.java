@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -24,8 +25,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.bouncycastle.util.Objects;
-
 /**
  *
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
@@ -33,61 +32,37 @@ import org.bouncycastle.util.Objects;
 @Entity
 @Table(name = "mail")
 @NamedQueries({
-    @NamedQuery(name = "Mail.findAll", query = "SELECT m FROM Mail m"),
-    @NamedQuery(name = "Mail.findByIdMail", query = "SELECT m FROM Mail m WHERE m.idMail = :idMail"),
-    @NamedQuery(name = "Mail.findByNbMail", query = "SELECT m FROM Mail m WHERE m.nbMail = :nbMail"),
-    @NamedQuery(name = "Mail.findByStPrincipal", query = "SELECT m FROM Mail m WHERE m.stPrincipal = :stPrincipal")})
+        @NamedQuery(name = "Mail.findAll", query = "SELECT m FROM Mail m"),
+        @NamedQuery(name = "Mail.findByIdMail", query = "SELECT m FROM Mail m WHERE m.idMail = :idMail"),
+        @NamedQuery(name = "Mail.findByNbMail", query = "SELECT m FROM Mail m WHERE m.nbMail = :nbMail"),
+        @NamedQuery(name = "Mail.findByStPrincipal", query = "SELECT m FROM Mail m WHERE m.stPrincipal = :stPrincipal") })
 public class Mail implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_mail")
     private Integer idMail;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "nb_mail")
     private String nbMail;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "st_principal")
     private boolean stPrincipal;
-    
+
     @JoinColumn(name = "tp_mail", referencedColumnName = "tp_mail")
     @ManyToOne(optional = false)
     private TipoMail tpMail;
-    
-    @OneToMany(mappedBy = "idMail", cascade=CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "idMail", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MedioCnt> medioCntList;
-    
-    @Override
-    public int hashCode() {
-    	if(this.idMail == null)
-    		return System.identityHashCode(this);
-    	return Objects.hashCode(this.idMail);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof Mail)) {
-            return false;
-        }
-        Mail other = (Mail) object;
-        if ((this.idMail == null && other.idMail != null) || (this.idMail != null && !this.idMail.equals(other.idMail))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Mail[ idMail=" + idMail + " ]";
-    }
 
     public Mail() {
     }
@@ -141,4 +116,30 @@ public class Mail implements Serializable {
     public void setMedioCntList(List<MedioCnt> medioCntList) {
         this.medioCntList = medioCntList;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Mail))
+            return false;
+        Mail that = (Mail) o;
+
+        if (this.idMail != null && that.idMail != null) {
+            return Objects.equals(this.idMail, that.idMail);
+        } else {
+            return this == that;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return (idMail != null) ? idMail.hashCode() : System.identityHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Mail[ idMail=" + idMail + " ]";
+    }
+
 }
