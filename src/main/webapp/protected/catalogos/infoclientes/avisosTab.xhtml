@@ -17,7 +17,7 @@
 
     <div class="orders-subtable">
         <p:dataTable id="dtAvisos" widgetVar="dtAvisos" var="pAviso" 
-                     value="#{clientesBean.lstAvisos}" reflow="true" 
+                     value="#{clientesBean.clienteSelected.avisoList}" reflow="true" 
                      rowKey="#{pAviso.avisoCve}" lazy="false"
                      paginator="true" rows="5" paginatorPosition="bottom">
 
@@ -54,8 +54,10 @@
                 </p:commandButton>
             </p:column>
             <p:column width="2rem" style="text-align: center;">
-                <p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteAvisoDialog').show()">
-                    <f:setPropertyActionListener value="#{pAviso}" target="#{clientesBean.avisoSelected}" />
+                <p:commandButton class="ui-button-danger" icon="pi pi-trash" 
+                                 process="@this" update="dtAvisos"
+                                 oncomplete="PF('deleteAvisoDialog').show()" 
+                                 actionListener="#{clientesBean.cargarServiciosAviso(pAviso)}">
                 </p:commandButton>
             </p:column>          
         </p:dataTable>
@@ -192,10 +194,10 @@
                                      rowSelectMode="add"
                                      reflow="true">
 
-                            <!-- Checkbox -->
+                           
                             <p:column width="5%" selectionMode="multiple" exportable="false"/>
 
-                            <!-- Nombre -->
+                            
                             <p:column headerText="Servicio">
                                 <h:outputText value="#{srv.servicio.servicioDs}" />
                             </p:column>

@@ -12,7 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.ClienteContactoDAO;
-import mx.com.ferbo.dao.n.ContactoDAO;
 import mx.com.ferbo.dao.n.MedioCntDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
@@ -33,13 +32,7 @@ public class ClienteContactoBL {
     private static final Logger log = LogManager.getLogger(ClienteContactoBL.class);
 
     @Inject
-    private MedioCntDAO medioCntDAO;
-
-    @Inject
     private ClienteContactoDAO clienteContactoDAO;
-
-    @Inject
-    private ContactoDAO contactoDAO;
 
     public ClienteContacto nuevoContacto() {
         ClienteContacto clienteContacto = new ClienteContacto();
@@ -72,7 +65,6 @@ public class ClienteContactoBL {
         clienteContacto.setFhAlta(new Date());
         clienteContacto.setStHabilitado(true);
         clienteContacto.setStUsuario("A");
-        log.info("Finaliza proceso para crear nuevo contacto");
         return clienteContacto;
     }
 
@@ -138,10 +130,11 @@ public class ClienteContactoBL {
         FacesUtils.requireNonNullWithReturn(medioCnt, "Debe proporcionar un medio de contacto para eliminar.");
 
         clienteContacto.getIdContacto().getMedioCntList().remove(medioCnt);
+        
+        medioCnt.setIdContacto(null);
+        medioCnt.setIdMail(null);
+        medioCnt.setIdTelefono(null);
 
-        if (medioCnt.getIdMedio() != null) {
-            medioCntDAO.eliminar(medioCnt);
-        }
         log.info("Finaliza el proceso de eliminar el medio de contacto del el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
     }
 
@@ -165,11 +158,14 @@ public class ClienteContactoBL {
 
             cliente.getClienteContactoList().remove(clienteContacto);
 
-            contactoDAO.eliminar(clienteContacto.getIdContacto());
-            clienteContactoDAO.eliminar(clienteContacto);
+            log.info("Finaliza el proceso de eliminar al contacto {} {} del cliente {}", clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1(), cliente.getNombre());
+
+            clienteContacto.setIdContacto(null);
+            clienteContacto.setIdCliente(null);
+            
 
         }
-        log.info("Finaliza el proceso de eliminar al contacto {} {} del cliente {}", clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1(), cliente.getNombre());
+       
     }
 
 }

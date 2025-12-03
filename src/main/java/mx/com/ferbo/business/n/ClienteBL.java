@@ -56,11 +56,11 @@ public class ClienteBL {
         return lista;
     }
 
-    public Cliente obtenerTodoCliente(Integer id, Boolean isFullInfo) throws InventarioException {
+    public Cliente obtenerTodoCliente(Cliente cliente, Boolean isFullInfo) throws InventarioException {
 
         try {
-            log.info("Inicia proceso para extraer la información minima del cliente con ide: {}", id);
-            return clienteDAO.obtenerPorId(id, isFullInfo);
+            log.info("Inicia proceso para extraer la información minima del cliente {}", cliente.getNombre());
+            return clienteDAO.obtenerPorId(cliente.getCteCve(), isFullInfo);
         } catch (DAOException ex) {
             log.info("Error al obtener la información del cliente", ex);
             throw new InventarioException("Hubo un problema al obtener la información del cliente");
@@ -84,12 +84,16 @@ public class ClienteBL {
         log.info("Inicia proceso para crear un nuevo cliente");
         Cliente cliente = new Cliente();
         cliente = new Cliente();
+        cliente.setHabilitado(true);
         cliente.setMetodoPago(new MetodoPago());
         cliente.setRegimenFiscal(new RegimenFiscal());
         cliente.setUsoCfdi(new UsoCfdi());
         cliente.setCandadoSalida(new CandadoSalida());
         cliente.setClienteContactoList(new ArrayList<>());
         cliente.setAvisoList(new ArrayList<>());
+        cliente.setClienteDomiciliosList(new ArrayList<>());
+        cliente.setPrecioServicioList(new ArrayList<>());
+        
         log.info("Finaliaza proceso para crear un nuevo cliente");
         return cliente;
     }

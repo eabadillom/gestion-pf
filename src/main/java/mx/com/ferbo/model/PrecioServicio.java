@@ -29,16 +29,8 @@ import javax.validation.constraints.NotNull;
 @NamedQuery(name = "PrecioServicio.findByClienteAviso", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.avisoCve.avisoCve = :avisoCve")
 @NamedQuery(name = "PrecioServicio.findByServicioAndAvisoAndCliente", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.avisoCve.avisoCve = :avisoCve and p.servicio.servicioCve = :servicioCve")
 @NamedQuery(name = "PrecioServicio.findByAviso", query = "SELECT p FROM PrecioServicio p WHERE p.avisoCve.avisoCve = :idAviso ORDER BY p.servicio.servicioDs ASC")
-@NamedQuery(name = "PrecioServicio.findAllByClienteAviso", query = "SELECT ps " +
-        "FROM PrecioServicio ps " +
-        "WHERE ps.avisoCve.avisoCve = 1 " +
-        "AND ps.cliente.cteCve = :idCliente " +
-        "AND NOT EXISTS ( " +
-        "   SELECT 1 FROM PrecioServicio t " +
-        "   WHERE t.cliente.cteCve = ps.cliente.cteCve " +
-        "   AND t.servicio.servicioCve = ps.servicio.servicioCve " +
-        "   AND t.avisoCve.avisoCve = :avisoCve " +
-        ")")
+@NamedQuery(name = "PrecioServicio.findByClienteSinAviso", query = "SELECT ps FROM PrecioServicio ps WHERE ps.cliente.cteCve = :cteCve AND ps.avisoCve IS NULL")
+//@NamedQuery(name = "PrecioServicio.findByClienteSinAviso", query = "SELECT ps FROM PrecioServicio ps WHERE ps.cliente.cteCve = :cteCve AND ps.avisoCve IS NOT NULL")
 public class PrecioServicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -66,7 +58,7 @@ public class PrecioServicio implements Serializable {
     @ManyToOne(optional = false)
     private UnidadDeManejo unidad;
 
-    @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve")
+    @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve", nullable = true)
     @ManyToOne(optional = false)
     private Aviso avisoCve;
 

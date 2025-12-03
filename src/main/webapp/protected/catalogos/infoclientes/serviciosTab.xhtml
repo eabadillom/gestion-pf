@@ -20,7 +20,7 @@
 
 
 
-    <p:dataTable id="dtPreciosServicios" widgetVar="dtPreciosServicios" value="#{clientesBean.lstPrecioServicios}" rowKey="#{pServicio.id}"
+    <p:dataTable id="dtPreciosServicios" widgetVar="dtPreciosServicios" value="#{clientesBean.clienteSelected.precioServicioList}" rowKey="#{pServicio.id}"
                  var="pServicio" reflow="true" lazy="false" paginator="true"
                  rows="5" paginatorPosition="bottom">
 

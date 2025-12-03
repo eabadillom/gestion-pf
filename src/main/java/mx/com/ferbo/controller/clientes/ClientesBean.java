@@ -213,18 +213,16 @@ public class ClientesBean implements Serializable {
     }
 
     public void cargarInfoCliente(Cliente cliente) {
-        log.info("El usuario {} consulto la información completa del cliente {}", usuario, cliente.getNombre());
+        log.info("El usuario {} consulta la información completa del cliente {}", usuario.getUsuario(), cliente.getNombre());
         try {
             this.limpiarListasDomicilios();
-            if (cliente == null) {
-                throw new InventarioException("El cliente no puede ser vacío");
-            }
+            FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
 
-            clienteSelected = clienteBL.obtenerTodoCliente(cliente.getCteCve(), true);
+            clienteSelected = clienteBL.obtenerTodoCliente(cliente, true);
             lstRegimenFiscalFiltered = fiscalBL.filtrarRegimenesFiscales(this.lstRegimenFiscal, clienteSelected);
             lstUsoCfdiFiltered = fiscalBL.filtrarCfdis(this.lstUsoCfdi, clienteSelected);
-            lstPrecioServicios = precioServicioBL.obtenerPrecioServiciosPorCliente(clienteSelected, false);
-            lstAvisos = avisoBL.obtenerAvisosPorCliente(clienteSelected);
+            clienteSelected.setAvisoList(avisoBL.obtenerAvisosPorCliente(clienteSelected));
+            clienteSelected.setPrecioServicioList(precioServicioBL.obtenerPorClienteConOSinAviso(clienteSelected, null));
             this.actualizarListasDomicilios();
 
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Fiscal", "Información fiscal cargada");
@@ -244,28 +242,21 @@ public class ClientesBean implements Serializable {
 
     // Funciones para clientes
     public void nuevoCliente() {
-        log.info("El usuario {} ha inicia el proceso para crear un nuevo cliente", usuario);
-        clienteSelected = new Cliente();
-        clienteSelected.setMetodoPago(new MetodoPago());
-        clienteSelected.setRegimenFiscal(new RegimenFiscal());
-        clienteSelected.setUsoCfdi(new UsoCfdi());
-        clienteSelected.setClienteContactoList(new ArrayList<>());
-        clienteSelected.setAvisoList(new ArrayList<>());
-        clienteSelected.setClienteDomiciliosList(new ArrayList<>());
+        log.info("El usuario {} ha inicia el proceso para crear un nuevo cliente", usuario.getUsuario());
+        clienteSelected = clienteBL.nuevoCliente();
         tipoDomicilioSelected = new TiposDomicilio();
-        clienteSelected.setHabilitado(true);
         lstTiposDomicilio = domicilios.buscarTiposDomicilios();
         lstClienteDomicilios.clear();
         lstClienteDomiciliosFiltered.clear();
-        lstPrecioServicios.clear();
     }
 
     public void guardarOActualizarCliente() {
+        log.info("El usuario {} ha comenzado a realizar operaciones con el cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         String mensaje = null;
         try {
             fiscalBL.validarInfoFiscal(clienteSelected);
             mensaje = clienteBL.guardarOActualizar(clienteSelected);
-            log.info("El usuario {} ha hecho la operación de {}", usuario, mensaje);
+            log.info("El usuario {} ha hecho la operación de {}", usuario.getUsuario(), mensaje);
             this.lstClientes = null;
             this.lstClientes = clienteBL.obtenerTodos();
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Cliente", mensaje);
@@ -289,29 +280,18 @@ public class ClientesBean implements Serializable {
 
     // Funciones para Avisos
     public void nuevoAviso() {
-        log.info("El usuario {} ha iniciado la operacion crear un nuevo aviso para el cliente {}", usuario, clienteSelected.getNombre());
+        log.info("El usuario {} ha iniciado la operacion crear un nuevo aviso para el cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         this.avisoSelected = avisoBL.nuevoAviso();
         this.avisoSelected.setCteCve(clienteSelected);
     }
 
     public void cargarServiciosAviso(Aviso aviso) {
+        log.info("El usuario {} ha comenzado a cargar el aviso {}", usuario.getUsuario(), aviso);
         try {
             avisoSelected = aviso;
-
-            Aviso aviso_1 = new Aviso();
-            aviso_1.setAvisoCve(1);
-            PrecioServicio precioServicioAux = new PrecioServicio();
-            
-            precioServicioAux = new PrecioServicio();
-            precioServicioAux.setCliente(clienteSelected);
-            precioServicioAux.setAvisoCve(aviso_1);
-            this.lstPrecioServiciosDisponibles = precioServicioBL.buscarServiciosDisponibles(clienteSelected, avisoSelected);
-
-            precioServicioAux = new PrecioServicio();
-            precioServicioAux.setCliente(clienteSelected);
-            precioServicioAux.setAvisoCve(avisoSelected);
-            avisoSelected.setPrecioServicioList(precioServicioBL.buscarPorCriterios(precioServicioAux));
-            
+            List<PrecioServicio> preciosSinAviso = precioServicioBL.obtenerPorClienteConOSinAviso(clienteSelected, null);
+            avisoSelected.setPrecioServicioList(precioServicioBL.obtenerPorClienteConOSinAviso(clienteSelected, avisoSelected));
+            lstPrecioServiciosDisponibles = precioServicioBL.obtenerDisponibles(preciosSinAviso, avisoSelected.getPrecioServicioList());
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Avisos", "La información cargo exitosamente");
         } catch (InventarioException ex) {
             log.warn("No se pudo extraer la información de los precios de servicios...", ex);
@@ -325,35 +305,36 @@ public class ClientesBean implements Serializable {
     }
 
     public void operarAvisos(String operacion) {
+        log.info("El usuario {} ha comenzado a realizar operaciones con los avisos del cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         String mensaje = null;
         try {
             switch (operacion) {
                 case "agregaraviso":
                     verificarAgregadoOActualizado(avisoSelected.getAvisoCve());
-                    avisoBL.agregarOActualizarAviso(clienteSelected, avisoSelected, lstAvisos);
-                    lstPrecioServicios = precioServicioBL.obtenerPrecioServiciosPorCliente(clienteSelected, false);
+                    avisoBL.agregarOActualizarAviso(clienteSelected, avisoSelected);
+                    clienteSelected.setPrecioServicioList(precioServicioBL.obtenerPorClienteConOSinAviso(clienteSelected, null));
                     mensaje = "Aviso " + agregadoOActualizado + " exitosamente";
                     break;
 
                 case "agregarservicio":
-                    avisoBL.agregarServicioAviso(avisoSelected, clienteSelected, lstPrecioServiciosDisponibles, seleccionadosParaAgregar, avisoSelected.getPrecioServicioList());
+                    avisoBL.agregarServicioAviso(avisoSelected, clienteSelected, lstPrecioServiciosDisponibles, seleccionadosParaAgregar);
                     mensaje = "Servico agregado al aviso exitosamente";
                     break;
 
                 case "eliminaraviso":
-                    avisoBL.eliminaAviso(clienteSelected, avisoSelected, lstAvisos);
+                    avisoBL.eliminaAviso(clienteSelected, avisoSelected);
                     mensaje = "Aviso eliminado exitosamente";
                     break;
 
                 case "eliminarservicio":
-                    avisoBL.eliminarServicioAviso(avisoSelected.getPrecioServicioList(), precioAvisoSelected,  lstPrecioServiciosDisponibles);
+                    avisoBL.eliminarServicioAviso(avisoSelected, precioAvisoSelected, lstPrecioServiciosDisponibles);
                     mensaje = "Servicio de aviso eliminado exitosamente";
                     break;
 
                 default:
                     throw new InventarioException("Operación sobre avisos no válida");
             }
-            log.info("El usuario {} ha relalizaddo {}", usuario, mensaje);
+            log.info("El usuario {} ha relalizaddo {}", usuario.getUsuario(), mensaje);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Aviso", mensaje);
         } catch (InventarioException ex) {
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Aviso", ex.getMessage());
@@ -419,23 +400,26 @@ public class ClientesBean implements Serializable {
 
     // Metodos exclusivos de servicios
     public void nuevoPrecioServicio() {
+        log.info("El usuario {} ha comenzado a crear un nuevo precio servicio para el cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         precioServicioSelected = precioServicioBL.nuevoPrecioServicio(clienteSelected);
     }
 
     public void operarServicios(String operacion) {
+        log.info("El usuario {} ha comenzado a hacer operaciones con los precios de servicios del cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         String mensaje = null;
         try {
             switch (operacion) {
                 case "agregarprecioservicio":
                     verificarAgregadoOActualizado(precioServicioSelected.getId());
-                    precioServicioBL.agregarOActualizarPrecioServicio(clienteSelected, precioServicioSelected, lstPrecioServicios);
+                    precioServicioBL.agregarOActualizarPrecioServicio(clienteSelected, precioServicioSelected);
                     mensaje = "Servicio " + agregadoOActualizado + " exitosamente";
                     break;
                 case "eliminarprecioservicio":
-                    precioServicioBL.eliminarPrecioServicio(lstPrecioServicios, this.precioServicioSelected);
+                    precioServicioBL.eliminarPrecioServicio(clienteSelected, this.precioServicioSelected);
                     mensaje = "Servicio eliminado exitosamente";
                     break;
             }
+            log.info("El usuario {} ha realizado {}", usuario.getUsuario(), mensaje);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Servicio", mensaje);
         } catch (InventarioException ex) {
             log.warn(ex);
@@ -449,18 +433,19 @@ public class ClientesBean implements Serializable {
         }
     }
 
-
-
     // Metodos exclusivos para contactos
     public void nuevoClienteContacto() {
+        log.info("El usuario {} ha creado un nuevo contacto para el cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         this.clienteContactoSelected = contactoBL.nuevoClienteContacto();
     }
 
     public void nuevoMedioContacto() {
+        log.info("El usuario {} ha creado un nuevo medio de contacto para el contacto {} {}", usuario.getUsuario(), clienteContactoSelected.getIdContacto().getNbNombre(), clienteContactoSelected.getIdContacto().getNbApellido1());
         this.medioCntSelected = medioContactoBL.nuevoMedio();
     }
 
     public void operarContactos(String operacion) {
+        log.info("El usuario {} ha comenzado a hacer operaciones con los contactos del cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         String mensaje = null;
         try {
 
@@ -497,12 +482,13 @@ public class ClientesBean implements Serializable {
                 default:
                     throw new InventarioException("Sin operación valida para contactos");
             }
+            log.info("El usuario {} ha realizado {}", usuario.getUsuario(), mensaje);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Contacto", mensaje);
         } catch (InventarioException ex) {
             log.warn(ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Contacto", ex.getMessage());
         } catch (Exception ex) {
-            log.error(ex);
+            log.error(ex.getMessage());
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Contacto", "Contacte con el admistrador del sistema.");
         } finally {
             PrimeFaces.current().ajax().update("form:messages");
@@ -797,8 +783,6 @@ public class ClientesBean implements Serializable {
     public void setLstAvisos(List<Aviso> lstAvisos) {
         this.lstAvisos = lstAvisos;
     }
-    
-    
 
     // Getter y Setter para Fiscal
     public List<UsoCfdi> getLstUsoCfdi() {
