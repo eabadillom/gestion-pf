@@ -343,7 +343,7 @@
 					
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Aceptar" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.updateDetallePartida()}" onclick="PF('dlgDetalleP').hide()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" update="form:datosGenerales:tabProductos">
+					<p:commandButton value="Aceptar" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.updateDetallePartida()}" onclick="PF('dlgDetalleP').hide()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" update="form:datosGenerales:dlg-partidas">
 					</p:commandButton>
 					<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dlgDetalleP').hide()" styleClass="ui-button-secondary"></p:commandButton>
 				</f:facet>
