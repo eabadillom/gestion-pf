@@ -24,8 +24,6 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import mx.com.ferbo.dao.*;
-import mx.com.ferbo.model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
@@ -35,6 +33,22 @@ import org.primefaces.model.StreamedContent;
 import com.ferbo.facturama.tools.FacturamaException;
 
 import mx.com.ferbo.business.FacturamaBL;
+import mx.com.ferbo.dao.FacturaMedioPagoDAO;
+import mx.com.ferbo.dao.MedioPagoDAO;
+import mx.com.ferbo.dao.MetodoPagoDAO;
+import mx.com.ferbo.dao.StatusFacturaDAO;
+import mx.com.ferbo.dao.UsoCfdiDAO;
+import mx.com.ferbo.dao.n.FacturaDAO;
+import mx.com.ferbo.model.CancelaFactura;
+import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.FacturaMedioPago;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.StatusFactura;
+import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.CacertsPath;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -58,12 +72,10 @@ public class FacMantenimentoBean implements Serializable {
 	private List<UsoCfdi> usosCFDI;
 
 	private List<Factura> listFac;
-	private FacturaDAO daoFac;
 	private Factura seleccion;
 	private FacturaMedioPagoDAO factMedioPagoDAO;
 	
 	private CancelaFactura cancelaFactura = null;
-	private CancelaFacturaDAO cancelaDAO = null;
 	private MetodoPagoDAO metodoPagoDAO;
 	private MedioPagoDAO medioPagoDAO;
 	private UsoCfdiDAO   usoCfdiDAO;
@@ -80,15 +92,15 @@ public class FacMantenimentoBean implements Serializable {
 
 	private StreamedContent file;
 	private Usuario usuario;
+	private FacturaDAO facturaDAO;
 
 	public FacMantenimentoBean() {
 		seleccion = new Factura();
-		daoFac = new FacturaDAO();
 		medioPagoDAO = new MedioPagoDAO();
 		metodoPagoDAO = new MetodoPagoDAO();
 		usoCfdiDAO = new UsoCfdiDAO();
-		cancelaDAO = new CancelaFacturaDAO();
 		factMedioPagoDAO = new FacturaMedioPagoDAO();
+		facturaDAO = new FacturaDAO();
 		listFac = new ArrayList<Factura>();
 		listClientes = new ArrayList<>();
 		listaMedioPago = new ArrayList<MedioPago>();
@@ -120,9 +132,9 @@ public class FacMantenimentoBean implements Serializable {
 	public void findFacture() {
 
 		if (clienteSelect == null) {
-			listFac = daoFac.buscaFacturas(de, this.hasta, true);
+			listFac = facturaDAO.buscaFacturas(this.de, this.hasta, true);
 		} else {
-			listFac = daoFac.buscaFacturas(clienteSelect, de, this.hasta, true);
+			listFac = facturaDAO.buscaFacturas(this.clienteSelect, this.de, this.hasta, true);
 		}
 	}
 
@@ -140,41 +152,38 @@ public class FacMantenimentoBean implements Serializable {
 		MedioPago mp = null;
 		
 		FacturaMedioPago factMedioPago = null;
+		
 		try {
+			
 			mp = medioPagoDAO.buscarPorId(idMedioPagoSelected);
 			factMedioPago = factMedioPagoDAO.buscarPorFactura(seleccion.getId());
 			factMedioPago.setMpDescripcion(mp.getMpDescripcion());
 			factMedioPago.setMpId(mp);
-			//seleccion.setFecha(fechaModificada);
 			
 			seleccion.setMetodoPago(cdMetodoPagoSelected);
-			if(factMedioPagoDAO.actualizar(factMedioPago ) == null && daoFac.actualizarFechaFactura(seleccion) == null) {
-				mensaje = String.format("Factura %s-%s actualizada correctamente", seleccion.getNomSerie(), seleccion.getNumero());
-				severity = FacesMessage.SEVERITY_INFO;
-				PrimeFaces.current().executeScript("PF('dg-factura').hide()");
-			}else {
-				mensaje = "Problema para actualizar la factura";
-				severity = FacesMessage.SEVERITY_ERROR;
-			}
+			
+			facturaDAO.actualizar(seleccion);
+			
+			mensaje = String.format("Factura %s-%s actualizada correctamente", seleccion.getNomSerie(), seleccion.getNumero());
+			severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('dg-factura').hide()");
+			
 		} catch (Exception e) {
 			log.error("Ocurrió un problema en la actualización de la factura...", e);
+			mensaje = "Problema para actualizar la factura";
+			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			message = new FacesMessage(severity, "Actualizacion", mensaje );
+			message = new FacesMessage(severity, "Actualización", mensaje );
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages");
-
 		}
-		
-		
-		
-		
 	}
 	
 	public void datosCliente() {
 		
 		consultarPagos();
 		
-		Factura fact = this.daoFac.buscarPorId(seleccion.getId(), true);		
+		Factura fact = facturaDAO.buscarPorId(seleccion.getId(), true);		
 		this.idMedioPagoSelected = fact.getFacturaMedioPagoList().get(0).getMpId().getMpId();
 		this.cdMetodoPagoSelected = this.seleccion.getMetodoPago();
 		this.usoCFDI = usoCfdiDAO.buscarPorId(seleccion.getCdUsoCfdi());
@@ -190,23 +199,18 @@ public class FacMantenimentoBean implements Serializable {
 			StatusFacturaDAO statusDAO = new StatusFacturaDAO();
 			StatusFactura statusCancelada = statusDAO.buscarPorId(StatusFactura.STATUS_CANCELADA);
 			this.seleccion.setStatus(statusCancelada);
+			this.seleccion.setCancelaFactura(cancelaFactura);
 			this.cancelaFactura.setFactura(seleccion);
 
-			respuesta = daoFac.actualizaStatus(seleccion);
-			if (respuesta != null)
-				throw new InventarioException("Error al cancelar la factura.");
-
-			respuesta = cancelaDAO.guardar(cancelaFactura);
-			if (respuesta != null)
-				throw new InventarioException("Error al cancelar la factura.");
+			facturaDAO.actualizar(seleccion);
 
 			if (clienteSelect == null)
-				listFac = daoFac.buscaFacturas(de, actual, true);
+				listFac = facturaDAO.buscaFacturas(this.de, this.actual, true);
 			else
-				listFac = daoFac.buscaFacturas(clienteSelect, de, actual, true);
+				listFac = facturaDAO.buscaFacturas(this.clienteSelect, this.de, this.actual, true);
 
-			seleccion = new Factura();
-			cancelaFactura = null;
+			this.seleccion = new Factura();
+			this.cancelaFactura = null;
 
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "La factura se canceló correctamente.";
@@ -298,10 +302,10 @@ public class FacMantenimentoBean implements Serializable {
 		FacturamaBL facturamaBO = new FacturamaBL(factura.getId(), this.usuario);
 		try {
 			log.info("Timbrando factura: {}...", factura);
+			CacertsPath.showCacertsPath();
 			facturamaBO.timbrar();
 			facturamaBO.sendMail();
 			log.info("Timbrado completado correctamente.");
-			// this.findFacture();
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se generó correctamente";
 		} catch (FacturamaException e) {

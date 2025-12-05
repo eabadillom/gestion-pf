@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteFacturaServicios" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="aca071e1-4e54-4cc7-9e4e-105bc8dbbad9">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_Desarrollo.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_local.jrdax"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#FAF0F0"/>
@@ -178,7 +178,7 @@ from (
 	    fac.id as idFactura,
 	    fac.numero,
 	    fac.nom_serie,
-	    cl.cte_cve,
+	    fac.cliente,
 	    fac.nombre_cliente as nombre_cliente,
 	    fac.fecha as fecha,
 		fac.pais,
@@ -190,7 +190,7 @@ from (
 		fac.num_ext,
 		fac.num_int,
 		fac.cp,
-		cl.cte_rfc as rfc,
+		fac.rfc as rfc,
 	    cf.folio_cliente as constancia,
 	    cf.vigencia_inicio as ingreso,
 	    cf.vigencia_fin as vencimiento,
@@ -222,17 +222,13 @@ from (
 	from  factura fac
 	inner join constancia_factura cf on cf.factura = fac.id
 	inner join servicio_constancia sc on sc.constancia = cf.id 
-	inner join constancia_de_deposito cd on cd.folio = cf.folio
-	inner join aviso avi on avi.aviso_cve = cd.aviso_cve
-	inner join cliente cl on cl.cte_cve = fac.cliente
-	where
-	      fac.id = $P{idFactura}
+	where fac.id = $P{idFactura}
 	GROUP BY
 	    fac.id,
 	    fac.numero,
 	    fac.nom_serie,
-	    cl.cte_cve,
-	    constancia,
+	    fac.cliente,
+	    cf.folio_cliente ,
 	    ingreso,
 	    vencimiento,
 	    nombre_cliente,
@@ -246,7 +242,7 @@ from (
 		fac.num_ext,
 		fac.num_int,
 		fac.cp,
-	    rfc,
+	    fac.rfc,
 	    servicio,
 	    cuota,
 	    tipoCobro,
@@ -254,7 +250,7 @@ from (
 	    iva,
 	    total, 
 	    montoLetra,
-	    retencion,
+	    fac.retencion,
 	    planta,
 	    metodo_pago,
 	    fac.tp_persona,
@@ -272,7 +268,7 @@ from (
 	    f.id as idFactura,
 	    f.numero,
 	    f.nom_serie,
-	    cl.cte_cve,
+	    f.cliente,
 	    f.nombre_cliente as nombre_cliente,
 	    f.fecha as fecha,
 	    f.pais,
@@ -284,7 +280,7 @@ from (
 		f.num_ext,
 		f.num_int,
 		f.cp,
-	    cl.cte_rfc as rfc,
+	    f.rfc as rfc,
 	    cf.folio_cliente as constancia,
 	    csrv.fecha as ingreso,
 	    csrv.fecha as vencimiento,
@@ -313,17 +309,14 @@ from (
 	    
 	from factura f
 	inner join constancia_factura_ds cf on cf.factura = f.id
-	inner join constancia_de_servicio csrv ON cf.folio = csrv.folio 
+	inner join constancia_de_servicio csrv ON cf.folio = csrv.folio
 	inner join servicio_constancia_ds sc on sc.constancia = cf.id
-	inner join constancia_de_servicio cs on cs.folio = cf.folio
-	inner join cliente cl on cl.cte_cve = f.cliente
-	where 
-	      f.id = $P{idFactura}
+	where f.id = $P{idFactura}
 	GROUP BY
 	    f.id,
 	    f.numero,
 	    f.nom_serie,
-	    cl.CTE_CVE,
+	    f.cliente,
 	    cf.folio_cliente,
 	    ingreso,
 	    vencimiento,
@@ -338,7 +331,7 @@ from (
 		f.num_ext,
 		f.num_int,
 		f.cp,
-	    cl.cte_rfc,
+	    f.rfc,
 	    servicio,
 	    cuota,
 	    tipoCobro,
@@ -364,7 +357,7 @@ from (
         f.id as idFactura,
 		f.numero,
 		f.nom_serie,
-		cl.cte_cve,
+		f.cliente,
 		f.nombre_cliente as nombre_cliente,
 		f.fecha,
 		f.pais,
@@ -376,7 +369,7 @@ from (
 		f.num_ext,
 		f.num_int,
 		f.cp,
-		cl.cte_rfc as rfc,
+		f.rfc as rfc,
 		'N/A' AS constancia,
 		f.inicio_servicios as ingreso,
 		f.fin_servicios as vencimiento,
@@ -401,15 +394,15 @@ from (
 	    f.nb_lugar_exp
     FROM factura f
     INNER JOIN servicio_factura sf ON sf.factura = f.id
-    inner join cliente cl on cl.cte_cve = f.cliente
-    WHERE
-    	f.id = $P{idFactura}
+    WHERE f.id = $P{idFactura}
 ) tFactura
 inner join planta plt ON tFactura.planta = plt.planta_cve
 inner join metodo_pago mp ON tFactura.metodo_pago = mp.cd_metodo_pago 
 inner join regimen_fiscal erf ON tFactura.emi_cd_regimen = erf.cd_regimen 
 inner join regimen_fiscal rrf On tFactura.cd_regimen = rrf.cd_regimen
-inner join uso_cfdi ucfdi ON tFactura.cd_uso_cfdi = ucfdi.cd_uso_cfdi]]>
+inner join uso_cfdi ucfdi ON tFactura.cd_uso_cfdi = ucfdi.cd_uso_cfdi
+
+]]>
 	</queryString>
 	<field name="idFactura" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="idFactura"/>

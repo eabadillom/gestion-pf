@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +23,7 @@ import com.ferbo.mail.beans.Adjunto;
 
 import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.FacturaDAO;
+import mx.com.ferbo.model.Cfdi;
 import mx.com.ferbo.model.ClaveUnidad;
 import mx.com.ferbo.model.ConstanciaFactura;
 import mx.com.ferbo.model.ConstanciaFacturaDs;
@@ -33,6 +35,8 @@ import mx.com.ferbo.model.ServicioFactura;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.InventarioException;
+
+
 
 public class FacturamaBL {
 	
@@ -207,8 +211,22 @@ public class FacturamaBL {
 		cfdi.setItems(conceptos);
 		
 		CfdiInfoModel registra = cfdiBL.registra(cfdi);
-		factura.setUuid(registra.getId());
-		facturaDAO.actualizarUuid(factura);
+		
+		String idPac             = registra.getId();
+		String uuid              = registra.getComplement().getTaxStamp().getUuid();
+		Date   fecha             = DateUtil.getDate(registra.getComplement().getTaxStamp().getDate(),DateUtil.FORMATO_ISO_8601);
+		String numCertificadoSAT = registra.getComplement().getTaxStamp().getSatCertNumber();
+		
+		factura.setUuid(idPac); //ID del PAC.
+		factura.setCfdi(new Cfdi());
+		factura.getCfdi().setFactura(factura);
+		factura.getCfdi().setUuid(uuid); //ID del CFDI (SAT).
+		factura.getCfdi().setFecha(fecha);
+		factura.getCfdi().setCertificadoSAT(numCertificadoSAT);
+		
+//		facturaDAO.actualizarUuid(factura);
+		
+		new mx.com.ferbo.dao.n.FacturaDAO().actualizar(factura);
 	}
 	
 	public void sendMail() throws FacturamaException {

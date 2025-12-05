@@ -22,11 +22,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.bouncycastle.util.Objects;
 
 @Entity
 @Table(name = "factura")
@@ -298,22 +301,28 @@ public class Factura implements Serializable {
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }, mappedBy = "factura")
     private List<Pago> pagoList;
 
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "facturaMedioPagoPK.facturaId")
     private List<FacturaMedioPago> facturaMedioPagoList;
 
-    @OneToMany(cascade = { CascadeType.PERSIST }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "factura")
     private List<ServicioFactura> servicioFacturaList;
 
-    @OneToMany(cascade = { CascadeType.PERSIST }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "factura")
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
 
-    @OneToMany(cascade = { CascadeType.PERSIST }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "factura")
     private List<ConstanciaFactura> constanciaFacturaList;
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "notaPorFacturaPK.factura")
     private List<NotaPorFactura> notaFacturaList;
+    
+    @OneToOne(cascade = {CascadeType.MERGE}, mappedBy = "factura")
+    private Cfdi cfdi;
+    
+    @OneToOne(cascade = {CascadeType.MERGE}, mappedBy = "factura")
+    private CancelaFactura cancelaFactura;
 
-    public Factura() {
+	public Factura() {
     }
 
     public Factura(Integer id) {
@@ -371,6 +380,31 @@ public class Factura implements Serializable {
         this.emisorRFC = emisorRFC;
         this.emisorCdRegimen = emisorCdRegimen;
 
+    }
+    
+    @Override
+    public int hashCode() {
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.id);
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+    	// TODO: Warning - this method won't work in the case the id fields are not set
+    	if (!(object instanceof Factura)) {
+    		return false;
+    	}
+    	Factura other = (Factura) object;
+    	if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+    		return false;
+    	}
+    	return true;
+    }
+    
+    @Override
+    public String toString() {
+    	return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
     }
 
     public Integer getId() {
@@ -757,36 +791,27 @@ public class Factura implements Serializable {
         this.notaFacturaList = notaFacturaList;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    public Cfdi getCfdi() {
+    	return cfdi;
     }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Factura)) {
-            return false;
-        }
-        Factura other = (Factura) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+    
+    public void setCfdi(Cfdi cfdi) {
+    	this.cfdi = cfdi;
     }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
-    }
-
+    
     public String getLugarExpedicion() {
-        return lugarExpedicion;
+    	return lugarExpedicion;
     }
-
+    
     public void setLugarExpedicion(String emisorCodigoPostal) {
-        this.lugarExpedicion = emisorCodigoPostal;
+    	this.lugarExpedicion = emisorCodigoPostal;
     }
+    
+    public CancelaFactura getCancelaFactura() {
+		return cancelaFactura;
+	}
+
+	public void setCancelaFactura(CancelaFactura cancelaFactura) {
+		this.cancelaFactura = cancelaFactura;
+	}
 }
