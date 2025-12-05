@@ -48,7 +48,6 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
-import mx.com.ferbo.util.CacertsPath;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -302,7 +301,6 @@ public class FacMantenimentoBean implements Serializable {
 		FacturamaBL facturamaBO = new FacturamaBL(factura.getId(), this.usuario);
 		try {
 			log.info("Timbrando factura: {}...", factura);
-			CacertsPath.showCacertsPath();
 			facturamaBO.timbrar();
 			facturamaBO.sendMail();
 			log.info("Timbrado completado correctamente.");
