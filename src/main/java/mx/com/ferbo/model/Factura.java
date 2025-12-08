@@ -37,35 +37,8 @@ import org.bouncycastle.util.Objects;
         @NamedQuery(name = "Factura.findAll", query = "SELECT f FROM Factura f"),
         @NamedQuery(name = "Factura.findById", query = "SELECT f FROM Factura f WHERE f.id = :id"),
         @NamedQuery(name = "Factura.findByNumero", query = "SELECT f FROM Factura f WHERE f.numero = :numero"),
-        @NamedQuery(name = "Factura.findByMoneda", query = "SELECT f FROM Factura f WHERE f.moneda = :moneda"),
-        @NamedQuery(name = "Factura.findByRfc", query = "SELECT f FROM Factura f WHERE f.rfc = :rfc"),
-        @NamedQuery(name = "Factura.findByNombreCliente", query = "SELECT f FROM Factura f WHERE f.nombreCliente = :nombreCliente"),
-        @NamedQuery(name = "Factura.findByFecha", query = "SELECT f FROM Factura f WHERE f.fecha = :fecha"),
-        @NamedQuery(name = "Factura.findByObservacion", query = "SELECT f FROM Factura f WHERE f.observacion = :observacion"),
-        @NamedQuery(name = "Factura.findBySubtotal", query = "SELECT f FROM Factura f WHERE f.subtotal = :subtotal"),
-        @NamedQuery(name = "Factura.findByIva", query = "SELECT f FROM Factura f WHERE f.iva = :iva"),
-        @NamedQuery(name = "Factura.findByTotal", query = "SELECT f FROM Factura f WHERE f.total = :total"),
-        @NamedQuery(name = "Factura.findByPais", query = "SELECT f FROM Factura f WHERE f.pais = :pais"),
-        @NamedQuery(name = "Factura.findByEstado", query = "SELECT f FROM Factura f WHERE f.estado = :estado"),
-        @NamedQuery(name = "Factura.findByMunicipio", query = "SELECT f FROM Factura f WHERE f.municipio = :municipio"),
-        @NamedQuery(name = "Factura.findByCiudad", query = "SELECT f FROM Factura f WHERE f.ciudad = :ciudad"),
-        @NamedQuery(name = "Factura.findByColonia", query = "SELECT f FROM Factura f WHERE f.colonia = :colonia"),
-        @NamedQuery(name = "Factura.findByCp", query = "SELECT f FROM Factura f WHERE f.cp = :cp"),
-        @NamedQuery(name = "Factura.findByCalle", query = "SELECT f FROM Factura f WHERE f.calle = :calle"),
-        @NamedQuery(name = "Factura.findByNumExt", query = "SELECT f FROM Factura f WHERE f.numExt = :numExt"),
-        @NamedQuery(name = "Factura.findByNumInt", query = "SELECT f FROM Factura f WHERE f.numInt = :numInt"),
-        @NamedQuery(name = "Factura.findByTelefono", query = "SELECT f FROM Factura f WHERE f.telefono = :telefono"),
-        @NamedQuery(name = "Factura.findByFax", query = "SELECT f FROM Factura f WHERE f.fax = :fax"),
-        @NamedQuery(name = "Factura.findByPorcentajeIva", query = "SELECT f FROM Factura f WHERE f.porcentajeIva = :porcentajeIva"),
-        @NamedQuery(name = "Factura.findByNumeroCliente", query = "SELECT f FROM Factura f WHERE f.numeroCliente = :numeroCliente"),
-        @NamedQuery(name = "Factura.findByValorDeclarado", query = "SELECT f FROM Factura f WHERE f.valorDeclarado = :valorDeclarado"),
-        @NamedQuery(name = "Factura.findByInicioServicios", query = "SELECT f FROM Factura f WHERE f.inicioServicios = :inicioServicios"),
-        @NamedQuery(name = "Factura.findByFinServicios", query = "SELECT f FROM Factura f WHERE f.finServicios = :finServicios"),
-        @NamedQuery(name = "Factura.findByMontoLetra", query = "SELECT f FROM Factura f WHERE f.montoLetra = :montoLetra"),
-        @NamedQuery(name = "Factura.findByPlazo", query = "SELECT f FROM Factura f WHERE f.plazo = :plazo"),
         @NamedQuery(name = "Factura.findByCliente", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente"),
         @NamedQuery(name = "Factura.findByClienteStatusFactura", query = "SELECT f FROM Factura f WHERE f.cliente.cteCve = :clienteCve and f.status.id = :status"),
-        @NamedQuery(name = "Factura.findByRetencion", query = "SELECT f FROM Factura f WHERE f.retencion = :retencion"),
         @NamedQuery(name = "Factura.findByPeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
         @NamedQuery(name = "Factura.findByClientePeriodo", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente AND f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
         @NamedQuery(name = "Factura.findByNomSerie", query = "SELECT f FROM Factura f WHERE f.nomSerie = :nomSerie"),
@@ -73,11 +46,9 @@ import org.bouncycastle.util.Objects;
         @NamedQuery(name = "Factura.findActivasBySerieNumero", query = "SELECT f FROM Factura f WHERE f.status NOT IN (0,2) AND f.numero = :numero AND f.nomSerie = :serie"),
         @NamedQuery(name = "Factura.findByPlanta", query = "SELECT f FROM Factura f WHERE f.planta.plantaCve = :plantaCve"),
         @NamedQuery(name = "Factura.findByStatusFacturaClientePeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin AND f.cliente.cteCve = :idCliente AND f.status.id = :idStatusFactura ORDER BY f.fecha, f.nomSerie, f.numero"),
-        @NamedQuery(name = "Factura.findByFolioDeposito", query = "SELECT f " +
-                "FROM ConstanciaDeDeposito cdd " +
-                "INNER JOIN cdd.constanciaFacturaList cf " +
-                "INNER JOIN cf.factura f " +
-                "WHERE cdd.folio = :folio") })
+        @NamedQuery(name = "Factura.findByFolioDeposito", query = "SELECT f FROM ConstanciaDeDeposito cdd INNER JOIN cdd.constanciaFacturaList cf INNER JOIN cf.factura f WHERE cdd.folio = :folio"),
+        @NamedQuery(name = "Factura.findByCliente?Periodo", query = "SELECT f FROM Factura f WHERE (f.cfdi IS NULL) AND  (f.fecha BETWEEN :fechaInicio AND :fechaFin) AND (f.cliente.cteCve = :idCliente OR :idCliente IS NULL) ORDER BY f.fecha")
+        })
 public class Factura implements Serializable {
 
     private static final long serialVersionUID = 1L;

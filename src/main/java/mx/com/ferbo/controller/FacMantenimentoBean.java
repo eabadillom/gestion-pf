@@ -30,6 +30,8 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import com.ferbo.facturama.business.CfdiBL;
+import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
 
 import mx.com.ferbo.business.FacturamaBL;
@@ -40,6 +42,7 @@ import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.UsoCfdiDAO;
 import mx.com.ferbo.dao.n.FacturaDAO;
 import mx.com.ferbo.model.CancelaFactura;
+import mx.com.ferbo.model.Cfdi;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturaMedioPago;
@@ -48,6 +51,7 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.CfdiUtils;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -335,11 +339,22 @@ public class FacMantenimentoBean implements Serializable {
 		Integer idCliente = null;
 		Date fechaInicio = null;
 		Date fechaFin = null;
-
+		
+		List<Factura> facturas = null;
+		
 		try {
 			idCliente = this.clienteSelect == null ? null : this.clienteSelect.getCteCve();
 			fechaInicio = this.de;
 			fechaFin = this.hasta;
+			
+			facturas = facturaDAO.consultaFacturas(idCliente, fechaInicio, fechaFin);
+			
+			for(Factura factura : facturas) {
+				
+				this.leerXML(factura);
+				
+				
+			}
 
 			jasperPath = "/jasper/consulta_facturacion.jrxml";
 			filename = String.format("consulta_facturacion.xls");
@@ -372,6 +387,26 @@ public class FacMantenimentoBean implements Serializable {
 			PrimeFaces.current().ajax().update("frmFactura:file-factura");
 		}
 
+	}
+
+	private void leerXML(Factura factura) {
+		
+		CfdiBL cfdiBO = null;
+		FileViewModel fileXML = null;
+		String cfdiUUID = null;
+		cfdiBO = new CfdiBL();
+		
+		log.info("Factura: {}", factura);
+		try {
+			fileXML = cfdiBO.getFile("xml", "issuedLite", factura.getUuid());
+			cfdiUUID = CfdiUtils.getCFDIUUIDFromString(fileXML.getContent());
+			log.info("UUID: {}", cfdiUUID);
+		} catch (FacturamaException ex) {
+			log.error("Problema para obtener la información del CFID...", ex);
+		} catch(Exception ex) {
+			log.error("Problema para obtener la información del CFID...", ex);
+		}
+		
 	}
 
 	public void setFolioFactura(Factura factura) {

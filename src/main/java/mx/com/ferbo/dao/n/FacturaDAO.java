@@ -172,5 +172,36 @@ public class FacturaDAO extends BaseDAO <Factura, Integer>{
 		
 		return list;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Factura> consultaFacturas(Integer idCliente, Date fechaInicio, Date fechaFin) {
+		List<Factura> facturas = null;
+		EntityManager em = null;
+		
+		try {
+			
+			
+			em = this.getEntityManager();
+			
+			facturas = em.createNativeQuery("SELECT f.* FROM factura f\n"
+					+ "LEFT OUTER JOIN cfdi c ON f.id = c.id_factura\n"
+					+ "WHERE (c.cfdi_id IS NULL)\n"
+					+ "AND (f.uuid IS NOT NULL)\n"
+					+ "AND (f.fecha BETWEEN :fechaInicio AND :fechaFin)\n"
+					+ "AND (f.cliente = :idCliente OR :idCliente IS NULL)", modelClass)
+					
+					.setParameter("idCliente", idCliente)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.getResultList();
+					
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de facturas...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return facturas;
+	}
     
 }

@@ -43,7 +43,10 @@ public class Cfdi {
 	@Basic(optional = false)
 	@Size(max = 20)
 	private String certificadoSAT;
-
+	
+	public Cfdi() {
+	}
+	
 	@Override
 	public int hashCode() {
 		if(this.id == null)
@@ -67,7 +70,7 @@ public class Cfdi {
 	public String toString() {
 		return "Cfdi [id=" + id + "]";
 	}
-
+	
 	public Integer getId() {
 		return id;
 	}
@@ -106,5 +109,57 @@ public class Cfdi {
 
 	public void setCertificadoSAT(String certificadoSAT) {
 		this.certificadoSAT = certificadoSAT;
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	private Cfdi(Builder builder) {
+		this.id = builder.id;
+		this.factura = builder.factura;
+		this.uuid = builder.uuid;
+		this.fecha = builder.fecha;
+		this.certificadoSAT = builder.certificadoSAT;
+	}
+
+	public static final class Builder {
+		private Integer id;
+		private Factura factura;
+		private String uuid;
+		private Date fecha;
+		private String certificadoSAT;
+
+		private Builder() {
+		}
+
+		public Builder id(Integer id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder factura(Factura factura) {
+			this.factura = factura;
+			return this;
+		}
+
+		public Builder uuid(String uuid) {
+			this.uuid = uuid;
+			return this;
+		}
+
+		public Builder fecha(Date fecha) {
+			this.fecha = fecha;
+			return this;
+		}
+
+		public Builder certificadoSAT(String certificadoSAT) {
+			this.certificadoSAT = certificadoSAT;
+			return this;
+		}
+
+		public Cfdi build() {
+			return new Cfdi(this);
+		}
 	}
 }
