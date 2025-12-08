@@ -65,12 +65,12 @@ public class Cfdi {
 		Cfdi other = (Cfdi) obj;
 		return Objects.equals(id, other.id);
 	}
-
+	
 	@Override
 	public String toString() {
-		return "Cfdi [id=" + id + "]";
+		return "Cfdi [id=" + id + ", uuid=" + uuid + ", fecha=" + fecha + ", certificadoSAT=" + certificadoSAT + "]";
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}

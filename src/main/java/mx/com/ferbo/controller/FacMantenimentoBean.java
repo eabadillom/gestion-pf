@@ -393,14 +393,14 @@ public class FacMantenimentoBean implements Serializable {
 		
 		CfdiBL cfdiBO = null;
 		FileViewModel fileXML = null;
-		String cfdiUUID = null;
 		cfdiBO = new CfdiBL();
+		Cfdi cfdi = null;
 		
 		log.info("Factura: {}", factura);
 		try {
 			fileXML = cfdiBO.getFile("xml", "issuedLite", factura.getUuid());
-			cfdiUUID = CfdiUtils.getCFDIUUIDFromString(fileXML.getContent());
-			log.info("UUID: {}", cfdiUUID);
+			cfdi = CfdiUtils.getCFDIUUIDFromString(fileXML.getContent());
+			log.info("UUID: {}", cfdi);
 		} catch (FacturamaException ex) {
 			log.error("Problema para obtener la información del CFID...", ex);
 		} catch(Exception ex) {

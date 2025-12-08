@@ -218,13 +218,12 @@ public class FacturamaBL {
 		String numCertificadoSAT = registra.getComplement().getTaxStamp().getSatCertNumber();
 		
 		factura.setUuid(idPac); //ID del PAC.
-		factura.setCfdi(new Cfdi());
-		factura.getCfdi().setFactura(factura);
-		factura.getCfdi().setUuid(uuid); //ID del CFDI (SAT).
-		factura.getCfdi().setFecha(fecha);
-		factura.getCfdi().setCertificadoSAT(numCertificadoSAT);
-		
-//		facturaDAO.actualizarUuid(factura);
+		factura.setCfdi(Cfdi.builder()
+				.factura(factura)
+				.uuid(uuid)
+				.fecha(fecha)
+				.certificadoSAT(numCertificadoSAT)
+				.build());
 		
 		new mx.com.ferbo.dao.n.FacturaDAO().actualizar(factura);
 	}
