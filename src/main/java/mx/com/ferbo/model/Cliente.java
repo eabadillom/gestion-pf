@@ -115,9 +115,6 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaServicios> constanciaServiciosList;
     
-    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
-    private List<Factura> facturaList;
-    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ProductoPorCliente> productoPorClienteList;
     
@@ -292,14 +289,6 @@ public class Cliente implements Serializable {
 
     public void setConstanciaServiciosList(List<ConstanciaServicios> constanciaServiciosList) {
         this.constanciaServiciosList = constanciaServiciosList;
-    }
-
-    public List<Factura> getFacturaList() {
-        return facturaList;
-    }
-
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
     }
 
     public List<ProductoPorCliente> getProductoPorClienteList() {

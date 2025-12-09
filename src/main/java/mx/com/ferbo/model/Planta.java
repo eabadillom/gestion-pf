@@ -69,9 +69,6 @@ public class Planta implements Serializable {
 	@OneToMany(mappedBy = "serieConstanciaPK.planta", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	private List<SerieConstancia> serieConstanciaList;
 	
-	@OneToMany(mappedBy = "planta")
-    private List<Factura> facturaList;
-	
 	@Column(name = " id_pais")
 	private Integer idPais;
 	
@@ -268,14 +265,6 @@ public class Planta implements Serializable {
 	public void setCamaraList(List<Camara> camaraList) {
 		this.camaraList = camaraList;
 	}
-
-	public List<Factura> getFacturaList() {
-        return facturaList;
-    }
-
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
-    }	
 
 	public EmisoresCFDIS getIdEmisoresCFDIS() {
 		return idEmisoresCFDIS;
