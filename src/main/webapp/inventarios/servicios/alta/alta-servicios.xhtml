@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:fieldset legend="Servicios">
+        <p:panel>
+            <p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaConstanciaServicioBean.servicio.servicioCve}" filterMatchMode="startsWith" converter="entityConverter"
+                             onchange="PF('statusInfoDialog').show();" >
+                <f:selectItem itemLabel="Seleccione Servicio" noSelectionOption="true" />
+                <f:selectItems var="ps" value="#{altaConstanciaServicioBean.alServicios}" itemLabel="#{ps.servicio.servicioDs} (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps.servicio}" />
+                <p:ajax process="@this" oncomplete="PF('statusInfoDialog').hide();" />
+            </p:selectOneMenu>
+            <p:spacer width="5rem" />
+            <p:column>
+                <p:inputNumber id="txtCantidadSrv" value="#{altaConstanciaServicioBean.servicio.servicioCantidad}" placeholder="Cantidad" minValue="1" decimalPlaces="3" style="width: 6em;">
+                    <p:ajax process="@this"/>
+                </p:inputNumber>
+            </p:column>
+            <p:spacer width="5rem" />
+            <p:column>
+                <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.agregarServicio}" update="dt-servicios" 
+                                 onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()"/>
+            </p:column>
+        </p:panel>
+        <p:dataTable id="dt-servicios"	var="servicio" selection="#{altaConstanciaServicioBean.selServicio}" value="#{altaConstanciaServicioBean.alServiciosDetalle}" reflow="true">	
+            <p:column headerText="Servicio seleccionado"><h:outputText value="#{servicio.servicioCve.servicioDs}" /></p:column>
+            <p:column width="6rem" style="text-align: right;" headerText="Cantidad"><h:outputText value="#{servicio.servicioCantidad}" /></p:column>
+            <p:column width="2rem" style="text-align: right;">
+                <p:commandButton icon="pi pi-times" styleClass="ui-button-danger p-mr-2 p-mb-2" actionListener="#{altaConstanciaServicioBean.deleteServicio(servicio)}" 
+                                 update="dt-servicios" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+            </p:column>
+            <p:ajax event="page" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+        </p:dataTable>
+    </p:fieldset>
+</ui:composition>

@@ -1,7 +1,8 @@
 package mx.com.ferbo.controller;
 
-
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
@@ -21,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
@@ -41,7 +44,6 @@ import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
-
 public class ConsultarConstanciaSalidaBean implements Serializable{
 	
 	private static final long serialVersionUID = -3109002730694247052L;
@@ -68,13 +70,14 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
 	private Usuario usuario;
+        
+        private StreamedContent file;
 	
 	public ConsultarConstanciaSalidaBean() {
 		listadoConstanciaSalida = new ArrayList<>();
 		listadoClientes = new ArrayList<Cliente>();
 		listadoDetalleConstanciaS = new ArrayList<>();
 	}
-	
 	
 	@SuppressWarnings("unchecked")
 	@PostConstruct
@@ -118,9 +121,8 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		String titulo = "Carga de información...";
 		
 		try {
-			log.debug("Constancia salida: {}", this.constanciaSelect);
 			this.constanciaSelect = constanciaSalidaDAO.buscarPorId(this.constanciaSelect.getId(), true);
-			log.info("Cargando constancia salida: {}", this.constanciaSelect);
+			log.info("Cargando constancia de salida: {}", this.constanciaSelect.getNumero());
 		} catch (Exception ex) {
 			log.error("Problema para cargar la información de la constancia...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
@@ -135,7 +137,6 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	}
 
 	public void imprimirTicket() {
-		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
 		String filename = String.format("ticket-salida_%s.pdf", constanciaSelect.getNumero());
 		String images = "/images/logoF.png";
@@ -161,10 +162,12 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("NUMERO", constancia.getNumero());
 			parameters.put("LogoPath", imgFile.getPath());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			   
+                        byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+                        this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
+                        log.info("Reporte generado {}...", filename);
 		} catch (Exception e) {
-			e.printStackTrace();
+                        log.info("Problema para imprimir el ticket...", e);
 			message = String.format("No se pudo imprimir el folio %s", (constancia == null ? "" : constancia.getNumero()));
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
@@ -188,7 +191,8 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		String resultUpdate = null;
 		
 		try {
-			
+			log.info("Iniciando la cancelacion de la constancia de salida: {}", constanciaSelect.getNumero());
+                        
 			if(this.constanciaSelect.getStatus().getId() == 2)
 				throw new InventarioException("La constancia ya se encuentra cancelada");
 			
@@ -230,8 +234,9 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 				this.folio = null;
 			
 			listadoConstanciaSalida = constanciaSalidaDAO.buscar(fechaInicial, fechaFinal, (cliente == null ? null : cliente.getCteCve()), folio);
-			
-			mensaje = "La constancia de salida "+constanciaSelect.getNumero()+" fue cancelada";
+			log.info("La constancia de salida {} se cancelo exitosamente.", constanciaSelect.getNumero());
+                        
+			mensaje = String.format("La constancia de salida %s fue cancelada", constanciaSelect.getNumero());
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {	
 			log.error("Problema para cancelar la constancia de salida...", ex);
@@ -325,8 +330,13 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
 	}
-	
-	
-	
-	
+
+        public StreamedContent getFile() {
+            return file;
+        }
+
+        public void setFile(StreamedContent file) {
+            this.file = file;
+        }
+    
 }

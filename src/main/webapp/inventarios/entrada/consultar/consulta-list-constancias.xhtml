@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:panel id="pnl-list-constancias" header="CONSTANCIAS" toggleable="true">
+        <p:dataTable id="dt-constanciaDeDeposito" widgetVar="dtconstanciaDD" value="#{consultarConstanciaDeDepositoBean.listadoConstanciaDeDepositos}" rowKey="#{constanciaDD.folio}"	var="constanciaDD" rows="10" paginator="true" paginatorPosition="bottom">
+            <p:column headerText="Folio" style="text-align: center" width="5rem">
+                <h:outputText value="#{constanciaDD.folioCliente}" class="#{constanciaDD.status.edoCve == 2 ? 'product-badge status-outofstock' : null}"/>
+            </p:column>
+            <p:column headerText="Cliente">
+                <h:outputText value="#{constanciaDD.cteCve.nombre}" />
+            </p:column>
+            <p:column headerText="Ingreso" width="6rem" style="text-align: center;">
+                <h:outputText value="#{constanciaDD.fechaIngreso}">
+                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                </h:outputText>
+            </p:column>
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton icon="pi pi-bars" process="@this" action="#{consultarConstanciaDeDepositoBean.cargaDetalle}" update="form:constanciaD" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('infoDatos').show();">
+                    <f:setPropertyActionListener value="#{constanciaDD}" target="#{consultarConstanciaDeDepositoBean.selectConstanciaDD}" />
+                </p:commandButton>
+            </p:column>
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton icon="pi pi-times" process="@this" action="#{consultarConstanciaDeDepositoBean.cargaDetalle}" update="form:dt-constanciaDeDeposito" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('cancelDialog').show();" disabled="#{constanciaDD.status.edoCve == 2}" class="ui-button-danger" >
+                    <f:setPropertyActionListener value="#{constanciaDD}" target="#{consultarConstanciaDeDepositoBean.selectConstanciaDD}" />
+                </p:commandButton>
+            </p:column>
+            <p:ajax event="page" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+        </p:dataTable>
+    </p:panel>
+</ui:composition>

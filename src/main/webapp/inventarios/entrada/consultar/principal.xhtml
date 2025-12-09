@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Consultar Entradas</ui:define>
+    <ui:define name="content">
+        <h:form id="form" enctype="multipart/form-data">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- Datos Generales -->
+            <!-- ID: FechaI, FechaF, Folio, s-cliente -->
+            <!-- Seccion de captura de datos: "Fecha de Inicio", "Fecha Final", "Folio", "Lista de clientes" y "Consultar" -->
+            <ui:include src="/inventarios/entrada/consultar/consulta-config-constancias.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- DataTable de las Constancias del cliente -->
+            <!-- ID: dt-constanciaDeDeposito, pnl-list-constancias -->
+            <!-- Lista las constancias de deposito del cliente -->
+            <ui:include src="/inventarios/entrada/consultar/consulta-list-constancias.xhtml" />
+            
+            <!-- Consulta el detalle de la constancia -->
+            <!-- ID: constanciaD, datosGenerales, tabGeneral, dlg-constancia, tabProductos, dlg-partidas, dt-partida, tabTarimas, tabServicios, dlg-servicios, dt-ConstanciaDepositoDetalle -->
+            <!-- Muestra el detalle de la constancia seleccionada del cliente -->
+            <ui:include src="/inventarios/entrada/consultar/consulta-det-constancia.xhtml" />
+            
+            <!-- Dialogo de productos -->
+            <!-- ID: dlgDetalleP, detalleP -->
+            <!-- Sección de consulta detalle de productos de una constancia -->
+            <ui:include src="/inventarios/entrada/consultar/consulta-det-producto.xhtml" />
+            
+            <!-- Dialogos de confirmacion -->
+            <ui:include src="/inventarios/entrada/consultar/consulta-confirm-dlg.xhtml" />
+        </h:form>
+    </ui:define>        
+</ui:composition>

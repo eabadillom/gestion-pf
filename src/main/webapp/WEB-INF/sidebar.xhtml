@@ -30,21 +30,21 @@
 						<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
 							<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/entrada/alta/principal" />
-								<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/consultarConstanciaDeDeposito"/>
+								<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/entrada/consultar/principal"/>
 								<p:menuitem id="frb_inventarios_sm144" value="Orden de Entrada" icon="pi pi-fw pi-sign-in" outcome="/inventarios/ordenEntrada" />
 							</p:submenu>
 							<p:submenu id="frb_inventarios_sm3" label="Salidas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm110" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/salida/alta/principal" />
-								<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/consultaConstanciaSalida" />
+								<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/salida/consultar/principal" />
 								<p:menuitem id="frb_inventarios_sm13" value="Ordenes de salida" icon="pi pi-fw pi-sign-in" outcome="/inventarios/OrdenSalida" badge="#{sideBarBean.numeroSalidas}" />
 							</p:submenu>
 							<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
-								<p:menuitem id="frb_inventariossm31" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaTraspaso" />
-								<p:menuitem id="frb_inventariossm32" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/constanciaTraspasos" />
+								<p:menuitem id="frb_inventariossm31" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/traspasos/alta/principal" />
+								<p:menuitem id="frb_inventariossm32" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/traspasos/consultar/principal" />
 							</p:submenu>
 							<p:submenu id="frb_inventarios_sm2" label="Servicios" icon="fa fa-fw fa-edit">
-								<p:menuitem id="frb_inventarios_sm21" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaConstanciaServicios" />
-								<p:menuitem id="frb_inventarios_sm22" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/constanciaServicios" />
+								<p:menuitem id="frb_inventarios_sm21" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/servicios/alta/principal" />
+								<p:menuitem id="frb_inventarios_sm22" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/servicios/consultar/principal" />
 							</p:submenu>
 									
 							<p:submenu label="Catálogos" icon="pi pi-fw pi-book">

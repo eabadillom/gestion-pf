@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:panel id="pnl-list-constancias-salidas" header="CONSTANCIAS DE SALIDA" >
+        <p:dataTable id="dt-ConstanciaSalida" widgetVar="dtConstanciaS" value="#{consultarConstanciaSalidaBean.listadoConstanciaSalida}" var="constanciaSalida" rows="10" paginator="true" paginatorPosition="bottom">
+            <p:column headerText="Folio" style="text-align: center" width="5rem">
+                <h:outputText value="#{constanciaSalida.numero}" class="#{constanciaSalida.status.id == 2 ? 'product-badge status-outofstock' : null}" />
+            </p:column>
+            <p:column headerText="Cliente">
+                <h:outputText value="#{constanciaSalida.clienteCve.nombre}" />
+            </p:column>
+            <p:column headerText="Ingreso" width="6rem" style="text-align: center;">
+                <p:outputLabel value="#{constanciaSalida.fecha}">
+                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                </p:outputLabel>
+            </p:column>
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton icon="pi pi-bars" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetalles').show();" update="form:constanciaSalida" action="#{consultarConstanciaSalidaBean.cargaDetalle}">
+                    <f:setPropertyActionListener value="#{constanciaSalida}" target="#{consultarConstanciaSalidaBean.constanciaSelect}" />
+                </p:commandButton>
+            </p:column>
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton icon="pi pi-times" process="@this" action="#{consultarConstanciaSalidaBean.cargaDetalle()}" update="form:constanciaSalida" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('cancelDialog').show();" disabled="#{(consultarConstanciaSalidaBean.usuario.perfil == 1) or (consultarConstanciaSalidaBean.usuario.perfil == 4) or (constanciaSalida.status.id == 2)}" class="ui-button-danger" >
+                    <f:setPropertyActionListener value="#{constanciaSalida}" target="#{consultarConstanciaSalidaBean.constanciaSelect}" />
+                </p:commandButton>
+            </p:column>
+            <p:ajax event="page" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+        </p:dataTable>
+    </p:panel>
+</ui:composition>

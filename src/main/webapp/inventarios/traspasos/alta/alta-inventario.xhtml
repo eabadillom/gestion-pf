@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:overlayPanel widgetVar="dlg1" dismissable="false" showCloseIcon="true" dynamic="true">
+        <p:outputPanel rendered="#{not empty altaTraspasoBean.inventario}">
+            <p:panel id="folioC">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="folioC-new" id="folioC-new" value="#{altaTraspasoBean.selectedInventario.folioCliente}" readonly="true"/>
+                        <p:outputLabel for="folioC-new" value="Folio" styleClass="ml-4" />
+                        <i class="pi pi-user" />
+                    </span>
+                </div>
+            </p:panel>
+            <p:panel id="cantidad">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="Cantidad-new" id="Cantidad-new" value="#{altaTraspasoBean.selectedInventario.cantidad}" readonly="true"/>
+                        <p:outputLabel for="Cantidad-new" value="En existencia" styleClass="ml-4" />
+                        <i class="pi pi-user" />
+                    </span>
+                </div>
+            </p:panel>
+            <p:panel id="Kgs">
+                <div class="field">
+                    <span class="ui-float-label ui-input-icon-right">
+                        <p:inputText widgetVar="kg-new" id="kg-new" value="#{altaTraspasoBean.selectedInventario.peso}" readonly="true"/>
+                        <p:outputLabel for="kg-new" value="Kilogramos" styleClass="ml-4" />
+                        <i class="pi pi-user" />
+                    </span>
+                </div>
+            </p:panel>
+        </p:outputPanel>
+    </p:overlayPanel>
+</ui:composition>

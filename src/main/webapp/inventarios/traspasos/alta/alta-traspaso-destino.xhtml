@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:panel id="pnl-traspaso-destino" header="DESTINO" >
+        <p:dataTable id="destino" var="partida" value="#{altaTraspasoBean.destino}" reflow="true" rowKey="#{altaTraspasoBean.selectedInventario}">
+            <p:column style="text-align: center" width="2rem;">
+                <p:commandButton styleClass="ui-button-flat" type="button" icon="pi pi-search" onclick="PF('dlg1').show()"/>
+            </p:column>
+            <p:column headerText="Producto" width="8em"><h:outputText value="#{partida.producto.productoDs}"/></p:column>
+            <p:column headerText="Planta destino" width="10em"><h:outputText value="#{partida.plantaDestino.plantaDs}"/></p:column>
+            <p:column headerText="Camara destino" width="10em"><h:outputText value="#{partida.camaraDestino.camaraDs}"/></p:column>
+            <p:column headerText="Posicion destino" width="10em" rendered="partida != null"><h:outputText value="#{partida.posicionDestino.idPosicion}"/></p:column>
+            <p:fieldset legend="Header" toggleable="true" toggleSpeed="500">
+                <p:ajax event="toggle" listener="#{fieldsetView.handleToggle}"/>
+            </p:fieldset>
+            <p:column width="2em">
+                <p:commandButton icon="pi pi-times" styleClass="ui-button-danger p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deletePartida(partida)}" 
+                    onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" update="destino" />
+            </p:column>
+            <p:ajax event="page" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+        </p:dataTable>
+    </p:panel>
+</ui:composition>

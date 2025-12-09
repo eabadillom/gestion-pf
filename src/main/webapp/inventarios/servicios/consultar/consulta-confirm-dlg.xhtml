@@ -1,0 +1,18 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:confirmDialog widgetVar="dlgModificarServicio" showEffect="fade" width="400" message="Desea modificar el servicio?" header="Modificar" severity="warn">
+        <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{constanciaServicioBean.actualizaServicio}" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgModificarServicio').hide()"/>
+        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgModificarServicio').hide()" />
+    </p:confirmDialog>
+    <p:confirmDialog widgetVar="dlgEliminarServicio" showEffect="fade" width="400" message="Desea eliminar el servicio?" header="Eliminar" severity="warn">
+        <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{constanciaServicioBean.eliminaServicio}" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgEliminarServicio').hide()"/>
+        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarServicio').hide()" />
+    </p:confirmDialog>
+    <p:confirmDialog widgetVar="dlgCancelarDialog" showEffect="fade" width="400" message="¿Desea cancelar la constancia?" header="Cancelar constancia" severity="warn">
+        <p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{constanciaServicioBean.cancelar()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgCancelarDialog').hide();"/>
+        <p:commandButton value="No" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgCancelarDialog').hide()" />
+    </p:confirmDialog>
+</ui:composition>

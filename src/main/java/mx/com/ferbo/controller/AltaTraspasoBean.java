@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -68,6 +70,8 @@ import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 import net.sf.jasperreports.engine.JRException;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 @Named
 @ViewScoped
@@ -139,6 +143,8 @@ public class AltaTraspasoBean implements Serializable {
 	
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
+        
+        private StreamedContent file;
 
 	public AltaTraspasoBean() {
 		log.debug("Entrando al constructor del controller...");
@@ -176,6 +182,7 @@ public class AltaTraspasoBean implements Serializable {
 		context = FacesContext.getCurrentInstance();
 		request = (HttpServletRequest) context.getExternalContext().getRequest();
 		usuario = (Usuario) request.getSession(false).getAttribute("usuario");
+                log.info("El usuario {} ingresa al alta constancia de traspaso.", this.usuario.getUsuario());
 		
 		log.debug("Buscando lista de clientes...");
 		clientes = sideBar.getListaClientesActivos();
@@ -248,7 +255,8 @@ public class AltaTraspasoBean implements Serializable {
 				list.add(ps);
 			}
 			mpPrecioServicio.get(idAviso);
-			alServicios.clear();
+                        if(!alServicios.isEmpty())
+                            alServicios.clear();
 			alServicios = mpPrecioServicio.get(idAviso);
 			for (PrecioServicio ps : alServicios) {
 				log.debug(ps.getServicio().getServicioDs());
@@ -542,8 +550,10 @@ public class AltaTraspasoBean implements Serializable {
 			parameters.put("LogoPath", imgfile.getPath());
 			log.debug("Parametros: " + parameters.toString());
 			
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+                        this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
+                        log.info("Ticket de traspaso generado {}...", filename);
 		} catch(InventarioException ex) {
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -583,9 +593,11 @@ public class AltaTraspasoBean implements Serializable {
 	}
 
 		public void deleteServicio(TraspasoServicio servicio) {
+                log.info("Eliminando servicio del traspaso: {}", servicio.getServicio());
 		this.alServiciosDetalle.remove(servicio);
 	}
 		public void deletePartida(InventarioDetalle partida) {
+                        log.info("Eliminando producto del traspaso: {}", partida.getProducto().getProductoDs());
 			this.destino.remove(partida);
 		}
 
@@ -900,5 +912,13 @@ public class AltaTraspasoBean implements Serializable {
 	public void setListaEntradas(List<String> listaEntradas) {
 		this.listaEntradas = listaEntradas;
 	}
+
+        public StreamedContent getFile() {
+            return file;
+        }
+
+        public void setFile(StreamedContent file) {
+            this.file = file;
+        }
 
 }

@@ -102,6 +102,8 @@ public class ConstanciaServicioBean implements Serializable{
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		
+                log.info("El usuario {} entrando a consultar constancia de servicio", usuario.getUsuario());
+                
 		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		if(listaClientes.size() == 1)
 			this.idCliente = listaClientes.get(0).getCteCve();
@@ -123,8 +125,12 @@ public class ConstanciaServicioBean implements Serializable{
 		if(listaClientes.size() == 1)
 			this.idCliente = listaClientes.get(0).getCteCve();
 		
-		listaConstanciaServicios = constanciaServicioDAO.buscar(fechaInicio, fechaFinal, idCliente, folio);
+		this.actualizarConstancias();
 	}
+        
+        public void actualizarConstancias(){
+            this.listaConstanciaServicios = constanciaServicioDAO.buscar(fechaInicio, fechaFinal, idCliente, folio);
+        }
 	
 	public void cargaDetalle() {
 		FacesMessage message = null;
@@ -133,6 +139,7 @@ public class ConstanciaServicioBean implements Serializable{
 		String titulo = "Carga de información...";
 		
 		try {
+                        log.info("Cargando el detalle de la constancia: {}", this.seleccion.getFolioCliente());
 			this.seleccion = constanciaServicioDAO.buscarPorId(this.seleccion.getFolio(), true);
 			this.precioServicioList = precioServicioDAO.buscarPorCliente(seleccion.getCteCve().getCteCve(), true);
 			this.servicioSelected = new Servicio();
@@ -158,6 +165,7 @@ public class ConstanciaServicioBean implements Serializable{
 		String response = null;
 		
 		try {
+                        log.info("Actualizando la informacion de la constancia: {}", this.seleccion.getFolioCliente());
 			response = constanciaServicioDAO.actualizar(this.seleccion);
 			log.debug("Respuesta del DAO: {}", response);
 			if(response != null )
@@ -200,6 +208,7 @@ public class ConstanciaServicioBean implements Serializable{
 			if(this.cantidadServicio.intValue() <= 0)
 				throw new InventarioException("Debe indicar una cantidad correcta.");
 			
+                        log.info("Agregando el servicio a la constancia: {}", this.seleccion.getFolio());
 			constancia = this.seleccion;
 			
 			servicio = new ConstanciaServicioDetalle();
@@ -254,6 +263,7 @@ public class ConstanciaServicioBean implements Serializable{
 			constancia = this.seleccion;
 			
 			log.debug("Constancia Servicio Detalle: {}", this.selectedConstanciaServicioDetalle);
+                        log.info("Actualizando la constancia de servicio: {}", constancia.getFolioCliente());
 			
 			csdDAO.actualizar(selectedConstanciaServicioDetalle);
 			
@@ -292,6 +302,7 @@ public class ConstanciaServicioBean implements Serializable{
 		String titulo = "Agregar servicio...";
 		
 		try {
+                        log.info("Eliminando servicio de la constancia: {}", this.seleccion.getFolioCliente());
 			log.debug("Constancia De Servicio: {}", this.seleccion);
 			log.debug("Constancia Servicio Detalle (eliminar) {}", this.selectedConstanciaServicioDetalle);
 			
@@ -329,12 +340,9 @@ public class ConstanciaServicioBean implements Serializable{
 	}
 	
 	public void cancelar() {
-		PrimeFaces.current().executeScript("PF('dlg-constancia').hide()");
 		ConstanciaDeServicio constancia = this.seleccion;
 		String message = null;
 		Severity severity = null;
-		
-		EntityManager manager = null;
 		
 		List<ControlFacturaConstanciaDS> alControlFacturas = null;
 		EstadoConstancia stCancelada = null;
@@ -343,11 +351,9 @@ public class ConstanciaServicioBean implements Serializable{
 		Date fechaHoy = null;
 		
 		try {
-			System.out.println("Cancelando constancia...");
+			log.info("Cancelando constancia: {}", constancia.getFolioCliente());
 			if(constancia.getStatus().getEdoCve() == 4)
 				throw new InventarioException("La constancia ya se encuentra cancelada.");
-			
-			manager = EntityManagerUtil.getEntityManager();
 			
 			//Validar si la constancia de servicio ya se encuentra facturada.
 			alControlFacturas = cfcDAO.buscarPorConstancia(constancia.getFolio());
@@ -361,27 +367,6 @@ public class ConstanciaServicioBean implements Serializable{
 					.collect(Collectors.toList())
 					.get(0);
 			
-			manager.getTransaction().begin();
-			//manager.merge(constancia);
-			
-			List<PartidaServicio> partidas = constancia.getPartidaServicioList();
-			
-			if(partidas.removeAll(partidas)) {
-				constancia.setPartidaServicioList(partidas);
-				System.out.println("Partidas eliminadas.");
-			}
-			
-			List<ConstanciaServicioDetalle> servicios = constancia.getConstanciaServicioDetalleList();
-			for(int i = 0; i < servicios.size(); i++) {
-				servicios.remove(0);
-				manager.merge(constancia);
-			}
-			
-			if(servicios.removeAll(servicios)) {
-				constancia.setConstanciaServicioDetalleList(servicios);
-				System.out.println("Servicios eliminados.");
-			}
-			
 			constancia.setStatus(stCancelada);
 			fechaHoy = new Date();
 			sFechaHoy = DateUtil.getString(fechaHoy, DateUtil.FORMATO_DD_MM_YYYY);
@@ -389,27 +374,24 @@ public class ConstanciaServicioBean implements Serializable{
 			observaciones = String.format("CANCELADA EL %S: %S", sFechaHoy, observaciones);
 			constancia.setObservaciones(observaciones);
 			
-			manager.merge(constancia);
-			
-			manager.getTransaction().commit();
+			this.constanciaServicioDAO.actualizar(constancia);
 			message = "Constancia cancelada correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			
-			System.out.println("Constancia cancelada.");
+			log.info("Constancia cancelada.");
 		} catch(InventarioException ex) {
-			EntityManagerUtil.rollback(manager);
-			ex.printStackTrace();
-			message = ex.getMessage();
+			log.error("Error al cancelar: ", ex);
+                        message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_ERROR;
 		} catch(Exception ex) {
-			EntityManagerUtil.rollback(manager);
-			ex.printStackTrace();
+			log.error("Error al cancelar: ", ex);
 			message = "Problema con la actualización de la constancia.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			EntityManagerUtil.close(manager);
+			this.actualizarConstancias();
+                        PrimeFaces.current().executeScript("PF('dlg-constancia').hide();");
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Cancelación", message));
-			PrimeFaces.current().ajax().update("form:messages", "form:dt-constanciaServicios");
+			PrimeFaces.current().ajax().update("form:messages", "form:dtconstanciaServicios");
 		}
 	}
 	

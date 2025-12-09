@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Alta Constancia de Traspaso</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- Datos Generales -->
+            <!-- ID: Cliente, s-planta, fecha y txtFolio -->
+            <!-- Seccion de captura de datos: "Lista de Clientes", "Lista de Plantas", "Fecha" y "Folio" -->
+            <ui:include src="/inventarios/traspasos/alta/alta-cfg-servicios.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Lista de Productos a Traspasar del cliente -->
+            <!-- ID: pnl-traspaso-origen y traspaso -->
+            <ui:include src="/inventarios/traspasos/alta/alta-traspaso-origen.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Detalle para dar de alta un Traspaso -->
+            <!-- ID: pnlCliente, Nombre, Cantidad, unidadM, Peso, planta, Camara, camaradestino, Posicion y posiciondestino -->
+            <ui:include src="/inventarios/traspasos/alta/alta-det-traspaso.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Panel donde se muestre la lista de productos traspasados -->
+            <!-- ID: pnl-traspaso-destino y destino -->
+            <ui:include src="/inventarios/traspasos/alta/alta-traspaso-destino.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Panel donde se muetra los productos traspaso -->
+            <!-- ID: folioC, cantidad y Kgs -->
+            <ui:include src="/inventarios/traspasos/alta/alta-inventario.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Panel donde se muestra los servicios añadidos de los productos traspasados -->
+            <!-- ID: selServicio, txtCantidadSrv y dtServicios -->
+            <ui:include src="/inventarios/traspasos/alta/alta-servicios.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Seccion de botones para Guardar, Imprimir y Nuevo Traspaso -->
+            <ui:include src="/inventarios/traspasos/alta/alta-acciones.xhtml" />
+        </h:form>
+    </ui:define>
+</ui:composition>

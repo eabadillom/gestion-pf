@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -27,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
@@ -102,9 +106,10 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
+        
+        private StreamedContent file;
 
 	public AltaConstanciaServicioBean() {
-		log.info("Entrando al constructor del controller...");
 		clientes = new ArrayList<Cliente>();
 		alPartidas = new ArrayList<PartidaServicio>();
 		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
@@ -124,12 +129,11 @@ public class AltaConstanciaServicioBean implements Serializable {
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		log.info("Entrando a Init...");
-		
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-		
+		log.info("El usuario {} ingresa al alta consulta de constancias de servicio.", this.usuario.getUsuario()); 
+               
 		fecha = new Date();
 		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		alUnidades = udmDAO.buscarTodos();
@@ -386,6 +390,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 			Integer numeroSerie = this.serie.getNuSerie() + 1;
 			this.serie.setNuSerie(numeroSerie);
 			serieConstanciaDAO.actualizar(this.serie);
+                        log.info("Constancia guardada correctamente");
 			
 			this.isSaved = true;
 			this.habilitareporte = true;
@@ -398,7 +403,6 @@ public class AltaConstanciaServicioBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de servicios del cliente.", ex);
-			ex.printStackTrace();
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
@@ -440,9 +444,11 @@ public class AltaConstanciaServicioBean implements Serializable {
 			parameters.put("FOLIO", folio);
 			parameters.put("LogoPath",imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());			
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+                        InputStream input = new ByteArrayInputStream(bytes);
+                        this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
+                        log.info("Ticket de servicio generado {}...", filename);
 		} catch (Exception ex) {
-			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
@@ -467,10 +473,12 @@ public class AltaConstanciaServicioBean implements Serializable {
 	}
 
 	public void deletePartida(PartidaServicio partida) {
+                log.info("Eliminando producto: {}", partida.getProductoCve().getProductoDs());
 		this.alPartidas.remove(partida);
 	}
 
 	public void deleteServicio(ConstanciaServicioDetalle servicio) {
+                log.info("Eliminando servicio: {}", servicio.getServicioCve().getServicioDs());
 		this.alServiciosDetalle.remove(servicio);
 	}
 
@@ -681,5 +689,13 @@ public class AltaConstanciaServicioBean implements Serializable {
 	public void setServicio(ConstanciaServicioDetalle servicio) {
 		this.servicio = servicio;
 	}
+
+        public StreamedContent getFile() {
+            return file;
+        }
+
+        public void setFile(StreamedContent file) {
+            this.file = file;
+        }
 
 }
