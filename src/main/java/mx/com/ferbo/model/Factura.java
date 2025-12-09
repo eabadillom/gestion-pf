@@ -47,7 +47,8 @@ import org.bouncycastle.util.Objects;
         @NamedQuery(name = "Factura.findByPlanta", query = "SELECT f FROM Factura f WHERE f.planta.plantaCve = :plantaCve"),
         @NamedQuery(name = "Factura.findByStatusFacturaClientePeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin AND f.cliente.cteCve = :idCliente AND f.status.id = :idStatusFactura ORDER BY f.fecha, f.nomSerie, f.numero"),
         @NamedQuery(name = "Factura.findByFolioDeposito", query = "SELECT f FROM ConstanciaDeDeposito cdd INNER JOIN cdd.constanciaFacturaList cf INNER JOIN cf.factura f WHERE cdd.folio = :folio"),
-        @NamedQuery(name = "Factura.findByCliente?Periodo", query = "SELECT f FROM Factura f WHERE (f.cfdi IS NULL) AND  (f.fecha BETWEEN :fechaInicio AND :fechaFin) AND (f.cliente.cteCve = :idCliente OR :idCliente IS NULL) ORDER BY f.fecha")
+        @NamedQuery(name = "Factura.findByCliente?Periodo", query = "SELECT f FROM Factura f WHERE (f.cfdi IS NULL) AND  (f.fecha BETWEEN :fechaInicio AND :fechaFin) AND (f.cliente.cteCve = :idCliente OR :idCliente IS NULL) ORDER BY f.fecha"),
+        @NamedQuery(name = "Factura.findByNoCFDI", query = "SELECT f FROM Factura f LEFT JOIN f.cfdi c WHERE (f.fecha BETWEEN :fechaInicio AND :fechaFin) AND (f.cliente = :idCliente OR :idCliente IS NULL) AND (c IS NULL) AND (f.uuid IS NOT NULL)")
         })
 public class Factura implements Serializable {
 

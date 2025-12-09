@@ -196,9 +196,7 @@ public class FacMantenimentoBean implements Serializable {
 	public void cancelaFactura() {
 		String message = null;
 		Severity severity = null;
-
-		String respuesta = null;
-
+		
 		try {
 			StatusFacturaDAO statusDAO = new StatusFacturaDAO();
 			StatusFactura statusCancelada = statusDAO.buscarPorId(StatusFactura.STATUS_CANCELADA);
@@ -407,10 +405,11 @@ public class FacMantenimentoBean implements Serializable {
 			cfdi.setFactura(factura);
 			factura.setCfdi(cfdi);
 			facturaDAO.actualizar(factura);
+			log.info("Información CFDI de la factura {} actualizada.", factura);
 		} catch (FacturamaException ex) {
-			log.error("Problema para obtener la información del CFID...", ex);
+			log.warn("Problema para obtener la información del CFID...", ex.getMessage());
 		} catch(Exception ex) {
-			log.error("Problema para obtener la información del CFID...", ex);
+			log.warn("Problema para obtener la información del CFID...", ex.getMessage());
 		}
 		
 	}
