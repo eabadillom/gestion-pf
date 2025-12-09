@@ -17,7 +17,7 @@ import mx.com.ferbo.model.Cfdi;
 
 public class CfdiUtils {
 
-    public static Cfdi getCFDIUUIDFromString(String xmlContent)
+    public static Cfdi getCFDI(String xmlContent)
     throws InventarioException {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
