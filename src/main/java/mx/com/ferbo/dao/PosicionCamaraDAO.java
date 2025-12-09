@@ -26,7 +26,7 @@ public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
 			em = EntityManagerUtil.getEntityManager();
 			Query sql = entity.createNamedQuery("Posicion.findAll", Posicion.class);
 			posiciones = sql.getResultList();
-			System.out.println(posiciones + "*****************************************************");
+			log.debug(posiciones + "*****************************************************");
 		}catch(Exception e) {
 			log.error("Error al obtener informacion",e);
 		}finally {

@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <div style="padding-top: 1rem;">
+        <p:panel header="SELECCIONE SUS SERVICIOS">
+            <p:selectOneMenu id="selServicio" autoWidth="true" value="#{altaTraspasoBean.idPrecioServicio}" filterMatchMode="startsWith" onchange="PF('statusInfoDialog').show();" >
+                <f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
+                <f:selectItems var="selectedPrecioServicio" value="#{altaTraspasoBean.alServicios}"
+                               itemLabel="#{selectedPrecioServicio.servicio.servicioDs} (#{selectedPrecioServicio.unidad.unidadDeManejoDs})" itemValue="#{selectedPrecioServicio.id}" />
+                <p:ajax process="@this" oncomplete="PF('statusInfoDialog').hide();" />
+            </p:selectOneMenu>
+            <p:spacer width="8rem" />
+            <p:column>
+                <p:inputNumber id="txtCantidadSrv" value="#{altaTraspasoBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0" style="width: 6em;"/>
+            </p:column>
+            <p:spacer width="8rem" />
+            <p:column>
+                <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.agregarServicio}" 
+                                 update="dtServicios" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+            </p:column>
+        </p:panel>
+    </div>
+    <div style="padding-top: 1rem;">
+        <p:panel header="PARA LOS SERVICIOS DE">
+            <p:dataTable id="dtServicios" var="servicio" selection="#{altaTraspasoBean.selServicio}" value="#{altaTraspasoBean.alServiciosDetalle}">	
+                <p:column headerText="Servicio" width="10rem">
+                    <h:outputText value="#{servicio.servicio}" />
+                </p:column>
+                <p:column headerText="Cantidad" width="3rem">
+                    <h:outputText value="#{servicio.cantidad}" />
+                </p:column>
+                <p:column width="2rem">
+                    <p:commandButton icon="pi pi-times" styleClass="ui-button-danger p-mr-2 p-mb-2" actionListener="#{altaTraspasoBean.deleteServicio(servicio)}" 
+                                     update="dtServicios" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+                </p:column>
+                <p:ajax event="page" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+            </p:dataTable>
+        </p:panel>
+    </div>
+    <div style="padding-top: 1rem;">
+        <p:panel id="Descripcion">
+            <div class="field col-12 md:col-4">
+                <p:inputText id="txtObservaciones" value="#{altaTraspasoBean.observaciones}" placeholder="OBSERVACIONES" style="width: 50rem;"/>
+            </div>
+        </p:panel>
+    </div>
+</ui:composition>
