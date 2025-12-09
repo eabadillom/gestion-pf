@@ -185,7 +185,7 @@ public class FacturaDAO extends BaseDAO <Factura, Integer>{
 					+ "AND (f.uuid IS NOT NULL)\n"
 					+ "AND (f.fecha BETWEEN :fechaInicio AND :fechaFin)\n"
 					+ "AND (f.cliente = :idCliente OR :idCliente IS NULL)";
-			log.info("Query: {}", query);
+			log.debug("Query: {}", query);
 			em = this.getEntityManager();
 			facturas = em.createNativeQuery(query, modelClass)
 					.setParameter("idCliente", idCliente)

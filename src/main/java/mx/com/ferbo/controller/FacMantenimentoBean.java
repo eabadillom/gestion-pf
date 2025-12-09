@@ -9,6 +9,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -348,12 +349,9 @@ public class FacMantenimentoBean implements Serializable {
 			fechaFin = this.hasta;
 			
 			facturas = facturaDAO.consultaFacturas(idCliente, fechaInicio, fechaFin);
-			
+			log.info("Facturas: {}", facturas);
 			for(Factura factura : facturas) {
-				
 				this.leerXML(factura);
-				
-				
 			}
 
 			jasperPath = "/jasper/consulta_facturacion.jrxml";
@@ -395,12 +393,16 @@ public class FacMantenimentoBean implements Serializable {
 		FileViewModel fileXML = null;
 		cfdiBO = new CfdiBL();
 		Cfdi cfdi = null;
+		byte[] content = null;
+		String xml = null;
 		
 		log.info("Factura: {}", factura);
 		try {
 			fileXML = cfdiBO.getFile("xml", "issuedLite", factura.getUuid());
-			log.info("XML: {}", fileXML.getContent());
-			cfdi = CfdiUtils.getCFDI(fileXML.getContent());
+			content = Base64.getDecoder().decode(fileXML.getContent());
+			xml = new String(content);
+			log.info("XML: {}", xml);
+			cfdi = CfdiUtils.getCFDI(xml);
 			log.info("UUID: {}", cfdi);
 		} catch (FacturamaException ex) {
 			log.error("Problema para obtener la información del CFID...", ex);
