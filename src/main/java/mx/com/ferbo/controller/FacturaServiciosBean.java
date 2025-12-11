@@ -77,6 +77,7 @@ import mx.com.ferbo.model.TipoCobro;
 import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.CurrencyToolMXN;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.FormatUtil;
@@ -611,10 +612,7 @@ public class FacturaServiciosBean implements Serializable {
 			int serie = (serieFacturaSelect.getNumeroActual()+1);
 			serieFacturaSelect.setNumeroActual(serie);
 			
-			List<Factura> alFacturas = new ArrayList<>();
 			factura.setId(idFactura);
-			alFacturas.add(factura);
-			cliente.setFacturaList(alFacturas);
 			factura.setCliente(cliente);
 			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
 			factura.setMoneda(this.moneda);
@@ -645,7 +643,9 @@ public class FacturaServiciosBean implements Serializable {
 			factura.setPorcentajeIva(tasaIva.multiply(new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP)));
 			factura.setNumeroCliente(cliente.getNumeroCte());
 			factura.setValorDeclarado(BigDecimal.ZERO);
-			factura.setMontoLetra(FormatUtil.numeroPalabras(total.doubleValue()));
+			String montoConLetra = CurrencyToolMXN.convertirAMoneda(total);
+//			factura.setMontoLetra(FormatUtil.numeroPalabras(total.doubleValue()));
+			factura.setMontoLetra(montoConLetra);
 			factura.setFacturaMedioPagoList(new ArrayList<FacturaMedioPago>());
 			FacturaMedioPagoPK facturaPK = new FacturaMedioPagoPK();
 			facturaPK.setFacturaId(factura);
@@ -654,7 +654,7 @@ public class FacturaServiciosBean implements Serializable {
 			fmp.setFacturaMedioPagoPK(facturaPK);
 			MedioPago medioP = medioPagoDAO.buscarPorFormaPago(medioPagoSelect);
 			fmp.setMpId(medioP);
-			fmp.setFactura(factura);
+//			fmp.setFactura(factura);
 			fmp.setFmpPorcentaje(100);
 			fmp.setMpDescripcion(medioP.getMpDescripcion());
 			fmp.setFmpReferencia(referencia);

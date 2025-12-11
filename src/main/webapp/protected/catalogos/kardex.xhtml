@@ -88,7 +88,7 @@
 						<p:rowExpansion>
 							<div style="padding-left: 2rem;">
 								<p:dataTable id="dt-salidasKardex"
-									value="#{partida.detalleConstanciaSalidaList}"
+									value="#{kardexBean.getDetalleConstanciaSalidaList(partida)}"
 									var="detSalida" lazy="false">
 									<p:column headerText="Salida" width="4rem">
 										<h:outputText value="#{detSalida.constanciaCve.numero}" />
@@ -114,7 +114,7 @@
 									</p:column>
 									<f:facet name="footer">
 										<div align="right">
-											Quedan: #{partida.cantidadTotal - partida.detalleConstanciaSalidaList.stream().map(item->item.cantidad).sum()} [#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}] con #{partida.pesoTotal - partida.detalleConstanciaSalidaList.stream().map(item->item.peso).sum()} [kg] 
+											Quedan: #{kardexBean.saldoCantidadParcial(partida)} [#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}] con #{kardexBean.saldoPesoParcial(partida)} [kg] 
 										</div>
 									</f:facet>
 								</p:dataTable>

@@ -35,8 +35,10 @@ import javax.validation.constraints.Size;
 public class FacturaMedioPago implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
     protected FacturaMedioPagoPK facturaMedioPagoPK;
+    
     @JoinColumn(name = "mp_id", referencedColumnName = "mp_id")
     @ManyToOne(optional = false)
     private MedioPago mpId;
@@ -56,9 +58,9 @@ public class FacturaMedioPago implements Serializable {
     @Column(name = "fmp_referencia")
     private String fmpReferencia;
     
-    @JoinColumn(name = "factura_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private Factura factura;
+//    @JoinColumn(name = "factura_id", referencedColumnName = "id", insertable = false, updatable = false)
+//    @ManyToOne(optional = false)
+//    private Factura factura;
 
     public FacturaMedioPago() {
     }
@@ -117,13 +119,13 @@ public class FacturaMedioPago implements Serializable {
         this.fmpReferencia = fmpReferencia;
     }
 
-    public Factura getFactura() {
-        return factura;
-    }
-
-    public void setFactura(Factura factura) {
-        this.factura = factura;
-    }
+//    public Factura getFactura() {
+//        return factura;
+//    }
+//
+//    public void setFactura(Factura factura) {
+//        this.factura = factura;
+//    }
 
     @Override
     public int hashCode() {
