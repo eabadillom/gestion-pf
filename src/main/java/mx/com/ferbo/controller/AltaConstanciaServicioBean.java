@@ -171,22 +171,7 @@ public class AltaConstanciaServicioBean implements Serializable {
             for (ProductoPorCliente ppc : alProductosFiltered) {
                 log.info("Producto: " + ppc.getProductoCve());
             }
-            /* Logica anterior, precio servicio no aceptaba nulos
-			precioServicioList = cliente.getPrecioServicioList();
-			Integer idAviso = new Integer(-1);
-			for (PrecioServicio ps : precioServicioList) {
-				Integer avisoCve = ps.getAvisoCve().getAvisoCve();
-				if (avisoCve > idAviso)
-					idAviso = new Integer(avisoCve);
-				List<PrecioServicio> list = mpPrecioServicio.get(avisoCve);
-				if (list == null) {
-					list = new ArrayList<PrecioServicio>();
-					mpPrecioServicio.put(avisoCve, list);
-				}
-				list.add(ps);
-			}
-			mpPrecioServicio.get(idAviso);
-             */
+
             precioServicioList = cliente.getPrecioServicioList();
 
             int idAviso = -1;
@@ -197,7 +182,6 @@ public class AltaConstanciaServicioBean implements Serializable {
                         ? ps.getAvisoCve().getAvisoCve()
                         : null;
 
-                // Clave del mapa, -1 para SIN AVISO
                 Integer avisoKey = avisoCve != null ? avisoCve : -1;
 
                 if (avisoCve != null && avisoCve > idAviso) {
@@ -208,10 +192,8 @@ public class AltaConstanciaServicioBean implements Serializable {
                         .add(ps);
             }
 
-            alServicios = mpPrecioServicio.get(idAviso);
+            alServicios = new ArrayList<>(mpPrecioServicio.get(idAviso));
 
-            alServicios.clear();
-            alServicios = mpPrecioServicio.get(idAviso);
             for (PrecioServicio ps : alServicios) {
                 log.info(ps.getServicio().getServicioDs());
                 log.info(ps.getUnidad().getUnidadDeManejoDs());

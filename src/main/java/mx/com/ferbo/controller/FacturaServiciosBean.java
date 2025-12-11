@@ -352,10 +352,11 @@ public class FacturaServiciosBean implements Serializable {
             }
 
             // Obtener servicios del aviso máximo, protegiendo null
-            alServicios = mpPrecioServicio.getOrDefault(idAviso, new ArrayList<>());
+           // alServicios = mpPrecioServicio.getOrDefault(idAviso, new ArrayList<>());
 
-            alServicios.clear();
-            alServicios = mpPrecioServicio.get(idAviso);
+            //alServicios.clear();
+            //alServicios = mpPrecioServicio.get(idAviso);
+            alServicios = new ArrayList<>(mpPrecioServicio.getOrDefault(idAviso, new ArrayList<>()));
             for (PrecioServicio ps : alServicios) {
                 log.debug("Servicio: {} - Unidad: {}", ps.getServicio().getServicioDs(), ps.getUnidad().getUnidadDeManejoDs());
             }
