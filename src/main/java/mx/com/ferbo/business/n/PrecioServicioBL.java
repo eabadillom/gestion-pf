@@ -42,7 +42,7 @@ public class PrecioServicioBL {
         precioServicio.setPrecio(BigDecimal.ZERO);
         precioServicio.setServicio(new Servicio());
         precioServicio.setUnidad(new UnidadDeManejo());
-        precioServicio.setAvisoCve(new Aviso(1));
+        precioServicio.setAvisoCve(null);
         return precioServicio;
     }
 
@@ -62,7 +62,7 @@ public class PrecioServicioBL {
             cliente.getPrecioServicioList().set(index, precioServicio);
             log.info("Se ha actualizado el precio del servicio de forma correcta al cliente {}", cliente.getNombre());
         } else {
-            precioServicio.setAvisoCve(new Aviso(1));
+            precioServicio.setAvisoCve(null);
             precioServicio.setCliente(cliente);
             cliente.getPrecioServicioList().add(precioServicio);
             log.info("Se ha agregado el precio del servicio de forma correcta al cliente {}", cliente.getNombre());

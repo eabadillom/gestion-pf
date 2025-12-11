@@ -119,7 +119,7 @@ public class AvisoBL {
         log.info("Finaliza proceso para agregar el servicio son su precio al aviso");
     }
 
-    public void eliminaAviso(Cliente cliente, Aviso aviso/* , List<Aviso> avisos */)
+    public void eliminaAviso(Cliente cliente, Aviso aviso)
             throws InventarioException, DAOException {
 
         log.info("Inicia porceso para eliminar el aviso del cliente: " + cliente.getNombre());

@@ -21,8 +21,8 @@
 
 
     <p:dataTable id="dtPreciosServicios" widgetVar="dtPreciosServicios" value="#{clientesBean.clienteSelected.precioServicioList}" rowKey="#{pServicio.id}"
-                 var="pServicio" reflow="true" lazy="false" paginator="true"
-                 rows="5" paginatorPosition="bottom">
+                 var="pServicio" reflow="true" paginator="true"
+                 rows="6" paginatorPosition="bottom">
 
         <p:column headerText="Servicio" sortBy="#{pServicio.servicio.servicioDs}">
             <h:outputText value="#{pServicio.servicio.servicioDs}" />

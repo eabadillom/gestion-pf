@@ -127,7 +127,7 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<DetalleFacturacion> detalleFacturacionList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "cteCve", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Aviso> avisoList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")

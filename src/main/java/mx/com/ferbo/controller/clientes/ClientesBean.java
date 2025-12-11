@@ -283,6 +283,7 @@ public class ClientesBean implements Serializable {
         log.info("El usuario {} ha iniciado la operacion crear un nuevo aviso para el cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         this.avisoSelected = avisoBL.nuevoAviso();
         this.avisoSelected.setCteCve(clienteSelected);
+        cargarServiciosAviso(this.avisoSelected);
     }
 
     public void cargarServiciosAviso(Aviso aviso) {
