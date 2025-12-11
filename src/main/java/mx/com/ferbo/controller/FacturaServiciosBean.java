@@ -322,40 +322,19 @@ public class FacturaServiciosBean implements Serializable {
             }
 
             precioServicioList = psDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
-            /*Logica anterior, precio servicio no aceptaba nulos
-                        Integer idAviso = new Integer(-1);
-			for (PrecioServicio ps : precioServicioList) {
-				Integer avisoCve = ps.getAvisoCve().getAvisoCve();
-				if (avisoCve > idAviso)
-					idAviso = new Integer(avisoCve);
-				List<PrecioServicio> list = mpPrecioServicio.get(avisoCve);
-				if (list == null) {
-					list = new ArrayList<PrecioServicio>();
-					mpPrecioServicio.put(avisoCve, list);
-				}
-				list.add(ps);
-			}
-			mpPrecioServicio.get(idAviso);*/
-            Integer idAviso = -1; // inicializamos sin usar 'new Integer'
+            
+            Integer idAviso = -1;
 
             for (PrecioServicio ps : precioServicioList) {
-                // Controlar posible null en avisoCve
                 Integer avisoCve = (ps.getAvisoCve() != null) ? ps.getAvisoCve().getAvisoCve() : -1;
 
-                // Determinar el aviso máximo
                 if (avisoCve > idAviso) {
                     idAviso = avisoCve;
                 }
 
-                // Agrupar servicios por aviso
                 mpPrecioServicio.computeIfAbsent(avisoCve, k -> new ArrayList<>()).add(ps);
             }
 
-            // Obtener servicios del aviso máximo, protegiendo null
-           // alServicios = mpPrecioServicio.getOrDefault(idAviso, new ArrayList<>());
-
-            //alServicios.clear();
-            //alServicios = mpPrecioServicio.get(idAviso);
             alServicios = new ArrayList<>(mpPrecioServicio.getOrDefault(idAviso, new ArrayList<>()));
             for (PrecioServicio ps : alServicios) {
                 log.debug("Servicio: {} - Unidad: {}", ps.getServicio().getServicioDs(), ps.getUnidad().getUnidadDeManejoDs());
