@@ -224,7 +224,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 			if (this.selCliente == null)
 				throw new InventarioException("Debe seleccionar un cliente");
 			
-			plantaSelect = plantaDAO.buscarPorId(usuario.getIdPlanta());
+			plantaSelect = plantaDAO.buscarPorId(this.plantaSelect.getPlantaCve());
 
 			if (plantaSelect == null)
 				throw new InventarioException("Debe seleccionar una planta");
@@ -245,6 +245,8 @@ public class AltaConstanciaServicioBean implements Serializable {
 					selCliente.getCodUnico(), serie.getNuSerie());
 			
 			this.serie = serie;
+			
+			log.info("Folio: {}", this.folio);
 
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();

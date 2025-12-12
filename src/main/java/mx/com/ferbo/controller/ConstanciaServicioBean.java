@@ -450,6 +450,25 @@ public class ConstanciaServicioBean implements Serializable{
 		
 	}
 	
+	public String itemLabelServicio(PrecioServicio ps) {
+		String itemLabel = null;
+		String aviso = ps.getAvisoCve() == null ? "Sin aviso" : "Aviso " + ps.getAvisoCve().getAvisoCve();
+		
+		
+		switch(this.usuario.getPerfil()) {
+		case 1:
+		case 4:
+			itemLabel = String.format("%s - %s - cobro por %s",
+					aviso, ps.getServicio().getServicioDs(), ps.getUnidad().getUnidadDeManejoDs());
+		case 2:
+		case 3:
+			itemLabel = String.format("%s - %s - $ %s por %s",
+					aviso, ps.getServicio().getServicioDs(), ps.getPrecio(), ps.getUnidad().getUnidadDeManejoDs());
+		}
+		
+		return itemLabel;
+	}
+	
 	public List<Cliente> getListaClientes() {
 		return listaClientes;
 	}

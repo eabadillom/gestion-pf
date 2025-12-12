@@ -110,9 +110,9 @@
                     </p:dataTable>
                     <div class="p-grid p-mt-2">
                         <div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
-                            <p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{constanciaServicioBean.servicioSelected}">
+                            <p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{constanciaServicioBean.servicioSelected}" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemLabel="Selecciona un servicio" itemValue="" noSelectionOption="true"/>
-                                <f:selectItems value="#{constanciaServicioBean.precioServicioList}" var="pServicio" itemValue="#{pServicio.servicio}" itemLabel="#{pServicio.servicio.servicioDs}"/>
+                                <f:selectItems value="#{constanciaServicioBean.precioServicioList}" var="pServicio" itemValue="#{pServicio.servicio}" itemLabel="#{constanciaServicioBean.itemLabelServicio(pServicio)}"/>
                             </p:selectOneMenu>
                         </div>
                         <div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">

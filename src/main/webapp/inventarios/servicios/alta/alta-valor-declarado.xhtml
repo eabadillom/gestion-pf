@@ -4,17 +4,19 @@
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <p:fieldset legend="Valor declarado">
-        <div class="field col-12 md:col-4">
-            <p:inputNumber id="txtValorDeclarado" value="#{altaConstanciaServicioBean.valorDeclarado}" placeholder="Valor declarado" minValue="1" decimalPlaces="2"/>
-            <p:spacer width="5rem" />
-            <p:inputText id="txtNombreTransportista" value="#{altaConstanciaServicioBean.nombreTransportista}" placeholder="Nombre del transportista." />
-            <p:spacer width="5rem" />
-            <p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." />
-        </div>
-        <div class="p-grid p-col-12 ui-fluid">
-            <div class="p-card p-col-12 p-md-6">
-                <p:inputText id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." />
-            </div>
-        </div>
+    	<div class="p-grid ui-fluid">
+    		<div class="p-col-12 p-md-3">
+	            <p:inputNumber id="txtValorDeclarado" value="#{altaConstanciaServicioBean.valorDeclarado}" placeholder="Valor declarado" minValue="1" decimalPlaces="2"/>
+    		</div>
+    		<div class="p-col-12 p-md-6">
+	            <p:inputText id="txtNombreTransportista" value="#{altaConstanciaServicioBean.nombreTransportista}" placeholder="Nombre del transportista." />
+    		</div>
+    		<div class="p-col-12 p-md-3">
+    			<p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." />
+    		</div>
+    		<div class="p-col-12 p-md-12">
+    			<p:inputText id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." />
+    		</div>
+    	</div>
     </p:fieldset>
 </ui:composition>
