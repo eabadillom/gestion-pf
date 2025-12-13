@@ -22,11 +22,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.bouncycastle.util.Objects;
 
 @Entity
 @Table(name = "factura")
@@ -34,35 +37,8 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "Factura.findAll", query = "SELECT f FROM Factura f"),
         @NamedQuery(name = "Factura.findById", query = "SELECT f FROM Factura f WHERE f.id = :id"),
         @NamedQuery(name = "Factura.findByNumero", query = "SELECT f FROM Factura f WHERE f.numero = :numero"),
-        @NamedQuery(name = "Factura.findByMoneda", query = "SELECT f FROM Factura f WHERE f.moneda = :moneda"),
-        @NamedQuery(name = "Factura.findByRfc", query = "SELECT f FROM Factura f WHERE f.rfc = :rfc"),
-        @NamedQuery(name = "Factura.findByNombreCliente", query = "SELECT f FROM Factura f WHERE f.nombreCliente = :nombreCliente"),
-        @NamedQuery(name = "Factura.findByFecha", query = "SELECT f FROM Factura f WHERE f.fecha = :fecha"),
-        @NamedQuery(name = "Factura.findByObservacion", query = "SELECT f FROM Factura f WHERE f.observacion = :observacion"),
-        @NamedQuery(name = "Factura.findBySubtotal", query = "SELECT f FROM Factura f WHERE f.subtotal = :subtotal"),
-        @NamedQuery(name = "Factura.findByIva", query = "SELECT f FROM Factura f WHERE f.iva = :iva"),
-        @NamedQuery(name = "Factura.findByTotal", query = "SELECT f FROM Factura f WHERE f.total = :total"),
-        @NamedQuery(name = "Factura.findByPais", query = "SELECT f FROM Factura f WHERE f.pais = :pais"),
-        @NamedQuery(name = "Factura.findByEstado", query = "SELECT f FROM Factura f WHERE f.estado = :estado"),
-        @NamedQuery(name = "Factura.findByMunicipio", query = "SELECT f FROM Factura f WHERE f.municipio = :municipio"),
-        @NamedQuery(name = "Factura.findByCiudad", query = "SELECT f FROM Factura f WHERE f.ciudad = :ciudad"),
-        @NamedQuery(name = "Factura.findByColonia", query = "SELECT f FROM Factura f WHERE f.colonia = :colonia"),
-        @NamedQuery(name = "Factura.findByCp", query = "SELECT f FROM Factura f WHERE f.cp = :cp"),
-        @NamedQuery(name = "Factura.findByCalle", query = "SELECT f FROM Factura f WHERE f.calle = :calle"),
-        @NamedQuery(name = "Factura.findByNumExt", query = "SELECT f FROM Factura f WHERE f.numExt = :numExt"),
-        @NamedQuery(name = "Factura.findByNumInt", query = "SELECT f FROM Factura f WHERE f.numInt = :numInt"),
-        @NamedQuery(name = "Factura.findByTelefono", query = "SELECT f FROM Factura f WHERE f.telefono = :telefono"),
-        @NamedQuery(name = "Factura.findByFax", query = "SELECT f FROM Factura f WHERE f.fax = :fax"),
-        @NamedQuery(name = "Factura.findByPorcentajeIva", query = "SELECT f FROM Factura f WHERE f.porcentajeIva = :porcentajeIva"),
-        @NamedQuery(name = "Factura.findByNumeroCliente", query = "SELECT f FROM Factura f WHERE f.numeroCliente = :numeroCliente"),
-        @NamedQuery(name = "Factura.findByValorDeclarado", query = "SELECT f FROM Factura f WHERE f.valorDeclarado = :valorDeclarado"),
-        @NamedQuery(name = "Factura.findByInicioServicios", query = "SELECT f FROM Factura f WHERE f.inicioServicios = :inicioServicios"),
-        @NamedQuery(name = "Factura.findByFinServicios", query = "SELECT f FROM Factura f WHERE f.finServicios = :finServicios"),
-        @NamedQuery(name = "Factura.findByMontoLetra", query = "SELECT f FROM Factura f WHERE f.montoLetra = :montoLetra"),
-        @NamedQuery(name = "Factura.findByPlazo", query = "SELECT f FROM Factura f WHERE f.plazo = :plazo"),
         @NamedQuery(name = "Factura.findByCliente", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente"),
         @NamedQuery(name = "Factura.findByClienteStatusFactura", query = "SELECT f FROM Factura f WHERE f.cliente.cteCve = :clienteCve and f.status.id = :status"),
-        @NamedQuery(name = "Factura.findByRetencion", query = "SELECT f FROM Factura f WHERE f.retencion = :retencion"),
         @NamedQuery(name = "Factura.findByPeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
         @NamedQuery(name = "Factura.findByClientePeriodo", query = "SELECT f FROM Factura f WHERE f.cliente = :cliente AND f.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY f.fecha"),
         @NamedQuery(name = "Factura.findByNomSerie", query = "SELECT f FROM Factura f WHERE f.nomSerie = :nomSerie"),
@@ -70,11 +46,10 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "Factura.findActivasBySerieNumero", query = "SELECT f FROM Factura f WHERE f.status NOT IN (0,2) AND f.numero = :numero AND f.nomSerie = :serie"),
         @NamedQuery(name = "Factura.findByPlanta", query = "SELECT f FROM Factura f WHERE f.planta.plantaCve = :plantaCve"),
         @NamedQuery(name = "Factura.findByStatusFacturaClientePeriodo", query = "SELECT f FROM Factura f WHERE f.fecha BETWEEN :fechaInicio AND :fechaFin AND f.cliente.cteCve = :idCliente AND f.status.id = :idStatusFactura ORDER BY f.fecha, f.nomSerie, f.numero"),
-        @NamedQuery(name = "Factura.findByFolioDeposito", query = "SELECT f " +
-                "FROM ConstanciaDeDeposito cdd " +
-                "INNER JOIN cdd.constanciaFacturaList cf " +
-                "INNER JOIN cf.factura f " +
-                "WHERE cdd.folio = :folio") })
+        @NamedQuery(name = "Factura.findByFolioDeposito", query = "SELECT f FROM ConstanciaDeDeposito cdd INNER JOIN cdd.constanciaFacturaList cf INNER JOIN cf.factura f WHERE cdd.folio = :folio"),
+        @NamedQuery(name = "Factura.findByCliente?Periodo", query = "SELECT f FROM Factura f WHERE (f.cfdi IS NULL) AND  (f.fecha BETWEEN :fechaInicio AND :fechaFin) AND (f.cliente.cteCve = :idCliente OR :idCliente IS NULL) ORDER BY f.fecha"),
+        @NamedQuery(name = "Factura.findByNoCFDI", query = "SELECT f FROM Factura f LEFT JOIN f.cfdi c WHERE (f.fecha BETWEEN :fechaInicio AND :fechaFin) AND (f.cliente = :idCliente OR :idCliente IS NULL) AND (c IS NULL) AND (f.uuid IS NOT NULL)")
+        })
 public class Factura implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -298,22 +273,28 @@ public class Factura implements Serializable {
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }, mappedBy = "factura")
     private List<Pago> pagoList;
 
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "facturaMedioPagoPK.facturaId")
     private List<FacturaMedioPago> facturaMedioPagoList;
 
-    @OneToMany(cascade = { CascadeType.PERSIST }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "factura")
     private List<ServicioFactura> servicioFacturaList;
 
-    @OneToMany(cascade = { CascadeType.PERSIST }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "factura")
     private List<ConstanciaFacturaDs> constanciaFacturaDsList;
 
-    @OneToMany(cascade = { CascadeType.PERSIST }, mappedBy = "factura")
+    @OneToMany(cascade = { CascadeType.PERSIST}, mappedBy = "factura")
     private List<ConstanciaFactura> constanciaFacturaList;
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "notaPorFacturaPK.factura")
     private List<NotaPorFactura> notaFacturaList;
+    
+    @OneToOne(cascade = {CascadeType.MERGE}, mappedBy = "factura")
+    private Cfdi cfdi;
+    
+    @OneToOne(cascade = {CascadeType.MERGE}, mappedBy = "factura")
+    private CancelaFactura cancelaFactura;
 
-    public Factura() {
+	public Factura() {
     }
 
     public Factura(Integer id) {
@@ -371,6 +352,31 @@ public class Factura implements Serializable {
         this.emisorRFC = emisorRFC;
         this.emisorCdRegimen = emisorCdRegimen;
 
+    }
+    
+    @Override
+    public int hashCode() {
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.id);
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+    	// TODO: Warning - this method won't work in the case the id fields are not set
+    	if (!(object instanceof Factura)) {
+    		return false;
+    	}
+    	Factura other = (Factura) object;
+    	if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+    		return false;
+    	}
+    	return true;
+    }
+    
+    @Override
+    public String toString() {
+    	return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
     }
 
     public Integer getId() {
@@ -757,36 +763,27 @@ public class Factura implements Serializable {
         this.notaFacturaList = notaFacturaList;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    public Cfdi getCfdi() {
+    	return cfdi;
     }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Factura)) {
-            return false;
-        }
-        Factura other = (Factura) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+    
+    public void setCfdi(Cfdi cfdi) {
+    	this.cfdi = cfdi;
     }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Factura[ id=" + id + " ]";
-    }
-
+    
     public String getLugarExpedicion() {
-        return lugarExpedicion;
+    	return lugarExpedicion;
     }
-
+    
     public void setLugarExpedicion(String emisorCodigoPostal) {
-        this.lugarExpedicion = emisorCodigoPostal;
+    	this.lugarExpedicion = emisorCodigoPostal;
     }
+    
+    public CancelaFactura getCancelaFactura() {
+		return cancelaFactura;
+	}
+
+	public void setCancelaFactura(CancelaFactura cancelaFactura) {
+		this.cancelaFactura = cancelaFactura;
+	}
 }

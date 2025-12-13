@@ -49,44 +49,55 @@ public class ProductoConstancia implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "catidad_cobro")
     private BigDecimal catidadCobro;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "unidad_cobro")
     private String unidadCobro;
+    
     @Column(name = "cantidad_manejo")
     private BigDecimal cantidadManejo;
+    
     @Size(max = 255)
     @Column(name = "unidad_manejo")
     private String unidadManejo;
+    
     @Column(name = "planta_cve")
     private Integer plantaCve;
+    
     @Size(max = 80)
     @Column(name = "planta_ds")
     private String plantaDs;
+    
     @Size(max = 6)
     @Column(name = "planta_abrev")
     private String plantaAbrev;
+    
     @Column(name = "camara_cve")
     private Integer camaraCve;
+    
     @Size(max = 80)
     @Column(name = "camara_ds")
     private String camaraDs;
+    
     @Size(max = 6)
     @Column(name = "camara_abrev")
-    private String camaraAbrev;    
-    @JoinColumn(name = "constancia", referencedColumnName = "id")
+    private String camaraAbrev;
+    
     @ManyToOne(optional = false)
+    @JoinColumn(name = "constancia", referencedColumnName = "id")
     private ConstanciaFactura constanciaFactura;
 
     public ProductoConstancia() {
