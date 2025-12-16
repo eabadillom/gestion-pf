@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:panel id="pnl-list-venta" header="VENTAS" >
+        <p:dataTable id="dt-venta" widgetVar="dt-Venta" var="venta" value="#{consultaVentasBean.listVentas}" rowKey="#{venta.idVentas}" 
+            reflow="true"  rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom">
+            
+            <p:column headerText="Fecha" width="5rem" style="text-align:center">
+                <h:outputText value="#{venta.fecha}" >
+                    <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00" />
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Concepto" width="5rem" style="text-align:center">
+                <h:outputText value="#{venta.concepto}" >
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Cliente" width="5rem" style="text-align:center">
+                <h:outputText value="#{venta.cteCve.nombre}" >
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Importe" width="5rem" style="text-align:center">
+                <h:outputText value="#{venta.total}" >
+                    <f:convertNumber type="currency" locale="es_MX" />
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Status" width="5rem" style="text-align:center">
+                <h:outputText value="#{(venta.status == true ? 'Por Cobrar': 'Pagada')}"  >
+                </h:outputText>
+            </p:column>
+            
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton icon="pi pi-bars" process="@this" action="#{consultaVentasBean.cargaDetalle()}" update="form:pnl-det-venta" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetVenta').show();" >
+                    <f:setPropertyActionListener value="#{venta}" target="#{consultaVentasBean.venta}" />
+                </p:commandButton>
+            </p:column>
+            <p:ajax event="page" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+        </p:dataTable>
+    </p:panel>
+</ui:composition>

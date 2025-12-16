@@ -3,9 +3,11 @@ package mx.com.ferbo.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -689,5 +691,20 @@ public class DateUtil {
             Date finDate = Date.from(fin.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
             return new Date[]{inicioDate, finDate};
+        }
+        
+        /*
+        * Inicializa una fecha inicio una semana
+        * atras (7 dias) con una fecha final
+        */
+        public static Date moverFechaSemanaAtras(Date fechaFin) {
+            if (fechaFin == null) {
+                throw new IllegalArgumentException("La fecha fin no puede ser nula");
+            }
+
+            Instant instant = fechaFin.toInstant();
+            Instant inicioInstant = instant.minus(7, ChronoUnit.DAYS);
+
+            return Date.from(inicioInstant);
         }
 }

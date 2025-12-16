@@ -31,7 +31,8 @@ import javax.validation.constraints.NotNull;
     @NamedQuery(name = "Ventas.findByfecha", query = "SELECT v FROM Ventas v WHERE v.fecha= :fecha"),
     @NamedQuery(name = "Ventas.findByCliente", query = "SELECT v FROM Ventas v WHERE v.cteCve = :cliente"),
     @NamedQuery(name = "Ventas.findByStatus", query = "SELECT v FROM Ventas v WHERE v.status = :status"),
-    @NamedQuery(name = "Ventas.findByPlanta", query = "SELECT v FROM Ventas v WHERE v.cdEmisor = :emisor") 
+    @NamedQuery(name = "Ventas.findByPlanta", query = "SELECT v FROM Ventas v WHERE v.cdEmisor = :emisor"),
+    @NamedQuery(name = "Ventas.findByParametros", query = "SELECT v FROM Ventas v WHERE (v.fecha BETWEEN :fechaIni and :fechaFin) AND (:idCliente IS NULL OR v.cteCve.cteCve = :idCliente) AND (:idEmisor IS NULL OR v.cdEmisor.cd_emisor = :idEmisor)")
 })
 public class Ventas implements Serializable 
 {

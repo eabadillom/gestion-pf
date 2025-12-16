@@ -1,0 +1,28 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Ventas</ui:define>
+    <ui:define name="content">
+        <h:form id="form" enctype="multipart/form-data">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- Configuracion de la Venta -->
+            <!-- id: pnl-config-venta, cliente y emisor -->
+            <ui:include src="/protected/catalogos/ventas/alta/alta-cfg-ventas.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- Detalle de la venta -->
+            <!-- id: pnl-generar-venta, frm-agregaVenta, concepto y total -->
+            <ui:include src="/protected/catalogos/ventas/alta/alta-generar-ventas.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <ui:include src="/protected/catalogos/ventas/alta/alta-acciones.xhtml" />
+        </h:form>
+    </ui:define>
+</ui:composition>
