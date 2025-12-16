@@ -32,6 +32,7 @@ public class ImporteEgresosDAO extends BaseDAO<ImporteEgreso, Integer> {
         EntityManager em = null;
         List<ImporteUtilidad> list = null;
         try {
+            log.info("Inicia proceso para obtener la utilidad por emisor en una determinada fecha.");
             em = super.getEntityManager();
             String sql = "SELECT  " + "    combined.emi_nombre AS emi_nombre, "
                     + "    DATE_FORMAT(combined.fecha, '%Y-%m') AS fecha, " + "    SUM(combined.total_pagos) AS pagos, "
@@ -69,7 +70,7 @@ public class ImporteEgresosDAO extends BaseDAO<ImporteEgreso, Integer> {
                 u.setUtilidadPerdida((BigDecimal) o[id++]);
                 list.add(u);
             }
-
+            log.info("Finaliza proceso para obtener la utilidad por emisor en una determinada fecha.");
             return list;
         } catch (Exception e) {
             log.warn("Error al obtener la utilidad del emisor {} en la fecha {}", emisor, fecha);
@@ -84,12 +85,14 @@ public class ImporteEgresosDAO extends BaseDAO<ImporteEgreso, Integer> {
         EntityManager em = null;
         List<ImporteEgreso> list = null;
         try {
+            log.info("Inicia proceso para obtener la utilidad por emisor en un determinado periodo.");
             em = super.getEntityManager();
             list = em.createNamedQuery("ImporteEgreso.findByParametros", ImporteEgreso.class)
                     .setParameter("emisor", emisor)
                     .setParameter("fechaInicio", fechaInicio)
                     .setParameter("fechaFin", fechaFin)
                     .getResultList();
+            log.info("Finaliza proceso para obtener la utilidad por emisor en un determinado periodo.");
             return list;
         } catch (Exception ex) {
             log.warn("Error al obtener los importes de ingreso del emisor {} desde {} hasta la fecha {}. {}", emisor,
@@ -104,8 +107,10 @@ public class ImporteEgresosDAO extends BaseDAO<ImporteEgreso, Integer> {
         EntityManager em = null;
         List<ImporteEgreso> list = null;
         try {
+            log.info("Inicia proceso para obtener todos los importes de ingreso.");
             em = super.getEntityManager();
             list = em.createNamedQuery("ImporteEgreso.findByAll", ImporteEgreso.class).getResultList();
+            log.info("Finaliza proceso para obtener todos los importes de ingreso.");
             return list;
         } catch (Exception ex) {
             log.warn("Error al obtener todos los importes de egreso. {}", ex);

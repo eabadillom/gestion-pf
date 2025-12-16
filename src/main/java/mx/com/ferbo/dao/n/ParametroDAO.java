@@ -25,9 +25,11 @@ public class ParametroDAO extends BaseDAO<Parametro, Integer> {
         EntityManager em = null;
         Parametro parametro = null;
         try {
+            log.info("Inicia proceso para buscar el parametro en base a asu nombre.");
             em = super.getEntityManager();
             parametro = em.createNamedQuery("Parametro.findByNombre", Parametro.class)
 				.setParameter("nombre", nombre).getSingleResult();
+            log.info("Finaliza proceso para buscar el parametro en base a asu nombre.");
             return parametro;
         } catch (Exception ex) {
             log.warn("Error al obtener el parametro con nombre {}. {}", nombre,ex);
