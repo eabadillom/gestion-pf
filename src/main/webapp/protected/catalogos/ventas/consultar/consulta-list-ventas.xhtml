@@ -13,11 +13,6 @@
                 </h:outputText>
             </p:column>
 
-            <p:column headerText="Concepto" width="5rem" style="text-align:center">
-                <h:outputText value="#{venta.concepto}" >
-                </h:outputText>
-            </p:column>
-
             <p:column headerText="Cliente" width="5rem" style="text-align:center">
                 <h:outputText value="#{venta.cteCve.nombre}" >
                 </h:outputText>
@@ -35,8 +30,8 @@
             </p:column>
             
             <p:column width="2rem" style="text-align: center;">
-                <p:commandButton icon="pi pi-bars" process="@this" action="#{consultaVentasBean.cargaDetalle()}" update="form:pnl-det-venta" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetVenta').show();" >
-                    <f:setPropertyActionListener value="#{venta}" target="#{consultaVentasBean.venta}" />
+                <p:commandButton icon="pi pi-bars" process="@this" action="#{consultaVentasBean.cargaDetalleVenta()}" update="form:pnl-det-venta" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetVenta').show();" >
+                    <f:setPropertyActionListener value="#{venta}" target="#{consultaVentasBean.ventaSelected}" />
                 </p:commandButton>
             </p:column>
             <p:ajax event="page" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />

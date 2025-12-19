@@ -3,8 +3,10 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,10 +16,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -48,10 +50,6 @@ public class Ventas implements Serializable
     @Temporal(TemporalType.DATE)
     Date fecha;
 
-    @Column(name = "concepto")
-    @NotNull
-    private String concepto;
-
     @JoinColumn(name = "id_cliente", referencedColumnName = "CTE_CVE")
     @ManyToOne
     private Cliente cteCve;
@@ -68,6 +66,9 @@ public class Ventas implements Serializable
     @JoinColumn(name = "id_emisor", referencedColumnName = "cd_emisor")
     @ManyToOne
     private EmisoresCFDIS cdEmisor;
+    
+    @OneToMany(mappedBy = "venta", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<DetalleVenta> detalles;
 
     public Integer getIdVentas() {
         return idVentas;
@@ -83,14 +84,6 @@ public class Ventas implements Serializable
 
     public void setFecha(Date fecha) {
         this.fecha = fecha;
-    }
-
-    public String getConcepto() {
-        return concepto;
-    }
-
-    public void setConcepto(String concepto) {
-        this.concepto = concepto;
     }
 
     public Cliente getCteCve() {
@@ -131,6 +124,14 @@ public class Ventas implements Serializable
 
     public void setCdEmisor(EmisoresCFDIS cdEmisor) {
         this.cdEmisor = cdEmisor;
+    }
+
+    public List<DetalleVenta> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetalleVenta> detalles) {
+        this.detalles = detalles;
     }
     
 }

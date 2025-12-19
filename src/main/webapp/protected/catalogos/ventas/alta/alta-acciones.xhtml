@@ -3,13 +3,31 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <h:panelGroup style="display:block; text-align:left;">
-        <p:splitButton value="Guardar" actionListener="#{altasVentasBean.guardar}" icon="pi pi-save" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" >
-            <p:menuitem value="Imprimir" actionListener="#{altasVentasBean.imprimirTicket()}" icon="pi pi-file-pdf" ajax="false" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" >
-                <ui:remove><p:fileDownload value="#{altasVentasBean.file}" /></ui:remove>
-            </p:menuitem>
-            <p:menuitem value="Nueva" actionListener="#{altasVentasBean.crearVenta()}" icon="pi pi-refresh" ajax="false" process="@this" 
-                        onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" update="form:cliente form:emisor form:pnl-generar-venta" />
-        </p:splitButton>
-    </h:panelGroup>
+    <p:panel id="pnl-total-venta" >
+        <p:outputPanel id="totalVenta" style="display:block; text-align:right;">
+            <div class="p-grid ui-fluid">
+                <div class="p-col-6">
+                    <strong>Total de la venta:</strong>
+                </div>
+                <div class="p-col-2">
+                    <h:outputText value="#{altasVentasBean.total}" style="text-align:right" >
+                        <f:convertNumber type="currency" currencySymbol="$" />
+                    </h:outputText>
+                </div>
+            </div>
+        </p:outputPanel>
+    </p:panel>
+    <p:spacer style="height: 2rem;"/>
+    <p:toolbar id="acciones">
+        <p:toolbarGroup>
+            <p:commandButton value="Guardar" actionListener="#{altasVentasBean.guardar}" icon="pi pi-save" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" styleClass="m-2" />
+            <p:spacer style="width: 0.5rem;"/>
+            <p:commandButton value="Exportar PDF" actionListener="#{altasVentasBean.exportarPDF()}" icon="pi pi-file-pdf" ajax="false" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" styleClass="m-2" >
+                <p:fileDownload value="#{altasVentasBean.file}" />
+            </p:commandButton>
+            <p:spacer style="width: 0.5rem;"/>
+            <p:commandButton value="Nueva" actionListener="#{altasVentasBean.crearVenta()}" icon="pi pi-refresh" ajax="false" process="@this" styleClass="m-2"
+                        onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" update="form:cliente form:emisor form:planta form:dt-venta" />
+        </p:toolbarGroup>
+    </p:toolbar>
 </ui:composition>

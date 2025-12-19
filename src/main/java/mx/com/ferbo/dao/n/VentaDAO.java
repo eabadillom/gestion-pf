@@ -66,6 +66,11 @@ public class VentaDAO extends BaseDAO<Ventas, Integer>
                 .setParameter("fechaIni", fechaIni)
                 .setParameter("fechaFin", fechaFin)
                 .getResultList();
+            
+            for(Ventas venta : listModel){
+                log.debug("DetalleVenta: {}", venta.getDetalles().toString());
+            }
+            
         } catch (Exception e) {
             log.error("Error al buscar las ventas: ", e);
             return null;

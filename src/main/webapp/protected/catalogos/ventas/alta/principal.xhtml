@@ -11,17 +11,23 @@
             <ui:include src="/protected/common/status-info.xhtml" />
             
             <!-- Configuracion de la Venta -->
-            <!-- id: pnl-config-venta, cliente y emisor -->
+            <!-- id: pnl-config-venta, planta, cliente y emisor -->
             <ui:include src="/protected/catalogos/ventas/alta/alta-cfg-ventas.xhtml" />
             
             <p:spacer style="height: 2rem;"/>
             
-            <!-- Detalle de la venta -->
-            <!-- id: pnl-generar-venta, frm-agregaVenta, concepto y total -->
-            <ui:include src="/protected/catalogos/ventas/alta/alta-generar-ventas.xhtml" />
+            <!-- Lista de los detalles de la venta -->
+            <!-- id: pnl-det-venta y dt-venta -->
+            <ui:include src="/protected/catalogos/ventas/alta/alta-det-venta.xhtml" />
+            
+            <!-- Dialogo para agregar un concepto de la venta -->
+            <!-- id: dlgDetConcepto y pnl-detalle-concepto -->
+            <ui:include src="/protected/catalogos/ventas/alta/alta-dlg-detalle.xhtml" />
             
             <p:spacer style="height: 2rem;"/>
             
+            <!-- Total de la venta y botones de guardar, exportarPDF y crearVenta -->
+            <!-- id: pnl-total-venta, totalVenta y acciones -->
             <ui:include src="/protected/catalogos/ventas/alta/alta-acciones.xhtml" />
         </h:form>
     </ui:define>
