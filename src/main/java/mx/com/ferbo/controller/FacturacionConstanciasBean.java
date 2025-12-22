@@ -992,6 +992,7 @@ public class FacturacionConstanciasBean implements Serializable{
 
 		if (!(listaPrecioSTemp.isEmpty())) { // modificado por error de retornar objeto precioServicio en null
 			Optional<PrecioServicio> precioServicioMax = listaPrecioSTemp.stream()
+					.filter(ps -> ps.getAvisoCve() != null)
 					.max((i, j) -> i.getAvisoCve().getAvisoCve().compareTo(j.getAvisoCve().getAvisoCve()));
 			precioServicio = precioServicioMax.get();// colocar condicional, si y solo si precioServicioMax != null
 		}
