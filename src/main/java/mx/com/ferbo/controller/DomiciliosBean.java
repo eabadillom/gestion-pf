@@ -114,6 +114,7 @@ public class DomiciliosBean implements Serializable
      */
     private List<Paises> listPaises;
     private Paises paisSelected;
+    private Paises mexico;
     
     private String codigoPostal = "";
     
@@ -145,6 +146,11 @@ public class DomiciliosBean implements Serializable
         this.initGuardarObjetos();
         this.initActualizarObjetos();
         this.initEliminarObjetos();
+        try {
+			this.mexico = paisesDAO.buscarPorClave("MX").orElseThrow(() -> new InventarioException("Pais por defecto no encontrado: MX"));
+		} catch (InventarioException e) {
+			log.warn(e.getMessage());
+		}
     }
 
     public void filtraListadoEstados()
@@ -168,7 +174,7 @@ public class DomiciliosBean implements Serializable
             
             this.listEstadosFiltered = estadosDAO.buscarPorCriteriosEstados(this.estadoSelected);
             
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Estados", "Elemento encontrado");
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Estados", "Seleccione un estado");
         } catch (InventarioException ex) {
             log.warn("Problema para buscar un estado...", ex.getMessage());
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Estados", ex.getMessage());
@@ -199,7 +205,7 @@ public class DomiciliosBean implements Serializable
             
             this.listMunicipiosFiltered = municipiosDAO.buscarPorPaisEstado(this.municipioSelected);
             
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Municipios", "Elemento encontrado");
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Municipios", "Elemento encontrado");
         } catch (InventarioException ex) {
             log.warn("Problema para buscar un municipio...", ex.getMessage());
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Municipios", ex.getMessage());
@@ -230,13 +236,13 @@ public class DomiciliosBean implements Serializable
             
             this.listCiudadesFiltered = this.ciudadesDAO.buscarPorCriteriosCiudades(this.ciudadSelected);
             
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Ciudades", "Elemento encontrado");
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Ciudades", "Elemento encontrado");
         } catch (InventarioException ex) {
             log.warn("Problema para buscar una ciudad...", ex.getMessage());
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Ciudades", ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Localidad / ciudad", ex.getMessage());
         } catch (Exception ex) {
             log.error("Problema para buscar una ciudad...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Ciudades", "Problema para buscar una ciudad.");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Localidad / ciudad", "Problema para buscar una ciudad.");
         } finally {
             PrimeFaces.current().ajax().update("form:messages");
         }
@@ -259,13 +265,13 @@ public class DomiciliosBean implements Serializable
             
             this.listAsentamientoHumanoFiltered = this.asentamientoDAO.buscarPorCiudad(this.ciudadSelected);
             
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento Humano", "Elemento encontrado");
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento Humano", "Elemento encontrado");
         } catch (InventarioException ex) {
             log.warn("Problema para buscar un asentamiento...", ex.getMessage());
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Asentamiento Humano", ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Colonia (asentamiento)", ex.getMessage());
         } catch (Exception ex) {
             log.error("Problema para buscar un asentamiento...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Asentamiento Humano", "Problema para buscar un asentamiento.");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Colonia (asentamiento)", "Problema para buscar un asentamiento.");
         } finally {
             PrimeFaces.current().ajax().update("form:messages");
         }
@@ -280,7 +286,7 @@ public class DomiciliosBean implements Serializable
             this.entidadPostalSelected = this.asentamientoHumanoSelected.getEntidadPostal();
             this.tipoAsentamientoSelected = this.asentamientoHumanoSelected.getTipoAsentamiento();
             
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento", "Elemento encontrado");
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento", "Elemento encontrado");
         } catch (InventarioException ex) {
             log.warn("Problema para buscar los elementos...", ex.getMessage());
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Asentamiento", ex.getMessage());
@@ -806,7 +812,7 @@ public class DomiciliosBean implements Serializable
             this.listCiudadesFiltered = this.ciudadesDAO.buscarPorCriteriosCiudades(this.ciudadSelected);
             this.listAsentamientoHumanoFiltered = this.asentamientoDAO.buscarPorCiudad(this.ciudadSelected);
             
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento Humano", "Domicilio seleccionado");
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento Humano", "Domicilio seleccionado");
         } catch (InventarioException ex) {
             log.error("Problema para buscar un asentamiento...", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Asentamiento Humano", ex.getMessage());
@@ -853,8 +859,14 @@ public class DomiciliosBean implements Serializable
         this.ciudadSelected = new Ciudades();
         this.municipioSelected = new Municipios();
         this.estadoSelected = new Estados();
-        this.paisSelected = new Paises();
         this.limpiarListasFiltradas();
+        
+        if(this.mexico == null)
+        	this.paisSelected = new Paises();
+        else
+        	this.paisSelected = this.mexico;
+        
+        this.filtraListadoEstados();
     }
     
     public void limpiarListasFiltradas(){

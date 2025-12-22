@@ -221,11 +221,11 @@ public class ClientesBean implements Serializable {
             clienteSelected = clienteBL.obtenerTodoCliente(cliente, true);
             lstRegimenFiscalFiltered = fiscalBL.filtrarRegimenesFiscales(this.lstRegimenFiscal, clienteSelected);
             lstUsoCfdiFiltered = fiscalBL.filtrarCfdis(this.lstUsoCfdi, clienteSelected);
-            clienteSelected.setAvisoList(avisoBL.obtenerAvisosPorCliente(clienteSelected));
-            clienteSelected.setPrecioServicioList(precioServicioBL.obtenerPorClienteConOSinAviso(clienteSelected, null));
+            lstPrecioServiciosDisponibles = this.clienteSelected.getPrecioServicioList().stream()
+            		.filter(item -> item.getAvisoCve() == null)
+            		.collect(Collectors.toList());
             this.actualizarListasDomicilios();
 
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Fiscal", "Información fiscal cargada");
         } catch (InventarioException ex) {
             log.warn(ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cargar informacion", ex.getMessage());
@@ -290,19 +290,36 @@ public class ClientesBean implements Serializable {
         log.info("El usuario {} ha comenzado a cargar el aviso {}", usuario.getUsuario(), aviso);
         try {
             avisoSelected = aviso;
-            List<PrecioServicio> preciosSinAviso = precioServicioBL.obtenerPorClienteConOSinAviso(clienteSelected, null);
-            avisoSelected.setPrecioServicioList(precioServicioBL.obtenerPorClienteConOSinAviso(clienteSelected, avisoSelected));
-            lstPrecioServiciosDisponibles = precioServicioBL.obtenerDisponibles(preciosSinAviso, avisoSelected.getPrecioServicioList());
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Avisos", "La información cargo exitosamente");
-        } catch (InventarioException ex) {
-            log.warn("No se pudo extraer la información de los precios de servicios...", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Avisos", ex.getMessage());
+            List<PrecioServicio> preciosSinAviso = this.clienteSelected.getPrecioServicioList()
+            		.stream()
+            		.filter(ps -> ps.getAvisoCve() == null)
+            		.collect(Collectors.toList());
+            
+            lstPrecioServiciosDisponibles = new ArrayList<PrecioServicio>();
+            lstPrecioServiciosDisponibles.addAll(preciosSinAviso);
+            
+            for(PrecioServicio ps : preciosSinAviso) {
+            	
+            	aviso.getPrecioServicioList().forEach(t -> {
+            		if(t.getServicio().equals(ps.getServicio()))
+            			lstPrecioServiciosDisponibles.remove(ps);
+            	});
+            }
+            
         } catch (Exception ex) {
             log.error("Error desconocido al momento de cargar la información...", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Avisos", "Contacte con el administrador del sistema");
         } finally {
             PrimeFaces.current().ajax().update("form:messages");
         }
+    }
+    
+    public List<PrecioServicio> servicios() {
+    	return this.clienteSelected
+    			.getPrecioServicioList()
+    			.stream()
+    			.filter(item -> item.getAvisoCve() == null)
+    			.collect(Collectors.toList());
     }
 
     public void operarAvisos(String operacion) {

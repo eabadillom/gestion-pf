@@ -57,7 +57,7 @@
                         <!-- Paises -->
                         <div class="p-col-3 p-md-3">
                             <div class="field col">
-                                <p:outputLabel for="@next" value="Paises"/>
+                                <p:outputLabel for="@next" value="País"/>
                                 <p:selectOneMenu id="pais" autoWidth="false" converter="entityConverter" value="#{domiciliosBean.paisSelected}" 
                                     disabled="#{empty domiciliosBean.listPaises}" filter="true" filterMatchMode="contains" >
                                    <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}" />
@@ -84,7 +84,7 @@
                         <!-- Estados -->
                         <div class="p-col-3 p-md-3">
                             <div class="field col">
-                                <p:outputLabel for="@next" value="Estados"/>
+                                <p:outputLabel for="@next" value="Estado"/>
                                 <p:selectOneMenu id="estado" autoWidth="false" converter="entityConverter" value="#{domiciliosBean.estadoSelected}" 
                                     disabled="#{empty domiciliosBean.listEstadosFiltered}" filter="true" filterMatchMode="contains" 
                                     styleClass="custom-style">
@@ -112,7 +112,7 @@
                         <!-- Municipios -->
                         <div class="p-col-3 p-md-3">
                             <div class="field col">
-                                <p:outputLabel for="@next" value="Municipios"/>
+                                <p:outputLabel for="@next" value="Municipio o demarcación terrotirial"/>
                                 <p:selectOneMenu id="municipio" autoWidth="false" converter="entityConverter" value="#{domiciliosBean.municipioSelected}"
                                     disabled="#{empty domiciliosBean.listMunicipiosFiltered}" filter="true" filterMatchMode="contains" 
                                     styleClass="custom-style">
@@ -144,7 +144,7 @@
                         <!-- Ciudades -->
                         <div class="p-col-4 p-md-5">
                             <div class="field col">
-                                <p:outputLabel for="@next" value="Ciudades"/>
+                                <p:outputLabel for="@next" value="Localidad o ciudad"/>
                                 <p:selectOneMenu id="ciudad" autoWidth="false" converter="entityConverter" value="#{domiciliosBean.ciudadSelected}"
                                     disabled="#{empty domiciliosBean.listCiudadesFiltered}" filter="true" filterMatchMode="contains" 
                                     styleClass="custom-style">
@@ -174,7 +174,7 @@
                         <!-- Asentamientos -->
                         <div class="p-col-4 p-md-5">
                             <div class="field col">
-                                <p:outputLabel for="@next" value="Asentamiento"/>
+                                <p:outputLabel for="@next" value="Colonia (asentamiento)"/>
                                 <p:selectOneMenu id="asentamiento" autoWidth="false" converter="entityConverter" value="#{domiciliosBean.asentamientoHumanoSelected}"
                                     disabled="#{empty domiciliosBean.listAsentamientoHumanoFiltered}" filter="true" filterMatchMode="contains" 
                                     styleClass="custom-style">

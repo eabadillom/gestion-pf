@@ -20,7 +20,7 @@
 
 
 
-    <p:dataTable id="dtPreciosServicios" widgetVar="dtPreciosServicios" value="#{clientesBean.clienteSelected.precioServicioList}" rowKey="#{pServicio.id}"
+    <p:dataTable id="dtPreciosServicios" widgetVar="dtPreciosServicios" value="#{clientesBean.servicios()}" rowKey="#{pServicio.id}"
                  var="pServicio" reflow="true" paginator="true"
                  rows="6" paginatorPosition="bottom">
 
@@ -76,8 +76,8 @@
                 </div>
                 <div class="p-field">
                     <p:outputLabel>Precio</p:outputLabel>
-                    <p:inputNumber value="#{clientesBean.precioServicioSelected.precio}" emptyValue="0" symbol="$" symbolPosition="p" thousandSeparator=","
-                                   minValue="0" required="true" requiredMessage="Campo requerido" disabled="#{clientesBean.precioServicioSelected.avisoCve.avisoCve != 1}"/>
+                    <p:inputNumber value="#{clientesBean.precioServicioSelected.precio}" emptyValue="0" symbol="$ " symbolPosition="p" thousandSeparator=","
+                                   minValue="0" required="true" requiredMessage="Campo requerido" disabled="#{clientesBean.precioServicioSelected.avisoCve.avisoCve ne null}"/>
                 </div>
             </p:outputPanel>
         </p:outputPanel>

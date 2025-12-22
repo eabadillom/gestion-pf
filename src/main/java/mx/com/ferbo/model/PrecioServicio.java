@@ -59,7 +59,7 @@ public class PrecioServicio implements Serializable {
     private UnidadDeManejo unidad;
 
     @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve", nullable = true)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     private Aviso avisoCve;
 
     public PrecioServicio() {

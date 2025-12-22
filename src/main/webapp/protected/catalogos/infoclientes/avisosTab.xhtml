@@ -207,7 +207,7 @@
                             <p:commandButton value="Agregar seleccionados al aviso"
                                              icon="pi pi-plus"
                                              actionListener="#{clientesBean.operarAvisos('agregarservicio')}"
-                                             update="pnlAviso"
+                                             update="form:tabView:dtServicioAviso form:tabView:dtServiciosSinAviso"
                                              process="@this dtServiciosSinAviso" />
                         </div>
                     </p:panel>
@@ -215,8 +215,8 @@
                     <p:panel header="Servicios con este aviso">
                         <p:dataTable id="dtServicioAviso" 
                                      widgetVar="dtServicioAviso" var="pServicioAviso"
-                                     value="#{clientesBean.avisoSelected.precioServicioList}" reflow="true"
-                                     rowKey="#{pServicioAviso.id}" lazy="false" paginator="true"
+                                     value="#{clientesBean.avisoSelected.precioServicioList}"
+                                     rowKey="#{pServicioAviso.id}" paginator="true"
                                      rows="5" paginatorPosition="bottom">
 
                             <p:column headerText="Servicio">

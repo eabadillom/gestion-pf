@@ -67,7 +67,7 @@ public class Contacto implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto")
     private List<ClienteContacto> clienteContactoList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto", orphanRemoval = true)//removi ophanremovel
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "idContacto")
     private List<MedioCnt> medioCntList;
 
     public Contacto() {
