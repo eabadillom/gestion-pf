@@ -5,20 +5,22 @@
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <p:tab title="Domicilios">
-        <div class="p-field p-col">
-            <p:outputLabel for="soClienteTipoDom" value="Tipo de domicilio" />
-            <p:selectOneMenu id="soClienteTipoDom" converter="entityConverter"
-                    disabled="#{clientesBean.clienteSelected eq null and clientesBean.clienteSelected.cteCve eq null}"
-                    value="#{clientesBean.tipoDomicilioSelected}" requiredMessage="Campo requerido" >
-                    <f:selectItem itemLabel="--Selecciona--" itemValue="#{null}"/>
-                    <f:selectItems value="#{clientesBean.lstTiposDomicilio}" var="tipoDomicilio"
-                            itemLabel="#{tipoDomicilio.domicilioTipoDesc}" itemValue="#{tipoDomicilio}" />
-                    <p:ajax listener="#{clientesBean.filtraListadoDomicilioFiltered()}" event="valueChange" 
-                            update="form:tabView:btnAddClienteDireccion form:tabView:dt-domiciliosCliente"/>
-            </p:selectOneMenu>
-        </div>
-        <div class="p-field p-col-3 p-md-6">
-            <span class="filter-container ui-input-icon-left"> <p:commandButton
+    	<div class="p-grid ui-fluid">
+    		<div class="p-col-12 p-md-6">
+	            <p:outputLabel for="soClienteTipoDom" value="Tipo de domicilio" />
+	            <p:selectOneMenu id="soClienteTipoDom" converter="entityConverter"
+	                    disabled="#{clientesBean.clienteSelected eq null and clientesBean.clienteSelected.cteCve eq null}"
+	                    value="#{clientesBean.tipoDomicilioSelected}" requiredMessage="Campo requerido" >
+	                    <f:selectItem itemLabel="--Selecciona--" itemValue="#{null}"/>
+	                    <f:selectItems value="#{clientesBean.lstTiposDomicilio}" var="tipoDomicilio"
+	                            itemLabel="#{tipoDomicilio.domicilioTipoDesc}" itemValue="#{tipoDomicilio}" />
+	                    <p:ajax listener="#{clientesBean.filtraListadoDomicilioFiltered()}" event="valueChange" 
+	                            update="form:tabView:btnAddClienteDireccion form:tabView:dt-domiciliosCliente"/>
+	            </p:selectOneMenu>
+    		</div>
+    		<div class="p-col-12 p-md-6">
+    			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+    			<span class="filter-container ui-input-icon-left"> <p:commandButton
                     id="btnAddClienteDireccion" icon="pi pi-plus" value="Agregar" process="@this"
                     update="form:panel-addClienteDireccion"
                     styleClass="ui-button-primary" style="margin-right: .5rem"
@@ -26,8 +28,10 @@
                     oncomplete="PF('clienteDireccionesAddDialog').show()"
                     disabled="#{clientesBean.clienteSelected eq null or clientesBean.tipoDomicilioSelected eq null}"
                     resetValues="panel-addClienteDireccion" />
-            </span>
-        </div>
+            	</span>
+    		</div>
+    	</div>
+    	<p:spacer style="height: 1rem;"/>
         <p:dataTable id="dt-domiciliosCliente"
             widgetVar="dtDomiciliosCliente"
             value="#{clientesBean.lstClienteDomiciliosFiltered}"

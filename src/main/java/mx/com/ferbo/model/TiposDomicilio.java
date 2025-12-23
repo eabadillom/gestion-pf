@@ -6,10 +6,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +16,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -49,9 +47,6 @@ public class TiposDomicilio implements Serializable {
     @Column(name = "domicilio_tipo_desc")
     private String domicilioTipoDesc;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "domicilioTipoCve")
-    private List<Domicilios> domiciliosList;
-
     public TiposDomicilio() {
     }
 
@@ -78,14 +73,6 @@ public class TiposDomicilio implements Serializable {
 
     public void setDomicilioTipoDesc(String domicilioTipoDesc) {
         this.domicilioTipoDesc = domicilioTipoDesc;
-    }
-
-    public List<Domicilios> getDomiciliosList() {
-        return domiciliosList;
-    }
-
-    public void setDomiciliosList(List<Domicilios> domiciliosList) {
-        this.domiciliosList = domiciliosList;
     }
 
     @Override

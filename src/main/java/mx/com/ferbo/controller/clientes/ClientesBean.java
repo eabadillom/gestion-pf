@@ -191,7 +191,7 @@ public class ClientesBean implements Serializable {
     public void init() {
         try {
             request = (HttpServletRequest) context.getExternalContext().getRequest();
-            this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+            this.usuario = (Usuario) request.getSession(false).getAttribute("usuario");
             log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
             this.lstClientes = clienteBL.obtenerTodos();
             this.lstMedioPago = medioPagoBL.obtenerMediosPago();
@@ -225,7 +225,12 @@ public class ClientesBean implements Serializable {
             		.filter(item -> item.getAvisoCve() == null)
             		.collect(Collectors.toList());
             this.actualizarListasDomicilios();
-
+            this.tipoDomicilioSelected = lstTiposDomicilio
+            		.stream()
+            		.filter(item -> item.getDomicilioTipoDesc().contains("Fiscal"))
+            		.findFirst().orElse(null);
+            this.filtraListadoDomicilioFiltered();
+            
         } catch (InventarioException ex) {
             log.warn(ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cargar informacion", ex.getMessage());
