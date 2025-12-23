@@ -15,7 +15,7 @@
             </div>
             <div class="p-field p-col-12 p-md-2">
                 <p:outputLabel for="txtRFC">RFC</p:outputLabel>
-                <p:inputText id="txtRFC" value="#{clientesBean.clienteSelected.cteRfc}" maxlength="13">
+                <p:inputText id="txtRFC" value="#{clientesBean.clienteSelected.cteRfc}" maxlength="13" style="text-transform: uppercase">
                     <p:ajax event="blur" listener="#{clientesBean.validarRFC()}" update="txtCodigo" />
                 </p:inputText>
             </div>
@@ -27,23 +27,23 @@
             </div>
             <div class="p-field p-col-12 p-md-2">
                 <p:outputLabel for="txtCodigo">Código único</p:outputLabel>
-                <p:inputText id="txtCodigo" value="#{clientesBean.clienteSelected.codUnico}" maxlength="4" />
+                <p:inputText id="txtCodigo" value="#{clientesBean.clienteSelected.codUnico}" maxlength="4" style="text-transform: uppercase"/>
             </div>
             <div class="p-field p-col-12 p-md-4">
                 <p:outputLabel for="txtNombre">Nombre</p:outputLabel>
-                <p:inputText id="txtNombre" value="#{clientesBean.clienteSelected.nombre}" required="true"
+                <p:inputText id="txtNombre" value="#{clientesBean.clienteSelected.nombre}" required="true" style="text-transform: uppercase"
                              requiredMessage="Debe indicar el nombre" maxlength="150" > 
                     <p:ajax process="@this"/>
                 </p:inputText>
             </div>
             <div class="p-field p-col-12 p-md-4">
                 <p:outputLabel for="txtAlias">Alias</p:outputLabel>
-                <p:inputText id="txtAlias" value="#{clientesBean.clienteSelected.alias}" required="false"
+                <p:inputText id="txtAlias" value="#{clientesBean.clienteSelected.alias}" required="false" style="text-transform: uppercase"
                              maxlength="150" readonly="#{clientesBean.clienteSelected.tipoPersona != 'M'}" />
             </div>
             <div class="p-field p-col-12 p-md-4">
                 <p:outputLabel for="txtRegimenCapital">Régimen capital</p:outputLabel>
-                <p:inputText id="txtRegimenCapital" value="#{clientesBean.clienteSelected.regimenCapital}"
+                <p:inputText id="txtRegimenCapital" value="#{clientesBean.clienteSelected.regimenCapital}" style="text-transform: uppercase"
                              readonly="#{clientesBean.clienteSelected.tipoPersona eq 'F'}" maxlength="150">
                     <p:ajax process="@this"/>
                 </p:inputText>
