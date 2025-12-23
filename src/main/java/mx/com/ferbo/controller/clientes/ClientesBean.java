@@ -174,6 +174,8 @@ public class ClientesBean implements Serializable {
 
     @Inject
     private ServicioBL servicioBL;
+    
+    private Categoria categoriaAll;
 
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
@@ -204,6 +206,10 @@ public class ClientesBean implements Serializable {
             this.lstCategoria = categoriaBL.obtenerCategorias();
             this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
             this.lstUsoCfdi = fiscalBL.obtenerCfdis();
+            this.categoriaAll = categoriaBL.obtenerCategorias()
+            		.stream()
+            		.filter(item -> "ALL".equalsIgnoreCase(item.getCategoriaDs()))
+            		.findFirst().orElse(null);
         } catch (InventarioException ex) {
             log.warn("Error: ", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cargar Información", ex.getMessage());
@@ -288,6 +294,7 @@ public class ClientesBean implements Serializable {
         log.info("El usuario {} ha iniciado la operacion crear un nuevo aviso para el cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         this.avisoSelected = avisoBL.nuevoAviso();
         this.avisoSelected.setCteCve(clienteSelected);
+        this.avisoSelected.setCategoriaCve(categoriaAll);
         cargarServiciosAviso(this.avisoSelected);
     }
 

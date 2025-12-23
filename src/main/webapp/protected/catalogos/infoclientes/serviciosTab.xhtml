@@ -49,7 +49,7 @@
     </p:dataTable>
 
     <p:dialog id="dialogPrecioServicio" header="#{(clientesBean.precioServicioSelected.id != null) ? 'Actualizar' : 'Agregar'} Precio Servicio" showEffect="fade" modal="false" widgetVar="dialogPrecioServicio" responsive="true" position="center center"
-              width="100%" resizable="false" dynamic="true">
+              width="30rem" resizable="false" dynamic="true">
         <p:outputPanel id="pnlServicio" class="ui-fluid">
             <p:outputPanel>
                 <div class="p-field">
@@ -76,7 +76,7 @@
                 </div>
                 <div class="p-field">
                     <p:outputLabel>Precio</p:outputLabel>
-                    <p:inputNumber value="#{clientesBean.precioServicioSelected.precio}" emptyValue="0" symbol="$ " symbolPosition="p" thousandSeparator=","
+                    <p:inputNumber value="#{clientesBean.precioServicioSelected.precio}" emptyValue="null" symbol="$ " symbolPosition="p" thousandSeparator="," inputStyle="text-align: right"
                                    minValue="0" required="true" requiredMessage="Campo requerido" disabled="#{clientesBean.precioServicioSelected.avisoCve.avisoCve ne null}"/>
                 </div>
             </p:outputPanel>

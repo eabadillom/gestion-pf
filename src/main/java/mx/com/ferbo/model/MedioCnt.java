@@ -57,7 +57,7 @@ public class MedioCnt implements Serializable {
     private boolean stMedio;
 
     @JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
-    @ManyToOne(optional = false, cascade = CascadeType.DETACH) // Cambie por ALL
+    @ManyToOne
     private Contacto idContacto;
 
     @JoinColumn(name = "id_mail", referencedColumnName = "id_mail")

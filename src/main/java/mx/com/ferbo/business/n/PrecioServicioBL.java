@@ -1,6 +1,5 @@
 package mx.com.ferbo.business.n;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -39,7 +38,7 @@ public class PrecioServicioBL {
         log.info("Incia proceso para crear un nuevo precio de servicio");
         PrecioServicio precioServicio = new PrecioServicio();
         precioServicio.setCliente(cliente);
-        precioServicio.setPrecio(BigDecimal.ZERO);
+        precioServicio.setPrecio(null);
         precioServicio.setServicio(new Servicio());
         precioServicio.setUnidad(new UnidadDeManejo());
         precioServicio.setAvisoCve(null);

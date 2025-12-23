@@ -141,8 +141,9 @@ public class Aviso implements Serializable {
     @ManyToOne
     private Planta plantaCve;
 
-    @JoinColumn(name = "categoria_cve", referencedColumnName = "categoria_cve", nullable = false)
     @ManyToOne
+    @JoinColumn(name = "categoria_cve", referencedColumnName = "categoria_cve")
+    @Basic(optional = true)
     private Categoria categoriaCve;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve", orphanRemoval = true)
