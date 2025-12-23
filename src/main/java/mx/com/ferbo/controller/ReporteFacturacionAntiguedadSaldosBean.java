@@ -83,7 +83,7 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 		if(concentradoSelect == true) {
 			String jasperPath = "/jasper/AntiguedadSaldosCondensado.jrxml";
 			String filename = "AntiguedadSaldosCondensado"+fecha+".pdf";
-			String images = "/images/logo.jpeg";
+			String images = "/images/logoF.png";
 			String message = null;
 			Severity severity = null;
 			File reportFile = new File(jasperPath);
@@ -137,7 +137,7 @@ public class ReporteFacturacionAntiguedadSaldosBean implements Serializable {
 			if(condensadoSelect == true ) {
 				String jasperPath = "/jasper/AntiguedadSaldosDesglosado.jrxml";
 				String filename = "AntiguedadSaldosDesglosado"+fecha+".pdf";
-				String images = "/images/logo.jpeg";
+				String images = "/images/logoF.png";
 				String message = null;
 				Severity severity = null;
 				File reportFile = new File(jasperPath);
