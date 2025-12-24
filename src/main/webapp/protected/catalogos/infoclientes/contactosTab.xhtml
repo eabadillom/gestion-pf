@@ -58,20 +58,20 @@
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Nombre</p:outputLabel>
-                            <p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" style="text-transform: uppercase"
+                            <p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbNombre}" oninput="this.value = this.value.toUpperCase()"
                                 required="true" requiredMessage="Debe indicar el nombre del contacto." />
                         </div>
                     </div>
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Primer apellido</p:outputLabel>
-                            <p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" style="text-transform: uppercase"/>
+                            <p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido1}" oninput="this.value = this.value.toUpperCase()"/>
                         </div>
                     </div>
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Segundo apellido</p:outputLabel>
-                            <p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" style="text-transform: uppercase"/>
+                            <p:inputText value="#{clientesBean.clienteContactoSelected.idContacto.nbApellido2}" oninput="this.value = this.value.toUpperCase()"/>
                         </div>
                     </div>
                     <div class="p-col-12 p-md-4 p-lg-4">
