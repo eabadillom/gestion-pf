@@ -175,8 +175,6 @@ public class ClientesBean implements Serializable {
     @Inject
     private ServicioBL servicioBL;
     
-    private Categoria categoriaAll;
-
     public ClientesBean() {
         this.lstClientes = new ArrayList<>();
         this.clienteSelected = new Cliente();
@@ -206,10 +204,6 @@ public class ClientesBean implements Serializable {
             this.lstCategoria = categoriaBL.obtenerCategorias();
             this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
             this.lstUsoCfdi = fiscalBL.obtenerCfdis();
-            this.categoriaAll = categoriaBL.obtenerCategorias()
-            		.stream()
-            		.filter(item -> "ALL".equalsIgnoreCase(item.getCategoriaDs()))
-            		.findFirst().orElse(null);
         } catch (InventarioException ex) {
             log.warn("Error: ", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cargar Información", ex.getMessage());
@@ -292,10 +286,8 @@ public class ClientesBean implements Serializable {
     // Funciones para Avisos
     public void nuevoAviso() {
         log.info("El usuario {} ha iniciado la operacion crear un nuevo aviso para el cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
-        this.avisoSelected = avisoBL.nuevoAviso();
-        this.avisoSelected.setCteCve(clienteSelected);
-        this.avisoSelected.setCategoriaCve(categoriaAll);
-        cargarServiciosAviso(this.avisoSelected);
+        Aviso aviso = avisoBL.nuevoAviso(this.clienteSelected);
+        cargarServiciosAviso(aviso);
     }
 
     public void cargarServiciosAviso(Aviso aviso) {
@@ -309,6 +301,11 @@ public class ClientesBean implements Serializable {
             
             lstPrecioServiciosDisponibles = new ArrayList<PrecioServicio>();
             lstPrecioServiciosDisponibles.addAll(preciosSinAviso);
+            
+            for(PrecioServicio ps : preciosSinAviso) {
+            	if(preciosSinAviso.contains(ps))
+            		log.info("la lista de precios sin aviso contiene el precio servicio {}", ps);
+            }
             
             for(PrecioServicio ps : preciosSinAviso) {
             	
@@ -365,7 +362,7 @@ public class ClientesBean implements Serializable {
                     throw new InventarioException("Operación sobre avisos no válida");
             }
             log.info("El usuario {} ha relalizaddo {}", usuario.getUsuario(), mensaje);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Aviso", mensaje);
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Aviso", mensaje);
         } catch (InventarioException ex) {
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Aviso", ex.getMessage());
         } catch (Exception ex) {

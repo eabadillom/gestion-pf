@@ -148,6 +148,33 @@ public class Aviso implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve", orphanRemoval = true)
     private List<PrecioServicio> precioServicioList;
+    
+    @Override
+    public int hashCode() {
+    	if(this.avisoCve == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.avisoCve);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+    	if (this == o)
+    		return true;
+    	if (!(o instanceof Aviso))
+    		return false;
+    	Aviso other = (Aviso) o;
+    	
+    	if (this.avisoCve != null && other.avisoCve != null) {
+    		return Objects.equals(this.avisoCve, other.avisoCve);
+    	} else {
+    		return this == other;
+    	}
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Aviso[ avisoCve=" + avisoCve + " ]";
+    }
 
     public Aviso() {
     }
@@ -346,30 +373,4 @@ public class Aviso implements Serializable {
         ps.setServicio(null);
         ps.setUnidad(null);
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Aviso))
-            return false;
-        Aviso that = (Aviso) o;
-
-        if (this.avisoCve != null && that.avisoCve != null) {
-            return Objects.equals(this.avisoCve, that.avisoCve);
-        } else {
-            return this == that;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return (avisoCve != null) ? avisoCve.hashCode() : System.identityHashCode(this);
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Aviso[ avisoCve=" + avisoCve + " ]";
-    }
-
 }

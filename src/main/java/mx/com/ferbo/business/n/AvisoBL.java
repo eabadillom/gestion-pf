@@ -1,6 +1,5 @@
 package mx.com.ferbo.business.n;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.AvisoDAO;
+import mx.com.ferbo.dao.n.CategoriaDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
@@ -33,14 +33,29 @@ public class AvisoBL {
     @Inject
     private AvisoDAO avisoDAO;
 
-    public Aviso nuevoAviso() {
+    public Aviso nuevoAviso(Cliente cliente) {
         log.info("Inicia el proceso para crear un nuevo aviso");
+        Categoria categoriaAll = null;
+        CategoriaDAO categoriaDAO = new CategoriaDAO();
+        try {
+			categoriaAll = categoriaDAO.buscarTodos()
+					.stream()
+					.filter(item -> "ALL".equalsIgnoreCase(item.getCategoriaDs()))
+					.findFirst().orElse(null);
+		} catch (DAOException e) {
+			log.warn("Problema para obtener las categorias de los avisos: {}", e.getMessage());
+		}
+        
         Aviso aviso = new Aviso();
+        if(cliente.getAvisoList().contains(aviso) == false)
+        	cliente.getAvisoList().add(aviso);
+        aviso.setCteCve(cliente);
         aviso.setPlantaCve(new Planta());
-        aviso.setAvisoValSeg(BigDecimal.ZERO);
+        aviso.setAvisoValSeg(null);
         aviso.setAvisoFecha(new Date());
-        aviso.setCategoriaCve(new Categoria());
         aviso.setPrecioServicioList(new ArrayList<>());
+        aviso.setCategoriaCve(categoriaAll);
+        
         return aviso;
     }
 

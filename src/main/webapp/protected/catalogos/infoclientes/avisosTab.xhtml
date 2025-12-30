@@ -72,22 +72,30 @@
 
                 <div class="p-grid">
                     <div class="p-field p-col-12 p-md-12">
-                        <p:selectBooleanCheckbox id="aviso-po-m" itemLabel="P.O."
-                                                 value="#{clientesBean.avisoSelected.avisoPo}" />
-                        <p:selectBooleanCheckbox id="aviso-ped-m" itemLabel="Pedimento"
-                                                 value="#{clientesBean.avisoSelected.avisoPedimento}" />
-                        <p:selectBooleanCheckbox id="aviso-sap-m" itemLabel="Contenedor"
-                                                 value="#{clientesBean.avisoSelected.avisoSap}" />
-                        <p:selectBooleanCheckbox id="aviso-lote-m" itemLabel="Lote"
-                                                 value="#{clientesBean.avisoSelected.avisoLote}" />
-                        <p:selectBooleanCheckbox id="aviso-cad-m" itemLabel="Caducidad"
-                                                 value="#{clientesBean.avisoSelected.avisoCaducidad}" />
-                        <p:selectBooleanCheckbox id="aviso-tarima-m" itemLabel="Tarima"
-                                                 value="#{clientesBean.avisoSelected.avisoTarima}" />
-                        <p:selectBooleanCheckbox id="aviso-codigo-m" itemLabel="Código"
-                                                 value="#{clientesBean.avisoSelected.avisoCodigo}" />
-                        <p:selectBooleanCheckbox id="aviso-otro-m" itemLabel="Otro"
-                                                 value="#{clientesBean.avisoSelected.avisoOtro}" />
+                        <p:selectBooleanCheckbox id="aviso-po-m" itemLabel="P.O." value="#{clientesBean.avisoSelected.avisoPo}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-ped-m" itemLabel="Pedimento" value="#{clientesBean.avisoSelected.avisoPedimento}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-sap-m" itemLabel="Contenedor" value="#{clientesBean.avisoSelected.avisoSap}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-lote-m" itemLabel="Lote" value="#{clientesBean.avisoSelected.avisoLote}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-cad-m" itemLabel="Caducidad" value="#{clientesBean.avisoSelected.avisoCaducidad}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-tarima-m" itemLabel="Tarima" value="#{clientesBean.avisoSelected.avisoTarima}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-codigo-m" itemLabel="Código" value="#{clientesBean.avisoSelected.avisoCodigo}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-otro-m" itemLabel="Otro" value="#{clientesBean.avisoSelected.avisoOtro}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
                     </div>
 
                     <div class="p-col-12 p-md-6 p-lg-4">
@@ -103,15 +111,18 @@
                                 minValue="0"
                                 maxValue="99.9999"
                                 required="true"
-                                emptyValue="0"
-                                requiredMessage="Campo requerido"
-                                />
+                                emptyValue="null"
+                                requiredMessage="Campo requerido">
+                                <p:ajax process="@this"/>
+                            </p:inputNumber>
                         </div>
                     </div>  
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel> Temperatura</p:outputLabel>
-                            <p:inputText disabled="false" value="#{clientesBean.avisoSelected.avisoTemp}" />
+                            <p:inputText disabled="false" value="#{clientesBean.avisoSelected.avisoTemp}">
+                            	<p:ajax process="@this"/>
+                            </p:inputText>
                         </div>
                     </div>
 
@@ -122,6 +133,7 @@
                                 <f:selectItem itemLabel="--Seleccione--" />
                                 <f:selectItems value="#{clientesBean.lstPlanta}" var="planta"
                                                itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+								<p:ajax process="@this"/>
                             </p:selectOneMenu>
                         </div>
                     </div>
@@ -129,7 +141,9 @@
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <div class="p-field">
                             <p:outputLabel>Observaciones</p:outputLabel>
-                            <p:inputText value="#{clientesBean.avisoSelected.avisoObservaciones}" />
+                            <p:inputText value="#{clientesBean.avisoSelected.avisoObservaciones}">
+                            	<p:ajax process="@this"/>
+                            </p:inputText>
                         </div>
                     </div>
 
@@ -141,6 +155,7 @@
                                 <f:selectItem itemLabel="--Seleccione--" />
                                 <f:selectItem itemLabel="Por Kg" itemValue="K" />
                                 <f:selectItem itemLabel="Por Tarima" itemValue="T" />
+                                <p:ajax process="@this" />
                             </p:selectOneMenu>
                         </div>
                     </div>
@@ -153,6 +168,7 @@
                                 <f:selectItem itemLabel="--Seleccione--" />
                                 <f:selectItems value="#{clientesBean.lstCategoria}" var="categoria"
                                                itemLabel="#{categoria.categoriaDs}" itemValue="#{categoria}" />
+								<p:ajax process="@this"/>
                             </p:selectOneMenu>
                         </div>
                     </div>
@@ -164,7 +180,9 @@
                                 value="#{clientesBean.avisoSelected.avisoVigencia}"
                                 decimal="false"
                                 minValue="0"
-                                maxValue="365" />
+                                maxValue="365">
+                                <p:ajax process="@this"/>
+                            </p:inputNumber>
                         </div>
                     </div>
 
@@ -175,7 +193,9 @@
                                 value="#{clientesBean.avisoSelected.avisoPlazo}"
                                 decimal="false"
                                 minValue="0"
-                                maxValue="365" />
+                                maxValue="365">
+                                <p:ajax process="@this"/>
+                            </p:inputNumber>
                         </div>
                     </div>
                 </div>
@@ -186,17 +206,13 @@
 
                     <p:panel header="Servicios disponibles">
                         <p:dataTable id="dtServiciosSinAviso"
-                                     widgetVar="dtServiciosSinAviso"
                                      value="#{clientesBean.lstPrecioServiciosDisponibles}"
                                      var="srv"
                                      selection="#{clientesBean.seleccionadosParaAgregar}"
-                                     rowKey="#{srv.id}"
-                                     rowSelectMode="add"
-                                     reflow="true">
+                                     rowKey="#{srv.hashCode()}">
 
                            
-                            <p:column width="5%" selectionMode="multiple" exportable="false"/>
-
+                            <p:column width="2rem" selectionMode="multiple"/>
                             
                             <p:column headerText="Servicio">
                                 <h:outputText value="#{srv.servicio.servicioDs}" />
@@ -245,7 +261,7 @@
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
                              actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="dtAvisos form:tabView:dtPreciosServicios"
-                             process="pnlAviso @this" oncomplete="PF('dialogAviso').hide()"/>
+                             process="@this form:tabView:pnlAviso" oncomplete="PF('dialogAviso').hide()"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogAviso').hide()"
                              class="ui-button-secondary"
                              resetValues="true" immediate="true" />

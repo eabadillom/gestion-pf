@@ -61,6 +61,37 @@ public class PrecioServicio implements Serializable {
     @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve", nullable = true)
     @ManyToOne(optional = true)
     private Aviso avisoCve;
+    
+    @Override
+    public int hashCode() {
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.id);
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (this == object)
+            return true;
+        if (!(object instanceof PrecioServicio))
+            return false;
+        PrecioServicio other = (PrecioServicio) object;
+        
+        if(this == other)
+        	return true;
+        
+        if(this == null || other.id == null) {
+        	System.out.println(String.format("this: %d, other: %d", this.hashCode(), other.hashCode()));
+        	return System.identityHashCode(this) == System.identityHashCode(other);
+        }
+        
+        return this.id.equals(other.id);
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.PrecioServicio[ id=" + id + ", hashCode" + this.hashCode() + " ]";
+    }
 
     public PrecioServicio() {
     }
@@ -121,30 +152,4 @@ public class PrecioServicio implements Serializable {
     public void setAvisoCve(Aviso avisoCve) {
         this.avisoCve = avisoCve;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof PrecioServicio))
-            return false;
-        PrecioServicio that = (PrecioServicio) o;
-
-        if (this.id != null && that.id != null) {
-            return Objects.equals(this.id, that.id);
-        } else {
-            return this == that;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return (id != null) ? id.hashCode() : System.identityHashCode(this);
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.PrecioServicio[ id=" + id + " ]";
-    }
-
 }
