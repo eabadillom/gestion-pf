@@ -80,10 +80,8 @@ public class PrecioServicio implements Serializable {
         if(this == other)
         	return true;
         
-        if(this == null || other.id == null) {
-        	System.out.println(String.format("this: %d, other: %d", this.hashCode(), other.hashCode()));
+        if(this == null || other.id == null)
         	return System.identityHashCode(this) == System.identityHashCode(other);
-        }
         
         return this.id.equals(other.id);
     }

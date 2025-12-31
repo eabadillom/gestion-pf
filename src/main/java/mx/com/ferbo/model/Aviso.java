@@ -120,6 +120,7 @@ public class Aviso implements Serializable {
     private int avisoVigencia;
 
     @Column(name = "aviso_val_seg")
+    @Basic(optional = true)
     private BigDecimal avisoValSeg;
 
     @Basic(optional = false)
@@ -139,6 +140,7 @@ public class Aviso implements Serializable {
 
     @JoinColumn(name = "planta_cve", referencedColumnName = "PLANTA_CVE")
     @ManyToOne
+    @Basic(optional = true)
     private Planta plantaCve;
 
     @ManyToOne
