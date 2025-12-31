@@ -17,6 +17,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
  *
  * @author alberto
  */
+@Deprecated
 public class EgresosDAO extends IBaseDAO<Egresos, Integer>
 {
     private static Logger log = LogManager.getLogger(EgresosDAO.class);

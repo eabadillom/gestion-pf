@@ -21,6 +21,7 @@ import javax.persistence.Table;
  *
  * @author alberto
  */
+@Deprecated
 @Entity
 @Table(name = "importe_egreso")
 @NamedQueries({ 

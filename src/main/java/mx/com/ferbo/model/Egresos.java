@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author alberto
  */
+@Deprecated
 @Entity
 @Table(name = "concepto_egreso")
 @NamedQueries({ 
