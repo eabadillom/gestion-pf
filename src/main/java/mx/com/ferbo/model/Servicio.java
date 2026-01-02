@@ -22,6 +22,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.bouncycastle.util.Objects;
+
 
 
 /**
@@ -92,6 +94,32 @@ public class Servicio implements Serializable {
     
     @OneToMany(cascade = CascadeType.DETACH, mappedBy = "servicioCve")
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
+    
+    @Override
+    public int hashCode() {
+    	if(this.servicioCve == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.servicioCve);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Servicio)) {
+            return false;
+        }
+        
+        Servicio other = (Servicio) object;
+        if ((this.servicioCve == null && other.servicioCve != null) || (this.servicioCve != null && !this.servicioCve.equals(other.servicioCve))) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Servicio[ servicioCve=" + servicioCve + " ]";
+    }
     
 	public Servicio() {
     }
@@ -211,29 +239,4 @@ public class Servicio implements Serializable {
 	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
 		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
 	}
-
-	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (servicioCve != null ? servicioCve.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Servicio)) {
-            return false;
-        }
-        Servicio other = (Servicio) object;
-        if ((this.servicioCve == null && other.servicioCve != null) || (this.servicioCve != null && !this.servicioCve.equals(other.servicioCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Servicio[ servicioCve=" + servicioCve + " ]";
-    }
 }
