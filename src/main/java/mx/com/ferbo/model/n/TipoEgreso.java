@@ -11,9 +11,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "TipoEgreso.findAllActivos", query = "SELECT te FROM TipoEgreso te WHERE te.activo = 1"),
+    @NamedQuery(name = "TipoEgreso.findAllNoActivos", query = "SELECT te FROM TipoEgreso te WHERE te.activo = 0")
+})
 @Entity
 @Table(name = "tipo_egreso")
 public class TipoEgreso implements Serializable {
@@ -32,7 +38,7 @@ public class TipoEgreso implements Serializable {
 
     @Basic(optional = false)
     @Column(name = "st_tipo_egre")
-    private Boolean status;
+    private Boolean activo;
 
     @OneToMany(mappedBy = "tipoEgreso", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CategoriaEgreso> categorias;
@@ -57,12 +63,12 @@ public class TipoEgreso implements Serializable {
         this.nombre = nombre;
     }
 
-    public Boolean getStatus() {
-        return status;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setStatus(Boolean status) {
-        this.status = status;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public List<CategoriaEgreso> getCategorias() {
@@ -91,6 +97,6 @@ public class TipoEgreso implements Serializable {
 
     @Override
     public String toString() {
-        return "TipoEgreso [id=" + id + ", nombre=" + nombre + ", status=" + status + "]";
+        return "TipoEgreso [id=" + id + ", nombre=" + nombre + ", activo=" + activo + "]";
     }
 }

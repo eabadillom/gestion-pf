@@ -7,7 +7,13 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
+@NamedQueries({
+    @NamedQuery(name = "StatusActivoFijo.findByNombre", query = "SELECT saf FROM StatusActivoFijo saf WHERE saf.nombre = :nombre"),
+    @NamedQuery(name = "StatusActivoFijo.findAllActivos", query = "SELECT saf FROm StatusActivoFijo saf WHERE saf.activo = 1")
+})
 public class StatusActivoFijo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -19,12 +25,16 @@ public class StatusActivoFijo implements Serializable {
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "nb_status_acti_fijo", length = 50, nullable = false)
+    @Column(name = "nb_status_acti_fijo", length = 50, nullable = false, unique = true)
     private String nombre;
 
     @Basic(optional = false)
     @Column(name = "tx_status_acti_fijo", length = 255, nullable = false)
     private String descripcion;
+
+    @Basic(optional = false)
+    @Column(name = "st_status_acti_fijo")
+    private Boolean activo = Boolean.TRUE;
 
     public StatusActivoFijo(){
         // Constructor sin parametros
@@ -54,6 +64,14 @@ public class StatusActivoFijo implements Serializable {
         this.descripcion = descripcion;
     }
 
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -72,7 +90,8 @@ public class StatusActivoFijo implements Serializable {
 
     @Override
     public String toString() {
-        return "StatusActivoFijo [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + "]";
+        return "StatusActivoFijo [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", activo="
+                + activo + "]";
     }
 
 }

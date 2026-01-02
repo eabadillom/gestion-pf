@@ -9,9 +9,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "StatusPago.findByNombre", query = "SELECT sp FROM StatusPago sp WHERE sp.nombre = :nombre"),
+    @NamedQuery(name = "StatusPago.findAllActivos", query = "SEELCT sp FROM StatusPAgo sp WHERE sp.activo = 1")
+})
 @Entity
 @Table(name = "cat_status_pago")
 public class StatusPago implements Serializable{
@@ -25,7 +31,7 @@ public class StatusPago implements Serializable{
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "nb_status_pago", length = 30, nullable = false)
+    @Column(name = "nb_status_pago", length = 30, nullable = false, unique =  true)
     private String  nombre;
 
     @Basic(optional = true)

@@ -12,10 +12,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import mx.com.ferbo.model.n.ImporteEgreso;
 
+@NamedQueries({
+    @NamedQuery(name = "PagoEgreso.findByPeriodoYStatus", query = "SELECT pe FROM PagoEgreso pe WHERE (pe.fechaPago BETWEEN :incio AND :fin) AND (pe.status.nombre = :status)")
+})
 @Entity
 @Table(name = "pago_egreso")
 public class PagoEgreso implements Serializable {

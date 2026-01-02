@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -18,6 +20,12 @@ import javax.persistence.Table;
 import mx.com.ferbo.model.CargoEgreso;
 import mx.com.ferbo.model.PagoEgreso;
 
+@NamedQueries({
+    @NamedQuery(name = "ImporteEgreso.findByPeriodo", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaAlta BETWEEN :inicio AND :fin ORDER BY ie.fechaAlta ASC"),
+    @NamedQuery(name = "ImporteEgreso.findByVencidos", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimitePago < :hoy"),
+    @NamedQuery(name = "ImporteEgreso.findByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.nombre = :concepto"),
+    @NamedQuery(name = "ImporteEgreso.findByPeriodoYConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE (ie.fechaAlta BETWEEN :inicio AND :fin) AND ie.conceptoEgreso.nombre = :concepto")
+})
 @Entity
 @Table(name = "importe_egreso")
 public class ImporteEgreso implements Serializable {

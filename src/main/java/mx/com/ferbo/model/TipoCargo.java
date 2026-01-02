@@ -8,8 +8,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "TipoCargo.findByNombre", query = "SELECT tc FROM TipoCargo tc WHERE tc.nombre = :nombre"),
+    @NamedQuery(name = "TipoCargo.findAllActivos", query = "SELECT tc FROM TipoCargo tc WHERE tc.activo = 1"),
+    @NamedQuery(name = "TipoCargo.findAllNoActivos", query = "SELECT tc FROM TipoCargo tc WHERE tc.activo = 0")
+})
 @Entity
 @Table(name = "cat_tipo_cargo")
 public class TipoCargo implements Serializable {

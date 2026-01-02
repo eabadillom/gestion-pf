@@ -26,7 +26,7 @@ public class ActivoFijo implements Serializable{
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "nb_acti_fijo", length = 30, nullable = false)
+    @Column(name = "nb_acti_fijo", length = 150, nullable = false)
     private String descripcion;
 
     @Basic(optional = false)

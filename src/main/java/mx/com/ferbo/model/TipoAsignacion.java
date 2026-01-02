@@ -8,8 +8,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "TipoAsignacion.findByNombre", query = "SELECT ta FROM TipoAsignacion ta WHERE ta.nombre = :nombre"),
+    @NamedQuery(name = "TipoAsignacion.findAllActivo", query = "SELECT ta FROM TipoAsignacion ta WHERE ta.activo = 1")
+})
 @Entity
 @Table(name = "cat_tipo_asignacion")
 public class TipoAsignacion implements Serializable {
@@ -25,6 +31,10 @@ public class TipoAsignacion implements Serializable {
     @Basic(optional = false)
     @Column(name = "nb_tipo_asig", length = 50, nullable = false, unique = true)
     private String nombre;
+
+    @Basic(optional = false)
+    @Column(name = "st_status_tipo_asig")
+    private Boolean activo = Boolean.TRUE;
 
     public TipoAsignacion(){
         // Constructor sin parametros
@@ -46,6 +56,14 @@ public class TipoAsignacion implements Serializable {
         this.nombre = nombre;
     }
 
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
     @Override
     public boolean equals(Object o){
         if (this == o)
@@ -64,8 +82,7 @@ public class TipoAsignacion implements Serializable {
 
     @Override
     public String toString() {
-        return "TipoAsignacion [id=" + id + ", nombre=" + nombre + "]";
+        return "TipoAsignacion [id=" + id + ", nombre=" + nombre + ", activo=" + activo + "]";
     }
-
     
 }

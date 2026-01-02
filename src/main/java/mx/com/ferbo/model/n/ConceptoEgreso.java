@@ -13,9 +13,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "ConceptoEgreso.findAllActivos", query = "SELECT ce FROM ConceptoEgreso ce WHERE ce.activo = 1")
+})
 @Entity
 @Table(name = "concepto_egreso")
 public class ConceptoEgreso implements Serializable{
@@ -34,7 +39,7 @@ public class ConceptoEgreso implements Serializable{
 
     @Basic(optional = false)
     @Column(name = "st_conc_egre")
-    private Boolean status;
+    private Boolean activo;
 
     @Basic(optional = false)
     @Column(name = "cd_sat", length = 100, nullable = false)
@@ -88,12 +93,12 @@ public class ConceptoEgreso implements Serializable{
         this.nombre = nombre;
     }
 
-    public Boolean getStatus() {
-        return status;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setStatus(Boolean status) {
-        this.status = status;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public String getCodigoSAT() {
@@ -178,7 +183,7 @@ public class ConceptoEgreso implements Serializable{
 
     @Override
     public String toString() {
-        return "ConceptoEgreso [id=" + id + ", nombre=" + nombre + ", status=" + status + ", codigoSAT=" + codigoSAT
+        return "ConceptoEgreso [id=" + id + ", nombre=" + nombre + ", activo=" + activo + ", codigoSAT=" + codigoSAT
                 + ", esActivoFijo=" + esActivoFijo + ", tieneIVA=" + tieneIVA + ", porcentajeIVA=" + porcentajeIVA
                 + ", tieneIEPS=" + tieneIEPS + ", porcentajeIEPS=" + porcentajeIEPS + "]";
     }

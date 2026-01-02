@@ -8,8 +8,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "TipoDocumento.findByNombre", query = "SELECT td FROM TipoDocumento td WHERE td.nombre = :nombre"),
+    @NamedQuery(name = "TipoDocumento.findAllActivos", query = "SELECT td FROM TipoDocumento td WHERE td.activo = 1"), 
+    @NamedQuery(name = "TipoDocumento.findAllNoActivos", query = "SELECT td FROM TipoDocumento td WHERE td.activo = 0")
+})
 @Entity
 @Table(name = "cat_tipo_documento")
 public class TipoDocumento implements Serializable{
@@ -39,8 +46,8 @@ public class TipoDocumento implements Serializable{
     private Boolean esObligatorio;
 
     @Basic(optional = false)
-    @Column(name = "st_acti")
-    private Boolean activo;
+    @Column(name = "st_tipo_docu")
+    private Boolean activo = Boolean.TRUE;
 
     public TipoDocumento(){
         // Constructor sin parametro

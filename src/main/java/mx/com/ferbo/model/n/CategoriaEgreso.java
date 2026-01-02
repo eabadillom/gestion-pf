@@ -13,9 +13,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "CategoriaEgreso.findAllActivos", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.activo = 1")
+})
 @Entity
 @Table(name = "categoria_egreso")
 public class CategoriaEgreso implements Serializable {
@@ -34,7 +39,7 @@ public class CategoriaEgreso implements Serializable {
 
     @Basic(optional = false)
     @Column(name = "st_cate_egre")
-    private Boolean status;
+    private Boolean activo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_tipo_egre", nullable = false)
@@ -63,12 +68,12 @@ public class CategoriaEgreso implements Serializable {
         this.nombre = nombre;
     }
 
-    public Boolean getStatus() {
-        return status;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setStatus(Boolean status) {
-        this.status = status;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public TipoEgreso getTipoEgreso() {
@@ -105,7 +110,7 @@ public class CategoriaEgreso implements Serializable {
 
     @Override
     public String toString() {
-        return "CategoriaEgreso [id=" + id + ", nombre=" + nombre + ", status=" + status + "]";
+        return "CategoriaEgreso [id=" + id + ", nombre=" + nombre + ", activo=" + activo + "]";
     }
 
     
