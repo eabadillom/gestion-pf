@@ -24,7 +24,8 @@ public class DateUtil {
 	public static final String FORMATO_YYYY_MM_DD          = "yyyy-MM-dd";
 	public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss.SSS";
 	public static final String FORMATO_DD_MM_YYYY_FULL     = "dd MMMM yyyy";
-	public static final String FORMATO_FECHA_CADENA 		= "dd 'de' MMMM 'de' yyyy";
+	public static final String FORMATO_FECHA_CADENA        = "dd 'de' MMMM 'de' yyyy";
+	public static final String FORMATO_ISO_8601            = "yyyy-MM-dd'T'HH:mm:ss";
 
 	public static final int ENERO      = Calendar.JANUARY;
 	public static final int FEBRERO    = Calendar.FEBRUARY;

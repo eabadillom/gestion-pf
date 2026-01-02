@@ -1118,7 +1118,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			medioPagoSelect = medioP;
 		}
 		fmp.setMpId(medioP);
-		fmp.setFactura(factura);
+//		fmp.setFactura(factura);
 		fmp.setFmpPorcentaje(100);
 		fmp.setMpDescripcion(medioP.getMpDescripcion());
 		fmp.setFmpReferencia(referencia);
@@ -1311,13 +1311,12 @@ public class FacturacionConstanciasBean implements Serializable{
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se generó correctamente";
 		} catch (FacturamaException e) {
+			log.error("Problema para timbrar la factura...", e);
 			severity = FacesMessage.SEVERITY_ERROR;
 			message = e.getMessage();
-			e.printStackTrace();
 		}catch (Exception ex) {
-			//log.error("Problema para obtener los servicios del cliente.", ex);
-			ex.printStackTrace();
-			message = "Problema con la información de servicios.";
+			log.error("Problema para timbrar la factura...", ex);
+			message = "Problema para timbrar la factura.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			if(severity == null)
@@ -1331,7 +1330,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 	}
 	
-public String paginaFactura() {
+	public String paginaFactura() {
 	
 		session.removeAttribute("plantaSelect");
 		session.removeAttribute("cliente");
