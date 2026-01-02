@@ -7,7 +7,7 @@
     <p:tab title="Domicilios">
     	<div class="p-grid ui-fluid">
     		<div class="p-col-12 p-md-6">
-	            <p:outputLabel for="soClienteTipoDom" value="Tipo de domicilio" />
+	            <p:outputLabel for="soClienteTipoDom" value="Tipo de domicilio*" />
 	            <p:selectOneMenu id="soClienteTipoDom" converter="entityConverter"
 	                    disabled="#{clientesBean.clienteSelected eq null and clientesBean.clienteSelected.cteCve eq null}"
 	                    value="#{clientesBean.tipoDomicilioSelected}" requiredMessage="Campo requerido" >

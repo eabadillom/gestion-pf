@@ -99,7 +99,7 @@
                     </div>
                     
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <p:outputLabel>Tipo facturación</p:outputLabel>
+                        <p:outputLabel>Tipo facturación*</p:outputLabel>
                         <p:selectOneMenu id="soTpFacturacion-m"
                                          value="#{clientesBean.avisoSelected.avisoTpFacturacion}">
                             <f:selectItem itemLabel="--Seleccione--" />
@@ -110,7 +110,7 @@
                     </div>
                     
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <p:outputLabel>Vigencia en días</p:outputLabel>
+                        <p:outputLabel>Vigencia en días*</p:outputLabel>
                         <p:inputNumber
                             value="#{clientesBean.avisoSelected.avisoVigencia}"
                             decimal="false"
@@ -121,7 +121,7 @@
                     </div>
 
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <p:outputLabel>Plazo de pago en días</p:outputLabel>
+                        <p:outputLabel>Plazo de pago en días*</p:outputLabel>
                         <p:inputNumber
                             value="#{clientesBean.avisoSelected.avisoPlazo}"
                             decimal="false"
@@ -132,7 +132,7 @@
                     </div>
                     
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <p:outputLabel>Planta</p:outputLabel>
+                        <p:outputLabel>Planta*</p:outputLabel>
                         <p:selectOneMenu id="soPlantaAct" converter="entityConverter" value="#{clientesBean.avisoSelected.plantaCve}">
                             <f:selectItem itemLabel="--Seleccione--" />
                             <f:selectItems value="#{clientesBean.lstPlanta}" var="planta"
@@ -142,7 +142,7 @@
                     </div>
                     
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <p:outputLabel>Categoria</p:outputLabel>
+                        <p:outputLabel>Categoria*</p:outputLabel>
                         <p:selectOneMenu id="soCategoriaAct" converter="entityConverter"
                                          value="#{clientesBean.avisoSelected.categoriaCve}" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="--Seleccione--" />
