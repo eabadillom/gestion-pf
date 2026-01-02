@@ -1,0 +1,284 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Detalle de Egresos </ui:define>
+    <ui:define name="content">
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+        <script type ="text/javascript">
+            function charExtender() {
+                var options = {
+                    options: {
+                        plugins: {
+                            tiitle: {
+                                display: true,
+                                text: "title set from JavaScript"
+                            }, legend: {
+                                display: false
+                            }
+                        }, scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }, plugins: [ChartDataLabels]
+                };
+                //merge all options into to main chart options
+                $.extend(true, this.cfg.config, options);
+            };
+        </script>
+
+        <h:form id="form">
+            <div class="p-col-12">
+                <div class="card">
+                    <p:growl id="messages" showDetail="true" />
+                    <p:fieldset legend="Nuevo Egreso" toggleable="true" toggleSpeed="500" collapsed="true">
+                        <p:ajax event="toggle" listener="#{egresosBean.handleToggle}" />
+
+                        <p:toolbarGroup>
+                            <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2"
+                                             actionListener="#{egresosBean.nuevoRegistroEgreso()}" oncomplete="PF('dg-agregaConcepto').show();" update="frm-agregaConcepto" process="@this" />
+                        </p:toolbarGroup>
+                    </p:fieldset>
+                    
+                    <p:fieldset id="fs-egresos" legend="Egresos existentes" toggleable="true" toggleSpeed="500" collapsed="true">
+                        <p:ajax event="toggle" listener="#{egresosBean.handleToggle}" />
+                        <div class="card p-fluid">
+
+                            <div class="p-field p-mb-3">
+                                <p:outputLabel for="emisor-som" value="Emisor" />
+                                <span class="ui-float-label ui-input-icon-left">
+                                    <p:selectOneMenu id="emisor-som" value="#{egresosBean.importeSelected.cdEmisor}" converter="entityConverter"  >  
+                                        <f:selectItem itemLabel="--Seleccione--" itemValue=""/>
+                                        <f:selectItems value="#{egresosBean.listaEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
+                                        <p:ajax update="form:emisorImporte-som" process="@this"/>
+                                    </p:selectOneMenu>    
+                                </span>
+                            </div>
+
+                            <div class="p-field p-mb-3">
+                                <p:outputLabel for="concepto-som" value="Concepto" />
+                                <span class="ui-float-label ui-input-icon-left">
+                                    <p:selectOneMenu id="concepto-som" value="#{egresosBean.importeSelected.egreso}" converter="entityConverter"  >  
+                                        <f:selectItem itemLabel="--Seleccione--" itemValue=""/>
+                                        <f:selectItems value="#{egresosBean.listaEgresos}" var="concepto" itemLabel="#{concepto.nombreEgreso}" itemValue="#{concepto}" />
+                                        <p:ajax update="form:egresoImporte" process="@this"/>
+                                    </p:selectOneMenu>
+                                </span>
+                            </div>
+                            <p:commandButton value="Añadir importe" icon="pi pi-plus" styleClass="ui-button-info p-mt-3" oncomplete="PF('dg-importe').show();" process="@this" update="frm-agregaimporte "/>
+                        </div>
+                    </p:fieldset>
+
+                    <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+                        <p:outputLabel for="yearMonth" value="Periodo "/>
+                        <p:datePicker id="yearMonth" view="month" value="#{egresosBean.mesActual}" locale="es" pattern="MMMM yyyy" yearNavigator="true" yearRange="2000:2050" maxdate="#{egresosBean.maxDate}" converter="monthYearConverter" >
+                            <p:ajax process="@this" />
+                            <p:ajax event="dateSelect" listener="#{egresosBean.buscar}" update="dt-egresos"/>
+                        </p:datePicker>
+
+                        <p:toolbar>
+                            <p:toolbarGroup>
+                                <div class="col-5 flex align-items-center justify-content-center">
+                                    <p:commandButton value=".pdf" actionListener="#{egresosBean.exportarPDF}" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                                        <p:fileDownload value="#{egresosBean.file}" />
+                                    </p:commandButton>  
+                                </div>
+
+                                <div class="col-2">
+                                    <p:divider layout="vertical">
+                                    </p:divider>
+                                </div>
+
+                                <div class="col-5 flex align-items-center justify-content-center">
+                                    <p:commandButton value=".xlsx"  actionListener="#{egresosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                                        <p:fileDownload value="#{egresosBean.file}" />
+                                    </p:commandButton>  
+                                </div>
+
+                                <div class="col-2">
+                                    <p:divider layout="vertical">
+                                    </p:divider>
+                                </div>
+                                
+                                <div class="col-5 flex align-items-center justify-content-center">
+                                    <p:outputLabel for="listaEmisores" value="Emisor" />
+                                    <span class="ui-float-label ui-input-icon-left">
+                                        <p:selectOneMenu id="listaEmisores" value="#{egresosBean.emisorCFDIS}" converter="entityConverter"  >
+                                            <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}" />
+                                            <f:selectItems value="#{egresosBean.listaEmisores}" var="emisorSelected" itemLabel="#{emisorSelected.nb_emisor}" itemValue="#{emisorSelected}" />
+                                            <p:ajax event="change" listener="#{egresosBean.buscar}" update="dt-egresos" />
+                                        </p:selectOneMenu>
+                                    </span>
+                                </div>
+
+                                <div class="col-2">
+                                    <p:divider layout="vertical">
+                                    </p:divider>
+                                </div>
+
+                                <div class="col-5 flex align-items-center justify-content-center">
+                                    <p:commandButton id="barChart" value="Mostrar"  oncomplete="PF('dgEgresos').show()" update="@widgetVar(dgEgresos)" action="#{egresosBean.grafica()}" process="@this" styleClass="ui-button-outlined ui-button-secondary"/>  
+                                </div>
+
+                            </p:toolbarGroup>
+                        </p:toolbar>
+                    </p:fieldset>
+
+                    <p:dialog header="Generacion de importe" widgetVar="dg-importe" modal="true" showEffect="fade" responsive="true">
+                        <p:outputPanel id="frm-agregaimporte" class="ui-fluid">
+                            <div class="p-field">
+                                <p:outputLabel for="@next">Nombre de egreso:</p:outputLabel>
+                                <p:inputText id="egresoImporte" value="#{egresosBean.importeSelected.egreso.nombreEgreso}"  disabled="true" />
+                                <p:ajax update="form:tipoImporte-som" process="@this"/>
+                            </div>
+
+                            <div class="p-field">
+                                <p:outputLabel for="emisorImporte-som" value="Emisor" />
+                                <span class="ui-float-label ui-input-icon-left">
+                                    <p:selectOneMenu id="emisorImporte-som" value="#{egresosBean.importeSelected.cdEmisor}" converter="entityConverter"  >  
+                                        <f:selectItem itemLabel="" itemValue=""/>
+                                        <f:selectItems value="#{egresosBean.listaEmisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}" />
+                                    </p:selectOneMenu>
+                                </span>
+                            </div>
+
+                            <div class="p-field">
+                                <p:outputLabel for="CatImporte-som" value="Categoria" />
+                                <span class="ui-float-label ui-input-icon-left">
+                                    <p:selectOneMenu id="CatImporte-som" value="#{egresosBean.importeSelected.egreso.categoriaEgreso}" converter="entityConverter"  disabled="true" >  
+                                        <f:selectItem itemLabel="#{egresosBean.importeSelected.egreso.categoriaEgreso.nombreCategoria}" itemValue=""/>
+                                        <f:selectItems value="#{egresosBean.listaCatEgresos}" var="categoria" itemLabel="#{categoria.nombreCategoria}" itemValue="#{categoria}" />
+                                    </p:selectOneMenu>
+                                </span>
+                            </div>
+
+                            <div class="p-field">
+                                <p:outputLabel value="Fecha " />
+                                <p:datePicker value="#{egresosBean.importeSelected.fecha}" monthNavigator="true" yearNavigator="true" showWeek="true" >
+                                    <p:ajax process="@this" />
+                                    <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                                </p:datePicker>
+                            </div>
+
+                            <div class="p-field">
+                                <p:outputLabel for="@next">IVA:</p:outputLabel>
+                                <p:inputNumber id="iva" value="#{egresosBean.parametro.valor}"  />
+                            </div>
+
+                            <div class="p-field">
+                                <p:selectBooleanCheckbox id="iepsCheck" itemLabel="IEPS" value="#{egresosBean.ieps}">
+                                    <p:ajax update="iepsCheck ieps" />
+                                </p:selectBooleanCheckbox>
+                            </div>
+                            <div class="p-field">
+                                <p:outputLabel for="@next">IEPS:</p:outputLabel>
+                                <p:inputNumber id="ieps" value="#{egresosBean.iepsSelect}"  readonly="#{(egresosBean.ieps != true)}" />
+                            </div>										
+
+                            <div class="p-field">
+                                <p:outputLabel for="@next">Subtotal:</p:outputLabel>
+                                <p:inputNumber id="subTotal" value="#{egresosBean.importeSelected.subTotal}"  >
+                                    <p:ajax event="blur" update="importe ieps" process=" ieps @this" listener="#{egresosBean.calcularTotal()}"/> 
+                                </p:inputNumber>
+                            </div>	
+
+                            <div class="p-field">
+                                <p:outputLabel for="@next">Total:</p:outputLabel>
+                                <p:inputNumber id="importe" value="#{egresosBean.importeSelected.importe}"  />
+                            </div>
+                        </p:outputPanel>
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{egresosBean.actualizar()}" process="frm-agregaimporte @this" >
+                                <p:ajax update="form:dt-egresos"/>
+                            </p:commandButton>
+                            <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-danger" oncomplete="PF('dg-importe').hide()" process="@this"/>
+                        </f:facet>
+                    </p:dialog>
+
+                    <p:dialog header="Concepto nuevo" widgetVar="dg-agregaConcepto" modal="true" showEffect="fade" responsive="true">
+                        <p:outputPanel id="frm-agregaConcepto" class="ui-fluid">
+
+                            <div class="p-field">
+                                <p:outputLabel id="opEgreso" >Nombre:</p:outputLabel>
+                                <p:inputText value="#{egresosBean.conceptoEgreso}"  />
+                            </div>
+
+                            <div class="p-field">
+                                <p:outputLabel for="cat-som" value="Categoria" />
+                                <span class="ui-float-label ui-input-icon-left">
+                                    <p:selectOneMenu id="cat-som" value="#{egresosBean.nuevoEgreso.categoriaEgreso}"  converter="entityConverter"  >  
+                                        <f:selectItem itemLabel="--Seleccione--" itemValue=""/>
+                                        <f:selectItems value="#{egresosBean.listaCatEgresos}" var="categoria" itemLabel="#{categoria.nombreCategoria}" itemValue="#{categoria}" />
+                                    </p:selectOneMenu>
+                                </span>
+                            </div>
+                        </p:outputPanel>
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Agregar" icon="pi pi-check" actionListener="#{egresosBean.guardar}" update="frm-agregaConcepto form:fs-egresos form:emisor-som" process="frm-agregaConcepto @this" />
+                            <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-danger" oncomplete="PF('dg-agregaConcepto').hide()" update="frm-agregaConcepto" process="@this"/>
+                        </f:facet>
+                    </p:dialog>
+
+                    <p:dialog modal="true" widgetVar="dgEgresos" responsive="true" showEffect="fade" style="max-width:900px !important;max-height: 750px;">
+                        <p:outputPanel id="grafica-panel" class="ui-fluid">
+                            <div class="card">
+                                <p:barChart model="#{egresosBean.stackedGroupBarModel}" style="width: 100%; height: 500px;"/>
+                            </div>
+                        </p:outputPanel>
+                        
+                        <f:facet name="footer">
+                            <p:commandButton value="Cerrar" oncomplete="PF('dgEgresos').hide()" />
+                        </f:facet>
+
+                    </p:dialog>
+
+                    <p:dataTable id="dt-egresos" widgetVar="dt-egresos" var="importe" value="#{egresosBean.listaImporteEgreso}"
+                        rowKey="#{importe.idImporte}" reflow="true" selection="#{egresosBean.importeSelected}"
+                        rowSelectMode="single" paginator="true" rows="10" paginatorPosition="bottom" sortMode="multiple">
+
+                        <f:facet name="header">
+                            <div class="products-table-header">
+                                <span style="font-weight: bold">Egresos</span>
+                            </div>
+                        </f:facet>
+
+                        <p:column headerText="Egreso" width="5rem" style="text-align:center"
+                            sortBy="#{importe.egreso.nombreEgreso}" sortable="true">
+                            <h:outputText value="#{importe.egreso.nombreEgreso}" />
+                        </p:column>
+
+                        <p:column headerText="Fecha" width="5rem" style="text-align:center"
+                            sortBy="#{importe.fecha}" sortable="true">
+                            <h:outputText value="#{importe.fecha}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Emisor" width="5rem" style="text-align:center"
+                            sortBy="#{importe.cdEmisor.nb_emisor}" sortable="true">
+                            <h:outputText value="#{importe.cdEmisor.nb_emisor}" />
+                        </p:column>
+
+                        <p:column headerText="Importe" width="5rem" style="text-align:center"
+                            sortBy="#{importe.importe}" sortable="true">
+                            <h:outputText value="#{importe.importe}" >
+                                <f:convertNumber pattern="$#,##0.00" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+
+            <p:confirmDialog widgetVar="dg-delete" showEffect="fade" width="300" message="¿Desea cancelar la serie factura?" header="Eliminar Serie Factura" severity="warn">
+                <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{serieFacturaBean.cancelar()}" process="@this" />
+                <p:commandButton value="No" type="button" styleClass="ui-button-danger" icon="pi pi-times" onclick="PF('dg-delete').hide()" />
+            </p:confirmDialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

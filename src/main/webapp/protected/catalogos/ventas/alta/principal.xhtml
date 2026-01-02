@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Ventas</ui:define>
+    <ui:define name="content">
+        <h:form id="form" enctype="multipart/form-data">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- Configuracion de la Venta -->
+            <!-- id: pnl-config-venta, planta, cliente y emisor -->
+            <ui:include src="/protected/catalogos/ventas/alta/alta-cfg-ventas.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- Lista de los detalles de la venta -->
+            <!-- id: pnl-det-venta y dt-venta -->
+            <ui:include src="/protected/catalogos/ventas/alta/alta-det-venta.xhtml" />
+            
+            <!-- Dialogo para agregar un concepto de la venta -->
+            <!-- id: dlgDetConcepto y pnl-detalle-concepto -->
+            <ui:include src="/protected/catalogos/ventas/alta/alta-dlg-detalle.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- Total de la venta y botones de guardar, exportarPDF y crearVenta -->
+            <!-- id: pnl-total-venta, totalVenta y acciones -->
+            <ui:include src="/protected/catalogos/ventas/alta/alta-acciones.xhtml" />
+        </h:form>
+    </ui:define>
+</ui:composition>

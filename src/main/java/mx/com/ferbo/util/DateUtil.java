@@ -3,6 +3,11 @@ package mx.com.ferbo.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -24,9 +29,10 @@ public class DateUtil {
 	public static final String FORMATO_YYYY_MM_DD          = "yyyy-MM-dd";
 	public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss.SSS";
 	public static final String FORMATO_DD_MM_YYYY_FULL     = "dd MMMM yyyy";
-	public static final String FORMATO_FECHA_CADENA        = "dd 'de' MMMM 'de' yyyy";
-	public static final String FORMATO_ISO_8601            = "yyyy-MM-dd'T'HH:mm:ss";
-
+        public static final String FORMATO_FECHA_CADENA        = "dd 'de' MMMM 'de' yyyy";
+        public static final String FORMATO_ISO_8601            = "yyyy-MM-dd'T'HH:mm:ss";
+        public static final String FORMATO_YYYY_MM          = "yyyy-MM";
+        
 	public static final int ENERO      = Calendar.JANUARY;
 	public static final int FEBRERO    = Calendar.FEBRUARY;
 	public static final int MARZO      = Calendar.MARCH;
@@ -662,4 +668,43 @@ public class DateUtil {
 			log.error("Problema para obtener el vencimiento...", ex);
 		}
 	}
+        
+        public static Date[] obtenerRango(Date fechaSeleccionada) 
+        {
+            ZoneId ZONE = ZoneId.of("Etc/GMT+6");
+            LocalDate fecha = fechaSeleccionada.toInstant().atZone(ZONE).toLocalDate();
+            LocalDate hoy = LocalDate.now();
+
+            LocalDate inicio = fecha.withDayOfMonth(1);
+
+            // último día depende si es mes actual o no
+            LocalDate fin;
+            if (fecha.getMonth() == hoy.getMonth() && fecha.getYear() == hoy.getYear()) {
+                fin = hoy; // mes actual → hasta hoy
+            } else {
+                YearMonth ym = YearMonth.of(fecha.getYear(), fecha.getMonth());
+                fin = ym.atEndOfMonth(); // mes pasado/futuro → último día del mes
+            }
+
+            // convertir de LocalDate a java.util.Date
+            Date inicioDate = Date.from(inicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date finDate = Date.from(fin.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            return new Date[]{inicioDate, finDate};
+        }
+        
+        /*
+        * Inicializa una fecha inicio una semana
+        * atras (7 dias) con una fecha final
+        */
+        public static Date moverFechaSemanaAtras(Date fechaFin) {
+            if (fechaFin == null) {
+                throw new IllegalArgumentException("La fecha fin no puede ser nula");
+            }
+
+            Instant instant = fechaFin.toInstant();
+            Instant inicioInstant = instant.minus(7, ChronoUnit.DAYS);
+
+            return Date.from(inicioInstant);
+        }
 }
