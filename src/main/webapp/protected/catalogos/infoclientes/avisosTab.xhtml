@@ -97,108 +97,93 @@
                         	<p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                     </div>
-
+                    
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <div class="p-field">
-                            <p:outputLabel>Valor del seguro</p:outputLabel>
-                            <p:inputNumber
-                                value="#{clientesBean.avisoSelected.avisoValSeg}"
-                                symbol="%"
-                                symbolPosition="s"
-                                thousandSeparator=","
-                                decimalSeparator="."
-                                decimalPlaces="4"
-                                minValue="0"
-                                maxValue="99.9999"
-                                required="true"
-                                emptyValue="null">
-                                <p:ajax process="@this"/>
-                            </p:inputNumber>
-                        </div>
-                    </div>  
+                        <p:outputLabel>Tipo facturación</p:outputLabel>
+                        <p:selectOneMenu id="soTpFacturacion-m"
+                                         value="#{clientesBean.avisoSelected.avisoTpFacturacion}">
+                            <f:selectItem itemLabel="--Seleccione--" />
+                            <f:selectItem itemLabel="Por Kg" itemValue="K" />
+                            <f:selectItem itemLabel="Por Tarima" itemValue="T" />
+                            <p:ajax process="@this" />
+                        </p:selectOneMenu>
+                    </div>
+                    
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <div class="p-field">
-                            <p:outputLabel> Temperatura</p:outputLabel>
-                            <p:inputText disabled="false" value="#{clientesBean.avisoSelected.avisoTemp}">
-                            	<p:ajax process="@this"/>
-                            </p:inputText>
-                        </div>
+                        <p:outputLabel>Vigencia en días</p:outputLabel>
+                        <p:inputNumber
+                            value="#{clientesBean.avisoSelected.avisoVigencia}"
+                            decimal="false"
+                            minValue="0"
+                            maxValue="365">
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
                     </div>
 
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <div class="p-field">
-                            <p:outputLabel>Planta</p:outputLabel>
-                            <p:selectOneMenu id="soPlantaAct" converter="entityConverter" value="#{clientesBean.avisoSelected.plantaCve}">
-                                <f:selectItem itemLabel="--Seleccione--" />
-                                <f:selectItems value="#{clientesBean.lstPlanta}" var="planta"
-                                               itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-								<p:ajax process="@this"/>
-                            </p:selectOneMenu>
-                        </div>
+                        <p:outputLabel>Plazo de pago en días</p:outputLabel>
+                        <p:inputNumber
+                            value="#{clientesBean.avisoSelected.avisoPlazo}"
+                            decimal="false"
+                            minValue="0"
+                            maxValue="365">
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
                     </div>
-
+                    
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <div class="p-field">
-                            <p:outputLabel>Observaciones</p:outputLabel>
-                            <p:inputText value="#{clientesBean.avisoSelected.avisoObservaciones}">
-                            	<p:ajax process="@this"/>
-                            </p:inputText>
-                        </div>
+                        <p:outputLabel>Planta</p:outputLabel>
+                        <p:selectOneMenu id="soPlantaAct" converter="entityConverter" value="#{clientesBean.avisoSelected.plantaCve}">
+                            <f:selectItem itemLabel="--Seleccione--" />
+                            <f:selectItems value="#{clientesBean.lstPlanta}" var="planta"
+                                           itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+							<p:ajax process="@this"/>
+                        </p:selectOneMenu>
                     </div>
-
+                    
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <div class="p-field">
-                            <p:outputLabel>Tipo facturación</p:outputLabel>
-                            <p:selectOneMenu id="soTpFacturacion-m"
-                                             value="#{clientesBean.avisoSelected.avisoTpFacturacion}">
-                                <f:selectItem itemLabel="--Seleccione--" />
-                                <f:selectItem itemLabel="Por Kg" itemValue="K" />
-                                <f:selectItem itemLabel="Por Tarima" itemValue="T" />
-                                <p:ajax process="@this" />
-                            </p:selectOneMenu>
-                        </div>
+                        <p:outputLabel>Categoria</p:outputLabel>
+                        <p:selectOneMenu id="soCategoriaAct" converter="entityConverter"
+                                         value="#{clientesBean.avisoSelected.categoriaCve}" filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="--Seleccione--" />
+                            <f:selectItems value="#{clientesBean.lstCategoria}" var="categoria"
+                                           itemLabel="#{categoria.categoriaDs}" itemValue="#{categoria}" />
+							<p:ajax process="@this"/>
+                        </p:selectOneMenu>
                     </div>
-
+					
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <div class="p-field">
-                            <p:outputLabel>Categoria</p:outputLabel>
-                            <p:selectOneMenu id="soCategoriaAct" converter="entityConverter"
-                                             value="#{clientesBean.avisoSelected.categoriaCve}" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemLabel="--Seleccione--" />
-                                <f:selectItems value="#{clientesBean.lstCategoria}" var="categoria"
-                                               itemLabel="#{categoria.categoriaDs}" itemValue="#{categoria}" />
-								<p:ajax process="@this"/>
-                            </p:selectOneMenu>
-                        </div>
+                        <p:outputLabel>Valor del seguro</p:outputLabel>
+                        <p:inputNumber
+                            value="#{clientesBean.avisoSelected.avisoValSeg}"
+                            symbol="%"
+                            symbolPosition="s"
+                            thousandSeparator=","
+                            decimalSeparator="."
+                            decimalPlaces="4"
+                            minValue="0"
+                            maxValue="99.9999"
+                            required="true"
+                            emptyValue="null">
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
                     </div>
-
+                    
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <div class="p-field">
-                            <p:outputLabel>Vigencia en días</p:outputLabel>
-                            <p:inputNumber
-                                value="#{clientesBean.avisoSelected.avisoVigencia}"
-                                decimal="false"
-                                minValue="0"
-                                maxValue="365">
-                                <p:ajax process="@this"/>
-                            </p:inputNumber>
-                        </div>
+                        <p:outputLabel> Temperatura</p:outputLabel>
+                        <p:inputText disabled="false" value="#{clientesBean.avisoSelected.avisoTemp}">
+                        	<p:ajax process="@this"/>
+                        </p:inputText>
                     </div>
-
+					
                     <div class="p-col-12 p-md-6 p-lg-4">
-                        <div class="p-field">
-                            <p:outputLabel>Plazo de pago en días</p:outputLabel>
-                            <p:inputNumber
-                                value="#{clientesBean.avisoSelected.avisoPlazo}"
-                                decimal="false"
-                                minValue="0"
-                                maxValue="365">
-                                <p:ajax process="@this"/>
-                            </p:inputNumber>
-                        </div>
+                        <p:outputLabel>Observaciones</p:outputLabel>
+                        <p:inputText value="#{clientesBean.avisoSelected.avisoObservaciones}">
+							<p:ajax process="@this"/>
+                        </p:inputText>
                     </div>
-                </div>
-
+				</div>
+				
                 <p:panelGrid columns="2" layout="grid"
                              style="width:100%;"
                              columnClasses="ui-g-6 ui-md-6 ui-lg-6, ui-g-6 ui-md-6 ui-lg-6">
