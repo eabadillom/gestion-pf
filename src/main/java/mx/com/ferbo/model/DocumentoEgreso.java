@@ -11,8 +11,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "DocumentoEgreso.findByPago", query = "SELECT de FROM DocumentoEgreso de WHERE de.pagoEgreso.id = :id")
+})
 @Entity
 @Table(name = "documento_egreso")
 public class DocumentoEgreso implements Serializable{

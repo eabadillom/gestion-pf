@@ -19,7 +19,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "CategoriaEgreso.findAllActivos", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.activo = 1")
+    @NamedQuery(name = "CategoriaEgreso.findAllActivos", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.activo = 1"),
+    @NamedQuery(name = "CategoriaEgreso.findAllByTipoEgreso", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.tipoEgreso.id = :id")
 })
 @Entity
 @Table(name = "categoria_egreso")
