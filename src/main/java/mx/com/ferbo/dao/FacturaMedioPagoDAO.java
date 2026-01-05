@@ -59,28 +59,28 @@ public class FacturaMedioPagoDAO extends IBaseDAO<FacturaMedioPago, Integer > {
 		return null;
 	}
 
-	@Override
-	public String actualizar(FacturaMedioPago e) {
-		
-		EntityManager em = null;
-		
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			em.createNativeQuery("UPDATE factura_medio_pago fmp SET fmp.mp_id =:mpId, fmp.mp_descripcion = :mpDescripcion WHERE fmp.factura_id = :facturaId",FacturaMedioPago.class)
-			.setParameter("mpId", e.getMpId())
-			.setParameter("mpDescripcion", e.getMpDescripcion())
-			.setParameter("facturaId", e.getFactura().getId()).executeUpdate();			
-			
-			em.getTransaction().commit();			
-		} catch (Exception e2) {
-			log.info("Error al actualizar factira medio pago", e2.getMessage());
-		}finally {
-			EntityManagerUtil.close(em);
-		}
-		
-		return null;
-	}
+//	@Override
+//	public String actualizar(FacturaMedioPago e) {
+//		
+//		EntityManager em = null;
+//		
+//		try {
+//			em = EntityManagerUtil.getEntityManager();
+//			em.getTransaction().begin();
+//			em.createNativeQuery("UPDATE factura_medio_pago fmp SET fmp.mp_id =:mpId, fmp.mp_descripcion = :mpDescripcion WHERE fmp.factura_id = :facturaId",FacturaMedioPago.class)
+//			.setParameter("mpId", e.getMpId())
+//			.setParameter("mpDescripcion", e.getMpDescripcion())
+//			.setParameter("facturaId", e.getFactura().getId()).executeUpdate();			
+//			
+//			em.getTransaction().commit();			
+//		} catch (Exception e2) {
+//			log.info("Error al actualizar factira medio pago", e2.getMessage());
+//		}finally {
+//			EntityManagerUtil.close(em);
+//		}
+//		
+//		return null;
+//	}
 
 	@Override
 	public String guardar(FacturaMedioPago e) {

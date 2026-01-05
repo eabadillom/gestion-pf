@@ -81,7 +81,7 @@ public class AltaTraspasoBean implements Serializable {
 	private static Logger log = LogManager.getLogger(AltaTraspasoBean.class);
 	
 	@Inject
-    private SideBarBean sideBar;
+	private SideBarBean sideBar;
 
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;
@@ -182,7 +182,7 @@ public class AltaTraspasoBean implements Serializable {
 		context = FacesContext.getCurrentInstance();
 		request = (HttpServletRequest) context.getExternalContext().getRequest();
 		usuario = (Usuario) request.getSession(false).getAttribute("usuario");
-                log.info("El usuario {} ingresa al alta constancia de traspaso.", this.usuario.getUsuario());
+		log.info("El usuario {} ingresa al alta constancia de traspaso.", this.usuario.getUsuario());
 		
 		log.debug("Buscando lista de clientes...");
 		clientes = sideBar.getListaClientesActivos();
@@ -194,14 +194,14 @@ public class AltaTraspasoBean implements Serializable {
 			alProductosFiltered = new ArrayList<ProductoPorCliente>();
 		estados = edoDAO.buscarTodos();
 		log.debug("Usuario con perfil: {}", usuario.getPerfil());
-		if((usuario.getPerfil() == 1)||(usuario.getPerfil() == 4)) {
+		if ((usuario.getPerfil() == 1) || (usuario.getPerfil() == 4)) {
 			listadoPlantas = new ArrayList<Planta>();
 			listadoPlantas.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
-		}else {
+		} else {
 			listadoPlantas = plantaDAO.findall(false);
 		}
 		plantaSelect = listadoPlantas.get(0);
-		
+
 	}
 
 	public void filtrarCliente() {
@@ -230,9 +230,10 @@ public class AltaTraspasoBean implements Serializable {
 			}
 			
 			listaEntradas = new ArrayList<String>();
-			for(InventarioDetalle i : inventario) {
-				if(listaEntradas.contains(i.getFolioCliente()))
+			for (InventarioDetalle i : inventario) {
+				if (listaEntradas.contains(i.getFolioCliente())) {
 					continue;
+				}
 				listaEntradas.add(i.getFolioCliente());
 			}
 			log.debug("Lista entradas: {}", listaEntradas);
@@ -243,6 +244,7 @@ public class AltaTraspasoBean implements Serializable {
 			precioServicioList = cliente.getPrecioServicioList();
 			Integer idAviso = new Integer(-1);
 			for (PrecioServicio ps : precioServicioList) {
+				/*Código que no consideraba nulos en precios servicio
 				Integer avisoCve = ps.getAvisoCve().getAvisoCve();
 				if (avisoCve > idAviso)
 					idAviso = new Integer(avisoCve);
@@ -252,11 +254,26 @@ public class AltaTraspasoBean implements Serializable {
 					list = new ArrayList<PrecioServicio>();
 					mpPrecioServicio.put(avisoCve, list);
 				}
-				list.add(ps);
+				list.add(ps);*/
+
+				// Obtener el aviso (puede ser null por cambios en BD)
+				Integer avisoCve = (ps.getAvisoCve() != null) ? ps.getAvisoCve().getAvisoCve() : null;
+
+				// Usamos -1 para agrupar los que no tienen aviso
+				Integer avisoKey = (avisoCve != null) ? avisoCve : -1;
+
+				// Solo actualizar idAviso cuando NO es null
+				if (avisoCve != null && avisoCve > idAviso) {
+					idAviso = avisoCve;
+				}
+
+				// Agrupar por aviso
+				mpPrecioServicio.computeIfAbsent(avisoKey, k -> new ArrayList<>())
+						.add(ps);
+
 			}
 			mpPrecioServicio.get(idAviso);
-                        if(!alServicios.isEmpty())
-                            alServicios.clear();
+			alServicios.clear();
 			alServicios = mpPrecioServicio.get(idAviso);
 			for (PrecioServicio ps : alServicios) {
 				log.debug(ps.getServicio().getServicioDs());
@@ -279,18 +296,20 @@ public class AltaTraspasoBean implements Serializable {
 	public void generaFolioTraspaso() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
-		SerieConstancia serieConstancia = null; 
+		SerieConstancia serieConstancia = null;
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Folio";
 
 		try {
-			if (this.selCliente == null)
+			if (this.selCliente == null) {
 				throw new InventarioException("Debe seleccionar un cliente");
+			}
 
-			if (this.plantaSelect == null)
+			if (this.plantaSelect == null) {
 				throw new InventarioException("Debe seleccionar una planta");
+			}
 			serieConstancia = new SerieConstancia();
 			seriePK = new SerieConstanciaPK();
 			seriePK.setCliente(this.selCliente);
@@ -305,7 +324,7 @@ public class AltaTraspasoBean implements Serializable {
 						"No se encontró información de los folios del cliente. Debe indicar manualmente un folio de constancia.");
 			}
 
-			this.numero = String.format("%s%s%s%d", serieConstancia.getSerieConstanciaPK().getTpSerie(),plantaSelect.getPlantaSufijo(),
+			this.numero = String.format("%s%s%s%d", serieConstancia.getSerieConstanciaPK().getTpSerie(), plantaSelect.getPlantaSufijo(),
 					selCliente.getCodUnico(), serie.getNuSerie());
 			
 			this.serie = serie;
@@ -343,10 +362,11 @@ public class AltaTraspasoBean implements Serializable {
 			List<InventarioDetalle> list = destino.stream()
 					.filter(t -> t.getPartidaCve() == this.selectedInventario.getPartidaCve())
 					.collect(Collectors.toList());
-			
-			if(list.size() > 0)
+
+			if (list.size() > 0) {
 				throw new InventarioException("El producto ya se encuentra en la lista de traspaso.");
-			
+			}
+
 			destino.add(selectedInventario);
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
 			
@@ -366,9 +386,6 @@ public class AltaTraspasoBean implements Serializable {
 		} finally {
 			PrimeFaces.current().ajax().update(":form:messages");
 		}
-		
-		
-		
 
 	}
 	
@@ -379,19 +396,23 @@ public class AltaTraspasoBean implements Serializable {
 		TraspasoServicio servicio = null;
 
 		try {
-			if (this.idCliente == null || this.idCliente == 0)
+			if (this.idCliente == null || this.idCliente == 0) {
 				throw new InventarioException("Debe seleccionar el cliente");
+			}
 
-			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0)
+			if (this.cantidadServicio == null || this.cantidadServicio.compareTo(BigDecimal.ZERO) <= 0) {
 				throw new InventarioException("Debe indicar la cantidad de servicios.");
+			}
 
-			if (this.idPrecioServicio == null)
+			if (this.idPrecioServicio == null) {
 				throw new InventarioException("Debe seleccionar un servicio.");
+			}
 
 			precioServicio = this.alServicios.stream().filter(ps -> this.idPrecioServicio.equals(ps.getId()))
 					.collect(Collectors.toList()).get(0);
-			if (alServiciosDetalle == null)
+			if (alServiciosDetalle == null) {
 				alServiciosDetalle = new ArrayList<TraspasoServicio>();
+			}
 
 			servicio = new TraspasoServicio();
 			servicio.setCantidad(this.cantidadServicio);
@@ -420,11 +441,12 @@ public class AltaTraspasoBean implements Serializable {
 		List<Camara> listaCamarasDestino = camaraDAO.buscarPorPlanta(plantaDestino);
 		selectedInventario.setListacamara(listaCamarasDestino);
 	}
+
 	public void camaraselect() {
-			Camara camD = this.selectedInventario.getCamaraDestino();
-			List<Posicion> listaposicionDestino = posicionDAO.buscarPorCamara(camD);
-			selectedInventario.setListaposicion(listaposicionDestino);
-		}
+		Camara camD = this.selectedInventario.getCamaraDestino();
+		List<Posicion> listaposicionDestino = posicionDAO.buscarPorCamara(camD);
+		selectedInventario.setListaposicion(listaposicionDestino);
+	}
 
 	public synchronized void guardar() {
 		String message = null;
@@ -433,19 +455,23 @@ public class AltaTraspasoBean implements Serializable {
 		List<ConstanciaTraspaso> alConstancias = null;
 		
 		try {
-			if (this.isSaved)
+			if (this.isSaved) {
 				throw new InventarioException("La constancia ya se encuentra registrada.");
+			}
 
-			if (this.numero == null || "".equalsIgnoreCase(this.numero.trim()))
+			if (this.numero == null || "".equalsIgnoreCase(this.numero.trim())) {
 				throw new InventarioException("Debe indicar el folio de la constancia.");
+			}
 
-			if (this.destino == null || this.destino.size() == 0)
+			if (this.destino == null || this.destino.size() == 0) {
 				throw new InventarioException("Debe traspasar almenos un producto");
+			}
 
 			alConstancias = constanciaTDAO.buscarporNumero(this.numero);
 
-			if (alConstancias != null && alConstancias.size() > 0)
+			if (alConstancias != null && alConstancias.size() > 0) {
 				throw new InventarioException(String.format("El folio %s ya se encuentra registrado.", this.numero));
+			}
 
 			constancia = new ConstanciaTraspaso();
 			constancia.setFecha(this.fecha);
@@ -487,7 +513,7 @@ public class AltaTraspasoBean implements Serializable {
 				
 				partidaDAO.actualizar(partida);
 			}
-			for(TraspasoServicio servicio : alServiciosDetalle) {
+			for (TraspasoServicio servicio : alServiciosDetalle) {
 				servicio.setTraspaso(constancia);
 			}
 			constancia.setTraspasoServicioList(alServiciosDetalle);
@@ -531,9 +557,10 @@ public class AltaTraspasoBean implements Serializable {
 		Map<String, Object> parameters = null;
 		Connection connection = null;
 		try {
-			if (habilitareporte == false)
+			if (habilitareporte == false) {
 				throw new InventarioException("Favor de guardar la constancia");
-			
+			}
+
 			URL resource = getClass().getResource(jasperPath);
 			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
@@ -552,8 +579,8 @@ public class AltaTraspasoBean implements Serializable {
 			
 			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
 			InputStream input = new ByteArrayInputStream(bytes);
-                        this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
-                        log.info("Ticket de traspaso generado {}...", filename);
+			this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
+			log.info("Ticket de traspaso generado {}...", filename);
 		} catch(InventarioException ex) {
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -592,14 +619,13 @@ public class AltaTraspasoBean implements Serializable {
 		this.unidadcobro = unidadcobro;
 	}
 
-		public void deleteServicio(TraspasoServicio servicio) {
-                log.info("Eliminando servicio del traspaso: {}", servicio.getServicio());
+	public void deleteServicio(TraspasoServicio servicio) {
 		this.alServiciosDetalle.remove(servicio);
 	}
-		public void deletePartida(InventarioDetalle partida) {
-                        log.info("Eliminando producto del traspaso: {}", partida.getProducto().getProductoDs());
-			this.destino.remove(partida);
-		}
+
+	public void deletePartida(InventarioDetalle partida) {
+		this.destino.remove(partida);
+	}
 
 	public Cliente getSelCliente() {
 		return selCliente;

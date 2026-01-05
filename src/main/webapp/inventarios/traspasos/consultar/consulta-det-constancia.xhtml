@@ -3,7 +3,7 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <p:dialog id="constanciaTraspasos" header="Constancia de Traspaso: #{consultaTraspasosBean.selectedconstancia.numero}" showEffect="fade" modal="true" widgetVar="constanciaTraspaso" responsive="true" style="max-width:80em !important;" resizable="true">
+    <p:dialog id="constanciaTraspasos" header="Constancia de Traspaso: #{consultaTraspasosBean.selectedconstancia.numero}" showEffect="fade" modal="true" widgetVar="constanciaTraspaso" responsive="true" position="center top" style="max-width:80em !important;" resizable="true">
         <p:tabView id="datosGenerales" dynamic="true" cache="false">
             <p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
             <p:tab id="tabGeneral" title="Datos Generales">
@@ -19,7 +19,7 @@
                         </div>
                         <div class="p-md-3 p-lg-3">
                             <h:outputLabel for="fecha-new" value="Fecha" styleClass="ml-4" />
-                            <p:inputText widgetVar="fecha-new" id="fecha-new" value="#{consultaTraspasosBean.selectedconstancia.fecha}" readonly="true" />
+                            <p:datePicker widgetVar="fecha-new" id="fecha-new" value="#{consultaTraspasosBean.selectedconstancia.fecha}" readonly="true" pattern="dd / MM / yyyy" locale="es_MX" timeZone="GMT-6"/>
                         </div>
                         <div class="p-md-6 p-lg-6">
                             <h:outputLabel for="observacion-new" value="Observaciones" styleClass="ml-4" />

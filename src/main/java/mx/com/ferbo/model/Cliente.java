@@ -115,25 +115,22 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaServicios> constanciaServiciosList;
     
-    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
-    private List<Factura> facturaList;
-    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ProductoPorCliente> productoPorClienteList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ClienteDomicilios> clienteDomiciliosList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<DetalleFacturacion> detalleFacturacionList;
     
-    @OneToMany(mappedBy = "cteCve", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "cteCve", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Aviso> avisoList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<PrecioServicio> precioServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true)
     private List<ClienteContacto> clienteContactoList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
@@ -294,14 +291,6 @@ public class Cliente implements Serializable {
         this.constanciaServiciosList = constanciaServiciosList;
     }
 
-    public List<Factura> getFacturaList() {
-        return facturaList;
-    }
-
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
-    }
-
     public List<ProductoPorCliente> getProductoPorClienteList() {
         return productoPorClienteList;
     }
@@ -309,7 +298,7 @@ public class Cliente implements Serializable {
     public void setProductoPorClienteList(List<ProductoPorCliente> productoPorClienteList) {
         this.productoPorClienteList = productoPorClienteList;
     }
-
+    
     public List<ClienteDomicilios> getClienteDomiciliosList() {
         return clienteDomiciliosList;
     }

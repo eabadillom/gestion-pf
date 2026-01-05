@@ -3,19 +3,19 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <p:fieldset legend="Valor declarado">
+    <p:fieldset legend="Datos adicionales">
     	<div class="p-grid ui-fluid">
     		<div class="p-col-12 p-md-3">
 	            <p:inputNumber id="txtValorDeclarado" value="#{altaConstanciaServicioBean.valorDeclarado}" placeholder="Valor declarado" minValue="1" decimalPlaces="2"/>
     		</div>
     		<div class="p-col-12 p-md-6">
-	            <p:inputText id="txtNombreTransportista" value="#{altaConstanciaServicioBean.nombreTransportista}" placeholder="Nombre del transportista." />
+	            <p:inputText id="txtNombreTransportista" value="#{altaConstanciaServicioBean.nombreTransportista}" placeholder="Nombre del transportista." oninput="this.value = this.value.toUpperCase()"/>
     		</div>
     		<div class="p-col-12 p-md-3">
-    			<p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." />
+    			<p:inputText id="txtPlacasVehiculo" value="#{altaConstanciaServicioBean.placasVehiculo}" placeholder="Placas del transporte." oninput="this.value = this.value.toUpperCase()"/>
     		</div>
     		<div class="p-col-12 p-md-12">
-    			<p:inputText id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." />
+    			<p:inputText id="txtObservaciones" value="#{altaConstanciaServicioBean.observaciones}" placeholder="Observaciones." oninput="this.value = this.value.toUpperCase()"/>
     		</div>
     	</div>
     </p:fieldset>

@@ -79,7 +79,7 @@
 						<div class="p-col-6 p-md-6">
 							<p:outputLabel value="Domicilio fiscal"/>
 							<p:selectOneMenu id="domicilio" autoWidth="false" value="#{facturaServiciosBean.domicilioSelect}" disabled="true">
-								<f:selectItem itemLabel="#{facturaServiciosBean.domicilioSelect.paisCved.paisDesc}" />
+                                                            <f:selectItem itemLabel="#{facturaServiciosBean.domicilioSelect.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisDesc}" />
 								<f:selectItems value="#{facturaServiciosBean.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios.domCve}" />
 							</p:selectOneMenu>
 						</div>

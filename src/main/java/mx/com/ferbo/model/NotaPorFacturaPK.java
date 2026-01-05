@@ -18,7 +18,7 @@ public class NotaPorFacturaPK implements Serializable, Cloneable{
 	private NotaCredito nota;
 	
 	@JoinColumn(name = "FACTURA")
-    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
+    @ManyToOne(optional = false)
     private Factura factura;
 
 	public NotaPorFacturaPK() {
@@ -49,7 +49,7 @@ public class NotaPorFacturaPK implements Serializable, Cloneable{
 
 	@Override
 	public String toString() {
-		return "NotaPorFacturaPK [nota=" + nota + ", factura=" + factura + "]";
+		return "NotaPorFacturaPK [nota=" + nota.getId() + ", factura=" + factura.getId() + "]";
 	}
 
 	@Override

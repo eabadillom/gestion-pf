@@ -9,6 +9,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class PaisDAO extends IBaseDAO<Pais, Integer> {
 
 	@Override

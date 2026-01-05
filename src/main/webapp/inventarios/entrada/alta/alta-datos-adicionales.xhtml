@@ -13,17 +13,17 @@
 					</div>
 					<div class="p-col-12 p-md-6">
 						<p:outputLabel value="Nombre transportista" />
-						<p:inputText maxlength="100" value="#{ingresoBean.entrada.nombreTransportista}" style="text-transform: uppercase">
+						<p:inputText maxlength="100" value="#{ingresoBean.entrada.nombreTransportista}" oninput="this.value = this.value.toUpperCase()">
 						</p:inputText>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Placas vehículo"/>
-						<p:inputText maxlength="10" value="#{ingresoBean.entrada.placasTransporte}" style="text-transform: uppercase">
+						<p:inputText maxlength="10" value="#{ingresoBean.entrada.placasTransporte}" oninput="this.value = this.value.toUpperCase()">
 						</p:inputText>
 					</div>
 					<div class="p-col-12 p-md-12">
 						<p:outputLabel value="Observaciones" />
-						<p:inputText maxlength="200" value="#{ingresoBean.entrada.observaciones}" style="text-transform: uppercase">
+						<p:inputText maxlength="200" value="#{ingresoBean.entrada.observaciones}" oninput="this.value = this.value.toUpperCase()">
 						</p:inputText>
 					</div>
 				</div>

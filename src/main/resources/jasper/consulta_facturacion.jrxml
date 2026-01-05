@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="consulta_facturacion" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f661436b-2ff3-427a-9ca5-3f4eba5d6639">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="consulta_facturacion" pageWidth="960" pageHeight="792" columnWidth="920" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f661436b-2ff3-427a-9ca5-3f4eba5d6639">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_Desarrollo.jrdax"/>
 	<parameter name="idCliente" class="java.lang.Integer"/>
 	<parameter name="fechaIni" class="java.util.Date"/>
 	<parameter name="fechaFin" class="java.util.Date"/>
@@ -11,13 +11,17 @@
 	f.nom_serie,
 	f.numero,
 	f.fecha,
-	c.CTE_NOMBRE,
+	f.nombre_cliente,
+	f.cp,
 	f.total,
 	sf.nombre,
-	f.uuid
+	f.uuid,
+	c.cfdi_fecha,
+	c.cfdi_uuid,
+	c.cfdi_cert_sat
 from factura f
+left outer join cfdi c on f.id = c.id_factura
 inner join status_factura sf on f.status = sf.id
-INNER JOIN cliente c ON f.cliente = c.CTE_CVE
 WHERE (f.fecha BETWEEN $P{fechaIni} AND $P{fechaFin})
 AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)]]>
 	</queryString>
@@ -36,10 +40,15 @@ AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)]]>
 		<property name="com.jaspersoft.studio.field.label" value="fecha"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="factura"/>
 	</field>
-	<field name="CTE_NOMBRE" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
-		<property name="com.jaspersoft.studio.field.label" value="CTE_NOMBRE"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
+	<field name="nombre_cliente" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nombre_cliente"/>
+		<property name="com.jaspersoft.studio.field.label" value="nombre_cliente"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="factura"/>
+	</field>
+	<field name="cp" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="cp"/>
+		<property name="com.jaspersoft.studio.field.label" value="cp"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="factura"/>
 	</field>
 	<field name="total" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="total"/>
@@ -56,14 +65,30 @@ AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)]]>
 		<property name="com.jaspersoft.studio.field.label" value="uuid"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="factura"/>
 	</field>
+	<field name="cfdi_fecha" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="cfdi_fecha"/>
+		<property name="com.jaspersoft.studio.field.label" value="cfdi_fecha"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cfdi"/>
+	</field>
+	<field name="cfdi_uuid" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="cfdi_uuid"/>
+		<property name="com.jaspersoft.studio.field.label" value="cfdi_uuid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cfdi"/>
+	</field>
+	<field name="cfdi_cert_sat" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="cfdi_cert_sat"/>
+		<property name="com.jaspersoft.studio.field.label" value="cfdi_cert_sat"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cfdi"/>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="35" splitType="Stretch"/>
+		<band height="96" splitType="Stretch"/>
 	</title>
 	<pageHeader>
 		<band height="15" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
 				<reportElement mode="Opaque" x="0" y="0" width="50" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="15557384-e9fa-4eb1-bd6c-11a1cb95935e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -86,25 +111,48 @@ AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)]]>
 				<text><![CDATA[Cliente]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="378" y="0" width="61" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="2848b9d6-84c7-46fc-b658-854681ff59f4"/>
+				<reportElement mode="Opaque" x="438" y="0" width="61" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="2848b9d6-84c7-46fc-b658-854681ff59f4"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="439" y="0" width="81" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="65b11048-ce1d-42fb-bce8-e315c0e940a6"/>
+				<reportElement mode="Opaque" x="499" y="0" width="81" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="65b11048-ce1d-42fb-bce8-e315c0e940a6"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Status]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="520" y="0" width="52" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="7f32bba9-9ba1-4054-9c97-83b0c8f736d0"/>
+				<reportElement mode="Opaque" x="580" y="0" width="52" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="7f32bba9-9ba1-4054-9c97-83b0c8f736d0"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Timbrado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="632" y="0" width="188" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="61c1a1c1-78f8-4714-b1d6-08b93acf0027"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UUID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="820" y="0" width="100" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="04352f74-7f9a-4b06-9e31-8769ee76430e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha timbrado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="378" y="0" width="60" height="15" forecolor="#FFFFFF" backcolor="#2196F3" uuid="b5bb2d66-f1e5-45ed-8e99-f1800db69248"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cod. postal]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
@@ -115,6 +163,7 @@ AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)]]>
 	</columnHeader>
 	<detail>
 		<band height="15" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
 				<reportElement x="0" y="0" width="50" height="15" uuid="914c0bef-d84a-415b-9afb-ae84a11c6c24">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -136,28 +185,55 @@ AND (f.cliente = $P{idCliente} OR $P{idCliente} IS NULL)]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{CTE_NOMBRE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
 			</textField>
 			<textField pattern="$#,##0.00;$-#,##0.00">
-				<reportElement x="378" y="0" width="61" height="15" uuid="fb5c2e37-7878-4c97-af3d-c891cad552a1"/>
+				<reportElement x="438" y="0" width="61" height="15" uuid="fb5c2e37-7878-4c97-af3d-c891cad552a1"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="439" y="0" width="81" height="15" uuid="5d12114a-8ca0-4bf1-be03-cf61668d954c"/>
+				<reportElement x="499" y="0" width="81" height="15" uuid="5d12114a-8ca0-4bf1-be03-cf61668d954c"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="520" y="0" width="52" height="15" uuid="ad40df14-4e30-4ca2-a3e1-dadbb6cbe3df"/>
+				<reportElement x="580" y="0" width="52" height="15" uuid="ad40df14-4e30-4ca2-a3e1-dadbb6cbe3df"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{uuid} == null ? null : "SI")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{uuid} == null ? "NO" : "SI")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="632" y="0" width="188" height="15" uuid="828ab851-e768-49e3-b16d-ce0e86b0eddb">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cfdi_uuid} == null ? "" : $F{cfdi_uuid}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH:mm:ss" isBlankWhenNull="true">
+				<reportElement x="820" y="0" width="100" height="15" uuid="9fbd32aa-dffc-4572-bc3c-c6c583219d6c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cfdi_fecha}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="378" y="0" width="60" height="15" uuid="ecf5ed7a-639b-4baf-a950-386eeac42ad0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cp}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

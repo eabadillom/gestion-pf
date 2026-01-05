@@ -7,8 +7,9 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -47,55 +48,70 @@ import javax.validation.constraints.Size;
 public class ServicioConstancia implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "costo")
     private BigDecimal costo;
+    
     @Column(name = "tarifa")
     private BigDecimal tarifa;
+    
     @Column(name = "baseCargo")
     private BigDecimal baseCargo;
+    
     @Column(name = "planta_cve")
     private Integer plantaCve;
+    
     @Size(max = 80)
     @Column(name = "planta_ds")
     private String plantaDs;
+    
     @Size(max = 6)
     @Column(name = "planta_abrev")
     private String plantaAbrev;
+    
     @Column(name = "camara_cve")
     private Integer camaraCve;
-    @Size(max = 80)
+    
     @Column(name = "camara_ds")
-    private String camaraDs;
     @Size(max = 80)
+    private String camaraDs;
+    
     @Column(name = "camara_abrev")
+    @Size(max = 80)
     private String camaraAbrev;
+    
     @Size(max = 20)
     @Column(name = "unidad_medida")
     private String unidadMedida;
+    
     @Size(max = 20)
     @Column(name = "codigo")
     private String codigo;
+    
     @Size(max = 10)
     @Column(name = "planta_cod")
     private String plantaCod;
+    
     @Size(max = 5)
     @Column(name = "cd_unidad")
     private String cdUnidad;
+    
+    @ManyToOne(optional = false)
     @JoinColumn(name = "constancia", referencedColumnName = "id")
-    @ManyToOne(optional = false)//modificado 10 de enero 2021
     private ConstanciaFactura constancia;
 
     public ServicioConstancia() {
@@ -241,9 +257,9 @@ public class ServicioConstancia implements Serializable {
 
 	@Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+		if(this.id == null)
+			return System.identityHashCode(this);
+		return Objects.hash(this.id);
     }
 
     @Override

@@ -24,41 +24,72 @@ import javax.validation.constraints.NotNull;
 @NamedQuery(name = "PrecioServicio.findByCliente", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve ORDER BY p.servicio.servicioDs, p.avisoCve.avisoCve")
 @NamedQuery(name = "PrecioServicio.findByClienteServicio", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.servicio.servicioCve = :servicioCve")
 @NamedQuery(name = "PrecioServicio.findByClienteAvisoServicio", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.avisoCve.avisoCve = :avisoCve and p.servicio.servicioCve = :servicioCve")
-@NamedQuery(name = "PrecioServicio.getMaxPrecioServicioByIdServicio" , query = "SELECT p.servicio, MIN(p.precio) AS precio FROM PrecioServicio p WHERE p.servicio = :idServicio")
+@NamedQuery(name = "PrecioServicio.getMaxPrecioServicioByIdServicio", query = "SELECT p.servicio, MIN(p.precio) AS precio FROM PrecioServicio p WHERE p.servicio = :idServicio")
 @NamedQuery(name = "PrecioServicio.findByPrecio", query = "SELECT p FROM PrecioServicio p WHERE p.precio = :precio")
 @NamedQuery(name = "PrecioServicio.findByClienteAviso", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.avisoCve.avisoCve = :avisoCve")
 @NamedQuery(name = "PrecioServicio.findByServicioAndAvisoAndCliente", query = "SELECT p FROM PrecioServicio p WHERE p.cliente.cteCve = :cteCve and p.avisoCve.avisoCve = :avisoCve and p.servicio.servicioCve = :servicioCve")
 @NamedQuery(name = "PrecioServicio.findByAviso", query = "SELECT p FROM PrecioServicio p WHERE p.avisoCve.avisoCve = :idAviso ORDER BY p.servicio.servicioDs ASC")
+@NamedQuery(name = "PrecioServicio.findByClienteSinAviso", query = "SELECT ps FROM PrecioServicio ps WHERE ps.cliente.cteCve = :cteCve AND ps.avisoCve IS NULL")
+//@NamedQuery(name = "PrecioServicio.findByClienteSinAviso", query = "SELECT ps FROM PrecioServicio ps WHERE ps.cliente.cteCve = :cteCve AND ps.avisoCve IS NOT NULL")
 public class PrecioServicio implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "precio")
     private BigDecimal precio;
-    
+
     @JoinColumn(name = "cliente", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente cliente;
-    
+
     @JoinColumn(name = "servicio", referencedColumnName = "SERVICIO_CVE")
     @ManyToOne(optional = false)
     private Servicio servicio;
-    
+
     @JoinColumn(name = "unidad", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
     @ManyToOne(optional = false)
     private UnidadDeManejo unidad;
-    
-    @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve")
-    @ManyToOne(optional = false)
+
+    @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve", nullable = true)
+    @ManyToOne(optional = true)
     private Aviso avisoCve;
+    
+    @Override
+    public int hashCode() {
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.id);
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (this == object)
+            return true;
+        if (!(object instanceof PrecioServicio))
+            return false;
+        PrecioServicio other = (PrecioServicio) object;
+        
+        if(this == other)
+        	return true;
+        
+        if(this == null || other.id == null)
+        	return System.identityHashCode(this) == System.identityHashCode(other);
+        
+        return this.id.equals(other.id);
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.PrecioServicio[ id=" + id + ", hashCode" + this.hashCode() + " ]";
+    }
 
     public PrecioServicio() {
     }
@@ -119,30 +150,4 @@ public class PrecioServicio implements Serializable {
     public void setAvisoCve(Aviso avisoCve) {
         this.avisoCve = avisoCve;
     }
-
-    @Override
-    public int hashCode() {
-    	if(this.id == null)
-    		return System.identityHashCode(this);
-        return Objects.hash(this.id);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof PrecioServicio)) {
-            return false;
-        }
-        PrecioServicio other = (PrecioServicio) object;
-        
-        if( this.avisoCve != other.avisoCve || this.getCliente().getCteCve() != other.getCliente().getCteCve() || this.getServicio().getServicioCve() != other.getServicio().getServicioCve() )
-        	return false;
-        
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.PrecioServicio[ id=" + id + " ]";
-    }
-
 }

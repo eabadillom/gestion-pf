@@ -258,7 +258,9 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 				log.debug(ps.getCliente().getCteCve());
 				log.debug(ps.getServicio().getServicioCve());
 				log.debug(ps.getUnidad().getUnidadDeManejoCve());
-				log.debug(ps.getAvisoCve() == null ? null : ps.getAvisoCve().getAvisoCve());
+
+				if(ps.getAvisoCve() != null)
+					log.debug(ps.getAvisoCve().getAvisoCve());
 			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de precios...", ex);

@@ -42,13 +42,14 @@ public class ConstanciaDepositoDetalle implements Serializable {
     private Integer constanciaDepositoDetalleCve;
     
     @Column(name = "servicio_cantidad")
+    @Basic(optional = false)
     private BigDecimal servicioCantidad;
     
-    @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
+    @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO", nullable = false)
     @ManyToOne(optional = false)
     private ConstanciaDeDeposito folio;
     
-    @JoinColumn(name = "SERVICIO_CVE", referencedColumnName = "SERVICIO_CVE")
+    @JoinColumn(name = "SERVICIO_CVE", referencedColumnName = "SERVICIO_CVE", nullable = false)
     @ManyToOne
     private Servicio servicioCve;
     
