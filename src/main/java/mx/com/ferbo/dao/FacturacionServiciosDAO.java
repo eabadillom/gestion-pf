@@ -79,7 +79,7 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 					+ "WHERE cs.status not in (4) "
 					+ "AND cs.CTE_CVE = :cteCve "
 					+ "AND tCF.id IS NULL "
-					+ "ORDER BY cs.folio_cliente "
+					+ "ORDER BY cs.FECHA, cs.FOLIO_CLIENTE "
 					;
 			
 			Query query = em.createNativeQuery(sql, ConstanciaDeServicio.class)
