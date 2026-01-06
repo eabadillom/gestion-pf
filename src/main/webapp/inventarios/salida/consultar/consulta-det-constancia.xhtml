@@ -1,0 +1,106 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog id="constanciaSalida" header="Constancia de Salida: #{consultarConstanciaSalidaBean.constanciaSelect.numero}" widgetVar="dlgDetalles" modal="true" hideEffect="fade" style="max-width:80em !important;">
+        <p:tabView id="datosGenerales" dynamic="true" cache="false">
+            <p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+            <p:tab id="tabGeneral" title="Datos Generales">
+                <p:outputPanel id="detalleCS" class="ui-fluid">
+                    <p:outputPanel rendered="#{consultarConstanciaSalidaBean.constanciaSelect != null}">
+                        <div class="p-grid p-col-12">
+                            <div class="p-md-3 p-lg-3">
+                                <p:outputLabel for="@next" value="Fecha:" />
+                                <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.fecha}" readonly="true" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </p:inputText>
+                            </div>
+                            <div class="p-md-3 p-lg-3">
+                                <p:outputLabel value="Folio" />
+                                <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.numero}" readonly="true" />
+                            </div>
+                            <div class="p-md-6 p-lg-6">
+                                <p:outputLabel value="Cliente"/>
+                                <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.clienteCve.nombre}" readonly="true" />
+                            </div>
+                        </div>
+                        <div class="p-grid p-col-12">
+                            <div class="p-md-6 p-lg-6">
+                                <p:outputLabel value="Transportista" />
+                                <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.nombreTransportista}" readonly="true" />
+                            </div>
+                            <div class="p-md-3 p-lg-3">
+                                <p:outputLabel value="Placas transporte" />
+                                <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.placasTransporte}" readonly="true" />
+                            </div>
+                        </div>
+                        <div class="p-grid p-col-12">
+                            <div class="p-md-12 p-lg-12">
+                                <p:outputLabel value="Observaciones: " />
+                                <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.observaciones}" readonly="true" />
+                            </div>
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+                <div class="p-field p-col-12 p-md-12" style="text-align: right; padding-left: 0.5rem!important;">
+                    <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                        <p:commandButton value="Imprimir" icon="pi pi-file-pdf" actionListener="#{consultarConstanciaSalidaBean.imprimirTicket()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" ajax="false" process="this" styleClass="ui-button-outlined" >
+                            <p:fileDownload value="#{consultarConstanciaSalidaBean.file}" />
+                        </p:commandButton>
+                    </span>
+                    <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                        <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dlgdetalleConstancia').hide()" process="@this" styleClass="ui-button-secondary" />
+                    </span>
+                </div>
+            </p:tab>
+            <p:tab id="tabProductos" title="Productos">
+                <p:outputPanel id="dlg-partidas" class="ui-fluid">
+                    <p:dataTable value="#{consultarConstanciaSalidaBean.constanciaSelect.detalleConstanciaSalidaList}" var="detalleConstanciaSalida" paginator="true" rows="5" paginatorPosition="bottom">
+                        <p:column headerText="Ingreso" width="6rem" style="text-align: center;">
+                            <h:outputText value="#{detalleConstanciaSalida.folioEntrada}" />
+                        </p:column>
+                        <p:column headerText="Son" width="4rem" style="text-align: center;">
+                            <h:outputText value="#{detalleConstanciaSalida.cantidad}" />
+                        </p:column>
+                        <p:column headerText="Unidad" style="text-align: center;" width="5rem">
+                            <h:outputText value="#{detalleConstanciaSalida.unidad}" />
+                        </p:column>
+                        <p:column headerText="Producto" style="text-align: left;" width="auto">
+                            <h:outputText value="#{detalleConstanciaSalida.producto}" />
+                        </p:column>
+                        <p:column headerText="Peso(Kg)" style="text-align: right;" width="5rem">
+                            <h:outputText value="#{detalleConstanciaSalida.peso}" />
+                        </p:column>
+                        <p:column headerText="Camara" style="text-align: center;" width="6rem">
+                            <h:outputText value="#{detalleConstanciaSalida.camaraCadena}" />
+                        </p:column>
+                        <p:ajax event="page" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+                    </p:dataTable>
+                </p:outputPanel>
+                <div class="p-field p-col-12 p-md-12" style="text-align: right; padding-left: 0.5rem!important;">
+                    <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                        <p:commandButton value="Cerrar" onclick="PF('dlgdetalleConstancia').hide()" process="@this" />
+                    </span>
+                </div>
+            </p:tab>
+            <p:tab id="tabServicios" title="Servicios">
+                <p:outputPanel id="dlg-servicios" class="ui-fluid" rendered="#{consultarConstanciaSalidaBean.constanciaSelect != null}">
+                    <p:dataTable value="#{consultarConstanciaSalidaBean.constanciaSelect.constanciaSalidaServiciosList}" var="constanciaServicio" paginator="true" rows="3" paginatorPosition="bottom">
+                        <p:column headerText="Servicio">
+                            <h:outputText value="#{constanciaServicio.servicioCve.servicioDs}" />
+                        </p:column>
+                        <p:column headerText="Cantidad">
+                            <h:outputText value="#{constanciaServicio.numCantidad}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+                <div class="p-field p-col-12 p-md-12" style="text-align: right; padding-left: 0.5rem!important;">
+                    <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+                        <p:commandButton value="Cerrar" onclick="PF('dlgdetalleConstancia').hide()" process="@this" />
+                    </span>
+                </div>
+            </p:tab>
+        </p:tabView>
+    </p:dialog>
+</ui:composition>

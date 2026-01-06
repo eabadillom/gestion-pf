@@ -258,6 +258,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 				log.debug(ps.getCliente().getCteCve());
 				log.debug(ps.getServicio().getServicioCve());
 				log.debug(ps.getUnidad().getUnidadDeManejoCve());
+
 				if(ps.getAvisoCve() != null)
 					log.debug(ps.getAvisoCve().getAvisoCve());
 			}

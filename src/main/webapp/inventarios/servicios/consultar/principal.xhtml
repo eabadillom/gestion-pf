@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Consultar Constancia de Servicios</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- Datos Generales -->
+            <!-- ID: fechaInicial, fechaFinal, cliente-som -->
+            <!-- Seccion de captura de datos: "Fecha de Inicio", "Fecha Final", "Folio", "Lista de clientes" y "Consultar" -->
+            <ui:include src="/inventarios/servicios/consultar/consulta-cfg-constancias.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- DataTable de los servicios de las constancias del cliente -->
+            <!-- ID: dt-constanciaServicios, pnl-list-constancias-servicios -->
+            <!-- Lista las constancias de servicios del cliente -->
+            <ui:include src="/inventarios/servicios/consultar/consulta-list-constancias.xhtml" />
+            
+            <!-- Consulta el detalle del servicio de la constancia -->
+            <!-- ID: constanciaSalida, datosGenerales, tabGeneral, detalleCS, dlg-servicios -->
+            <!-- Muestra el detalle de la constancia seleccionada del cliente -->
+            <ui:include src="/inventarios/servicios/consultar/consulta-det-constancia.xhtml" />
+            
+            <!-- Dialogos de confirmacion -->
+            <ui:include src="/inventarios/servicios/consultar/consulta-confirm-dlg.xhtml" />
+        </h:form>
+    </ui:define>
+</ui:composition>

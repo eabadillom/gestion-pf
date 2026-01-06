@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogCliente" responsive="true">
+        <p:outputPanel id="pnlCliente" class="ui-fluid" >
+            <p:outputPanel rendered="#{not empty altaTraspasoBean.inventario}">                  
+                <div class="card" style="width: 100%">
+                    <div class="grid ui-fluid mt-3 floatlabel-demo">
+                        <div class="col-12 md:col-6">
+                            <p:panelGrid columns="3" >
+                                <p:panel id="Nombre">
+                                    <div class="field">              
+                                        <p:outputLabel for="@next" value="Cliente" />
+                                        <p:inputText value="#{altaTraspasoBean.selectedInventario.cliente.nombre}" readonly="true" />
+                                    </div>
+                                </p:panel>
+                                <p:panel id="Cantidad">
+                                    <div class="field">              
+                                        <p:outputLabel for="cantidad-new" value="Cantidad" />
+                                        <p:inputText widgetVar="cantidad-new" id="cantidad-new" value="#{altaTraspasoBean.selectedInventario.cantidad}" readonly="true" />
+                                    </div>
+                                </p:panel>
+                                <p:panel id="unidadM">
+                                    <div class="field">              
+                                        <p:outputLabel for="unidadM" value="Unidad de Manejo" />
+                                        <p:inputText widgetVar="unidadM-new" id="unidadM-new" value="#{altaTraspasoBean.selectedInventario.unidadManejo.unidadDeManejoDs}" readonly="true" />
+                                    </div>
+                                </p:panel>
+                                <p:panel id="Peso">
+                                    <div class="field">              
+                                        <p:outputLabel for="peso-new" value="Peso" />
+                                        <p:inputText widgetVar="peso-new" id="peso-new" value="#{altaTraspasoBean.selectedInventario.peso}" readonly="true" />
+                                    </div>
+                                </p:panel>
+                                <p:panel id="planta">
+                                    <div class="field">
+                                        <p:outputLabel for="planta" value="Planta destino" />
+                                        <p:selectOneMenu id="txtplantadestino" value="#{altaTraspasoBean.selectedInventario.plantaDestino}" converter="entityConverter" required="true" requiredMessage="Ingresa planta destino"
+                                                         onchange="PF('statusInfoDialog').show();" >
+                                            <f:selectItem itemLabel="--Planta--" itemValue=""  />
+                                            <f:selectItems value="#{altaTraspasoBean.selectedInventario.listaplanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+                                            <p:ajax listener="#{altaTraspasoBean.plantaselect}" process="@this" update=":form:camaradestino" oncomplete="PF('statusInfoDialog').hide();" />						
+                                        </p:selectOneMenu>
+                                    </div>
+                                </p:panel>
+
+                                <p:panel id="Camara">
+                                    <div class="field">
+                                        <p:outputLabel for="camaradestino" value="Camara destino" />
+                                        <p:selectOneMenu id="camaradestino" value="#{altaTraspasoBean.selectedInventario.camaraDestino}" converter="entityConverter" required="true" requiredMessage="Ingresa camara destino"
+                                                         onchange="PF('statusInfoDialog').show();" >
+                                            <f:selectItem itemLabel="--Camara--" itemValue=""  />
+                                            <f:selectItems value="#{altaTraspasoBean.selectedInventario.listacamara}" var="camaradestino" itemLabel="#{camaradestino.camaraDs}" itemValue="#{camaradestino}" />
+                                            <p:ajax listener="#{altaTraspasoBean.camaraselect}" process="@this" update=":form:posiciondestino" oncomplete="PF('statusInfoDialog').hide();" />						
+                                        </p:selectOneMenu>
+                                    </div>
+                                </p:panel>
+                                <p:panel id="Posicion">
+                                    <div class="field">
+                                        <p:outputLabel for="posiciondestino" value="Posicion destino" />
+                                        <p:selectOneMenu id="posiciondestino" value="#{altaTraspasoBean.selectedInventario.posicionDestino}" converter="entityConverter" onchange="PF('statusInfoDialog').show();" >
+                                            <f:selectItem itemLabel="--Posicion--" itemValue=""  />
+                                            <f:selectItems value="#{altaTraspasoBean.selectedInventario.listaposicion}" var="posiciondestino" itemLabel="#{posiciondestino.idPosicion}" itemValue="#{posiciondestino}" />
+                                            <p:ajax process="@this" oncomplete="PF('statusInfoDialog').hide();" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                </p:panel>
+                            </p:panelGrid>
+                        </div>
+                    </div>
+                </div>
+            </p:outputPanel>
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Añadir" icon="pi pi-check" actionListener="#{altaTraspasoBean.agrega()}" update="destino messages" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+            <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogCliente').hide();" class="ui-button-secondary" ></p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
