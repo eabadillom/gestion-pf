@@ -12,10 +12,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import mx.com.ferbo.model.n.ImporteEgreso;
 
+@NamedQueries({
+    @NamedQuery(name = "CargoEgreso.findAllByImporteEgreso", query = "SELECT ce FROM CargoEgreso ce WHERE ce.importeEgreso.id = :id")
+})
 @Entity
 @Table(name = "cargo_egreso")
 public class CargoEgreso implements Serializable {

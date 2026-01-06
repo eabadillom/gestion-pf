@@ -21,10 +21,8 @@ import mx.com.ferbo.model.CargoEgreso;
 import mx.com.ferbo.model.PagoEgreso;
 
 @NamedQueries({
-    @NamedQuery(name = "ImporteEgreso.findByPeriodo", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaAlta BETWEEN :inicio AND :fin ORDER BY ie.fechaAlta ASC"),
-    @NamedQuery(name = "ImporteEgreso.findByVencidos", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimitePago < :hoy"),
-    @NamedQuery(name = "ImporteEgreso.findByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.nombre = :concepto"),
-    @NamedQuery(name = "ImporteEgreso.findByPeriodoYConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE (ie.fechaAlta BETWEEN :inicio AND :fin) AND ie.conceptoEgreso.nombre = :concepto")
+    @NamedQuery(name = "ImporteEgreso.findAllByMes", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimite BETWEEN :inicio AND :fin ORDER BY ie.fechaLimite ASC"),
+    @NamedQuery(name = "ImporteEgreso.findAllByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.nombre = :concepto"),
 })
 @Entity
 @Table(name = "importe_egreso")

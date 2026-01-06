@@ -19,7 +19,10 @@ import javax.persistence.Table;
 import mx.com.ferbo.model.n.ImporteEgreso;
 
 @NamedQueries({
-    @NamedQuery(name = "PagoEgreso.findByPeriodoYStatus", query = "SELECT pe FROM PagoEgreso pe WHERE (pe.fechaPago BETWEEN :incio AND :fin) AND (pe.status.nombre = :status)")
+    @NamedQuery(name = "PagoEgreso.findAllByImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :id"),
+    @NamedQuery(name = "PagoEgreso.findAllByStatuPagoEImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE (pe.statusPago.nombre = :status) AND (pe.importeEgreso.id = :id)"),
+    @NamedQuery(name = "PagoEgreso.findAllByMesYStatus", query = "SELECT pe FROM PagoEgreso pe WHERE (pe.status.nombre = :status) AND (pe.fechaPago BETWEEN :incio AND :fin)"),
+    @NamedQuery(name = "PagoEgreso.findAllByFechaLimiteEImporte", query = "SELECT pe FROM PagoEgreso pe WHERE (pe.fechaLimite <= :hoy) AND (pe.importeEgreso = :id)")
 })
 @Entity
 @Table(name = "pago_egreso")
@@ -37,8 +40,8 @@ public class PagoEgreso implements Serializable {
     @Column(name = "im_pago", precision = 15, scale = 2, nullable = false)
     private BigDecimal importe;
 
-    @Basic(optional = false)
-    @Column(name = "fh_pago", nullable =  false)
+    @Basic(optional = true)
+    @Column(name = "fh_pago", nullable =  true)
     private Date fechaPago;
 
     @Basic(optional = false)
@@ -52,6 +55,10 @@ public class PagoEgreso implements Serializable {
     @Basic(optional = false)
     @Column(name = "fh_alta", nullable =  false)
     private Date fechaAlta;
+
+    @Basic(optional = false)
+    @Column(name = "fh_limite", nullable = false)
+    private Date fechaLimite;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "cd_impo_egre")
@@ -117,6 +124,14 @@ public class PagoEgreso implements Serializable {
         this.fechaAlta = fechaAlta;
     }
 
+    public Date getFechaLimite() {
+        return fechaLimite;
+    }
+
+    public void setFechaLimite(Date fechaLimite) {
+        this.fechaLimite = fechaLimite;
+    }
+
     public ImporteEgreso getImporteEgreso() {
         return importeEgreso;
     }
@@ -160,8 +175,11 @@ public class PagoEgreso implements Serializable {
     @Override
     public String toString() {
         return "PagoEgreso [id=" + id + ", importe=" + importe + ", fechaPago=" + fechaPago + ", referencia="
-                + referencia + ", observaciones=" + observaciones + ", fechaAlta=" + fechaAlta + "]";
+                + referencia + ", observaciones=" + observaciones + ", fechaAlta=" + fechaAlta + ", fechaLimite="
+                + fechaLimite + "]";
     }
+
+    
 
     
 }

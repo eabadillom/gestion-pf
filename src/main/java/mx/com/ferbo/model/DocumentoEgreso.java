@@ -16,7 +16,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "DocumentoEgreso.findByPago", query = "SELECT de FROM DocumentoEgreso de WHERE de.pagoEgreso.id = :id")
+    @NamedQuery(name = "DocumentoEgreso.findByPago", query = "SELECT de FROM DocumentoEgreso de WHERE de.pagoEgreso.id = :id"),
+    @NamedQuery(name = "DocumentoEgreso.findAllByImporteEgreso", query = "SELECT de FROM DocumentoEgreso de WHERE de.pagoEgreso.importeEgreso.id = :id")
 })
 @Entity
 @Table(name = "documento_egreso")

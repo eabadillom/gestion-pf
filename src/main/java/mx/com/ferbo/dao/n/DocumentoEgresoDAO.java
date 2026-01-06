@@ -1,5 +1,7 @@
 package mx.com.ferbo.dao.n;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -21,7 +23,7 @@ public class DocumentoEgresoDAO extends BaseDAO <DocumentoEgreso, Integer> {
         super(DocumentoEgreso.class);
     }
     
-    public DocumentoEgreso buscarPorPago(Integer id) throws DAOException {
+    public DocumentoEgreso buscarPorPagoEgreso(Integer id) throws DAOException {
         DocumentoEgreso docuento = null;
         EntityManager em = null;
         try {
@@ -31,6 +33,21 @@ public class DocumentoEgresoDAO extends BaseDAO <DocumentoEgreso, Integer> {
         } catch (Exception ex) {
             log.error("Error al buscar el documento del pago con id {}. {}", id, ex);
             throw new DAOException("Hubo un problema al buscar el documento del pago por id.");
+        } finally {
+            super.close(em);
+        }
+    }
+
+    public List<DocumentoEgreso> buscarTodosPorImporteEgreso(Integer id) throws DAOException {
+        List<DocumentoEgreso> lista = null;
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+            lista = em.createQuery("DocumentoEgreso.findAllByImporteEgreso", DocumentoEgreso.class).setParameter("id", id).getResultList();
+            return lista;
+        } catch (Exception ex) {
+            log.error("Error al buscar todos los documentos asociado al importe de egreso con id {}. {}", id, ex);
+            throw new DAOException("Hubo un problema al buscar por id, todos los ducumentos asociados al importe de egreso.");
         } finally {
             super.close(em);
         }
