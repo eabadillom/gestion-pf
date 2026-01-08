@@ -14,7 +14,8 @@ import javax.persistence.Table;
 
 @NamedQueries({
     @NamedQuery(name = "TipoAsignacion.findByNombre", query = "SELECT ta FROM TipoAsignacion ta WHERE ta.nombre = :nombre"),
-    @NamedQuery(name = "TipoAsignacion.findAllActivo", query = "SELECT ta FROM TipoAsignacion ta WHERE ta.activo = 1")
+    @NamedQuery(name = "TipoAsignacion.findAllActivo", query = "SELECT ta FROM TipoAsignacion ta WHERE ta.activo = 1"),
+    @NamedQuery(name = "TipoAsignacion.findAllNoActivo", query = "SELECT ta FROM TipoAsignacion ta WHERE ta.activo = 0")
 })
 @Entity
 @Table(name = "cat_tipo_asignacion")

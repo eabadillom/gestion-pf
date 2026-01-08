@@ -19,8 +19,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "ConceptoEgreso.findAllActivos", query = "SELECT ce FROM ConceptoEgreso ce WHERE ce.activo = 1"),
-    @NamedQuery(name = "ConceptoEgreso.findAllByCategoriaEgreso", query = "SELECT ce ConceptoEgreso ce WHERE ce.categoriaEgreso.id = :id")
+    @NamedQuery(name = "ConceptoEgreso.findAllActivos", query = "SELECT ce FROM ConceptoEgreso ce WHERE ce.activo = :activo"),
+    @NamedQuery(name = "ConceptoEgreso.findAllByCategoriaEgreso", query = "SELECT ce ConceptoEgreso ce WHERE ce.categoriaEgreso.id = :id"),
+    @NamedQuery(name = "ConceptoEgreso.findAllByCategoriaEgresoYActivo", query = "SELECT ce ConceptoEgreso ce WHERE (ce.categoriaEgreso.id = :id) AND (ce.activo = :activo)")
 })
 @Entity
 @Table(name = "concepto_egreso")
@@ -64,7 +65,7 @@ public class ConceptoEgreso implements Serializable{
 
     @Basic(optional = true)
     @Column(name = "pc_ieps", precision = 6, scale = 3)
-    private Boolean porcentajeIEPS;
+    private BigDecimal porcentajeIEPS;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_cate_egre", nullable = false)
@@ -142,11 +143,11 @@ public class ConceptoEgreso implements Serializable{
         this.tieneIEPS = tieneIEPS;
     }
 
-    public Boolean getPorcentajeIEPS() {
+    public BigDecimal getPorcentajeIEPS() {
         return porcentajeIEPS;
     }
 
-    public void setPorcentajeIEPS(Boolean porcentajeIEPS) {
+    public void setPorcentajeIEPS(BigDecimal porcentajeIEPS) {
         this.porcentajeIEPS = porcentajeIEPS;
     }
 

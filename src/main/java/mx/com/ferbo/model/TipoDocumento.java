@@ -13,13 +13,13 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "TipoDocumento.findByNombre", query = "SELECT td FROM TipoDocumento td WHERE td.nombre = :nombre"),
-    @NamedQuery(name = "TipoDocumento.findAllActivos", query = "SELECT td FROM TipoDocumento td WHERE td.activo = 1"), 
-    @NamedQuery(name = "TipoDocumento.findAllNoActivos", query = "SELECT td FROM TipoDocumento td WHERE td.activo = 0")
+        @NamedQuery(name = "TipoDocumento.findByNombre", query = "SELECT td FROM TipoDocumento td WHERE td.nombre = :nombre"),
+        @NamedQuery(name = "TipoDocumento.findAllActivos", query = "SELECT td FROM TipoDocumento td WHERE td.activo = 1"),
+        @NamedQuery(name = "TipoDocumento.findAllNoActivos", query = "SELECT td FROM TipoDocumento td WHERE td.activo = 0")
 })
 @Entity
 @Table(name = "cat_tipo_documento")
-public class TipoDocumento implements Serializable{
+public class TipoDocumento implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -49,12 +49,60 @@ public class TipoDocumento implements Serializable{
     @Column(name = "st_tipo_docu")
     private Boolean activo = Boolean.TRUE;
 
-    public TipoDocumento(){
+    public TipoDocumento() {
         // Constructor sin parametro
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Boolean getEsFiscal() {
+        return esFiscal;
+    }
+
+    public void setEsFiscal(Boolean esFiscal) {
+        this.esFiscal = esFiscal;
+    }
+
+    public Boolean getEsObligatorio() {
+        return esObligatorio;
+    }
+
+    public void setEsObligatorio(Boolean esObligatorio) {
+        this.esObligatorio = esObligatorio;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof TipoDocumento))
@@ -65,7 +113,7 @@ public class TipoDocumento implements Serializable{
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return 31;
     }
 

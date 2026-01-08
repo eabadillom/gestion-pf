@@ -20,7 +20,9 @@ import javax.persistence.Table;
 
 @NamedQueries({
     @NamedQuery(name = "CategoriaEgreso.findAllActivos", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.activo = 1"),
-    @NamedQuery(name = "CategoriaEgreso.findAllByTipoEgreso", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.tipoEgreso.id = :id")
+    @NamedQuery(name = "CategoriaEgreso.findAllNoActivos", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.activo = 0"),
+    @NamedQuery(name = "CategoriaEgreso.findAllByTipoEgreso", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.tipoEgreso.id = :id"),
+    @NamedQuery(name = "CategoriaEgreso.findAllByTipoEgresoYActivo", query = "SELECT ce FROM CategoriaEgreso ce WHERE (ce.tipoEgreso.id = :id) AND (ce.activo = :activo)")
 })
 @Entity
 @Table(name = "categoria_egreso")

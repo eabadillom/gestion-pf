@@ -37,4 +37,40 @@ public class CategoriaEgresoDAO extends BaseDAO<CategoriaEgreso, Integer> {
             super.close(em);
         }
     }
+
+    public List<CategoriaEgreso> buscarTodosActivos(boolean activo) throws DAOException {
+        List<CategoriaEgreso> lista = null;
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+            if (activo) {
+                lista = em.createQuery("CategoriaEgreso.findAllActivos", CategoriaEgreso.class).getResultList();
+            } else {
+                lista = em.createQuery("CategoriaEgreso.findAllNoActivos", CategoriaEgreso.class).getResultList();
+            }
+            return lista;
+        } catch (Exception ex) {
+            String estado = activo ? "activas" : "no activas";
+            log.error("Error al buscar todas las categorias de egreso {}. {}", estado);
+            throw new DAOException("Hubo un problema al buscar las categorioas " + estado);
+        } finally {
+            super.close(em);
+        }
+    }
+
+    public List<CategoriaEgreso> buscarTodosPorTipoEgresoYActivo(Integer id, boolean activo) throws DAOException {
+        List<CategoriaEgreso> lista = null;
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+            lista = em.createQuery("CargoEgreso.findAllByTipoEgresoYActivo", CategoriaEgreso.class).setParameter("id", id).setParameter("activo", activo).getResultList();
+            return lista;
+        } catch (Exception ex) {
+            String estado = activo ? "activo" : "no activo";
+            log.error("Error al buscar todas las categorias del tipo de egreso con id {} y estado {}. {}", id, estado, ex);
+            throw new DAOException("Hubo un problema al buscar el listado de categoria en base al tipo y estado");
+        } finally {
+            super.close(em);
+        }
+    }
 }
