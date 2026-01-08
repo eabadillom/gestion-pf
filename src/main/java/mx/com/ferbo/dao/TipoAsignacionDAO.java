@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.TipoAsignacion;
+import mx.com.ferbo.model.n.catalogos.TipoAsignacion;
 import mx.com.ferbo.util.DAOException;
 
 @Named
