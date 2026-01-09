@@ -18,7 +18,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.n.egresos.ConceptoEgreso;
 
 @NamedQueries({
     @NamedQuery(name = "CategoriaEgreso.findAllVigentesONoVigentes", query = "SELECT ce FROM CategoriaEgreso ce WHERE ce.vigente = :vigente"),
@@ -50,7 +49,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
     private TipoEgreso tipoEgreso;
 
     @OneToMany(mappedBy = "categoriaEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConceptoEgreso> conceptos;
+    private List<CatConceptoEgreso> catConceptos;
 
     public CategoriaEgreso() {
         // Constructor sin parametros
@@ -91,12 +90,12 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         this.tipoEgreso = tipoEgreso;
     }
 
-    public List<ConceptoEgreso> getConceptos() {
-        return conceptos;
+    public List<CatConceptoEgreso> getCatConceptos() {
+        return catConceptos;
     }
 
-    public void setConceptos(List<ConceptoEgreso> conceptos) {
-        this.conceptos = conceptos;
+    public void setCatConceptos(List<CatConceptoEgreso> catConceptos) {
+        this.catConceptos = catConceptos;
     }
 
     @Override
