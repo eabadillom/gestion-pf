@@ -40,15 +40,15 @@ public class ImporteEgresoDAO extends BaseDAO<ImporteEgreso, Integer> {
         }
     }
 
-    public List<ImporteEgreso> buscarTodosPorConcepto(String concepto) throws DAOException {
+    public List<ImporteEgreso> buscarTodosPorConcepto(Integer idConcepto) throws DAOException {
         List<ImporteEgreso> lista = null;
         EntityManager em = null;
         try {
             em = super.getEntityManager();
-            lista = em.createQuery("ImporteEgreso.findAllByConcepto", ImporteEgreso.class).setParameter("concepto", concepto).getResultList();
+            lista = em.createQuery("ImporteEgreso.findAllByConcepto", ImporteEgreso.class).setParameter("idConcepto", idConcepto).getResultList();
             return lista;
         } catch (Exception ex) {
-            log.error("Error al buscar todos los importe de egreso asociado al concepto {}. {}", concepto, ex);
+            log.error("Error al buscar todos los importe de egreso asociado al concepto con id {}. {}", idConcepto, ex);
             throw new DAOException("Hubo un problema al buscar la lista de importe de egresos asociados al concepto dado");
         } finally {
             super.close(em);

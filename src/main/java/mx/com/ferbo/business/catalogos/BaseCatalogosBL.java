@@ -2,6 +2,8 @@ package mx.com.ferbo.business.catalogos;
 
 import java.util.List;
 
+import javax.enterprise.inject.Model;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -59,6 +61,16 @@ public abstract class BaseCatalogosBL<MODEL extends Catalogo> {
                     + ex.getMessage());
             throw new InventarioException(
                     "Hubo un problema al buscar " + dao.getClass().getSimpleName() + " por nombre " + nombre, ex);
+        }
+    }
+
+    public String agregarOActualizar(MODEL model) throws InventarioException {
+        if (model.getId() == null){
+            dao.guardar(model);
+            return "se agrego exitosamente";
+        } else {
+            dao.actualizar(model);
+            return "se aztualizo exitosamente";
         }
     }
 

@@ -48,7 +48,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
     @JoinColumn(name = "cd_tipo_egre", nullable = false)
     private TipoEgreso tipoEgreso;
 
-    @OneToMany(mappedBy = "categoriaEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "categoriaEgreso", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<CatConceptoEgreso> catConceptos;
 
     public CategoriaEgreso() {

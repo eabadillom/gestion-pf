@@ -56,7 +56,7 @@ public class ActivoFijo implements Serializable{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_impo_egre")
-    private ImporteEgreso importeEgreso;
+    private ImporteEgreso origen;
 
     public ActivoFijo(){
         // Constructor sin parametros
@@ -110,12 +110,12 @@ public class ActivoFijo implements Serializable{
         this.status = status;
     }
 
-    public ImporteEgreso getImporteEgreso() {
-        return importeEgreso;
+    public ImporteEgreso getOrigen() {
+        return origen;
     }
 
-    public void setImporteEgreso(ImporteEgreso importeEgreso) {
-        this.importeEgreso = importeEgreso;
+    public void setOrigen(ImporteEgreso origen) {
+        this.origen = origen;
     }
 
     public boolean equals(Object o){

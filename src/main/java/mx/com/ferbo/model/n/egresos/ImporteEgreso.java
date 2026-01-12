@@ -3,23 +3,26 @@ package mx.com.ferbo.model.n.egresos;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @NamedQueries({
     @NamedQuery(name = "ImporteEgreso.findAllByMes", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimite BETWEEN :inicio AND :fin ORDER BY ie.fechaLimite ASC"),
-    @NamedQuery(name = "ImporteEgreso.findAllByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.nombre = :concepto"),
+    @NamedQuery(name = "ImporteEgreso.findAllByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.catConceptoEgreso.id = :idConcepto"),
 })
 @Entity
 @Table(name = "importe_egreso")
@@ -69,14 +72,15 @@ public class ImporteEgreso implements Serializable {
     @Column(name = "fh_limi_pago")
     private Date fechaLimitePago;
 
-    @OneToOne(mappedBy = "importe")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_conc_egre", nullable = false)
     private ConceptoEgreso conceptoEgreso;
 
     @OneToMany(mappedBy = "importeEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
-    private PagoEgreso pagos; 
+    private List<PagoEgreso> pagos; 
 
     @OneToMany(mappedBy = "importeEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
-    private CargoEgreso cargos;
+    private List<CargoEgreso> cargos;
 
     public ImporteEgreso(){
         // Constructor sin parametros
@@ -170,19 +174,19 @@ public class ImporteEgreso implements Serializable {
         this.conceptoEgreso = conceptoEgreso;
     }
 
-    public PagoEgreso getPagos() {
+    public List<PagoEgreso> getPagos() {
         return pagos;
     }
 
-    public void setPagos(PagoEgreso pagos) {
+    public void setPagos(List<PagoEgreso> pagos) {
         this.pagos = pagos;
     }
-
-    public CargoEgreso getCargos() {
+    
+    public List<CargoEgreso> getCargos() {
         return cargos;
     }
 
-    public void setCargos(CargoEgreso cargos) {
+    public void setCargos(List<CargoEgreso> cargos) {
         this.cargos = cargos;
     }
 

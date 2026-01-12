@@ -7,24 +7,17 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.n.catalogos.StatusPago;
 
-@NamedQueries({
-    @NamedQuery(name = "PagoEgreso.findAllByImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :id"),
-    @NamedQuery(name = "PagoEgreso.findAllByStatuPagoEImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE (pe.statusPago.nombre = :status) AND (pe.importeEgreso.id = :id)"),
-    @NamedQuery(name = "PagoEgreso.findAllByMesYStatus", query = "SELECT pe FROM PagoEgreso pe WHERE (pe.status.nombre = :status) AND (pe.fechaPago BETWEEN :incio AND :fin)"),
-    @NamedQuery(name = "PagoEgreso.findAllByFechaLimiteEImporte", query = "SELECT pe FROM PagoEgreso pe WHERE (pe.fechaLimite <= :hoy) AND (pe.importeEgreso = :id)")
-})
 @Entity
 @Table(name = "pago_egreso")
 public class PagoEgreso implements Serializable {
@@ -61,17 +54,21 @@ public class PagoEgreso implements Serializable {
     @Column(name = "fh_limite", nullable = false)
     private Date fechaLimite;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "cd_impo_egre")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_impo_egre", nullable = false)
     private ImporteEgreso importeEgreso;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "cd_status_pago")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_status_pago", nullable = false)
     private StatusPago status;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "mp_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mp_id", nullable = false)
     private MedioPago medioPago;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_docu_egre")
+    private DocumentoEgreso documentoEgreso;
 
     public PagoEgreso(){
         // Constructor sin parametros
@@ -155,6 +152,14 @@ public class PagoEgreso implements Serializable {
 
     public void setMedioPago(MedioPago medioPago) {
         this.medioPago = medioPago;
+    }
+
+    public DocumentoEgreso getDocumentoEgreso() {
+        return documentoEgreso;
+    }
+
+    public void setDocumentoEgreso(DocumentoEgreso documentoEgreso) {
+        this.documentoEgreso = documentoEgreso;
     }
 
     @Override 

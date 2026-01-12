@@ -12,15 +12,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import mx.com.ferbo.model.n.catalogos.TipoAsignacion;
 
-@NamedQueries({
-    @NamedQuery(name = "AsignacionEgreso.findAllByEgreso", query = "SELECT ae FROM AsignacionEgreso ae WHERE ae.importeEgreso.id = :id")
-})
 @Entity
 @Table(name = "asignacion_egreso")
 public class AsignacionEgreso implements Serializable {
@@ -42,11 +37,11 @@ public class AsignacionEgreso implements Serializable {
     private BigDecimal importe;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cd_impo_egre")
+    @JoinColumn(name = "cd_impo_egre", nullable = false)
     private ImporteEgreso importeEgreso;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cd_tipo_asig")
+    @JoinColumn(name = "cd_tipo_asig", nullable = false)
     private TipoAsignacion tipoAsignacion;
 
     public AsignacionEgreso(){

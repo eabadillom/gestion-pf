@@ -11,18 +11,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import mx.com.ferbo.model.n.catalogos.CatConceptoEgreso;
 
-@NamedQueries({
-    @NamedQuery(name = "ConceptoEgreso.findAllActivos", query = "SELECT ce FROM ConceptoEgreso ce WHERE ce.activo = :activo"),
-    @NamedQuery(name = "ConceptoEgreso.findAllByCategoriaEgreso", query = "SELECT ce ConceptoEgreso ce WHERE ce.categoriaEgreso.id = :id"),
-    @NamedQuery(name = "ConceptoEgreso.findAllByCategoriaEgresoYActivo", query = "SELECT ce ConceptoEgreso ce WHERE (ce.categoriaEgreso.id = :id) AND (ce.activo = :activo)")
-})
 @Entity
 @Table(name = "concepto_egreso")
 public class ConceptoEgreso implements Serializable{
@@ -44,12 +37,8 @@ public class ConceptoEgreso implements Serializable{
     private BigDecimal porcentajeIEPS;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cd_conc_egre", nullable = false)
+    @JoinColumn(name = "cd_cat_conc_egre", nullable = false)
     private CatConceptoEgreso catConceptoEgreso;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cd_impo_egre", nullable = false)
-    private ImporteEgreso importeEgreso;
 
     public ConceptoEgreso(){
         // Constructor sin parametros
@@ -79,13 +68,12 @@ public class ConceptoEgreso implements Serializable{
         this.porcentajeIEPS = porcentajeIEPS;
     }
 
-
-    public ImporteEgreso getImporteEgreso() {
-        return importeEgreso;
+    public CatConceptoEgreso getCatConceptoEgreso() {
+        return catConceptoEgreso;
     }
 
-    public void setImporteEgreso(ImporteEgreso importeEgreso) {
-        this.importeEgreso = importeEgreso;
+    public void setCatConceptoEgreso(CatConceptoEgreso catConceptoEgreso) {
+        this.catConceptoEgreso = catConceptoEgreso;
     }
 
     @Override

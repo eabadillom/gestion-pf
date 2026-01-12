@@ -39,7 +39,7 @@ public class TipoEgreso implements Serializable, Catalogo{
     @Column(name = "st_tipo_egre")
     private Boolean vigente = Boolean.TRUE;
 
-    @OneToMany(mappedBy = "tipoEgreso", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "tipoEgreso", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<CategoriaEgreso> categorias;
 
     public TipoEgreso() {

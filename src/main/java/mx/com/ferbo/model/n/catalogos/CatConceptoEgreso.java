@@ -1,10 +1,8 @@
 package mx.com.ferbo.model.n.catalogos;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,10 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import mx.com.ferbo.model.n.egresos.ConceptoEgreso;
 
 @Entity
 @Table(name = "cat_concepto_egreso")
@@ -27,7 +22,7 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cb_conc_egre")
+    @Column(name = "cb_cat_conc_egre")
     private Integer id;
 
     @Basic(optional = false)
@@ -57,9 +52,6 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_cate_egre", nullable = false)
     private CategoriaEgreso categoriaEgreso;
-
-    @OneToMany(mappedBy = "catConceptoEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConceptoEgreso> conceptos;
 
     public CatConceptoEgreso() {
         // Constructor sin parametros

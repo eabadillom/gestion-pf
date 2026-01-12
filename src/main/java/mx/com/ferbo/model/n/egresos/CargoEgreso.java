@@ -5,22 +5,20 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import mx.com.ferbo.model.n.catalogos.TipoCargo;
 
-@NamedQueries({
-    @NamedQuery(name = "CargoEgreso.findAllByImporteEgreso", query = "SELECT ce FROM CargoEgreso ce WHERE ce.importeEgreso.id = :id")
-})
 @Entity
 @Table(name = "cargo_egreso")
 public class CargoEgreso implements Serializable {
@@ -65,16 +63,16 @@ public class CargoEgreso implements Serializable {
     @Column(name = "tx_obser", nullable = true, length = 250)
     private String observaciones;
 
-    @ManyToOne(optional = false)
+    @OneToMany(mappedBy = "importeEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cd_impo_egre")
     private ImporteEgreso importeEgreso;
 
-    @ManyToOne(optional = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_pago_egre")
     private PagoEgreso pagoEgreso;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "cd_tipo_carg")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_tipo_carg", nullable = false)
     private TipoCargo tipoCargo;
 
     public CargoEgreso(){
