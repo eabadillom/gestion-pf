@@ -41,12 +41,11 @@ public class OcupacionCamaraChart implements Serializable
 
     private static final String CHART_EXTENDER = "charOcupacionCamaraExtender";
     
-    public static BarChartModel construirModeloOcupacionCamara() 
+    public static BarChartModel construirModeloOcupacionCamara(Date fecha, Integer idPlanta) 
     {
-        Date fecha = new Date();
         RepOcupacionCamaraDAO ocupacionCamaraDAO = new RepOcupacionCamaraDAO();
         PlantaDAO plantaDAO = new PlantaDAO();
-        List<OcupacionCamara> listOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, null, null, null);
+        List<OcupacionCamara> listOcupacionCamara = ocupacionCamaraDAO.ocupacionCamara(fecha, null, idPlanta, null);
         List<Planta> listPlantas = plantaDAO.findall(false);
 
         List<Number> disponibles = new ArrayList<>();
