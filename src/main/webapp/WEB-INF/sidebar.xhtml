@@ -30,21 +30,21 @@
 						<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
 							<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/entrada/alta/principal" />
-								<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/consultarConstanciaDeDeposito"/>
+								<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/entrada/consultar/principal"/>
 								<p:menuitem id="frb_inventarios_sm144" value="Orden de Entrada" icon="pi pi-fw pi-sign-in" outcome="/inventarios/ordenEntrada" />
 							</p:submenu>
 							<p:submenu id="frb_inventarios_sm3" label="Salidas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm110" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/salida/alta/principal" />
-								<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/consultaConstanciaSalida" />
+								<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/salida/consultar/principal" />
 								<p:menuitem id="frb_inventarios_sm13" value="Ordenes de salida" icon="pi pi-fw pi-sign-in" outcome="/inventarios/OrdenSalida" badge="#{sideBarBean.numeroSalidas}" />
 							</p:submenu>
 							<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
-								<p:menuitem id="frb_inventariossm31" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaTraspaso" />
-								<p:menuitem id="frb_inventariossm32" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/constanciaTraspasos" />
+								<p:menuitem id="frb_inventariossm31" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/traspasos/alta/principal" />
+								<p:menuitem id="frb_inventariossm32" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/traspasos/consultar/principal" />
 							</p:submenu>
 							<p:submenu id="frb_inventarios_sm2" label="Servicios" icon="fa fa-fw fa-edit">
-								<p:menuitem id="frb_inventarios_sm21" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/altaConstanciaServicios" />
-								<p:menuitem id="frb_inventarios_sm22" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/constanciaServicios" />
+								<p:menuitem id="frb_inventarios_sm21" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/servicios/alta/principal" />
+								<p:menuitem id="frb_inventarios_sm22" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/servicios/consultar/principal" />
 							</p:submenu>
 									
 							<p:submenu label="Catálogos" icon="pi pi-fw pi-book">
@@ -68,18 +68,6 @@
 								<p:menuitem id="frb_facturacion_sm122" value="Emisores CFDI" icon="pi pi-building " outcome="/protected/catalogos/EmisoresCFDIS" />							
 								<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" icon="pi pi-fw pi-user" />
 								<p:menuitem id="frb_facturacion_sm113" value="Banco" icon="pi pi-fw pi-money-bill" outcome="/protected/catalogos/bancos" />
-								<p:submenu id="frb_facturacionsm2" label="Domicilios" icon="pi pi-fw pi-building">
-									<p:menuitem id="frb_facturacion_domicilioCliente" value="Domicilios por Cliente" icon="pi pi-fw pi-home" outcome="/protected/catalogos/domicilios" />
-									<p:submenu id="frb_facturacion_sm21" label="Cambios" icon="pi pi-fw pi-pencil">
-										<p:menuitem id="frb_facturacion_sm211" value="País" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/paises" />
-										<p:menuitem id="frb_facturacion_sm212" value="Estado" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/estados" />
-										<p:menuitem id="frb_facturacion_sm213" value="Municipio / Alcadía" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/municipios" />
-										<p:menuitem id="frb_facturacion_sm214" value="Ciudad" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/ciudades" />
-										<p:menuitem id="frb_facturacion_sm215" value="Tipo de Asentamiento" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/tipoAsentamiento" />
-										<p:menuitem id="frb_facturacion_sm216" value="Entidad Postal" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/entidadPostal" />
-										<p:menuitem id="frb_facturacion_sm217" value="Colonia" icon="pi pi-fw pi-globe" outcome="/protected/catalogos/asentamientoHumano" />
-									</p:submenu>
-								</p:submenu>
 								<p:menuitem id="frb_facturacion_sm15" value="Tipos de Pago" icon="pi pi-fw pi-credit-card" outcome="/protected/catalogos/tipoPago" />
 								<p:menuitem value="Formas de Pago (SAT)" icon="pi pi-fw pi-credit-card" outcome="/protected/catalogos/tiposPago" />
 								<p:submenu label="Series" icon="pi pi-ellipsis-h">
@@ -88,7 +76,6 @@
 								</p:submenu>
 								<p:menuitem id="frb_facturacion_sm121" value="Ud de Medida" icon="pi pi-fw pi-tags" outcome="/protected/catalogos/unidadManejo" />
 								<p:menuitem value="Servicios" outcome="/protected/catalogos/servicios" icon="pi pi-fw pi-list" />
-								<p:menuitem value="Servicios por cliente" outcome="/protected/catalogos/serviciosPorCliente" icon="pi pi-fw pi-user-edit" />
 								<p:menuitem value="Candado Salida" outcome="/protected/catalogos/candadoSalida" icon="pi pi-lock" />
 							</p:submenu>
 						</p:submenu>
@@ -103,7 +90,6 @@
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />
 							<p:menuitem value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/consultaNotasCredito"></p:menuitem>
 						</p:submenu>
-						<p:menuitem value="Comercial" outcome="/protected/catalogos/avisosComercial" icon="pi pi-fw pi-dollar" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}" />
 						<p:submenu id="frb_reportes" label="Reportes" icon="pi pi-fw pi-file-o">
 							<p:submenu id="frb_inventario_reporte" label="Inventarios" icon="pi pi-fw pi-table">
 								<p:menuitem value="Entradas" icon="pi pi-file" outcome="/protected/reportes/inventarioEntradas" />
@@ -142,7 +128,8 @@
 						<p:menuitem value="Usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
-						<p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
+						<p:menuitem value="Ajustes" outcome="/protected/settings/ajustes" icon="pi pi-cog" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
+                                                <p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
 					</po:menu>
 				</div>
 			</div>

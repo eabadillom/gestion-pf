@@ -11,18 +11,14 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
-import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.Telefono;
-import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
 
@@ -75,6 +71,17 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                 log.info(cliente.getUsoCfdi().getUsoCfdi());
                 log.info(cliente.getMetodoPago().getNbMetodoPago());
                 log.info(cliente.getMetodoPago().getCdMetodoPago());
+                
+                for(Aviso a : clienteAvisos) {
+                	log.debug("Aviso: {}", a.getAvisoCve());
+                	a.getPrecioServicioList().forEach(ps -> {
+                		log.debug("Precio servicio: {}", ps.getId());
+                	});
+                }
+                
+                for(PrecioServicio ps : clientePrecioServicios) {
+                	log.debug("Precio servicio: {}", ps.getId());
+                }
 
                 if (!clienteContactoList.isEmpty()) {
                     for (ClienteContacto clienteContacto : clienteContactoList) {

@@ -6,9 +6,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +16,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,23 +29,24 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "TiposDomicilio.findAll", query = "SELECT t FROM TiposDomicilio t"),
     @NamedQuery(name = "TiposDomicilio.findByDomicilioTipoCve", query = "SELECT t FROM TiposDomicilio t WHERE t.domicilioTipoCve = :domicilioTipoCve"),
-    @NamedQuery(name = "TiposDomicilio.findByDomicilioTipoDesc", query = "SELECT t FROM TiposDomicilio t WHERE t.domicilioTipoDesc = :domicilioTipoDesc")})
+    @NamedQuery(name = "TiposDomicilio.findByDomicilioTipoDesc", query = "SELECT t FROM TiposDomicilio t WHERE t.domicilioTipoDesc = :domicilioTipoDesc")
+})
 public class TiposDomicilio implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "domicilio_tipo_cve")
     private Short domicilioTipoCve;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "domicilio_tipo_desc")
     private String domicilioTipoDesc;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "domicilioTipoCve")
-    private List<Domicilios> domiciliosList;
-
+    
     public TiposDomicilio() {
     }
 
@@ -75,32 +75,26 @@ public class TiposDomicilio implements Serializable {
         this.domicilioTipoDesc = domicilioTipoDesc;
     }
 
-    public List<Domicilios> getDomiciliosList() {
-        return domiciliosList;
-    }
-
-    public void setDomiciliosList(List<Domicilios> domiciliosList) {
-        this.domiciliosList = domiciliosList;
-    }
-
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (domicilioTipoCve != null ? domicilioTipoCve.hashCode() : 0);
-        return hash;
+        if (this.domicilioTipoCve == null) {
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(domicilioTipoCve);
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof TiposDomicilio)) {
+        if (this == object)
+            return true;
+        if (object == null)
             return false;
-        }
+        if (getClass() != object.getClass())
+            return false;
         TiposDomicilio other = (TiposDomicilio) object;
-        if ((this.domicilioTipoCve == null && other.domicilioTipoCve != null) || (this.domicilioTipoCve != null && !this.domicilioTipoCve.equals(other.domicilioTipoCve))) {
-            return false;
-        }
-        return true;
+        if(this.domicilioTipoCve == null || other.domicilioTipoCve == null)
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+        return Objects.equals(domicilioTipoCve, other.domicilioTipoCve);
     }
 
     @Override

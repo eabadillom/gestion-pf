@@ -21,22 +21,22 @@
 					<div class="p-grid ui-fluid">
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Código" />
-							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpCodigo}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}">
+							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpCodigo}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Pedimento" />
-							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpPedimento}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}">
+							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpPedimento}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Contenedor" />
-							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpSAP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}">
+							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpSAP}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Lote" />
-							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpLote}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}">
+							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpLote}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
@@ -46,7 +46,7 @@
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Otro" />
-							<p:inputText maxlength="12" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpMP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}">
+							<p:inputText maxlength="12" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpMP}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}">
 							</p:inputText>
 						</div>
 					</div>
@@ -73,22 +73,22 @@
 					<div class="p-grid ui-fluid">
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Código" />
-							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpCodigo}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}">
+							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpCodigo}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Pedimento" />
-							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpPedimento}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}">
+							<p:inputText maxlength="13" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpPedimento}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Contenedor" />
-							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpSAP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}">
+							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpSAP}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Lote" />
-							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpLote}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}">
+							<p:inputText maxlength="20" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpLote}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}">
 							</p:inputText>
 						</div>
 						<div class="p-col-12 p-md-2">
@@ -98,13 +98,13 @@
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Otro" />
-							<p:inputText maxlength="12" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpMP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}">
+							<p:inputText maxlength="12" value="#{ingresoBean.partidaEdit.detallePartidaList.get(0).dtpMP}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}">
 							</p:inputText>
 						</div>
 					</div>
 				</p:outputPanel>
 				<f:facet name="footer">
-                                        <p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{ingresoBean.editarPartida()}" process="@this form:pnl-det-partida-completa" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetPartidaCompleta').hide();" styleClass="ui-button-outlined" />
+					<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{ingresoBean.editarPartida()}" process="@this form:pnl-det-partida-completa" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetPartidaCompleta').hide();" styleClass="ui-button-outlined" />
 					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlgDetPartidaCompleta').hide();" styleClass="ui-button-outlined ui-button-secondary"/>
 				</f:facet>
 			</p:dialog> </ui:remove>
