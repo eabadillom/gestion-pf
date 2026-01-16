@@ -60,6 +60,7 @@ public class TipoEgreso implements Serializable, Catalogo{
         return nombre;
     }
 
+    @Override
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -69,6 +70,7 @@ public class TipoEgreso implements Serializable, Catalogo{
         return vigente;
     }
 
+    @Override
     public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }
@@ -107,4 +109,12 @@ public class TipoEgreso implements Serializable, Catalogo{
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getDescripcion'");
     }
+
+    @Override
+    public void setDescripcion(String descripcion) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    
 }

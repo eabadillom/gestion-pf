@@ -11,8 +11,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+@NamedQueries({
+    @NamedQuery(name = "CatConceptoEgreso.findByNombre", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.nombre = :nombre"),
+    @NamedQuery(name = "CatConceptoEgreso.findAllVigentesONoVigentes", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.vigente = :vigente"),
+    @NamedQuery(name = "CatConceptoEgreso.findAllByCategoriaEgreso", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.categoriaEgreso.id = :id"),
+    @NamedQuery(name = "CatConceptoEgreso.findAllByCategoriaEgresoYVigencia", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.categoriaEgreso.id = :id and cce.vigente = :vigente")
+})
 @Entity
 @Table(name = "cat_concepto_egreso")
 public class CatConceptoEgreso implements Serializable, Catalogo {
@@ -74,6 +82,11 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
     }
 
     @Override
+    public void setDescripcion(String descripcion) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
     public Boolean getVigente() {
         return vigente;
     }
@@ -82,10 +95,12 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
         this.id = id;
     }
 
+    @Override
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    @Override
     public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }
@@ -120,6 +135,14 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
 
     public void setTieneIEPS(Boolean tieneIEPS) {
         this.tieneIEPS = tieneIEPS;
+    }
+
+    public CategoriaEgreso getCategoriaEgreso() {
+        return categoriaEgreso;
+    }
+
+    public void setCategoriaEgreso(CategoriaEgreso categoriaEgreso) {
+        this.categoriaEgreso = categoriaEgreso;
     }
 
     public boolean equals(Object o){

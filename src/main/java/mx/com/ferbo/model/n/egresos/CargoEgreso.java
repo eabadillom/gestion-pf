@@ -63,13 +63,13 @@ public class CargoEgreso implements Serializable {
     @Column(name = "tx_obser", nullable = true, length = 250)
     private String observaciones;
 
-    @OneToMany(mappedBy = "importeEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "cd_impo_egre")
-    private ImporteEgreso importeEgreso;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_pago_egre")
     private PagoEgreso pagoEgreso;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_impo_egre", nullable = false)
+    private ImporteEgreso importeEgreso;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_tipo_carg", nullable = false)
@@ -149,14 +149,6 @@ public class CargoEgreso implements Serializable {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
-    }
-
-    public ImporteEgreso getImporteEgreso() {
-        return importeEgreso;
-    }
-
-    public void setImporteEgreso(ImporteEgreso importeEgreso) {
-        this.importeEgreso = importeEgreso;
     }
 
     public PagoEgreso getPagoEgreso() {

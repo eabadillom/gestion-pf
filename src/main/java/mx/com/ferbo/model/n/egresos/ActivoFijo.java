@@ -20,7 +20,7 @@ import javax.persistence.Table;
 import mx.com.ferbo.model.n.catalogos.StatusActivoFijo;
 
 @NamedQueries({
-    @NamedQuery(name = "ActivoFijo.findByEgreso", query = "SELECT af FROM ActivoFijo af WHERE af.importeEgreso.id = :id")
+    @NamedQuery(name = "ActivoFijo.findByEgreso", query = "SELECT af FROM ActivoFijo af WHERE af.origen.id = :id")
 })
 @Entity
 @Table(name = "activo_fijo")

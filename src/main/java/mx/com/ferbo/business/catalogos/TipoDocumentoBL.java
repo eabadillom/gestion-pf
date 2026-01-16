@@ -1,5 +1,6 @@
 package mx.com.ferbo.business.catalogos;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,13 +19,15 @@ public class TipoDocumentoBL extends BaseCatalogosBL<TipoDocumento> {
     private static final Logger log = LogManager.getLogger();
 
     @Inject
-    public TipoDocumentoBL(TipoDocumentoDAO tipoDocumentoDAO){
-        super(tipoDocumentoDAO);
+    private TipoDocumentoDAO tipoDocumentoDAO;
+
+    @PostConstruct
+    public void init(){
+        setDao(tipoDocumentoDAO);
     }
 
     @Override
     protected void validarEspecifico(TipoDocumento model) throws InventarioException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validarEspecifico'");
+        // Metodo vacío porque no hay más validaciones
     }
 }

@@ -21,7 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "ImporteEgreso.findAllByMes", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimite BETWEEN :inicio AND :fin ORDER BY ie.fechaLimite ASC"),
+    @NamedQuery(name = "ImporteEgreso.findAllByMes", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimitePago BETWEEN :inicio AND :fin ORDER BY ie.fechaLimitePago ASC"),
     @NamedQuery(name = "ImporteEgreso.findAllByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.catConceptoEgreso.id = :idConcepto"),
 })
 @Entity

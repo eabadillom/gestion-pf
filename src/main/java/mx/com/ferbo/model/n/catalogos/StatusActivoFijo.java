@@ -4,16 +4,20 @@ import java.io.Serializable;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 @NamedQueries({
     @NamedQuery(name = "StatusActivoFijo.findByNombre", query = "SELECT saf FROM StatusActivoFijo saf WHERE saf.nombre = :nombre"),
     @NamedQuery(name = "StatusActivoFijo.findAllVigentesONoVigentes", query = "SELECT saf FROm StatusActivoFijo saf WHERE saf.vigente = :vigente")
 })
+@Entity
+@Table(name = "cat_status_activo_fijo")
 public class StatusActivoFijo implements Serializable, Catalogo {
 
     private static final long serialVersionUID = 1L;
@@ -54,6 +58,7 @@ public class StatusActivoFijo implements Serializable, Catalogo {
         return nombre;
     }
 
+    @Override
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -63,6 +68,7 @@ public class StatusActivoFijo implements Serializable, Catalogo {
         return descripcion;
     }
 
+    @Override
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
@@ -72,6 +78,7 @@ public class StatusActivoFijo implements Serializable, Catalogo {
         return vigente;
     }
 
+    @Override
     public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }

@@ -1,5 +1,6 @@
 package mx.com.ferbo.business.catalogos;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,14 +19,16 @@ public class StatusActivoFijoBL extends BaseCatalogosBL<StatusActivoFijo> {
     private static final Logger log = LogManager.getLogger(StatusActivoFijoBL.class );
 
     @Inject
-    public StatusActivoFijoBL(StatusActivoFijoDAO statusActivoFijoDAO){
-        super(statusActivoFijoDAO);
+    private StatusActivoFijoDAO statusActivoFijoDAO;
+
+    @PostConstruct
+    public void init(){
+        setDao(statusActivoFijoDAO);
     }
 
     @Override
     protected void validarEspecifico(StatusActivoFijo model) throws InventarioException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validarEspecifico'");
+        // Metodo vacío porque no hay más validaciones
     }
 
     

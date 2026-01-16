@@ -28,7 +28,7 @@ public class CategoriaEgresoDAO extends BaseDAO<CategoriaEgreso, Integer> {
         EntityManager em = null;
         try {
             em = super.getEntityManager();
-            lista = em.createQuery("CategoriaEgreso.findAllByTipoEgreso", CategoriaEgreso.class).setParameter("id", id).getResultList();
+            lista = em.createNamedQuery("CategoriaEgreso.findAllByTipoEgreso", CategoriaEgreso.class).setParameter("id", id).getResultList();
             return lista;
         } catch (Exception ex) {
             log.error("Error al buscar las tegorias por el tipo de egreso con id {}. {}", id, ex);
@@ -43,7 +43,7 @@ public class CategoriaEgresoDAO extends BaseDAO<CategoriaEgreso, Integer> {
         EntityManager em = null;
         try {
             em = super.getEntityManager();
-            lista = em.createQuery("CargoEgreso.findAllByTipoEgresoYActivo", CategoriaEgreso.class).setParameter("id", id).setParameter("activo", activo).getResultList();
+            lista = em.createNamedQuery("CargoEgreso.findAllByTipoEgresoYActivo", CategoriaEgreso.class).setParameter("id", id).setParameter("activo", activo).getResultList();
             return lista;
         } catch (Exception ex) {
             String estado = activo ? "activo" : "no activo";

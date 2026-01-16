@@ -1,0 +1,48 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+    <!-- DIALOGO CATEGORIA EGRESO -->
+    <p:dialog id="dlgCategoria"
+              widgetVar="dlgCategoria"
+              header="Categorías de #{tipoEgresoBean.selected.nombre}"
+              modal="true"
+              dynamic="true"
+              resizable="false"
+              width="900">
+
+        <!-- IMPORTANTÍSIMO -->
+        <!-- Asignamos el padre -->
+        <f:event type="preRenderComponent"
+                 listener="#{categoriaEgresoBean.setPadre(tipoEgresoBean.selected)}" />
+
+        <h:form id="formCategoria">
+
+            <ui:decorate template="/protected/catalogos/catalogoBase.xhtml">
+                <ui:param name="catalogoBean" value="#{categoriaEgresoBean}" />
+
+                <!-- NO HAY DESCRIPCIÓN -->
+                <ui:define name="campoDescripcion" />
+                <ui:define name="columnasDescripcion" />
+
+                <!-- BOTÓN PARA CONCEPTO -->
+                <ui:define name="columnasExtra">
+                    <p:column headerText="Conceptos" style="width:120px">
+                        <p:commandButton icon="pi pi-list"
+                                         title="Administrar conceptos"
+                                         actionListener="#{conceptoEgresoBean.setPadre(item)}"
+                                         oncomplete="PF('dlgConcepto').show()"
+                                         update=":formConcepto"
+                                         process="@this"/>
+                    </p:column>
+                </ui:define>
+
+            </ui:decorate>
+
+        </h:form>
+    </p:dialog>
+
+</ui:composition>

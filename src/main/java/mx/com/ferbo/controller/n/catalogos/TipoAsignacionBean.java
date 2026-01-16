@@ -1,5 +1,66 @@
 package mx.com.ferbo.controller.n.catalogos;
 
-public class TipoAsignacionBean {
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.business.catalogos.TipoAsignacionBL;
+import mx.com.ferbo.model.n.catalogos.TipoAsignacion;
+import mx.com.ferbo.util.InventarioException;
+
+@Named
+@RequestScoped
+public class TipoAsignacionBean extends AbstractCatalogoBean<TipoAsignacion> {
+
+    private static final Logger log = LogManager.getLogger(TipoAsignacionBean.class);
+
+    @Inject
+    private TipoAsignacionBL tipoAsignacionBL;
+
+    public TipoAsignacionBean(){
+
+    }
+
+    @PostConstruct
+    public void init() {
+        titulo = "Tipo asignación";
+        initCatalogo();
+    }
+
+    @Override
+    protected List<TipoAsignacion> cargar() throws InventarioException {
+        return tipoAsignacionBL.vigentesONoVigentes(estado);
+    }
+
+    @Override
+    protected String guardar() throws InventarioException {
+        return "El tipo de asignación se " + tipoAsignacionBL.agregarOActualizar(selected);
+    }
+
+    @Override
+    protected TipoAsignacion nuevo() {
+        return new TipoAsignacion();
+    }
+
+    @Override
+    protected void logInfo(String msg) {
+        log.info("{}", msg);
+    }
+
+    @Override
+    protected void logWarn(String msg, Exception ex) {
+        log.warn("{}. {}", msg, ex);
+    }
+
+    @Override
+    protected void logError(String msg, Exception ex) {
+        log.error("{}. {}", msg, ex);
+    }
 
 }

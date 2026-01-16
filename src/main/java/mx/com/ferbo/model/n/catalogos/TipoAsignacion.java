@@ -58,14 +58,17 @@ public class TipoAsignacion implements Serializable, Catalogo {
         return nombre;
     }
 
+    @Override
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    @Override
     public String getDescripcion() {
         return descripcion;
     }
 
+    @Override
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
@@ -75,7 +78,8 @@ public class TipoAsignacion implements Serializable, Catalogo {
         return vigente;
     }
 
-    public void setVigete(Boolean vigente) {
+    @Override
+    public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }
 

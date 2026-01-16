@@ -18,7 +18,7 @@ import mx.com.ferbo.model.n.egresos.PagoEgreso;
 
 @NamedQueries({
         @NamedQuery(name = "StatusPago.findByNombre", query = "SELECT sp FROM StatusPago sp WHERE sp.nombre = :nombre"),
-        @NamedQuery(name = "StatusPago.findAllVigentesONoVigentes", query = "SEELCT sp FROM StatusPAgo sp WHERE sp.vigente = :vigentes")
+        @NamedQuery(name = "StatusPago.findAllVigentesONoVigentes", query = "SELECT sp FROM StatusPago sp WHERE sp.vigente = :vigentes")
 })
 @Entity
 @Table(name = "cat_status_pago")
@@ -37,7 +37,7 @@ public class StatusPago implements Serializable, Catalogo {
     private String nombre;
 
     @Basic(optional = true)
-    @Column(name = "tx_satus_pago", length = 100, nullable = true)
+    @Column(name = "tx_status_pago", length = 100, nullable = true)
     private String descripcion;
 
     @Basic(optional = false)
@@ -65,6 +65,7 @@ public class StatusPago implements Serializable, Catalogo {
         return nombre;
     }
 
+    @Override
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -74,6 +75,7 @@ public class StatusPago implements Serializable, Catalogo {
         return descripcion;
     }
 
+    @Override
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
@@ -83,6 +85,7 @@ public class StatusPago implements Serializable, Catalogo {
         return vigente;
     }
 
+    @Override
     public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }

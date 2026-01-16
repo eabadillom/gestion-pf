@@ -2,6 +2,7 @@ package mx.com.ferbo.business.catalogos;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,12 +22,12 @@ public class CategoriaEgresoBL extends BaseCatalogosBL<CategoriaEgreso> {
 
     private static final Logger log = LogManager.getLogger(CategoriaEgresoBL.class);
 
-    private final CategoriaEgresoDAO categoriaEgresoDAO;
-
     @Inject
-    public CategoriaEgresoBL(CategoriaEgresoDAO categoriaEgresoDAO){
-        super(categoriaEgresoDAO);
-        this.categoriaEgresoDAO = categoriaEgresoDAO;
+    private CategoriaEgresoDAO categoriaEgresoDAO;
+
+    @PostConstruct
+    public void init(){
+        setDao(categoriaEgresoDAO);
     }
 
     @Override

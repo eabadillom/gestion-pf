@@ -66,6 +66,7 @@ public class TipoCargo implements Serializable, Catalogo {
         return nombre;
     }
 
+    @Override
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -75,14 +76,17 @@ public class TipoCargo implements Serializable, Catalogo {
         return descripcion;
     }
 
+    @Override
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
 
+    @Override
     public Boolean getVigente() {
         return vigente;
     }
 
+    @Override
     public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }

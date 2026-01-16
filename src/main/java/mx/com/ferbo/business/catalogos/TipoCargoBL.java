@@ -1,5 +1,6 @@
 package mx.com.ferbo.business.catalogos;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,8 +19,11 @@ public class TipoCargoBL extends BaseCatalogosBL<TipoCargo> {
     private static final Logger log = LogManager.getLogger(TipoCargoBL.class);
 
     @Inject
-    public TipoCargoBL(TipoCargoDAO tipoCargoDAO) {
-        super(tipoCargoDAO); // pasa el DAO al BaseCatalogosBL
+    private TipoCargoDAO tipoCargoDAO;
+
+    @PostConstruct
+    public void init(){
+        setDao(tipoCargoDAO);
     }
 
     @Override

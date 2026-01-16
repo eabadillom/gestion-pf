@@ -29,7 +29,7 @@ public class ImporteEgresoDAO extends BaseDAO<ImporteEgreso, Integer> {
         EntityManager em = null;
         try {
             em = super.getEntityManager();
-            lista = em.createQuery("ImporteEgreso.findAllByMes", ImporteEgreso.class).setParameter("inicio", inicio)
+            lista = em.createNamedQuery("ImporteEgreso.findAllByMes", ImporteEgreso.class).setParameter("inicio", inicio)
                     .setParameter("fin", fin).getResultList();
             return lista;
         } catch (Exception ex) {
@@ -45,7 +45,7 @@ public class ImporteEgresoDAO extends BaseDAO<ImporteEgreso, Integer> {
         EntityManager em = null;
         try {
             em = super.getEntityManager();
-            lista = em.createQuery("ImporteEgreso.findAllByConcepto", ImporteEgreso.class).setParameter("idConcepto", idConcepto).getResultList();
+            lista = em.createNamedQuery("ImporteEgreso.findAllByConcepto", ImporteEgreso.class).setParameter("idConcepto", idConcepto).getResultList();
             return lista;
         } catch (Exception ex) {
             log.error("Error al buscar todos los importe de egreso asociado al concepto con id {}. {}", idConcepto, ex);

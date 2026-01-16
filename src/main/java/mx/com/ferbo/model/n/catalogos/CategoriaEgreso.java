@@ -60,7 +60,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
@@ -69,7 +69,8 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         return nombre;
     }
 
-    public void setNombre(String nombre) {
+    @Override
+    public void setNombre(final String nombre) {
         this.nombre = nombre;
     }
 
@@ -78,7 +79,8 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         return vigente;
     }
 
-    public void setVigente(Boolean vigente) {
+    @Override
+    public void setVigente(final Boolean vigente) {
         this.vigente = vigente;
     }
 
@@ -86,7 +88,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         return tipoEgreso;
     }
 
-    public void setTipoEgreso(TipoEgreso tipoEgreso) {
+    public void setTipoEgreso(final TipoEgreso tipoEgreso) {
         this.tipoEgreso = tipoEgreso;
     }
 
@@ -94,18 +96,18 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         return catConceptos;
     }
 
-    public void setCatConceptos(List<CatConceptoEgreso> catConceptos) {
+    public void setCatConceptos(final List<CatConceptoEgreso> catConceptos) {
         this.catConceptos = catConceptos;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o)
             return true;
         if (!(o instanceof CategoriaEgreso))
             return false;
 
-        CategoriaEgreso that = (CategoriaEgreso) o;
+        final CategoriaEgreso that = (CategoriaEgreso) o;
         return id != null && id.equals(that.id);
     }
 
@@ -125,5 +127,10 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         throw new UnsupportedOperationException("Unimplemented method 'getDescripcion'");
     }
 
+    @Override
+    public void setDescripcion(String descripcion) {
+        // TODO Auto-generated method stub
+        
+    }
     
 }

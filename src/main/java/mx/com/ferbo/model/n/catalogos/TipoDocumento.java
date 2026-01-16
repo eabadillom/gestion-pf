@@ -67,6 +67,7 @@ public class TipoDocumento implements Serializable, Catalogo {
         return nombre;
     }
 
+    @Override
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -76,6 +77,7 @@ public class TipoDocumento implements Serializable, Catalogo {
         return descripcion;
     }
 
+    @Override
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
@@ -85,6 +87,7 @@ public class TipoDocumento implements Serializable, Catalogo {
         return vigente;
     }
 
+    @Override
     public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }

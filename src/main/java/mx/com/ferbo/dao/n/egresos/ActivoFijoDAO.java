@@ -26,7 +26,7 @@ public class ActivoFijoDAO extends BaseDAO <ActivoFijo, Integer> {
         EntityManager em = null;
         try {
            em = super.getEntityManager();
-           activo = em.createQuery("ActivoFijo.findByEgreso", ActivoFijo.class).setParameter("id", id).getSingleResult();
+           activo = em.createNamedQuery("ActivoFijo.findByEgreso", ActivoFijo.class).setParameter("id", id).getSingleResult();
            return activo;
         } catch (Exception ex) {
             log.error("Error al buscar el activo fijo asociado al egreso con id {}. {}", id, ex);

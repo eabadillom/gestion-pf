@@ -2,8 +2,6 @@ package mx.com.ferbo.business.catalogos;
 
 import java.util.List;
 
-import javax.enterprise.inject.Model;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,11 +12,11 @@ import mx.com.ferbo.util.InventarioException;
 
 public abstract class BaseCatalogosBL<MODEL extends Catalogo> {
 
-    protected BaseDAO<MODEL, ?> dao; // DAO genérico
+    protected BaseDAO<MODEL, ?> dao;
     protected Logger log = LogManager.getLogger(this.getClass().getName());
 
-    public BaseCatalogosBL(BaseDAO<MODEL, ?> dao) {
-        this.dao = dao;
+    public BaseCatalogosBL(){
+        
     }
 
     protected void validarGenerico(MODEL model) throws InventarioException {
@@ -42,7 +40,7 @@ public abstract class BaseCatalogosBL<MODEL extends Catalogo> {
 
     protected abstract void validarEspecifico(MODEL model) throws InventarioException;
 
-    public List<MODEL> getVigentesONoVigentes(boolean vigente) throws InventarioException {
+    public List<MODEL> vigentesONoVigentes(boolean vigente) throws InventarioException {
         String sVigente = vigente ? "vigentes" : "no vigentes";
         try {
             return dao.findByVigente(vigente);
@@ -65,6 +63,9 @@ public abstract class BaseCatalogosBL<MODEL extends Catalogo> {
     }
 
     public String agregarOActualizar(MODEL model) throws InventarioException {
+        validarGenerico(model);
+        validarEspecifico(model);
+
         if (model.getId() == null){
             dao.guardar(model);
             return "se agrego exitosamente";

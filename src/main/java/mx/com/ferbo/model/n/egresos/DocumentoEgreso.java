@@ -30,7 +30,7 @@ public class DocumentoEgreso implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cd_tipo_docu")
+    @Column(name = "cd_docu_egre")
     private Integer id;
 
     @Basic(optional = true)
