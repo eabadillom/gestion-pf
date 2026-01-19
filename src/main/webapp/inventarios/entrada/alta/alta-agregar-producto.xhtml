@@ -30,19 +30,19 @@
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Código"/>
-						<p:inputText maxlength="13" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpCodigo}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}" placeholder="Código" title="Código"/>
+						<p:inputText maxlength="13" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpCodigo}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoCodigo}" placeholder="Código" title="Código"/>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Pedimento" />
-						<p:inputText maxlength="13" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpPedimento}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}" placeholder="Pedimento" title="Pedimento"/>
+						<p:inputText maxlength="13" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpPedimento}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoPedimento}" placeholder="Pedimento" title="Pedimento"/>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Contenedor" />
-						<p:inputText maxlength="20" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpSAP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}" placeholder="Contenedor" title="Contenedor"/>
+						<p:inputText maxlength="20" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpSAP}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoSap}" placeholder="Contenedor" title="Contenedor"/>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Lote" />
-						<p:inputText maxlength="20" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpLote}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}" placeholder="Lote" title="Lote"/>
+						<p:inputText maxlength="20" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpLote}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoLote}" placeholder="Lote" title="Lote"/>
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Caducidad" />
@@ -50,7 +50,7 @@
 					</div>
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Otro" />
-						<p:inputText maxlength="12" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpMP}" style="text-transform: uppercase" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}" placeholder="Otro" title="Otro"/>
+						<p:inputText maxlength="12" value="#{ingresoBean.partida.detallePartidaList.get(0).dtpMP}" oninput="this.value = this.value.toUpperCase()" disabled="#{not ingresoBean.entrada.avisoCve.avisoOtro}" placeholder="Otro" title="Otro"/>
 					</div>
 				</p:outputPanel>
 				<f:facet name="footer">

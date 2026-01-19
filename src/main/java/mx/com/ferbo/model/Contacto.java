@@ -8,6 +8,8 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,8 +23,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.bouncycastle.util.Objects;
 
 /**
  *
@@ -67,32 +67,8 @@ public class Contacto implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto")
     private List<ClienteContacto> clienteContactoList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idContacto", orphanRemoval = true)//removi ophanremovel
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "idContacto")
     private List<MedioCnt> medioCntList;
-    
-    @Override
-    public int hashCode() {
-    	if(this.idContacto == null)
-    		return System.identityHashCode(this);
-    	return Objects.hashCode(this.idContacto);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof Contacto)) {
-            return false;
-        }
-        Contacto other = (Contacto) object;
-        if ((this.idContacto == null && other.idContacto != null) || (this.idContacto != null && !this.idContacto.equals(other.idContacto))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Contacto[ idContacto=" + idContacto + " ]";
-    }
 
     public Contacto() {
     }
@@ -183,4 +159,28 @@ public class Contacto implements Serializable {
     public void setMedioCntList(List<MedioCnt> medioCntList) {
         this.medioCntList = medioCntList;
     }
+
+    @Override 
+    public boolean equals(Object o) {
+        if(this == o) return true;
+        if (!(o instanceof Contacto)) return false;
+        Contacto that = (Contacto) o;
+
+        if (this.idContacto != null && that.idContacto != null) {
+            return Objects.equals(this.idContacto, that.idContacto);
+        } else {
+            return this == that;
+        }
+    }
+     
+    @Override
+    public int hashCode() {
+        return (idContacto != null) ? idContacto.hashCode() : System.identityHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Contacto[ idContacto=" + idContacto + " ]";
+    }
+    
 }
