@@ -20,6 +20,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import mx.com.ferbo.model.n.catalogos.StatusEgreso;
+
 @NamedQueries({
     @NamedQuery(name = "ImporteEgreso.findAllByMes", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimitePago BETWEEN :inicio AND :fin ORDER BY ie.fechaLimitePago ASC"),
     @NamedQuery(name = "ImporteEgreso.findAllByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.catConceptoEgreso.id = :idConcepto"),
@@ -48,14 +50,6 @@ public class ImporteEgreso implements Serializable {
     @Column(name = "im_ieps", precision = 15, scale = 2)
     private BigDecimal ieps;
 
-    @Basic(optional = false)
-    @Column (name = "to_egreso", precision = 15, scale = 2)
-    private BigDecimal total;
-
-    @Basic(optional = true)
-    @Column(name = "cb_refe_pago", length = 100, nullable = true)
-    private String refenrencia;
-
     @Basic(optional = true)
     @Column(name = "tx_obser", length = 250, nullable = true)
     private String observaciones;
@@ -81,6 +75,10 @@ public class ImporteEgreso implements Serializable {
 
     @OneToMany(mappedBy = "importeEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargoEgreso> cargos;
+
+    @ManyToOne
+    @JoinColumn(name = "cd_status_egre", nullable = false)
+    private StatusEgreso status;
 
     public ImporteEgreso(){
         // Constructor sin parametros
@@ -116,22 +114,6 @@ public class ImporteEgreso implements Serializable {
 
     public void setIeps(BigDecimal ieps) {
         this.ieps = ieps;
-    }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
-    public String getRefenrencia() {
-        return refenrencia;
-    }
-
-    public void setRefenrencia(String refenrencia) {
-        this.refenrencia = refenrencia;
     }
 
     public String getObservaciones() {
@@ -190,6 +172,14 @@ public class ImporteEgreso implements Serializable {
         this.cargos = cargos;
     }
 
+    public StatusEgreso getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusEgreso status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o){
         if(this == o)
@@ -208,10 +198,9 @@ public class ImporteEgreso implements Serializable {
 
     @Override
     public String toString() {
-        return "ImporteEgreso [id=" + id + ", subTotal=" + subTotal + ", iva=" + iva + ", ieps=" + ieps + ", total="
-                + total + ", refenrencia=" + refenrencia + ", observaciones=" + observaciones + ", motivo=" + motivo
-                + ", fechaAlta=" + fechaAlta + ", fechaLimitePago=" + fechaLimitePago + "]";
+        return "ImporteEgreso [id=" + id + ", subTotal=" + subTotal + ", iva=" + iva + ", ieps=" + ieps
+                + ", observaciones=" + observaciones + ", motivo=" + motivo + ", fechaAlta=" + fechaAlta
+                + ", fechaLimitePago=" + fechaLimitePago + "]";
     }
-
 
 }

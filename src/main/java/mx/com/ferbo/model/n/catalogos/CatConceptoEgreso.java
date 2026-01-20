@@ -1,6 +1,7 @@
 package mx.com.ferbo.model.n.catalogos;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -42,7 +43,7 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
     private Boolean vigente;
 
     @Basic(optional = false)
-    @Column(name = "cd_sat", length = 100, nullable = false)
+    @Column(name = "cd_sat", length = 8, nullable = false)
     private String codigoSAT;
 
     @Basic(optional = false)
@@ -56,6 +57,26 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
     @Basic(optional = false)
     @Column(name = "st_ieps")
     private Boolean tieneIEPS;
+
+    @Basic(optional =  false)
+    @Column(name = "st_cfdi")
+    private Boolean requiereCFDI;
+
+    @Basic(optional = false)
+    @Column(name = "st_dedu")
+    private Boolean esDeducible;
+
+    @Basic(optional = false)
+    @Column(name = "st_cfdi_dedu")
+    private Boolean requiereCFDIDecucible;
+
+    @Basic(optional = false)
+    @Column(name = "pc_iva", precision = 6, scale = 3)
+    private BigDecimal porcentajeIVA = new BigDecimal("16.000");;
+
+    @Basic(optional = false)
+    @Column(name = "pc_ieps", precision = 6, scale = 3)
+    private BigDecimal porcentajeIEPS = new BigDecimal("00.000");
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_cate_egre", nullable = false)
@@ -137,12 +158,52 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
         this.tieneIEPS = tieneIEPS;
     }
 
+    public BigDecimal getPorcentajeIVA() {
+        return porcentajeIVA;
+    }
+
+    public void setPorcentajeIVA(BigDecimal porcentajeIVA) {
+        this.porcentajeIVA = porcentajeIVA;
+    }
+
+    public BigDecimal getPorcentajeIEPS() {
+        return porcentajeIEPS;
+    }
+
+    public void setPorcentajeIEPS(BigDecimal porcentajeIEPS) {
+        this.porcentajeIEPS = porcentajeIEPS;
+    }
+
     public CategoriaEgreso getCategoriaEgreso() {
         return categoriaEgreso;
     }
 
     public void setCategoriaEgreso(CategoriaEgreso categoriaEgreso) {
         this.categoriaEgreso = categoriaEgreso;
+    }
+
+    public Boolean getRequiereCFDI() {
+        return requiereCFDI;
+    }
+
+    public void setRequiereCFDI(Boolean requiereCFDI) {
+        this.requiereCFDI = requiereCFDI;
+    }
+
+    public Boolean getEsDeducible() {
+        return esDeducible;
+    }
+
+    public void setEsDeducible(Boolean esDeducible) {
+        this.esDeducible = esDeducible;
+    }
+
+    public Boolean getRequiereCFDIDecucible() {
+        return requiereCFDIDecucible;
+    }
+
+    public void setRequiereCFDIDecucible(Boolean requiereCFDIDecucible) {
+        this.requiereCFDIDecucible = requiereCFDIDecucible;
     }
 
     public boolean equals(Object o){
@@ -163,8 +224,9 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
     public String toString() {
         return "CatConceptoEgreso [id=" + id + ", nombre=" + nombre + ", vigente=" + vigente + ", codigoSAT="
                 + codigoSAT + ", esActivoFijo=" + esActivoFijo + ", tieneIVA=" + tieneIVA + ", tieneIEPS=" + tieneIEPS
+                + ", porcentajeIVA=" + porcentajeIVA + ", porcentajeIEPS=" + porcentajeIEPS + ", requiereCFDI="
+                + requiereCFDI + ", esDeducible=" + esDeducible + ", requiereCFDIDecucible=" + requiereCFDIDecucible
                 + "]";
     }
 
-    
 }

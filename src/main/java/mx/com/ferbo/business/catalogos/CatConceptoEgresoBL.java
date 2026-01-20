@@ -1,5 +1,6 @@
 package mx.com.ferbo.business.catalogos;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -9,6 +10,7 @@ import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.formula.functions.T;
 
 import mx.com.ferbo.dao.n.catalogos.CatConceptoEgresoDAO;
 import mx.com.ferbo.model.n.catalogos.CatConceptoEgreso;
@@ -26,41 +28,112 @@ public class CatConceptoEgresoBL extends BaseCatalogosBL<CatConceptoEgreso> {
     private CatConceptoEgresoDAO dao;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         setDao(dao);
     }
 
     @Override
     protected void validarEspecifico(CatConceptoEgreso model) throws InventarioException {
-        if ("".equalsIgnoreCase(model.getCodigoSAT())) {
-            throw new InventarioException("El concepto no tiene un código de SAT asignado.");
+        
+        validarCodigoSat(model);
+        validarCategoria(model);
+        validarFlagsFiscales(model);
+        validarImpuestos(
+                model.getTieneIVA(),
+                model.getPorcentajeIVA(),
+                model.getTieneIEPS(),
+                model.getPorcentajeIEPS());
+    }
+
+    private void validarCodigoSat(CatConceptoEgreso model)
+            throws InventarioException {
+
+        if (model.getCodigoSAT() == null || model.getCodigoSAT().trim().isEmpty()) {
+            throw new InventarioException("El concepto del catálogo no tiene código SAT.");
         }
 
-        if (model.getTieneIVA() == null){
-            throw new InventarioException("No se puede determinar si el concepto incluye IVA o no.");
-        }
-
-        if (model.getTieneIEPS() == null) {
-            throw new InventarioException("No se puede determinar si el concepto incluye IEPSE o no.");
+        if (model.getCodigoSAT().length() != 8) {
+            throw new InventarioException("El código SAT debe tener 8 dígitos.");
         }
     }
 
-    public List<CatConceptoEgreso> obtenerPorCategoria(CategoriaEgreso categoria) throws InventarioException{
+    private void validarCategoria(CatConceptoEgreso model)
+            throws InventarioException {
+
+        if (model.getCategoriaEgreso() == null) {
+            throw new InventarioException("El concepto del catálogo no tiene categoría.");
+        }
+    }
+
+    private void validarFlagsFiscales(CatConceptoEgreso model)
+            throws InventarioException {
+
+        if (model.getEsActivoFijo() == null) {
+            throw new InventarioException("No se puede determinar si es activo fijo.");
+        }
+
+        if (model.getRequiereCFDI() == null) {
+            throw new InventarioException("No se puede determinar si requiere CFDI.");
+        }
+
+        if (model.getEsDeducible() == null) {
+            throw new InventarioException("No se puede determinar si es deducible.");
+        }
+    }
+
+    private void validarImpuestos(
+            Boolean tieneIva, BigDecimal pcIva,
+            Boolean tieneIeps, BigDecimal pcIeps) throws InventarioException {
+
+        if (tieneIva == null) {
+            throw new InventarioException("No se puede determinar si aplica IVA.");
+        }
+
+        if (Boolean.TRUE.equals(tieneIva)) {
+            if (pcIva == null) {
+                throw new InventarioException("Aplica IVA pero no tiene porcentaje.");
+            }
+            if (pcIva.compareTo(BigDecimal.ZERO) < 0 ||
+                    pcIva.compareTo(new BigDecimal("100")) > 0) {
+                throw new InventarioException("El porcentaje de IVA debe estar entre 0 y 100.");
+            }
+        }
+
+        if (tieneIeps == null) {
+            throw new InventarioException("No se puede determinar si aplica IEPS.");
+        }
+
+        if (Boolean.TRUE.equals(tieneIeps)) {
+            if (pcIeps == null) {
+                throw new InventarioException("Aplica IEPS pero no tiene porcentaje.");
+            }
+            if (pcIeps.compareTo(BigDecimal.ZERO) < 0 ||
+                    pcIeps.compareTo(new BigDecimal("100")) > 0) {
+                throw new InventarioException("El porcentaje de IEPS debe estar entre 0 y 100.");
+            }
+        }
+    }
+
+    public List<CatConceptoEgreso> obtenerPorCategoria(CategoriaEgreso categoria) throws InventarioException {
         try {
             return dao.buscarPorCategoriaEgreso(categoria.getId());
         } catch (DAOException ex) {
             log.warn("Error al obtener conceptos asociados con la categoria {}. {}", categoria.getNombre(), ex);
-            throw new InventarioException("Hubo un problema al obtener los conceptos asociados con la categoria " + categoria.getNombre());
+            throw new InventarioException(
+                    "Hubo un problema al obtener los conceptos asociados con la categoria " + categoria.getNombre());
         }
     }
 
-    public List<CatConceptoEgreso> obtenerPorCategoriaYVigencia (CategoriaEgreso categoria, Boolean vigencia) throws InventarioException{
+    public List<CatConceptoEgreso> obtenerPorCategoriaYVigencia(CategoriaEgreso categoria, Boolean vigencia)
+            throws InventarioException {
         try {
             return dao.buscarPorCategoriaEgreso(categoria.getId());
         } catch (DAOException ex) {
             String estado = vigencia ? "vigentes" : "no vigentes";
-            log.warn("Error al obtener conceptos asociados con la categoria {} y {}. {}", categoria.getNombre(), estado, ex);
-            throw new InventarioException("Hubo un problema al obtener los conceptos asociados con la categoria " + categoria.getNombre() + " y " + estado);
+            log.warn("Error al obtener conceptos asociados con la categoria {} y {}. {}", categoria.getNombre(), estado,
+                    ex);
+            throw new InventarioException("Hubo un problema al obtener los conceptos asociados con la categoria "
+                    + categoria.getNombre() + " y " + estado);
         }
     }
 }
