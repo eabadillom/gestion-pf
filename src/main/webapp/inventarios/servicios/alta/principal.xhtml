@@ -1,0 +1,46 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Alta Constancia de Servicio</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- Datos Generales -->
+            <!-- ID: fecha, txtFolio, cliente-som y s-planta -->
+            <!-- Seccion de captura de datos: "Fecha", "Folio", "Lista de clientes" y "Lista de plantas" -->
+            <ui:include src="/inventarios/servicios/alta/alta-cfg-servicios.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Mercancía -->
+            <!-- ID: txtCantidadProd, selUnidad, txtPesoProd, selProducto y dt-partidas -->
+            <!-- Seccion de captura de datos: "Cantidad", "Unidades", "Peso", "Producto" y un boton para agregar mercancias -->
+            <ui:include src="/inventarios/servicios/alta/alta-mercancia.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Servicios -->
+            <!-- ID: selServicio, txtCantidadSrv y dt-servicios -->
+            <!-- Seccion de captura de datos: "Servicios", "Cantidad" y un boton para agregar servicios -->
+            <ui:include src="/inventarios/servicios/alta/alta-servicios.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Valor Declarado -->
+            <!-- ID: txtValorDeclarado, txtNombreTransportista, txtPlacasVehiculo y txtObservaciones -->
+            <!-- Seccion de captura de datos: "Valor declarado", "Nombre del transportista", "Placas del transporte" y "Observaciones" -->
+            <ui:include src="/inventarios/servicios/alta/alta-valor-declarado.xhtml" />
+            
+            <p:spacer style="height: 1rem;"/>
+            
+            <!-- Guardar -->
+            <!-- Seccion para el guardado -->
+            <ui:include src="/inventarios/servicios/alta/alta-acciones.xhtml" />
+        </h:form>
+    </ui:define>
+</ui:composition>

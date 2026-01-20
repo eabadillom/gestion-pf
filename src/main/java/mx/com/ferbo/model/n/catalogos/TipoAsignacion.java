@@ -25,7 +25,7 @@ public class TipoAsignacion implements Serializable, Catalogo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cd_asig_egre")
+    @Column(name = "cd_tipo_asig")
     private Integer id;
 
     @Basic(optional = false)
@@ -33,11 +33,11 @@ public class TipoAsignacion implements Serializable, Catalogo {
     private String nombre;
 
     @Basic(optional = true)
-    @Column(name = "tx_asig_egre", length = 150, nullable = true)
+    @Column(name = "tx_tipo_asig", length = 150, nullable = true)
     private String descripcion;
 
     @Basic(optional = false)
-    @Column(name = "st_status_tipo_asig")
+    @Column(name = "st_tipo_asig")
     private Boolean vigente = Boolean.TRUE;
 
     public TipoAsignacion(){

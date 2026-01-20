@@ -31,7 +31,7 @@ public class ConceptoEgresoBL {
                 model.getPorcentajeIVA(),
                 model.getTieneIEPS(),
                 model.getPorcentajeIEPS());
-        validarDeducibilidad(model);
+        //validarDeducibilidad(model);
     }
 
     private void validarImpuestos(

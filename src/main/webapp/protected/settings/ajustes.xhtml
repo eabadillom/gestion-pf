@@ -1,0 +1,32 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Ajustes</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <div class="ui-fluid">
+                <div class="card">
+                    <h5 style="margin-top:0">Sistema</h5>
+                    <p:panelGrid columns="4" layout="grid">
+                        <p:commandButton value="Domicilios" icon="pi pi-home" actionListener="#{ajustesBean.domicilios}"></p:commandButton>
+                    </p:panelGrid>
+                </div>
+                <div class="card">
+                    <h5 style="margin-top:0">Catálogos de Egresos</h5>
+                    <p:panelGrid columns="6" layout="grid">
+                        <p:commandButton value="Status Activo Fijo" icon="pi pi-book" actionListener="#{ajustesBean.catalogosEgresos('statusActivoFijo')}" process="@this"></p:commandButton>
+                        <p:commandButton value="Status Egreso" icon="pi pi-book" actionListener="#{ajustesBean.catalogosEgresos('statusEgreso')}" process="@this"></p:commandButton>
+                        <p:commandButton value="Status Pago" icon="pi pi-book" actionListener="#{ajustesBean.catalogosEgresos('statusPago')}" process="@this"></p:commandButton>
+                        <p:commandButton value="Tipo Asignación" icon="pi pi-book" actionListener="#{ajustesBean.catalogosEgresos('tipoAsignacion')}" process="@this"></p:commandButton>
+                        <p:commandButton value="Tipo Cargo" icon="pi pi-book" actionListener="#{ajustesBean.catalogosEgresos('tipoCargo')}" process="@this"></p:commandButton>
+                        <p:commandButton value="Tipo Documento" icon="pi pi-book" actionListener="#{ajustesBean.catalogosEgresos('tipoDocumento')}" process="@this"></p:commandButton>
+                    </p:panelGrid>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>        
+</ui:composition>

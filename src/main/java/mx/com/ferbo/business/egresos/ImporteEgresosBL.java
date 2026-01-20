@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.egresos.ImporteEgresoDAO;
+import mx.com.ferbo.model.n.catalogos.ConceptoEgreso;
 import mx.com.ferbo.model.n.egresos.CargoEgreso;
-import mx.com.ferbo.model.n.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.n.egresos.ImporteEgreso;
 import mx.com.ferbo.model.n.egresos.PagoEgreso;
 import mx.com.ferbo.util.DAOException;
@@ -64,17 +64,17 @@ public class ImporteEgresosBL {
             if (concepto == null) {
                 return importeEgresoDAO.buscarTodosPorPeriodo(inicio, fin);
             } else {
-                Integer catConceptoId = concepto.getCatConceptoEgreso() != null
-                        ? concepto.getCatConceptoEgreso().getId()
+                Integer catConceptoId = concepto.getCatConcepto() != null
+                        ? concepto.getCatConcepto().getId()
                         : null;
                 return importeEgresoDAO.buscarTodosPorConcepto(catConceptoId);
             }
         } catch (DAOException ex) {
             log.warn("Error al obtener egresos: {}", ex.getMessage(), ex);
 
-            String detalle = (concepto == null || concepto.getCatConceptoEgreso() == null)
+            String detalle = (concepto == null || concepto.getCatConcepto() == null)
                     ? "del mes " + mes
-                    : "con concepto " + concepto.getCatConceptoEgreso().getNombre();
+                    : "con concepto " + concepto.getCatConcepto().getNombre();
 
             throw new InventarioException("Hubo un problema al obtener los egresos " + detalle);
         }
@@ -154,7 +154,7 @@ public class ImporteEgresosBL {
             subtotal = BigDecimal.ZERO;
         }
 
-        if (concepto != null && concepto.getCatConceptoEgreso().getTieneIVA() && concepto.getPorcentajeIVA() != null) {
+        if (concepto != null && concepto.getCatConcepto().getTieneIVA() && concepto.getPorcentajeIVA() != null) {
             return subtotal.multiply(concepto.getPorcentajeIVA())
                     .setScale(2, RoundingMode.HALF_UP);
         }
@@ -167,7 +167,7 @@ public class ImporteEgresosBL {
             subtotal = BigDecimal.ZERO;
         }
 
-        if (concepto != null && concepto.getCatConceptoEgreso().getTieneIEPS()
+        if (concepto != null && concepto.getCatConcepto().getTieneIEPS()
                 && concepto.getPorcentajeIEPS() != null) {
             return subtotal.multiply(concepto.getPorcentajeIEPS())
                     .setScale(2, RoundingMode.HALF_UP);

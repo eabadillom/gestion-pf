@@ -1,8 +1,9 @@
 package mx.com.ferbo.controller;
 
-
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -25,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
@@ -43,6 +46,7 @@ import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.TraspasoPartida;
 import mx.com.ferbo.model.TraspasoServicio;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -53,7 +57,7 @@ import net.sf.jasperreports.engine.JRException;
 public class ConsultaTraspasosBean implements Serializable {
 
 	private static final long serialVersionUID = -3109002730694247052L;
-	private static Logger log = LogManager.getLogger(AltaConstanciaServicioBean.class);
+	private static Logger log = LogManager.getLogger(ConsultaTraspasosBean.class);
 	private List<Cliente> clientes;
 	private List<PartidaServicio> alPartidas;
 	private List<TraspasoServicio> alServiciosDetalle;
@@ -96,10 +100,12 @@ public class ConsultaTraspasosBean implements Serializable {
 	private boolean habilitareporte = false;
 	
 	private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
+        private HttpServletRequest httpServletRequest;
+        
+        private Usuario usuario;
+        private StreamedContent file;
 
 	public ConsultaTraspasosBean() {
-		log.info("Entrando al constructor del controller...");
 		clienteDAO = new ClienteDAO();
 		edoDAO = new EstadoConstanciaDAO();
 		constanciaTraspasoDAO = new ConstanciaTraspasoDAO();
@@ -124,6 +130,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
+                usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
 		if(clientes.size() == 1)
 			this.idCliente = clientes.get(0).getCteCve();
 		estados = edoDAO.buscarTodos();
@@ -133,7 +140,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		Date today = new Date();
 		setMaxDate(new Date(today.getTime() ));
 		this.selectedconstancia = new ConstanciaTraspaso();
-		
+		log.info("El usuario {} ingresa a la consulta de constancias de traspaso.", this.usuario.getUsuario());
 	}
 	public void buscarConstancia() {
 		if(numero != null && "".equalsIgnoreCase(numero.trim()))
@@ -155,7 +162,7 @@ public class ConsultaTraspasosBean implements Serializable {
 		Severity severity = null;
 		EntityManager manager = null;
 		try {
-			log.info("Cargando constancia de traspaso: {}", this.selectedconstancia);
+			log.info("Cargando constancia de traspaso: {}", this.selectedconstancia.getNumero());
 			this.selectedconstancia = constanciaTraspasoDAO.buscarPorId(this.selectedconstancia.getId(), true);
 			
 			log.debug("TraspasoPartida (size): {}", selectedconstancia.getTraspasoPartidaList().size());
@@ -198,9 +205,11 @@ public class ConsultaTraspasosBean implements Serializable {
 			parameters.put("FOLIO", this.selectedconstancia.getNumero());
 			parameters.put("LogoPath", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());			
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+                        this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
+                        log.info("Ticket de traspaso generado {}...", filename);
 		} catch (Exception ex) {
-			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.selectedconstancia.getNumero());
 			severity = FacesMessage.SEVERITY_INFO;
@@ -357,8 +366,6 @@ public class ConsultaTraspasosBean implements Serializable {
 		this.listaconstanciadepo = listaconstanciadepo;
 	}
 
-
-
 	public List<Partida> getPartida() {
 		return partida;
 	}
@@ -382,8 +389,6 @@ public class ConsultaTraspasosBean implements Serializable {
 	public void setInventario(List<InventarioDetalle> inventario) {
 		this.inventario = inventario;
 	}
-
-
 
 	public TraspasoPartida getTp() {
 		return tp;
@@ -424,7 +429,6 @@ public class ConsultaTraspasosBean implements Serializable {
 	public void setInv(Inventario inv) {
 		this.inv = inv;
 	}
-
 
 	public List<ConstanciaTraspaso> getListaTraspasos() {
 		return listaTraspasos;
@@ -474,6 +478,12 @@ public class ConsultaTraspasosBean implements Serializable {
 		this.maxDate = maxDate;
 	}
 
+        public StreamedContent getFile() {
+            return file;
+        }
 
+        public void setFile(StreamedContent file) {
+            this.file = file;
+        }
 
 }

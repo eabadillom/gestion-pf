@@ -45,9 +45,9 @@ public abstract class BaseCatalogosBL<MODEL extends Catalogo> {
         try {
             return dao.findByVigente(vigente);
         } catch (DAOException ex) {
-            log.warn("Error al obtener " + dao.getClass().getSimpleName() + " " + sVigente + ": " + ex.getMessage());
+            log.warn("Error al obtener los datos" + sVigente + ": " + ex.getMessage());
             throw new InventarioException(
-                    "Hubo un problema al obtener " + dao.getClass().getSimpleName() + " " + sVigente, ex);
+                    "Hubo un problema al obtener los datos " + sVigente, ex);
         }
     }
 
@@ -55,10 +55,10 @@ public abstract class BaseCatalogosBL<MODEL extends Catalogo> {
         try {
             return dao.buscarPorNombre(nombre);
         } catch (DAOException ex) {
-            log.warn("Error al buscar " + dao.getClass().getSimpleName() + " por nombre " + nombre + ": "
+            log.warn("Error al buscar el registro por nombre " + nombre + ": "
                     + ex.getMessage());
             throw new InventarioException(
-                    "Hubo un problema al buscar " + dao.getClass().getSimpleName() + " por nombre " + nombre, ex);
+                    "Hubo un problema al buscar el registro por nombre " + nombre, ex);
         }
     }
 

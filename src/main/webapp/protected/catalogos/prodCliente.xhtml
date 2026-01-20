@@ -15,56 +15,67 @@
 			<div class="p-grid productosClientes">
 				<div class="p-col-12">
 					<div class="card">
-						<p:growl id="messages" showDetail="true" />
-						<div class="p-col-12">
-							<div class="card">
-								<div class="ui-fluid p-formgrid p-grid">
-									<div class="p-field p-col-12 p-md-6">
-										<span class="ui-float-label ui-input-icon-left">
-										<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{prodClienteBean.clienteSelected}" filter="true" filterMatchMode="contains">
-											<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" noSelectionOption="true" />
-											<f:selectItems value="#{prodClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre)}" itemValue="#{cliente}" />
-											<p:ajax listener="#{prodClienteBean.filtraListado()}" update="dt-productosCliente" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
-										</p:selectOneMenu>
-										<p:outputLabel for="soClientes" value="Clientes" />
-										</span>
-									</div>
-								</div>
-							</div>
-						</div>
+                                                <p:growl id="messages" showDetail="true" />
+                                                <p:panel id="pnl-datos-generales" header="CONFIGURACION DEL PRODUCTO" >
+                                                    <div class="p-grid ui-fluid">
+                                                        <div class="p-field p-col-12 p-md-6">
+                                                            <p:outputLabel for="soClientes" value="Clientes" />
+                                                            <p:selectOneMenu id="soClientes" converter="entityConverter" value="#{prodClienteBean.clienteSelected}" filter="true" filterMatchMode="contains">
+                                                                    <f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" noSelectionOption="true" />
+                                                                    <f:selectItems value="#{prodClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre)}" itemValue="#{cliente}" />
+                                                                    <p:ajax listener="#{prodClienteBean.filtraListado()}" update="dt-productosCliente btnAdd" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                    <div class="p-grid ui-fluid">
+                                                        <div class="p-field p-col-6 p-md-3">
+                                                            <p:commandButton id="btnAdd" icon="pi pi-plus" value="Agregar producto" process="@this" styleClass="ui-button-primary"
+                                                                update="form:panel-producto" oncomplete="PF('productoClienteDialog').show()"
+                                                                disabled="#{prodClienteBean.clienteSelected eq null and prodClienteBean.clienteSelected.cteCve eq null}"
+                                                                actionListener="#{prodClienteBean.nuevoProductoCliente()}" resetValues="panel-producto" />
+                                                        </div>
+                                                    </div>	
+                                                </p:panel>
+                                                
+                                                <p:spacer style="height: 1rem;"/>
+                                                
+                                                <p:panel id="pnl-list-productos" header="PRODUCTOS" >
+                                                    <p:dataTable id="dt-productosCliente" widgetVar="dtProductosCliente" value="#{prodClienteBean.filtrarPorDescripcionYCodigo()}" var="pProducto" rowKey="#{pProducto.productoCve.productoCve}"
+                                                            selection="#{prodClienteBean.ppcSelected}" reflow="true" lazy="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                                                            <f:facet name="header">
+                                                                <div class="p-grid ui-fluid">
+                                                                    <div class="p-field p-col-3 p-md-4" style="margin-right: 3rem" >
+                                                                        <p:inputText id="filtarCodigo" value="#{prodClienteBean.codigo}" style="width:300px; margin-right: 7rem;" placeholder="Buscar por código" onkeyup="PF('dtProductosCliente').filter();" >
+                                                                            <p:ajax update="dt-productosCliente" process="@this"/>
+                                                                        </p:inputText>
+                                                                    </div>
+                                                                    <div class="p-field p-col-4 p-md-5" >
+                                                                        <p:inputText id="filtarProducto" value="#{prodClienteBean.productoFiltrado}" style="width:300px;" placeholder="Buscar por descripción" onkeyup="PF('dtProductosCliente').filter();" >
+                                                                            <p:ajax update="dt-productosCliente" process="@this"/>
+                                                                        </p:inputText>
+                                                                    </div>
+                                                                </div>
+                                                            </f:facet>
+                                                        <p:column headerText="Código" sortBy="#{pProducto.productoCve.numeroProd}" width="7rem" style="text-align:center" >
+                                                                    <h:outputText value="#{pProducto.productoCve.numeroProd}" />
+                                                            </p:column>
+                                                        <p:column headerText="Descripción" sortBy="#{pProducto.productoCve.productoDs}" style="text-align:center" >
+                                                                    <h:outputText value="#{pProducto.productoCve.productoDs}" />
+                                                            </p:column>
+                                                            <p:column exportable="false" style="text-align:center" width="2rem">
+                                                                    <p:commandButton icon="pi pi-pencil"  update="form:panel-producto" process="@this" oncomplete="PF('productoClienteDialog').show()"  
+                                                                    styleClass="edit-button ui-button-primary" action="#{prodClienteBean.cargaProductoCliente}" style="text-align:center">
+                                                                            <f:setPropertyActionListener value="#{pProducto}" target="#{prodClienteBean.ppcSelected}" />
+                                                                    </p:commandButton>
+                                                            </p:column>
+                                                            <p:column exportable="false" style="text-align:center" width="2rem">
+                                                                    <p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteProductoClienteDialog').show()">
+                                                                            <f:setPropertyActionListener value="#{pProducto}" target="#{prodClienteBean.ppcSelected}" />
+                                                                    </p:commandButton>
+                                                            </p:column>
 
-
-						<p:dataTable id="dt-productosCliente" widgetVar="dtProductosCliente" value="#{prodClienteBean.lstProductosClienteFiltered}" var="pProducto" rowKey="#{pProducto.productoCve.productoCve}"
-							selection="#{prodClienteBean.ppcSelected}" reflow="true" lazy="true" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
-							<f:facet name="header">
-								<div class="products-table-header">
-									<span class="filter-container ui-input-icon-left"> 
-										<p:commandButton id="btnAdd" icon="pi pi-plus" value="Agregar producto" process="@this" styleClass="ui-button-primary" style="margin-right: .5rem"
-											update="form:panel-producto" oncomplete="PF('productoClienteDialog').show()"
-											disabled="#{prodClienteBean.clienteSelected eq null and prodClienteBean.clienteSelected.cteCve eq null}"
-											actionListener="#{prodClienteBean.nuevoProductoCliente()}" resetValues="panel-producto" />
-									</span>
-								</div>
-							</f:facet>
-							<p:column headerText="Código" sortBy="#{pProducto.productoCve.numeroProd}" width="7rem" style="text-align:center" filterBy="#{pProducto.productoCve.numeroProd}" filterMatchMode="contains">
-								<h:outputText value="#{pProducto.productoCve.numeroProd}" />
-							</p:column>
-							<p:column headerText="Descripción" sortBy="#{pProducto.productoCve.productoDs}" style="text-align:center" filterBy="#{pProducto.productoCve.productoDs}" filterMatchMode="contains">
-								<h:outputText value="#{pProducto.productoCve.productoDs}" />
-							</p:column>
-							<p:column exportable="false" style="text-align:center" width="2rem">
-								<p:commandButton icon="pi pi-pencil"  update="form:panel-producto" process="@this" oncomplete="PF('productoClienteDialog').show()"  
-								styleClass="edit-button ui-button-primary" action="#{prodClienteBean.cargaProductoCliente}" style="text-align:center">
-									<f:setPropertyActionListener value="#{pProducto}" target="#{prodClienteBean.ppcSelected}" />
-								</p:commandButton>
-							</p:column>
-							<p:column exportable="false" style="text-align:center" width="2rem">
-								<p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this" oncomplete="PF('deleteProductoClienteDialog').show()">
-									<f:setPropertyActionListener value="#{pProducto}" target="#{prodClienteBean.ppcSelected}" />
-								</p:commandButton>
-							</p:column>
-
-						</p:dataTable>
+                                                    </p:dataTable>
+                                                </p:panel>
 						<p:dialog header="Producto" showEffect="fade" modal="true" widgetVar="productoClienteDialog" responsive="true">
 							<p:outputPanel id="panel-producto" class="ui-fluid">
 								<p:outputPanel>

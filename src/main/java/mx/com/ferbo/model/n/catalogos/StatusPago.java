@@ -18,7 +18,7 @@ import mx.com.ferbo.model.n.egresos.PagoEgreso;
 
 @NamedQueries({
         @NamedQuery(name = "StatusPago.findByNombre", query = "SELECT sp FROM StatusPago sp WHERE sp.nombre = :nombre"),
-        @NamedQuery(name = "StatusPago.findAllVigentesONoVigentes", query = "SELECT sp FROM StatusPago sp WHERE sp.vigente = :vigentes")
+        @NamedQuery(name = "StatusPago.findAllVigentesONoVigentes", query = "SELECT sp FROM StatusPago sp WHERE sp.vigente = :vigente")
 })
 @Entity
 @Table(name = "cat_status_pago")

@@ -20,7 +20,7 @@ import mx.com.ferbo.util.InventarioException;
 @ViewScoped
 public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
     
-        private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = LogManager.getLogger(TipoEgreso.class);
 

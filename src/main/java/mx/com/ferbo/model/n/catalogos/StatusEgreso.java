@@ -13,8 +13,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "StatusEgreso.findByNombre", query = "SELECT se FROM se WHERE se.nombre = :nombre"),
-    @NamedQuery(name = "StatusEgreso.findAllByVigenteONoVigentes", query = "SELECT se FROM se WHERE se.vigente = :vigente")
+    @NamedQuery(name = "StatusEgreso.findByNombre", query = "SELECT se FROM StatusEgreso se WHERE se.nombre = :nombre"),
+    @NamedQuery(name = "StatusEgreso.findAllVigentesONoVigentes", query = "SELECT se FROM StatusEgreso se WHERE se.vigente = :vigente")
 })
 @Entity
 @Table(name = "cat_status_egreso")

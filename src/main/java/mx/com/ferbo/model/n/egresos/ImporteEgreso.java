@@ -19,12 +19,13 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import mx.com.ferbo.model.n.catalogos.ConceptoEgreso;
 
 import mx.com.ferbo.model.n.catalogos.StatusEgreso;
 
 @NamedQueries({
     @NamedQuery(name = "ImporteEgreso.findAllByMes", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimitePago BETWEEN :inicio AND :fin ORDER BY ie.fechaLimitePago ASC"),
-    @NamedQuery(name = "ImporteEgreso.findAllByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.catConceptoEgreso.id = :idConcepto"),
+    @NamedQuery(name = "ImporteEgreso.findAllByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.catConcepto.id = :idConcepto"),
 })
 @Entity
 @Table(name = "importe_egreso")
