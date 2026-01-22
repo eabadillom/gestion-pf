@@ -98,7 +98,7 @@
                             rotation: 90,
                             font: 'bold 20px sans-serif',
                             formatter: function(value, context) {
-                                return '$' + value.toLocaleString('es-MX'); // 1200
+                                return '$' + formatNumber(value); // 1200
                             }
                         }
 
@@ -112,7 +112,17 @@
 
                 //merge all options into to main chart options
                 $.extend(true, this.cfg.config, options);
-                };
+            };
+            
+            function formatNumber(value) {
+                if (value >= 1_000_000) {
+                    return (value / 1_000_000).toFixed(1).replace('.0','') + ' Millones';
+                }
+                if (value >= 1_000) {
+                    return (value / 1_000).toFixed(1).replace('.0','') + ' Mil';
+                }
+                return value.toLocaleString('es-MX');
+            }
 
             function charExtenderDonut() {
                 var options = {
@@ -128,7 +138,7 @@
                             datalabels: {
                                 font: 'bold 16px sans-serif',
                                 formatter: function (value, context) {
-                                    return '$' + value.toLocaleString('es-MX'); // 1200
+                                    return '$' + formatNumber(value); // 1200
                                 }
                             }
 
@@ -230,7 +240,9 @@
 			                    </p:column>
 			
 			                    <p:column headerText="Pendiente por cobrar (efectivo)" style="text-align:center">
-			                        <h:outputText value="#{ventas.total_por_efectivo}" />
+                                                <h:outputText value="#{ventas.total_por_efectivo}" >
+                                                    <f:convertNumber currencySymbol="$" type="currency" />
+                                                </h:outputText>
 			                    </p:column>
 			
 			                </p:dataTable>

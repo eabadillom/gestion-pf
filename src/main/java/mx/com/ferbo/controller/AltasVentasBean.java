@@ -103,7 +103,7 @@ public class AltasVentasBean implements Serializable
     
     public void seleccionarEmisor()
     {
-        this.emisoresCFDIS = this.plantaSelected.getIdEmisoresCFDIS();
+        this.emisoresCFDIS = (this.plantaSelected != null) ? this.plantaSelected.getIdEmisoresCFDIS() : null;
     }
     
     public void crearVenta() 

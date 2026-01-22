@@ -150,7 +150,7 @@ public class UtilidadPorMesMensualStackedBar implements Serializable
         tooltip.setMode("index");
         tooltip.setIntersect(false);
         options.setTooltip(tooltip);
-
+        
         return options;
     }
 

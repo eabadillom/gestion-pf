@@ -20,7 +20,7 @@
                         <p:ajax oncomplete="PF('statusInfoDialog').hide();" />
                     </p:selectOneMenu>
                 </div>
-                <div class="p-col-12 p-md-4">
+                <div class="p-col-12 p-md-6">
                     <p:outputLabel value="Emisor: " />
                     <p:selectOneMenu id="emisorDetalle" autoWidth="false" converter="entityConverter" value="#{consultaVentasBean.ventaSelected.cdEmisor}" onchange="PF('statusInfoDialog').show();" disabled="true" >  
                         <f:selectItem itemLabel="Selecciona un emisor" noSelectionOption="true" />
@@ -52,18 +52,18 @@
                 </p:dataTable>
             </div>
             <p:separator style="margin: 1rem" />
-            <div class="formgrid grid" style="text-align: right" >
-                <div class="p-col-12">
-                    <p:outputLabel value="Total: " styleClass="font-bold" />
-                    <p:inputNumber value="#{consultaVentasBean.ventaSelected.total}" symbol="$" symbolPosition="p"
-                                   decimalPlaces="2" thousandSeparator="," decimalSeparator="." style="width:20%; text-align:right;" disabled="true" />
-                </div>
-            </div>
-            <div class="formgrid grid" style="text-align: right" >
-                <div class="p-col-12">
-                    <p:outputLabel value="Monto en Letra: " styleClass="font-bold" />
-                    <p:inputTextarea value="#{consultaVentasBean.ventaSelected.montoLetra}" style="width:90%; text-align:right;" disabled="true" />
-                </div>
+            <div class="formgrid grid" style="text-align: right" > 
+                <div class="p-col-12"> 
+                    <p:outputLabel value="Total: " styleClass="font-bold" /> 
+                    <p:inputNumber value="#{consultaVentasBean.ventaSelected.total}" symbol="$" symbolPosition="p" 
+                                   decimalPlaces="2" thousandSeparator="," decimalSeparator="." style="width:20%; text-align:right;" disabled="true" /> 
+                </div> 
+            </div> 
+            <div class="formgrid grid" style="text-align: right" > 
+                <div class="p-col-12"> 
+                    <p:outputLabel value="Monto en Letra: " styleClass="font-bold" /> 
+                    <p:inputTextarea value="#{consultaVentasBean.ventaSelected.montoLetra}" style="width:90%; text-align:right;" disabled="true" /> 
+                </div> 
             </div>
         </p:outputPanel>
         <f:facet name="footer">
