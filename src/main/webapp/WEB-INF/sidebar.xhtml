@@ -59,7 +59,11 @@
 							<p:menuitem value="Facturar Servicios" icon="pi pi-briefcase" outcome="/protected/catalogos/facturacionServicios" />
 							<p:menuitem value="Consultar" icon="pi pi-user-edit" outcome="/protected/catalogos/facMantenimiento" />
 							<p:menuitem value="Modificar Plazos de Pago" icon="pi pi-pencil" outcome="/protected/catalogos/modPlazosPago" />
-							<p:submenu id="frb_facturacion_sm1" label="Catálogos" icon="pi pi-fw pi-th-large">
+                                                        <p:submenu id="frb_ventas" label="Ventas" icon="pi pi-dollar" >
+                                                            <p:menuitem value="Alta" icon="pi pi-fw pi-check" outcome="/protected/catalogos/ventas/alta/principal" />
+                                                            <p:menuitem value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/ventas/consultar/principal" />
+                                                        </p:submenu>
+                                                        <p:submenu id="frb_facturacion_sm1" label="Catálogos" icon="pi pi-fw pi-th-large">
 		              				<p:menuitem value="Plantas" outcome="/protected/catalogos/plantas" icon="pi pi-building" />
 								<p:menuitem id="frb_facturacion_sm122" value="Emisores CFDI" icon="pi pi-building " outcome="/protected/catalogos/EmisoresCFDIS" />							
 								<p:menuitem value="Clientes" outcome="/protected/catalogos/clientes" icon="pi pi-fw pi-user" />
@@ -78,6 +82,9 @@
 						<p:submenu id="frb_facturacion_ingresos" label="Ingresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem id="frb_facturacion_ingresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/ingAlta" />
 							<p:menuitem id="frb_facturacion_ingresos_actualizar" value="Consultar" icon="pi pi-fw pi-search" outcome="/protected/catalogos/ingAct" />
+						</p:submenu>
+                                                <p:submenu id="frb_facturacion_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+							<p:menuitem id="facturacion_egresos" value="Alta/Consulta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos" />
 						</p:submenu>
 						<p:submenu label="Notas de Credito" icon="pi pi-file-o" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />

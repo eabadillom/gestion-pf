@@ -27,7 +27,6 @@ public class RepOcupacionCamaraDAO {
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
 			
 			
 			listaOcupacionCamara = new ArrayList<OcupacionCamara>();
@@ -42,6 +41,7 @@ public class RepOcupacionCamaraDAO {
 						"cam.CAMARA_ABREV AS camara_abrev, " + 
 						"cam.CAMARA_DS AS camara_ds, " + 						
 						"plt.PLANTA_DS AS planta_ds, " + 
+                                                "plt.PLANTA_ABREV AS planta_abrev, " +
 						"SUM(CEILING((parEnt.cantidad_total - COALESCE(salidas.cantidad, 0)) * parEnt.no_tarimas / parEnt.CANTIDAD_TOTAL )) as tarima, " +
 						"cam.total_posiciones AS total_pos " + 
 					"from " + 
@@ -99,7 +99,8 @@ public class RepOcupacionCamaraDAO {
 						"camara_cve, " + 
 						"camara_ds, " + 
 						"camara_abrev, " + 
-						"planta_ds " + 
+						"planta_ds, " + 
+                                                "planta_abrev " +
 						"ORDER BY " + 
 						"camara_cve " + 
 					") I " + 
@@ -109,7 +110,8 @@ public class RepOcupacionCamaraDAO {
 					"I.camara_cve, " + 
 					"I.camara_ds, " + 
 					"I.camara_abrev , " + 
-					"I.planta_ds";
+					"I.planta_ds," +
+                                        "I.planta_abrev";
 			
 			Query query = em.createNativeQuery(sql)
 					.setParameter("Fecha", fecha)
@@ -129,6 +131,7 @@ public class RepOcupacionCamaraDAO {
 				oc.setCamara_abrev((String) o[id++]);
 				oc.setCamara_ds((String) o[id++]);
 				oc.setPlanta_ds((String) o[id++]);
+                                oc.setPlanta_abrev((String) o[id++]);
 				oc.setTarima((BigDecimal)o[id++]);//setear al objeto total posiciones y posiciones disponibles
 				oc.setTotal_pos((Integer) o[id++]);				
 				oc.setPosiciones_Disponibles((BigDecimal)o[id++]);
@@ -141,7 +144,7 @@ public class RepOcupacionCamaraDAO {
 		} catch (Exception e) {
 			log.info("Error al obtener Ocupacion de Camaras " + e.getMessage());
 		}finally {
-			em.close();
+			EntityManagerUtil.close(em);
 		}
 		
 		

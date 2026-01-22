@@ -43,7 +43,6 @@
 		<class>mx.com.ferbo.model.ConstanciaDepositoDetalle</class>
 		<class>mx.com.ferbo.model.Bancos</class>
 		<class>mx.com.ferbo.model.CandadoSalida</class>
-		<class>mx.com.ferbo.model.ChequeDevuelto</class>
 		<class>mx.com.ferbo.model.CuotaMensualServicio</class>
 		<class>mx.com.ferbo.model.Formato</class>
 		<class>mx.com.ferbo.model.ConstanciaTraspaso</class>

@@ -8,6 +8,7 @@ public class OcupacionCamara {
 	private String camara_abrev;
 	private String camara_ds;
 	private String planta_ds;
+        private String planta_abrev;
 	private BigDecimal tarima;//agregar posiciones que permite la camara  y posiciones disponibles
 	private Integer total_pos;
 	private BigDecimal posiciones_Disponibles;
@@ -46,6 +47,14 @@ public class OcupacionCamara {
 
 	public void setPlanta_ds(String planta_ds) {
 		this.planta_ds = planta_ds;
+	}
+        
+        public String getPlanta_abrev() {
+		return planta_abrev;
+	}
+
+	public void setPlanta_abrev(String planta_abrev) {
+		this.planta_abrev = planta_abrev;
 	}
 
 	public BigDecimal getTarima() {
