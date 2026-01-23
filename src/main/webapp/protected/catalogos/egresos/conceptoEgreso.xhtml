@@ -14,14 +14,10 @@
               resizable="false"
               width="950">
 
-        <!-- Asignación del PADRE -->
-        <f:event type="preRenderComponent"
-                 listener="#{conceptoEgresoBean.setPadre(categoriaEgresoBean.selected)}" />
-
         <h:form id="formConcepto">
 
             <ui:decorate template="/protected/catalogos/catalogoBase.xhtml">
-                <ui:param name="catalogoBean" value="#{conceptoEgresoBean}" />
+                <ui:param name="catalogoBean" value="#{catConceptoEgresoBean}" />
 
                 <!-- NO USAMOS DESCRIPCIÓN -->
                 <ui:define name="campoDescripcion" />

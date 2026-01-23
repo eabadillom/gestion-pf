@@ -38,15 +38,15 @@ public class CategoriaEgresoDAO extends BaseDAO<CategoriaEgreso, Integer> {
         }
     }
 
-    public List<CategoriaEgreso> buscarTodosPorTipoEgresoYActivo(Integer id, boolean activo) throws DAOException {
+    public List<CategoriaEgreso> buscarTodosPorTipoEgresoYActivo(Integer id, boolean vigente) throws DAOException {
         List<CategoriaEgreso> lista = null;
         EntityManager em = null;
         try {
             em = super.getEntityManager();
-            lista = em.createNamedQuery("CargoEgreso.findAllByTipoEgresoYActivo", CategoriaEgreso.class).setParameter("id", id).setParameter("activo", activo).getResultList();
+            lista = em.createNamedQuery("CategoriaEgreso.findAllByTipoEgresoYVigenteONoVigente", CategoriaEgreso.class).setParameter("id", id).setParameter("vigente", vigente).getResultList();
             return lista;
         } catch (Exception ex) {
-            String estado = activo ? "activo" : "no activo";
+            String estado = vigente ? "activo" : "no activo";
             log.error("Error al buscar todas las categorias del tipo de egreso con id {} y estado {}. {}", id, estado, ex);
             throw new DAOException("Hubo un problema al buscar el listado de categoria en base al tipo y estado");
         } finally {

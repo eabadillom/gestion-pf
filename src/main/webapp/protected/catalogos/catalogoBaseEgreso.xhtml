@@ -8,18 +8,7 @@
 
     <ui:insert name="loadingDialog"/>
 
-    <ui:insert name="toolbar">
-        <p:toolbar styleClass="p-mb-4">
-            <p:toolbarGroup>
-                <ui:insert name="botonAgregar"/>
-
-                <p:outputLabel value="Vigentes:" style="margin-right:8px" />
-                <p:inputSwitch value="#{catalogoBean.estado}">
-                    <p:ajax listener="#{catalogoBean.vigentesONoVigentes()}" process="@this" update="form:tabla" />
-                </p:inputSwitch>
-            </p:toolbarGroup>
-        </p:toolbar>
-    </ui:insert>
+    <ui:insert name="toolbar"/>
 
     <ui:insert name="dataTable">
         <p:dataTable id="tabla" value="#{catalogoBean.lst}" var="item" rowKey="#{item.id}" 
@@ -46,12 +35,18 @@
             </p:column>
         </p:dataTable>
     </ui:insert>
-                
+
     <ui:insert name="dlgEdicion">
         <p:dialog id="dialog" widgetVar="dlg"
-                  header="#{catalogoBean.selected.id == null ? 'Nuevo' : 'Editar'}" 
                   showEffect="fade" modal="false" responsive="true" resizable="false" 
                   cache="false" style="max-width:80em !important;" dynamic="true">
+            
+            <f:facet name="header">
+                <ui:insert name="tituloDialogo">
+                    <h:outputText value="#{catalogoBean.selected.id == null ? 'Nuevo' : 'Editar'}"
+                                  style="font-size:1.3rem; font-weight:bold;" />
+                </ui:insert>
+            </f:facet>
 
             <h:form id="dialogForm">
 
@@ -67,6 +62,9 @@
                             </div>
                             <div class="p-col-12 p-md-6 p-lg-6">
                                 <ui:insert name="camposExtra" />
+                            </div>
+                            <div class="p-col-12">
+                                <ui:insert name="tablaDialogo" />
                             </div>
                         </div>
                     </p:scrollPanel>

@@ -25,17 +25,14 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
 
     private static final Logger log = LogManager.getLogger(CategoriaEgresoBean.class);
 
-    @Override
     protected CategoriaEgreso crearNueva() {
         return new CategoriaEgreso();
     }
 
-    @Override
     protected void asignarPadre(CategoriaEgreso entidad) {
         entidad.setTipoEgreso(padre);
     }
 
-    @Override
     protected String guardarConPadre(CategoriaEgreso entidad) throws InventarioException {
         entidad.setTipoEgreso(padre);
         return "Categoria de egreso " + bl.agregarOActualizar(entidad);
@@ -61,4 +58,39 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
         log.error("{}. {}", msg, ex);
     }
 
+    public void cargarCategorias(TipoEgreso padre){
+        try{
+            TipoEgreso father = (padre == null) ? new TipoEgreso() : padre;
+            setPadre(father);
+            lst = cargar();addInfo("Las categorias se cargarón exitosamente");
+        } catch (InventarioException ex) {
+            logWarn(ex.getMessage(), ex);
+            addWarn("Hubo un problema al buscar las categorias asociadas al tipo de egreso.");
+        } catch (Exception ex) {
+            logError(ex.getMessage(), ex);
+            addError("Error desconocido al buscar las categorias. Contacte con el administrador.");
+        } finally {
+            super.actualizaciones();
+        }
+    }
+
+    @Override
+    protected void cargarConPadre(TipoEgreso entidad) throws InventarioException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    protected void guardarConPadre(TipoEgreso entidad) throws InventarioException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    protected String guardar() throws InventarioException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    protected CategoriaEgreso nuevo() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

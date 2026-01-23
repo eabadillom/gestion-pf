@@ -26,17 +26,14 @@ public class CatConceptoEgresoBean
 
     private static final Logger log = LogManager.getLogger(CatConceptoEgresoBean.class);
 
-    @Override
     protected CatConceptoEgreso crearNueva() {
         return new CatConceptoEgreso();
     }
 
-    @Override
     protected void asignarPadre(CatConceptoEgreso entidad) {
         entidad.setCategoriaEgreso(padre);
     }
 
-    @Override
     protected String guardarConPadre(CatConceptoEgreso entidad) throws InventarioException {
         entidad.setCategoriaEgreso(padre);
         return "Catalogo de concepto de egreso " + bl.agregarOActualizar(entidad);
@@ -60,5 +57,25 @@ public class CatConceptoEgresoBean
     @Override
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
+    }
+
+    @Override
+    protected void cargarConPadre(CategoriaEgreso entidad) throws InventarioException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    protected void guardarConPadre(CategoriaEgreso entidad) throws InventarioException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    protected String guardar() throws InventarioException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    protected CatConceptoEgreso nuevo() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
