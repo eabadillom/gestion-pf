@@ -16,32 +16,14 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, TipoEgreso>{
+public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, TipoEgreso> {
 
-        private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Inject
     private CategoriaEgresoBL bl;
 
     private static final Logger log = LogManager.getLogger(CategoriaEgresoBean.class);
-
-    protected CategoriaEgreso crearNueva() {
-        return new CategoriaEgreso();
-    }
-
-    protected void asignarPadre(CategoriaEgreso entidad) {
-        entidad.setTipoEgreso(padre);
-    }
-
-    protected String guardarConPadre(CategoriaEgreso entidad) throws InventarioException {
-        entidad.setTipoEgreso(padre);
-        return "Categoria de egreso " + bl.agregarOActualizar(entidad);
-    }
-
-    @Override
-    protected List<CategoriaEgreso> cargar() throws InventarioException {
-        return bl.obtenerCateogiasPorTipoYEstado(padre, estado);
-    }
 
     @Override
     protected void logInfo(String msg) {
@@ -58,11 +40,18 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
         log.error("{}. {}", msg, ex);
     }
 
-    public void cargarCategorias(TipoEgreso padre){
-        try{
-            TipoEgreso father = (padre == null) ? new TipoEgreso() : padre;
-            setPadre(father);
-            lst = cargar();addInfo("Las categorias se cargarón exitosamente");
+    @Override
+    protected List<CategoriaEgreso> cargar() throws InventarioException {
+        return bl.obtenerCateogiasPorTipoYEstado(padre, estado);
+    }
+
+    @Override
+    public void cargarHijos(TipoEgreso tipo) {
+        try {
+            titulo = "Categorias";
+            setPadre((tipo == null) ? new TipoEgreso() : tipo);
+            lst = cargar();
+            addInfo("Las categorias se cargarón exitosamente");
         } catch (InventarioException ex) {
             logWarn(ex.getMessage(), ex);
             addWarn("Hubo un problema al buscar las categorias asociadas al tipo de egreso.");
@@ -75,22 +64,31 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
     }
 
     @Override
-    protected void cargarConPadre(TipoEgreso entidad) throws InventarioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected CategoriaEgreso crearNueva() {
+        return new CategoriaEgreso();
     }
 
     @Override
-    protected void guardarConPadre(TipoEgreso entidad) throws InventarioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected void asignarPadre() {
+        selected.setTipoEgreso(padre);
     }
 
     @Override
-    protected String guardar() throws InventarioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected String guardarConPadre() throws InventarioException {
+        selected.setTipoEgreso(padre);
+        return bl.agregarOActualizar(selected);
     }
 
     @Override
-    protected CategoriaEgreso nuevo() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void verificarVigenciaHijos(TipoEgreso tipo) throws InventarioException {
+
+        List<CategoriaEgreso> categorias
+                = bl.obtenerCateogiasPorTipoYEstado(tipo, true);
+
+        if (!categorias.isEmpty()) {
+            throw new InventarioException(
+                    "No se puede cancelar el tipo de egreso por tener categorias vigentes."
+            );
+        }
     }
 }

@@ -16,33 +16,14 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class CatConceptoEgresoBean
-        extends AbstractCatEgresoBean<CatConceptoEgreso, CategoriaEgreso> {
+public class CatConceptoEgresoBean extends AbstractCatEgresoBean<CatConceptoEgreso, CategoriaEgreso> {
 
-        private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Inject
     private CatConceptoEgresoBL bl;
 
     private static final Logger log = LogManager.getLogger(CatConceptoEgresoBean.class);
-
-    protected CatConceptoEgreso crearNueva() {
-        return new CatConceptoEgreso();
-    }
-
-    protected void asignarPadre(CatConceptoEgreso entidad) {
-        entidad.setCategoriaEgreso(padre);
-    }
-
-    protected String guardarConPadre(CatConceptoEgreso entidad) throws InventarioException {
-        entidad.setCategoriaEgreso(padre);
-        return "Catalogo de concepto de egreso " + bl.agregarOActualizar(entidad);
-    }
-
-    @Override
-    protected List<CatConceptoEgreso> cargar() throws InventarioException {
-        return bl.obtenerPorCategoriaYVigencia(padre, estado);
-    }
 
     @Override
     protected void logInfo(String msg) {
@@ -60,22 +41,61 @@ public class CatConceptoEgresoBean
     }
 
     @Override
-    protected void cargarConPadre(CategoriaEgreso entidad) throws InventarioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected CatConceptoEgreso crearNueva() {
+        return new CatConceptoEgreso();
     }
 
     @Override
-    protected void guardarConPadre(CategoriaEgreso entidad) throws InventarioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected void asignarPadre() {
+        selected.setCategoriaEgreso(padre);
     }
 
     @Override
-    protected String guardar() throws InventarioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected String guardarConPadre() throws InventarioException {
+        selected.setCategoriaEgreso(padre);
+        return bl.agregarOActualizar(selected);
     }
 
     @Override
-    protected CatConceptoEgreso nuevo() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected List<CatConceptoEgreso> cargar() throws InventarioException {
+        return bl.obtenerPorCategoriaYVigencia(padre, estado);
+    }
+
+    @Override
+    public void cargarHijos(CategoriaEgreso categoria) {
+        try {
+            titulo = "gresos";
+            setPadre((categoria == null) ? new CategoriaEgreso() : categoria);
+            lst = cargar();
+            addInfo("Los conceptos se cargaron de forma exitosa.");
+        } catch (InventarioException ex) {
+            logWarn(ex.getMessage(), ex);
+            addWarn(ex.getMessage());
+        } catch (Exception ex) {
+            logError(ex.getMessage(), ex);
+            addError(ex.getMessage());
+        } finally {
+            actualizaciones();
+        }
+    }
+
+    @Override
+    protected void verificarVigenciaHijos(CategoriaEgreso categoria) {
+        titulo = "Categoria";
+        try {
+            List<CatConceptoEgreso> conceptos = bl.obtenerPorCategoriaYVigencia(padre, true);
+            if (conceptos.size() > 0) {
+                throw new InventarioException("No se puede cancelar la categoria de egreso por tener conceptos vigentes.");
+            }
+            addInfo("Se procede a cambiar a no vigente.");
+        } catch (InventarioException ex) {
+            logWarn(ex.getMessage(), ex);
+            addWarn(ex.getMessage());
+        } catch (Exception ex){
+            logError(ex.getMessage(), ex);
+            addError("Error desconocido al cambiar la vigencia de la categoria de egreso: " + categoria.getNombre() );
+        } finally {
+            actualizaciones();
+        }
     }
 }

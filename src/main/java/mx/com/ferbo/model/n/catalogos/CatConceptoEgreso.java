@@ -31,7 +31,7 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cb_cat_conc_egre")
+    @Column(name = "cd_cat_conc_egre")
     private Integer id;
 
     @Basic(optional = false)
@@ -98,13 +98,12 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
 
     @Override
     public String getDescripcion() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDescripcion'");
+        return "Descripción valida";
     }
 
     @Override
     public void setDescripcion(String descripcion) {
-        // TODO Auto-generated method stub
+        // Vacío
     }
 
     @Override

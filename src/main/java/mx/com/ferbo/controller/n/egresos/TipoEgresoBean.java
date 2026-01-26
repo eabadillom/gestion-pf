@@ -1,4 +1,3 @@
-
 package mx.com.ferbo.controller.n.egresos;
 
 import java.util.List;
@@ -19,13 +18,16 @@ import mx.com.ferbo.util.InventarioException;
 @Named
 @ViewScoped
 public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
-    
+
     private static final long serialVersionUID = 1L;
 
     private static final Logger log = LogManager.getLogger(TipoEgreso.class);
 
-   @Inject
+    @Inject
     private TipoEgresoBL bl;
+
+    @Inject
+    private CategoriaEgresoBean categoriaBean;
 
     @PostConstruct
     public void init() {
@@ -61,5 +63,17 @@ public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
     @Override
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
+    }
+
+    public void cambiarVigencia(TipoEgreso tipo) {
+
+        try {
+            categoriaBean.verificarVigenciaHijos(tipo);
+        } catch (InventarioException ex) {
+            return;
+        }
+
+        this.selected = tipo;
+        super.cambiarVigenciaSeleccionado();
     }
 }

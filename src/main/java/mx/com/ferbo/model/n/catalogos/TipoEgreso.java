@@ -106,14 +106,12 @@ public class TipoEgreso implements Serializable, Catalogo{
 
     @Override
     public String getDescripcion() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDescripcion'");
+        return "Descripción valida";
     }
 
     @Override
     public void setDescripcion(String descripcion) {
-        // TODO Auto-generated method stub
-        
+        //vacio
     }
 
     

@@ -19,17 +19,19 @@ public abstract class AbstractCatEgresoBean <T extends Catalogo, P extends Catal
     @Override
     protected T nuevo(){
         T entidad = crearNueva();
-        asignarPadre(entidad);
+        asignarPadre();
         return entidad;
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        asignarPadre(selected);
-        return guardarConPadre(selected);
+        return guardarConPadre();
     }
     
     protected abstract T crearNueva();
-    protected abstract void asignarPadre(T entidad);
-    protected abstract String guardarConPadre(T entidad) throws InventarioException;
-}
+    protected abstract void asignarPadre();
+    protected abstract String guardarConPadre() throws InventarioException;
+    protected abstract void cargarHijos(P entidad) throws InventarioException;
+    protected abstract void verificarVigenciaHijos(P entidad) throws InventarioException;
+
+    }

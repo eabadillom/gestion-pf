@@ -60,7 +60,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         return id;
     }
 
-    public void setId(final Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -70,7 +70,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
     }
 
     @Override
-    public void setNombre(final String nombre) {
+    public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
@@ -80,7 +80,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
     }
 
     @Override
-    public void setVigente(final Boolean vigente) {
+    public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }
 
@@ -88,7 +88,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         return tipoEgreso;
     }
 
-    public void setTipoEgreso(final TipoEgreso tipoEgreso) {
+    public void setTipoEgreso(TipoEgreso tipoEgreso) {
         this.tipoEgreso = tipoEgreso;
     }
 
@@ -96,7 +96,7 @@ public class CategoriaEgreso implements Serializable, Catalogo {
         return catConceptos;
     }
 
-    public void setCatConceptos(final List<CatConceptoEgreso> catConceptos) {
+    public void setCatConceptos(List<CatConceptoEgreso> catConceptos) {
         this.catConceptos = catConceptos;
     }
 
@@ -123,14 +123,12 @@ public class CategoriaEgreso implements Serializable, Catalogo {
 
     @Override
     public String getDescripcion() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDescripcion'");
+        return "Descripción valida";
     }
 
     @Override
     public void setDescripcion(String descripcion) {
-        // TODO Auto-generated method stub
-        
+        // vacía
     }
     
 }
