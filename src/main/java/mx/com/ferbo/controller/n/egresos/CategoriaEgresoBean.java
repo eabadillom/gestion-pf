@@ -25,6 +25,9 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
 
     private static final Logger log = LogManager.getLogger(CategoriaEgresoBean.class);
 
+    @Inject
+    private CatConceptoEgresoBean conceptoBean;
+
     @Override
     protected void logInfo(String msg) {
         log.info("{}", msg);
@@ -46,24 +49,6 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
     }
 
     @Override
-    public void cargarHijos(TipoEgreso tipo) {
-        try {
-            titulo = "Categorias";
-            setPadre((tipo == null) ? new TipoEgreso() : tipo);
-            lst = cargar();
-            addInfo("Las categorias se cargarón exitosamente");
-        } catch (InventarioException ex) {
-            logWarn(ex.getMessage(), ex);
-            addWarn("Hubo un problema al buscar las categorias asociadas al tipo de egreso.");
-        } catch (Exception ex) {
-            logError(ex.getMessage(), ex);
-            addError("Error desconocido al buscar las categorias. Contacte con el administrador.");
-        } finally {
-            super.actualizaciones();
-        }
-    }
-
-    @Override
     protected CategoriaEgreso crearNueva() {
         return new CategoriaEgreso();
     }
@@ -80,15 +65,46 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
     }
 
     @Override
-    public void verificarVigenciaHijos(TipoEgreso tipo) throws InventarioException {
+    protected void verificarVigenciaHijos(TipoEgreso tipo) throws InventarioException {
+        bl.verificarExistenciaHijos(tipo);
+    }
 
-        List<CategoriaEgreso> categorias
-                = bl.obtenerCateogiasPorTipoYEstado(tipo, true);
+    @Override
+    protected void asignarHijos() throws InventarioException {
+        lst = bl.obtenerCateogiasPorTipoYEstado(padre, true);
+    }
 
-        if (!categorias.isEmpty()) {
-            throw new InventarioException(
-                    "No se puede cancelar el tipo de egreso por tener categorias vigentes."
-            );
+    public void cambiarVigencia(CategoriaEgreso categoria) {
+        try {
+            titulo = "Categoria de Egreso";
+            conceptoBean.verificarVigenciaHijos(categoria);
+            super.nuevoOExistente(categoria);
+            super.cambiarVigenciaSeleccionado();
+        } catch (InventarioException ex) {
+            logWarn(ex.getMessage(), ex);
+            addWarn(ex.getMessage());
+        } catch (Exception ex) {
+            logError(ex.getMessage(), ex);
+            addError("Error inesperado al cambiar vigencia de la categoria de egreso: " + categoria.getNombre() + ". Contacte al admistrador");
+        } finally {
+            actualizaciones();
+        }
+    }
+
+    public void preparar(CategoriaEgreso categoria) {
+        try {
+            titulo = "Categoria de Egreso";
+            super.nuevoOExistente(categoria);
+            conceptoBean.setPadre(selected);
+            conceptoBean.asignarHijos();
+        } catch (InventarioException ex) {
+            logWarn(ex.getMessage(), ex);
+            addWarn(ex.getMessage());
+        } catch (Exception ex) {
+            logError(ex.getMessage(), ex);
+            addError("Error inesperado al obtener los conceptos asociados con la categoria: " + categoria.getNombre() + ". Contacte con el admistrador.");
+        } finally {
+            actualizaciones();
         }
     }
 }

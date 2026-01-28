@@ -31,7 +31,7 @@ public abstract class AbstractCatEgresoBean <T extends Catalogo, P extends Catal
     protected abstract T crearNueva();
     protected abstract void asignarPadre();
     protected abstract String guardarConPadre() throws InventarioException;
-    protected abstract void cargarHijos(P entidad) throws InventarioException;
     protected abstract void verificarVigenciaHijos(P entidad) throws InventarioException;
+    protected abstract void asignarHijos() throws InventarioException;
 
-    }
+}

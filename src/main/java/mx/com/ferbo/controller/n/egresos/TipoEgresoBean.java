@@ -32,6 +32,7 @@ public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
     @PostConstruct
     public void init() {
         titulo = "Tipo de Egreso";
+        super.vigentesONoVigentes();
         initCatalogo();
     }
 
@@ -66,14 +67,34 @@ public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
     }
 
     public void cambiarVigencia(TipoEgreso tipo) {
-
         try {
             categoriaBean.verificarVigenciaHijos(tipo);
+            super.nuevoOExistente(tipo);
+            super.cambiarVigenciaSeleccionado();
         } catch (InventarioException ex) {
-            return;
+            logWarn(ex.getMessage(), ex);
+            addWarn(ex.getMessage());
+        } catch (Exception ex) {
+            logError(ex.getMessage(), ex);
+            addError("Error inesperado al cambiar vigencia del tipo de egreso: " + tipo.getNombre() + ". Contacte al admistrador");
+        } finally {
+            actualizaciones();
         }
+    }
 
-        this.selected = tipo;
-        super.cambiarVigenciaSeleccionado();
+    public void preparar(TipoEgreso tipo) {
+        try {
+            super.nuevoOExistente(tipo);
+            categoriaBean.setPadre(selected);
+            categoriaBean.asignarHijos();
+        } catch (InventarioException ex) {
+            logWarn(ex.getMessage(), ex);
+            addWarn(ex.getMessage());
+        } catch (Exception ex) {
+            logError(ex.getMessage(), ex);
+            addError("Error inesperado al cargar las categorias del tipo de egreso: " + tipo.getNombre() + ". Conctacte al administrador.");
+        } finally {
+            actualizaciones();
+        }
     }
 }

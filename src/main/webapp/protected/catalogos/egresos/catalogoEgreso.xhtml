@@ -5,18 +5,44 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
-    <!-- Título de la página -->
     <ui:define name="title">Catálogos de Egreso</ui:define>
 
-    <!-- Contenido principal -->
     <ui:define name="content">
 
-            <!-- =========================
-                 Tabla y Dialog TipoEgreso
-                 ========================= -->
-            <ui:include src="/protected/catalogos/egresos/tipoEgreso.xhtml" />
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
 
-           
+            <p:dialog widgetVar="statusInfoDialog" modal="true" header="Cargando información..." draggable="false"
+                      closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+
+            <p:toolbar styleClass="p-mb-4">
+                <p:toolbarGroup>
+
+                    <p:commandButton id="btnAddTipo" value="Agregar Tipo"
+                                     style="margin-right: .5rem"
+                                     action="#{tipoEgresoBean.preparar(null)}"
+                                     icon="pi pi-plus"
+                                     update=":form:tbTipo"
+                                     onstart="PF('statusInfoDialog').show();"
+                                     oncomplete="PF('statusInfoDialog').hide(); PF('dlgTipo').show()">
+                    </p:commandButton>
+
+                    <p:outputLabel value="Tipos vigentes:" style="margin-right:8px" />
+                    <p:inputSwitch id="stTipoVige" value="#{tipoEgresoBean.estado}">
+                        <p:ajax listener="#{tipoEgresoBean.vigentesONoVigentes()}" process="@this" update=":form:tbTipo" />
+                    </p:inputSwitch>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <ui:include src="/protected/catalogos/egresos/tablaTipoEgreso.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/dialogoTipoEgreso.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/dialogoCategoriaEgreso.xhtml"/>
+        </h:form>
+
     </ui:define>
 
 </ui:composition>

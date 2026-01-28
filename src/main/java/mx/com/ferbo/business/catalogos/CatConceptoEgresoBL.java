@@ -136,4 +136,15 @@ public class CatConceptoEgresoBL extends BaseCatalogosBL<CatConceptoEgreso> {
                     + categoria.getNombre() + " y " + estado);
         }
     }
+    
+    public void verificarExistenciaHijos(CategoriaEgreso categoria) throws InventarioException {
+        try {
+            List<CatConceptoEgreso> conceptos = dao.buscarPorCategoriaEgresoYEstado(categoria.getId(), Boolean.TRUE);
+            if (!conceptos.isEmpty()) {
+                throw new DAOException("No se puede cancelar la categoria de egreso por tener conceptos vigentes.");
+            }
+        } catch (DAOException ex) {
+            throw new InventarioException(ex.getMessage());
+        }
+    }
 }

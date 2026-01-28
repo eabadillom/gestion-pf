@@ -62,40 +62,13 @@ public class CatConceptoEgresoBean extends AbstractCatEgresoBean<CatConceptoEgre
     }
 
     @Override
-    public void cargarHijos(CategoriaEgreso categoria) {
-        try {
-            titulo = "gresos";
-            setPadre((categoria == null) ? new CategoriaEgreso() : categoria);
-            lst = cargar();
-            addInfo("Los conceptos se cargaron de forma exitosa.");
-        } catch (InventarioException ex) {
-            logWarn(ex.getMessage(), ex);
-            addWarn(ex.getMessage());
-        } catch (Exception ex) {
-            logError(ex.getMessage(), ex);
-            addError(ex.getMessage());
-        } finally {
-            actualizaciones();
-        }
+    protected void verificarVigenciaHijos(CategoriaEgreso entidad) throws InventarioException {
+        bl.verificarExistenciaHijos(entidad);
     }
 
     @Override
-    protected void verificarVigenciaHijos(CategoriaEgreso categoria) {
-        titulo = "Categoria";
-        try {
-            List<CatConceptoEgreso> conceptos = bl.obtenerPorCategoriaYVigencia(padre, true);
-            if (conceptos.size() > 0) {
-                throw new InventarioException("No se puede cancelar la categoria de egreso por tener conceptos vigentes.");
-            }
-            addInfo("Se procede a cambiar a no vigente.");
-        } catch (InventarioException ex) {
-            logWarn(ex.getMessage(), ex);
-            addWarn(ex.getMessage());
-        } catch (Exception ex){
-            logError(ex.getMessage(), ex);
-            addError("Error desconocido al cambiar la vigencia de la categoria de egreso: " + categoria.getNombre() );
-        } finally {
-            actualizaciones();
-        }
+    protected void asignarHijos() throws InventarioException {
+       lst = bl.obtenerPorCategoriaYVigencia(padre, Boolean.TRUE);
     }
+    
 }
