@@ -10,7 +10,6 @@ import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.ss.formula.functions.T;
 
 import mx.com.ferbo.dao.n.catalogos.CatConceptoEgresoDAO;
 import mx.com.ferbo.model.n.catalogos.CatConceptoEgreso;
@@ -127,7 +126,7 @@ public class CatConceptoEgresoBL extends BaseCatalogosBL<CatConceptoEgreso> {
     public List<CatConceptoEgreso> obtenerPorCategoriaYVigencia(CategoriaEgreso categoria, Boolean vigencia)
             throws InventarioException {
         try {
-            return dao.buscarPorCategoriaEgreso(categoria.getId());
+            return dao.buscarPorCategoriaEgresoYEstado(categoria.getId(), vigencia);
         } catch (DAOException ex) {
             String estado = vigencia ? "vigentes" : "no vigentes";
             log.warn("Error al obtener conceptos asociados con la categoria {} y {}. {}", categoria.getNombre(), estado,

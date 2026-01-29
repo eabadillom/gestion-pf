@@ -62,5 +62,10 @@ public class StatusPagoBean extends AbstractCatalogoBean<StatusPago> {
         log.error("{}. {}", msg, ex);
     }
 
+    @Override
+    protected StatusPago createNewSelected() {
+        return new StatusPago();
+    }
+
     
 }

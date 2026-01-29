@@ -63,4 +63,9 @@ public class TipoCargoBean extends AbstractCatalogoBean<TipoCargo> {
         log.error("{}. {}", msg, ex);
     }
 
+    @Override
+    protected TipoCargo createNewSelected() {
+        return new TipoCargo();
+    }
+
 }

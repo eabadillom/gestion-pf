@@ -25,22 +25,24 @@
                                      style="width:100%" />
                     </div>
 
-                    <div class="p-col-12 p-md-6">
-                        <p:outputPanel style="display:flex; align-items:center; gap:0.5rem;">
+                    <div class="p-col-12 p-md-6"></div>
 
-                            <p:commandButton id="btnAddConc" value="Agregar Concepto"
-                                             icon="pi pi-plus"
-                                             process="@this"/>
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton id="btnAddConc" value="Agregar Concepto"
+                                         icon="pi pi-plus"
+                                         process="@this"
+                                         action="#{catConceptoEgresoBean.nuevoOExistente(null)}"
+                                         update="form:dlgConc"
+                                         oncomplete="PF('dlgConc').show()"
+                                         disabled="#{categoriaEgresoBean.selected.id eq null}"/>
+                    </div>
 
-                            <p:outputLabel value="Conceptos vigentes:" />
-
-                            <p:inputSwitch id="stConcVig" value="#{catConceptoEgresoBean.estado}">
-                                <p:ajax listener="#{catConceptoEgresoBean.vigentesONoVigentes}"
-                                        process="@this"
-                                        />
-                            </p:inputSwitch>
-
-                        </p:outputPanel>
+                    <div class="p-col-12 p-md-3">
+                        <p:outputLabel for="stConcVige" value="Conceptos vigentes:" />
+                        <p:inputSwitch id="stConcVige" value="#{catConceptoEgresoBean.estado}">
+                            <p:ajax listener="#{catConceptoEgresoBean.vigentesONoVigentes}"
+                                    process="@this" update="form:tbConc"/>
+                        </p:inputSwitch>
                     </div>
 
                     <div class="p-col-12">
@@ -54,7 +56,9 @@
 
                                 <p:commandButton id="btnEditConc" icon="pi pi-pencil" styleClass="ui-button-info p-mr-2"
                                                  process="@this"
-                                                 />
+                                                 action="#{catConceptoEgresoBean.nuevoOExistente(item)}"
+                                                 update="form:dlgConc"
+                                                 oncomplete="PF('dlgConc').show()"/>
 
 
                                 <p:commandButton id="btnCambConcVige"
@@ -62,7 +66,8 @@
                                                  styleClass="#{item.vigente ? 'ui-button-danger' : 'ui-button-success'} p-ml-2"
                                                  title="#{item.vigente ? 'Deshabilitar' : 'Habilitar'}"
                                                  process="@this"
-                                                 >
+                                                 update="form:tbConc"
+                                                 action="#{catConceptoEgresoBean.cambiarVigenciaSeleccionado(item)}">
                                 </p:commandButton>
                             </p:column>
 
@@ -71,21 +76,24 @@
 
                 </div>
             </p:scrollPanel>
-            
+
         </p:outputPanel>
-        
+
         <f:facet name="footer">
             <p:commandButton id="btnOperCate"
-                value="#{tipoEgresoBean.selected.id == null ? 'Guardar' : 'Actualizar'}"
-                icon="pi pi-save"
-                action="#{tipoEgresoBean.operar}"
-                update=":form:dlgTipo"
-                process="@this" />
+                             value="#{categoriaEgresoBean.selected.id == null ? 'Guardar' : 'Actualizar'}"
+                             icon="pi pi-save"
+                             action="#{tipoEgresoBean.operar}"
+                             update="form:tbCate"
+                             process="@this" />
 
             <p:commandButton id="btnCancCate"
-                value="Cancelar"
-                icon="pi pi-times"
-                styleClass="ui-button-secondary p-ml-2" />
+                             value="Cancelar"
+                             icon="pi pi-times"
+                             styleClass="ui-button-secondary p-ml-2" 
+                             action="#{categoriaEgresoBean.limpiarSelect()}"
+                             process="@this"
+                             oncomplete="PF('dlgCate').hide()"/>
         </f:facet>
 
     </p:dialog>

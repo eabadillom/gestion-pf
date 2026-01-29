@@ -67,4 +67,9 @@ public class StatusActivoFijoBean extends AbstractCatalogoBean<StatusActivoFijo>
         log.error("{}. {}", msg, ex);
     }    
 
+    @Override
+    protected StatusActivoFijo createNewSelected() {
+        return new StatusActivoFijo();
+    }
+
 }

@@ -26,7 +26,7 @@
                                      style="margin-right: .5rem"
                                      action="#{tipoEgresoBean.preparar(null)}"
                                      icon="pi pi-plus"
-                                     update=":form:tbTipo"
+                                     update=":form:dlgTipo"
                                      onstart="PF('statusInfoDialog').show();"
                                      oncomplete="PF('statusInfoDialog').hide(); PF('dlgTipo').show()">
                     </p:commandButton>
@@ -41,6 +41,7 @@
             <ui:include src="/protected/catalogos/egresos/tablaTipoEgreso.xhtml"/>
             <ui:include src="/protected/catalogos/egresos/dialogoTipoEgreso.xhtml"/>
             <ui:include src="/protected/catalogos/egresos/dialogoCategoriaEgreso.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/dialogoConceptoEgreso.xhtml"/>
         </h:form>
 
     </ui:define>

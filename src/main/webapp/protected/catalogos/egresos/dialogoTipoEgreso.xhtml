@@ -25,25 +25,26 @@
                                      style="width:100%" />
                     </div>
 
-                    <div class="p-col-12 p-md-6">
-                        <p:outputPanel style="display:flex; align-items:center; gap:0.5rem;">
+                    <div class="p-col-12 p-md-6"></div>
 
-                            <p:commandButton id="btnAddCate" value="Agregar Categoría"
-                                             icon="pi pi-plus" 
-                                             action="#{categoriaEgresoBean.preparar(null)}"
-                                             process="@this"
-                                             update="form:dlgCate"
-                                             oncomplete="PF('dlgCate').show()"/>
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton id="btnAddCate" value="Agregar Categoría"
+                                         icon="pi pi-plus" 
+                                         action="#{categoriaEgresoBean.preparar(null)}"
+                                         process="@this"
+                                         update="form:dlgCate"
+                                         oncomplete="PF('dlgCate').show()"
+                                         disabled="#{tipoEgresoBean.selected.id eq null}"/>
+                    </div>
 
-                            <p:outputLabel value="Categorias vigentes:" />
-
-                            <p:inputSwitch id="stCateVig" value="#{categoriaEgresoBean.estado}">
-                                <p:ajax listener="#{categoriaEgresoBean.vigentesONoVigentes}"
-                                        process="@this"
-                                        />
-                            </p:inputSwitch>
-
-                        </p:outputPanel>
+                    <div class="p-col-12 p-md-3">
+                        <p:outputLabel for="stCateVige" value="Categorias vigentes:" />
+                        <p:inputSwitch id="stCateVige" value="#{categoriaEgresoBean.estado}">
+                            <p:ajax listener="#{categoriaEgresoBean.vigentesONoVigentes}"
+                                    process="@this"
+                                    update="form:tbCate"
+                                    />
+                        </p:inputSwitch>
                     </div>
 
                     <div class="p-col-12">
@@ -67,6 +68,7 @@
                                                  styleClass="#{item.vigente ? 'ui-button-danger' : 'ui-button-success'} p-ml-2"
                                                  title="#{item.vigente ? 'Deshabilitar' : 'Habilitar'}"
                                                  process="@this"
+                                                 update="form:tbCate"
                                                  action="#{categoriaEgresoBean.cambiarVigencia(item)}"
                                                  >
                                 </p:commandButton>
@@ -85,13 +87,16 @@
                              value="#{tipoEgresoBean.selected.id == null ? 'Guardar' : 'Actualizar'}"
                              icon="pi pi-save"
                              action="#{tipoEgresoBean.operar}"
-                             update=":form:dlgTipo"
+                             update="form:tbTipo"
                              process="@this" />
 
             <p:commandButton id="btnCancTipo"
                              value="Cancelar"
                              icon="pi pi-times"
-                             styleClass="ui-button-secondary p-ml-2" />
+                             styleClass="ui-button-secondary p-ml-2" 
+                             action="#{tipoEgresoBean.limpiarSelect()}"
+                             process="@this"
+                             oncomplete="PF('dlgTipo').hide()"/>
         </f:facet>
 
     </p:dialog>

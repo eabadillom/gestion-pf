@@ -31,6 +31,8 @@ public abstract class AbstractCatalogoBean<T extends Catalogo> implements Serial
         vigentesONoVigentes();
     }
 
+    protected abstract T createNewSelected();
+    
     public void nuevoOExistente(T entity) {
         selected = (entity != null) ? entity : nuevo();
     }
@@ -87,7 +89,11 @@ public abstract class AbstractCatalogoBean<T extends Catalogo> implements Serial
         PrimeFaces.current().ajax().update("form:messages");
     }
 
-     protected abstract void logInfo(String msg);
+    public void limpiarSelect() {
+        selected = null;
+    }
+
+    protected abstract void logInfo(String msg);
 
     protected abstract void logWarn(String msg, Exception ex);
 
@@ -114,6 +120,9 @@ public abstract class AbstractCatalogoBean<T extends Catalogo> implements Serial
     }
 
     public T getSelected() {
+        if (selected == null) {
+         selected = createNewSelected();
+        }
         return selected;
     }
 

@@ -68,7 +68,7 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
 
     @Basic(optional = false)
     @Column(name = "st_cfdi_dedu")
-    private Boolean requiereCFDIDecucible;
+    private Boolean requiereCFDIDeducible;
 
     @Basic(optional = false)
     @Column(name = "pc_iva", precision = 6, scale = 3)
@@ -197,12 +197,12 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
         this.esDeducible = esDeducible;
     }
 
-    public Boolean getRequiereCFDIDecucible() {
-        return requiereCFDIDecucible;
+    public Boolean getRequiereCFDIDeducible() {
+        return requiereCFDIDeducible;
     }
 
-    public void setRequiereCFDIDecucible(Boolean requiereCFDIDecucible) {
-        this.requiereCFDIDecucible = requiereCFDIDecucible;
+    public void setRequiereCFDIDeducible(Boolean requiereCFDIDeducible) {
+        this.requiereCFDIDeducible = requiereCFDIDeducible;
     }
 
     public boolean equals(Object o){
@@ -224,7 +224,7 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
         return "CatConceptoEgreso [id=" + id + ", nombre=" + nombre + ", vigente=" + vigente + ", codigoSAT="
                 + codigoSAT + ", esActivoFijo=" + esActivoFijo + ", tieneIVA=" + tieneIVA + ", tieneIEPS=" + tieneIEPS
                 + ", porcentajeIVA=" + porcentajeIVA + ", porcentajeIEPS=" + porcentajeIEPS + ", requiereCFDI="
-                + requiereCFDI + ", esDeducible=" + esDeducible + ", requiereCFDIDecucible=" + requiereCFDIDecucible
+                + requiereCFDI + ", esDeducible=" + esDeducible + ", requiereCFDIDecucible=" + requiereCFDIDeducible
                 + "]";
     }
 

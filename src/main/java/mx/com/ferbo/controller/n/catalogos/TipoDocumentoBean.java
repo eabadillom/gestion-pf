@@ -62,4 +62,10 @@ public class TipoDocumentoBean extends AbstractCatalogoBean<TipoDocumento> {
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
+
+    @Override
+    protected TipoDocumento createNewSelected() {
+        return new TipoDocumento();
+    }
+
 }

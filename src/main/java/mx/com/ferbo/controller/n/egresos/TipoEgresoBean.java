@@ -85,6 +85,7 @@ public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
     public void preparar(TipoEgreso tipo) {
         try {
             super.nuevoOExistente(tipo);
+            categoriaBean.setEstado(Boolean.TRUE);
             categoriaBean.setPadre(selected);
             categoriaBean.asignarHijos();
         } catch (InventarioException ex) {
@@ -96,5 +97,15 @@ public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
         } finally {
             actualizaciones();
         }
+    }
+
+    @Override
+    protected TipoEgreso createNewSelected() {
+        return new TipoEgreso();
+    }
+
+    @Override
+    public void limpiarSelect() {
+        selected = null;
     }
 }

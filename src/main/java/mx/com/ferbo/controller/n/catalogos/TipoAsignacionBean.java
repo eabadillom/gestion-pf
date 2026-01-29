@@ -63,4 +63,9 @@ public class TipoAsignacionBean extends AbstractCatalogoBean<TipoAsignacion> {
         log.error("{}. {}", msg, ex);
     }
 
+    @Override
+    protected TipoAsignacion createNewSelected() {
+        return new TipoAsignacion();
+    }
+
 }

@@ -21,13 +21,14 @@
                              action="#{tipoEgresoBean.preparar(item)}"
                              onstart="PF('statusInfoDialog').show();"
                              oncomplete="PF('statusInfoDialog').hide(); PF('dlgTipo').show()"
+                             process="@this"
                              update="form:dlgTipo"/>
 
             <p:commandButton id="btnCambTipoVige" icon="#{item.vigente ? 'pi pi-times' : 'pi pi-check'}"
                              styleClass="#{item.vigente ? 'ui-button-danger' : 'ui-button-success'}"
                              action="#{tipoEgresoBean.cambiarVigencia(item)}"
                              process="@this"
-                             update=":form:tbTipo" />
+                             update="form:tbTipo" />
         </p:column>
 
     </p:dataTable>

@@ -60,6 +60,11 @@ public class StatusEgresoBean extends AbstractCatalogoBean<StatusEgreso> {
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
+
+    @Override
+    protected StatusEgreso createNewSelected() {
+        return new StatusEgreso();
+    }
     
     
 }

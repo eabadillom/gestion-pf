@@ -52,7 +52,10 @@ public class CatConceptoEgresoBean extends AbstractCatEgresoBean<CatConceptoEgre
 
     @Override
     protected String guardarConPadre() throws InventarioException {
-        selected.setCategoriaEgreso(padre);
+        titulo = "Conceptos de egreso";
+        if (selected.getCategoriaEgreso() == null){
+            selected.setCategoriaEgreso(padre);
+        }
         return bl.agregarOActualizar(selected);
     }
 
@@ -68,7 +71,23 @@ public class CatConceptoEgresoBean extends AbstractCatEgresoBean<CatConceptoEgre
 
     @Override
     protected void asignarHijos() throws InventarioException {
+       titulo = "Conceptos de egreso";
        lst = bl.obtenerPorCategoriaYVigencia(padre, Boolean.TRUE);
     }
+
+    @Override
+    protected CatConceptoEgreso createNewSelected() {
+       return new CatConceptoEgreso();
+    }
     
+    public void cambiarVigenciaSeleccionado(CatConceptoEgreso categoria) {
+        titulo = "Conceptos de egreso";
+        selected = categoria;
+        super.cambiarVigenciaSeleccionado();
+    }
+
+    @Override
+    public void limpiarSelect() {
+        selected = null;
+    }
 }

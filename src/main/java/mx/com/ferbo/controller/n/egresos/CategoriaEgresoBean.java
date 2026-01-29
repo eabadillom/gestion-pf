@@ -60,7 +60,9 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
 
     @Override
     protected String guardarConPadre() throws InventarioException {
-        selected.setTipoEgreso(padre);
+        if (selected.getTipoEgreso() == null){
+            selected.setTipoEgreso(padre);
+        }
         return bl.agregarOActualizar(selected);
     }
 
@@ -95,6 +97,7 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
         try {
             titulo = "Categoria de Egreso";
             super.nuevoOExistente(categoria);
+            conceptoBean.setEstado(Boolean.TRUE);
             conceptoBean.setPadre(selected);
             conceptoBean.asignarHijos();
         } catch (InventarioException ex) {
@@ -106,5 +109,15 @@ public class CategoriaEgresoBean extends AbstractCatEgresoBean<CategoriaEgreso, 
         } finally {
             actualizaciones();
         }
+    }
+
+    @Override
+    protected CategoriaEgreso createNewSelected() {
+        return new CategoriaEgreso();
+    }
+
+    @Override
+    public void limpiarSelect() {
+        selected = null;
     }
 }
