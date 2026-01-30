@@ -19,11 +19,11 @@ public class StatusPagoBL extends BaseCatalogosBL<StatusPago>{
     private static final Logger log = LogManager.getLogger(StatusPagoBL.class);
 
     @Inject
-    private StatusPagoDAO statusPagoDAO;
+    private StatusPagoDAO dao;
 
     @PostConstruct
     public void init(){
-        setDao(statusPagoDAO);
+        setDao(dao);
     }
 
     @Override

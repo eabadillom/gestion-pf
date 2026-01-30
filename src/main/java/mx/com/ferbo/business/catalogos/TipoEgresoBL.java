@@ -19,11 +19,11 @@ public class TipoEgresoBL extends BaseCatalogosBL<TipoEgreso> {
     private static final Logger log = LogManager.getLogger(TipoEgresoBL.class);
 
     @Inject
-    private TipoEgresoDAO tipoEgresoDAO;
+    private TipoEgresoDAO dao;
 
     @PostConstruct
     public void init(){
-        setDao(tipoEgresoDAO);
+        setDao(dao);
     }
 
     @Override

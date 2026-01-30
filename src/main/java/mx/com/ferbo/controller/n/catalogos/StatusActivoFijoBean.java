@@ -21,7 +21,7 @@ public class StatusActivoFijoBean extends AbstractCatalogoBean<StatusActivoFijo>
     private static final Logger log = LogManager.getLogger(StatusActivoFijoBean.class);
 
     @Inject
-    private StatusActivoFijoBL statusActivoFijoBL;
+    private StatusActivoFijoBL bl;
 
     public StatusActivoFijoBean(){
 
@@ -36,13 +36,13 @@ public class StatusActivoFijoBean extends AbstractCatalogoBean<StatusActivoFijo>
 
     @Override
     protected List<StatusActivoFijo> cargar() throws InventarioException {
-        return statusActivoFijoBL.vigentesONoVigentes(estado);
+        return bl.vigentesONoVigentes(estado);
     }
 
 
     @Override
     protected String guardar() throws InventarioException {
-        return "El status de activo fijo se " + statusActivoFijoBL.agregarOActualizar(selected);
+        return "El status de activo fijo se " + bl.agregarOActualizar(selected);
     }
 
 
@@ -66,10 +66,5 @@ public class StatusActivoFijoBean extends AbstractCatalogoBean<StatusActivoFijo>
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }    
-
-    @Override
-    protected StatusActivoFijo createNewSelected() {
-        return new StatusActivoFijo();
-    }
 
 }

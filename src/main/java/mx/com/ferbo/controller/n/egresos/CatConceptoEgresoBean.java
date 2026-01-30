@@ -41,43 +41,26 @@ public class CatConceptoEgresoBean extends AbstractCatEgresoBean<CatConceptoEgre
     }
 
     @Override
-    protected CatConceptoEgreso crearNueva() {
+    protected List<CatConceptoEgreso> cargar() throws InventarioException {
+        return bl.obtenerPorCategoriaYVigencia(getPadre(), estado);
+    }
+
+    @Override
+    protected CatConceptoEgreso nuevo() {
         return new CatConceptoEgreso();
     }
 
     @Override
-    protected void asignarPadre() {
-        selected.setCategoriaEgreso(padre);
-    }
-
-    @Override
-    protected String guardarConPadre() throws InventarioException {
-        titulo = "Conceptos de egreso";
-        if (selected.getCategoriaEgreso() == null){
-            selected.setCategoriaEgreso(padre);
+    protected String guardar() throws InventarioException {
+        if (selected.getCategoriaEgreso() == null) {
+            selected.setCategoriaEgreso(getPadre());
         }
         return bl.agregarOActualizar(selected);
     }
 
     @Override
-    protected List<CatConceptoEgreso> cargar() throws InventarioException {
-        return bl.obtenerPorCategoriaYVigencia(padre, estado);
-    }
-
-    @Override
     protected void verificarVigenciaHijos(CategoriaEgreso entidad) throws InventarioException {
         bl.verificarExistenciaHijos(entidad);
-    }
-
-    @Override
-    protected void asignarHijos() throws InventarioException {
-       titulo = "Conceptos de egreso";
-       lst = bl.obtenerPorCategoriaYVigencia(padre, Boolean.TRUE);
-    }
-
-    @Override
-    protected CatConceptoEgreso createNewSelected() {
-       return new CatConceptoEgreso();
     }
     
     public void cambiarVigenciaSeleccionado(CatConceptoEgreso categoria) {
@@ -86,8 +69,4 @@ public class CatConceptoEgresoBean extends AbstractCatEgresoBean<CatConceptoEgre
         super.cambiarVigenciaSeleccionado();
     }
 
-    @Override
-    public void limpiarSelect() {
-        selected = null;
-    }
 }

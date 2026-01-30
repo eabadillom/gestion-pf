@@ -3,6 +3,7 @@ package mx.com.ferbo.controller.n.catalogos;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 
 import javax.faces.application.FacesMessage;
 
@@ -20,19 +21,65 @@ public abstract class AbstractCatalogoBean<T extends Catalogo> implements Serial
 
     protected List<T> lst;
     protected T selected;
+    
+    public void initCatalogo() {
+        vigentesONoVigentes();
+    }
+
+    /* Inicia Getters y Setters */
+    public List<T> getLst() {
+        return lst;
+    }
+
+    public void setLst(List<T> lst) {
+        this.lst = lst;
+    }
+
+    public T getSelected() {
+        if (selected == null) {
+            selected = nuevo();
+        }
+        return selected;
+    }
+
+    public void setSelected(T selected) {
+        this.selected = selected;
+    }
+
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    /* Finaliza Getters y Setters */
+
+    /* Incian métodos abstractos */
+    protected abstract T nuevo();
 
     protected abstract List<T> cargar() throws InventarioException;
 
     protected abstract String guardar() throws InventarioException;
 
-    protected abstract T nuevo();
+    protected abstract void logInfo(String msg);
 
-    public void initCatalogo() {
-        vigentesONoVigentes();
-    }
+    protected abstract void logWarn(String msg, Exception ex);
 
-    protected abstract T createNewSelected();
-    
+    protected abstract void logError(String msg, Exception ex);
+    /* Finalizan métodos abstractos */
+
+    /* Inician métodos reutilizables */
+
     public void nuevoOExistente(T entity) {
         selected = (entity != null) ? entity : nuevo();
     }
@@ -85,19 +132,9 @@ public abstract class AbstractCatalogoBean<T extends Catalogo> implements Serial
         }
     }
 
-    public void actualizaciones(){
+    public void actualizaciones() {
         PrimeFaces.current().ajax().update("form:messages");
     }
-
-    public void limpiarSelect() {
-        selected = null;
-    }
-
-    protected abstract void logInfo(String msg);
-
-    protected abstract void logWarn(String msg, Exception ex);
-
-    protected abstract void logError(String msg, Exception ex);
 
     protected void addInfo(String msg) {
         FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo, msg);
@@ -111,31 +148,5 @@ public abstract class AbstractCatalogoBean<T extends Catalogo> implements Serial
         FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo, msg);
     }
 
-    public List<T> getLst() {
-        return lst;
-    }
-
-    public void setLst(List<T> lst) {
-        this.lst = lst;
-    }
-
-    public T getSelected() {
-        if (selected == null) {
-         selected = createNewSelected();
-        }
-        return selected;
-    }
-
-    public void setSelected(T selected) {
-        this.selected = selected;
-    }
-
-    public Boolean getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Boolean estado) {
-        this.estado = estado;
-    }
-
+    /* Finalizan métodos reutilizables */
 }

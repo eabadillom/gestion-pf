@@ -19,11 +19,11 @@ public class TipoAsignacionBL extends BaseCatalogosBL<TipoAsignacion> {
     private static final Logger log = LogManager.getLogger(TipoAsignacionBL.class);
 
     @Inject
-    private TipoAsignacionDAO tipoAsignacionDAO;
+    private TipoAsignacionDAO dao;
 
     @PostConstruct
     public void init(){
-        setDao(tipoAsignacionDAO);
+        setDao(dao);
     }
 
     @Override

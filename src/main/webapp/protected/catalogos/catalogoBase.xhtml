@@ -5,65 +5,73 @@
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
     xmlns:p="http://primefaces.org/ui">
 
-    <!-- Mensajes -->
     <ui:insert name="mensajes">
         <p:growl id="messages" showDetail="true" />
     </ui:insert>
 
-    <!-- Diálogo de carga -->
     <ui:insert name="loadingDialog">
-        <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false"
-                  closable="false" resizable="false">
+        <p:dialog modal="true" 
+                  widgetVar="statusInfoDialog" 
+                  header="Cargando información..." 
+                  draggable="false"
+                  closable="false" 
+                  resizable="false">
             <div align="center">
                 <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
             </div>
         </p:dialog>
     </ui:insert>
 
-    <!-- Toolbar de acciones -->
     <ui:insert name="toolbar">
         <p:toolbar styleClass="p-mb-4">
             <p:toolbarGroup>
                 <p:commandButton value="Agregar"
                                  style="margin-right: .5rem"
-                                 actionListener="#{catalogoBean.nuevoOExistente(null)}"
+                                 action="#{catalogoBean.nuevoOExistente(null)}"
                                  icon="pi pi-plus"
-                                 update="form:dialogForm"
+                                 update="form:dialog"
                                  onstart="PF('statusInfoDialog').show();"
-                                 oncomplete="PF('dlg').show()">
+                                 process="@this"
+                                 oncomplete="PF('statusInfoDialog').hide(); PF('dlg').show()">
                 </p:commandButton>
 
-                <p:outputLabel value="Vigentes:" style="margin-right:8px" />
+                <p:outputLabel value="Vigentes:" 
+                               style="margin-right:8px" />
                 <p:inputSwitch value="#{catalogoBean.estado}">
-                    <p:ajax listener="#{catalogoBean.vigentesONoVigentes()}" process="@this" update="form:tabla" />
+                    <p:ajax listener="#{catalogoBean.vigentesONoVigentes()}" 
+                            process="@this" 
+                            update="form:tabla" />
                 </p:inputSwitch>
             </p:toolbarGroup>
         </p:toolbar>
     </ui:insert>
 
     <ui:insert name="dataTable">
-        <p:dataTable id="tabla" value="#{catalogoBean.lst}" var="item" rowKey="#{item.id}" 
-                     paginator="true" rows="6" paginatorPosition="bottom">
+        <p:dataTable id="tabla" 
+                     value="#{catalogoBean.lst}" 
+                     var="item" 
+                     rowKey="#{item.id}" 
+                     paginator="true" 
+                     rows="6" 
+                     paginatorPosition="bottom">
 
-            <!-- Nombre (FIJA) -->
             <p:column headerText="Nombre">
                 #{item.nombre}
             </p:column>
 
-            <!-- Descripción Variable -->
-            <ui:insert name="columnasDescripcion" />
+            <p:column headerText="Descripción">
+                #{item.descripcion}
+            </p:column>
 
-            <!-- Columnas adicionales (OPCIONAL) -->
-            <ui:insert name="columnasExtra" />
-
-            <!-- Acciones -->
             <p:column headerText="Acciones" style="width:150px">
-                <!-- Botón Editar -->
-                <p:commandButton icon="pi pi-pencil" styleClass="ui-button-info p-mr-2"
-                                 actionListener="#{catalogoBean.nuevoOExistente(item)}"
-                                 process="@this" update="form:dialog" oncomplete="PF('dlg').show()" />
+                <p:commandButton icon="pi pi-pencil" 
+                                 styleClass="ui-button-info p-mr-2"
+                                 action="#{catalogoBean.nuevoOExistente(item)}"
+                                 process="@this" 
+                                 update="form:dialog" 
+                                 onstart="PF('statusInfoDialog').show();" 
+                                 oncomplete="PF('statusInfoDialog').hide(); PF('dlg').show()" />
 
-                <!-- Botón Cambiar Vigencia -->
                 <p:commandButton id="btnVigencia"
                                  icon="#{item.vigente ? 'pi pi-times' : 'pi pi-check'}"
                                  styleClass="#{item.vigente ? 'ui-button-danger' : 'ui-button-success'} p-ml-2"
@@ -78,10 +86,16 @@
     </ui:insert>
 
     <ui:insert name="dlgEdicion">
-        <p:dialog id="dialog" widgetVar="dlg"
+        <p:dialog id="dialog" 
+                  widgetVar="dlg"
                   header="#{catalogoBean.selected.id == null ? 'Nuevo' : 'Editar'}" 
-                  showEffect="fade" modal="false" responsive="true" resizable="false" 
-                  cache="false" style="max-width:80em !important;" dynamic="true">
+                  showEffect="fade" 
+                  modal="false" 
+                  responsive="true" 
+                  resizable="false" 
+                  cache="false" 
+                  style="max-width:80em !important;" 
+                  dynamic="true">
 
             <h:form id="dialogForm">
 
@@ -90,10 +104,19 @@
                         <div class="p-grid">
                             <div class="p-col-12 p-md-6 p-lg-6">
                                 <p:outputLabel for="nombre" value="Nombre: " />
-                                <p:inputText id="nombre" value="#{catalogoBean.selected.nombre}" required="true" maxlength="100" style="width:100%" />
+                                <p:inputText id="nombre" 
+                                             value="#{catalogoBean.selected.nombre}" 
+                                             required="true" 
+                                             maxlength="100" 
+                                             style="width:100%" />
                             </div> 
                             <div class="p-col-12 p-md-6 p-lg-6">
-                                <ui:insert name="campoDescripcion" />
+                                <p:outputLabel for="descripcion" value="Descripción:" />
+                                <p:inputTextarea id="descripcion" 
+                                                 value="#{catalogoBean.selected.descripcion}"
+                                                 maxlength="255"
+                                                 autoResize="true" 
+                                                 style="width:100%" />
                             </div>
                             <div class="p-col-12 p-md-6 p-lg-6">
                                 <ui:insert name="camposExtra" />
@@ -105,14 +128,15 @@
                     <p:commandButton value="#{catalogoBean.selected.id == null ? 'Guardar' : 'Actualizar'}"
                                      icon="pi pi-save"
                                      action="#{catalogoBean.operar}"
-                                     update=":form:tabla :form:messages"
-                                     process="@this dialogForm"
-                                     oncomplete="if (!args.validationFailed) PF('dlg').hide();" />
+                                     update=":form:tabla"
+                                     process="@this"
+                                     oncomplete="PF('dlg').hide()" />
 
                     <p:commandButton value="Cancelar"
                                      icon="pi pi-times"
                                      styleClass="ui-button-secondary p-ml-2"
-                                     onclick="PF('dlg').hide(); return false;" />
+                                     immediate="true"
+                                     oncomplete="PF('dlg').hide();" />
                 </div>
             </h:form>
         </p:dialog>

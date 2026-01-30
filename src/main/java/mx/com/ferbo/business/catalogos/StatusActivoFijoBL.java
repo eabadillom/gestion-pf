@@ -19,11 +19,11 @@ public class StatusActivoFijoBL extends BaseCatalogosBL<StatusActivoFijo> {
     private static final Logger log = LogManager.getLogger(StatusActivoFijoBL.class );
 
     @Inject
-    private StatusActivoFijoDAO statusActivoFijoDAO;
+    private StatusActivoFijoDAO dao;
 
     @PostConstruct
     public void init(){
-        setDao(statusActivoFijoDAO);
+        setDao(dao);
     }
 
     @Override

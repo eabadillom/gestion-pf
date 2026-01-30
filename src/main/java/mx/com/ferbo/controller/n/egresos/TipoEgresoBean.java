@@ -27,7 +27,7 @@ public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
     private TipoEgresoBL bl;
 
     @Inject
-    private CategoriaEgresoBean categoriaBean;
+    private CategoriaEgresoBean bean;
 
     @PostConstruct
     public void init() {
@@ -68,44 +68,27 @@ public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
 
     public void cambiarVigencia(TipoEgreso tipo) {
         try {
-            categoriaBean.verificarVigenciaHijos(tipo);
-            super.nuevoOExistente(tipo);
-            super.cambiarVigenciaSeleccionado();
+            bean.verificarVigenciaHijos(tipo);
+            nuevoOExistente(tipo);
+            cambiarVigenciaSeleccionado();
         } catch (InventarioException ex) {
             logWarn(ex.getMessage(), ex);
             addWarn(ex.getMessage());
         } catch (Exception ex) {
             logError(ex.getMessage(), ex);
-            addError("Error inesperado al cambiar vigencia del tipo de egreso: " + tipo.getNombre() + ". Contacte al admistrador");
+            addError("Error inesperado al cambiar vigencia del tipo de egreso: " + tipo.getNombre()
+                    + ". Contacte al admistrador");
         } finally {
             actualizaciones();
         }
     }
 
     public void preparar(TipoEgreso tipo) {
-        try {
-            super.nuevoOExistente(tipo);
-            categoriaBean.setEstado(Boolean.TRUE);
-            categoriaBean.setPadre(selected);
-            categoriaBean.asignarHijos();
-        } catch (InventarioException ex) {
-            logWarn(ex.getMessage(), ex);
-            addWarn(ex.getMessage());
-        } catch (Exception ex) {
-            logError(ex.getMessage(), ex);
-            addError("Error inesperado al cargar las categorias del tipo de egreso: " + tipo.getNombre() + ". Conctacte al administrador.");
-        } finally {
-            actualizaciones();
-        }
+        nuevoOExistente(tipo);
+        bean.setEstado(Boolean.TRUE);
+        bean.setPadre(selected);
+        bean.setTitulo("Categoria de egreso");
+        bean.vigentesONoVigentes();
     }
 
-    @Override
-    protected TipoEgreso createNewSelected() {
-        return new TipoEgreso();
-    }
-
-    @Override
-    public void limpiarSelect() {
-        selected = null;
-    }
 }

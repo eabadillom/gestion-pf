@@ -43,7 +43,7 @@ public class AjustesBean implements Serializable
     public void catalogosEgresos(String catalogo){
         String path = null;
         try{
-            path = contextPath + "/protected/catalogos/egresos/" + catalogo +".xhtml";
+            path = contextPath + "/protected/catalogos/categresos/" + catalogo +".xhtml";
             FacesContext.getCurrentInstance().getExternalContext().redirect(path);
         } catch (Exception ex){
             log.error("Error ocuarrido al navegar entre páginas. {}", ex);

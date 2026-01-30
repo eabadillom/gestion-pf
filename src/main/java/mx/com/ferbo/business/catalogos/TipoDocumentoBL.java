@@ -19,11 +19,11 @@ public class TipoDocumentoBL extends BaseCatalogosBL<TipoDocumento> {
     private static final Logger log = LogManager.getLogger();
 
     @Inject
-    private TipoDocumentoDAO tipoDocumentoDAO;
+    private TipoDocumentoDAO dao;
 
     @PostConstruct
     public void init(){
-        setDao(tipoDocumentoDAO);
+        setDao(dao);
     }
 
     @Override

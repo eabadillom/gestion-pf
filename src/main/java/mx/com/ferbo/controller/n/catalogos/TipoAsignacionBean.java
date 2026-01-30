@@ -21,7 +21,7 @@ public class TipoAsignacionBean extends AbstractCatalogoBean<TipoAsignacion> {
     private static final Logger log = LogManager.getLogger(TipoAsignacionBean.class);
 
     @Inject
-    private TipoAsignacionBL tipoAsignacionBL;
+    private TipoAsignacionBL bl;
 
     public TipoAsignacionBean(){
 
@@ -35,12 +35,12 @@ public class TipoAsignacionBean extends AbstractCatalogoBean<TipoAsignacion> {
 
     @Override
     protected List<TipoAsignacion> cargar() throws InventarioException {
-        return tipoAsignacionBL.vigentesONoVigentes(estado);
+        return bl.vigentesONoVigentes(estado);
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        return "El tipo de asignación se " + tipoAsignacionBL.agregarOActualizar(selected);
+        return "El tipo de asignación se " + bl.agregarOActualizar(selected);
     }
 
     @Override
@@ -62,10 +62,4 @@ public class TipoAsignacionBean extends AbstractCatalogoBean<TipoAsignacion> {
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
-
-    @Override
-    protected TipoAsignacion createNewSelected() {
-        return new TipoAsignacion();
-    }
-
 }

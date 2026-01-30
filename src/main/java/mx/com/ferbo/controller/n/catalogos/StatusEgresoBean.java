@@ -25,7 +25,7 @@ public class StatusEgresoBean extends AbstractCatalogoBean<StatusEgreso> {
         
     }
     
-     @PostConstruct
+    @PostConstruct
     public void init() {
         titulo = "Status Egreso";
         initCatalogo();
@@ -60,11 +60,5 @@ public class StatusEgresoBean extends AbstractCatalogoBean<StatusEgreso> {
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
-
-    @Override
-    protected StatusEgreso createNewSelected() {
-        return new StatusEgreso();
-    }
-    
     
 }

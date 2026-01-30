@@ -21,7 +21,7 @@ public class TipoDocumentoBean extends AbstractCatalogoBean<TipoDocumento> {
     private static final Logger log = LogManager.getLogger(TipoDocumentoBean.class);
 
     @Inject
-    private TipoDocumentoBL tipoDocumentoBL;
+    private TipoDocumentoBL bl;
 
     public TipoDocumentoBean(){
 
@@ -35,12 +35,12 @@ public class TipoDocumentoBean extends AbstractCatalogoBean<TipoDocumento> {
 
     @Override
     protected List<TipoDocumento> cargar() throws InventarioException {
-        return tipoDocumentoBL.vigentesONoVigentes(estado);
+        return bl.vigentesONoVigentes(estado);
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        return "El tipo de documento se " + tipoDocumentoBL.agregarOActualizar(selected);
+        return "El tipo de documento se " + bl.agregarOActualizar(selected);
     }
 
     @Override
@@ -62,10 +62,5 @@ public class TipoDocumentoBean extends AbstractCatalogoBean<TipoDocumento> {
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
-
-    @Override
-    protected TipoDocumento createNewSelected() {
-        return new TipoDocumento();
-    }
-
+    
 }

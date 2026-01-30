@@ -20,7 +20,7 @@ public class StatusPagoBean extends AbstractCatalogoBean<StatusPago> {
     private static final Logger log = LogManager.getLogger(StatusPagoBean.class);
 
     @Inject
-    private StatusPagoBL statusPagoBL;
+    private StatusPagoBL bl;
 
     public StatusPagoBean(){
 
@@ -34,12 +34,12 @@ public class StatusPagoBean extends AbstractCatalogoBean<StatusPago> {
 
     @Override
     protected List<StatusPago> cargar() throws InventarioException {
-        return statusPagoBL.vigentesONoVigentes(estado);
+        return bl.vigentesONoVigentes(estado);
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        return "El status de pago se " +statusPagoBL.agregarOActualizar(selected);
+        return "El status de pago se " + bl.agregarOActualizar(selected);
     }
 
     @Override
@@ -61,11 +61,5 @@ public class StatusPagoBean extends AbstractCatalogoBean<StatusPago> {
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
-
-    @Override
-    protected StatusPago createNewSelected() {
-        return new StatusPago();
-    }
-
     
 }

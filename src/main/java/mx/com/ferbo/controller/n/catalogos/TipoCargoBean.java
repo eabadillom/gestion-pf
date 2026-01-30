@@ -21,7 +21,7 @@ public class TipoCargoBean extends AbstractCatalogoBean<TipoCargo> {
     private static final Logger log = LogManager.getLogger(TipoCargoBean.class);
 
     @Inject
-    private TipoCargoBL tipoCargoBL;
+    private TipoCargoBL bl;
 
     public TipoCargoBean(){
 
@@ -35,12 +35,12 @@ public class TipoCargoBean extends AbstractCatalogoBean<TipoCargo> {
 
     @Override
     protected List<TipoCargo> cargar() throws InventarioException {
-        return tipoCargoBL.vigentesONoVigentes(estado);
+        return bl.vigentesONoVigentes(estado);
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        return "El tipo de cargo se " + tipoCargoBL.agregarOActualizar(selected);
+        return "El tipo de cargo se " + bl.agregarOActualizar(selected);
     }
 
     @Override
@@ -62,10 +62,5 @@ public class TipoCargoBean extends AbstractCatalogoBean<TipoCargo> {
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
-
-    @Override
-    protected TipoCargo createNewSelected() {
-        return new TipoCargo();
-    }
-
+    
 }

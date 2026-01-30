@@ -19,11 +19,11 @@ public class TipoCargoBL extends BaseCatalogosBL<TipoCargo> {
     private static final Logger log = LogManager.getLogger(TipoCargoBL.class);
 
     @Inject
-    private TipoCargoDAO tipoCargoDAO;
+    private TipoCargoDAO dao;
 
     @PostConstruct
     public void init(){
-        setDao(tipoCargoDAO);
+        setDao(dao);
     }
 
     @Override
