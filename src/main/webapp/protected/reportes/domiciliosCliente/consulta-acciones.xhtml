@@ -1,0 +1,29 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
+        <p:toolbar>
+            <p:toolbarGroup>
+                <div class="col-5 flex align-items-center justify-content-center">
+                    <p:commandButton value=".pdf" actionListener="#{reporteDomClienteBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" >
+                        <p:fileDownload value="#{reporteDomClienteBean.file}" />
+                    </p:commandButton>  
+                </div>
+
+                <div class="col-2">
+                    <p:divider layout="vertical">
+                    </p:divider>
+                </div>
+
+                <div class="col-5 flex align-items-center justify-content-center">
+                    <p:commandButton value=".xlsx" actionListener="#{reporteDomClienteBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" >
+                        <p:fileDownload value="#{reporteDomClienteBean.file}" />
+                    </p:commandButton>  
+                </div>
+            </p:toolbarGroup>
+        </p:toolbar>
+    </p:fieldset>
+</ui:composition>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteServicioPorCliente" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="507d1894-b9d1-4b4f-b6f1-5fca5227b189">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionLocal"/>
 	<parameter name="imagen" class="java.lang.String"/>
+	<parameter name="idCliente" class="java.lang.Integer"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT
 	c.numero_cte,
@@ -18,7 +19,7 @@ INNER JOIN precio_servicio ps ON c.cte_cve = ps.cliente
 INNER JOIN servicio s ON s.servicio_cve = ps.servicio
 INNER JOIN unidad_de_manejo u ON ps.unidad = u.unidad_de_manejo_cve
 INNER JOIN aviso a ON ps.aviso_cve = a.aviso_cve
-WHERE a.cte_cve = c.cte_cve
+WHERE a.cte_cve = c.cte_cve AND (c.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
 ORDER BY
 	c.cte_nombre ASC,
 	c.numero_cte ASC,

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DomPorCliente" pageWidth="960" pageHeight="612" columnWidth="900" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="b4fb066c-e7d8-4940-bcac-00f682040c09">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DomicilioPorCliente" pageWidth="960" pageHeight="612" columnWidth="900" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="e156fa60-e1c6-45ae-9c2a-f5765f25e202">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionLocal"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
@@ -15,64 +14,42 @@
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[new String ("resources/logo_square.gif")]]></defaultValueExpression>
 	</parameter>
+	<parameter name="idCliente" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT
-    cliente.numero_cte,
-    cliente.cte_nombre,
-    cliente.cte_rfc,
-    domicilios.dom_cve,
-    domicilios.domicilio_colonia,
-    domicilios.domicilio_calle,
-    domicilios.domicilio_num_ext,
-    domicilios.domicilio_num_int,
-    domicilios.domicilio_tel1,
-    domicilios.domicilio_tel2,
-    domicilios.domicilio_fax,
-    domicilios.domicilio_cp,
-    paises.pais_desc,
-    estados.estado_desc,
-    municipios.municipio_ds,
-    ciudades.ciudad_ds,
-    tipoasntmnto_ds,
-    asentamiento_humano.asentamiento_ds,
-    asentamiento_humano.cp
+    cl.numero_cte,
+    cl.cte_nombre,
+    cl.cte_rfc,
+    dom.dom_cve,
+    dom.domicilio_calle,
+    dom.domicilio_num_ext,
+    dom.domicilio_num_int,
+    dom.domicilio_tel1,
+    dom.domicilio_tel2,
+    dom.domicilio_fax,
+    dom.domicilio_cp,
+    p.pais_desc,
+    ed.estado_desc,
+    mn.municipio_ds,
+    cd.ciudad_ds,
+    tp.tipoasntmnto_ds,
+    ah.asentamiento_ds,
+    ah.cp
 FROM
-	cliente INNER JOIN cliente_domicilios ON cliente_domicilios.cte_cve = cliente.cte_cve
-    INNER JOIN domicilios ON domicilios.domicilio_tipo_cve = cliente_domicilios.domicilio_tipo_cve AND domicilios.dom_cve = cliente_domicilios.dom_cve
-    INNER JOIN paises ON domicilios.pais_cve = paises.pais_cve
-    INNER JOIN estados ON estados.pais_cve = paises.pais_cve
-    INNER JOIN municipios ON municipios.pais_cve = estados.pais_cve AND municipios.estado_cve = estados.estado_cve
-    INNER JOIN ciudades ON
-        ciudades.pais_cve = municipios.pais_cve 
-        AND ciudades.estado_cve = municipios.estado_cve
-        AND ciudades.municipio_cve = municipios.municipio_cve
-        AND ciudades.pais_cve = domicilios.pais_cve
-        AND ciudades.estado_cve = domicilios.estado_cve
-        AND ciudades.municipio_cve = domicilios.municipio_cve
-        AND ciudades.ciudad_cve = domicilios.ciudad_cve
-    INNER JOIN asentamiento_humano
-        ON ciudades.pais_cve = asentamiento_humano.pais_cve
-        AND ciudades.estado_cve = asentamiento_humano.estado_cve
-        AND ciudades.municipio_cve = asentamiento_humano.municipio_cve
-        AND ciudades.ciudad_cve = asentamiento_humano.ciudad_cve
-        AND asentamiento_humano.pais_cve = domicilios.pais_cve
-        AND asentamiento_humano.estado_cve = domicilios.estado_cve
-        AND asentamiento_humano.municipio_cve = domicilios.municipio_cve
-        AND asentamiento_humano.ciudad_cve = domicilios.ciudad_cve
-        AND asentamiento_humano.asentamiento_cve = domicilios.domicilio_colonia
-        AND asentamiento_humano.pais_cve = estados.pais_cve
-        AND asentamiento_humano.estado_cve = estados.estado_cve
-        AND asentamiento_humano.pais_cve = municipios.pais_cve
-        AND asentamiento_humano.estado_cve = municipios.estado_cve
-        AND asentamiento_humano.municipio_cve = municipios.municipio_cve
-        AND asentamiento_humano.pais_cve = paises.pais_cve
-    INNER JOIN tipo_asentamiento
-        ON asentamiento_humano.tipoasntmnto_cve = tipo_asentamiento.tipoasntmnto_cve
-ORDER BY cliente.cte_nombre
-
-
-
-]]>
+	cliente cl
+	INNER JOIN cliente_domicilios clDom ON clDom.cte_cve = cl.cte_cve
+    INNER JOIN domicilios dom ON dom.domicilio_tipo_cve = clDom.domicilio_tipo_cve AND dom.dom_cve = clDom.dom_cve
+    INNER JOIN asentamiento_humano ah ON ah.asentamiento_cve = dom.asentamiento_cve  AND ah.ciudad_cve = dom.ciudad_cve AND ah.municipio_cve = dom.municipio_cve 
+    	AND ah.estado_cve = dom.estado_cve AND ah.pais_cve = dom.pais_cve
+	INNER JOIN ciudades cd ON cd.ciudad_cve = ah.ciudad_cve AND cd.municipio_cve = ah.municipio_cve AND cd.estado_cve = ah.estado_cve AND cd.pais_cve = ah.pais_cve
+	INNER JOIN municipios mn ON mn.municipio_cve = cd.municipio_cve AND mn.estado_cve = cd.estado_cve AND mn.pais_cve = cd.pais_cve
+	INNER JOIN estados ed ON ed.estado_cve = mn.estado_cve AND ed.pais_cve = mn.pais_cve
+	INNER JOIN paises p ON p.pais_cve = ed.pais_cve  
+    INNER JOIN tipo_asentamiento tp ON ah.tipoasntmnto_cve = tp.tipoasntmnto_cve
+    WHERE (cl.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
+ORDER BY cl.cte_nombre]]>
 	</queryString>
 	<field name="numero_cte" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cte"/>
@@ -92,11 +69,6 @@ ORDER BY cliente.cte_nombre
 	<field name="dom_cve" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="dom_cve"/>
 		<property name="com.jaspersoft.studio.field.label" value="dom_cve"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
-	</field>
-	<field name="domicilio_colonia" class="java.lang.Integer">
-		<property name="com.jaspersoft.studio.field.name" value="domicilio_colonia"/>
-		<property name="com.jaspersoft.studio.field.label" value="domicilio_colonia"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="domicilio_calle" class="java.lang.String">
@@ -174,14 +146,14 @@ ORDER BY cliente.cte_nombre
 		<groupHeader>
 			<band height="24">
 				<textField>
-					<reportElement x="69" y="0" width="801" height="24" forecolor="#2196F3" uuid="950d8698-d547-4c1a-a25f-f105e9756423"/>
+					<reportElement x="70" y="0" width="800" height="24" forecolor="#2196F3" uuid="950d8698-d547-4c1a-a25f-f105e9756423"/>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cte_nombre}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement mode="Transparent" x="0" y="0" width="69" height="24" forecolor="#2196F3" uuid="c0e53adc-c7cc-4962-8fd9-ab8888114571"/>
+					<reportElement mode="Transparent" x="0" y="0" width="70" height="24" forecolor="#2196F3" uuid="c0e53adc-c7cc-4962-8fd9-ab8888114571"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="12" isBold="true"/>
 					</textElement>
@@ -207,7 +179,7 @@ ORDER BY cliente.cte_nombre
 				<text><![CDATA[REPORTE DOMICILIO POR CLIENTE]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="170" height="50" uuid="4ff73eda-f1d3-4f27-a7aa-89fa8979d388"/>
+				<reportElement x="0" y="0" width="170" height="51" uuid="4ff73eda-f1d3-4f27-a7aa-89fa8979d388"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
 		</band>
@@ -216,7 +188,7 @@ ORDER BY cliente.cte_nombre
 		<band height="11" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="0" y="0" width="69" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="46d4336f-2625-4bef-af03-3f1e78a4fe7e">
+				<reportElement key="" mode="Opaque" x="0" y="0" width="70" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="46d4336f-2625-4bef-af03-3f1e78a4fe7e">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -234,7 +206,7 @@ ORDER BY cliente.cte_nombre
 				<text><![CDATA[Cliente]]></text>
 			</staticText>
 			<staticText>
-				<reportElement key="" mode="Opaque" x="69" y="0" width="701" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="f4d619fe-cc32-429b-be3e-e53f3338b0ee">
+				<reportElement key="" mode="Opaque" x="70" y="0" width="700" height="11" forecolor="#F7EEED" backcolor="#2196F3" uuid="f4d619fe-cc32-429b-be3e-e53f3338b0ee">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -272,26 +244,26 @@ ORDER BY cliente.cte_nombre
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="42" splitType="Stretch">
+		<band height="47" splitType="Stretch">
 			<textField textAdjust="StretchHeight">
-				<reportElement x="69" y="0" width="701" height="20" uuid="42722fa4-a99d-438d-94a4-b70de988c1f9">
+				<reportElement x="70" y="0" width="700" height="26" uuid="42722fa4-a99d-438d-94a4-b70de988c1f9">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{domicilio_calle} + ", "+$F{domicilio_num_ext}+ ", "+$F{domicilio_num_int}+ ", "+$F{tipoasntmnto_ds} +  " ," + $F{asentamiento_ds} + " ," +$F{cp}+" ,"+$F{ciudad_ds}+", "+$F{municipio_ds} + " ,"+$F{estado_desc}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{domicilio_calle} + ", " + $F{domicilio_num_ext} + ", " +$F{domicilio_num_int} + ", " +$F{tipoasntmnto_ds} +  ", " + $F{asentamiento_ds} + ", " + $F{cp}+", "+$F{ciudad_ds} + ", " + $F{municipio_ds} + ", "+$F{estado_desc}+ ", "+$F{pais_desc}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="69" y="20" width="801" height="20" uuid="ca24af48-9a56-49bb-b59c-26b037ca1ef7"/>
-				<textElement textAlignment="Left"/>
+				<reportElement x="70" y="26" width="800" height="20" uuid="ca24af48-9a56-49bb-b59c-26b037ca1ef7"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA["Telefono:" +" "+ $F{domicilio_tel1} +"-"+ $F{domicilio_tel2}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="770" y="0" width="100" height="20" uuid="0240ffdc-2073-460e-9434-0a8ec3e3e75e"/>
+				<reportElement x="770" y="0" width="100" height="26" uuid="0240ffdc-2073-460e-9434-0a8ec3e3e75e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{cte_rfc}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="0" y="40" width="870" height="1" forecolor="#2196F3" uuid="dfdc2f69-7e8b-4978-9128-da75793a7cec">
+				<reportElement x="0" y="46" width="870" height="1" forecolor="#2196F3" uuid="dfdc2f69-7e8b-4978-9128-da75793a7cec">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 			</line>
