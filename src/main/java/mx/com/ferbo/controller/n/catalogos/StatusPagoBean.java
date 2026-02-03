@@ -3,7 +3,7 @@ package mx.com.ferbo.controller.n.catalogos;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +14,7 @@ import mx.com.ferbo.model.n.catalogos.StatusPago;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
-@RequestScoped
+@ViewScoped
 public class StatusPagoBean extends AbstractCatalogoBean<StatusPago> {
 
     private static final Logger log = LogManager.getLogger(StatusPagoBean.class);
