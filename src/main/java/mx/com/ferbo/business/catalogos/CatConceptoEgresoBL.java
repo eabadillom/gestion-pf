@@ -11,9 +11,9 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.catalogos.CatConceptoEgresoDAO;
-import mx.com.ferbo.model.n.catalogos.CatConceptoEgreso;
-import mx.com.ferbo.model.n.catalogos.CategoriaEgreso;
+import mx.com.ferbo.dao.catalogos.CatConceptoEgresoDAO;
+import mx.com.ferbo.model.catalogos.CatConceptoEgreso;
+import mx.com.ferbo.model.catalogos.CategoriaEgreso;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
 

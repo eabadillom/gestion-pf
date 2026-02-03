@@ -8,8 +8,8 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.catalogos.StatusPagoDAO;
-import mx.com.ferbo.model.n.catalogos.StatusPago;
+import mx.com.ferbo.dao.catalogos.StatusPagoDAO;
+import mx.com.ferbo.model.catalogos.StatusPago;
 import mx.com.ferbo.util.InventarioException;
 
 @Named

@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.n.catalogos.Catalogo;
+import mx.com.ferbo.model.catalogos.Catalogo;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
 

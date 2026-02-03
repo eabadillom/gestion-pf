@@ -9,8 +9,8 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.catalogos.ConceptoEgresoDAO;
-import mx.com.ferbo.model.n.catalogos.ConceptoEgreso;
+import mx.com.ferbo.dao.catalogos.ConceptoEgresoDAO;
+import mx.com.ferbo.model.catalogos.ConceptoEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named

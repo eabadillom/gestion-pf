@@ -10,9 +10,9 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.catalogos.CategoriaEgresoDAO;
-import mx.com.ferbo.model.n.catalogos.CategoriaEgreso;
-import mx.com.ferbo.model.n.catalogos.TipoEgreso;
+import mx.com.ferbo.dao.catalogos.CategoriaEgresoDAO;
+import mx.com.ferbo.model.catalogos.CategoriaEgreso;
+import mx.com.ferbo.model.catalogos.TipoEgreso;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
 

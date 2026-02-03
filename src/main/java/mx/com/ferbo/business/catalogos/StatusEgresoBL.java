@@ -5,8 +5,8 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import mx.com.ferbo.dao.n.catalogos.StatusEgresoDAO;
-import mx.com.ferbo.model.n.catalogos.StatusEgreso;
+import mx.com.ferbo.dao.catalogos.StatusEgresoDAO;
+import mx.com.ferbo.model.catalogos.StatusEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 import org.apache.logging.log4j.LogManager;

@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.TipoAsignacionDAO;
-import mx.com.ferbo.model.n.catalogos.TipoAsignacion;
+import mx.com.ferbo.model.catalogos.TipoAsignacion;
 import mx.com.ferbo.util.InventarioException;
 
 @Named

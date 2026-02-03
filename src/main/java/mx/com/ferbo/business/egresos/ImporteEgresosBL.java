@@ -14,11 +14,11 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.egresos.ImporteEgresoDAO;
-import mx.com.ferbo.model.n.catalogos.ConceptoEgreso;
-import mx.com.ferbo.model.n.egresos.CargoEgreso;
-import mx.com.ferbo.model.n.egresos.ImporteEgreso;
-import mx.com.ferbo.model.n.egresos.PagoEgreso;
+import mx.com.ferbo.dao.egresos.ImporteEgresoDAO;
+import mx.com.ferbo.model.catalogos.ConceptoEgreso;
+import mx.com.ferbo.model.egresos.CargoEgreso;
+import mx.com.ferbo.model.egresos.ImporteEgreso;
+import mx.com.ferbo.model.egresos.PagoEgreso;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.InventarioException;

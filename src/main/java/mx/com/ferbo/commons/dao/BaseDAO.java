@@ -3,11 +3,15 @@ package mx.com.ferbo.commons.dao;
 import java.util.List;
 import java.util.Optional;
 
+import javax.enterprise.inject.Model;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.formula.functions.T;
+
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -125,6 +129,22 @@ public abstract class BaseDAO<MODEL, PK> {
 			close(em);
 		}
 		return resultados;
+	}
+
+	/* Función recomendada para modelos con muy pocos registros */
+	public List<MODEL> buscarTodos() throws DAOException {
+		EntityManager em = null;
+		List<MODEL> lista = null;
+		try {
+			em = getEntityManager(); // Método que abre un EntityManager
+			lista = em.createNamedQuery(modelClass.getSimpleName() + ".findAll", modelClass).getResultList();
+			return lista;
+		} catch (Exception ex) {
+			log.error("Error al buscar todos los registros de {}. {}", modelClass.getSimpleName(), ex);
+			throw new DAOException("Hubo un problema al buscar todos los registros de " + modelClass.getSimpleName());
+		} finally {
+			close(em); // Método que cierra el EntityManager
+		}
 	}
 
 	public synchronized void eliminar(MODEL model) throws InventarioException {
