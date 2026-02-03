@@ -60,7 +60,7 @@ public class ReporteServClienteBean implements Serializable
             context = FacesContext.getCurrentInstance();
             request = (HttpServletRequest) context.getExternalContext().getRequest();
             this.usuario = (Usuario) request.getSession(false).getAttribute("usuario");
-            log.info("El usuario {} ingresa al reporte de domicilios por cliente.", usuario.getUsuario());
+            log.info("El usuario {} ingresa al reporte de servicios por cliente.", usuario.getUsuario());
             lstClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 	}
         
@@ -113,7 +113,7 @@ public class ReporteServClienteBean implements Serializable
 			} catch (Exception ex) {
                             log.error("Problema general...", ex);
                             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se puede descargar el reporte, consulte con su administrador de sistemas");
-                            PrimeFaces.current().ajax().update("form:messages", "form:dt-ServicioPorCliente");
+                            PrimeFaces.current().ajax().update("form:messages");
 			} finally {
                             conexion.close((Connection) connection);
 			}
@@ -160,7 +160,7 @@ public class ReporteServClienteBean implements Serializable
 			} catch (Exception ex) {
                             log.error("Problema general...", ex);
                             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se puede descargar el reporte, consulte con su administrador de sistemas");
-                            PrimeFaces.current().ajax().update("form:messages", "form:dt-ServicioPorCliente");
+                            PrimeFaces.current().ajax().update("form:messages");
 			} finally {
                             conexion.close((Connection) connection);
 			}
