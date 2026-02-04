@@ -29,7 +29,6 @@
     dom.domicilio_tel1,
     dom.domicilio_tel2,
     dom.domicilio_fax,
-    dom.domicilio_cp,
     p.pais_desc,
     ed.estado_desc,
     mn.municipio_ds,
@@ -99,11 +98,6 @@ ORDER BY cl.cte_nombre]]>
 	<field name="domicilio_fax" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="domicilio_fax"/>
 		<property name="com.jaspersoft.studio.field.label" value="domicilio_fax"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
-	</field>
-	<field name="domicilio_cp" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="domicilio_cp"/>
-		<property name="com.jaspersoft.studio.field.label" value="domicilio_cp"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="domicilios"/>
 	</field>
 	<field name="pais_desc" class="java.lang.String">
@@ -255,7 +249,7 @@ ORDER BY cl.cte_nombre]]>
 			<textField>
 				<reportElement x="70" y="26" width="800" height="20" uuid="ca24af48-9a56-49bb-b59c-26b037ca1ef7"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA["Telefono:" +" "+ $F{domicilio_tel1} +"-"+ $F{domicilio_tel2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Telefono:" +" "+ $F{domicilio_tel1} +", "+ $F{domicilio_tel2}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="770" y="0" width="100" height="26" uuid="0240ffdc-2073-460e-9434-0a8ec3e3e75e"/>
@@ -278,7 +272,7 @@ ORDER BY cl.cte_nombre]]>
 				</textElement>
 				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER} + " de  "]]></textFieldExpression>
 			</textField>
-			<textField pattern="MMMMM dd, yyyy">
+			<textField pattern="dd &apos;de&apos; MMMMM &apos;de&apos; yyyy">
 				<reportElement x="0" y="0" width="113" height="8" uuid="720aa77c-0971-461f-b768-b8bdd16c1a30"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
@@ -299,7 +293,7 @@ ORDER BY cl.cte_nombre]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[NO SE ENCONTRO INFORMACION]]></text>
+				<text><![CDATA[NO SE ENCONTRÓ INFORMACIÓN]]></text>
 			</staticText>
 			<image>
 				<reportElement x="0" y="0" width="140" height="69" uuid="f05d1909-5b85-42a6-bdb3-d8361b48d2be"/>

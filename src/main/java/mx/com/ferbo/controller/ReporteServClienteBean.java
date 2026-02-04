@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -45,6 +46,7 @@ public class ReporteServClienteBean implements Serializable
         private List<Cliente> lstClientes;
         
 	private Date fecha;
+        private Locale localeMx = new Locale("es", "MX");
         private StreamedContent file;
         
         private Usuario usuario;
@@ -102,6 +104,7 @@ public class ReporteServClienteBean implements Serializable
 
                             connection = EntityManagerUtil.getConnection();
                             parameters.put("REPORT_CONNECTION", connection);
+                            parameters.put("REPORT_LOCALE", localeMx);
                             parameters.put("idCliente", idCliente);
                             parameters.put("imagen", imgfile.getPath());
                             log.info("Parametros: " + parameters.toString());
@@ -149,6 +152,7 @@ public class ReporteServClienteBean implements Serializable
 
                             connection = EntityManagerUtil.getConnection();
                             parameters.put("REPORT_CONNECTION", connection);
+                            parameters.put("REPORT_LOCALE", localeMx);
                             parameters.put("idCliente", idCliente);
                             parameters.put("imagen", imgfile.getPath());
                             log.info("Parametros: " + parameters.toString());
