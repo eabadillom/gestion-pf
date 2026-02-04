@@ -19,7 +19,7 @@
 			<p:growl id="messages" showDetail="true" life="4000"></p:growl>
 			<p:fieldset id="emisor" legend="Emisor">
 				<div class="p-grid ui-fluid p-col-12">
-					<div class="p-col-6 p-md-6">
+					<div class="p-col-12 p-md-6">
 						<p:outputLabel value="Sucursal (Planta)"/>
 						<p:selectOneMenu id="planta" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.plantaSelect}" onchange="PF('statusInfoDialog').show();">
 							<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
@@ -27,23 +27,23 @@
 							<p:ajax update="emisor" listener="#{facturaServiciosBean.serieFactura}" oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-6 p-md-6">
-						<p:outputLabel value="Razon Social"/>
+					<div class="p-col-12 p-md-6">
+						<p:outputLabel value="Razón Social"/>
 						<p:selectOneMenu id="selEmisor" value="#{facturaServiciosBean.emisor}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
 							<f:selectItem itemLabel="---SELECCIONE UN EMISOR---" noSelectionOption="true" />
 							<f:selectItems value="#{facturaServiciosBean.emisores}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"></f:selectItems>
 							<p:ajax update="emisor" process="@this" listener="#{facturaServiciosBean.filtraSeries}" />
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-6 p-md-3">
 						<p:outputLabel value="RFC"/>
 						<p:inputText id="txtRFC" value="#{facturaServiciosBean.emisor.nb_rfc}" readonly="true" /> 
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-6 p-md-3">
 						<p:outputLabel value="Código Postal"/>
 						<p:inputText id="emisorCP" value="#{facturaServiciosBean.emisor.codigoPostal}"/>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-12 p-md-3">
 						<p:outputLabel value="Serie-número (Factura)"/>
 						<p:selectOneMenu id="serieFactura" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.serieFacturaSelect}">
 							<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"/>
@@ -55,33 +55,55 @@
 			<div style="margin-top: 2rem;">
 				<p:fieldset id="receptor" legend="Receptor (Cliente)">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-6 p-md-6">
+						<div class="p-col-12 p-md-6">
 							<p:outputLabel value="Cliente" />
 							<p:selectOneMenu id="cliente" converter="entityConverter" autoWidth="false" value="#{facturaServiciosBean.clienteSelect}" filter="true" filterMatchMode="contains" onchange="PF('statusInfoDialog').show();">
 								<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true"></f:selectItem>
 								<f:selectItems var="cliente" value="#{facturaServiciosBean.listaCliente}" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
-								<p:ajax listener="#{facturaServiciosBean.cargaInfoCliente}" process="@this" update="receptor factura servicioSelect metodoPago medioPago domicilio metodoPago" oncomplete="PF('statusInfoDialog').hide();"/>
+								<p:ajax listener="#{facturaServiciosBean.cargaInfoCliente}" process="@this" update="form:receptor form:factura form:servicioSelect" oncomplete="PF('statusInfoDialog').hide();"/>
 							</p:selectOneMenu>
 						</div>
-						<div class="p-col-6 p-md-6">
+						<div class="p-col-12 p-md-6">
 							<p:outputLabel value="Régimen capital"/>
 							<p:inputText value="#{facturaServiciosBean.clienteSelect.regimenCapital}" readonly="true"/>
 						</div>
-						<div class="p-col-3 p-md-3">
-							<p:outputLabel value="Numero"/>
+						<div class="p-col-4 p-md-2">
+							<p:outputLabel value="Número"/>
 							<p:inputNumber value="#{facturaServiciosBean.clienteSelect.numeroCte}" decimalPlaces="0" readonly="true" decimalSeparator=".
 							" /> 
 						</div>
-						<div class="p-col-3 p-md-3">
+						<div class="p-col-8 p-md-2">
 							<p:outputLabel value="RFC"/>
 							<p:inputText value="#{facturaServiciosBean.clienteSelect.cteRfc}" readonly="true" /> 
 						</div>
-						<div class="p-col-6 p-md-6">
-							<p:outputLabel value="Domicilio fiscal"/>
-							<p:selectOneMenu id="domicilio" autoWidth="false" value="#{facturaServiciosBean.domicilioSelect}" disabled="true">
-                                                            <f:selectItem itemLabel="#{facturaServiciosBean.domicilioSelect.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisDesc}" />
-								<f:selectItems value="#{facturaServiciosBean.listaClienteDomicilio}" var="domicilio" itemLabel="#{domicilio.domicilios.domicilioCalle}" itemValue="#{domicilio.domicilios.domCve}" />
-							</p:selectOneMenu>
+						<div class="p-col-12 p-md-4">
+							<p:outputLabel value="Calle"/>
+							<p:inputText readonly="true" value="#{facturaServiciosBean.domicilioSelect.domicilioCalle}">
+							</p:inputText>
+						</div>
+						<div class="p-col-6 p-md-2">
+							<p:outputLabel value="Núm. ext." />
+							<p:inputText readonly="true" value="#{facturaServiciosBean.domicilioSelect.domicilioNumExt}"></p:inputText>
+						</div>
+						<div class="p-col-6 p-md-2">
+							<p:outputLabel value="Núm. int." />
+							<p:inputText readonly="true" value="#{empty facturaServiciosBean.domicilioSelect.domicilioNumInt ? '' : facturaServiciosBean.domicilioSelect.domicilioNumInt}" />
+						</div>
+						<div class="p-col-12 p-md-6">
+							<p:outputLabel value="Colonia"></p:outputLabel>
+							<p:inputText readonly="true" value="C. P. #{facturaServiciosBean.domicilioSelect.asentamiento.cp} #{facturaServiciosBean.domicilioSelect.asentamiento.tipoAsentamiento.tipoasntmntoDs} #{facturaServiciosBean.domicilioSelect.asentamiento.asentamientoDs}" />
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Localidad" />
+							<p:inputText readonly="true" value="#{facturaServiciosBean.domicilioSelect.asentamiento.asentamientoHumanoPK.ciudades.ciudadDs}" />
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Alc. / Municipio" />
+							<p:inputText readonly="true" value="#{facturaServiciosBean.domicilioSelect.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipioDs}" />
+						</div>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Estado" />
+							<p:inputText readonly="true" value="#{facturaServiciosBean.domicilioSelect.asentamiento.asentamientoHumanoPK.ciudades.ciudadesPK.municipios.municipiosPK.estados.estadoDesc}" />
 						</div>
 					</div>
 				</p:fieldset>
@@ -90,18 +112,18 @@
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Información de la factura">
 					<p:outputPanel id="factura">
-						<div class="p-grid ui-fluid p-col-12">
-							<div class="p-col-3 p-md-3">
+						<div class="p-grid ui-fluid">
+							<div class="p-col-6 p-md-3">
 								<p:outputLabel value="Fecha" />
 								<p:datePicker id="fechaFact" showIcon="true" value="#{facturaServiciosBean.fechaFactura}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 									<p:ajax process="@this" />
 								</p:datePicker>
 							</div>
-							<div class="p-col-3 p-md-3">
+							<div class="p-col-6 p-md-3">
 								<p:outputLabel value="Moneda" />
 								<p:inputText value="#{facturaServiciosBean.moneda}" readonly="true" />
 							</div>
-							<div class="p-col-6 p-md-6">
+							<div class="p-col-12 p-md-6">
 								<p:outputLabel value="Metodo de Pago (SAT)" />
 								<p:selectOneMenu id="metodoPago" value="#{facturaServiciosBean.metodoPagoSelect}" autoWidth="false" converter="entityConverter">
 									<f:selectItem itemLabel="--METODO DE PAGO--" noSelectionOption="true" />
@@ -109,35 +131,35 @@
 									<p:ajax process="@this"/>
 								</p:selectOneMenu>
 							</div>
-							<div class="p-col-6 p-md-6">
+							<div class="p-col-12 p-md-6">
 								<p:outputLabel value="Forma de pago (SAT)" />
 								<p:selectOneMenu id="medioPago" autoWidth="false" value="#{facturaServiciosBean.medioPagoSelect}">
 									<f:selectItem itemLabel="" noSelectionOption="true" />
 									<f:selectItems value="#{facturaServiciosBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.formaPago} - #{medioP.mpDescripcion}" itemValue="#{medioP.formaPago}" />
 								</p:selectOneMenu>
 							</div>
-							<div class="p-col-6 p-md-6">
+							<div class="p-col-12 p-md-6">
 								<p:outputLabel value="Referencia" />
 								<p:inputText value="#{facturaServiciosBean.referencia}" /> 
 							</div>
-							<div class="p-col-3 p-md-3">
+							<div class="p-col-6 p-md-3">
 								<p:outputLabel value="IVA" />
 								<p:inputNumber value="#{facturaServiciosBean.iva.valor * 100}" decimalSeparator="." readonly="true" symbol="%" symbolPosition="s" required="true" emptyValue="empty" decimalPlaces="2"/>
 							</div>
-							<div class="p-col-3 p-md-3">
+							<div class="p-col-6 p-md-3">
 								<p:outputLabel value="Plazo de Pago" />
 								<p:selectOneMenu id="plazo" autoWidth="false" value="#{facturaServiciosBean.plazoSelect}">
 									<f:selectItem itemLabel="" itemValue=""/>
 									<f:selectItems value="#{facturaServiciosBean.listaAviso}" var="aviso" itemLabel="#{aviso.avisoPlazo}" itemValue="#{aviso.avisoPlazo}" />
 								</p:selectOneMenu>
 							</div>
-							<div class="p-col-3 p-md-3">
-								<p:outputLabel value="InicioPeriodo" />
+							<div class="p-col-6 p-md-3">
+								<p:outputLabel value="Inicio Periodo" />
 								<p:datePicker id="fechaInicio" showIcon="true" value="#{facturaServiciosBean.factura.inicioServicios}" pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6">
 									<p:ajax process="@this"></p:ajax>
 								</p:datePicker>
 							</div>
-							<div class="p-col-3 p-md-3">
+							<div class="p-col-6 p-md-3">
 								<p:outputLabel value="Fin periodo" />
 								<p:datePicker id="fechaFin" showIcon="true" value="#{facturaServiciosBean.factura.finServicios}" pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6">
 									<p:ajax process="@this"></p:ajax>
@@ -153,11 +175,18 @@
 			<div style="margin-top: 2rem;">
 				<p:fieldset legend="Servicios a facturar">
 					<p:outputPanel id="servicioSelect">
-						<div class="p-grid ui-fluid p-col-12">
-							<div class="p-col-12 p-md-6">
-								<p:selectOneMenu id="selServicio" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.precioServicio}" filterMatchMode="startsWith">
-									<f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true" />
-									<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} ($#{selectedPrecioServicio.precio} por #{selectedPrecioServicio.unidad.unidadDeManejoDs} - Aviso #{selectedPrecioServicio.avisoCve.avisoCve})" itemValue="#{selectedPrecioServicio}" />
+						<div class="p-grid ui-fluid">
+							<div class="p-col-12 p-md-2">
+								<p:selectOneMenu id="selAviso" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.aviso}">
+									<f:selectItem itemLabel="TODOS LOS SERVICIOS" itemValue="" />
+									<f:selectItems value="#{facturaServiciosBean.listaAviso}" var="aviso" itemLabel="Aviso #{aviso.avisoCve}-#{aviso.categoriaCve.categoriaDs}-#{aviso.avisoVigencia}" itemValue="#{aviso}"></f:selectItems>
+									<p:ajax event="change" process="@this" listener="#{facturaServiciosBean.seleccionaServicios()}" update="form:servicioSelect form:factura"></p:ajax>
+								</p:selectOneMenu>
+							</div>
+							<div class="p-col-12 p-md-4">
+								<p:selectOneMenu id="selServicio" autoWidth="false" converter="entityConverter" value="#{facturaServiciosBean.precioServicio}" filter="true" filterMatchMode="startsWith">
+									<f:selectItem itemLabel="--Seleccione Servicio--" itemValue="" noSelectionOption="true" />
+									<f:selectItems var="selectedPrecioServicio" value="#{facturaServiciosBean.alServicios}" itemLabel="#{selectedPrecioServicio.servicio.servicioDs} ($#{selectedPrecioServicio.precio} por #{selectedPrecioServicio.unidad.unidadDeManejoDs} #{selectedPrecioServicio.avisoCve eq null ? '' : ' - Aviso '}#{selectedPrecioServicio.avisoCve.avisoCve})" itemValue="#{selectedPrecioServicio}" />
 								</p:selectOneMenu>
 							</div>
 							<div class="p-col-12 p-md-2">
