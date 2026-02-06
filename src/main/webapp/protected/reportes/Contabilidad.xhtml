@@ -32,19 +32,19 @@
 							<p:ajax process="@this" />
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-6 p-md-6">
+					<div class="p-col-12 p-md-6">
 						<p:selectOneRadio value="#{reporteContabilidadBean.tipoReporte}" >
 						    <f:selectItem itemLabel="Conciliación" itemValue="C" />
 						    <f:selectItem itemLabel="Auxiliar de clientes" itemValue="A" />
 						    <p:ajax process="@this" />
 						</p:selectOneRadio>
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-6 p-md-3">
 						<p:commandButton icon="pi pi-file-pdf" value="PDF" actionListener="#{reporteContabilidadBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
 							<p:fileDownload value="#{reporteContabilidadBean.file}" />
 						</p:commandButton>  
 					</div>
-					<div class="p-col-3 p-md-3">
+					<div class="p-col-6 p-md-3">
 						<p:commandButton icon="pi pi-file-excel" value="Excel" actionListener="#{reporteContabilidadBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
 							<p:fileDownload value="#{reporteContabilidadBean.file}" />
 						</p:commandButton>  
