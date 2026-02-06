@@ -1,16 +1,11 @@
 package mx.com.ferbo.controller;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Serializable;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -23,13 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.JasperReportUtil;
-import mx.com.ferbo.util.conexion;
-import net.sf.jasperreports.engine.JRException;
+import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.reports.AuxiliarClientesReport;
+import mx.com.ferbo.reports.ConciliacionReport;
+import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
@@ -38,25 +35,22 @@ public class ReporteContabilidadBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(ReporteContabilidadBean.class);
 
+	private Usuario usuario;
 	private Date fecha;
 	private Date maxDate;
 	private Date fecha_ini;
 	private Date fecha_fin;
-	boolean auxClienteSelect;
-	boolean conciliacionSelect;
+	private String tipoReporte;
 
 	private Cliente clienteSelect;
-
 	private List<Cliente> listaClientes;
+	private StreamedContent file;
 
-	private ClienteDAO clienteDAO;
-	
 	private FacesContext faceContext;
     private HttpServletRequest request;
 
 	public ReporteContabilidadBean() {
 		fecha = new Date();
-		clienteDAO = new ClienteDAO();
 		listaClientes = new ArrayList<Cliente>();
 	}
 	@SuppressWarnings("unchecked")
@@ -64,215 +58,112 @@ public class ReporteContabilidadBean implements Serializable {
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
         request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-		
-		listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
-		clienteSelect = new Cliente();
+        this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+		this.listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+		this.clienteSelect = new Cliente();
 		Date today = new Date();
-		maxDate = new Date(today.getTime() );
+		this.maxDate = new Date(today.getTime() );
 		this.fecha_ini = new Date();
 		this.fecha_fin = new Date();
 	}
 	
 
 	
-	public void exportarPdf() throws JRException, IOException, SQLException{
-		System.out.println("Exportando a pdf.....");
-		if(auxClienteSelect == true) {
-			String jasperPath = "/jasper/reportAuxCtes.jrxml";
-			String filename = "reportAuxCtes"+fecha+".pdf";
-			String images = "/images/logo.jpeg";
-			String message = null;
-			Severity severity = null;
-			File reportFile = new File(jasperPath);
-			File imgfile = null;
-			JasperReportUtil jasperReportUtil = new JasperReportUtil();
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			Connection connection = null;
-			parameters = new HashMap<String, Object>();
-			
-			try {
-			
-				URL resource = getClass().getResource(jasperPath);
-				URL resourceimg = getClass().getResource(images);
-				String file = resource.getFile();
-				String img = resourceimg.getFile();
-				reportFile = new File(file);
-				imgfile = new File(img);
-				log.info(reportFile.getPath());
-			
-				Integer clienteCve = null;
-				if(clienteSelect == null) {
-					clienteCve = null;
-				}else {
-					clienteCve = clienteSelect.getCteCve();
-				}
-			
-				connection = EntityManagerUtil.getConnection();
-				parameters.put("REPORT_CONNECTION", connection);
-				parameters.put("idCliente",clienteCve );
-				parameters.put("fechaInicio", fecha_ini);
-				parameters.put("fechaFin", fecha_fin);
-				parameters.put("imagen", imgfile.getPath());
-				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-			} catch (Exception ex) {
-				log.error("Problema general...", ex);
-				message = String.format("No se pudo imprimir el reporte");
-				severity = FacesMessage.SEVERITY_INFO;
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-ClienteAlmacen");
-			} finally {
-				conexion.close((Connection) connection);
-			}
-		}else 
-			if (conciliacionSelect == true ) {
-				String jasperPath = "/jasper/reportConciliacion.jrxml";
-				String filename = "reportConciliacion"+fecha+".pdf";
-				String images = "/images/logo.jpeg";
-				String message = null;
-				Severity severity = null;
-				File reportFile = new File(jasperPath);
-				File imgfile = null;
-				JasperReportUtil jasperReportUtil = new JasperReportUtil();
-				Map<String, Object> parameters = new HashMap<String, Object>();
-				Connection connection = null;
-				parameters = new HashMap<String, Object>();
-				
-				try {
-				
-					URL resource = getClass().getResource(jasperPath);
-					URL resourceimg = getClass().getResource(images);
-					String file = resource.getFile();
-					String img = resourceimg.getFile();
-					reportFile = new File(file);
-					imgfile = new File(img);
-					log.info(reportFile.getPath());
-				
-					Integer clienteCve = null;
-					if(clienteSelect == null) {
-						clienteCve = null;
-					}else {
-						clienteCve = clienteSelect.getCteCve();
-					}
-				
-					connection = EntityManagerUtil.getConnection();
-					parameters.put("REPORT_CONNECTION", connection);
-					parameters.put("idCliente",clienteCve );
-					parameters.put("fechaInicio", fecha_ini);
-					parameters.put("fechaFin", fecha_fin);
-					parameters.put("imagen", imgfile.getPath());
-					log.info("Parametros: " + parameters.toString());
-					jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
-				} catch (Exception ex) {
-					log.error("Problema general...", ex);
-					message = String.format("No se pudo imprimir el reporte");
-					severity = FacesMessage.SEVERITY_INFO;
-					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-					PrimeFaces.current().ajax().update("form:messages", "form:dt-ClienteAlmacen");
-				} finally {
-					conexion.close((Connection) connection);
-				}
-			}
-		}
-	
-	public void exportarExcel() throws JRException, IOException, SQLException{
-		System.out.println("Exportando a excel.....");
-		if(auxClienteSelect == true) {
-			String jasperPath = "/jasper/reportAuxCtes.jrxml";
-			String filename = "reportAuxCtes" +fecha+".xlsx";
-			String images = "/images/logo.jpeg";
-			String message = null;
-			Severity severity = null;
-			File reportFile = new File(jasperPath);
-			File imgfile = null;
-			JasperReportUtil jasperReportUtil = new JasperReportUtil();
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			Connection connection = null;
-			parameters = new HashMap<String, Object>();
-			
-			try {
-			
-				URL resource = getClass().getResource(jasperPath);
-				URL resourceimg = getClass().getResource(images);
-				String file = resource.getFile();
-				String img = resourceimg.getFile();
-				reportFile = new File(file);
-				imgfile = new File(img);
-				log.info(reportFile.getPath());
-			
-				Integer clienteCve = null;
-				if(clienteSelect == null) {
-					clienteCve = null;
-				}else {
-					clienteCve = clienteSelect.getCteCve();
-				}
-				connection = EntityManagerUtil.getConnection();
-				parameters.put("REPORT_CONNECTION", connection);
-				parameters.put("idCliente",clienteCve );
-				parameters.put("fechaInicio", fecha_ini);
-				parameters.put("fechaFin", fecha_fin);
-				parameters.put("imagen", imgfile.getPath());
-				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
-			} catch (Exception ex) {
-				log.error("Problema general...", ex);
-				message = String.format("No se pudo imprimir el reporte");
-				severity = FacesMessage.SEVERITY_INFO;
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-ClienteAlmacen");
-			} finally {
-				conexion.close((Connection) connection);
-			}
-		}else 	if(conciliacionSelect == true) {
-			String jasperPath = "/jasper/reportConciliacion.jrxml";
-			String filename = "reportConciliacion" +fecha+".xlsx";
-			String images = "/images/logo.jpeg";
-			String message = null;
-			Severity severity = null;
-			File reportFile = new File(jasperPath);
-			File imgfile = null;
-			JasperReportUtil jasperReportUtil = new JasperReportUtil();
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			Connection connection = null;
-			parameters = new HashMap<String, Object>();
-			
-			try {
-			
-				URL resource = getClass().getResource(jasperPath);
-				URL resourceimg = getClass().getResource(images);
-				String file = resource.getFile();
-				String img = resourceimg.getFile();
-				reportFile = new File(file);
-				imgfile = new File(img);
-				log.info(reportFile.getPath());
-			
-				Integer clienteCve = null;
-				if(clienteSelect == null) {
-					clienteCve = null;
-				}else {
-					clienteCve = clienteSelect.getCteCve();
-				}
-				connection = EntityManagerUtil.getConnection();
-				parameters.put("REPORT_CONNECTION", connection);
-				parameters.put("idCliente",clienteCve );
-				parameters.put("fechaInicio", fecha_ini);
-				parameters.put("fechaFin", fecha_fin);
-				parameters.put("imagen", imgfile.getPath());
-				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
-			} catch (Exception ex) {
-				log.error("Problema general...", ex);
-				message = String.format("No se pudo imprimir el reporte");
-				severity = FacesMessage.SEVERITY_INFO;
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-ClienteAlmacen");
-			} finally {
-				conexion.close((Connection) connection);
-			}
-		}
-		}
-	
+	public void exportarPdf() {
+		String   message = null;
+		Severity severity = null;
 		
+		String      fileName = null;
+		InputStream input;
+		byte[]      bytes = null;
+		Integer     clienteCve = null;
+		
+		try {
+			clienteCve = (clienteSelect == null) ? null : clienteSelect.getCteCve();
+			
+			if("A".equalsIgnoreCase(this.tipoReporte)) {
+				
+				fileName = String.format("AuxiliarClientes_%s.pdf", DateUtil.getString(fecha, DateUtil.FORMATO_YYYY_MM_DD));
+				bytes = AuxiliarClientesReport.getPDF(fecha_ini, fecha_fin, clienteCve);
+				log.info("El usuario {} ha descargado el reporte de contabilidad (auxiliar de clientes): {}", this.usuario.getUsuario(), fileName);
+				
+			} else if ("C".equalsIgnoreCase(this.tipoReporte)) {
+				
+				fileName = String.format("Conciliacion_%s.pdf", DateUtil.getString(fecha, DateUtil.FORMATO_YYYY_MM_DD));
+				bytes = ConciliacionReport.getPDF(fecha_ini, fecha_fin, clienteCve);
+				log.info("El usuario {} ha descargado el reporte de contabilidad (auxiliar de clientes): {}", this.usuario.getUsuario(), fileName);
+				
+			} else
+				
+				throw new InventarioException("Debe indicar el tipo de reporte.");
+			
+			input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentType("application/pdf")
+					.name(fileName)
+					.stream(() -> input)
+					.contentLength(bytes.length)
+					.build();
+			
+		} catch(InventarioException ex) {
+			log.warn("Problema para descargar el reporte...", ex.getMessage());
+			message = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en la descarga", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		} catch(Exception ex) {
+			log.error("Problema para descargar el reporte...", ex);
+			message = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_ERROR;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en la descarga", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+	}
+	
+	public void exportarExcel() {
+		String   message = null;
+		Severity severity = null;
+		
+		String      fileName = null;
+		InputStream input;
+		byte[]      bytes = null;
+		Integer     clienteCve = null;
+		
+		try {
+			clienteCve = (clienteSelect == null) ? null : clienteSelect.getCteCve();
+			
+			if("A".equalsIgnoreCase(this.tipoReporte)) {
+				
+				fileName = String.format("AuxiliarClientes_%s.xlsx", DateUtil.getString(fecha, DateUtil.FORMATO_YYYY_MM_DD));
+				bytes = AuxiliarClientesReport.getXLSX(fecha_ini, fecha_fin, clienteCve);
+				log.info("El usuario {} ha descargado el reporte de contabilidad (auxiliar de clientes): {}", this.usuario.getUsuario(), fileName);
+				
+			} else if ("C".equalsIgnoreCase(this.tipoReporte)) {
+				
+				fileName = String.format("Conciliacion_%s.xlsx", DateUtil.getString(fecha, DateUtil.FORMATO_YYYY_MM_DD));
+				bytes = ConciliacionReport.getXLSX(fecha_ini, fecha_fin, clienteCve);
+				log.info("El usuario {} ha descargado el reporte de contabilidad (auxiliar de clientes): {}", this.usuario.getUsuario(), fileName);
+				
+			} else
+				
+				throw new InventarioException("El tipo de reporte seleccionado es incorrecto");
+			
+			input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder()
+					.contentType("application/vnd.ms-excel")
+					.name(fileName)
+					.stream(() -> input)
+					.contentLength(bytes.length)
+					.build();
+			
+		} catch(Exception ex) {
+			log.error("Problema para descargar el reporte...", ex);
+			message = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en la descarga", message));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+	}
 	
 	public Date getFecha() {
 		return fecha;
@@ -310,16 +201,16 @@ public class ReporteContabilidadBean implements Serializable {
 	public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
 	}
-	public boolean isAuxClienteSelect() {
-		return auxClienteSelect;
+	public String getTipoReporte() {
+		return tipoReporte;
 	}
-	public void setAuxClienteSelect(boolean auxClienteSelect) {
-		this.auxClienteSelect = auxClienteSelect;
+	public void setTipoReporte(String tipoReporte) {
+		this.tipoReporte = tipoReporte;
 	}
-	public boolean isConciliacionSelect() {
-		return conciliacionSelect;
+	public StreamedContent getFile() {
+		return file;
 	}
-	public void setConciliacionSelect(boolean conciliacionSelect) {
-		this.conciliacionSelect = conciliacionSelect;
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 }

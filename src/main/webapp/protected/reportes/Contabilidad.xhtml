@@ -8,84 +8,49 @@
     <ui:define name="title">Contabilidad</ui:define>
 
     <ui:define name="content">
-        <h:form id="form">
-			<p:growl id="messages" showDetail="true" />
-            <div class="p-grid crud-demo">
-                <div class="p-col-12">
-                    <div class="card">
-						 <p:fieldset legend="Rangos de fechas">
-			               <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax1" styleClass="p-mr-4 p-mb-2" value="#{reporteContabilidadBean.fecha_ini}" placeholder="Ej. dd/MM/yyyy" maxdate="#{reporteContabilidadBean.maxDate}" showIcon="true">
-			                	<p:ajax process="@this" />
-			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-			                </p:datePicker>
-			                <p:outputLabel for="minmax1" value="Fecha de inicio "/>
-						</span>
-						
-						 <span class="ui-float-label ui-input-icon-left">
-			                <p:datePicker id="minmax2" styleClass="p-mr-4 p-mb-2" value="#{reporteContabilidadBean.fecha_fin}" placeholder="Ej. dd/MM/yyyy" maxdate="#{reporteContabilidadBean.maxDate}"  showIcon="true">
-			                	<p:ajax process="@this"/>
-			                	<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-			                </p:datePicker>
-			                <p:outputLabel for="minmax2" value="Fecha  final "/>
-						</span>
-           				 
-
-							</p:fieldset>
-            
-                        <p:fieldset legend="Elección de cliente">
-                       			 <span class="ui-float-label ui-input-icon-left">
-									<p:selectOneMenu id="Cliente" value="#{reporteContabilidadBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
-									<f:selectItem itemLabel="Todos los clientes" />
-									<f:selectItems value="#{reporteContabilidadBean.listaClientes}" var="cliente"  itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre) }" itemValue="#{cliente}" />
-									<p:ajax process ="@this" />
-									</p:selectOneMenu>
-								<p:outputLabel for="Cliente" value="Cliente" />
-							</span>
-								
-					</p:fieldset>
-			<p:fieldset legend="Filtros de descarga" styleClass="p-mt-2">
-						 <p:toolbar>
-				<p:toolbarGroup>
-					   <div class="col-5 flex align-items-center justify-content-center">
-							<p:outputLabel for="@next">Conciliacion</p:outputLabel>
-       							<p:selectBooleanCheckbox  value="#{reporteContabilidadBean.conciliacionSelect}" />
-       						 </div>
-							         <div class="col-2">
-							            <p:divider layout="vertical">
-							            </p:divider>
-							        </div>
-										 <div class="col-5 flex align-items-center justify-content-center">
-										  <p:outputLabel for="@next">Auxiliar de clientes</p:outputLabel>
-												<p:selectBooleanCheckbox  value="#{reporteContabilidadBean.auxClienteSelect}" />
-							     </div>
-							        </p:toolbarGroup>
-							        </p:toolbar>
-
-        </p:fieldset>
-					  <p:fieldset legend="Formatos de descarga" styleClass="p-mt-2">
-					  <p:toolbar>
-				<p:toolbarGroup>
-					   <div class="col-5 flex align-items-center justify-content-center">
-						<p:commandButton value=".pdf" actionListener="#{reporteContabilidadBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
-						 </div>
-							         <div class="col-2">
-							            <p:divider layout="vertical">
-							            </p:divider>
-							        </div>
-										 <div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".xlsx"  actionListener="#{reporteContabilidadBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
-							     </div>
-							        </p:toolbarGroup>
-							        </p:toolbar>
-						</p:fieldset>
-						
-						
-                    </div>
-                </div>
-            </div>
+        <h:form id="form" enctype="multipart/form-data">
+        	<ui:include src="/protected/common/status-info.xhtml" />
+			<p:panel>
+				<div class="p-grid ui-fluid">
+					<div class="p-col-6 p-md-3">
+						<p:outputLabel value="Inicio periodo"/>
+						<p:datePicker value="#{reporteContabilidadBean.fecha_ini}" placeholder="Ej. dd/MM/yyyy" maxdate="#{reporteContabilidadBean.maxDate}" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
+		                	<p:ajax process="@this" />
+		                </p:datePicker>
+					</div>
+					<div class="p-col-6 p-md-3">
+						<p:outputLabel value="Fin periodo"/>
+						<p:datePicker value="#{reporteContabilidadBean.fecha_fin}" placeholder="Ej. dd/MM/yyyy" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
+		                	<p:ajax process="@this"/>
+		                </p:datePicker>
+					</div>
+					<div class="p-col-12 p-md-6">
+						<p:outputLabel value="Cliente" />
+						<p:selectOneMenu value="#{reporteContabilidadBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
+							<f:selectItem itemLabel="Todos los clientes" />
+							<f:selectItems value="#{reporteContabilidadBean.listaClientes}" var="cliente"  itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre) }" itemValue="#{cliente}" />
+							<p:ajax process="@this" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-6 p-md-6">
+						<p:selectOneRadio value="#{reporteContabilidadBean.tipoReporte}" >
+						    <f:selectItem itemLabel="Conciliación" itemValue="C" />
+						    <f:selectItem itemLabel="Auxiliar de clientes" itemValue="A" />
+						    <p:ajax process="@this" />
+						</p:selectOneRadio>
+					</div>
+					<div class="p-col-3 p-md-3">
+						<p:commandButton icon="pi pi-file-pdf" value="PDF" actionListener="#{reporteContabilidadBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+							<p:fileDownload value="#{reporteContabilidadBean.file}" />
+						</p:commandButton>  
+					</div>
+					<div class="p-col-3 p-md-3">
+						<p:commandButton icon="pi pi-file-excel" value="Excel" actionListener="#{reporteContabilidadBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+							<p:fileDownload value="#{reporteContabilidadBean.file}" />
+						</p:commandButton>  
+					</div>
+				</div>
+			</p:panel>
         </h:form>
-
     </ui:define>
-
 </ui:composition>

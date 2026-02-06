@@ -101,9 +101,7 @@
 								<p:menuitem value="Antiguedad de Saldos" icon="pi pi-file" outcome="/protected/reportes/FacturasAntiguedadSaldos" />
 								<p:menuitem value="Cartera Clientes" icon="pi pi-file" outcome="/protected/reportes/CarteraCliente" />
 							</p:submenu>
-							<p:submenu id="frb_inventario_reporteCont" label="Contabilidad" icon="pi pi-fw pi-table" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
-								<p:menuitem value="Contabilidad" icon="pi pi-file" outcome="/protected/reportes/Contabilidad" />
-							</p:submenu>
+							<p:menuitem value="Contabilidad" icon="pi pi-file" outcome="/protected/reportes/Contabilidad" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}"/>
 							<p:submenu id="frb_inventario_reporteIng" label="Ingresos" icon="pi pi-fw pi-table" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 								<p:menuitem value="Ingresos" icon="pi pi-file" outcome="/protected/reportes/Ingresos" />
 								<p:menuitem value="Ventas e ingresos" icon="pi pi-file" outcome="/protected/reportes/VentasIngresos" />
