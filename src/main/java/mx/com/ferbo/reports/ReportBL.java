@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.utils.IOUtil;
 import mx.com.ferbo.utils.ToolException;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -61,6 +63,7 @@ public abstract class ReportBL {
 				.orElseThrow(() -> new ToolException("No hay conexión con la base de datos"));
 		
 		parameters.put("REPORT_CONNECTION", conn);
+		parameters.put(JRParameter.REPORT_LOCALE, new Locale("es", "MX"));
 		
 		return parameters;
 	}
@@ -74,6 +77,7 @@ public abstract class ReportBL {
 		JasperPrint jasperPrint = null;
 		
 		try {
+			log.info("Parametros jasper: {}", params);
 			output = new ByteArrayOutputStream();
 			design = JRXmlLoader.load(jrxmlPath);
 			report = JasperCompileManager.compileReport(design);
@@ -101,6 +105,7 @@ public abstract class ReportBL {
 		OutputStreamExporterOutput outputExporter = null;
 		
 		try {
+			log.info("Parametros jasper: {}", params);
 			output = new ByteArrayOutputStream();
 			design = JRXmlLoader.load(path);
 			report = JasperCompileManager.compileReport(design);

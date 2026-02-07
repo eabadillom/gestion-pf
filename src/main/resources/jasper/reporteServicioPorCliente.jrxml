@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteServicioPorCliente" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="507d1894-b9d1-4b4f-b6f1-5fca5227b189">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Gestion-MySQL-Local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionDesarrollo"/>
 	<parameter name="imagen" class="java.lang.String"/>
+	<parameter name="idCliente" class="java.lang.Integer"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT
 	c.numero_cte,
@@ -12,18 +13,20 @@
 	s.servicio_ds,
 	u.unidad_de_manejo_ds,
 	ps.precio,
-	a.aviso_cve
+	a.aviso_cve,
+    a.aviso_vigencia,
+    ca.categoria_ds
 FROM cliente c
 INNER JOIN precio_servicio ps ON c.cte_cve = ps.cliente
 INNER JOIN servicio s ON s.servicio_cve = ps.servicio
 INNER JOIN unidad_de_manejo u ON ps.unidad = u.unidad_de_manejo_cve
-INNER JOIN aviso a ON ps.aviso_cve = a.aviso_cve
-WHERE a.cte_cve = c.cte_cve
+LEFT JOIN aviso a ON ps.aviso_cve = a.aviso_cve
+LEFT JOIN categoria ca on ca.categoria_cve = a.categoria_cve
+WHERE (c.cte_cve = $P{idCliente} OR $P{idCliente} IS NULL)
 ORDER BY
 	c.cte_nombre ASC,
-	c.numero_cte ASC,
-	s.servicio_ds ASC,
-	a.aviso_cve ASC]]>
+	a.aviso_cve ASC,
+	s.servicio_ds ASC]]>
 	</queryString>
 	<field name="numero_cte" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="numero_cte"/>
@@ -55,32 +58,56 @@ ORDER BY
 		<property name="com.jaspersoft.studio.field.label" value="precio"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="precio_servicio"/>
 	</field>
-	<field name="COLUMN_7" class="java.lang.Integer">
-		<property name="com.jaspersoft.studio.field.name" value="aviso_cve"/>
-		<property name="com.jaspersoft.studio.field.label" value="aviso_cve"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="aviso"/>
+	<field name="categoria_ds" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="categoria_ds"/>
+		<property name="com.jaspersoft.studio.field.label" value="categoria_ds"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="categoria_ds"/>
 	</field>
+	<field name="aviso_vigencia" class="java.lang.String"/>
 	<group name="Cliente">
 		<groupExpression><![CDATA[$F{cte_nombre}]]></groupExpression>
 		<groupHeader>
-			<band height="16">
+			<band height="26">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<textField>
-					<reportElement x="0" y="0" width="555" height="16" forecolor="#2196F3" uuid="76509c26-dff4-4b66-95e5-07b796f4e80b">
+					<reportElement x="0" y="0" width="555" height="26" forecolor="#2196F3" uuid="76509c26-dff4-4b66-95e5-07b796f4e80b">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
-					<textElement verticalAlignment="Middle">
-						<font isBold="true"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cte_nombre}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="1">
-				<line>
-					<reportElement x="0" y="0" width="554" height="1" forecolor="#2196F3" uuid="c46f584b-b14b-4dfb-a3b9-be05a660f853"/>
-				</line>
+			<band height="10">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Aviso Group" minHeightToStartNewPage="5">
+		<groupExpression><![CDATA[$F{aviso_cve}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField>
+					<reportElement x="0" y="0" width="555" height="20" forecolor="#2196F3" uuid="08a71dc4-9bf9-4559-a5fe-5ce6a7af41c6">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{aviso_cve} != null
+? "SERVICIOS DEL AVISO " + $F{aviso_cve} + "-" + $F{categoria_ds} + "-" + $F{aviso_vigencia}
+: "SERVICIOS GENERALES DEL CLIENTE"]]></textFieldExpression>
+					<patternExpression><![CDATA[$F{aviso_cve} != null
+? $F{aviso_cve} + "-" + $F{categoria_ds} + "-" + $F{aviso_vigencia}
+: "SERVICIOS DEL CLIENTE"]]></patternExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="10">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</band>
 		</groupFooter>
 	</group>
@@ -164,10 +191,10 @@ ORDER BY
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="14" splitType="Stretch">
+		<band height="16" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField pattern="¤#,##0.00;¤-##0.00">
-				<reportElement x="480" y="0" width="75" height="14" uuid="bcbb357b-3b24-486a-8392-5b3feaafbac6">
+				<reportElement x="480" y="0" width="75" height="15" uuid="bcbb357b-3b24-486a-8392-5b3feaafbac6">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bf23dd79-c671-4d36-9e3c-45b4e37c0038"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -175,23 +202,31 @@ ORDER BY
 				<textFieldExpression><![CDATA[$F{precio}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight">
-				<reportElement x="0" y="0" width="350" height="14" uuid="376ba5ad-ae3a-4914-a5fb-56f715f8978e">
+				<reportElement x="15" y="0" width="335" height="15" uuid="376ba5ad-ae3a-4914-a5fb-56f715f8978e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="de981ecb-e11e-4e58-8fe8-133f1f9fd892"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="html">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{servicio_ds}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="350" y="0" width="130" height="14" uuid="54500538-27e2-4658-8659-02c99f9dfcb4">
+				<reportElement x="350" y="0" width="130" height="15" uuid="54500538-27e2-4658-8659-02c99f9dfcb4">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="630aa292-380d-414c-bed3-64d0faf63b45"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{unidad_de_manejo_ds}]]></textFieldExpression>
 			</textField>
+			<line>
+				<reportElement x="15" y="15" width="539" height="1" forecolor="#2196F3" uuid="c46f584b-b14b-4dfb-a3b9-be05a660f853">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+			</line>
 		</band>
 	</detail>
 	<pageFooter>
@@ -203,7 +238,7 @@ ORDER BY
 				</textElement>
 				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER} + " de  " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<textField pattern="MMMMM dd, yyyy">
+			<textField pattern="dd &apos;de&apos; MMMM &apos;de&apos; yyyy">
 				<reportElement x="0" y="0" width="119" height="8" uuid="f737eca1-1bf6-4409-b685-b5e496aa5366"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="5" isBold="false"/>
@@ -224,7 +259,7 @@ ORDER BY
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[NO SE ENCONTRO INFORMACION]]></text>
+				<text><![CDATA[NO SE ENCONTRÓ INFORMACIÓN]]></text>
 			</staticText>
 			<image>
 				<reportElement x="0" y="0" width="130" height="47" uuid="97c8ef44-3815-4f6b-9bbd-afd1ff92bbb9"/>

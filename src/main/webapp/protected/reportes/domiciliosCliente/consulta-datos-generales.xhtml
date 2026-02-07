@@ -1,0 +1,20 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:outputLabel>
+        <div class="p-grid ui-fluid">
+            <div class="p-col-12 p-md-6">
+                <p:outputLabel value="Cliente" />
+                <p:selectOneMenu id="d-cliente" autoWidth="false" converter="entityConverter" value="#{reporteDomClienteBean.clienteSelected}" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="--Todos los clientes--"/>
+                    <f:selectItems value="#{reporteDomClienteBean.lstClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre)}" itemValue="#{cliente}" />
+                    <p:ajax listener="#{reporteDomClienteBean.infoCliente}"
+                        process="@this" oncomplete="PF('statusInfoDialog').hide();"/>
+                </p:selectOneMenu>
+            </div>
+        </div>
+    </p:outputLabel>
+</ui:composition>
