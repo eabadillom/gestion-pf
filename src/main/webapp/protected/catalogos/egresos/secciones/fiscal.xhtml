@@ -4,43 +4,161 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
     <div class="surface-0 p-3 border-round">
-        <div class="grid">
 
-            <div class="col-12 md:col-4">
-                <p:outputLabel for="tipoEgre" value="Tipo de egreso" />
-                <p:selectOneMenu 
-                    id="tipoEgre"
-                    widgetVar="tipoEgre"
-                    styleClass="w-full" 
-                    value="#{tipoEgresoBean.selected}" 
-                    required="true" 
-                    requiredMessage="Debe indicar un tipo de egreso"
-                    converter="entityConverter" 
-                    filter="true" 
-                    filterMatchMode="contains" 
-                    autoWidth="false">
-                    <f:selectItem itemLabel="---Tipo de Egreso---" noSelectionOption="true" />
-                    <f:selectItems value="#{tipoEgresoBean.lst}" var="tipo"
-                                   itemLabel="#{tipo.nombre}" itemValue="#{tipo}" />
-                    <p:ajax process="@this"/>
-                </p:selectOneMenu>
+        <p:fieldset legend="Egreso">
+            <div class="p-grid">
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="tipoEgre" value="Tipo de egreso" style="display:block" />
+                    <p:selectOneMenu id="tipoEgre"
+                                     widgetVar="tipoEgre"
+                                     styleClass="w-full" 
+                                     value="#{tipoEgresoBean.selected}" 
+                                     required="true" 
+                                     requiredMessage="Debe indicar un tipo de egreso"
+                                     converter="entityConverter" 
+                                     filter="true" 
+                                     filterMatchMode="contains" 
+                                     autoWidth="false">
+                        <f:selectItem itemLabel="---Tipo de Egreso---" noSelectionOption="true" />
+                        <f:selectItems value="#{tipoEgresoBean.lst}" var="tipo"
+                                       itemLabel="#{tipo.nombre}" itemValue="#{tipo}" />
+                        <p:ajax process="@this" listener="#{tipoEgresoBean.preparar(tipoEgresoBean.selected)}" update="cateEgre"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                        <p:outputLabel for="cateEgre" value="Categoría" style="display:block"/>
+                        <p:selectOneMenu id="cateEgre"
+                                         widgetVar="cateEgre"
+                                         styleClass="w-full" 
+                                         value="#{categoriaEgresoBean.selected}" 
+                                         required="true" 
+                                         requiredMessage="Debe indicar una categoria de egreso"
+                                         converter="entityConverter" 
+                                         filter="true" 
+                                         filterMatchMode="contains" 
+                                         autoWidth="false">
+                            <f:selectItem itemLabel="---Categoria de Egreso---" noSelectionOption="true"/>
+                            <f:selectItems value="#{categoriaEgresoBean.lst}" var="cate" 
+                                           itemLabel="#{cate.nombre}" itemValue="#{cate}" /> 
+                            <p:ajax process="@this" listener="#{categoriaEgresoBean.preparar(categoriaEgresoBean.selected)}" update="concEgre"/>
+                        </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="concEgre" value="Concepto" style="display:block"/>
+                    <p:selectOneMenu id="concEgre"
+                                     widgetVar="concEgre"
+                                     styleClass="w-full" 
+                                     value="#{catConceptoEgresoBean.selected}" 
+                                     required="true" 
+                                     requiredMessage="Debe indicar un concepto de egreso"
+                                     converter="entityConverter" 
+                                     filter="true" 
+                                     filterMatchMode="contains" 
+                                     autoWidth="false">
+                        <f:selectItem itemLabel="---Concepto de Egreso---" noSelectionOption="true"/>
+                        <f:selectItems value="#{catConceptoEgresoBean.lst}" var="conc" 
+                                       itemLabel="#{conc.nombre}" itemValue="#{conc}" /> 
+                        <p:ajax process="@this" />
+
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="stDedu" value="¿Es deducible?" style="display:block"/>
+                    <p:selectOneMenu id="stDedu" value="">
+                        <f:selectItem itemLabel="Sí" itemValue="true" />
+                        <f:selectItem itemLabel="No" itemValue="false" />
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="txNoDedu" value="¿Por que no es deducible?" style="display:block"/> 
+                    <p:inputTextarea id="txNoDedu" 
+                                     value="" 
+                                     rows="3" 
+                                     maxlength="250" 
+                                     autoResize="true" 
+                                     readonly=""/> 
+                </div>
+
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="stCFDI" value="¿Requiere CFDI?" style="display:block"/> 
+                    <p:selectOneMenu id="stCFDI" value="">
+                        <f:selectItem itemLabel="Sí" itemValue="true" />
+                        <f:selectItem itemLabel="No" itemValue="false" />
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="cfdiUUID" value="CFDI UUID:" style="display:block" />
+                    <p:inputText id="cfdiUUID" 
+                                 maxlength="36" 
+                                 value="" 
+                                 readonly=""/>
+                </div>
+
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="stIVA" value="¿Tiene IVA?" style="display:block"/>
+                    <p:selectOneMenu id="stIVA" value="">
+                        <f:selectItem itemLabel="Sí" itemValue="true" />
+                        <f:selectItem itemLabel="No" itemValue="false" />
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="pcIVA" value="Porcentaje IVA:" style="display:block" />
+                    <p:inputNumber id="pcIVA"
+                                   value=""
+                                   decimalPlaces="3"
+                                   maxValue="100.000"
+                                   minValue="0"
+                                   symbol="%"
+                                   symbolPosition="s"
+                                   readonly=""
+                                   inputStyle="width:120px"><p:ajax process="@this"/></p:inputNumber>
+                </div>
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="stIEPS" value="¿Tiene IEPS?" style="display:block"/>
+                    <p:selectOneMenu id="stIEPS" value="">
+                        <f:selectItem itemLabel="Sí" itemValue="true" />
+                        <f:selectItem itemLabel="No" itemValue="false" />
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="pcIEPS" value="Porcentaje IEPS:" style="display:block"/>
+                    <p:inputNumber id="pcIEPS"
+                                   value=""
+                                   decimalPlaces="3"
+                                   maxValue="100.000"
+                                   minValue="0"
+                                   symbol="%"
+                                   symbolPosition="s"
+                                   readonly=""
+                                   inputStyle="width:120px"><p:ajax process="@this"/></p:inputNumber>
+                </div>
+
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="stActiFijo" value="¿Es activo fijo?" style="display:block"/>
+                    <p:selectOneMenu id="stActiFijo" value="">
+                        <f:selectItem itemLabel="Sí" itemValue="true" />
+                        <f:selectItem itemLabel="No" itemValue="false" />
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="" value="" />
+
+                </div>
+
             </div>
+        </p:fieldset>
 
-            <div class="col-12 md:col-4">
-                <p:outputLabel value="Categoría" />
-                <p:selectOneMenu styleClass="w-full">
-
-                </p:selectOneMenu>
-            </div>
-
-            <div class="col-12 md:col-4">
-                <p:outputLabel value="Concepto" />
-                <p:selectOneMenu styleClass="w-full">
-
-                </p:selectOneMenu>
-            </div>
-
-        </div>
     </div>
 
 </ui:composition>
