@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioAlmacen" pageWidth="851" pageHeight="611" columnWidth="761" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="2f361463-f417-4104-8c12-7ab1c04e4a00">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InventarioAlmacen" pageWidth="851" pageHeight="611" whenNoDataType="NoDataSection" columnWidth="761" leftMargin="45" rightMargin="45" topMargin="28" bottomMargin="28" uuid="2f361463-f417-4104-8c12-7ab1c04e4a00">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_Azure.jrdax"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -12,6 +12,50 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="dsCliente" whenResourceMissingType="Empty" uuid="f4ddf1e6-47c0-44e5-b04d-23b6e7889b80">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_Azure.jrdax"/>
+		<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="552"/>
+		<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="434"/>
+		<parameter name="idCliente" class="java.lang.Integer" evaluationTime="Early"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT cte_nombre
+FROM cliente c
+WHERE c.cte_cve = $P{idCliente} ]]>
+		</queryString>
+		<field name="cte_nombre" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="CTE_NOMBRE"/>
+			<property name="com.jaspersoft.studio.field.label" value="cte_nombre"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="cliente"/>
+		</field>
+	</subDataset>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[new String ("resources/logo_square.gif")]]></defaultValueExpression>
 	</parameter>
@@ -1285,7 +1329,7 @@ ORDER BY cliente,numero_cte, nb_tarima, producto]]>
 		</band>
 	</lastPageFooter>
 	<noData>
-		<band height="100">
+		<band height="280">
 			<staticText>
 				<reportElement x="0" y="0" width="761" height="21" forecolor="#2196F3" uuid="24ead9c8-9ac9-41bd-bc06-5eb8ed78ba49">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1298,21 +1342,61 @@ ORDER BY cliente,numero_cte, nb_tarima, producto]]>
 				<text><![CDATA[REPORTE DE INVENTARIO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="71" width="761" height="29" uuid="a35e933e-3b46-4397-b194-ede13c317f08">
+				<reportElement style="Table_TD" x="0" y="170" width="761" height="29" uuid="a35e933e-3b46-4397-b194-ede13c317f08">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[new Boolean($P{idCliente} == null)]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[NO SE ENCONTRO INFORMACION DEL INVENTARIO]]></text>
+				<text><![CDATA[NO SE ENCONTRÓ INFORMACIÓN DE INVENTARIO]]></text>
 			</staticText>
 			<image>
 				<reportElement x="0" y="0" width="170" height="54" uuid="d3c0e26f-5be3-46c6-8bd9-0f69f9c7ea56"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
+			<componentElement>
+				<reportElement x="0" y="199" width="761" height="31" uuid="d8c936ca-4196-400a-8b84-7d34312d571a">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="Blank">
+					<datasetRun subDataset="dsCliente" uuid="fe1946fd-1779-40fd-9049-2efa5da57465">
+						<datasetParameter name="idCliente">
+							<datasetParameterExpression><![CDATA[$P{idCliente}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="761" uuid="5fe29131-178a-4cba-a3e3-04a720e6c91b">
+						<jr:detailCell style="Table_TD" height="30">
+							<box>
+								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement x="0" y="0" width="761" height="30" uuid="d86d681d-da7a-4395-9876-d0e560cffaae"/>
+								<box>
+									<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+									<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12" isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA["EL CLIENTE --" + $F{cte_nombre} + "-- NO TIENE INVENTARIO."]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
 		</band>
 	</noData>
 </jasperReport>
