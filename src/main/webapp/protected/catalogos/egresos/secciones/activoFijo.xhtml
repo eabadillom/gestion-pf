@@ -1,15 +1,80 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
--->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>TODO supply a title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
-</html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <div class="surface-0 p-3 border-round">
+
+        <p:fieldset legend="Activo Fijo" toggleable="true">
+            <div class="p-grid">
+                <div class="p-col-12 p-md-6">
+                    <p:outputLabel for="nombActiFijo" value="Activo Fijo:" style="display: block"/>
+                    <p:inputTextarea id="nombActiFijo" 
+                                     value="" 
+                                     rows="3"
+                                     required="true"
+                                     maxlength="150" 
+                                     style="width:100%"
+                                     autoResize="false"/>
+                </div>
+
+                <div class="p-col-12 p-md-6">
+                    <p:outputLabel for="fhAdqu" value="Fecha de adquisición:" style="display: block"/>
+                    <p:datePicker id="fhAdqu" 
+                                  value=""
+                                  pattern="dd/MM/yyyy"
+                                  showIcon="true">
+                        <p:ajax event="dateSelect" process="@this"/>             
+                    </p:datePicker>
+                </div>
+
+                <div class="p-col-12 p-md-6">
+                    <p:outputLabel for="impoActiFijo" value="Importe del Activo Fijo:" style="display: block"/>
+                    <p:inputNumber id="impoActiFijo"
+                                   value=""
+                                   decimalPlaces="2"
+                                   maxValue="999999999999999.99"
+                                   minValue="0"
+                                   symbol="$"
+                                   symbolPosition="p"
+                                   thousandSeparator=","
+                                   decimalSeparator="."
+                                   required="true"
+                                   inputStyle="width:100%">
+                        <p:ajax process="@this"/>
+                    </p:inputNumber>
+                </div>
+                
+                <div class="p-col-12 p-md-6">
+                <p:outputLabel for="vidaUtil" value="Vida útil (meses):" style="display: block"/>
+                <p:inputNumber id="vidaUtil"
+                               value=""
+                               decimalPlaces="0"
+                               minValue="0"
+                               maxValue="365"
+                               inputStyle="width:50%">
+                    <p:ajax event="blur" process="@this" />
+                </p:inputNumber>
+            </div>
+                
+                <div class="p-col-12 p-md-4">
+                <p:outputLabel for="statActiFijo" value="Status del activo fijo:" style="display:block"/>
+                <p:selectOneMenu id="statActiFijo"
+                                 widgetVar="statActiFijo"
+                                 styleClass="w-full" 
+                                 value="" 
+                                 required="true" 
+                                 requiredMessage="Debe indicar un status para el activo fijo"
+                                 converter="entityConverter" 
+                                 filter="true" 
+                                 filterMatchMode="contains" 
+                                 autoWidth="false">
+                    <f:selectItem itemLabel="---Status de cargo---" noSelectionOption="true"/> 
+                    <p:ajax process="@this"/>
+                </p:selectOneMenu>
+            </div>
+            </div> 
+        </p:fieldset>
+    </div>
+
+</ui:composition>

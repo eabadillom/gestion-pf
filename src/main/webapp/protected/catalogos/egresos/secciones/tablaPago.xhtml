@@ -8,7 +8,12 @@
         <p:fieldset legend="Pagos de Egreso">
             <div class="p-grid">
                 <div class="p-col-12 p-md-3">
-                    <p:commandButton value="Agregar Pago" icon="pi pi-plus" styleClass="ui-button-primary" >
+                    <p:commandButton id="btnAddPago" 
+                                     value="Agregar Pago" 
+                                     icon="pi pi-plus" 
+                                     styleClass="ui-button-primary" 
+                                     onstart="PF('statusInfoDialog').show();"
+                                     oncomplete="PF('statusInfoDialog').hide(); PF('dlgPagoEgre').show()" >
                         <p:ajax process="@this"/>
                     </p:commandButton>
                 </div>
@@ -36,7 +41,7 @@
 
                             <p:commandButton id="btnEditPago" icon="pi pi-pencil"
                                              onstart="PF('statusInfoDialog').show();"
-                                             oncomplete="PF('statusInfoDialog').hide();"
+                                             oncomplete="PF('statusInfoDialog').hide(); PF('dlgPagoEgre').show()"
                                              process="@this"/>
                         </p:column>
                     </p:dataTable>

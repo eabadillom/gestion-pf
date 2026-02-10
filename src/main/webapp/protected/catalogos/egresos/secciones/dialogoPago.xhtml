@@ -2,21 +2,134 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
-    
+
     <p:dialog id="dlgPagoEgre"
-              widgetVar="dlgEgre"
+              widgetVar="dlgPagoEgre"
               modal="true"
               header="Pago de Egreso"
               resizable="false"
               dynamic="true"
               style="max-width:80em;">
-        
+
         <div class="p-grid">
-            <div class="p-col-12" class="p-md-4">
-                
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="fhLimi" value="Fecha limite:" style="display: block"/>
+                <p:datePicker id="fhLimi" 
+                              value=""
+                              pattern="dd/MM/yyyy"
+                              showIcon="true">
+                    <p:ajax event="dateSelect" process="@this"/>             
+                </p:datePicker>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="fhPago" value="Fecha Pago:" style="display: block"/>
+                <p:datePicker id="fhPago" 
+                              value=""
+                              pattern="dd/MM/yyyy"
+                              showIcon="true">
+                    <p:ajax event="dateSelect" process="@this"/>             
+                </p:datePicker>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="refePago" value="Referencia de pago:" style="display: block" />
+                <p:inputText id="refePago"
+                             value=""
+                             maxlength="100"
+                             required="true"
+                             style="width:100%">
+                    <p:ajax process="@this"/>
+                </p:inputText>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="impoPago" value="Importe:" style="display: block"/>
+                <p:inputNumber id="impoPago"
+                               value=""
+                               decimalPlaces="2"
+                               maxValue="999999999999999.99"
+                               minValue="0"
+                               symbol="$"
+                               symbolPosition="p"
+                               thousandSeparator=","
+                               decimalSeparator="."
+                               required="true"
+                               inputStyle="width:100%">
+                    <p:ajax process="@this"/>
+                </p:inputNumber>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="mediPago" value="Medio de pago:" style="display:block"/>
+                <p:selectOneMenu id="mediPago"
+                                 widgetVar="mediPago"
+                                 styleClass="w-full" 
+                                 value="" 
+                                 required="true" 
+                                 requiredMessage="Debe indicar un medio de pago"
+                                 converter="entityConverter" 
+                                 filter="true" 
+                                 filterMatchMode="contains" 
+                                 autoWidth="false">
+                    <f:selectItem itemLabel="---Medios de pago---" noSelectionOption="true"/>
+                    <p:ajax process="@this"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="statPago" value="Status del pago:" style="display:block"/>
+                <p:selectOneMenu id="statPago"
+                                 widgetVar="stat"
+                                 styleClass="w-full" 
+                                 value="" 
+                                 required="true" 
+                                 requiredMessage="Debe indicar un status de pago"
+                                 converter="entityConverter" 
+                                 filter="true" 
+                                 filterMatchMode="contains" 
+                                 autoWidth="false">
+                    <f:selectItem itemLabel="---Status de pago---" noSelectionOption="true"/> 
+                    <p:ajax process="@this"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="txObsePago" value="Observaciones:" style="display: block"/>
+                <p:inputTextarea id="txObsePago" 
+                                 value="" 
+                                 rows="3" 
+                                 maxlength="250" 
+                                 autoResize="true" 
+                                 style="width:100%"/>
+            </div>
+
+            <div class="p-col-12">
+                <p:fileUpload id="filePagoEgre"
+                              value=""
+                              mode="advanced"
+                              dragDropSupport="true"
+                              multiple="false"
+                              allowTypes="/(\.|\/)(pdf|jpg|png)$/"
+                              sizeLimit="5242880"
+                              auto="true"
+                              label="Subir archivo"/>
             </div>
         </div>
-        
+        <f:facet name="footer">
+            <p:commandButton id="btnOperPago"
+                             value="Accion"
+                             icon="pi pi-save"
+                             process="@this" />
+
+            <p:commandButton id="btnCancPago"
+                             value="Cancelar"
+                             icon="pi pi-times"
+                             styleClass="ui-button-secondary p-ml-2" 
+                             immediate="true"
+                             oncomplete="PF('dlgPagoEgre').hide()"/>
+        </f:facet>
     </p:dialog>
 
 </ui:composition>

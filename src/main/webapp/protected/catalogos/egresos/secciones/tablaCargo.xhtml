@@ -8,7 +8,12 @@
         <p:fieldset legend="Cargos del Egreso">
             <div class="p-grid">
                 <div class="p-col-12 p-md-3">
-                    <p:commandButton value="Agregar Cargo" icon="pi pi-plus" styleClass="ui-button-primary" >
+                    <p:commandButton id="btnAddCarg" 
+                                     value="Agregar Cargo"
+                                     icon="pi pi-plus" 
+                                     styleClass="ui-button-primary" 
+                                     onstart="PF('statusInfoDialog').show();"
+                                     oncomplete="PF('statusInfoDialog').hide(); PF('dlgCargEgre').show()" >
                         <p:ajax process="@this"/>
                     </p:commandButton>
                 </div>
@@ -34,10 +39,11 @@
 
                         <p:column headerText="Acciones" style="width:150px">
 
-                            <p:commandButton id="btnEditCargo" icon="pi pi-pencil"
+                            <p:commandButton id="btnEditCarg" icon="pi pi-pencil"
                                              onstart="PF('statusInfoDialog').show();"
-                                             oncomplete="PF('statusInfoDialog').hide();"
-                                             process="@this"/>
+                                             oncomplete="PF('statusInfoDialog').hide(); PF('dlgCargEgre').show()"
+                                             process="@this"
+                                             />
                         </p:column>
                     </p:dataTable>
                 </div>

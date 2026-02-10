@@ -1,15 +1,191 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
--->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>TODO supply a title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
-</html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <p:dialog id="dlgCargEgre"
+              widgetVar="dlgCargEgre"
+              modal="true"
+              header="Cargo de Egreso"
+              resizable="false"
+              dynamic="true"
+              style="max-width:80em;">
+
+        <div class="p-grid">
+            
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="tipoCarg" value="Tipo de cargo:" style="display:block"/>
+                <p:selectOneMenu id="tipoCarg"
+                                 widgetVar="tipoCarg"
+                                 styleClass="w-full" 
+                                 value="" 
+                                 required="true" 
+                                 requiredMessage="Debe indicar un tipo de cargo"
+                                 converter="entityConverter" 
+                                 filter="true" 
+                                 filterMatchMode="contains" 
+                                 autoWidth="false">
+                    <f:selectItem itemLabel="---Tipo de cargo---" noSelectionOption="true"/> 
+                    <p:ajax process="@this"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="fhCalc" value="Fecha de calculo" style="display: block"/>
+                <p:datePicker id="fhCalc" 
+                              value=""
+                              pattern="dd/MM/yyyy"
+                              showIcon="true">
+                    <p:ajax event="dateSelect" process="@this"/>             
+                </p:datePicker>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="fhApli" value="Fecha de calculo" style="display: block"/>
+                <p:datePicker id="fhApli" 
+                              value=""
+                              pattern="dd/MM/yyyy"
+                              showIcon="true">
+                    <p:ajax event="dateSelect" process="@this"/>             
+                </p:datePicker>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="nuDias" value="Número de días:" style="display: block"/>
+                <p:inputNumber id="nuDias"
+                               value=""
+                               decimalPlaces="0"
+                               minValue="0"
+                               maxValue="365"
+                               inputStyle="width:50%">
+                    <p:ajax event="blur" process="@this" />
+                </p:inputNumber>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="pcTasaCarg" value="Porcentaje Tasa:" style="display:block" />
+                <p:inputNumber id="pcTasaCarg"
+                               value=""
+                               decimalPlaces="3"
+                               maxValue="100.000"
+                               minValue="0"
+                               symbol="%"
+                               symbolPosition="s"
+                               readonly=""
+                               inputStyle="width:100%">
+                    <p:ajax process="@this"/>
+                </p:inputNumber>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="impoCarg" value="Importe del cargo:" style="display: block"/>
+                <p:inputNumber id="impoCarg"
+                               value=""
+                               decimalPlaces="2"
+                               maxValue="999999999999999.99"
+                               minValue="0"
+                               symbol="$"
+                               symbolPosition="p"
+                               thousandSeparator=","
+                               decimalSeparator="."
+                               required="true"
+                               inputStyle="width:100%">
+                    <p:ajax process="@this"/>
+                </p:inputNumber>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="ivaCargo" value="IVA:" style="display: block"/>
+                <p:inputNumber id="ivaCargo"
+                               value=""
+                               decimalPlaces="2"
+                               maxValue="999999999999999.99"
+                               minValue="0"
+                               symbol="$"
+                               symbolPosition="p"
+                               thousandSeparator=","
+                               decimalSeparator="."
+                               required="true"
+                               inputStyle="width:100%">
+                    <p:ajax process="@this"/>
+                </p:inputNumber>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="iepsCarg" value="IEPS:" style="display: block"/>
+                <p:inputNumber id="iepsCarg"
+                               value=""
+                               decimalPlaces="2"
+                               maxValue="999999999999999.99"
+                               minValue="0"
+                               symbol="$"
+                               symbolPosition="p"
+                               thousandSeparator=","
+                               decimalSeparator="."
+                               required="true"
+                               inputStyle="width:100%">
+                    <p:ajax process="@this"/>
+                </p:inputNumber>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="totaCarg" value="Total:" style="display: block"/>
+                <p:inputNumber id="totaCarg"
+                               value=""
+                               decimalPlaces="2"
+                               maxValue="999999999999999.99"
+                               minValue="0"
+                               symbol="$"
+                               symbolPosition="p"
+                               thousandSeparator=","
+                               decimalSeparator="."
+                               required="true"
+                               inputStyle="width:100%">
+                    <p:ajax process="@this"/>
+                </p:inputNumber>
+            </div>
+            
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="txObseCarg" value="Observaciones:" style="display: block"/>
+                <p:inputTextarea id="txObseCarg" 
+                                 value="" 
+                                 rows="3" 
+                                 maxlength="250" 
+                                 style="width:100%"
+                                 autoResize="false" />
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="statCarg" value="Status del cargo:" style="display:block"/>
+                <p:selectOneMenu id="statCarg"
+                                 widgetVar="statCarg"
+                                 styleClass="w-full" 
+                                 value="" 
+                                 required="true" 
+                                 requiredMessage="Debe indicar un status al cargo"
+                                 converter="entityConverter" 
+                                 filter="true" 
+                                 filterMatchMode="contains" 
+                                 autoWidth="false">
+                    <f:selectItem itemLabel="---Status de cargo---" noSelectionOption="true"/> 
+                    <p:ajax process="@this"/>
+                </p:selectOneMenu>
+            </div>
+
+        </div>
+        <f:facet name="footer">
+            <p:commandButton id="btnOperCarg"
+                             value="Accion"
+                             icon="pi pi-save"
+                             process="@this" />
+
+            <p:commandButton id="btnCancCarg"
+                             value="Cancelar"
+                             icon="pi pi-times"
+                             styleClass="ui-button-secondary p-ml-2" 
+                             immediate="true"
+                             oncomplete="PF('dlgCargEgre').hide()"/>
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>

@@ -22,7 +22,7 @@
             <div class="p-grid">
                 <div class="p-col-12">
                     <div class="p-col-12 p-md-3">
-                        <p:outputLabel for="emi" value="Emisor:"/> 
+                        <p:outputLabel for="emi" value="Emisor:" style="display: block"/> 
                         <p:selectOneMenu id="emi"
                                          widgetVar="emi"
                                          styleClass="w-full" 
@@ -44,11 +44,14 @@
 
             <ui:include src="/protected/catalogos/egresos/secciones/fiscal.xhtml"/>
             <ui:include src="/protected/catalogos/egresos/secciones/importeEgreso.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/activoFijo.xhtml"/>
             <ui:include src="/protected/catalogos/egresos/secciones/tablaPago.xhtml"/>
             <ui:include src="/protected/catalogos/egresos/secciones/tablaCargo.xhtml"/>
             <ui:include src="/protected/catalogos/egresos/secciones/tablaAsignacion.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/dialogoPago.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/dialogoCargo.xhtml"/>
         </h:form>      
-
+        
     </ui:define>
 
 </ui:composition>

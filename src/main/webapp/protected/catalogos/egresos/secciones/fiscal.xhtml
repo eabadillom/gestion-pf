@@ -7,7 +7,7 @@
 
         <p:fieldset legend="Egreso">
             <div class="p-grid">
-                <div class="p-col-12 p-md-4">
+                <div class="p-col-12 p-md-3">
                     <p:outputLabel for="tipoEgre" value="Tipo de egreso" style="display:block" />
                     <p:selectOneMenu id="tipoEgre"
                                      widgetVar="tipoEgre"
@@ -26,7 +26,7 @@
                     </p:selectOneMenu>
                 </div>
 
-                <div class="p-col-12 p-md-4">
+                <div class="p-col-12 p-md-3">
                         <p:outputLabel for="cateEgre" value="Categoría" style="display:block"/>
                         <p:selectOneMenu id="cateEgre"
                                          widgetVar="cateEgre"
@@ -45,7 +45,7 @@
                         </p:selectOneMenu>
                 </div>
 
-                <div class="p-col-12 p-md-4">
+                <div class="p-col-12 p-md-3">
                     <p:outputLabel for="concEgre" value="Concepto" style="display:block"/>
                     <p:selectOneMenu id="concEgre"
                                      widgetVar="concEgre"
@@ -62,6 +62,15 @@
                                        itemLabel="#{conc.nombre}" itemValue="#{conc}" /> 
                         <p:ajax process="@this" />
 
+                    </p:selectOneMenu>
+                </div>
+                
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="stActiFijo" value="¿Es activo fijo?" style="display:block"/>
+                    <p:selectOneMenu id="stActiFijo" value="">
+                        <f:selectItem itemLabel="Sí" itemValue="true" />
+                        <f:selectItem itemLabel="No" itemValue="false" />
+                        <p:ajax process="@this"/>
                     </p:selectOneMenu>
                 </div>
 
@@ -140,15 +149,6 @@
                                    symbolPosition="s"
                                    readonly=""
                                    inputStyle="width:120px"><p:ajax process="@this"/></p:inputNumber>
-                </div>
-
-                <div class="p-col-12 p-md-3">
-                    <p:outputLabel for="stActiFijo" value="¿Es activo fijo?" style="display:block"/>
-                    <p:selectOneMenu id="stActiFijo" value="">
-                        <f:selectItem itemLabel="Sí" itemValue="true" />
-                        <f:selectItem itemLabel="No" itemValue="false" />
-                        <p:ajax process="@this"/>
-                    </p:selectOneMenu>
                 </div>
 
                 <div class="p-col-12 p-md-3">
