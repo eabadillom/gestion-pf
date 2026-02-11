@@ -8,7 +8,12 @@
         <p:fieldset legend="Asignaciones del Egreso">
             <div class="p-grid">
                 <div class="p-col-12 p-md-3">
-                    <p:commandButton value="Agregar Asignación" icon="pi pi-plus" styleClass="ui-button-primary" >
+                    <p:commandButton id="btnAddAsig"
+                                     value="Agregar Asignación" 
+                                     icon="pi pi-plus" 
+                                     styleClass="ui-button-primary" 
+                                     onstart="PF('statusInfoDialog').show();"
+                                     oncomplete="PF('statusInfoDialog').hide(); PF('dlgAsigEgre').show()">
                         <p:ajax process="@this"/>
                     </p:commandButton>
                 </div>
@@ -31,9 +36,11 @@
 
                         <p:column headerText="Acciones" style="width:150px">
 
-                            <p:commandButton id="btnEditAsig" icon="pi pi-pencil"
+                            <p:commandButton id="btnEditAsig" 
+                                             icon="pi pi-pencil" 
+                                             styleClass="ui-button-primary" 
                                              onstart="PF('statusInfoDialog').show();"
-                                             oncomplete="PF('statusInfoDialog').hide();"
+                                             oncomplete="PF('statusInfoDialog').hide(); PF('dlgAsigEgre').show()"
                                              process="@this"/>
                         </p:column>
                     </p:dataTable>

@@ -1,15 +1,58 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
--->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>TODO supply a title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
-</html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Egreso</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="formEgre">
+            <p:growl id="messages" showDetail="true" />
+
+            <p:dialog widgetVar="statusInfoDialog" modal="true" header="Cargando información..." draggable="false"
+                      closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+
+            <div class="p-grid">
+                <div class="p-col-12">
+                    <div class="p-col-12 p-md-3">
+                        <p:outputLabel for="emi" value="Emisor:" style="display: block"/> 
+                        <p:selectOneMenu id="emi"
+                                         widgetVar="emi"
+                                         styleClass="w-full" 
+                                         value="#{nEmisoresCFDISBean.selected}" 
+                                         required="true" 
+                                         requiredMessage="Debe indicar una razón social"
+                                         converter="entityConverter" 
+                                         filter="true" 
+                                         filterMatchMode="contains" 
+                                         autoWidth="false">
+                            <f:selectItem  itemLabel="---Emisores---" noSelectionOption="true"/>
+                            <f:selectItems value="#{nEmisoresCFDISBean.lst}" var="emisor"
+                                           itemLabel="#{emisor.nombre}" itemValue="#{emisor}"/>
+                            <p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+            </div>
+
+            <ui:include src="/protected/catalogos/egresos/secciones/fiscal.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/importeEgreso.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/activoFijo.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/tablaPago.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/tablaCargo.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/tablaAsignacion.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/dialogoPago.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/dialogoCargo.xhtml"/>
+            <ui:include src="/protected/catalogos/egresos/secciones/dialogoAsignacion.xhtml"/>
+        </h:form>      
+        
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Consulta de egreso</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="formCons">
+
+            <p:growl id="messages" showDetail="true" />
+
+            <p:dialog widgetVar="statusInfoDialog" modal="true" header="Cargando información..." draggable="false"
+                      closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+
+            <p:panel header="Filtros de búsqueda" styleClass="p-mb-3">
+
+                <div class="p-fluid">
+                    <div class="p-grid">
+
+                        <div class="p-col-12 p-md-3">
+                            <p:outputLabel for="mes" value="Mes" style="display: block"/>
+                            <p:datePicker id="mes"
+                                          value=""
+                                          view="month"
+                                          pattern="MM/yyyy"
+                                          yearNavigator="true"
+                                          monthNavigator="true"
+                                          showIcon="true"/>
+                        </div>
+
+                        <div class="p-col-12 p-md-4">
+                            <p:outputLabel for="emisorFiltro" value="Emisor" style="display: block"/>
+                            <p:selectOneMenu id="emisorFiltro"
+                                             value=""
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             style="width:100%">
+                                <f:selectItem itemLabel="--- Todos ---" noSelectionOption="true"/>
+                                <f:selectItems value=""
+                                               var="em"
+                                               itemLabel="#{em.nombre}"
+                                               itemValue="#{em}"/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="p-col-12 p-md-3">
+                            <p:outputLabel for="statusFiltro" value="Status" style="display: block"/>
+                            <p:selectOneMenu id="statusFiltro"
+                                             value=""
+                                             style="width:100%">
+                                <f:selectItem itemLabel="--- Todos ---" noSelectionOption="true"/>
+                                <f:selectItems value=""/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="p-col-12 p-md-2 p-d-flex p-ai-end">
+                            <p:commandButton value="Buscar"
+                                             icon="pi pi-search"
+                                             styleClass="p-mr-2"/>
+
+                            <p:commandButton value="Limpiar"
+                                             icon="pi pi-times"
+                                             styleClass="ui-button-secondary"/>
+                        </div>
+
+                    </div>
+                </div>
+
+            </p:panel>
+
+            <p:dataTable id="tbEgre"
+                         widgetVar="tbEgre"
+                         value=""
+                         var="item"
+                         rowKey="#{item.id}"
+                         paginator="true"
+                         paginatorPosition="bottom"
+                         rows="5"
+                         >
+
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

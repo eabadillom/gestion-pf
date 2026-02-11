@@ -9,7 +9,7 @@
               header="Pago de Egreso"
               resizable="false"
               dynamic="true"
-              style="max-width:80em;">
+              width="768">
 
         <div class="p-grid">
 
@@ -106,8 +106,13 @@
             </div>
 
             <div class="p-col-12">
+                <div style="margin-bottom:10px;">
+                    <span style="font-weight:600;">Comprobante de pago</span><br/>
+                    <small style="color:#6c757d;">
+                        Formatos permitidos: PDF, JPG o PNG. Máximo 5MB.
+                    </small>
+                </div>
                 <p:fileUpload id="filePagoEgre"
-                              value=""
                               mode="advanced"
                               dragDropSupport="true"
                               multiple="false"
@@ -116,6 +121,7 @@
                               auto="true"
                               label="Subir archivo"/>
             </div>
+            
         </div>
         <f:facet name="footer">
             <p:commandButton id="btnOperPago"
