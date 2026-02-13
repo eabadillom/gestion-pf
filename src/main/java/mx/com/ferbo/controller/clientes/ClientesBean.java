@@ -225,12 +225,9 @@ public class ClientesBean implements Serializable {
             		.filter(item -> item.getAvisoCve() == null)
             		.collect(Collectors.toList());
             this.actualizarListasDomicilios();
-            this.tipoDomicilioSelected = lstTiposDomicilio
-            		.stream()
-            		.filter(item -> item.getDomicilioTipoDesc().contains("Fiscal"))
-            		.findFirst().orElse(null);
+            this.tipoDomicilioSelected = domicilios.tipoDomicilioFiscal();
             this.filtraListadoDomicilioFiltered();
-            
+            log.info("El usuario {} ha seleccionado al cliente {}", this.usuario.getNombre(), this.clienteSelected.getNombre());
         } catch (InventarioException ex) {
             log.warn(ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Cargar informacion", ex.getMessage());
@@ -259,6 +256,7 @@ public class ClientesBean implements Serializable {
         log.info("El usuario {} ha comenzado a realizar operaciones con el cliente {}", usuario.getUsuario(), clienteSelected.getNombre());
         String mensaje = null;
         try {
+            log.info("El usuario {} esta guardando/actualizando al cliente {}", usuario.getNombre(), clienteSelected.getNombre());
             fiscalBL.validarInfoFiscal(clienteSelected);
             mensaje = clienteBL.guardarOActualizar(clienteSelected);
             log.info("El usuario {} ha hecho la operación de {}", usuario.getUsuario(), mensaje);
@@ -361,7 +359,7 @@ public class ClientesBean implements Serializable {
                 default:
                     throw new InventarioException("Operación sobre avisos no válida");
             }
-            log.info("El usuario {} ha relalizaddo {}", usuario.getUsuario(), mensaje);
+            log.info("El usuario {} ha relalizado {}", usuario.getUsuario(), mensaje);
 //            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Aviso", mensaje);
         } catch (InventarioException ex) {
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Aviso", ex.getMessage());
@@ -550,17 +548,14 @@ public class ClientesBean implements Serializable {
     }
 
     public void filtraListadoDomicilioFiltered() {
-        if (tipoDomicilioSelected.getDomicilioTipoCve() != null) {
+        if (tipoDomicilioSelected != null) {
             lstClienteDomiciliosFiltered = domicilios.filtrarListadoDomicilio(lstClienteDomicilios,
                     tipoDomicilioSelected, clienteSelected);
         } else {
             tipoDomicilioSelected = null;
-
-            if (!lstClienteDomiciliosFiltered.isEmpty()) {
-                lstClienteDomiciliosFiltered.clear();
-            }
+            lstClienteDomiciliosFiltered = this.lstClienteDomicilios;
         }
-
+        
         PrimeFaces.current().ajax().update("form:tabView:soClienteTipoDom", "form:tabView:dt-domiciliosCliente");
     }
 
@@ -604,8 +599,9 @@ public class ClientesBean implements Serializable {
             log.info("Domicilio agregado: {}", domicilioSelected.toString());
             clienteDomicilioSelected = domicilios.nuevoClienteDomicilio(clienteSelected, domicilioSelected);
 
+            lstClienteDomicilios.add(clienteDomicilioSelected);
             lstClienteDomiciliosFiltered.add(clienteDomicilioSelected);
-            clienteSelected.setClienteDomiciliosList(lstClienteDomiciliosFiltered);
+            clienteSelected.setClienteDomiciliosList(lstClienteDomicilios);
             limpiaClienteDomicilio();
 
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Domicilios", "Se agrego correctamente");
@@ -632,12 +628,17 @@ public class ClientesBean implements Serializable {
             clienteDomicilioSelected = domicilios.actualizarDomicilios(clienteSelected, clienteDomicilioSelected,
                     domicilioSelected, tipoDomicilioSelected);
 
+            lstClienteDomicilios = lstClienteDomicilios.stream()
+                    .map(aux -> aux.getDomicilios().getDomCve().equals(
+                    clienteDomicilioSelected.getDomicilios().getDomCve()) ? clienteDomicilioSelected : aux)
+                    .collect(Collectors.toList());
+            
             lstClienteDomiciliosFiltered = lstClienteDomiciliosFiltered.stream()
                     .map(aux -> aux.getDomicilios().getDomCve().equals(
                     clienteDomicilioSelected.getDomicilios().getDomCve()) ? clienteDomicilioSelected : aux)
                     .collect(Collectors.toList());
-
-            clienteSelected.setClienteDomiciliosList(lstClienteDomiciliosFiltered);
+            
+            clienteSelected.setClienteDomiciliosList(lstClienteDomicilios);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Domicilios", "Se actualizo correctamente");
         } catch (InventarioException ex) {
             log.error("Problema para actualizar la información de domicilios...", ex);
@@ -659,20 +660,21 @@ public class ClientesBean implements Serializable {
                 throw new InventarioException("Error al eliminar el domicilio de la lista.");
             }
 
-            if (lstClienteDomiciliosFiltered == null || lstClienteDomiciliosFiltered.isEmpty()) {
+            if (lstClienteDomicilios == null || lstClienteDomicilios.isEmpty()) {
                 throw new InventarioException("El cliente no tiene domicilios registrados.");
             }
 
             // Buscar el domicilio en la lista y eliminarlo
-            boolean eliminado = lstClienteDomiciliosFiltered
+            boolean eliminado = lstClienteDomicilios
                     .removeIf(dom -> Objects.equals(dom.getId(), clienteDomicilioSelected.getId()));
 
             if (!eliminado) {
                 log.info("Elemento no eliminado: {}", eliminado);
                 throw new InventarioException("No se encontró el domicilio seleccionado en la lista.");
             }
-
-            clienteSelected.setClienteDomiciliosList(lstClienteDomiciliosFiltered);
+            
+            lstClienteDomiciliosFiltered.removeIf(dom -> Objects.equals(dom.getId(), clienteDomicilioSelected.getId()));
+            clienteSelected.setClienteDomiciliosList(lstClienteDomicilios);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Domicilios", "Se elimino correctamente");
         } catch (InventarioException ex) {
             log.error("Problema para actualizar la información de domicilios...", ex);

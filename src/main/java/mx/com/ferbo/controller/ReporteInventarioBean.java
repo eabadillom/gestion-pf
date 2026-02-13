@@ -112,8 +112,23 @@ public class ReporteInventarioBean implements Serializable {
 	}
 
 	public void filtradoCamara() {
-		this.listaCamara = this.camaraDAO.buscarPorPlanta(this.plantaSelect);
-		this.plantaSelect.setCamaraList(this.listaCamara);
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Seleccionar cámara";
+		
+		try {
+			if(this.plantaSelect == null)
+				throw new InventarioException("Debe seleccionar una planta");
+			this.listaCamara = this.camaraDAO.buscarPorPlanta(this.plantaSelect);
+			this.plantaSelect.setCamaraList(this.listaCamara);
+		} catch(Exception ex) {
+			log.error("Problema con la selección de cámaras...", ex);
+			mensaje = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance()
+				.addMessage(titulo, new FacesMessage(severity, "Problema con la consulta de cámras", mensaje));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
 	}
 
 	public void exportarPdf() throws JRException, IOException, SQLException {
@@ -272,7 +287,7 @@ public class ReporteInventarioBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		String titulo = "Reporte Servicios";
+		String titulo = "Reporte de inventario";
 
 		try {
 

@@ -67,6 +67,14 @@ public class DomiciliosBL implements Serializable
         return tiposDomicilioDAO.buscarTodos();
     }
     
+    public TiposDomicilio tipoDomicilioFiscal(){
+        List<TiposDomicilio> lstTiposDomicilio = this.buscarTiposDomicilios();
+        
+        return lstTiposDomicilio.stream()
+            .filter(item -> item.getDomicilioTipoDesc().contains("Fiscal"))
+            .findFirst().orElse(null);
+    }
+    
     public List<ClienteDomicilios> filtrarListado(List<ClienteDomicilios> listAux, Cliente clienteSelected)
     {
         List<ClienteDomicilios> listClienteDomiciliosFiltered = listAux.stream()

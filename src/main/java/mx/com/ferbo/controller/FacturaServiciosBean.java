@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -36,7 +37,7 @@ import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.ClienteDomiciliosDAO;
+import mx.com.ferbo.dao.n.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.ConceptoDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.FacturaDAO;
@@ -103,6 +104,7 @@ public class FacturaServiciosBean implements Serializable {
 	private List<Planta> listaPlanta;
 	private List<Aviso> listaA;
 	private List<Aviso> listaAviso;
+	private Aviso aviso;
 	private List<MetodoPago> listaMetodoPago;
 	private List<MedioPago> listaMedioPago;
 	private List<PrecioServicio> alServicios;
@@ -126,6 +128,7 @@ public class FacturaServiciosBean implements Serializable {
 	private SerieFactura serieFacturaSelect;
 	private ServicioFactura selServicio;
 	private ServicioFactura otroServicio;
+	private List<PrecioServicio> preciosServicio;
 	private PrecioServicio precioServicio;
 	private Factura factura;
 	private EmisoresCFDIS emisor;
@@ -305,39 +308,31 @@ public class FacturaServiciosBean implements Serializable {
 		try {
 			
 			this.clienteSelect = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
+			this.listaClienteDomicilio = new ClienteDomiciliosDAO().buscarPorCliente(this.clienteSelect.getCteCve());
 			
-			Map<Integer, List<PrecioServicio>> mpPrecioServicio = new HashMap<Integer, List<PrecioServicio>>();
-			List<PrecioServicio> precioServicioList = null;
-			listaClienteDomicilio.clear();
-			listaClienteDomicilio = clienteDomicilioDAO.buscarPorCliente(clienteSelect.getCteCve());
 			if(this.clienteSelect.getMetodoPago() == null)
 				throw new InventarioException("El cliente no tiene un método de pago configurado.");
 			this.metodoPagoSelect = this.clienteSelect.getMetodoPago();
 			
 			if (listaClienteDomicilio.size() > 0) {
-				domicilioSelect = listaClienteDomicilio.get(0).getDomicilios();
+				domicilioSelect = listaClienteDomicilio.stream()
+						.filter(cd -> cd.getDomicilios().getDomicilioTipoCve().getDomicilioTipoCve() == 1)
+						.findFirst()
+						.orElseThrow(() -> new InventarioException("El cliente no tiene configurado su domicilio fiscal."))
+						.getDomicilios()
+						;
+				log.debug("Domicilio seleccionado: {} {}", domicilioSelect.getDomicilioCalle(), domicilioSelect.getDomicilioNumExt());
 			}
 			
-			precioServicioList = psDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
+			this.preciosServicio = psDAO.buscarPorCliente(clienteSelect.getCteCve(), true);
 			
-			Integer idAviso = -1;
-
-			for (PrecioServicio ps : precioServicioList) {
-				Integer avisoCve = (ps.getAvisoCve() != null) ? ps.getAvisoCve().getAvisoCve() : -1;
-
-				if (avisoCve > idAviso) {
-					idAviso = avisoCve;
-				}
-
-				mpPrecioServicio.computeIfAbsent(avisoCve, k -> new ArrayList<>()).add(ps);
-			}
-
-			alServicios = new ArrayList<>(mpPrecioServicio.getOrDefault(idAviso, new ArrayList<>()));
 			for (PrecioServicio ps : alServicios) {
 				log.debug("Servicio: {} - Unidad: {}", ps.getServicio().getServicioDs(), ps.getUnidad().getUnidadDeManejoDs());
 			}
+			this.aviso = null;
 			
 			AvisoCliente();
+			seleccionaServicios();
 			setMedioPago();
 			setMetodoPago();
 			
@@ -353,13 +348,14 @@ public class FacturaServiciosBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, "Catálogo de clientes", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("receptor", "factura", "servicioSelect", "metodoPago", "medioPago");
+			PrimeFaces.current().ajax().update("form:receptor", "form:factura", "form:servicioSelect");
 		}
 	}
 	
 	public void AvisoCliente() {
 		listaAviso.clear();
 		listaAviso = avisoDAO.buscarPorCliente(clienteSelect.getCteCve());
+		
 		Aviso aviso;
 		if (listaAviso.size() > 1) {
 			Optional<Aviso> numeroMax = listaAviso.stream().max(Comparator.comparing(Aviso::getAvisoPlazo));
@@ -370,9 +366,28 @@ public class FacturaServiciosBean implements Serializable {
 				aviso = listaAviso.get(0);
 				this.plazoSelect = aviso.getAvisoPlazo();
 			} else {
-				System.out.println("el cliente no tiene aviso");
+				log.warn("el cliente no tiene aviso");
 			}
 		}
+	}
+	
+	public void seleccionaServicios() {
+		try {
+			if(this.aviso == null)
+				this.alServicios = preciosServicio.stream()
+				.filter(ps -> ps.getAvisoCve() == null)
+				.collect(Collectors.toList());
+			else
+				this.alServicios = preciosServicio.stream()
+				.filter(ps -> ps.getAvisoCve() != null)
+				.filter(ps -> ps.getAvisoCve().getAvisoCve() == this.aviso.getAvisoCve())
+				.collect(Collectors.toList());
+			
+		} catch(Exception ex) {
+			log.error("Problema para seleccionar los servicios del aviso...", ex);
+		}
+		
+			
 	}
 	
 	public void agregarServicio() {
@@ -1206,4 +1221,21 @@ public class FacturaServiciosBean implements Serializable {
 	public void setClaveUnidad(ClaveUnidad claveUnidad) {
 		this.claveUnidad = claveUnidad;
 	}
+	
+	public Aviso getAviso() {
+		return aviso;
+	}
+
+	public void setAviso(Aviso aviso) {
+		this.aviso = aviso;
+	}
+
+	public List<PrecioServicio> getPreciosServicio() {
+		return preciosServicio;
+	}
+
+	public void setPreciosServicio(List<PrecioServicio> preciosServicio) {
+		this.preciosServicio = preciosServicio;
+	}
+
 }
