@@ -82,8 +82,8 @@
 						</p:submenu>
                                                 <p:submenu id="frb_facturacion_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
                                                         <p:menuitem id="clasificacion_egresos" value="Clasificación de egresos" icon="pi pi-fw pi-tags" outcome="/protected/catalogos/categresos/catalogoEgreso" />
-							<p:menuitem id="consulta_egresos" value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/egresos/consulta" />
-                                                        <p:menuitem id="facturacion_egresos" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos/egreso" />
+                                                        <p:menuitem id="consulta_egresos" value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/egresos/consulta"/>
+                                                        <p:menuitem id="facturacion_egresos" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos/egreso"/>
 						</p:submenu>
 						<p:submenu label="Notas de Credito" icon="pi pi-file-o" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />

@@ -23,8 +23,14 @@ import mx.com.ferbo.model.catalogos.ConceptoEgreso;
 import mx.com.ferbo.model.catalogos.StatusEgreso;
 
 @NamedQueries({
-    @NamedQuery(name = "ImporteEgreso.findAllByMes", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.fechaLimitePago BETWEEN :inicio AND :fin ORDER BY ie.fechaLimitePago ASC"),
-    @NamedQuery(name = "ImporteEgreso.findAllByConcepto", query = "SELECT ie FROM ImporteEgreso ie WHERE ie.conceptoEgreso.catConcepto.id = :idConcepto"),
+   @NamedQuery(
+    name = "ImporteEgreso.findByFiltros",
+    query = "SELECT ie FROM ImporteEgreso ie " +
+            "WHERE ie.fechaLimitePago BETWEEN :inicio AND :fin " +
+            "AND (:idConcepto IS NULL OR ie.conceptoEgreso.catConcepto.id = :idConcepto) " +
+            "AND (:idEmisor IS NULL OR ie.emisor.id = :idEmisor) " +
+            "ORDER BY ie.fechaLimitePago ASC"
+)
 })
 @Entity
 @Table(name = "importe_egreso")

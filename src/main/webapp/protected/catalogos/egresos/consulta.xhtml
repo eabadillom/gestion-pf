@@ -28,7 +28,6 @@
                         <div class="p-col-12 p-md-3">
                             <p:outputLabel for="mes" value="Mes" style="display: block"/>
                             <p:datePicker id="mes"
-                                          value=""
                                           view="month"
                                           pattern="MM/yyyy"
                                           yearNavigator="true"
@@ -39,12 +38,11 @@
                         <div class="p-col-12 p-md-4">
                             <p:outputLabel for="emisorFiltro" value="Emisor" style="display: block"/>
                             <p:selectOneMenu id="emisorFiltro"
-                                             value=""
                                              filter="true"
                                              filterMatchMode="contains"
                                              style="width:100%">
                                 <f:selectItem itemLabel="--- Todos ---" noSelectionOption="true"/>
-                                <f:selectItems value=""
+                                <f:selectItems 
                                                var="em"
                                                itemLabel="#{em.nombre}"
                                                itemValue="#{em}"/>
@@ -54,7 +52,6 @@
                         <div class="p-col-12 p-md-3">
                             <p:outputLabel for="statusFiltro" value="Status" style="display: block"/>
                             <p:selectOneMenu id="statusFiltro"
-                                             value=""
                                              style="width:100%">
                                 <f:selectItem itemLabel="--- Todos ---" noSelectionOption="true"/>
                                 <f:selectItems value=""/>
@@ -86,6 +83,12 @@
                          rows="5"
                          >
 
+                <p:column headerText="Acciones">
+                    <p:commandButton value="Editar"
+                                     icon="pi pi-pencil"
+                                     action="#{principalBean.irEditar(item.id)}"
+                                     ajax="false" />
+                </p:column>
             </p:dataTable>
         </h:form>
     </ui:define>

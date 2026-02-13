@@ -15,10 +15,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.egresos.ImporteEgresoDAO;
+import mx.com.ferbo.model.catalogos.CatConceptoEgreso;
 import mx.com.ferbo.model.catalogos.ConceptoEgreso;
 import mx.com.ferbo.model.egresos.CargoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.model.egresos.PagoEgreso;
+import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.InventarioException;
@@ -52,31 +54,49 @@ public class ImporteEgresosBL {
         }
     }
 
-    public List<ImporteEgreso> obtenerPorPeriodoOConcepto(ConceptoEgreso concepto, YearMonth mes)
+    public List<ImporteEgreso> obtenerPorFiltros(
+            CatConceptoEgreso concepto,
+            NEmisoresCFDIS razon,
+            YearMonth mes)
             throws InventarioException {
+
         try {
+
             LocalDate lInicio = mes.atDay(1);
             LocalDate lFin = mes.atEndOfMonth();
 
             Date inicio = DateUtil.toDate(lInicio);
             Date fin = DateUtil.toDate(lFin);
 
-            if (concepto == null) {
-                return importeEgresoDAO.buscarTodosPorPeriodo(inicio, fin);
-            } else {
-                Integer catConceptoId = concepto.getCatConcepto() != null
-                        ? concepto.getCatConcepto().getId()
-                        : null;
-                return importeEgresoDAO.buscarTodosPorConcepto(catConceptoId);
+            Integer idConcepto = null;
+            Integer idEmisor = null;
+
+            if (concepto != null && concepto != null) {
+                idConcepto = concepto.getId();
             }
+
+            if (razon != null) {
+                idEmisor = razon.getId();
+            }
+
+            return importeEgresoDAO.buscarPorFiltros(
+                    inicio,
+                    fin,
+                    idConcepto,
+                    idEmisor
+            );
+
         } catch (DAOException ex) {
+
             log.warn("Error al obtener egresos: {}", ex.getMessage(), ex);
 
-            String detalle = (concepto == null || concepto.getCatConcepto() == null)
+            String detalle = (concepto == null || concepto == null)
                     ? "del mes " + mes
-                    : "con concepto " + concepto.getCatConcepto().getNombre();
+                    : "con concepto " + concepto.getNombre();
 
-            throw new InventarioException("Hubo un problema al obtener los egresos " + detalle);
+            throw new InventarioException(
+                    "Hubo un problema al obtener los egresos " + detalle
+            );
         }
     }
 
@@ -198,8 +218,8 @@ public class ImporteEgresosBL {
             throw new InventarioException("El pago no puede ser vacío");
         }
 
-        if (pago.getImporte() == null ||
-                pago.getImporte().compareTo(BigDecimal.ZERO) <= 0) {
+        if (pago.getImporte() == null
+                || pago.getImporte().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InventarioException("El importe del pago debe ser mayor a cero");
         }
 
@@ -218,8 +238,8 @@ public class ImporteEgresosBL {
             throw new InventarioException("El cargo no puede ser vacío");
         }
 
-        if (cargo.getImporteCargo() == null ||
-                cargo.getImporteCargo().compareTo(BigDecimal.ZERO) <= 0) {
+        if (cargo.getImporteCargo() == null
+                || cargo.getImporteCargo().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InventarioException("El importe del cargo debe ser mayor a cero");
         }
 
