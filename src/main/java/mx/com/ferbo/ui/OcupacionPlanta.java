@@ -8,36 +8,11 @@ import java.math.BigDecimal;
  */
 public class OcupacionPlanta 
 {
-    private String nbTarima;
-    private BigDecimal tarima;
-    private String camara;
     private String planta;
+    private String camara;
+    private BigDecimal tarima;
 
     public OcupacionPlanta() {
-    }
-
-    public String getNbTarima() {
-        return nbTarima;
-    }
-
-    public void setNbTarima(String nbTarima) {
-        this.nbTarima = nbTarima;
-    }
-
-    public BigDecimal getTarima() {
-        return tarima;
-    }
-
-    public void setTarima(BigDecimal tarima) {
-        this.tarima = tarima;
-    }
-
-    public String getCamara() {
-        return camara;
-    }
-
-    public void setCamara(String camara) {
-        this.camara = camara;
     }
 
     public String getPlanta() {
@@ -48,9 +23,25 @@ public class OcupacionPlanta
         this.planta = planta;
     }
 
+    public String getCamara() {
+        return camara;
+    }
+
+    public void setCamara(String camara) {
+        this.camara = camara;
+    }
+
+    public BigDecimal getTarima() {
+        return tarima;
+    }
+
+    public void setTarima(BigDecimal tarima) {
+        this.tarima = tarima;
+    }
+
     @Override
     public String toString() {
-        return "OcupacionPlanta[" + "nbTarima=" + nbTarima + ", tarima=" + tarima + ", camara=" + camara + ", planta=" + planta + ']';
+        return "OcupacionPlanta[" + "planta=" + planta + ", camara=" + camara + ", tarima=" + tarima + ']';
     }
     
 }

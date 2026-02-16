@@ -7,10 +7,10 @@ import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.donut.DonutChartOptions;
 
 import java.io.Serializable;
-
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import mx.com.ferbo.dao.ReportesVentasDAO;
 import mx.com.ferbo.model.FacturacionGeneral;
@@ -31,6 +31,8 @@ public class VentasRazonSocialDonutChart implements Serializable
     private static final String TITULO_GRAFICA = "Ventas Por Razón Social";
     private static final String CHART_EXTENDER = "charExtenderDonut";
     
+    private static final Random RND = new Random();
+    
     public static DonutChartModel construirModeloVentasRazonSocial()
     {
         Date fechaFin = new Date();
@@ -45,34 +47,14 @@ public class VentasRazonSocialDonutChart implements Serializable
     {
         DonutChartModel donutModel = new DonutChartModel();
         ChartData data = new ChartData();
-        DonutChartOptions options = new DonutChartOptions();
-        donutModel.setOptions(options);
-
-        // Crear dataset
-        DonutChartDataSet dataSet = new DonutChartDataSet();
-        List<Number> listaVentas = new ArrayList<>();
         
-        for (FacturacionGeneral f : listaVentaRazonSocial) {
-            listaVentas.add(f.getTotal_facturacion());
-        }
-        dataSet.setData(listaVentas);
+        donutModel.setOptions(chartOptions());
+        
+        Integer totalVentas = listaVentaRazonSocial.size();
+        
+        data.addChartDataSet(crearDataSet(listaVentaRazonSocial, totalVentas));
 
-        // Colores de fondo
-        dataSet.setBackgroundColor(getDefaultColors());
-        data.addChartDataSet(dataSet);
-
-        // Etiquetas
-        List<String> listaEmisores = new ArrayList<>();
-        for (FacturacionGeneral fc : listaVentaRazonSocial) {
-            listaEmisores.add(fc.getRazonSocial());
-        }
-        data.setLabels(listaEmisores);
-
-        // Título
-        Title title = new Title();
-        title.setDisplay(true);
-        title.setText(TITULO_GRAFICA);
-        options.setTitle(title);
+        data.setLabels(labels(listaVentaRazonSocial));
 
         donutModel.setData(data);
         donutModel.setExtender(CHART_EXTENDER);
@@ -80,15 +62,57 @@ public class VentasRazonSocialDonutChart implements Serializable
         return donutModel;
     }
     
-    private static List<String> getDefaultColors() 
+    private static DonutChartDataSet crearDataSet(List<FacturacionGeneral> listaVentaRazonSocial, Integer totalVentas) // Crear dataset
     {
-        List<String> bgColors = new ArrayList<>();
-        bgColors.add("rgb(194, 193, 250)");
-        bgColors.add("rgb(233, 193, 250)");
-        bgColors.add("rgb(174, 252, 244)");
-        bgColors.add("rgb(165, 204, 249)");
-        bgColors.add("rgb(250, 223, 193)");
-        return bgColors;
+        DonutChartDataSet dataSet = new DonutChartDataSet();
+        List<Number> listaVentas = new ArrayList<>();
+        
+        for (FacturacionGeneral f : listaVentaRazonSocial) {
+            listaVentas.add(f.getTotal_facturacion());
+        }
+        dataSet.setData(listaVentas);
+        
+        // Colores de fondo
+        List<String> colorsBackground = new ArrayList();
+        
+        for(int i=0; i < totalVentas; i++){
+            colorsBackground.add(getDefaultRandomColor());
+        }
+        
+        dataSet.setBackgroundColor(colorsBackground);
+        
+        return dataSet;
+    }
+    
+    private static DonutChartOptions chartOptions() //
+    {
+        DonutChartOptions options = new DonutChartOptions();
+        options.setTitle(titulo());
+        
+        return options;
+    }
+    
+    private static List<String> labels(List<FacturacionGeneral> listaVentaRazonSocial) // Etiquetas
+    {
+        List<String> listaEmisores = new ArrayList<>();
+        
+        for (FacturacionGeneral fc : listaVentaRazonSocial) {
+            listaEmisores.add(fc.getRazonSocial());
+        }
+        return listaEmisores;
+    }
+    
+    private static Title titulo() // Título
+    {
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText(TITULO_GRAFICA);
+        return title;
+    }
+    
+    private static String getDefaultRandomColor() //Set Random Color
+    {
+        return String.format("rgb(%d,%d,%d)", RND.nextInt(256), RND.nextInt(256), RND.nextInt(256));
     }
     
 }

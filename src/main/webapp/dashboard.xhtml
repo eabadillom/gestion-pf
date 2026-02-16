@@ -156,26 +156,68 @@
                 //merge all options into to main chart options
                 $.extend(true, this.cfg.config, options);
             };
+            
+            function charExtenderPosiciones() {
+                var options = {
+                    options: {
+                        plugins: {
+                            title: {
+                                display: false,
+                                text: "title set from JavaScript"
+
+                            }, legend: {
+                                display: true
+                            },
+                            datalabels: {
+                                color: '#000',
+                                font: {
+                                    weight: 'bold',
+                                    size: 10,
+                                    family: 'sans-serif'
+                                },
+                                formatter: function (value, context) {
+                                    var data = context.chart.data.datasets[0].data;
+                                    var total = data.reduce((a, b) => a + b, 0);
+                                    var percentage = (value / total * 100).toFixed(1);
+
+                                    return new Intl.NumberFormat('es-MX').format(value) 
+                                           + " (" + percentage + "%)";
+                                }
+                            }
+
+                        }, scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }, plugins: [ChartDataLabels]
+                };
+
+                //merge all options into to main chart options
+                $.extend(true, this.cfg.config, options);
+            };
 
         </script>
         <h:form id="form">
             <p:panel header="Ocupación de cámaras" toggleable="true" >
-                <ui:remove><p:barChart model="#{dashboardBean.modelCamara}" style="width: 100%; height: 400px;" /></ui:remove>
                 <div class="p-grid ui-fluid" >
                     <p:repeat value="#{dashboardBean.plantas}" var="planta">
                         <div class="grid col-12 md:col-6 lg:col-4 p-2 flex justify-content-space-around" style="padding: .5rem;">
                             <p:card styleClass="planta-card" style="width: fit-content; margin: 0 auto;" >
                                 <f:facet name="header">
                                     <h:panelGroup layout="block" style="font-weight: bold; font-size: 1.4rem; text-align: center; display: block;" >
-                                        <h:outputText value="Planta #{planta}" />
+                                        <h:outputText value="#{planta}" style="margin-left: 0.5rem;" />
                                         <i class="pi pi-building ml-2" style="margin-right: .5rem;"></i>
+                                        <p:spacer style="width: 0.5rem;"/>
+                                        <p:commandButton icon="pi pi-chart-bar" style="margin-right: 0.5rem;" styleClass="p-button-rounded p-button-text" oncomplete="PF('dlg-grafica').show()" update="@widgetVar(dlg-grafica)"
+                                        actionListener="#{dashboardBean.crearGraficaPosiciones(planta)}" />
                                     </h:panelGroup>
                                 </f:facet>
                                 <div class="p-grid flex justify-content-center">
                                     <p:repeat value="#{dashboardBean.getCamaras(planta)}" var="camara">
                                         <div class="col-12 sm:col-6 md:col-4 lg:col-3 p-2" style="padding: .3rem;">
                                             <p:card styleClass="camara-card p-3 text-center" style="text-align: center; padding: .8rem;">
-                                                <h:outputText value="Cámara #{camara.key}" style="font-weight: bold;" />
+                                                <h:outputText value="#{camara.key}" style="font-weight: bold;" />
                                                 <br/>
                                                 <h:outputText value="#{camara.value}">
                                                     <f:convertNumber minFractionDigits="0" maxFractionDigits="2" />
@@ -190,6 +232,16 @@
                     </p:repeat>
                 </div>
             </p:panel>
+            
+            <p:dialog header="Ocupación de cámaras" modal="true" widgetVar="dlg-grafica" responsive="true" showEffect="fade" style="width: 80vw; max-width: 900px; max-height: 720px;" position="top" >
+                <p:outputPanel id="grafica-panel" class="ui-fluid" >
+                    <p:donutChart rendered="#{not empty dashboardBean.posicionesCamara}" model="#{dashboardBean.posicionesCamara}" style="width:100%; height:270px;" />
+                </p:outputPanel>
+                
+                <f:facet name="footer">
+                    <p:commandButton value="Cerrar" oncomplete="PF('dlg-grafica').hide()" />
+                </f:facet>
+            </p:dialog>
 			
         	<p:spacer style="height: 2rem;"/>
 			

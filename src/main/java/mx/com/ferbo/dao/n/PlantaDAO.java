@@ -50,4 +50,30 @@ public class PlantaDAO extends BaseDAO <Planta, Integer> {
 		}
 		return list;
 	}
+    
+    public Planta findById(Integer idPlanta)
+    {
+        Planta model = null;
+        EntityManager em = null;
+        
+        try {
+            em = super.getEntityManager();
+            
+            model = em.createNamedQuery("Planta.findByPlantaCve", Planta.class)
+                .setParameter("plantaCve", idPlanta)
+                .getSingleResult();
+            
+            if(model.getCamaraList() != null){
+                log.debug(model.getCamaraList().toString());
+            }
+            
+        } catch(Exception ex) {
+            log.error("Problema para obtener la planta: ", ex);
+        } finally {
+            super.close(em);
+        }
+        
+        return model;
+    }
+    
 }

@@ -14,14 +14,11 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import mx.com.ferbo.business.dashboard.OcupacionPlantasBL;
-import mx.com.ferbo.dao.PlantaDAO;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,8 +27,10 @@ import org.primefaces.model.chart.LineChartModel;
 import org.primefaces.model.charts.bar.BarChartModel;
 import org.primefaces.model.charts.donut.DonutChartModel;
 
-import mx.com.ferbo.dao.ReportesVentasDAO;
-import mx.com.ferbo.graficas.OcupacionCamaraChart;
+import mx.com.ferbo.business.dashboard.OcupacionPlantasBL;
+import mx.com.ferbo.dao.n.PlantaDAO;
+import mx.com.ferbo.dao.n.ReportesVentasDAO;
+import mx.com.ferbo.graficas.OcupacionCamaraDonutChart;
 import mx.com.ferbo.graficas.UtilidadPorMesMensualStackedBar;
 import mx.com.ferbo.graficas.VentasFormaPagoStackedBar;
 import mx.com.ferbo.graficas.VentasRazonSocialDonutChart;
@@ -41,15 +40,26 @@ import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.model.VentasGlobales;
 import mx.com.ferbo.ui.ImporteUtilidad;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.FacesUtils;
 
 @Named
 @ViewScoped
-public class DashboardBean implements Serializable {
-
+public class DashboardBean implements Serializable 
+{
     private static final long serialVersionUID = -6551673633472266325L;
     private static Logger log = LogManager.getLogger(DashboardBean.class);
+    
+    @Inject
+    private PlantaDAO plantaDAO;
+    
+    @Inject
+    private ReportesVentasDAO reportesVentasDAO;
+    
+    @Inject
+    private OcupacionPlantasBL ocupacionPlantasBL;
 
     private DonutChartModel donutModel;
+    private DonutChartModel posicionesCamara;
     private BarChartModel stackedGroupBarModel;
     private BarChartModel smVentasFormaPago;
 
@@ -63,7 +73,6 @@ public class DashboardBean implements Serializable {
     private Date maxDate;
     private Date fechaPrueba;
     private VentasGlobales ventasGlobales;
-    private ReportesVentasDAO reportesVentasDAO;
 
     private List<ImporteUtilidad> listaImporteUtilidad;
     private List<FacturacionGeneral> listaFacturacionGeneral;
@@ -74,17 +83,10 @@ public class DashboardBean implements Serializable {
     private List<FacturacionGeneral> listaVentaRazonSocial;
     private List<FacturacionGeneral> listaGananciaRazonSocial;
     private List<FacturacionGeneral> listaVentaPagos;
-
-    private BarChartModel modelCamara;
-    
-    @Inject
-    private OcupacionPlantasBL ocupacionPlantasBL;
     
     private Planta plantaSelect;
     private List<Planta> listaPlanta;
     private Map<String, Map<String, BigDecimal>> reporte;
-    
-    private PlantaDAO plantaDAO;
     
     private FacesContext context;
     private HttpServletRequest request;
@@ -97,7 +99,6 @@ public class DashboardBean implements Serializable {
         totalFacturacion = null;
         sumaEgresosSelect = null;
         ventasGlobales = new VentasGlobales();
-        reportesVentasDAO = new ReportesVentasDAO();
         listaFacturacionGeneral = new ArrayList<>();
         listaVentaDia = new ArrayList<>();
         listaVentaRazonSocial = new ArrayList<>();
@@ -111,9 +112,9 @@ public class DashboardBean implements Serializable {
         this.context = FacesContext.getCurrentInstance();
         this.request = (HttpServletRequest) context.getExternalContext().getRequest();
         this.usuario = (Usuario) request.getSession(false).getAttribute("usuario");
+        log.info("Usuario {} ha ingresado al dashboard", this.usuario.getUsuario());
         
         this.plantaSelect = new Planta();
-        this.plantaDAO = new PlantaDAO();
         
         try {
             fechaPrueba = new Date();
@@ -125,12 +126,12 @@ public class DashboardBean implements Serializable {
             ventaRazonSocial();
             gananciaPorRazonSocial();
             donutModel = VentasRazonSocialDonutChart.construirModeloVentasRazonSocial();
-            /*modelCamara = OcupacionCamaraChart.construirModeloOcupacionCamara();*/
+            
             if ((this.usuario.getPerfil() != 1) && (this.usuario.getPerfil() != 4)) {
-                listaPlanta = plantaDAO.buscarTodos();
+                listaPlanta = plantaDAO.buscarTodos(false);
                 reporte = ocupacionPlantasBL.reporteTodasPlantas(listaPlanta, fechaPrueba);
             } else {
-                this.plantaSelect = this.plantaDAO.buscarPorId(this.usuario.getIdPlanta());
+                this.plantaSelect = this.plantaDAO.findById(this.usuario.getIdPlanta());
                 reporte = ocupacionPlantasBL.reportePorPlanta(plantaSelect, fechaPrueba);
             }
             
@@ -254,7 +255,7 @@ public class DashboardBean implements Serializable {
 
         // listaFacturacionGeneral.add(facturacionSelected);
         // mesActual = new Date();
-        PrimeFaces.current().ajax().update("dt-facturacion");
+        PrimeFaces.current().ajax().update("dt-facturacionGeneral");
     }
 
     public void ventasPorMes() {
@@ -267,10 +268,6 @@ public class DashboardBean implements Serializable {
 
     public void readerList() 
     {
-        FacesMessage msj = null;
-        String mensaje = null;
-        Severity severity = null;
-
         listaFacturacionGeneral = new ArrayList<>();
         listFacturacionMesAnt = new ArrayList<>();
         try {
@@ -308,10 +305,8 @@ public class DashboardBean implements Serializable {
             if (listaFacturacionGeneral == null) {
                 listaFacturacionGeneral = new ArrayList<>();
             }
-            mensaje = e.getMessage();
-            severity = FacesMessage.SEVERITY_ERROR;
-            msj = new FacesMessage(severity, "Error Facturacion", mensaje);
-            FacesContext.getCurrentInstance().addMessage(null, msj);
+            
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage());
         } finally {
             PrimeFaces.current().ajax().update(":form:messages");
             Calendar calendario = Calendar.getInstance();
@@ -406,6 +401,11 @@ public class DashboardBean implements Serializable {
 
     public int getCantidadCamaras(String planta) {
         return reporte.get(planta).size();
+    }
+    
+    public void crearGraficaPosiciones(String planta){
+        Set<Map.Entry<String, BigDecimal>> camarasPlanta = reporte.get(planta).entrySet();
+        posicionesCamara = OcupacionCamaraDonutChart.construirModeloPosicionesPlanta(camarasPlanta);
     }
     
     public Usuario getUsuario() {
@@ -568,15 +568,6 @@ public class DashboardBean implements Serializable {
         this.ventasGlobales = ventasGlobales;
     }
 
-    public BarChartModel getModelCamara() {
-        return modelCamara;
-    }
-
-    public void setModelCamara(BarChartModel modelCamara) {
-        this.modelCamara = modelCamara;
-
-    }
-
     public List<VentasGlobales> getListaVentasGlobales() {
         return listaVentasGlobales;
     }
@@ -607,6 +598,14 @@ public class DashboardBean implements Serializable {
 
     public void setDonutModel(DonutChartModel donutModel) {
         this.donutModel = donutModel;
+    }
+
+    public DonutChartModel getPosicionesCamara() {
+        return posicionesCamara;
+    }
+
+    public void setPosicionesCamara(DonutChartModel posicionesCamara) {
+        this.posicionesCamara = posicionesCamara;
     }
 
     public BarChartModel getSmVentasFormaPago() {
