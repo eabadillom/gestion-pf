@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import mx.com.ferbo.model.catalogos.ConceptoEgreso;
 import mx.com.ferbo.model.catalogos.StatusEgreso;
+import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 
 @NamedQueries({
    @NamedQuery(
@@ -85,6 +86,11 @@ public class ImporteEgreso implements Serializable {
     @ManyToOne
     @JoinColumn(name = "cd_status_egre", nullable = false)
     private StatusEgreso status;
+    
+    @ManyToOne(optional = false) // muchos egresos -> un emisor
+    @JoinColumn(name = "id_emisor", nullable = false)
+    private NEmisoresCFDIS emisor;
+    
 
     public ImporteEgreso(){
         // Constructor sin parametros
@@ -184,6 +190,14 @@ public class ImporteEgreso implements Serializable {
 
     public void setStatus(StatusEgreso status) {
         this.status = status;
+    }
+
+    public NEmisoresCFDIS getEmisor() {
+        return emisor;
+    }
+
+    public void setEmisor(NEmisoresCFDIS emisor) {
+        this.emisor = emisor;
     }
 
     @Override

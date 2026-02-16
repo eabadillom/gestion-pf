@@ -12,8 +12,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "CatStatusCargoEgreso.findByNombre", query = "SELECT csce FROM CatStatusCargoEgreso csce WHERE csce.nombre = :nombre"),
-    @NamedQuery(name = "CatStatusCargoEgreso.findAllVigentesONoVigentes", query = "SLECT csce FROM CatStatusCargoEgreso csce WHERE csce.vigente = :vigente")
+    @NamedQuery(name = "StatusCargoEgreso.findByNombre", query = "SELECT sce FROM StatusCargoEgreso sce WHERE sce.nombre = :nombre"),
+    @NamedQuery(name = "StatusCargoEgreso.findAllVigentesONoVigentes", query = "SELECT sce FROM StatusCargoEgreso sce WHERE sce.vigente = :vigente")
 })
 @Entity
 @Table (name="cat_status_cargo_egreso")

@@ -34,6 +34,15 @@ public class ImporteEgresosBL {
     @Inject
     private ImporteEgresoDAO importeEgresoDAO;
 
+    public ImporteEgreso obtenerPorId(Integer id) {
+        try {
+            return importeEgresoDAO.buscarPorId(id).orElseThrow(() -> new DAOException ("Hubo un problema al buscar un egreso con id: " + id));
+        } catch (DAOException ex) {
+            log.error("Hubo un problema al obtener algun egreso con id: {}. {}", id, ex);
+            return new ImporteEgreso();
+        }
+    }
+
     public String agregarOActualizar(ImporteEgreso importeEgreso) throws InventarioException {
 
         String mensaje;
@@ -52,6 +61,22 @@ public class ImporteEgresosBL {
             log.warn("El importe de egreso no se {} satisfactoriamente. {}", estado, ex);
             throw new InventarioException("El importe de egreso no se " + estado + " satisfacoriamente");
         }
+    }
+
+    public ConceptoEgreso obtenerConcepto(CatConceptoEgreso catConcepto) throws InventarioException{
+        if (catConcepto == null) {
+            throw new InventarioException("El concepto del catálogo no debe ser vacío");
+        }
+
+        ConceptoEgreso concepto = new ConceptoEgreso();
+
+        concepto.setEsActivoFijo(catConcepto.getEsActivoFijo());
+        concepto.setEsDeducible(catConcepto.getEsDeducible());
+        concepto.setRequiereCFDI(catConcepto.getRequiereCFDI());
+        concepto.setPorcentajeIVA(catConcepto.getPorcentajeIVA());
+        concepto.setPorcentajeIEPS(catConcepto.getPorcentajeIEPS());
+
+        return concepto;
     }
 
     public List<ImporteEgreso> obtenerPorFiltros(

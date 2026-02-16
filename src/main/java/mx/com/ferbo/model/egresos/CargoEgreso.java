@@ -16,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import mx.com.ferbo.model.catalogos.StatusCargoEgreso;
 
 import mx.com.ferbo.model.catalogos.TipoCargo;
 
@@ -48,7 +49,7 @@ public class CargoEgreso implements Serializable {
     private BigDecimal porcentajeTasa;
 
     @Basic(optional = true)
-    @Column(name = "nu_dias") 
+    @Column(name = "nu_dias")
     private Integer numeroDias;
 
     @Basic(optional = false)
@@ -75,7 +76,11 @@ public class CargoEgreso implements Serializable {
     @JoinColumn(name = "cd_tipo_carg", nullable = false)
     private TipoCargo tipoCargo;
 
-    public CargoEgreso(){
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_status_carg_egre", nullable = false)
+    private StatusCargoEgreso status;
+
+    public CargoEgreso() {
         // Construcctor sin parametros
     }
 
@@ -167,19 +172,37 @@ public class CargoEgreso implements Serializable {
         this.tipoCargo = tipoCargo;
     }
 
-    @Override   
-    public boolean equals(Object o){
-        if (this == o)
+    public ImporteEgreso getImporteEgreso() {
+        return importeEgreso;
+    }
+
+    public void setImporteEgreso(ImporteEgreso importeEgreso) {
+        this.importeEgreso = importeEgreso;
+    }
+
+    public StatusCargoEgreso getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusCargoEgreso status) {
+        this.status = status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        if (!(o instanceof CargoEgreso))
+        }
+        if (!(o instanceof CargoEgreso)) {
             return false;
+        }
 
         CargoEgreso that = (CargoEgreso) o;
         return id != null && id.equals(that.id);
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return 31;
     }
 
