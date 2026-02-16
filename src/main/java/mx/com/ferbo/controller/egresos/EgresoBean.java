@@ -3,7 +3,6 @@ package mx.com.ferbo.controller.egresos;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
