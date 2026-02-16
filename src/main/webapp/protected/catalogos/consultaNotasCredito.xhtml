@@ -16,6 +16,7 @@
 					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{consultaNotasCreditoBean.clienteSelect}" filter="true" filterMatchMode="contains">
 						<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
 						<f:selectItems value="#{consultaNotasCreditoBean.listaCliente}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}"/>
+                                                <p:ajax process="@this" />
 					</p:selectOneMenu>
 				</div>
 				<div class="p-col-3 p-md-3">

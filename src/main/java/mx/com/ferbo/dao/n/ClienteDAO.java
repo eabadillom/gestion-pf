@@ -6,7 +6,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -83,7 +82,7 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                 for(PrecioServicio ps : clientePrecioServicios) {
                 	log.debug("Precio servicio: {}", ps.getId());
                 }
-                
+
                 if (!clienteContactoList.isEmpty()) {
                     for (ClienteContacto clienteContacto : clienteContactoList) {
 
