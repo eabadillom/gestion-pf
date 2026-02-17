@@ -18,7 +18,8 @@
                                      converter="entityConverter" 
                                      filter="true" 
                                      filterMatchMode="contains" 
-                                     autoWidth="false">
+                                     autoWidth="false"
+                                     style="width: 100%">
                         <f:selectItem itemLabel="---Tipo de Egreso---" noSelectionOption="true" />
                         <f:selectItems value="#{tipoEgresoBean.lst}" var="tipo"
                                        itemLabel="#{tipo.nombre}" itemValue="#{tipo}" />
@@ -27,22 +28,23 @@
                 </div>
 
                 <div class="p-col-12 p-md-3">
-                        <p:outputLabel for="cateEgre" value="Categoría" style="display:block"/>
-                        <p:selectOneMenu id="cateEgre"
-                                         widgetVar="cateEgre"
-                                         styleClass="w-full" 
-                                         value="#{categoriaEgresoBean.selected}" 
-                                         required="true" 
-                                         requiredMessage="Debe indicar una categoria de egreso"
-                                         converter="entityConverter" 
-                                         filter="true" 
-                                         filterMatchMode="contains" 
-                                         autoWidth="false">
-                            <f:selectItem itemLabel="---Categoria de Egreso---" noSelectionOption="true"/>
-                            <f:selectItems value="#{categoriaEgresoBean.lst}" var="cate" 
-                                           itemLabel="#{cate.nombre}" itemValue="#{cate}" /> 
-                            <p:ajax process="@this" listener="#{categoriaEgresoBean.preparar(categoriaEgresoBean.selected)}" update="concEgre"/>
-                        </p:selectOneMenu>
+                    <p:outputLabel for="cateEgre" value="Categoría" style="display:block"/>
+                    <p:selectOneMenu id="cateEgre"
+                                     widgetVar="cateEgre"
+                                     styleClass="w-full" 
+                                     value="#{categoriaEgresoBean.selected}" 
+                                     required="true" 
+                                     requiredMessage="Debe indicar una categoria de egreso"
+                                     converter="entityConverter" 
+                                     filter="true" 
+                                     filterMatchMode="contains" 
+                                     autoWidth="false"
+                                     style="width: 100%">
+                        <f:selectItem itemLabel="---Categoria de Egreso---" noSelectionOption="true"/>
+                        <f:selectItems value="#{categoriaEgresoBean.lst}" var="cate" 
+                                       itemLabel="#{cate.nombre}" itemValue="#{cate}" /> 
+                        <p:ajax process="@this" listener="#{categoriaEgresoBean.preparar(categoriaEgresoBean.selected)}" update="concEgre"/>
+                    </p:selectOneMenu>
                 </div>
 
                 <div class="p-col-12 p-md-3">
@@ -56,7 +58,8 @@
                                      converter="entityConverter" 
                                      filter="true" 
                                      filterMatchMode="contains" 
-                                     autoWidth="false">
+                                     autoWidth="false"
+                                     style="width: 100%">
                         <f:selectItem itemLabel="---Concepto de Egreso---" noSelectionOption="true"/>
                         <f:selectItems value="#{catConceptoEgresoBean.lst}" var="conc" 
                                        itemLabel="#{conc.nombre}" itemValue="#{conc}" /> 
@@ -64,10 +67,10 @@
 
                     </p:selectOneMenu>
                 </div>
-                
+
                 <div class="p-col-12 p-md-3">
                     <p:outputLabel for="stActiFijo" value="¿Es activo fijo?" style="display:block"/>
-                    <p:selectOneMenu id="stActiFijo" value="">
+                    <p:selectOneMenu id="stActiFijo" value="" style="width: 100%">
                         <f:selectItem itemLabel="Sí" itemValue="true" />
                         <f:selectItem itemLabel="No" itemValue="false" />
                         <p:ajax process="@this"/>
@@ -76,7 +79,7 @@
 
                 <div class="p-col-12 p-md-3">
                     <p:outputLabel for="stDedu" value="¿Es deducible?" style="display:block"/>
-                    <p:selectOneMenu id="stDedu" value="">
+                    <p:selectOneMenu id="stDedu" value="" style="width: 100%">
                         <f:selectItem itemLabel="Sí" itemValue="true" />
                         <f:selectItem itemLabel="No" itemValue="false" />
                         <p:ajax process="@this"/>
@@ -90,12 +93,13 @@
                                      rows="3" 
                                      maxlength="250" 
                                      autoResize="true" 
-                                     readonly=""/> 
+                                     readonly=""
+                                     style="width: 100%"/> 
                 </div>
 
                 <div class="p-col-12 p-md-3">
                     <p:outputLabel for="stCFDI" value="¿Requiere CFDI?" style="display:block"/> 
-                    <p:selectOneMenu id="stCFDI" value="">
+                    <p:selectOneMenu id="stCFDI" value="" style="width: 100%">
                         <f:selectItem itemLabel="Sí" itemValue="true" />
                         <f:selectItem itemLabel="No" itemValue="false" />
                         <p:ajax process="@this"/>
@@ -107,12 +111,13 @@
                     <p:inputText id="cfdiUUID" 
                                  maxlength="36" 
                                  value="" 
-                                 readonly=""/>
+                                 readonly=""
+                                 style="width: 100%"/>
                 </div>
 
                 <div class="p-col-12 p-md-3">
                     <p:outputLabel for="stIVA" value="¿Tiene IVA?" style="display:block"/>
-                    <p:selectOneMenu id="stIVA" value="">
+                    <p:selectOneMenu id="stIVA" value="" style="width: 100%">
                         <f:selectItem itemLabel="Sí" itemValue="true" />
                         <f:selectItem itemLabel="No" itemValue="false" />
                         <p:ajax process="@this"/>
@@ -128,11 +133,13 @@
                                    symbol="%"
                                    symbolPosition="s"
                                    readonly=""
-                                   inputStyle="width:120px"><p:ajax process="@this"/></p:inputNumber>
+                                   inputStyle="width:100%">
+                        <p:ajax process="@this"/>
+                    </p:inputNumber>
                 </div>
                 <div class="p-col-12 p-md-3">
                     <p:outputLabel for="stIEPS" value="¿Tiene IEPS?" style="display:block"/>
-                    <p:selectOneMenu id="stIEPS" value="">
+                    <p:selectOneMenu id="stIEPS" value="" style="width: 100%">
                         <f:selectItem itemLabel="Sí" itemValue="true" />
                         <f:selectItem itemLabel="No" itemValue="false" />
                         <p:ajax process="@this"/>
@@ -148,12 +155,26 @@
                                    symbol="%"
                                    symbolPosition="s"
                                    readonly=""
-                                   inputStyle="width:120px"><p:ajax process="@this"/></p:inputNumber>
+                                   inputStyle="width:100%">
+                        <p:ajax process="@this"/>
+                    </p:inputNumber>
                 </div>
 
-                <div class="p-col-12 p-md-3">
-                    <p:outputLabel for="" value="" />
 
+                <div class="p-col-12 p-md-3">
+                    <p:outputLabel for="toCubrir" value="Total por cubrir:" style="display: block"/>
+                    <p:inputNumber id="toCubrir"
+                                   value=""
+                                   decimalPlaces="2"
+                                   maxValue="9999999999999.99"
+                                   minValue="0"
+                                   symbol="$"
+                                   symbolPosition="p"
+                                   thousandSeparator=","
+                                   decimalSeparator="."
+                                   inputStyle="width:100%">
+                        <p:ajax process="@this"/>
+                    </p:inputNumber>
                 </div>
 
             </div>

@@ -33,7 +33,7 @@ public class ConceptoEgreso implements Serializable {
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "to_conc_egre", precision = 15, scale = 2, nullable = false)
+    @Column(name = "to_conc_egre", precision = 12, scale = 2, nullable = false)
     private BigDecimal totalConceptoEgreso;
 
     @Basic(optional = true)
@@ -69,11 +69,11 @@ public class ConceptoEgreso implements Serializable {
     private Date fechaRegistro;
 
     @Basic(optional = true)
-    @Column(name = "pc_iva", nullable = true)
+    @Column(name = "pc_iva", precision = 7, scale = 4, nullable = true)
     private BigDecimal porcentajeIVA;
 
     @Basic(optional = true)
-    @Column(name = "pc_ieps", nullable = true)
+    @Column(name = "pc_ieps", precision = 7, scale = 4, nullable = true)
     private BigDecimal porcentajeIEPS;
 
     @ManyToOne(fetch = FetchType.LAZY)

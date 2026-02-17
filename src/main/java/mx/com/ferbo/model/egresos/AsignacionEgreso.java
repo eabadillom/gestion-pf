@@ -29,11 +29,11 @@ public class AsignacionEgreso implements Serializable {
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "pc_asig_egre", precision = 6, scale = 3)
+    @Column(name = "pc_asig_egre", precision = 7, scale = 4)
     private BigDecimal porcentaje;
 
     @Basic(optional = false) 
-    @Column(name = "im_asig_egre", precision = 15, scale = 2)
+    @Column(name = "im_asig_egre", precision = 12, scale = 2)
     private BigDecimal importe;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -19,6 +19,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.catalogos.ConceptoEgreso;
 import mx.com.ferbo.model.catalogos.StatusEgreso;
 import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
@@ -46,15 +48,15 @@ public class ImporteEgreso implements Serializable {
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "im_egreso", precision = 15, scale = 2)
+    @Column(name = "im_egreso", precision = 12, scale = 2)
     private BigDecimal subTotal;
 
     @Basic(optional = true)
-    @Column(name = "im_iva", precision = 15, scale = 2)
+    @Column(name = "im_iva", precision = 12, scale = 2)
     private BigDecimal iva; 
 
     @Basic(optional = true)
-    @Column(name = "im_ieps", precision = 15, scale = 2)
+    @Column(name = "im_ieps", precision = 12, scale = 2)
     private BigDecimal ieps;
 
     @Basic(optional = true)
@@ -72,6 +74,10 @@ public class ImporteEgreso implements Serializable {
     @Basic(optional = false)
     @Column(name = "fh_limi_pago")
     private Date fechaLimitePago;
+    
+    @Basic(optional = false)
+    @Column(name = "nu_pagos")
+    private Integer numeroPagos;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_conc_egre", nullable = false)
@@ -90,6 +96,14 @@ public class ImporteEgreso implements Serializable {
     @ManyToOne(optional = false) // muchos egresos -> un emisor
     @JoinColumn(name = "id_emisor", nullable = false)
     private NEmisoresCFDIS emisor;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mp_id", nullable = false)
+    private MedioPago medioPago;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cd_metodo_pago", nullable = false)
+    private MetodoPago metodoPago;
     
 
     public ImporteEgreso(){
@@ -198,6 +212,30 @@ public class ImporteEgreso implements Serializable {
 
     public void setEmisor(NEmisoresCFDIS emisor) {
         this.emisor = emisor;
+    }
+
+    public Integer getNumeroPagos() {
+        return numeroPagos;
+    }
+
+    public void setNumeroPagos(Integer numeroPagos) {
+        this.numeroPagos = numeroPagos;
+    }
+
+    public MedioPago getMedioPago() {
+        return medioPago;
+    }
+
+    public void setMedioPago(MedioPago medioPago) {
+        this.medioPago = medioPago;
+    }
+
+    public MetodoPago getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(MetodoPago metodoPago) {
+        this.metodoPago = metodoPago;
     }
 
     @Override

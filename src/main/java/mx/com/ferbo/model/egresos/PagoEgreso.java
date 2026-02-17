@@ -13,11 +13,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.catalogos.StatusPago;
 
+@NamedQueries({
+    @NamedQuery(name = "PagoEgreso.findAllByImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :idImporteEgreso")
+})
 @Entity
 @Table(name = "pago_egreso")
 public class PagoEgreso implements Serializable {
@@ -31,7 +35,7 @@ public class PagoEgreso implements Serializable {
     private Integer id;
 
     @Basic(optional =  false)
-    @Column(name = "im_pago", precision = 15, scale = 2, nullable = false)
+    @Column(name = "im_pago", precision = 12, scale = 2, nullable = false)
     private BigDecimal importe;
 
     @Basic(optional = true)
@@ -61,10 +65,6 @@ public class PagoEgreso implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_status_pago", nullable = false)
     private StatusPago status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mp_id", nullable = false)
-    private MedioPago medioPago;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_docu_egre")
@@ -144,14 +144,6 @@ public class PagoEgreso implements Serializable {
 
     public void setStatus(StatusPago status) {
         this.status = status;
-    }
-
-    public MedioPago getMedioPago() {
-        return medioPago;
-    }
-
-    public void setMedioPago(MedioPago medioPago) {
-        this.medioPago = medioPago;
     }
 
     public DocumentoEgreso getDocumentoEgreso() {

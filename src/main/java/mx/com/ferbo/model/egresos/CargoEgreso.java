@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,12 +13,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import mx.com.ferbo.model.catalogos.StatusCargoEgreso;
 
 import mx.com.ferbo.model.catalogos.TipoCargo;
 
+@NamedQueries({
+    @NamedQuery(name = "CargoEgreso.findAllByImporteEgreso", query = "SELECT ce FROM CargoEgreso ce WHERE ce.importeEgreso.id = :idImporteEgreso")
+})
 @Entity
 @Table(name = "cargo_egreso")
 public class CargoEgreso implements Serializable {
@@ -33,19 +36,19 @@ public class CargoEgreso implements Serializable {
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "im_carg", precision = 15, scale = 2)
+    @Column(name = "im_carg", precision = 12, scale = 2)
     private BigDecimal importeCargo;
 
     @Basic(optional = true)
-    @Column(name = "im_iva", precision = 15, scale = 2)
+    @Column(name = "im_iva", precision = 12, scale = 2)
     private BigDecimal importeIVA;
 
     @Basic(optional = true)
-    @Column(name = "im_ieps", precision = 15, scale = 2)
+    @Column(name = "im_ieps", precision = 12, scale = 2)
     private BigDecimal importeIEPS;
 
     @Basic(optional = true)
-    @Column(name = "pc_tasa", precision = 6, scale = 3)
+    @Column(name = "pc_tasa", precision = 7, scale = 4)
     private BigDecimal porcentajeTasa;
 
     @Basic(optional = true)

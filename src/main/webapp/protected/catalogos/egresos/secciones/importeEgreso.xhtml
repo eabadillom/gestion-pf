@@ -12,13 +12,13 @@
                     <p:inputNumber id="imEgre"
                                    value=""
                                    decimalPlaces="2"
-                                   maxValue="999999999999999.99"
+                                   maxValue="9999999999999.99"
                                    minValue="0"
                                    symbol="$"
                                    symbolPosition="p"
                                    thousandSeparator=","
                                    decimalSeparator="."
-                                   inputStyle="width:180px">
+                                   inputStyle="width:50%">
                         <p:ajax process="@this"/>
                     </p:inputNumber>
                 </div>
@@ -28,13 +28,13 @@
                     <p:inputNumber id="imIVA" 
                                    value=""
                                    decimalPlaces="2"
-                                   maxValue="999999999999999.99"
+                                   maxValue="9999999999999.99"
                                    minValue="0"
                                    symbol="$"
                                    symbolPosition="p"
                                    thousandSeparator=","
                                    decimalSeparator="."
-                                   inputStyle="width:180px">
+                                   inputStyle="width:50%">
                         <p:ajax process="@this"/>
                     </p:inputNumber>
                 </div>
@@ -44,13 +44,13 @@
                     <p:inputNumber id="imIEPS"
                                    value=""
                                    decimalPlaces="2"
-                                   maxValue="999999999999999.99"
+                                   maxValue="9999999999999.99"
                                    minValue="0"
                                    symbol="$"
                                    symbolPosition="p"
                                    thousandSeparator=","
                                    decimalSeparator="."
-                                   inputStyle="width:180px">
+                                   inputStyle="width:50%">
                         <p:ajax process="@this"/>
                     </p:inputNumber>
                 </div>
@@ -60,27 +60,78 @@
                     <p:datePicker id="fhLimiPago" 
                                   value=""
                                   pattern="dd/MM/yyyy"
-                                  showIcon="true">
+                                  showIcon="true"
+                                  style="width:50%">
                         <p:ajax event="dateSelect" process="@this"/>             
                     </p:datePicker>
                 </div>
-                
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="mediPago" value="Medio de pago:" style="display:block"/>
+                    <p:selectOneMenu id="mediPago"
+                                     widgetVar="mediPago"
+                                     styleClass="w-full" 
+                                     value="" 
+                                     required="true" 
+                                     requiredMessage="Debe indicar un medio de pago"
+                                     converter="entityConverter" 
+                                     filter="true" 
+                                     filterMatchMode="contains" 
+                                     autoWidth="false"
+                                     style="width:50%">
+                        <f:selectItem itemLabel="---Medios de pago---" noSelectionOption="true"/>
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="metoPago" value="Forma de pago:" style="display:block"/>
+                    <p:selectOneMenu id="metoPago"
+                                     widgetVar="metoPago"
+                                     styleClass="w-full" 
+                                     value="" 
+                                     required="true" 
+                                     requiredMessage="Debe indicar una forma de pago"
+                                     converter="entityConverter" 
+                                     filter="true" 
+                                     filterMatchMode="contains" 
+                                     autoWidth="false"
+                                     style="width:50%">
+                        <f:selectItem itemLabel="---Formas de pago---" noSelectionOption="true"/>
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="nuPagos" value="Número de pagos:" style="display: block"/>
+                    <p:inputNumber id="nuPagos"
+                                   value=""
+                                   decimalPlaces="0"
+                                   minValue="0"
+                                   maxValue="200"
+                                   inputStyle="width:50%">
+                        <p:ajax event="blur" process="@this" />
+                    </p:inputNumber>
+                </div>
+
                 <div class="p-col-12 p-md-4">
                     <p:outputLabel for="txMoti" value="Motivo:" style="display: block"/>
                     <p:inputTextarea id="txMoti" 
                                      value="" 
                                      rows="3" 
                                      maxlength="250" 
-                                     autoResize="true" />
+                                     autoResize="true" 
+                                     style="width:50%"/>
                 </div>
-                
+
                 <div class="p-col-12 p-md-4">
                     <p:outputLabel for="txObse" value="Observaciones:" style="display: block"/>
                     <p:inputTextarea id="txObse" 
                                      value="" 
                                      rows="3" 
                                      maxlength="250" 
-                                     autoResize="true" />
+                                     autoResize="true" 
+                                     style="width:50%"/>
                 </div>
             </div>
         </p:fieldset>

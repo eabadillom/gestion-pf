@@ -53,10 +53,6 @@ public class PagoBL {
             if ("".equalsIgnoreCase(pago.getReferencia())){
                 throw new InventarioException("El pago no tiene ninguna referencia.");
             }
-            
-            if (pago.getMedioPago() == null) {
-                throw new InventarioException("El pago no tiene un medio de pago asociado.");
-            }
         }
         
     }

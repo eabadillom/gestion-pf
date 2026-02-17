@@ -71,12 +71,12 @@ public class CatConceptoEgreso implements Serializable, Catalogo {
     private Boolean requiereCFDIDeducible;
 
     @Basic(optional = false)
-    @Column(name = "pc_iva", precision = 6, scale = 3)
-    private BigDecimal porcentajeIVA = new BigDecimal("16.000");;
+    @Column(name = "pc_iva", precision = 7, scale = 4)
+    private BigDecimal porcentajeIVA = new BigDecimal("16.0000");;
 
     @Basic(optional = false)
-    @Column(name = "pc_ieps", precision = 6, scale = 3)
-    private BigDecimal porcentajeIEPS = new BigDecimal("00.000");
+    @Column(name = "pc_ieps", precision = 7, scale = 4)
+    private BigDecimal porcentajeIEPS = new BigDecimal("00.0000");
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_cate_egre", nullable = false)

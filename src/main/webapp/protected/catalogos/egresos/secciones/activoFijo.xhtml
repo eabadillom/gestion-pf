@@ -7,72 +7,74 @@
 
         <p:fieldset legend="Activo Fijo" toggleable="true">
             <div class="p-grid">
-                <div class="p-col-12 p-md-6">
+                <div class="p-col-12 p-md-4">
                     <p:outputLabel for="nombActiFijo" value="Activo Fijo:" style="display: block"/>
                     <p:inputTextarea id="nombActiFijo" 
                                      value="" 
                                      rows="3"
                                      required="true"
                                      maxlength="150" 
-                                     style="width:100%"
+                                     style="width:50%"
                                      autoResize="false"/>
                 </div>
 
-                <div class="p-col-12 p-md-6">
-                    <p:outputLabel for="fhAdqu" value="Fecha de adquisición:" style="display: block"/>
-                    <p:datePicker id="fhAdqu" 
-                                  value=""
-                                  pattern="dd/MM/yyyy"
-                                  showIcon="true">
-                        <p:ajax event="dateSelect" process="@this"/>             
-                    </p:datePicker>
-                </div>
-
-                <div class="p-col-12 p-md-6">
+                <div class="p-col-12 p-md-4">
                     <p:outputLabel for="impoActiFijo" value="Importe del Activo Fijo:" style="display: block"/>
                     <p:inputNumber id="impoActiFijo"
                                    value=""
                                    decimalPlaces="2"
-                                   maxValue="999999999999999.99"
+                                   maxValue="9999999999.99"
                                    minValue="0"
                                    symbol="$"
                                    symbolPosition="p"
                                    thousandSeparator=","
                                    decimalSeparator="."
                                    required="true"
-                                   inputStyle="width:100%">
+                                   inputStyle="width:50%">
                         <p:ajax process="@this"/>
                     </p:inputNumber>
                 </div>
-                
-                <div class="p-col-12 p-md-6">
-                <p:outputLabel for="vidaUtil" value="Vida útil (meses):" style="display: block"/>
-                <p:inputNumber id="vidaUtil"
-                               value=""
-                               decimalPlaces="0"
-                               minValue="0"
-                               maxValue="365"
-                               inputStyle="width:50%">
-                    <p:ajax event="blur" process="@this" />
-                </p:inputNumber>
-            </div>
-                
+
                 <div class="p-col-12 p-md-4">
-                <p:outputLabel for="statActiFijo" value="Status del activo fijo:" style="display:block"/>
-                <p:selectOneMenu id="statActiFijo"
-                                 widgetVar="statActiFijo"
-                                 styleClass="w-full" 
-                                 value="" 
-                                 required="true" 
-                                 requiredMessage="Debe indicar un status para el activo fijo"
-                                 converter="entityConverter" 
-                                 filter="true" 
-                                 filterMatchMode="contains" 
-                                 autoWidth="false">
-                    <f:selectItem itemLabel="---Status de cargo---" noSelectionOption="true"/> 
-                    <p:ajax process="@this"/>
-                </p:selectOneMenu>
-            </div>
+                    <p:outputLabel for="vidaUtil" value="Vida útil (meses):" style="display: block"/>
+                    <p:inputNumber id="vidaUtil"
+                                   value=""
+                                   decimalPlaces="0"
+                                   minValue="0"
+                                   maxValue="365"
+                                   inputStyle="width:50%">
+                        <p:ajax event="blur" process="@this" />
+                    </p:inputNumber>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="fhAdqu" value="Fecha de adquisición:" style="display: block"/>
+                    <p:datePicker id="fhAdqu" 
+                                  value=""
+                                  pattern="dd/MM/yyyy"
+                                  showIcon="true"
+                                  style="width:50%">
+                        <p:ajax event="dateSelect" process="@this"/>             
+                    </p:datePicker>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="statActiFijo" value="Status del activo fijo:" style="display:block"/>
+                    <p:selectOneMenu id="statActiFijo"
+                                     widgetVar="statActiFijo"
+                                     styleClass="w-full" 
+                                     value="" 
+                                     required="true" 
+                                     requiredMessage="Debe indicar un status para el activo fijo"
+                                     converter="entityConverter" 
+                                     filter="true" 
+                                     filterMatchMode="contains" 
+                                     autoWidth="false"
+                                     style="width:50%">
+                        <f:selectItem itemLabel="---Status de cargo---" noSelectionOption="true"/> 
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </div>
             </div> 
         </p:fieldset>
     </div>
