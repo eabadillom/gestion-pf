@@ -17,14 +17,14 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.catalogos.StatusPago;
+import mx.com.ferbo.model.categresos.StatusPago;
 
 @NamedQueries({
     @NamedQuery(name = "PagoEgreso.findAllByImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :idImporteEgreso")
 })
 @Entity
 @Table(name = "pago_egreso")
-public class PagoEgreso implements Serializable {
+public class PagoEgreso implements Serializable, Egreso {
 
     private static final long serialVersionUID = 1L;
 
@@ -74,6 +74,7 @@ public class PagoEgreso implements Serializable {
         // Constructor sin parametros
     }
 
+    @Override
     public Integer getId() {
         return id;
     }

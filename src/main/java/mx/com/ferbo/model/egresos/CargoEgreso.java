@@ -16,16 +16,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import mx.com.ferbo.model.catalogos.StatusCargoEgreso;
-
-import mx.com.ferbo.model.catalogos.TipoCargo;
+import mx.com.ferbo.model.categresos.StatusCargoEgreso;
+import mx.com.ferbo.model.categresos.TipoCargo;
 
 @NamedQueries({
     @NamedQuery(name = "CargoEgreso.findAllByImporteEgreso", query = "SELECT ce FROM CargoEgreso ce WHERE ce.importeEgreso.id = :idImporteEgreso")
 })
 @Entity
 @Table(name = "cargo_egreso")
-public class CargoEgreso implements Serializable {
+public class CargoEgreso implements Serializable, Egreso {
 
     private static final long serialVersionUID = 1L;
 
@@ -87,6 +86,7 @@ public class CargoEgreso implements Serializable {
         // Construcctor sin parametros
     }
 
+    @Override
     public Integer getId() {
         return id;
     }

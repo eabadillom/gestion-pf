@@ -8,11 +8,11 @@ import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import mx.com.ferbo.business.catalogos.CatConceptoEgresoBL;
+import mx.com.ferbo.business.categresos.CatConceptoEgresoBL;
 
 import mx.com.ferbo.business.egresos.ImporteEgresosBL;
 import mx.com.ferbo.business.empresa.NEmisoresCFDISBL;
-import mx.com.ferbo.model.catalogos.CatConceptoEgreso;
+import mx.com.ferbo.model.categresos.CatConceptoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 import mx.com.ferbo.util.FacesUtils;

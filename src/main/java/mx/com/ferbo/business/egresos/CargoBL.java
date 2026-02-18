@@ -2,14 +2,14 @@ package mx.com.ferbo.business.egresos;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import mx.com.ferbo.dao.egresos.CargoDAO;
-import mx.com.ferbo.model.catalogos.ConceptoEgreso;
-import mx.com.ferbo.model.catalogos.StatusCargoEgreso;
+import mx.com.ferbo.model.egresos.ConceptoEgreso;
+import mx.com.ferbo.model.categresos.StatusCargoEgreso;
 import mx.com.ferbo.model.egresos.CargoEgreso;
+import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
@@ -17,19 +17,33 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class CargoBL {
+public class CargoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, StatusCargoEgreso> {
 
     private static final Logger log = LogManager.getLogger(CargoBL.class);
 
     @Inject
     private CargoDAO dao;
 
-    public void validarCargo(CargoEgreso cargo) throws InventarioException {
+    public CargoBL() {
+        setDao(dao);
+    }
 
+    @Override
+    protected String nombreHijo() {
+        return "el cargo";
+    }
+
+    @Override
+    protected String nombreHijos() {
+        return "los cargos";
+    }
+
+    @Override
+    protected void validar(CargoEgreso cargo) throws InventarioException {
         if (cargo == null) {
             throw new InventarioException("El cargo no puede ser vacío.");
         }
-        
+
         if (cargo.getImporteEgreso() == null) {
             throw new InventarioException("El cargo no tiene asociado un egreso.");
         }
@@ -37,7 +51,7 @@ public class CargoBL {
         if (cargo.getTipoCargo() == null) {
             throw new InventarioException("El cargo no tiene asosciado ningun tipo de cargo.");
         }
-        
+
         if (cargo.getStatus() == null) {
             throw new InventarioException("El cargo no tiene un status asociado.");
         }
@@ -45,7 +59,14 @@ public class CargoBL {
         if (cargo.getImporteCargo() == null || cargo.getImporteCargo().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InventarioException("El importe del cargo no pude ser vacío o cero.");
         }
+    }
 
+    @Override
+    protected void antesDeGuardar(CargoEgreso cargo, ImporteEgreso importe) throws InventarioException {
+        
+        if (cargo.getImporteEgreso() == null) {
+            cargo.setImporteEgreso(importe);
+        }
     }
 
     public Integer calcularDias(CargoEgreso cargo) {
@@ -93,32 +114,29 @@ public class CargoBL {
 
         return BigDecimal.ZERO;
     }
-    
-    public String operar(CargoEgreso cargo) throws InventarioException{
-        String mensaje = "El cargo se ";
-        try {
-            validarCargo(cargo);
-            if (cargo.getId() == null) {
-                dao.guardar(cargo);
-                mensaje += "aplico correctamente.";
-            } else {
-                dao.actualizar(cargo);
-                mensaje += "acutalizo correctamente.";
-            }
-            return mensaje;
-        } catch (InventarioException ex) {
-            log.warn("Hubo un problema al operar con el cargo {}. {}", cargo, ex);
-            throw ex;
-        }
-    }
-    
-    public String cambiarEstado(CargoEgreso cargo, StatusCargoEgreso status) throws InventarioException{
-        
-        if ("APLICADO".equalsIgnoreCase(status.getNombre()) || "CANCELADO".equalsIgnoreCase(status.getNombre()) || "CONDONADO".equalsIgnoreCase(status.getNombre())){
+
+    public String cambiarEstado(CargoEgreso cargo, StatusCargoEgreso status) throws InventarioException {
+
+        if ("APLICADO".equalsIgnoreCase(status.getNombre()) || "CANCELADO".equalsIgnoreCase(status.getNombre()) || "CONDONADO".equalsIgnoreCase(status.getNombre())) {
             throw new InventarioException("El status del cargo ya no se pueda cambiar.");
         }
-        
+
         cargo.setStatus(status);
         return "El status del cargo cambio exitosamente a: " + status.getNombre();
     }
+
+    @Override
+    protected String nombreCatalogo() {
+        return "el status";
+    }
+
+    @Override
+    protected void antesDeCambiar(CargoEgreso entity, StatusCargoEgreso catalog) throws InventarioException {
+        if ("APLICADO".equalsIgnoreCase(entity.getStatus().getNombre()) || "CANCELADO".equalsIgnoreCase(entity.getStatus().getNombre()) || "CONDONADO".equalsIgnoreCase(entity.getStatus().getNombre())) {
+            throw new InventarioException("El status del cargo ya no se pueda cambiar.");
+        }
+
+        entity.setStatus(catalog);
+    }
+
 }

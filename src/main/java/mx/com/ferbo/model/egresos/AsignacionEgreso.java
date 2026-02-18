@@ -12,13 +12,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.catalogos.TipoAsignacion;
+import mx.com.ferbo.model.categresos.TipoAsignacion;
 
+@NamedQueries({
+    @NamedQuery(name = "AsignacionEgreso.findAllByImporteEgreso", query = "SELECT ae FROM AsignacionEgreso ae WHERE ae.importeEgreso.id = :idImporteEgreso")
+})
 @Entity
 @Table(name = "asignacion_egreso")
-public class AsignacionEgreso implements Serializable {
+public class AsignacionEgreso implements Serializable, Egreso {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,6 +53,7 @@ public class AsignacionEgreso implements Serializable {
         // Constructor sin parametros
     }
 
+    @Override
     public Integer getId() {
         return id;
     }

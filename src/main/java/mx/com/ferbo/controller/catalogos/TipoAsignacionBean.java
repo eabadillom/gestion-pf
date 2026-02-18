@@ -10,8 +10,8 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.catalogos.TipoAsignacionBL;
-import mx.com.ferbo.model.catalogos.TipoAsignacion;
+import mx.com.ferbo.business.categresos.TipoAsignacionBL;
+import mx.com.ferbo.model.categresos.TipoAsignacion;
 import mx.com.ferbo.util.InventarioException;
 
 @Named

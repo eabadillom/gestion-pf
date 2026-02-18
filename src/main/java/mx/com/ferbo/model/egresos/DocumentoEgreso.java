@@ -15,11 +15,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.catalogos.TipoDocumento;
+import mx.com.ferbo.model.categresos.TipoDocumento;
 
 @NamedQueries({
-    @NamedQuery(name = "DocumentoEgreso.findByPago", query = "SELECT de FROM DocumentoEgreso de WHERE de.pagoEgreso.id = :id"),
-    @NamedQuery(name = "DocumentoEgreso.findAllByImporteEgreso", query = "SELECT de FROM DocumentoEgreso de WHERE de.pagoEgreso.importeEgreso.id = :id")
+    @NamedQuery(name = "DocumentoEgreso.findByPago", query = "SELECT de FROM DocumentoEgreso de WHERE de.pagoEgreso.id = :idPago"),
+    @NamedQuery(name = "DocumentoEgreso.findAllByImporteEgreso", query = "SELECT de FROM DocumentoEgreso de WHERE de.pagoEgreso.importeEgreso.id = :idImporteEgreso")
 })
 @Entity
 @Table(name = "documento_egreso")

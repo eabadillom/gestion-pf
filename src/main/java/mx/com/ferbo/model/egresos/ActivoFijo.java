@@ -17,14 +17,14 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.catalogos.StatusActivoFijo;
+import mx.com.ferbo.model.categresos.StatusActivoFijo;
 
 @NamedQueries({
-    @NamedQuery(name = "ActivoFijo.findByEgreso", query = "SELECT af FROM ActivoFijo af WHERE af.origen.id = :id")
+    @NamedQuery(name = "ActivoFijo.findByEgreso", query = "SELECT af FROM ActivoFijo af WHERE af.importeEgreso = :idImporteEgreso")
 })
 @Entity
 @Table(name = "activo_fijo")
-public class ActivoFijo implements Serializable{
+public class ActivoFijo implements Serializable, Egreso{
 
     private static final long serialVersionUID = 1L;
 
@@ -56,12 +56,13 @@ public class ActivoFijo implements Serializable{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_impo_egre")
-    private ImporteEgreso origen;
+    private ImporteEgreso importeEgreso;
 
     public ActivoFijo(){
         // Constructor sin parametros
     }
 
+    @Override
     public Integer getId() {
         return id;
     }
@@ -110,14 +111,14 @@ public class ActivoFijo implements Serializable{
         this.status = status;
     }
 
-    public ImporteEgreso getOrigen() {
-        return origen;
+    public ImporteEgreso getImporteEgreso() {
+        return importeEgreso;
     }
 
-    public void setOrigen(ImporteEgreso origen) {
-        this.origen = origen;
+    public void setImporteEgreso(ImporteEgreso importeEgreso) {
+        this.importeEgreso = importeEgreso;
     }
-
+    
     public boolean equals(Object o){
         if (this == o)
             return true;

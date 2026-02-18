@@ -10,8 +10,8 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.catalogos.StatusActivoFijoBL;
-import mx.com.ferbo.model.catalogos.StatusActivoFijo;
+import mx.com.ferbo.business.categresos.StatusActivoFijoBL;
+import mx.com.ferbo.model.categresos.StatusActivoFijo;
 import mx.com.ferbo.util.InventarioException;
 
 @Named

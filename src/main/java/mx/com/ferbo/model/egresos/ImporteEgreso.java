@@ -21,8 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
-import mx.com.ferbo.model.catalogos.ConceptoEgreso;
-import mx.com.ferbo.model.catalogos.StatusEgreso;
+import mx.com.ferbo.model.categresos.StatusEgreso;
 import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 
 @NamedQueries({
@@ -37,7 +36,7 @@ import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 })
 @Entity
 @Table(name = "importe_egreso")
-public class ImporteEgreso implements Serializable {
+public class ImporteEgreso implements Serializable, Egreso {
     
     private static final long serialVersionUID = 1L;
 
@@ -110,6 +109,7 @@ public class ImporteEgreso implements Serializable {
         // Constructor sin parametros
     }
 
+    @Override
     public Integer getId() {
         return id;
     }
