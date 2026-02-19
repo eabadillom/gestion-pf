@@ -18,6 +18,7 @@ public abstract class EgresoBaseBL<T extends Egreso, P extends Egreso, C extends
     
     public EgresoBaseBL(){}
     
+    protected abstract T nuevo();
     protected abstract String nombreHijo();
     protected abstract String nombreHijos();
     protected abstract String nombreCatalogo();
@@ -27,6 +28,14 @@ public abstract class EgresoBaseBL<T extends Egreso, P extends Egreso, C extends
     
     protected void setDao(EgresoBaseDAO<T> dao) {
         this.dao = dao;
+    }
+    
+    public void statusIncial(T son, C catalog){
+        
+        if (son.getId() == null){
+            son.setStatus(catalog);
+        } 
+        
     }
     
     public List<T> obtenerPorImporteEgreso(P father) throws InventarioException{

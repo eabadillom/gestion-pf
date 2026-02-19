@@ -36,7 +36,7 @@ import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 })
 @Entity
 @Table(name = "importe_egreso")
-public class ImporteEgreso implements Serializable, Egreso {
+public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
     
     private static final long serialVersionUID = 1L;
 
@@ -67,8 +67,8 @@ public class ImporteEgreso implements Serializable, Egreso {
     private String motivo;
 
     @Basic(optional = false)
-    @Column(name = "fh_alta")
-    private Date fechaAlta;
+    @Column(name = "fh_modi")
+    private Date fechaModificacion;
 
     @Basic(optional = false)
     @Column(name = "fh_limi_pago")
@@ -158,12 +158,12 @@ public class ImporteEgreso implements Serializable, Egreso {
         this.motivo = motivo;
     }
 
-    public Date getFechaAlta() {
-        return fechaAlta;
+    public Date getFechaModificacion() {
+        return fechaModificacion;
     }
 
-    public void setFechaAlta(Date fechaAlta) {
-        this.fechaAlta = fechaAlta;
+    public void setFechaModificacion(Date fechaModificacion) {
+        this.fechaModificacion = fechaModificacion;
     }
 
     public Date getFechaLimitePago() {
@@ -202,6 +202,7 @@ public class ImporteEgreso implements Serializable, Egreso {
         return status;
     }
 
+    @Override
     public void setStatus(StatusEgreso status) {
         this.status = status;
     }
@@ -257,7 +258,7 @@ public class ImporteEgreso implements Serializable, Egreso {
     @Override
     public String toString() {
         return "ImporteEgreso [id=" + id + ", subTotal=" + subTotal + ", iva=" + iva + ", ieps=" + ieps
-                + ", observaciones=" + observaciones + ", motivo=" + motivo + ", fechaAlta=" + fechaAlta
+                + ", observaciones=" + observaciones + ", motivo=" + motivo + ", fechaModificacion=" + fechaModificacion
                 + ", fechaLimitePago=" + fechaLimitePago + "]";
     }
 

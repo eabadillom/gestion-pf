@@ -10,13 +10,12 @@ import javax.persistence.EntityManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
-public class ImporteEgresoDAO extends BaseDAO<ImporteEgreso, Integer> {
+public class ImporteEgresoDAO extends EgresoBaseDAO<ImporteEgreso> {
 
     private static final Logger log = LogManager.getLogger(ImporteEgresoDAO.class);
 
@@ -43,5 +42,10 @@ public class ImporteEgresoDAO extends BaseDAO<ImporteEgreso, Integer> {
         } finally {
             super.close(em);
         }
+    }
+
+    @Override
+    protected Class<ImporteEgreso> getEntityClass() {
+        return ImporteEgreso.class;
     }
 }

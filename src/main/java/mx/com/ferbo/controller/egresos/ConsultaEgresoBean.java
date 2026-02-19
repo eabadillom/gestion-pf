@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import mx.com.ferbo.business.categresos.CatConceptoEgresoBL;
 
-import mx.com.ferbo.business.egresos.ImporteEgresosBL;
+import mx.com.ferbo.business.egresos.ImporteEgresoBL;
 import mx.com.ferbo.business.empresa.NEmisoresCFDISBL;
 import mx.com.ferbo.model.categresos.CatConceptoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
@@ -33,7 +33,7 @@ public class ConsultaEgresoBean implements Serializable {
     private ImporteEgreso egresoSelected;
     
     @Inject
-    private ImporteEgresosBL egresoBL;
+    private ImporteEgresoBL egresoBL;
     
     @Inject    
     private CatConceptoEgresoBL conceptoBL;

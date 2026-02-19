@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.business.egresos.ImporteEgresosBL;
+import mx.com.ferbo.business.egresos.ImporteEgresoBL;
 import mx.com.ferbo.model.categresos.CatConceptoEgreso;
 import mx.com.ferbo.model.categresos.CategoriaEgreso;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
@@ -43,7 +43,7 @@ public class EgresoBean implements Serializable {
     private ConceptoEgreso conceptoSelected;
 
     @Inject
-    private ImporteEgresosBL importeBL;
+    private ImporteEgresoBL importeBL;
 
     public EgresoBean() {
     }

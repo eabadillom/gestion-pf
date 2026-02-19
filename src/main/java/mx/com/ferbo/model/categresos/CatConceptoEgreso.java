@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import mx.com.ferbo.model.egresos.Egreso;
 
 @NamedQueries({
     @NamedQuery(name = "CatConceptoEgreso.findByNombre", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.nombre = :nombre"),
@@ -24,7 +25,7 @@ import javax.persistence.Table;
 })
 @Entity
 @Table(name = "cat_concepto_egreso")
-public class CatConceptoEgreso implements Serializable, CatEgreso {
+public class CatConceptoEgreso implements Serializable, CatEgreso, Egreso<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -226,6 +227,11 @@ public class CatConceptoEgreso implements Serializable, CatEgreso {
                 + ", porcentajeIVA=" + porcentajeIVA + ", porcentajeIEPS=" + porcentajeIEPS + ", requiereCFDI="
                 + requiereCFDI + ", esDeducible=" + esDeducible + ", requiereCFDIDecucible=" + requiereCFDIDeducible
                 + "]";
+    }
+
+    @Override
+    public void setStatus(String entity) {
+        // Método vacío porque no se necesita una implementación
     }
 
 }

@@ -24,7 +24,7 @@ import mx.com.ferbo.model.categresos.TipoCargo;
 })
 @Entity
 @Table(name = "cargo_egreso")
-public class CargoEgreso implements Serializable, Egreso {
+public class CargoEgreso implements Serializable, Egreso<StatusCargoEgreso> {
 
     private static final long serialVersionUID = 1L;
 
@@ -187,6 +187,7 @@ public class CargoEgreso implements Serializable, Egreso {
         return status;
     }
 
+    @Override
     public void setStatus(StatusCargoEgreso status) {
         this.status = status;
     }

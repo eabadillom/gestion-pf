@@ -13,15 +13,20 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ApplicationScoped
-public class AsignacionBL extends EgresoBaseBL<AsignacionEgreso, ImporteEgreso, TipoAsignacion> {
+public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEgreso, TipoAsignacion> {
 
     @Inject
     private AsignacionDAO dao;
     
     private static final BigDecimal CIEN = BigDecimal.valueOf(100);
 
-    public AsignacionBL() {
+    public AsignacionEgresoBL() {
         setDao(dao);
+    }
+    
+    @Override
+    protected AsignacionEgreso nuevo(){
+        return new AsignacionEgreso();
     }
 
     @Override

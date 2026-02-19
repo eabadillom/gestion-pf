@@ -11,6 +11,7 @@ import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import mx.com.ferbo.business.categresos.StatusEgresoBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +20,9 @@ import mx.com.ferbo.dao.egresos.ImporteEgresoDAO;
 import mx.com.ferbo.model.categresos.CatConceptoEgreso;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.categresos.StatusEgreso;
+import mx.com.ferbo.model.egresos.CargoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
+import mx.com.ferbo.model.egresos.PagoEgreso;
 import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.DateUtil;
@@ -27,13 +30,40 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
-public class ImporteEgresosBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso, StatusEgreso> {
+public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso, StatusEgreso> {
 
-    private static final Logger log = LogManager.getLogger(ImporteEgresosBL.class);
+    private static final Logger log = LogManager.getLogger(ImporteEgresoBL.class);
 
     @Inject
-    private ImporteEgresoDAO importeEgresoDAO;
+    private ImporteEgresoDAO dao;
 
+    @Inject
+    private PagoEgresoBL pagoBL;
+    
+    @Inject 
+    private CargoEgresoBL cargoBL;
+    
+    @Inject 
+    private StatusEgresoBL statusBL;
+    
+    private final String  STATUS_REGISTRADO = "REGISTRADO";
+    
+    private final String STATUS_PENDIENTE = "PENDIENTE";
+    
+    private final String STATUS_PAGADO = "PAGADO";
+    
+    private final String STATUS_PARCIAL = "PARACIAL";
+    
+    private final String STATUS_CANCELADO = "CANCELADO";
+    public ImporteEgresoBL(){
+        setDao(dao);
+    }
+    
+    @Override
+    protected ImporteEgreso nuevo(){
+        return new ImporteEgreso();
+    }
+            
     @Override
     protected String nombreHijo() {
         return "el importe de egreso";
@@ -69,24 +99,37 @@ public class ImporteEgresosBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso
 
     @Override
     protected void antesDeGuardar(ImporteEgreso importe, ConceptoEgreso concepto) throws InventarioException {
+        
+        if (importe.getId() == null) {
+            StatusEgreso status = statusBL.buscarPorNombre(STATUS_REGISTRADO);
+            antesDeCambiar(importe, status);
+        }
 
         if (importe.getConceptoEgreso() == null) {
             importe.setConceptoEgreso(concepto);
         }
 
-        if (importe.getId() == null) {
-            importe.setFechaAlta(new Date());
-        }
+        importe.setFechaModificacion(new Date());
     }
 
     @Override
-    protected void antesDeCambiar(ImporteEgreso entity, StatusEgreso catalog) throws InventarioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected void antesDeCambiar(ImporteEgreso importe, StatusEgreso status) throws InventarioException {
+        
+        if (STATUS_CANCELADO.equalsIgnoreCase(importe.getStatus().getNombre())) {
+            throw new InventarioException("El egreso ya se encuentra en status de cancelado.");
+        } 
+        
+        if (STATUS_PAGADO.equalsIgnoreCase(importe.getStatus().getNombre())) {
+            throw new InventarioException("El egreso ya se encuentra pagado en su totalidad.");
+        }
+        
+        importe.setStatus(status);
+        
     }
-
+    
     public ImporteEgreso obtenerPorId(Integer id) {
         try {
-            return importeEgresoDAO.buscarPorId(id).orElseThrow(() -> new DAOException ("Hubo un problema al buscar un egreso con id: " + id));
+            return dao.buscarPorId(id).orElseThrow(() -> new DAOException ("Hubo un problema al buscar un egreso con id: " + id));
         } catch (DAOException ex) {
             log.error("Hubo un problema al obtener algun egreso con id: {}. {}", id, ex);
             return new ImporteEgreso();
@@ -118,7 +161,7 @@ public class ImporteEgresosBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso
                 idEmisor = razon.getId();
             }
 
-            return importeEgresoDAO.buscarPorFiltros(
+            return dao.buscarPorFiltros(
                     inicio,
                     fin,
                     idConcepto,
@@ -138,4 +181,6 @@ public class ImporteEgresosBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso
             );
         }
     }
+
+
 }

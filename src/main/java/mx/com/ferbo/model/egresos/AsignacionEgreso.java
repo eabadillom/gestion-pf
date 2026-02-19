@@ -23,7 +23,7 @@ import mx.com.ferbo.model.categresos.TipoAsignacion;
 })
 @Entity
 @Table(name = "asignacion_egreso")
-public class AsignacionEgreso implements Serializable, Egreso {
+public class AsignacionEgreso implements Serializable, Egreso<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -113,6 +113,11 @@ public class AsignacionEgreso implements Serializable, Egreso {
     @Override
     public String toString() {
         return "AsignacionEgreso [id=" + id + ", porcentaje=" + porcentaje + ", importe=" + importe + "]";
+    }
+
+    @Override
+    public void setStatus(String entity) {
+        // Método vacío porque no se necesita una implementación
     }
 
 }

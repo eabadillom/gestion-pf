@@ -1,11 +1,15 @@
 package mx.com.ferbo.business.egresos;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import mx.com.ferbo.business.categresos.StatusEgresoBL;
 import mx.com.ferbo.dao.egresos.PagoDAO;
+import mx.com.ferbo.model.categresos.StatusEgreso;
 import mx.com.ferbo.model.categresos.StatusPago;
+import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.model.egresos.PagoEgreso;
 import mx.com.ferbo.util.FacesUtils;
@@ -15,15 +19,36 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class PagoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPago> {
+public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPago> {
 
-    private static final Logger log = LogManager.getLogger(PagoBL.class);
+    private static final Logger log = LogManager.getLogger(PagoEgresoBL.class);
 
     @Inject
     private PagoDAO dao;
 
-    public PagoBL() {
+    @Inject
+    private ImporteEgresoBL importeBL;
+
+    @Inject
+    private StatusEgresoBL statusEgresoBL;
+
+    private final String STATUS_PENDIENTE = "PENDIENTE";
+
+    private final String STATUS_PAGADO = "PAGADO";
+
+    private final String STATUS_PARCIAL = "PARACIAL";
+
+    private final String STATUS_CANCELADO = "CANCELADO";
+
+    private final String STATUS_VENCIDO = "VENCIDO";
+
+    public PagoEgresoBL() {
         setDao(dao);
+    }
+
+    @Override
+    protected PagoEgreso nuevo() {
+        return new PagoEgreso();
     }
 
     @Override
@@ -76,7 +101,7 @@ public class PagoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPago> 
 
     @Override
     protected void antesDeGuardar(PagoEgreso pago, ImporteEgreso importe) throws InventarioException {
-        
+
         if (pago.getImporteEgreso() == null) {
             pago.setImporteEgreso(importe);
         }
@@ -84,6 +109,8 @@ public class PagoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPago> 
         if (pago.getFechaAlta() == null) {
             pago.setFechaAlta(new Date());
         }
+
+        pago.setFechaModificacion(new Date());
     }
 
     @Override
@@ -100,4 +127,7 @@ public class PagoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPago> 
     protected String nombreCatalogo() {
         return "el status";
     }
+
+    
+
 }

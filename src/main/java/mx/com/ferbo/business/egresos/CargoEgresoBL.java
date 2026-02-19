@@ -17,15 +17,20 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class CargoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, StatusCargoEgreso> {
+public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, StatusCargoEgreso> {
 
-    private static final Logger log = LogManager.getLogger(CargoBL.class);
+    private static final Logger log = LogManager.getLogger(CargoEgresoBL.class);
 
     @Inject
     private CargoDAO dao;
 
-    public CargoBL() {
+    public CargoEgresoBL() {
         setDao(dao);
+    }
+    
+    @Override
+    protected CargoEgreso nuevo(){
+        return new CargoEgreso();
     }
 
     @Override

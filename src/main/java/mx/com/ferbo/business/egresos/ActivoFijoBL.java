@@ -27,6 +27,11 @@ public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, Status
     public ActivoFijoBL() {
         setDao(dao);
     }
+    
+    @Override
+    protected ActivoFijo nuevo(){
+        return new ActivoFijo();
+    }
 
     @Override
     protected String nombreHijo() {

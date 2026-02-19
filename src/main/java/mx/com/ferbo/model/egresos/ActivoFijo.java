@@ -24,7 +24,7 @@ import mx.com.ferbo.model.categresos.StatusActivoFijo;
 })
 @Entity
 @Table(name = "activo_fijo")
-public class ActivoFijo implements Serializable, Egreso{
+public class ActivoFijo implements Serializable, Egreso<StatusActivoFijo>{
 
     private static final long serialVersionUID = 1L;
 
@@ -107,6 +107,7 @@ public class ActivoFijo implements Serializable, Egreso{
         return status;
     }
 
+    @Override
     public void setStatus(StatusActivoFijo status) {
         this.status = status;
     }

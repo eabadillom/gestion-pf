@@ -24,7 +24,7 @@ import mx.com.ferbo.model.categresos.StatusPago;
 })
 @Entity
 @Table(name = "pago_egreso")
-public class PagoEgreso implements Serializable, Egreso {
+public class PagoEgreso implements Serializable, Egreso<StatusPago>{
 
     private static final long serialVersionUID = 1L;
 
@@ -57,6 +57,10 @@ public class PagoEgreso implements Serializable, Egreso {
     @Basic(optional = false)
     @Column(name = "fh_limite", nullable = false)
     private Date fechaLimite;
+    
+    @Basic(optional = false)
+    @Column(name = "fh_modi", nullable = false)
+    private Date fechaModificacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_impo_egre", nullable = false)
@@ -131,6 +135,14 @@ public class PagoEgreso implements Serializable, Egreso {
         this.fechaLimite = fechaLimite;
     }
 
+    public Date getFechaModificacion() {
+        return fechaModificacion;
+    }
+
+    public void setFechaModificacion(Date fechaModificacion) {
+        this.fechaModificacion = fechaModificacion;
+    }
+
     public ImporteEgreso getImporteEgreso() {
         return importeEgreso;
     }
@@ -143,6 +155,7 @@ public class PagoEgreso implements Serializable, Egreso {
         return status;
     }
 
+    @Override
     public void setStatus(StatusPago status) {
         this.status = status;
     }

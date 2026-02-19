@@ -18,13 +18,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import mx.com.ferbo.model.categresos.CatConceptoEgreso;
-import mx.com.ferbo.model.egresos.Egreso;
-
-import mx.com.ferbo.model.egresos.ImporteEgreso;
 
 @Entity
 @Table(name = "concepto_egreso")
-public class ConceptoEgreso implements Serializable, Egreso {
+public class ConceptoEgreso implements Serializable, Egreso<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -225,6 +222,11 @@ public class ConceptoEgreso implements Serializable, Egreso {
                 + ", tieneIVA=" + tieneIVA + ", tieneIEPS=" + tieneIEPS + ", noDeducible=" + noDeducible
                 + ", fechaRegistro=" + fechaRegistro + ", porcentajeIVA=" + porcentajeIVA + ", porcentajeIEPS="
                 + porcentajeIEPS + "]";
+    }
+
+    @Override
+    public void setStatus(String entity) {
+        // Método vacío por que no se necesita una implementación
     }
 
 }    
