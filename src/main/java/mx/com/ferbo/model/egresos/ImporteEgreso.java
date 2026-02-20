@@ -49,6 +49,10 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
     @Basic(optional = false)
     @Column(name = "im_egreso", precision = 12, scale = 2)
     private BigDecimal subTotal;
+    
+    @Basic(optional = false)
+    @Column(name = "to_egreso", precision = 12, scale = 2)
+    private BigDecimal total;
 
     @Basic(optional = true)
     @Column(name = "im_iva", precision = 12, scale = 2)
@@ -124,6 +128,14 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
 
     public void setSubTotal(BigDecimal subTotal) {
         this.subTotal = subTotal;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
     }
 
     public BigDecimal getIva() {

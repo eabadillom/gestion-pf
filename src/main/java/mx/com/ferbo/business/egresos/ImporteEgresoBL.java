@@ -39,31 +39,36 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     @Inject
     private PagoEgresoBL pagoBL;
-    
-    @Inject 
+
+    @Inject
     private CargoEgresoBL cargoBL;
-    
-    @Inject 
+
+    @Inject
     private StatusEgresoBL statusBL;
-    
-    private final String  STATUS_REGISTRADO = "REGISTRADO";
-    
+
+    private final String STATUS_REGISTRADO = "REGISTRADO";
+
     private final String STATUS_PENDIENTE = "PENDIENTE";
-    
+
     private final String STATUS_PAGADO = "PAGADO";
-    
+
     private final String STATUS_PARCIAL = "PARACIAL";
-    
+
     private final String STATUS_CANCELADO = "CANCELADO";
-    public ImporteEgresoBL(){
+
+    private final String STATUS_EXCEDENTE = "EXCEDENTE";
+    
+    private final String STATUS_POR_CONCILIAR = "POR_CONCILIAR";
+
+    public ImporteEgresoBL() {
         setDao(dao);
     }
-    
+
     @Override
-    protected ImporteEgreso nuevo(){
+    protected ImporteEgreso nuevo() {
         return new ImporteEgreso();
     }
-            
+
     @Override
     protected String nombreHijo() {
         return "el importe de egreso";
@@ -99,7 +104,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     @Override
     protected void antesDeGuardar(ImporteEgreso importe, ConceptoEgreso concepto) throws InventarioException {
-        
+
         if (importe.getId() == null) {
             StatusEgreso status = statusBL.buscarPorNombre(STATUS_REGISTRADO);
             antesDeCambiar(importe, status);
@@ -114,28 +119,28 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     @Override
     protected void antesDeCambiar(ImporteEgreso importe, StatusEgreso status) throws InventarioException {
-        
+
         if (STATUS_CANCELADO.equalsIgnoreCase(importe.getStatus().getNombre())) {
             throw new InventarioException("El egreso ya se encuentra en status de cancelado.");
-        } 
-        
+        }
+
         if (STATUS_PAGADO.equalsIgnoreCase(importe.getStatus().getNombre())) {
             throw new InventarioException("El egreso ya se encuentra pagado en su totalidad.");
         }
-        
+
         importe.setStatus(status);
-        
+
     }
-    
+
     public ImporteEgreso obtenerPorId(Integer id) {
         try {
-            return dao.buscarPorId(id).orElseThrow(() -> new DAOException ("Hubo un problema al buscar un egreso con id: " + id));
+            return dao.buscarPorId(id).orElseThrow(() -> new DAOException("Hubo un problema al buscar un egreso con id: " + id));
         } catch (DAOException ex) {
             log.error("Hubo un problema al obtener algun egreso con id: {}. {}", id, ex);
             return new ImporteEgreso();
         }
     }
-    
+
     public List<ImporteEgreso> obtenerPorFiltros(
             CatConceptoEgreso concepto,
             NEmisoresCFDIS razon,
@@ -182,5 +187,67 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
         }
     }
 
+    public void procesarSubTotalEgreso(ImporteEgreso importe) throws InventarioException {
+        List<PagoEgreso> pagos = pagoBL.obtenerPorImporteEgreso(importe);
 
+        BigDecimal subTotal = BigDecimal.ZERO;
+
+        for (PagoEgreso pago : pagos) {
+            subTotal = subTotal.add(pago.getImporte());
+        }
+
+        BigDecimal totalAux = subTotal.add(importe.getIeps().add(importe.getIva()));
+
+        int comparacion = totalAux.compareTo(importe.getConceptoEgreso().getTotalConceptoEgreso());
+
+        StatusEgreso status = statusBL.buscarPorNombre(STATUS_PARCIAL);
+
+        if (comparacion > 0) {
+            status = statusBL.buscarPorNombre(STATUS_POR_CONCILIAR);
+        }
+
+        antesDeCambiar(importe, status);
+
+        importe.setSubTotal(subTotal);
+
+        ConceptoEgreso concepto = importe.getConceptoEgreso();
+
+        operar(importe, concepto);
+    }
+
+    public void procesarTotalEgreso(ImporteEgreso importe) throws InventarioException {
+
+        List<CargoEgreso> cargos = cargoBL.obtenerPorImporteEgreso(importe);
+
+        BigDecimal subtotal = importe.getSubTotal();
+        BigDecimal total = subtotal;
+
+        for (CargoEgreso cargo : cargos) {
+            total = total.add(cargo.getImporteCargo().add(cargo.getImporteIEPS().add(cargo.getImporteIVA())));
+        }
+
+        total = total.add(importe.getIeps());
+
+        total = total.add(importe.getIva());
+
+        int comparacion = total.compareTo(importe.getConceptoEgreso().getTotalConceptoEgreso());
+
+        StatusEgreso status = importe.getStatus();
+        
+        if (comparacion == 0) {
+            status = statusBL.buscarPorNombre(STATUS_PAGADO);
+        }
+
+        if (comparacion > 0) {
+            status = statusBL.buscarPorNombre(STATUS_EXCEDENTE);
+        }
+
+        antesDeCambiar(importe, status);
+
+        importe.setTotal(total);
+
+        ConceptoEgreso concepto = importe.getConceptoEgreso();
+
+        operar(importe, concepto);
+    }
 }

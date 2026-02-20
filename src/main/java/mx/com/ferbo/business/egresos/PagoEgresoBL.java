@@ -28,6 +28,9 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
 
     @Inject
     private ImporteEgresoBL importeBL;
+    
+    @Inject
+    private CargoEgresoBL cargoBL;
 
     @Inject
     private StatusEgresoBL statusEgresoBL;
@@ -129,5 +132,5 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     }
 
     
-
+    
 }
