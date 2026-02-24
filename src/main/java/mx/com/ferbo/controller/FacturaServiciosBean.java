@@ -37,7 +37,6 @@ import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.n.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.ConceptoDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.FacturaDAO;
@@ -51,6 +50,7 @@ import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoCobroDAO;
 import mx.com.ferbo.dao.TipoFacturacionDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
+import mx.com.ferbo.dao.n.ClienteDomiciliosDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.ClaveUnidad;
@@ -137,7 +137,6 @@ public class FacturaServiciosBean implements Serializable {
 	private ClaveUnidad claveUnidad;
 
 	private ClienteDAO clienteDAO;
-	private ClienteDomiciliosDAO clienteDomicilioDAO;
 	private PlantaDAO plantaDAO;
 	private AvisoDAO avisoDAO;
 	private MetodoPagoDAO metodoPagoDAO;
@@ -201,7 +200,6 @@ public class FacturaServiciosBean implements Serializable {
 		medioPagoSelect = null;
 		
 		clienteDAO = new ClienteDAO();
-		clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		plantaDAO = new PlantaDAO();
 		avisoDAO = new AvisoDAO();
 		metodoPagoDAO = new MetodoPagoDAO();
@@ -379,15 +377,12 @@ public class FacturaServiciosBean implements Serializable {
 				.collect(Collectors.toList());
 			else
 				this.alServicios = preciosServicio.stream()
-				.filter(ps -> ps.getAvisoCve() != null)
-				.filter(ps -> ps.getAvisoCve().getAvisoCve() == this.aviso.getAvisoCve())
-				.collect(Collectors.toList());
-			
+						.filter(ps -> (ps.getAvisoCve() != null))
+						.filter(ps -> ps.getAvisoCve().getAvisoCve().equals(this.aviso.getAvisoCve()))
+						.collect(Collectors.toList());
 		} catch(Exception ex) {
 			log.error("Problema para seleccionar los servicios del aviso...", ex);
 		}
-		
-			
 	}
 	
 	public void agregarServicio() {
