@@ -25,19 +25,19 @@ import mx.com.ferbo.model.categresos.StatusEgreso;
 import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 
 @NamedQueries({
-   @NamedQuery(
-    name = "ImporteEgreso.findByFiltros",
-    query = "SELECT ie FROM ImporteEgreso ie " +
-            "WHERE ie.fechaLimitePago BETWEEN :inicio AND :fin " +
-            "AND (:idConcepto IS NULL OR ie.conceptoEgreso.catConcepto.id = :idConcepto) " +
-            "AND (:idEmisor IS NULL OR ie.emisor.id = :idEmisor) " +
-            "ORDER BY ie.fechaLimitePago ASC"
-)
+    @NamedQuery(
+            name = "ImporteEgreso.findByFiltros",
+            query = "SELECT ie FROM ImporteEgreso ie "
+            + "WHERE ie.fechaLimitePago BETWEEN :inicio AND :fin "
+            + "AND (:idConcepto IS NULL OR ie.conceptoEgreso.catConcepto.id = :idConcepto) "
+            + "AND (:idEmisor IS NULL OR ie.emisor.id = :idEmisor) "
+            + "ORDER BY ie.fechaLimitePago ASC"
+    )
 })
 @Entity
 @Table(name = "importe_egreso")
 public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
-    
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -49,14 +49,14 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
     @Basic(optional = false)
     @Column(name = "im_egreso", precision = 12, scale = 2)
     private BigDecimal subTotal;
-    
+
     @Basic(optional = false)
     @Column(name = "to_egreso", precision = 12, scale = 2)
     private BigDecimal total;
 
     @Basic(optional = true)
     @Column(name = "im_iva", precision = 12, scale = 2)
-    private BigDecimal iva; 
+    private BigDecimal iva;
 
     @Basic(optional = true)
     @Column(name = "im_ieps", precision = 12, scale = 2)
@@ -71,13 +71,17 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
     private String motivo;
 
     @Basic(optional = false)
+    @Column(name = "fh_alta")
+    private Date fechaAlta;
+
+    @Basic(optional = false)
     @Column(name = "fh_modi")
     private Date fechaModificacion;
 
     @Basic(optional = false)
     @Column(name = "fh_limi_pago")
     private Date fechaLimitePago;
-    
+
     @Basic(optional = false)
     @Column(name = "nu_pagos")
     private Integer numeroPagos;
@@ -87,7 +91,7 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
     private ConceptoEgreso conceptoEgreso;
 
     @OneToMany(mappedBy = "importeEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PagoEgreso> pagos; 
+    private List<PagoEgreso> pagos;
 
     @OneToMany(mappedBy = "importeEgreso", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargoEgreso> cargos;
@@ -95,21 +99,20 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
     @ManyToOne
     @JoinColumn(name = "cd_status_egre", nullable = false)
     private StatusEgreso status;
-    
+
     @ManyToOne(optional = false) // muchos egresos -> un emisor
     @JoinColumn(name = "id_emisor", nullable = false)
     private NEmisoresCFDIS emisor;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mp_id", nullable = false)
     private MedioPago medioPago;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_metodo_pago", nullable = false)
     private MetodoPago metodoPago;
-    
 
-    public ImporteEgreso(){
+    public ImporteEgreso() {
         // Constructor sin parametros
     }
 
@@ -170,6 +173,14 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
         this.motivo = motivo;
     }
 
+    public Date getFechaAlta() {
+        return fechaAlta;
+    }
+
+    public void setFechaAlta(Date fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+
     public Date getFechaModificacion() {
         return fechaModificacion;
     }
@@ -201,7 +212,7 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
     public void setPagos(List<PagoEgreso> pagos) {
         this.pagos = pagos;
     }
-    
+
     public List<CargoEgreso> getCargos() {
         return cargos;
     }
@@ -252,26 +263,26 @@ public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
     }
 
     @Override
-    public boolean equals(Object o){
-        if(this == o)
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        if(!(o instanceof ImporteEgreso))
+        }
+        if (!(o instanceof ImporteEgreso)) {
             return false;
+        }
 
         ImporteEgreso that = (ImporteEgreso) o;
         return id != null && id.equals(that.id);
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return 31;
     }
 
     @Override
     public String toString() {
-        return "ImporteEgreso [id=" + id + ", subTotal=" + subTotal + ", iva=" + iva + ", ieps=" + ieps
-                + ", observaciones=" + observaciones + ", motivo=" + motivo + ", fechaModificacion=" + fechaModificacion
-                + ", fechaLimitePago=" + fechaLimitePago + "]";
+        return "ImporteEgreso{" + "id=" + id + ", subTotal=" + subTotal + ", total=" + total + ", iva=" + iva + ", ieps=" + ieps + ", observaciones=" + observaciones + ", motivo=" + motivo + ", fechaAlta=" + fechaAlta + ", fechaModificacion=" + fechaModificacion + ", fechaLimitePago=" + fechaLimitePago + ", numeroPagos=" + numeroPagos + '}';
     }
 
 }

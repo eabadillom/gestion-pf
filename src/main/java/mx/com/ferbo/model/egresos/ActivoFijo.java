@@ -20,7 +20,8 @@ import javax.persistence.Table;
 import mx.com.ferbo.model.categresos.StatusActivoFijo;
 
 @NamedQueries({
-    @NamedQuery(name = "ActivoFijo.findByEgreso", query = "SELECT af FROM ActivoFijo af WHERE af.importeEgreso = :idImporteEgreso")
+    @NamedQuery(name = "ActivoFijo.findAllByImporteEgreso", query = "SELECT af FROM ActivoFijo af WHERE af.importeEgreso = :idImporteEgreso"),
+    @NamedQuery(name = "ActivoFijo.findAllByImporteEgresoYStatus", query = "SELECT af FROM ActivoFijo af WHERE af.importeEgreso = :idImporteEgreso AND af.status.nombre = :status")
 })
 @Entity
 @Table(name = "activo_fijo")
@@ -57,6 +58,14 @@ public class ActivoFijo implements Serializable, Egreso<StatusActivoFijo>{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_impo_egre")
     private ImporteEgreso importeEgreso;
+    
+    @Basic(optional = false)
+    @Column(name = "fh_alta")
+    private Date fechaAlta;
+    
+    @Basic(optional = false)
+    @Column(name = "fh_modi")
+    private Date fechaModificacion;
 
     public ActivoFijo(){
         // Constructor sin parametros
@@ -107,6 +116,22 @@ public class ActivoFijo implements Serializable, Egreso<StatusActivoFijo>{
         return status;
     }
 
+    public Date getFechaAlta() {
+        return fechaAlta;
+    }
+
+    public void setFechaAlta(Date fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+
+    public Date getFechaModificacion() {
+        return fechaModificacion;
+    }
+
+    public void setFechaModificacion(Date fechaModificacion) {
+        this.fechaModificacion = fechaModificacion;
+    }
+
     @Override
     public void setStatus(StatusActivoFijo status) {
         this.status = status;
@@ -120,6 +145,7 @@ public class ActivoFijo implements Serializable, Egreso<StatusActivoFijo>{
         this.importeEgreso = importeEgreso;
     }
     
+    @Override
     public boolean equals(Object o){
         if (this == o)
             return true;
@@ -130,14 +156,14 @@ public class ActivoFijo implements Serializable, Egreso<StatusActivoFijo>{
         return id != null && id.equals(that.id);
     }
 
+    @Override
     public int hashCode(){
         return 31;
     }
 
     @Override
     public String toString() {
-        return "ActivoFijo [id=" + id + ", descripcion=" + descripcion + ", fechaAdquisicion=" + fechaAdquisicion
-                + ", importe=" + importe + ", vidaUtil=" + vidaUtil + "]";
+        return "ActivoFijo{" + "id=" + id + ", descripcion=" + descripcion + ", fechaAdquisicion=" + fechaAdquisicion + ", importe=" + importe + ", vidaUtil=" + vidaUtil + ", fechaAlta=" + fechaAlta + ", fechaModificacion=" + fechaModificacion + '}';
     }
-    
+
 }

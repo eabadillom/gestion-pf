@@ -1,7 +1,7 @@
+
 package mx.com.ferbo.model.categresos;
 
 import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,44 +13,34 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-        @NamedQuery(name = "TipoDocumento.findByNombre", query = "SELECT td FROM TipoDocumento td WHERE td.nombre = :nombre"),
-        @NamedQuery(name = "TipoDocumento.findAllVigenteONoVigentes", query = "SELECT td FROM TipoDocumento td WHERE td.vigente = :vigente")
+    @NamedQuery(name = "TipoDevolucion.findByNombre", query = "SELECT td FROM TipoDevolucion td WHERE td.nombre = :nombre"),
+    @NamedQuery(name = "TipoDevolucion.findAllVigentesONoVigentes", query = "SELECT td FROM TipoDevolucion td WHERE td.vigente = :vigente")
 })
 @Entity
-@Table(name = "cat_tipo_documento")
-public class TipoDocumento implements Serializable, CatEgreso {
-
+@Table (name = "cat_tipo_devolucion")
+public class TipoDevolucionEgreso implements Serializable, CatEgreso {
+    
     private static final long serialVersionUID = 1L;
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cd_tipo_docu")
+    @Column(name = "cd_tipo_devo")
     private Integer id;
-
+    
     @Basic(optional = false)
-    @Column(name = "nb_tipo_docu", length = 50, nullable = false, unique = true)
+    @Column(name = "nb_tipo_devo", unique = true, length = 50, nullable = false)
     private String nombre;
-
+    
     @Basic(optional = false)
-    @Column(name = "tx_tipo_docu", length = 250, nullable = false)
+    @Column(name = "tx_tipo_devo", length = 250, nullable = false)
     private String descripcion;
-
+    
     @Basic(optional = false)
-    @Column(name = "st_tipo_docu")
+    @Column(name = "st_tipo_devo")
     private Boolean vigente = Boolean.TRUE;
-
-    @Basic(optional = false)
-    @Column(name = "st_fisc")
-    private Boolean esFiscal;
-
-    @Basic(optional = false)
-    @Column(name = "st_obli")
-    private Boolean esObligatorio;
-
-
-    public TipoDocumento() {
-        // Constructor sin parametro
+    
+    public TipoDevolucionEgreso() {
     }
 
     @Override
@@ -91,34 +81,18 @@ public class TipoDocumento implements Serializable, CatEgreso {
     public void setVigente(Boolean vigente) {
         this.vigente = vigente;
     }
-
-    public Boolean getEsFiscal() {
-        return esFiscal;
-    }
-
-    public void setEsFiscal(Boolean esFiscal) {
-        this.esFiscal = esFiscal;
-    }
-
-    public Boolean getEsObligatorio() {
-        return esObligatorio;
-    }
-
-    public void setEsObligatorio(Boolean esObligatorio) {
-        this.esObligatorio = esObligatorio;
-    }
-
+    
     @Override
-    public boolean equals(Object o) {
+    public boolean equals (Object o){
         if (this == o)
             return true;
-        if (!(o instanceof TipoDocumento))
+        if (!(o instanceof TipoDevolucionEgreso))
             return false;
-
-        TipoDocumento that = (TipoDocumento) o;
+        
+        TipoDevolucionEgreso that = (TipoDevolucionEgreso) o;
         return id != null && id.equals(that.id);
     }
-
+    
     @Override
     public int hashCode() {
         return 31;
@@ -126,8 +100,8 @@ public class TipoDocumento implements Serializable, CatEgreso {
 
     @Override
     public String toString() {
-        return "TipoDocumento [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", vigente="
-                + vigente + ", esFiscal=" + esFiscal + ", esObligatorio=" + esObligatorio + "]";
+        return "TipoDevolucion{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", vigente=" + vigente + '}';
     }
-
+    
+    
 }

@@ -8,6 +8,6 @@ package mx.com.ferbo.business.egresos;
  *
  * @author julio
  */
-public class DocumentoBL {
+public class DocumentoEgresoBL {
     
 }

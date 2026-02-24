@@ -14,7 +14,7 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
-public class TipoEgresoBL extends BaseCatalogosBL<TipoEgreso> {
+public class TipoEgresoBL extends CatEgresoBaseBL<TipoEgreso> {
 
     private static final Logger log = LogManager.getLogger(TipoEgresoBL.class);
 

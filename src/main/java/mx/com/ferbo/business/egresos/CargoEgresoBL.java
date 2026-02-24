@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import mx.com.ferbo.dao.egresos.CargoDAO;
+import mx.com.ferbo.dao.egresos.CargoEgresoDAO;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.categresos.StatusCargoEgreso;
 import mx.com.ferbo.model.egresos.CargoEgreso;
@@ -22,7 +22,7 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     private static final Logger log = LogManager.getLogger(CargoEgresoBL.class);
 
     @Inject
-    private CargoDAO dao;
+    private CargoEgresoDAO dao;
 
     public CargoEgresoBL() {
         setDao(dao);

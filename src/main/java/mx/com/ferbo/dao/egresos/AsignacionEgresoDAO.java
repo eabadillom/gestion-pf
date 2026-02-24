@@ -9,11 +9,11 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @ApplicationScoped
-public class AsignacionDAO extends EgresoBaseDAO <AsignacionEgreso> {
+public class AsignacionEgresoDAO extends EgresoBaseDAO <AsignacionEgreso> {
     
-    private static final Logger log = LogManager.getLogger(AsignacionDAO.class);
+    private static final Logger log = LogManager.getLogger(AsignacionEgresoDAO.class);
     
-    public AsignacionDAO(){
+    public AsignacionEgresoDAO(){
         super(AsignacionEgreso.class);
     }
 

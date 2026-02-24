@@ -3,6 +3,7 @@ package mx.com.ferbo.model.egresos;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -15,12 +16,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import mx.com.ferbo.model.categresos.StatusCargoEgreso;
-import mx.com.ferbo.model.categresos.TipoCargo;
+import mx.com.ferbo.model.categresos.TipoCargoEgreso;
 
 @NamedQueries({
-    @NamedQuery(name = "CargoEgreso.findAllByImporteEgreso", query = "SELECT ce FROM CargoEgreso ce WHERE ce.importeEgreso.id = :idImporteEgreso")
+    @NamedQuery(name = "CargoEgreso.findAllByImporteEgreso", query = "SELECT ce FROM CargoEgreso ce WHERE ce.importeEgreso.id = :idImporteEgreso"),
+    @NamedQuery(name = "CargoEgreso.findAllByImporteEgresoYStatus", query = "SELECT ce FROM CargoEgreso ce WHERE ce.importeEgreso.id = :idImporteEgreso AND ce.status.nombre = :status")
 })
 @Entity
 @Table(name = "cargo_egreso")
@@ -61,6 +64,14 @@ public class CargoEgreso implements Serializable, Egreso<StatusCargoEgreso> {
     @Basic(optional = false)
     @Column(name = "fh_aplicacion")
     private Date fechaAplicacion;
+    
+    @Basic(optional = false)
+    @Column(name = "fh_alta")
+    private Date fechaAlta;
+    
+    @Basic(optional = false)
+    @Column(name = "fh_modi")
+    private Date fechaModificacion;
 
     @Basic(optional = true)
     @Column(name = "tx_obser", nullable = true, length = 250)
@@ -76,11 +87,14 @@ public class CargoEgreso implements Serializable, Egreso<StatusCargoEgreso> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_tipo_carg", nullable = false)
-    private TipoCargo tipoCargo;
+    private TipoCargoEgreso tipoCargo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_status_carg_egre", nullable = false)
     private StatusCargoEgreso status;
+    
+    @OneToMany(mappedBy = "cargo")
+    private List<DocumentoMovimientoEgreso> movimientos;
 
     public CargoEgreso() {
         // Construcctor sin parametros
@@ -151,6 +165,22 @@ public class CargoEgreso implements Serializable, Egreso<StatusCargoEgreso> {
         this.fechaAplicacion = fechaAplicacion;
     }
 
+    public Date getFechaAlta() {
+        return fechaAlta;
+    }
+
+    public void setFechaAlta(Date fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+
+    public Date getFechaModificacion() {
+        return fechaModificacion;
+    }
+
+    public void setFechaModificacion(Date fechaModificacion) {
+        this.fechaModificacion = fechaModificacion;
+    }
+
     public String getObservaciones() {
         return observaciones;
     }
@@ -167,11 +197,11 @@ public class CargoEgreso implements Serializable, Egreso<StatusCargoEgreso> {
         this.pagoEgreso = pagoEgreso;
     }
 
-    public TipoCargo getTipoCargo() {
+    public TipoCargoEgreso getTipoCargo() {
         return tipoCargo;
     }
 
-    public void setTipoCargo(TipoCargo tipoCargo) {
+    public void setTipoCargo(TipoCargoEgreso tipoCargo) {
         this.tipoCargo = tipoCargo;
     }
 
@@ -192,6 +222,14 @@ public class CargoEgreso implements Serializable, Egreso<StatusCargoEgreso> {
         this.status = status;
     }
 
+    public List<DocumentoMovimientoEgreso> getMovimientos() {
+        return movimientos;
+    }
+
+    public void setMovimientos(List<DocumentoMovimientoEgreso> movimientos) {
+        this.movimientos = movimientos;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -212,10 +250,7 @@ public class CargoEgreso implements Serializable, Egreso<StatusCargoEgreso> {
 
     @Override
     public String toString() {
-        return "CargoEgreso [id=" + id + ", importeCargo=" + importeCargo + ", importeIVA=" + importeIVA
-                + ", importeIEPS=" + importeIEPS + ", porcentajeTasa=" + porcentajeTasa + ", numeroDias=" + numeroDias
-                + ", fechaCalculo=" + fechaCalculo + ", fechaAplicacion=" + fechaAplicacion + ", observaciones="
-                + observaciones + "]";
+        return "CargoEgreso{" + "id=" + id + ", importeCargo=" + importeCargo + ", importeIVA=" + importeIVA + ", importeIEPS=" + importeIEPS + ", porcentajeTasa=" + porcentajeTasa + ", numeroDias=" + numeroDias + ", fechaCalculo=" + fechaCalculo + ", fechaAplicacion=" + fechaAplicacion + ", fechaAlta=" + fechaAlta + ", fechaModificacion=" + fechaModificacion + ", observaciones=" + observaciones + '}';
     }
 
 }

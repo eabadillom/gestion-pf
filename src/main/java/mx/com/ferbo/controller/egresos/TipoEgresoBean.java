@@ -11,13 +11,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.categresos.TipoEgresoBL;
-import mx.com.ferbo.controller.catalogos.AbstractCatalogoBean;
+import mx.com.ferbo.controller.catalogos.CatEgresoBaseBean;
 import mx.com.ferbo.model.categresos.TipoEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class TipoEgresoBean extends AbstractCatalogoBean<TipoEgreso> {
+public class TipoEgresoBean extends CatEgresoBaseBean<TipoEgreso> {
 
     private static final long serialVersionUID = 1L;
 

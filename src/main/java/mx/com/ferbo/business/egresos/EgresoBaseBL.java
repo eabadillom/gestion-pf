@@ -40,9 +40,7 @@ public abstract class EgresoBaseBL<T extends Egreso, P extends Egreso, C extends
     
     public List<T> obtenerPorImporteEgreso(P father) throws InventarioException{
          
-        if (father == null) {
-            throw new InventarioException("El egreso no puede estar vacío.");
-        }
+        FacesUtils.requireNonNull(father, "El egreso no puede estar vacío.");
         
         try {
             return dao.buscarPorImporteEgreso(father.getId());
@@ -51,6 +49,19 @@ public abstract class EgresoBaseBL<T extends Egreso, P extends Egreso, C extends
             throw new InventarioException("Hubo un problema al obtener" + nombreHijos() + " relaciondos con el egreso seleccionado.");
         }
         
+    }
+    
+    public List<T> obtenerPorImporteEgresoYStatus(P father, C catalog) throws InventarioException{
+    
+        FacesUtils.requireNonNull(father, nombrePadre() + " no puese ser vacío.");
+        FacesUtils.requireNonNull(catalog, nombreCatalogo() + " no puese ser vacío.");
+        
+        try {
+            return dao.buscarPorImporteEgresoYStatus(father.getId(), catalog.getNombre());
+        } catch (DAOException ex) {
+            log.warn("Error al obetener los elementos asociados con el importe egreso de id: {}, y status: {}. {}", father.getId(), catalog.getNombre(), ex);
+            throw new InventarioException("Hubo un problema al obtener la información solicitada por el importe de egreso y el status " + catalog.getNombre() + ".");
+        } 
     }
     
     public String operar(T son, P father) throws InventarioException {

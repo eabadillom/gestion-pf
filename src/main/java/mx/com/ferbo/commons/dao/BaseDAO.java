@@ -94,59 +94,6 @@ public abstract class BaseDAO<MODEL, PK> {
 		}
 	}
 
-	// Metodo pensado inicialmente en los catalogos
-	public MODEL buscarPorNombre(String nombre) throws DAOException {
-		EntityManager em = null;
-		try {
-			em = getEntityManager();
-			String jpql = "SELECT e FROM " + modelClass.getSimpleName() + " e WHERE e.nombre = :nombre";
-			return em.createQuery(jpql, modelClass)
-					.setParameter("nombre", nombre)
-					.getSingleResult();
-		} catch (Exception ex) {
-			log.error("Error al buscar {} por nombre {}: {}", modelClass.getSimpleName(), nombre, ex);
-			throw new DAOException(
-					"Hubo un problema al buscar " + modelClass.getSimpleName() + " por nombre: " + nombre, ex);
-		} finally {
-			close(em);
-		}
-	}
-
-	// Metodo pensado inicialmente en los catalogos
-	public List<MODEL> findByVigente(boolean vigente) throws DAOException {
-		EntityManager em = null;
-		List<MODEL> resultados = null;
-		try {
-			em = getEntityManager();
-			String jpql = "SELECT e FROM " + modelClass.getSimpleName() + " e WHERE e.vigente = :vigente";
-			resultados = em.createQuery(jpql, modelClass)
-					.setParameter("vigente", vigente)
-					.getResultList();
-		} catch (Exception ex) {
-			log.error("Error al obtener elementos vigentes: ", ex);
-			throw new DAOException("Error al obtener elementos vigentes de " + modelClass.getSimpleName(), ex);
-		} finally {
-			close(em);
-		}
-		return resultados;
-	}
-
-	/* Función recomendada para modelos con muy pocos registros */
-	public List<MODEL> buscarTodos() throws DAOException {
-		EntityManager em = null;
-		List<MODEL> lista = null;
-		try {
-			em = getEntityManager(); // Método que abre un EntityManager
-			lista = em.createNamedQuery(modelClass.getSimpleName() + ".findAll", modelClass).getResultList();
-			return lista;
-		} catch (Exception ex) {
-			log.error("Error al buscar todos los registros de {}. {}", modelClass.getSimpleName(), ex);
-			throw new DAOException("Hubo un problema al buscar todos los registros de " + modelClass.getSimpleName());
-		} finally {
-			close(em); // Método que cierra el EntityManager
-		}
-	}
-
 	public synchronized void eliminar(MODEL model) throws InventarioException {
 		EntityManager em = null;
 

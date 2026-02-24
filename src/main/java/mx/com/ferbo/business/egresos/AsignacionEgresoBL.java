@@ -5,18 +5,18 @@ import java.math.RoundingMode;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import mx.com.ferbo.dao.egresos.AsignacionDAO;
-import mx.com.ferbo.model.categresos.TipoAsignacion;
+import mx.com.ferbo.dao.egresos.AsignacionEgresoDAO;
+import mx.com.ferbo.model.categresos.TipoAsignacionEgreso;
 import mx.com.ferbo.model.egresos.AsignacionEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ApplicationScoped
-public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEgreso, TipoAsignacion> {
+public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEgreso, TipoAsignacionEgreso> {
 
     @Inject
-    private AsignacionDAO dao;
+    private AsignacionEgresoDAO dao;
     
     private static final BigDecimal CIEN = BigDecimal.valueOf(100);
 
@@ -93,7 +93,7 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
     }
 
     @Override
-    protected void antesDeCambiar(AsignacionEgreso entity, TipoAsignacion catalog) throws InventarioException {
+    protected void antesDeCambiar(AsignacionEgreso entity, TipoAsignacionEgreso catalog) throws InventarioException {
         entity.setTipoAsignacion(catalog);
     }
 

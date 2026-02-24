@@ -63,10 +63,6 @@ public class ConceptoEgreso implements Serializable, Egreso<String> {
     @Column(name = "tx_no_dedu", nullable = true)
     private String noDeducible;
 
-    @Basic(optional = false)
-    @Column(name = "fh_regi")
-    private Date fechaRegistro;
-
     @Basic(optional = true)
     @Column(name = "pc_iva", precision = 7, scale = 4, nullable = true)
     private BigDecimal porcentajeIVA;
@@ -159,14 +155,6 @@ public class ConceptoEgreso implements Serializable, Egreso<String> {
         this.noDeducible = noDeducible;
     }
 
-    public Date getFechaRegistro() {
-        return fechaRegistro;
-    }
-
-    public void setFechaRegistro(Date fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
-    }
-
     public BigDecimal getPorcentajeIVA() {
         return porcentajeIVA;
     }
@@ -217,11 +205,7 @@ public class ConceptoEgreso implements Serializable, Egreso<String> {
 
     @Override
     public String toString() {
-        return "ConceptoEgreso [id=" + id + ", totalConceptoEgreso=" + totalConceptoEgreso + ", cfdiUUID=" + cfdiUUID
-                + ", esDeducible=" + esDeducible + ", requiereCFDI=" + requiereCFDI + ", esActivoFijo=" + esActivoFijo
-                + ", tieneIVA=" + tieneIVA + ", tieneIEPS=" + tieneIEPS + ", noDeducible=" + noDeducible
-                + ", fechaRegistro=" + fechaRegistro + ", porcentajeIVA=" + porcentajeIVA + ", porcentajeIEPS="
-                + porcentajeIEPS + "]";
+        return "ConceptoEgreso{" + "id=" + id + ", totalConceptoEgreso=" + totalConceptoEgreso + ", cfdiUUID=" + cfdiUUID + ", esDeducible=" + esDeducible + ", requiereCFDI=" + requiereCFDI + ", esActivoFijo=" + esActivoFijo + ", tieneIVA=" + tieneIVA + ", tieneIEPS=" + tieneIEPS + ", noDeducible=" + noDeducible + ", porcentajeIVA=" + porcentajeIVA + ", porcentajeIEPS=" + porcentajeIEPS + '}';
     }
 
     @Override

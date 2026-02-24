@@ -5,42 +5,44 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.dao.categresos.CatEgresoBaseDAO;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.model.categresos.CatEgreso;
 
-public abstract class BaseCatalogosBL<MODEL extends CatEgreso> {
+public abstract class CatEgresoBaseBL<T extends CatEgreso> {
 
-    protected BaseDAO<MODEL, ?> dao;
+    protected CatEgresoBaseDAO<T> dao;
     protected Logger log = LogManager.getLogger(this.getClass().getName());
 
-    public BaseCatalogosBL(){
-        
+    public CatEgresoBaseBL() {}
+
+    protected void setDao(CatEgresoBaseDAO<T> dao) {
+        this.dao = dao;
     }
 
-    protected void validarGenerico(MODEL model) throws InventarioException {
-        if (model == null) {
+    protected void validarGenerico(T entity) throws InventarioException {
+        if (entity == null) {
             throw new InventarioException("El objeto del catálogo no puede ser vacío.");
         }
 
-        if (model.getNombre() == null || model.getNombre().trim().isEmpty()) {
+        if (entity.getNombre() == null || entity.getNombre().trim().isEmpty()) {
             throw new InventarioException("El objeto del catálogo no tiene ningún nombre asociado.");
         }
 
-        String descripcion = model.getDescripcion();
+        String descripcion = entity.getDescripcion();
         if (descripcion != null && descripcion.trim().isEmpty()) {
             throw new InventarioException("El objeto del catálogo debe tener una descripción.");
         }
 
-        if (model.getVigente() == null) {
+        if (entity.getVigente() == null) {
             throw new InventarioException("No se sabe si el objeto del catálogo está vigente o no.");
         }
     }
 
-    protected abstract void validarEspecifico(MODEL model) throws InventarioException;
+    protected abstract void validarEspecifico(T entity) throws InventarioException;
 
-    public List<MODEL> vigentesONoVigentes(boolean vigente) throws InventarioException {
+    public List<T> vigentesONoVigentes(boolean vigente) throws InventarioException {
         String sVigente = vigente ? "vigentes" : "no vigentes";
         try {
             return dao.findByVigente(vigente);
@@ -51,7 +53,7 @@ public abstract class BaseCatalogosBL<MODEL extends CatEgreso> {
         }
     }
 
-    public MODEL buscarPorNombre(String nombre) throws InventarioException {
+    public T buscarPorNombre(String nombre) throws InventarioException {
         try {
             return dao.buscarPorNombre(nombre);
         } catch (DAOException ex) {
@@ -62,20 +64,16 @@ public abstract class BaseCatalogosBL<MODEL extends CatEgreso> {
         }
     }
 
-    public String agregarOActualizar(MODEL model) throws InventarioException {
-        validarGenerico(model);
-        validarEspecifico(model);
+    public String agregarOActualizar(T entity) throws InventarioException {
+        validarGenerico(entity);
+        validarEspecifico(entity);
 
-        if (model.getId() == null){
-            dao.guardar(model);
+        if (entity.getId() == null) {
+            dao.guardar(entity);
             return "se agrego exitosamente";
         } else {
-            dao.actualizar(model);
+            dao.actualizar(entity);
             return "se aztualizo exitosamente";
         }
-    }
-
-    protected void setDao(BaseDAO<MODEL, ?> dao) {
-        this.dao = dao;
     }
 }

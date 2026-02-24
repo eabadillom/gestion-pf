@@ -3,6 +3,7 @@ package mx.com.ferbo.model.egresos;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -15,16 +16,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.categresos.StatusPago;
+import mx.com.ferbo.model.categresos.StatusPagoEgreso;
 
 @NamedQueries({
-    @NamedQuery(name = "PagoEgreso.findAllByImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :idImporteEgreso")
+    @NamedQuery(name = "PagoEgreso.findAllByImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :idImporteEgreso"),
+    @NamedQuery(name = "PagoEgreso.findAllByImporteEgresoYStatus", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :idImporteEgreso AND pe.status.nombre = :status")   
 })
 @Entity
 @Table(name = "pago_egreso")
-public class PagoEgreso implements Serializable, Egreso<StatusPago>{
+public class PagoEgreso implements Serializable, Egreso<StatusPagoEgreso>{
 
     private static final long serialVersionUID = 1L;
 
@@ -68,11 +71,10 @@ public class PagoEgreso implements Serializable, Egreso<StatusPago>{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_status_pago", nullable = false)
-    private StatusPago status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cd_docu_egre")
-    private DocumentoEgreso documentoEgreso;
+    private StatusPagoEgreso status;
+    
+    @OneToMany(mappedBy = "pago")
+    private List<DocumentoMovimientoEgreso> movimientos;
 
     public PagoEgreso(){
         // Constructor sin parametros
@@ -151,21 +153,21 @@ public class PagoEgreso implements Serializable, Egreso<StatusPago>{
         this.importeEgreso = importeEgreso;
     }
 
-    public StatusPago getStatus() {
+    public StatusPagoEgreso getStatus() {
         return status;
     }
 
     @Override
-    public void setStatus(StatusPago status) {
+    public void setStatus(StatusPagoEgreso status) {
         this.status = status;
     }
 
-    public DocumentoEgreso getDocumentoEgreso() {
-        return documentoEgreso;
+    public List<DocumentoMovimientoEgreso> getMovimientos() {
+        return movimientos;
     }
 
-    public void setDocumentoEgreso(DocumentoEgreso documentoEgreso) {
-        this.documentoEgreso = documentoEgreso;
+    public void setMovimientos(List<DocumentoMovimientoEgreso> movimientos) {
+        this.movimientos = movimientos;
     }
 
     @Override 
@@ -186,12 +188,8 @@ public class PagoEgreso implements Serializable, Egreso<StatusPago>{
 
     @Override
     public String toString() {
-        return "PagoEgreso [id=" + id + ", importe=" + importe + ", fechaPago=" + fechaPago + ", referencia="
-                + referencia + ", observaciones=" + observaciones + ", fechaAlta=" + fechaAlta + ", fechaLimite="
-                + fechaLimite + "]";
+        return "PagoEgreso{" + "id=" + id + ", importe=" + importe + ", fechaPago=" + fechaPago + ", referencia=" + referencia + ", observaciones=" + observaciones + ", fechaAlta=" + fechaAlta + ", fechaLimite=" + fechaLimite + ", fechaModificacion=" + fechaModificacion + '}';
     }
-
-    
 
     
 }

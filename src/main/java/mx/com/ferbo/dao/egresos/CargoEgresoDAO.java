@@ -9,11 +9,11 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @ApplicationScoped
-public class CargoDAO extends EgresoBaseDAO{
+public class CargoEgresoDAO extends EgresoBaseDAO <CargoEgreso>{
     
-    private static final Logger log = LogManager.getLogger(CargoDAO.class);
+    private static final Logger log = LogManager.getLogger(CargoEgresoDAO.class);
     
-    public CargoDAO(){
+    public CargoEgresoDAO(){
         super(CargoEgreso.class);
     }
 

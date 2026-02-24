@@ -8,18 +8,18 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.categresos.TipoCargoDAO;
-import mx.com.ferbo.model.categresos.TipoCargo;
+import mx.com.ferbo.dao.categresos.TipoCargoEgresoDAO;
+import mx.com.ferbo.model.categresos.TipoCargoEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
-public class TipoCargoBL extends BaseCatalogosBL<TipoCargo> {
+public class TipoCargoEgresoBL extends CatEgresoBaseBL<TipoCargoEgreso> {
 
-    private static final Logger log = LogManager.getLogger(TipoCargoBL.class);
+    private static final Logger log = LogManager.getLogger(TipoCargoEgresoBL.class);
 
     @Inject
-    private TipoCargoDAO dao;
+    private TipoCargoEgresoDAO dao;
 
     @PostConstruct
     public void init(){
@@ -27,7 +27,7 @@ public class TipoCargoBL extends BaseCatalogosBL<TipoCargo> {
     }
 
     @Override
-    protected void validarEspecifico(TipoCargo model) throws InventarioException {
+    protected void validarEspecifico(TipoCargoEgreso model) throws InventarioException {
         if (model.getTieneIVA() == null) {
             throw new InventarioException("No se sabe si el tipo de cargo tiene o no IVA");
         }

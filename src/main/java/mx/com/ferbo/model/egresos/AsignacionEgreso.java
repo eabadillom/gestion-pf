@@ -2,6 +2,7 @@ package mx.com.ferbo.model.egresos;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -16,7 +17,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.categresos.TipoAsignacion;
+import mx.com.ferbo.model.categresos.TipoAsignacionEgreso;
 
 @NamedQueries({
     @NamedQuery(name = "AsignacionEgreso.findAllByImporteEgreso", query = "SELECT ae FROM AsignacionEgreso ae WHERE ae.importeEgreso.id = :idImporteEgreso")
@@ -37,7 +38,7 @@ public class AsignacionEgreso implements Serializable, Egreso<String> {
     @Column(name = "pc_asig_egre", precision = 7, scale = 4)
     private BigDecimal porcentaje;
 
-    @Basic(optional = false) 
+    @Basic(optional = false)
     @Column(name = "im_asig_egre", precision = 12, scale = 2)
     private BigDecimal importe;
 
@@ -47,9 +48,17 @@ public class AsignacionEgreso implements Serializable, Egreso<String> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_tipo_asig", nullable = false)
-    private TipoAsignacion tipoAsignacion;
+    private TipoAsignacionEgreso tipoAsignacion;
 
-    public AsignacionEgreso(){
+    @Basic(optional = false)
+    @Column(name = "fh_alta")
+    private Date fechaAlta;
+
+    @Basic(optional = false)
+    @Column(name = "fh_modi")
+    private Date fechaModificacion;
+
+    public AsignacionEgreso() {
         // Constructor sin parametros
     }
 
@@ -86,33 +95,51 @@ public class AsignacionEgreso implements Serializable, Egreso<String> {
         this.importeEgreso = importeEgreso;
     }
 
-    public TipoAsignacion getTipoAsignacion() {
+    public TipoAsignacionEgreso getTipoAsignacion() {
         return tipoAsignacion;
     }
 
-    public void setTipoAsignacion(TipoAsignacion tipoAsignacion) {
+    public void setTipoAsignacion(TipoAsignacionEgreso tipoAsignacion) {
         this.tipoAsignacion = tipoAsignacion;
     }
 
+    public Date getFechaAlta() {
+        return fechaAlta;
+    }
+
+    public void setFechaAlta(Date fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+
+    public Date getFechaModificacion() {
+        return fechaModificacion;
+    }
+
+    public void setFechaModificacion(Date fechaModificacion) {
+        this.fechaModificacion = fechaModificacion;
+    }
+
     @Override
-    public boolean equals(Object o){
-        if (this == o)
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        if (!(o instanceof AsignacionEgreso))
+        }
+        if (!(o instanceof AsignacionEgreso)) {
             return false;
+        }
 
         AsignacionEgreso that = (AsignacionEgreso) o;
         return id != null && id.equals(that.id);
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return 31;
     }
 
     @Override
     public String toString() {
-        return "AsignacionEgreso [id=" + id + ", porcentaje=" + porcentaje + ", importe=" + importe + "]";
+        return "AsignacionEgreso{" + "id=" + id + ", porcentaje=" + porcentaje + ", importe=" + importe + ", fechaAlta=" + fechaAlta + ", fechaModificacion=" + fechaModificacion + '}';
     }
 
     @Override

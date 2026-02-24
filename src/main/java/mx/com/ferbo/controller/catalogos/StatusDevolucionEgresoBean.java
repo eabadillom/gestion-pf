@@ -2,45 +2,40 @@
 package mx.com.ferbo.controller.catalogos;
 
 import java.util.List;
-import javax.faces.view.ViewScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import mx.com.ferbo.business.categresos.StatusCargoEgresoBL;
-import mx.com.ferbo.model.categresos.StatusCargoEgreso;
+import mx.com.ferbo.business.categresos.StatusDevolucionEgresoBL;
+import mx.com.ferbo.model.categresos.StatusDevolucionEgreso;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Named
-@ViewScoped
-public class StatusCargoEgresoBean extends CatEgresoBaseBean <StatusCargoEgreso>{
+@ApplicationScoped
+public class StatusDevolucionEgresoBean extends CatEgresoBaseBean <StatusDevolucionEgreso>{
     
-    private static final Logger log = LogManager.getLogger(StatusCargoEgresoBean.class);
-    
-    private StatusCargoEgresoBL bl;
-    
-    public StatusCargoEgresoBean(){
-    }
+    private static final Logger log = LogManager.getLogger(StatusDevolucionEgresoBean.class);
     
     @Inject
-    public void init(){
-        titulo = "Status Cargo Egreso";
-        initCatalogo();
+    private StatusDevolucionEgresoBL bl;
+    
+    public StatusDevolucionEgresoBean() {
     }
 
     @Override
-    protected StatusCargoEgreso nuevo() {
-        return new StatusCargoEgreso();
+    protected StatusDevolucionEgreso nuevo() {
+        return new StatusDevolucionEgreso();
     }
 
     @Override
-    protected List<StatusCargoEgreso> cargar() throws InventarioException {
+    protected List<StatusDevolucionEgreso> cargar() throws InventarioException {
         return bl.vigentesONoVigentes(estado);
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        return bl.agregarOActualizar(selected);
+        return "El status devolución de egreso " + bl.agregarOActualizar(selected);
     }
 
     @Override
@@ -57,5 +52,6 @@ public class StatusCargoEgresoBean extends CatEgresoBaseBean <StatusCargoEgreso>
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
+ 
     
 }

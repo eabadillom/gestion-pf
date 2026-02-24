@@ -1,7 +1,6 @@
 package mx.com.ferbo.model.categresos;
 
 import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,43 +12,35 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "TipoCargo.findByNombre", query = "SELECT tc FROM TipoCargo tc WHERE tc.nombre = :nombre"),
-    @NamedQuery(name = "TipoCargo.findAllVigentesONoVigentes", query = "SELECT tc FROM TipoCargo tc WHERE tc.vigente = :vigente")
+    @NamedQuery(name = "StatusDevolucion.findByNombre", query = "SELECT sd FROM StatusDevolucion sd WHERE sd.nombre = :nombre"),
+    @NamedQuery(name = "StatusDevolucion.findAllVigentesONoVigentes", query = "SELECT sd FROM StatusDevolucion sd WHERE sd.vigente = :vigente")
 })
 @Entity
-@Table(name = "cat_tipo_cargo")
-public class TipoCargo implements Serializable, CatEgreso {
-
+@Table(name = "cat_status_devolucion")
+public class StatusDevolucionEgreso implements Serializable, CatEgreso {
+    
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cd_tipo_carg")
+    @Column(name = "cd_status_devo")
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "nb_tipo_carg", length = 50, nullable = false, unique = true)
+    @Column(name = "nb_status_devo", unique = true, length = 50, nullable = false)
     private String nombre;
 
     @Basic(optional = false)
-    @Column(name = "tx_tipo_carg", length = 250, nullable = false)
+    @Column(name = "tx_status_devo", length = 250, nullable = false)
     private String descripcion;
 
     @Basic(optional = false)
-    @Column(name = "st_tipo_carg")
+    @Column(name = "st_activo")
     private Boolean vigente = Boolean.TRUE;
 
-    @Basic(optional = false)
-    @Column(name = "st_iva")
-    private Boolean tieneIVA;
+    public StatusDevolucionEgreso() {
 
-    @Basic(optional = false)
-    @Column(name = "st_ieps")
-    private Boolean tieneIEPS;
-
-    public TipoCargo(){
-        // Constructor sin parametros
     }
 
     @Override
@@ -91,42 +82,27 @@ public class TipoCargo implements Serializable, CatEgreso {
         this.vigente = vigente;
     }
 
-    public Boolean getTieneIVA() {
-        return tieneIVA;
-    }
-
-    public void setTieneIVA(Boolean tieneIVA) {
-        this.tieneIVA = tieneIVA;
-    }
-
-    public Boolean getTieneIEPS() {
-        return tieneIEPS;
-    }
-
-    public void setTieneIEPS(Boolean tieneIEPS) {
-        this.tieneIEPS = tieneIEPS;
-    }
-
     @Override
-    public boolean equals(Object o){
-        if (this == o)
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        if (!(o instanceof TipoCargo))
+        }
+        if (!(o instanceof StatusDevolucionEgreso)) {
             return false;
+        }
 
-        TipoCargo that = (TipoCargo) o;
+        StatusDevolucionEgreso that = (StatusDevolucionEgreso) o;
         return id != null && id.equals(that.id);
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return 31;
     }
 
     @Override
     public String toString() {
-        return "TipoCargo [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", vigente=" + vigente
-                + ", tieneIVA=" + tieneIVA + ", tieneIEPS=" + tieneIEPS + "]";
+        return "StatusDevolucion{" + "id=" + id + ", nombre=" + nombre + ", desripcion=" + descripcion + ", vigente=" + vigente + '}';
     }
-       
+
 }

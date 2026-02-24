@@ -13,35 +13,44 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-    @NamedQuery(name = "TipoAsignacion.findByNombre", query = "SELECT ta FROM TipoAsignacion ta WHERE ta.nombre = :nombre"),
-    @NamedQuery(name = "TipoAsignacion.findAllVigentesONoVigentes", query = "SELECT ta FROM TipoAsignacion ta WHERE ta.vigente = :vigente")
+        @NamedQuery(name = "TipoDocumento.findByNombre", query = "SELECT td FROM TipoDocumento td WHERE td.nombre = :nombre"),
+        @NamedQuery(name = "TipoDocumento.findAllVigenteONoVigentes", query = "SELECT td FROM TipoDocumento td WHERE td.vigente = :vigente")
 })
 @Entity
-@Table(name = "cat_tipo_asignacion")
-public class TipoAsignacion implements Serializable, CatEgreso {
+@Table(name = "cat_tipo_documento")
+public class TipoDocumentoEgreso implements Serializable, CatEgreso {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cd_tipo_asig")
+    @Column(name = "cd_tipo_docu")
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "nb_tipo_asig", length = 50, nullable = false, unique = true)
+    @Column(name = "nb_tipo_docu", length = 50, nullable = false, unique = true)
     private String nombre;
 
-    @Basic(optional = true)
-    @Column(name = "tx_tipo_asig", length = 150, nullable = true)
+    @Basic(optional = false)
+    @Column(name = "tx_tipo_docu", length = 250, nullable = false)
     private String descripcion;
 
     @Basic(optional = false)
-    @Column(name = "st_tipo_asig")
+    @Column(name = "st_tipo_docu")
     private Boolean vigente = Boolean.TRUE;
 
-    public TipoAsignacion(){
-        // Constructor sin parametros
+    @Basic(optional = false)
+    @Column(name = "st_fisc")
+    private Boolean esFiscal;
+
+    @Basic(optional = false)
+    @Column(name = "st_obli")
+    private Boolean esObligatorio;
+
+
+    public TipoDocumentoEgreso() {
+        // Constructor sin parametro
     }
 
     @Override
@@ -83,28 +92,42 @@ public class TipoAsignacion implements Serializable, CatEgreso {
         this.vigente = vigente;
     }
 
+    public Boolean getEsFiscal() {
+        return esFiscal;
+    }
+
+    public void setEsFiscal(Boolean esFiscal) {
+        this.esFiscal = esFiscal;
+    }
+
+    public Boolean getEsObligatorio() {
+        return esObligatorio;
+    }
+
+    public void setEsObligatorio(Boolean esObligatorio) {
+        this.esObligatorio = esObligatorio;
+    }
+
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof TipoAsignacion))
+        if (!(o instanceof TipoDocumentoEgreso))
             return false;
 
-        TipoAsignacion that = (TipoAsignacion) o;
+        TipoDocumentoEgreso that = (TipoDocumentoEgreso) o;
         return id != null && id.equals(that.id);
     }
 
     @Override
-    public int hashCode(){
-        return 32;
+    public int hashCode() {
+        return 31;
     }
 
     @Override
     public String toString() {
-        return "TipoAsignacion [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", vigente="
-                + vigente + "]";
+        return "TipoDocumento [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", vigente="
+                + vigente + ", esFiscal=" + esFiscal + ", esObligatorio=" + esObligatorio + "]";
     }
 
-    
-    
 }

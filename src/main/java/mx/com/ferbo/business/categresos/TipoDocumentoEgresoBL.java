@@ -8,18 +8,18 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.TipoAsignacionDAO;
-import mx.com.ferbo.model.categresos.TipoAsignacion;
+import mx.com.ferbo.dao.categresos.TipoDocumentoDAO;
+import mx.com.ferbo.model.categresos.TipoDocumentoEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
-public class TipoAsignacionBL extends BaseCatalogosBL<TipoAsignacion> {
+public class TipoDocumentoEgresoBL extends CatEgresoBaseBL<TipoDocumentoEgreso> {
 
-    private static final Logger log = LogManager.getLogger(TipoAsignacionBL.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Inject
-    private TipoAsignacionDAO dao;
+    private TipoDocumentoDAO dao;
 
     @PostConstruct
     public void init(){
@@ -27,7 +27,7 @@ public class TipoAsignacionBL extends BaseCatalogosBL<TipoAsignacion> {
     }
 
     @Override
-    protected void validarEspecifico(TipoAsignacion model) throws InventarioException {
+    protected void validarEspecifico(TipoDocumentoEgreso model) throws InventarioException {
         // Metodo vacío porque no hay más validaciones
     }
 }

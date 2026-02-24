@@ -1,7 +1,6 @@
 package mx.com.ferbo.model.categresos;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -11,44 +10,46 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import mx.com.ferbo.model.egresos.PagoEgreso;
-
 @NamedQueries({
-        @NamedQuery(name = "StatusPago.findByNombre", query = "SELECT sp FROM StatusPago sp WHERE sp.nombre = :nombre"),
-        @NamedQuery(name = "StatusPago.findAllVigentesONoVigentes", query = "SELECT sp FROM StatusPago sp WHERE sp.vigente = :vigente")
+    @NamedQuery(name = "TipoCargo.findByNombre", query = "SELECT tc FROM TipoCargo tc WHERE tc.nombre = :nombre"),
+    @NamedQuery(name = "TipoCargo.findAllVigentesONoVigentes", query = "SELECT tc FROM TipoCargo tc WHERE tc.vigente = :vigente")
 })
 @Entity
-@Table(name = "cat_status_pago")
-public class StatusPago implements Serializable, CatEgreso {
+@Table(name = "cat_tipo_cargo")
+public class TipoCargoEgreso implements Serializable, CatEgreso {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cd_status_pago")
+    @Column(name = "cd_tipo_carg")
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "nb_status_pago", length = 30, nullable = false, unique = true)
+    @Column(name = "nb_tipo_carg", length = 50, nullable = false, unique = true)
     private String nombre;
 
-    @Basic(optional = true)
-    @Column(name = "tx_status_pago", length = 100, nullable = true)
+    @Basic(optional = false)
+    @Column(name = "tx_tipo_carg", length = 250, nullable = false)
     private String descripcion;
 
     @Basic(optional = false)
-    @Column(name = "st_activo")
+    @Column(name = "st_tipo_carg")
     private Boolean vigente = Boolean.TRUE;
 
-    @OneToMany(mappedBy = "status")
-    private List<PagoEgreso> pagos;
+    @Basic(optional = false)
+    @Column(name = "st_iva")
+    private Boolean tieneIVA;
 
-    public StatusPago() {
-        // Constuctor sin parametros
+    @Basic(optional = false)
+    @Column(name = "st_ieps")
+    private Boolean tieneIEPS;
+
+    public TipoCargoEgreso(){
+        // Constructor sin parametros
     }
 
     @Override
@@ -90,26 +91,42 @@ public class StatusPago implements Serializable, CatEgreso {
         this.vigente = vigente;
     }
 
+    public Boolean getTieneIVA() {
+        return tieneIVA;
+    }
+
+    public void setTieneIVA(Boolean tieneIVA) {
+        this.tieneIVA = tieneIVA;
+    }
+
+    public Boolean getTieneIEPS() {
+        return tieneIEPS;
+    }
+
+    public void setTieneIEPS(Boolean tieneIEPS) {
+        this.tieneIEPS = tieneIEPS;
+    }
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o){
         if (this == o)
             return true;
-        if (!(o instanceof StatusPago))
+        if (!(o instanceof TipoCargoEgreso))
             return false;
 
-        StatusPago that = (StatusPago) o;
+        TipoCargoEgreso that = (TipoCargoEgreso) o;
         return id != null && id.equals(that.id);
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode(){
         return 31;
     }
 
     @Override
     public String toString() {
-        return "StatusPago [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", vigente=" + vigente
-                + "]";
+        return "TipoCargo [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", vigente=" + vigente
+                + ", tieneIVA=" + tieneIVA + ", tieneIEPS=" + tieneIEPS + "]";
     }
-
+       
 }

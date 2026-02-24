@@ -10,18 +10,18 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.categresos.TipoCargoBL;
-import mx.com.ferbo.model.categresos.TipoCargo;
+import mx.com.ferbo.business.categresos.TipoCargoEgresoBL;
+import mx.com.ferbo.model.categresos.TipoCargoEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class TipoCargoBean extends AbstractCatalogoBean<TipoCargo> {
+public class TipoCargoBean extends CatEgresoBaseBean<TipoCargoEgreso> {
 
     private static final Logger log = LogManager.getLogger(TipoCargoBean.class);
 
     @Inject
-    private TipoCargoBL bl;
+    private TipoCargoEgresoBL bl;
 
     public TipoCargoBean(){
 
@@ -34,7 +34,7 @@ public class TipoCargoBean extends AbstractCatalogoBean<TipoCargo> {
     }
 
     @Override
-    protected List<TipoCargo> cargar() throws InventarioException {
+    protected List<TipoCargoEgreso> cargar() throws InventarioException {
         return bl.vigentesONoVigentes(estado);
     }
 
@@ -44,8 +44,8 @@ public class TipoCargoBean extends AbstractCatalogoBean<TipoCargo> {
     }
 
     @Override
-    protected TipoCargo nuevo() {
-        return new TipoCargo();
+    protected TipoCargoEgreso nuevo() {
+        return new TipoCargoEgreso();
     }
 
     @Override

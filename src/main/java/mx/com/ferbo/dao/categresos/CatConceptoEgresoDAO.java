@@ -9,13 +9,12 @@ import javax.persistence.EntityManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.categresos.CatConceptoEgreso;
 import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
-public class CatConceptoEgresoDAO extends BaseDAO<CatConceptoEgreso, Integer> {
+public class CatConceptoEgresoDAO extends CatEgresoBaseDAO<CatConceptoEgreso> {
 
     private static final Logger log = LogManager.getLogger(CatConceptoEgresoDAO.class);
 
@@ -51,5 +50,10 @@ public class CatConceptoEgresoDAO extends BaseDAO<CatConceptoEgreso, Integer> {
         } finally {
             super.close(em);
         }
+    }
+
+    @Override
+    protected Class<CatConceptoEgreso> getEntityClass() {
+        return CatConceptoEgreso.class;
     }
 }

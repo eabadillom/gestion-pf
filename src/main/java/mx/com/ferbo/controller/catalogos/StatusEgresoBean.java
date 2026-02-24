@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @ViewScoped
-public class StatusEgresoBean extends AbstractCatalogoBean<StatusEgreso> {
+public class StatusEgresoBean extends CatEgresoBaseBean<StatusEgreso> {
     
     private static final Logger log = LogManager.getLogger(StatusEgresoBean.class);
     

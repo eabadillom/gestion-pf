@@ -1,10 +1,10 @@
 package mx.com.ferbo.controller.egresos;
 
-import mx.com.ferbo.controller.catalogos.AbstractCatalogoBean;
+import mx.com.ferbo.controller.catalogos.CatEgresoBaseBean;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.model.categresos.CatEgreso;
 
-public abstract class AbstractCatEgresoBean <T extends CatEgreso, P extends CatEgreso> extends AbstractCatalogoBean<T> {
+public abstract class AbstractCatEgresoBean <T extends CatEgreso, P extends CatEgreso> extends CatEgresoBaseBean<T> {
 
     private P padre;
 

@@ -13,7 +13,7 @@ import mx.com.ferbo.model.categresos.CatEgreso;
 
 @Named
 @RequestScoped
-public class StatusCargoEgresoBL extends BaseCatalogosBL {
+public class StatusCargoEgresoBL extends CatEgresoBaseBL {
     
     private static final Logger log = LogManager.getLogger(StatusCargoEgresoBL.class);
     

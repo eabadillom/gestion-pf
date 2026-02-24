@@ -10,11 +10,11 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @ApplicationScoped
-public class DocumentoDAO extends EgresoBaseDAO<DocumentoEgreso> {
+public class DocumentoEgresoDAO extends EgresoBaseDAO<DocumentoEgreso> {
     
-    private static final Logger log = LogManager.getLogger(DocumentoDAO.class);
+    private static final Logger log = LogManager.getLogger(DocumentoEgresoDAO.class);
 
-    public DocumentoDAO() {
+    public DocumentoEgresoDAO() {
         super(DocumentoEgreso.class);
     }
 

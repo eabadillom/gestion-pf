@@ -1,14 +1,17 @@
-
 package mx.com.ferbo.dao.egresos;
 
 import java.util.List;
 import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.util.DAOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class EgresoBaseDAO<T> extends BaseDAO<T, Integer> {
 
     private final String entityName;
+    
+    private static final Logger log = LogManager.getLogger(EgresoBaseDAO.class);
 
     protected EgresoBaseDAO(Class<T> entityClass) {
         super(entityClass);
@@ -24,11 +27,30 @@ public abstract class EgresoBaseDAO<T> extends BaseDAO<T, Integer> {
                     entityName + ".findAllByImporteEgreso",
                     getEntityClass()
             )
-            .setParameter("idImporteEgreso", idImporteEgreso)
-            .getResultList();
+                    .setParameter("idImporteEgreso", idImporteEgreso)
+                    .getResultList();
 
         } catch (Exception ex) {
-            throw new DAOException("Error al buscar por ImporteEgreso.", ex);
+            log.error("Error al buscar los registros de {} por importe egreso. {}", entityName, ex);
+            throw new DAOException("Hubo un problema al buscar por Importe Egreso.", ex);
+        } finally {
+            super.close(em);
+        }
+    }
+
+    public List<T> buscarPorImporteEgresoYStatus(Integer idImporteEgreso, String status) throws DAOException {
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+
+            return em.createNamedQuery(entityName + ".findAllByImporteEgresoyStatus", getEntityClass()).
+                    setParameter("idImporteEgreso", idImporteEgreso).
+                    setParameter("status", status).
+                    getResultList();
+            
+        } catch (Exception ex) {
+            log.error("Error al buscar los registros de {} por importe egreso y status. {}", entityName, ex);
+            throw new DAOException("Hubo un problema al buscar por importe egreso y status");
         } finally {
             super.close(em);
         }

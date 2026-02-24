@@ -8,11 +8,11 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @ApplicationScoped
-public class PagoDAO extends EgresoBaseDAO {
+public class PagoEgresoDAO extends EgresoBaseDAO <PagoEgreso> {
 
-    private static final Logger log = LogManager.getLogger(PagoDAO.class);
+    private static final Logger log = LogManager.getLogger(PagoEgresoDAO.class);
 
-    public PagoDAO() {
+    public PagoEgresoDAO() {
         super(PagoEgreso.class);
     }
 

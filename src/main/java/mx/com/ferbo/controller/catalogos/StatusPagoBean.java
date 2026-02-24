@@ -9,18 +9,18 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.categresos.StatusPagoBL;
-import mx.com.ferbo.model.categresos.StatusPago;
+import mx.com.ferbo.business.categresos.StatusPagoEgresoBL;
+import mx.com.ferbo.model.categresos.StatusPagoEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class StatusPagoBean extends AbstractCatalogoBean<StatusPago> {
+public class StatusPagoBean extends CatEgresoBaseBean<StatusPagoEgreso> {
 
     private static final Logger log = LogManager.getLogger(StatusPagoBean.class);
 
     @Inject
-    private StatusPagoBL bl;
+    private StatusPagoEgresoBL bl;
 
     public StatusPagoBean(){
 
@@ -33,7 +33,7 @@ public class StatusPagoBean extends AbstractCatalogoBean<StatusPago> {
     }
 
     @Override
-    protected List<StatusPago> cargar() throws InventarioException {
+    protected List<StatusPagoEgreso> cargar() throws InventarioException {
         return bl.vigentesONoVigentes(estado);
     }
 
@@ -43,8 +43,8 @@ public class StatusPagoBean extends AbstractCatalogoBean<StatusPago> {
     }
 
     @Override
-    protected StatusPago nuevo() {
-        return new StatusPago();
+    protected StatusPagoEgreso nuevo() {
+        return new StatusPagoEgreso();
     }
 
     @Override

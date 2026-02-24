@@ -16,7 +16,7 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class StatusActivoFijoBean extends AbstractCatalogoBean<StatusActivoFijo>{
+public class StatusActivoFijoBean extends CatEgresoBaseBean<StatusActivoFijo>{
 
     private static final Logger log = LogManager.getLogger(StatusActivoFijoBean.class);
 

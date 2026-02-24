@@ -6,9 +6,9 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import mx.com.ferbo.business.categresos.StatusEgresoBL;
-import mx.com.ferbo.dao.egresos.PagoDAO;
+import mx.com.ferbo.dao.egresos.PagoEgresoDAO;
 import mx.com.ferbo.model.categresos.StatusEgreso;
-import mx.com.ferbo.model.categresos.StatusPago;
+import mx.com.ferbo.model.categresos.StatusPagoEgreso;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.model.egresos.PagoEgreso;
@@ -19,12 +19,12 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPago> {
+public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPagoEgreso> {
 
     private static final Logger log = LogManager.getLogger(PagoEgresoBL.class);
 
     @Inject
-    private PagoDAO dao;
+    private PagoEgresoDAO dao;
 
     @Inject
     private ImporteEgresoBL importeBL;
@@ -117,7 +117,7 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     }
 
     @Override
-    public void antesDeCambiar(PagoEgreso pago, StatusPago status) throws InventarioException {
+    public void antesDeCambiar(PagoEgreso pago, StatusPagoEgreso status) throws InventarioException {
 
         if (pago.getStatus().getNombre().equalsIgnoreCase("PAGADO") || pago.getStatus().getNombre().equalsIgnoreCase("CANCELADO")) {
             throw new InventarioException("El stutus del pago no se puede cambiar de: " + pago.getStatus().getNombre());

@@ -18,7 +18,7 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
-public class CategoriaEgresoBL extends BaseCatalogosBL<CategoriaEgreso> {
+public class CategoriaEgresoBL extends CatEgresoBaseBL<CategoriaEgreso> {
 
     private static final Logger log = LogManager.getLogger(CategoriaEgresoBL.class);
 

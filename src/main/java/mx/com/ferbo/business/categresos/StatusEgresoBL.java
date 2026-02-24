@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class StatusEgresoBL extends BaseCatalogosBL<StatusEgreso> {
+public class StatusEgresoBL extends CatEgresoBaseBL<StatusEgreso> {
     
     private static final Logger log = LogManager.getLogger(StatusEgresoBL.class);
     

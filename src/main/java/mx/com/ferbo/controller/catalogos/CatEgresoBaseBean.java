@@ -12,7 +12,7 @@ import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.model.categresos.CatEgreso;
 
-public abstract class AbstractCatalogoBean<T extends CatEgreso> implements Serializable {
+public abstract class CatEgresoBaseBean<T extends CatEgreso> implements Serializable {
 
     protected String titulo;
     protected String mensaje;
