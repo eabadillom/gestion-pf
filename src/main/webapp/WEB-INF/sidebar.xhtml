@@ -120,7 +120,7 @@
 						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
 						<p:menuitem value="Ajustes" outcome="/protected/settings/ajustes" icon="pi pi-cog" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
-                                                <p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
+						<p:menuitem value="Salir" icon="pi pi-sign-out" url="#{request.contextPath}/logout" ajax="false" />
 					</po:menu>
 				</div>
 			</div>
