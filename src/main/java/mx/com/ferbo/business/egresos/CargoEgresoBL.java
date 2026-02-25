@@ -2,9 +2,11 @@ package mx.com.ferbo.business.egresos;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import mx.com.ferbo.business.categresos.StatusCargoEgresoBL;
 import mx.com.ferbo.dao.egresos.CargoEgresoDAO;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.categresos.StatusCargoEgreso;
@@ -21,8 +23,17 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
 
     private static final Logger log = LogManager.getLogger(CargoEgresoBL.class);
 
+    private final String STATUS_PENDIENTE = "PENDIENTE";
+    private final String STATUS_APLICADO = "APLICADO";
+    private final String STATUS_PAGADO = "PAGADO";
+    private final String STATUS_CANCELADO = "CANCELADO";
+    private final String STATUS_CONDONADO = "CONDONADO";
+    
     @Inject
     private CargoEgresoDAO dao;
+    
+    @Inject
+    private StatusCargoEgresoBL statusBL;
 
     public CargoEgresoBL() {
         setDao(dao);
@@ -41,6 +52,11 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     @Override
     protected String nombreHijos() {
         return "los cargos";
+    }
+    
+     @Override
+    protected String nombreCatalogo() {
+        return "el status";
     }
 
     @Override
@@ -72,7 +88,36 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
         if (cargo.getImporteEgreso() == null) {
             cargo.setImporteEgreso(importe);
         }
+        
+        Date hoy = new Date();
+        
+        if (cargo.getFechaAlta() == null) {
+            cargo.setFechaAlta(hoy);
+        }
+        
+        cargo.setFechaModificacion(hoy);
     }
+    
+    @Override
+    protected void antesDeCambiar(CargoEgreso entity, StatusCargoEgreso catalog) throws InventarioException {
+        if ("APLICADO".equalsIgnoreCase(entity.getStatus().getNombre()) || "CANCELADO".equalsIgnoreCase(entity.getStatus().getNombre()) || "CONDONADO".equalsIgnoreCase(entity.getStatus().getNombre())) {
+            throw new InventarioException("El status del cargo ya no se pueda cambiar.");
+        }
+
+        entity.setStatus(catalog);
+    }
+
+    @Override
+    protected StatusCargoEgreso estadoInicialInicial() throws InventarioException {
+        return statusBL.buscarPorNombre(STATUS_PENDIENTE);
+    }
+
+    @Override
+    protected StatusCargoEgreso aplicable() throws InventarioException {
+        return statusBL.buscarPorNombre(STATUS_PAGADO);
+    }
+    
+    
 
     public Integer calcularDias(CargoEgreso cargo) {
 
@@ -118,30 +163,6 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
         }
 
         return BigDecimal.ZERO;
-    }
-
-    public String cambiarEstado(CargoEgreso cargo, StatusCargoEgreso status) throws InventarioException {
-
-        if ("APLICADO".equalsIgnoreCase(status.getNombre()) || "CANCELADO".equalsIgnoreCase(status.getNombre()) || "CONDONADO".equalsIgnoreCase(status.getNombre())) {
-            throw new InventarioException("El status del cargo ya no se pueda cambiar.");
-        }
-
-        cargo.setStatus(status);
-        return "El status del cargo cambio exitosamente a: " + status.getNombre();
-    }
-
-    @Override
-    protected String nombreCatalogo() {
-        return "el status";
-    }
-
-    @Override
-    protected void antesDeCambiar(CargoEgreso entity, StatusCargoEgreso catalog) throws InventarioException {
-        if ("APLICADO".equalsIgnoreCase(entity.getStatus().getNombre()) || "CANCELADO".equalsIgnoreCase(entity.getStatus().getNombre()) || "CONDONADO".equalsIgnoreCase(entity.getStatus().getNombre())) {
-            throw new InventarioException("El status del cargo ya no se pueda cambiar.");
-        }
-
-        entity.setStatus(catalog);
-    }
+    } 
 
 }

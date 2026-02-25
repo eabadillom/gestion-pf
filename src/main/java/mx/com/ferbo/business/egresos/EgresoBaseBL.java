@@ -25,6 +25,8 @@ public abstract class EgresoBaseBL<T extends Egreso, P extends Egreso, C extends
     protected abstract void validar(T entity) throws InventarioException;
     protected abstract void antesDeGuardar(T son, P father) throws InventarioException;
     protected abstract void antesDeCambiar(T son, C catalog) throws InventarioException;
+    protected abstract C estadoInicialInicial() throws InventarioException;
+    protected abstract C aplicable() throws InventarioException;
     
     protected void setDao(EgresoBaseDAO<T> dao) {
         this.dao = dao;

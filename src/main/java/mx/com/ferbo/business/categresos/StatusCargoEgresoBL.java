@@ -9,11 +9,11 @@ import mx.com.ferbo.dao.categresos.StatusCargoEgresoDAO;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import mx.com.ferbo.model.categresos.CatEgreso;
+import mx.com.ferbo.model.categresos.StatusCargoEgreso;
 
 @Named
 @RequestScoped
-public class StatusCargoEgresoBL extends CatEgresoBaseBL {
+public class StatusCargoEgresoBL extends CatEgresoBaseBL<StatusCargoEgreso> {
     
     private static final Logger log = LogManager.getLogger(StatusCargoEgresoBL.class);
     
@@ -26,7 +26,7 @@ public class StatusCargoEgresoBL extends CatEgresoBaseBL {
     }
 
     @Override
-    protected void validarEspecifico(CatEgreso model) throws InventarioException {
+    protected void validarEspecifico(StatusCargoEgreso entity) throws InventarioException {
         // Metodo vacio
     }
     

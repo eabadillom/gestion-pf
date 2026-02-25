@@ -16,14 +16,14 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class TipoAsignacionBean extends CatEgresoBaseBean<TipoAsignacionEgreso> {
+public class TipoAsignacionEgresoBean extends CatEgresoBaseBean<TipoAsignacionEgreso> {
 
-    private static final Logger log = LogManager.getLogger(TipoAsignacionBean.class);
+    private static final Logger log = LogManager.getLogger(TipoAsignacionEgresoBean.class);
 
     @Inject
     private TipoAsignacionEgresoBL bl;
 
-    public TipoAsignacionBean(){
+    public TipoAsignacionEgresoBean(){
 
     }
 

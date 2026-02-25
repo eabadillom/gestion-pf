@@ -12,6 +12,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import mx.com.ferbo.business.categresos.StatusEgresoBL;
+import mx.com.ferbo.business.egresos.util.MaquinaStatusEgreso;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +27,7 @@ import mx.com.ferbo.model.egresos.PagoEgreso;
 import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -45,23 +47,20 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     @Inject
     private StatusEgresoBL statusBL;
-
-    private final String STATUS_REGISTRADO = "REGISTRADO";
-
-    private final String STATUS_PENDIENTE = "PENDIENTE";
-
-    private final String STATUS_PAGADO = "PAGADO";
-
-    private final String STATUS_PARCIAL = "PARACIAL";
-
-    private final String STATUS_CANCELADO = "CANCELADO";
-
-    private final String STATUS_EXCEDENTE = "EXCEDENTE";
     
+    MaquinaStatusEgreso maquinaStatus;
+
+    private final String STATUS_BORRADOR = "BORRADOR";
+    private final String STATUS_REGISTRADO = "REGISTRADO";
+    private final String STATUS_PARCIAL = "PARACIAL";
+    private final String STATUS_PAGADO = "PAGADO";
+    private final String STATUS_CANCELADO = "CANCELADO";
+    private final String STATUS_EXCEDENTE = "EXCEDENTE";
     private final String STATUS_POR_CONCILIAR = "POR_CONCILIAR";
 
     public ImporteEgresoBL() {
         setDao(dao);
+        maquinaStatus = new MaquinaStatusEgreso();
     }
 
     @Override
@@ -119,17 +118,24 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     @Override
     protected void antesDeCambiar(ImporteEgreso importe, StatusEgreso status) throws InventarioException {
-
-        if (STATUS_CANCELADO.equalsIgnoreCase(importe.getStatus().getNombre())) {
-            throw new InventarioException("El egreso ya se encuentra en status de cancelado.");
-        }
-
-        if (STATUS_PAGADO.equalsIgnoreCase(importe.getStatus().getNombre())) {
-            throw new InventarioException("El egreso ya se encuentra pagado en su totalidad.");
-        }
+        
+        FacesUtils.requireNonNull(importe, "El egreso no puede ser vacío.");
+        
+        FacesUtils.requireNonNull(importe.getStatus(), "El egreso no tiene un status asignado.");
+        
+        FacesUtils.requireNonNull(status, "El status a cambiar no puede ser vacío.");
+        
+        FacesUtils.requireNonNull(status.getNombre(), "El nombre del nuevo status no puede ser vacío.");
+        
+        maquinaStatus.cambiarStatus(importe, status.getNombre());
 
         importe.setStatus(status);
 
+    }
+
+    @Override
+    protected StatusEgreso estadoInicialInicial() throws InventarioException {
+        return statusBL.buscarPorNombre(STATUS_BORRADOR);
     }
 
     public ImporteEgreso obtenerPorId(Integer id) {
@@ -188,7 +194,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     }
 
     public void procesarSubTotalEgreso(ImporteEgreso importe) throws InventarioException {
-        List<PagoEgreso> pagos = pagoBL.obtenerPorImporteEgreso(importe);
+        List<PagoEgreso> pagos = pagoBL.obtenerPorImporteEgresoYStatus(importe, pagoBL.aplicable());
 
         BigDecimal subTotal = BigDecimal.ZERO;
 

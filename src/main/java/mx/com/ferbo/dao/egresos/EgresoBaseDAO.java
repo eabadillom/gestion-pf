@@ -17,6 +17,8 @@ public abstract class EgresoBaseDAO<T> extends BaseDAO<T, Integer> {
         super(entityClass);
         this.entityName = entityClass.getSimpleName();
     }
+    
+    protected abstract Class<T> getEntityClass();
 
     public List<T> buscarPorImporteEgreso(Integer idImporteEgreso) throws DAOException {
         EntityManager em = null;
@@ -56,5 +58,4 @@ public abstract class EgresoBaseDAO<T> extends BaseDAO<T, Integer> {
         }
     }
 
-    protected abstract Class<T> getEntityClass();
 }

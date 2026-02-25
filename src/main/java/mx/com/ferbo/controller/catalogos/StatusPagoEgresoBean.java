@@ -15,14 +15,14 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class StatusPagoBean extends CatEgresoBaseBean<StatusPagoEgreso> {
+public class StatusPagoEgresoBean extends CatEgresoBaseBean<StatusPagoEgreso> {
 
-    private static final Logger log = LogManager.getLogger(StatusPagoBean.class);
+    private static final Logger log = LogManager.getLogger(StatusPagoEgresoBean.class);
 
     @Inject
     private StatusPagoEgresoBL bl;
 
-    public StatusPagoBean(){
+    public StatusPagoEgresoBean(){
 
     }
 

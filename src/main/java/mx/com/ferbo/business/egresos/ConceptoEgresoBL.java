@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 @RequestScoped
 public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEgreso, StatusEgreso> {
 
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger(ConceptoEgresoBL.class);
 
     @Inject
     private ConceptoEgresoDAO dao;
@@ -110,6 +110,18 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
         // Método sin implementar porque no se reqioere en el proceso
     }
 
+    @Override
+    protected StatusEgreso estadoInicialInicial() throws InventarioException {
+        // Métodos vacío porque no es necesaria su implementacion
+        return new StatusEgreso();
+    }
+
+    @Override
+    protected StatusEgreso aplicable() throws InventarioException {
+        // Métodos vacío porque no es necesaria su implementacion
+        return new StatusEgreso();
+    }
+    
     public void extraerDeCatalogo(ConceptoEgreso concepto, CatConceptoEgreso catConcepto) {
 
         concepto.setEsDeducible(catConcepto.getEsDeducible());

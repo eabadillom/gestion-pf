@@ -17,15 +17,15 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
 
     @Inject
     private AsignacionEgresoDAO dao;
-    
+
     private static final BigDecimal CIEN = BigDecimal.valueOf(100);
 
     public AsignacionEgresoBL() {
         setDao(dao);
     }
-    
+
     @Override
-    protected AsignacionEgreso nuevo(){
+    protected AsignacionEgreso nuevo() {
         return new AsignacionEgreso();
     }
 
@@ -37,6 +37,11 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
     @Override
     protected String nombreHijos() {
         return "las asignaciones";
+    }
+
+    @Override
+    protected String nombreCatalogo() {
+        return "el tipo";
     }
 
     @Override
@@ -61,11 +66,28 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
 
     @Override
     protected void antesDeGuardar(AsignacionEgreso asignacion, ImporteEgreso importe) throws InventarioException {
-        
+
         if (asignacion.getImporteEgreso() == null) {
             asignacion.setImporteEgreso(importe);
         }
-        
+
+    }
+
+    @Override
+    protected void antesDeCambiar(AsignacionEgreso entity, TipoAsignacionEgreso catalog) throws InventarioException {
+        entity.setTipoAsignacion(catalog);
+    }
+
+    @Override
+    protected TipoAsignacionEgreso estadoInicialInicial() throws InventarioException {
+        // Métodos vacío porque no es necesaria su implementacion
+        return new TipoAsignacionEgreso();
+    }
+
+    @Override
+    protected TipoAsignacionEgreso aplicable() throws InventarioException {
+         // Métodos vacío porque no es necesaria su implementacion
+        return new TipoAsignacionEgreso();
     }
 
     public BigDecimal calcularImporte(ImporteEgreso entity,
@@ -85,16 +107,6 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
                 .getTotalConceptoEgreso()
                 .multiply(asignacion.getPorcentaje())
                 .divide(CIEN, 2, RoundingMode.HALF_UP);
-    }
-    
-    @Override
-    protected String nombreCatalogo() {
-        return "el tipo";
-    }
-
-    @Override
-    protected void antesDeCambiar(AsignacionEgreso entity, TipoAsignacionEgreso catalog) throws InventarioException {
-        entity.setTipoAsignacion(catalog);
     }
 
 }

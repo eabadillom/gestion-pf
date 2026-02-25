@@ -1,15 +1,13 @@
 package mx.com.ferbo.business.egresos;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import mx.com.ferbo.business.categresos.StatusEgresoBL;
+import mx.com.ferbo.business.categresos.StatusPagoEgresoBL;
+import mx.com.ferbo.business.egresos.util.MaquinaStatusPago;
 import mx.com.ferbo.dao.egresos.PagoEgresoDAO;
-import mx.com.ferbo.model.categresos.StatusEgreso;
 import mx.com.ferbo.model.categresos.StatusPagoEgreso;
-import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.model.egresos.PagoEgreso;
 import mx.com.ferbo.util.FacesUtils;
@@ -28,25 +26,24 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
 
     @Inject
     private ImporteEgresoBL importeBL;
-    
+
     @Inject
     private CargoEgresoBL cargoBL;
 
     @Inject
-    private StatusEgresoBL statusEgresoBL;
+    private StatusPagoEgresoBL statusBL;
+
+    private MaquinaStatusPago maquinaStatus;
 
     private final String STATUS_PENDIENTE = "PENDIENTE";
-
     private final String STATUS_PAGADO = "PAGADO";
-
     private final String STATUS_PARCIAL = "PARACIAL";
-
     private final String STATUS_CANCELADO = "CANCELADO";
-
     private final String STATUS_VENCIDO = "VENCIDO";
 
     public PagoEgresoBL() {
         setDao(dao);
+        maquinaStatus = new MaquinaStatusPago();
     }
 
     @Override
@@ -109,19 +106,28 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
             pago.setImporteEgreso(importe);
         }
 
+        Date hoy = new Date();
+
         if (pago.getFechaAlta() == null) {
-            pago.setFechaAlta(new Date());
+            pago.setFechaAlta(hoy);
         }
 
-        pago.setFechaModificacion(new Date());
+        pago.setFechaModificacion(hoy);
     }
 
     @Override
     public void antesDeCambiar(PagoEgreso pago, StatusPagoEgreso status) throws InventarioException {
 
-        if (pago.getStatus().getNombre().equalsIgnoreCase("PAGADO") || pago.getStatus().getNombre().equalsIgnoreCase("CANCELADO")) {
-            throw new InventarioException("El stutus del pago no se puede cambiar de: " + pago.getStatus().getNombre());
-        }
+        FacesUtils.requireNonNull(pago, "El pago del egreso no puede ser vacío.");
+
+        FacesUtils.requireNonNull(pago.getStatus(), "El pago no tiene un status asignado.");
+
+        FacesUtils.requireNonNull(status, "El status a cambiar no puede ser vacío.");
+
+        FacesUtils.requireNonNull(status.getNombre(), "El nombre del nuevo status no puede ser vacío.");
+
+        maquinaStatus.cambiarStatus(pago, status.getNombre());
+
         pago.setStatus(status);
 
     }
@@ -131,6 +137,14 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
         return "el status";
     }
 
-    
-    
+    @Override
+    protected StatusPagoEgreso estadoInicialInicial() throws InventarioException {
+        return statusBL.buscarPorNombre(STATUS_PENDIENTE);
+    }
+
+    @Override
+    protected StatusPagoEgreso aplicable() throws InventarioException {
+        return statusBL.buscarPorNombre(STATUS_PAGADO);
+    }
+
 }
