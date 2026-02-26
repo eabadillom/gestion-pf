@@ -3,46 +3,59 @@ package mx.com.ferbo.business.egresos.util;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+
+import mx.com.ferbo.model.categresos.StatusDevolucionEgreso;
 import mx.com.ferbo.model.egresos.DevolucionEgreso;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.MaquinaStatusBase;
+import mx.com.ferbo.util.SetUtils;
 
 public class MaquinaStatusDevolucion {
 
-    private final MaquinaStatusBase<DevolucionEgreso> maquinaStatus;
+    private final MaquinaStatusBase<StatusDevolucionEgreso> maquinaStatus;
 
-    private final String STATUS_REGISTRADA = "REGISTRADA";
-    private final String STATUS_AUTORIZADA = "AUTORIZADA";
-    private final String STATUS_APLICADA = "APLICADA";
-    private final String STATUS_RECHAZADA = "RECHAZADA";
-    private final String STATUS_CANCELADA = "CANCELADA";
-    private final String STATUS_EN_PROCESO = "EN_PROCESO";
+    private final StatusDevolucionEgreso REGISTRADA;
+    private final StatusDevolucionEgreso AUTORIZADA;
+    private final StatusDevolucionEgreso APLICADA;
+    private final StatusDevolucionEgreso RECHAZADA;
+    private final StatusDevolucionEgreso CANCELADA;
+    private final StatusDevolucionEgreso EN_PROCESO;
 
-    public MaquinaStatusDevolucion() {
+    public MaquinaStatusDevolucion(StatusDevolucionEgreso registrada, StatusDevolucionEgreso autorizada, 
+                                   StatusDevolucionEgreso aplicada, StatusDevolucionEgreso rechazada, 
+                                   StatusDevolucionEgreso cancelada, StatusDevolucionEgreso en_proceso) {
 
-        Map<String, Set<String>> transiciones = new HashMap<String, Set<String>>();
+        this.REGISTRADA = registrada;
+        this.AUTORIZADA = autorizada;
+        this.APLICADA = aplicada;
+        this.RECHAZADA = rechazada;
+        this.CANCELADA = cancelada;
+        this.EN_PROCESO = en_proceso;
 
-        transiciones.put(STATUS_REGISTRADA, SetUtils.s(STATUS_EN_PROCESO, STATUS_AUTORIZADA, STATUS_RECHAZADA, STATUS_CANCELADA));
-        transiciones.put(STATUS_EN_PROCESO, SetUtils.s(STATUS_AUTORIZADA, STATUS_RECHAZADA, STATUS_CANCELADA));
-        transiciones.put(STATUS_AUTORIZADA, SetUtils.s(STATUS_APLICADA, STATUS_CANCELADA));
-        transiciones.put(STATUS_APLICADA, SetUtils.s()); // terminal
-        transiciones.put(STATUS_RECHAZADA, SetUtils.s()); // terminal
-        transiciones.put(STATUS_CANCELADA, SetUtils.s()); // terminal
+        Map<StatusDevolucionEgreso, Set<StatusDevolucionEgreso>> transiciones = new HashMap<>();
 
-        this.maquinaStatus = new MaquinaStatusBase<DevolucionEgreso>(transiciones);
+        transiciones.put(REGISTRADA, SetUtils.setOf(EN_PROCESO, AUTORIZADA, RECHAZADA, CANCELADA));
+        transiciones.put(EN_PROCESO, SetUtils.setOf(AUTORIZADA, RECHAZADA, CANCELADA));
+        transiciones.put(AUTORIZADA, SetUtils.setOf(APLICADA, CANCELADA));
+        transiciones.put(APLICADA, SetUtils.setOf()); // terminal
+        transiciones.put(RECHAZADA, SetUtils.setOf()); // terminal
+        transiciones.put(CANCELADA, SetUtils.setOf()); // terminal
+
+        this.maquinaStatus = new MaquinaStatusBase<>(transiciones);
     }
 
     /**
      * Valida el cambio de status a la devolución
      */
-    public void cambiarStatus(DevolucionEgreso devolucion, String nuevo) throws InventarioException {
+    public void cambiarStatus(DevolucionEgreso devolucion, StatusDevolucionEgreso nuevo) throws InventarioException {
 
-        String actual = devolucion.getStatus().getNombre();
+        StatusDevolucionEgreso actual = devolucion.getStatus();
 
         try {
             maquinaStatus.validarTransicion(actual, nuevo);
         } catch (IllegalStateException ex) {
-            throw new InventarioException("No se puede cambiar la devolución del status " + actual + " al status " + nuevo);
+            throw new InventarioException("No se puede cambiar la devolución del status " + actual.getNombre() + " al status " + nuevo.getNombre());
         }
-
+        devolucion.setStatus(nuevo);
     }
 }

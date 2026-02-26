@@ -121,15 +121,9 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
         
         FacesUtils.requireNonNull(importe, "El egreso no puede ser vacío.");
         
-        FacesUtils.requireNonNull(importe.getStatus(), "El egreso no tiene un status asignado.");
-        
         FacesUtils.requireNonNull(status, "El status a cambiar no puede ser vacío.");
         
-        FacesUtils.requireNonNull(status.getNombre(), "El nombre del nuevo status no puede ser vacío.");
-        
-        maquinaStatus.cambiarStatus(importe, status.getNombre());
-
-        importe.setStatus(status);
+        maquinaStatus.cambiarStatus(importe, status);
 
     }
 

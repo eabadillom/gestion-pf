@@ -41,9 +41,24 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     private final String STATUS_CANCELADO = "CANCELADO";
     private final String STATUS_VENCIDO = "VENCIDO";
 
+    private StatusPagoEgreso pendiente;
+    private StatusPagoEgreso pagado;
+    private StatusPagoEgreso parcial;
+    private StatusPagoEgreso cancelado;
+    private StatusPagoEgreso vencido;
+
     public PagoEgresoBL() {
-        setDao(dao);
-        maquinaStatus = new MaquinaStatusPago();
+        try {
+            setDao(dao);
+            pendiente = statusBL.buscarPorNombre(STATUS_PENDIENTE);
+            pagado = statusBL.buscarPorNombre(STATUS_PAGADO);
+            parcial = statusBL.buscarPorNombre(STATUS_PARCIAL);
+            cancelado = statusBL.buscarPorNombre(STATUS_CANCELADO);
+            vencido = statusBL.buscarPorNombre(STATUS_VENCIDO);
+            maquinaStatus = new MaquinaStatusPago(pendiente, pagado, parcial, cancelado, vencido);
+        } catch (InventarioException ex) {
+            throw new RuntimeException();
+        }
     }
 
     @Override
@@ -102,14 +117,12 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     @Override
     protected void antesDeGuardar(PagoEgreso pago, ImporteEgreso importe) throws InventarioException {
 
-        if (pago.getImporteEgreso() == null) {
-            pago.setImporteEgreso(importe);
-        }
-
         Date hoy = new Date();
 
-        if (pago.getFechaAlta() == null) {
+        if (pago.getId() == null) {
+            pago.setImporteEgreso(importe);
             pago.setFechaAlta(hoy);
+            pago.setStatus(estadoInicialInicial());
         }
 
         pago.setFechaModificacion(hoy);
@@ -119,14 +132,9 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     public void antesDeCambiar(PagoEgreso pago, StatusPagoEgreso status) throws InventarioException {
 
         FacesUtils.requireNonNull(pago, "El pago del egreso no puede ser vacío.");
+        FacesUtils.requireNonNull(status, "El nuevo status del pago no puede ser vacío.");
 
-        FacesUtils.requireNonNull(pago.getStatus(), "El pago no tiene un status asignado.");
-
-        FacesUtils.requireNonNull(status, "El status a cambiar no puede ser vacío.");
-
-        FacesUtils.requireNonNull(status.getNombre(), "El nombre del nuevo status no puede ser vacío.");
-
-        maquinaStatus.cambiarStatus(pago, status.getNombre());
+        maquinaStatus.cambiarStatus(pago, status);
 
         pago.setStatus(status);
 
@@ -137,14 +145,12 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
         return "el status";
     }
 
-    @Override
-    protected StatusPagoEgreso estadoInicialInicial() throws InventarioException {
-        return statusBL.buscarPorNombre(STATUS_PENDIENTE);
+    public StatusPagoEgreso estadoInicialInicial() throws InventarioException {
+        return pendiente;
     }
 
-    @Override
-    protected StatusPagoEgreso aplicable() throws InventarioException {
-        return statusBL.buscarPorNombre(STATUS_PAGADO);
+    public StatusPagoEgreso aplicable() throws InventarioException {
+        return pagado;
     }
 
 }

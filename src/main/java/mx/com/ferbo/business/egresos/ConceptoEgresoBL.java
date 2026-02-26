@@ -109,18 +109,6 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
     protected void antesDeCambiar(ConceptoEgreso son, StatusEgreso catalog) throws InventarioException {
         // Método sin implementar porque no se reqioere en el proceso
     }
-
-    @Override
-    protected StatusEgreso estadoInicialInicial() throws InventarioException {
-        // Métodos vacío porque no es necesaria su implementacion
-        return new StatusEgreso();
-    }
-
-    @Override
-    protected StatusEgreso aplicable() throws InventarioException {
-        // Métodos vacío porque no es necesaria su implementacion
-        return new StatusEgreso();
-    }
     
     public void extraerDeCatalogo(ConceptoEgreso concepto, CatConceptoEgreso catConcepto) {
 

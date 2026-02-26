@@ -78,18 +78,6 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
         entity.setTipoAsignacion(catalog);
     }
 
-    @Override
-    protected TipoAsignacionEgreso estadoInicialInicial() throws InventarioException {
-        // Métodos vacío porque no es necesaria su implementacion
-        return new TipoAsignacionEgreso();
-    }
-
-    @Override
-    protected TipoAsignacionEgreso aplicable() throws InventarioException {
-         // Métodos vacío porque no es necesaria su implementacion
-        return new TipoAsignacionEgreso();
-    }
-
     public BigDecimal calcularImporte(ImporteEgreso entity,
             AsignacionEgreso asignacion)
             throws InventarioException {

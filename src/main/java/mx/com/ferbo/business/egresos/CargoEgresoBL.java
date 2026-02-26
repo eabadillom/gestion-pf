@@ -7,12 +7,14 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import mx.com.ferbo.business.categresos.StatusCargoEgresoBL;
+import mx.com.ferbo.business.egresos.util.MaquinaStatusCargo;
 import mx.com.ferbo.dao.egresos.CargoEgresoDAO;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.categresos.StatusCargoEgreso;
 import mx.com.ferbo.model.egresos.CargoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +30,12 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     private final String STATUS_PAGADO = "PAGADO";
     private final String STATUS_CANCELADO = "CANCELADO";
     private final String STATUS_CONDONADO = "CONDONADO";
+
+    private StatusCargoEgreso pendiente;
+    private StatusCargoEgreso aplicado;
+    private StatusCargoEgreso pagado;
+    private StatusCargoEgreso cancelado;
+    private StatusCargoEgreso condonado;
     
     @Inject
     private CargoEgresoDAO dao;
@@ -35,8 +43,21 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     @Inject
     private StatusCargoEgresoBL statusBL;
 
+    MaquinaStatusCargo maquinaStatus;
+
     public CargoEgresoBL() {
+        try {
         setDao(dao);
+            pendiente = statusBL.buscarPorNombre(STATUS_PENDIENTE);
+            aplicado = statusBL.buscarPorNombre(STATUS_APLICADO);
+            pagado = statusBL.buscarPorNombre(STATUS_PAGADO);
+            cancelado = statusBL.buscarPorNombre(STATUS_CANCELADO);
+            condonado = statusBL.buscarPorNombre(STATUS_CONDONADO);
+            maquinaStatus = new MaquinaStatusCargo(pendiente, aplicado, pagado, cancelado, condonado);
+        } catch (InventarioException ex) {
+            log.error("Error inicializando máquina de estados", ex);
+            throw new RuntimeException("Error crítico de configuración del sistema.", ex);
+        } 
     }
     
     @Override
@@ -85,39 +106,32 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     @Override
     protected void antesDeGuardar(CargoEgreso cargo, ImporteEgreso importe) throws InventarioException {
         
-        if (cargo.getImporteEgreso() == null) {
-            cargo.setImporteEgreso(importe);
-        }
-        
         Date hoy = new Date();
-        
-        if (cargo.getFechaAlta() == null) {
+
+        if (cargo.getId() == null) {
+            cargo.setImporteEgreso(importe);
             cargo.setFechaAlta(hoy);
+            cargo.setStatus(estadoInicialInicial());
         }
         
         cargo.setFechaModificacion(hoy);
     }
     
     @Override
-    protected void antesDeCambiar(CargoEgreso entity, StatusCargoEgreso catalog) throws InventarioException {
-        if ("APLICADO".equalsIgnoreCase(entity.getStatus().getNombre()) || "CANCELADO".equalsIgnoreCase(entity.getStatus().getNombre()) || "CONDONADO".equalsIgnoreCase(entity.getStatus().getNombre())) {
-            throw new InventarioException("El status del cargo ya no se pueda cambiar.");
-        }
+    protected void antesDeCambiar(CargoEgreso cargo, StatusCargoEgreso status) throws InventarioException {
+        FacesUtils.requireNonNull(cargo, "El cargo al egreso no puede ser vacía");
+        FacesUtils.requireNonNull(status, "El nuevo status para el cargo no puede ser vacío.");
 
-        entity.setStatus(catalog);
+        maquinaStatus.cambiarStatus(cargo, status);
     }
 
-    @Override
-    protected StatusCargoEgreso estadoInicialInicial() throws InventarioException {
-        return statusBL.buscarPorNombre(STATUS_PENDIENTE);
+    public StatusCargoEgreso estadoInicialInicial() throws InventarioException {
+        return pendiente;
     }
 
-    @Override
-    protected StatusCargoEgreso aplicable() throws InventarioException {
-        return statusBL.buscarPorNombre(STATUS_PAGADO);
+    public StatusCargoEgreso aplicable() throws InventarioException {
+        return pagado;
     }
-    
-    
 
     public Integer calcularDias(CargoEgreso cargo) {
 

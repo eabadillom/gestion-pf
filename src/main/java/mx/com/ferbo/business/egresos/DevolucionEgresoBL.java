@@ -29,18 +29,38 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
     private final String STATUS_CANCELADA = "CANCELADA";
     private final String STATUS_EN_PROCESO = "EN_PROCESO";
 
+    private StatusDevolucionEgreso registrada;
+    private StatusDevolucionEgreso autorizada;
+    private StatusDevolucionEgreso aplicada;
+    private StatusDevolucionEgreso rechazada;
+    private StatusDevolucionEgreso cancelada;
+    private StatusDevolucionEgreso en_proceso;
+
     @Inject
     private DevolucionEgresoDAO dao;
-    
+
     @Inject
     private StatusDevolucionEgresoBL statusBL;
-    
+
     private MaquinaStatusDevolucion maquinaStatus;
 
     @PostConstruct
     public void init() {
-        setDao(dao);
-        maquinaStatus = new MaquinaStatusDevolucion();
+
+        try {
+            setDao(dao);
+            registrada = statusBL.buscarPorNombre(STATUS_REGISTRADA);
+            autorizada = statusBL.buscarPorNombre(STATUS_AUTORIZADA);
+            aplicada = statusBL.buscarPorNombre(STATUS_APLICADA);
+            rechazada = statusBL.buscarPorNombre(STATUS_RECHAZADA);
+            cancelada = statusBL.buscarPorNombre(STATUS_CANCELADA);
+            en_proceso = statusBL.buscarPorNombre(STATUS_EN_PROCESO);
+            maquinaStatus = new MaquinaStatusDevolucion(registrada, autorizada, aplicada, rechazada, cancelada,
+                    en_proceso);
+        } catch (InventarioException ex) {
+            log.error("Error inicializando máquina de estados", ex);
+            throw new RuntimeException("Error crítico de configuración del sistema.", ex);
+        }
     }
 
     @Override
@@ -94,43 +114,34 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
     @Override
     protected void antesDeGuardar(DevolucionEgreso devolucion, ImporteEgreso importe) throws InventarioException {
 
-        if (devolucion.getImporteEgreso() == null) {
-            devolucion.setImporteEgreso(importe);
-        }
-
         Date hoy = new Date();
 
         if (devolucion.getId() == null) {
+            devolucion.setImporteEgreso(importe);
             devolucion.setFechaAlta(hoy);
+            devolucion.setStatus(estadoInicialInicial());
         }
 
         devolucion.setFechaModificacion(hoy);
     }
 
     @Override
-    protected void antesDeCambiar(DevolucionEgreso devolucion, StatusDevolucionEgreso status) throws InventarioException {
-        
+    protected void antesDeCambiar(DevolucionEgreso devolucion, StatusDevolucionEgreso status)
+            throws InventarioException {
+
         FacesUtils.requireNonNull(devolucion, "La devolución del egreso no puede ser vacía.");
+        FacesUtils.requireNonNull(status, "El nuevo status para la devolución no puede ser vacío.");
 
-        FacesUtils.requireNonNull(devolucion.getStatus(), "La devolución no tiene asociado un status.");
+        maquinaStatus.cambiarStatus(devolucion, status);
 
-        FacesUtils.requireNonNull(status, "El status a cambiar no puede ser vacío.");
-        
-        FacesUtils.requireNonNull(status.getNombre(), "El nombre del nuevo status no puede ser vacío.");
-
-        maquinaStatus.cambiarStatus(devolucion, status.getNombre());
-
-        devolucion.setStatus(status);
     }
 
-    @Override
-    protected StatusDevolucionEgreso estadoInicialInicial() throws InventarioException {
-        return statusBL.buscarPorNombre(STATUS_REGISTRADA);
+    public StatusDevolucionEgreso estadoInicialInicial() throws InventarioException {
+        return registrada;
     }
 
-    @Override
-    protected StatusDevolucionEgreso aplicable() throws InventarioException {
-        return statusBL.buscarPorNombre(STATUS_APLICADA);
+    public StatusDevolucionEgreso aplicable() throws InventarioException {
+        return autorizada;
     }
 
 }

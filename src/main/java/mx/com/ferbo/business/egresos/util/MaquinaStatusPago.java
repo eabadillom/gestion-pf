@@ -3,40 +3,54 @@ package mx.com.ferbo.business.egresos.util;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+
+import mx.com.ferbo.model.categresos.StatusPagoEgreso;
 import mx.com.ferbo.model.egresos.PagoEgreso;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.MaquinaStatusBase;
+import mx.com.ferbo.util.SetUtils;
 
 public class MaquinaStatusPago {
 
-    private final MaquinaStatusBase<PagoEgreso> maquinaStatus;
+    private final MaquinaStatusBase<StatusPagoEgreso> maquinaStatus;
 
-    private final String STATUS_PENDIENTE = "PENDIENTE";
-    private final String STATUS_PAGADO = "PAGADO";
-    private final String STATUS_PARCIAL = "PARCIAL";
-    private final String STATUS_CANCELADO = "CANCELADO";
-    private final String STATUS_VENCIDO = "VENCIDO";
+    private final StatusPagoEgreso PENDIENTE;
+    private final StatusPagoEgreso PAGADO;
+    private final StatusPagoEgreso PARCIAL;
+    private final StatusPagoEgreso CANCELADO;
+    private final StatusPagoEgreso VENCIDO;
 
-    public MaquinaStatusPago() {
-        Map<String, Set<String>> transiciones = new HashMap<String, Set<String>>();
+    public MaquinaStatusPago(StatusPagoEgreso pendiente, StatusPagoEgreso pagado, 
+                             StatusPagoEgreso parcial, StatusPagoEgreso cancelado, 
+                             StatusPagoEgreso vencido ) {
 
-        transiciones.put(STATUS_PENDIENTE, SetUtils.s(STATUS_PARCIAL, STATUS_PAGADO, STATUS_CANCELADO, STATUS_VENCIDO));
-        transiciones.put(STATUS_PARCIAL, SetUtils.s(STATUS_PAGADO, STATUS_CANCELADO, STATUS_VENCIDO));
-        transiciones.put(STATUS_PAGADO, SetUtils.s()); // terminal
-        transiciones.put(STATUS_CANCELADO, SetUtils.s()); // terminal
-        transiciones.put(STATUS_VENCIDO, SetUtils.s(STATUS_PAGADO, STATUS_CANCELADO));
+        this.PENDIENTE = pendiente;
+        this.PAGADO = pagado;
+        this.PARCIAL = parcial;
+        this.CANCELADO = cancelado;
+        this.VENCIDO = vencido;
 
-        this.maquinaStatus = new MaquinaStatusBase<PagoEgreso>(transiciones);
+        Map<StatusPagoEgreso, Set<StatusPagoEgreso>> transiciones = new HashMap<StatusPagoEgreso, Set<StatusPagoEgreso>>();
+
+        transiciones.put(PENDIENTE, SetUtils.setOf(PARCIAL, PAGADO, CANCELADO, VENCIDO));
+        transiciones.put(PARCIAL, SetUtils.setOf(PAGADO, CANCELADO, VENCIDO));
+        transiciones.put(PAGADO, SetUtils.setOf()); // terminal
+        transiciones.put(CANCELADO, SetUtils.setOf()); // terminal
+        transiciones.put(VENCIDO, SetUtils.setOf(PAGADO, CANCELADO));
+
+        this.maquinaStatus = new MaquinaStatusBase<StatusPagoEgreso>(transiciones);
     }
 
     /**
      * Valida el cambio de status al Pago
      */
-    public void cambiarStatus(PagoEgreso pago, String nuevo) throws InventarioException {
-        String actual = pago.getStatus().getNombre();
+    public void cambiarStatus(PagoEgreso pago, StatusPagoEgreso nuevo) throws InventarioException {
+        StatusPagoEgreso actual = pago.getStatus();
         try {
             maquinaStatus.validarTransicion(actual, nuevo);
         } catch (IllegalStateException ex) {
             throw new InventarioException("No se puede cambiar el pago del status " + actual + " al status " + nuevo);
         }
+        pago.setStatus(nuevo);
     }
 }

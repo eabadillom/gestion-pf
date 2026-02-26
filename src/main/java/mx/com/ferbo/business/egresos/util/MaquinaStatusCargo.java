@@ -5,43 +5,58 @@ package mx.com.ferbo.business.egresos.util;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+
+import mx.com.ferbo.model.categresos.StatusCargoEgreso;
 import mx.com.ferbo.model.egresos.CargoEgreso;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.MaquinaStatusBase;
+import mx.com.ferbo.util.SetUtils;
 
 public class MaquinaStatusCargo {
 
-    private final MaquinaStatusBase<CargoEgreso> maquinaStatus;
+    private final MaquinaStatusBase<StatusCargoEgreso> maquinaStatus;
 
-    private final String STATUS_PENDIENTE = "PENDIENTE";
-    private final String STATUS_APLICADO = "APLICADO";
-    private final String STATUS_PAGADO = "PAGADO";
-    private final String STATUS_CANCELADO = "CANCELADO";
-    private final String STATUS_CONDONADO = "CONDONADO";
+    private final StatusCargoEgreso PENDIENTE;
+    private final StatusCargoEgreso APLICADO;
+    private final StatusCargoEgreso PAGADO;
+    private final StatusCargoEgreso CANCELADO;
+    private final StatusCargoEgreso CONDONADO;
 
-    public MaquinaStatusCargo() {
+    public MaquinaStatusCargo(StatusCargoEgreso pendiente, StatusCargoEgreso aplicado,
+                              StatusCargoEgreso pagado, StatusCargoEgreso cancelado,
+                              StatusCargoEgreso condonado) {
 
-        Map<String, Set<String>> transiciones = new HashMap<String, Set<String>>();
+        this.PENDIENTE = pendiente;
+        this.APLICADO = aplicado;
+        this.PAGADO = pagado;
+        this.CANCELADO = cancelado;
+        this.CONDONADO = condonado;
 
-        transiciones.put(STATUS_PENDIENTE, SetUtils.s(STATUS_APLICADO, STATUS_PAGADO, STATUS_CANCELADO, STATUS_CONDONADO));
-        transiciones.put(STATUS_APLICADO, SetUtils.s(STATUS_PAGADO, STATUS_CANCELADO, STATUS_CONDONADO));
-        transiciones.put(STATUS_PAGADO, SetUtils.s());     // terminal
-        transiciones.put(STATUS_CANCELADO, SetUtils.s());  // terminal
-        transiciones.put(STATUS_CONDONADO, SetUtils.s());  // terminal
+        Map<StatusCargoEgreso, Set<StatusCargoEgreso>> transiciones = new HashMap<>();
 
-        this.maquinaStatus = new MaquinaStatusBase<CargoEgreso>(transiciones);
+        transiciones.put(PENDIENTE, SetUtils.setOf(APLICADO, PAGADO, CANCELADO, CONDONADO));
+        transiciones.put(APLICADO, SetUtils.setOf(PAGADO, CANCELADO, CONDONADO));
+        transiciones.put(PAGADO, SetUtils.setOf());     // terminal
+        transiciones.put(CANCELADO, SetUtils.setOf());  // terminal
+        transiciones.put(CONDONADO, SetUtils.setOf());  // terminal
+
+        this.maquinaStatus = new MaquinaStatusBase<>(transiciones);
     }
 
     /**
-     * Valida el cambio de status al Cargo
+     * Valida y cambia el status del Cargo
      */
-    public void cambiarStatus(CargoEgreso cargo, String nuevo)throws InventarioException {
+    public void cambiarStatus(CargoEgreso cargo, StatusCargoEgreso nuevo) throws InventarioException {
 
-        String actual = cargo.getStatus().getNombre();
+        StatusCargoEgreso actual = cargo.getStatus();
 
         try {
             maquinaStatus.validarTransicion(actual, nuevo);
         } catch (IllegalStateException ex) {
-            throw new InventarioException("No se puede cambiar el cargo del status " + actual + " al status " + nuevo);
+            throw new InventarioException("No se puede cambiar el cargo del status " 
+                + actual.getNombre() + " al status " + nuevo.getNombre());
         }
+
+        cargo.setStatus(nuevo); // aplicar el cambio
     }
 }
