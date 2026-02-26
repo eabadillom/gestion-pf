@@ -2,6 +2,7 @@ package mx.com.ferbo.model.categresos;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -18,10 +19,10 @@ import javax.persistence.Table;
 import mx.com.ferbo.model.egresos.Egreso;
 
 @NamedQueries({
-    @NamedQuery(name = "CatConceptoEgreso.findByNombre", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.nombre = :nombre"),
-    @NamedQuery(name = "CatConceptoEgreso.findAllVigentesONoVigentes", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.vigente = :vigente"),
-    @NamedQuery(name = "CatConceptoEgreso.findAllByCategoriaEgreso", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.categoriaEgreso.id = :id"),
-    @NamedQuery(name = "CatConceptoEgreso.findAllByCategoriaEgresoYVigencia", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.categoriaEgreso.id = :id and cce.vigente = :vigente")
+        @NamedQuery(name = "CatConceptoEgreso.findByNombre", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.nombre = :nombre"),
+        @NamedQuery(name = "CatConceptoEgreso.findAllVigentesONoVigentes", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.vigente = :vigente"),
+        @NamedQuery(name = "CatConceptoEgreso.findAllByCategoriaEgreso", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.categoriaEgreso.id = :id"),
+        @NamedQuery(name = "CatConceptoEgreso.findAllByCategoriaEgresoYVigencia", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.categoriaEgreso.id = :id and cce.vigente = :vigente")
 })
 @Entity
 @Table(name = "cat_concepto_egreso")
@@ -59,7 +60,7 @@ public class CatConceptoEgreso implements Serializable, CatEgreso, Egreso<String
     @Column(name = "st_ieps")
     private Boolean tieneIEPS;
 
-    @Basic(optional =  false)
+    @Basic(optional = false)
     @Column(name = "st_cfdi")
     private Boolean requiereCFDI;
 
@@ -206,18 +207,23 @@ public class CatConceptoEgreso implements Serializable, CatEgreso, Egreso<String
         this.requiereCFDIDeducible = requiereCFDIDeducible;
     }
 
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (! (o instanceof CatConceptoEgreso))
+        if (!(o instanceof CatConceptoEgreso))
             return false;
 
         CatConceptoEgreso that = (CatConceptoEgreso) o;
-        return id != null && id.equals(that.id);
+        
+        if (this.id != null && that.id != null) {
+            return this.id.equals(that.id);
+        }
+
+        return Objects.equals(this.nombre, that.nombre);
     }
 
-    public int hashCode(){
-        return 31;
+    public int hashCode() {
+        return id != null ? id.hashCode() : Objects.hash(nombre);
     }
 
     @Override

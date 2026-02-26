@@ -145,7 +145,7 @@ public class DocumentoEgreso implements Serializable{
 
     @Override
     public int hashCode(){
-        return 32;
+        return id != null ? id.hashCode() : System.identityHashCode(this);
     }
 
     @Override

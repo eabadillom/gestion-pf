@@ -116,7 +116,7 @@ public class DocumentoMovimientoEgreso implements Serializable, Egreso <TipoMovi
     
     @Override
     public int hashCode(){
-        return 31;
+        return id != null ? id.hashCode() : System.identityHashCode(this);
     }
 
     @Override

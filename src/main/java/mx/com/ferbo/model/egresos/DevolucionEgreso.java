@@ -176,7 +176,7 @@ public class DevolucionEgreso implements Serializable, Egreso <StatusDevolucionE
     
     @Override
     public int hashCode(){
-        return 31;
+        return id != null ? id.hashCode() : System.identityHashCode(this);
     }
 
     @Override

@@ -245,7 +245,7 @@ public class CargoEgreso implements Serializable, Egreso<StatusCargoEgreso> {
 
     @Override
     public int hashCode() {
-        return 31;
+        return id != null ? id.hashCode() : System.identityHashCode(this);
     }
 
     @Override

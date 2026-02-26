@@ -2,6 +2,8 @@
 package mx.com.ferbo.model.categresos;
 
 import java.io.Serializable;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -90,12 +92,17 @@ public class TipoMovimientoEgreso implements Serializable, CatEgreso{
             return false;
         
         TipoMovimientoEgreso that = (TipoMovimientoEgreso) o;
-        return id != null && id.equals(that.id);
+                                
+        if (this.id != null && that.id != null) {
+            return this.id.equals(that.id);
+        }
+
+        return Objects.equals(this.nombre, that.nombre);
     }
     
     @Override
     public int hashCode() {
-        return 31;
+        return id != null ? id.hashCode() : Objects.hash(nombre);
     }
 
     @Override
