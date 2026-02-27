@@ -76,7 +76,7 @@ public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, Status
     }
 
     @Override
-    protected ActivoFijo nuevo() {
+    public ActivoFijo nuevo() {
         return new ActivoFijo();
     }
 

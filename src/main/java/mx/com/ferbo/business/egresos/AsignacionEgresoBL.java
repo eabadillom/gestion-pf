@@ -25,7 +25,7 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
     }
 
     @Override
-    protected AsignacionEgreso nuevo() {
+    public AsignacionEgreso nuevo() {
         return new AsignacionEgreso();
     }
 

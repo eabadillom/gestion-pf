@@ -26,7 +26,7 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
     }
 
     @Override
-    protected ConceptoEgreso nuevo() {
+    public ConceptoEgreso nuevo() {
         return new ConceptoEgreso();
     }
 

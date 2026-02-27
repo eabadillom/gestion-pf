@@ -18,7 +18,7 @@ public abstract class EgresoBaseBL<T extends Egreso, P extends Egreso, C extends
     
     public EgresoBaseBL(){}
     
-    protected abstract T nuevo();
+    public abstract T nuevo();
     protected abstract String nombreHijo();
     protected abstract String nombreHijos();
     protected abstract String nombreCatalogo();

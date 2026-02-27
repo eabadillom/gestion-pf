@@ -57,7 +57,7 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     }
 
     @Override
-    protected PagoEgreso nuevo() {
+    public PagoEgreso nuevo() {
         return new PagoEgreso();
     }
 

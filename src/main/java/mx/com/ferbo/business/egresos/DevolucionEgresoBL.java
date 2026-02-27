@@ -64,7 +64,7 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
     }
 
     @Override
-    protected DevolucionEgreso nuevo() {
+    public DevolucionEgreso nuevo() {
         return new DevolucionEgreso();
     }
 

@@ -61,7 +61,7 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     }
     
     @Override
-    protected CargoEgreso nuevo(){
+    public CargoEgreso nuevo(){
         return new CargoEgreso();
     }
 

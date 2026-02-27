@@ -88,7 +88,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     }
 
     @Override
-    protected ImporteEgreso nuevo() {
+    public ImporteEgreso nuevo() {
         return new ImporteEgreso();
     }
 
@@ -153,8 +153,8 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     }
 
-    public StatusEgreso estadoBorrador() throws InventarioException {
-        return statusBL.buscarPorNombre(STATUS_BORRADOR);
+    public StatusEgreso estadoBorrador() {
+        return borrador;
     }
 
     public ImporteEgreso obtenerPorId(Integer id) {
