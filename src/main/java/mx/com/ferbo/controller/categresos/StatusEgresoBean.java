@@ -1,51 +1,49 @@
-package mx.com.ferbo.controller.catalogos;
+
+package mx.com.ferbo.controller.categresos;
 
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
+import mx.com.ferbo.business.categresos.StatusEgresoBL;
+import mx.com.ferbo.model.categresos.StatusEgreso;
+import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.categresos.TipoAsignacionEgresoBL;
-import mx.com.ferbo.model.categresos.TipoAsignacionEgreso;
-import mx.com.ferbo.util.InventarioException;
-
 @Named
 @ViewScoped
-public class TipoAsignacionEgresoBean extends CatEgresoBaseBean<TipoAsignacionEgreso> {
-
-    private static final Logger log = LogManager.getLogger(TipoAsignacionEgresoBean.class);
-
-    @Inject
-    private TipoAsignacionEgresoBL bl;
-
-    public TipoAsignacionEgresoBean(){
-
+public class StatusEgresoBean extends CatEgresoBaseBean<StatusEgreso> {
+    
+    private static final Logger log = LogManager.getLogger(StatusEgresoBean.class);
+    
+    @Inject 
+    private StatusEgresoBL bl;
+    
+    public StatusEgresoBean() {
+        
     }
-
+    
     @PostConstruct
     public void init() {
-        titulo = "Tipo asignación";
+        titulo = "Status Egreso";
         initCatalogo();
     }
 
     @Override
-    protected List<TipoAsignacionEgreso> cargar() throws InventarioException {
+    protected List<StatusEgreso> cargar() throws InventarioException {
         return bl.vigentesONoVigentes(estado);
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        return "El tipo de asignación se " + bl.agregarOActualizar(selected);
+       return "Status de egreso se " + bl.agregarOActualizar(selected);
     }
 
     @Override
-    protected TipoAsignacionEgreso nuevo() {
-        return new TipoAsignacionEgreso();
+    protected StatusEgreso nuevo() {
+        return new StatusEgreso();
     }
 
     @Override
@@ -62,4 +60,5 @@ public class TipoAsignacionEgresoBean extends CatEgresoBaseBean<TipoAsignacionEg
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
+    
 }

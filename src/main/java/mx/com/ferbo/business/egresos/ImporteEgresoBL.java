@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.dao.egresos.ImporteEgresoDAO;
 import mx.com.ferbo.model.categresos.CatConceptoEgreso;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
+import mx.com.ferbo.model.egresos.DevolucionEgreso;
 import mx.com.ferbo.model.categresos.StatusEgreso;
 import mx.com.ferbo.model.egresos.CargoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
@@ -46,6 +47,9 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     private CargoEgresoBL cargoBL;
 
     @Inject
+    private DevolucionEgresoBL devolucionBL;
+
+    @Inject
     private StatusEgresoBL statusBL;
     
     MaquinaStatusEgreso maquinaStatus;
@@ -58,9 +62,29 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     private final String STATUS_EXCEDENTE = "EXCEDENTE";
     private final String STATUS_POR_CONCILIAR = "POR_CONCILIAR";
 
+    private StatusEgreso borrador;
+    private StatusEgreso registrado;
+    private StatusEgreso parcial;
+    private StatusEgreso pagado;
+    private StatusEgreso cancelado;
+    private StatusEgreso excedente;
+    private StatusEgreso por_conciliar;
+
     public ImporteEgresoBL() {
-        setDao(dao);
-        maquinaStatus = new MaquinaStatusEgreso();
+        try {
+            setDao(dao);
+            borrador = statusBL.buscarPorNombre(STATUS_BORRADOR);
+            registrado = statusBL.buscarPorNombre(STATUS_REGISTRADO);
+            parcial = statusBL.buscarPorNombre(STATUS_PARCIAL);
+            pagado = statusBL.buscarPorNombre(STATUS_PAGADO);
+            cancelado = statusBL.buscarPorNombre(STATUS_CANCELADO);
+            excedente = statusBL.buscarPorNombre(STATUS_EXCEDENTE);
+            por_conciliar = statusBL.buscarPorNombre(STATUS_POR_CONCILIAR);
+            maquinaStatus = new MaquinaStatusEgreso(borrador, registrado, parcial, pagado, cancelado, excedente, por_conciliar);
+        } catch (InventarioException ex) {
+            log.error("Error inicializando máquina de estados", ex);
+            throw new RuntimeException("Error crítico de configuración del sistema.", ex);
+        }
     }
 
     @Override
@@ -104,31 +128,32 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     @Override
     protected void antesDeGuardar(ImporteEgreso importe, ConceptoEgreso concepto) throws InventarioException {
 
+        Date hoy = new Date();
+
         if (importe.getId() == null) {
-            StatusEgreso status = statusBL.buscarPorNombre(STATUS_REGISTRADO);
-            antesDeCambiar(importe, status);
-        }
-
-        if (importe.getConceptoEgreso() == null) {
             importe.setConceptoEgreso(concepto);
+            importe.setFechaAlta(hoy);
+            importe.setStatus(registrado);
         }
 
-        importe.setFechaModificacion(new Date());
+        procesarSubTotalEgreso(importe);
+
+        procesarTotalEgreso(importe);
+
+        importe.setFechaModificacion(hoy);
     }
 
     @Override
     protected void antesDeCambiar(ImporteEgreso importe, StatusEgreso status) throws InventarioException {
         
         FacesUtils.requireNonNull(importe, "El egreso no puede ser vacío.");
-        
-        FacesUtils.requireNonNull(status, "El status a cambiar no puede ser vacío.");
+        FacesUtils.requireNonNull(status, "El nuevo status para el egreso no puede ser vacío.");
         
         maquinaStatus.cambiarStatus(importe, status);
 
     }
 
-    @Override
-    protected StatusEgreso estadoInicialInicial() throws InventarioException {
+    public StatusEgreso estadoBorrador() throws InventarioException {
         return statusBL.buscarPorNombre(STATUS_BORRADOR);
     }
 
@@ -200,30 +225,36 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
         int comparacion = totalAux.compareTo(importe.getConceptoEgreso().getTotalConceptoEgreso());
 
-        StatusEgreso status = statusBL.buscarPorNombre(STATUS_PARCIAL);
+        StatusEgreso status = parcial;
 
         if (comparacion > 0) {
-            status = statusBL.buscarPorNombre(STATUS_POR_CONCILIAR);
+            status = por_conciliar;
+        }
+
+        if (comparacion == 0) {
+            status = pagado;
         }
 
         antesDeCambiar(importe, status);
 
         importe.setSubTotal(subTotal);
 
-        ConceptoEgreso concepto = importe.getConceptoEgreso();
-
-        operar(importe, concepto);
     }
 
     public void procesarTotalEgreso(ImporteEgreso importe) throws InventarioException {
 
-        List<CargoEgreso> cargos = cargoBL.obtenerPorImporteEgreso(importe);
+        List<CargoEgreso> cargos = cargoBL.obtenerPorImporteEgresoYStatus(importe, cargoBL.aplicable());
+        List<DevolucionEgreso> devoluciones = devolucionBL.obtenerPorImporteEgresoYStatus(importe, devolucionBL.aplicable());
 
         BigDecimal subtotal = importe.getSubTotal();
         BigDecimal total = subtotal;
 
         for (CargoEgreso cargo : cargos) {
             total = total.add(cargo.getImporteCargo().add(cargo.getImporteIEPS().add(cargo.getImporteIVA())));
+        }
+
+        for (DevolucionEgreso devolucion : devoluciones) {
+            total = total.subtract(devolucion.getImporteDevolucion());
         }
 
         total = total.add(importe.getIeps());
@@ -235,19 +266,16 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
         StatusEgreso status = importe.getStatus();
         
         if (comparacion == 0) {
-            status = statusBL.buscarPorNombre(STATUS_PAGADO);
+            status = pagado;
         }
 
         if (comparacion > 0) {
-            status = statusBL.buscarPorNombre(STATUS_EXCEDENTE);
+            status = excedente;
         }
 
         antesDeCambiar(importe, status);
 
         importe.setTotal(total);
 
-        ConceptoEgreso concepto = importe.getConceptoEgreso();
-
-        operar(importe, concepto);
     }
 }

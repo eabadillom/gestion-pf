@@ -1,4 +1,4 @@
-package mx.com.ferbo.controller.catalogos;
+package mx.com.ferbo.controller.categresos;
 
 import java.util.List;
 
@@ -6,45 +6,46 @@ import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.categresos.StatusPagoEgresoBL;
-import mx.com.ferbo.model.categresos.StatusPagoEgreso;
+import mx.com.ferbo.business.categresos.TipoAsignacionEgresoBL;
+import mx.com.ferbo.model.categresos.TipoAsignacionEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class StatusPagoEgresoBean extends CatEgresoBaseBean<StatusPagoEgreso> {
+public class TipoAsignacionEgresoBean extends CatEgresoBaseBean<TipoAsignacionEgreso> {
 
-    private static final Logger log = LogManager.getLogger(StatusPagoEgresoBean.class);
+    private static final Logger log = LogManager.getLogger(TipoAsignacionEgresoBean.class);
 
     @Inject
-    private StatusPagoEgresoBL bl;
+    private TipoAsignacionEgresoBL bl;
 
-    public StatusPagoEgresoBean(){
+    public TipoAsignacionEgresoBean(){
 
     }
 
     @PostConstruct
-    public void post(){
-        titulo = "Status de Pago";
+    public void init() {
+        titulo = "Tipo asignación";
         initCatalogo();
     }
 
     @Override
-    protected List<StatusPagoEgreso> cargar() throws InventarioException {
+    protected List<TipoAsignacionEgreso> cargar() throws InventarioException {
         return bl.vigentesONoVigentes(estado);
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        return "El status de pago se " + bl.agregarOActualizar(selected);
+        return "El tipo de asignación se " + bl.agregarOActualizar(selected);
     }
 
     @Override
-    protected StatusPagoEgreso nuevo() {
-        return new StatusPagoEgreso();
+    protected TipoAsignacionEgreso nuevo() {
+        return new TipoAsignacionEgreso();
     }
 
     @Override
@@ -61,5 +62,4 @@ public class StatusPagoEgresoBean extends CatEgresoBaseBean<StatusPagoEgreso> {
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
     }
-    
 }

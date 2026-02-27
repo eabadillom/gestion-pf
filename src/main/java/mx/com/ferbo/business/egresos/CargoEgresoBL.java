@@ -43,7 +43,7 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     @Inject
     private StatusCargoEgresoBL statusBL;
 
-    MaquinaStatusCargo maquinaStatus;
+    private MaquinaStatusCargo maquinaStatus;
 
     public CargoEgresoBL() {
         try {
@@ -111,7 +111,7 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
         if (cargo.getId() == null) {
             cargo.setImporteEgreso(importe);
             cargo.setFechaAlta(hoy);
-            cargo.setStatus(estadoInicialInicial());
+            cargo.setStatus(pendiente);
         }
         
         cargo.setFechaModificacion(hoy);
@@ -123,10 +123,6 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
         FacesUtils.requireNonNull(status, "El nuevo status para el cargo no puede ser vacío.");
 
         maquinaStatus.cambiarStatus(cargo, status);
-    }
-
-    public StatusCargoEgreso estadoInicialInicial() throws InventarioException {
-        return pendiente;
     }
 
     public StatusCargoEgreso aplicable() throws InventarioException {

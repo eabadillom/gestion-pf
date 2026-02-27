@@ -1,4 +1,4 @@
-package mx.com.ferbo.controller.catalogos;
+package mx.com.ferbo.controller.categresos;
 
 import java.util.List;
 
@@ -6,49 +6,45 @@ import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.categresos.StatusActivoFijoBL;
-import mx.com.ferbo.model.categresos.StatusActivoFijo;
+import mx.com.ferbo.business.categresos.StatusPagoEgresoBL;
+import mx.com.ferbo.model.categresos.StatusPagoEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class StatusActivoFijoBean extends CatEgresoBaseBean<StatusActivoFijo>{
+public class StatusPagoEgresoBean extends CatEgresoBaseBean<StatusPagoEgreso> {
 
-    private static final Logger log = LogManager.getLogger(StatusActivoFijoBean.class);
+    private static final Logger log = LogManager.getLogger(StatusPagoEgresoBean.class);
 
     @Inject
-    private StatusActivoFijoBL bl;
+    private StatusPagoEgresoBL bl;
 
-    public StatusActivoFijoBean(){
+    public StatusPagoEgresoBean(){
 
     }
 
     @PostConstruct
-    public void init() {
-        titulo = "Status Activo Fijo";
+    public void post(){
+        titulo = "Status de Pago";
         initCatalogo();
     }
 
-
     @Override
-    protected List<StatusActivoFijo> cargar() throws InventarioException {
+    protected List<StatusPagoEgreso> cargar() throws InventarioException {
         return bl.vigentesONoVigentes(estado);
     }
 
-
     @Override
     protected String guardar() throws InventarioException {
-        return "El status de activo fijo se " + bl.agregarOActualizar(selected);
+        return "El status de pago se " + bl.agregarOActualizar(selected);
     }
 
-
     @Override
-    protected StatusActivoFijo nuevo() {
-        return new StatusActivoFijo();
+    protected StatusPagoEgreso nuevo() {
+        return new StatusPagoEgreso();
     }
 
     @Override
@@ -61,10 +57,9 @@ public class StatusActivoFijoBean extends CatEgresoBaseBean<StatusActivoFijo>{
         log.warn("{}. {}", msg, ex);
     }
 
-
     @Override
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
-    }    
-
+    }
+    
 }

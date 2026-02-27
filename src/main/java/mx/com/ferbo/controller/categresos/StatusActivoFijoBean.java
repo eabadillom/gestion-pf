@@ -1,4 +1,4 @@
-package mx.com.ferbo.controller.catalogos;
+package mx.com.ferbo.controller.categresos;
 
 import java.util.List;
 
@@ -10,42 +10,45 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.categresos.TipoCargoEgresoBL;
-import mx.com.ferbo.model.categresos.TipoCargoEgreso;
+import mx.com.ferbo.business.categresos.StatusActivoFijoBL;
+import mx.com.ferbo.model.categresos.StatusActivoFijo;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class TipoCargoEgresoBean extends CatEgresoBaseBean<TipoCargoEgreso> {
+public class StatusActivoFijoBean extends CatEgresoBaseBean<StatusActivoFijo>{
 
-    private static final Logger log = LogManager.getLogger(TipoCargoEgresoBean.class);
+    private static final Logger log = LogManager.getLogger(StatusActivoFijoBean.class);
 
     @Inject
-    private TipoCargoEgresoBL bl;
+    private StatusActivoFijoBL bl;
 
-    public TipoCargoEgresoBean(){
+    public StatusActivoFijoBean(){
 
     }
 
     @PostConstruct
-    public void init(){
-        titulo = "Tipo de cargo";
+    public void init() {
+        titulo = "Status Activo Fijo";
         initCatalogo();
     }
 
+
     @Override
-    protected List<TipoCargoEgreso> cargar() throws InventarioException {
+    protected List<StatusActivoFijo> cargar() throws InventarioException {
         return bl.vigentesONoVigentes(estado);
     }
 
-    @Override
-    protected String guardar() throws InventarioException {
-        return "El tipo de cargo se " + bl.agregarOActualizar(selected);
-    }
 
     @Override
-    protected TipoCargoEgreso nuevo() {
-        return new TipoCargoEgreso();
+    protected String guardar() throws InventarioException {
+        return "El status de activo fijo se " + bl.agregarOActualizar(selected);
+    }
+
+
+    @Override
+    protected StatusActivoFijo nuevo() {
+        return new StatusActivoFijo();
     }
 
     @Override
@@ -58,9 +61,10 @@ public class TipoCargoEgresoBean extends CatEgresoBaseBean<TipoCargoEgreso> {
         log.warn("{}. {}", msg, ex);
     }
 
+
     @Override
     protected void logError(String msg, Exception ex) {
         log.error("{}. {}", msg, ex);
-    }
-    
+    }    
+
 }

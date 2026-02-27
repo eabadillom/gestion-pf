@@ -119,7 +119,7 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
         if (devolucion.getId() == null) {
             devolucion.setImporteEgreso(importe);
             devolucion.setFechaAlta(hoy);
-            devolucion.setStatus(estadoInicialInicial());
+            devolucion.setStatus(registrada);
         }
 
         devolucion.setFechaModificacion(hoy);
@@ -134,10 +134,6 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
 
         maquinaStatus.cambiarStatus(devolucion, status);
 
-    }
-
-    public StatusDevolucionEgreso estadoInicialInicial() throws InventarioException {
-        return registrada;
     }
 
     public StatusDevolucionEgreso aplicable() throws InventarioException {

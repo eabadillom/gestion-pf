@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.categresos.TipoEgresoBL;
-import mx.com.ferbo.controller.catalogos.CatEgresoBaseBean;
+import mx.com.ferbo.controller.categresos.CatEgresoBaseBean;
 import mx.com.ferbo.model.categresos.TipoEgreso;
 import mx.com.ferbo.util.InventarioException;
 

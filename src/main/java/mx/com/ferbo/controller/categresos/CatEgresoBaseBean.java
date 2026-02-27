@@ -1,4 +1,4 @@
-package mx.com.ferbo.controller.catalogos;
+package mx.com.ferbo.controller.categresos;
 
 import java.io.Serializable;
 import java.util.ArrayList;

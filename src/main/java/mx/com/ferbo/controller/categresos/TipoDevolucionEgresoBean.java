@@ -1,5 +1,5 @@
 
-package mx.com.ferbo.controller.catalogos;
+package mx.com.ferbo.controller.categresos;
 
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;

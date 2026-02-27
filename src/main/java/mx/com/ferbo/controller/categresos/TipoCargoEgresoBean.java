@@ -1,4 +1,4 @@
-package mx.com.ferbo.controller.catalogos;
+package mx.com.ferbo.controller.categresos;
 
 import java.util.List;
 
@@ -10,42 +10,42 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.categresos.TipoDocumentoEgresoBL;
-import mx.com.ferbo.model.categresos.TipoDocumentoEgreso;
+import mx.com.ferbo.business.categresos.TipoCargoEgresoBL;
+import mx.com.ferbo.model.categresos.TipoCargoEgreso;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-public class TipoDocumentoEgresoBean extends CatEgresoBaseBean<TipoDocumentoEgreso> {
+public class TipoCargoEgresoBean extends CatEgresoBaseBean<TipoCargoEgreso> {
 
-    private static final Logger log = LogManager.getLogger(TipoDocumentoEgresoBean.class);
+    private static final Logger log = LogManager.getLogger(TipoCargoEgresoBean.class);
 
     @Inject
-    private TipoDocumentoEgresoBL bl;
+    private TipoCargoEgresoBL bl;
 
-    public TipoDocumentoEgresoBean(){
+    public TipoCargoEgresoBean(){
 
     }
 
     @PostConstruct
     public void init(){
-        titulo = "Tipo de documento";
+        titulo = "Tipo de cargo";
         initCatalogo();
     }
 
     @Override
-    protected List<TipoDocumentoEgreso> cargar() throws InventarioException {
+    protected List<TipoCargoEgreso> cargar() throws InventarioException {
         return bl.vigentesONoVigentes(estado);
     }
 
     @Override
     protected String guardar() throws InventarioException {
-        return "El tipo de documento se " + bl.agregarOActualizar(selected);
+        return "El tipo de cargo se " + bl.agregarOActualizar(selected);
     }
 
     @Override
-    protected TipoDocumentoEgreso nuevo() {
-        return new TipoDocumentoEgreso();
+    protected TipoCargoEgreso nuevo() {
+        return new TipoCargoEgreso();
     }
 
     @Override

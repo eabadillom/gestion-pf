@@ -25,12 +25,6 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     private PagoEgresoDAO dao;
 
     @Inject
-    private ImporteEgresoBL importeBL;
-
-    @Inject
-    private CargoEgresoBL cargoBL;
-
-    @Inject
     private StatusPagoEgresoBL statusBL;
 
     private MaquinaStatusPago maquinaStatus;
@@ -57,7 +51,8 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
             vencido = statusBL.buscarPorNombre(STATUS_VENCIDO);
             maquinaStatus = new MaquinaStatusPago(pendiente, pagado, parcial, cancelado, vencido);
         } catch (InventarioException ex) {
-            throw new RuntimeException();
+            log.error("Error inicializando máquina de estados", ex);
+            throw new RuntimeException("Error crítico de configuración del sistema.", ex);
         }
     }
 
@@ -122,7 +117,7 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
         if (pago.getId() == null) {
             pago.setImporteEgreso(importe);
             pago.setFechaAlta(hoy);
-            pago.setStatus(estadoInicialInicial());
+            pago.setStatus(pendiente);
         }
 
         pago.setFechaModificacion(hoy);
@@ -136,17 +131,11 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
 
         maquinaStatus.cambiarStatus(pago, status);
 
-        pago.setStatus(status);
-
     }
 
     @Override
     protected String nombreCatalogo() {
         return "el status";
-    }
-
-    public StatusPagoEgreso estadoInicialInicial() throws InventarioException {
-        return pendiente;
     }
 
     public StatusPagoEgreso aplicable() throws InventarioException {

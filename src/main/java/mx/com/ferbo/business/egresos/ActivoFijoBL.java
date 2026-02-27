@@ -7,10 +7,14 @@ import java.util.Date;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import mx.com.ferbo.business.categresos.StatusActivoFijoBL;
+import mx.com.ferbo.business.egresos.util.MaquinaStatusActivoFijo;
 import mx.com.ferbo.dao.egresos.ActivoFijoDAO;
 import mx.com.ferbo.model.categresos.StatusActivoFijo;
 import mx.com.ferbo.model.egresos.ActivoFijo;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,12 +28,55 @@ public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, Status
     @Inject
     private ActivoFijoDAO dao;
 
+    @Inject
+    private StatusActivoFijoBL statusBL;
+
+    private MaquinaStatusActivoFijo maquinaStatus;
+
+    private final String STATUS_EN_USO = "EN_USO";
+    private final String STATUS_EN_REPARACION = "EN_REPARACIÓN/MANTENIMIENTO";
+    private final String STATUS_INACTIVO = "INACTIVO";
+    private final String STATUS_EN_BAJA = "EN_BAJA";
+    private final String STATUS_VENDIDO = "VENDIDO";
+    private final String STATUS_OBSOLETO = "OBSOLETO";
+    private final String STATUS_DADO_DE_BAJA = "DADO_DE_BAJA";
+    private final String STATUS_EN_REVALUACION = "EN_REVALUACIÓN";
+    private final String STATUS_RECIBIDO = "RECIBIDO";
+    private final String STATUS_DESCARTADO = "DESCARTADO";
+
+    private StatusActivoFijo en_uso;
+    private StatusActivoFijo en_reparacion;
+    private StatusActivoFijo inactivo;
+    private StatusActivoFijo en_baja;
+    private StatusActivoFijo vendido;
+    private StatusActivoFijo obsoleto;
+    private StatusActivoFijo dado_de_baja;
+    private StatusActivoFijo en_revaluacion;
+    private StatusActivoFijo recibido;
+    private StatusActivoFijo descartado;
+
     public ActivoFijoBL() {
+        try {
         setDao(dao);
+        en_uso = statusBL.buscarPorNombre(STATUS_EN_USO);
+        en_reparacion = statusBL.buscarPorNombre(STATUS_EN_REPARACION);
+        inactivo = statusBL.buscarPorNombre(STATUS_INACTIVO);
+        en_baja = statusBL.buscarPorNombre(STATUS_EN_BAJA);
+        vendido = statusBL.buscarPorNombre(STATUS_VENDIDO);
+        obsoleto = statusBL.buscarPorNombre(STATUS_OBSOLETO);
+        dado_de_baja = statusBL.buscarPorNombre(STATUS_DADO_DE_BAJA);
+        en_revaluacion = statusBL.buscarPorNombre(STATUS_EN_REVALUACION);
+        recibido = statusBL.buscarPorNombre(STATUS_RECIBIDO);
+        descartado = statusBL.buscarPorNombre(STATUS_DESCARTADO);
+        maquinaStatus = new MaquinaStatusActivoFijo(en_uso, en_reparacion, inactivo, en_baja, vendido, obsoleto, dado_de_baja, en_revaluacion, recibido, descartado);
+        } catch (InventarioException ex) {
+            log.error("Error inicializando máquina de estados", ex);
+            throw new RuntimeException("Error crítico de configuración del sistema.", ex);
+        }
     }
-    
+
     @Override
-    protected ActivoFijo nuevo(){
+    protected ActivoFijo nuevo() {
         return new ActivoFijo();
     }
 
@@ -84,18 +131,24 @@ public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, Status
 
     @Override
     protected void antesDeGuardar(ActivoFijo activo, ImporteEgreso importe) throws InventarioException {
-        
-        if (activo.getImporteEgreso() == null){
+
+        Date hoy = new Date();
+
+        if (activo.getId() == null) {
             activo.setImporteEgreso(importe);
+            activo.setFechaAlta(hoy);
+            activo.setStatus(recibido);
         }
+
+        activo.setFechaModificacion(hoy);
     }
 
     @Override
     protected void antesDeCambiar(ActivoFijo activo, StatusActivoFijo status) throws InventarioException {
-        if ("Dado de Baja".equalsIgnoreCase(activo.getStatus().getNombre()) || "Descartado".equalsIgnoreCase(activo.getStatus().getNombre()) || "Vendido".equalsIgnoreCase(activo.getStatus().getNombre())) {
-            throw new InventarioException("El status actuaal del activo fijo, ya no puede ser cambiado.");
-        }
-
-        activo.setStatus(status);
+        
+        FacesUtils.requireNonNull(activo, "El activo fijo no puede ser vacío.");
+        FacesUtils.requireNonNull(status, "El nuevo status para el activo fijo no puede ser vacío.");
+        
+        maquinaStatus.cambiarStatus(activo, status);
     }
 }
