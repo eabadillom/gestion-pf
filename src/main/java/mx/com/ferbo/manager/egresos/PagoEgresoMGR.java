@@ -14,6 +14,12 @@ public class PagoEgresoMGR {
     @Inject
     private PagoEgresoBL pagoBl;
 
+    public PagoEgreso nuevoOExistente(PagoEgreso pago) {
+        if (pago.getId() ==  null) {
+            
+        }
+    }
+
     public String guardar(PagoEgreso pago, ImporteEgreso egreso) throws InventarioException {
         return pagoBl.operar(pago, egreso);
     }
