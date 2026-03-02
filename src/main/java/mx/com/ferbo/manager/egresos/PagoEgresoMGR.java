@@ -1,31 +1,26 @@
 package mx.com.ferbo.manager.egresos;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
+import mx.com.ferbo.business.egresos.EgresoBaseBL;
 import mx.com.ferbo.business.egresos.PagoEgresoBL;
+import mx.com.ferbo.model.categresos.StatusPagoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.model.egresos.PagoEgreso;
-import mx.com.ferbo.util.InventarioException;
 
-public class PagoEgresoMGR {
+public class PagoEgresoMGR extends EgresoBaseMGR <PagoEgreso, ImporteEgreso, StatusPagoEgreso>{
 
     @Inject
-    private PagoEgresoBL pagoBl;
+    private PagoEgresoBL pagoBL;
 
-    public PagoEgreso nuevoOExistente(PagoEgreso pago) {
-        if (pago.getId() ==  null) {
-            
-        }
+    @Override
+    protected EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPagoEgreso> getBL() {
+        return pagoBL;
     }
 
-    public String guardar(PagoEgreso pago, ImporteEgreso egreso) throws InventarioException {
-        return pagoBl.operar(pago, egreso);
+    @Override
+    protected Integer getId(PagoEgreso entity) {
+        return entity.getId();
     }
 
-    public List<PagoEgreso> obtenerLista(ImporteEgreso egreso) throws InventarioException {
-        return pagoBl.obtenerPorImporteEgreso(egreso);
-    }
-    
 }

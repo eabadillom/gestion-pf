@@ -14,7 +14,7 @@ import mx.com.ferbo.model.categresos.StatusCargoEgreso;
 import mx.com.ferbo.model.egresos.CargoEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.FacesUtils;
+import mx.com.ferbo.util.ValidationUtils;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,17 +66,17 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     }
 
     @Override
-    protected String nombreHijo() {
+    public String nombreHijo() {
         return "el cargo";
     }
 
     @Override
-    protected String nombreHijos() {
+    public String nombreHijos() {
         return "los cargos";
     }
     
      @Override
-    protected String nombreCatalogo() {
+    public String nombreCatalogo() {
         return "el status";
     }
 
@@ -119,8 +119,8 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
     
     @Override
     protected void antesDeCambiar(CargoEgreso cargo, StatusCargoEgreso status) throws InventarioException {
-        FacesUtils.requireNonNull(cargo, "El cargo al egreso no puede ser vacía");
-        FacesUtils.requireNonNull(status, "El nuevo status para el cargo no puede ser vacío.");
+        ValidationUtils.requireNonNull(cargo, "El cargo al egreso no puede ser vacía");
+        ValidationUtils.requireNonNull(status, "El nuevo status para el cargo no puede ser vacío.");
 
         maquinaStatus.cambiarStatus(cargo, status);
     }
@@ -175,4 +175,8 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
         return BigDecimal.ZERO;
     } 
 
-}
+    @Override
+    protected StatusCargoEgreso statusInicial() {
+        return pendiente;
+    }
+}   

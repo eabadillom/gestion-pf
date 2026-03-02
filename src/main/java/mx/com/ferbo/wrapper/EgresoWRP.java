@@ -2,25 +2,15 @@ package mx.com.ferbo.wrapper;
 
 import java.util.List;
 
-import mx.com.ferbo.model.categresos.CatConceptoEgreso;
-import mx.com.ferbo.model.categresos.CategoriaEgreso;
-import mx.com.ferbo.model.categresos.TipoEgreso;
+import mx.com.ferbo.model.egresos.ActivoFijo;
+import mx.com.ferbo.model.egresos.AsignacionEgreso;
 import mx.com.ferbo.model.egresos.CargoEgreso;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.model.egresos.DevolucionEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
 import mx.com.ferbo.model.egresos.PagoEgreso;
 
-public class EgresoWrapper {
-    
-    private CatConceptoEgreso catConcepctoSelected;
-    private List<CatConceptoEgreso> lstCatConceptos;
-    
-    private CategoriaEgreso categoriaSelected;
-    private List<CategoriaEgreso> lstCategorias;
-
-    private TipoEgreso tipoSelected;
-    private List<TipoEgreso> lstTipos;
+public class EgresoWRP {
 
     private ConceptoEgreso conceptoSelected;
 
@@ -36,42 +26,11 @@ public class EgresoWrapper {
     private CargoEgreso cargoSelected;
     private List<CargoEgreso> lstCargos;
 
-    public CatConceptoEgreso getCatConcepctoSelected() {
-        return catConcepctoSelected;
-    }
-    public void setCatConcepctoSelected(CatConceptoEgreso catConcepctoSelected) {
-        this.catConcepctoSelected = catConcepctoSelected;
-    }
-    public List<CatConceptoEgreso> getLstCatConceptos() {
-        return lstCatConceptos;
-    }
-    public void setLstCatConceptos(List<CatConceptoEgreso> lstCatConceptos) {
-        this.lstCatConceptos = lstCatConceptos;
-    }
-    public CategoriaEgreso getCategoriaSelected() {
-        return categoriaSelected;
-    }
-    public void setCategoriaSelected(CategoriaEgreso categoriaSelected) {
-        this.categoriaSelected = categoriaSelected;
-    }
-    public List<CategoriaEgreso> getLstCategorias() {
-        return lstCategorias;
-    }
-    public void setLstCategorias(List<CategoriaEgreso> lstCategorias) {
-        this.lstCategorias = lstCategorias;
-    }
-    public TipoEgreso getTipoSelected() {
-        return tipoSelected;
-    }
-    public void setTipoSelected(TipoEgreso tipoSelected) {
-        this.tipoSelected = tipoSelected;
-    }
-    public List<TipoEgreso> getLstTipos() {
-        return lstTipos;
-    }
-    public void setLstTipos(List<TipoEgreso> lstTipos) {
-        this.lstTipos = lstTipos;
-    }
+    private AsignacionEgreso asignacionSelected;
+    private List<AsignacionEgreso> lstAsignaciones;
+
+    private ActivoFijo activoFijoSelected;
+
     public ConceptoEgreso getConceptoSelected() {
         return conceptoSelected;
     }
@@ -125,6 +84,24 @@ public class EgresoWrapper {
     }
     public void setLstCargos(List<CargoEgreso> lstCargos) {
         this.lstCargos = lstCargos;
+    }
+    public AsignacionEgreso getAsignacionSelected() {
+        return asignacionSelected;
+    }
+    public void setAsignacionSelected(AsignacionEgreso asignacionSelected) {
+        this.asignacionSelected = asignacionSelected;
+    }
+    public List<AsignacionEgreso> getLstAsignaciones() {
+        return lstAsignaciones;
+    }
+    public void setLstAsignaciones(List<AsignacionEgreso> lstAsignaciones) {
+        this.lstAsignaciones = lstAsignaciones;
+    }
+    public ActivoFijo getActivoFijoSelected() {
+        return activoFijoSelected;
+    }
+    public void setActivoFijoSelected(ActivoFijo activoFijoSelected) {
+        this.activoFijoSelected = activoFijoSelected;
     }
 
     

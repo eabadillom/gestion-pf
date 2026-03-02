@@ -9,6 +9,8 @@ import mx.com.ferbo.model.categresos.CatConceptoEgreso;
 import mx.com.ferbo.model.categresos.StatusEgreso;
 import mx.com.ferbo.model.egresos.ConceptoEgreso;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.ValidationUtils;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,17 +33,17 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
     }
 
     @Override
-    protected String nombreHijo() {
+    public String nombreHijo() {
         return "el concepto del egreso";
     }
 
     @Override
-    protected String nombreHijos() {
+    public String nombreHijos() {
         return "los concepto de egresos";
     }
 
     @Override
-    protected String nombreCatalogo() {
+    public String nombreCatalogo() {
         return "el status";
     }
 
@@ -59,15 +61,18 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
             throw new InventarioException("No se tiene la información si el egreso es deducible por CFDI o no.");
         }
 
-        if (concepto.getEsDeducible() && concepto.getRequiereCFDI() && (concepto.getCfdiUUID() == null || "".equalsIgnoreCase(concepto.getCfdiUUID()))) {
+        if (concepto.getEsDeducible() && concepto.getRequiereCFDI()
+                && (concepto.getCfdiUUID() == null || "".equalsIgnoreCase(concepto.getCfdiUUID()))) {
             throw new InventarioException("No se tiene la información de CFDI UUID.");
         }
 
-        if (!concepto.getEsDeducible() && concepto.getRequiereCFDI() && (concepto.getCfdiUUID() == null || "".equalsIgnoreCase(concepto.getCfdiUUID()))) {
+        if (!concepto.getEsDeducible() && concepto.getRequiereCFDI()
+                && (concepto.getCfdiUUID() == null || "".equalsIgnoreCase(concepto.getCfdiUUID()))) {
             throw new InventarioException("No se tiene la información de CFDI UUID.");
         }
 
-        if (!concepto.getEsDeducible() && (concepto.getNoDeducible() == null || "".equalsIgnoreCase(concepto.getNoDeducible()))) {
+        if (!concepto.getEsDeducible()
+                && (concepto.getNoDeducible() == null || "".equalsIgnoreCase(concepto.getNoDeducible()))) {
             throw new InventarioException("No se tiene la información de porque el egreso no es deducible.");
         }
 
@@ -91,7 +96,8 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
             throw new InventarioException("No se tiene la información si es activo fijo o no");
         }
 
-        if (concepto.getTotalConceptoEgreso() == null || concepto.getTotalConceptoEgreso().compareTo(BigDecimal.ZERO) <= 0) {
+        if (concepto.getTotalConceptoEgreso() == null
+                || concepto.getTotalConceptoEgreso().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InventarioException("No se tiene un total esperado para el egreso.");
         }
     }
@@ -109,8 +115,11 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
     protected void antesDeCambiar(ConceptoEgreso son, StatusEgreso catalog) throws InventarioException {
         // Método sin implementar porque no se reqioere en el proceso
     }
-    
-    public void extraerDeCatalogo(ConceptoEgreso concepto, CatConceptoEgreso catConcepto) {
+
+    public void extraerDeCatalogo(ConceptoEgreso concepto, CatConceptoEgreso catConcepto) throws InventarioException {
+
+        ValidationUtils.requireNonNull(concepto, "El concepto del egreso no puede ser vacío.");
+        ValidationUtils.requireNonNull(catConcepto, "El concepto del catalogo no puede ser vacío.");
 
         concepto.setEsDeducible(catConcepto.getEsDeducible());
         concepto.setRequiereCFDI(catConcepto.getRequiereCFDI());
@@ -120,5 +129,11 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
         concepto.setPorcentajeIEPS(catConcepto.getPorcentajeIEPS());
         concepto.setEsActivoFijo(catConcepto.getEsActivoFijo());
 
+    }
+
+    @Override
+    protected StatusEgreso statusInicial() {
+        // No se utiliza en esta clase; retorna objeto vacío para cumplir contrato
+        return new StatusEgreso();
     }
 }

@@ -1,24 +1,26 @@
 package mx.com.ferbo.manager.egresos;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import mx.com.ferbo.business.egresos.ActivoFijoBL;
+import mx.com.ferbo.business.egresos.EgresoBaseBL;
+import mx.com.ferbo.model.categresos.StatusActivoFijo;
 import mx.com.ferbo.model.egresos.ActivoFijo;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
-import mx.com.ferbo.util.InventarioException;
 
-public class ActivoFijoMGR {
+public class ActivoFijoMGR extends EgresoBaseMGR<ActivoFijo, ImporteEgreso, StatusActivoFijo>{
 
     @Inject
     private ActivoFijoBL activoBL;
 
-    public String guardar(ActivoFijo activo, ImporteEgreso egreso) throws InventarioException {
-        return activoBL.operar(activo, egreso);
+    @Override
+    protected EgresoBaseBL<ActivoFijo, ImporteEgreso, StatusActivoFijo> getBL() {
+        return activoBL;
     }
 
-    public List<ActivoFijo> obtenerLista(ImporteEgreso egreso) throws InventarioException {
-        return activoBL.obtenerPorImporteEgreso(egreso);
+    @Override
+    protected Integer getId(ActivoFijo entity) {
+        return entity.getId();
     }
+
 }

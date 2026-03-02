@@ -62,12 +62,12 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     }
 
     @Override
-    protected String nombreHijo() {
+    public String nombreHijo() {
         return "el pago";
     }
 
     @Override
-    protected String nombreHijos() {
+    public String nombreHijos() {
         return "los pagos";
     }
 
@@ -134,12 +134,17 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     }
 
     @Override
-    protected String nombreCatalogo() {
+    public String nombreCatalogo() {
         return "el status";
     }
 
     public StatusPagoEgreso aplicable() throws InventarioException {
         return pagado;
+    }
+
+    @Override
+    protected StatusPagoEgreso statusInicial() {
+        return pendiente;
     }
 
 }

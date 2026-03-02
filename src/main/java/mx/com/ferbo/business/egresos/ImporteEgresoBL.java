@@ -28,7 +28,7 @@ import mx.com.ferbo.model.egresos.PagoEgreso;
 import mx.com.ferbo.model.empresa.NEmisoresCFDIS;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.FacesUtils;
+import mx.com.ferbo.util.ValidationUtils;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -51,8 +51,10 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     @Inject
     private StatusEgresoBL statusBL;
-    
+
     MaquinaStatusEgreso maquinaStatus;
+
+    private static final BigDecimal CIEN = new BigDecimal("100");
 
     private final String STATUS_BORRADOR = "BORRADOR";
     private final String STATUS_REGISTRADO = "REGISTRADO";
@@ -80,7 +82,8 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
             cancelado = statusBL.buscarPorNombre(STATUS_CANCELADO);
             excedente = statusBL.buscarPorNombre(STATUS_EXCEDENTE);
             por_conciliar = statusBL.buscarPorNombre(STATUS_POR_CONCILIAR);
-            maquinaStatus = new MaquinaStatusEgreso(borrador, registrado, parcial, pagado, cancelado, excedente, por_conciliar);
+            maquinaStatus = new MaquinaStatusEgreso(borrador, registrado, parcial, pagado, cancelado, excedente,
+                    por_conciliar);
         } catch (InventarioException ex) {
             log.error("Error inicializando máquina de estados", ex);
             throw new RuntimeException("Error crítico de configuración del sistema.", ex);
@@ -93,12 +96,12 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     }
 
     @Override
-    protected String nombreHijo() {
+    public String nombreHijo() {
         return "el importe de egreso";
     }
 
     @Override
-    protected String nombreHijos() {
+    public String nombreHijos() {
         return "los importe de egresos";
     }
 
@@ -108,7 +111,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     }
 
     @Override
-    protected String nombreCatalogo() {
+    public String nombreCatalogo() {
         return "el status";
     }
 
@@ -145,25 +148,28 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     @Override
     protected void antesDeCambiar(ImporteEgreso importe, StatusEgreso status) throws InventarioException {
-        
-        FacesUtils.requireNonNull(importe, "El egreso no puede ser vacío.");
-        FacesUtils.requireNonNull(status, "El nuevo status para el egreso no puede ser vacío.");
-        
+
+        ValidationUtils.requireNonNull(importe, "El egreso no puede ser vacío.");
+        ValidationUtils.requireNonNull(status, "El nuevo status para el egreso no puede ser vacío.");
+
         maquinaStatus.cambiarStatus(importe, status);
 
     }
 
-    public StatusEgreso estadoBorrador() {
+    @Override
+    protected StatusEgreso statusInicial() {
         return borrador;
     }
 
-    public ImporteEgreso obtenerPorId(Integer id) {
-        try {
-            return dao.buscarPorId(id).orElseThrow(() -> new DAOException("Hubo un problema al buscar un egreso con id: " + id));
-        } catch (DAOException ex) {
-            log.error("Hubo un problema al obtener algun egreso con id: {}. {}", id, ex);
-            return new ImporteEgreso();
+    public ImporteEgreso nuevoOExistente(Integer id) throws InventarioException {
+        ImporteEgreso egreso;
+        if (id == null) {
+            egreso = nuevo();
+            egreso.setStatus(statusInicial());
+            return egreso;
         }
+        return dao.buscarPorId(id).orElseThrow(
+                () -> new InventarioException("No se enecontro ningun egreso asociado con el identificador: " + id));
     }
 
     public List<ImporteEgreso> obtenerPorFiltros(
@@ -195,8 +201,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
                     inicio,
                     fin,
                     idConcepto,
-                    idEmisor
-            );
+                    idEmisor);
 
         } catch (DAOException ex) {
 
@@ -207,9 +212,44 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
                     : "con concepto " + concepto.getNombre();
 
             throw new InventarioException(
-                    "Hubo un problema al obtener los egresos " + detalle
-            );
+                    "Hubo un problema al obtener los egresos " + detalle);
         }
+    }
+
+    public ImporteEgreso desglosarIvaIeps(ImporteEgreso egreso) throws InventarioException {
+
+        if (egreso == null || egreso.getConceptoEgreso() == null
+                || egreso.getConceptoEgreso().getTotalConceptoEgreso() == null) {
+            throw new InventarioException("Datos insuficientes para desglosar impuestos.");
+        }
+
+        BigDecimal total = egreso.getConceptoEgreso().getTotalConceptoEgreso();
+
+        BigDecimal porcentajeIEPS = egreso.getConceptoEgreso().getPorcentajeIEPS() != null
+                ? egreso.getConceptoEgreso().getPorcentajeIEPS()
+                : BigDecimal.ZERO;
+        BigDecimal porcentajeIVA = egreso.getConceptoEgreso().getPorcentajeIVA() != null
+                ? egreso.getConceptoEgreso().getPorcentajeIVA()
+                : BigDecimal.ZERO;
+
+        BigDecimal tasaIEPS = porcentajeIEPS.divide(CIEN, 6, RoundingMode.HALF_UP);
+        BigDecimal tasaIVA = porcentajeIVA.divide(CIEN, 6, RoundingMode.HALF_UP);
+
+        // Factor combinado
+        BigDecimal factor = BigDecimal.ONE.add(tasaIEPS).multiply(BigDecimal.ONE.add(tasaIVA));
+
+        // Calculamos la base
+        BigDecimal base = total.divide(factor, 6, RoundingMode.HALF_UP);
+
+        // Calculamos cada impuesto
+        BigDecimal ieps = base.multiply(tasaIEPS);
+        BigDecimal iva = base.add(ieps).multiply(tasaIVA);
+
+        // Guardamos en el objeto egreso
+        egreso.setIeps(ieps.setScale(2, RoundingMode.HALF_UP));
+        egreso.setIva(iva.setScale(2, RoundingMode.HALF_UP));
+
+        return egreso;
     }
 
     public void procesarSubTotalEgreso(ImporteEgreso importe) throws InventarioException {
@@ -244,7 +284,8 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     public void procesarTotalEgreso(ImporteEgreso importe) throws InventarioException {
 
         List<CargoEgreso> cargos = cargoBL.obtenerPorImporteEgresoYStatus(importe, cargoBL.aplicable());
-        List<DevolucionEgreso> devoluciones = devolucionBL.obtenerPorImporteEgresoYStatus(importe, devolucionBL.aplicable());
+        List<DevolucionEgreso> devoluciones = devolucionBL.obtenerPorImporteEgresoYStatus(importe,
+                devolucionBL.aplicable());
 
         BigDecimal subtotal = importe.getSubTotal();
         BigDecimal total = subtotal;
@@ -264,7 +305,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
         int comparacion = total.compareTo(importe.getConceptoEgreso().getTotalConceptoEgreso());
 
         StatusEgreso status = importe.getStatus();
-        
+
         if (comparacion == 0) {
             status = pagado;
         }

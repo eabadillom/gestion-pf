@@ -69,17 +69,17 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
     }
 
     @Override
-    protected String nombreHijo() {
+    public String nombreHijo() {
         return "la devolución del pago";
     }
 
     @Override
-    protected String nombreHijos() {
+    public String nombreHijos() {
         return "las devoluciones del pago";
     }
 
     @Override
-    protected String nombreCatalogo() {
+    public String nombreCatalogo() {
         return "el status";
     }
 
@@ -138,6 +138,11 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
 
     public StatusDevolucionEgreso aplicable() throws InventarioException {
         return autorizada;
+    }
+
+    @Override
+    protected StatusDevolucionEgreso statusInicial() {
+        return registrada;
     }
 
 }

@@ -2,9 +2,12 @@ package mx.com.ferbo.business.egresos;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import mx.com.ferbo.dao.egresos.AsignacionEgresoDAO;
 import mx.com.ferbo.model.categresos.TipoAsignacionEgreso;
 import mx.com.ferbo.model.egresos.AsignacionEgreso;
@@ -30,17 +33,17 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
     }
 
     @Override
-    protected String nombreHijo() {
+    public String nombreHijo() {
         return "la asignación";
     }
 
     @Override
-    protected String nombreHijos() {
+    public String nombreHijos() {
         return "las asignaciones";
     }
 
     @Override
-    protected String nombreCatalogo() {
+    public String nombreCatalogo() {
         return "el tipo";
     }
 
@@ -67,34 +70,44 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
     @Override
     protected void antesDeGuardar(AsignacionEgreso asignacion, ImporteEgreso importe) throws InventarioException {
 
-        if (asignacion.getImporteEgreso() == null) {
+        Date hoy = new Date();
+
+        if (asignacion.getId() == null) {
             asignacion.setImporteEgreso(importe);
+            asignacion.setFechaAlta(hoy);
         }
 
+        asignacion.setFechaModificacion(hoy);
     }
 
     @Override
-    protected void antesDeCambiar(AsignacionEgreso entity, TipoAsignacionEgreso catalog) throws InventarioException {
-        entity.setTipoAsignacion(catalog);
+    protected void antesDeCambiar(AsignacionEgreso asingacion, TipoAsignacionEgreso Tipo) throws InventarioException {
+       // Méotodo sin implementar para que compla el contrato
     }
 
-    public BigDecimal calcularImporte(ImporteEgreso entity,
+    public BigDecimal calcularImporte(ImporteEgreso egreso,
             AsignacionEgreso asignacion)
             throws InventarioException {
 
-        if (entity == null
+        if (egreso == null
                 || asignacion == null
-                || entity.getConceptoEgreso() == null
-                || entity.getConceptoEgreso().getTotalConceptoEgreso() == null
+                || egreso.getConceptoEgreso() == null
+                || egreso.getConceptoEgreso().getTotalConceptoEgreso() == null
                 || asignacion.getPorcentaje() == null) {
 
             throw new InventarioException("Datos insuficientes para calcular el importe.");
         }
 
-        return entity.getConceptoEgreso()
+        return egreso.getConceptoEgreso()
                 .getTotalConceptoEgreso()
                 .multiply(asignacion.getPorcentaje())
                 .divide(CIEN, 2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    protected TipoAsignacionEgreso statusInicial() {
+        // No se utiliza en esta clase; retorna objeto vacío para cumplir contrato
+        return new TipoAsignacionEgreso();
     }
 
 }

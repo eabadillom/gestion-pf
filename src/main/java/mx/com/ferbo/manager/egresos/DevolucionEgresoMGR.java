@@ -1,25 +1,27 @@
 package mx.com.ferbo.manager.egresos;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import mx.com.ferbo.business.egresos.DevolucionEgresoBL;
+import mx.com.ferbo.business.egresos.EgresoBaseBL;
+import mx.com.ferbo.model.categresos.StatusDevolucionEgreso;
 import mx.com.ferbo.model.egresos.DevolucionEgreso;
 import mx.com.ferbo.model.egresos.ImporteEgreso;
-import mx.com.ferbo.util.InventarioException;
 
-public class DevolucionEgresoMGR {
+public class DevolucionEgresoMGR extends EgresoBaseMGR <DevolucionEgreso, ImporteEgreso, StatusDevolucionEgreso>{
 
     @Inject
     private DevolucionEgresoBL devolucionBL;
 
-    public String guardar(DevolucionEgreso devolucion, ImporteEgreso egreso) throws InventarioException { 
-        return devolucionBL.operar(devolucion, egreso);
+    @Override
+    protected EgresoBaseBL<DevolucionEgreso, ImporteEgreso, StatusDevolucionEgreso> getBL() {
+        return devolucionBL;
     }
 
-    public List<DevolucionEgreso> obtenerLista(ImporteEgreso egreso) throws InventarioException{
-        return devolucionBL.obtenerPorImporteEgreso(egreso);
+    @Override
+    protected Integer getId(DevolucionEgreso entity) {
+        return entity.getId();
     }
 
+    
 }
