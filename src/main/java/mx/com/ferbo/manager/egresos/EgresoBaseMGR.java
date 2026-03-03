@@ -11,7 +11,7 @@ public abstract class EgresoBaseMGR  <T extends Egreso ,P extends Egreso, S exte
     
     protected abstract EgresoBaseBL<T, P, S> getBL();
 
-    public String cargar(T entity) {
+    public String[] cargar(T entity) {
         entity = getBL().nuevoOExistente(entity);
 
         String mensaje;
@@ -20,31 +20,35 @@ public abstract class EgresoBaseMGR  <T extends Egreso ,P extends Egreso, S exte
         } else {
             mensaje = getBL().nombreHijo() + " se ha cargado para edición";
         }
-        return mensaje;
+        return new String[]{"Cargar " + getBL().nombreHijo(), mensaje};
     }
 
-    public String guardar(T entity, P padre) throws InventarioException {
+    public String[] guardar(T entity, P padre) throws InventarioException {
         boolean esNuevo = (getId(entity) == null);
         getBL().operar(entity, padre);
-
+        String mensaje;
         if (esNuevo) {
-            return getBL().nombreHijo() + " del egreso se guardó correctamente";
+            mensaje = getBL().nombreHijo() + " del egreso se guardó correctamente";
         } else {
-            return getBL().nombreHijo() + " del egreso se actualizó correctamente";
+            mensaje = getBL().nombreHijo() + " del egreso se actualizó correctamente";
         }
+        return new String[] {"Guardar/Actualizar " + getBL().nombreHijo(), mensaje};
     }
 
-    public String obtenerLista(P padre, List<T> lista) throws InventarioException {
+    public String[] obtenerLista(P padre, List<T> lista) throws InventarioException {
         List<T> nuevaLista = getBL().obtenerPorImporteEgreso(padre);
         lista.clear();
         lista.addAll(nuevaLista);
 
-        return "Se han cargado satisfactoriamente " + getBL().nombreHijos();
+        String mensaje = "Se han cargado satisfactoriamente " + getBL().nombreHijos();
+
+        return new String[]{"Cargar " + getBL().nombreHijos(), mensaje} ;
     }
 
-    public String cambiarStatus(T entity, S status) throws InventarioException {
+    public String [] cambiarStatus(T entity, S status) throws InventarioException {
         entity = getBL().cambiar(entity, status);
-        return "El status de " + getBL().nombreHijo() + " se actualizó correctamente";
+        String mensaje = "El status de " + getBL().nombreHijo() + " se actualizó correctamente";
+        return new String[] {"Cambiar status de " + getBL().nombreHijo(), mensaje};
     }
 
     // Método para obtener ID de T (puede ser abstracto o usar reflection según convenga)
