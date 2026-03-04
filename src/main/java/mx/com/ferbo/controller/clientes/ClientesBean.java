@@ -29,6 +29,8 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.modulos.pagos.bussines.MedioPagoBL;
+import mx.com.ferbo.modulos.pagos.bussines.MetodoPagoBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,8 +44,6 @@ import mx.com.ferbo.business.n.ClienteContactoBL;
 import mx.com.ferbo.business.n.DomiciliosBL;
 import mx.com.ferbo.business.n.FiscalBL;
 import mx.com.ferbo.business.n.MedioContactoBL;
-import mx.com.ferbo.business.n.MedioPagoBL;
-import mx.com.ferbo.business.n.MetodoPagoBL;
 import mx.com.ferbo.business.n.PlantaBL;
 import mx.com.ferbo.business.n.PrecioServicioBL;
 import mx.com.ferbo.business.n.SeguridadBL;
@@ -194,8 +194,8 @@ public class ClientesBean implements Serializable {
             this.usuario = (Usuario) request.getSession(false).getAttribute("usuario");
             log.info("El usuario {} ingresa al catálogo de clientes.", usuario.getUsuario());
             this.lstClientes = clienteBL.obtenerTodos();
-            this.lstMedioPago = medioPagoBL.obtenerMediosPago();
-            this.lstMetodoPago = metodoPagoBL.obtenerMetodosPago();
+            this.lstMedioPago = medioPagoBL.obtenerVigentes();
+            this.lstMetodoPago = metodoPagoBL.obtenerVigentes();
             this.lstTipoMail = medioContactoBL.obtenerTiposMail();
             this.lstTipoTelefono = medioContactoBL.obtenerTiposTelefono();
             this.lstServicio = servicioBL.obtenerServicios();
