@@ -1,27 +1,27 @@
 package mx.com.ferbo.modulos.egresos.manager.egresos;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
-import mx.com.ferbo.modulos.egresos.business.EgresoBaseBL;
 import mx.com.ferbo.modulos.egresos.business.egreso.ActivoFijoBL;
-import mx.com.ferbo.modulos.egresos.manager.EgresoBaseMGR;
-import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusActivoFijo;
 import mx.com.ferbo.modulos.egresos.model.egreso.ActivoFijo;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
+import mx.com.ferbo.util.BaseMGR;
+import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.ResultadoOperacion;
 
-public class ActivoFijoMGR extends EgresoBaseMGR<ActivoFijo, ImporteEgreso, StatusActivoFijo>{
+public class ActivoFijoMGR implements BaseMGR {
 
     @Inject
     private ActivoFijoBL activoBL;
 
-    @Override
-    protected EgresoBaseBL<ActivoFijo, ImporteEgreso, StatusActivoFijo> getBL() {
-        return activoBL;
+    public ResultadoOperacion obtnerPorImporteEgreso(ImporteEgreso importeEgreso, List<ActivoFijo> lst)
+            throws InventarioException {
+        return BaseMGR.super.cargar(
+                lst,
+                () -> activoBL.obtenerPorImporteEgreso(importeEgreso),
+                "Cargar activos fijo de egreso",
+                "Se han cargado exitosamente los avtibos fijos.");
     }
-
-    @Override
-    protected Integer getId(ActivoFijo entity) {
-        return entity.getId();
-    }
-
 }

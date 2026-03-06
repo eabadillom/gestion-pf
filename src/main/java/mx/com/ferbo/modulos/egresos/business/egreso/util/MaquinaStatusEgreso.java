@@ -6,7 +6,6 @@ import java.util.Set;
 
 import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
-import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.MaquinaStatusBase;
 import mx.com.ferbo.util.SetUtils;
 
@@ -22,10 +21,10 @@ public class MaquinaStatusEgreso {
     private final StatusEgreso EXCEDENTE;
     private final StatusEgreso POR_CONCILIAR;
 
-    public MaquinaStatusEgreso(StatusEgreso borrador, StatusEgreso registrado, 
-                               StatusEgreso parcial, StatusEgreso pagado, 
-                               StatusEgreso cancelado, StatusEgreso excedente, 
-                               StatusEgreso por_conciliar ) {
+    public MaquinaStatusEgreso(StatusEgreso borrador, StatusEgreso registrado,
+            StatusEgreso parcial, StatusEgreso pagado,
+            StatusEgreso cancelado, StatusEgreso excedente,
+            StatusEgreso por_conciliar) {
 
         this.BORRADOR = borrador;
         this.REGISTRADO = registrado;
@@ -34,7 +33,7 @@ public class MaquinaStatusEgreso {
         this.CANCELADO = cancelado;
         this.EXCEDENTE = excedente;
         this.POR_CONCILIAR = por_conciliar;
-                            
+
         Map<StatusEgreso, Set<StatusEgreso>> transiciones = new HashMap<StatusEgreso, Set<StatusEgreso>>();
 
         transiciones.put(BORRADOR, SetUtils.setOf(REGISTRADO, CANCELADO));
@@ -49,15 +48,12 @@ public class MaquinaStatusEgreso {
     }
 
     /*
-        Valida antes de hacer el cambio de Status.
+     * Valida antes de hacer el cambio de Status.
      */
-    public void cambiarStatus(ImporteEgreso importe, StatusEgreso nuevo) throws InventarioException {
-        StatusEgreso actual = importe.getStatus();
-        try {
-            maquinaStatus.validarTransicion(actual, nuevo);
-        } catch (IllegalStateException ex) {
-            throw new InventarioException("No se puede cambiar el egreso del status " + actual.getNombre() + " al status " + nuevo.getNombre());
-        }
-        importe.setStatus(nuevo);
+    public void cambiarStatus(ImporteEgreso egreso, StatusEgreso nuevo) {
+        maquinaStatus.conTransicionValida(
+                egreso.getStatus(),
+                nuevo,
+                () -> egreso.setStatus(nuevo));
     }
 }

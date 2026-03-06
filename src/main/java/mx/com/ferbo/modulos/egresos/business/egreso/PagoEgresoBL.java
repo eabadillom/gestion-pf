@@ -12,14 +12,17 @@ import mx.com.ferbo.modulos.egresos.dao.egreso.PagoEgresoDAO;
 import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusPagoEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.PagoEgreso;
-import mx.com.ferbo.util.FacesUtils;
+import mx.com.ferbo.util.BaseBL;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.ValidationUtils;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPagoEgreso> {
+public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, StatusPagoEgreso>
+        implements BaseBL<PagoEgreso> {
 
     private static final Logger log = LogManager.getLogger(PagoEgresoBL.class);
 
@@ -45,17 +48,23 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
 
     public PagoEgresoBL() {
         try {
-            setDao(dao);
-            pendiente = statusBL.buscarPorNombre(STATUS_PENDIENTE);
-            pagado = statusBL.buscarPorNombre(STATUS_PAGADO);
-            parcial = statusBL.buscarPorNombre(STATUS_PARCIAL);
-            cancelado = statusBL.buscarPorNombre(STATUS_CANCELADO);
-            vencido = statusBL.buscarPorNombre(STATUS_VENCIDO);
-            maquinaStatus = new MaquinaStatusPago(pendiente, pagado, parcial, cancelado, vencido);
+            construirMaquinaStatus();
         } catch (InventarioException ex) {
             log.error("Error inicializando máquina de estados", ex);
             throw new RuntimeException("Error crítico de configuración del sistema.", ex);
         }
+    }
+
+    @Override
+    protected void construirMaquinaStatus() throws InventarioException {
+        log.info("Inicia proceso de la construccion de la maquina de status para pago.");
+        pendiente = statusBL.buscarPorNombre(STATUS_PENDIENTE);
+        pagado = statusBL.buscarPorNombre(STATUS_PAGADO);
+        parcial = statusBL.buscarPorNombre(STATUS_PARCIAL);
+        cancelado = statusBL.buscarPorNombre(STATUS_CANCELADO);
+        vencido = statusBL.buscarPorNombre(STATUS_VENCIDO);
+        maquinaStatus = new MaquinaStatusPago(pendiente, pagado, parcial, cancelado, vencido);
+        log.info("Finaliza proceso de la construccion de la maquina de status para pago.");
     }
 
     @Override
@@ -64,55 +73,39 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
     }
 
     @Override
-    public String nombreHijo() {
-        return "el pago";
+    protected String nombreCatalogo() {
+        return "el status de pago";
     }
 
     @Override
-    public String nombreHijos() {
-        return "los pagos";
+    protected String nombreHijo() {
+        return "pago de egreso";
     }
 
     @Override
-    protected void validar(PagoEgreso pago) throws InventarioException {
-        if (pago == null) {
-            throw new InventarioException("El pago no puede ser vacío");
-        }
+    protected String nombreHijos() {
+        return "pagos de egreso";
+    }
 
-        if (pago.getImporteEgreso() == null) {
-            throw new InventarioException("El pago no tiene asociado un egreso.");
-        }
+    private void validarPagoEgreso(PagoEgreso pago) throws InventarioException {
 
-        if (pago.getFechaAlta() == null) {
-            throw new InventarioException("El pago no tiene una fecha de alta asignada.");
-        }
+        ValidationUtils.requireNonNull(pago, "El pago no puede ser vacío");
 
-        if (pago.getFechaLimite() == null) {
-            throw new InventarioException("El pago no tiene una fecha limite para el pago");
-        }
+        ValidationUtils.requireNonNull(pago.getImporteEgreso(), "El pago no tiene asociado un egreso.");
 
-        if (pago.getImporte() == null) {
-            throw new InventarioException("El pago no tiene un importe.");
-        }
+        ValidationUtils.requireNonNull(pago.getFechaAlta(), "El pago no tiene una fecha de alta asignada.");
 
-        if (pago.getStatus() == null) {
-            throw new InventarioException("El pago no tiene asociado un status.");
-        }
+        ValidationUtils.requireNonNull(pago.getFechaLimite(), "El pago no tiene una fecha limite de liquidacion");
 
-        if (pago.getStatus().getNombre().equalsIgnoreCase("PAGADO")) {
-            if (pago.getFechaPago() == null) {
-                throw new InventarioException("El pago no tiene una fecha de cuando se realizo.");
-            }
+        ValidationUtils.requireNonNull(pago.getFechaModificacion(), "El pago no tiene una fecha de modificación.");
 
-            if ("".equalsIgnoreCase(pago.getReferencia())) {
-                throw new InventarioException("El pago no tiene ninguna referencia.");
-            }
-        }
+        ValidationUtils.requireNonNull(pago.getImporte(), "El pago no tiene un importe.");
+
+        ValidationUtils.requireNonNull(pago.getStatus(), "El pago no tiene asociado un status.");
 
     }
 
-    @Override
-    protected void antesDeGuardar(PagoEgreso pago, ImporteEgreso importe) throws InventarioException {
+    private void asgingarAntesDeGuardar(PagoEgreso pago, ImporteEgreso importe) throws InventarioException {
 
         Date hoy = new Date();
 
@@ -125,28 +118,31 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
         pago.setFechaModificacion(hoy);
     }
 
-    @Override
-    public void antesDeCambiar(PagoEgreso pago, StatusPagoEgreso status) throws InventarioException {
+    private void asignarStatus(PagoEgreso pago, StatusPagoEgreso status) throws InventarioException {
 
-        FacesUtils.requireNonNull(pago, "El pago del egreso no puede ser vacío.");
-        FacesUtils.requireNonNull(status, "El nuevo status del pago no puede ser vacío.");
+        super.validarHijoYStatus(pago, status);
+        ValidationUtils.requireNonNull(pago.getStatus(), "El status del pago no puede ser vacío.");
 
-        maquinaStatus.cambiarStatus(pago, status);
+        log.info("Inicia proceso para cambiar {}: {} a {}.", nombreCatalogo(),pago.getStatus().getNombre(),
+                status.getNombre());
+
+        ejecutar(
+                () -> maquinaStatus.cambiarStatus(pago, status),
+                "cambiar " + nombreCatalogo());
+
+        log.info("Finaliza procesao para cambiar {}.", nombreCatalogo());
 
     }
 
-    @Override
-    public String nombreCatalogo() {
-        return "el status";
+    public PagoEgreso obtenerPagoEgreso(PagoEgreso pago) {
+        return BaseBL.super.nuevoOExistente(pago);
     }
 
-    public StatusPagoEgreso aplicable() throws InventarioException {
-        return pagado;
-    }
+    public void guardarPagoEgreso(ImporteEgreso egreso, PagoEgreso pago){
 
-    @Override
-    protected StatusPagoEgreso statusInicial() {
-        return pendiente;
+
+        
+
     }
 
 }

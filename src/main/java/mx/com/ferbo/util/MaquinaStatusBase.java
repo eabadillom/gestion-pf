@@ -12,10 +12,15 @@ public class MaquinaStatusBase<T> {
         this.transiciones = transiciones;
     }
 
-    public void validarTransicion(T actual, T nuevo) {
-        Set<T> posibles = transiciones.getOrDefault(actual, Collections.<T>emptySet());
+    public void conTransicionValida(T actual, T nuevo, Runnable accion) {
+
+        Set<T> posibles = transiciones.getOrDefault(actual, Collections.emptySet());
+
         if (!posibles.contains(nuevo)) {
-            throw new IllegalStateException("No se puede cambiar de " + actual + " a " + nuevo );
+            throw new IllegalStateException(
+                    "No se puede cambiar de " + actual + " a " + nuevo);
         }
+
+        accion.run();
     }
 }

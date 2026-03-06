@@ -6,9 +6,9 @@ import mx.com.ferbo.util.funcional.ThrowingConsumer;
 import mx.com.ferbo.util.funcional.ThrowingSupplier;
 import mx.com.ferbo.util.funcional.ThrowingRunnable;
 
-public abstract class BaseMGR {
+public interface BaseMGR {
 
-        protected <T> ResultadoOperacion cargar(
+        default public <T> ResultadoOperacion cargar(
                         List<T> listaDestino,
                         ThrowingSupplier<List<T>, InventarioException> proveedorDatos,
                         String titulo,
@@ -32,7 +32,7 @@ public abstract class BaseMGR {
                                 NivelMensaje.INFO);
         }
 
-        protected <T extends Identificable<?>> ResultadoOperacion guardar(
+        default public <T extends Identificable<?>> ResultadoOperacion guardar(
                         T entidad,
                         ThrowingConsumer<T, InventarioException> accionGuardar,
                         String nombreEntidad) throws InventarioException {
@@ -56,7 +56,7 @@ public abstract class BaseMGR {
                                 NivelMensaje.INFO);
         }
 
-        protected <T> ResultadoOperacion cambiarEstado(
+        default public <T> ResultadoOperacion cambiarEstado(
                         T entidad,
                         ThrowingConsumer<T, InventarioException> accionCambioEstado,
                         String nombreEntidad,
@@ -76,7 +76,7 @@ public abstract class BaseMGR {
                                 NivelMensaje.INFO);
         }
 
-        protected ResultadoOperacion ejecutarOperacion(
+        default public ResultadoOperacion ejecutarOperacion(
                         ThrowingRunnable<InventarioException> accion,
                         String titulo,
                         String mensaje) throws InventarioException {
