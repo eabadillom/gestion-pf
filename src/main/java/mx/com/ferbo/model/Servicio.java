@@ -11,6 +11,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -94,6 +95,9 @@ public class Servicio implements Serializable {
     
     @OneToMany(cascade = CascadeType.DETACH, mappedBy = "servicioCve")
     private List<ConstanciaServicioDetalle> constanciaServicioDetalleList;
+    
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "servicio", fetch = FetchType.LAZY)
+    private List<ServiciosSalida> listServiciosSalida;
     
     @Override
     public int hashCode() {
@@ -239,4 +243,13 @@ public class Servicio implements Serializable {
 	public void setConstanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
 		this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
 	}
+        
+    public List<ServiciosSalida> getListServiciosSalida() {
+        return listServiciosSalida;
+    }
+
+    public void setListServiciosSalida(List<ServiciosSalida> listServiciosSalida) {
+        this.listServiciosSalida = listServiciosSalida;
+    }
+        
 }

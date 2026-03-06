@@ -59,4 +59,36 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
             super.close(em);
         }
     }
+    
+    public List<PrecioServicio> buscarPorCliente(Integer cteCve, boolean isFullInfo) {
+        List<PrecioServicio> list = null;
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+            list = em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
+                    .setParameter("cteCve", cteCve)
+                    .getResultList();
+            
+            if (isFullInfo == false) {
+                return list;
+            }
+            
+            for (PrecioServicio ps : list) {
+                log.debug(ps.getCliente().getCteCve());
+                log.debug(ps.getServicio().getServicioCve());
+                log.debug(ps.getUnidad().getUnidadDeManejoCve());
+
+                if (ps.getAvisoCve() != null) {
+                    log.debug(ps.getAvisoCve().getAvisoCve());
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Problema para obtener el listado de precios...", ex);
+        } finally {
+            super.close(em);
+        }
+        
+        return list;
+    }
+    
 }

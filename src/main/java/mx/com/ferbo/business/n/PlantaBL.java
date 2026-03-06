@@ -2,6 +2,7 @@ package mx.com.ferbo.business.n;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -12,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
@@ -34,6 +36,21 @@ public class PlantaBL {
         }
 
         return list;
+    }
+    
+    public Planta buscarPlanta(Integer idPlanta) throws InventarioException {
+        if(idPlanta == null)
+            throw new InventarioException("La planta no puede ser vacía");
+        
+        Optional<Planta> planta = plantaDAO.buscarPorId(idPlanta);
+        Planta aux = null;
+        
+        if(planta.isPresent())
+            aux = planta.get();
+        else
+            throw new InventarioException("No se encontro registro con ese identificador");
+        
+        return aux;
     }
 
 }
