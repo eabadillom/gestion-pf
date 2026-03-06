@@ -15,7 +15,7 @@ import mx.com.ferbo.modulos.egresos.model.Egreso;
 
 public abstract class EgresoBaseBL<T extends Egreso, P extends Egreso, C extends CatEgreso> {
 
-    protected EgresoBaseDAO<T> dao;
+    protected EgresoBaseDAO<T extends Egreso> dao;
     protected Logger log = LogManager.getLogger(this.getClass().getName());
 
     public EgresoBaseBL() {
@@ -37,7 +37,7 @@ public abstract class EgresoBaseBL<T extends Egreso, P extends Egreso, C extends
 
     protected abstract void antesDeCambiar(T son, C catalog) throws InventarioException;
 
-    protected void setDao(EgresoBaseDAO<T> dao) {
+    protected void setDao(EgresoBaseDAO<T extends Egreso> dao) {
         this.dao = dao;
     }
 

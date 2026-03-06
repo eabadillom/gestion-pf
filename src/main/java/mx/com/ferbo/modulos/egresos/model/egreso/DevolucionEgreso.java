@@ -23,7 +23,7 @@ import mx.com.ferbo.modulos.egresos.model.catsecundarios.TipoDevolucionEgreso;
 
 @Entity
 @Table(name = "devolucion_egreso")
-public class DevolucionEgreso implements Serializable, Egreso <StatusDevolucionEgreso>{
+public class DevolucionEgreso implements Serializable, Egreso<Integer, StatusDevolucionEgreso>{
 
     private static final long serialVersionUID = 1L;
     

@@ -1,18 +1,13 @@
 package mx.com.ferbo.commons.dao;
 
-import java.util.List;
 import java.util.Optional;
 
-import javax.enterprise.inject.Model;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.ss.formula.functions.T;
 
-import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 

@@ -1,8 +1,8 @@
 package mx.com.ferbo.modulos.egresos.model;
 
-public interface CatEgreso {
-    Integer getId();
+import mx.com.ferbo.util.Identificable;
 
+public interface CatEgreso<T> extends Identificable<T> {
     String getNombre();
     void setNombre(String nombre);
 

@@ -3,11 +3,13 @@ package mx.com.ferbo.modulos.egresos.dao;
 import java.util.List;
 import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.modulos.egresos.model.Egreso;
 import mx.com.ferbo.util.DAOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class EgresoBaseDAO<T> extends BaseDAO<T, Integer> {
+public abstract class EgresoBaseDAO<T extends Egreso> extends BaseDAO<T, Integer> {
 
     private final String entityName;
     

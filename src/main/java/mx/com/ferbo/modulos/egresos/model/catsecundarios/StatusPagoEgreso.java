@@ -24,7 +24,7 @@ import mx.com.ferbo.modulos.egresos.model.egreso.PagoEgreso;
 })
 @Entity
 @Table(name = "cat_status_pago")
-public class StatusPagoEgreso implements Serializable, CatEgreso {
+public class StatusPagoEgreso implements Serializable, CatEgreso<Integer> {
 
     private static final long serialVersionUID = 1L;
 

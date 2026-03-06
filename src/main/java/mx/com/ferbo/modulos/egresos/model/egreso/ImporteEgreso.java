@@ -37,7 +37,7 @@ import mx.com.ferbo.modulos.empresa.model.EmisorCFDI;
 })
 @Entity
 @Table(name = "importe_egreso")
-public class ImporteEgreso implements Serializable, Egreso<StatusEgreso> {
+public class ImporteEgreso implements Serializable, Egreso<Integer, StatusEgreso> {
 
     private static final long serialVersionUID = 1L;
 

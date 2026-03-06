@@ -29,7 +29,7 @@ import mx.com.ferbo.modulos.egresos.model.CatEgreso;
 })
 @Entity
 @Table(name = "categoria_egreso")
-public class CategoriaEgreso implements Serializable, CatEgreso {
+public class CategoriaEgreso implements Serializable, CatEgreso<Integer> {
 
     private static final long serialVersionUID = 1L;
 

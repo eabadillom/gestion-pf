@@ -18,7 +18,7 @@ import mx.com.ferbo.modulos.egresos.model.catsecundarios.TipoMovimientoEgreso;
 
 @Entity
 @Table(name = "documento_movimiento_egreso")
-public class DocumentoMovimientoEgreso implements Serializable, Egreso <TipoMovimientoEgreso>{
+public class DocumentoMovimientoEgreso implements Serializable, Egreso <Integer, TipoMovimientoEgreso> {
     
     private static final long serialVersionUID = 1L;
    

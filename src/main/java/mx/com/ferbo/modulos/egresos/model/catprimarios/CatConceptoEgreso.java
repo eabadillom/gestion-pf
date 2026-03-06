@@ -19,6 +19,7 @@ import javax.persistence.Table;
 
 import mx.com.ferbo.modulos.egresos.model.CatEgreso;
 import mx.com.ferbo.modulos.egresos.model.Egreso;
+import mx.com.ferbo.util.Identificable;
 
 @NamedQueries({
         @NamedQuery(name = "CatConceptoEgreso.findByNombre", query = "SELECT cce FROM CatConceptoEgreso cce WHERE cce.nombre = :nombre"),
@@ -28,7 +29,7 @@ import mx.com.ferbo.modulos.egresos.model.Egreso;
 })
 @Entity
 @Table(name = "cat_concepto_egreso")
-public class CatConceptoEgreso implements Serializable, CatEgreso, Egreso<String> {
+public class CatConceptoEgreso implements Serializable, CatEgreso<Integer>, Egreso<Integer, String> {
 
     private static final long serialVersionUID = 1L;
 

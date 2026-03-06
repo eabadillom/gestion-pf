@@ -21,7 +21,7 @@ import mx.com.ferbo.modulos.egresos.model.CatEgreso;
 })
 @Entity
 @Table(name = "cat_tipo_documento")
-public class TipoDocumentoEgreso implements Serializable, CatEgreso {
+public class TipoDocumentoEgreso implements Serializable, CatEgreso<Integer> {
 
     private static final long serialVersionUID = 1L;
 

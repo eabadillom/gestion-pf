@@ -1,58 +1,84 @@
 package mx.com.ferbo.modulos.egresos.manager;
 
 import java.util.List;
-import java.util.function.Consumer;
 
+import org.apache.hc.core5.util.Identifiable;
 import org.apache.poi.ss.formula.functions.T;
 
 import mx.com.ferbo.modulos.egresos.model.CatEgreso;
+import mx.com.ferbo.util.Identificable;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.NivelMensaje;
+import mx.com.ferbo.util.ResultadoOperacion;
+import mx.com.ferbo.util.funcional.ThrowingConsumer;
+import mx.com.ferbo.util.funcional.ThrowingSupplierL;
 
-public abstract class CatEgresoBaseMGR<T extends CatEgreso> {
+public abstract class CatEgresoBaseMGR<T extends Identificable<?>> {
 
-    @FunctionalInterface
-    public interface ThrowingSupplier<T> {
-        List<T> get() throws InventarioException;
-    }
-
-    @FunctionalInterface
-    public interface CheckedConsumer<T> {
-        void accept(T t) throws InventarioException;
-    }
-
-    protected <T> String[] cargarVigentes(
+    protected <T> ResultadoOperacion cargar(
             List<T> listaDestino,
-            ThrowingSupplier<T> proveedorDatos,
+            ThrowingSupplierL<T, InventarioException> proveedorDatos,
             String titulo,
             String mensaje) throws InventarioException {
 
         List<T> nuevaLista = proveedorDatos.get();
-        listaDestino.clear();
-        listaDestino.addAll(nuevaLista);
 
-        return new String[] { titulo, mensaje };
+        listaDestino.clear();
+
+        int total = 0;
+
+        if (nuevaLista != null) {
+            listaDestino.addAll(nuevaLista);
+            total = nuevaLista.size();
+        }
+
+        return new ResultadoOperacion(
+                titulo,
+                mensaje,
+                total,
+                NivelMensaje.INFO);
     }
 
-    protected <T extends CatEgreso> String[] guardarCatalogo(
+    protected <T extends Identificable<?>> ResultadoOperacion guardar(
             T entidad,
-            CheckedConsumer<T> accionGuardar,
+            ThrowingConsumer<T, InventarioException> accionGuardar,
             String nombreCatalogo) throws InventarioException {
-
-        String titulo;
-        String mensaje;
 
         boolean esNuevo = (entidad.getId() == null);
 
-        accionGuardar.accept(entidad); // ahora puede lanzar InventarioException
+        accionGuardar.accept(entidad);
 
-        if (esNuevo) {
-            titulo = "Guardar " + nombreCatalogo;
-            mensaje = "El " + nombreCatalogo + " se guardó correctamente.";
-        } else {
-            titulo = "Actualizar " + nombreCatalogo;
-            mensaje = "El " + nombreCatalogo + " se actualizó correctamente.";
-        }
+        String titulo = esNuevo
+                ? "Guardar " + nombreCatalogo
+                : "Actualizar " + nombreCatalogo;
 
-        return new String[] { titulo, mensaje };
+        String mensaje = esNuevo
+                ? "El " + nombreCatalogo + " se guardó correctamente."
+                : "El " + nombreCatalogo + " se actualizó correctamente.";
+
+        return new ResultadoOperacion(
+                titulo,
+                mensaje,
+                1,
+                NivelMensaje.INFO);
     }
+
+    protected <T> ResultadoOperacion cambiarEstado(
+            T entidad,
+            ThrowingConsumer<T, InventarioException> accionCambioEstado,
+            String nombreEntidad,
+            String nuevoEstado) throws InventarioException {
+
+        accionCambioEstado.accept(entidad);
+
+        String titulo = "Cambiar estado de " + nombreEntidad;
+        String mensaje = "El " + nombreEntidad + " ahora está en estado: " + nuevoEstado + ".";
+
+        return new ResultadoOperacion(
+                titulo,
+                mensaje,
+                1,
+                NivelMensaje.INFO);
+    }
+
 }

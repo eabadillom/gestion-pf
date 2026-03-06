@@ -23,7 +23,7 @@ import mx.com.ferbo.modulos.egresos.model.catprimarios.CatConceptoEgreso;
 
 @Entity
 @Table(name = "concepto_egreso")
-public class ConceptoEgreso implements Serializable, Egreso<String> {
+public class ConceptoEgreso implements Serializable, Egreso<Integer, String> {
 
     private static final long serialVersionUID = 1L;
 

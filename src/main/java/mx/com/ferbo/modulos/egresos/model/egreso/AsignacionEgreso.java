@@ -25,7 +25,7 @@ import mx.com.ferbo.modulos.egresos.model.catsecundarios.TipoAsignacionEgreso;
 })
 @Entity
 @Table(name = "asignacion_egreso")
-public class AsignacionEgreso implements Serializable, Egreso<String> {
+public class AsignacionEgreso implements Serializable, Egreso<Integer, String> {
 
     private static final long serialVersionUID = 1L;
 
