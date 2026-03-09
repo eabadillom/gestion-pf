@@ -11,12 +11,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.modulos.egresos.dao.EgresoBaseDAO;
+import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
 import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
-public class ImporteEgresoDAO extends EgresoBaseDAO<ImporteEgreso> {
+public class ImporteEgresoDAO extends EgresoBaseDAO<ImporteEgreso, StatusEgreso> {
 
     private static final Logger log = LogManager.getLogger(ImporteEgresoDAO.class);
 

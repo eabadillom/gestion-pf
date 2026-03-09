@@ -194,7 +194,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     private void asignarStatus(ImporteEgreso egreso, StatusEgreso status) throws InventarioException {
 
-        super.validarHijoYStatus(egreso, status);
+        super.validarHijoYCatalogo(egreso, status);
         ValidationUtils.requireNonNull(egreso.getStatus(), "El status del egreso no puede ser vacío.");
 
         log.info("Inicia proceso para camiar {}: {} a {}.", nombreCatalogo(), egreso.getStatus().getNombre(),
@@ -341,5 +341,12 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
             asignarStatus(egreso, status);
 
         }, "procesar egreso completo");
+    }
+
+    @Override
+    protected List<ImporteEgreso> obtenerHijos(ConceptoEgreso father, List<StatusEgreso> catalog)
+            throws InventarioException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'obtenerHijos'");
     }
 }

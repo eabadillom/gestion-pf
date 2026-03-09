@@ -15,6 +15,7 @@ import mx.com.ferbo.modulos.egresos.dao.egreso.ActivoFijoDAO;
 import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusActivoFijo;
 import mx.com.ferbo.modulos.egresos.model.egreso.ActivoFijo;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
+import mx.com.ferbo.util.BaseBL;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.ValidationUtils;
 
@@ -23,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, StatusActivoFijo> {
+public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, StatusActivoFijo> implements BaseBL<ActivoFijo> {
 
     private static final Logger log = LogManager.getLogger();
 

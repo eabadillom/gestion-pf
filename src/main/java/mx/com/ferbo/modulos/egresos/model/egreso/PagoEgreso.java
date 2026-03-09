@@ -24,7 +24,7 @@ import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusPagoEgreso;
 
 @NamedQueries({
     @NamedQuery(name = "PagoEgreso.findAllByImporteEgreso", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :idImporteEgreso"),
-    @NamedQuery(name = "PagoEgreso.findAllByImporteEgresoYStatus", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :idImporteEgreso AND pe.status.nombre = :status")   
+    @NamedQuery(name = "PagoEgreso.findAllByImporteEgresoYStatus", query = "SELECT pe FROM PagoEgreso pe WHERE pe.importeEgreso.id = :idImporteEgreso AND pe.status IN :lstStatus")   
 })
 @Entity
 @Table(name = "pago_egreso")

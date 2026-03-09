@@ -3,6 +3,7 @@ package mx.com.ferbo.modulos.egresos.business.egreso;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
+import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,11 +14,15 @@ import mx.com.ferbo.modulos.egresos.dao.egreso.AsignacionEgresoDAO;
 import mx.com.ferbo.modulos.egresos.model.catsecundarios.TipoAsignacionEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.AsignacionEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
+import mx.com.ferbo.util.BaseBL;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.MonetaryValidationUtils;
+import mx.com.ferbo.util.ValidationUtils;
 
 @Named
 @ApplicationScoped
-public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEgreso, TipoAsignacionEgreso> {
+public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEgreso, TipoAsignacionEgreso>
+        implements BaseBL<AsignacionEgreso> {
 
     @Inject
     private AsignacionEgresoDAO dao;
@@ -25,7 +30,6 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
     private static final BigDecimal CIEN = BigDecimal.valueOf(100);
 
     public AsignacionEgresoBL() {
-        setDao(dao);
     }
 
     @Override
@@ -34,42 +38,49 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
     }
 
     @Override
-    public String nombreHijo() {
-        return "la asignación";
+    protected void construirMaquinaStatus() throws InventarioException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'consturirMaquinaStatus'");
     }
 
     @Override
-    public String nombreHijos() {
-        return "las asignaciones";
+    protected String nombreCatalogo() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'nombreCatalogo'");
     }
 
     @Override
-    public String nombreCatalogo() {
-        return "el tipo";
+    protected String nombreHijo() {
+        return "aginación de egeso";
     }
 
     @Override
-    protected void validar(AsignacionEgreso entity) throws InventarioException {
-
-        if (entity == null) {
-            throw new InventarioException("La asignación no puede ser vacía");
-        }
-
-        if (entity.getImporteEgreso() == null) {
-            throw new InventarioException("La asignación no tiene asociado ningun egreso.");
-        }
-
-        if (entity.getTipoAsignacion() == null) {
-            throw new InventarioException("La asignación no tiene asociado un tipo.");
-        }
-
-        if (entity.getImporte() == null || entity.getImporte().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InventarioException("La asignación no tiene un importe valido.");
-        }
+    protected String nombreHijos() {
+        return "asignaciones de egreso";
     }
 
     @Override
-    protected void antesDeGuardar(AsignacionEgreso asignacion, ImporteEgreso importe) throws InventarioException {
+    protected List<AsignacionEgreso> obtenerHijos(ImporteEgreso father, List<TipoAsignacionEgreso> catalog)
+            throws InventarioException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'obtenerHijos'");
+    }
+
+    private void validar(AsignacionEgreso asignacion) throws InventarioException {
+
+        ValidationUtils.requireNonNull(asignacion, "La asignación no puede ser vacía");
+
+        ValidationUtils.requireNonNull(asignacion.getImporteEgreso(), "La asignación no tiene asociado ningun egreso.");
+
+        ValidationUtils.requireNonNull(asignacion.getTipoAsignacion(), "La asignación no tiene asociado un tipo.");
+
+        ValidationUtils.requireNonNull(asignacion.getImporte(), "La asignación no tiene ningun inporte");
+        
+        MonetaryValidationUtils.requirePositive(asignacion.getImporte(), "el impor de la asinación");
+
+    }
+
+    private void antesDeGuardar(AsignacionEgreso asignacion, ImporteEgreso importe) throws InventarioException {
 
         Date hoy = new Date();
 
@@ -81,12 +92,7 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
         asignacion.setFechaModificacion(hoy);
     }
 
-    @Override
-    protected void antesDeCambiar(AsignacionEgreso asingacion, TipoAsignacionEgreso Tipo) throws InventarioException {
-       // Méotodo sin implementar para que compla el contrato
-    }
-
-    public BigDecimal calcularImporte(ImporteEgreso egreso,
+    public void calcularImporte(ImporteEgreso egreso,
             AsignacionEgreso asignacion)
             throws InventarioException {
 
@@ -99,16 +105,10 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
             throw new InventarioException("Datos insuficientes para calcular el importe.");
         }
 
-        return egreso.getConceptoEgreso()
+        egreso.getConceptoEgreso()
                 .getTotalConceptoEgreso()
                 .multiply(asignacion.getPorcentaje())
                 .divide(CIEN, 2, RoundingMode.HALF_UP);
-    }
-
-    @Override
-    protected TipoAsignacionEgreso statusInicial() {
-        // No se utiliza en esta clase; retorna objeto vacío para cumplir contrato
-        return new TipoAsignacionEgreso();
     }
 
 }

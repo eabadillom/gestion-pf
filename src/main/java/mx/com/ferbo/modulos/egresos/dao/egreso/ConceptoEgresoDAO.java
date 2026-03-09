@@ -7,11 +7,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.modulos.egresos.dao.EgresoBaseDAO;
+import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ConceptoEgreso;
 
 @Named
 @ApplicationScoped
-public class ConceptoEgresoDAO extends EgresoBaseDAO<ConceptoEgreso> {
+public class ConceptoEgresoDAO extends EgresoBaseDAO<ConceptoEgreso, StatusEgreso> {
 
     private static final Logger log = LogManager.getLogger(ConceptoEgresoDAO.class);
 

@@ -7,11 +7,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.modulos.egresos.dao.EgresoBaseDAO;
+import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusPagoEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.PagoEgreso;
 
 @Named
 @ApplicationScoped
-public class PagoEgresoDAO extends EgresoBaseDAO <PagoEgreso> {
+public class PagoEgresoDAO extends EgresoBaseDAO <PagoEgreso, StatusPagoEgreso> {
 
     private static final Logger log = LogManager.getLogger(PagoEgresoDAO.class);
 
@@ -20,7 +21,7 @@ public class PagoEgresoDAO extends EgresoBaseDAO <PagoEgreso> {
     }
 
     @Override
-    protected Class getEntityClass() {
+    protected Class<PagoEgreso> getEntityClass() {
         return PagoEgreso.class;
     }
 

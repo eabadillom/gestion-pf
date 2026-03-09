@@ -1,6 +1,10 @@
 package mx.com.ferbo.modulos.egresos.business.egreso;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,7 +78,7 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
 
     @Override
     protected String nombreCatalogo() {
-        return "el status de pago";
+        return "status de pago";
     }
 
     @Override
@@ -105,12 +109,12 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
 
     }
 
-    private void asgingarAntesDeGuardar(PagoEgreso pago, ImporteEgreso importe) throws InventarioException {
+    private void asgingarAntesDeGuardar(ImporteEgreso egreso, PagoEgreso pago) throws InventarioException {
 
         Date hoy = new Date();
 
         if (pago.getId() == null) {
-            pago.setImporteEgreso(importe);
+            pago.setImporteEgreso(egreso);
             pago.setFechaAlta(hoy);
             pago.setStatus(pendiente);
         }
@@ -120,10 +124,10 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
 
     private void asignarStatus(PagoEgreso pago, StatusPagoEgreso status) throws InventarioException {
 
-        super.validarHijoYStatus(pago, status);
+        validarHijoYCatalogo(pago, status);
         ValidationUtils.requireNonNull(pago.getStatus(), "El status del pago no puede ser vacío.");
 
-        log.info("Inicia proceso para cambiar {}: {} a {}.", nombreCatalogo(),pago.getStatus().getNombre(),
+        log.info("Inicia proceso para cambiar {}: {} a {}.", nombreCatalogo(), pago.getStatus().getNombre(),
                 status.getNombre());
 
         ejecutar(
@@ -138,11 +142,76 @@ public class PagoEgresoBL extends EgresoBaseBL<PagoEgreso, ImporteEgreso, Status
         return BaseBL.super.nuevoOExistente(pago);
     }
 
-    public void guardarPagoEgreso(ImporteEgreso egreso, PagoEgreso pago){
+    public void guardarPagoEgreso(ImporteEgreso egreso, PagoEgreso pago, StatusPagoEgreso status)
+            throws InventarioException {
 
+        validarPadreEHijo(egreso, pago);
+        validarHijoYCatalogo(pago, status);
 
-        
+        boolean esNuevo = pago.getId() == null;
+
+        asgingarAntesDeGuardar(egreso, pago);
+
+        if (!esNuevo) {
+            asignarStatus(pago, status);
+        }
+
+        validarPagoEgreso(pago);
+
+        String tipoOperacion = esNuevo ? "guardar" : "actualizar";
+        String mensaje = tipoOperacion + " " + nombreHijo();
+
+        log.info("Se inicia el proceso para {}", mensaje);
+
+        persistir(pago, mensaje);
+
+        log.info("Se finaliza el proceso para {}", mensaje);
+    }
+
+    private void persistir(PagoEgreso pago, String mensaje) throws InventarioException {
+
+        if (pago.getId() == null) {
+            BaseBL.super.ejecutar(() -> dao.guardar(pago), mensaje);
+        } else {
+            BaseBL.super.ejecutar(() -> dao.actualizar(pago), mensaje);
+        }
 
     }
 
+    private List<StatusPagoEgreso> obtenerPagosAplicablesStatus() {
+        List<StatusPagoEgreso> lst = new ArrayList<>();
+        lst.add(parcial);
+        lst.add(pagado);
+        return lst;
+    }
+
+    public List<PagoEgreso> obtenerPagosEgresoPorStatus(
+            ImporteEgreso egreso,
+            List<StatusPagoEgreso> lstStatus) throws InventarioException {
+
+        ValidationUtils.requireNonNull(egreso, nombrePadre() + " no puede ser vacío");
+        ValidationUtils.requireNonNull(egreso.getId(), nombrePadre() + " no puede ser vacío.");
+        ValidationUtils.requireNonEmpty(lstStatus, "La lista " + nombreCatalogo() + " no puede ser vacía");
+
+        if (lstStatus.stream().anyMatch(Objects::isNull)) {
+            throw new InventarioException("La lista " + nombreCatalogo() + " contiene elementos nulos");
+        }
+
+        return obtenerHijos(egreso, lstStatus);
+
+    }
+
+    @Override
+    protected List<PagoEgreso> obtenerHijos(ImporteEgreso egreso, List<StatusPagoEgreso> lstStatus)
+            throws InventarioException {
+
+        Integer idEgreso = egreso.getId();
+
+        return BaseBL.super.operar(() -> dao.buscarPorImporteEgresoYStatus(idEgreso, lstStatus),
+                "cargar " + nombreHijos() + " con el status " + nombreCatalogo());
+    }
+
+    public List<PagoEgreso> obtenerPagosAplicables(ImporteEgreso egreso) throws InventarioException {
+        return obtenerPagosEgresoPorStatus(egreso, obtenerPagosAplicablesStatus());
+    }
 }

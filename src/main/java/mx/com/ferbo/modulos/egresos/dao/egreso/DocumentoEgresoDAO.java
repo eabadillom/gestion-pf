@@ -5,6 +5,7 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 
 import mx.com.ferbo.modulos.egresos.dao.EgresoBaseDAO;
+import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.DocumentoEgreso;
 import mx.com.ferbo.util.DAOException;
 import org.apache.logging.log4j.LogManager;
