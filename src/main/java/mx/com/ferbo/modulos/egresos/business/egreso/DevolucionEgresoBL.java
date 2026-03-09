@@ -13,6 +13,7 @@ import mx.com.ferbo.modulos.egresos.dao.egreso.DevolucionEgresoDAO;
 import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusDevolucionEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.DevolucionEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
+import mx.com.ferbo.util.BaseBL;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEgreso, StatusDevolucionEgreso> {
+public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEgreso, StatusDevolucionEgreso> implements BaseBL<ImporteEgreso>{
 
     private static final Logger log = LogManager.getLogger(DevolucionEgresoBL.class);
 
@@ -113,8 +114,7 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
 
     }
 
-    @Override
-    protected void antesDeGuardar(DevolucionEgreso devolucion, ImporteEgreso importe) throws InventarioException {
+    private void asignarAntesDeGuardar(DevolucionEgreso devolucion, ImporteEgreso importe) throws InventarioException {
 
         Date hoy = new Date();
 
@@ -127,8 +127,7 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
         devolucion.setFechaModificacion(hoy);
     }
 
-    @Override
-    protected void antesDeCambiar(DevolucionEgreso devolucion, StatusDevolucionEgreso status)
+    private void asignarStatus(DevolucionEgreso devolucion, StatusDevolucionEgreso status)
             throws InventarioException {
 
         FacesUtils.requireNonNull(devolucion, "La devolución del egreso no puede ser vacía.");

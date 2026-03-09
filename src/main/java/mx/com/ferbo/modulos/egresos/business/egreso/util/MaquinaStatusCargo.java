@@ -1,7 +1,6 @@
 
 package mx.com.ferbo.modulos.egresos.business.egreso.util;
 
-
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -23,8 +22,8 @@ public class MaquinaStatusCargo {
     private final StatusCargoEgreso CONDONADO;
 
     public MaquinaStatusCargo(StatusCargoEgreso pendiente, StatusCargoEgreso aplicado,
-                              StatusCargoEgreso pagado, StatusCargoEgreso cancelado,
-                              StatusCargoEgreso condonado) {
+            StatusCargoEgreso pagado, StatusCargoEgreso cancelado,
+            StatusCargoEgreso condonado) {
 
         this.PENDIENTE = pendiente;
         this.APLICADO = aplicado;
@@ -36,9 +35,9 @@ public class MaquinaStatusCargo {
 
         transiciones.put(PENDIENTE, SetUtils.setOf(APLICADO, PAGADO, CANCELADO, CONDONADO));
         transiciones.put(APLICADO, SetUtils.setOf(PAGADO, CANCELADO, CONDONADO));
-        transiciones.put(PAGADO, SetUtils.setOf());     // terminal
-        transiciones.put(CANCELADO, SetUtils.setOf());  // terminal
-        transiciones.put(CONDONADO, SetUtils.setOf());  // terminal
+        transiciones.put(PAGADO, SetUtils.setOf()); // terminal
+        transiciones.put(CANCELADO, SetUtils.setOf()); // terminal
+        transiciones.put(CONDONADO, SetUtils.setOf()); // terminal
 
         this.maquinaStatus = new MaquinaStatusBase<>(transiciones);
     }
@@ -48,15 +47,9 @@ public class MaquinaStatusCargo {
      */
     public void cambiarStatus(CargoEgreso cargo, StatusCargoEgreso nuevo) throws InventarioException {
 
-        StatusCargoEgreso actual = cargo.getStatus();
-
-        try {
-            maquinaStatus.validarTransicion(actual, nuevo);
-        } catch (IllegalStateException ex) {
-            throw new InventarioException("No se puede cambiar el cargo del status " 
-                + actual.getNombre() + " al status " + nuevo.getNombre());
-        }
-
-        cargo.setStatus(nuevo); // aplicar el cambio
+        maquinaStatus.conTransicionValida(
+                cargo.getStatus(),
+                nuevo,
+                () -> cargo.setStatus(nuevo));
     }
 }

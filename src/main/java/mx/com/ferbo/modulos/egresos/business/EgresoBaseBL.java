@@ -3,8 +3,6 @@ package mx.com.ferbo.modulos.egresos.business;
 
 import mx.com.ferbo.util.ValidationUtils;
 
-import java.util.List;
-
 import mx.com.ferbo.util.InventarioException;
 
 public abstract class EgresoBaseBL<T, P, C> {
@@ -16,8 +14,6 @@ public abstract class EgresoBaseBL<T, P, C> {
     protected abstract String nombreHijos();
 
     protected abstract String nombreCatalogo();
-
-    protected abstract List<T> obtenerHijos(P father, List<C> catalog) throws InventarioException;
 
     protected String nombrePadre() {
         return "el egreso";

@@ -21,9 +21,9 @@ public class MaquinaStatusDevolucion {
     private final StatusDevolucionEgreso CANCELADA;
     private final StatusDevolucionEgreso EN_PROCESO;
 
-    public MaquinaStatusDevolucion(StatusDevolucionEgreso registrada, StatusDevolucionEgreso autorizada, 
-                                   StatusDevolucionEgreso aplicada, StatusDevolucionEgreso rechazada, 
-                                   StatusDevolucionEgreso cancelada, StatusDevolucionEgreso en_proceso) {
+    public MaquinaStatusDevolucion(StatusDevolucionEgreso registrada, StatusDevolucionEgreso autorizada,
+            StatusDevolucionEgreso aplicada, StatusDevolucionEgreso rechazada,
+            StatusDevolucionEgreso cancelada, StatusDevolucionEgreso en_proceso) {
 
         this.REGISTRADA = registrada;
         this.AUTORIZADA = autorizada;
@@ -49,13 +49,9 @@ public class MaquinaStatusDevolucion {
      */
     public void cambiarStatus(DevolucionEgreso devolucion, StatusDevolucionEgreso nuevo) throws InventarioException {
 
-        StatusDevolucionEgreso actual = devolucion.getStatus();
-
-        try {
-            maquinaStatus.validarTransicion(actual, nuevo);
-        } catch (IllegalStateException ex) {
-            throw new InventarioException("No se puede cambiar la devolución del status " + actual.getNombre() + " al status " + nuevo.getNombre());
-        }
-        devolucion.setStatus(nuevo);
+        maquinaStatus.conTransicionValida(
+                devolucion.getStatus(),
+                nuevo,
+                () -> devolucion.setStatus(nuevo));
     }
 }

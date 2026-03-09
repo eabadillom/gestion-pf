@@ -1,15 +1,15 @@
 package mx.com.ferbo.modulos.egresos.business.egreso;
 
 import java.math.BigDecimal;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import mx.com.ferbo.modulos.egresos.business.EgresoBaseBL;
 import mx.com.ferbo.modulos.egresos.dao.egreso.ConceptoEgresoDAO;
 import mx.com.ferbo.modulos.egresos.model.catprimarios.CatConceptoEgreso;
-import mx.com.ferbo.modulos.egresos.model.catsecundarios.StatusEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ConceptoEgreso;
+import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.ValidationUtils;
 
@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEgreso, StatusEgreso> {
+public class ConceptoEgresoBL {
 
     private static final Logger log = LogManager.getLogger(ConceptoEgresoBL.class);
 
@@ -26,42 +26,21 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
     private ConceptoEgresoDAO dao;
 
     public ConceptoEgresoBL() {
-        setDao(dao);
     }
 
-    @Override
     public ConceptoEgreso nuevo() {
         return new ConceptoEgreso();
     }
 
-    @Override
-    public String nombreHijo() {
-        return "el concepto del egreso";
-    }
+    private void validarConceptoEgreso(ConceptoEgreso concepto) throws InventarioException {
 
-    @Override
-    public String nombreHijos() {
-        return "los concepto de egresos";
-    }
+        ValidationUtils.requireNonNull(concepto, "El concepto del egreso no puede ser vacío.");
 
-    @Override
-    public String nombreCatalogo() {
-        return "el status";
-    }
+        ValidationUtils.requireNonNull(concepto.getEsDeducible(), "No se tiene la informacíon si el egreso es deducible o no.");
 
-    @Override
-    protected void validar(ConceptoEgreso concepto) throws InventarioException {
-        if (concepto == null) {
-            throw new InventarioException("El concepto del egreso no puede ser vacío.");
-        }
+        ValidationUtils.requireNonNull(concepto.getRequiereCFDI(), "No se tiene la información si el egreso es deducible por CFDI o no.");
 
-        if (concepto.getEsDeducible() == null) {
-            throw new InventarioException("No se tiene la informacíon si el egreso es deducible o no.");
-        }
-
-        if (concepto.getRequiereCFDI() == null) {
-            throw new InventarioException("No se tiene la información si el egreso es deducible por CFDI o no.");
-        }
+        ValidationUtils.requireNonNull(concepto, null);
 
         if (concepto.getEsDeducible() && concepto.getRequiereCFDI()
                 && (concepto.getCfdiUUID() == null || "".equalsIgnoreCase(concepto.getCfdiUUID()))) {
@@ -104,18 +83,36 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
         }
     }
 
-    @Override
-    protected void antesDeGuardar(ConceptoEgreso concepto, CatConceptoEgreso catConcepto) throws InventarioException {
+    private void asignarAntesDeGuardar(ConceptoEgreso concepto, CatConceptoEgreso catConcepto) {
 
-        if (concepto.getCatConcepto() == null) {
+        if (concepto.getId() == null) {
             concepto.setCatConcepto(catConcepto);
         }
 
     }
 
-    @Override
-    protected void antesDeCambiar(ConceptoEgreso son, StatusEgreso catalog) throws InventarioException {
-        // Método sin implementar porque no se reqioere en el proceso
+    public ConceptoEgreso obtenerConceptoEgreso(ImporteEgreso egreso) {
+        if (egreso.getConceptoEgreso().getId() == null) {
+            return nuevo();
+        } else {
+            return egreso.getConceptoEgreso();
+        }
+
+    }
+
+    public void guardarConceptoEgreso(CatConceptoEgreso catConcepto, ConceptoEgreso concepto) throws InventarioException{
+
+        ValidationUtils.requireNonNull(catConcepto, "El concepto egreso del catalogo no puede ser vacío.");
+        ValidationUtils.requireNonNull(concepto, "El concepto de egreso no puede ser vacío.");
+
+        asignarAntesDeGuardar(concepto, catConcepto);
+
+        validarConceptoEgreso(concepto);
+
+        if (concepto.getId() == null){
+            dao.guardar(concepto);
+        }
+        
     }
 
     public void extraerDeCatalogo(ConceptoEgreso concepto, CatConceptoEgreso catConcepto) throws InventarioException {
@@ -133,9 +130,4 @@ public class ConceptoEgresoBL extends EgresoBaseBL<ConceptoEgreso, CatConceptoEg
 
     }
 
-    @Override
-    protected StatusEgreso statusInicial() {
-        // No se utiliza en esta clase; retorna objeto vacío para cumplir contrato
-        return new StatusEgreso();
-    }
 }

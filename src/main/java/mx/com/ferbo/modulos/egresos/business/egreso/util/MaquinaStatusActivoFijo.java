@@ -26,25 +26,25 @@ public class MaquinaStatusActivoFijo {
     private final StatusActivoFijo DESCARTADO;
 
     public MaquinaStatusActivoFijo(StatusActivoFijo en_uso, StatusActivoFijo en_reparacion,
-                                   StatusActivoFijo inactivo, StatusActivoFijo en_baja,
-                                   StatusActivoFijo vendido, StatusActivoFijo obsoleto,
-                                   StatusActivoFijo dado_de_baja, StatusActivoFijo en_revaluacion,
-                                   StatusActivoFijo recibido, StatusActivoFijo descartado) {
+            StatusActivoFijo inactivo, StatusActivoFijo en_baja,
+            StatusActivoFijo vendido, StatusActivoFijo obsoleto,
+            StatusActivoFijo dado_de_baja, StatusActivoFijo en_revaluacion,
+            StatusActivoFijo recibido, StatusActivoFijo descartado) {
 
-    this.EN_USO = en_uso;
-    this.EN_REPARACION = en_reparacion;
-    this.INACTIVO = inactivo;
-    this.EN_BAJA = en_baja;
-    this.VENDIDO = vendido;
-    this.OBSOLETO = obsoleto;
-    this.DADO_DE_BAJA = dado_de_baja;
-    this.EN_REVALUACION = en_revaluacion;
-    this.RECIBIDO = recibido;
-    this.DESCARTADO = descartado;
+        this.EN_USO = en_uso;
+        this.EN_REPARACION = en_reparacion;
+        this.INACTIVO = inactivo;
+        this.EN_BAJA = en_baja;
+        this.VENDIDO = vendido;
+        this.OBSOLETO = obsoleto;
+        this.DADO_DE_BAJA = dado_de_baja;
+        this.EN_REVALUACION = en_revaluacion;
+        this.RECIBIDO = recibido;
+        this.DESCARTADO = descartado;
 
-    Map<StatusActivoFijo, Set<StatusActivoFijo>> transiciones = new HashMap<>();
+        Map<StatusActivoFijo, Set<StatusActivoFijo>> transiciones = new HashMap<>();
 
-    // Flujo inicial
+        // Flujo inicial
         transiciones.put(RECIBIDO, SetUtils.setOf(EN_REVALUACION, EN_USO));
         transiciones.put(EN_REVALUACION, SetUtils.setOf(EN_USO, INACTIVO));
 
@@ -62,17 +62,13 @@ public class MaquinaStatusActivoFijo {
         transiciones.put(VENDIDO, SetUtils.setOf());
         transiciones.put(DESCARTADO, SetUtils.setOf());
 
-    this.maquinaStatus = new MaquinaStatusBase<>(transiciones);
+        this.maquinaStatus = new MaquinaStatusBase<>(transiciones);
     }
 
-    public void cambiarStatus(ActivoFijo activo, StatusActivoFijo nuevo) throws InventarioException{
-        StatusActivoFijo actual = activo.getStatus();
-
-        try {
-            maquinaStatus.validarTransicion(actual, nuevo);
-        } catch (IllegalStateException ex) {
-            throw new InventarioException("No se puede cambiar el activo fijo del status " + actual.getNombre() + " al status " + nuevo.getNombre());
-        }
-        activo.setStatus(nuevo);
+    public void cambiarStatus(ActivoFijo activo, StatusActivoFijo nuevo) throws InventarioException {
+        maquinaStatus.conTransicionValida(
+                activo.getStatus(),
+                nuevo,
+                () -> activo.setStatus(nuevo));
     }
 }

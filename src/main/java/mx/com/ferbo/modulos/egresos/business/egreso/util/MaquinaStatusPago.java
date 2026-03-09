@@ -20,9 +20,9 @@ public class MaquinaStatusPago {
     private final StatusPagoEgreso CANCELADO;
     private final StatusPagoEgreso VENCIDO;
 
-    public MaquinaStatusPago(StatusPagoEgreso pendiente, StatusPagoEgreso pagado, 
-                             StatusPagoEgreso parcial, StatusPagoEgreso cancelado, 
-                             StatusPagoEgreso vencido ) {
+    public MaquinaStatusPago(StatusPagoEgreso pendiente, StatusPagoEgreso pagado,
+            StatusPagoEgreso parcial, StatusPagoEgreso cancelado,
+            StatusPagoEgreso vencido) {
 
         this.PENDIENTE = pendiente;
         this.PAGADO = pagado;
@@ -45,12 +45,9 @@ public class MaquinaStatusPago {
      * Valida el cambio de status al Pago
      */
     public void cambiarStatus(PagoEgreso pago, StatusPagoEgreso nuevo) throws InventarioException {
-        StatusPagoEgreso actual = pago.getStatus();
-        try {
-            maquinaStatus.validarTransicion(actual, nuevo);
-        } catch (IllegalStateException ex) {
-            throw new InventarioException("No se puede cambiar el pago del status " + actual + " al status " + nuevo);
-        }
-        pago.setStatus(nuevo);
+        maquinaStatus.conTransicionValida(
+                pago.getStatus(),
+                nuevo,
+                () -> pago.setStatus(nuevo));
     }
 }

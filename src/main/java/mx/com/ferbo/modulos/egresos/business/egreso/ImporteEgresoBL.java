@@ -117,7 +117,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
 
     private void asignarAntesDeGuardar(ConceptoEgreso concepto, ImporteEgreso egreso) {
 
-        log.info("Inicia proceso de asignacion de lo esenciaal para guardar el egreso.");
+        log.info("Inicia proceso de asignacion de lo esencial para guardar el egreso.");
 
         Date hoy = new Date();
 
@@ -126,13 +126,13 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
             egreso.setConceptoEgreso(concepto);
             log.info("Al egreso se le asigna la fecha de alta: {}", hoy);
             egreso.setFechaAlta(hoy);
-            log.info("Al areso se le asigna el status de registrado.");
+            log.info("Al egreso se le asigna el status de registrado.");
             egreso.setStatus(registrado);
         }
 
-        log.info("Se actualiza fecha actualizacion a: {}", hoy);
+        log.info("Se actualiza fecha de actualizacion a: {}", hoy);
         egreso.setFechaModificacion(hoy);
-        log.info("Finaliza proceso de asignacion de lo esenciaal para guardar el egreso.");
+        log.info("Finaliza proceso de asignacion de lo esencial para guardar el egreso.");
     }
 
     private void validarEgreso(ImporteEgreso egreso) throws InventarioException {
@@ -183,18 +183,24 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
         String mensaje = tipoOperciaon + " " + nombreHijo();
 
         log.info("Se inicia el proceso para " + mensaje);
+        
+        persistir(egreso, mensaje);
+
+        log.info("Se finaliza el proceso para " + mensaje);
+
+    }
+
+    private void persistir(ImporteEgreso egreso, String mensaje) throws InventarioException {
         if (egreso.getId() == null) {
             BaseBL.super.ejecutar(() -> dao.guardar(egreso), mensaje);
         } else {
             BaseBL.super.ejecutar(() -> dao.actualizar(egreso), mensaje);
         }
-        log.info("Se finaliza el proceso para " + mensaje);
-
     }
 
     private void asignarStatus(ImporteEgreso egreso, StatusEgreso status) throws InventarioException {
 
-        super.validarHijoYCatalogo(egreso, status);
+        validarHijoYCatalogo(egreso, status);
         ValidationUtils.requireNonNull(egreso.getStatus(), "El status del egreso no puede ser vacío.");
 
         log.info("Inicia proceso para camiar {}: {} a {}.", nombreCatalogo(), egreso.getStatus().getNombre(),
@@ -343,10 +349,4 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
         }, "procesar egreso completo");
     }
 
-    @Override
-    protected List<ImporteEgreso> obtenerHijos(ConceptoEgreso father, List<StatusEgreso> catalog)
-            throws InventarioException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerHijos'");
-    }
 }
