@@ -4,89 +4,115 @@ import java.util.List;
 
 import mx.com.ferbo.util.funcional.ThrowingConsumer;
 import mx.com.ferbo.util.funcional.ThrowingSupplier;
+import mx.com.ferbo.util.messaging.NivelMensaje;
+import mx.com.ferbo.util.messaging.ResultadoOperacion;
+import mx.com.ferbo.util.validation.ValidationException;
 import mx.com.ferbo.util.funcional.ThrowingRunnable;
 
 public interface BaseMGR {
 
-        default public <T> ResultadoOperacion cargar(
-                        List<T> listaDestino,
-                        ThrowingSupplier<List<T>, InventarioException> proveedorDatos,
-                        String titulo,
-                        String mensaje) throws InventarioException {
+    // -----------------------
+    // Método genérico para cargar listas
+    // -----------------------
+    default <T> ResultadoOperacion cargar(
+            List<T> listaDestino,
+            ThrowingSupplier<List<T>, InventarioException> proveedorDatos,
+            String titulo,
+            String mensaje) throws InventarioException {
 
-                List<T> nuevaLista = proveedorDatos.get();
+        try {
+            List<T> nuevaLista = proveedorDatos.get();
 
-                listaDestino.clear();
+            listaDestino.clear();
 
-                int total = 0;
+            int total = (nuevaLista != null) ? nuevaLista.size() : 0;
+            if (nuevaLista != null) listaDestino.addAll(nuevaLista);
 
-                if (nuevaLista != null) {
-                        listaDestino.addAll(nuevaLista);
-                        total = nuevaLista.size();
-                }
+            return ResultadoOperacion.info(titulo, mensaje, total);
 
-                return new ResultadoOperacion(
-                                titulo,
-                                mensaje,
-                                total,
-                                NivelMensaje.INFO);
+        } catch (ValidationException ex) {
+            return ResultadoOperacion.error(
+                    "Error de validación",
+                    "Se encontraron errores al cargar la lista",
+                    ex.getNotification().getMensajes()
+            );
+        }
+    }
+
+    // -----------------------
+    // Método genérico para guardar/actualizar
+    // -----------------------
+    default <T extends Identificable<?>> ResultadoOperacion guardar(
+            T entidad,
+            ThrowingConsumer<T, InventarioException> accionGuardar,
+            String nombreEntidad) throws InventarioException {
+
+        boolean esNuevo = (entidad.getId() == null);
+
+        try {
+            accionGuardar.accept(entidad);
+
+        } catch (ValidationException ex) {
+            return ResultadoOperacion.error(
+                    "Error de validación",
+                    "Se encontraron errores en " + nombreEntidad,
+                    ex.getNotification().getMensajes()
+            );
         }
 
-        default public <T extends Identificable<?>> ResultadoOperacion guardar(
-                        T entidad,
-                        ThrowingConsumer<T, InventarioException> accionGuardar,
-                        String nombreEntidad) throws InventarioException {
+        String titulo = (esNuevo ? "Guardar " : "Actualizar ") + nombreEntidad;
+        String mensaje = (esNuevo
+                ? "El " + nombreEntidad + " se guardó correctamente."
+                : "El " + nombreEntidad + " se actualizó correctamente.");
 
-                boolean esNuevo = (entidad.getId() == null);
+        return ResultadoOperacion.exito(titulo, mensaje, 1);
+    }
 
-                accionGuardar.accept(entidad);
+    // -----------------------
+    // Método genérico para cambiar estado
+    // -----------------------
+    default <T> ResultadoOperacion cambiarEstado(
+            T entidad,
+            ThrowingConsumer<T, InventarioException> accionCambioEstado,
+            String nombreEntidad,
+            String accion) throws InventarioException {
 
-                String titulo = esNuevo
-                                ? "Guardar " + nombreEntidad
-                                : "Actualizar " + nombreEntidad;
+        try {
+            accionCambioEstado.accept(entidad);
 
-                String mensaje = esNuevo
-                                ? "El " + nombreEntidad + " se guardó correctamente."
-                                : "El " + nombreEntidad + " se actualizó correctamente.";
-
-                return new ResultadoOperacion(
-                                titulo,
-                                mensaje,
-                                1,
-                                NivelMensaje.INFO);
+        } catch (ValidationException ex) {
+            return ResultadoOperacion.error(
+                    "Error de validación",
+                    "Se encontraron errores al " + accion.toLowerCase() + " " + nombreEntidad,
+                    ex.getNotification().getMensajes()
+            );
         }
 
-        default public <T> ResultadoOperacion cambiarEstado(
-                        T entidad,
-                        ThrowingConsumer<T, InventarioException> accionCambioEstado,
-                        String nombreEntidad,
-                        String accion) throws InventarioException {
+        String titulo = accion + " " + nombreEntidad;
+        String mensaje = "El " + nombreEntidad + " se " + accion.toLowerCase() + " correctamente.";
 
-                accionCambioEstado.accept(entidad);
+        return ResultadoOperacion.exito(titulo, mensaje, 1);
+    }
 
-                String titulo = accion + " " + nombreEntidad;
+    // -----------------------
+    // Método genérico para ejecutar cualquier operación
+    // -----------------------
+    default ResultadoOperacion ejecutarOperacion(
+            ThrowingRunnable<InventarioException> accion,
+            String titulo,
+            String mensaje) throws InventarioException {
 
-                String mensaje = "El " + nombreEntidad +
-                                " se " + accion.toLowerCase() + " correctamente.";
+        try {
+            accion.run();
 
-                return new ResultadoOperacion(
-                                titulo,
-                                mensaje,
-                                1,
-                                NivelMensaje.INFO);
+            return ResultadoOperacion.exito(titulo, mensaje, 1);
+
+        } catch (ValidationException ex) {
+            return ResultadoOperacion.error(
+                    "Error de validación",
+                    "Se encontraron errores al ejecutar la operación",
+                    ex.getNotification().getMensajes()
+            );
         }
-
-        default public ResultadoOperacion ejecutarOperacion(
-                        ThrowingRunnable<InventarioException> accion,
-                        String titulo,
-                        String mensaje) throws InventarioException {
-
-                accion.run();
-
-                return new ResultadoOperacion(
-                                titulo,
-                                mensaje,
-                                1,
-                                NivelMensaje.INFO);
-        }
+    }
 }

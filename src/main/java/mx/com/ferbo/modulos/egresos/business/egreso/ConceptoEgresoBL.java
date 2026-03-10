@@ -11,7 +11,7 @@ import mx.com.ferbo.modulos.egresos.model.catprimarios.CatConceptoEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ConceptoEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
 import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.ValidationUtils;
+import mx.com.ferbo.util.validation.ValidationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,13 +34,13 @@ public class ConceptoEgresoBL {
 
     private void validarConceptoEgreso(ConceptoEgreso concepto) throws InventarioException {
 
-        ValidationUtils.requireNonNull(concepto, "El concepto del egreso no puede ser vacío.");
+        ValidationException.requireNonNull(concepto, "El concepto del egreso no puede ser vacío.");
 
-        ValidationUtils.requireNonNull(concepto.getEsDeducible(), "No se tiene la informacíon si el egreso es deducible o no.");
+        ValidationException.requireNonNull(concepto.getEsDeducible(), "No se tiene la informacíon si el egreso es deducible o no.");
 
-        ValidationUtils.requireNonNull(concepto.getRequiereCFDI(), "No se tiene la información si el egreso es deducible por CFDI o no.");
+        ValidationException.requireNonNull(concepto.getRequiereCFDI(), "No se tiene la información si el egreso es deducible por CFDI o no.");
 
-        ValidationUtils.requireNonNull(concepto, null);
+        ValidationException.requireNonNull(concepto, null);
 
         if (concepto.getEsDeducible() && concepto.getRequiereCFDI()
                 && (concepto.getCfdiUUID() == null || "".equalsIgnoreCase(concepto.getCfdiUUID()))) {
@@ -102,8 +102,8 @@ public class ConceptoEgresoBL {
 
     public void guardarConceptoEgreso(CatConceptoEgreso catConcepto, ConceptoEgreso concepto) throws InventarioException{
 
-        ValidationUtils.requireNonNull(catConcepto, "El concepto egreso del catalogo no puede ser vacío.");
-        ValidationUtils.requireNonNull(concepto, "El concepto de egreso no puede ser vacío.");
+        ValidationException.requireNonNull(catConcepto, "El concepto egreso del catalogo no puede ser vacío.");
+        ValidationException.requireNonNull(concepto, "El concepto de egreso no puede ser vacío.");
 
         asignarAntesDeGuardar(concepto, catConcepto);
 
@@ -117,8 +117,8 @@ public class ConceptoEgresoBL {
 
     public void extraerDeCatalogo(ConceptoEgreso concepto, CatConceptoEgreso catConcepto) throws InventarioException {
 
-        ValidationUtils.requireNonNull(concepto, "El concepto del egreso no puede ser vacío.");
-        ValidationUtils.requireNonNull(catConcepto, "El concepto del catalogo no puede ser vacío.");
+        ValidationException.requireNonNull(concepto, "El concepto del egreso no puede ser vacío.");
+        ValidationException.requireNonNull(catConcepto, "El concepto del catalogo no puede ser vacío.");
 
         concepto.setEsDeducible(catConcepto.getEsDeducible());
         concepto.setRequiereCFDI(catConcepto.getRequiereCFDI());

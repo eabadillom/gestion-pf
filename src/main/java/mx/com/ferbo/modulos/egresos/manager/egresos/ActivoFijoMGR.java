@@ -9,7 +9,7 @@ import mx.com.ferbo.modulos.egresos.model.egreso.ActivoFijo;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
 import mx.com.ferbo.util.BaseMGR;
 import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.ResultadoOperacion;
+import mx.com.ferbo.util.messaging.ResultadoOperacion;
 
 public class ActivoFijoMGR implements BaseMGR {
 

@@ -29,8 +29,8 @@ import mx.com.ferbo.modulos.empresa.model.EmisorCFDI;
 import mx.com.ferbo.util.BaseBL;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.ValidationUtils;
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.validation.ValidationException;
 
 @Named
 @RequestScoped
@@ -138,34 +138,34 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     private void validarEgreso(ImporteEgreso egreso) throws InventarioException {
         log.info("Inicia proceso que valida las propiedades del egreso.");
 
-        ValidationUtils.requireNonNull(egreso, "El egreso no puede ser vacío");
+        ValidationException.requireNonNull(egreso, "El egreso no puede ser vacío");
 
-        ValidationUtils.requireNonNull(egreso.getConceptoEgreso(), "Debe asignar un concepto al egreso");
+        ValidationException.requireNonNull(egreso.getConceptoEgreso(), "Debe asignar un concepto al egreso");
 
-        ValidationUtils.requireNonNull(egreso.getEmisor(), "Debe asignar un emisor al egreso.");
+        ValidationException.requireNonNull(egreso.getEmisor(), "Debe asignar un emisor al egreso.");
 
-        ValidationUtils.requireNonNull(egreso.getFechaAlta(), "El egreso no tiene una fecha de alta.");
+        ValidationException.requireNonNull(egreso.getFechaAlta(), "El egreso no tiene una fecha de alta.");
 
-        ValidationUtils.requireNonNull(egreso.getFechaModificacion(), "El egreso no tiene una fecha de modificación.");
+        ValidationException.requireNonNull(egreso.getFechaModificacion(), "El egreso no tiene una fecha de modificación.");
 
-        ValidationUtils.requireNonNull(egreso.getFechaLimitePago(),
+        ValidationException.requireNonNull(egreso.getFechaLimitePago(),
                 "El egreso no tiene una fecha para el limitie de liquidación");
 
-        ValidationUtils.requireNonNull(egreso.getNumeroPagos(), "El egreso no tiene un número de pagos.");
+        ValidationException.requireNonNull(egreso.getNumeroPagos(), "El egreso no tiene un número de pagos.");
 
-        ValidationUtils.requireNonNull(egreso.getIeps(), "El egreso no tiene definido el IVA.");
+        ValidationException.requireNonNull(egreso.getIeps(), "El egreso no tiene definido el IVA.");
 
-        ValidationUtils.requireNonNull(egreso.getIeps(), "El egreso no tiene definido el IEPS");
+        ValidationException.requireNonNull(egreso.getIeps(), "El egreso no tiene definido el IEPS");
 
-        ValidationUtils.requireNonNull(egreso.getMedioPago(), "El egreso no tiene asignado una forma de pago.");
+        ValidationException.requireNonNull(egreso.getMedioPago(), "El egreso no tiene asignado una forma de pago.");
 
-        ValidationUtils.requireNonNull(egreso.getMetodoPago(), "El egreso no tiene definido un método de pago.");
+        ValidationException.requireNonNull(egreso.getMetodoPago(), "El egreso no tiene definido un método de pago.");
 
-        ValidationUtils.requireNonNull(egreso.getSubTotal(), "El sub total del egreso no esta definido.");
+        ValidationException.requireNonNull(egreso.getSubTotal(), "El sub total del egreso no esta definido.");
 
-        ValidationUtils.requireNonNull(egreso.getTotal(), "El total del egreso no esta definido.");
+        ValidationException.requireNonNull(egreso.getTotal(), "El total del egreso no esta definido.");
 
-        ValidationUtils.requireNonNull(egreso.getStatus(), "El egreso no tiene un status asignado.");
+        ValidationException.requireNonNull(egreso.getStatus(), "El egreso no tiene un status asignado.");
 
         log.info("Finaliza proceso que valida las propiedades del egreso.");
     }
@@ -201,7 +201,7 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
     private void asignarStatus(ImporteEgreso egreso, StatusEgreso status) throws InventarioException {
 
         validarHijoYCatalogo(egreso, status);
-        ValidationUtils.requireNonNull(egreso.getStatus(), "El status del egreso no puede ser vacío.");
+        ValidationException.requireNonNull(egreso.getStatus(), "El status del egreso no puede ser vacío.");
 
         log.info("Inicia proceso para camiar {}: {} a {}.", nombreCatalogo(), egreso.getStatus().getNombre(),
                 status.getNombre());
@@ -220,11 +220,11 @@ public class ImporteEgresoBL extends EgresoBaseBL<ImporteEgreso, ConceptoEgreso,
             throws InventarioException, DAOException {
 
         log.info("Inicia proceso para obtener los egresos por filtros.");
-        ValidationUtils.requireNonNull(concepto, "El concepto no puede ser vacio");
-        ValidationUtils.requireNonNull(concepto.getId(), "El concepto aún no se encuentra guardado.");
-        ValidationUtils.requireNonNull(emisor, "El emisor no puede ser vacío. ");
-        ValidationUtils.requireNonNull(emisor.getId(), "El emisor aún no se encuentra guardado.");
-        ValidationUtils.requireNonNull(mes, "La el periodo no puede ser vacío.");
+        ValidationException.requireNonNull(concepto, "El concepto no puede ser vacio");
+        ValidationException.requireNonNull(concepto.getId(), "El concepto aún no se encuentra guardado.");
+        ValidationException.requireNonNull(emisor, "El emisor no puede ser vacío. ");
+        ValidationException.requireNonNull(emisor.getId(), "El emisor aún no se encuentra guardado.");
+        ValidationException.requireNonNull(mes, "La el periodo no puede ser vacío.");
 
         LocalDate lInicio = mes.atDay(1);
         LocalDate lFin = mes.atEndOfMonth();

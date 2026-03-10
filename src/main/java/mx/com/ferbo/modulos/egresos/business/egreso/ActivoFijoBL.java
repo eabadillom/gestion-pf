@@ -19,11 +19,11 @@ import mx.com.ferbo.modulos.egresos.model.egreso.ActivoFijo;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
 import mx.com.ferbo.util.BaseBL;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.IntegerValidationUtils;
 import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.MonetaryValidationUtils;
-import mx.com.ferbo.util.TextValidationUtils;
-import mx.com.ferbo.util.ValidationUtils;
+import mx.com.ferbo.util.validation.IntegerValidationUtils;
+import mx.com.ferbo.util.validation.ValidationException;
+import mx.com.ferbo.util.validation.helpers.MonetaryValidator;
+import mx.com.ferbo.util.validation.helpers.TextValidator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -116,15 +116,15 @@ public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, Status
 
         log.info("Inicia proceso para validar el activo fijo.");
 
-        ValidationUtils.requireNonNull(activo, "El activo fijo no puede ser nulo.");
+        ValidationException.requireNonNull(activo, "El activo fijo no puede ser nulo.");
 
-        TextValidationUtils.requireNonNull(activo.getDescripcion(), "La descripción del activo fijo");
+        TextValidator.requireNonNull(activo.getDescripcion(), "La descripción del activo fijo");
 
-        TextValidationUtils.requireNonBlank(activo.getDescripcion(), "La descripción del activo fijo");
+        TextValidator.requireNonBlank(activo.getDescripcion(), "La descripción del activo fijo");
 
-        MonetaryValidationUtils.requireNonNull(activo.getImporte(), "El importe del activo fijo");
+        MonetaryValidator.requireNonNull(activo.getImporte(), "El importe del activo fijo");
 
-        MonetaryValidationUtils.requirePositive(activo.getImporte(), "El importe del activo fijo");
+        MonetaryValidator.requirePositive(activo.getImporte(), "El importe del activo fijo");
 
         IntegerValidationUtils.requireNonNull(activo.getVidaUtil(), "La vida util del activo fijo");
 
@@ -138,18 +138,18 @@ public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, Status
 
         DateUtil.resetTime(hoy);
 
-        ValidationUtils.requireNonNull(fecha, "La fecha de adquisición no puede ser nula.");
+        ValidationException.requireNonNull(fecha, "La fecha de adquisición no puede ser nula.");
 
         if (fecha.after(hoy)) {
             throw new InventarioException("La fecha de adquisición no puede ser una fecha a futuro.");
         }
 
-        ValidationUtils.requireNonNull(activo.getFechaAlta(), "El activo fijo no tiene una fecha de alta.");
+        ValidationException.requireNonNull(activo.getFechaAlta(), "El activo fijo no tiene una fecha de alta.");
 
-        ValidationUtils.requireNonNull(activo.getFechaModificacion(),
+        ValidationException.requireNonNull(activo.getFechaModificacion(),
                 "El activo fijo no tiene una fecha de modificación.");
 
-        ValidationUtils.requireNonNull(activo.getStatus(), "El activo fijo no tiene asociado un status.");
+        ValidationException.requireNonNull(activo.getStatus(), "El activo fijo no tiene asociado un status.");
 
         log.info("Finaliza proceso para validar el activo fijo.");
     }
@@ -177,7 +177,7 @@ public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, Status
     private void asignarStatus(ActivoFijo activo, StatusActivoFijo status) throws InventarioException {
 
         validarHijoYCatalogo(activo, status);
-        ValidationUtils.requireNonNull(activo.getStatus(), "El status de activo fijo es nulo.");
+        ValidationException.requireNonNull(activo.getStatus(), "El status de activo fijo es nulo.");
 
         log.info("Inicia proceso para camiar {}: {} a {}.", nombreCatalogo(), activo.getStatus().getNombre(),
                 status.getNombre());
@@ -221,8 +221,8 @@ public class ActivoFijoBL extends EgresoBaseBL<ActivoFijo, ImporteEgreso, Status
 
     public List<ActivoFijo> obtenrActivoFijoPorEgreso(ImporteEgreso egreso) throws InventarioException {
 
-        ValidationUtils.requireNonNull(egreso, nombrePadre() + " no puede ser vacío");
-        ValidationUtils.requireNonNull(egreso.getId(), nombrePadre() + " no está guardado en el sistema.");
+        ValidationException.requireNonNull(egreso, nombrePadre() + " no puede ser vacío");
+        ValidationException.requireNonNull(egreso.getId(), nombrePadre() + " no está guardado en el sistema.");
 
         Integer idEgreso = egreso.getId();
 

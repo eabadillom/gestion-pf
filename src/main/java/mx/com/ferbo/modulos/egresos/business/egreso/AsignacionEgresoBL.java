@@ -16,8 +16,8 @@ import mx.com.ferbo.modulos.egresos.model.egreso.AsignacionEgreso;
 import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
 import mx.com.ferbo.util.BaseBL;
 import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.MonetaryValidationUtils;
-import mx.com.ferbo.util.ValidationUtils;
+import mx.com.ferbo.util.validation.ValidationException;
+import mx.com.ferbo.util.validation.helpers.MonetaryValidator;
 
 @Named
 @ApplicationScoped
@@ -61,15 +61,15 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
 
     private void validarAsignacioneEgreso(AsignacionEgreso asignacion) throws InventarioException {
 
-        ValidationUtils.requireNonNull(asignacion, "La asignación no puede ser vacía");
+        ValidationException.requireNonNull(asignacion, "La asignación no puede ser vacía");
 
-        ValidationUtils.requireNonNull(asignacion.getImporteEgreso(), "La asignación no tiene asociado ningun egreso.");
+        ValidationException.requireNonNull(asignacion.getImporteEgreso(), "La asignación no tiene asociado ningun egreso.");
 
-        ValidationUtils.requireNonNull(asignacion.getTipoAsignacion(), "La asignación no tiene asociado un tipo.");
+        ValidationException.requireNonNull(asignacion.getTipoAsignacion(), "La asignación no tiene asociado un tipo.");
 
-        ValidationUtils.requireNonNull(asignacion.getImporte(), "La asignación no tiene ningun inporte");
+        ValidationException.requireNonNull(asignacion.getImporte(), "La asignación no tiene ningun inporte");
 
-        MonetaryValidationUtils.requirePositive(asignacion.getImporte(), "el impor de la asinación");
+        MonetaryValidator.requirePositive(asignacion.getImporte(), "el impor de la asinación");
 
     }
 
@@ -115,7 +115,7 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
             throw new InventarioException("Datos insuficientes para calcular el importe.");
         }
 
-        MonetaryValidationUtils.requirePositive(asignacion.getPorcentaje(), "el procentaje de la asignación");
+        MonetaryValidator.requirePositive(asignacion.getPorcentaje(), "el procentaje de la asignación");
 
         return egreso.getConceptoEgreso()
                 .getTotalConceptoEgreso()
@@ -129,8 +129,8 @@ public class AsignacionEgresoBL extends EgresoBaseBL<AsignacionEgreso, ImporteEg
     }
 
     public List<AsignacionEgreso> obtenerAsgianaciones(ImporteEgreso egreso) throws InventarioException {
-        ValidationUtils.requireNonNull(egreso, "El egreso no puede ser vacío.");
-        ValidationUtils.requireNonNull(egreso.getId(), "El egreso aun no esta guaradado en el sistema.");
+        ValidationException.requireNonNull(egreso, "El egreso no puede ser vacío.");
+        ValidationException.requireNonNull(egreso.getId(), "El egreso aun no esta guaradado en el sistema.");
 
         Integer idEgreso = egreso.getId();
 

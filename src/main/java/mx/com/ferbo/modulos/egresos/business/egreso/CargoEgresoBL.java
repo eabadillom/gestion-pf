@@ -20,10 +20,10 @@ import mx.com.ferbo.modulos.egresos.model.egreso.ImporteEgreso;
 import mx.com.ferbo.util.BaseBL;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.IntegerValidationUtils;
-import mx.com.ferbo.util.ValidationUtils;
 import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.MonetaryValidationUtils;
+import mx.com.ferbo.util.validation.IntegerValidationUtils;
+import mx.com.ferbo.util.validation.ValidationException;
+import mx.com.ferbo.util.validation.helpers.MonetaryValidator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -104,17 +104,17 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
 
         log.info("Inicia el proceso para validar el cargo del egreso.");
 
-        ValidationUtils.requireNonNull(cargo, "El cargo no puede ser vacío.");
+        ValidationException.requireNonNull(cargo, "El cargo no puede ser vacío.");
 
-        ValidationUtils.requireNonNull(cargo.getImporteEgreso(), "El cargo no tiene asociado un egreso.");
+        ValidationException.requireNonNull(cargo.getImporteEgreso(), "El cargo no tiene asociado un egreso.");
 
-        ValidationUtils.requireNonNull(cargo.getTipoCargo(), "El cargo no tiene asosciado ningun tipo de cargo.");
+        ValidationException.requireNonNull(cargo.getTipoCargo(), "El cargo no tiene asosciado ningun tipo de cargo.");
 
-        MonetaryValidationUtils.requireNonNull(cargo.getImporteCargo(), "El importe del cargo");
+        MonetaryValidator.requireNonNull(cargo.getImporteCargo(), "El importe del cargo");
 
-        MonetaryValidationUtils.requirePositive(cargo.getImporteCargo(), "El importe del cargo");
+        MonetaryValidator.requirePositive(cargo.getImporteCargo(), "El importe del cargo");
 
-        ValidationUtils.requireNonNull(cargo.getStatus(), "El cargo no tiene un status asociado.");
+        ValidationException.requireNonNull(cargo.getStatus(), "El cargo no tiene un status asociado.");
 
         log.info("Finaliza el proceso para validar el cargo del egreso.");
     }
@@ -142,7 +142,7 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
 
     private void asignarStatus(CargoEgreso cargo, StatusCargoEgreso status) throws InventarioException {
         validarHijoYCatalogo(cargo, status);
-        ValidationUtils.requireNonNull(cargo.getStatus(), "El status del egreso no puede ser vacío.");
+        ValidationException.requireNonNull(cargo.getStatus(), "El status del egreso no puede ser vacío.");
 
         log.info("Inicia proceso para camiar {}: {} a {}.", nombreCatalogo(), cargo.getStatus().getNombre(),
                 status.getNombre());
@@ -160,7 +160,7 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
 
     private int obtenerNumeroDias(CargoEgreso cargo) throws InventarioException {
 
-        ValidationUtils.requireNonNull(cargo, "El cargo no puede ser nulo.");
+        ValidationException.requireNonNull(cargo, "El cargo no puede ser nulo.");
 
         if (cargo.getFechaAplicacion() == null || cargo.getFechaCalculo() == null) {
             log.warn("No se pueden calcular los días porque alguna fecha es nula.");
@@ -178,18 +178,18 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
 
     private BigDecimal obtenerImporteCargo(CargoEgreso cargo) throws InventarioException {
 
-        ValidationUtils.requireNonNull(cargo, "El cargo no puede ser vacío");
+        ValidationException.requireNonNull(cargo, "El cargo no puede ser vacío");
 
-        ValidationUtils.requireNonNull(cargo.getImporteEgreso(), "El egreso asociado al egreso no puede ser vacío");
+        ValidationException.requireNonNull(cargo.getImporteEgreso(), "El egreso asociado al egreso no puede ser vacío");
 
-        ValidationUtils.requireNonNull(cargo.getImporteEgreso().getConceptoEgreso(),
+        ValidationException.requireNonNull(cargo.getImporteEgreso().getConceptoEgreso(),
                 "El concepto del egreso no puede ser vacío.");
 
-        ValidationUtils.requireNonNull(cargo.getImporteEgreso().getConceptoEgreso().getTotalConceptoEgreso(),
+        ValidationException.requireNonNull(cargo.getImporteEgreso().getConceptoEgreso().getTotalConceptoEgreso(),
                 "El egreso no tiene el total contractuado.");
 
-        MonetaryValidationUtils.requireNonNull(cargo.getPorcentajeTasa(), "El porcentaje de tasa del cargo");
-        MonetaryValidationUtils.requirePositive(cargo.getPorcentajeTasa(), "La tasa del cargo");
+        MonetaryValidator.requireNonNull(cargo.getPorcentajeTasa(), "El porcentaje de tasa del cargo");
+        MonetaryValidator.requirePositive(cargo.getPorcentajeTasa(), "La tasa del cargo");
 
         IntegerValidationUtils.requireNonNull(cargo.getNumeroDias(), "El número de días del cargo");
         IntegerValidationUtils.requirePositive(cargo.getNumeroDias(), "El número de días del cargo");
@@ -245,8 +245,8 @@ public class CargoEgresoBL extends EgresoBaseBL<CargoEgreso, ImporteEgreso, Stat
 
     private List<CargoEgreso> obtenerCargosEgresoPorEstatus(ImporteEgreso egreso,
             StatusCargoEgreso status) throws InventarioException, DAOException {
-        ValidationUtils.requireNonNull(egreso, nombrePadre() + " no puede ser vacío");
-        ValidationUtils.requireNonNull(egreso.getId(), nombrePadre() + " no puede ser vacío.");
+        ValidationException.requireNonNull(egreso, nombrePadre() + " no puede ser vacío");
+        ValidationException.requireNonNull(egreso.getId(), nombrePadre() + " no puede ser vacío.");
 
         List<StatusCargoEgreso> lst;
 

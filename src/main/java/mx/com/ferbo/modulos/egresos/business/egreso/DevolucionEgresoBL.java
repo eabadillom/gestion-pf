@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @RequestScoped
-public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEgreso, StatusDevolucionEgreso> implements BaseBL<ImporteEgreso>{
+public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEgreso, StatusDevolucionEgreso> implements BaseBL<DevolucionEgreso>{
 
     private static final Logger log = LogManager.getLogger(DevolucionEgresoBL.class);
 
@@ -51,7 +51,6 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
     public void init() {
 
         try {
-            setDao(dao);
             registrada = statusBL.buscarPorNombre(STATUS_REGISTRADA);
             autorizada = statusBL.buscarPorNombre(STATUS_AUTORIZADA);
             aplicada = statusBL.buscarPorNombre(STATUS_APLICADA);
@@ -66,25 +65,7 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
         }
     }
 
-    @Override
-    public DevolucionEgreso nuevo() {
-        return new DevolucionEgreso();
-    }
-
-    @Override
-    public String nombreHijo() {
-        return "la devolución del pago";
-    }
-
-    @Override
-    public String nombreHijos() {
-        return "las devoluciones del pago";
-    }
-
-    @Override
-    public String nombreCatalogo() {
-        return "el status";
-    }
+    
 
     @Override
     protected void validar(DevolucionEgreso devolucion) throws InventarioException {
@@ -137,13 +118,44 @@ public class DevolucionEgresoBL extends EgresoBaseBL<DevolucionEgreso, ImporteEg
 
     }
 
-    public StatusDevolucionEgreso aplicable() throws InventarioException {
-        return autorizada;
-    }
+
 
     @Override
-    protected StatusDevolucionEgreso statusInicial() {
-        return registrada;
+    public DevolucionEgreso nuevo() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'nuevo'");
+    }
+
+
+
+    @Override
+    protected void construirMaquinaStatus() throws InventarioException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'construirMaquinaStatus'");
+    }
+
+
+
+    @Override
+    protected String nombreHijo() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'nombreHijo'");
+    }
+
+
+
+    @Override
+    protected String nombreHijos() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'nombreHijos'");
+    }
+
+
+
+    @Override
+    protected String nombreCatalogo() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'nombreCatalogo'");
     }
 
 }

@@ -1,13 +1,10 @@
 
 package mx.com.ferbo.modulos.egresos.business;
 
-import mx.com.ferbo.util.ValidationUtils;
-
 import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.util.validation.ValidationException;
 
 public abstract class EgresoBaseBL<T, P, C> {
-
-    protected abstract void construirMaquinaStatus() throws InventarioException;
 
     protected abstract String nombreHijo();
 
@@ -21,19 +18,19 @@ public abstract class EgresoBaseBL<T, P, C> {
 
     protected void validarHijoYCatalogo(T son, C catalog) throws InventarioException {
 
-        ValidationUtils.requireNonNull(son, nombreHijo() + " no puese ser vacío.");
-        ValidationUtils.requireNonNull(catalog, nombreCatalogo() + " no puese ser vacío.");
+        ValidationException.requireNonNull(son, nombreHijo() + " no puese ser vacío.");
+        ValidationException.requireNonNull(catalog, nombreCatalogo() + " no puese ser vacío.");
     }
 
     public void validarPadreYCatalogo(P father, C catalog) throws InventarioException {
-         ValidationUtils.requireNonNull(father, nombrePadre() + " no puede ser vacío.");
-         ValidationUtils.requireNonNull(catalog, nombreCatalogo() + " no puede ser vacío");
+         ValidationException.requireNonNull(father, nombrePadre() + " no puede ser vacío.");
+         ValidationException.requireNonNull(catalog, nombreCatalogo() + " no puede ser vacío");
     }
 
     protected void validarPadreEHijo(P father, T son) throws InventarioException {
 
-        ValidationUtils.requireNonNull(father, nombrePadre() + " no puede ser vacío.");
-        ValidationUtils.requireNonNull(son, nombreHijo() + " no puede ser vacío.");
+        ValidationException.requireNonNull(father, nombrePadre() + " no puede ser vacío.");
+        ValidationException.requireNonNull(son, nombreHijo() + " no puede ser vacío.");
 
     }
 }

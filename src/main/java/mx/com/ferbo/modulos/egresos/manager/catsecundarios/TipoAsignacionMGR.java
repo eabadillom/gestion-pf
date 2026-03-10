@@ -8,7 +8,7 @@ import mx.com.ferbo.modulos.egresos.business.categreso.TipoAsignacionEgresoBL;
 import mx.com.ferbo.modulos.egresos.model.catsecundarios.TipoAsignacionEgreso;
 import mx.com.ferbo.util.BaseMGR;
 import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.ResultadoOperacion;
+import mx.com.ferbo.util.messaging.ResultadoOperacion;
 
 public class TipoAsignacionMGR extends BaseMGR {
 

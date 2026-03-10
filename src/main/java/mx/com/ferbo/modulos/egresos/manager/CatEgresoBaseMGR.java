@@ -8,10 +8,10 @@ import org.apache.poi.ss.formula.functions.T;
 import mx.com.ferbo.modulos.egresos.model.CatEgreso;
 import mx.com.ferbo.util.Identificable;
 import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.NivelMensaje;
-import mx.com.ferbo.util.ResultadoOperacion;
 import mx.com.ferbo.util.funcional.ThrowingConsumer;
 import mx.com.ferbo.util.funcional.ThrowingSupplierL;
+import mx.com.ferbo.util.messaging.NivelMensaje;
+import mx.com.ferbo.util.messaging.ResultadoOperacion;
 
 public abstract class CatEgresoBaseMGR<T extends Identificable<?>> {
 
