@@ -146,4 +146,28 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
 
         return model;
     }
+    
+    public Cliente buscarPorNombre(String nombreCte) throws DAOException {
+        Cliente model = null;
+        EntityManager em = null;
+        
+        try {
+            em = super.getEntityManager();
+            
+            model = em.createNamedQuery("Cliente.findByCteNombre", this.modelClass)
+                    .setParameter("cteNombre", nombreCte)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            log.info("No se encontró cliente con el nombre: {}", nombreCte);
+            return null;
+        } catch (Exception ex) {
+            log.warn("Problema para obtener el cliente por el nombre: {}", ex.getMessage());
+            throw new DAOException("Hubo un problema al buscar el cliente");
+        } finally {
+            super.close(em);
+        }
+        
+        return model;
+    }
+    
 }
