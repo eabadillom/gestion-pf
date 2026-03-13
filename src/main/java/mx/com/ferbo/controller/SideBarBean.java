@@ -1,6 +1,5 @@
 package mx.com.ferbo.controller;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -15,8 +15,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.OrdenSalidaDAO;
+import mx.com.ferbo.business.salidas.SalidasBL;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.StatusSalida;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 
@@ -27,7 +28,9 @@ public class SideBarBean implements Serializable {
 	private static final long serialVersionUID = 8802717839932668484L;
 	private static Logger log = LogManager.getLogger(SideBarBean.class);
 	
-	private OrdenSalidaDAO ordenSalidaDAO = null;
+        @Inject
+	private SalidasBL salidasBL;
+        
 	private List<Cliente> listaClientesActivos;
 	private List<Cliente> listaClientesTodos;
 	private Usuario usuario;
@@ -52,14 +55,13 @@ public class SideBarBean implements Serializable {
 
 	public SideBarBean() {
     	this.usuario = new Usuario();
-    	this.ordenSalidaDAO = new OrdenSalidaDAO();
     }
     
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		Date fecha = null;
-		
+		StatusSalida statusSalida = null;
 		try {
 			fecha = new Date();
 			DateUtil.resetTime(fecha);
@@ -73,7 +75,8 @@ public class SideBarBean implements Serializable {
 			fotografia = (String) request.getSession(false).getAttribute("fotografia");
 			
 			if(this.usuario.getPerfil() == 1 || this.usuario.getPerfil() == 4) {
-				numeroSalidas = ordenSalidaDAO.getCantidadPorClientePlanta(fecha, this.usuario.getIdPlanta());
+				statusSalida = salidasBL.obtenerStatusEnviado();
+                                numeroSalidas = salidasBL.totalSalidasPorCliente(statusSalida.getClave(), fecha, this.usuario.getIdPlanta());
 				log.info("Ordenes de salida pendientes: {}", numeroSalidas);
 			}
 			
@@ -125,30 +128,12 @@ public class SideBarBean implements Serializable {
     	}
 	}
 	
-	public void redirectOrdenesSalida() {
-		String contextPath = null;
-		String fullPath = null;
-		
-	    try {
-	    	contextPath = context.getExternalContext().getApplicationContextPath();
-			fullPath = contextPath + "/inventarios/OrdenSalida.xhtml";
-			this.context.getExternalContext().redirect(fullPath);
-		} catch (IOException e) {
-			log.warn("Problema para redirigir a las órdenes de salida...",e);
-		}
-	}
+	public String redirectOrdenesSalida() {
+            return "/inventarios/ordenSalidas/principal?faces-redirect=true";
+        }
 	
-	public void redirectOrdenEntrada() {
-		String contextPath = null;
-		String fullPath = null;
-		
-	    try {
-	    	contextPath = context.getExternalContext().getApplicationContextPath();
-			fullPath = contextPath + "/inventarios/ordenEntrada.xhtml";
-			this.context.getExternalContext().redirect(fullPath);
-		} catch (IOException e) {
-			log.warn("Problema para redirigir a las órdenes de salida...",e);
-		}
+	public String redirectOrdenEntrada() {
+            return "/inventarios/ordenEntrada?faces-redirect=true";
 	}
 	
 	public Usuario getUsuario() {

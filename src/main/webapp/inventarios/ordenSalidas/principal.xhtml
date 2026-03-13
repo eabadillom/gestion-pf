@@ -1,0 +1,48 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Ordenes de Salida</ui:define>
+    <ui:define name="content">
+        <h:form id="form" enctype="multipart/form-data">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- DATOS GENERALES -->
+            <!-- id: cliente-som, folio-som, txtfecha, txtHora, txtnomOperador, txtplacas, folioSalida, txtObservaciones -->
+            <ui:include src="/inventarios/ordenSalidas/alta-datos-generales.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- Detalle Salida -->
+            <!-- id: dt-salidas, dtDetallesSalida -->
+            <ui:include src="/inventarios/ordenSalidas/alta-det-salidas.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- Agregar Servicios -->
+            <!-- id: selServicio, txtCantidadSrv -->
+            <ui:include src="/inventarios/ordenSalidas/alta-agregar-servicios.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- Detalle Servicios -->
+            <!-- id: dt-servicios -->
+            <ui:include src="/inventarios/ordenSalidas/alta-det-servicios.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- Acciones -->
+            <!-- id: btnTicketSalida, btnTicketServicio -->
+            <ui:include src="/inventarios/ordenSalidas/alta-acciones.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- Dialogo confirmar -->
+            <ui:include src="/inventarios/ordenSalidas/alta-dlg-confirmar.xhtml" />
+        </h:form>
+    </ui:define>
+</ui:composition>

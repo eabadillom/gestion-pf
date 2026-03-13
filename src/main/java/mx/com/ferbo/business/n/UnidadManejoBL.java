@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.n;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -16,8 +17,8 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
-public class UnidadManejoBL {
-
+public class UnidadManejoBL 
+{
     private static final Logger log = LogManager.getLogger(UnidadManejoBL.class);
 
     @Inject
@@ -31,6 +32,21 @@ public class UnidadManejoBL {
             log.error("Error al obtener unidades de manejo", ex);
             throw new InventarioException("Ocurrió un error al obtener las unidades de manejo", ex);
         }
+    }
+    
+    public UnidadDeManejo obtenerUDMPorId(Integer idUDM) throws InventarioException {
+        if(idUDM == null)
+            throw new InventarioException("La unidad de manejo no puede ser vacía");
+        
+        Optional<UnidadDeManejo> planta = unidadManejoDAO.buscarPorId(idUDM);
+        UnidadDeManejo aux = null;
+        
+        if(planta.isPresent())
+            aux = planta.get();
+        else
+            throw new InventarioException("No se encontro registro con ese identificador");
+        
+        return aux;
     }
 
 }

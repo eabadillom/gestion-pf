@@ -64,7 +64,6 @@
 		<class>mx.com.ferbo.model.TipoMovimiento</class>
 		<class>mx.com.ferbo.model.Pais</class>
 		<class>mx.com.ferbo.model.DetalleCteProd</class>
-		<class>mx.com.ferbo.model.PreSalida</class>
 		<class>mx.com.ferbo.model.PartidaServicio</class>
 		<class>mx.com.ferbo.model.StatusFactura</class>
 		<class>mx.com.ferbo.model.Contacto</class>

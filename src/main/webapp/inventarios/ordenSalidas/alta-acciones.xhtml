@@ -1,0 +1,25 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <div align="center" style="padding: 1rem;">
+        <span style="padding-left: 0.5rem; padding-right: 1rem;">
+            <p:commandButton value="Guardar" process="@this" icon="pi pi-save" onclick="PF('confirmGuardar').show();"/>
+        </span>
+        <span style="padding-left: 0.5rem; padding-right: 1rem;">
+            <p:commandButton id="btnTicketSalida" value="Ticket de Salida" icon="pi pi-print" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                <p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
+            </p:commandButton>
+        </span>
+        <span style="padding-left: 0.5rem; padding-right: 1rem;">
+            <p:commandButton id="btnTicketServicio" value="Ticket de Servicio" icon="pi pi-print" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketServicios}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                <p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
+            </p:commandButton>
+        </span>
+        <span style="padding-left: 0.5rem; padding-right: 1rem;">
+            <p:commandButton value="Nueva orden" actionListener="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh" />
+        </span>
+    </div>
+</ui:composition>
