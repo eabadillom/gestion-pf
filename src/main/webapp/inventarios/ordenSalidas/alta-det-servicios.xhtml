@@ -1,0 +1,26 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dataTable id="dt-servicios" var="servicio" selection="#{ordenSalidaBean.serviciosSalida}" value="#{ordenSalidaBean.listaServiciosSalida}" reflow="true">
+        <f:facet name="header">
+            <p:outputLabel value="Para los servicios de" />
+        </f:facet>	
+        <p:column headerText="Servicio">
+            <h:outputText value="#{servicio.servicio.servicioDs}" />
+        </p:column>
+        <p:column headerText="Cantidad" width="10rem">
+            <p:inputNumber value="#{servicio.cantidad}" decimalPlaces="0" minValue="1" style="width: 8rem!important;">
+                <p:ajax process="@this" />
+            </p:inputNumber>
+        </p:column>
+        <p:column headerText="Unidad" width="10rem">
+            <p:outputLabel value="#{servicio.unidadDeManejo.unidadDeManejoDs}"/>
+        </p:column>
+        <p:column width="2rem">
+            <p:commandButton icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{ordenSalidaBean.deleteServicio(servicio)}" update="dt-servicios" process="@this"/>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

@@ -13,7 +13,8 @@ import org.apache.logging.log4j.Logger;
 
 @Named
 @ApplicationScoped
-public class ConstanciaSalidaDAO extends BaseDAO <ConstanciaSalida, Integer>{
+public class ConstanciaSalidaDAO extends BaseDAO <ConstanciaSalida, Integer>
+{
     private static Logger log = LogManager.getLogger(ConstanciaSalidaDAO.class);
 
     public ConstanciaSalidaDAO(){
@@ -23,14 +24,17 @@ public class ConstanciaSalidaDAO extends BaseDAO <ConstanciaSalida, Integer>{
     public List<ConstanciaSalida> obtenerPorFolioDeposito(Integer folio){
         EntityManager em = null;
         List<ConstanciaSalida> lista = null;
-		try {
-			em = super.getEntityManager();
-            lista = em.createNamedQuery("ConstanciaSalida.findByFolioDeposito", ConstanciaSalida.class).setParameter("folio", folio).getResultList();
-		} finally{
+        try {
+            em = super.getEntityManager();
+            lista = em.createNamedQuery("ConstanciaSalida.findByFolioDeposito", ConstanciaSalida.class)
+                .setParameter("folio", folio)
+                .getResultList();
+        } finally{
             super.close(em);
         }
+        
         return lista;
-	}
+    }
     
     public String buscarPorNumero(String numFolio) {
         ConstanciaSalida constanciaSalida;

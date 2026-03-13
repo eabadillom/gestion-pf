@@ -10,15 +10,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
-public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
-
+public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> 
+{
     private static Logger log = LogManager.getLogger(PrecioServicioDAO.class);
 
     public PrecioServicioDAO() {

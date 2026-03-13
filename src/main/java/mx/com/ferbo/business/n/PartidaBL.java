@@ -7,8 +7,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import mx.com.ferbo.dao.n.DetallePartidaDAO;
 import mx.com.ferbo.dao.n.PartidaDAO;
+import mx.com.ferbo.dao.n.TipoMovimientoDAO;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Partida;
+import mx.com.ferbo.model.TipoMovimiento;
+import mx.com.ferbo.ui.OrdenDeSalidas;
 import mx.com.ferbo.util.InventarioException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +31,9 @@ public class PartidaBL
     
     @Inject
     private DetallePartidaDAO detallePartidaDAO;
+    
+    @Inject
+    private TipoMovimientoDAO tipoMovimientoDAO;
     
     /*Partida*/
     public Partida buscarPartidaPorId(Integer idPartida) throws InventarioException {
@@ -52,6 +58,11 @@ public class PartidaBL
         return partidaDAO.buscarPorIdConEntrada(idPartida);
     }
     
+    public Partida obtenerPartidaPorSalida(OrdenDeSalidas orden) throws InventarioException 
+    {
+        return buscarPartidaConEntrada(orden.getPartidaCve());
+    }
+    
     /*Detalle Partida*/
     public List<DetallePartida> buscarPorId(Integer partidaCve) throws InventarioException {
         if(partidaCve == null)
@@ -66,6 +77,22 @@ public class PartidaBL
     
     public void actualizarDetallePartida(DetallePartida detallePartida) throws InventarioException{
         detallePartidaDAO.actualizar(detallePartida);
+    }
+    
+    /*Tipo Movimiento*/
+    public TipoMovimiento buscarTMPorId(Integer idTipoMovimiento) throws InventarioException {
+        if(idTipoMovimiento == null)
+            throw new InventarioException("El tipo de movimiento no puede ser vacía");
+        
+        Optional<TipoMovimiento> auxTipoMovimiento = tipoMovimientoDAO.buscarPorId(idTipoMovimiento);
+        TipoMovimiento tipoMovimiento = null;
+        
+        if(auxTipoMovimiento.isPresent())
+            tipoMovimiento = auxTipoMovimiento.get();
+        else
+            throw new InventarioException("No se encontro registro con ese identificador");
+        
+        return tipoMovimiento;
     }
     
 }

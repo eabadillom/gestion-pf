@@ -1,6 +1,5 @@
 package mx.com.ferbo.controller;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -129,30 +128,12 @@ public class SideBarBean implements Serializable {
     	}
 	}
 	
-	public void redirectOrdenesSalida() {
-		String contextPath = null;
-		String fullPath = null;
-		
-	    try {
-	    	contextPath = context.getExternalContext().getApplicationContextPath();
-			fullPath = contextPath + "/inventarios/OrdenSalida.xhtml";
-			this.context.getExternalContext().redirect(fullPath);
-		} catch (IOException e) {
-			log.warn("Problema para redirigir a las órdenes de salida...",e);
-		}
-	}
+	public String redirectOrdenesSalida() {
+            return "/inventarios/ordenSalidas/principal?faces-redirect=true";
+        }
 	
-	public void redirectOrdenEntrada() {
-		String contextPath = null;
-		String fullPath = null;
-		
-	    try {
-	    	contextPath = context.getExternalContext().getApplicationContextPath();
-			fullPath = contextPath + "/inventarios/ordenEntrada.xhtml";
-			this.context.getExternalContext().redirect(fullPath);
-		} catch (IOException e) {
-			log.warn("Problema para redirigir a las órdenes de salida...",e);
-		}
+	public String redirectOrdenEntrada() {
+            return "/inventarios/ordenEntrada?faces-redirect=true";
 	}
 	
 	public Usuario getUsuario() {

@@ -78,6 +78,13 @@ public class SalidasBL
         return folios;
     }
     
+    public void actualizarSalida(Salida salida) throws DAOException, InventarioException  {
+        StatusSalida auxStatusSalida = obtenerStatusAceptado();
+        salida.setStatus(auxStatusSalida);
+        salida.setFechaModificacion(new Date());
+        actualizar(salida);
+    }
+    
     public List<OrdenDeSalidas> obtenerInventario(String folioSalida, Date fecha){
         List<OrdenDeSalidas> listOrdenSalidas = new ArrayList();
         StatusSalida stSalida = null;
@@ -85,7 +92,6 @@ public class SalidasBL
         try{
             if(fecha == null)
                 throw new InventarioException("Error al obtener la fecha");
-            
             
             if(folioSalida == null)
                 throw new InventarioException("Error al obtener el folio de salida");
@@ -111,7 +117,7 @@ public class SalidasBL
         return serviciosSalidasDAO.buscarPorFolioSalida(folioSalida);
     }
     
-    public void actualizarSalida(Salida salida) throws InventarioException {
+    public void actualizar(Salida salida) throws InventarioException {
         FacesUtils.requireNonNull(salida, "Error al actualizar la salida");
         salidasDAO.actualizar(salida);
     }

@@ -1,0 +1,56 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:panel header="Información de la solicitud">
+        <div class="p-grid ui-fluid p-col-12">
+            <div class="p-col-6 p-md-6">
+                <p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="---SELECCIONE EL CLIENTE---" noSelectionOption="true"/>
+                    <f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
+                    <p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:selServicio :form:planta-som :form:folio-som" oncomplete="PF('statusInfoDialog').hide();"/>
+                </p:selectOneMenu>
+            </div>
+            <div class="p-col-6 p-md-6">
+                <p:selectOneMenu id="planta-som" autoWidth="false"  value="#{ordenSalidaBean.plantaSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="---SELECCIONE LA PLANTA---" noSelectionOption="true"/>
+                    <f:selectItems value="#{ordenSalidaBean.listPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+                    <p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:planta-som :form:folio-som" oncomplete="PF('statusInfoDialog').hide();"/>
+                </p:selectOneMenu>
+            </div>
+            <div class="p-col-2 p-md-2">
+                <p:selectOneMenu id="folio-som" widgetVar="somFolios"  value="#{ordenSalidaBean.folioSelected}" converter="entityConverter" onchange="PF('statusInfoDialog').show();">
+                    <f:selectItem itemLabel="Ordenes del día..." itemValue="" />
+                    <f:selectItems value="#{ordenSalidaBean.listaFolios}" var="folio" itemLabel="#{folio}" itemValue="#{folio}"></f:selectItems>
+                    <p:ajax listener="#{ordenSalidaBean.filtroPorOrdenesSalida}"  process ="@this" update=":form:txtfecha :form:txtHora :form:txtnomOperador :form:txtplacas :form:txtObservaciones :form:dt-salidas :form:dt-servicios :form:folioSalida" oncomplete="PF('statusInfoDialog').hide();"/>
+                </p:selectOneMenu>
+            </div>
+            <div class="p-col-2 p-md-2">
+                <p:inputText id="txtfecha" value="#{ordenSalidaBean.salida.fechaSalida}" placeholder="Fecha" readonly="true">
+                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                </p:inputText>
+            </div>
+            <div class="p-col-2 p-md-2">
+                <p:inputText id="txtHora" value="#{ordenSalidaBean.salida.horaSalida}" placeholder="Hora" readonly="true" >
+                    <f:convertDateTime type="localTime" pattern="HH:mm:ss" />
+                </p:inputText>
+            </div>
+            <div class="p-col-2 p-md-2">
+                <p:inputText id="folioSalida" value="#{ordenSalidaBean.folioSalida}" placeholder="Folio Salida"/>
+            </div>
+            <div class="p-col-6 p-md-2">
+                <p:inputText id="txtnomOperador" value="#{ordenSalidaBean.salida.nombreTransportista}" placeholder="Nombre del operador" />
+            </div>
+            <div class="p-col-2 p-md-2">
+                <p:inputText id="txtplacas" value="#{ordenSalidaBean.salida.placasTransporte}" placeholder="Placas"/>
+            </div>
+            <div class="p-col-12 p-md-12">
+                <p:inputText id="txtObservaciones" value="#{ordenSalidaBean.observaciones}"  placeholder="Observaciones">
+                    <p:ajax process="@this" />
+                </p:inputText>
+            </div>
+        </div>
+    </p:panel>
+</ui:composition>

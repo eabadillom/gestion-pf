@@ -1,0 +1,75 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dataTable id="dt-salidas" widgetVar="dtsalidas" value="#{ordenSalidaBean.listaSalidaUI}" var="salidas" paginator="false"
+        rowSelectMode="add" rows="10" rowKey="#{salidas.folioSalida}" reflow="true" selection="#{salidas.folioSalida}" tableStyle="table-layout: auto;">
+        <f:facet name="header">
+            <p:outputLabel value="Productos solicitados" />
+        </f:facet>
+        <p:column exportable="false" width="1rem">
+            <p:rowToggler />
+        </p:column>
+        <p:column headerText="Planta" width="4rem">
+            <h:outputText value="#{salidas.nombrePlanta}"/>
+        </p:column>
+        <p:column headerText="Camara" width="4rem">
+            <h:outputText value="#{salidas.nombreCamara}"/>
+        </p:column>
+        <p:column headerText="Folio ingreso" width="4rem">
+            <h:outputText value="#{salidas.folioEntrada}" />
+        </p:column>
+        <p:column headerText="Producto">
+            <h:outputText value="#{salidas.nombreProducto}"/>
+            <f:facet name="footer">
+                <h:outputText value="Total:"/>
+            </f:facet>
+        </p:column>
+        <p:column headerText="Cantidad" width="4rem" style="text-align: right;">
+            <h:outputText value="#{salidas.cantidad}"/>
+            <f:facet name="footer">
+                <h:outputText value="#{ordenSalidaBean.totalCajas}"/>
+            </f:facet>
+        </p:column>
+        <p:column headerText="Peso (kg)" width="5rem" style="text-align: right;">
+            <h:outputText value="#{salidas.peso}"/>
+            <f:facet name="footer">
+                <h:outputText value="#{ordenSalidaBean.pesoTotal}"/>
+            </f:facet>
+        </p:column>
+        <p:column headerText="Temp. (°C)" width="4rem">
+            <p:inputText value="#{salidas.temperatura}" requiredMessage="Ingresar el grado de temperatura" style="width: 4rem!important;"
+                         disabled="#{not salidas.salidaSelected}"  >
+                <p:ajax process="@this" listener="#{ordenSalidaBean.validarTemperatura(salidas)}" />
+            </p:inputText>
+        </p:column>
+        <p:column headerText="Seleccionado" width="4rem">
+            <p:selectBooleanCheckbox value="#{salidas.salidaSelected}" >
+                <p:ajax process="@this" listener="#{ordenSalidaBean.validarProducto(salidas)}" update="form:dt-salidas"/>
+            </p:selectBooleanCheckbox>
+        </p:column>
+        <p:rowExpansion>
+            <div class="orders-subtable">
+                <p:dataTable id="dtDetallesSalida" widgetVar="wv-detalleSalida" var="detalleSalidas" value="#{ordenSalidaBean.listaSalidaUI}" reflow="true" rowKey="#{ordenSalidaBean.salida.folioSalida}" lazy="true">
+                    <p:column headerText="Unidad">
+                        <h:outputText value="#{detalleSalidas.unidadManejo}"/>
+                    </p:column>
+                    <p:column headerText="Lote">
+                        <h:outputText value="#{detalleSalidas.lote}" />
+                    </p:column>
+                    <p:column headerText="Caducidad">
+                        <h:outputText value="#{detalleSalidas.fechaCaducidad}" />
+                    </p:column>
+                    <p:column headerText="Pedimento">
+                        <h:outputText value="#{detalleSalidas.pedimento}" />
+                    </p:column>
+                    <p:column headerText="SAP">
+                        <h:outputText value="#{detalleSalidas.SAP}" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </p:rowExpansion>
+    </p:dataTable>
+</ui:composition>

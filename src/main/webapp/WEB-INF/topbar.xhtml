@@ -18,13 +18,13 @@
         <div align="right">
 	        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
 	        	<p:badge value="#{sideBarBean.numeroEntradas}" severity="danger" rendered="#{sideBarBean.numeroEntradas != null}">
-		       		<p:commandButton value="Ordenes de entrada" actionListener="#{sideBarBean.redirectOrdenEntrada()}" action="/inventarios/ordenEntrada.xhtml"/>
+		       		<p:commandButton value="Ordenes de entrada" action="#{sideBarBean.redirectOrdenEntrada()}" />
 		       	</p:badge>
 	        </span>
 	        <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
 		       	<p:badge id="numeroSalidas" value="#{sideBarBean.numeroSalidas}" severity="danger" rendered="#{sideBarBean.numeroSalidas != null}">
 		       		<p:autoUpdate on="eventNumeroSalidas"/>
-		       		<p:commandButton value="Ordenes de salida" actionListener="#{sideBarBean.redirectOrdenesSalida()}" action="/inventarios/OrdenSalida.xhtml">
+		       		<p:commandButton value="Ordenes de salida" action="#{sideBarBean.redirectOrdenesSalida()}" >
 		       		</p:commandButton>
 		       	</p:badge>
 	        </span>

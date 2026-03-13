@@ -1,0 +1,23 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:panel header="Agregar servicios">	
+        <div class="p-grid ui-fluid p-col-12">
+            <div class="p-col-6 p-md-6">
+                <p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.servicioSelect}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
+                    <f:selectItem itemLabel="Seleccione Servicio" noSelectionOption="true"  />
+                    <f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} - (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps}" />
+                </p:selectOneMenu>
+            </div>
+            <div class="p-col-3 p-md-3">
+                <p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0"/>
+            </div>
+            <div class="p-col-3 p-md-3">
+                <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="form:dt-servicios form:selServicio form:txtCantidadSrv"/>
+            </div>
+        </div>
+    </p:panel>
+</ui:composition>

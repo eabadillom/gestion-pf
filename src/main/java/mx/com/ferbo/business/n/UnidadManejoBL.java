@@ -17,8 +17,8 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
-public class UnidadManejoBL {
-
+public class UnidadManejoBL 
+{
     private static final Logger log = LogManager.getLogger(UnidadManejoBL.class);
 
     @Inject

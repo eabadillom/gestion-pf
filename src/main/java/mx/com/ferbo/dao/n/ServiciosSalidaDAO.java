@@ -1,6 +1,8 @@
 package mx.com.ferbo.dao.n;
 
 import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.ServiciosSalida;
@@ -12,6 +14,8 @@ import org.apache.logging.log4j.Logger;
  *
  * @author alberto
  */
+@Named
+@ApplicationScoped
 public class ServiciosSalidaDAO extends BaseDAO<ServiciosSalida, Integer>
 {
     private static Logger log = LogManager.getLogger(ServiciosSalidaDAO.class);
