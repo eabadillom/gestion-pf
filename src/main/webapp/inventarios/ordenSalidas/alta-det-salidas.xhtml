@@ -45,7 +45,7 @@
                 <p:ajax process="@this" listener="#{ordenSalidaBean.validarTemperatura(salidas)}" />
             </p:inputText>
         </p:column>
-        <p:column headerText="Seleccionado" width="4rem">
+        <p:column headerText="Confirmado" width="4rem">
             <p:selectBooleanCheckbox value="#{salidas.salidaSelected}" >
                 <p:ajax process="@this" listener="#{ordenSalidaBean.validarProducto(salidas)}" update="form:dt-salidas"/>
             </p:selectBooleanCheckbox>
