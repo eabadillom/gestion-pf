@@ -7,21 +7,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.Camara;
-import mx.com.ferbo.model.Partida;
-import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Salida;
 import mx.com.ferbo.model.SalidaDetalle;
 import mx.com.ferbo.model.ServiciosSalida;
 import mx.com.ferbo.ui.OrdenDeSalidas;
 import mx.com.ferbo.util.DAOException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -81,35 +81,26 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
     }
     
     public List<Salida> findByParametros(String clave, Date fechaSalida, Integer idCliente, Integer idPlanta) throws DAOException {
-        List<Salida> listModel = null;
+        List<Salida> modelList = null;
         EntityManager em = null;
         
         try {
             em = super.getEntityManager();
-            listModel = em.createNamedQuery("Salida.findByParametros", Salida.class)
-                .setParameter("clave", clave)
-                .setParameter("fechaSalida", fechaSalida)
-                .setParameter("idCliente", idCliente)
-                .getResultList();
-            
-            List<Integer> plantas = new ArrayList<Integer>();
-            for(Salida auxSalida : listModel){
-                for(SalidaDetalle auxSalidaDetalle : auxSalida.getListSalidaDetalle()){
-                    Partida partida = auxSalidaDetalle.getPartida();
-                    Camara camara = partida.getCamaraCve();
-                    Planta planta = camara.getPlantaCve();
-                    if (plantas.contains(planta.getPlantaCve())) {
-                        continue;
-                    }
-                    plantas.add(planta.getPlantaCve());
-                }
-            }
-            
-            for(Integer auxIdPlanta : plantas){
-                if(!auxIdPlanta.equals(idPlanta))
-                    throw new DAOException("Problema al obtener la salida");
-            }
-            
+            modelList = em.createQuery(
+            		  "SELECT DISTINCT s from Salida s "
+            		+ "INNER JOIN s.cliente c "
+            		+ "INNER JOIN s.listSalidaDetalle d "
+            		+ "INNER JOIN d.partida p "
+            		+ "INNER JOIN p.camaraCve cam "
+            		+ "INNER JOIN cam.plantaCve plt "
+            		+ "WHERE s.status.clave = :clave AND c.cteCve = :idCliente AND s.fechaSalida = :fechaSalida AND plt.plantaCve = :idPlanta "
+            		+ "ORDER BY s.id ASC, s.fechaSalida ASC", this.modelClass)
+            		.setParameter("clave", clave)
+            		.setParameter("fechaSalida", fechaSalida)
+            		.setParameter("idCliente", idCliente)
+            		.setParameter("idPlanta", idPlanta)
+            		.getResultList();
+            		
         } catch (Exception ex) {
             log.error("Problema en la consulta de la salida por parametros...", ex);
             throw new DAOException("Problema al obtener la salida");
@@ -117,7 +108,7 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
             super.close(em);
         }
         
-        return listModel;
+        return modelList;
     }
     
     public Salida findById(Integer idSalida) throws DAOException {
@@ -222,7 +213,8 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
                 .setParameter("clave", clave)
                 .setParameter("fecha", fech)
                 .setParameter("folioSalida", folioSalida);
-            List<Object[]> results = query.getResultList();
+            @SuppressWarnings("unchecked")
+			List<Object[]> results = query.getResultList();
             listaOrdenDeSalidas = new ArrayList<OrdenDeSalidas>();
             for (Object[] o : results) {
                 OrdenDeSalidas ods = new OrdenDeSalidas();

@@ -4,24 +4,30 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
     <p:dataTable id="dt-salidas" widgetVar="dtsalidas" value="#{ordenSalidaBean.listaSalidaUI}" var="salidas" paginator="false"
-        rowSelectMode="add" rows="10" rowKey="#{salidas.folioSalida}" reflow="true" selection="#{salidas.folioSalida}" tableStyle="table-layout: auto;">
+        rowSelectMode="add" rowKey="#{salidas.folioSalida}" reflow="true" selection="#{salidas.folioSalida}">
         <f:facet name="header">
             <p:outputLabel value="Productos solicitados" />
         </f:facet>
-        <p:column exportable="false" width="1rem">
+        <p:column exportable="false" width="2rem">
             <p:rowToggler />
         </p:column>
-        <p:column headerText="Planta" width="4rem">
+        <p:column width="2rem">
+            <p:selectBooleanCheckbox value="#{salidas.salidaSelected}" >
+                <p:ajax process="@this" listener="#{ordenSalidaBean.validarProducto(salidas)}" update="form:dt-salidas"/>
+            </p:selectBooleanCheckbox>
+        </p:column>
+        <p:column headerText="Planta" width="3rem">
             <h:outputText value="#{salidas.nombrePlanta}"/>
         </p:column>
-        <p:column headerText="Camara" width="4rem">
+        <p:column headerText="Camara" width="3rem">
             <h:outputText value="#{salidas.nombreCamara}"/>
         </p:column>
-        <p:column headerText="Folio ingreso" width="4rem">
+        <p:column headerText="Ingreso" width="4rem">
             <h:outputText value="#{salidas.folioEntrada}" />
         </p:column>
-        <p:column headerText="Producto">
+        <p:column headerText="Producto" width="auto">
             <h:outputText value="#{salidas.nombreProducto}"/>
             <f:facet name="footer">
                 <h:outputText value="Total:"/>
@@ -39,16 +45,10 @@
                 <h:outputText value="#{ordenSalidaBean.pesoTotal}"/>
             </f:facet>
         </p:column>
-        <p:column headerText="Temp. (°C)" width="4rem">
-            <p:inputText value="#{salidas.temperatura}" requiredMessage="Ingresar el grado de temperatura" style="width: 4rem!important;"
-                         disabled="#{not salidas.salidaSelected}"  >
-                <p:ajax process="@this" listener="#{ordenSalidaBean.validarTemperatura(salidas)}" />
-            </p:inputText>
-        </p:column>
-        <p:column headerText="Confirmado" width="4rem">
-            <p:selectBooleanCheckbox value="#{salidas.salidaSelected}" >
-                <p:ajax process="@this" listener="#{ordenSalidaBean.validarProducto(salidas)}" update="form:dt-salidas"/>
-            </p:selectBooleanCheckbox>
+        <p:column headerText="Temp." width="5rem">
+        	<p:inputNumber value="#{salidas.temperatura}" disabled="#{not salidas.salidaSelected}" symbol=" °C" symbolPosition="s" decimalPlaces="2" inputStyle="text-align: right; width: 100%; box-sizing: border-box;" style="width: 100%; box-sizing: border-box;">
+        		<p:ajax process="@this" listener="#{ordenSalidaBean.validarTemperatura(salidas)}" />
+        	</p:inputNumber>
         </p:column>
         <p:rowExpansion>
             <div class="orders-subtable">
@@ -71,5 +71,26 @@
                 </p:dataTable>
             </div>
         </p:rowExpansion>
+        <p:columnGroup type="footer">
+			<p:row>
+				<p:column colspan="6" footerText=""/>
+				<p:column style="text-align:right;">
+					<f:facet name="footer">
+						<p:outputLabel value="#{ordenSalidaBean.listSolicitadosSalidaUI.stream().map(item-> (item.cantidad) ).sum()}">
+							<f:convertNumber type="number" maxFractionDigits="0" />
+						</p:outputLabel>
+					</f:facet>
+				</p:column>
+				<p:column style="text-align:right;">
+					<f:facet name="footer">
+						<p:outputLabel value="#{ordenSalidaBean.listSolicitadosSalidaUI.stream().map(item-> (item.peso) ).sum()}">
+							<f:convertNumber type="number" maxFractionDigits="3" minFractionDigits="3" />
+						</p:outputLabel>
+					</f:facet>
+				</p:column>
+				<p:column>
+				</p:column>
+			</p:row>
+		</p:columnGroup>
     </p:dataTable>
 </ui:composition>

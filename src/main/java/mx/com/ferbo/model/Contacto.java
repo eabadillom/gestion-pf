@@ -14,7 +14,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -71,9 +70,6 @@ public class Contacto implements Serializable {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "idContacto", orphanRemoval = true)
     private List<MedioCnt> medioCntList;
     
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "contacto", fetch = FetchType.LAZY)
-    private List<Salida> salidaList;
-
     public Contacto() {
     }
 

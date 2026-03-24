@@ -7,7 +7,7 @@
     <p:panel header="Agregar servicios">	
         <div class="p-grid ui-fluid p-col-12">
             <div class="p-col-6 p-md-6">
-                <p:selectOneMenu id="selServicio" autoWidth="true" value="#{ordenSalidaBean.servicioSelect}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
+                <p:selectOneMenu id="selServicio" autoWidth="false" value="#{ordenSalidaBean.servicioSelect}" filterMatchMode="startsWith" converter="entityConverter" filter="true">
                     <f:selectItem itemLabel="Seleccione Servicio" noSelectionOption="true"  />
                     <f:selectItems var="ps" value="#{ordenSalidaBean.listaServicios}" itemLabel="#{ps.servicio.servicioDs} - (#{ps.unidad.unidadDeManejoDs})" itemValue="#{ps}" />
                 </p:selectOneMenu>

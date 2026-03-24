@@ -12,9 +12,11 @@
             <h:outputText value="#{servicio.servicio.servicioDs}" />
         </p:column>
         <p:column headerText="Cantidad" width="10rem">
-            <p:inputNumber value="#{servicio.cantidad}" decimalPlaces="0" minValue="1" style="width: 8rem!important;">
-                <p:ajax process="@this" />
-            </p:inputNumber>
+        	<div style="padding-right: 1rem!important;">
+	            <p:inputNumber value="#{servicio.cantidad}" decimalPlaces="0" minValue="1" inputStyle="text-align: right; width: 100%; box-sizing: border-box;" style="width: 100%; box-sizing: border-box;">
+	                <p:ajax process="@this" />
+	            </p:inputNumber>
+        	</div>
         </p:column>
         <p:column headerText="Unidad" width="10rem">
             <p:outputLabel value="#{servicio.unidadDeManejo.unidadDeManejoDs}"/>

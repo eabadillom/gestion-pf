@@ -42,6 +42,7 @@ import mx.com.ferbo.business.n.SaldosBL;
 import mx.com.ferbo.business.n.SerieConstanciaBL;
 import mx.com.ferbo.business.salidas.OrdenSalidasBL;
 import mx.com.ferbo.business.salidas.SalidasBL;
+import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
@@ -112,6 +113,8 @@ public class OrdenSalidaBean implements Serializable {
 
 	@Inject
 	private EstadoInventarioBL estadoInventarioBL;
+	
+	
         
 	private List<Cliente> listaClientes;
 	private List<OrdenDeSalidas> ordenesDeSalida;
@@ -158,9 +161,13 @@ public class OrdenSalidaBean implements Serializable {
 	private HttpServletRequest request;
 	private HttpSession session;
 	private Usuario usuario;
+	private Planta planta;
     
     @Inject
     private SideBarBean sideBar;
+    
+    @Inject
+    private PlantaDAO plantaDAO;
 
 	public OrdenSalidaBean() {
 		listaClientes = new ArrayList<Cliente>();
@@ -179,19 +186,20 @@ public class OrdenSalidaBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		try {
-			context = FacesContext.getCurrentInstance();
-			request = (HttpServletRequest) context.getExternalContext().getRequest();
-			session = request.getSession(false);
+			this.context = FacesContext.getCurrentInstance();
+			this.request = (HttpServletRequest) this.context.getExternalContext().getRequest();
+			this.session = this.request.getSession(false);
 			
 			this.usuario = (Usuario) session.getAttribute("usuario");
 			log.info("El usuario {} ha entrado a Orden de Salidas", this.usuario.getUsuario());
                         this.serie = new SerieConstancia();
 			log.info("Cargando lista de clientes en orden de salidas...");
-			listaClientes = sideBar.getListaClientesActivos();
-			fecha = new Date();
+			this.planta = plantaDAO.buscarPorId(this.usuario.getIdPlanta()).orElseThrow(() -> new InventarioException("El usuario no tiene asignada una planta."));
+			this.listaClientes = this.salidasBL.getListaClientesPendientes(this.planta);
+			this.fecha = new Date();
 			DateUtil.setTime(fecha, 0, 0, 0, 0);
-			estadoInventarioActual = estadoInventarioBL.buscarPorId(1);
-			estadoInventarioHistorico = estadoInventarioBL.buscarPorId(2);
+			this.estadoInventarioActual = this.estadoInventarioBL.buscarPorId(1);
+			this.estadoInventarioHistorico = this.estadoInventarioBL.buscarPorId(2);
 			byte bytes[] = {};
 			this.file = DefaultStreamedContent.builder()
 					.contentType("application/pdf")
@@ -327,8 +335,6 @@ public class OrdenSalidaBean implements Serializable {
 				cantidadTotal -= salida.getCantidad();
 			}
                     
-			String mensaje = salida.isSalidaSelected() ? "Producto agregado con éxito" : "Producto eliminado con éxito";
-			FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Productos", mensaje);
 		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
 			FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Productos", "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.");
@@ -415,11 +421,19 @@ public class OrdenSalidaBean implements Serializable {
 			if(this.isSalidaSaved)
 				throw new InventarioException("La constancia ya se encuentra registrada.");
 			
+			if(this.listSolicitadosSalidaUI == null)
+				throw new InventarioException("Debe confirmar la salida de al menos un producto");
+			
 			if(this.listSolicitadosSalidaUI.isEmpty())
 				throw new InventarioException("Debe confirmar al menos un producto para la salida");
                         
 			if(observaciones == null || observaciones.equals(""))
 				throw new InventarioException("Debe indicar las observaciones para la salida");
+			
+			for(SalidaUI preS : this.listSolicitadosSalidaUI) {
+				if(preS.getTemperatura() == null)
+					throw new InventarioException("Debe indicar la temperatura de salida de sus productos.");
+			}
                         
 			dcsList = new ArrayList<>();
 			saldoBL.validarSalidaMercancia(clienteSelect, fecha, cantidadTotal);
@@ -438,7 +452,9 @@ public class OrdenSalidaBean implements Serializable {
 			constancia.setDetalleConstanciaSalidaList(dcsList);
 			
 			tpMovimientoSalida = partidaBL.buscarTMPorId(2);
+			
 			for (SalidaUI preS : this.listSolicitadosSalidaUI) {
+				
 				DetalleConstanciaSalida dcs = new DetalleConstanciaSalida();
 				Partida p = partidaBL.buscarPartidaPorId(preS.getPartidaCve());
 				
@@ -530,6 +546,8 @@ public class OrdenSalidaBean implements Serializable {
 			
 			this.isServicioSaved = true;
 			FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Orden Salida", "Constancia guardada correctamente.");
+			sideBar.cargaOrdenesDeSalida();
+			PrimeFaces.current().ajax().update("topbarForm");
 		} catch (InventarioException ex) {
 			this.isSalidaSaved = false;
 			log.warn("Problema para obtener el listado de la orden...", ex);
@@ -555,6 +573,7 @@ public class OrdenSalidaBean implements Serializable {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
+		
 		try {
 			if(!this.isSalidaSaved)
 				throw new InventarioException("Debe guardar la salida.");
@@ -852,5 +871,12 @@ public class OrdenSalidaBean implements Serializable {
 	public void setPesoTotal(BigDecimal pesoTotal) {
 		this.pesoTotal = pesoTotal;
 	}
+	
+	public List<SalidaUI> getListSolicitadosSalidaUI() {
+		return listSolicitadosSalidaUI;
+	}
 
+	public void setListSolicitadosSalidaUI(List<SalidaUI> listSolicitadosSalidaUI) {
+		this.listSolicitadosSalidaUI = listSolicitadosSalidaUI;
+	}
 }

@@ -3,13 +3,20 @@ package mx.com.ferbo.business.salidas;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.dao.n.ClienteDAO;
 import mx.com.ferbo.dao.n.SalidaDAO;
 import mx.com.ferbo.dao.n.ServiciosSalidaDAO;
 import mx.com.ferbo.dao.n.StatusSalidaDAO;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Salida;
 import mx.com.ferbo.model.ServiciosSalida;
 import mx.com.ferbo.model.StatusSalida;
@@ -17,8 +24,6 @@ import mx.com.ferbo.ui.OrdenDeSalidas;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -39,6 +44,9 @@ public class SalidasBL
     @Inject
     private StatusSalidaDAO statusSalidaDAO;
     
+    @Inject
+    private ClienteDAO clienteDAO;
+    
     public static final String TP_ENVIADO = "E";
     public static final String TP_ACEPTADO = "A";
     public static final String TP_CANCELADO = "C";
@@ -51,12 +59,26 @@ public class SalidasBL
         return statusSalidaDAO.findByClave(TP_ACEPTADO);
     }
     
+    public List<Cliente> getListaClientesPendientes(Planta planta) {
+    	List<Cliente> clientes = null;
+    	StatusSalida statusEnviada;
+    	
+		try {
+			statusEnviada = statusSalidaDAO.findByClave(TP_ENVIADO);
+			clientes = clienteDAO.buscarPorOrdenesDeSalida(planta, statusEnviada, new Date());
+		} catch (DAOException ex) {
+			log.error("Problema para obtener la lista de clientes con ordenes de retiro pendientes...", ex);
+		}
+		
+		return clientes;
+	}
+    
     public List<String> obtenerFolios(Cliente cliente, Date fecha, Integer idPlanta) 
     {
-        List<String> folios = new ArrayList();
+        List<String> folios = new ArrayList<String>();
         StatusSalida stSalida = null;
         
-        try{
+        try {
             FacesUtils.requireNonNull(cliente, "Error al obtener el cliente");
             FacesUtils.requireNonNull(fecha, "Error al obtener la fecha");
             FacesUtils.requireNonNull(idPlanta, "Error al obtener la planta");

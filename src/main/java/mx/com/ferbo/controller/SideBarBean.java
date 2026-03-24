@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.business.salidas.SalidasBL;
 import mx.com.ferbo.model.Cliente;
@@ -28,7 +29,7 @@ public class SideBarBean implements Serializable {
 	private static final long serialVersionUID = 8802717839932668484L;
 	private static Logger log = LogManager.getLogger(SideBarBean.class);
 	
-        @Inject
+	@Inject
 	private SalidasBL salidasBL;
         
 	private List<Cliente> listaClientesActivos;
@@ -42,8 +43,17 @@ public class SideBarBean implements Serializable {
     private HttpSession session;
     private Integer numeroEntradas;
     private Integer numeroSalidas;
+    private String severity;
     
-    private String fotografia;
+    public String getSeverity() {
+		return severity;
+	}
+
+	public void setSeverity(String severity) {
+		this.severity = severity;
+	}
+
+	private String fotografia;
     
     public String getFotografia() {
 		return fotografia;
@@ -56,15 +66,38 @@ public class SideBarBean implements Serializable {
 	public SideBarBean() {
     	this.usuario = new Usuario();
     }
-    
+	
+	public void cargaOrdenesDeSalida() {
+		StatusSalida statusSalida = null;
+		Date fecha = null;
+		try {
+			switch(this.usuario.getPerfil()) {
+			case 2:
+			case 3:
+				this.numeroSalidas = null;
+				return;
+			}
+			
+			fecha = new Date();
+			DateUtil.resetTime(fecha);
+			statusSalida = salidasBL.obtenerStatusEnviado();
+			numeroSalidas = salidasBL.totalSalidasPorCliente(statusSalida.getClave(), fecha, this.usuario.getIdPlanta());
+			severity = numeroSalidas > 0 ? "danger" : "info";
+			
+			log.info("Ordenes de salida pendientes: {}", numeroSalidas);
+		} catch (Exception ex) {
+			log.error("Problema para obtener las órdenes de salida.");
+		} finally {
+			PrimeFaces.current().ajax().update("menuform");
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		Date fecha = null;
-		StatusSalida statusSalida = null;
+		
 		try {
-			fecha = new Date();
-			DateUtil.resetTime(fecha);
+			
 			context = FacesContext.getCurrentInstance();
 			request = (HttpServletRequest) context.getExternalContext().getRequest();
 			session = request.getSession(false);
@@ -73,19 +106,11 @@ public class SideBarBean implements Serializable {
 			listaClientesActivos = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 			listaClientesTodos = (List<Cliente>) request.getSession(false).getAttribute("clientesTodosList");
 			fotografia = (String) request.getSession(false).getAttribute("fotografia");
-			
-			if(this.usuario.getPerfil() == 1 || this.usuario.getPerfil() == 4) {
-				statusSalida = salidasBL.obtenerStatusEnviado();
-                                numeroSalidas = salidasBL.totalSalidasPorCliente(statusSalida.getClave(), fecha, this.usuario.getIdPlanta());
-				log.info("Ordenes de salida pendientes: {}", numeroSalidas);
-			}
+			this.cargaOrdenesDeSalida();
 			
 			this.numeroEntradas = null;
-			
 		} catch(Exception ex) {
 			log.error("Problema al iniciar la sesión del usuario.", ex);
-		} finally {
-			
 		}
 	}
 	

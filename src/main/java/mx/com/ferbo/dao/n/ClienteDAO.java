@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao.n;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -18,7 +19,9 @@ import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.StatusSalida;
 import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
@@ -145,5 +148,27 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
         }
 
         return model;
+    }
+    
+    public List<Cliente> buscarPorOrdenesDeSalida(Planta planta, StatusSalida status, Date fecha) {
+    	List<Cliente> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createQuery("SELECT DISTINCT s.cliente FROM Salida s INNER JOIN s.cliente INNER JOIN s.status INNER JOIN s.listSalidaDetalle d INNER JOIN d.partida p INNER JOIN p.camaraCve cam INNER JOIN cam.plantaCve plt WHERE s.status = :status AND s.fechaSalida = :fecha AND cam.plantaCve = :planta ORDER BY s.cliente.nombre ASC", this.modelClass)
+    			.setParameter("status", status)
+    			.setParameter("fecha", fecha)
+    			.setParameter("planta", planta)
+    			.getResultList();
+    		
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la lista de clientes con ordenes de salida por status...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
     }
 }
