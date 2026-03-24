@@ -103,9 +103,6 @@ public class Partida implements Serializable, Cloneable {
     @JoinColumn(name = "cd_tarima", referencedColumnName = "cd_tarima")
     private Tarima tarima;
     
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "partida", fetch = FetchType.LAZY)
-    private List<SalidaDetalle> listSalidaDetalle;
-    
     @Override
     public int hashCode() {
     	if(this.partidaCve == null)
@@ -232,14 +229,6 @@ public class Partida implements Serializable, Cloneable {
         this.noTarimas = noTarimas;
     }
     
-    public List<SalidaDetalle> getListSalidaDetalle() {
-        return listSalidaDetalle;
-    }
-
-    public void setListSalidaDetalle(List<SalidaDetalle> listSalidaDetalle) {
-        this.listSalidaDetalle = listSalidaDetalle;
-    }
-
     public List<DetallePartida> getDetallePartidaList() {
         return detallePartidaList;
     }
