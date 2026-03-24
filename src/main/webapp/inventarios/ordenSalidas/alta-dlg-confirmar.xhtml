@@ -1,0 +1,11 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:confirmDialog widgetVar="confirmGuardar" showEffect="fade" message="¿Está seguro que desea guardar la salida?" header="Guardar salida" severity="warn">
+        <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{ordenSalidaBean.guardar()}" process="@this" update="messages form:btnTicketSalida form:btnTicketServicio" onclick="PF('statusInfoDialog').show();" oncomplete="PF('confirmGuardar').hide();PF('statusInfoDialog').hide();"></p:commandButton>
+        <p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-secondary" onclick="PF('confirmGuardar').hide();"></p:commandButton>
+    </p:confirmDialog>
+</ui:composition>

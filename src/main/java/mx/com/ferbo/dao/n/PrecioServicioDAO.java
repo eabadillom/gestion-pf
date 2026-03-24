@@ -10,15 +10,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
-public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
-
+public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> 
+{
     private static Logger log = LogManager.getLogger(PrecioServicioDAO.class);
 
     public PrecioServicioDAO() {
@@ -59,4 +57,36 @@ public class PrecioServicioDAO extends BaseDAO<PrecioServicio, Integer> {
             super.close(em);
         }
     }
+    
+    public List<PrecioServicio> buscarPorCliente(Integer cteCve, boolean isFullInfo) {
+        List<PrecioServicio> list = null;
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+            list = em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
+                    .setParameter("cteCve", cteCve)
+                    .getResultList();
+            
+            if (isFullInfo == false) {
+                return list;
+            }
+            
+            for (PrecioServicio ps : list) {
+                log.debug(ps.getCliente().getCteCve());
+                log.debug(ps.getServicio().getServicioCve());
+                log.debug(ps.getUnidad().getUnidadDeManejoCve());
+
+                if (ps.getAvisoCve() != null) {
+                    log.debug(ps.getAvisoCve().getAvisoCve());
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Problema para obtener el listado de precios...", ex);
+        } finally {
+            super.close(em);
+        }
+        
+        return list;
+    }
+    
 }

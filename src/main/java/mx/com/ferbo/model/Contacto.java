@@ -69,7 +69,7 @@ public class Contacto implements Serializable {
     
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "idContacto", orphanRemoval = true)
     private List<MedioCnt> medioCntList;
-
+    
     public Contacto() {
     }
 
