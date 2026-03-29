@@ -151,6 +151,9 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "serieConstanciaPK.cliente", orphanRemoval = true)
     private List<SerieConstancia> serieConstanciaList;
     
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "cliente", fetch = FetchType.LAZY)
+    private List<Salida> salidaList;
+    
     @Override
     public int hashCode() {
         if(this.cteCve == null)
@@ -455,6 +458,12 @@ public class Cliente implements Serializable {
 		this.serieConstanciaList.add(serie);
 	}
 
-	
+        public List<Salida> getSalidaList() {
+            return salidaList;
+        }
+
+        public void setSalidaList(List<Salida> salidaList) {
+            this.salidaList = salidaList;
+        }
     
 }

@@ -103,7 +103,6 @@ public class Partida implements Serializable, Cloneable {
     @JoinColumn(name = "cd_tarima", referencedColumnName = "cd_tarima")
     private Tarima tarima;
     
-    
     @Override
     public int hashCode() {
     	if(this.partidaCve == null)
@@ -229,7 +228,7 @@ public class Partida implements Serializable, Cloneable {
     public void setNoTarimas(BigDecimal noTarimas) {
         this.noTarimas = noTarimas;
     }
-
+    
     public List<DetallePartida> getDetallePartidaList() {
         return detallePartidaList;
     }

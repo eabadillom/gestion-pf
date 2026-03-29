@@ -140,4 +140,11 @@ public class PrecioServicioBL {
         return disponibles;
     }
 
+    public List<PrecioServicio> buscarPorCliente(Integer cteCve, boolean isFullInfo) throws InventarioException {
+        if(cteCve == null)
+            throw new InventarioException("El cliente no puede ser vacío");
+        
+        return precioServicioDAO.buscarPorCliente(cteCve, isFullInfo);
+    }
+    
 }
