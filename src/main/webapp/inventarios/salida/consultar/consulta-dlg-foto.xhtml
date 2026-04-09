@@ -1,0 +1,21 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+	<p:dialog header="Fotografía" widgetVar="dialogFotografia" modal="true" draggable="false" cache="false" dynamic="true" onHide="liberarCamara();PF('camera').detach();">
+		<p:photoCam
+			widgetVar="camera"
+			listener="#{consultarConstanciaSalidaBean.capturar}"
+			update="form:datosGenerales"
+			device="environment"
+			format="jpeg"
+			jpegQuality="85"
+			onCameraError="onError(event)"/>
+		<f:facet name="footer">
+			<p:commandButton value="Guardar" onclick="PF('camera').capture()" type="button" styleClass="ui-button-success"/>
+			<p:commandButton value="Cerrar" onclick="PF('camera').detach();PF('dialogFotografia').hide()"></p:commandButton>
+		</f:facet>
+	</p:dialog>
+</ui:composition>

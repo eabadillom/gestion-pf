@@ -619,7 +619,7 @@ public class OrdenSalidaBean implements Serializable {
 		parameters = new HashMap<String, Object>();
 		try {
 			if(!this.isServicioSaved)
-                            throw new InventarioException("No hay constancia de servicios registrada.");
+                throw new InventarioException("No hay constancia de servicios registrada.");
 			
 			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
 			URL resourceimg = getClass().getResource(images); 
