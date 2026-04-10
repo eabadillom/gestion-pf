@@ -81,7 +81,7 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ConstanciaSalida> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
+	public List<ConstanciaSalida> buscar(Integer idCliente, Integer idPlanta, Date fechaInicio, Date fechaFin, String folioCliente) {
 		List<ConstanciaSalida> resultList = null;
 		EntityManager em = null;
 		Query sql = null;
@@ -93,14 +93,18 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 			em = EntityManagerUtil.getEntityManager();
 			sql = em.createNativeQuery("SELECT * FROM (\n"
 					+ "	SELECT * FROM (\n"
-					+ "		SELECT *\n"
+					+ "		SELECT DISTINCT cs.*\n"
 					+ "		FROM constancia_salida cs\n"
-					+ "		where (:idCliente IS NULL OR cs.CLIENTE_CVE = :idCliente)\n"
-					+ "	) cs2 WHERE ((cs2.FECHA BETWEEN :fechaInicio AND :fechaFin) OR (:fechaInicio IS NULL OR :fechaFin IS NULL)) \n"
+					+ "		inner join detalle_constancia_salida dcs on cs.id = dcs.CONSTANCIA_CVE\n"
+					+ "		inner join partida p on dcs.PARTIDA_CVE = p.PARTIDA_CVE\n"
+					+ "		inner join camara cam on p.CAMARA_CVE = cam.CAMARA_CVE\n"
+					+ "		where (:idCliente IS NULL OR cs.CLIENTE_CVE = :idCliente) AND (:idPlanta IS NULL OR cam.planta_cve = :idPlanta)\n"
+					+ "	) cs2 WHERE ((cs2.FECHA BETWEEN :fechaInicio AND :fechaFin) OR (:fechaInicio IS NULL OR :fechaFin IS NULL))\n"
 					+ ") cs3 WHERE (:folioCliente IS NULL OR cs3.NUMERO like :folioCliente ) ORDER BY cs3.FECHA", ConstanciaSalida.class)
-					.setParameter("fechaInicio", fechaInicio)
-					.setParameter("fechaFin", fechaFin)
-					.setParameter("idCliente", idCliente)
+					.setParameter("idCliente",    idCliente)
+					.setParameter("idPlanta",     idPlanta)
+					.setParameter("fechaInicio",  fechaInicio)
+					.setParameter("fechaFin",     fechaFin)
 					.setParameter("folioCliente", folioCliente)
 					;
 			resultList = sql.getResultList();
