@@ -6,14 +6,13 @@
 
 	<p:dialog header="Fotografía" widgetVar="dialogFotografia" modal="true" draggable="false" cache="false" dynamic="true" onHide="liberarCamara();PF('camera').detach();">
 	
-		<p:photoCam widgetVar="camera" listener="#{consultarConstanciaSalidaBean.capturar}"
-			update="form:datosGenerales:fotoPreview" device="environment" format="jpeg"
-			jpegQuality="90" onCameraError="onError(event)"/>
-			
 		<h:inputHidden id="realHeight" value="#{consultarConstanciaSalidaBean.realHeight}"/>
 		<h:inputHidden id="realWidth" value="#{consultarConstanciaSalidaBean.realWidth}"/>
-			
-		<p:remoteCommand name="enviarInfoImagen" action="#{consultarConstanciaSalidaBean.recibirInfoImagen}" process="@this form:realHeight form:realWidth"/>
+		<p:remoteCommand name="enviarInfoImagen" action="#{consultarConstanciaSalidaBean.recibirInfoImagen}" process="@this form:realHeight form:realWidth" update="form:camera"/>
+		
+		<p:photoCam id="camera" widgetVar="camera" listener="#{consultarConstanciaSalidaBean.capturar}"
+			update="form:datosGenerales:fotoPreview" device="environment" format="jpeg"
+			jpegQuality="90" onCameraError="onError(event)" photoHeight="#{consultarConstanciaSalidaBean.realHeight}" photoWidth="#{consultarConstanciaSalidaBean.realWidth}"/>
 		
 		<f:facet name="footer">
 			<p:commandButton value="Guardar"  icon="pi pi-check" onclick="capturarConOrientacion()" type="button" styleClass="ui-button-primary"/>
