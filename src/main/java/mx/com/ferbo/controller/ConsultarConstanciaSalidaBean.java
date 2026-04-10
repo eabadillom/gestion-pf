@@ -28,6 +28,9 @@ import org.primefaces.event.CaptureEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import com.ferbo.mail.beans.Adjunto;
+
+import mx.com.ferbo.business.SendMailTicketSalida;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
 import mx.com.ferbo.dao.PartidaDAO;
@@ -40,6 +43,7 @@ import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.ImageTool;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -76,7 +80,10 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
         
 	private StreamedContent file;
 	private String imagenBase64;
+	private byte[] imagen;
 	private String mensaje;
+	private Integer realWidth;
+	private Integer realHeight;
 	
 	public ConsultarConstanciaSalidaBean() {
 		listadoConstanciaSalida = new ArrayList<>();
@@ -139,6 +146,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 			this.constanciaSelect = constanciaSalidaDAO.buscarPorId(this.constanciaSelect.getId(), true);
 			log.info("Cargando constancia de salida: {}", this.constanciaSelect.getNumero());
 			this.imagenBase64 = null;
+			this.mensaje = null;
 			PrimeFaces.current().executeScript("iniciarCamara()");
 		} catch (Exception ex) {
 			log.error("Problema para cargar la información de la constancia...", ex);
@@ -252,7 +260,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 			
 			listadoConstanciaSalida = constanciaSalidaDAO.buscar((cliente == null ? null : cliente.getCteCve()), this.idPlanta, fechaInicial, fechaFinal, folio);
 			log.info("La constancia de salida {} se cancelo exitosamente.", constanciaSelect.getNumero());
-                        
+			
 			mensaje = String.format("La constancia de salida %s fue cancelada", constanciaSelect.getNumero());
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {	
@@ -271,12 +279,24 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		}
 	}
 	
+	public void recibirInfoImagen() {
+		log.info("Height: {}, Width: {}", this.realHeight, this.realWidth);
+		Boolean esVertical = realHeight > realWidth;
+		
+		if(esVertical.booleanValue())
+			log.info("Es vertical");
+		else
+			log.info("Es horizontal");
+	}
+	
 	public void capturar(CaptureEvent event) {
         try {
             byte[] imageData = event.getData();
-
+            
+            this.imagen = ImageTool.resizeImage(imageData, this.realWidth, this.realHeight);
+            
             if (imageData != null && imageData.length > 0) {
-                imagenBase64 = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageData);
+                imagenBase64 = "data:image/png;base64," + Base64.getEncoder().encodeToString(this.imagen);
                 mensaje = "Foto capturada correctamente.";
             } else {
                 mensaje = "No se recibió imagen.";
@@ -288,6 +308,23 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
         	PrimeFaces.current().executeScript("PF('dialogFotografia').hide()");
         }
     }
+	
+	public void enviar() {
+		SendMailTicketSalida sendBO = null;
+		
+		try {
+			sendBO = new SendMailTicketSalida(constanciaSelect.getClienteCve().getCteCve());
+			sendBO.setFolio(this.folio);
+			sendBO.setLoggedUser(this.usuario);
+			sendBO.addAttachment("no-name.jpg", Adjunto.TP_ARCHIVO_JPEG, this.imagen);
+			sendBO.send();
+			
+		} catch(Exception ex) {
+			log.error("Problema para enviar el correo electrónico...", ex);
+		} finally {
+			
+		}
+	}
 	
 	public List<ConstanciaSalida> getListadoConstanciaSalida() {
 		return listadoConstanciaSalida;
@@ -374,6 +411,22 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 
 	public void setMensaje(String mensaje) {
 		this.mensaje = mensaje;
+	}
+
+	public Integer getRealWidth() {
+		return realWidth;
+	}
+
+	public void setRealWidth(Integer realWidth) {
+		this.realWidth = realWidth;
+	}
+
+	public Integer getRealHeight() {
+		return realHeight;
+	}
+
+	public void setRealHeight(Integer realHeight) {
+		this.realHeight = realHeight;
 	}
 
     

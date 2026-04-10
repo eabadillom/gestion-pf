@@ -103,9 +103,12 @@
             	<p:outputPanel class="p-grid ui-fluid">
             		<div class="p-col-12 p-md-12">
 						<h:panelGroup id="fotoPreview">
-							<p:graphicImage library="ferbo" name="images/no-image.png" rendered="#{empty consultarConstanciaSalidaBean.imagenBase64}">
-							</p:graphicImage>
-							<h:graphicImage value="#{consultarConstanciaSalidaBean.imagenBase64}" rendered="#{not empty consultarConstanciaSalidaBean.imagenBase64}"/>
+							<p:graphicImage library="ferbo" name="images/no-image.png" rendered="#{empty consultarConstanciaSalidaBean.imagenBase64}"/>
+							<h:graphicImage id="imgPreview"
+								value="#{consultarConstanciaSalidaBean.imagenBase64}"
+								style="max-width:100%; height:auto;"
+							/>
+							
 						</h:panelGroup>
             		</div>
             		<div class="p-col-12 p-md-12">
@@ -116,7 +119,7 @@
 						</p:commandButton>
 					</div>
 					<div class="p-col-6 p-md-3">
-						<p:commandButton value="Enviar" icon="pi pi-send" process="@this" immediate="true" onclick="iniciarCamara();" oncomplete="PF('dialogFotografia').show();">
+						<p:commandButton value="Enviar" icon="pi pi-send" process="@this" immediate="true" actionListener="#{consultarConstanciaSalidaBean.enviar}">
 						</p:commandButton>
             		</div>
             	</p:outputPanel>

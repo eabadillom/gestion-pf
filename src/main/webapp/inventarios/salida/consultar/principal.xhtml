@@ -29,6 +29,31 @@
 					}
 				}, 300);
 			}
+			
+			function capturarConOrientacion() {
+				var video = document.querySelector('video');
+				if (!video) {
+					console.error('No se encontró el elemento video.');
+					return;
+				}
+				
+				// Leer dimensiones reales del stream en este momento
+				var realWidth  = video.videoWidth;
+				var realHeight = video.videoHeight;
+				
+				if (!realWidth || !realHeight) {
+					console.error('El stream de video aún no tiene dimensiones.');
+					return;
+				}
+				
+				document.getElementById('form:realHeight').value = realHeight;
+				document.getElementById('form:realWidth').value = realWidth;
+				
+				enviarInfoImagen();
+				
+				// Enviar al servidor usando el mecanismo de p:photoCam
+				PF('camera').capture();
+		    }
 			//]]>
 		</h:outputScript>
         <h:form id="form" enctype="multipart/form-data">
