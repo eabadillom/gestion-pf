@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +23,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+import org.primefaces.event.CaptureEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
-import org.primefaces.PrimeFaces;
 
+import com.ferbo.mail.beans.Adjunto;
+
+import mx.com.ferbo.business.SendMailTicketSalida;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.DetalleConstanciaSalidaDAO;
 import mx.com.ferbo.dao.PartidaDAO;
@@ -38,6 +43,7 @@ import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.ImageTool;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -58,6 +64,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	private Date fechaInicial;
 	private Date fechaFinal;
 	private String folio;
+	private Integer idPlanta;
 	
 	private List<Cliente> listadoClientes;
 	private Cliente cliente;
@@ -71,7 +78,12 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	private HttpServletRequest httpServletRequest;
 	private Usuario usuario;
         
-        private StreamedContent file;
+	private StreamedContent file;
+	private String imagenBase64;
+	private byte[] imagen;
+	private String mensaje;
+	private Integer realWidth;
+	private Integer realHeight;
 	
 	public ConsultarConstanciaSalidaBean() {
 		listadoConstanciaSalida = new ArrayList<>();
@@ -86,6 +98,16 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		
+		if(usuario.getPerfil() == 1 || usuario.getPerfil() == 4) {
+			this.fechaInicial = new Date();
+			DateUtil.setTime(fechaInicial, 0, 0, 0, 0);
+			
+			this.fechaFinal = new Date();
+			DateUtil.setTime(fechaFinal, 23, 59, 59, 999);
+			
+			this.idPlanta = usuario.getIdPlanta();
+		}
 		
 		constanciaSalidaDAO = new ConstanciaSalidaDAO();
 		detalleCSDAO = new DetalleConstanciaSalidaDAO();
@@ -111,7 +133,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		if(listadoClientes.size() == 1)
 			this.cliente = listadoClientes.get(0);
 		
-		listadoConstanciaSalida = constanciaSalidaDAO.buscar(fechaInicial, fechaFinal, (cliente == null ? null : cliente.getCteCve()), folio);
+		listadoConstanciaSalida = constanciaSalidaDAO.buscar((cliente == null ? null : cliente.getCteCve()), this.idPlanta, fechaInicial, fechaFinal, folio);
 	}
 	
 	public void cargaDetalle() {
@@ -123,6 +145,9 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		try {
 			this.constanciaSelect = constanciaSalidaDAO.buscarPorId(this.constanciaSelect.getId(), true);
 			log.info("Cargando constancia de salida: {}", this.constanciaSelect.getNumero());
+			this.imagenBase64 = null;
+			this.mensaje = null;
+			PrimeFaces.current().executeScript("iniciarCamara()");
 		} catch (Exception ex) {
 			log.error("Problema para cargar la información de la constancia...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
@@ -233,9 +258,9 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 			if("".equalsIgnoreCase(this.folio))
 				this.folio = null;
 			
-			listadoConstanciaSalida = constanciaSalidaDAO.buscar(fechaInicial, fechaFinal, (cliente == null ? null : cliente.getCteCve()), folio);
+			listadoConstanciaSalida = constanciaSalidaDAO.buscar((cliente == null ? null : cliente.getCteCve()), this.idPlanta, fechaInicial, fechaFinal, folio);
 			log.info("La constancia de salida {} se cancelo exitosamente.", constanciaSelect.getNumero());
-                        
+			
 			mensaje = String.format("La constancia de salida %s fue cancelada", constanciaSelect.getNumero());
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {	
@@ -254,6 +279,53 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		}
 	}
 	
+	public void recibirInfoImagen() {
+		log.info("Height: {}, Width: {}", this.realHeight, this.realWidth);
+		Boolean esVertical = realHeight > realWidth;
+		
+		if(esVertical.booleanValue())
+			log.info("Es vertical");
+		else
+			log.info("Es horizontal");
+	}
+	
+	public void capturar(CaptureEvent event) {
+        try {
+            byte[] imageData = event.getData();
+            
+            this.imagen = ImageTool.resizeImage(imageData, this.realWidth, this.realHeight);
+            
+            if (imageData != null && imageData.length > 0) {
+                imagenBase64 = "data:image/png;base64," + Base64.getEncoder().encodeToString(this.imagen);
+                mensaje = "Foto capturada correctamente.";
+            } else {
+                mensaje = "No se recibió imagen.";
+            }
+
+        } catch (Exception e) {
+            mensaje = "Error al procesar la imagen: " + e.getMessage();
+        } finally {
+        	PrimeFaces.current().executeScript("PF('dialogFotografia').hide()");
+        }
+    }
+	
+	public void enviar() {
+		SendMailTicketSalida sendBO = null;
+		
+		try {
+			sendBO = new SendMailTicketSalida(constanciaSelect.getClienteCve().getCteCve());
+			sendBO.setFolio(this.folio);
+			sendBO.setLoggedUser(this.usuario);
+			sendBO.addAttachment("no-name.jpg", Adjunto.TP_ARCHIVO_JPEG, this.imagen);
+			sendBO.send();
+			
+		} catch(Exception ex) {
+			log.error("Problema para enviar el correo electrónico...", ex);
+		} finally {
+			
+		}
+	}
+	
 	public List<ConstanciaSalida> getListadoConstanciaSalida() {
 		return listadoConstanciaSalida;
 	}
@@ -261,82 +333,101 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 	public void setListadoConstanciaSalida(List<ConstanciaSalida> listadoConstanciaSalida) {
 		this.listadoConstanciaSalida = listadoConstanciaSalida;
 	}
-
+	
 	public Date getFechaInicial() {
 		return fechaInicial;
 	}
-
-
+	
 	public void setFechaInicial(Date fechaInicial) {
 		this.fechaInicial = fechaInicial;
 	}
-
-
+	
 	public Date getFechaFinal() {
 		return fechaFinal;
 	}
-
-
+	
 	public void setFechaFinal(Date fechaFinal) {
 		this.fechaFinal = fechaFinal;
 	}
-
-
+	
 	public String getFolio() {
 		return folio;
 	}
-
-
+	
 	public void setFolio(String folio) {
 		this.folio = folio;
 	}
-
-
+	
 	public List<Cliente> getListadoClientes() {
 		return listadoClientes;
 	}
-
-
+	
 	public void setListadoClientes(List<Cliente> listadoClientes) {
 		this.listadoClientes = listadoClientes;
 	}
-
-
+	
 	public Cliente getCliente() {
 		return cliente;
 	}
-
-
+	
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
-
-
+	
 	public ConstanciaSalida getConstanciaSelect() {
 		return constanciaSelect;
 	}
-
-
+	
 	public void setConstanciaSelect(ConstanciaSalida constanciaSelect) {
 		this.constanciaSelect = constanciaSelect;
 	}
-
-
+	
 	public Usuario getUsuario() {
 		return usuario;
 	}
-
-
+	
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
 	}
 
-        public StreamedContent getFile() {
-            return file;
-        }
+	public StreamedContent getFile() {
+		return file;
+	}
 
-        public void setFile(StreamedContent file) {
-            this.file = file;
-        }
+	public void setFile(StreamedContent file) {
+		this.file = file;
+	}
+	public String getImagenBase64() {
+		return imagenBase64;
+	}
+
+	public void setImagenBase64(String imagenBase64) {
+		this.imagenBase64 = imagenBase64;
+	}
+
+	public String getMensaje() {
+		return mensaje;
+	}
+
+	public void setMensaje(String mensaje) {
+		this.mensaje = mensaje;
+	}
+
+	public Integer getRealWidth() {
+		return realWidth;
+	}
+
+	public void setRealWidth(Integer realWidth) {
+		this.realWidth = realWidth;
+	}
+
+	public Integer getRealHeight() {
+		return realHeight;
+	}
+
+	public void setRealHeight(Integer realHeight) {
+		this.realHeight = realHeight;
+	}
+
     
 }
