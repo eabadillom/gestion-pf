@@ -287,6 +287,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 			log.info("Es vertical");
 		else
 			log.info("Es horizontal");
+		PrimeFaces.current().ajax().update("form:camera");
 	}
 	
 	public void capturar(CaptureEvent event) {
@@ -310,6 +311,11 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
     }
 	
 	public void enviar() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Confirmación";
+		
 		SendMailTicketSalida sendBO = null;
 		
 		try {
@@ -319,10 +325,15 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 			sendBO.addAttachment("no-name.jpg", Adjunto.TP_ARCHIVO_JPEG, this.imagen);
 			sendBO.send();
 			
+			mensaje = "El mensaje se envió correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
 		} catch(Exception ex) {
 			log.error("Problema para enviar el correo electrónico...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
 		}
 	}
 	

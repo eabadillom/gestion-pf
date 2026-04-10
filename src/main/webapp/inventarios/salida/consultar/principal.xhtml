@@ -8,6 +8,14 @@
     <ui:define name="content">
     	<h:outputScript>
 			//<![CDATA[
+			function iniciarCamara() {
+				setTimeout(function() {
+					if (typeof PF('camera') !== 'undefined') {
+						PF('camera').initialize();
+					}
+				}, 300);
+			}
+			
 			function liberarCamara() {
 				try {
 					var video = document.querySelector('video');
@@ -20,14 +28,6 @@
 				} catch (e) {
 					console.error('Error al liberar la cámara:', e);
 				}
-			}
-			
-			function iniciarCamara() {
-				setTimeout(function() {
-					if (typeof PF('camera') !== 'undefined') {
-						PF('camera').initialize();
-					}
-				}, 300);
 			}
 			
 			function capturarConOrientacion() {
@@ -52,6 +52,7 @@
 				enviarInfoImagen();
 				
 				// Enviar al servidor usando el mecanismo de p:photoCam
+				
 				PF('camera').capture();
 		    }
 			//]]>
