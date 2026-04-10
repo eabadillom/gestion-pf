@@ -99,6 +99,16 @@ public class SendMailTicketSalida {
     	}
 	}
 	
+	private void processMail(Contacto contacto) {
+		List<MedioCnt> medioCntList = contacto.getMedioCntList();
+		for(MedioCnt medioCnt : medioCntList) {
+			Mail mail = medioCnt.getIdMail();
+			String nombreBuzon = String.format("%s, %s, %s", contacto.getNbNombre(), contacto.getNbApellido1(), contacto.getNbApellido2());
+            Correo correo = new Correo(mail.getNbMail(), nombreBuzon);
+            alTo.add(correo);
+		}
+	}
+	
 	public void processUsers() {
 		String destinatario = null;
 		String sMail = null;
@@ -108,24 +118,14 @@ public class SendMailTicketSalida {
 			return;
     	}
 		destinatario = String.format("%s %s %s",
-				this.loggedUser.getNombre() == null ? "" : this.loggedUser.getNombre(),
-						this.loggedUser.getApellido1() == null ? "" : this.loggedUser.getApellido1(),
-								this.loggedUser.getApellido2() == null ? "" : this.loggedUser.getApellido2());
+			this.loggedUser.getNombre() == null ? "" : this.loggedUser.getNombre(),
+			this.loggedUser.getApellido1() == null ? "" : this.loggedUser.getApellido1(),
+			this.loggedUser.getApellido2() == null ? "" : this.loggedUser.getApellido2());
 		
 		sMail = this.loggedUser.getMail();
 		mailLoggedUser = new Correo(sMail, destinatario);
 		
 		alCC.add(mailLoggedUser);
-	}
-	
-	private void processMail(Contacto contacto) {
-		List<MedioCnt> medioCntList = contacto.getMedioCntList();
-		for(MedioCnt medioCnt : medioCntList) {
-			Mail mail = medioCnt.getIdMail();
-			String nombreBuzon = String.format("%s, %s, %s", contacto.getNbNombre(), contacto.getNbApellido1(), contacto.getNbApellido2());
-            Correo correo = new Correo(mail.getNbMail(), nombreBuzon);
-            alTo.add(correo);
-		}
 	}
 	
 	private void sendMail() throws IOException, MailException {
@@ -170,7 +170,7 @@ public class SendMailTicketSalida {
                 helper.addAttachment(adjunto);
             }
             
-            helper.sendMessage(MailHelper.JNDI_MAIL_FACTURACION);
+            helper.sendMessage(MailHelper.JNDI_MAIL_INVENTARIO);
             
         } finally {
             IOUtil.close(reader);
