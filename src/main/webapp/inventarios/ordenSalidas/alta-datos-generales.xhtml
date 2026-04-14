@@ -4,27 +4,27 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <p:panel header="Información de la solicitud">
+    <p:panel id="pnl-datos-generales" header="Información de la solicitud">
         <div class="p-grid ui-fluid p-col-12">
             <div class="p-col-12 p-md-4">
                 <p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
                     <f:selectItem itemLabel="--CLIENTE--" noSelectionOption="true"/>
                     <f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
-                    <p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:selServicio :form:planta-som :form:folio-som" oncomplete="PF('statusInfoDialog').hide();"/>
+                    <p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update="form:pnl-datos-generales form:selServicio" oncomplete="PF('statusInfoDialog').hide();"/>
                 </p:selectOneMenu>
             </div>
             <div class="p-col-6 p-md-4">
                 <p:selectOneMenu id="planta-som" autoWidth="false"  value="#{ordenSalidaBean.plantaSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
                     <f:selectItem itemLabel="--PLANTA--" noSelectionOption="true"/>
                     <f:selectItems value="#{ordenSalidaBean.listPlantas}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-                    <p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update=":form:planta-som :form:folio-som" oncomplete="PF('statusInfoDialog').hide();"/>
+                    <p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update="form:pnl-datos-generales" oncomplete="PF('statusInfoDialog').hide();"/>
                 </p:selectOneMenu>
             </div>
             <div class="p-col-6 p-md-4">
                 <p:selectOneMenu id="folio-som" autoWidth="false" widgetVar="somFolios"  value="#{ordenSalidaBean.folioSelected}" converter="entityConverter" onchange="PF('statusInfoDialog').show();">
                     <f:selectItem itemLabel="--ORDENES DEL DIA--" itemValue="" noSelectionOption="true"/>
                     <f:selectItems value="#{ordenSalidaBean.listaFolios}" var="folio" itemLabel="#{folio}" itemValue="#{folio}"></f:selectItems>
-                    <p:ajax listener="#{ordenSalidaBean.filtroPorOrdenesSalida}"  process ="@this" update=":form:txtfecha :form:txtHora :form:txtnomOperador :form:txtplacas :form:txtObservaciones :form:dt-salidas :form:dt-servicios :form:folioSalida" oncomplete="PF('statusInfoDialog').hide();"/>
+                    <p:ajax listener="#{ordenSalidaBean.cargarOrden}"  process ="@this" update="form:pnl-datos-generales form:dt-salidas form:dt-servicios form:pnl-acciones" oncomplete="PF('statusInfoDialog').hide();"/>
                 </p:selectOneMenu>
             </div>
             <div class="p-col-12 p-md-4">
