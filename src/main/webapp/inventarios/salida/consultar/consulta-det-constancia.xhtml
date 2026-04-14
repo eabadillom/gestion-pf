@@ -119,7 +119,7 @@
 						</p:commandButton>
 					</div>
 					<div class="p-col-6 p-md-3">
-						<p:commandButton value="Enviar" icon="pi pi-send" process="@this" immediate="true" actionListener="#{consultarConstanciaSalidaBean.enviar}">
+						<p:commandButton value="Enviar" icon="pi pi-send" process="@this" immediate="true" actionListener="#{consultarConstanciaSalidaBean.enviar}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
 						</p:commandButton>
             		</div>
             	</p:outputPanel>
