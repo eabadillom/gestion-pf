@@ -209,7 +209,7 @@
 		<dependency>
 			<groupId>com.ferbo</groupId>
 			<artifactId>gestion-mail</artifactId>
-			<version>0.0.4-SNAPSHOT</version>
+			<version>0.0.5-RELEASE</version>
 		</dependency>
 	</dependencies>
 

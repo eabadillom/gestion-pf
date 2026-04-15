@@ -325,6 +325,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 			sendBO.addAttachment("no-name.jpg", Adjunto.TP_ARCHIVO_JPEG, this.imagen);
 			sendBO.send();
 			
+			PrimeFaces.current().executeScript("PF('dlgDetalles').hide()");
 			mensaje = "El mensaje se envió correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(Exception ex) {

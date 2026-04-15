@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -30,7 +31,11 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.file.UploadedFile;
 
+import com.ferbo.mail.beans.Adjunto;
+
+import mx.com.ferbo.business.SendMailTicketSalida;
 import mx.com.ferbo.business.constancias.ConstanciaSalidaBL;
 import mx.com.ferbo.business.constancias.ConstanciaServicioBL;
 import mx.com.ferbo.business.n.CandadoBL;
@@ -114,8 +119,14 @@ public class OrdenSalidaBean implements Serializable {
 	@Inject
 	private EstadoInventarioBL estadoInventarioBL;
 	
+	@Inject
+	private SideBarBean sideBar;
+    
+	@Inject
+	private PlantaDAO plantaDAO;
 	
-        
+	
+	private ConstanciaSalida constancia;
 	private List<Cliente> listaClientes;
 	private List<OrdenDeSalidas> ordenesDeSalida;
 	private List<PrecioServicio> listaServicios;
@@ -162,25 +173,29 @@ public class OrdenSalidaBean implements Serializable {
 	private HttpSession session;
 	private Usuario usuario;
 	private Planta planta;
+	
+	private UploadedFile attachmentFile;
+	private List<Adjunto> archivosList;
+	private Adjunto selectedAttachment;
+	private BigDecimal tamanioTotal = null;
+	private BigDecimal limite = new BigDecimal("10485760").setScale(2, BigDecimal.ROUND_HALF_UP);
+	private BigDecimal megabyte = new BigDecimal("1048576").setScale(2, BigDecimal.ROUND_HALF_UP);
     
-    @Inject
-    private SideBarBean sideBar;
-    
-    @Inject
-    private PlantaDAO plantaDAO;
-
 	public OrdenSalidaBean() {
-		listaClientes = new ArrayList<Cliente>();
-		listPlantas = new ArrayList<>();
-		listaSalidaUI = new ArrayList<>();
-		listSolicitadosSalidaUI = new ArrayList<>();
-		listaServicios = new ArrayList<PrecioServicio>();
-		ordenesDeSalida = new ArrayList<OrdenDeSalidas>();
-		listaServiciosSalida = new ArrayList<>();
-		listaFolios = new ArrayList<>();
-		listaSalidasPorFolio = new ArrayList<>();
-		totalCajas = 0;
-		cantidadTotal = 0;
+		this.listaClientes = new ArrayList<Cliente>();
+		this.listPlantas = new ArrayList<>();
+		this.listaSalidaUI = new ArrayList<>();
+		this.listSolicitadosSalidaUI = new ArrayList<>();
+		this.listaServicios = new ArrayList<PrecioServicio>();
+		this.ordenesDeSalida = new ArrayList<OrdenDeSalidas>();
+		this.listaServiciosSalida = new ArrayList<>();
+		this.listaFolios = new ArrayList<>();
+		this.listaSalidasPorFolio = new ArrayList<>();
+		this.totalCajas = 0;
+		this.cantidadTotal = 0;
+		
+		this.archivosList = new ArrayList<Adjunto>();
+        this.tamanioTotal = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 	}
 
 	@PostConstruct
@@ -207,7 +222,7 @@ public class OrdenSalidaBean implements Serializable {
 					.name("factura.pdf")
 					.stream(() -> new ByteArrayInputStream(bytes) )
 					.build();
-			
+			this.ordenSalida = ordenSalidasBL.build();
 		} catch(Exception ex) {
 			log.error("Problema con el inicio del controller...", ex);
 		}
@@ -219,9 +234,11 @@ public class OrdenSalidaBean implements Serializable {
 	}
 
 	public void filtrarCliente() {
-		log.info("Entrando a filtrar cliente...");
-		
 		try {
+			log.info("Cargando la información del cliente...");
+			if(this.clienteSelect == null)
+				throw new InventarioException("Debe seleccionar un cliente.");
+			
 			log.info("El usuario {}  ha seleccionado al cliente {}", this.usuario.getUsuario(), this.clienteSelect.getNombre());
 			saldoBL.validaSaldo(clienteSelect, fecha);
 			candadoSalida = candadoBL.obtenerCandadoSalidaPorCliente(clienteSelect);
@@ -256,7 +273,7 @@ public class OrdenSalidaBean implements Serializable {
 		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
 
-	public void filtroPorOrdenesSalida() {
+	public void cargarOrden() {
 		Salida salidaFolio = null;
 		this.listaSalidaUI = new ArrayList<SalidaUI>();
 		
@@ -397,8 +414,20 @@ public class OrdenSalidaBean implements Serializable {
             log.debug("Salida {}", p);
 	}
 	
+	public void deleteServicio(ServiciosSalida servicio) {
+		log.info("Servicio eliminado: {}", servicio.getServicio().getServicioNombre());
+		this.listaServiciosSalida.remove(servicio);
+	}
+	
+	public void validarOrden() {
+		
+		if(this.constancia == null || this.constancia.getId() == null)
+			PrimeFaces.current().executeScript("PF('dialogCargaError').show();");
+		else
+			PrimeFaces.current().executeScript("PF('dialogCarga').show();");
+	}
+	
 	public synchronized void guardar() {
-		ConstanciaSalida constancia = null;
 		StatusConstanciaSalida statusConstancia = null;
 		DetallePartida detPAnterior = null;
 		DetallePartida detPNuevo= null;
@@ -520,6 +549,9 @@ public class OrdenSalidaBean implements Serializable {
 			}
                         
 			candadoBL.actualizaCandadoSalida(candadoSalida);
+			
+			sideBar.cargaOrdenesDeSalida();
+			PrimeFaces.current().ajax().update("topbarForm", "menuform:frb_orden_retiro");
                         
 			if(listaServiciosSalida.isEmpty()) {
 				FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Orden Salida", "Constancia guardada correctamente.");
@@ -546,8 +578,6 @@ public class OrdenSalidaBean implements Serializable {
 			
 			this.isServicioSaved = true;
 			FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Orden Salida", "Constancia guardada correctamente.");
-			sideBar.cargaOrdenesDeSalida();
-			PrimeFaces.current().ajax().update("topbarForm");
 		} catch (InventarioException ex) {
 			this.isSalidaSaved = false;
 			log.warn("Problema para obtener el listado de la orden...", ex);
@@ -651,9 +681,102 @@ public class OrdenSalidaBean implements Serializable {
 
 	}
 	
-	public void deleteServicio(ServiciosSalida servicio) {
-		log.info("Servicio eliminado: {}", servicio.getServicio().getServicioNombre());
-		this.listaServiciosSalida.remove(servicio);
+	public void cargarArchivo() {
+		Adjunto archivo = null;
+		BigDecimal tamanio = null;
+		
+		try {
+			
+			this.tamanioTotal = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+			tamanio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+			if(this.attachmentFile == null)
+				throw new InventarioException("Debe seleccionar un archivo");
+			
+			if(this.attachmentFile.getSize() == 0)
+				throw new InventarioException("El archivo no debe estar vacío.");
+			
+			for(Adjunto a : archivosList) {
+				tamanio = tamanio.add(new BigDecimal(a.getTamanio()));
+			}
+			tamanioTotal = tamanioTotal.add(tamanio);
+			
+			archivo = new Adjunto(attachmentFile.getFileName(), Adjunto.TP_ARCHIVO_GENERICO, attachmentFile.getContent());
+			tamanio = tamanio.add(new BigDecimal(archivo.getTamanio()));
+			
+			if(tamanio.compareTo(limite) > 0) //El tamaño debe ser menor o igual a 10 MB.
+				throw new InventarioException("El tamaño de todos los archivos no debe superar los 10 MB.");
+			tamanioTotal = tamanio;
+			
+			log.info("Tamaño total de archivos adjuntos (MB): " + tamanioTotal);
+			this.archivosList.add(archivo);
+			this.attachmentFile = null;
+			
+			FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Emisión de salida", "El archivo se cargó correctamente.");
+		} catch(InventarioException ex) {
+			log.error("Problema con la emisión de salidas...", ex);
+                        FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Emisión de salida", ex.getMessage());
+		} catch (Exception ex) {
+			log.error("Problema con la emisión de salidas...", ex);
+			FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Emisión de salida", "Su solicitud no se pudo generar.\nFavor de comunicarse con el administrador del sistema.");
+		} finally {
+			tamanioTotal = tamanioTotal.divide(megabyte, BigDecimal.ROUND_HALF_UP);
+			
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+	}
+	
+	public void eliminarAdjunto() {
+		BigDecimal tamanio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		this.archivosList.remove(this.selectedAttachment);
+		for(Adjunto a : archivosList) {
+			tamanio = tamanio.add(new BigDecimal(a.getTamanio()));
+		}
+		this.tamanioTotal = tamanio.divide(megabyte, BigDecimal.ROUND_HALF_UP);
+	}
+	
+	public void notificar() {
+ 		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Confirmación";
+		
+		SendMailTicketSalida sendBO = null;
+		
+		try {
+			if(this.constancia == null || this.constancia.getId() == null)
+				throw new InventarioException("Debe confirmar una orden de retiro.");
+			
+			if(this.archivosList == null || this.archivosList.size() <= 0)
+				throw new InventarioException("Debe agregar al menos un archivo a la notificación.");
+		
+			log.info("Confirmando la orden de retiro {}", this.folioSelected);
+			sendBO = new SendMailTicketSalida(clienteSelect.getCteCve());
+			sendBO.setFolio(this.folioSalida);
+			sendBO.setLoggedUser(this.usuario);
+			for(Adjunto a : this.archivosList ) {
+				sendBO.addAttachment(a);
+			}
+			sendBO.send();
+			
+			mensaje = "El mensaje se envió correctamente.";
+			severity = FacesMessage.SEVERITY_INFO;
+			
+			PrimeFaces.current().executeScript("PF('dialogCarga').hide()");
+		} catch(InventarioException ex) {
+			log.warn("Problema para enviar el correo electrónico...", ex.getMessage());
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			log.error("Problema para enviar el correo electrónico...", ex);
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages");
+		}
+		
 	}
 
 	public Cliente getClienteSelect() {
@@ -878,5 +1001,61 @@ public class OrdenSalidaBean implements Serializable {
 
 	public void setListSolicitadosSalidaUI(List<SalidaUI> listSolicitadosSalidaUI) {
 		this.listSolicitadosSalidaUI = listSolicitadosSalidaUI;
+	}
+
+	public UploadedFile getAttachmentFile() {
+		return attachmentFile;
+	}
+
+	public void setAttachmentFile(UploadedFile attachmentFile) {
+		this.attachmentFile = attachmentFile;
+	}
+
+	public List<Adjunto> getArchivosList() {
+		return archivosList;
+	}
+
+	public void setArchivosList(List<Adjunto> archivosList) {
+		this.archivosList = archivosList;
+	}
+
+	public BigDecimal getTamanioTotal() {
+		return tamanioTotal;
+	}
+
+	public void setTamanioTotal(BigDecimal tamanioTotal) {
+		this.tamanioTotal = tamanioTotal;
+	}
+
+	public BigDecimal getLimite() {
+		return limite;
+	}
+
+	public void setLimite(BigDecimal limite) {
+		this.limite = limite;
+	}
+
+	public BigDecimal getMegabyte() {
+		return megabyte;
+	}
+
+	public void setMegabyte(BigDecimal megabyte) {
+		this.megabyte = megabyte;
+	}
+
+	public Adjunto getSelectedAttachment() {
+		return selectedAttachment;
+	}
+
+	public void setSelectedAttachment(Adjunto selectedAttachment) {
+		this.selectedAttachment = selectedAttachment;
+	}
+
+	public ConstanciaSalida getConstancia() {
+		return constancia;
+	}
+
+	public void setConstancia(ConstanciaSalida constancia) {
+		this.constancia = constancia;
 	}
 }

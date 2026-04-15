@@ -4,22 +4,32 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <div align="center" style="padding: 1rem;">
-        <span style="padding-left: 0.5rem; padding-right: 1rem;">
-            <p:commandButton value="Guardar" process="@this" icon="pi pi-save" onclick="PF('confirmGuardar').show();"/>
-        </span>
-        <span style="padding-left: 0.5rem; padding-right: 1rem;">
-            <p:commandButton id="btnTicketSalida" value="Ticket de Salida" icon="pi pi-print" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+    <p:outputPanel id="pnl-acciones" styleClass="p-grid ui-fluid">
+    	<div class="p-col-12 p-md-1">
+    		
+    	</div>
+    	<div class="p-col-12 p-md-2">
+    		<p:commandButton value="Guardar" process="@this" icon="pi pi-save" onclick="PF('confirmGuardar').show();" update="pnl-acciones" disabled="#{ordenSalidaBean.folioSelected eq null}"/>
+    	</div>
+    	<div class="p-col-12 p-md-2">
+    		<p:commandButton id="btnTicketSalida" value="Ticket Salida" icon="pi pi-print" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" ajax="false" styleClass="ui-button-outlined" disabled="#{ordenSalidaBean.constancia.id eq null}">
                 <p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
             </p:commandButton>
-        </span>
-        <span style="padding-left: 0.5rem; padding-right: 1rem;">
-            <p:commandButton id="btnTicketServicio" value="Ticket de Servicio" icon="pi pi-print" styleClass="ui-button-outlined" actionListener="#{ordenSalidaBean.imprimirTicketServicios}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+    	</div>
+    	<div class="p-col-12 p-md-2">
+    		<p:commandButton id="btnTicketServicio" value="Ticket Servicio" icon="pi pi-print" actionListener="#{ordenSalidaBean.imprimirTicketServicios}" ajax="false" styleClass="ui-button-outlined" disabled="#{ordenSalidaBean.constancia.id eq null}">
                 <p:fileDownload value="#{ordenSalidaBean.file}"></p:fileDownload>
             </p:commandButton>
-        </span>
-        <span style="padding-left: 0.5rem; padding-right: 1rem;">
-            <p:commandButton value="Nueva orden" actionListener="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh" />
-        </span>
-    </div>
+    	</div>
+    	<div class="p-col-12 p-md-2">
+    		<p:commandButton id="btnNotificar" value="Notificar" icon="pi pi-send" actionListener="#{ordenSalidaBean.validarOrden}" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" disabled="#{ordenSalidaBean.folioSelected eq null}">
+        	</p:commandButton>
+    	</div>
+    	<div class="p-col-12 p-md-2">
+    		<p:commandButton value="Nueva orden" actionListener="#{ordenSalidaBean.reload}" update="messages" process="@this" icon="pi pi-refresh" />
+    	</div>
+    	<div class="p-col-12 p-md-1">
+    	</div>
+    	
+    </p:outputPanel>
 </ui:composition>
