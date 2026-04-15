@@ -31,12 +31,6 @@ public class SideBarBean implements Serializable {
 	
 	@Inject
 	private SalidasBL salidasBL;
-        
-	private List<Cliente> listaClientesActivos;
-	private List<Cliente> listaClientesTodos;
-	private Usuario usuario;
-	private Integer idCliente = null;
-	
 	
 	private FacesContext context;
     private HttpServletRequest request;
@@ -44,28 +38,36 @@ public class SideBarBean implements Serializable {
     private Integer numeroEntradas;
     private Integer numeroSalidas;
     private String severity;
-    
-    public String getSeverity() {
-		return severity;
-	}
-
-	public void setSeverity(String severity) {
-		this.severity = severity;
-	}
-
-	private String fotografia;
-    
-    public String getFotografia() {
-		return fotografia;
-	}
-
-	public void setFotografia(String fotografia) {
-		this.fotografia = fotografia;
-	}
-
+        
+	private List<Cliente> listaClientesActivos;
+	private List<Cliente> listaClientesTodos;
+	private Usuario usuario;
+	private Integer idCliente = null;
+	
 	public SideBarBean() {
     	this.usuario = new Usuario();
     }
+	
+	@SuppressWarnings("unchecked")
+	@PostConstruct
+	public void init() {
+		
+		try {
+			context = FacesContext.getCurrentInstance();
+			request = (HttpServletRequest) context.getExternalContext().getRequest();
+			session = request.getSession(false);
+			this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+			
+			listaClientesActivos = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+			listaClientesTodos = (List<Cliente>) request.getSession(false).getAttribute("clientesTodosList");
+			fotografia = (String) request.getSession(false).getAttribute("fotografia");
+			this.cargaOrdenesDeSalida();
+			
+			this.numeroEntradas = null;
+		} catch(Exception ex) {
+			log.error("Problema al iniciar la sesión del usuario.", ex);
+		}
+	}
 	
 	public void cargaOrdenesDeSalida() {
 		StatusSalida statusSalida = null;
@@ -89,28 +91,6 @@ public class SideBarBean implements Serializable {
 			log.error("Problema para obtener las órdenes de salida.");
 		} finally {
 			PrimeFaces.current().ajax().update("menuform");
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	@PostConstruct
-	public void init() {
-		
-		try {
-			
-			context = FacesContext.getCurrentInstance();
-			request = (HttpServletRequest) context.getExternalContext().getRequest();
-			session = request.getSession(false);
-			this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
-			
-			listaClientesActivos = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
-			listaClientesTodos = (List<Cliente>) request.getSession(false).getAttribute("clientesTodosList");
-			fotografia = (String) request.getSession(false).getAttribute("fotografia");
-			this.cargaOrdenesDeSalida();
-			
-			this.numeroEntradas = null;
-		} catch(Exception ex) {
-			log.error("Problema al iniciar la sesión del usuario.", ex);
 		}
 	}
 	
@@ -198,5 +178,23 @@ public class SideBarBean implements Serializable {
 
 	public void setListaClientesTodos(List<Cliente> listaClientesTodos) {
 		this.listaClientesTodos = listaClientesTodos;
+	}
+	
+	public String getSeverity() {
+		return severity;
+	}
+
+	public void setSeverity(String severity) {
+		this.severity = severity;
+	}
+
+	private String fotografia;
+    
+    public String getFotografia() {
+		return fotografia;
+	}
+
+	public void setFotografia(String fotografia) {
+		this.fotografia = fotografia;
 	}
 }

@@ -17,7 +17,7 @@
 	        </a>
 	        <div id="topbar-icons">
 	        	<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-	        		<p:commandLink action="#{sideBarBean.redirectOrdenEntrada()}" title="Ordenes de entrada pendientes">
+	        		<p:commandLink id="tblOrdenesRetiro" action="#{sideBarBean.redirectOrdenEntrada()}" title="Ordenes de entrada pendientes">
 			        	<p:badge value="#{sideBarBean.numeroEntradas}" severity="danger" rendered="#{sideBarBean.numeroEntradas != null}">
 				       	</p:badge>
 	        		</p:commandLink>

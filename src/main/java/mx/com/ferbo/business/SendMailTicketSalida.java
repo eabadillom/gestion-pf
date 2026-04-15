@@ -57,32 +57,39 @@ public class SendMailTicketSalida {
 	
 	public void addAttachment(String nombreArchivo, String tipoArchivo, byte[] contenido)
 	throws MailException {
-		Adjunto archivo = null;
-		
+		Adjunto archivo = new Adjunto(nombreArchivo, tipoArchivo, contenido);
+		this.addAttachment(archivo);
+	}
+	
+	public void addAttachment(Adjunto adjunto)
+	throws MailException {
 		if(alFiles == null)
 			alFiles = new ArrayList<Adjunto>();
 		
-		if(nombreArchivo == null || "".equalsIgnoreCase(nombreArchivo.trim()))
+		if(adjunto == null)
+			throw new MailException("El archivo indicado es incorrecto o no se ha seleccionado.");
+		
+		if(adjunto.getNombreArchivo() == null || "".equalsIgnoreCase(adjunto.getNombreArchivo()))
 			throw new MailException("Debe indicar un nombre de archivo.");
 		
-		if(tipoArchivo == null || "".equalsIgnoreCase(tipoArchivo.trim()))
-			throw new MailException("Debe indicar un tipo de archivo");
+		if(adjunto.getTipoArchivo() == null || "".equalsIgnoreCase(adjunto.getTipoArchivo()))
+			throw new MailException("Debe inidcar un tipo de archivo.");
 		
-		if(contenido == null || contenido.length <= 0)
+		if(adjunto.getContenido() == null || adjunto.getContenido().length <= 0)
 			throw new MailException("El contenido del archivo se encuentra vacío.");
 		
-		switch(tipoArchivo) {
-		case Adjunto.TP_ARCHIVO_JPEG:
-		case Adjunto.TP_ARCHIVO_PDF:
-		case Adjunto.TP_ARCHIVO_PNG:
-		case Adjunto.TP_ARCHIVO_XLS:
-		case Adjunto.TP_ARCHIVO_XML:
-		case Adjunto.TP_ARCHIVO_ZIP:
-			archivo = new Adjunto(nombreArchivo, tipoArchivo, contenido);
-			alFiles.add(archivo);
-			break;
-		default:
-			throw new MailException("Tipo de archivo no soportado.");	
+		switch(adjunto.getTipoArchivo()) {
+			case Adjunto.TP_ARCHIVO_JPEG:
+			case Adjunto.TP_ARCHIVO_PDF:
+			case Adjunto.TP_ARCHIVO_PNG:
+			case Adjunto.TP_ARCHIVO_XLS:
+			case Adjunto.TP_ARCHIVO_XML:
+			case Adjunto.TP_ARCHIVO_ZIP:
+			case Adjunto.TP_ARCHIVO_GENERICO:
+				alFiles.add(adjunto);
+				break;
+			default:
+				throw new MailException("Tipo de archivo no soportado.");
 		}
 	}
 	

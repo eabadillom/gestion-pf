@@ -17,6 +17,7 @@ import mx.com.ferbo.model.ConstanciaServicioDetalle;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Producto;
+import mx.com.ferbo.model.Salida;
 import mx.com.ferbo.model.ServiciosSalida;
 import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.ui.OrdenDeSalidas;
@@ -44,9 +45,15 @@ public class OrdenSalidasBL
     @Inject
     private UnidadManejoBL unidadDeManejoBL;
     
+    public Salida build() {
+    	Salida salida = new Salida();
+    	//TODO agregar otros atributos y objetos dependientes de "Salida"
+    	return salida;
+    }
+    
     public List<SalidaUI> procesarOrdenesSalida(List<OrdenDeSalidas> listOrdenDeSalidas) throws InventarioException
     {
-        List<SalidaUI> listSalidasUI = new ArrayList();
+        List<SalidaUI> listSalidasUI = new ArrayList<SalidaUI>();
         
         for (OrdenDeSalidas orden : listOrdenDeSalidas) {
             Partida partida = partidaBL.obtenerPartidaPorSalida(orden);
@@ -127,7 +134,7 @@ public class OrdenSalidasBL
     }
     
     public List<ConstanciaSalidaServicios> addConstanciaSalidaServicios(List<ServiciosSalida> listaServiciosSalida, ConstanciaSalida constancia) {
-        List<ConstanciaSalidaServicios> listConstSalServicios = new ArrayList();
+        List<ConstanciaSalidaServicios> listConstSalServicios = new ArrayList<ConstanciaSalidaServicios>();
         ConstanciaSalidaServicios css = null;
         
         if(listaServiciosSalida == null || listaServiciosSalida.isEmpty())
