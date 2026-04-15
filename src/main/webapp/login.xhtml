@@ -4,17 +4,15 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
-
     <h:head>
-       	<title>FERBO Inventario</title>
         <f:facet name="first">
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        	<link rel="icon" type="image/x-icon" href="#{request.contextPath}/favicon.ico" />
             <meta name="apple-mobile-web-app-capable" content="yes" />
         </f:facet>
-        <link rel="icon" type="image/x-icon" href="#{request.contextPath}/favicon.ico" />
-        <title>Inicio de sesión</title>
+       	<title>FERBO Inventario</title>
     </h:head>
     <h:body styleClass="login-body">
     	<h:form id="login_form">
@@ -26,20 +24,18 @@
 		    </p:dialog>
 	        <div id="login-wrapper">
 	            <p:graphicImage name="images/login.png" library="omega-layout" style="width:100%"/>
-	            <div id="login-container">
+	            <div id="login-container">	
 	                <span class="title">Iniciar sesión</span>
-	                <div class="p-grid ui-fluid">
-	                    <div class="p-col-12">
+	                <div style="padding: 1rem;">
 	                        <p:inputText placeholder="Usuario" id="usuario" required="true" requiredMessage="Usuario requerido." value="#{loginBean.username}" style="width: 18rem; text-align: center;"/>
 	                        <p:message for="usuario"/>
-	                    </div>
-	                    <div class="p-col-12">
-	                        <p:password placeholder="Contraseña" id="contraseña" required="true" feedback="false" value="#{loginBean.password}" requiredMessage="Contraseña requerida." style="width: 18rem; text-align: center;"/>
+	                </div>
+	                <div style="padding: 1rem;">
+	                        <p:password placeholder="Contraseña" id="contraseña" required="true" feedback="false" value="#{loginBean.password}" requiredMessage="Contraseña requerida." style="width: 18rem; text-align: center;" toggleMask="true"/>
 	                        <p:message for="contraseña" />
-	                    </div>
-	                    <div class="p-col-12">
+	                </div>
+	                <div style="padding: 1rem;">
 	                        <p:commandButton value="Iniciar sesión" icon="pi pi-user" action="#{loginBean.login}" process="@this login_form" update="login_form" style="width: 16rem;" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
-	                    </div>
 	                </div>
 	            </div>
         </div>
