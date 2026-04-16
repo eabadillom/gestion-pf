@@ -320,7 +320,7 @@ public class ConsultarConstanciaSalidaBean implements Serializable{
 		
 		try {
 			sendBO = new SendMailTicketSalida(constanciaSelect.getClienteCve().getCteCve());
-			sendBO.setFolio(this.folio);
+			sendBO.setFolio(this.constanciaSelect.getNumero());
 			sendBO.setLoggedUser(this.usuario);
 			sendBO.addAttachment("no-name.jpg", Adjunto.TP_ARCHIVO_JPEG, this.imagen);
 			sendBO.send();

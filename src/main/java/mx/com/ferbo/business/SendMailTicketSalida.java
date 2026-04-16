@@ -146,7 +146,7 @@ public class SendMailTicketSalida {
         
         try {
             subject = String.format("Confirmación de salida %s - FERBO ", this.folio);
-            
+            log.info("Asunto: {}", subject);
             mailHTML = "/mail/mailConfirmacionSalida.html";
             mailFile = new File( getClass().getResource(mailHTML).getFile());
             mailReader = new FileReader(mailFile);
