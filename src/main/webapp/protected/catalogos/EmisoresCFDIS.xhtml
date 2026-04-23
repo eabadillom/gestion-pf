@@ -10,7 +10,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 		<h:form id="form">
 		<p:growl id="messages" showDetail="true" />
 		<p:panel>
-			<p:commandButton value="Agregar emisor" oncomplete="PF('dialogEmisor').show();" actionListener="#{emisoresCFDISBean.nuevoEmisor}" update="pnlEmisor"/>
+			<p:commandButton value="Agregar emisor" actionListener="#{emisoresCFDISBean.nuevoEmisor}" process="@this" update="pnlEmisor" oncomplete="PF('dialogEmisor').show();"/>
 		</p:panel>
 		<div style="padding-top: 1rem;">
 			<p:dataTable id="dt-emisor" widgetVar="dtEmisor" var="emisordt" value="#{emisoresCFDISBean.listaEmisor}" reflow="true" rowKey="#{emisordt.emisor}" paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add">
@@ -44,38 +44,47 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 				</p:column>
 			</p:dataTable>
 		</div>
-		<p:dialog id="pnlEmisor" header="Información del emisor" showEffect="fade" modal="true" widgetVar="dialogEmisor" responsive="true">
-			<div class="p-grid ui-fluid p-col-12">
+		<p:dialog header="Información del emisor" showEffect="fade" modal="true" widgetVar="dialogEmisor" responsive="true">
+			<p:outputPanel id="pnlEmisor" styleClass="p-grid ui-fluid p-col-12">
 				<div class="p-col-12 p-md-6">
 					<p:outputLabel value="Tipo Persona"></p:outputLabel>
 					<p:selectOneRadio id="selTpPersona" value="#{emisoresCFDISBean.emisor.tp_persona}" layout="grid" columns="3">
 					    <f:selectItem itemLabel="Persona Moral" itemValue="M"/>
           				<f:selectItem itemLabel="Persona Fisica" itemValue="F"/>
-			        	<p:ajax listener="#{emisoresCFDISBean.regimenSelect}" process="@this" update="txtRegimenCapital" />
+			        	<p:ajax listener="#{emisoresCFDISBean.regimenSelect}" process="@this" update="txtRegimenCapital"/>
 			        </p:selectOneRadio>
 				</div>
 				<div class="p-col-12 p-md-6">
 					<p:outputLabel for="@next" value="Nombre o Razón social"/>
-					<p:inputText value="#{emisoresCFDISBean.emisor.nb_emisor}"/>
+					<p:inputText value="#{emisoresCFDISBean.emisor.nb_emisor}" oninput="this.value = this.value.toUpperCase()">
+						<p:ajax process="@this" />
+					</p:inputText>
 				</div>
 				<div class="p-col-12 p-md-6">
 					<p:outputLabel for="@next" value="RFC"/>
-					<p:inputText id="RFC" value="#{emisoresCFDISBean.emisor.nb_rfc}"/>
+					<p:inputText id="RFC" value="#{emisoresCFDISBean.emisor.nb_rfc}" oninput="this.value = this.value.toUpperCase()">
+						<p:ajax process="@this" />
+					</p:inputText>
 				</div>
 				<div class="p-col-12 p-md-6">
 					<p:outputLabel for="@next" value="Regimen Capital"/>
-					<p:inputText id="txtRegimenCapital" value="#{emisoresCFDISBean.emisor.nb_regimen_capital}" placeholder="p. e. SOCIEDAD ANONIMA DE CAPITAL VARIABLE" disabled="#{emisoresCFDISBean.estado}"/>
+					<p:inputText id="txtRegimenCapital" value="#{emisoresCFDISBean.emisor.nb_regimen_capital}" placeholder="p. e. SOCIEDAD ANONIMA DE CAPITAL VARIABLE" disabled="#{emisoresCFDISBean.estado}" oninput="this.value = this.value.toUpperCase()">
+						<p:ajax process="@this" />
+					</p:inputText>
 				</div>
 				<div class="p-col-12 p-md-6">
 					<p:outputLabel value="Régimen Fiscal"></p:outputLabel>
 					<p:selectOneMenu id="regimenFiscal" value="#{emisoresCFDISBean.emisor.cd_regimen}" converter="entityConverter" autoWidth="false">
 						<f:selectItem itemLabel="---SELECCIONE---" noSelectionOption="true"/>
                         <f:selectItems value="#{emisoresCFDISBean.listaRegimenFiscal}" var="regimenFiscal" itemLabel="#{regimenFiscal.cd_regimen} - #{regimenFiscal.nb_regimen}" itemValue="#{regimenFiscal}" />
+                        <p:ajax process="@this" />
                     </p:selectOneMenu>
 				</div>
 				<div class="p-col-12 p-md-6">
 					<p:outputLabel value="Código Postal (domicilio fiscal)" />
-					<p:inputText id="codigoPostal" value="#{emisoresCFDISBean.emisor.codigoPostal}" maxlength="5"></p:inputText>
+					<p:inputText id="codigoPostal" value="#{emisoresCFDISBean.emisor.codigoPostal}" maxlength="5">
+						<p:ajax process="@this" />
+					</p:inputText>
 				</div>
 				<div class="p-col-12 p-md-6">
 					<p:outputLabel for="@next" value="Inicio de operaciones"/>
@@ -95,11 +104,12 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 						<f:selectItem itemLabel="---SELECCIONE---" itemValue="" noSelectionOption="true"/>
 						<f:selectItem itemLabel="Activo" itemValue="A" />
 						<f:selectItem itemLabel="Baja" itemValue="B" />
+						<p:ajax process="@this" />
                   	</p:selectOneMenu>
 				</div>
-			</div>
+			</p:outputPanel>
 			<f:facet name="footer">
-				<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardarEmisor}" process="@this pnlEmisor" update="pnlEmisor messages statusPadron" />
+				<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{emisoresCFDISBean.guardarEmisor}" process="form:pnlEmisor @this" update="messages statusPadron" />
 				<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogEmisor').hide()" process="@this" immediate="true" />
 			</f:facet>
 		</p:dialog>
@@ -107,7 +117,7 @@ xmlns:jsf="http://xmlns.jcp.org/jsf">
 	<p:dialog header="Carga/Descarga de archivos" showEffect="fade" modal="true" widgetVar="dialogCarga" responsive="true" width="600" height="500"> 
 		<h:form id="frmArchivos" enctype="multipart/form-data">
 			<p:outputPanel id="pnlCarga" class="ui-fluid">
-			<p:outputPanel rendered="#{not empty emisoresCFDISBean.certificado}">
+			<p:outputPanel rendered="#{emisoresCFDISBean.certificado ne null}">
 				<div class="p-grid">
 			
 	   <p:divider align="left">
