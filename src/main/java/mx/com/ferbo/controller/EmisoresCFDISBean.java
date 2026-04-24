@@ -80,6 +80,7 @@ public class EmisoresCFDISBean implements Serializable {
 	}
 	
 	public void nuevoEmisor() {
+		log.info("Preparando nuevo emisor...");
 		this.emisor = new EmisoresCFDIS();
 	}
 	
@@ -123,14 +124,17 @@ public class EmisoresCFDISBean implements Serializable {
 				throw new InventarioException("Ocurrió un problema al guardar el emisor.");
 			
 			listaEmisor = emisoresDAO.findall(false);
+			PrimeFaces.current().executeScript("PF('dialogEmisor').hide()");
 			
 			mensaje = "El emisor se guardó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
-			severity = FacesMessage.SEVERITY_ERROR;
+			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception ex) {
 			log.error("Problema para cargar los regímenes fiscales...", ex);
+			mensaje = "Ocurrió un problema al guardar al emisor. Si el problema persiste, avise a su administrador de sistemas.";
+			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
