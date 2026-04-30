@@ -42,7 +42,7 @@ import mx.com.ferbo.model.MetodoPago;
                 "AND (:fin IS NULL OR e.fecha <= :fin) " +
                 "AND (:categoria IS NULL OR e.categoria = :categoria) " +
                 "AND (:status IS NULL OR e.status = :status) " +
-                "AND (:texto IS NULL OR LOWER(e.concepto) LIKE LOWER(CONCAT('%', :texto, '%'))) " +
+                "AND (:concepto IS NULL OR LOWER(e.concepto) LIKE LOWER(CONCAT('%', :concepto, '%'))) " +
                 "ORDER BY e.fecha DESC")
 })
 public class Egreso {
