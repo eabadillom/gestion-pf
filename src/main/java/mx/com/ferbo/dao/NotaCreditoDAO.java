@@ -9,12 +9,17 @@ import javax.persistence.Query;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.CancelaNotaCredito;
 import mx.com.ferbo.model.NotaCredito;
 import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class NotaCreditoDAO {
+public class NotaCreditoDAO extends BaseDAO<NotaCredito, Integer> {
+	public NotaCreditoDAO() {
+		super(NotaCredito.class);
+	}
+	
 	private static Logger log = LogManager.getLogger(NotaCreditoDAO.class);
 	
 	EntityManager entity = EntityManagerUtil.getEntityManager();
@@ -28,29 +33,6 @@ public class NotaCreditoDAO {
 		System.out.println(notaCredito + "*****************************************************");
 		return notaCredito;
 	}
-	
-	public void guardar(NotaCredito notaCredito) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			em.persist(notaCredito);
-			em.getTransaction().commit();
-			em.close();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public EntityManager getEm() {
-		return em;
-	}
-
-	public void setEm(EntityManager em) {
-		this.em = em;
-	}
-	
 	
 	public List<NotaCredito> buscarPor(Date fechaInicio, Date fechaFin, Integer idCliente) {
 		List<NotaCredito> resultList = null;
@@ -76,7 +58,6 @@ public class NotaCreditoDAO {
 		
 		return resultList;
 	}
-	
 	
 	public NotaCredito buscarPor(Integer idNotaCredito, boolean isFullInfo) {
 		NotaCredito nota = null;
@@ -109,25 +90,5 @@ public class NotaCreditoDAO {
 			EntityManagerUtil.close(entity);
 		}
 		return nota;
-	}
-	
-	
-	public String actualizar(NotaCredito notaCredito) {
-		String resultado = null;
-		EntityManager em = null;
-		
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			notaCredito = em.merge(notaCredito);
-			em.getTransaction().commit();
-		} catch(Exception ex) {
-			EntityManagerUtil.rollback(em);
-			resultado = ex.getMessage();
-		} finally {
-			EntityManagerUtil.close(em);
-		}
-		
-		return resultado;
 	}
 }
