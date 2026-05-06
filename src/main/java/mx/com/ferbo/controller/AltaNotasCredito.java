@@ -52,7 +52,6 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-
 public class AltaNotasCredito implements Serializable{
 	
 	private static final long serialVersionUID = -626048119540963939L;
@@ -244,8 +243,6 @@ public class AltaNotasCredito implements Serializable{
 	}
 	
 	public void agregaFactura() {
-		log.debug("Factura seleccionada: {}", this.facturaSelect);
-		
 		if(facturaSelect == null)
 			return;
 		
@@ -259,7 +256,7 @@ public class AltaNotasCredito implements Serializable{
 		for(Pago p : facturaSelect.getPagoList()) {
 			saldoSelected = saldoSelected.subtract(p.getMonto());
 		}
-		log.debug("Saldo: {}", saldoSelected);
+		this.cantidad = null;
 	}
 	
 	public void facturasSeleccionadas() { 
@@ -401,11 +398,8 @@ public class AltaNotasCredito implements Serializable{
 			serieNotaSelect.setNumeroActual(serieNotaSelect.getNumeroActual()+1);
 			serieNotaDAO.update(serieNotaSelect);
 			
-			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Nota agregada correctamente";
-			
-			
 		} catch(Exception e) {
 			log.error("Ocurrió un problema al guardar la nota de crédito...", e);
 			mensaje = "Ocurrió un problema al guardar la nota de crédito.";
@@ -415,7 +409,6 @@ public class AltaNotasCredito implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update(":form:messages");
 		}
-			
 	}
 	
 	public void reload() throws IOException {
