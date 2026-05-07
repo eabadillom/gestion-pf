@@ -59,14 +59,13 @@
 				</div>
 			</div>
 
-			<p:dialog header="Agregar Serie Nota" widgetVar="dg-agrega"
-				modal="true" showEffect="fade" responsive="true">
+			<p:dialog header="Agregar Serie Nota" widgetVar="dg-agrega" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-agrega" class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
 						<p:datePicker value="#{serieNotaBean.nuevo.fechaInicio}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true">
 							<p:ajax process="@this" />
-							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 						</p:datePicker>
 					</div>
 					<div class="p-field">
@@ -96,12 +95,8 @@
 				</p:outputPanel>
 
 				<f:facet name="footer">
-					<p:commandButton value="Agregar" icon="pi pi-check"
-						actionListener="#{serieNotaBean.save()}" update="frm-agrega"
-						process="frm-agrega @this" />
-					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-danger" oncomplete="PF('dg-agrega').hide()"
-						update="frm-agrega" />
+					<p:commandButton value="Agregar" icon="pi pi-check" actionListener="#{serieNotaBean.save()}" update="frm-agrega" process="frm-agrega @this" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" oncomplete="PF('dg-agrega').hide()" update="frm-agrega" />
 				</f:facet>
 			</p:dialog>
 
@@ -110,13 +105,13 @@
 				<p:outputPanel id="frm-modifica" class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel for="@next">Serie:</p:outputLabel>
-						<p:inputText value="#{serieNotaBean.seleccion.id}" disabled="true" />
+						<p:inputText value="#{serieNotaBean.seleccion.id}" readonly="true" />
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha Inicio:" />
 						<p:datePicker value="#{serieNotaBean.seleccion.fechaInicio}" monthNavigator="true" yearNavigator="true" showWeek="true" required="true">
 							<p:ajax process="@this" />
-							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 						</p:datePicker>
 					</div>
 					<div class="p-field">
@@ -146,11 +141,8 @@
 				</p:outputPanel>
 
 				<f:facet name="footer">
-					<p:commandButton value="Actualizar" icon="pi pi-check"
-						actionListener="#{serieNotaBean.update()}"
-						process="frm-modifica @this" update="frm-modifica" />
-					<p:commandButton value="Cancelar" icon="pi pi-times"
-						class="ui-button-danger" oncomplete="PF('dg-modifica').hide()" />
+					<p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{serieNotaBean.update()}" process="frm-modifica @this" update="frm-modifica" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" oncomplete="PF('dg-modifica').hide()" />
 				</f:facet>
 			</p:dialog>
 
