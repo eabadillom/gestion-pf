@@ -21,6 +21,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.bouncycastle.util.Objects;
+
 /**
  *
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
@@ -43,15 +45,20 @@ public class SerieNota implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID")
     private Integer id;
+    
     @Column(name = "FECHA_INICIO")
     @Temporal(TemporalType.DATE)
     private Date fechaInicio;
+    
     @Column(name = "NUMERO_INICIAL")
     private Integer numeroInicial;
+    
     @Column(name = "NUMERO_ACTUAL")
     private Integer numeroActual;
+    
     @Column(name = "NUMERO_FINAL")
     private Integer numeroFinal;
+    
     @JoinColumn(name = "STATUS_SERIE", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private StatusSerie statusSerie;
@@ -113,9 +120,9 @@ public class SerieNota implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.id);
     }
 
     @Override
@@ -131,9 +138,8 @@ public class SerieNota implements Serializable {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.SerieNota[ id=" + id + " ]";
-    }
-    
+	@Override
+	public String toString() {
+		return "SerieNota [id=" + id + ", numeroActual=" + numeroActual + "]";
+	}
 }

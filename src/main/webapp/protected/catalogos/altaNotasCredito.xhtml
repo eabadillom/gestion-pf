@@ -37,6 +37,7 @@
 					<p:selectOneMenu id="serieNota" autoWidth="false" converter="entityConverter" value="#{altaNotasCredito.serieNotaSelect}"  required="true" >
 					 	<f:selectItem itemLabel="---Serie---" noSelectionOption="true" />
 					 	<f:selectItems value="#{altaNotasCredito.listaSerieNota}" var="serieNota" itemLabel="#{serieNota.numeroActual+1}-#{serieNota.statusSerie.descripcion} " itemValue="#{serieNota}" />
+					 	<p:ajax process="@this" listener="#{altaNotasCredito.verSerie()}"/>
 					</p:selectOneMenu>					
 				</div>
 			</div>
@@ -137,7 +138,6 @@
 			<p:outputPanel id="factura-mod" class="ui-fluid">
 				<p:outputPanel>
 					<div class="p-field">
-						<p:focus for="cantidad"/>
 						<p:outputLabel value="FOLIO:" />
 						<p:inputText value="#{altaNotasCredito.facturaSelect.nomSerie}-#{altaNotasCredito.facturaSelect.numero}" readonly="true"/>
 					</div>
@@ -172,6 +172,7 @@
 					
 					<div class="p-field">
 						<p:outputLabel value="Cantidad" />
+						<p:focus for="form:cantidad"/>
 						<p:inputNumber id="cantidad" value="#{altaNotasCredito.cantidad}" symbol="$ " symbolPosition="p" decimalPlaces="2" thousandSeparator="," inputStyle="text-align: right" emptyValue="null"/>		
 					</div>
 				</p:outputPanel>					
@@ -289,7 +290,7 @@
 		</p:panel>
 		
 		<div style="padding-top: 2rem;" align="center">
-			<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{altaNotasCredito.save()}"  update="notaCredito emisor domicilio" process="@this emisor notaCredito domicilio" >
+			<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{altaNotasCredito.save()}"  update="notaCredito emisor domicilio" process="@this emisor notaCredito domicilio" disabled="#{altaNotasCredito.notaCredito.id ne null}">
 				<p:confirm header="Registrar Nota de crédito" message="¿Está seguro que desea GUARDAR la nota de crédito?" icon="pi pi-exclamation-triangle" />
 			</p:commandButton>
 			<p:commandButton icon="pi pi-refresh" style="margin-left: 10px;" value="Generar nueva nota" actionListener="#{altaNotasCredito.reload()}"  process="@this" >

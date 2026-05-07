@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -13,6 +14,7 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.SerieNotaDAO;
 import mx.com.ferbo.model.SerieNota;
 import mx.com.ferbo.model.StatusSerie;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
@@ -33,92 +35,135 @@ public class SerieNotaBean implements Serializable {
 		listSerie = daoSerie.findAll();
 		status = daoSerie.findStatus();
 		seleccion = new SerieNota();
-	};
+		nuevo = new SerieNota();
+	}
 
 	public void openNew() {
 		nuevo = new SerieNota();
-	};
+	}
 
 	public void save() {
-		PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
-		String message = daoSerie.save(nuevo);
-
-		if (message == null) {
+		FacesMessage message = null;
+		Severity severity = null;
+		String titulo = null;
+		String mensaje = null;
+		
+		try {
+			daoSerie.guardar(nuevo);
 			listSerie.clear();
 			listSerie = daoSerie.findAll();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Serie Factura Agregada ", null));
+			nuevo = new SerieNota();
+			PrimeFaces.current().executeScript("PF('dg-agrega').hide()");
+			titulo = "Serie registrada";
+			mensaje = String.format("Folio %s", nuevo.getNumeroActual());
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			titulo = "Información incorrecta";
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			titulo = "Error al guardar la serie";
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al agregar serie", message));
-			PrimeFaces.current().ajax().update("form:messages");
 		}
-		nuevo = new SerieNota();
-	};
+	}
 
 	public void update() {
-		PrimeFaces.current().executeScript("PF('dg-modifica').hide()");
-		String message = daoSerie.update(seleccion);
-
-		if (message == null) {
+		FacesMessage message = null;
+		Severity severity = null;
+		String titulo = null;
+		String mensaje = null;
+		
+		try {
+			daoSerie.actualizar(seleccion);
 			listSerie.clear();
 			listSerie = daoSerie.findAll();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Serie Modificada", null));
+			PrimeFaces.current().executeScript("PF('dg-modifica').hide()");
+			mensaje = String.format("Folio %s", seleccion.getNumeroActual());
+			this.seleccion = new SerieNota();
+			titulo = "Serie actualizada";
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			titulo = "Información incorrecta";
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			titulo = "Error al guardar la serie";
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al modificar", message));
-			PrimeFaces.current().ajax().update("form:messages");
 		}
-		this.seleccion = new SerieNota();
-	};
+	}
 
 	public void cancelar() {
-		PrimeFaces.current().executeScript("PF('dg-delete').hide()");
-		String message = daoSerie.cancelar(seleccion.getId());
-
-		if (message == null) {
+		FacesMessage message = null;
+		Severity severity = null;
+		String titulo = null;
+		String mensaje = null;
+		
+		StatusSerie cancelada = null;
+		
+		try {
+			cancelada = status.stream().filter(item -> item.getId().equals(new Integer(3)))
+					.findFirst().orElseThrow(() -> new InventarioException("Status incorrecto."));
+			seleccion.setStatusSerie(cancelada);
+			daoSerie.actualizar(seleccion);
 			listSerie.clear();
 			listSerie = daoSerie.findAll();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Serie Cancelada", null));
+			seleccion = new SerieNota();
+			
+			PrimeFaces.current().executeScript("PF('dg-delete').hide()");
+			titulo = "Serie cancelada";
+			mensaje = String.format("Folio %s", seleccion.getNumeroActual());
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			titulo = "Información incorrecta";
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (Exception ex) {
+			titulo = "Error al cancelar la serie";
+			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, comuniquese con su administrador del sistema.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages", "form:dtSerieFac");
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al cancelar", message));
-			PrimeFaces.current().ajax().update("form:messages");
 		}
-		this.seleccion = new SerieNota();
-	};
+
+	}
 
 	public List<SerieNota> getListSerie() {
 		return listSerie;
-	};
+	}
 
 	public void setListSerie(List<SerieNota> listSerie) {
 		this.listSerie = listSerie;
-	};
+	}
 
 	public SerieNota getNuevo() {
 		return nuevo;
-	};
+	}
 
 	public void setNuevo(SerieNota nuevo) {
 		this.nuevo = nuevo;
-	};
+	}
 
 	public List<StatusSerie> getStatus() {
 		return status;
-	};
+	}
 
 	public SerieNota getSeleccion() {
 		return seleccion;
-	};
+	}
 
 	public void setSeleccion(SerieNota seleccion) {
 		this.seleccion = seleccion;
-	};
-
+	}
 }

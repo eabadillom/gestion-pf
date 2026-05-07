@@ -40,9 +40,8 @@ public abstract class BaseDAO<MODEL, PK> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			model = em.find(modelClass, id);
-			if (model != null) {
-	            em.refresh(model);
-	        }
+			em.refresh(model);
+			log.info("Model: {}", model);
 			optional = Optional.of(model);
 		} catch(Exception ex) {
 			log.warn("Problema para obtener el elemento por ID: {}", id);
