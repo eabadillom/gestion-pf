@@ -2,6 +2,7 @@ package mx.com.ferbo.dao;
 
 import java.util.List;
 
+import javax.persistence.CacheRetrieveMode;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -23,7 +24,9 @@ public class SerieFacturaDAO {
 
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			list = entity.createNamedQuery("SerieFactura.findAll", SerieFactura.class).getResultList();
+			list = entity.createNamedQuery("SerieFactura.findAll", SerieFactura.class)
+					.setHint("javax.persistence.cache.retrieveMode", CacheRetrieveMode.BYPASS)
+					.getResultList();
 		} catch (Exception e) {
 			log.error("Error al obtener informacion", e);
 		} finally {
@@ -200,8 +203,9 @@ public class SerieFacturaDAO {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			modelList = em.createNamedQuery("SerieFactura.findByEmisor", SerieFactura.class)
+					.setHint("javax.persistence.cache.retrieveMode", CacheRetrieveMode.BYPASS)
 					.setParameter("idEmisor", idEmisoresCFDIS.getCd_emisor()).getResultList();
-
+			
 			if (isFullInfo == false)
 				return modelList;
 
