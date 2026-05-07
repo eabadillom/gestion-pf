@@ -1,4 +1,4 @@
-package mx.com.ferbo.egresos.bl.catalogos;
+package mx.com.ferbo.egresos.business.catalogos;
 
 import java.util.List;
 
@@ -7,20 +7,24 @@ import org.apache.logging.log4j.Logger;
 
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import mx.com.ferbo.egresos.dao.catalogos.StatusEgresoDAO;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
+import mx.com.ferbo.util.InventarioException;
 
-public class StatusEgresoBL {
+@Named
+@RequestScoped
+public class StatusEgresoBL implements CatalogoBL<StatusEgreso> {
 
     private static final Logger log = LogManager.getLogger(StatusEgresoBL.class);
 
-    private final StatusEgresoDAO dao;
+    @Inject
+    private StatusEgresoDAO dao;
 
-    public StatusEgresoBL(StatusEgresoDAO dao) {
-        this.dao = dao;
-    }
-
+    @Override
     public StatusEgreso buscarPorClave(String clave) {
         try {
             return dao.buscarPorClave(clave);
@@ -31,6 +35,7 @@ public class StatusEgresoBL {
         }
     }
 
+    @Override
     public List<StatusEgreso> buscarActivos(Boolean activo) {
         try {
             return dao.buscarActivosOInactivos(activo);
@@ -43,17 +48,19 @@ public class StatusEgresoBL {
         }
     }
 
-    public void guardar(StatusEgreso status) {
-
+    @Override
+    public void guardar(StatusEgreso status) throws InventarioException {
         validar(status);
-
         try {
-            dao.save(status);
-
-        } catch (Exception ex) {
+            if (status.getId() == null) {
+                dao.guardar(status);
+            } else {
+                dao.actualizar(status);
+            }
+        } catch (InventarioException ex) {
             log.error("Error al guardar status {}", status.getNombre(), ex);
-            throw new SystemException(
-                    "Hubo un problema al guardar el status: " + status.getNombre());
+            throw ex;
+            //throw new SystemException("Hubo un problema al guardar el status: " + status.getNombre());
         }
     }
 

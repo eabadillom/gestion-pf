@@ -29,22 +29,22 @@ public class CategoriaEgreso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cd_cate")
+    @Column(name = "cd_cate_egre")
     private Long id;
 
-    @Column(name = "nb_cate", nullable = false, length = 100)
+    @Column(name = "nb_cate_egre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(name = "cl_cate", nullable = false, unique = true, length = 10)
+    @Column(name = "cl_cate_egre", nullable = false, unique = true, length = 10)
     private String clave;
 
-    @Column(name = "tx_cate")
+    @Column(name = "tx_cate_egre")
     private String descripcion;
 
-    @Column(name = "st_cate", nullable = false)
+    @Column(name = "st_cate_egre", nullable = false)
     private Boolean activo;
 
-    @Column(name = "nu_cate")
+    @Column(name = "nu_cate_egre")
     private Integer orden;
 
     @Column(name = "tm_creacion", nullable = false, updatable = false)

@@ -29,6 +29,8 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.pagos.businesslogic.MedioPagoBL;
+import mx.com.ferbo.pagos.businesslogic.MetodoPagoBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,8 +44,6 @@ import mx.com.ferbo.business.n.ClienteContactoBL;
 import mx.com.ferbo.business.n.DomiciliosBL;
 import mx.com.ferbo.business.n.FiscalBL;
 import mx.com.ferbo.business.n.MedioContactoBL;
-import mx.com.ferbo.business.n.MedioPagoBL;
-import mx.com.ferbo.business.n.MetodoPagoBL;
 import mx.com.ferbo.business.n.PlantaBL;
 import mx.com.ferbo.business.n.PrecioServicioBL;
 import mx.com.ferbo.business.n.SeguridadBL;

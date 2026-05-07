@@ -1,67 +1,85 @@
-package mx.com.ferbo.egresos.bl;
+package mx.com.ferbo.egresos.business;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.ferbo.tools.exception.SystemException;
+import com.ferbo.tools.validation.ObjectValidator;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
 
 import mx.com.ferbo.egresos.dao.EgresoDAO;
 import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.CategoriaEgreso;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
+import mx.com.ferbo.util.InventarioException;
 
+@Named
+@RequestScoped
 public class EgresoBL {
 
     private static final Logger log = LogManager.getLogger(EgresoBL.class);
 
-    private final EgresoDAO dao;
-
-    public EgresoBL(EgresoDAO dao) {
-        this.dao = dao;
-    }
+    @Inject
+    private EgresoDAO dao;
 
     // =====================================================
     // 1. CREAR EGRESO
     // =====================================================
-    public Egreso crearEgreso(Egreso egreso) {
+    public void crearEgreso(Egreso egreso) throws InventarioException {
 
         validarNuevoEgreso(egreso);
 
         egreso.setStatus(obtenerStatusInicial());
 
-        return dao.save(egreso);
+        try {
+            dao.guardar(egreso);
+        } catch (InventarioException ex) {
+            throw ex;
+        }
+
     }
 
     // =====================================================
     // 2. ACTUALIZAR EGRESO
     // =====================================================
-    public Egreso actualizarEgreso(Egreso egreso) {
+    public void actualizarEgreso(Egreso egreso) throws InventarioException {
 
-        Egreso actual = obtenerPorId(egreso.getId());
+        Egreso actual = obtenerPorId(egreso);
 
         validarActualizacion(actual);
 
-        return dao.save(egreso);
+        try {
+            dao.actualizar(actual);
+        } catch (InventarioException ex) {
+            throw ex;
+        }
     }
 
     // =====================================================
     // 3. OBTENER POR ID
     // =====================================================
-    public Egreso obtenerPorId(Long id) {
-        return dao.find(id)
-                .orElseThrow(() -> new SystemException("Egreso no encontrado con id: " + id));
+    public Egreso obtenerPorId(Egreso egreso) {
+        return dao.buscarPorId(egreso.getId())
+                .orElseThrow(() -> new SystemException("Egreso no encontrado con id: " + egreso.getId()));
     }
 
     // =====================================================
     // 4. LISTAR TODOS
     // =====================================================
     public List<Egreso> listarTodos() {
-        return dao.buscarTodos();
+        try {
+            return dao.buscarTodos();
+        } catch (SystemException ex) {
+            throw ex;
+        }
     }
 
     // =====================================================
@@ -73,36 +91,33 @@ public class EgresoBL {
             CategoriaEgreso categoria,
             StatusEgreso status,
             String concepto) {
-
-        return dao.buscarPorFiltros(inicio, fin, categoria, status, concepto);
+        try {
+            return dao.buscarPorFiltros(inicio, fin, categoria, status, concepto);
+        } catch (SystemException ex) {
+            throw ex;
+        }
     }
 
-    // =====================================================
-    // 6. CANCELAR EGRESO
-    // =====================================================
-    public void cancelarEgreso(Long id) {
+    public void asignarStatusEgreso(Egreso egreso, StatusEgreso status) {
+        ObjectValidator.notNull(egreso, "El egreso");
+        ObjectValidator.notNull(status, "El status");
 
-        Egreso egreso = obtenerPorId(id);
-
-        validarCancelacion(egreso);
-
-        egreso.setStatus(obtenerStatusCancelado());
-
-        dao.save(egreso);
+        egreso.setStatus(status);
     }
 
+    
     // =====================================================
     // 7. PROCESAR EGRESO
     // =====================================================
-    public void procesarEgreso(Long id) {
-
-        Egreso egreso = obtenerPorId(id);
+    public void procesarEgreso(Egreso egreso) throws InventarioException {
 
         validarProcesamiento(egreso);
 
-        egreso.setStatus(obtenerStatusProcesado());
-
-        dao.save(egreso);
+        try {
+            dao.actualizar(egreso);
+        } catch (InventarioException ex) {
+            throw ex;
+        }
     }
 
     // =====================================================
@@ -117,11 +132,6 @@ public class EgresoBL {
                 .validateNested("categoria", Egreso::getCategoria, cat -> cat.validateObject()
                         .texto("nombre", CategoriaEgreso::getNombre))
                 .validateOrThrow();
-
-        if (e.getMonto() == null || e.getMonto().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new SystemException("El monto debe ser mayor a 0");
-        }
-
     }
 
     private void validarActualizacion(Egreso actual) {

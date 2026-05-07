@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:form id="formCatalogo">
+
+        <p:toolbar>
+            <p:commandButton value="Nuevo"
+                             actionListener="#{bean.prepararNuevo}"
+                             update=":dialogForm"
+                             oncomplete="PF('dlg').show()" />
+
+            <p:commandButton value="Refrescar"
+                             actionListener="#{bean.buscar}"
+                             update="tabla" />
+        </p:toolbar>
+
+        <ui:include src="tablaCatalogo.xhtml"/>
+
+    </h:form>
+
+    <ui:include src="dialogCatalogo.xhtml"/>
+
+</ui:composition>

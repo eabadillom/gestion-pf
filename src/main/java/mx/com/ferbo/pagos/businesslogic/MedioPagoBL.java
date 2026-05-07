@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.n;
+package mx.com.ferbo.pagos.businesslogic;
 
 import java.util.Date;
 import java.util.List;
@@ -10,10 +10,10 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.MedioPagoDAO;
+import com.ferbo.tools.exception.SystemException;
+
 import mx.com.ferbo.model.MedioPago;
-import mx.com.ferbo.util.DAOException;
-import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.pagos.dao.MedioPagoDAO;
 
 @Named
 @RequestScoped
@@ -24,17 +24,14 @@ public class MedioPagoBL {
 	@Inject
 	private MedioPagoDAO medioPagoDAO;
 
-	public List<MedioPago> obtenerMediosPago() throws InventarioException {
-            log.info("Inicia proceso para obtener todos los medios de pago");
+	public List<MedioPago> obtenerMediosPago() throws SystemException {
+		log.info("Inicia proceso para obtener todos los medios de pago");
 		Date fecha = new Date();
 		try {
-
 			return medioPagoDAO.buscarVigentes(fecha);
-		} catch (DAOException ex) {
+		} catch (SystemException ex) {
 			log.error("Error al obtener los medios de pago vigentes hasta la fecha: " + fecha, ex);
-			throw new InventarioException(
-					"Ocurrio un problema al obtener los medios de pago vigentes hasta la fecha: " + fecha,
-					ex);
+			throw ex;
 		}
 	}
 

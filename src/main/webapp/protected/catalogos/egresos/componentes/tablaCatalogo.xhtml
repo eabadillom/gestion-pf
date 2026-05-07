@@ -1,0 +1,29 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <p:dataTable id="tabla"
+                 value="#{bean.items}"
+                 var="item"
+                 selection="#{bean.selected}"
+                 selectionMode="single">
+
+        <p:column headerText="Clave">
+            #{item.clave}
+        </p:column>
+
+        <p:column headerText="Nombre">
+            #{item.nombre}
+        </p:column>
+
+        <p:column headerText="Orden">
+            #{item.orden}
+        </p:column>
+
+        <p:column headerText="Activo">
+            #{item.activo}
+        </p:column>
+
+    </p:dataTable>
+
+</ui:composition>

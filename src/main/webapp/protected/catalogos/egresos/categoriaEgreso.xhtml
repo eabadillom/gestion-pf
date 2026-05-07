@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" 
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Categoría Egreso</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
+            <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false"
+                      closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+            <!-- Toolbar -->
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Nuevo" icon="pi pi-plus" actionListener="#{categoriaEgresoBean.nuevoOExistente(null)}"
+                                     update=":dlgForm" oncomplete="PF('dlgCategoriaEgreso').show()" process="@this">
+
+                    </p:commandButton>
+
+                    <p:commandButton value="Activos/Inactivos" icon="pi pi-filter"
+                                     actionListener="#{categoriaEgresoBean.toggleActivos}" update="tbCategoriaEgreso">
+
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <!-- Tabla -->
+            <p:dataTable id="tbCategoriaEgreso" widgetVar="tbCategoriaEgreso" value="#{categoriaEgresoBean.items}" var="s" rowKey="#{s.id}"
+                         reflow="true" lazy="false" paginator="true" rows="5" paginatorPosition="bottom">
+
+                <p:column headerText="Clave">
+                    #{s.clave}
+                </p:column>
+
+                <p:column headerText="Nombre">
+                    #{s.nombre}
+                </p:column>
+
+                <p:column headerText="descripcion">
+                    #{s.descripcion}
+                </p:column>
+
+                <p:column headerText="Orden">
+                    #{s.orden}
+                </p:column>
+
+                <p:column headerText='Operaciones'>
+                    <p:commandButton icon="pi pi-pencil"  actionListener="#{categoriaEgresoBean.nuevoOExistente(s)}"
+                                     update=":dlgForm" oncomplete="PF('dlgCategoriaEgreso').show()" process="@this">
+
+                    </p:commandButton>
+                    <p:commandButton icon="pi pi-times" class="ui-button-danger"
+                                     update=":dlgForm" oncomplete="PF('dlgCategoriaEgreso').show()" process="@this">
+
+                    </p:commandButton>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+        <!-- Dialog -->
+        <h:form id="dlgForm">
+            <p:dialog id="dlgCategoriaEgreso" widgetVar="dlgCategoriaEgreso" modal="true" header="Status de Egreso" resizable="false">
+
+                <h:panelGrid columns="2">
+
+                    <h:outputLabel>Clave: </h:outputLabel>
+                    <p:inputText value="#{categoriaEgresoBean.selected.clave}"/>
+
+                    <h:outputLabel>Nombre: </h:outputLabel>
+                    <p:inputText value="#{categoriaEgresoBean.selected.nombre}"/>
+
+                    <h:outputLabel>Descripción: </h:outputLabel>
+                    <p:inputTextarea value="#{categoriaEgresoBean.selected.descripcion}"/>
+
+                    <h:outputLabel>Orden: </h:outputLabel>
+                    <p:inputText value="#{categoriaEgresoBean.selected.orden}"/>
+                </h:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar"
+                                     icon="pi pi-save"
+                                     actionListener="#{categoriaEgresoBean.guardar}"
+                                     update=":form:tbCategoriaEgreso"
+                                     oncomplete="PF('dlgCategoriaEgreso').hide()">
+                    </p:commandButton>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('clienteDireccionesActDialog').hide()"
+                                     class="ui-button-secondary"  resetValues="true" immediate="true" process="@this">
+                    </p:commandButton>
+                </f:facet>
+
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
