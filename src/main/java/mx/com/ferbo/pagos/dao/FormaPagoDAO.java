@@ -17,13 +17,13 @@ import mx.com.ferbo.model.MedioPago;
 
 @Named
 @ApplicationScoped
-public class MedioPagoDAO extends BaseDAO<MedioPago, Integer> {
+public class FormaPagoDAO extends BaseDAO<MedioPago, Integer> {
 
-	private static Logger log = LogManager.getLogger(MedioPagoDAO.class);
+	private static Logger log = LogManager.getLogger(FormaPagoDAO.class);
 
 	private EntityManager em;
 
-	public MedioPagoDAO() {
+	public FormaPagoDAO() {
 		super(MedioPago.class);
 	}
 

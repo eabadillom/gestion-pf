@@ -5,10 +5,11 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.transaction.SystemException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.ferbo.tools.exception.SystemException;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;

@@ -213,9 +213,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.ferbo.arch</groupId>
-  			<artifactId>ferbo-arch</artifactId>
-    		<version>0.1.0-SNAPSHOT</version>
+			<groupId>com.ferbo</groupId>
+  			<artifactId>ferbo-tools</artifactId>
+    		<version>0.1.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

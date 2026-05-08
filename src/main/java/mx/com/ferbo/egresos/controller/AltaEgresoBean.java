@@ -31,10 +31,9 @@ import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Usuario;
-import mx.com.ferbo.pagos.businesslogic.MedioPagoBL;
+import mx.com.ferbo.pagos.businesslogic.FormaPagoBL;
 import mx.com.ferbo.pagos.businesslogic.MetodoPagoBL;
 import mx.com.ferbo.util.FacesUtils;
-import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
@@ -54,7 +53,7 @@ public class AltaEgresoBean implements Serializable {
     private EgresoBL egresoBL;
 
     @Inject
-    private MedioPagoBL medioPagoBL;
+    private FormaPagoBL medioPagoBL;
 
     @Inject
     private MetodoPagoBL metodoPagoBL;
@@ -96,14 +95,30 @@ public class AltaEgresoBean implements Serializable {
         categoriaEgresoSelected = new CategoriaEgreso();
         statusEgresoSelected = new StatusEgreso();
         emisorCfdiSelected = new EmisoresCFDIS();
+        context = FacesContext.getCurrentInstance();
     }
 
     @PostConstruct
     public void init() {
         titulo = "configuración básica de egresos";
         try {
+
             request = (HttpServletRequest) context.getExternalContext().getRequest();
             usuario = (Usuario) request.getSession(false).getAttribute("usuario");
+
+            String idParam = context
+                    .getExternalContext()
+                    .getRequestParameterMap()
+                    .get("id");
+
+            Long id = null;
+
+            if (idParam != null) {
+                id = Long.valueOf(idParam);
+            }
+
+            egresoSelected = egresoBL.nuevoOExistente(id);
+            
             inicioLeyenda = "El usuario " + usuario.getUsuario();
             log.info("{} inicio la carga de {}.", inicioLeyenda, titulo);
             lstMediosPago = medioPagoBL.obtenerMediosPago();
@@ -151,23 +166,17 @@ public class AltaEgresoBean implements Serializable {
 
     public void guardarOActualizarEgreso(Egreso egreso) {
         try {
-            if (egreso.getId() == null) {
-                titulo = "guardar el egreso";
-                log.info("{} inicia el proceso para {}.", inicioLeyenda, titulo);
-                egresoBL.crearEgreso(egreso);
+            titulo = (egreso.getId() == null) ? "guardar el egreso" : "actualizar el egreso";
 
-            } else {
-                titulo = "actualizar el egreso";
-                log.info("{} inicia el proceso para {}.", inicioLeyenda, titulo);
-                egresoBL.actualizarEgreso(egreso);
-            }
+            log.info("{} inicia el proceso para {}.", inicioLeyenda, titulo);
+            egresoBL.procesarEgreso(egreso);
             log.info("{} finaliza proceso para {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado el proceso de " + titulo + ".");
         } catch (ValidationException ex) {
             log.info("Error al momento de validar el egreso. {}", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Validacioón de egreso", ex.getMessage());
-        } catch (InventarioException | SystemException ex) {
+        } catch (SystemException ex) {
             log.warn("Error al momento de {}. {}", titulo.toUpperCase(), ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (Exception ex) {
@@ -180,46 +189,6 @@ public class AltaEgresoBean implements Serializable {
     }
 
     // Getters y Setters
-    public StatusEgresoBL getStutusBL() {
-        return stutusBL;
-    }
-
-    public void setStutusBL(StatusEgresoBL stutusBL) {
-        this.stutusBL = stutusBL;
-    }
-
-    public CategoriaEgresoBL getCategoriaBL() {
-        return categoriaBL;
-    }
-
-    public void setCategoriaBL(CategoriaEgresoBL categoriaBL) {
-        this.categoriaBL = categoriaBL;
-    }
-
-    public EgresoBL getEgresoBL() {
-        return egresoBL;
-    }
-
-    public void setEgresoBL(EgresoBL egresoBL) {
-        this.egresoBL = egresoBL;
-    }
-
-    public MedioPagoBL getMedioPagoBL() {
-        return medioPagoBL;
-    }
-
-    public void setMedioPagoBL(MedioPagoBL medioPagoBL) {
-        this.medioPagoBL = medioPagoBL;
-    }
-
-    public MetodoPagoBL getMetodoPagoBL() {
-        return metodoPagoBL;
-    }
-
-    public void setMetodoPagoBL(MetodoPagoBL metodoPagoBL) {
-        this.metodoPagoBL = metodoPagoBL;
-    }
-
     public List<StatusEgreso> getLstStatusEgresos() {
         return lstStatusEgresos;
     }

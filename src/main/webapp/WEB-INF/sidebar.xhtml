@@ -80,6 +80,7 @@
 						</p:submenu>
                                                 <p:submenu id="frb_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
                                                         <p:menuitem id="frb_categoria_egreso" value="Categoría" icon="pi pi-fw pi-book" outcome="/protected/catalogos/egresos/categoriaEgreso" />
+                                                        <p:menuitem id="frb_alta_egreso" value="Alta Egreso" icon="pi pi-fw pi-check" outcome="/protected/catalogos/egresos/altaEgreso" />
                                                 </p:submenu>
 						<p:submenu label="Notas de Credito" icon="pi pi-file-o" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />

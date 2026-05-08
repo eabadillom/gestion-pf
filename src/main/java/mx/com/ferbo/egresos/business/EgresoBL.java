@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.ferbo.tools.exception.SystemException;
+import com.ferbo.tools.exception.ValidationException;
 import com.ferbo.tools.validation.ObjectValidator;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
 
@@ -19,6 +20,9 @@ import mx.com.ferbo.egresos.dao.EgresoDAO;
 import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.CategoriaEgreso;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
+import mx.com.ferbo.model.EmisoresCFDIS;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -31,44 +35,46 @@ public class EgresoBL {
     private EgresoDAO dao;
 
     // =====================================================
-    // 1. CREAR EGRESO
+    // 1. OBTENER POR ID
     // =====================================================
-    public void crearEgreso(Egreso egreso) throws InventarioException {
-
-        validarNuevoEgreso(egreso);
-
-        egreso.setStatus(obtenerStatusInicial());
-
+    public Egreso nuevoOExistente(Long id) {
         try {
-            dao.guardar(egreso);
-        } catch (InventarioException ex) {
-            throw ex;
-        }
-
-    }
-
-    // =====================================================
-    // 2. ACTUALIZAR EGRESO
-    // =====================================================
-    public void actualizarEgreso(Egreso egreso) throws InventarioException {
-
-        Egreso actual = obtenerPorId(egreso);
-
-        validarActualizacion(actual);
-
-        try {
-            dao.actualizar(actual);
-        } catch (InventarioException ex) {
-            throw ex;
+            return dao.buscarPorId(id).orElseThrow(
+                    () -> new SystemException("El egreso con identificador: " + id + ",  no se ha encontrado."));
+        } catch (SystemException ex) {
+            log.warn(ex);
+            return new Egreso();
         }
     }
 
     // =====================================================
-    // 3. OBTENER POR ID
+    // 2. PERSISTIR EGRESO
     // =====================================================
-    public Egreso obtenerPorId(Egreso egreso) {
-        return dao.buscarPorId(egreso.getId())
-                .orElseThrow(() -> new SystemException("Egreso no encontrado con id: " + egreso.getId()));
+    private void crearOActualizarEgreso(Egreso egreso) {
+        String estado = "";
+        try {
+            Long id = egreso.getId();
+            if (id == null) {
+                dao.guardar(egreso);
+                estado = "guardar";
+            } else {
+                dao.actualizar(egreso);
+                estado = "actualizar";
+            }
+        } catch (InventarioException ex) {
+            log.warn(ex);
+            throw new SystemException("Hubo un problema al momento de " + estado + " el egreso.");
+        }
+    }
+
+    // =====================================================
+    // 3. CAMBIAR STATUS EGRESO
+    // =====================================================
+    public void asignarStatusEgreso(Egreso egreso, StatusEgreso status) {
+        ObjectValidator.notNull(egreso, "El egreso");
+        ObjectValidator.notNull(status, "El status");
+
+        egreso.setStatus(status);
     }
 
     // =====================================================
@@ -98,106 +104,49 @@ public class EgresoBL {
         }
     }
 
-    public void asignarStatusEgreso(Egreso egreso, StatusEgreso status) {
-        ObjectValidator.notNull(egreso, "El egreso");
-        ObjectValidator.notNull(status, "El status");
+    // =====================================================
+    // 6. VALIDACIONES DE NEGOCIO
+    // =====================================================
+    private void validarEgresoNuevo(Egreso egreso) {
 
-        egreso.setStatus(status);
+        new ObjectValidatorBuilder<>("egreso", egreso)
+                .validateObject()
+                .texto("concepto", Egreso::getConcepto)
+                .texto("referencia", Egreso::getReferencia)
+                .validateNested("categoria", Egreso::getCategoria, cat -> cat.validateObject()
+                        .texto("nombre", CategoriaEgreso::getNombre))
+                .validateNested("emisor", Egreso::getEmisor, emi -> emi.validateObject()
+                        .texto("nombre", EmisoresCFDIS::getNb_emisor))
+                .validateNested("forma pago", Egreso::getFormaPago, fpago -> fpago.validateObject()
+                        .texto("nombre", MedioPago::getFormaPago))
+                .validateNested("metodo pago", Egreso::getMetodoPago, mpago -> mpago.validateObject()
+                        .texto("nombre", MetodoPago::getNbMetodoPago))
+                .validateOrThrow();
+            
+        BigDecimal total = egreso.getMonto();
+
+        if (total == null || BigDecimal.ZERO.compareTo(total) < 0) {
+            throw new ValidationException("El monto no del egreso no puede ser vacío, ni negativo.");
+        }
+
+        LocalDateTime fechaEgreso = egreso.getFecha();
+        
+        LocalDateTime hoy = LocalDateTime.now();
+
+        if (fechaEgreso == null || fechaEgreso.isAfter(hoy)) {
+            throw new ValidationException("La fecha de pago del egreso no puede ser mayor a al día de hoy.");
+        }
     }
 
-    
     // =====================================================
     // 7. PROCESAR EGRESO
     // =====================================================
-    public void procesarEgreso(Egreso egreso) throws InventarioException {
+    public void procesarEgreso(Egreso egreso) throws ValidationException, SystemException {
 
-        validarProcesamiento(egreso);
+        validarEgresoNuevo(egreso);
 
-        try {
-            dao.actualizar(egreso);
-        } catch (InventarioException ex) {
-            throw ex;
-        }
+        crearOActualizarEgreso(egreso);
+
     }
 
-    // =====================================================
-    // VALIDACIONES DE NEGOCIO
-    // =====================================================
-
-    private void validarNuevoEgreso(Egreso e) {
-
-        new ObjectValidatorBuilder<>("egreso", e)
-                .validateObject()
-                .texto("concepto", Egreso::getConcepto)
-                .validateNested("categoria", Egreso::getCategoria, cat -> cat.validateObject()
-                        .texto("nombre", CategoriaEgreso::getNombre))
-                .validateOrThrow();
-    }
-
-    private void validarActualizacion(Egreso actual) {
-
-        if (esProcesado(actual)) {
-            throw new SystemException("No se puede modificar un egreso procesado");
-        }
-
-        if (esCancelado(actual)) {
-            throw new SystemException("No se puede modificar un egreso cancelado");
-        }
-    }
-
-    private void validarCancelacion(Egreso e) {
-
-        if (esCancelado(e)) {
-            throw new SystemException("El egreso ya está cancelado");
-        }
-
-        if (esProcesado(e)) {
-            throw new SystemException("No se puede cancelar un egreso procesado");
-        }
-    }
-
-    private void validarProcesamiento(Egreso e) {
-
-        if (esCancelado(e)) {
-            throw new SystemException("No se puede procesar un egreso cancelado");
-        }
-
-        if (esProcesado(e)) {
-            throw new SystemException("El egreso ya está procesado");
-        }
-    }
-
-    // =====================================================
-    // REGLAS DE ESTADO
-    // =====================================================
-
-    private boolean esProcesado(Egreso e) {
-        return "PRO".equals(e.getStatus().getClave());
-    }
-
-    private boolean esCancelado(Egreso e) {
-        return "CAN".equals(e.getStatus().getClave());
-    }
-
-    // =====================================================
-    // ESTADOS AUXILIARES
-    // =====================================================
-
-    private StatusEgreso obtenerStatusInicial() {
-        StatusEgreso s = new StatusEgreso();
-        s.setClave("PEN");
-        return s;
-    }
-
-    private StatusEgreso obtenerStatusCancelado() {
-        StatusEgreso s = new StatusEgreso();
-        s.setClave("CAN");
-        return s;
-    }
-
-    private StatusEgreso obtenerStatusProcesado() {
-        StatusEgreso s = new StatusEgreso();
-        s.setClave("PRO");
-        return s;
-    }
 }

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.ferbo.tools.exception.SystemException;
 
+import mx.com.ferbo.empresa.dao.EmisorCfdiDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
 
 @Named
@@ -20,7 +21,7 @@ public class EmisorCdfiBL {
     private static final Logger log = LogManager.getLogger(EmisorCdfiBL.class);
 
     @Inject
-    private EmisorCdfiBL emisorDAO;
+    private EmisorCfdiDAO emisorDAO;
 
     public List<EmisoresCFDIS> obtenerTodos() {
         try {

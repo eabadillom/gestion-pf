@@ -83,7 +83,7 @@ public class Egreso {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false)
-    private MedioPago medioPago;
+    private MedioPago formaPago;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor", nullable = false)
@@ -156,12 +156,12 @@ public class Egreso {
         this.metodoPago = metodoPago;
     }
 
-    public MedioPago getMedioPago() {
-        return medioPago;
+    public MedioPago getFormaPago() {
+        return formaPago;
     }
 
-    public void setMedioPago(MedioPago medioPago) {
-        this.medioPago = medioPago;
+    public void setFormaPago(MedioPago formaPago) {
+        this.formaPago = formaPago;
     }
 
     public EmisoresCFDIS getEmisor() {

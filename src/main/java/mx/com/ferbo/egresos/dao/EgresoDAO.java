@@ -112,4 +112,5 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
             close(em);
         }
     }
+    
 }

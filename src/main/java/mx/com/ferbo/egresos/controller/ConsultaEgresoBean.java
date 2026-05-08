@@ -104,8 +104,7 @@ public class ConsultaEgresoBean implements Serializable {
         titulo = "cargar egresos";
         try {
             log.info("{} inicio el proceso de {}.", inicioLeyenda, titulo);
-            lstEgresos = egresoBL.buscarPorFiltros(incioMes, finMes, categoriaEgresoSelected, statusEgresoSelected,
-                    conceptoEgreso);
+            lstEgresos = egresoBL.buscarPorFiltros(incioMes, finMes, categoriaEgresoSelected, statusEgresoSelected, conceptoEgreso);
             log.info("{} finalizo el proceso de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado exitosamente el proceso de " + titulo + ".");

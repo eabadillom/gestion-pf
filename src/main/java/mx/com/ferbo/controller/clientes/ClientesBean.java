@@ -29,7 +29,7 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
-import mx.com.ferbo.pagos.businesslogic.MedioPagoBL;
+import mx.com.ferbo.pagos.businesslogic.FormaPagoBL;
 import mx.com.ferbo.pagos.businesslogic.MetodoPagoBL;
 
 import org.apache.logging.log4j.LogManager;
@@ -158,7 +158,7 @@ public class ClientesBean implements Serializable {
     private PlantaBL plantaBL;
 
     @Inject
-    private MedioPagoBL medioPagoBL;
+    private FormaPagoBL medioPagoBL;
 
     @Inject
     private MetodoPagoBL metodoPagoBL;
