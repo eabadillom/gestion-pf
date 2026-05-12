@@ -203,7 +203,7 @@ public class FacMantenimentoBean implements Serializable {
 			this.seleccion.setStatus(statusCancelada);
 			this.seleccion.setCancelaFactura(cancelaFactura);
 			this.cancelaFactura.setFactura(seleccion);
-
+			log.info("Iniciando actualizar Factura.java...");
 			facturaDAO.actualizar(seleccion);
 
 			if (clienteSelect == null)

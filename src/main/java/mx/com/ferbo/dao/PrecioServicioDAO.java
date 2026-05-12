@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CacheRetrieveMode;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
@@ -249,9 +250,9 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			list = em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
-			.setParameter("cteCve", cteCve)
-			.getResultList()
-			;
+					.setHint("javax.persistence.cache.retrieveMode", CacheRetrieveMode.BYPASS)
+					.setParameter("cteCve", cteCve)
+					.getResultList();
 			if(isFullInfo == false)
 				return list;
 			for(PrecioServicio ps : list) {
