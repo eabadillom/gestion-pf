@@ -5,13 +5,16 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
+import com.ferbo.tools.validation.ObjectValidator;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import mx.com.ferbo.egresos.dao.catalogos.StatusEgresoDAO;
+import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
 import mx.com.ferbo.util.InventarioException;
 
@@ -73,6 +76,20 @@ public class StatusEgresoBL implements CatalogoBL<StatusEgreso> {
                 .texto("descripcion", StatusEgreso::getDescripcion)
                 .integer("orden", StatusEgreso::getOrden, 1, 100)
                 .validateOrThrow();
+    }
+
+    public void desactivarStatus(List<Egreso> egresos, StatusEgreso status) {
+        ObjectValidator.notNull(status, "status de egreso");
+
+        if (status.getActivo()) {
+            throw new BusinessException("El status de egreso ya se encuentra desactivado.");
+        }
+
+        if (!egresos.isEmpty()) {
+            throw new BusinessException("No se puede desactivar el status del egreso por tener egresos dependientes de el.");
+        }
+
+        status.setActivo(Boolean.FALSE);
     }
     
 }

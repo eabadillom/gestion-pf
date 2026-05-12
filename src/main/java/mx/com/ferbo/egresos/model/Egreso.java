@@ -26,24 +26,23 @@ import mx.com.ferbo.model.MetodoPago;
 @Entity
 @Table(name = "egreso")
 @NamedQueries({
+    @NamedQuery(name = "Egreso.findAll", query = "SELECT e FROM Egreso e ORDER BY e.fecha DESC"),
 
-        @NamedQuery(name = "Egreso.findAll", query = "SELECT e FROM Egreso e ORDER BY e.fecha DESC"),
+    @NamedQuery(name = "Egreso.findByFechaBetween", query = "SELECT e FROM Egreso e WHERE e.fecha BETWEEN :inicio AND :fin ORDER BY e.fecha DESC"),
 
-        @NamedQuery(name = "Egreso.findByFechaBetween", query = "SELECT e FROM Egreso e WHERE e.fecha BETWEEN :inicio AND :fin ORDER BY e.fecha DESC"),
+    @NamedQuery(name = "Egreso.findByCategoria", query = "SELECT e FROM Egreso e WHERE e.categoria = :categoria ORDER BY e.fecha DESC"),
 
-        @NamedQuery(name = "Egreso.findByCategoria", query = "SELECT e FROM Egreso e WHERE e.categoria = :categoria ORDER BY e.fecha DESC"),
+    @NamedQuery(name = "Egreso.findByStatus", query = "SELECT e FROM Egreso e WHERE e.status = :status ORDER BY e.fecha DESC"),
 
-        @NamedQuery(name = "Egreso.findByStatus", query = "SELECT e FROM Egreso e WHERE e.status = :status ORDER BY e.fecha DESC"),
+    @NamedQuery(name = "Egreso.searchByConcepto", query = "SELECT e FROM Egreso e WHERE LOWER(e.concepto) LIKE LOWER(CONCAT('%', :concepto, '%')) ORDER BY e.fecha DESC"),
 
-        @NamedQuery(name = "Egreso.searchByConcepto", query = "SELECT e FROM Egreso e WHERE LOWER(e.concepto) LIKE LOWER(CONCAT('%', :concepto, '%')) ORDER BY e.fecha DESC"),
-
-        @NamedQuery(name = "Egreso.findWithFilters", query = "SELECT e FROM Egreso e " +
-                "WHERE (:inicio IS NULL OR e.fecha >= :inicio) " +
-                "AND (:fin IS NULL OR e.fecha <= :fin) " +
-                "AND (:categoria IS NULL OR e.categoria = :categoria) " +
-                "AND (:status IS NULL OR e.status = :status) " +
-                "AND (:concepto IS NULL OR LOWER(e.concepto) LIKE LOWER(CONCAT('%', :concepto, '%'))) " +
-                "ORDER BY e.fecha DESC")
+    @NamedQuery(name = "Egreso.findWithFilters", query = "SELECT e FROM Egreso e "
+            + "WHERE (:inicio IS NULL OR e.fecha >= :inicio) "
+            + "AND (:fin IS NULL OR e.fecha <= :fin) "
+            + "AND (:categoria IS NULL OR e.categoria = :categoria) "
+            + "AND (:status IS NULL OR e.status = :status) "
+            + "AND (:concepto IS NULL OR LOWER(e.concepto) LIKE LOWER(CONCAT('%', :concepto, '%'))) "
+            + "ORDER BY e.fecha DESC")
 })
 public class Egreso {
 
@@ -55,7 +54,7 @@ public class Egreso {
     @Column(name = "fh_egre", nullable = false)
     private LocalDateTime fecha;
 
-    @Column(name = "to_egre", nullable = false, precision = 12, scale = 2)
+    @Column(name = "to_egre", nullable = true, precision = 12, scale = 2)
     private BigDecimal monto;
 
     @Column(name = "tx_conc", nullable = false, length = 150)
@@ -64,7 +63,6 @@ public class Egreso {
     // =========================
     // RELACIONES
     // =========================
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_cate_egre", referencedColumnName = "cd_cate_egre", nullable = false)
     private CategoriaEgreso categoria;
@@ -76,7 +74,6 @@ public class Egreso {
     // =========================
     // CATÁLOGOS EXTERNOS
     // =========================
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_metodo_pago", referencedColumnName = "cd_metodo_pago", nullable = false)
     private MetodoPago metodoPago;
@@ -90,8 +87,7 @@ public class Egreso {
     private EmisoresCFDIS emisor;
 
     // =========================
-
-    @Column(name = "tx_refe")
+    @Column(name = "tx_refe", nullable = true, length = 150)
     private String referencia;
 
     @Column(name = "tm_creacion", nullable = false, updatable = false)
@@ -113,7 +109,11 @@ public class Egreso {
     }
 
     public void setFecha(LocalDateTime fecha) {
-        this.fecha = fecha;
+        if (fecha != null) {
+            this.fecha = fecha.toLocalDate().atStartOfDay();
+        } else {
+            this.fecha = null;
+        }
     }
 
     public BigDecimal getMonto() {
@@ -198,10 +198,12 @@ public class Egreso {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof Egreso))
+        }
+        if (!(o instanceof Egreso)) {
             return false;
+        }
 
         Egreso that = (Egreso) o;
         return id != null && id.equals(that.id);

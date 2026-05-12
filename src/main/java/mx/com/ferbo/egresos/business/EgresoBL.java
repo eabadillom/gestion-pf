@@ -2,6 +2,7 @@ package mx.com.ferbo.egresos.business;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -34,9 +35,6 @@ public class EgresoBL {
     @Inject
     private EgresoDAO dao;
 
-    // =====================================================
-    // 1. OBTENER POR ID
-    // =====================================================
     public Egreso nuevoOExistente(Long id) {
         try {
             return dao.buscarPorId(id).orElseThrow(
@@ -47,9 +45,6 @@ public class EgresoBL {
         }
     }
 
-    // =====================================================
-    // 2. PERSISTIR EGRESO
-    // =====================================================
     private void crearOActualizarEgreso(Egreso egreso) {
         String estado = "";
         try {
@@ -67,9 +62,6 @@ public class EgresoBL {
         }
     }
 
-    // =====================================================
-    // 3. CAMBIAR STATUS EGRESO
-    // =====================================================
     public void asignarStatusEgreso(Egreso egreso, StatusEgreso status) {
         ObjectValidator.notNull(egreso, "El egreso");
         ObjectValidator.notNull(status, "El status");
@@ -77,9 +69,6 @@ public class EgresoBL {
         egreso.setStatus(status);
     }
 
-    // =====================================================
-    // 4. LISTAR TODOS
-    // =====================================================
     public List<Egreso> listarTodos() {
         try {
             return dao.buscarTodos();
@@ -88,49 +77,64 @@ public class EgresoBL {
         }
     }
 
-    // =====================================================
-    // 5. BUSCAR CON FILTROS
-    // =====================================================
-    public List<Egreso> buscarPorFiltros(
-            LocalDateTime inicio,
-            LocalDateTime fin,
+    public List<Egreso> obtenerPorFiltros(
+            YearMonth mes,
             CategoriaEgreso categoria,
             StatusEgreso status,
             String concepto) {
         try {
+            LocalDateTime inicio = inicioMes(mes);
+            LocalDateTime fin = finMes(mes);
             return dao.buscarPorFiltros(inicio, fin, categoria, status, concepto);
         } catch (SystemException ex) {
             throw ex;
         }
     }
 
-    // =====================================================
-    // 6. VALIDACIONES DE NEGOCIO
-    // =====================================================
+    public List<Egreso> obtenerPorCategoria(CategoriaEgreso categoria) {
+        ObjectValidator.notNull(categoria, "categoria egreso");
+        try {
+            return dao.buscarPorCategoria(categoria);
+        } catch (SystemException ex) {
+            log.warn("Error al momento de obtener los egresos. {}", ex);
+            throw ex;
+        }
+    }
+
+    public List<Egreso> obtenerPorStatus(StatusEgreso status) {
+        ObjectValidator.notNull(status, "status de egreso");
+        try {
+            return dao.buscarPorStatus(status);
+        } catch (SystemException ex) {
+            log.warn("Error al momento de obtener los egresos. {}", ex);
+            throw ex;
+        }
+    }
+
     private void validarEgresoNuevo(Egreso egreso) {
 
         new ObjectValidatorBuilder<>("egreso", egreso)
                 .validateObject()
                 .texto("concepto", Egreso::getConcepto)
-                .texto("referencia", Egreso::getReferencia)
                 .validateNested("categoria", Egreso::getCategoria, cat -> cat.validateObject()
-                        .texto("nombre", CategoriaEgreso::getNombre))
+                .texto("nombre", CategoriaEgreso::getNombre))
                 .validateNested("emisor", Egreso::getEmisor, emi -> emi.validateObject()
-                        .texto("nombre", EmisoresCFDIS::getNb_emisor))
+                .texto("nombre", EmisoresCFDIS::getNb_emisor))
                 .validateNested("forma pago", Egreso::getFormaPago, fpago -> fpago.validateObject()
-                        .texto("nombre", MedioPago::getFormaPago))
+                .texto("nombre", MedioPago::getFormaPago))
                 .validateNested("metodo pago", Egreso::getMetodoPago, mpago -> mpago.validateObject()
-                        .texto("nombre", MetodoPago::getNbMetodoPago))
+                .texto("nombre", MetodoPago::getNbMetodoPago))
                 .validateOrThrow();
-            
+
         BigDecimal total = egreso.getMonto();
 
-        if (total == null || BigDecimal.ZERO.compareTo(total) < 0) {
-            throw new ValidationException("El monto no del egreso no puede ser vacío, ni negativo.");
+        if (total != null) {
+            if (total.compareTo(BigDecimal.ZERO) < 0) {
+                throw new ValidationException("El monto del egreso no puede ser vacío ni negativo.");
+            }
         }
-
         LocalDateTime fechaEgreso = egreso.getFecha();
-        
+
         LocalDateTime hoy = LocalDateTime.now();
 
         if (fechaEgreso == null || fechaEgreso.isAfter(hoy)) {
@@ -138,15 +142,22 @@ public class EgresoBL {
         }
     }
 
-    // =====================================================
-    // 7. PROCESAR EGRESO
-    // =====================================================
     public void procesarEgreso(Egreso egreso) throws ValidationException, SystemException {
 
         validarEgresoNuevo(egreso);
 
         crearOActualizarEgreso(egreso);
 
+    }
+
+    private LocalDateTime inicioMes(YearMonth mes) {
+        ObjectValidator.notNull(mes, "El mes");
+        return mes.atDay(1).atStartOfDay();
+    }
+
+    private LocalDateTime finMes(YearMonth mes) {
+        ObjectValidator.notNull(mes, "El mes");
+        return mes.atEndOfMonth().atTime(23, 59, 59, 999_999_999);
     }
 
 }

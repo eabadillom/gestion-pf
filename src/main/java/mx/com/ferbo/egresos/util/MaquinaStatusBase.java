@@ -14,13 +14,13 @@ public class MaquinaStatusBase<T> {
         this.transiciones = transiciones;
     }
 
-    public void transicionValida(T actual, T nuevo) {
+    public void transicionValida(T actual, T nuevo, String nombreActual, String nombreNuevo) {
 
         Set<T> posibles = transiciones.getOrDefault(actual, Collections.emptySet());
 
         if (!posibles.contains(nuevo)) {
             throw new BusinessException(
-                    "No se puede cambiar de " + actual + " a " + nuevo);
+                    "No se puede cambiar de " + nombreActual + " a " + nombreNuevo);
         }
     }
 }

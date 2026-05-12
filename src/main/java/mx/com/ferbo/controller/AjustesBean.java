@@ -43,7 +43,7 @@ public class AjustesBean implements Serializable
     public void egresos() {
          String path = null;
         try{
-            path = contextPath + "/protected/catalogos/egresos/statusEgreso.xhtml";
+            path = contextPath + "/protected/catalogos/egresos/catalogs/statusEgreso.xhtml";
             FacesContext.getCurrentInstance().getExternalContext().redirect(path);
         }
         catch(Exception e) {

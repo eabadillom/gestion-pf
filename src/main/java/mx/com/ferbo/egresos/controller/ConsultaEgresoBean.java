@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import com.ferbo.tools.exception.SystemException;
-import com.ferbo.tools.validation.ObjectValidator;
+import java.io.IOException;
 
 import mx.com.ferbo.egresos.business.EgresoBL;
 import mx.com.ferbo.egresos.business.catalogos.CategoriaEgresoBL;
@@ -46,13 +46,16 @@ public class ConsultaEgresoBean implements Serializable {
     @Inject
     private EgresoBL egresoBL;
 
-    private List<StatusEgreso> lstStatusEgresos;
+    private String PENDIENTE = "PEN";
+    private String GENERAL = "GEN";
+
+    private transient List<StatusEgreso> lstStatusEgresos;
     private StatusEgreso statusEgresoSelected;
 
-    private List<CategoriaEgreso> lstCategoriasEgreso;
+    private transient List<CategoriaEgreso> lstCategoriasEgreso;
     private CategoriaEgreso categoriaEgresoSelected;
 
-    private List<Egreso> lstEgresos;
+    private transient List<Egreso> lstEgresos;
 
     private String conceptoEgreso;
 
@@ -63,27 +66,28 @@ public class ConsultaEgresoBean implements Serializable {
     private String inicioLeyenda;
     private final Boolean activo = Boolean.TRUE;
 
-    private FacesContext context;
-    private HttpServletRequest request;
     private Usuario usuario;
 
-    private YearMonth yearMonth;
+    private YearMonth mes = YearMonth.now();
 
     public ConsultaEgresoBean() {
-        statusEgresoSelected = new StatusEgreso();
-        categoriaEgresoSelected = new CategoriaEgreso();
     }
 
     @PostConstruct
     public void init() {
         titulo = "configuración básica de egresos";
         try {
-            request = (HttpServletRequest) context.getExternalContext().getRequest();
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
             usuario = (Usuario) request.getSession(false).getAttribute("usuario");
             inicioLeyenda = "El usuario " + usuario.getUsuario();
             log.info("{} inicio la carga de {}.", inicioLeyenda, titulo);
             lstCategoriasEgreso = categoriaBL.buscarActivos(activo);
             lstStatusEgresos = stutusBL.buscarActivos(activo);
+            statusEgresoSelected = null;
+            categoriaEgresoSelected = null;
+            conceptoEgreso = null;
+            lstEgresos = egresoBL.obtenerPorFiltros(mes, null, null, null);
             log.info("{} finalizo la carga de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha cargado exitosamente la " + titulo + ".");
@@ -96,7 +100,7 @@ public class ConsultaEgresoBean implements Serializable {
         }
     }
 
-    public void actualizacionComponentesPrimeFaces() {
+    private void actualizacionComponentesPrimeFaces() {
         PrimeFaces.current().ajax().update("form:messages");
     }
 
@@ -104,29 +108,30 @@ public class ConsultaEgresoBean implements Serializable {
         titulo = "cargar egresos";
         try {
             log.info("{} inicio el proceso de {}.", inicioLeyenda, titulo);
-            lstEgresos = egresoBL.buscarPorFiltros(incioMes, finMes, categoriaEgresoSelected, statusEgresoSelected, conceptoEgreso);
+            lstEgresos = egresoBL.obtenerPorFiltros(mes, categoriaEgresoSelected, statusEgresoSelected, conceptoEgreso);
             log.info("{} finalizo el proceso de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado exitosamente el proceso de " + titulo + ".");
         } catch (SystemException ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
-        } catch (Exception ex ) {
+        } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo, "Error al momento de " + titulo + ". Contacte con el administrador de sistemas.");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
+                    "Error al momento de " + titulo + ". Contacte con el administrador de sistemas.");
         } finally {
             actualizacionComponentesPrimeFaces();
         }
     }
 
-    public LocalDateTime convertirInicioMes() {
-        ObjectValidator.notNull(yearMonth, "El mes");
-        return yearMonth.atDay(1).atStartOfDay();
-    }
+    public void editar(Long id) throws IOException {
 
-    public LocalDateTime convertirFinalMes() {
-        ObjectValidator.notNull(yearMonth, "El mes");
-        return yearMonth.atEndOfMonth().atTime(23, 59, 59);
+        FacesContext context = FacesContext.getCurrentInstance();
+
+        String contextPath = context.getExternalContext().getRequestContextPath();
+
+        context.getExternalContext().redirect(
+                contextPath + "/protected/catalogos/egresos/alta/principal.xhtml?id=" + id);
     }
 
     // Getters y Setters
@@ -193,5 +198,13 @@ public class ConsultaEgresoBean implements Serializable {
     public void setFinMes(LocalDateTime finMes) {
         this.finMes = finMes;
     }
-    
+
+    public YearMonth getMes() {
+        return mes;
+    }
+
+    public void setMes(YearMonth mes) {
+        this.mes = mes;
+    }
+
 }

@@ -2,6 +2,7 @@ package mx.com.ferbo.egresos.dao;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -27,6 +28,28 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
 
     public EgresoDAO() {
         super(Egreso.class);
+    }
+
+    @Override
+    public Optional<Egreso> buscarPorId(Long id) {
+        Optional<Egreso> e = null;
+        Egreso egreso;
+        try {
+            em = getEntityManager();
+            egreso = em.find(Egreso.class, id);
+            log.info("Emisor del egreso: {}", egreso.getEmisor());
+            log.info("Categoría del egreso: {}", egreso.getCategoria());
+            log.info("Metodo de pago del egreso: {}", egreso.getMetodoPago());
+            log.info("Forma de pago del egreso: {}", egreso.getFormaPago());
+            log.info("Status del egreso: {}", egreso.getStatus());
+            e = Optional.of(egreso);
+        } catch (Exception ex) {
+            log.warn("Error al momento de obtener el egreso con id: {}. {}", id, ex);
+            e = Optional.empty();
+        } finally {
+            close(em);
+        }
+        return e;
     }
 
     public List<Egreso> buscarTodos() throws SystemException {
@@ -62,7 +85,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
                     .getResultList();
         } catch (Exception ex) {
             log.error("Error al momento de buscar los egresos con la categoría: {}. {}", categoria.getNombre(), ex);
-            throw new SystemException("Hubo un problema al momento de buscar los egresos por categoría.");
+            throw new SystemException("Hubo un problema al momento de buscar los egresos con la categoría " + categoria.getNombre() + ".");
         } finally {
             close(em);
         }
@@ -75,7 +98,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
                     .getResultList();
         } catch (Exception ex) {
             log.error("Error al momento de buscar los egresos con el status: {}. {}", status.getNombre(), ex);
-            throw new SystemException("Hubo un problema al momento de buscar los egresos por status.");
+            throw new SystemException("Hubo un problema al momento de buscar los egresos con el status " + status.getNombre() + ".");
         } finally {
             close(em);
         }
@@ -88,7 +111,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
                     .getResultList();
         } catch (Exception ex) {
             log.error("Error al momento de buscar los egresos con el concepto: {}. {}", concepto, ex);
-            throw new SystemException("Hubo un problema al momento de buscar los egresos por concepto.");
+            throw new SystemException("Hubo un problema al momento de buscar los egresos con el concepto " + concepto + ".");
         } finally {
             close(em);
         }
@@ -97,12 +120,24 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     public List<Egreso> buscarPorFiltros(LocalDateTime inicio, LocalDateTime fin, CategoriaEgreso categoria,
             StatusEgreso status,
             String concepto) throws SystemException {
+        List<Egreso> lst = null;
         try {
             em = getEntityManager();
-            return em.createNamedQuery("Egreso.findWithFilters", Egreso.class).setParameter("inicio", inicio)
+            lst = em.createNamedQuery("Egreso.findWithFilters", Egreso.class)
+                    .setParameter("inicio", inicio)
                     .setParameter("fin", fin)
-                    .setParameter("categoria", categoria).setParameter("status", status)
-                    .setParameter("concepto", concepto).getResultList();
+                    .setParameter("categoria", categoria)
+                    .setParameter("status", status)
+                    .setParameter("concepto", concepto)
+                    .getResultList();
+            for (Egreso e : lst) {
+                log.info("Emisor del egreso: {}", e.getEmisor());
+                log.info("Categoría del egreso: {}", e.getCategoria());
+                log.info("Metodo de pago del egreso: {}", e.getMetodoPago());
+                log.info("Forma de pago del egreso: {}", e.getFormaPago());
+                log.info("Status del egreso: {}", e.getStatus());
+            }
+            return lst;
         } catch (Exception ex) {
             log.error(
                     "Error al momento de buscar los egresos con los los filtros: inicio={}, fin={}, categoria={}, status={}, concepto={}. {}",
@@ -112,5 +147,5 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
             close(em);
         }
     }
-    
+
 }

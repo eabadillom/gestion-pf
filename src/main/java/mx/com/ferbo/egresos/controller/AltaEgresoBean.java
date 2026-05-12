@@ -85,8 +85,6 @@ public class AltaEgresoBean implements Serializable {
     private String inicioLeyenda;
     private final Boolean activo = Boolean.TRUE;
 
-    private FacesContext context;
-    private HttpServletRequest request;
     private Usuario usuario;
 
     public AltaEgresoBean() {
@@ -95,15 +93,18 @@ public class AltaEgresoBean implements Serializable {
         categoriaEgresoSelected = new CategoriaEgreso();
         statusEgresoSelected = new StatusEgreso();
         emisorCfdiSelected = new EmisoresCFDIS();
-        context = FacesContext.getCurrentInstance();
     }
 
     @PostConstruct
     public void init() {
         titulo = "configuración básica de egresos";
         try {
+            FacesContext context = FacesContext.getCurrentInstance();
 
-            request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpServletRequest request
+                    = (HttpServletRequest) context
+                            .getExternalContext()
+                            .getRequest();
             usuario = (Usuario) request.getSession(false).getAttribute("usuario");
 
             String idParam = context
@@ -118,7 +119,7 @@ public class AltaEgresoBean implements Serializable {
             }
 
             egresoSelected = egresoBL.nuevoOExistente(id);
-            
+
             inicioLeyenda = "El usuario " + usuario.getUsuario();
             log.info("{} inicio la carga de {}.", inicioLeyenda, titulo);
             lstMediosPago = medioPagoBL.obtenerMediosPago();
@@ -142,7 +143,7 @@ public class AltaEgresoBean implements Serializable {
         }
     }
 
-    public void actualizacionComponentesPrimeFaces() {
+    private void actualizacionComponentesPrimeFaces() {
         PrimeFaces.current().ajax().update("form:messages");
     }
 
@@ -157,19 +158,21 @@ public class AltaEgresoBean implements Serializable {
                     "Se ha cambiado correctamente el status a: " + statusEgresoSelected.getNombre());
         } catch (ValidationException ex) {
             log.warn("Error al momento de validar los objetos. {}");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
         } catch (BusinessException ex) {
             log.warn("Error al momento de cambiar de status en el egreso. {}");
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
         } finally {
             actualizacionComponentesPrimeFaces();
         }
     }
 
-    public void guardarOActualizarEgreso(Egreso egreso) {
+    public void guardarOActualizarEgreso() {
         try {
-            titulo = (egreso.getId() == null) ? "guardar el egreso" : "actualizar el egreso";
+            titulo = (egresoSelected.getId() == null) ? "guardar el egreso" : "actualizar el egreso";
 
             log.info("{} inicia el proceso para {}.", inicioLeyenda, titulo);
-            egresoBL.procesarEgreso(egreso);
+            egresoBL.procesarEgreso(egresoSelected);
             log.info("{} finaliza proceso para {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado el proceso de " + titulo + ".");

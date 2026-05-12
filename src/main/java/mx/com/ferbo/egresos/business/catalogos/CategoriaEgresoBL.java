@@ -9,10 +9,13 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
+import com.ferbo.tools.validation.ObjectValidator;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
 
 import mx.com.ferbo.egresos.dao.catalogos.CategoriaEgresoDAO;
+import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.CategoriaEgreso;
 
 @Named
@@ -67,5 +70,20 @@ public class CategoriaEgresoBL implements CatalogoBL<CategoriaEgreso> {
                 .texto("descripcion", CategoriaEgreso::getDescripcion)
                 .integer("orden", CategoriaEgreso::getOrden, 1, 100)
                 .validateOrThrow();
+    }
+
+    public void desactivarCategoria(List<Egreso> egresos, CategoriaEgreso categoria) {
+        
+        ObjectValidator.notNull(categoria, "categoria egreso");
+
+        if (!categoria.getActivo()) {
+            throw new BusinessException("La categoría de egreso ya se encuenta desactivada");
+        }
+
+        if (!egresos.isEmpty()) {
+            throw new BusinessException("No se puede desactivar la categoría del egreso por tenener egresos dependiente de ella.");
+        }
+
+        categoria.setActivo(Boolean.FALSE);
     }
 }

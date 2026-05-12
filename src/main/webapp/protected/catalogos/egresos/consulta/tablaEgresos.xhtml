@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" 
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <p:dataTable id="dtEgresos" widgetVar="dtEgresos" value="#{consultaEgresoBean.lstEgresos}" var="e"
+                 rowKey="#{e.id}" reflow="true" paginator="true" rows="10" rowSelectMode="add"
+                 paginatorPosition="bottom" lazy="false">
+        <p:column headerText="Status">
+            <p:outputLabel value="#{e.status.nombre}"/>
+        </p:column>
+        <p:column headerText="Categoria">
+            <p:outputLabel value="#{e.categoria.nombre}"/>
+        </p:column>
+        <p:column headerText="Concepto">
+            <p:outputLabel value="#{e.concepto}"/>
+        </p:column>
+        <p:column headerText="Referencia">
+            <p:outputLabel value="#{e.referencia}"/>
+        </p:column>
+        <p:column headerText="Monto">
+            <p:outputLabel value="$#{e.monto}"/>
+        </p:column>
+        <p:column headerText="Fecha">
+            <h:outputText value="#{e.fecha}"/>
+        </p:column>
+        <p:column>
+            <p:commandButton id="editEgreso" 
+                             icon="pi pi-pencil" 
+                             class="ui-button-primary"
+                             action='#{consultaEgresoBean.editar(e.id)}'
+                             ajax="false"
+                             />
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

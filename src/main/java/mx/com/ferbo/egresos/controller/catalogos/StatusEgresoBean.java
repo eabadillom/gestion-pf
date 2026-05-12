@@ -27,6 +27,5 @@ public class StatusEgresoBean extends AbstractCatalogoBean<StatusEgreso> {
     protected StatusEgreso crearNuevo() {
         return new StatusEgreso();
     }
-
     
 }

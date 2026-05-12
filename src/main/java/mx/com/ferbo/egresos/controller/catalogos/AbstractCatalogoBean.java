@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.primefaces.PrimeFaces;
+
 import com.ferbo.tools.exception.BusinessException;
 
 import mx.com.ferbo.egresos.business.catalogos.CatalogoBL;
@@ -51,7 +53,13 @@ public abstract class AbstractCatalogoBean<T> implements Serializable {
             selected = null;
         } catch (BusinessException | InventarioException ex) {
             // Mensaje para PrimeFaces
+        } finally {
+            actualizacionComponentesPrimeFaces();
         }
+    }
+
+    protected void actualizacionComponentesPrimeFaces() {
+        PrimeFaces.current().ajax().update("form:messages");
     }
 
     public void seleccionar(T item) {

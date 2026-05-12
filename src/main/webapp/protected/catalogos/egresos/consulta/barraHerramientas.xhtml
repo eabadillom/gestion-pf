@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" 
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <p:toolbar>
+        <p:toolbarGroup>
+            <div class="p-grid">
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="mes" value="Mes:" style="width:100%"/>
+                    <p:datePicker
+                        id="mes"
+                        value="#{consultaEgresoBean.mes}"
+                        view="month"
+                        pattern="MM/yyyy"
+                        yearNavigator="true"
+                        monthNavigator="true"
+                        yearRange="2000:2070"
+                        showIcon="true"
+                        placeholder="MM/AAAA" 
+                        style="width:100%">
+
+                        <p:ajax process="@this" event="change" listener="#{consultaEgresoBean.obtenerEgresosPorFiltro}" update=":form:dtEgresos"/>
+                    </p:datePicker>
+                </div> 
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="categoria" value="Categoría:"/>
+                    <p:selectOneMenu
+                        id="categoria"
+                        value="#{consultaEgresoBean.categoriaEgresoSelected}"
+                        converter="entityConverter"
+                        style="width:100%">
+
+                        <f:selectItem itemLabel="--- Seleccione una categoría ---"/>
+
+                        <f:selectItems
+                            value="#{consultaEgresoBean.lstCategoriasEgreso}"
+                            var="c"
+                            itemLabel="#{c.descripcion}"
+                            itemValue="#{c}"/>
+
+                        <p:ajax process="@this" event="change" listener="#{consultaEgresoBean.obtenerEgresosPorFiltro}" update=":form:dtEgresos"/>
+                    </p:selectOneMenu>
+                </div>
+                
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel
+                    for="statusEgreso"
+                    value="Status:" style="width:100%"/>
+
+                <p:selectOneMenu
+                    id="statusEgreso"
+                    value="#{consultaEgresoBean.statusEgresoSelected}"
+                    converter="entityConverter"
+                    style="width:100%">
+
+                    <f:selectItem itemLabel="--- Seleccione un status ---"/>
+
+                    <f:selectItems
+                        value="#{consultaEgresoBean.lstStatusEgresos}"
+                        var="s"
+                        itemLabel="#{s.nombre}"
+                        itemValue="#{s}"/>
+
+                    <p:ajax process="@this" event="change" listener="#{consultaEgresoBean.obtenerEgresosPorFiltro}" update=":form:dtEgresos"/>
+                </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="concepto" value="Concepto:" style="width:100%"/>
+
+                    <p:inputText
+                        id="concepto"
+                        value="#{consultaEgresoBean.conceptoEgreso}"
+                        maxlength="150"
+                        counter="contador"
+                        placeholder="Ej. Pago de luz" 
+                        style="width:100%">
+                        <p:ajax process="@this" 
+                                event="keyup"
+                                delay="500"  
+                                listener="#{consultaEgresoBean.obtenerEgresosPorFiltro}" 
+                                update=":form:dtEgresos"/>
+
+                    </p:inputText>
+
+                    <h:outputText id="contador"/>
+                </div>
+            </div>
+        </p:toolbarGroup>
+    </p:toolbar>
+</ui:composition>

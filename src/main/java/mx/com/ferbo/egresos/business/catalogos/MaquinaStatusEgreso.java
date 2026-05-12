@@ -77,7 +77,7 @@ public class MaquinaStatusEgreso {
             }
         } else {
             construirMaquiaStatusEgreso();
-            maquina.transicionValida(actual, nuevo);
+            maquina.transicionValida(actual, nuevo, actual.getNombre(), nuevo.getNombre());
         }
 
     }
