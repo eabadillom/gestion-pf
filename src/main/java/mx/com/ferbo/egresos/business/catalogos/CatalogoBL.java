@@ -2,14 +2,14 @@ package mx.com.ferbo.egresos.business.catalogos;
 
 import java.util.List;
 
-import mx.com.ferbo.util.InventarioException;
+import com.ferbo.tools.exception.SystemException;
 
 public interface CatalogoBL<T> {
 
-    T buscarPorClave(String clave)  throws InventarioException;
+    T buscarPorClave(String clave)  throws SecurityException;
 
-    List<T> buscarActivos(Boolean activo) throws InventarioException;
+    List<T> buscarActivos(Boolean activo) throws SystemException;
 
-    void guardar(T entity) throws InventarioException;
+    void guardar(T entity) throws SystemException;
     
 }

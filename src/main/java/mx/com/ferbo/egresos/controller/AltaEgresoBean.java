@@ -17,7 +17,6 @@ import org.primefaces.PrimeFaces;
 
 import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
-import com.ferbo.tools.exception.ValidationException;
 
 import mx.com.ferbo.egresos.business.EgresoBL;
 import mx.com.ferbo.egresos.business.catalogos.CategoriaEgresoBL;
@@ -70,8 +69,8 @@ public class AltaEgresoBean implements Serializable {
     private List<CategoriaEgreso> lstCategoriasEgreso;
     private CategoriaEgreso categoriaEgresoSelected;
 
-    private List<MedioPago> lstMediosPago;
-    private MedioPago medioPagoSelected;
+    private List<MedioPago> lstFormasPago;
+    private MedioPago formaPagoSelected;
 
     private List<MetodoPago> lstMetodosPago;
     private MetodoPago metodoPagoSelected;
@@ -88,7 +87,7 @@ public class AltaEgresoBean implements Serializable {
     private Usuario usuario;
 
     public AltaEgresoBean() {
-        medioPagoSelected = new MedioPago();
+        formaPagoSelected = new MedioPago();
         metodoPagoSelected = new MetodoPago();
         categoriaEgresoSelected = new CategoriaEgreso();
         statusEgresoSelected = new StatusEgreso();
@@ -101,10 +100,9 @@ public class AltaEgresoBean implements Serializable {
         try {
             FacesContext context = FacesContext.getCurrentInstance();
 
-            HttpServletRequest request
-                    = (HttpServletRequest) context
-                            .getExternalContext()
-                            .getRequest();
+            HttpServletRequest request = (HttpServletRequest) context
+                    .getExternalContext()
+                    .getRequest();
             usuario = (Usuario) request.getSession(false).getAttribute("usuario");
 
             String idParam = context
@@ -122,7 +120,7 @@ public class AltaEgresoBean implements Serializable {
 
             inicioLeyenda = "El usuario " + usuario.getUsuario();
             log.info("{} inicio la carga de {}.", inicioLeyenda, titulo);
-            lstMediosPago = medioPagoBL.obtenerMediosPago();
+            lstFormasPago = medioPagoBL.obtenerMediosPago();
             lstMetodosPago = metodoPagoBL.obtenerMetodosPago();
             lstCategoriasEgreso = categoriaBL.buscarActivos(activo);
             lstStatusEgresos = stutusBL.buscarActivos(activo);
@@ -130,21 +128,25 @@ public class AltaEgresoBean implements Serializable {
             log.info("{} finalizo la carga de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha cargado exitosamente la " + titulo + ".");
-        } catch (SystemException ex) {
+        } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de cargar la {}. {}", titulo, ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
                     ex.getMessage());
         } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
-                    "Error al momento de cargar la " + titulo + ". Contacte con el administrador de sistemas.");
+                    "Error desconocido. Contacte con el administrador de sistemas.");
         } finally {
-            actualizacionComponentesPrimeFaces();
+            actualizarMensajes();
         }
     }
 
-    private void actualizacionComponentesPrimeFaces() {
+    private void actualizarMensajes() {
         PrimeFaces.current().ajax().update("form:messages");
+    }
+
+    private void actualizarFormulario() {
+        PrimeFaces.current().ajax().update("form");
     }
 
     public void cambiarStatusEgreso() {
@@ -156,14 +158,15 @@ public class AltaEgresoBean implements Serializable {
             log.info("{} finalizo el proceso de {}.");
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha cambiado correctamente el status a: " + statusEgresoSelected.getNombre());
-        } catch (ValidationException ex) {
-            log.warn("Error al momento de validar los objetos. {}");
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
-        } catch (BusinessException ex) {
+        } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de cambiar de status en el egreso. {}");
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
+        } catch (Exception ex) {
+            log.warn("Error al momento de {}. {}", titulo, ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
+                    "Error desconocido. Contacte con el administrador de sistemas.");
         } finally {
-            actualizacionComponentesPrimeFaces();
+            actualizarMensajes();
         }
     }
 
@@ -176,18 +179,16 @@ public class AltaEgresoBean implements Serializable {
             log.info("{} finaliza proceso para {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado el proceso de " + titulo + ".");
-        } catch (ValidationException ex) {
-            log.info("Error al momento de validar el egreso. {}", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Validacioón de egreso", ex.getMessage());
-        } catch (SystemException ex) {
+            actualizarFormulario();
+        } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de {}. {}", titulo.toUpperCase(), ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
-                    "Error al momento de cargar la " + titulo + ". Contacte con el administrador de sistemas.");
+                    "Error desconocido. Contacte con el administrador de sistemas.");
         } finally {
-            actualizacionComponentesPrimeFaces();
+            actualizarMensajes();
         }
     }
 
@@ -224,20 +225,20 @@ public class AltaEgresoBean implements Serializable {
         this.categoriaEgresoSelected = categoriaEgresoSelected;
     }
 
-    public List<MedioPago> getLstMediosPago() {
-        return lstMediosPago;
+    public List<MedioPago> getLstFormasPago() {
+        return lstFormasPago;
     }
 
-    public void setLstMediosPago(List<MedioPago> lstMediosPago) {
-        this.lstMediosPago = lstMediosPago;
+    public void setLstFormasPago(List<MedioPago> lstFormasPago) {
+        this.lstFormasPago = lstFormasPago;
     }
 
-    public MedioPago getMedioPagoSelected() {
-        return medioPagoSelected;
+    public MedioPago getFormaPagoSelected() {
+        return formaPagoSelected;
     }
 
-    public void setMedioPagoSelected(MedioPago medioPagoSelected) {
-        this.medioPagoSelected = medioPagoSelected;
+    public void setFormaPagoSelected(MedioPago formaPagoSelected) {
+        this.formaPagoSelected = formaPagoSelected;
     }
 
     public List<MetodoPago> getLstMetodosPago() {

@@ -66,7 +66,7 @@
                     autoResize="false"
                     required="true"
                     placeholder="Ej. Pago de luz" 
-                    style="width:100%"
+                    style="width:100%; resize: none"
                     readonly="#{altaEgresoBean.egresoSelected.id != null}"
                     disabled="#{not empty altaEgresoBean.egresoSelected.id}">
                     <p:ajax process="@this"/>
@@ -145,7 +145,7 @@
                     <f:selectItem itemLabel="--- Seleccione una forma de pago ---"/>
 
                     <f:selectItems
-                        value="#{altaEgresoBean.lstMediosPago}"
+                        value="#{altaEgresoBean.lstFormasPago}"
                         var="fp"
                         itemLabel="#{fp.mpDescripcion}"
                         itemValue="#{fp}"/>
@@ -184,7 +184,9 @@
                     converter="entityConverter"
                     required="true" style="width:100%">
 
-                    <f:selectItem itemLabel="--- Seleccione un status ---"/>
+                    <f:selectItem itemLabel="--- Seleccione un status ---"
+                                  itemValue="#{null}"
+                                  noSelectionOption="true"/>
 
                     <f:selectItems
                         value="#{altaEgresoBean.lstStatusEgresos}"
@@ -201,13 +203,13 @@
 
     <p:panel>
         <div class="field" style="display:flex; justify-content:flex-end; gap:10px;">
-            <p:commandButton value="#{(altaEgresoBean.egresoSelected.id == null) ? 'Guardar' : 'Actualizar'}" icon="pi pi-check"
-                             actionListener="#{altaEgresoBean.guardarOActualizarEgreso()}" update=":form"
-                             process="@this" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()"/>
+            <p:commandButton value="#{(altaEgresoBean.egresoSelected.id == null) ? 'Guardar' : 'Actualizar'}" 
+                             icon="pi pi-check"
+                             actionListener="#{altaEgresoBean.guardarOActualizarEgreso()}"
+                             process="@this" 
+                             onstart="PF('statusInfoDialog').show()" 
+                             oncomplete="PF('statusInfoDialog').hide()"/>
 
-            <p:commandButton value="Cancelar" icon="pi pi-times"
-                             class="ui-button-secondary"
-                             resetValues="true" immediate="true" />
         </div>
     </p:panel>
 

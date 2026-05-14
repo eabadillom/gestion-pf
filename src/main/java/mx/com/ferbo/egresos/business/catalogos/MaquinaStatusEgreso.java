@@ -21,17 +21,12 @@ public class MaquinaStatusEgreso {
     private MaquinaStatusBase<StatusEgreso> maquina;
 
     private StatusEgreso cancelado;
-    private StatusEgreso activo;
     private StatusEgreso pendiente;
     private StatusEgreso procesado;
 
     private void asinarStatusExistentes(List<StatusEgreso> lstStatus) {
         for (StatusEgreso status : lstStatus) {
             switch (status.getClave()) {
-                case "ACT":
-                    activo = status;
-                    break;
-
                 case "CAN":
                     cancelado = status;
                     break;
@@ -54,8 +49,7 @@ public class MaquinaStatusEgreso {
 
         Map<StatusEgreso, Set<StatusEgreso>> transiciones = new HashMap<StatusEgreso, Set<StatusEgreso>>();
 
-        transiciones.put(pendiente, SetUtils.setOf(cancelado, activo, procesado));
-        transiciones.put(activo, SetUtils.setOf(cancelado, procesado));
+        transiciones.put(pendiente, SetUtils.setOf(cancelado, procesado));
         transiciones.put(procesado, SetUtils.setOf());
         transiciones.put(cancelado, SetUtils.setOf());
 
@@ -72,7 +66,7 @@ public class MaquinaStatusEgreso {
         asinarStatusExistentes(lstStatus);
 
         if (actual == null && nuevo != null) {
-            if (!nuevo.getClave().equals(pendiente.getClave()) && !nuevo.getClave().equals(activo.getClave())) {
+            if (!nuevo.getClave().equals(pendiente.getClave()) && !nuevo.getClave().equals(procesado.getClave())) {
                 throw new BusinessException("No se puede asignar un status no valido a un nuevo egreso.");
             }
         } else {

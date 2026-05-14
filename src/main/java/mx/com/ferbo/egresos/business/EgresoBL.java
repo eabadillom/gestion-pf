@@ -14,8 +14,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.exception.ValidationException;
+import com.ferbo.tools.validation.Notification;
 import com.ferbo.tools.validation.ObjectValidator;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
+import com.ferbo.tools.validation.TextValidator;
 
 import mx.com.ferbo.egresos.dao.EgresoDAO;
 import mx.com.ferbo.egresos.model.Egreso;
@@ -126,26 +128,41 @@ public class EgresoBL {
                 .texto("nombre", MetodoPago::getNbMetodoPago))
                 .validateOrThrow();
 
-        BigDecimal total = egreso.getMonto();
+        ObjectValidator.notNull(egreso.getFecha(), "fecha de pago");
+    }
 
-        if (total != null) {
+    public void validarEgresoProcesado(Egreso egreso) {
+
+        if ("PRO".equalsIgnoreCase(egreso.getStatus().getClave())) {
+
+            BigDecimal total = egreso.getMonto();
+
+            Notification notification = new Notification();
+
+            TextValidator textValidator = new TextValidator(150);
+
+            try {
+                textValidator.validate(egreso.getReferencia(), notification);
+            } catch (ValidationException ex) {
+                log.warn("Hubo una error en la referenficía, solamente se cambia el mensaje para el usuario.");
+                throw new ValidationException("El egreso cambio a status 'Procesado' por lo tanto debe tener un una referencía.");
+            }
+
+            if (total == null) {
+                throw new ValidationException("El egreso cambio a status 'Procesado' por lo tanto debe tener el monto pagado.");
+            }
+
             if (total.compareTo(BigDecimal.ZERO) < 0) {
-                throw new ValidationException("El monto del egreso no puede ser vacío ni negativo.");
+                throw new ValidationException("El monto del egreso no puede ser negativo.");
             }
         }
-        LocalDateTime fechaEgreso = egreso.getFecha();
 
-        LocalDateTime hoy = LocalDateTime.now();
-
-        if (fechaEgreso == null || fechaEgreso.isAfter(hoy)) {
-            throw new ValidationException("La fecha de pago del egreso no puede ser mayor a al día de hoy.");
-        }
     }
 
     public void procesarEgreso(Egreso egreso) throws ValidationException, SystemException {
 
         validarEgresoNuevo(egreso);
-
+        validarEgresoProcesado(egreso);
         crearOActualizarEgreso(egreso);
 
     }

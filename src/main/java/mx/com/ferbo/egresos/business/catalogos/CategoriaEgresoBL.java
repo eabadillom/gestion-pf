@@ -61,7 +61,7 @@ public class CategoriaEgresoBL implements CatalogoBL<CategoriaEgreso> {
         }
     }
 
-    private void validar(CategoriaEgreso categoria) {
+    public void validar(CategoriaEgreso categoria) {
 
         new ObjectValidatorBuilder<>("categoria egreso", categoria)
                 .validateObject()
@@ -76,14 +76,12 @@ public class CategoriaEgresoBL implements CatalogoBL<CategoriaEgreso> {
         
         ObjectValidator.notNull(categoria, "categoria egreso");
 
-        if (!categoria.getActivo()) {
-            throw new BusinessException("La categoría de egreso ya se encuenta desactivada");
-        }
-
         if (!egresos.isEmpty()) {
             throw new BusinessException("No se puede desactivar la categoría del egreso por tenener egresos dependiente de ella.");
         }
 
-        categoria.setActivo(Boolean.FALSE);
+        Boolean nuevo = categoria.getActivo();
+        
+        categoria.setActivo(!nuevo);
     }
 }

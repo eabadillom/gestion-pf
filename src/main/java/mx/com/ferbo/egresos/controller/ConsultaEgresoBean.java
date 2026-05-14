@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -17,7 +18,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
+import com.ferbo.tools.util.date.DateFormatter;
+
 import java.io.IOException;
 
 import mx.com.ferbo.egresos.business.EgresoBL;
@@ -45,9 +49,6 @@ public class ConsultaEgresoBean implements Serializable {
 
     @Inject
     private EgresoBL egresoBL;
-
-    private String PENDIENTE = "PEN";
-    private String GENERAL = "GEN";
 
     private transient List<StatusEgreso> lstStatusEgresos;
     private StatusEgreso statusEgresoSelected;
@@ -91,10 +92,14 @@ public class ConsultaEgresoBean implements Serializable {
             log.info("{} finalizo la carga de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha cargado exitosamente la " + titulo + ".");
-        } catch (SystemException ex) {
+        } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de cargar la {}. {}", titulo, ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
                     ex.getMessage());
+        } catch (Exception ex) {
+            log.warn("Error al momento de {}. {}", titulo, ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
+                    "Error desconocido. Contacte con el administrador de sistemas.");
         } finally {
             actualizacionComponentesPrimeFaces();
         }
@@ -112,15 +117,39 @@ public class ConsultaEgresoBean implements Serializable {
             log.info("{} finalizo el proceso de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado exitosamente el proceso de " + titulo + ".");
-        } catch (SystemException ex) {
+        } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
-                    "Error al momento de " + titulo + ". Contacte con el administrador de sistemas.");
+                    "Error desconocido. Contacte con el administrador de sistemas.");
         } finally {
             actualizacionComponentesPrimeFaces();
+        }
+    }
+
+    public String getSoloFecha(LocalDateTime fecha) {
+        return DateFormatter.format(
+                fecha,
+                "dd/MM/yyyy",
+                new Locale("es", "MX"));
+    }
+
+    public String obtenerSeverity(String status) {
+
+        switch (status) {
+            case "PENDIENTE":
+                return "warning";
+
+            case "PROCESADO":
+                return "success";
+
+            case "CANCELADO":
+                return "danger";
+
+            default:
+                return "info";
         }
     }
 

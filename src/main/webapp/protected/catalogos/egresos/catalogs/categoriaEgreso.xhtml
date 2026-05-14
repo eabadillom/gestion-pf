@@ -19,55 +19,96 @@
             <!-- Toolbar -->
             <p:toolbar>
                 <p:toolbarGroup>
-                    <p:commandButton value="Nuevo" icon="pi pi-plus" actionListener="#{categoriaEgresoBean.nuevoOExistente(null)}"
-                                     update=":dlgForm" oncomplete="PF('dlgCategoriaEgreso').show()" process="@this">
+                    <p:commandButton id="btnNuevo" 
+                                     value="Nuevo" 
+                                     icon="pi pi-plus" 
+                                     actionListener="#{categoriaEgresoBean.nuevoOExistente(null)}"
+                                     update="dlgForm:dlg" 
+                                     onstart="PF('statusInfoDialog').show()"
+                                     oncomplete="PF('statusInfoDialog').hide(); PF('dlg').show()"
+                                     process="@this">
 
                     </p:commandButton>
+                    
+                    <p:separator style="width:5px;" />
 
-                    <p:commandButton value="Activos/Inactivos" icon="pi pi-filter"
-                                     actionListener="#{categoriaEgresoBean.toggleActivos}" update="tbCategoriaEgreso">
+                    <p:commandButton id="btnFiltrar" value="Activos/Inactivos" icon="pi pi-filter"
+                                     actionListener="#{categoriaEgresoBean.toggleActivos}" update="tabla">
 
                     </p:commandButton>
                 </p:toolbarGroup>
             </p:toolbar>
 
             <!-- Tabla -->
-            <p:dataTable id="tbCategoriaEgreso" widgetVar="tbCategoriaEgreso" value="#{categoriaEgresoBean.items}" var="s" rowKey="#{s.id}"
+            <p:dataTable id="tabla" widgetVar="tabla" value="#{categoriaEgresoBean.items}" var="item" rowKey="#{item.id}"
                          reflow="true" lazy="false" paginator="true" rows="5" paginatorPosition="bottom">
 
                 <p:column headerText="Clave">
-                    #{s.clave}
+                    #{item.clave}
                 </p:column>
 
                 <p:column headerText="Nombre">
-                    #{s.nombre}
+                    #{item.nombre}
                 </p:column>
 
                 <p:column headerText="descripcion">
-                    #{s.descripcion}
+                    #{item.descripcion}
                 </p:column>
 
                 <p:column headerText="Orden">
-                    #{s.orden}
+                    #{item.orden}
                 </p:column>
 
                 <p:column headerText='Operaciones'>
-                    <p:commandButton icon="pi pi-pencil"  actionListener="#{categoriaEgresoBean.nuevoOExistente(s)}"
-                                     update=":dlgForm" oncomplete="PF('dlgCategoriaEgreso').show()" process="@this">
+                    <p:commandButton id="btnEditar"
+                                     icon="pi pi-pencil" 
+                                     actionListener="#{categoriaEgresoBean.nuevoOExistente(item)}"
+                                     onstart="PF('statusInfoDialog').show()"
+                                     oncomplete="PF('statusInfoDialog').hide(); PF('dlg').show()" 
+                                     update="dlgForm:dlg"
+                                     process="@this"
+                                     style="margin-right: 5px;">
 
                     </p:commandButton>
-                    <p:commandButton icon="pi pi-times" class="ui-button-danger"
-                                     update=":dlgForm" oncomplete="PF('dlgCategoriaEgreso').show()" process="@this">
+                    
+                    <p:commandButton id="btnModEstado"
+                                     icon="#{(item.activo)?'pi pi-times':'pi pi-check'}"
+                                     class="#{(item.activo)?'ui-button-danger':'ui-button-success'}"
+                                     actionListener="#{categoriaEgresoBean.desactivarOActivarCategoria(item)}"
+                                     process="@this">
+
+                        <p:confirm
+                            header="Confirmación"
+                            message="#{categoriaEgresoBean.mensajeDialogConfir(item)}"
+                            icon="pi pi-exclamation-triangle"/>
 
                     </p:commandButton>
                 </p:column>
 
             </p:dataTable>
+            <p:confirmDialog id="dlgConfir"
+                             global="true"
+                             showEffect="fade"
+                             hideEffect="fade"
+                             responsive="true"
+                             width="350">
+
+                <p:commandButton id="btnConfirSi"
+                                 value="Sí"
+                                 type="button"
+                                 styleClass="ui-confirmdialog-yes ui-button-primary"/>
+
+                <p:commandButton id="btnConfirNo"
+                                 value="No"
+                                 type="button"
+                                 styleClass="ui-confirmdialog-no ui-button-secondary"/>
+
+            </p:confirmDialog>
         </h:form>
 
         <!-- Dialog -->
         <h:form id="dlgForm">
-            <p:dialog id="dlgCategoriaEgreso" widgetVar="dlgCategoriaEgreso" modal="true" header="Status de Egreso" resizable="false">
+            <p:dialog id="dlg" widgetVar="dlg" modal="true" header="Categoría de Egreso" resizable="false">
 
                 <h:panelGrid columns="2">
 
@@ -85,13 +126,14 @@
                 </h:panelGrid>
 
                 <f:facet name="footer">
-                    <p:commandButton value="Guardar"
+                    <p:commandButton id="btnOperar"
+                                     value="#{statusEgresoBean.selected.id == null ? 'Guardar' : 'Actualizar'}"
                                      icon="pi pi-save"
-                                     actionListener="#{categoriaEgresoBean.guardar}"
-                                     update=":form:tbCategoriaEgreso"
-                                     oncomplete="PF('dlgCategoriaEgreso').hide()">
+                                     actionListener="#{categoriaEgresoBean.procesarCategoriaEgreso()}"
+                                     oncomplete="PF('dlg').hide()">
                     </p:commandButton>
-                    <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('clienteDireccionesActDialog').hide()"
+                    <p:commandButton id="btnCancelar"
+                                     value="Cancelar" icon="pi pi-times" onclick="PF('clienteDireccionesActDialog').hide()"
                                      class="ui-button-secondary"  resetValues="true" immediate="true" process="@this">
                     </p:commandButton>
                 </f:facet>

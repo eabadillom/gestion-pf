@@ -52,22 +52,24 @@ public class StatusEgresoBL implements CatalogoBL<StatusEgreso> {
     }
 
     @Override
-    public void guardar(StatusEgreso status) throws InventarioException {
+    public void guardar(StatusEgreso status) throws SystemException {
         validar(status);
+        String estado = "";
         try {
             if (status.getId() == null) {
                 dao.guardar(status);
+                estado = "guardar";
             } else {
                 dao.actualizar(status);
+                estado = "actualizar";
             }
         } catch (InventarioException ex) {
-            log.error("Error al guardar status {}", status.getNombre(), ex);
-            throw ex;
-            //throw new SystemException("Hubo un problema al guardar el status: " + status.getNombre());
+            log.error("Error al {} status {}", estado, status.getNombre(), ex);
+            throw new SystemException("Hubo un problema al momento de " + estado +" el status: " + status.getNombre());
         }
     }
 
-    private void validar(StatusEgreso status) {
+    public void validar(StatusEgreso status) {
 
         new ObjectValidatorBuilder<>("status egreso", status)
                 .validateObject()
@@ -81,15 +83,13 @@ public class StatusEgresoBL implements CatalogoBL<StatusEgreso> {
     public void desactivarStatus(List<Egreso> egresos, StatusEgreso status) {
         ObjectValidator.notNull(status, "status de egreso");
 
-        if (status.getActivo()) {
-            throw new BusinessException("El status de egreso ya se encuentra desactivado.");
-        }
-
         if (!egresos.isEmpty()) {
             throw new BusinessException("No se puede desactivar el status del egreso por tener egresos dependientes de el.");
         }
+        
+        Boolean nuevo = status.getActivo();
 
-        status.setActivo(Boolean.FALSE);
+        status.setActivo(!nuevo);
     }
     
 }

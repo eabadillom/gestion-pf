@@ -4,36 +4,33 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-
 import org.primefaces.PrimeFaces;
 
-import com.ferbo.tools.exception.BusinessException;
-
 import mx.com.ferbo.egresos.business.catalogos.CatalogoBL;
-import mx.com.ferbo.util.InventarioException;
+import mx.com.ferbo.model.Usuario;
 
 public abstract class AbstractCatalogoBean<T> implements Serializable {
 
     protected List<T> items;
     protected T selected;
-    protected Boolean mostrarInactivos = Boolean.FALSE;
+    protected Boolean mostrarInactivos = Boolean.TRUE;
+
+    protected String titulo;
+    protected String inicioLeyenda;
+    protected Usuario usuario;
 
     protected abstract CatalogoBL<T> getBL();
 
     protected abstract T crearNuevo();
+    protected abstract void cargaInicial();
 
     @PostConstruct
     public void init() {
-        buscar();
+        cargaInicial();
     }
 
     public void buscar() {
-        try {
-            items = getBL().buscarActivos(mostrarInactivos ? null : Boolean.TRUE);
-        } catch (InventarioException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        items = getBL().buscarActivos(mostrarInactivos);
     }
 
     public void toggleActivos() {
@@ -45,21 +42,12 @@ public abstract class AbstractCatalogoBean<T> implements Serializable {
         selected = (entidad == null) ? crearNuevo() : entidad;
     }
 
-    public void guardar() {
-        try {
-            getBL().guardar(selected);
-            // Mensaje para PrimeFaces
-            buscar();
-            selected = null;
-        } catch (BusinessException | InventarioException ex) {
-            // Mensaje para PrimeFaces
-        } finally {
-            actualizacionComponentesPrimeFaces();
-        }
+    protected void actualizarMensajes() {
+        PrimeFaces.current().ajax().update("form:messages");
     }
 
-    protected void actualizacionComponentesPrimeFaces() {
-        PrimeFaces.current().ajax().update("form:messages");
+    protected void actualizarTabla() {
+        PrimeFaces.current().ajax().update("form:tabla");
     }
 
     public void seleccionar(T item) {
@@ -94,5 +82,5 @@ public abstract class AbstractCatalogoBean<T> implements Serializable {
     public void setMostrarInactivos(Boolean mostrarInactivos) {
         this.mostrarInactivos = mostrarInactivos;
     }
-    
+
 }
