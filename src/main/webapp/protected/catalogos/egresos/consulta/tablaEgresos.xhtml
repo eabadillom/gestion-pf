@@ -10,6 +10,9 @@
         <p:column headerText="Status">
             <p:tag value="#{e.status.nombre}" severity="#{consultaEgresoBean.obtenerSeverity(e.status.nombre)}"/>
         </p:column>
+        <p:column headerText="Emisor">
+            <p:outputLabel value="#{e.emisor.nb_emisor}"/>
+        </p:column>
         <p:column headerText="Categoria">
             <p:outputLabel value="#{e.categoria.nombre}"/>
         </p:column>

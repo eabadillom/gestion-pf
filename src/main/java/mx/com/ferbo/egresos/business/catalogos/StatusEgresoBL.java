@@ -53,7 +53,6 @@ public class StatusEgresoBL implements CatalogoBL<StatusEgreso> {
 
     @Override
     public void guardar(StatusEgreso status) throws SystemException {
-        validar(status);
         String estado = "";
         try {
             if (status.getId() == null) {

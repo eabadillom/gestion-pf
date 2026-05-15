@@ -17,6 +17,7 @@ import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.CategoriaEgreso;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
+import mx.com.ferbo.model.EmisoresCFDIS;
 
 @Named
 @ApplicationScoped
@@ -117,9 +118,21 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
         }
     }
 
+    public List<Egreso> buscarPorEmisor(EmisoresCFDIS emisor) throws SystemException {
+        try {
+             em = getEntityManager();
+             return em.createNamedQuery("Egreso.searchByEmisor", Egreso.class).setParameter("emisor", emisor).getResultList();
+        } catch (Exception ex) {
+            log.error("Error al momento de buscar los egresos con el emisor: {}. {}", emisor.getNb_emisor(), ex);
+            throw new SystemException("Hubo un problema al momento de buscar los egresos con el emisor " + emisor.getNb_emisor() + ".");
+        } finally {
+            close(em);
+        }
+    }
+
     public List<Egreso> buscarPorFiltros(LocalDateTime inicio, LocalDateTime fin, CategoriaEgreso categoria,
             StatusEgreso status,
-            String concepto) throws SystemException {
+            String concepto, EmisoresCFDIS emisor) throws SystemException {
         List<Egreso> lst = null;
         try {
             em = getEntityManager();
@@ -129,6 +142,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
                     .setParameter("categoria", categoria)
                     .setParameter("status", status)
                     .setParameter("concepto", concepto)
+                    .setParameter("emisor", emisor)
                     .getResultList();
             for (Egreso e : lst) {
                 log.info("Emisor del egreso: {}", e.getEmisor());

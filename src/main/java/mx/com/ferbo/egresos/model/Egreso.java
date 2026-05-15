@@ -36,10 +36,13 @@ import mx.com.ferbo.model.MetodoPago;
 
     @NamedQuery(name = "Egreso.searchByConcepto", query = "SELECT e FROM Egreso e WHERE LOWER(e.concepto) LIKE LOWER(CONCAT('%', :concepto, '%')) ORDER BY e.fecha DESC"),
 
+    @NamedQuery(name = "Egreso.searchByEmisor", query = "SELECT e FROM Egreso e WHERE e.emisor = :emisor ORDER BY e.fecha DESC"),
+
     @NamedQuery(name = "Egreso.findWithFilters", query = "SELECT e FROM Egreso e "
             + "WHERE (:inicio IS NULL OR e.fecha >= :inicio) "
             + "AND (:fin IS NULL OR e.fecha <= :fin) "
             + "AND (:categoria IS NULL OR e.categoria = :categoria) "
+            + "AND (:emisor IS NULL OR e.emisor = :emisor)"
             + "AND (:status IS NULL OR e.status = :status) "
             + "AND (:concepto IS NULL OR LOWER(e.concepto) LIKE LOWER(CONCAT('%', :concepto, '%'))) "
             + "ORDER BY e.fecha DESC")

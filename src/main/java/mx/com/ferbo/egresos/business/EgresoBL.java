@@ -47,7 +47,7 @@ public class EgresoBL {
         }
     }
 
-    private void crearOActualizarEgreso(Egreso egreso) {
+    public void crearOActualizarEgreso(Egreso egreso) {
         String estado = "";
         try {
             Long id = egreso.getId();
@@ -83,11 +83,11 @@ public class EgresoBL {
             YearMonth mes,
             CategoriaEgreso categoria,
             StatusEgreso status,
-            String concepto) {
+            String concepto, EmisoresCFDIS emisor) {
         try {
             LocalDateTime inicio = inicioMes(mes);
             LocalDateTime fin = finMes(mes);
-            return dao.buscarPorFiltros(inicio, fin, categoria, status, concepto);
+            return dao.buscarPorFiltros(inicio, fin, categoria, status, concepto, emisor);
         } catch (SystemException ex) {
             throw ex;
         }
@@ -113,19 +113,19 @@ public class EgresoBL {
         }
     }
 
-    private void validarEgresoNuevo(Egreso egreso) {
+    public void validarEgresoNuevo(Egreso egreso) {
 
         new ObjectValidatorBuilder<>("egreso", egreso)
                 .validateObject()
                 .texto("concepto", Egreso::getConcepto)
                 .validateNested("categoria", Egreso::getCategoria, cat -> cat.validateObject()
-                .texto("nombre", CategoriaEgreso::getNombre))
+                        .texto("nombre", CategoriaEgreso::getNombre))
                 .validateNested("emisor", Egreso::getEmisor, emi -> emi.validateObject()
-                .texto("nombre", EmisoresCFDIS::getNb_emisor))
+                        .texto("nombre", EmisoresCFDIS::getNb_emisor))
                 .validateNested("forma pago", Egreso::getFormaPago, fpago -> fpago.validateObject()
-                .texto("nombre", MedioPago::getFormaPago))
+                        .texto("nombre", MedioPago::getFormaPago))
                 .validateNested("metodo pago", Egreso::getMetodoPago, mpago -> mpago.validateObject()
-                .texto("nombre", MetodoPago::getNbMetodoPago))
+                        .texto("nombre", MetodoPago::getNbMetodoPago))
                 .validateOrThrow();
 
         ObjectValidator.notNull(egreso.getFecha(), "fecha de pago");
@@ -145,11 +145,13 @@ public class EgresoBL {
                 textValidator.validate(egreso.getReferencia(), notification);
             } catch (ValidationException ex) {
                 log.warn("Hubo una error en la referenficía, solamente se cambia el mensaje para el usuario.");
-                throw new ValidationException("El egreso cambio a status 'Procesado' por lo tanto debe tener un una referencía.");
+                throw new ValidationException(
+                        "El egreso cambio a status 'Procesado' por lo tanto debe tener un una referencía.");
             }
 
             if (total == null) {
-                throw new ValidationException("El egreso cambio a status 'Procesado' por lo tanto debe tener el monto pagado.");
+                throw new ValidationException(
+                        "El egreso cambio a status 'Procesado' por lo tanto debe tener el monto pagado.");
             }
 
             if (total.compareTo(BigDecimal.ZERO) < 0) {
@@ -160,10 +162,6 @@ public class EgresoBL {
     }
 
     public void procesarEgreso(Egreso egreso) throws ValidationException, SystemException {
-
-        validarEgresoNuevo(egreso);
-        validarEgresoProcesado(egreso);
-        crearOActualizarEgreso(egreso);
 
     }
 

@@ -122,12 +122,12 @@
                     <p:inputTextarea value="#{categoriaEgresoBean.selected.descripcion}"/>
 
                     <h:outputLabel>Orden: </h:outputLabel>
-                    <p:inputText value="#{categoriaEgresoBean.selected.orden}"/>
+                    <p:inputText value="#{categoriaEgresoBean.ordenSugerido}"/>
                 </h:panelGrid>
 
                 <f:facet name="footer">
                     <p:commandButton id="btnOperar"
-                                     value="#{statusEgresoBean.selected.id == null ? 'Guardar' : 'Actualizar'}"
+                                     value="#{categoriaEgresoBean.selected.id == null ? 'Guardar' : 'Actualizar'}"
                                      icon="pi pi-save"
                                      actionListener="#{categoriaEgresoBean.procesarCategoriaEgreso()}"
                                      oncomplete="PF('dlg').hide()">

@@ -130,14 +130,8 @@ public class AltaEgresoBean implements Serializable {
                     "Se ha cargado exitosamente la " + titulo + ".");
         } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de cargar la {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
-                    ex.getMessage());
         } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
-                    "Error desconocido. Contacte con el administrador de sistemas.");
-        } finally {
-            actualizarMensajes();
         }
     }
 
@@ -170,12 +164,14 @@ public class AltaEgresoBean implements Serializable {
         }
     }
 
-    public void guardarOActualizarEgreso() {
+    public void procesarEgreso() {
         try {
             titulo = (egresoSelected.getId() == null) ? "guardar el egreso" : "actualizar el egreso";
 
             log.info("{} inicia el proceso para {}.", inicioLeyenda, titulo);
-            egresoBL.procesarEgreso(egresoSelected);
+            egresoBL.validarEgresoNuevo(egresoSelected);
+            egresoBL.validarEgresoProcesado(egresoSelected);
+            egresoBL.crearOActualizarEgreso(egresoSelected);
             log.info("{} finaliza proceso para {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado el proceso de " + titulo + ".");

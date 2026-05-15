@@ -5,10 +5,10 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
 
-    <p:panel header="Datos Generales" styleClass="mb-4">
+    <p:panel header="Datos Generales" styleClass="ui-fluid">
         <div class="p-grid">
 
-            <div class="p-col-12 p-md-3">
+            <div class="p-col-12 p-md-4">
                 <p:outputLabel
                     for="emisor"
                     value="Emisor:" style="width:100%"/>
@@ -20,7 +20,7 @@
                     required="true" style="width:100%"
                     disabled="#{not empty altaEgresoBean.egresoSelected.id}">
 
-                    <f:selectItem itemLabel="--- Seleccione un emisor ---"/>
+                    <f:selectItem itemLabel="--- Emisores ---"/>
 
                     <f:selectItems
                         value="#{altaEgresoBean.lstEmisoresCfdi}"
@@ -32,7 +32,7 @@
                 </p:selectOneMenu>
             </div>
 
-            <div class="p-col-12 p-md-3">
+            <div class="p-col-12 p-md-4">
                 <p:outputLabel for="cdCategoria" value="Categoría" style="width:100%"/>
 
                 <p:selectOneMenu
@@ -42,7 +42,7 @@
                     required="true" style="width:100%"
                     disabled="#{not empty altaEgresoBean.egresoSelected.id}">
 
-                    <f:selectItem itemLabel="--- Seleccione una categoría ---"/>
+                    <f:selectItem itemLabel="--- Categorías ---"/>
 
                     <f:selectItems
                         value="#{altaEgresoBean.lstCategoriasEgreso}"
@@ -54,7 +54,7 @@
                 </p:selectOneMenu>
             </div>
 
-            <div class="p-col-12 p-md-3">
+            <div class="p-col-12 p-md-4">
                 <p:outputLabel for="concepto" value="Concepto:" style="width:100%"/>
 
                 <p:inputTextarea
@@ -76,7 +76,69 @@
                 <h:outputText id="contador"/>
             </div>
 
-            <div class="p-col-12 p-md-3">
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel
+                    for="metodoPago"
+                    value="Método de Pago:" style="width:100%"/>
+
+                <p:selectOneMenu
+                    id="metodoPago"
+                    value="#{altaEgresoBean.egresoSelected.metodoPago}"
+                    converter="entityConverter"
+                    required="true" style="width:100%"
+                    disabled="#{not empty altaEgresoBean.egresoSelected.id}">
+
+                    <f:selectItem itemLabel="--- Métodos de pago ---"/>
+
+                    <f:selectItems
+                        value="#{altaEgresoBean.lstMetodosPago}"
+                        var="m"
+                        itemLabel="#{m.nbMetodoPago}"
+                        itemValue="#{m}"/>
+                    <p:ajax process="@this"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div  class="p-col-12 p-md-4">
+                <p:outputLabel
+                    for="formaPago"
+                    value="Forma de Pago:" style="width:100%"/>
+
+                <p:selectOneMenu
+                    id="formaPago"
+                    value="#{altaEgresoBean.egresoSelected.formaPago}"
+                    converter="entityConverter"
+                    required="true" style="width:100%"
+                    disabled="#{not empty altaEgresoBean.egresoSelected.id}">
+
+                    <f:selectItem itemLabel="--- Formas de pago ---"/>
+
+                    <f:selectItems
+                        value="#{altaEgresoBean.lstFormasPago}"
+                        var="fp"
+                        itemLabel="#{fp.mpDescripcion}"
+                        itemValue="#{fp}"/>
+
+                    <p:ajax process="@this"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div class="p-col-12 p-md-4">
+                <p:outputLabel for="fhEgreso" value="Fecha:" style="width:100%"/>
+                <p:datePicker id="fhEgreso" 
+                              value="#{altaEgresoBean.egresoSelected.fecha}"
+                              pattern="dd/MM/yyyy"
+                              placeholder="dd/MM/aaaa" 
+                              showIcon="true"
+                              showTime="false"
+                              required="true" 
+                              style="width:100%"
+                              disabled="#{not empty altaEgresoBean.egresoSelected.id}">
+                    <p:ajax event="dateSelect" process="@this"/>
+                </p:datePicker>
+            </div>
+
+            <div class="p-col-12 p-md-4">
                 <p:outputLabel
                     for="referencia"
                     value="Referencia:" style="width:100%"/>
@@ -92,69 +154,7 @@
                 </p:inputText>
             </div>
 
-            <div class="p-col-12 p-md-3">
-                <p:outputLabel for="fhEgreso" value="Fecha:" style="width:100%"/>
-                <p:datePicker id="fhEgreso" 
-                              value="#{altaEgresoBean.egresoSelected.fecha}"
-                              pattern="dd/MM/yyyy"
-                              placeholder="dd/MM/aaaa" 
-                              showIcon="true"
-                              showTime="false"
-                              required="true" 
-                              style="width:100%"
-                              disabled="#{not empty altaEgresoBean.egresoSelected.id}">
-                    <p:ajax event="dateSelect" process="@this"/>
-                </p:datePicker>
-            </div>
-
-            <div class="p-col-12 p-md-3">
-                <p:outputLabel
-                    for="metodoPago"
-                    value="Método de Pago:" style="width:100%"/>
-
-                <p:selectOneMenu
-                    id="metodoPago"
-                    value="#{altaEgresoBean.egresoSelected.metodoPago}"
-                    converter="entityConverter"
-                    required="true" style="width:100%"
-                    disabled="#{not empty altaEgresoBean.egresoSelected.id}">
-
-                    <f:selectItem itemLabel="--- Seleccione un método de pago ---"/>
-
-                    <f:selectItems
-                        value="#{altaEgresoBean.lstMetodosPago}"
-                        var="m"
-                        itemLabel="#{m.nbMetodoPago}"
-                        itemValue="#{m}"/>
-                    <p:ajax process="@this"/>
-                </p:selectOneMenu>
-            </div>
-
-            <div  class="p-col-12 p-md-3">
-                <p:outputLabel
-                    for="formaPago"
-                    value="Forma de Pago:" style="width:100%"/>
-
-                <p:selectOneMenu
-                    id="formaPago"
-                    value="#{altaEgresoBean.egresoSelected.formaPago}"
-                    converter="entityConverter"
-                    required="true" style="width:100%"
-                    disabled="#{not empty altaEgresoBean.egresoSelected.id}">
-
-                    <f:selectItem itemLabel="--- Seleccione una forma de pago ---"/>
-
-                    <f:selectItems
-                        value="#{altaEgresoBean.lstFormasPago}"
-                        var="fp"
-                        itemLabel="#{fp.mpDescripcion}"
-                        itemValue="#{fp}"/>
-
-                    <p:ajax process="@this"/>
-                </p:selectOneMenu>
-            </div>
-
-            <div class="p-col-12 p-md-3">
+            <div class="p-col-12 p-md-4">
                 <p:outputLabel for="toEgreso" value="Total" style="width:100%"/>
                 <p:inputNumber 
                     id="toEgreso"
@@ -173,7 +173,7 @@
                 </p:inputNumber>
             </div>
 
-            <div class="p-col-12 p-md-3">
+            <div class="p-col-12 p-md-4">
                 <p:outputLabel
                     for="statusEgreso"
                     value="Status:" style="width:100%"/>
@@ -184,7 +184,7 @@
                     converter="entityConverter"
                     required="true" style="width:100%">
 
-                    <f:selectItem itemLabel="--- Seleccione un status ---"
+                    <f:selectItem itemLabel="--- Status de egreso ---"
                                   itemValue="#{null}"
                                   noSelectionOption="true"/>
 
@@ -205,7 +205,7 @@
         <div class="field" style="display:flex; justify-content:flex-end; gap:10px;">
             <p:commandButton value="#{(altaEgresoBean.egresoSelected.id == null) ? 'Guardar' : 'Actualizar'}" 
                              icon="pi pi-check"
-                             actionListener="#{altaEgresoBean.guardarOActualizarEgreso()}"
+                             actionListener="#{altaEgresoBean.procesarEgreso()}"
                              process="@this" 
                              onstart="PF('statusInfoDialog').show()" 
                              oncomplete="PF('statusInfoDialog').hide()"/>

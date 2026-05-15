@@ -16,14 +16,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "categoria_egreso")
 @NamedQueries({
-    @NamedQuery(
-        name = "CategoriaEgreso.findByClave",
-        query = "SELECT c FROM CategoriaEgreso c WHERE c.clave = :clave"
-    ),
-    @NamedQuery(
-        name = "CategoriaEgreso.findActivosOInactivos",
-        query = "SELECT c FROM CategoriaEgreso c WHERE c.activo = :activo ORDER BY c.orden"
-    )
+        @NamedQuery(name = "CategoriaEgreso.findMaxOrden", query = "SELECT MAX(c.orden) FROM CategoriaEgreso c"),
+        @NamedQuery(name = "CategoriaEgreso.findByClave", query = "SELECT c FROM CategoriaEgreso c WHERE c.clave = :clave"),
+        @NamedQuery(name = "CategoriaEgreso.findActivosOInactivos", query = "SELECT c FROM CategoriaEgreso c WHERE c.activo = :activo ORDER BY c.orden")
 })
 public class CategoriaEgreso {
 
@@ -120,22 +115,22 @@ public class CategoriaEgreso {
     @Override
     public int hashCode() {
 
-        if (clave != null) 
+        if (clave != null)
             return clave.hashCode();
-        
+
         return id != null ? id.hashCode() : 0;
-        
+
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) 
+        if (this == obj)
             return true;
         if (!(obj instanceof CategoriaEgreso))
             return false;
 
         CategoriaEgreso that = (CategoriaEgreso) obj;
-        
+
         if (this.clave != null && that.clave != null) {
             return this.clave.equals(that.clave);
         }

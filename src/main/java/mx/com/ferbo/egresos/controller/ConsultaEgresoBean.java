@@ -30,6 +30,8 @@ import mx.com.ferbo.egresos.business.catalogos.StatusEgresoBL;
 import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.CategoriaEgreso;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
+import mx.com.ferbo.empresa.business.EmisorCdfiBL;
+import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.FacesUtils;
 
@@ -48,13 +50,19 @@ public class ConsultaEgresoBean implements Serializable {
     private CategoriaEgresoBL categoriaBL;
 
     @Inject
+    private EmisorCdfiBL emisorCdfiBL;
+
+    @Inject
     private EgresoBL egresoBL;
 
-    private transient List<StatusEgreso> lstStatusEgresos;
+    private List<StatusEgreso> lstStatusEgresos;
     private StatusEgreso statusEgresoSelected;
 
-    private transient List<CategoriaEgreso> lstCategoriasEgreso;
+    private List<CategoriaEgreso> lstCategoriasEgreso;
     private CategoriaEgreso categoriaEgresoSelected;
+
+    private List<EmisoresCFDIS> lstEmisoresCFDIs;
+    private EmisoresCFDIS emisorSelected;
 
     private transient List<Egreso> lstEgresos;
 
@@ -85,23 +93,18 @@ public class ConsultaEgresoBean implements Serializable {
             log.info("{} inicio la carga de {}.", inicioLeyenda, titulo);
             lstCategoriasEgreso = categoriaBL.buscarActivos(activo);
             lstStatusEgresos = stutusBL.buscarActivos(activo);
+            lstEmisoresCFDIs = emisorCdfiBL.obtenerTodos();
             statusEgresoSelected = null;
             categoriaEgresoSelected = null;
             conceptoEgreso = null;
-            lstEgresos = egresoBL.obtenerPorFiltros(mes, null, null, null);
+            lstEgresos = egresoBL.obtenerPorFiltros(mes, null, null, null, null);
             log.info("{} finalizo la carga de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha cargado exitosamente la " + titulo + ".");
         } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de cargar la {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
-                    ex.getMessage());
         } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
-                    "Error desconocido. Contacte con el administrador de sistemas.");
-        } finally {
-            actualizacionComponentesPrimeFaces();
         }
     }
 
@@ -113,7 +116,8 @@ public class ConsultaEgresoBean implements Serializable {
         titulo = "cargar egresos";
         try {
             log.info("{} inicio el proceso de {}.", inicioLeyenda, titulo);
-            lstEgresos = egresoBL.obtenerPorFiltros(mes, categoriaEgresoSelected, statusEgresoSelected, conceptoEgreso);
+            lstEgresos = egresoBL.obtenerPorFiltros(mes, categoriaEgresoSelected, statusEgresoSelected, conceptoEgreso,
+                    emisorSelected);
             log.info("{} finalizo el proceso de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado exitosamente el proceso de " + titulo + ".");
@@ -234,6 +238,22 @@ public class ConsultaEgresoBean implements Serializable {
 
     public void setMes(YearMonth mes) {
         this.mes = mes;
+    }
+
+    public List<EmisoresCFDIS> getLstEmisoresCFDIs() {
+        return lstEmisoresCFDIs;
+    }
+
+    public void setLstEmisoresCFDIs(List<EmisoresCFDIS> lstEmisoresCFDIs) {
+        this.lstEmisoresCFDIs = lstEmisoresCFDIs;
+    }
+
+    public EmisoresCFDIS getEmisorSelected() {
+        return emisorSelected;
+    }
+
+    public void setEmisorSelected(EmisoresCFDIS emisorSelected) {
+        this.emisorSelected = emisorSelected;
     }
 
 }

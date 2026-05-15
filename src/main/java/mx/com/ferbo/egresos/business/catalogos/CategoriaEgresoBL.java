@@ -31,8 +31,8 @@ public class CategoriaEgresoBL implements CatalogoBL<CategoriaEgreso> {
         try {
             return dao.buscarPorClave(clave);
         } catch (Exception ex) {
-            log.error("Error buscando categoria con clave {}", clave, ex);
-            throw new SystemException("No se pudo obtener la categoría");
+            log.warn("Error buscando categoria con clave {}", clave, ex);
+            throw ex;
         }
     }
 
@@ -42,14 +42,14 @@ public class CategoriaEgresoBL implements CatalogoBL<CategoriaEgreso> {
         } catch (Exception ex) {
             String estado = Boolean.TRUE.equals(activo) ? "activas" : "inactivas";
             log.error("Error buscando categorías {}", estado, ex);
-            throw new SystemException("Error consultando categorías " + estado);
+            throw ex;
         }
     }
 
     public void guardar(CategoriaEgreso categoria) {
-        validar(categoria);
         try {
             if (categoria.getId() == null) {
+                categoria.setActivo(Boolean.TRUE);
                 dao.guardar(categoria);
             } else {
                 dao.actualizar(categoria);
@@ -73,15 +73,34 @@ public class CategoriaEgresoBL implements CatalogoBL<CategoriaEgreso> {
     }
 
     public void desactivarCategoria(List<Egreso> egresos, CategoriaEgreso categoria) {
-        
+
         ObjectValidator.notNull(categoria, "categoria egreso");
 
         if (!egresos.isEmpty()) {
-            throw new BusinessException("No se puede desactivar la categoría del egreso por tenener egresos dependiente de ella.");
+            throw new BusinessException(
+                    "No se puede desactivar la categoría del egreso por tenener egresos dependiente de ella.");
         }
 
         Boolean nuevo = categoria.getActivo();
-        
+
         categoria.setActivo(!nuevo);
+    }
+
+    public Integer calcularOrdenSugerido() {
+        try {
+            Integer mayor = dao.buscarMaximoOrden().orElseThrow(() -> new SystemException(
+                    "Hubo un problema al momento de obtner el máximo orden de las categorías."));
+            mayor = mayor + 1;
+            return mayor;
+        } catch (SystemException ex) {
+            log.warn("Error al momento de calcular el orden sugerido: {}.", ex);
+            throw ex;
+        }
+    }
+
+    public void asignarOrdenSugerio(Integer ordenSugerido, CategoriaEgreso categoria) {
+        if (categoria.getId() == null) {
+            categoria.setOrden(ordenSugerido);
+        }
     }
 }

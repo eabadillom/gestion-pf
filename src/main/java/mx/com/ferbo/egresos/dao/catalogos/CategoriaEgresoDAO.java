@@ -1,6 +1,7 @@
 package mx.com.ferbo.egresos.dao.catalogos;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -33,17 +34,35 @@ public class CategoriaEgresoDAO extends BaseDAO<CategoriaEgreso, Long> {
                     .setParameter("clave", clave).getSingleResult();
         } catch (Exception ex) {
             log.error("Error al momento de buscar las categorias de egreso por clave. {}", ex);
-            throw new SystemException("Hubo un problema al momento de buscar las categorias de egresos por clave");
+            throw new SystemException(
+                    "Hubo un problema al momento de buscar las categorias de egresos con la clave: " + clave);
         } finally {
             close(em);
         }
+    }
+
+    public Optional<Integer> buscarMaximoOrden() {
+        Optional<Integer> ordenSugeridoOptional;
+        Integer maxOrden = null;
+        try {
+            em = getEntityManager();
+            maxOrden = (Integer) em.createNamedQuery("CategoriaEgreso.findMaxOrden")
+                    .getSingleResult();
+            ordenSugeridoOptional = Optional.of(maxOrden);
+        } catch (Exception ex) {
+            log.error("Error al calcular el orden sugerido: {}", ex);
+            ordenSugeridoOptional = Optional.empty();
+        } finally {
+            close(em);
+        }
+        return ordenSugeridoOptional;
     }
 
     public List<CategoriaEgreso> buscarActivosOInactivos(Boolean activo) {
         try {
             em = getEntityManager();
             return em.createNamedQuery("CategoriaEgreso.findActivosOInactivos", CategoriaEgreso.class)
-                .setParameter("activo", activo).getResultList();
+                    .setParameter("activo", activo).getResultList();
         } catch (Exception ex) {
             String estado = (activo) ? "activas" : "inactivas";
             log.error("Error al momento de buscar las categorias de egreso {}. {}", estado, ex);

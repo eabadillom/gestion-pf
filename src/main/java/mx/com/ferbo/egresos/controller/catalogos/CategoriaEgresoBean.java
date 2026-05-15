@@ -36,6 +36,8 @@ public class CategoriaEgresoBean extends AbstractCatalogoBean<CategoriaEgreso> {
     @Inject
     private EgresoBL egresoBL;
 
+    private Integer ordenSugerido;
+
     public CategoriaEgresoBean() {
     }
 
@@ -68,14 +70,8 @@ public class CategoriaEgresoBean extends AbstractCatalogoBean<CategoriaEgreso> {
                     "Se ha completado exitosamente la " + titulo + ".");
         } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
-                    "Hubo un problema al " + titulo + ".");
         } catch (Exception ex) {
-            log.warn("Error al momento de {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
-                    "Error desconocido. Contacte con el administrador de sistemas.");
-        } finally {
-            actualizarMensajes();
+            log.error("Error al momento de {}. {}", titulo, ex);
         }
     }
 
@@ -84,6 +80,7 @@ public class CategoriaEgresoBean extends AbstractCatalogoBean<CategoriaEgreso> {
             String estado = (selected.getId() == null) ? "guardar" : "actualizar";
             titulo = estado + " categoría egreso";
             log.info("{} ha iniciado el proceso de {}.", inicioLeyenda, titulo);
+            categoriaBL.asignarOrdenSugerio(ordenSugerido, selected);
             categoriaBL.validar(selected);
             categoriaBL.guardar(selected);
             log.info("{} ha finalizado el procesp de {}.", inicioLeyenda, titulo);
@@ -92,7 +89,7 @@ public class CategoriaEgresoBean extends AbstractCatalogoBean<CategoriaEgreso> {
             actualizarTabla();
         } catch (ValidationException | SystemException ex) {
             log.warn("Error al momento de procesar el egreso. {}", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(), ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
         } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
@@ -132,5 +129,22 @@ public class CategoriaEgresoBean extends AbstractCatalogoBean<CategoriaEgreso> {
 
     public String mensajeDialogConfir(CategoriaEgreso categoria) {
         return "¿Desea " + (categoria.getActivo() ? "desactivar" : "activar") + " la categoría de egreso?";
+    }
+
+    @Override
+    protected void ontenerOrdenSuegerido(CategoriaEgreso entidad) {
+        if (entidad == null) {
+            ordenSugerido = categoriaBL.calcularOrdenSugerido();
+        } else {
+            ordenSugerido = entidad.getOrden();
+        }
+    }
+
+    public Integer getOrdenSugerido() {
+        return ordenSugerido;
+    }
+
+    public void setOrdenSugerido(Integer ordenSugerido) {
+        this.ordenSugerido = ordenSugerido;
     }
 }
