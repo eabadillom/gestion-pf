@@ -41,23 +41,6 @@ public class CategoriaEgresoDAO extends BaseDAO<CategoriaEgreso, Long> {
         }
     }
 
-    public Optional<Integer> buscarMaximoOrden() {
-        Optional<Integer> ordenSugeridoOptional;
-        Integer maxOrden = null;
-        try {
-            em = getEntityManager();
-            maxOrden = (Integer) em.createNamedQuery("CategoriaEgreso.findMaxOrden")
-                    .getSingleResult();
-            ordenSugeridoOptional = Optional.of(maxOrden);
-        } catch (Exception ex) {
-            log.error("Error al calcular el orden sugerido: {}", ex);
-            ordenSugeridoOptional = Optional.empty();
-        } finally {
-            close(em);
-        }
-        return ordenSugeridoOptional;
-    }
-
     public List<CategoriaEgreso> buscarActivosOInactivos(Boolean activo) {
         try {
             em = getEntityManager();

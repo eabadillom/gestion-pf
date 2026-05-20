@@ -21,8 +21,6 @@ public abstract class AbstractCatalogoBean<T> implements Serializable {
 
     protected abstract CatalogoBL<T> getBL();
 
-    protected abstract void ontenerOrdenSuegerido(T entidad);
-
     protected abstract T crearNuevo();
     protected abstract void cargaInicial();
 
@@ -42,7 +40,6 @@ public abstract class AbstractCatalogoBean<T> implements Serializable {
 
     public void nuevoOExistente(T entidad) {
         selected = (entidad == null) ? crearNuevo() : entidad;
-        ontenerOrdenSuegerido(entidad);
     }
 
     protected void actualizarMensajes() {

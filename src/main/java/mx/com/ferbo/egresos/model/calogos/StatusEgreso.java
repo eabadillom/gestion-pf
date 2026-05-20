@@ -1,5 +1,6 @@
 package mx.com.ferbo.egresos.model.calogos;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -22,10 +23,10 @@ import javax.persistence.Table;
     ),
     @NamedQuery(
         name = "StatusEgreso.findActivosOInactivos",
-        query = "SELECT s FROM StatusEgreso s WHERE s.activo = :activo ORDER BY s.orden"
+        query = "SELECT s FROM StatusEgreso s WHERE s.activo = :activo"
     )
 })
-public class StatusEgreso {
+public class StatusEgreso implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,9 +44,6 @@ public class StatusEgreso {
 
     @Column(name = "st_status_egre", nullable = false)
     private Boolean activo;
-
-    @Column(name = "nu_status_egre")
-    private Integer orden;
 
     @Column(name = "tm_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
@@ -91,14 +89,6 @@ public class StatusEgreso {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
-    }
-
-    public Integer getOrden() {
-        return orden;
-    }
-
-    public void setOrden(Integer orden) {
-        this.orden = orden;
     }
 
     public LocalDateTime getFechaCreacion() {
@@ -147,7 +137,7 @@ public class StatusEgreso {
     @Override
     public String toString() {
         return "StatusEgreso [id=" + id + ", nombre=" + nombre + ", clave=" + clave + ", descripcion=" + descripcion
-                + ", activo=" + activo + ", orden=" + orden + ", fechaCreacion=" + fechaCreacion
+                + ", activo=" + activo + ", fechaCreacion=" + fechaCreacion
                 + ", fechaModificacion=" + fechaModificacion + "]";
     }
 

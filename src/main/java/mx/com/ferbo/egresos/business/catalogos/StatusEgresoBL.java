@@ -75,7 +75,6 @@ public class StatusEgresoBL implements CatalogoBL<StatusEgreso> {
                 .texto("nombre", StatusEgreso::getNombre)
                 .texto("clave", StatusEgreso::getClave)
                 .texto("descripcion", StatusEgreso::getDescripcion)
-                .integer("orden", StatusEgreso::getOrden, 1, 100)
                 .validateOrThrow();
     }
 

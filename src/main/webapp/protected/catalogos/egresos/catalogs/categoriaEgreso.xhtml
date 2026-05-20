@@ -55,10 +55,6 @@
                     #{item.descripcion}
                 </p:column>
 
-                <p:column headerText="Orden">
-                    #{item.orden}
-                </p:column>
-
                 <p:column headerText='Operaciones'>
                     <p:commandButton id="btnEditar"
                                      icon="pi pi-pencil" 
@@ -121,8 +117,6 @@
                     <h:outputLabel>Descripción: </h:outputLabel>
                     <p:inputTextarea value="#{categoriaEgresoBean.selected.descripcion}"/>
 
-                    <h:outputLabel>Orden: </h:outputLabel>
-                    <p:inputText value="#{categoriaEgresoBean.ordenSugerido}"/>
                 </h:panelGrid>
 
                 <f:facet name="footer">

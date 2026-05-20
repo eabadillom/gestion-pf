@@ -205,7 +205,7 @@
         <div class="field" style="display:flex; justify-content:flex-end; gap:10px;">
             <p:commandButton value="#{(altaEgresoBean.egresoSelected.id == null) ? 'Guardar' : 'Actualizar'}" 
                              icon="pi pi-check"
-                             actionListener="#{altaEgresoBean.procesarEgreso()}"
+                             actionListener="#{altaEgresoBean.abrirDialogoOProcesar()}"
                              process="@this" 
                              onstart="PF('statusInfoDialog').show()" 
                              oncomplete="PF('statusInfoDialog').hide()"/>

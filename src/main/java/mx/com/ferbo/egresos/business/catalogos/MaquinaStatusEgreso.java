@@ -65,14 +65,8 @@ public class MaquinaStatusEgreso {
 
         asinarStatusExistentes(lstStatus);
 
-        if (actual == null && nuevo != null) {
-            if (!nuevo.getClave().equals(pendiente.getClave()) && !nuevo.getClave().equals(procesado.getClave())) {
-                throw new BusinessException("No se puede asignar un status no valido a un nuevo egreso.");
-            }
-        } else {
-            construirMaquiaStatusEgreso();
-            maquina.transicionValida(actual, nuevo, actual.getNombre(), nuevo.getNombre());
-        }
+        construirMaquiaStatusEgreso();
+        maquina.transicionValida(actual, nuevo, actual.getNombre(), nuevo.getNombre());
 
     }
 }

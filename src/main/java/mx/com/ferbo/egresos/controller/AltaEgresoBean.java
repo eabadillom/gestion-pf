@@ -18,10 +18,12 @@ import org.primefaces.PrimeFaces;
 import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
 
+import mx.com.ferbo.egresos.business.CancelaEgresoBL;
 import mx.com.ferbo.egresos.business.EgresoBL;
 import mx.com.ferbo.egresos.business.catalogos.CategoriaEgresoBL;
 import mx.com.ferbo.egresos.business.catalogos.MaquinaStatusEgreso;
 import mx.com.ferbo.egresos.business.catalogos.StatusEgresoBL;
+import mx.com.ferbo.egresos.model.CancelaEgreso;
 import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.CategoriaEgreso;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
@@ -63,6 +65,9 @@ public class AltaEgresoBean implements Serializable {
     @Inject
     private MaquinaStatusEgreso maquinaStatusEgreso;
 
+    @Inject
+    private CancelaEgresoBL cancelaEgresoBL;
+
     private List<StatusEgreso> lstStatusEgresos;
     private StatusEgreso statusEgresoSelected;
 
@@ -79,6 +84,8 @@ public class AltaEgresoBean implements Serializable {
     private EmisoresCFDIS emisorCfdiSelected;
 
     private Egreso egresoSelected;
+
+    private CancelaEgreso cancelaEgresoSelected;
 
     private String titulo;
     private String inicioLeyenda;
@@ -146,45 +153,73 @@ public class AltaEgresoBean implements Serializable {
     public void cambiarStatusEgreso() {
         titulo = "cambiar status egreso";
         try {
-            log.info("{} inicio el proceso de {}.");
-            maquinaStatusEgreso.valiarCambioStatus(lstStatusEgresos, egresoSelected.getStatus(), statusEgresoSelected);
+            log.info("{} inicio el proceso de {}.", inicioLeyenda, titulo);
+            egresoBL.varificarStatusPrimeraVez(statusEgresoSelected, egresoSelected);
+            if (egresoSelected.getId() != null) {
+                maquinaStatusEgreso.valiarCambioStatus(lstStatusEgresos, egresoSelected.getStatus(),
+                        statusEgresoSelected);
+            }
             egresoBL.asignarStatusEgreso(egresoSelected, statusEgresoSelected);
-            log.info("{} finalizo el proceso de {}.");
+            log.info("{} finalizo el proceso de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha cambiado correctamente el status a: " + statusEgresoSelected.getNombre());
         } catch (SystemException | BusinessException ex) {
-            log.warn("Error al momento de cambiar de status en el egreso. {}");
+            log.warn("Error al momento de cambiar de status en el egreso. {}", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
         } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
                     "Error desconocido. Contacte con el administrador de sistemas.");
         } finally {
             actualizarMensajes();
         }
     }
 
-    public void procesarEgreso() {
+    public void abrirDialogoOProcesar() {
+        Boolean procesar = egresoBL.verificarStatusParaCancelar(egresoSelected);
+
+        if (procesar) {
+            cancelaEgresoSelected = cancelaEgresoBL.nuevoOExistente(null);
+            PrimeFaces.current().ajax().update("form:dlgMotiCance");
+            PrimeFaces.current().executeScript("PF('dlgMotiCance').show();");
+        } else {
+            procesarEgreso("no");
+        }
+
+    }
+
+    public void procesarEgreso(String cancelar) {
+        boolean exito = false;
         try {
             titulo = (egresoSelected.getId() == null) ? "guardar el egreso" : "actualizar el egreso";
 
             log.info("{} inicia el proceso para {}.", inicioLeyenda, titulo);
             egresoBL.validarEgresoNuevo(egresoSelected);
             egresoBL.validarEgresoProcesado(egresoSelected);
-            egresoBL.crearOActualizarEgreso(egresoSelected);
+            if (egresoBL.verificarStatusParaCancelar(egresoSelected)) {
+                cancelaEgresoBL.concatenarSiHayMotivoCancelacion(cancelaEgresoSelected, inicioLeyenda);
+                cancelaEgresoBL.asignarEgreso(cancelaEgresoSelected, egresoSelected);
+                cancelaEgresoBL.guardarOActualizarCancelaEgreso(cancelaEgresoSelected);
+                egresoBL.asignarCancelacionEgreso(cancelaEgresoSelected, egresoSelected);
+            }
+            egresoBL.crearOActualizarEgreso(egresoSelected, inicioLeyenda);
             log.info("{} finaliza proceso para {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado el proceso de " + titulo + ".");
             actualizarFormulario();
+            exito = true;
         } catch (SystemException | BusinessException ex) {
             log.warn("Error al momento de {}. {}", titulo.toUpperCase(), ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
+            exito = false;
         } catch (Exception ex) {
             log.warn("Error al momento de {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
                     "Error desconocido. Contacte con el administrador de sistemas.");
+            exito = false;
         } finally {
             actualizarMensajes();
+            PrimeFaces.current().ajax().addCallbackParam("exito", exito);
         }
     }
 
@@ -275,6 +310,14 @@ public class AltaEgresoBean implements Serializable {
 
     public void setEmisorCfdiSelected(EmisoresCFDIS emisorCfdiSelected) {
         this.emisorCfdiSelected = emisorCfdiSelected;
+    }
+
+    public CancelaEgreso getCancelaEgresoSelected() {
+        return cancelaEgresoSelected;
+    }
+
+    public void setCancelaEgresoSelected(CancelaEgreso cancelaEgresoSelected) {
+        this.cancelaEgresoSelected = cancelaEgresoSelected;
     }
 
 }

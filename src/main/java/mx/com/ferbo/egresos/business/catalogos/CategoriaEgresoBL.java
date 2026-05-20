@@ -68,7 +68,6 @@ public class CategoriaEgresoBL implements CatalogoBL<CategoriaEgreso> {
                 .texto("nombre", CategoriaEgreso::getNombre)
                 .texto("clave", CategoriaEgreso::getClave)
                 .texto("descripcion", CategoriaEgreso::getDescripcion)
-                .integer("orden", CategoriaEgreso::getOrden, 1, 100)
                 .validateOrThrow();
     }
 
@@ -86,21 +85,4 @@ public class CategoriaEgresoBL implements CatalogoBL<CategoriaEgreso> {
         categoria.setActivo(!nuevo);
     }
 
-    public Integer calcularOrdenSugerido() {
-        try {
-            Integer mayor = dao.buscarMaximoOrden().orElseThrow(() -> new SystemException(
-                    "Hubo un problema al momento de obtner el máximo orden de las categorías."));
-            mayor = mayor + 1;
-            return mayor;
-        } catch (SystemException ex) {
-            log.warn("Error al momento de calcular el orden sugerido: {}.", ex);
-            throw ex;
-        }
-    }
-
-    public void asignarOrdenSugerio(Integer ordenSugerido, CategoriaEgreso categoria) {
-        if (categoria.getId() == null) {
-            categoria.setOrden(ordenSugerido);
-        }
-    }
 }

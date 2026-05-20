@@ -1,8 +1,10 @@
 package mx.com.ferbo.egresos.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -47,7 +50,7 @@ import mx.com.ferbo.model.MetodoPago;
             + "AND (:concepto IS NULL OR LOWER(e.concepto) LIKE LOWER(CONCAT('%', :concepto, '%'))) "
             + "ORDER BY e.fecha DESC")
 })
-public class Egreso {
+public class Egreso implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -88,6 +91,9 @@ public class Egreso {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor", nullable = false)
     private EmisoresCFDIS emisor;
+
+    @OneToOne(mappedBy = "egreso")
+    private CancelaEgreso cancelaEgreso;
 
     // =========================
     @Column(name = "tx_refe", nullable = true, length = 150)
@@ -181,6 +187,14 @@ public class Egreso {
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
+    }
+
+    public CancelaEgreso getCancelaEgreso() {
+        return cancelaEgreso;
+    }
+
+    public void setCancelaEgreso(CancelaEgreso cancelaEgreso) {
+        this.cancelaEgreso = cancelaEgreso;
     }
 
     public LocalDateTime getFechaCreacion() {

@@ -1,5 +1,6 @@
 package mx.com.ferbo.egresos.model.calogos;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -16,11 +17,10 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "categoria_egreso")
 @NamedQueries({
-        @NamedQuery(name = "CategoriaEgreso.findMaxOrden", query = "SELECT MAX(c.orden) FROM CategoriaEgreso c"),
         @NamedQuery(name = "CategoriaEgreso.findByClave", query = "SELECT c FROM CategoriaEgreso c WHERE c.clave = :clave"),
-        @NamedQuery(name = "CategoriaEgreso.findActivosOInactivos", query = "SELECT c FROM CategoriaEgreso c WHERE c.activo = :activo ORDER BY c.orden")
+        @NamedQuery(name = "CategoriaEgreso.findActivosOInactivos", query = "SELECT c FROM CategoriaEgreso c WHERE c.activo = :activo")
 })
-public class CategoriaEgreso {
+public class CategoriaEgreso implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +38,6 @@ public class CategoriaEgreso {
 
     @Column(name = "st_cate_egre", nullable = false)
     private Boolean activo;
-
-    @Column(name = "nu_cate_egre")
-    private Integer orden;
 
     @Column(name = "tm_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
@@ -86,14 +83,6 @@ public class CategoriaEgreso {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
-    }
-
-    public Integer getOrden() {
-        return orden;
-    }
-
-    public void setOrden(Integer orden) {
-        this.orden = orden;
     }
 
     public LocalDateTime getFechaCreacion() {
@@ -142,7 +131,7 @@ public class CategoriaEgreso {
     @Override
     public String toString() {
         return "CategoriaEgreso [id=" + id + ", nombre=" + nombre + ", clave=" + clave + ", descripcion=" + descripcion
-                + ", activo=" + activo + ", orden=" + orden + ", fechaCreacion=" + fechaCreacion
+                + ", activo=" + activo + ", fechaCreacion=" + fechaCreacion
                 + ", fechaModificacion=" + fechaModificacion + "]";
     }
 

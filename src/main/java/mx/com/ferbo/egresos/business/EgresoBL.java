@@ -20,6 +20,7 @@ import com.ferbo.tools.validation.ObjectValidatorBuilder;
 import com.ferbo.tools.validation.TextValidator;
 
 import mx.com.ferbo.egresos.dao.EgresoDAO;
+import mx.com.ferbo.egresos.model.CancelaEgreso;
 import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.CategoriaEgreso;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
@@ -47,16 +48,16 @@ public class EgresoBL {
         }
     }
 
-    public void crearOActualizarEgreso(Egreso egreso) {
+    public void crearOActualizarEgreso(Egreso egreso, String inicioLeyenda) {
         String estado = "";
         try {
             Long id = egreso.getId();
             if (id == null) {
-                dao.guardar(egreso);
                 estado = "guardar";
+                dao.guardar(egreso);
             } else {
-                dao.actualizar(egreso);
                 estado = "actualizar";
+                dao.actualizar(egreso);
             }
         } catch (InventarioException ex) {
             log.warn(ex);
@@ -69,6 +70,14 @@ public class EgresoBL {
         ObjectValidator.notNull(status, "El status");
 
         egreso.setStatus(status);
+    }
+
+      public void asignarCancelacionEgreso(CancelaEgreso cancelar, Egreso egreso) {
+
+        ObjectValidator.notNull(egreso, "El egreso");
+        ObjectValidator.notNull(cancelar, "El motivo cancelación");
+
+        egreso.setCancelaEgreso(cancelar);
     }
 
     public List<Egreso> listarTodos() {
@@ -135,9 +144,9 @@ public class EgresoBL {
 
         if ("PRO".equalsIgnoreCase(egreso.getStatus().getClave())) {
 
-            BigDecimal total = egreso.getMonto();
-
             Notification notification = new Notification();
+
+            BigDecimal total = egreso.getMonto();
 
             TextValidator textValidator = new TextValidator(150);
 
@@ -161,8 +170,21 @@ public class EgresoBL {
 
     }
 
-    public void procesarEgreso(Egreso egreso) throws ValidationException, SystemException {
+    public boolean verificarStatusParaCancelar(Egreso egreso) {
+        if (egreso.getId() != null) {
+            if ("CAN".equalsIgnoreCase(egreso.getStatus().getClave())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public void varificarStatusPrimeraVez(StatusEgreso status, Egreso egreso) {
+        if (egreso.getId() == null) {
+            if ("CAN".equalsIgnoreCase(status.getClave())) {
+                throw new ValidationException("No se puede poner el egreso como cancelado, si aún no está guardado.");
+            }
+        }
     }
 
     private LocalDateTime inicioMes(YearMonth mes) {

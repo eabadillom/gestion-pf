@@ -80,9 +80,9 @@ public class CategoriaEgresoBean extends AbstractCatalogoBean<CategoriaEgreso> {
             String estado = (selected.getId() == null) ? "guardar" : "actualizar";
             titulo = estado + " categoría egreso";
             log.info("{} ha iniciado el proceso de {}.", inicioLeyenda, titulo);
-            categoriaBL.asignarOrdenSugerio(ordenSugerido, selected);
             categoriaBL.validar(selected);
             categoriaBL.guardar(selected);
+            buscar();
             log.info("{} ha finalizado el procesp de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado satisfactoriamente " + titulo + ".");
@@ -129,15 +129,6 @@ public class CategoriaEgresoBean extends AbstractCatalogoBean<CategoriaEgreso> {
 
     public String mensajeDialogConfir(CategoriaEgreso categoria) {
         return "¿Desea " + (categoria.getActivo() ? "desactivar" : "activar") + " la categoría de egreso?";
-    }
-
-    @Override
-    protected void ontenerOrdenSuegerido(CategoriaEgreso entidad) {
-        if (entidad == null) {
-            ordenSugerido = categoriaBL.calcularOrdenSugerido();
-        } else {
-            ordenSugerido = entidad.getOrden();
-        }
     }
 
     public Integer getOrdenSugerido() {
