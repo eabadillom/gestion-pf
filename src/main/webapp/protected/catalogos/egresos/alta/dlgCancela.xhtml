@@ -13,22 +13,29 @@
               width="30rem" 
               resizable="false" 
               dynamic="true">
-        <h:panelGrid columns="1">
-            <p:outputLabel for="motivo" value="Motivo:" style="width:100%; align-content: center"/>
-            <p:inputTextarea
-                id="motivo"
-                value="#{altaEgresoBean.cancelaEgresoSelected.motivo}"
-                rows="4"
-                maxlength="255"
-                counter="contador"
-                autoResize="false"
-                required="true"
-                placeholder="" 
-                style="width:100%; resize: none; align-content: center">
-                <p:ajax process="@this"/>
+        <p:outputPanel id="frm-cancel" class="ui-fluid">
+            <div class="p-field">
+                <p:outputLabel 
+                    for="motivo" 
+                    value="Motivo:" 
+                    style="display:block; text-align:left; width:100%;" />
 
-            </p:inputTextarea>
-        </h:panelGrid>
+                <p:inputTextarea
+                    id="motivo"
+                    value="#{altaEgresoBean.cancelaEgresoSelected.motivo}"
+                    rows="4"
+                    maxlength="255"
+                    counter="contador"
+                    autoResize="false"
+                    required="true"
+                    placeholder="" 
+                    style="width:100%; resize: none">
+                    <p:ajax process="@this"/>
+
+                </p:inputTextarea>
+            </div>
+
+        </p:outputPanel>
 
         <f:facet name="footer">
             <p:commandButton id="btnGuardarConCance"

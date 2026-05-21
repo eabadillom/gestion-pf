@@ -52,7 +52,7 @@ public class CancelaEgresoBL {
         String motivoConcatenado = inicioLeyenda;
         motivoConcatenado = motivoConcatenado.concat(" ha cancelado el egreso porque: ");
         if (cancelaEgreso.getMotivo() == null || "".equalsIgnoreCase(cancelaEgreso.getMotivo())){
-            throw new ValidationException("El motivo de cancelación dele egreso no puede ser vacío.");
+            throw new ValidationException("El motivo de cancelación del egreso no puede ser vacío.");
         }
         motivoConcatenado = motivoConcatenado.concat(cancelaEgreso.getMotivo());
         cancelaEgreso.setMotivo(motivoConcatenado);
