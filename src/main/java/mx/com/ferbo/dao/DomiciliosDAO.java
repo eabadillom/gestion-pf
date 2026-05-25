@@ -14,7 +14,6 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 
 	@Override
 	public Domicilios buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -28,11 +27,11 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 
 	@Override
 	public List<Domicilios> buscarPorCriterios(Domicilios e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	public Domicilios buscarPorAsentamiento(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idCiudad, Integer idAsentamiento) {
+
+	public Domicilios buscarPorAsentamiento(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idCiudad,
+			Integer idAsentamiento) {
 		Domicilios domicilio = null;
 		EntityManager em = null;
 		try {
@@ -47,16 +46,15 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 			
 		} catch (Exception e) {
 			Log.error("Problema al encontrar domicilio", e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return domicilio;
 	}
 
 	@Override
 	public String actualizar(Domicilios dom) {
-		// TODO Auto-generated method stub
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -94,11 +92,11 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 			em.getTransaction().begin();
 			em.persist(dom);
 			em.getTransaction().commit();
-			
+
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -106,7 +104,6 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 
 	@Override
 	public String eliminar(Domicilios dom) {
-		// TODO Auto-generated method stub
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
@@ -123,7 +120,6 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 
 	@Override
 	public String eliminarListado(List<Domicilios> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
