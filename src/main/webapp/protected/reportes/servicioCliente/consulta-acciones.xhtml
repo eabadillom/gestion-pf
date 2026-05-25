@@ -1,0 +1,21 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:outputPanel>
+	   	<div class="p-grid ui-fluid">
+	   		<div class="p-col-6 p-md-3">
+				<p:commandButton value="PDF" icon="pi pi-file-pdf" actionListener="#{reporteServClienteBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" >
+					<p:fileDownload value="#{reporteServClienteBean.file}" />
+				</p:commandButton>
+	   		</div>
+	   		<div class="p-col-6 p-md-3">
+				<p:commandButton value="Excel" icon="pi pi-file-excel" actionListener="#{reporteServClienteBean.exportarExcel}"  process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" >
+					<p:fileDownload value="#{reporteServClienteBean.file}" />
+				</p:commandButton>
+	   		</div>
+	   	</div>
+    </p:outputPanel>
+</ui:composition>

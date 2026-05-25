@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -54,6 +55,9 @@ public class ProdClienteBean implements Serializable {
 	private FacesContext faceContext;
     private HttpServletRequest request;
     private HttpSession session;
+    
+    private String productoFiltrado;
+    private String codigo;
 
 	public ProdClienteBean() {
 		clienteDAO = new ClienteDAO();
@@ -99,6 +103,33 @@ public class ProdClienteBean implements Serializable {
 		
 		log.debug("Productos por cliente filtrados: {}",lstProductosClienteFiltered);
 	}
+        
+        public List<ProductoPorCliente> filtrarPorDescripcionYCodigo()
+        {
+            Stream<ProductoPorCliente> stream = lstProductosClienteFiltered.stream();
+            
+            if(this.productoFiltrado != null && !this.productoFiltrado.trim().isEmpty()){
+                String filtroProducto = this.productoFiltrado.trim().toUpperCase();
+                
+                stream = stream.filter(obj -> {
+                    String producto = obj.getProductoCve().getProductoDs().toUpperCase();
+                    
+                    return producto.contains(filtroProducto);
+                });
+            }
+            
+            if(this.codigo != null && !this.codigo.trim().isEmpty()){
+                String filtroCodigo = this.codigo.trim().toUpperCase();
+                
+                stream = stream.filter(obj -> {
+                    String codigoProd = obj.getProductoCve().getNumeroProd().toUpperCase();
+                    
+                    return codigoProd.contains(filtroCodigo);
+                });
+            }
+            
+            return stream.collect(Collectors.toList());
+        }
 
 	public void nuevoProductoCliente() {
 		
@@ -289,4 +320,20 @@ public class ProdClienteBean implements Serializable {
 	public void setProductoPorClienteDAO(ProductoClienteDAO productoPorClienteDAO) {
 		this.productoPorClienteDAO = productoPorClienteDAO;
 	}
+
+        public String getProductoFiltrado() {
+            return productoFiltrado;
+        }
+
+        public void setProductoFiltrado(String productoFiltrado) {
+            this.productoFiltrado = productoFiltrado;
+        }
+
+        public String getCodigo() {
+            return codigo;
+        }
+
+        public void setCodigo(String codigo) {
+            this.codigo = codigo;
+        }
 }

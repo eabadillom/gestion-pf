@@ -28,6 +28,11 @@ public class DetallePartidaPK implements Serializable, Cloneable {
     public DetallePartidaPK() {
     }
     
+    public DetallePartidaPK(Partida partida, Integer detPartCve) {
+    	this.partidaCve = partida;
+    	this.detPartCve = detPartCve;
+    }
+    
     public DetallePartidaPK clone() throws CloneNotSupportedException {
     	return (DetallePartidaPK) super.clone();
     }

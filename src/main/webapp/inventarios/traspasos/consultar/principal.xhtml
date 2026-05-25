@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Consultar Constancia de Traspasos</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- Datos Generales -->
+            <!-- ID: min, max, folio y cliente-som -->
+            <!-- Seccion de captura de datos: "Fecha de Inicio", "Fecha Final", "Folio", "Lista de clientes" y "Consultar" -->
+            <ui:include src="/inventarios/traspasos/consultar/consulta-cfg-constancias.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- DataTable de los traspasos de constancias del cliente -->
+            <!-- ID: dt-constanciaServicios, pnl-list-constancias-traspasos -->
+            <!-- Lista las constancias de traspaso del cliente -->
+            <ui:include src="/inventarios/traspasos/consultar/consulta-list-constancias.xhtml" />
+            
+            <!-- Consulta el detalle del traspaso de la constancia -->
+            <!-- ID: constanciaTraspasos, datosGenerales, tabGeneral, tabProductos, dlg-partidas, dt-detalleConstancia, tabServicios, dlg-servicios, dt-Servicios -->
+            <!-- Muestra el detalle de la constancia seleccionada del cliente -->
+            <ui:include src="/inventarios/traspasos/consultar/consulta-det-constancia.xhtml" />
+        </h:form>
+    </ui:define>
+</ui:composition>

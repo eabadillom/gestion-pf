@@ -1,7 +1,5 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -99,8 +97,8 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer> {
 			em = EntityManagerUtil.getEntityManager();
 			listaEmisores = em.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class).getResultList();
 		} catch (Exception e) {
-			log.error("Probelma al recuperar lista emisoresCFDIS", e);
-		} finally {
+			log.error("Problema al recuperar lista emisoresCFDIS", e);
+		}finally {
 			EntityManagerUtil.close(em);
 		}
 
@@ -136,7 +134,8 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer> {
 			ent.merge(emi);
 			ent.getTransaction().commit();
 			ent.close();
-		} catch (Exception e) {
+		}catch(Exception e){
+			log.error("Problema para actualizar el emisor...", e);
 			return "Failed!" + e.getMessage();
 		}
 		return null;
@@ -152,10 +151,11 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer> {
 			ent.getTransaction().begin();
 			ent.persist(emi);
 			ent.getTransaction().commit();
-
-		} catch (Exception e) {
-			return "Failed" + e.getMessage();
-		} finally {
+			
+		}catch(Exception e){
+			log.error("Problema para guardar el emisor...", e);
+ 			return "Failed" + e.getMessage();
+		}finally {
 			EntityManagerUtil.close(ent);
 		}
 		return null;

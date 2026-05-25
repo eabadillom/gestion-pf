@@ -3,6 +3,7 @@ package mx.com.ferbo.ui;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,37 +11,37 @@ import javax.persistence.Id;
 @Entity
 public class OrdenDeSalidas implements Cloneable {
 	@Id
-	private Integer id;
-	private String folioSalida;
-	private String status;
-	private Date fechaSalida;
-	private Time horaSalida;
-	private Integer partidaCve;
-	private Integer cantidad;
-	private BigDecimal peso;
-	private String codigo;
-	private String lote;
-	private Date fechaCaducidad;
-	private String sap;
-	private String pedimento;
-	private String temperatura;
-	private String unidadManejo;
-	private String codigoProducto;
-	private String nombreProducto;
-	private String nombrePlanta;
-	private String nombreCamara;
-	private Integer folioOrdenSalida;
-	private Integer productoClave;
-	private Integer unidadManejoCve;
+	protected Integer id;
+	protected String folioSalida;
+	protected String status;
+	protected Date fechaSalida;
+	protected Time horaSalida;
+	protected Integer partidaCve;
+	protected Integer cantidad;
+	protected BigDecimal peso;
+	protected String codigo;
+	protected String lote;
+	protected Date fechaCaducidad;
+	protected String sap;
+	protected String pedimento;
+	protected String temperatura;
+	protected String unidadManejo;
+	protected String codigoProducto;
+	protected String nombreProducto;
+	protected String nombrePlanta;
+	protected String nombreCamara;
+	protected Integer folioOrdenSalida;
+	protected Integer productoClave;
+	protected Integer unidadManejoCve;
 
 	public OrdenDeSalidas() {
 	}
 
-	
 	public OrdenDeSalidas(String folioSalida, String status, Date fechaSalida, Time horaSalida, Integer partidaCve,
 			Integer cantidad, BigDecimal peso, String codigo, String lote, Date fechaCaducidad, String sap,
 			String pedimento, String temperatura, String unidadManejo, String codigoProducto, String nombreProducto,
-			String nombrePlanta, String nombreCamara, Integer folioOrdenSalida, Integer productoCve, Integer unidadManejoCve) {
+			String nombrePlanta, String nombreCamara, Integer folioOrdenSalida, Integer productoCve,
+			Integer unidadManejoCve) {
 		this.folioSalida = folioSalida;
 		this.status = status;
 		this.fechaSalida = fechaSalida;
@@ -224,52 +225,37 @@ public class OrdenDeSalidas implements Cloneable {
 		this.folioOrdenSalida = folioOrdenSalida;
 	}
 
-	@Override
-	public OrdenDeSalidas clone() throws CloneNotSupportedException {
-		return (OrdenDeSalidas) super.clone();
-	}
-	
-	
-
 	public Integer getId() {
 		return id;
 	}
-
 
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-
 	public String getSap() {
 		return sap;
 	}
-
 
 	public void setSap(String sap) {
 		this.sap = sap;
 	}
 
-
 	public Integer getProductoClave() {
 		return productoClave;
 	}
-
 
 	public void setProductoClave(Integer productoClave) {
 		this.productoClave = productoClave;
 	}
 
-
 	public Integer getUnidadManejoCve() {
 		return unidadManejoCve;
 	}
 
-
 	public void setUnidadManejoCve(Integer unidadManejoCve) {
 		this.unidadManejoCve = unidadManejoCve;
 	}
-
 
 	@Override
 	public String toString() {
@@ -282,7 +268,25 @@ public class OrdenDeSalidas implements Cloneable {
 				+ folioOrdenSalida + ", productoClave=" + productoClave + ", unidadManejoCve=" + unidadManejoCve + "]";
 	}
 
+	@Override
+	public OrdenDeSalidas clone() throws CloneNotSupportedException {
+		return (OrdenDeSalidas) super.clone();
+	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
-	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		OrdenDeSalidas other = (OrdenDeSalidas) obj;
+		return Objects.equals(id, other.id);
+	}
 }

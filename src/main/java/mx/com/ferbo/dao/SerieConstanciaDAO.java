@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -77,9 +78,35 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 		}
 		return sc;
 	}
-
+	
+	public Optional<SerieConstancia> buscarPorClienteTipoSerieAndPlanta(Integer idCliente, String tipoSerie, Integer idPlanta) {
+		Optional<SerieConstancia> optional = null;
+		SerieConstancia model = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("SerieConstancia.findByClienteTpSeriePlanta", modelClass)
+					.setParameter("idCliente", idCliente)
+					.setParameter("tpSerie", tipoSerie)
+					.setParameter("idPlanta", idPlanta)
+					.getSingleResult()
+					;
+			
+			optional = Optional.of(model);
+		} catch(Exception ex) {
+			log.error("Problema para obtener la Serie-Constancia solicitada: cteCve = {}, tipoSerie = {}, plantaCve = {}, \n{}",
+					idCliente, tipoSerie, idPlanta, ex);
+			optional = Optional.empty();
+		} finally {
+			this.close(em);
+		}
+		
+		return optional;
+	}
+	
 	public List<SerieConstancia> buscarPorIdCliente(Integer idCliente) {
-
+		
 		EntityManager em = null;
 		List<SerieConstancia> lista = null;
 
@@ -130,6 +157,7 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 		} catch (Exception ex) {
 			log.error("Problema para actualizar la serie-constancia", ex);
 			EntityManagerUtil.rollback(em);
+			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
 		}

@@ -1,0 +1,321 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <div>
+        <p:commandButton id="avisoAdd"
+                         icon="pi pi-file" 
+                         value="Nuevo Aviso"
+                         actionListener="#{clientesBean.nuevoAviso()}" 
+                         process="@this"
+                         update="form:tabView:dialogAviso form:tabView:pnlAviso"
+                         oncomplete="PF('dialogAviso').show();"
+                         styleClass="ui-button-raised"
+                         style="margin-right: .5rem; width: auto;"
+                         disabled="#{clientesBean.clienteSelected == null}" />
+    </div>
+
+    <div class="orders-subtable">
+        <p:dataTable id="dtAvisos" widgetVar="dtAvisos" var="pAviso" 
+                     value="#{clientesBean.clienteSelected.avisoList}" reflow="true" 
+                     rowKey="#{pAviso.avisoCve}" lazy="false"
+                     paginator="true" rows="5" paginatorPosition="bottom">
+
+            <p:column headerText="Clave">
+                <h:outputText value="#{pAviso.avisoCve}-#{pAviso.categoriaCve.categoriaDs}-#{pAviso.avisoVigencia}" />
+            </p:column>
+            <p:column headerText="P.O.">
+                <h:outputText value="#{pAviso.avisoPo eq true ? 'Si':'No'}" />
+            </p:column>
+            <p:column headerText="Pedimento">
+                <h:outputText value="#{pAviso.avisoPedimento eq true ? 'Si':'No'}" />
+            </p:column>
+            <p:column headerText="Contenedor">
+                <h:outputText value="#{pAviso.avisoSap eq true ? 'Si':'No'}" />
+            </p:column>
+            <p:column headerText="LOTE">
+                <h:outputText value="#{pAviso.avisoLote eq true ? 'Si':'No'}" />
+            </p:column>
+            <p:column headerText="Caducidad">
+                <h:outputText value="#{pAviso.avisoCaducidad eq true ? 'Si':'No'}" />
+            </p:column>
+            <p:column headerText="Tarima">
+                <h:outputText value="#{pAviso.avisoTarima eq true ? 'Si':'No'}" />
+            </p:column>
+            <p:column headerText="Vigencia">
+                <h:outputText value="#{pAviso.avisoVigencia}" />
+            </p:column>
+            <p:column headerText="Plazo">
+                <h:outputText value="#{pAviso.avisoPlazo}" />
+            </p:column>
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button" oncomplete="PF('dialogAviso').show()"
+                                 update="form:tabView:dialogAviso form:tabView:pnlAviso" actionListener="#{clientesBean.cargarServiciosAviso(pAviso)}" >
+                </p:commandButton>
+            </p:column>
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton class="ui-button-danger" icon="pi pi-trash" 
+                                 process="@this" update="dtAvisos"
+                                 oncomplete="PF('deleteAvisoDialog').show()" 
+                                 actionListener="#{clientesBean.cargarServiciosAviso(pAviso)}">
+                </p:commandButton>
+            </p:column>          
+        </p:dataTable>
+    </div>
+
+    <p:dialog id="dialogAviso" widgetVar="dialogAviso" 
+              header="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'} Aviso" showEffect="fade"
+              modal="false" responsive="true" resizable="false" cache="false" style="max-width:80em !important;" dynamic="true">
+
+        <p:outputPanel id="pnlAviso" class="ui-fluid">
+            <p:scrollPanel mode="native" style="height: 500px; overflow:auto;">
+
+                <div class="p-grid">
+                    <div class="p-field p-col-12 p-md-12">
+                        <p:selectBooleanCheckbox id="aviso-po-m" itemLabel="P.O." value="#{clientesBean.avisoSelected.avisoPo}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-ped-m" itemLabel="Pedimento" value="#{clientesBean.avisoSelected.avisoPedimento}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-sap-m" itemLabel="Contenedor" value="#{clientesBean.avisoSelected.avisoSap}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-lote-m" itemLabel="Lote" value="#{clientesBean.avisoSelected.avisoLote}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-cad-m" itemLabel="Caducidad" value="#{clientesBean.avisoSelected.avisoCaducidad}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-tarima-m" itemLabel="Tarima" value="#{clientesBean.avisoSelected.avisoTarima}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-codigo-m" itemLabel="Código" value="#{clientesBean.avisoSelected.avisoCodigo}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectBooleanCheckbox id="aviso-otro-m" itemLabel="Otro" value="#{clientesBean.avisoSelected.avisoOtro}">
+                        	<p:ajax process="@this"/>
+                        </p:selectBooleanCheckbox>
+                    </div>
+                    
+                    <div class="p-col-12 p-md-6 p-lg-4">
+                        <p:outputLabel>Tipo facturación*</p:outputLabel>
+                        <p:selectOneMenu id="soTpFacturacion-m"
+                                         value="#{clientesBean.avisoSelected.avisoTpFacturacion}">
+                            <f:selectItem itemLabel="--Seleccione--" />
+                            <f:selectItem itemLabel="Por Kg" itemValue="K" />
+                            <f:selectItem itemLabel="Por Tarima" itemValue="T" />
+                            <p:ajax process="@this" />
+                        </p:selectOneMenu>
+                    </div>
+                    
+                    <div class="p-col-12 p-md-6 p-lg-4">
+                        <p:outputLabel>Vigencia en días*</p:outputLabel>
+                        <p:inputNumber
+                            value="#{clientesBean.avisoSelected.avisoVigencia}"
+                            decimal="false"
+                            minValue="0"
+                            maxValue="365">
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
+                    </div>
+
+                    <div class="p-col-12 p-md-6 p-lg-4">
+                        <p:outputLabel>Plazo de pago en días*</p:outputLabel>
+                        <p:inputNumber
+                            value="#{clientesBean.avisoSelected.avisoPlazo}"
+                            decimal="false"
+                            minValue="0"
+                            maxValue="365">
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
+                    </div>
+                    
+                    <div class="p-col-12 p-md-6 p-lg-4">
+                        <p:outputLabel>Planta*</p:outputLabel>
+                        <p:selectOneMenu id="soPlantaAct" converter="entityConverter" value="#{clientesBean.avisoSelected.plantaCve}">
+                            <f:selectItem itemLabel="--Seleccione--" />
+                            <f:selectItems value="#{clientesBean.lstPlanta}" var="planta"
+                                           itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
+							<p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                    
+                    <div class="p-col-12 p-md-6 p-lg-4">
+                        <p:outputLabel>Categoria*</p:outputLabel>
+                        <p:selectOneMenu id="soCategoriaAct" converter="entityConverter"
+                                         value="#{clientesBean.avisoSelected.categoriaCve}" filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="--Seleccione--" />
+                            <f:selectItems value="#{clientesBean.lstCategoria}" var="categoria"
+                                           itemLabel="#{categoria.categoriaDs}" itemValue="#{categoria}" />
+							<p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+					
+                    <div class="p-col-12 p-md-6 p-lg-4">
+                        <p:outputLabel>Valor del seguro</p:outputLabel>
+                        <p:inputNumber
+                            value="#{clientesBean.avisoSelected.avisoValSeg}"
+                            symbol="%"
+                            symbolPosition="s"
+                            thousandSeparator=","
+                            decimalSeparator="."
+                            decimalPlaces="4"
+                            minValue="0"
+                            maxValue="99.9999"
+                            required="true"
+                            emptyValue="null">
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
+                    </div>
+                    
+                    <div class="p-col-12 p-md-6 p-lg-4">
+                        <p:outputLabel> Temperatura</p:outputLabel>
+                        <p:inputText disabled="false" value="#{clientesBean.avisoSelected.avisoTemp}">
+                        	<p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+					
+                    <div class="p-col-12 p-md-6 p-lg-4">
+                        <p:outputLabel>Observaciones</p:outputLabel>
+                        <p:inputText value="#{clientesBean.avisoSelected.avisoObservaciones}">
+							<p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+				</div>
+				
+                <p:panelGrid columns="2" layout="grid"
+                             style="width:100%;"
+                             columnClasses="ui-g-6 ui-md-6 ui-lg-6, ui-g-6 ui-md-6 ui-lg-6">
+
+                    <p:panel header="Servicios disponibles">
+                        <p:dataTable id="dtServiciosSinAviso"
+                                     value="#{clientesBean.lstPrecioServiciosDisponibles}"
+                                     var="srv"
+                                     selection="#{clientesBean.seleccionadosParaAgregar}"
+                                     rowKey="#{srv.hashCode()}">
+
+                           
+                            <p:column width="2rem" selectionMode="multiple"/>
+                            
+                            <p:column headerText="Servicio">
+                                <h:outputText value="#{srv.servicio.servicioDs}" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <div style="margin-top:10px;">
+                            <p:commandButton value="Agregar seleccionados al aviso"
+                                             icon="pi pi-plus"
+                                             actionListener="#{clientesBean.operarAvisos('agregarservicio')}"
+                                             update="form:tabView:dtServicioAviso form:tabView:dtServiciosSinAviso"
+                                             process="@this dtServiciosSinAviso" />
+                        </div>
+                    </p:panel>
+
+                    <p:panel header="Servicios con este aviso">
+                        <p:dataTable id="dtServicioAviso" 
+                                     widgetVar="dtServicioAviso" var="pServicioAviso"
+                                     value="#{clientesBean.avisoSelected.precioServicioList}"
+                                     rowKey="#{pServicioAviso.id}" paginator="true"
+                                     paginatorPosition="bottom">
+
+                            <p:column headerText="Servicio">
+                                <h:outputText value="#{pServicioAviso.servicio.servicioDs}" />
+                            </p:column>
+                            <p:column headerText="Precio">
+                                <p:inputText value="#{pServicioAviso.precio}">
+                                    <p:ajax process="@this"/>
+                                </p:inputText>
+                            </p:column>
+                            <p:column headerText="Unidad">
+                                <h:outputText value="#{pServicioAviso.unidad.unidadDeManejoDs}" />
+                            </p:column>
+                            <p:column width="5%" style="text-align: right !important;">
+                                <p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this"
+                                                 oncomplete="PF('deleteServicioDialog').show(); $('.ui-widget-overlay').remove();">
+                                    <f:setPropertyActionListener value="#{pServicioAviso}" target="#{clientesBean.precioAvisoSelected}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </p:panelGrid> 
+            </p:scrollPanel>
+        </p:outputPanel>
+
+        <f:facet name="footer">
+            <p:commandButton value="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
+                             actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="dtAvisos form:tabView:dtPreciosServicios"
+                             process="@this form:tabView:pnlAviso" oncomplete="PF('dialogAviso').hide()"/>
+            <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogAviso').hide()"
+                             class="ui-button-secondary"
+                             resetValues="true" immediate="true" />
+        </f:facet>
+    </p:dialog>
+
+    <p:dialog header="Confirmar eliminación"
+              widgetVar="deleteServicioDialog"
+              modal="false"
+              closable="false"
+              resizable="false"
+              draggable="false"
+              width="400"
+              showEffect="fade"
+              hideEffect="fade"
+              dynamic="true">
+
+        <h:outputText value="¿Desea eliminar el servicio?" style="font-size: 16px;" />
+
+        <p:spacer height="20" />
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+            <p:commandButton value="Sí"
+                             icon="pi pi-check"
+                             styleClass="ui-button-danger"
+                             action="#{clientesBean.operarAvisos('eliminarservicio')}"
+                             process="@this"
+                             update="form:tabView:dtServiciosSinAviso form:tabView:dtServicioAviso"
+                             oncomplete="PF('deleteServicioDialog').hide()" />
+
+            <p:commandButton value="No"
+                             type="button"
+                             icon="pi pi-times"
+                             styleClass="ui-button-secondary"
+                             onclick="PF('deleteServicioDialog').hide()" />
+        </div>
+    </p:dialog>
+
+
+    <p:dialog header="Confirmar eliminación"
+              widgetVar="deleteAvisoDialog"
+              modal="false"
+              closable="false"
+              resizable="false"
+              draggable="false"
+              width="400"
+              showEffect="fade"
+              hideEffect="fade"
+              dynamic="true">
+
+        <h:outputText value="¿Desea eliminar el Aviso?" style="font-size: 16px;" />
+
+        <p:spacer height="20" />
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+            <p:commandButton value="Sí"
+                             icon="pi pi-check"
+                             styleClass="ui-button-danger"
+                             action="#{clientesBean.operarAvisos('eliminaraviso')}"
+                             update="form:tabView:dtAvisos"
+                             process="@this"
+                             oncomplete="PF('deleteAvisoDialog').hide()" />
+
+            <p:commandButton value="No"
+                             type="button"
+                             icon="pi pi-times"
+                             styleClass="ui-button-secondary"
+                             onclick="PF('deleteAvisoDialog').hide()" />
+        </div>
+    </p:dialog>
+
+
+</ui:composition>

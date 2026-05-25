@@ -4,10 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import mx.com.ferbo.dao.CamaraDAO;
-import mx.com.ferbo.dao.PlantaDAO;
-import mx.com.ferbo.dao.PosicionCamaraDAO;
-
 public class InventarioDetalle extends Inventario {
 	private List<Planta> listaplanta;
 	private List<Camara> listacamara;

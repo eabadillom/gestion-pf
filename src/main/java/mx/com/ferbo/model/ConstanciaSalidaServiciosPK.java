@@ -19,6 +19,32 @@ public class ConstanciaSalidaServiciosPK implements Serializable{
 	@JoinColumn(name = "id_servicio",referencedColumnName = "SERVICIO_CVE")
 	@ManyToOne(optional = false)
 	private Servicio servicioCve;
+	
+	@Override
+	public int hashCode() {
+		if(constanciaSalidaCve == null || servicioCve == null)
+			return System.identityHashCode(this);
+		return Objects.hash(constanciaSalidaCve, servicioCve);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConstanciaSalidaServiciosPK other = (ConstanciaSalidaServiciosPK) obj;
+		return Objects.equals(constanciaSalidaCve, other.constanciaSalidaCve)
+				&& Objects.equals(servicioCve, other.servicioCve);
+	}
+	
+	@Override
+	public String toString() {
+		return "ConstanciaSalidaServiciosPK [constanciaSalidaCve=" + constanciaSalidaCve + ", servicioCve="
+				+ servicioCve + "]";
+	}
 
 	public ConstanciaSalidaServiciosPK() {
 		
@@ -43,29 +69,5 @@ public class ConstanciaSalidaServiciosPK implements Serializable{
 
 	public void setServicioCve(Servicio servicioCve) {
 		this.servicioCve = servicioCve;
-	}
-
-	@Override
-	public String toString() {
-		return "ConstanciaSalidaServiciosPK [constanciaSalidaCve=" + constanciaSalidaCve + ", servicioCve="
-				+ servicioCve + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(constanciaSalidaCve, servicioCve);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ConstanciaSalidaServiciosPK other = (ConstanciaSalidaServiciosPK) obj;
-		return Objects.equals(constanciaSalidaCve, other.constanciaSalidaCve)
-				&& Objects.equals(servicioCve, other.servicioCve);
 	}
 }

@@ -17,6 +17,7 @@ import mx.com.ferbo.model.Ciudades;
 import mx.com.ferbo.model.CiudadesPK;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 
 	private static Logger log = LogManager.getLogger(CiudadesDAO.class);
@@ -87,9 +88,9 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class)
-					.setParameter("paisCve", e.getCiudadesPK().getPaisCve())
-					.setParameter("estadoCve", e.getCiudadesPK().getEstadoCve())
-					.setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve())
+					.setParameter("paisCve", e.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+					.setParameter("estadoCve", e.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+					.setParameter("municipioCve", e.getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
 					.getResultList()
 					;
 		} catch (Exception ex) {
@@ -133,14 +134,14 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			if (e.getMunicipios().getMunicipiosPK().getMunicipioCve() > 0) {
+			if (e.getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve() > 0) {
 				TypedQuery<Ciudades> consEstados = em.createNamedQuery("Ciudades.findByEstadoMunicipioCve", Ciudades.class);
-				consEstados.setParameter("municipioCve", e.getMunicipios().getMunicipiosPK().getMunicipioCve())
-						.setParameter("estadoCve", e.getMunicipios().getEstados().getEstadosPK().getEstadoCve());
+				consEstados.setParameter("municipioCve", e.getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
+						.setParameter("estadoCve", e.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve());
 				listado = consEstados.getResultList();
 			}
-			if (e.getCiudadesPK().getPaisCve() != -1 && e.getCiudadesPK().getEstadoCve() != -1 && e.getCiudadesPK().getMunicipioCve() != -1){
-				listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class).setParameter("paisCve", e.getCiudadesPK().getPaisCve()).setParameter("estadoCve", e.getCiudadesPK().getEstadoCve()).setParameter("municipioCve", e.getCiudadesPK().getMunicipioCve())
+			if (e.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve() != -1 && e.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve() != -1 && e.getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve() != -1){
+				listado = em.createNamedQuery("Ciudades.findByPaisCveEstadoCveMunicipioCve", Ciudades.class).setParameter("paisCve", e.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve()).setParameter("estadoCve", e.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve()).setParameter("municipioCve", e.getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
 						.getResultList();
 			} 
 			
@@ -200,10 +201,10 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 //			em.remove(em.merge(ciudades));
-			em.createQuery("DELETE FROM Ciudades c WHERE c.ciudadesPK.paisCve =:paisCve and c.ciudadesPK.estadoCve =:estadoCve and c.ciudadesPK.municipioCve =:municipioCve and c.ciudadesPK.ciudadCve =:ciudadCve")
-			.setParameter("paisCve", ciudades.getCiudadesPK().getPaisCve())
-			.setParameter("estadoCve", ciudades.getCiudadesPK().getEstadoCve())
-			.setParameter("municipioCve", ciudades.getCiudadesPK().getMunicipioCve())
+			em.createQuery("DELETE FROM Ciudades c WHERE c.ciudadesPK.municipios.municipiosPK.estados.estadosPK.pais.paisCve =:paisCve and c.ciudadesPK.municipios.municipiosPK.estados.estadosPK.estadoCve =:estadoCve and c.ciudadesPK.municipios.municipiosPK.municipioCve =:municipioCve and c.ciudadesPK.ciudadCve =:ciudadCve")
+			.setParameter("paisCve", ciudades.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+			.setParameter("estadoCve", ciudades.getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+			.setParameter("municipioCve", ciudades.getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
 			.setParameter("ciudadCve", ciudades.getCiudadesPK().getCiudadCve()).executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -230,9 +231,9 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 	public List<Ciudades> buscaPorAsentamiento(AsentamientoHumano as){
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Ciudades.findByTodo", Ciudades.class)
-				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getMunicipioCve())
-				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getEstadoCve())
-				.setParameter("ciudadCve", as.getAsentamientoHumanoPK().getCiudadCve())
+				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
+				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+				.setParameter("ciudadCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
 				.getResultList();
 	}
 }

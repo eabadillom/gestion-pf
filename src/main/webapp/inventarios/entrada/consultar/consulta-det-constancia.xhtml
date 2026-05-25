@@ -1,0 +1,218 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog id="constanciaD" modal="true" widgetVar="infoDatos" resizable="true" header="Constancia de Deposito: #{consultarConstanciaDeDepositoBean.selectConstanciaDD.folioCliente}" position="center top" width="100%">
+        <p:tabView id="datosGenerales" dynamic="true" cache="false">
+            <p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+            <p:tab id="tabGeneral" title="Datos Generales">
+                <p:outputPanel id="dlg-constancia" class="p-grid ui-fluid p-col-12">
+                    <div class="p-field p-col-6 p-md-6">
+                        <p:outputLabel value="Cliente:" />
+                        <p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.cteCve.nombre}" readonly="true"/>
+                    </div>
+                    <div class="p-field p-col-3 p-md-3">
+                        <p:outputLabel for="@next" value="Aviso:" />
+                        <p:selectOneMenu id="sel-aviso" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.avisoCve.avisoCve}" converter="entityConverter">
+                            <f:selectItems value="#{consultarConstanciaDeDepositoBean.listaAvisos}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.avisoVigencia}" itemValue="#{aviso.avisoCve}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-field p-col-3 p-md-3">
+                        <p:outputLabel value="Fecha Ingreso:"/>
+                        <p:datePicker value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.fechaIngreso}" showIcon="true">
+                            <p:ajax process="@this"/>
+                            <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                        </p:datePicker>
+                    </div>
+                    <div class="p-field p-col-3 p-md-3">
+                        <p:outputLabel for="@next" value="Folio:" />
+                        <p:inputText value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.folioCliente}" readonly="true"/>
+                    </div>
+                    <div class="p-field p-col-3 p-md-3">
+                        <p:outputLabel for="@next" value="Temperatura:" />
+                        <p:inputText id="temperatura" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.temperatura}"/>
+                    </div>
+                    <div class="p-field p-col-3 p-md-3">
+                        <p:outputLabel for="@next" value="Transportista:" />
+                        <p:inputText readonly="true" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.nombreTransportista}" />
+                    </div>
+                    <div class="p-field p-col-3 p-md-3">
+                        <p:outputLabel for="@next" value="Placas Transporte:" />
+                        <p:inputText readonly="true" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.placasTransporte}" />
+                    </div>
+                    <div class="p-field p-col-12 p-md-12">
+                        <p:outputLabel for="@next" value="Observaciones:" />
+                        <p:inputText id="observacion" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.observaciones}" />
+                    </div>
+                </p:outputPanel>
+            </p:tab>
+            <p:tab id="tabProductos" title="Productos">
+                <p:outputPanel id="dlg-partidas" class="ui-fluid"  >
+                    <p:dataTable id="dt-partida" value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList}" var="partida" rowKey="#{partida.partidaCve}"
+                                 paginator="true" rows="5" paginatorPosition="bottom" 
+                                 rendered="#{not empty consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList}" editable="true" editMode="cell">
+                        <p:column headerText="Producto" width="auto">
+                            <h:outputText id="productoDs" value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
+                        </p:column>
+                        <p:column headerText="#Tarimas" width="4rem" style="text-align: right;">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{partida.noTarimas}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText id="noTarimas" value="#{partida.noTarimas}" style="width:100%"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Tarima" width="6rem" style="text-align: center;">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <p:outputLabel value="#{partida.tarima.nombre}" />
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu value="#{partida.tarima}" autoWidth="false" converter="entityConverter">
+                                        <f:selectItem itemLabel="--TARIMA--" noSelectionOption="true" />
+                                        <f:selectItems value="#{consultarConstanciaDeDepositoBean.tarimas}" var="tarima" itemLabel="#{tarima.nombre}" itemValue="#{tarima}"></f:selectItems>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Piezas" width="4rem" style="text-align: right;">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{partida.cantidadTotal}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText id="cantidadTotal" value="#{partida.cantidadTotal}" style="width:100%">
+                                        <p:ajax process="@this" update="form:datosGenerales:dt-partida"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Unidad" style="text-align: center;" width="5rem">
+                            <h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" />
+                        </p:column> 
+                        <p:column headerText="Peso(Kg)" style="text-align: right;" width="5rem">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{partida.pesoTotal}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText id="pesoTotal" value="#{partida.pesoTotal}" style="width:100%">
+                                        <p:ajax process="@this" update="form:datosGenerales:dt-partida"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Planta" style="text-align: center;" width="3rem">								
+                            <h:outputText value="#{partida.camaraCve.plantaCve.plantaAbrev}" />
+                        </p:column>
+                        <p:column headerText="Camara" style="text-align: center;" width="3rem">								
+                            <h:outputText value="#{partida.camaraCve.camaraAbrev}" />
+                        </p:column>
+                        <p:column style="text-align: center;" width="2rem">
+                            <p:commandButton icon="pi pi-bars" onstart="PF('statusInfoDialog').show();" oncomplete="PF('dlgDetalleP').show();PF('statusInfoDialog').hide();" update="form:detalleP" action="#{consultarConstanciaDeDepositoBean.verDetallePartida()}">
+                                <f:setPropertyActionListener value="#{partida}" target="#{consultarConstanciaDeDepositoBean.partidaSelect}"></f:setPropertyActionListener>
+                            </p:commandButton>
+                        </p:column>
+                        <p:columnGroup type="footer">
+                            <p:row>
+                                <p:column style="text-align: left;" footerText="Totales"/>
+                                <p:column style="text-align: right;" footerText="#{consultarConstanciaDeDepositoBean.tarimasTotal}"/>
+                                <p:column />
+                                <p:column style="text-align: right;" footerText="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList.stream().map(item -> item.cantidadTotal).sum()}" />
+                                <p:column footerText="" />
+                                <p:column style="text-align: right;" footerText="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.partidaList.stream().map(item -> item.pesoTotal).sum()}" />
+                                <p:column footerText="" colspan="3"/>
+                            </p:row>
+                        </p:columnGroup>
+                        <p:ajax event="page" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+                    </p:dataTable>
+                </p:outputPanel>
+            </p:tab>
+            <p:tab id="tabTarimas" title="Tarimas">
+                <div class="col-12 md:col-6 lg:col-4 xl:col-3">
+                    <p:dataTable value="#{consultarConstanciaDeDepositoBean.tarimas}" var="tarima" rows="5" paginator="true" paginatorPosition="bottom" emptyMessage="No hay tarimas registradas">
+                        <p:column>
+                            <p:outputLabel value="#{tarima.nombre}"></p:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="#{tarima.partidas.size()} producto(s)"></p:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <p:commandButton icon="pi pi-trash" class="ui-button-danger" process="@this" actionListener="#{consultarConstanciaDeDepositoBean.eliminarTarima(tarima)}" update="form:datosGenerales">
+                                <f:setPropertyActionListener value="#{tarima}" target="#{consultarConstanciaDeDepositoBean.tarima}"></f:setPropertyActionListener>
+                            </p:commandButton>
+                        </p:column>
+                        <f:facet name="footer">
+                            <p:outputLabel value="#{consultarConstanciaDeDepositoBean.tarimas.size()} tarima(s)"></p:outputLabel>
+                        </f:facet>
+                        <p:ajax event="page" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+                    </p:dataTable>
+                </div>
+                <div align="right">
+                    <p:commandButton icon="pi pi-plus" value="Agregar tarima" process="@this" actionListener="#{consultarConstanciaDeDepositoBean.agregaTarima}" update="form:datosGenerales" styleClass="ui-button-outlined" />
+                </div>
+            </p:tab>
+            <p:tab id="tabServicios" title="Servicios">
+                <p:outputPanel id="dlg-servicios" class="ui-fluid">
+                    <p:dataTable id="dt-ConstanciaDepositoDetalle" widgetVar="constanciaDD" value="#{consultarConstanciaDeDepositoBean.listadoConstanciaDepositoDetalle}" var="constanciaDepositoDetalle"
+                                 paginator="true" rows="3" paginatorPosition="bottom" editable="true" editMode="cell" styleClass="p-mt-2">
+                        <p:column headerText="Servicio" width="auto">
+                            <h:outputText value="#{constanciaDepositoDetalle.servicioCve.servicioDs}" />
+                        </p:column>
+                        <p:column headerText="Cantidad" style="text-align: right;">
+                            <p:cellEditor>
+                                <f:facet name="output">									
+                                    <h:outputText value="#{constanciaDepositoDetalle.servicioCantidad}" />
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{consultarConstanciaDeDepositoBean.servicioCantidad}" ></p:inputNumber>
+                                </f:facet>
+                            </p:cellEditor>								
+                        </p:column>
+                        <p:column width="2rem">
+                            <p:commandButton oncomplete="PF('dlgModificarServicio').show()" icon="pi pi pi-save"  disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" >
+                                <f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
+                            </p:commandButton>
+                        </p:column>
+                        <p:column width="2rem">
+                            <p:commandButton oncomplete="PF('dlgEliminarServicio').show()" styleClass="ui-button-danger" icon="pi pi-trash" actionListener="#{consultarConstanciaDeDepositoBean.newServicio()}" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}">
+                                <f:setPropertyActionListener value="#{constanciaDepositoDetalle}" target="#{consultarConstanciaDeDepositoBean.constanciaSelect}"></f:setPropertyActionListener>									
+                            </p:commandButton>
+                        </p:column>
+                        <f:facet name="footer">
+                            <p:outputLabel value="#{consultarConstanciaDeDepositoBean.selectConstanciaDD.constanciaDepositoDetalleList.size()} servicio(s)"></p:outputLabel>
+                        </f:facet>
+                        <p:ajax event="page" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+                    </p:dataTable>
+                    <div class="p-grid p-mt-2">
+                        <div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
+                            <p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{consultarConstanciaDeDepositoBean.constanciaSelect.servicioCve}">
+                                <f:selectItem itemLabel="Selecciona un servicio" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{consultarConstanciaDeDepositoBean.serviciosDisponibles()}" var="pServicio" itemValue="#{pServicio.servicio}" itemLabel="#{pServicio.servicio.servicioDs}" />
+                                <p:ajax process="@this" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="p-col-12 p-md-6 p-lg-4" style="width: 20em">
+                            <p:inputNumber id="cantidadServicio" value="#{consultarConstanciaDeDepositoBean.constanciaSelect.servicioCantidad}">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </div>
+                        <div class="p-col-12 p-md-6 p-lg-4" style="width: 10em">
+                            <p:commandButton icon="pi pi-plus" value="Agregar" process="@this" actionListener="#{consultarConstanciaDeDepositoBean.saveServicio()}" update="form:datosGenerales:dlg-servicios" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" styleClass="ui-button-outlined" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+                        </div>
+                    </div>
+                </p:outputPanel>
+            </p:tab>
+        </p:tabView>
+        <f:facet name="footer">
+            <p:commandButton icon="pi pi-save" value="Guardar" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgModificarPartida').show()" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" />
+            <p:commandButton id="cmdImprimir" value="Imprimir" actionListener="#{consultarConstanciaDeDepositoBean.imprimir}" styleClass="ui-button-outlined" icon="pi pi-file-pdf" update="cmdGuardar cmdImprimir" ajax="false">
+                <p:fileDownload value="#{consultarConstanciaDeDepositoBean.file}" />
+            </p:commandButton>
+            <p:commandButton value="Cerrar" icon="pi pi-times" process="@this" update="form:constanciaD" oncomplete="PF('infoDatos').hide();" styleClass="ui-button-secondary"></p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

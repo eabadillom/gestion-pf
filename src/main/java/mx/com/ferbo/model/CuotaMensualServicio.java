@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author Gabriel Moreno <gabrielmos0309@gmail.com>
  */
+@Deprecated
 @Entity
 @Table(name = "cuota_mensual_servicio")
 @NamedQueries({

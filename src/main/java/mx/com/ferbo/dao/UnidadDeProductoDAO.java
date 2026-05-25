@@ -5,11 +5,15 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer> {
+public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
+	private static Logger log = LogManager.getLogger(UnidadDeProducto.class);
 
 	@Override
 	public UnidadDeProducto buscarPorId(Integer id) {
@@ -29,15 +33,30 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer> {
 		}
 		return bean;
 	}
+	
+	public List<UnidadDeProducto> buscarPorCliente(Integer idCliente) {
+		List<UnidadDeProducto> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de Unidades de producto por cliente...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
 
 	@Override
 	public List<UnidadDeProducto> buscarTodos() {
-		return null;
+		throw new UnsupportedOperationException("Esta función no está disponible.");
 	}
 
 	@Override
 	public List<UnidadDeProducto> buscarPorCriterios(UnidadDeProducto e) {
-		return null;
+		throw new UnsupportedOperationException("Esta función no está disponible.");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -87,16 +106,20 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer> {
 
 	@Override
 	public String guardar(UnidadDeProducto unidadDeProducto) {
+		EntityManager em = null;
+		
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = this.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(unidadDeProducto);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Al guardar la unidad de producto...", e);
 			return "ERROR";
+		} finally {
+			this.close(em);
 		}
+		
 		return null;
 	}
 

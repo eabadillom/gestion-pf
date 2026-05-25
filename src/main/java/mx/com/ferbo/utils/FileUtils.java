@@ -6,11 +6,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Base64;
 import java.util.Base64.Encoder;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.util.JasperReportUtil;
 
 public class FileUtils {
 	
@@ -101,4 +105,46 @@ public class FileUtils {
 		sOutput = encoder.encodeToString(bytes);
 		return sOutput;
 	}
+	
+	public static synchronized Optional<File> getFile(String path)
+	throws ToolException {
+		Optional<File> response = null;
+		File archivo = null;
+		
+		try {
+			archivo = new File(path);
+			if(archivo.exists() == false)
+				throw new ToolException("El archivo solicitado no existe: " + path);
+			
+			response = Optional.of(archivo);
+		} catch(Exception ex) {
+			response = Optional.empty();
+		}
+		
+		return response;
+	}
+	
+	public static synchronized Optional<String> getFullPath(String jasperPath) {
+		Optional<String> response = null;
+		
+		String fullPath = null;
+		File   file = null;
+		URL resource = null;
+		
+		try {
+			resource = JasperReportUtil.class.getResource(jasperPath);
+			fullPath = resource.getFile();
+			file = new File(fullPath);
+			if(file.exists() == false)
+				throw new ToolException("La ruta solicitada no existe: " + fullPath);
+			
+			response = Optional.of(file.getPath());
+		} catch(Exception ex) {
+			response = Optional.empty();
+		}
+		
+		return response;
+	}
+	
+	
 }

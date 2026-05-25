@@ -3,6 +3,7 @@ package mx.com.ferbo.util;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+@Deprecated
 public class JPAEntity {
 
 	private static final String PERSISTENCE_NAME = "gestionPU";

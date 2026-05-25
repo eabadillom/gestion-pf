@@ -9,22 +9,18 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Embeddable
 public class FacturaMedioPagoPK implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @ManyToOne(optional = false,cascade = CascadeType.ALL)//MODIFIQUE JUNIO 1
+    
+    @ManyToOne(optional = false)
     @JoinColumn(name = "factura_id")
     private Factura facturaId;
 	
@@ -73,12 +69,12 @@ public class FacturaMedioPagoPK implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		FacturaMedioPagoPK other = (FacturaMedioPagoPK) obj;
-		return facturaId == other.facturaId && fmpId == other.fmpId;
+		return fmpId == other.fmpId && Objects.equals(facturaId, other.facturaId);
 	}
 
 	@Override
 	public String toString() {
-		return "FacturaMedioPagoPK [facturaId=" + facturaId + ", fmpId=" + fmpId + "]";
+		return "FacturaMedioPagoPK [fmpId=" + fmpId + "]";
 	}
 
 	

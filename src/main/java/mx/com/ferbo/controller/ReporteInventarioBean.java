@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
@@ -20,10 +22,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import mx.com.ferbo.business.GestionApiClientBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.PlantaDAO;
@@ -34,6 +39,7 @@ import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.ui.RepInventario;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -59,10 +65,12 @@ public class ReporteInventarioBean implements Serializable {
 	private PlantaDAO plantaDAO;
 	private CamaraDAO camaraDAO;
 
-	private FacesContext faceContext;
-	private HttpServletRequest httpServletRequest;
+	private FacesContext context;
+	private HttpServletRequest request;
 	private Usuario usuario;
 	private List<RepInventario> reporte;
+	
+	private StreamedContent file;
 
 	public ReporteInventarioBean() {
 		fecha = new Date();
@@ -80,35 +88,47 @@ public class ReporteInventarioBean implements Serializable {
 	@PostConstruct
 	public void init() {
 
-		faceContext = FacesContext.getCurrentInstance();
-		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+		this.context = FacesContext.getCurrentInstance();
+		this.request = (HttpServletRequest) context.getExternalContext().getRequest();
+		this.usuario = (Usuario) request.getSession(false).getAttribute("usuario");
 
-		plantaSelect = new Planta();
-		camaraSelect = new Camara();
-		clienteSelect = new Cliente();
+		this.plantaSelect = new Planta();
+		this.camaraSelect = new Camara();
+		this.clienteSelect = new Cliente();
+		this.listaClientes = (List<Cliente>) this.request.getSession(false).getAttribute("clientesActivosList");
 
-//		listaClientes = clienteDAO.buscarHabilitados(true);
-		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
-
-		if ((usuario.getPerfil() == 1) || (usuario.getPerfil() == 4)) {
-			listaPlanta.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
-			plantaSelect = listaPlanta.get(0);
+		if ((this.usuario.getPerfil() == 1) || (this.usuario.getPerfil() == 4)) {
+			this.listaPlanta.add(this.plantaDAO.buscarPorId(this.usuario.getIdPlanta()));
+			this.plantaSelect = this.listaPlanta.get(0);
 		} else {
 			listaPlanta = plantaDAO.buscarTodos();
 		}
 
-		// plantaSelect = listaPlanta.get(0);
-		filtradoCamara();
-		// listaCamara = camaraDAO.buscarTodos();
+		this.filtradoCamara();
 
-		// PrimeFaces.current().ajax().update("form:so-camara");
-
+		byte bytes[] = {};
+		this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
+				.name("inventario.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
 	}
 
 	public void filtradoCamara() {
-		listaCamara = camaraDAO.buscarPorPlanta(plantaSelect);
-		plantaSelect.setCamaraList(listaCamara);
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Seleccionar cámara";
+		
+		try {
+			if(this.plantaSelect == null)
+				throw new InventarioException("Debe seleccionar una planta");
+			this.listaCamara = this.camaraDAO.buscarPorPlanta(this.plantaSelect);
+			this.plantaSelect.setCamaraList(this.listaCamara);
+		} catch(Exception ex) {
+			log.error("Problema con la selección de cámaras...", ex);
+			mensaje = String.format("No se pudo imprimir el reporte");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance()
+				.addMessage(titulo, new FacesMessage(severity, "Problema con la consulta de cámras", mensaje));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
 	}
 
 	public void exportarPdf() throws JRException, IOException, SQLException {
@@ -120,7 +140,7 @@ public class ReporteInventarioBean implements Serializable {
 		Severity severity = null;
 		File reportFile = new File(jasperPath);
 		File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		JasperReportUtil jasperReportUtil = null;
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
@@ -166,7 +186,12 @@ public class ReporteInventarioBean implements Serializable {
 			parameters.put("Fecha", fecha);
 			parameters.put("imagen", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
+			jasperReportUtil = new JasperReportUtil();
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename)
+					.stream(() -> input).build();
+			log.info("El usuario {} descargo el reporte de inventario {}", this.usuario.getUsuario(), filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
@@ -192,7 +217,7 @@ public class ReporteInventarioBean implements Serializable {
 		Severity severity = null;
 		File reportFile = new File(jasperPath);
 		File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+		JasperReportUtil jasperReportUtil = null;
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
@@ -236,7 +261,12 @@ public class ReporteInventarioBean implements Serializable {
 			parameters.put("Fecha", fecha);
 			parameters.put("imagen", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
+			jasperReportUtil = new JasperReportUtil();
+			byte[] bytes = jasperReportUtil.createXLSX(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").name(filename)
+					.stream(() -> input).build();
+			log.info("El usuario {} descargo el reporte de inventario {}", this.usuario.getUsuario(), filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el reporte");
@@ -257,7 +287,7 @@ public class ReporteInventarioBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		String titulo = "Reporte Servicios";
+		String titulo = "Reporte de inventario";
 
 		try {
 
@@ -278,20 +308,11 @@ public class ReporteInventarioBean implements Serializable {
 			}
 
 			Integer plantaCve = null;
-			/*if (plantaSelect == null) {
-				throw new InventarioException("Debe seleccionar una planta.");
-			}*/
-
-			/*if (plantaSelect.getPlantaCve() == null) {
-				throw new InventarioException("Debe seleccionar una planta.");
-			} else {
-				plantaCve = plantaSelect.getPlantaCve();
-			}*/
 
 			reporteDAO = new RepInventarioDAO();
 			reporte = reporteDAO.buscar(fecha, clienteCve, plantaCve, camaraCve);
 			log.debug("Registros del reporte: {}", reporte.size());
-
+			log.info("El usuario {} consulta e reporte de inventario.", this.usuario.getUsuario());
 		} catch (InventarioException ex) {
 			log.error("Problema para consultar el reporte de salidas...", ex);
 			mensaje = ex.getMessage();
@@ -310,6 +331,32 @@ public class ReporteInventarioBean implements Serializable {
 			PrimeFaces.current().ajax().update("form:dt-reporte", "form:dtReporte", "form:messages");
 		}
 	}
+        
+        public void enviarInventario(){
+            GestionApiClientBL gestionApi = new GestionApiClientBL();
+            String numeroCliente = null;
+            try {
+                if (clienteSelect == null) {
+                    throw new InventarioException("Debe seleccionar un cliente.");
+                } else {
+                    numeroCliente = clienteSelect.getNumeroCte();
+                }
+
+                if (numeroCliente == null || numeroCliente.isEmpty())
+                    throw new InventarioException("Debe seleccionar un cliente.");
+                
+                gestionApi.enviarCorreoCliente(numeroCliente);
+                FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Inventario", "El reporte se envió al cliente");
+            } catch (InventarioException ex) {
+                log.error("Problema para enviar por correo el reporte: {}", ex.getMessage());
+                FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Inventario", ex.getMessage());
+            } catch (Exception ex) {
+                log.error("Problema para consultar el reporte de salidas...", ex);
+                FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Inventario", "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.");
+            } finally {
+                PrimeFaces.current().ajax().update("form:messages");
+            }
+        }
 
 	public Usuario getUsuario() {
 		return usuario;
@@ -381,6 +428,14 @@ public class ReporteInventarioBean implements Serializable {
 
 	public void setReporte(List<RepInventario> reporte) {
 		this.reporte = reporte;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 
 }

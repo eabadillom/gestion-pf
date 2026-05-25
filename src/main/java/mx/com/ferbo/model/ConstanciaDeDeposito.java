@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -43,7 +45,9 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ConstanciaDeDeposito.findByFolioCliente", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.folioCliente = :folioCliente"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByValorDeclarado", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.valorDeclarado = :valorDeclarado"),
     @NamedQuery(name = "ConstanciaDeDeposito.findByFolioClientePeriodo", query = "SELECT c FROM ConstanciaDeDeposito c WHERE (c.fechaIngreso BETWEEN :fechaInicio AND :fechaFin) AND ((c.folioCliente = :folioCliente OR :folioCliente IS NULL) OR (c.cteCve.cteCve = :idCliente OR :idCliente IS NULL)\t) "),
-    @NamedQuery(name = "ConstanciaDeDeposito.findByTemperatura", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.temperatura = :temperatura")})
+    @NamedQuery(name = "ConstanciaDeDeposito.findByTemperatura", query = "SELECT c FROM ConstanciaDeDeposito c WHERE c.temperatura = :temperatura"),
+    @NamedQuery(name = "ConstanciaDeDeposito.findByProducto", query = "SELECT distinct c from ConstanciaDeDeposito c INNER JOIN c.partidaList p INNER JOIN p.unidadDeProductoCve up INNER JOIN up.productoCve pr where pr.productoDs like :nombreProducto OR pr.numeroProd like :nombreProducto order by c.fechaIngreso DESC")
+})
 public class ConstanciaDeDeposito implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,46 +56,58 @@ public class ConstanciaDeDeposito implements Serializable {
     @Basic(optional = false)
     @Column(name = "FOLIO")
     private Integer folio;
+    
     @Column(name = "FECHA_INGRESO")
     @Temporal(TemporalType.DATE)
     private Date fechaIngreso;
+    
     @Size(max = 100)
     @Column(name = "NOMBRE_TRANSPORTISTA")
     private String nombreTransportista;
+    
     @Size(max = 10)
     @Column(name = "PLACAS_TRANSPORTE")
     private String placasTransporte;
+    
     @Size(max = 200)
     @Column(name = "OBSERVACIONES")
     private String observaciones;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 8)
     @Column(name = "folio_cliente")
     private String folioCliente;
+    
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "valor_declarado")
     private BigDecimal valorDeclarado;
+    
     @Size(max = 50)
     @Column(name = "temperatura")
     private String temperatura;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
     private List<Partida> partidaList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
     private List<ConstanciaDepositoDetalle> constanciaDepositoDetalleList;
-    @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
+    
+    @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE", nullable = false)
     @ManyToOne(optional = false)
     private Cliente cteCve;
-    @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve")
+    
+    @JoinColumn(name = "aviso_cve", referencedColumnName = "aviso_cve", nullable = false)
     @ManyToOne
     private Aviso avisoCve;
-    @JoinColumn(name = "status", referencedColumnName = "edo_cve")
+    
+    @JoinColumn(name = "status", referencedColumnName = "edo_cve", nullable = false)
     @ManyToOne
     private EstadoConstancia status;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "folio")
     private List<ConstanciaFactura> constanciaFacturaList;
-
+    
     public ConstanciaDeDeposito() {
     }
 
@@ -224,9 +240,9 @@ public class ConstanciaDeDeposito implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (folio != null ? folio.hashCode() : 0);
-        return hash;
+    	if(this.folio == null)
+    		return System.identityHashCode(this);
+        return Objects.hash(this.folio);
     }
 
     @Override

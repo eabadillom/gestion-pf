@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog widgetVar="dlgDetalleP" modal="true" header="Detalle del producto">
+        <p:outputPanel id="detalleP" rendered="#{consultarConstanciaDeDepositoBean.partidaSelect != null}">
+            <div class="p-grid ui-fluid p-col-12">
+                <div class="p-col-12 p-md-6">
+                    <p:outputLabel value="Producto" />
+                    <p:selectOneMenu value="#{consultarConstanciaDeDepositoBean.productoSelect}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="--SELECCIONE UN PRODUCTO--" noSelectionOption="true" />
+                        <f:selectItems value="#{consultarConstanciaDeDepositoBean.listadoProductoPorCliente}" var="producto" itemLabel="#{producto.productoDs}" itemValue="#{producto}" />
+                        <p:ajax process="@this" />
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-col-12 p-md-6">
+                    <p:outputLabel value="Unidad" />
+                    <p:selectOneMenu value="#{consultarConstanciaDeDepositoBean.unidadSelect}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="--SELECCIONE UNA UNIDAD--" noSelectionOption="true" />
+                        <f:selectItems value="#{consultarConstanciaDeDepositoBean.unidades}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
+                        <p:ajax process="@this" />
+                    </p:selectOneMenu>
+                </div>
+            </div>
+            <div class="p-grid ui-fluid p-col-12">
+                <div class="p-col-3 p-md-3">
+                    <p:outputLabel value="Código:" />												
+                    <p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpCodigo}">
+                        <p:ajax process="@this"></p:ajax>
+                    </p:inputText>
+                </div>
+                <div class="p-col-3 p-md-3">
+                    <p:outputLabel value="Pedimento:" />												
+                    <p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpPedimento}">
+                        <p:ajax process="@this"></p:ajax>
+                    </p:inputText>
+                </div>
+                <div class="p-col-3 p-md-3">
+                    <p:outputLabel value="Contenedor:" />													
+                    <p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpSAP}">
+                        <p:ajax process="@this"></p:ajax>
+                    </p:inputText>
+                </div>
+                <div class="p-col-3 p-md-3">
+                    <p:outputLabel value="Lote:" />							
+                    <p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpLote}">
+                        <p:ajax process="@this"></p:ajax>
+                    </p:inputText>
+                </div>
+                <div class="p-col-3 p-md-3">
+                    <p:outputLabel value="Caducidad:" />
+                    <p:datePicker id="fechaCaducidad" showIcon="true" value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpCaducidad}" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es">
+                        <p:ajax process="@this" />
+                    </p:datePicker>
+                </div>
+                <div class="p-col-3 p-md-3">
+                    <p:outputLabel value="Otro:" />
+                    <p:inputText value="#{consultarConstanciaDeDepositoBean.detallePartida.dtpMP}">
+                        <p:ajax process="@this" />
+                    </p:inputText>
+                </div>
+            </div>
+
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Aceptar" icon="pi pi-check" actionListener="#{consultarConstanciaDeDepositoBean.updateDetallePartida()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgDetalleP').hide();" disabled="#{(consultarConstanciaDeDepositoBean.usuario.perfil == 1) or (consultarConstanciaDeDepositoBean.usuario.perfil == 4)}" update="form:datosGenerales:dlg-partidas" />
+            <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dlgDetalleP').hide()" styleClass="ui-button-secondary"></p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

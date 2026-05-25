@@ -1,19 +1,26 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.business.salidas.SalidasBL;
+import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.StatusSalida;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DateUtil;
 
 @Named
 @SessionScoped
@@ -21,40 +28,117 @@ public class SideBarBean implements Serializable {
 
 	private static final long serialVersionUID = 8802717839932668484L;
 	private static Logger log = LogManager.getLogger(SideBarBean.class);
-	private Usuario usuario;
 	
-	private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
+	@Inject
+	private SalidasBL salidasBL;
+	
+	private FacesContext context;
+    private HttpServletRequest request;
     private HttpSession session;
-    
-    public SideBarBean() {
+    private Integer numeroEntradas;
+    private Integer numeroSalidas;
+    private String severity;
+        
+	private List<Cliente> listaClientesActivos;
+	private List<Cliente> listaClientesTodos;
+	private Usuario usuario;
+	private Integer idCliente = null;
+	
+	public SideBarBean() {
     	this.usuario = new Usuario();
     }
-    
+	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		faceContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        session = httpServletRequest.getSession(false);
-        this.usuario = (Usuario) httpServletRequest.getSession(true).getAttribute("usuario");
+		
+		try {
+			context = FacesContext.getCurrentInstance();
+			request = (HttpServletRequest) context.getExternalContext().getRequest();
+			session = request.getSession(false);
+			this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+			
+			listaClientesActivos = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
+			listaClientesTodos = (List<Cliente>) request.getSession(false).getAttribute("clientesTodosList");
+			fotografia = (String) request.getSession(false).getAttribute("fotografia");
+			this.cargaOrdenesDeSalida();
+			
+			this.numeroEntradas = null;
+		} catch(Exception ex) {
+			log.error("Problema al iniciar la sesión del usuario.", ex);
+		}
+	}
+	
+	public void cargaOrdenesDeSalida() {
+		StatusSalida statusSalida = null;
+		Date fecha = null;
+		try {
+			switch(this.usuario.getPerfil()) {
+			case 2:
+			case 3:
+				this.numeroSalidas = null;
+				return;
+			}
+			
+			fecha = new Date();
+			DateUtil.resetTime(fecha);
+			statusSalida = salidasBL.obtenerStatusEnviado();
+			numeroSalidas = salidasBL.totalSalidasPorCliente(statusSalida.getClave(), fecha, this.usuario.getIdPlanta());
+			severity = numeroSalidas > 0 ? "danger" : "info";
+			
+			log.info("Ordenes de salida pendientes: {}", numeroSalidas);
+		} catch (Exception ex) {
+			log.error("Problema para obtener las órdenes de salida.");
+		} finally {
+			PrimeFaces.current().ajax().update("menuform");
+		}
 	}
 	
 	public void logout() {
 		String contextPath = null;
 		String fullPath = null;
 		try {
-			contextPath = faceContext.getExternalContext().getApplicationContextPath();
+			log.info("El usuario {} intenta finalizar su sesión...", this.usuario.getUsuario());
+			
+			contextPath = context.getExternalContext().getApplicationContextPath();
 			fullPath = contextPath + "/login.xhtml";
+			
     		this.usuario = (Usuario)session.getAttribute("usuario");
-    		log.info("El usuario intenta finalizar su sesión: " + this.usuario.getUsuario());
+    		this.idCliente = (Integer) session.getAttribute("idCliente");
+    		
+    		if(this.usuario != null) {
+    			session.removeAttribute("usuario");
+    			log.info("Información del usuario eliminada de la sesión.");
+    		}
+    		if(this.idCliente != null) {
+    			session.removeAttribute("idCliente");
+    			log.info("Información del id de cliente eliminada de la sesión.");
+    		}
+    		
     		session.setAttribute("usuario", null);
     		session.setAttribute("idCliente", null);
-    		log.info("Redirigiendo al usuario a {}", fullPath);
-    		faceContext.getExternalContext().redirect(fullPath);
+    		
+    		log.info("Invalidando sesión...");
     		session.invalidate();
+    		
+    		log.info("Obteniendo un nuevo objeto de sesión...");
+    		session = request.getSession(true);
+    		
+    		log.info("Redirigiendo al usuario a {}", fullPath);
+    		context.getExternalContext().redirect(fullPath);
+    		
+    		log.info("Fin del proceso de cierre de sesión.");
     	} catch(Exception ex) {
-    		log.error("Problema en el cierre de sesión del usuario...", ex);
+    		log.warn("Problema en el cierre de sesión del usuario...", ex);
     	}
+	}
+	
+	public String redirectOrdenesSalida() {
+            return "/inventarios/ordenSalidas/principal?faces-redirect=true";
+        }
+	
+	public String redirectOrdenEntrada() {
+            return "/inventarios/ordenEntrada?faces-redirect=true";
 	}
 	
 	public Usuario getUsuario() {
@@ -62,5 +146,55 @@ public class SideBarBean implements Serializable {
 	}
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
+	}
+
+	public Integer getNumeroSalidas() {
+		return numeroSalidas;
+	}
+
+	public void setNumeroSalidas(Integer numeroSalidas) {
+		this.numeroSalidas = numeroSalidas;
+	}
+
+	public Integer getNumeroEntradas() {
+		return numeroEntradas;
+	}
+
+	public void setNumeroEntradas(Integer numeroEntradas) {
+		this.numeroEntradas = numeroEntradas;
+	}
+
+	public List<Cliente> getListaClientesActivos() {
+		return listaClientesActivos;
+	}
+
+	public void setListaClientesActivos(List<Cliente> listaClientes) {
+		this.listaClientesActivos = listaClientes;
+	}
+
+	public List<Cliente> getListaClientesTodos() {
+		return listaClientesTodos;
+	}
+
+	public void setListaClientesTodos(List<Cliente> listaClientesTodos) {
+		this.listaClientesTodos = listaClientesTodos;
+	}
+	
+	public String getSeverity() {
+		return severity;
+	}
+
+	public void setSeverity(String severity) {
+		this.severity = severity;
+	}
+
+	private String fotografia;
+    
+    public String getFotografia() {
+		return fotografia;
+	}
+
+	public void setFotografia(String fotografia) {
+		this.fotografia = fotografia;
 	}
 }

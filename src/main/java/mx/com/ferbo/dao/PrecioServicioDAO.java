@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CacheRetrieveMode;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
@@ -19,8 +21,9 @@ import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
+	
 	private static Logger log = LogManager.getLogger(PrecioServicioDAO.class);
-
+	
 	@Override
 	public PrecioServicio buscarPorId(Integer id) {
 		return null;
@@ -37,7 +40,7 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		}
 		return listado;
 	}
-
+	
 	@Override
 	public List<PrecioServicio> buscarPorCriterios(PrecioServicio e) {
 		if (e.getCliente().getCteCve() == null)
@@ -52,22 +55,33 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	}
 
 	public PrecioServicio buscar(Integer cteCve, Integer avisoCve, Integer servicioCve, boolean isFullInfo) {
+		
 		PrecioServicio precio = null;
 		EntityManager em = null;
 		Query query = null;
+		
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			query = em.createNamedQuery("PrecioServicio.findByClienteAvisoServicio", PrecioServicio.class);
-			precio = (PrecioServicio) query.setParameter("cteCve", cteCve).setParameter("avisoCve", avisoCve)
+			precio = (PrecioServicio) query
+					.setParameter("cteCve", cteCve)
+					.setParameter("avisoCve", avisoCve)
+					.setParameter("servicioCve", servicioCve)
 					.getSingleResult();
-			if (isFullInfo == false)
+			
+			if(isFullInfo == false)
 				return precio;
 			precio.getServicio().getServicioCve();
-		} catch (Exception ex) {
+			
+		} catch(NoResultException ex){
+			log.warn("PrecioServicio no encontrado: cteCve = {}, avisoCve = {}, servicioCve = {}",
+					cteCve, avisoCve, servicioCve);
+		} catch(Exception ex) {
 			log.error("Problema para obtener el precio-servicio...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
+		
 		return precio;
 	}
 
@@ -77,7 +91,8 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		try {
 			entity = EntityManagerUtil.getEntityManager();
 			listaPrecioServicio = entity.createNamedQuery("PrecioServicio.findByAvisoAndCliente", PrecioServicio.class)
-					.setParameter("cteCve", cliente.getCteCve()).setParameter("avisoCve", aviso.getAvisoCve())
+					.setParameter("cteCve", cliente.getCteCve())
+					.setParameter("avisoCve", aviso.getAvisoCve())
 					.getResultList();
 		} catch (Exception e) {
 			log.error("Problema para obtener el PrecioServicio...", e);
@@ -232,14 +247,18 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			list = em.createNamedQuery("PrecioServicio.findByCliente", PrecioServicio.class)
-					.setParameter("cteCve", cteCve).getResultList();
-			if (isFullInfo == false)
+					.setHint("javax.persistence.cache.retrieveMode", CacheRetrieveMode.BYPASS)
+					.setParameter("cteCve", cteCve)
+					.getResultList();
+			if(isFullInfo == false)
 				return list;
 			for (PrecioServicio ps : list) {
 				log.debug(ps.getCliente().getCteCve());
 				log.debug(ps.getServicio().getServicioCve());
 				log.debug(ps.getUnidad().getUnidadDeManejoCve());
-				log.debug(ps.getAvisoCve().getAvisoCve());
+
+				if(ps.getAvisoCve() != null)
+					log.debug(ps.getAvisoCve().getAvisoCve());
 			}
 		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de precios...", ex);

@@ -1,20 +1,15 @@
 package mx.com.ferbo.dao;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
@@ -84,60 +79,8 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ConstanciaSalida> buscarPorCriterios(String folioCliente, Date fechaInico, Date fechaFin,
-			int idCliente) {
-		Cliente cliente = new Cliente();
-		Map<String, Object> paramaterMap = new HashMap<String, Object>();
-		List<String> whereCause = new ArrayList<String>();
-		StringBuilder queryBuilder = new StringBuilder();
+	public List<ConstanciaSalida> buscar(Integer idCliente, Integer idPlanta, Date fechaInicio, Date fechaFin, String folioCliente) {
 
-		try {
-
-			Query q = null;
-			queryBuilder.append("SELECT c FROM ConstanciaSalida c");
-
-			if (fechaInico != null && fechaFin != null) {
-				whereCause.add("(c.fecha BETWEEN :fechaInicio AND :fechaFinal)");
-				paramaterMap.put("fechaInicio", fechaInico);
-				paramaterMap.put("fechaFinal", fechaFin);
-			}
-			if (folioCliente != null && !"".equalsIgnoreCase(folioCliente.trim())) {
-				whereCause.add("c.numero = :folioCliente");
-				paramaterMap.put("folioCliente", folioCliente);
-			}
-			if (idCliente != 0) {
-				cliente.setCteCve(idCliente);
-				whereCause.add("c.clienteCve = :idCliente");
-				paramaterMap.put("idCliente", cliente);
-			}
-
-			queryBuilder.append(" WHERE " + StringUtils.join(whereCause, " AND "));
-
-			q = em.createQuery(queryBuilder.toString());
-
-			for (String key : paramaterMap.keySet()) {
-				q.setParameter(key, paramaterMap.get(key));
-			}
-
-			List<ConstanciaSalida> listado = (List<ConstanciaSalida>) q.getResultList();
-
-			for (ConstanciaSalida cs : listado) {
-				List<DetalleConstanciaSalida> listaDetalle = cs.getDetalleConstanciaSalidaList();
-				listaDetalle.size();
-				for (DetalleConstanciaSalida dcs : listaDetalle) {
-					log.debug(dcs.getPartidaCve());
-				}
-			}
-
-			return listado;
-		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return null;
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<ConstanciaSalida> buscar(Date fechaInicio, Date fechaFin, Integer idCliente, String folioCliente) {
 		List<ConstanciaSalida> resultList = null;
 		EntityManager em = null;
 		Query sql = null;
@@ -147,13 +90,22 @@ public class ConstanciaSalidaDAO extends IBaseDAO<ConstanciaSalida, Integer> {
 				folioCliente = "%".concat(folioCliente).concat("%");
 
 			em = EntityManagerUtil.getEntityManager();
-			sql = em.createNativeQuery("SELECT * FROM (\n" + "	SELECT * FROM (\n" + "		SELECT *\n"
+			sql = em.createNativeQuery("SELECT * FROM (\n"
+					+ "	SELECT * FROM (\n"
+					+ "		SELECT DISTINCT cs.*\n"
 					+ "		FROM constancia_salida cs\n"
-					+ "		where (:idCliente IS NULL OR cs.CLIENTE_CVE = :idCliente)\n"
-					+ "	) cs2 WHERE ((cs2.FECHA BETWEEN :fechaInicio AND :fechaFin) OR (:fechaInicio IS NULL OR :fechaFin IS NULL)) \n"
-					+ ") cs3 WHERE (:folioCliente IS NULL OR cs3.NUMERO like :folioCliente ) ORDER BY cs3.FECHA",
-					ConstanciaSalida.class).setParameter("fechaInicio", fechaInicio).setParameter("fechaFin", fechaFin)
-					.setParameter("idCliente", idCliente).setParameter("folioCliente", folioCliente);
+					+ "		inner join detalle_constancia_salida dcs on cs.id = dcs.CONSTANCIA_CVE\n"
+					+ "		inner join partida p on dcs.PARTIDA_CVE = p.PARTIDA_CVE\n"
+					+ "		inner join camara cam on p.CAMARA_CVE = cam.CAMARA_CVE\n"
+					+ "		where (:idCliente IS NULL OR cs.CLIENTE_CVE = :idCliente) AND (:idPlanta IS NULL OR cam.planta_cve = :idPlanta)\n"
+					+ "	) cs2 WHERE ((cs2.FECHA BETWEEN :fechaInicio AND :fechaFin) OR (:fechaInicio IS NULL OR :fechaFin IS NULL))\n"
+					+ ") cs3 WHERE (:folioCliente IS NULL OR cs3.NUMERO like :folioCliente ) ORDER BY cs3.FECHA", ConstanciaSalida.class)
+					.setParameter("idCliente",    idCliente)
+					.setParameter("idPlanta",     idPlanta)
+					.setParameter("fechaInicio",  fechaInicio)
+					.setParameter("fechaFin",     fechaFin)
+					.setParameter("folioCliente", folioCliente)
+					;
 			resultList = sql.getResultList();
 
 		} catch (Exception ex) {

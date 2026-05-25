@@ -2,868 +2,1016 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-
+import java.util.Map;
+import java.util.function.Consumer;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.primefaces.PrimeFaces;
+import mx.com.ferbo.dao.n.PaisesDAO;
+import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
+import mx.com.ferbo.dao.n.CiudadesDAO;
+import mx.com.ferbo.dao.n.EntidadPostalDAO;
+import mx.com.ferbo.dao.n.EstadosDAO;
+import mx.com.ferbo.dao.n.MunicipiosDAO;
+import mx.com.ferbo.dao.n.TipoAsentamientoDAO;
 
-import mx.com.ferbo.dao.AsentamientoHumanoDAO;
-import mx.com.ferbo.dao.CiudadesDAO;
-import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.ClienteDomiciliosDAO;
-import mx.com.ferbo.dao.DomiciliosDAO;
-import mx.com.ferbo.dao.EstadosDAO;
-import mx.com.ferbo.dao.MunicipiosDAO;
-import mx.com.ferbo.dao.PaisDAO;
-import mx.com.ferbo.dao.PaisesDAO;
-import mx.com.ferbo.dao.TiposDomicilioDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.AsentamientoHumanoPK;
 import mx.com.ferbo.model.Ciudades;
 import mx.com.ferbo.model.CiudadesPK;
-import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.ClienteDomicilios;
-import mx.com.ferbo.model.Domicilios;
+import mx.com.ferbo.model.EntidadPostal;
 import mx.com.ferbo.model.Estados;
+import mx.com.ferbo.model.EstadosPK;
 import mx.com.ferbo.model.Municipios;
 import mx.com.ferbo.model.MunicipiosPK;
-import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.Paises;
-import mx.com.ferbo.model.TiposDomicilio;
+import mx.com.ferbo.model.TipoAsentamiento;
+import mx.com.ferbo.util.FacesUtils;
 
-@Named
+import mx.com.ferbo.util.InventarioException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+
+/**
+ *
+ * @author alberto
+ */
+@Named(value = "domiciliosBean")
 @ViewScoped
-public class DomiciliosBean implements Serializable {
+public class DomiciliosBean implements Serializable 
+{
+    private static final long serialVersionUID = 1L;
+    private static Logger log = LogManager.getLogger(DomiciliosBean.class);
 
-	/**
-	 * @author Juan_Cervantes
-	 */
+    @Inject
+    private AsentamientoHumanoDAO asentamientoDAO;
+    
+    @Inject
+    private EntidadPostalDAO entidadPostalDAO;
+    
+    @Inject
+    private TipoAsentamientoDAO tipoAsentamientoDAO;
 
-	private static final long serialVersionUID = 4150584435387992139L;
+    @Inject
+    private CiudadesDAO ciudadesDAO;
 
-	/**
-	 * Objetos para clientes
-	 */
-	private List<Cliente> lstClientes;
-	private Cliente clienteSelected;
-	private ClienteDAO clienteDAO;
+    @Inject
+    private MunicipiosDAO municipiosDAO;
 
-	/**
-	 * Objetos para domicilio_cliente
-	 */
-	private List<ClienteDomicilios> lstClienteDomicilios;
-	private List<ClienteDomicilios> lstClienteDomiciliosFiltered;
-	private ClienteDomicilios clienteDomicilioSelected;
-	private ClienteDomiciliosDAO clienteDomiciliosDAO;
+    @Inject
+    private EstadosDAO estadosDAO;
 
-	/**
-	 * Objetos para tipos_domicilio
-	 */
-	private List<TiposDomicilio> lstTiposDomicilio;
-	private TiposDomicilio tipoDomicilioSelected;
-	private TiposDomicilioDAO tiposDomicilioDAO;
+    @Inject
+    private PaisesDAO paisesDAO;
 
-	/**
-	 * Objetos para domicilio
-	 */
-	private List<Domicilios> lstDomicilios;
-	private List<Domicilios> lstDomiciliosFiltered;
-	private Domicilios domicilioSelected;
-	private DomiciliosDAO domiciliosDAO;
-	// domicilio nuevo
-	private Domicilios domicilioNuevo;
-	private String domicilioNvoCalle;
-	private String domicilioNvoNumExt;
-	private String domicilioNvoNumInt;
-	private String domicilioNvoTel1;
-	private String domicilioNvoTel2;
-	private String domicilioNvoFax;
+    /**
+     * Objetos para Asentamientos
+     */
+    private List<AsentamientoHumano> listAsentamientoHumano;
+    private List<AsentamientoHumano> listAsentamientoHumanoFiltered;
+    private List<AsentamientoHumano> listAsentamientoHumanoCP;
+    private AsentamientoHumano asentamientoHumanoSelected;
+    
+    /**
+     * Objetos para EntidadPostal
+     */
+    private List<EntidadPostal> listEntidadPostal;
+    private EntidadPostal entidadPostalSelected;
+    
+    /**
+     * Objetos para TipoAsentamiento
+     */
+    private List<TipoAsentamiento> listTipoAsentamiento;
+    private TipoAsentamiento tipoAsentamientoSelected;
+    
+    /**
+     * Objetos para Ciudades
+     */
+    private List<Ciudades> listCiudadesFiltered;
+    private Ciudades ciudadSelected;
+    
+    /**
+     * Objetos para Municipios
+     */
+    private List<Municipios> listMunicipiosFiltered;
+    private Municipios municipioSelected;
+    
+    /**
+     * Objetos para Estados
+     */
+    private List<Estados> listEstadosFiltered;
+    private Estados estadoSelected;
+    
+    /**
+     * Objetos para Paises
+     */
+    private List<Paises> listPaises;
+    private Paises paisSelected;
+    private Paises mexico;
+    
+    private String codigoPostal = "";
+    
+    private final Map<Class<?>, Consumer<Object>> guardarObjetos = new HashMap<>();
+    private final Map<Class<?>, Consumer<Object>> actualizarObjetos = new HashMap<>();
+    private final Map<Class<?>, Consumer<Object>> eliminarObjetos = new HashMap<>();
+    
+    public DomiciliosBean() {
+        this.asentamientoHumanoSelected = this.nuevoAsentamiento();
+        this.listEstadosFiltered = new ArrayList<>();
+        this.listMunicipiosFiltered = new ArrayList<>();
+        this.listCiudadesFiltered = new ArrayList<>();
+        this.listAsentamientoHumanoFiltered = new ArrayList<>();
+        this.listAsentamientoHumanoCP = new ArrayList<>();
+        this.inicializaPais();
+        this.estadoSelected = null;
+        this.municipioSelected = null;
+        this.ciudadSelected = null;
+        this.asentamientoHumanoSelected = null;
+        this.entidadPostalSelected = null;
+        this.tipoAsentamientoSelected = null;
+    }
 
-	/**
-	 * Objetos para Paises
-	 */
-	private List<Paises> lstPaises;
-	private List<Paises> lstPaisesFiltered;
-	private Paises paisSelected;
-	private PaisesDAO paisesDAO;
-
-	/**
-	 * Objetos para País
-	 */
-	private PaisDAO paisDAO;
-	private Paises paisComplet;
-
-	/**
-	 * Objetos para Estados
-	 */
-	private List<Estados> lstEstados;
-	private List<Estados> lstEstadosFiltered;
-	private Estados estadoSelected;
-	private EstadosDAO estadosDAO;
-
-	/**
-	 * Objetos para Municipios
-	 */
-	private List<Municipios> lstMunicipios;
-	private List<Municipios> lstMunicipiosFiltered;
-	private Municipios municipioSelected;
-	private MunicipiosDAO municipiosDAO;
-
-	/**
-	 * Objetos para Ciudades
-	 */
-	private List<Ciudades> lstCiudades;
-	private List<Ciudades> lstCiudadesFiltered;
-	private Ciudades ciudadSelected;
-	private CiudadesDAO ciudadesDAO;
-
-	/**
-	 * Objetos para Asentamiento Humano
-	 */
-	private List<AsentamientoHumano> lstAsentamientoHumano;
-	private List<AsentamientoHumano> lstAsentamientoHumanoFiltered;
-	private AsentamientoHumano asentamientoHumanoSelected;
-	private AsentamientoHumano pintaColoniaSelected;
-	private AsentamientoHumanoDAO asentamientoHumanoDAO;
-
-	/**
-	 * Constructores
-	 */
-
-	public DomiciliosBean() {
-		clienteDAO = new ClienteDAO();
-		tiposDomicilioDAO = new TiposDomicilioDAO();
-		clienteDomiciliosDAO = new ClienteDomiciliosDAO();
-		domiciliosDAO = new DomiciliosDAO();
-		paisesDAO = new PaisesDAO();
-		estadosDAO = new EstadosDAO();
-		municipiosDAO = new MunicipiosDAO();
-		ciudadesDAO = new CiudadesDAO();
-		asentamientoHumanoDAO = new AsentamientoHumanoDAO();
-		lstClienteDomiciliosFiltered = new ArrayList<>();
-		lstDomiciliosFiltered = new ArrayList<>();
-		lstPaisesFiltered = new ArrayList<>();
-		lstEstadosFiltered = new ArrayList<>();
-		lstMunicipiosFiltered = new ArrayList<>();
-		lstCiudadesFiltered = new ArrayList<>();
-		lstAsentamientoHumanoFiltered = new ArrayList<>();
-		paisSelected = new Paises();
-		estadoSelected = new Estados();
-		municipioSelected = new Municipios();
-		ciudadSelected = new Ciudades();
-		asentamientoHumanoSelected = new AsentamientoHumano();
-	}
-
-	@PostConstruct
-	public void init() {
-		lstClientes = clienteDAO.buscarTodos();
-		lstTiposDomicilio = tiposDomicilioDAO.buscarTodos();
-		//lstClienteDomicilios = clienteDomiciliosDAO.buscarTodos();
-		lstDomicilios = domiciliosDAO.buscarTodos();
-		lstPaises = paisesDAO.buscarTodos();
-		//Collections.swap(lstPaises, 0, 150);
-		lstEstados = new ArrayList<>();
-		lstMunicipios = new ArrayList<>();
-		lstCiudades = new ArrayList<>();
-		lstAsentamientoHumano = new ArrayList<>();
-	}
-
-	/**
-	 * Método para filtrar del listado original por clave de cliente
-	 */
-	public void filtraListado() {
-		lstClienteDomiciliosFiltered.clear();
-		lstClienteDomicilios = clienteDomiciliosDAO.buscaPorCliente(clienteSelected);
-		lstClienteDomiciliosFiltered = lstClienteDomicilios.stream()
-				.filter(ps -> clienteSelected != null
-						? (ps.getCteCve().getCteCve().intValue() == clienteSelected.getCteCve().intValue())
-						: false)
-				.collect(Collectors.toList());
-		PrimeFaces.current().ajax().update("form:soClienteTipoDom");
-	}
-
-	/**
-	 * Método para filtrar del listado original por tipo de domicilio
-	 */
-	public void filtraListadoDomicilio() {
-		lstClienteDomiciliosFiltered.clear();
-		lstClienteDomiciliosFiltered = lstClienteDomicilios.stream()
-				.filter(ps -> tipoDomicilioSelected != null
-						? (ps.getDomicilios().getDomicilioTipoCve().getDomicilioTipoCve() == tipoDomicilioSelected
-								.getDomicilioTipoCve()
-								&& ps.getCteCve().getCteCve().intValue() == clienteSelected.getCteCve().intValue())
-						: false)
-				.collect(Collectors.toList());
-		PrimeFaces.current().ajax().update("form:buscarClienteDomicilio");
-	}
-
-	/**
-	 * Método para filtrar del listado original de paises por paiscve
-	 */
-	public void filtraListadoPaises() {
-		lstPaisesFiltered.clear();
-		lstPaisesFiltered = lstPaises.stream()
-				.filter(pa -> paisSelected != null
-						? (pa.getPaisCve().intValue() == paisSelected.getPaisCve().intValue())
-						: false)
-				.collect(Collectors.toList());
-		System.out.println("Paises Filtrados:" + lstPaisesFiltered.toString());
-		System.out.println("Paises Filtrados:" + lstPaisesFiltered.get(150).toString());
-		PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion");
-
-	}
-
-	/**
-	 * Método para filtrar del listado original de estados por paisCve
-	 */
-	public void filtraListadoEstados() { //ACTUALIZA LISTA ESTADOS 
-		estadoSelected.setPaises(paisSelected);
-		lstEstadosFiltered.clear();
-		Estados estadoAux = new Estados();
-		estadoAux.setPaises(paisSelected);
-		lstEstados = estadosDAO.buscarPorCriterios(estadoAux);
-		lstEstadosFiltered = lstEstados;
-		//System.out.println("Estados Filtrados:" + lstEstadosFiltered.toString());
-		//System.out.println("Países todos:" + lstPaises);
-		//System.out.println("Países todos:" + lstPaises.get(150));
-		//System.out.println("Países todos:" + lstPaises.get(0));
-
-		PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion");
-
-	}
-
-	/**
-	 * Método para filtrar del listado original de municipios por estadoCve
-	 */
-	public void filtraListadoMunicipios() { //ACTUALIZA LISTA MUNICIPIOS
-		municipioSelected.setEstados(estadoSelected);
-		lstMunicipiosFiltered.clear();
-		Municipios municipioAux = new Municipios();
-		MunicipiosPK municipiosPK = new MunicipiosPK();
-		
-		municipiosPK.setEstadoCve(estadoSelected.getEstadosPK().getEstadoCve());
-		municipiosPK.setPaisCve(paisSelected.getPaisCve());
-		municipioAux.setMunicipiosPK(municipiosPK);
-		lstMunicipios = municipiosDAO.buscarPorPaisEstado(municipioAux);//ERROR BUSCA SOLO POR ESTADO Y NO POR PAIS
-		lstMunicipiosFiltered = lstMunicipios;
-		System.out.println("Municipios Filtrados:" + lstMunicipiosFiltered.toString());
-
-		PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion");
-
-	}
-
-	/**
-	 * Método para filtrar del listado original de ciudades por municipioCve
-	 */
-	public void filtraListadoCiudades() { //ACTUALIZA LISTA CIUDADES 
-
-		ciudadSelected.setMunicipios(municipioSelected);
-		lstCiudadesFiltered.clear();
-		Ciudades ciudadAux = new Ciudades();
-		CiudadesPK ciudadesPK = new CiudadesPK();
-		
-		ciudadesPK.setPaisCve(paisSelected.getPaisCve());
-		ciudadesPK.setEstadoCve(estadoSelected.getEstadosPK().getEstadoCve());
-		ciudadesPK.setMunicipioCve(municipioSelected.getMunicipiosPK().getMunicipioCve());
-		
-		ciudadAux.setCiudadesPK(ciudadesPK);
-		lstCiudades = ciudadesDAO.buscarPorCriteriosCiudades(ciudadAux);
-		lstCiudadesFiltered = lstCiudades;
-		System.out.println("Ciudades Filtrados:" + lstCiudadesFiltered.toString());
-
-		PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion");
-
-	}
-
-	/**
-	 * Método para filtrar del listado original de asentamientos Humanos por
-	 * ciudadCve
-	 */
-	public void filtraListadoAsentamientoHumano() { //ACTUALIZA LISTA ASENATMIENTOS 
-		Domicilios domicilioAux = new Domicilios();
-		domicilioAux.setCiudades(ciudadSelected);
-
-		System.out.println("Ciudades Seleccionada:" + domicilioAux.toString());
-
-		lstAsentamientoHumanoFiltered.clear();
-		AsentamientoHumano coloniaAux = new AsentamientoHumano();
-		AsentamientoHumanoPK coloniaPKAux = new AsentamientoHumanoPK();
-		coloniaAux.setAsentamientoHumanoPK(coloniaPKAux);
-		coloniaAux.getAsentamientoHumanoPK().setCiudadCve(ciudadSelected.getCiudadesPK().getCiudadCve());
-
-		lstAsentamientoHumano = asentamientoHumanoDAO.buscaPorDomicilio(domicilioAux);
-		lstAsentamientoHumanoFiltered = lstAsentamientoHumano;
-		System.out.println("Colonia Filtrados:" + lstAsentamientoHumanoFiltered.toString());
-		actualizaCodigoPostal();
-
-		//PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion");
-
-	}
-
-	/**
-	 * Método para actualizar un código postal
-	 */
-
-	public void actualizaCodigoPostal() {
-		if (clienteDomicilioSelected.getDomicilios() != null) {
-			clienteDomicilioSelected.getDomicilios().setDomicilioCp(asentamientoHumanoSelected.getCp());
+    @PostConstruct
+    public void init() {
+        this.listPaises = paisesDAO.buscarTodos();
+        this.listEntidadPostal = entidadPostalDAO.buscarTodos();
+        this.listTipoAsentamiento = tipoAsentamientoDAO.buscarTodos();
+        this.initGuardarObjetos();
+        this.initActualizarObjetos();
+        this.initEliminarObjetos();
+        try {
+			this.mexico = paisesDAO.buscarPorClave("MX").orElseThrow(() -> new InventarioException("Pais por defecto no encontrado: MX"));
+		} catch (InventarioException e) {
+			log.warn(e.getMessage());
 		}
-		PrimeFaces.current().ajax().update("form:panel-addClienteDireccion", "form:panel-actClienteDireccion",
-				"form:actCodigo");
-
-	}
-
-	/**
-	 * Métodos para guardar objeto tipo ClienteDomicilio
-	 */
-	public void nuevoClienteDomicilio() {
-		clienteDomicilioSelected = new ClienteDomicilios();
-		clienteDomicilioSelected.setCteCve(clienteSelected);
-		clienteDomicilioSelected.setDomicilios(domicilioNuevo);
-	}
-
-	public void limpiaClienteDomicilio() {
-		clienteDomicilioSelected = new ClienteDomicilios();
-		domicilioSelected = new Domicilios();
-		ciudadSelected = new Ciudades();
-		asentamientoHumanoSelected = new AsentamientoHumano();
-		paisSelected = new Paises();
-		estadoSelected = new Estados();
-		municipioSelected = new Municipios();
-		paisComplet = new Paises();
-		domicilioNvoCalle = "";
-		domicilioNvoFax = "";
-		domicilioNvoNumExt = "";
-		domicilioNvoNumInt = "";
-		domicilioNvoTel1 = "";
-		domicilioNvoTel2 = "";
-	}
-
-	public void guardaClienteDomicilio() {
-		List<ClienteDomicilios> listaDomiciliosCliente = clienteDomiciliosDAO.buscaPorCliente(clienteSelected);
-		List<ClienteDomicilios> domicilioFiscal = listaDomiciliosCliente
-				.stream().filter(ps -> ps.getDomicilios().getDomicilioTipoCve().getDomicilioTipoCve() == tipoDomicilioSelected
-				.getDomicilioTipoCve()).collect(Collectors.toList());
-		
-		if(domicilioFiscal != null && domicilioFiscal.size() > 0) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ya existe un domicilio fiscal registrado para el cliente."));
-			PrimeFaces.current().ajax().update("form:messages");
-			nuevoClienteDomicilio();
-			return;
-		}
-		
-		nuevoDomicilio();
-		if (clienteDomiciliosDAO.guardar(clienteDomicilioSelected) == null) {
-			lstClienteDomiciliosFiltered.add(clienteDomicilioSelected);
-			lstClienteDomicilios.add(clienteDomicilioSelected);
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Domicilio Agregado"));
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ocurrió un error al intentar guardar el Domicilio"));
-		}
-		clienteDomicilioSelected = new ClienteDomicilios();
-		domicilioNuevo = new Domicilios();
-		limpiaClienteDomicilio();
-		PrimeFaces.current().ajax().update("form:messages", "form:dt-domiciliosCliente", "form:addDireccionCliente");
-	}
-	
-	public void cargaDatos() {
-		
-		this.paisSelected = clienteDomicilioSelected.getDomicilios().getPaisCved();
-		
-		
-	}
-
-	public void nuevoDomicilio() {
-		
-		if(this.tipoDomicilioSelected == null || this.tipoDomicilioSelected.getDomicilioTipoCve() <= 0) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Debe seleccionar un tipo de domicilio."));
-			return;
-		}
-		domicilioNuevo = new Domicilios();
-		paisComplet = new Paises();
-		paisComplet.setPaisCve(ciudadSelected.getMunicipios().getEstados().getPaises().getPaisCve());
-		domicilioNuevo.setPaisCved(paisComplet);
-		domicilioNuevo.setCiudades(ciudadSelected);
-		domicilioNuevo.setDomicilioCp(asentamientoHumanoSelected.getCp());
-		domicilioNuevo.setDomicilioColonia(asentamientoHumanoSelected.getAsentamientoHumanoPK().getAsentamientoCve());
-		domicilioNuevo.setDomicilioCalle(domicilioNvoCalle);
-		domicilioNuevo.setDomicilioFax(domicilioNvoFax);
-		domicilioNuevo.setDomicilioNumExt(domicilioNvoNumExt);
-		domicilioNuevo.setDomicilioNumInt(domicilioNvoNumInt);
-		domicilioNuevo.setDomicilioTel1(domicilioNvoTel1);
-		domicilioNuevo.setDomicilioTel2(domicilioNvoTel2);
-		domicilioNuevo.setDomicilioTipoCve(tipoDomicilioSelected);
-		domiciliosDAO.guardar(domicilioNuevo);
-		nuevoClienteDomicilio();
-	}
-
-	/**
-	 * Métodos para actualizar objeto tipo Domicilios
-	 */
-
-	public void actualizaDomicilio() {
-		domicilioNuevo = new Domicilios();
-		paisComplet = new Paises();
-		paisComplet.setPaisCve(ciudadSelected.getMunicipios().getEstados().getPaises().getPaisCve());
-		domicilioNuevo.setPaisCved(paisComplet);
-		domicilioNuevo.setCiudades(ciudadSelected);
-		domicilioNuevo.setDomicilioCp(asentamientoHumanoSelected.getCp());
-		domicilioNuevo.setDomicilioColonia(asentamientoHumanoSelected.getAsentamientoHumanoPK().getAsentamientoCve());
-		domicilioNuevo.setDomicilioCalle(clienteDomicilioSelected.getDomicilios().getDomicilioCalle());
-		domicilioNuevo.setDomicilioFax(clienteDomicilioSelected.getDomicilios().getDomicilioFax());
-		domicilioNuevo.setDomicilioNumExt(clienteDomicilioSelected.getDomicilios().getDomicilioNumExt());
-		domicilioNuevo.setDomicilioNumInt(clienteDomicilioSelected.getDomicilios().getDomicilioNumInt());
-		domicilioNuevo.setDomicilioTel1(clienteDomicilioSelected.getDomicilios().getDomicilioTel1());
-		domicilioNuevo.setDomicilioTel2(clienteDomicilioSelected.getDomicilios().getDomicilioTel2());
-		domicilioNuevo.setDomicilioTipoCve(tipoDomicilioSelected);
-		domicilioNuevo.setDomCve(clienteDomicilioSelected.getDomicilios().getDomCve());
-
-		if (domiciliosDAO.actualizar(domicilioNuevo) == null) {
-			clienteDomicilioSelected.setCteCve(clienteSelected);
-			clienteDomicilioSelected.setDomicilios(domicilioNuevo);
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Domicilio del cliente actualizado"));
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ocurrió un error al intentar actualizar el domicilio"));
-		}
-		PrimeFaces.current().ajax().update("form:messages", "form:dt-domiciliosCliente");
-	}
-
-	/**
-	 * Método para eliminar objeto tipo Cliente Domicilio y Domicilio
-	 */
-
-	public void eliminaClienteDomicilio() {
-		clienteDomicilioSelected.setCteCve(clienteSelected);
-		if (clienteDomiciliosDAO.eliminar(clienteDomicilioSelected) == null) {
-			if (domiciliosDAO.eliminar(clienteDomicilioSelected.getDomicilios()) == null) {
-				lstClienteDomiciliosFiltered.remove(clienteDomicilioSelected);
-				lstClienteDomicilios.remove(clienteDomicilioSelected);
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Domicilio eliminado"));
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-domiciliosCliente");
-			} else {
-				clienteDomiciliosDAO.guardar(clienteDomicilioSelected);
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						"Error", "Ocurrió un error al intentar eliminar el domicilio"));
-			}
-		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-					"Ocurrió un error al intentar eliminar el domicilio"));
-		}
-		PrimeFaces.current().ajax().update("form:messages");
-	}
-
-	/**
-	 * Método para pintar campos de actualización
-	 */
-	public void pintaActualiza() {
-		if (clienteDomicilioSelected != null && clienteDomicilioSelected.getDomicilios() != null) {
-			AsentamientoHumano coloniaAux = new AsentamientoHumano();
-			coloniaAux.setCp(clienteDomicilioSelected.getDomicilios().getDomicilioCp());
-			List<AsentamientoHumano> lstColAux = this.asentamientoHumanoDAO.buscaPorCP(coloniaAux.getCp());
-			for (AsentamientoHumano as : lstColAux) {
-				if (as.getAsentamientoHumanoPK().getAsentamientoCve() == clienteDomicilioSelected.getDomicilios()
-						.getDomicilioColonia()) {
-					asentamientoHumanoSelected = as;
-					break;
-				}
-			}
-		}
-		this.actualizaPais();
-		this.actualizaEstado();
-		this.actualizaMunicipio();
-		this.actualizaCiudad();
-		
-		
-		PrimeFaces.current().ajax().update("form:panel-actClienteDireccion");
-
-	}
-
-	public void actualizaCiudad() {
-		ciudadSelected = ciudadesDAO.buscaPorAsentamiento(asentamientoHumanoSelected).get(0);
-		filtraListadoDomicilio();
-		filtraListadoAsentamientoHumano();
-		PrimeFaces.current().ajax().update("form:coloniaAct");
-	}
-
-	public void actualizaMunicipio() {
-		municipioSelected = municipiosDAO.buscaPorAsentamiento(asentamientoHumanoSelected).get(0);
-		filtraListadoCiudades();
-		PrimeFaces.current().ajax().update("form:ciudadAct");
-	}
-
-	public void actualizaEstado() {
-		estadoSelected = estadosDAO.buscaPorAsentamiento(asentamientoHumanoSelected).get(0);
-		filtraListadoMunicipios();
-		PrimeFaces.current().ajax().update("form:municipioAct");
-	}
-
-	public void actualizaPais() {
-		paisSelected = paisesDAO.buscarPorId(asentamientoHumanoSelected.getAsentamientoHumanoPK().getPaisCve());
-		filtraListadoEstados();
-		PrimeFaces.current().ajax().update("form:estadoAct");
-	}
-
-	/**
-	 * Getters y Setters
-	 */
-	public List<Cliente> getLstClientes() {
-		return lstClientes;
-	}
-
-	public void setLstClientes(List<Cliente> lstClientes) {
-		this.lstClientes = lstClientes;
-	}
-
-	public Cliente getClienteSelected() {
-		return clienteSelected;
-	}
-
-	public void setClienteSelected(Cliente clienteSelected) {
-		this.clienteSelected = clienteSelected;
-	}
-
-	public ClienteDAO getClienteDAO() {
-		return clienteDAO;
-	}
-
-	public void setClienteDAO(ClienteDAO clienteDAO) {
-		this.clienteDAO = clienteDAO;
-	}
-
-	public List<TiposDomicilio> getLstTiposDomicilio() {
-		return lstTiposDomicilio;
-	}
-
-	public void setLstTiposDomicilio(List<TiposDomicilio> lstTiposDomicilio) {
-		this.lstTiposDomicilio = lstTiposDomicilio;
-	}
-
-	public TiposDomicilio getTipoDomicilioSelected() {
-		return tipoDomicilioSelected;
-	}
-
-	public void setTipoDomicilioSelected(TiposDomicilio tipoDomicilioSelected) {
-		this.tipoDomicilioSelected = tipoDomicilioSelected;
-	}
-
-	public TiposDomicilioDAO getTiposDomicilioDAO() {
-		return tiposDomicilioDAO;
-	}
-
-	public void setTiposDomicilioDAO(TiposDomicilioDAO tiposDomicilioDAO) {
-		this.tiposDomicilioDAO = tiposDomicilioDAO;
-	}
-
-	public List<ClienteDomicilios> getLstClienteDomicilios() {
-		return lstClienteDomicilios;
-	}
-
-	public void setLstClienteDomicilios(List<ClienteDomicilios> lstClienteDomicilios) {
-		this.lstClienteDomicilios = lstClienteDomicilios;
-	}
-
-	public List<ClienteDomicilios> getLstClienteDomiciliosFiltered() {
-		return lstClienteDomiciliosFiltered;
-	}
-
-	public void setLstClienteDomiciliosFiltered(List<ClienteDomicilios> lstClienteDomiciliosFiltered) {
-		this.lstClienteDomiciliosFiltered = lstClienteDomiciliosFiltered;
-	}
-
-	public ClienteDomicilios getClienteDomicilioSelected() {
-		return clienteDomicilioSelected;
-	}
-
-	public void setClienteDomicilioSelected(ClienteDomicilios clienteDomicilioSelected) {
-		this.clienteDomicilioSelected = clienteDomicilioSelected;
-	}
-
-	public ClienteDomiciliosDAO getClienteDomiciliosDAO() {
-		return clienteDomiciliosDAO;
-	}
-
-	public void setClienteDomiciliosDAO(ClienteDomiciliosDAO clienteDomiciliosDAO) {
-		this.clienteDomiciliosDAO = clienteDomiciliosDAO;
-	}
-
-	public List<Domicilios> getLstDomicilios() {
-		return lstDomicilios;
-	}
-
-	public void setLstDomicilios(List<Domicilios> lstDomicilios) {
-		this.lstDomicilios = lstDomicilios;
-	}
-
-	public List<Domicilios> getLstDomiciliosFiltered() {
-		return lstDomiciliosFiltered;
-	}
-
-	public void setLstDomiciliosFiltered(List<Domicilios> lstDomiciliosFiltered) {
-		this.lstDomiciliosFiltered = lstDomiciliosFiltered;
-	}
-
-	public Domicilios getDomicilioSelected() {
-		return domicilioSelected;
-	}
-
-	public void setDomicilioSelected(Domicilios domicilioSelected) {
-		this.domicilioSelected = domicilioSelected;
-	}
-
-	public DomiciliosDAO getDomiciliosDAO() {
-		return domiciliosDAO;
-	}
-
-	public void setDomiciliosDAO(DomiciliosDAO domiciliosDAO) {
-		this.domiciliosDAO = domiciliosDAO;
-	}
-
-	public List<Paises> getLstPaises() {
-		return lstPaises;
-	}
-
-	public void setLstPaises(List<Paises> lstPaises) {
-		this.lstPaises = lstPaises;
-	}
-
-	public List<Paises> getLstPaisesFiltered() {
-		return lstPaisesFiltered;
-	}
-
-	public void setLstPaisesFiltered(List<Paises> lstPaisesFiltered) {
-		this.lstPaisesFiltered = lstPaisesFiltered;
-	}
-
-	public Paises getPaisSelected() {
-		return paisSelected;
-	}
-
-	public void setPaisSelected(Paises paisSelected) {
-		this.paisSelected = paisSelected;
-	}
-
-	public PaisesDAO getPaisesDAO() {
-		return paisesDAO;
-	}
-
-	public void setPaisesDAO(PaisesDAO paisesDAO) {
-		this.paisesDAO = paisesDAO;
-	}
-
-	public List<Estados> getLstEstados() {
-		return lstEstados;
-	}
-
-	public void setLstEstados(List<Estados> lstEstados) {
-		this.lstEstados = lstEstados;
-	}
-
-	public List<Estados> getLstEstadosFiltered() {
-		return lstEstadosFiltered;
-	}
-
-	public void setLstEstadosFiltered(List<Estados> lstEstadosFiltered) {
-		this.lstEstadosFiltered = lstEstadosFiltered;
-	}
-
-	public Estados getEstadoSelected() {
-		return estadoSelected;
-	}
-
-	public void setEstadoSelected(Estados estadoSelected) {
-		this.estadoSelected = estadoSelected;
-	}
-
-	public EstadosDAO getEstadosDAO() {
-		return estadosDAO;
-	}
-
-	public void setEstadosDAO(EstadosDAO estadosDAO) {
-		this.estadosDAO = estadosDAO;
-	}
-
-	public List<Municipios> getLstMunicipios() {
-		return lstMunicipios;
-	}
-
-	public void setLstMunicipios(List<Municipios> lstMunicipios) {
-		this.lstMunicipios = lstMunicipios;
-	}
-
-	public List<Municipios> getLstMunicipiosFiltered() {
-		return lstMunicipiosFiltered;
-	}
-
-	public void setLstMunicipiosFiltered(List<Municipios> lstMunicipiosFiltered) {
-		this.lstMunicipiosFiltered = lstMunicipiosFiltered;
-	}
-
-	public Municipios getMunicipioSelected() {
-		return municipioSelected;
-	}
-
-	public void setMunicipioSelected(Municipios municipioSelected) {
-		this.municipioSelected = municipioSelected;
-	}
-
-	public MunicipiosDAO getMunicipiosDAO() {
-		return municipiosDAO;
-	}
-
-	public void setMunicipiosDAO(MunicipiosDAO municipiosDAO) {
-		this.municipiosDAO = municipiosDAO;
-	}
-
-	public List<Ciudades> getLstCiudades() {
-		return lstCiudades;
-	}
-
-	public void setLstCiudades(List<Ciudades> lstCiudades) {
-		this.lstCiudades = lstCiudades;
-	}
-
-	public List<Ciudades> getLstCiudadesFiltered() {
-		return lstCiudadesFiltered;
-	}
-
-	public void setLstCiudadesFiltered(List<Ciudades> lstCiudadesFiltered) {
-		this.lstCiudadesFiltered = lstCiudadesFiltered;
-	}
-
-	public Ciudades getCiudadSelected() {
-		return ciudadSelected;
-	}
-
-	public void setCiudadSelected(Ciudades ciudadSelected) {
-		this.ciudadSelected = ciudadSelected;
-	}
-
-	public CiudadesDAO getCiudadesDAO() {
-		return ciudadesDAO;
-	}
-
-	public void setCiudadesDAO(CiudadesDAO ciudadesDAO) {
-		this.ciudadesDAO = ciudadesDAO;
-	}
-
-	public List<AsentamientoHumano> getLstAsentamientoHumano() {
-		return lstAsentamientoHumano;
-	}
-
-	public void setLstAsentamientoHumano(List<AsentamientoHumano> lstAsentamientoHumano) {
-		this.lstAsentamientoHumano = lstAsentamientoHumano;
-	}
-
-	public List<AsentamientoHumano> getLstAsentamientoHumanoFiltered() {
-		return lstAsentamientoHumanoFiltered;
-	}
-
-	public void setLstAsentamientoHumanoFiltered(List<AsentamientoHumano> lstAsentamientoHumanoFiltered) {
-		this.lstAsentamientoHumanoFiltered = lstAsentamientoHumanoFiltered;
-	}
-
-	public AsentamientoHumano getAsentamientoHumanoSelected() {
-		return asentamientoHumanoSelected;
-	}
-
-	public void setAsentamientoHumanoSelected(AsentamientoHumano asentamientoHumanoSelected) {
-		this.asentamientoHumanoSelected = asentamientoHumanoSelected;
-	}
-
-	public AsentamientoHumanoDAO getAsentamientoHumanoDAO() {
-		return asentamientoHumanoDAO;
-	}
-
-	public void setAsentamientoHumanoDAO(AsentamientoHumanoDAO asentamientoHumanoDAO) {
-		this.asentamientoHumanoDAO = asentamientoHumanoDAO;
-	}
-
-	public PaisDAO getPaisDAO() {
-		return paisDAO;
-	}
-
-	public void setPaisDAO(PaisDAO paisDAO) {
-		this.paisDAO = paisDAO;
-	}
-
-	public Paises getPaisComplet() {
-		return paisComplet;
-	}
-
-	public void setPaisComplet(Paises paisComplet) {
-		this.paisComplet = paisComplet;
-	}
-
-	public Domicilios getDomicilioNuevo() {
-		return domicilioNuevo;
-	}
-
-	public void setDomicilioNuevo(Domicilios domicilioNuevo) {
-		this.domicilioNuevo = domicilioNuevo;
-	}
-
-	public String getDomicilioNvoCalle() {
-		return domicilioNvoCalle;
-	}
-
-	public void setDomicilioNvoCalle(String domicilioNvoCalle) {
-		this.domicilioNvoCalle = domicilioNvoCalle;
-	}
-
-	public String getDomicilioNvoNumExt() {
-		return domicilioNvoNumExt;
-	}
-
-	public void setDomicilioNvoNumExt(String domicilioNvoNumExt) {
-		this.domicilioNvoNumExt = domicilioNvoNumExt;
-	}
-
-	public String getDomicilioNvoNumInt() {
-		return domicilioNvoNumInt;
-	}
-
-	public void setDomicilioNvoNumInt(String domicilioNvoNumInt) {
-		this.domicilioNvoNumInt = domicilioNvoNumInt;
-	}
-
-	public String getDomicilioNvoTel1() {
-		return domicilioNvoTel1;
-	}
-
-	public void setDomicilioNvoTel1(String domicilioNvoTel1) {
-		this.domicilioNvoTel1 = domicilioNvoTel1;
-	}
-
-	public String getDomicilioNvoTel2() {
-		return domicilioNvoTel2;
-	}
-
-	public void setDomicilioNvoTel2(String domicilioNvoTel2) {
-		this.domicilioNvoTel2 = domicilioNvoTel2;
-	}
-
-	public String getDomicilioNvoFax() {
-		return domicilioNvoFax;
-	}
-
-	public void setDomicilioNvoFax(String domicilioNvoFax) {
-		this.domicilioNvoFax = domicilioNvoFax;
-	}
-
-	public AsentamientoHumano getPintaColoniaSelected() {
-		return pintaColoniaSelected;
-	}
-
-	public void setPintaColoniaSelected(AsentamientoHumano pintaColoniaSelected) {
-		this.pintaColoniaSelected = pintaColoniaSelected;
-	}
+    }
+
+    public void filtraListadoEstados()
+    {
+        try {
+            this.listEstadosFiltered.clear();
+            this.listMunicipiosFiltered.clear();
+            this.listCiudadesFiltered.clear();
+            this.listAsentamientoHumanoFiltered.clear();
+            
+            if(this.paisSelected == null){
+                throw new InventarioException("No hay pais seleccionado.");
+            }
+            
+            EstadosPK auxEstadosPK = new EstadosPK();
+            auxEstadosPK.setPais(this.paisSelected);
+            
+            this.estadoSelected = new Estados();
+            this.estadoSelected.setEstadosPK(auxEstadosPK);
+            log.debug("Info estado: {}", this.estadoSelected.getEstadosPK().toString());
+            
+            this.listEstadosFiltered = estadosDAO.buscarPorCriteriosEstados(this.estadoSelected);
+            
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Estados", "Seleccione un estado");
+        } catch (InventarioException ex) {
+            log.warn("Problema para buscar un estado...", ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Estados", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Problema para buscar un estado...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Estados", "Problema para buscar un estado.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public void filtraListadoMunicipios(){
+        try {
+            this.listMunicipiosFiltered.clear();
+            this.listCiudadesFiltered.clear();
+            this.listAsentamientoHumanoFiltered.clear();
+            
+            if(this.estadoSelected == null){
+                throw new InventarioException("No hay estado seleccionado.");
+            }
+            
+            MunicipiosPK municipiosPK = new MunicipiosPK();
+            municipiosPK.setEstados(this.estadoSelected);
+            
+            this.municipioSelected = new Municipios();
+            this.municipioSelected.setMunicipiosPK(municipiosPK);
+            log.debug("Info municipio: {}", this.municipioSelected.getMunicipiosPK().toString());
+            
+            this.listMunicipiosFiltered = municipiosDAO.buscarPorPaisEstado(this.municipioSelected);
+            
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Municipios", "Elemento encontrado");
+        } catch (InventarioException ex) {
+            log.warn("Problema para buscar un municipio...", ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Municipios", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Problema para buscar un municipio...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Municipios", "Problema para buscar un municipio.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public void filtraListadoCiudades(){
+        try {
+            log.debug("Municipio selected: {}", this.municipioSelected.toString());
+            this.listCiudadesFiltered.clear();
+            this.listAsentamientoHumanoFiltered.clear();
+            
+            if(this.municipioSelected == null){
+                throw new InventarioException("No hay municipio seleccionado.");
+            }
+            
+            CiudadesPK ciudadPK = new CiudadesPK();
+            ciudadPK.setMunicipios(this.municipioSelected);
+            
+            this.ciudadSelected = new Ciudades();
+            this.ciudadSelected.setCiudadesPK(ciudadPK);
+            log.debug("Info ciudad: {}", this.ciudadSelected.getCiudadesPK().toString());
+            
+            this.listCiudadesFiltered = this.ciudadesDAO.buscarPorCriteriosCiudades(this.ciudadSelected);
+            
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Ciudades", "Elemento encontrado");
+        } catch (InventarioException ex) {
+            log.warn("Problema para buscar una ciudad...", ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Localidad / ciudad", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Problema para buscar una ciudad...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Localidad / ciudad", "Problema para buscar una ciudad.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public void filtraListadoAsentamiento(){
+        try {
+            this.listAsentamientoHumanoFiltered.clear();
+            
+            if(this.ciudadSelected == null){
+                throw new InventarioException("No hay ciudad seleccionado.");
+            }
+            
+            AsentamientoHumanoPK asentamientoPK = new AsentamientoHumanoPK();
+            asentamientoPK.setCiudades(this.ciudadSelected);
+            
+            this.asentamientoHumanoSelected = new AsentamientoHumano();
+            this.asentamientoHumanoSelected.setAsentamientoHumanoPK(asentamientoPK);
+            log.debug("Info asentamiento: {}", this.asentamientoHumanoSelected.getAsentamientoHumanoPK().toString());
+            
+            this.listAsentamientoHumanoFiltered = this.asentamientoDAO.buscarPorCiudad(this.ciudadSelected);
+            
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento Humano", "Elemento encontrado");
+        } catch (InventarioException ex) {
+            log.warn("Problema para buscar un asentamiento...", ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Colonia (asentamiento)", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Problema para buscar un asentamiento...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Colonia (asentamiento)", "Problema para buscar un asentamiento.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public void filtraEntidadPostalTipoAsentamiento(){
+        try {
+            if(this.asentamientoHumanoSelected == null){
+                throw new InventarioException("No hay un asentamiento seleccionado.");
+            }
+            
+            this.entidadPostalSelected = this.asentamientoHumanoSelected.getEntidadPostal();
+            this.tipoAsentamientoSelected = this.asentamientoHumanoSelected.getTipoAsentamiento();
+            
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento", "Elemento encontrado");
+        } catch (InventarioException ex) {
+            log.warn("Problema para buscar los elementos...", ex.getMessage());
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Asentamiento", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Problema para buscar los elementos...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Asentamiento", "Problema para buscar los elementos.");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public <T> void guardar(T entidad){
+        String titulo = entidad.getClass().getSimpleName();
+        try{
+            log.info("Iniciando el proceso de guardar");
+            
+            Consumer<Object> accion = guardarObjetos.get(entidad.getClass());
+            if (accion == null) {
+                log.warn("Entidad no soportado: {}" + entidad.getClass());
+                throw new IllegalArgumentException("Problema para guardar, favor de contactar al administrador");
+            }
+
+            accion.accept(entidad);
+            
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo, "El elemento se guardo con exito");
+        } catch (RuntimeException ex) {
+            log.error("Se encontro un problema para guardar...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Se encontro un problema para guardar...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo, "Se encontro un problema para guardar el elemento, favor de contactar al administrador de sistemas");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public <T> void actualizar(T entidad){
+        String titulo = entidad.getClass().getSimpleName();
+        try{
+            log.info("Iniciando el proceso de actualizar");
+            
+            Consumer<Object> actualizador = actualizarObjetos.get(entidad.getClass());
+            if (actualizador == null) {
+                log.warn("Entidad no soportado: {}" + entidad.getClass());
+                throw new IllegalArgumentException("Problema para guardar, favor de contactar al administrador");
+            }
+
+            actualizador.accept(entidad);
+            
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo, "El elemento se actualizo con exito");
+        } catch (RuntimeException ex) {
+            log.error("Se encontro un problema para actualizar...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Se encontro un problema para actualizar...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo, "Se encontro un problema para actualizar el elemento, favor de contactar al administrador de sistemas");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public <T> void eliminarObjeto(T entidad){
+        String titulo = entidad.getClass().getSimpleName();
+        try {
+            log.info("Iniciando el proceso de eliminar");
+            
+            Consumer<Object> eliminador = eliminarObjetos.get(entidad.getClass());
+            if (eliminador == null) {
+                log.warn("Entidad no soportado: {}" + entidad.getClass());
+                throw new IllegalArgumentException("Problema para guardar, favor de contactar al administrador");
+            }
+
+            eliminador.accept(entidad);
+            
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo, "El elemento se elimino correctamente");
+        } catch (RuntimeException ex) {
+            log.error("Problema para eliminar...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Problema para eliminar...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo, "Se encontro un problema para eliminar el elemento, favor de contactar al administrador de sistemas");
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
+    public void initGuardarObjetos(){
+        guardarObjetos.put(Paises.class, o -> {
+            Paises entidad = (Paises) o;
+            try {
+                Paises auxPais = paisesDAO.buscarUltimoPais();
+                int numPais = auxPais.getPaisCve();
+                numPais++;
+                
+                entidad.setPaisCve(numPais);
+                this.validarPais(entidad);
+                
+                paisesDAO.guardar(entidad);
+                log.info("Guardando un pais");
+                
+                this.listPaises = paisesDAO.buscarTodos();
+                this.listEstadosFiltered = estadosDAO.buscarPorPais(this.paisSelected);
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        
+        guardarObjetos.put(Estados.class, o -> {
+            Estados entidad = (Estados) o;
+            try {
+                Estados auxEstado = estadosDAO.buscarUltimoEstado(this.paisSelected);
+                int numEstado = (auxEstado != null) ? auxEstado.getEstadosPK().getEstadoCve() : 0;
+                numEstado++;
+                
+                entidad.getEstadosPK().setEstadoCve(numEstado);
+                this.validarEstado(entidad);
+                
+                estadosDAO.guardar(entidad);
+                log.info("Guardando un estado");
+                
+                this.listEstadosFiltered = estadosDAO.buscarPorPais(this.paisSelected);
+                this.listMunicipiosFiltered = municipiosDAO.buscarPorPaisEstado(this.estadoSelected);
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        
+        guardarObjetos.put(Municipios.class, o -> {
+            Municipios entidad = (Municipios) o;
+            try {
+                Municipios auxMunicipio = municipiosDAO.buscarUltimoMunicipio(this.estadoSelected);
+                int numMunicipio = (auxMunicipio != null) ? auxMunicipio.getMunicipiosPK().getMunicipioCve() : 0;
+                numMunicipio++;
+                
+                entidad.getMunicipiosPK().setMunicipioCve(numMunicipio);
+                this.validarMunicipio(entidad);
+                
+                municipiosDAO.guardar(entidad);
+                log.info("Guardando un municipio");
+                
+                this.listMunicipiosFiltered = municipiosDAO.buscarPorCriterios(this.municipioSelected);
+                this.listCiudadesFiltered = ciudadesDAO.buscarPorPaisEstadoMunicipio(this.municipioSelected);
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        
+        guardarObjetos.put(Ciudades.class, o -> {
+            Ciudades entidad = (Ciudades) o;
+            try {
+                Ciudades auxCiudad = ciudadesDAO.buscarUltimaCidad(this.municipioSelected);
+                int numCiudad = (auxCiudad != null) ? auxCiudad.getCiudadesPK().getCiudadCve() : 0;
+                numCiudad++;
+                
+                entidad.getCiudadesPK().setCiudadCve(numCiudad);
+                this.validarCiudad(entidad);
+                
+                ciudadesDAO.guardar(entidad);
+                log.info("Guardando una ciudad");
+                
+                this.listCiudadesFiltered = ciudadesDAO.buscarPorCriteriosCiudades(this.ciudadSelected);
+                this.listAsentamientoHumanoFiltered = asentamientoDAO.buscarPorCiudad(this.ciudadSelected);
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        
+        guardarObjetos.put(AsentamientoHumano.class, o -> {
+            AsentamientoHumano entidad = (AsentamientoHumano) o;
+            try {
+                AsentamientoHumano auxAsentamiento = asentamientoDAO.buscarUltimoAsentamiento();
+                int numAsentamiento = (auxAsentamiento != null) ? auxAsentamiento.getAsentamientoHumanoPK().getAsentamientoCve() : 0;
+                numAsentamiento++;
+                
+                entidad.getAsentamientoHumanoPK().setAsentamientoCve(numAsentamiento);
+                entidad.setEntidadPostal(this.entidadPostalSelected);
+                entidad.setTipoAsentamiento(this.tipoAsentamientoSelected);
+                this.validarAsentamiento(entidad);
+                
+                asentamientoDAO.guardar(entidad);
+                log.info("Guardando un asentamiento");
+                
+                this.codigoPostal = entidad.getCp();
+                this.listAsentamientoHumanoFiltered = asentamientoDAO.buscarPorCriterios(this.asentamientoHumanoSelected);
+                this.listAsentamientoHumanoCP = asentamientoDAO.buscaPorCP(((AsentamientoHumano) entidad).getCp());
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        
+        guardarObjetos.put(EntidadPostal.class, o -> {
+            EntidadPostal entidad = (EntidadPostal) o;
+            try {
+                EntidadPostal auxEntidadPostal = entidadPostalDAO.buscarUltimaEntidadPostal();
+                int numEntidadPostal = auxEntidadPostal.getEntidadpostalCve();
+                numEntidadPostal++;
+                
+                entidad.setEntidadpostalCve(numEntidadPostal);
+                this.validarEntidadPostal(entidad);
+                
+                entidadPostalDAO.guardar(entidad);
+                log.info("Guardando una entidad postal");
+                
+                this.listEntidadPostal = entidadPostalDAO.buscarTodos();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        
+        guardarObjetos.put(TipoAsentamiento.class, o -> {
+            TipoAsentamiento entidad = (TipoAsentamiento) o;
+            try {
+                TipoAsentamiento auxTipoAsentamiento = tipoAsentamientoDAO.buscarUltimoTipoAsentamiento();
+                int numTipoAsentamiento = auxTipoAsentamiento.getTipoasntmntoCve();
+                numTipoAsentamiento++;
+                
+                entidad.setTipoasntmntoCve((short) numTipoAsentamiento);
+                this.validarTipoAsentamiento(entidad);
+                
+                tipoAsentamientoDAO.guardar(entidad);
+                log.info("Guardando un tipo de asentamiento");
+                
+                this.listTipoAsentamiento = tipoAsentamientoDAO.buscarTodos();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+    
+    public void initActualizarObjetos() {
+        actualizarObjetos.put(Paises.class, o -> {
+            Paises entidad = (Paises) o;
+            try {
+                validarPais(entidad);
+                paisesDAO.actualizar(entidad);
+                log.info("Actualizando un país");
+                listPaises = paisesDAO.buscarTodos();
+                listEstadosFiltered = estadosDAO.buscarPorPais(paisSelected);
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        actualizarObjetos.put(Estados.class, o -> {
+            Estados entidad = (Estados) o;
+            try {
+                validarEstado(entidad);
+                estadosDAO.actualizar(entidad);
+                log.info("Actualizando un estado");
+                listEstadosFiltered = estadosDAO.buscarPorPais(paisSelected);
+                listMunicipiosFiltered = municipiosDAO.buscarPorPaisEstado(estadoSelected);
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        actualizarObjetos.put(Municipios.class, o -> {
+            Municipios entidad = (Municipios) o;
+            try {
+                validarMunicipio(entidad);
+                municipiosDAO.actualizar(entidad);
+                log.info("Actualizando un municipio");
+                listMunicipiosFiltered = municipiosDAO.buscarPorCriterios(municipioSelected);
+                listCiudadesFiltered = ciudadesDAO.buscarPorPaisEstadoMunicipio(municipioSelected);
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        actualizarObjetos.put(Ciudades.class, o -> {
+            Ciudades entidad = (Ciudades) o;
+            try {
+                validarCiudad(entidad);
+                ciudadesDAO.actualizar(entidad);
+                log.info("Actualizando una ciudad");
+                listCiudadesFiltered = ciudadesDAO.buscarPorCriteriosCiudades(ciudadSelected);
+                listAsentamientoHumanoFiltered = asentamientoDAO.buscarPorCiudad(ciudadSelected);
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        actualizarObjetos.put(AsentamientoHumano.class, o -> {
+            AsentamientoHumano entidad = (AsentamientoHumano) o;
+            try {
+                validarAsentamiento(entidad);
+                asentamientoDAO.actualizar(entidad);
+                log.info("Actualizando un asentamiento humano");
+                codigoPostal = entidad.getCp();
+                listAsentamientoHumanoFiltered = asentamientoDAO.buscarPorCriterios(asentamientoHumanoSelected);
+                listAsentamientoHumanoCP = asentamientoDAO.buscaPorCP(entidad.getCp());
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        actualizarObjetos.put(EntidadPostal.class, o -> {
+            EntidadPostal entidad = (EntidadPostal) o;
+            try {
+                validarEntidadPostal(entidad);
+                entidadPostalDAO.actualizar(entidad);
+                log.info("Actualizando una entidad postal");
+                listEntidadPostal = entidadPostalDAO.buscarTodos();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        actualizarObjetos.put(TipoAsentamiento.class, o -> {
+            TipoAsentamiento entidad = (TipoAsentamiento) o;
+            try {
+                validarTipoAsentamiento(entidad);
+                tipoAsentamientoDAO.actualizar(entidad);
+                log.info("Actualizando un tipo de asentamiento");
+                listTipoAsentamiento = tipoAsentamientoDAO.buscarTodos();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+    
+    public void initEliminarObjetos() 
+    {
+        eliminarObjetos.put(Paises.class, o -> {
+            Paises entidad = (Paises) o;
+            log.info("Eliminando el país: {}", entidad.getPaisDesc());
+            try {
+                validarPais(entidad);
+                paisesDAO.eliminar(entidad);
+                inicializaPais();
+                listPaises = paisesDAO.buscarTodos();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+
+        eliminarObjetos.put(Estados.class, o -> {
+            Estados entidad = (Estados) o;
+            log.info("Eliminando el estado: {}", entidad.getEstadoDesc());
+            try {
+                validarEstado(entidad);
+                estadosDAO.eliminar(entidad);
+                inicializaEstado();
+                listEstadosFiltered = estadosDAO.buscarPorPais(paisSelected);
+                listMunicipiosFiltered.clear();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+
+        eliminarObjetos.put(Municipios.class, o -> {
+            Municipios entidad = (Municipios) o;
+            log.info("Eliminando el municipio: {}", entidad.getMunicipioDs());
+            try{
+                validarMunicipio(entidad);
+                municipiosDAO.eliminar(entidad);
+                inicializaMunicipio();
+                listMunicipiosFiltered = municipiosDAO.buscarPorPaisEstado(estadoSelected);
+                listCiudadesFiltered.clear();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+
+        eliminarObjetos.put(Ciudades.class, o -> {
+            Ciudades entidad = (Ciudades) o;
+            log.info("Eliminando la ciudad: {}", entidad.getCiudadDs());
+            try {
+                validarCiudad(entidad);
+                ciudadesDAO.eliminar(entidad);
+                inicializaCiudad();
+                listCiudadesFiltered = ciudadesDAO.buscarPorPaisEstadoMunicipio(municipioSelected);
+                listAsentamientoHumanoFiltered.clear();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+
+        eliminarObjetos.put(AsentamientoHumano.class, o -> {
+            AsentamientoHumano entidad = (AsentamientoHumano) o;
+            log.info("Eliminando el asentamiento humano: {}", entidad.getAsentamientoDs());
+            try {
+                validarAsentamiento(entidad);
+                asentamientoDAO.eliminar(entidad);
+                inicializaAsentamiento();
+                inicializaEntidadPostal();
+                inicializaTipoAsentamiento();
+                listAsentamientoHumanoFiltered = asentamientoDAO.buscarPorCiudad(ciudadSelected);
+                limpiar();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+
+        eliminarObjetos.put(EntidadPostal.class, o -> {
+            EntidadPostal entidad = (EntidadPostal) o;
+            log.info("Eliminando la entidad postal: {}", entidad.getEntidadpostalDs());
+            try {
+                validarEntidadPostal(entidad);
+                entidadPostalDAO.eliminar(entidad);
+                inicializaEntidadPostal();
+                listEntidadPostal = entidadPostalDAO.buscarTodos();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+
+        eliminarObjetos.put(TipoAsentamiento.class, o -> {
+            TipoAsentamiento entidad = (TipoAsentamiento) o;
+            log.info("Eliminando tipo de asentamiento: {}", entidad.getTipoasntmntoDs());
+            try {
+                validarTipoAsentamiento(entidad);
+                tipoAsentamientoDAO.eliminar(entidad);
+                inicializaTipoAsentamiento();
+                listTipoAsentamiento = tipoAsentamientoDAO.buscarTodos();
+            } catch (InventarioException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+    }
+    
+    private void validarPais(Paises pais) throws InventarioException {
+        if (pais.getPaisDesc() == null || pais.getPaisDesc().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción del país.");
+        if (pais.getPaisDsCorta() == null || pais.getPaisDsCorta().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción corta del país.");
+    }
+
+    private void validarEstado(Estados estado) throws InventarioException {
+        if (estado.getEstadoDesc() == null || estado.getEstadoDesc().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción del estado.");
+        if (estado.getEstadoDsCorta() == null || estado.getEstadoDsCorta().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción corta del estado.");
+    }
+    
+    private void validarMunicipio(Municipios municipio) throws InventarioException {
+        if (municipio.getMunicipioDs() == null || municipio.getMunicipioDs().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción del municipio.");
+    }
+    
+    private void validarCiudad(Ciudades ciudad) throws InventarioException {
+        if (ciudad.getCiudadDs() == null || ciudad.getCiudadDs().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción de la ciudad.");
+    }
+    
+    private void validarAsentamiento(AsentamientoHumano asentamiento) throws InventarioException {
+        if (asentamiento.getAsentamientoDs() == null || asentamiento.getAsentamientoDs().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción del asentamiento.");
+        if (asentamiento.getCp() == null || asentamiento.getCp().trim().isEmpty()) throw new InventarioException("Debes agregar un codigo postal del asentamiento");
+        if (asentamiento.getEntidadPostal() == null || asentamiento.getEntidadPostal().getEntidadpostalCve() == null) throw new InventarioException("Debes agregar una entidad postal del asentamiento");
+        if (asentamiento.getTipoAsentamiento() == null || asentamiento.getTipoAsentamiento().getTipoasntmntoCve() == null) throw new InventarioException("Debes agregar una tipo de asentamiento");
+    }
+    
+    private void validarEntidadPostal(EntidadPostal entidadPostal) throws InventarioException {
+        if (entidadPostal.getEntidadpostalDs() == null || entidadPostal.getEntidadpostalDs().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción de la entidad postal");
+    }
+    
+    private void validarTipoAsentamiento(TipoAsentamiento tipoAsentamiento) throws InventarioException {
+        if (tipoAsentamiento.getTipoasntmntoDsCorta() == null || tipoAsentamiento.getTipoasntmntoDsCorta().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción corta del tipo de asentamiento");
+        if (tipoAsentamiento.getTipoasntmntoDs() == null || tipoAsentamiento.getTipoasntmntoDs().trim().isEmpty()) throw new InventarioException("Debes agregar una descripción del tipo de asentamiento");
+    }
+    
+    public void inicializaPais(){
+        this.paisSelected = new Paises();
+    }
+    
+    public void inicializaEstado(){
+        EstadosPK estadosPK = new EstadosPK();
+        estadosPK.setPais(this.paisSelected);
+        
+        this.estadoSelected = new Estados();
+        this.estadoSelected.setEstadosPK(estadosPK);
+    }
+    
+    public void inicializaMunicipio(){
+        MunicipiosPK municipiosPK = new MunicipiosPK();
+        municipiosPK.setEstados(this.estadoSelected);
+        
+        this.municipioSelected = new Municipios();
+        this.municipioSelected.setMunicipiosPK(municipiosPK);
+    }
+    
+    public void inicializaCiudad(){
+        CiudadesPK ciudadesPK = new CiudadesPK();
+        ciudadesPK.setMunicipios(this.municipioSelected);
+        
+        this.ciudadSelected = new Ciudades();
+        this.ciudadSelected.setCiudadesPK(ciudadesPK);
+    }
+    
+    public void inicializaAsentamiento(){
+        AsentamientoHumanoPK asentamientoPK = new AsentamientoHumanoPK();
+        asentamientoPK.setCiudades(this.ciudadSelected);
+        
+        this.asentamientoHumanoSelected = new AsentamientoHumano();
+        this.asentamientoHumanoSelected.setAsentamientoHumanoPK(asentamientoPK);
+    }
+    
+    public void inicializaEntidadPostal(){
+        this.entidadPostalSelected = new EntidadPostal();
+    }
+    
+    public void inicializaTipoAsentamiento(){
+        this.tipoAsentamientoSelected = new TipoAsentamiento();
+    }
+    
+    public void asignarAsentamiento(AsentamientoHumano asentamiento) {
+        try {
+            this.asentamientoHumanoSelected = asentamiento;
+            
+            if (this.asentamientoHumanoSelected == null) {
+                throw new InventarioException("No hay objeto asentamiento seleccionado.");
+            }
+
+            log.info("Buscando información del asentamiento");
+            log.debug("Domicilio seleccionado: {}", this.asentamientoHumanoSelected.toString());
+            
+            this.entidadPostalSelected = this.asentamientoHumanoSelected.getEntidadPostal();
+            this.tipoAsentamientoSelected = this.asentamientoHumanoSelected.getTipoAsentamiento();
+            this.paisSelected = this.asentamientoHumanoSelected.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais();
+            this.estadoSelected = this.asentamientoHumanoSelected.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados();
+            this.municipioSelected = this.asentamientoHumanoSelected.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios();
+            this.ciudadSelected = this.asentamientoHumanoSelected.getAsentamientoHumanoPK().getCiudades();
+            this.codigoPostal = this.asentamientoHumanoSelected.getCp();
+            
+            this.limpiarListasFiltradas();
+            
+            this.listEstadosFiltered = estadosDAO.buscarPorCriteriosEstados(this.estadoSelected);
+            this.listMunicipiosFiltered = municipiosDAO.buscarPorCriterios(this.municipioSelected);
+            this.listCiudadesFiltered = this.ciudadesDAO.buscarPorCriteriosCiudades(this.ciudadSelected);
+            this.listAsentamientoHumanoFiltered = this.asentamientoDAO.buscarPorCiudad(this.ciudadSelected);
+            
+//            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Asentamiento Humano", "Domicilio seleccionado");
+        } catch (InventarioException ex) {
+            log.error("Problema para buscar un asentamiento...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Asentamiento Humano", ex.getMessage());
+        } catch (Exception ex) {
+            log.error("Problema para buscar un asentamiento...", ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Asentamiento Humano", "Problema para buscar un asentamiento");
+        } finally {
+            this.codigoPostal = "";
+            PrimeFaces.current().ajax().update("form:messages", "form:pais", "form:estado", "form:municipio", "form:ciudad", "form:asentamiento");
+        }
+    }
+    
+    public void sugerenciasCodigoPostal() {
+        this.listAsentamientoHumanoCP = asentamientoDAO.buscaPorCP(this.codigoPostal.trim());
+    }
+    
+    public AsentamientoHumano nuevoAsentamiento(){
+        AsentamientoHumano asentamiento = new AsentamientoHumano();
+        
+        AsentamientoHumanoPK pk = new AsentamientoHumanoPK();
+        pk.setCiudades(new Ciudades());
+        pk.getCiudades().setCiudadesPK(new CiudadesPK());
+        pk.getCiudades().getCiudadesPK().setMunicipios(new Municipios());
+        pk.getCiudades().getCiudadesPK().getMunicipios().setMunicipiosPK(new MunicipiosPK());
+        pk.getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().setEstados(new Estados());
+        pk.getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().setEstadosPK(new EstadosPK());
+        pk.getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().setPais(new Paises());
+        
+        asentamiento.setAsentamientoHumanoPK(pk);
+        
+        return asentamiento;
+    }
+    
+    public void limpiar(){
+        this.codigoPostal = "";
+        this.asentamientoHumanoSelected = this.nuevoAsentamiento();
+        this.listAsentamientoHumanoCP.clear();
+    }
+    
+    public void limpiarAsentamiento(){
+        this.asentamientoHumanoSelected = this.nuevoAsentamiento();
+        this.entidadPostalSelected = new EntidadPostal();
+        this.tipoAsentamientoSelected = new TipoAsentamiento();
+        this.ciudadSelected = new Ciudades();
+        this.municipioSelected = new Municipios();
+        this.estadoSelected = new Estados();
+        this.limpiarListasFiltradas();
+        
+        if(this.mexico == null)
+        	this.paisSelected = new Paises();
+        else
+        	this.paisSelected = this.mexico;
+        
+        this.filtraListadoEstados();
+    }
+    
+    public void limpiarListasFiltradas(){
+        this.listEstadosFiltered.clear();
+        this.listMunicipiosFiltered.clear();
+        this.listCiudadesFiltered.clear();
+        this.listAsentamientoHumanoFiltered.clear();
+    }
+
+    //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
+    public List<AsentamientoHumano> getListAsentamientoHumano() {
+        return listAsentamientoHumano;
+    }
+
+    public void setListAsentamientoHumano(List<AsentamientoHumano> listAsentamientoHumano) {
+        this.listAsentamientoHumano = listAsentamientoHumano;
+    }
+
+    public List<AsentamientoHumano> getListAsentamientoHumanoFiltered() {
+        return listAsentamientoHumanoFiltered;
+    }
+
+    public void setListAsentamientoHumanoFiltered(List<AsentamientoHumano> listAsentamientoHumanoFiltered) {
+        this.listAsentamientoHumanoFiltered = listAsentamientoHumanoFiltered;
+    }
+
+    public List<AsentamientoHumano> getListAsentamientoHumanoCP() {
+        return listAsentamientoHumanoCP;
+    }
+
+    public void setListAsentamientoHumanoCP(List<AsentamientoHumano> listAsentamientoHumanoCP) {
+        this.listAsentamientoHumanoCP = listAsentamientoHumanoCP;
+    }
+
+    public AsentamientoHumano getAsentamientoHumanoSelected() {
+        return asentamientoHumanoSelected;
+    }
+
+    public void setAsentamientoHumanoSelected(AsentamientoHumano asentamientoHumanoSelected) {
+        this.asentamientoHumanoSelected = asentamientoHumanoSelected;
+    }
+
+    public List<EntidadPostal> getListEntidadPostal() {
+        return listEntidadPostal;
+    }
+
+    public void setListEntidadPostal(List<EntidadPostal> listEntidadPostal) {
+        this.listEntidadPostal = listEntidadPostal;
+    }
+
+    public EntidadPostal getEntidadPostalSelected() {
+        return entidadPostalSelected;
+    }
+
+    public void setEntidadPostalSelected(EntidadPostal entidadPostalSelected) {
+        this.entidadPostalSelected = entidadPostalSelected;
+    }
+
+    public List<TipoAsentamiento> getListTipoAsentamiento() {
+        return listTipoAsentamiento;
+    }
+
+    public void setListTipoAsentamiento(List<TipoAsentamiento> listTipoAsentamiento) {
+        this.listTipoAsentamiento = listTipoAsentamiento;
+    }
+
+    public TipoAsentamiento getTipoAsentamientoSelected() {
+        return tipoAsentamientoSelected;
+    }
+
+    public void setTipoAsentamientoSelected(TipoAsentamiento tipoAsentamientoSelected) {
+        this.tipoAsentamientoSelected = tipoAsentamientoSelected;
+    }
+
+    public List<Ciudades> getListCiudadesFiltered() {
+        return listCiudadesFiltered;
+    }
+
+    public void setListCiudadesFiltered(List<Ciudades> listCiudadesFiltered) {
+        this.listCiudadesFiltered = listCiudadesFiltered;
+    }
+
+    public Ciudades getCiudadSelected() {
+        return ciudadSelected;
+    }
+
+    public void setCiudadSelected(Ciudades ciudadSelected) {
+        this.ciudadSelected = ciudadSelected;
+    }
+
+    public List<Municipios> getListMunicipiosFiltered() {
+        return listMunicipiosFiltered;
+    }
+
+    public void setListMunicipiosFiltered(List<Municipios> listMunicipiosFiltered) {
+        this.listMunicipiosFiltered = listMunicipiosFiltered;
+    }
+
+    public Municipios getMunicipioSelected() {
+        return municipioSelected;
+    }
+
+    public void setMunicipioSelected(Municipios municipioSelected) {
+        this.municipioSelected = municipioSelected;
+    }
+
+    public List<Estados> getListEstadosFiltered() {
+        return listEstadosFiltered;
+    }
+
+    public void setListEstadosFiltered(List<Estados> listEstadosFiltered) {
+        this.listEstadosFiltered = listEstadosFiltered;
+    }
+
+    public Estados getEstadoSelected() {
+        return estadoSelected;
+    }
+
+    public void setEstadoSelected(Estados estadoSelected) {
+        this.estadoSelected = estadoSelected;
+    }
+
+    public List<Paises> getListPaises() {
+        return listPaises;
+    }
+
+    public void setListPaises(List<Paises> listPaises) {
+        this.listPaises = listPaises;
+    }
+
+    public Paises getPaisSelected() {
+        return paisSelected;
+    }
+
+    public void setPaisSelected(Paises paisSelected) {
+        this.paisSelected = paisSelected;
+    }
+    
+    public String getCodigoPostal() {
+        return codigoPostal;
+    }
+
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
+    }
+    //</editor-fold>
 
 }

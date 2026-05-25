@@ -10,6 +10,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EntidadPostal;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class EntidadPostalDAO extends IBaseDAO<EntidadPostal, Integer> {
 
 	@Override

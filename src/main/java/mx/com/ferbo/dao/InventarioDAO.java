@@ -16,13 +16,11 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ConstanciaDeDeposito;
-import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.DetalleConstanciaSalida;
 import mx.com.ferbo.model.DetallePartida;
 import mx.com.ferbo.model.Inventario;
 import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.Planta;
-import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
@@ -129,20 +127,22 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					detalleConstanciaSalidaList = p.getDetalleConstanciaSalidaList();
 					detallePartidaList = p.getDetallePartidaList();
 					Integer cantidadSalidas = 0;
-					BigDecimal pesoSalidas = new BigDecimal(0).setScale(3, RoundingMode.HALF_UP);
-
-					for (DetalleConstanciaSalida dcs : detalleConstanciaSalidaList) { // Por cada partida, obtenemos su
-																						// detalle de salidas.
-						ConstanciaSalida constanciaSalida = dcs.getConstanciaCve();
-						StatusConstanciaSalida statusSalida = constanciaSalida.getStatus();
-						if (statusSalida.getId().compareTo(1) != 0) {
-							log.info("Constancia salida {} cancelada.", constanciaSalida.getNumero());
-							continue;
-						}
-						pesoSalidas = pesoSalidas.add(dcs.getPeso());
-						cantidadSalidas = cantidadSalidas + dcs.getCantidad();
-					}
-
+					BigDecimal pesoSalidas = new BigDecimal(0).setScale(3,RoundingMode.HALF_UP);
+					
+					pesoSalidas = detalleConstanciaSalidaList.stream()
+							.filter(item -> item.getConstanciaCve().getStatus().getId().equals(1))
+							.map(DetalleConstanciaSalida::getPeso)
+							.reduce(BigDecimal.ZERO, BigDecimal::add)
+							;
+					
+					cantidadSalidas = detalleConstanciaSalidaList.stream()
+							.filter(item -> item.getConstanciaCve().getStatus().getId().equals(1))
+							.mapToInt(DetalleConstanciaSalida::getCantidad)
+							.sum()
+							;
+					
+					log.debug("Partida: {}, cantidad salidas: {}, peso salidas: {}", p.getPartidaCve(), cantidadSalidas, pesoSalidas);
+					
 					Integer cantidadRestante = cantidadInicial - cantidadSalidas;
 					BigDecimal pesoRestante = pesoInicial.subtract(pesoSalidas);
 					DetallePartida dp = detallePartidaList.get(detallePartidaList.size() - 1);
@@ -174,6 +174,8 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 					inventario.setPedimento(dp.getDtpPedimento());
 					inventario.setPo(dp.getDtpPO());
 					inventario.setCliente(c.getCteCve());
+					inventario.setTarima(p.getTarima() == null ? null : p.getTarima().getNombre());
+					
 					inventarioList.add(inventario);
 					log.debug("Inventario agregado: folio: {}, folioCliente: {}, partidaCve: {}", inventario.getFolio(),
 							inventario.getFolioCliente(), inventario.getPartidaCve());
@@ -318,11 +320,6 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 		}
 		entity.close();
 		return listaInventario;
-	}
-
-	@Override
-	public String actualizar(Inventario e) {
-		return null;
 	}
 
 	@Override

@@ -7,11 +7,12 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,31 +34,60 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Producto.findByProductoCve", query = "SELECT p FROM Producto p WHERE p.productoCve = :productoCve"),
     @NamedQuery(name = "Producto.findByProductoDs", query = "SELECT p FROM Producto p WHERE p.productoDs = :productoDs"),
     @NamedQuery(name = "Producto.findByNumeroProd", query = "SELECT p FROM Producto p WHERE p.numeroProd = :numeroProd"),
-    @NamedQuery(name = "Producto.findByCategoria", query = "SELECT p FROM Producto p WHERE p.categoria = :categoria")})
+    @NamedQuery(name = "Producto.findByCategoria", query = "SELECT p FROM Producto p WHERE p.categoria = :categoria"),
+    @NamedQuery(name = "Producto.findByCliente", query = "SELECT p FROM Producto p JOIN p.productoPorClienteList ppc WHERE ppc.cteCve.cteCve = :idCliente ORDER BY p.productoDs ASC")
+})
 public class Producto implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "PRODUCTO_CVE")
     private Integer productoCve;
+    
     @Size(max = 80)
     @Column(name = "PRODUCTO_DS")
     private String productoDs;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "NUMERO_PROD")
     private String numeroProd;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "categoria")
     private int categoria;
-    @OneToMany(mappedBy = "productoCve")
-    private List<PartidaServicio> partidaServicioList;
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST}, mappedBy = "productoCve", fetch = FetchType.LAZY)
+    
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST}, mappedBy = "productoCve")
     private List<ProductoPorCliente> productoPorClienteList;
+    
+    @Override
+    public int hashCode() {
+        if(this.productoCve == null)
+        	return System.identityHashCode(this);
+        return Objects.hash(this.productoCve);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Producto)) {
+            return false;
+        }
+        Producto other = (Producto) object;
+        if ((this.productoCve == null && other.productoCve != null) || (this.productoCve != null && !this.productoCve.equals(other.productoCve))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Producto[ productoCve=" + productoCve + " ]";
+    }
 
     public Producto() {
     }
@@ -104,16 +134,6 @@ public class Producto implements Serializable {
         this.categoria = categoria;
     }
 
-    public List<PartidaServicio> getPartidaServicioList() {
-        return partidaServicioList;
-    }
-
-    public void setPartidaServicioList(List<PartidaServicio> partidaServicioList) {
-        this.partidaServicioList = partidaServicioList;
-    }
-    
-    
-
     public List<ProductoPorCliente> getProductoPorClienteList() {
 		return productoPorClienteList;
 	}
@@ -121,30 +141,4 @@ public class Producto implements Serializable {
 	public void setProductoPorClienteList(List<ProductoPorCliente> productoPorClienteList) {
 		this.productoPorClienteList = productoPorClienteList;
 	}
-
-	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (productoCve != null ? productoCve.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Producto)) {
-            return false;
-        }
-        Producto other = (Producto) object;
-        if ((this.productoCve == null && other.productoCve != null) || (this.productoCve != null && !this.productoCve.equals(other.productoCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Producto[ productoCve=" + productoCve + " ]";
-    }
-    
 }

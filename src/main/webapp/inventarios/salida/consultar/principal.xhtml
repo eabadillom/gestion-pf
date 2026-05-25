@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Consultar salidas</ui:define>
+    <ui:define name="content">
+    	<h:outputScript>
+			//<![CDATA[
+			function iniciarCamara() {
+				setTimeout(function() {
+					if (typeof PF('camera') !== 'undefined') {
+						PF('camera').initialize();
+					}
+				}, 300);
+			}
+			
+			function liberarCamara() {
+				try {
+					var video = document.querySelector('video');
+					if (video && video.srcObject) {
+						video.srcObject.getTracks().forEach(function(track) {
+							track.stop();
+						});
+						video.srcObject = null;
+					}
+				} catch (e) {
+					console.error('Error al liberar la cámara:', e);
+				}
+			}
+			
+			function capturarConOrientacion() {
+				var video = document.querySelector('video');
+				if (!video) {
+					console.error('No se encontró el elemento video.');
+					return;
+				}
+				
+				// Leer dimensiones reales del stream en este momento
+				var realWidth  = video.videoWidth;
+				var realHeight = video.videoHeight;
+				
+				if (!realWidth || !realHeight) {
+					console.error('El stream de video aún no tiene dimensiones.');
+					return;
+				}
+				
+				document.getElementById('form:realHeight').value = realHeight;
+				document.getElementById('form:realWidth').value = realWidth;
+				
+				enviarInfoImagen();
+				
+				// Enviar al servidor usando el mecanismo de p:photoCam
+				
+				PF('camera').capture();
+		    }
+			//]]>
+		</h:outputScript>
+        <h:form id="form" enctype="multipart/form-data">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            
+            <!-- Datos Generales -->
+            <!-- ID: FechaI, FechaF, s-cliente -->
+            <!-- Seccion de captura de datos: "Fecha de Inicio", "Fecha Final", "Folio", "Lista de clientes" y "Consultar" -->
+            <ui:include src="/inventarios/salida/consultar/consulta-config-constancias.xhtml" />
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <!-- DataTable de la salida de constancias del cliente -->
+            <!-- ID: dt-ConstanciaSalida, pnl-list-constancias-salidas -->
+            <!-- Lista las constancias de deposito del cliente -->
+            <ui:include src="/inventarios/salida/consultar/consulta-list-constancias.xhtml" />
+            
+            <!-- Consulta el detalle de la salida de la constancia -->
+            <!-- ID: constanciaSalida, datosGenerales, tabGeneral, detalleCS, dlg-servicios -->
+            <!-- Muestra el detalle de la constancia seleccionada del cliente -->
+            <ui:include src="/inventarios/salida/consultar/consulta-det-constancia.xhtml" />
+            
+            <!-- Dialogos de confirmacion -->
+            <ui:include src="/inventarios/salida/consultar/consulta-confirm-dlg.xhtml" />
+            
+            <!-- Dialogo para captura de fotografía -->
+            <ui:include src="/inventarios/salida/consultar/consulta-dlg-foto.xhtml"></ui:include>
+            
+        </h:form>
+    </ui:define>        
+</ui:composition>

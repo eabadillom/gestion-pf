@@ -18,6 +18,7 @@ import mx.com.ferbo.model.EstadosPK;
 import mx.com.ferbo.model.Paises;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	
 	private static Logger log = LogManager.getLogger(EstadosDAO.class);
@@ -55,7 +56,7 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 		return estado;
 	}
 	
-	public Estados buscarPorId(Integer idPais, Integer idEstado) {
+	public Estados buscarPorId(Paises idPais, Integer idEstado) {
 		Estados model = null;
 		EntityManager em = null;
 		
@@ -84,7 +85,7 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	public List<Estados> buscarPorCriteriosEstados(Estados e) {
 		List<Estados> listado = null;
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Estados.findByPaisCve", Estados.class).setParameter("paisCve", e.getEstadosPK().getPaisCve()).getResultList();
+		listado = em.createNamedQuery("Estados.findByPaisCve", Estados.class).setParameter("paisCve", e.getEstadosPK().getPais().getPaisCve()).getResultList();
 		return listado;
 	}
 	
@@ -92,9 +93,9 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	public List<Estados> buscarPorCriterios(Estados e) {
 		// TODO Auto-generated method stub
 		EntityManager em = EntityManagerUtil.getEntityManager();
-		if (e.getPaises().getPaisCve() != null) {
+		if (e.getEstadosPK().getPais().getPaisCve() != null) {
 			TypedQuery<Estados> consEstados = em.createNamedQuery("Estados.findByPaisCve", Estados.class);
-			consEstados.setParameter("paisCve", e.getPaises().getPaisCve());
+			consEstados.setParameter("paisCve", e.getEstadosPK().getPais().getPaisCve());
 			List<Estados> listado = consEstados.getResultList();
 			return listado;
 		} else {
@@ -137,8 +138,8 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 		try {
 			EntityManager em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			em.createQuery("DELETE FROM Estados e WHERE e.estadosPK.paisCve =:paisCve and e.estadosPK.estadoCve =:estadoCve")
-			.setParameter("paisCve", estados.getEstadosPK().getPaisCve())
+			em.createQuery("DELETE FROM Estados e WHERE e.estadosPK.pais.paisCve =:paisCve and e.estadosPK.estadoCve =:estadoCve")
+			.setParameter("paisCve", estados.getEstadosPK().getPais().getPaisCve())
 			.setParameter("estadoCve", estados.getEstadosPK().getEstadoCve()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
@@ -164,8 +165,9 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	public List<Estados> buscaPorAsentamiento(AsentamientoHumano as) {
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		return em.createNamedQuery("Estados.findByCriterios", Estados.class)
-				.setParameter("paisCve", as.getAsentamientoHumanoPK().getPaisCve())
-				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getEstadoCve()).getResultList();
+				.setParameter("paisCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+                                .getResultList();
 	}
 	
 	public List<Estados> buscarPorPais(Paises pais) {

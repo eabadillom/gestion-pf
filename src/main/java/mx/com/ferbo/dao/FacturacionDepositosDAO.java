@@ -50,15 +50,27 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listaConstanciaFactura = new ArrayList<>();
-
-			// La siguiente consulta recibe dos parámetros: cteCve y plantaCve
-			sql = "select " + "	cdd.FOLIO, " + "	cdd.CTE_CVE, " + "	cdd.FECHA_INGRESO, "
-					+ "	cdd.NOMBRE_TRANSPORTISTA, " + "	cdd.PLACAS_TRANSPORTE, " + "	cdd.OBSERVACIONES, "
-					+ "	cdd.folio_cliente, " + "	cdd.valor_declarado, " + "	cdd.status, " + "	cdd.aviso_cve, "
-					+ "	cdd.temperatura " + "from constancia_de_deposito cdd "
-					+ "INNER JOIN cliente cte ON cdd.CTE_CVE = cte.CTE_CVE " + "LEFT OUTER JOIN ( "
-					+ "	SELECT cf.* FROM constancia_factura cf " + "	INNER JOIN factura f ON cf.factura = f.id "
-					+ "	WHERE f.status NOT IN (0,2) " + ") tCF ON cdd.FOLIO = tCF.folio " + "INNER JOIN ( "
+			//La siguiente consulta recibe dos parámetros: cteCve y plantaCve
+			sql = "select "
+					+ "	cdd.FOLIO, "
+					+ "	cdd.CTE_CVE, "
+					+ "	cdd.FECHA_INGRESO, "
+					+ "	cdd.NOMBRE_TRANSPORTISTA, "
+					+ "	cdd.PLACAS_TRANSPORTE, "
+					+ "	cdd.OBSERVACIONES, "
+					+ "	cdd.folio_cliente, "
+					+ "	cdd.valor_declarado, "
+					+ "	cdd.status, "
+					+ "	cdd.aviso_cve, "
+					+ "	cdd.temperatura "
+					+ "from constancia_de_deposito cdd "
+					+ "INNER JOIN cliente cte ON cdd.CTE_CVE = cte.CTE_CVE "
+					+ "LEFT OUTER JOIN ( "
+					+ "	SELECT cf.* FROM constancia_factura cf "
+					+ "	INNER JOIN factura f ON cf.factura = f.id "
+					+ "	WHERE f.status NOT IN (0,2) "
+					+ ") tCF ON cdd.FOLIO = tCF.folio AND cdd.FECHA_INGRESO = tCF.vigencia_inicio "
+					+ "INNER JOIN ( "
 					+ "	select DISTINCT p.FOLIO, plt.PLANTA_CVE, plt.PLANTA_DS from partida p "
 					+ "	INNER JOIN camara cam ON p.CAMARA_CVE = cam.CAMARA_CVE  "
 					+ "	INNER JOIN planta plt ON cam.PLANTA_CVE = plt.PLANTA_CVE " + ") tPlt ON cdd.FOLIO = tPlt.FOLIO "

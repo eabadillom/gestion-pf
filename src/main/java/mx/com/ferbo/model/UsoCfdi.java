@@ -18,10 +18,10 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "uso_cfdi")
 @NamedQueries({
+    @NamedQuery(name = "UsoCfdi.findAll", query = "SELECT u FROM UsoCfdi u"),
     @NamedQuery(name = "UsoCfdi.findByPersonaFisica", query = "SELECT u FROM UsoCfdi u WHERE u.aplicaPersonaFisica = true "),
     @NamedQuery(name = "UsoCfdi.findByPersonaMoral", query = "SELECT u FROM  UsoCfdi u WHERE u.aplicaPersonaMoral = true ")
-    }
-)
+})
 public class UsoCfdi implements Serializable {
 	
 	private static final long serialVersionUID = 2460444038539852730L;

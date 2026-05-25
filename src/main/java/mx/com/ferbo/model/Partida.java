@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -26,10 +27,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "partida")
 @NamedQueries({
@@ -72,7 +69,7 @@ public class Partida implements Serializable, Cloneable {
     @Column(name = "rendimiento")
     private BigDecimal rendimiento;
     
-    @Basic(optional = false)
+    @Basic(optional = true)
     @NotNull
     @Column(name = "no_tarimas")
     private BigDecimal noTarimas;
@@ -81,11 +78,11 @@ public class Partida implements Serializable, Cloneable {
     private List<DetallePartida> detallePartidaList;
     
     @JoinColumn(name = "CAMARA_CVE", referencedColumnName = "CAMARA_CVE")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Camara camaraCve;
     
     @JoinColumn(name = "FOLIO", referencedColumnName = "FOLIO")
-    @ManyToOne(optional = false, cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, cascade = CascadeType.DETACH)
     private ConstanciaDeDeposito folio;
     
     @JoinColumn(name = "unidad_de_cobro", referencedColumnName = "UNIDAD_DE_MANEJO_CVE")
@@ -102,9 +99,38 @@ public class Partida implements Serializable, Cloneable {
     @OneToMany(mappedBy = "partida", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     private List<TraspasoPartida> traspasoPartidaList;
     
-    public Partida clone() throws CloneNotSupportedException{  
-    	return (Partida) super.clone();  
-	} 
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "cd_tarima", referencedColumnName = "cd_tarima")
+    private Tarima tarima;
+    
+    @Override
+    public int hashCode() {
+    	if(this.partidaCve == null)
+    		return System.identityHashCode(this);
+        return Objects.hash(this.partidaCve);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null) {
+            return false;
+        }
+        if (getClass() != object.getClass()) {
+            return false;
+        }
+        final Partida other = (Partida) object;
+        if (this.partidaCve == null && other.partidaCve == null) 
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+        return Objects.equals(this.partidaCve, other.partidaCve);
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + ", productoDs=" + unidadDeProductoCve.getProductoCve().getProductoDs() + " ]";
+    }
     
     public void add(DetallePartida detalle) {
     	if(this.detallePartidaList == null)
@@ -202,7 +228,7 @@ public class Partida implements Serializable, Cloneable {
     public void setNoTarimas(BigDecimal noTarimas) {
         this.noTarimas = noTarimas;
     }
-
+    
     public List<DetallePartida> getDetallePartidaList() {
         return detallePartidaList;
     }
@@ -249,33 +275,7 @@ public class Partida implements Serializable, Cloneable {
     public UnidadDeProducto getUnidadDeProductoCve() {
         return unidadDeProductoCve;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (partidaCve != null ? partidaCve.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Partida)) {
-            return false;
-        }
-        Partida other = (Partida) object;
-        if ((this.partidaCve == null && other.partidaCve != null)
-                || (this.partidaCve != null && !this.partidaCve.equals(other.partidaCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Partida[ partidaCve=" + partidaCve + " ]";
-    }
-
+    
 	public List<TraspasoPartida> getTraspasoPartidaList() {
 		return traspasoPartidaList;
 	}
@@ -284,6 +284,58 @@ public class Partida implements Serializable, Cloneable {
 		this.traspasoPartidaList = traspasoPartidaList;
 	}
 
-	
+	public Tarima getTarima() {
+		return tarima;
+	}
+
+	public void setTarima(Tarima tarima) {
+		this.tarima = tarima;
+	}
+
+    public Partida clone() throws CloneNotSupportedException{
+    	Partida partida = null;
+    	
+    	partida = new Partida();
+    	partida.setPartidaCve(this.partidaCve == null ? null : new Integer(this.partidaCve));
+    	partida.setPesoTotal(this.pesoTotal);
+    	partida.setCantidadTotal(this.cantidadTotal == null ? null : new Integer(this.cantidadTotal));
+    	partida.setCantidadDeCobro(this.cantidadDeCobro);
+    	partida.setPartidaSeq(this.partidaSeq == null ? null : new Integer(this.partidaSeq));
+    	partida.setValorMercancia(this.valorMercancia);
+    	partida.setRendimiento(this.rendimiento);
+    	partida.setNoTarimas(this.noTarimas);
+    	
+    	if(this.detallePartidaList != null)
+    		partida.setDetallePartidaList(new ArrayList<DetallePartida>());
+    	
+    	for(DetallePartida dp : this.detallePartidaList) {
+    		DetallePartida detalle = dp.clone();
+    		detalle.setDetallePartidaPK(new DetallePartidaPK(partida, dp.getDetallePartidaPK().getDetPartCve()));
+    		partida.add(detalle);
+    	}
+    	
+    	if(this.camaraCve != null)
+    		partida.setCamaraCve(this.camaraCve);
+    	
+    	if(this.folio != null)
+    		partida.setFolio(folio);
+    	
+    	if(this.unidadDeCobro != null)
+    		partida.setUnidadDeCobro(this.unidadDeCobro);
+    	
+    	//Se omite la lista de DetalleConstanciaSalida
+    	partida.setDetalleConstanciaSalidaList(null);
+    	
+    	if(this.unidadDeProductoCve != null)
+    		partida.setUnidadDeProductoCve(this.unidadDeProductoCve);
+    	
+    	//Se omite la lista de TraspasoPartida
+    	partida.setTraspasoPartidaList(null);
+    	
+    	//Se omite Tarima.
+    	partida.setTarima(null);
+    	
+    	return partida; 
+	} 
 
 }

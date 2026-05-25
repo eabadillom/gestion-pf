@@ -322,6 +322,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.merge(cliente);
 			em.getTransaction().commit();
 		} catch (Exception e) {
+			EntityManagerUtil.rollback(em);
 			log.error("Problema en la actualización del cliente: " + cliente.getCteCve(), e);
 			return "ERROR";
 		} finally {
@@ -492,5 +493,24 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		}
 
 		return cliente;
+	}
+	
+	public Cliente buscarPorCodigoUnico(String codigoUnico) {
+		Cliente model = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("Cliente.findByCodUnico", this.modelClass)
+					.setParameter("codUnico", codigoUnico)
+					.getSingleResult()
+					;
+		} catch(Exception ex) {
+			log.warn("Problema para obtener el cliente por codigo unico: {}", ex.getMessage());
+		} finally {
+			this.close(em);
+		}
+		
+		return model;
 	}
 }

@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+			<p:dialog widgetVar="dg-cantidad-producto" header="Indique cantidad y peso" modal="true" showEffect="fade">
+				<p:panel id="pnl-cantidad-producto">
+				<p:outputPanel rendered="#{altaConstanciaSalidaBean.detalleSalida ne null}">
+					<div class="card">
+						<div class="ui-fluid">
+							<div class="field">
+								<p:outputLabel for="@next" value="Cantidad"/>
+								<p:inputNumber id="det-cantidad" value="#{altaConstanciaSalidaBean.detalleSalida.cantidad}">
+									<p:ajax event="blur" process="@this" listener="#{altaConstanciaSalidaBean.calculoPesoSalida()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" update="form:det-peso" />
+								</p:inputNumber>
+							</div>
+							<div class="field">
+								<p:outputLabel for="@next" value="Peso"/>
+								<p:inputNumber id="det-peso" process="@this" value="#{altaConstanciaSalidaBean.detalleSalida.peso}" disabled="true" />
+							</div>
+							<div class="field">
+								<p:outputLabel for="@next" value="Temperatura (°C)"/>
+								<p:inputNumber id="det-temperatura" value="#{altaConstanciaSalidaBean.detalleSalida.temperatura}">
+									<p:ajax process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+								</p:inputNumber>
+							</div>
+						</div>
+					</div>
+					</p:outputPanel>
+				</p:panel>
+				<f:facet name="footer">
+					<p:commandButton value="Agregar" process="@this" actionListener="#{altaConstanciaSalidaBean.addDetalleSalida()}" update="dt-inventario"/>
+					<p:commandButton value="Cancelar" class="ui-button-danger" icon="pi pi-times" process="@this" actionListener="#{altaConstanciaSalidaBean.cancelaDetalleSalida()}"/>
+				</f:facet>
+			</p:dialog>
+</ui:composition>

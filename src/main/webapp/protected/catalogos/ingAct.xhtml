@@ -16,14 +16,12 @@
 			<p:toolbar>
 				<p:toolbarGroup>
 					<p:outputLabel for="startDateSelected" value="Fecha Inicio" />
-					<p:datePicker id="startDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.startDate}">
+					<p:datePicker id="startDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.startDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" process="@this"/>
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 					</p:datePicker>
 					<p:outputLabel for="endDateSelected" value="Fecha Fin" />
-					<p:datePicker id="endDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.endDate}">
-						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this" />
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+					<p:datePicker id="endDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.endDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this"/>
 					</p:datePicker>
 					
 					<p:divider></p:divider>
@@ -31,7 +29,7 @@
 						<p:outputLabel for="soClientes" value="Clientes" />
 						<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{ingresosActualizacionBean.cteSelect}" filter="true" filterMatchMode="contains">
 							<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" />
-							<f:selectItems value="#{ingresosActualizacionBean.listaCtes}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}" />
+							<f:selectItems value="#{ingresosActualizacionBean.listaCtes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
 							<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" />
 						</p:selectOneMenu>
 					</span>
@@ -49,19 +47,19 @@
 						<h:outputText
 							value="#{pPago.factura.nomSerie.concat('-').concat(pPago.factura.numero)}" />
 					</p:column>
-					<p:column headerText="Status" width="6rem" style="text-align: center;">
+					<p:column headerText="Status" width="5rem" style="text-align: center;">
 						<h:outputText value="#{pPago.factura.status.nombre}" />
 					</p:column>
-					<p:column headerText="Fecha" width="6rem" style="text-align: center;">
+					<p:column headerText="Fecha" width="5rem" style="text-align: center;">
 						<h:outputText value="#{pPago.fecha}">
-							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 						</h:outputText>
 					</p:column>
 					<p:column headerText="Tipo de Pago">
 						<h:outputText value="#{pPago.tipo.nombre}" />
 					</p:column>
-					<p:column headerText="Banco" width="6rem" style="text-align: center;">
-						<h:outputText value="#{pPago.banco.nombre}" />
+					<p:column headerText="Cliente" width="auto" style="text-align: left;">
+						<h:outputText value="#{pPago.factura.nombreCliente}" />
 					</p:column>
 					<p:column headerText="Importe" width="6rem" style="text-align: right;">
 						<h:outputText value="#{pPago.monto}">
@@ -81,8 +79,8 @@
 					<f:facet name="footer">
 						<div align="right">
 							Total de pagos:
-							<h:outputText value="#{ingresosActualizacionBean.totalPagos}">
-								<f:convertNumber pattern="$##,###.00" />
+							<h:outputText value="#{ingresosActualizacionBean.listaPago.stream().filter(p -> p.tipo.id != 5).map(item -> item.monto).sum()}">
+								<f:convertNumber pattern="$ #,###,##0.00" />
 							</h:outputText>
 						</div>
 					</f:facet>
@@ -92,7 +90,7 @@
 				<p:outputPanel id="panel-actualizaPago" class="ui-fluid">
 					<div class="p-grid p-col-12">
 						<div class="p-md-12 p-lg-12">
-							<p:outputLabel value="#{ingresosActualizacionBean.pagoSelected.factura.cliente.cteNombre}" class="font-bold"/>
+							<p:outputLabel value="#{ingresosActualizacionBean.pagoSelected.factura.cliente.nombre}" class="font-bold"/>
 						</div>
 						<div class="p-md-3 p-lg-3">
 							<p:outputLabel for="@next" value="Factura" />
@@ -100,8 +98,7 @@
 						</div>
 						<div class="p-md-3 p-lg-3">
 							<p:outputLabel for="@next" value="Fecha de pago" />
-							<p:datePicker value="#{ingresosActualizacionBean.pagoSelected.fecha}" showIcon="true">
-								<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+							<p:datePicker value="#{ingresosActualizacionBean.pagoSelected.fecha}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 								<p:ajax process="@this"/>
 							</p:datePicker>
 						</div>

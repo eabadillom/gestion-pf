@@ -58,86 +58,6 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			list = new ArrayList<>();
-			sql = "SELECT "
-					+ "     folio, "
-					+ "     folio_cliente, "
-					+ "     cte_cve, "
-					+ "     fecha_ingreso, "
-					+ "     nombre_transportista, "
-					+ "     placas_transporte, "
-					+ "     observaciones, "
-					+ "     valor_declarado, "
-					+ "     status, "
-					+ "     aviso_cve, "
-					+ "     temperatura "
-					+ "FROM ( "
-					+ "    SELECT "
-					+ "        cdd.folio, "
-					+ "        cdd.folio_cliente, "
-					+ "        cdd.cte_cve, "
-					+ "        cdd.fecha_ingreso, "
-					+ "        cdd.nombre_transportista, "
-					+ "        cdd.placas_transporte, "
-					+ "        cdd.observaciones, "
-					+ "        cdd.valor_declarado, "
-					+ "        cdd.status, "
-					+ "        cdd.aviso_cve, "
-					+ "        cdd.temperatura, "
-					+ "        (p.peso_total - COALESCE(s.peso, 0) )AS peso, "
-					+ "        'Kilogramo' AS unidad_peso, "
-					+ "        (p.cantidad_total - COALESCE(s.cantidad, 0) ) AS cantidad, "
-					+ "        udm.unidad_de_manejo_ds AS unidad_manejo, "
-					+ "        prd.producto_ds "
-					+ "FROM constancia_de_deposito cdd "
-					+ "INNER JOIN partida p ON p.folio = cdd.folio "
-					+ "INNER JOIN camara c ON p.CAMARA_CVE = c.CAMARA_CVE "
-					+ "INNER JOIN planta plt ON c.PLANTA_CVE = plt.PLANTA_CVE "
-					+ "INNER JOIN detalle_partida dp ON p.partida_cve = dp.partida_cve AND det_part_cve = 1 "
-					+ "INNER JOIN unidad_de_producto udp ON p.unidad_de_producto_cve = udp.unidad_de_producto_cve "
-					+ "INNER JOIN producto prd ON udp.producto_cve = prd.producto_cve "
-					+ "INNER JOIN unidad_de_manejo udm ON udp.unidad_de_manejo_cve = udm.unidad_de_manejo_cve "
-					+ "INNER JOIN aviso a ON cdd.aviso_cve = a.aviso_cve "
-					+ "LEFT OUTER JOIN ( "
-					+ "    SELECT "
-					+ "        dcs.partida_cve, "
-					+ "        MAX(cs.fecha) AS fecha_ult_sal, "
-					+ "        SUM(dcs.peso) AS peso, "
-					+ "        'Kilogramo' AS unidad_peso, "
-					+ "            SUM(dcs.cantidad) AS cantidad, "
-					+ "            dcs.unidad AS unidad_manejo "
-					+ "        FROM constancia_salida cs "
-					+ "        INNER JOIN detalle_constancia_salida dcs ON "
-					+ "            cs.id = dcs.constancia_cve "
-					+ "        WHERE "
-					+ "            cs.status = 1 "
-					+ "            AND cs.cliente_cve = :cteCve "
-					+ "            AND cs.fecha <= :fechaCorte "
-					+ "        GROUP BY "
-					+ "            dcs.partida_cve, "
-					+ "            dcs.unidad "
-					+ ") s ON p.partida_cve = s.partida_cve "
-					+ "    WHERE "
-					+ "        cdd.aviso_cve IS NOT NULL "
-					+ "        AND cdd.cte_cve = :cteCve "
-					+ "        AND cdd.fecha_ingreso <= :fechaCorte "
-					+ "        AND plt.PLANTA_CVE = :plantaCve "
-					+ "        ) T "
-					+"         WHERE T.cantidad > 0 "
-					+ "GROUP BY "
-					+ "    folio, "
-					+ "    folio_cliente, "
-					+ "    cte_cve, "
-					+ "    fecha_ingreso, "
-					+ "    nombre_transportista, "
-					+ "    placas_transporte, "
-					+ "    observaciones, "
-					+ "    valor_declarado, "
-					+ "    status, "
-					+ "	aviso_cve, "
-					+ "	temperatura "
-					+ "ORDER BY "
-					+ "    fecha_ingreso ASC ";
-			
 			
 			sql = "select distinct\n"
 					+ "	cdd.FOLIO, cdd.CTE_CVE, cdd.FECHA_INGRESO, cdd.NOMBRE_TRANSPORTISTA, cdd.PLACAS_TRANSPORTE, cdd.OBSERVACIONES, cdd.folio_cliente, cdd.valor_declarado, cdd.status, cdd.aviso_cve, cdd.temperatura\n"
@@ -217,8 +137,6 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				final Date vigenciaIni = cf.getVigenciaInicio();
 				final Date vigenciaFin = cf.getVigenciaFin();
 				
-				log.debug("folio: {}, vigencia ini: {}, vigencia fin: {}", cf.getFolioCliente(), cf.getVigenciaInicio(), cf.getVigenciaFin());
-				
 				List<ConstanciaFactura> lCFFacturadas = lConstanciaFactura.stream()
 						.filter(c -> (c.getVigenciaInicio().equals(vigenciaIni) || c.getVigenciaFin().equals(vigenciaFin)))
 						.collect(Collectors.toList());
@@ -226,6 +144,8 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 				log.debug("Constancias facturadas: {}", lCFFacturadas.size());
 				if(lCFFacturadas.size() > 0)
 					continue;
+				
+				log.info("folio: {}, vigencia ini: {}, vigencia fin: {}", cf.getFolioCliente(), cf.getVigenciaInicio(), cf.getVigenciaFin());
 				
 				for(Partida p : constancia.getPartidaList()) {
 					BigDecimal cantidadT = new BigDecimal(p.getCantidadTotal());
@@ -235,9 +155,11 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					BigDecimal tarimas = p.getNoTarimas();//cantidad_total
 					BigDecimal salidaCantidad = new BigDecimal(0),salidaPeso = new BigDecimal(0);
 					
-					cajasTarima = cantidadT.divide(tarimas, 2, BigDecimal.ROUND_HALF_UP);
+					if(tarimas != null) {
+						cajasTarima = cantidadT.divide(tarimas, 2, BigDecimal.ROUND_HALF_UP);
+						log.debug("caja x tarima "+cajasTarima);
+					}
 					
-					log.debug("caja x tarima "+cajasTarima);
 					List<DetalleConstanciaSalida> salidasList = p.getDetalleConstanciaSalidaList();
 					
 					for(DetalleConstanciaSalida dcs: salidasList) {
@@ -256,7 +178,7 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 								(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) > 0)
 								);
 						
-						if(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) >= 0)
+ 						if(constanciaSalida.getFecha().compareTo(cf.getVigenciaInicio()) >= 0)
 							continue;
 						
 						BigDecimal cantidad = new BigDecimal(dcs.getCantidad());
@@ -272,8 +194,12 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 					pesoTotal = pesoTotal.subtract(salidaPeso);
 					if(salidasList == null || salidasList.size() <= 0)
 						noTarimas = p.getNoTarimas();
-					else					
+					else if(salidasList != null && salidasList.size() > 0 && tarimas != null) {
 						noTarimas = cantidadT.divide(cajasTarima,0,RoundingMode.UP);
+					} else if(salidasList != null && salidasList.size() > 0 && tarimas == null) {
+						//TODO
+						log.info("FALTA CALCULO DE TARIMAS POR REGISTRO DE TARIMA...");
+					}
 					
 					p.setCantidadTotal(cantidadT.intValue());
 					p.setPesoTotal(pesoTotal);
@@ -289,10 +215,9 @@ public class FacturacionVigenciasDAO extends IBaseDAO<ConstanciaFactura, Integer
 			}
 			
 		} catch(Exception ex) {
-			ex.printStackTrace();
+			log.error("Problema para obtener las vigencias por facturar...", ex);
 		} finally {
-			if(em != null)
-				em.close();
+			EntityManagerUtil.close(em);
 		}
 		return list;
 	}

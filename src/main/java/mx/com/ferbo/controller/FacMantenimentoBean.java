@@ -9,12 +9,12 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -31,23 +31,28 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import com.ferbo.facturama.business.CfdiBL;
+import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
 
 import mx.com.ferbo.business.FacturamaBL;
-import mx.com.ferbo.dao.CancelaFacturaDAO;
-import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.FacturaMedioPagoDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
+import mx.com.ferbo.dao.UsoCfdiDAO;
+import mx.com.ferbo.dao.n.FacturaDAO;
 import mx.com.ferbo.model.CancelaFactura;
+import mx.com.ferbo.model.Cfdi;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturaMedioPago;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.StatusFactura;
+import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.CfdiUtils;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -68,19 +73,20 @@ public class FacMantenimentoBean implements Serializable {
 	private Cliente clienteSelect;
 	private List<MetodoPago> listaMetodoPago;
 	private List<MedioPago> listaMedioPago;
+	private List<UsoCfdi> usosCFDI;
 
 	private List<Factura> listFac;
-	private FacturaDAO daoFac;
 	private Factura seleccion;
 	private FacturaMedioPagoDAO factMedioPagoDAO;
 	
 	private CancelaFactura cancelaFactura = null;
-	private CancelaFacturaDAO cancelaDAO = null;
 	private MetodoPagoDAO metodoPagoDAO;
 	private MedioPagoDAO medioPagoDAO;
+	private UsoCfdiDAO   usoCfdiDAO;
 
 	private String cdMetodoPagoSelected;
 	private Integer idMedioPagoSelected;
+	private UsoCfdi usoCFDI;
 
 	private Date actual = GregorianCalendar.getInstance().getTime();
 	private Date de;
@@ -90,14 +96,15 @@ public class FacMantenimentoBean implements Serializable {
 
 	private StreamedContent file;
 	private Usuario usuario;
+	private FacturaDAO facturaDAO;
 
 	public FacMantenimentoBean() {
 		seleccion = new Factura();
-		daoFac = new FacturaDAO();
 		medioPagoDAO = new MedioPagoDAO();
 		metodoPagoDAO = new MetodoPagoDAO();
-		cancelaDAO = new CancelaFacturaDAO();
+		usoCfdiDAO = new UsoCfdiDAO();
 		factMedioPagoDAO = new FacturaMedioPagoDAO();
+		facturaDAO = new FacturaDAO();
 		listFac = new ArrayList<Factura>();
 		listClientes = new ArrayList<>();
 		listaMedioPago = new ArrayList<MedioPago>();
@@ -105,7 +112,7 @@ public class FacMantenimentoBean implements Serializable {
 		de = new Date();
 		fechaModificada = new Date();
 		hasta = new Date();
-	};
+	}
 
 	@SuppressWarnings("unchecked")
 	@PostConstruct
@@ -118,7 +125,7 @@ public class FacMantenimentoBean implements Serializable {
 		byte bytes[] = {};
 		this.file = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
 				.name("factura.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
-		
+		this.usosCFDI = this.usoCfdiDAO.buscarTodos();
 	}
 
 	public void consultarPagos() {
@@ -129,11 +136,11 @@ public class FacMantenimentoBean implements Serializable {
 	public void findFacture() {
 
 		if (clienteSelect == null) {
-			listFac = daoFac.buscaFacturas(de, actual, true);
+			listFac = facturaDAO.buscaFacturas(this.de, this.hasta, true);
 		} else {
-			listFac = daoFac.buscaFacturas(clienteSelect, de, actual, true);
+			listFac = facturaDAO.buscaFacturas(this.clienteSelect, this.de, this.hasta, true);
 		}
-	};
+	}
 
 	public void preparaCancelacion() {
 		this.cancelaFactura = new CancelaFactura();
@@ -146,73 +153,66 @@ public class FacMantenimentoBean implements Serializable {
 		String mensaje = null;
 		Severity severity = null;
 		
-		MedioPago mp = medioPagoDAO.buscarPorId(idMedioPagoSelected);			
+		MedioPago mp = null;
 		
-		FacturaMedioPago factMedioPago;
+		FacturaMedioPago factMedioPago = null;
+		
 		try {
+			
+			mp = medioPagoDAO.buscarPorId(idMedioPagoSelected);
 			factMedioPago = factMedioPagoDAO.buscarPorFactura(seleccion.getId());
 			factMedioPago.setMpDescripcion(mp.getMpDescripcion());
 			factMedioPago.setMpId(mp);
-			//seleccion.setFecha(fechaModificada);
 			
 			seleccion.setMetodoPago(cdMetodoPagoSelected);
-			if(factMedioPagoDAO.actualizar(factMedioPago ) == null && daoFac.actualizarFechaFactura(seleccion) == null) {
-				
-				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " actualizada";
-				severity = FacesMessage.SEVERITY_INFO;			
-			}else {
-				mensaje = "Factura medio pago de Factura: " + seleccion.getId() + " no actualizada";
-				severity = FacesMessage.SEVERITY_ERROR;
-			}
+			
+			facturaDAO.actualizar(seleccion);
+			
+			mensaje = String.format("Factura %s-%s actualizada correctamente", seleccion.getNomSerie(), seleccion.getNumero());
+			severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('dg-factura').hide()");
+			
 		} catch (Exception e) {
 			log.error("Ocurrió un problema en la actualización de la factura...", e);
+			mensaje = "Problema para actualizar la factura";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			message = new FacesMessage(severity, "Actualización", mensaje );
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages");
 		}
-		
-		
-		message = new FacesMessage(severity, "Actualizacion", mensaje );
-		FacesContext.getCurrentInstance().addMessage(null, message);
-		PrimeFaces.current().ajax().update("form:messages");
-		
 	}
 	
 	public void datosCliente() {
 		
 		consultarPagos();
 		
-		Factura fact = daoFac.buscarPorId(seleccion.getId(), true);		
-		idMedioPagoSelected = fact.getFacturaMedioPagoList().get(0).getMpId().getMpId();
-		
-		cdMetodoPagoSelected = seleccion.getMetodoPago();
-		
+		Factura fact = facturaDAO.buscarPorId(seleccion.getId(), true);		
+		this.idMedioPagoSelected = fact.getFacturaMedioPagoList().get(0).getMpId().getMpId();
+		this.cdMetodoPagoSelected = this.seleccion.getMetodoPago();
+		this.usoCFDI = usoCfdiDAO.buscarPorId(seleccion.getCdUsoCfdi());
 	}
 
 	public void cancelaFactura() {
 		String message = null;
 		Severity severity = null;
-
-		String respuesta = null;
-
+		
 		try {
 			StatusFacturaDAO statusDAO = new StatusFacturaDAO();
 			StatusFactura statusCancelada = statusDAO.buscarPorId(StatusFactura.STATUS_CANCELADA);
 			this.seleccion.setStatus(statusCancelada);
+			this.seleccion.setCancelaFactura(cancelaFactura);
 			this.cancelaFactura.setFactura(seleccion);
-
-			respuesta = daoFac.actualizaStatus(seleccion);
-			if (respuesta != null)
-				throw new InventarioException("Error al cancelar la factura.");
-
-			respuesta = cancelaDAO.guardar(cancelaFactura);
-			if (respuesta != null)
-				throw new InventarioException("Error al cancelar la factura.");
+			log.info("Iniciando actualizar Factura.java...");
+			facturaDAO.actualizar(seleccion);
 
 			if (clienteSelect == null)
-				listFac = daoFac.buscaFacturas(de, actual, true);
+				listFac = facturaDAO.buscaFacturas(this.de, this.actual, true);
 			else
-				listFac = daoFac.buscaFacturas(clienteSelect, de, actual, true);
+				listFac = facturaDAO.buscaFacturas(this.clienteSelect, this.de, this.actual, true);
 
-			seleccion = new Factura();
-			cancelaFactura = null;
+			this.seleccion = new Factura();
+			this.cancelaFactura = null;
 
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "La factura se canceló correctamente.";
@@ -307,7 +307,6 @@ public class FacMantenimentoBean implements Serializable {
 			facturamaBO.timbrar();
 			facturamaBO.sendMail();
 			log.info("Timbrado completado correctamente.");
-
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se generó correctamente";
 		} catch (FacturamaException e) {
@@ -329,11 +328,9 @@ public class FacMantenimentoBean implements Serializable {
 	public void exportar() throws JRException, IOException, SQLException {
 		String jasperPath = null;
 		String filename = null;
-		String images = null;
 		String message = null;
 		Severity severity = null;
 		File reportFile = null;
-		File imgfile = null;
 		JasperReportUtil jasperReportUtil = null;
 		Map<String, Object> parameters = null;
 		Connection conn = null;
@@ -341,22 +338,26 @@ public class FacMantenimentoBean implements Serializable {
 		Integer idCliente = null;
 		Date fechaInicio = null;
 		Date fechaFin = null;
-
+		
+		List<Factura> facturas = null;
+		
 		try {
 			idCliente = this.clienteSelect == null ? null : this.clienteSelect.getCteCve();
 			fechaInicio = this.de;
 			fechaFin = this.hasta;
+			
+			facturas = facturaDAO.consultaFacturas(idCliente, fechaInicio, fechaFin);
+			log.info("Facturas: {}", facturas);
+			for(Factura factura : facturas) {
+				this.leerXML(factura);
+			}
 
 			jasperPath = "/jasper/consulta_facturacion.jrxml";
 			filename = String.format("consulta_facturacion.xls");
-			images = "/images/logo.jpeg";
 			reportFile = new File(jasperPath);
 			URL resource = getClass().getResource(jasperPath);
-			URL resourceimg = getClass().getResource(images);
 			String file = resource.getFile();
-			String img = resourceimg.getFile();
 			reportFile = new File(file);
-			imgfile = new File(img);
 			log.debug("Ruta del reporte: {}", reportFile.getPath());
 
 			conn = EntityManagerUtil.getConnection();
@@ -368,14 +369,7 @@ public class FacMantenimentoBean implements Serializable {
 			log.debug("Parametros: {}", parameters.toString());
 
 			jasperReportUtil = new JasperReportUtil();
-			// jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 			this.file = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
-			// InputStream input = new ByteArrayInputStream(bytes);
-//			this.file = DefaultStreamedContent.builder()
-//					.contentType("application/vnd.ms-excel")
-//					.name(filename)
-//					.stream(() -> input )
-//					.build();
 			log.info("Factura generada {}...", filename);
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
@@ -389,6 +383,35 @@ public class FacMantenimentoBean implements Serializable {
 			PrimeFaces.current().ajax().update("frmFactura:file-factura");
 		}
 
+	}
+
+	private void leerXML(Factura factura) {
+		
+		CfdiBL cfdiBO = null;
+		FileViewModel fileXML = null;
+		cfdiBO = new CfdiBL();
+		Cfdi cfdi = null;
+		byte[] content = null;
+		String xml = null;
+		
+		log.info("Buscando información CFDI de la factura con id {}", factura);
+		try {
+			fileXML = cfdiBO.getFile("xml", "issuedLite", factura.getUuid());
+			content = Base64.getDecoder().decode(fileXML.getContent());
+			xml = new String(content);
+			log.debug("XML: {}", xml);
+			cfdi = CfdiUtils.getCFDI(xml);
+			log.info("UUID: {}", cfdi);
+			cfdi.setFactura(factura);
+			factura.setCfdi(cfdi);
+			facturaDAO.actualizar(factura);
+			log.info("Información CFDI de la factura {} actualizada.", factura);
+		} catch (FacturamaException ex) {
+			log.warn("Problema para obtener la información del CFID...", ex.getMessage());
+		} catch(Exception ex) {
+			log.warn("Problema para obtener la información del CFID...", ex.getMessage());
+		}
+		
 	}
 
 	public void setFolioFactura(Factura factura) {
@@ -522,6 +545,22 @@ public class FacMantenimentoBean implements Serializable {
 
 	public void setFechaModificada(Date fechaModificada) {
 		this.fechaModificada = fechaModificada;
+	}
+
+	public List<UsoCfdi> getUsosCFDI() {
+		return this.usosCFDI;
+	}
+
+	public void setUsosCFDI(List<UsoCfdi> usosCFDI) {
+		this.usosCFDI = usosCFDI;
+	}
+
+	public UsoCfdi getUsoCFDI() {
+		return usoCFDI;
+	}
+
+	public void setUsoCFDI(UsoCfdi usoCFDI) {
+		this.usoCFDI = usoCFDI;
 	}
 
 }

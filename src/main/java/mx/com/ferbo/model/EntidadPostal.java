@@ -7,6 +7,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,18 +29,22 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "EntidadPostal.findAll", query = "SELECT e FROM EntidadPostal e"),
     @NamedQuery(name = "EntidadPostal.findByEntidadpostalCve", query = "SELECT e FROM EntidadPostal e WHERE e.entidadpostalCve = :entidadpostalCve"),
-    @NamedQuery(name = "EntidadPostal.findByEntidadpostalDs", query = "SELECT e FROM EntidadPostal e WHERE e.entidadpostalDs = :entidadpostalDs")})
+    @NamedQuery(name = "EntidadPostal.findByEntidadpostalDs", query = "SELECT e FROM EntidadPostal e WHERE e.entidadpostalDs = :entidadpostalDs")
+})
 public class EntidadPostal implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "entidadpostal_cve")
     private Integer entidadpostalCve;
+    
     @Size(max = 100)
     @Column(name = "entidadpostal_ds")
     private String entidadpostalDs;
+    
     @OneToMany(cascade = CascadeType.DETACH, mappedBy = "entidadPostal")
     private List<AsentamientoHumano> asentamientoHumanoList;
 
@@ -76,22 +81,25 @@ public class EntidadPostal implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (entidadpostalCve != null ? entidadpostalCve.hashCode() : 0);
-        return hash;
+        if(this.entidadpostalCve == null){
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(this.entidadpostalCve);
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof EntidadPostal)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        EntidadPostal other = (EntidadPostal) object;
-        if ((this.entidadpostalCve == null && other.entidadpostalCve != null) || (this.entidadpostalCve != null && !this.entidadpostalCve.equals(other.entidadpostalCve))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        return true;
+        final EntidadPostal other = (EntidadPostal) obj;
+        return Objects.equals(this.entidadpostalCve, other.entidadpostalCve);
     }
 
     @Override

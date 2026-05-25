@@ -258,9 +258,9 @@ public class AvisosComercialBean implements Serializable {
 	public void nuevoAviso() {
 		Categoria categoria = null;
 		
+		this.categoriaSelected = 1;
 		categoria = categoriaDAO.buscarPorId(this.categoriaSelected);
 		this.avisoSelected = new Aviso();
-		this.categoriaSelected = 1;
 		this.avisoSelected.setCteCve(clienteSelected);
 		this.avisoSelected.setCategoriaCve(categoria);
 	}

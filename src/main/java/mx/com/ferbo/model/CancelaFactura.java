@@ -1,14 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -48,8 +43,8 @@ public class CancelaFactura implements Serializable {
     @Column(name = "descripcion")
     private String descripcion;
     
-    @JoinColumn(name = "factura")
-    @OneToOne(optional = false, cascade = {CascadeType.MERGE})
+    @OneToOne
+    @JoinColumn(name = "factura", referencedColumnName = "id")
     private Factura factura;
 
     public CancelaFactura() {
@@ -90,9 +85,9 @@ public class CancelaFactura implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+    	return Objects.hash(this.id);
     }
 
     @Override

@@ -59,11 +59,17 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 					+ "	SELECT cf.* FROM constancia_factura_ds cf " + "	INNER JOIN factura f ON cf.factura = f.id "
 					+ "	WHERE f.status NOT IN (0,2) " + ") tCF ON cs.FOLIO = tCF.folio " + "INNER JOIN ( "
 					+ "	SELECT FOLIO, COUNT(FOLIO) AS CTA_SERVICIOS FROM constancia_servicio_detalle cdet "
-					+ "	GROUP BY FOLIO " + ") det ON cs.FOLIO = det.FOLIO " + "WHERE cs.status not in (4) "
-					+ "AND cs.CTE_CVE = :cteCve " + "AND tCF.id IS NULL " + "ORDER BY cs.folio_cliente ";
-
-			Query query = em.createNativeQuery(sql, ConstanciaDeServicio.class).setParameter("cteCve", idCliente);
-			;
+					+ "	GROUP BY FOLIO "
+					+ ") det ON cs.FOLIO = det.FOLIO "
+					+ "WHERE cs.status not in (4) "
+					+ "AND cs.CTE_CVE = :cteCve "
+					+ "AND tCF.id IS NULL "
+					+ "ORDER BY cs.FECHA, cs.FOLIO_CLIENTE "
+					;
+			
+			Query query = em.createNativeQuery(sql, ConstanciaDeServicio.class)
+					.setParameter("cteCve", idCliente)
+					;
 
 			listaConstancias = query.getResultList();
 

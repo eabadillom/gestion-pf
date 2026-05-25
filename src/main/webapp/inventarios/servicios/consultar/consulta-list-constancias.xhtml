@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:panel id="pnl-list-constancias-servicios" header="CONSTANCIAS DE SERVICIOS" >
+        <p:dataTable id="dtconstanciaServicios" widgetVar="dtConstanciaServicios" var="constancia" reflow="true" rowKey="#{constancia.folio}" value="#{constanciaServicioBean.listaConstanciaServicios}" paginator="true" rows="10" paginatorPosition="bottom">
+            <p:column headerText="Folio" style="text-align: center;" width="5rem">
+                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                              value="#{constancia.folioCliente}" class="#{constancia.status.edoCve == 4 ? 'product-badge status-outofstock' : null}" />
+            </p:column>
+            <p:column headerText="Cliente" style="text-align: center;">
+                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                              value="#{constancia.cteCve.nombre}" />
+            </p:column>
+            <p:column headerText="Fecha" style="text-align: center;" width="7rem">
+                <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{constancia.fecha}">
+                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                </h:outputText>
+            </p:column>
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton update=":form:constanciaServicio" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('constanciaServicio').show()" icon="pi pi-bars" styleClass="edit-button ui-button-info" action="#{constanciaServicioBean.cargaDetalle}">
+                    <f:setPropertyActionListener value="#{constancia}" target="#{constanciaServicioBean.seleccion}"/>
+                </p:commandButton>
+            </p:column>
+            <p:column width="2rem" style="text-align: center;">
+                <p:commandButton icon="pi pi-times" process="@this" action="#{constanciaServicioBean.cargaDetalle}" update="form:dtconstanciaServicios" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgCancelarDialog').show();" rendered="#{(constanciaServicioBean.usuario.perfil != 4) and (constanciaServicioBean.usuario.perfil != 1)}" class="ui-button-danger"
+                                 disabled="${constancia.status.edoCve == 4}">
+                    <f:setPropertyActionListener value="#{constancia}" target="#{constanciaServicioBean.seleccion}" />
+                </p:commandButton>
+            </p:column>
+            <p:ajax event="page" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" />
+        </p:dataTable>
+    </p:panel>
+</ui:composition>

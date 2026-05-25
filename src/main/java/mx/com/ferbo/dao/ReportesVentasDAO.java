@@ -84,10 +84,12 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
 					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ'\n" + 
 					"where v.fecha BETWEEN :fechaini AND :fechaFin\n" + 
 					"group by fecha\n" + 
-					"UNION\n" + 
-					"select 0 as total_facturas, 0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales\n" + 
-					"from importe_egreso ie  where ie.fecha BETWEEN :fechaini AND :fechaFin\n" + 
-					"group by fecha     )combined   )a ;\n";
+					"UNION\n"  
+//					+ "select 0 as total_facturas, 0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales\n" + 
+//					"from importe_egreso ie  where ie.fecha BETWEEN :fechaini AND :fechaFin\n" + 
+//					"group by fecha     "
+					+ ")combined   )a ;\n"
+					;
 
 			Query query = em.createNativeQuery(sql)
 					.setParameter("fechaini", DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD))

@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -27,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.ClienteDAO;
@@ -102,9 +106,10 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private Usuario usuario;
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
+        
+        private StreamedContent file;
 
 	public AltaConstanciaServicioBean() {
-		log.info("Entrando al constructor del controller...");
 		clientes = new ArrayList<Cliente>();
 		alPartidas = new ArrayList<PartidaServicio>();
 		alServiciosDetalle = new ArrayList<ConstanciaServicioDetalle>();
@@ -124,12 +129,10 @@ public class AltaConstanciaServicioBean implements Serializable {
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-		log.info("Entrando a Init...");
-		
 		faceContext = FacesContext.getCurrentInstance();
 		httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
 		usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-		
+
 		fecha = new Date();
 		clientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		alUnidades = udmDAO.buscarTodos();
@@ -139,7 +142,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 		
 		if((usuario.getPerfil() == 1)||(usuario.getPerfil() == 4)) {
 			listadoPlantas.add(plantaDAO.buscarPorId(usuario.getIdPlanta()));
-		}else {
+		} else {
 			listadoPlantas = plantaDAO.findall(false);
 		}
 		plantaSelect = listadoPlantas.get(0);
@@ -171,21 +174,27 @@ public class AltaConstanciaServicioBean implements Serializable {
 				log.info("Producto: " + ppc.getProductoCve());
 			}
 			precioServicioList = cliente.getPrecioServicioList();
-			Integer idAviso = new Integer(-1);
+
+			int idAviso = -1;
+
 			for (PrecioServicio ps : precioServicioList) {
-				Integer avisoCve = ps.getAvisoCve().getAvisoCve();
-				if (avisoCve > idAviso)
-					idAviso = new Integer(avisoCve);
-				List<PrecioServicio> list = mpPrecioServicio.get(avisoCve);
-				if (list == null) {
-					list = new ArrayList<PrecioServicio>();
-					mpPrecioServicio.put(avisoCve, list);
+
+				Integer avisoCve = ps.getAvisoCve() != null
+						? ps.getAvisoCve().getAvisoCve()
+						: null;
+
+				Integer avisoKey = avisoCve != null ? avisoCve : -1;
+
+				if (avisoCve != null && avisoCve > idAviso) {
+					idAviso = avisoCve;
 				}
-				list.add(ps);
+
+				mpPrecioServicio.computeIfAbsent(avisoKey, k -> new ArrayList<>())
+						.add(ps);
 			}
-			mpPrecioServicio.get(idAviso);
-			alServicios.clear();
-			alServicios = mpPrecioServicio.get(idAviso);
+
+			alServicios = new ArrayList<>(mpPrecioServicio.get(idAviso));
+
 			for (PrecioServicio ps : alServicios) {
 				log.info(ps.getServicio().getServicioDs());
 				log.info(ps.getUnidad().getUnidadDeManejoDs());
@@ -204,7 +213,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 		}
 		log.info("Productos y/o servicios del cliente filtrados.");
 	}
-	
+
 	public void generaFolioServicio() {
 		SerieConstanciaPK seriePK = null;
 		SerieConstancia serie = null;
@@ -212,19 +221,21 @@ public class AltaConstanciaServicioBean implements Serializable {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
-		
+
 		Planta plantaSelect = null;
 
 		try {
 			this.selCliente = clienteDAO.buscarPorId(this.selCliente.getCteCve());
-			if (this.selCliente == null)
+			if (this.selCliente == null) {
 				throw new InventarioException("Debe seleccionar un cliente");
-			
+			}
+
 			plantaSelect = plantaDAO.buscarPorId(usuario.getIdPlanta());
 
-			if (plantaSelect == null)
+			if (plantaSelect == null) {
 				throw new InventarioException("Debe seleccionar una planta");
-			
+			}
+
 			seriePK = new SerieConstanciaPK();
 			seriePK.setCliente(this.selCliente);
 			seriePK.setPlanta(this.plantaSelect);
@@ -239,20 +250,22 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 			this.folio = String.format("%s%s%s%d", seriePK.getTpSerie(), plantaSelect.getPlantaSufijo(),
 					selCliente.getCodUnico(), serie.getNuSerie());
-			
+
 			this.serie = serie;
+			
+			log.info("Folio: {}", this.folio);
 
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-			
+
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} catch (Exception ex) {
 			log.error("Problema para generar el folio de entrada...", ex);
 			mensaje = "Ha ocurrido un error en el sistema. Intente nuevamente.\nSi el problema persiste, por favor comuniquese con su administrador del sistema.";
 			severity = FacesMessage.SEVERITY_ERROR;
-			
+
 			message = new FacesMessage(severity, "Aviso", mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
@@ -266,24 +279,30 @@ public class AltaConstanciaServicioBean implements Serializable {
 		try {
 			log.info("AGREGANDO PRODUCTO...");
 
-			if (this.idCliente == null || this.idCliente == 0)
+			if (this.idCliente == null || this.idCliente == 0) {
 				throw new InventarioException("Debe seleccionar el cliente");
-			
-			if(this.partida.getCantidadTotal() == null || this.partida.getCantidadTotal() <= 0)
-				throw new InventarioException("Debe indicar la cantidad de piezas");
-			
-			if(this.partida.getCantidadDeCobro() == null || this.partida.getCantidadDeCobro().compareTo(BigDecimal.ZERO) <= 0)
-				throw new InventarioException("Debe indicar el peso del producto.");
-			
-			if(this.partida.getUnidadDeCobro() == null)
-				throw new InventarioException("Debe seleccionar una unidad de manejo");
-			
-			if(this.partida.getProductoCve() == null)
-				throw new InventarioException("Debe seleccionar un producto");
+			}
 
-			if (alPartidas == null)
+			if (this.partida.getCantidadTotal() == null || this.partida.getCantidadTotal() <= 0) {
+				throw new InventarioException("Debe indicar la cantidad de piezas");
+			}
+
+			if (this.partida.getCantidadDeCobro() == null || this.partida.getCantidadDeCobro().compareTo(BigDecimal.ZERO) <= 0) {
+				throw new InventarioException("Debe indicar el peso del producto.");
+			}
+
+			if (this.partida.getUnidadDeCobro() == null) {
+				throw new InventarioException("Debe seleccionar una unidad de manejo");
+			}
+
+			if (this.partida.getProductoCve() == null) {
+				throw new InventarioException("Debe seleccionar un producto");
+			}
+
+			if (alPartidas == null) {
 				alPartidas = new ArrayList<PartidaServicio>();
-			
+			}
+
 			partida.setUnidadDeManejoCve(partida.getUnidadDeCobro());
 			alPartidas.add(partida);
 			log.info("Id Producto: " + this.partida.getProductoCve().getProductoDs());
@@ -311,20 +330,23 @@ public class AltaConstanciaServicioBean implements Serializable {
 		Severity severity = null;
 		
 		try {
-			if (this.idCliente == null || this.idCliente == 0)
+			if (this.idCliente == null || this.idCliente == 0) {
 				throw new InventarioException("Debe seleccionar el cliente");
+			}
 
-			if (this.servicio.getServicioCantidad() == null || this.servicio.getServicioCantidad().compareTo(BigDecimal.ZERO) <= 0)
+			if (this.servicio.getServicioCantidad() == null || this.servicio.getServicioCantidad().compareTo(BigDecimal.ZERO) <= 0) {
 				throw new InventarioException("Debe indicar la cantidad del servicio.");
+			}
 
-			if (this.servicio.getServicioCve() == null)
+			if (this.servicio.getServicioCve() == null) {
 				throw new InventarioException("Debe seleccionar un servicio.");
+			}
 
 			alServiciosDetalle.add(servicio);
 			log.info("Servicio agregado: {}", this.servicio.getServicioCve().getServicioDs());
-			
+
 			this.servicio = new ConstanciaServicioDetalle();
-		
+
 			message = "Producto agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
@@ -343,25 +365,29 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 	public synchronized void guardar() {
 		String message = null;
-		Severity severity = null;		
+		Severity severity = null;
 		ConstanciaDeServicio constancia = null;
 		List<ConstanciaDeServicio> alConstancias = null;
 		EstadoConstancia estado = null;
 
 		try {
-			if (this.isSaved)
+			if (this.isSaved) {
 				throw new InventarioException("La constancia ya se encuentra registrada.");
+			}
 
-			if (this.folio == null || "".equalsIgnoreCase(this.folio.trim()))
+			if (this.folio == null || "".equalsIgnoreCase(this.folio.trim())) {
 				throw new InventarioException("Debe indicar el folio de la constancia.");
+			}
 
-			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0)
+			if (this.alServiciosDetalle == null || this.alServiciosDetalle.size() == 0) {
 				throw new InventarioException("Debe seleccionar al menos un servicio");
+			}
 
 			alConstancias = csDAO.buscarPorFolioCliente(this.folio);
 
-			if (alConstancias != null && alConstancias.size() > 0)
+			if (alConstancias != null && alConstancias.size() > 0) {
 				throw new InventarioException(String.format("El folio %s ya se encuentra registrado.", this.folio));
+			}
 
 			estado = estados.stream().filter(e -> e.getEdoCve() == 1).collect(Collectors.toList()).get(0);
 			constancia = new ConstanciaDeServicio();
@@ -386,6 +412,7 @@ public class AltaConstanciaServicioBean implements Serializable {
 			Integer numeroSerie = this.serie.getNuSerie() + 1;
 			this.serie.setNuSerie(numeroSerie);
 			serieConstanciaDAO.actualizar(this.serie);
+			log.info("Constancia guardada correctamente");
 			
 			this.isSaved = true;
 			this.habilitareporte = true;
@@ -398,7 +425,6 @@ public class AltaConstanciaServicioBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de servicios del cliente.", ex);
-			ex.printStackTrace();
 			message = "Problema con la información de servicios.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
@@ -407,7 +433,6 @@ public class AltaConstanciaServicioBean implements Serializable {
 		}
 	}
 
-
 	public void jasper() throws JRException, IOException, SQLException {
 		String jasperPath = "/jasper/ticketServicio.jrxml";
 		String filename = "Constancia_de_servicio.pdf";
@@ -415,14 +440,14 @@ public class AltaConstanciaServicioBean implements Serializable {
 		String message = null;
 		Severity severity = null;
 		ConstanciaDeServicio constancia = null;
-		 File reportFile = new File(jasperPath);
-		 File imgfile = null;
+		File reportFile = new File(jasperPath);
+		File imgfile = null;
 		JasperReportUtil jasperReportUtil = new JasperReportUtil();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
 		parameters = new HashMap<String, Object>();
 		try {
-			if(habilitareporte == false ) {
+			if (habilitareporte == false) {
 				throw new Exception("Favor de guardar constancia");
 			}
 			URL resource = getClass().getResource(jasperPath);
@@ -438,11 +463,13 @@ public class AltaConstanciaServicioBean implements Serializable {
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("FOLIO", folio);
-			parameters.put("LogoPath",imgfile.getPath());
+			parameters.put("LogoPath", imgfile.getPath());
 			log.info("Parametros: " + parameters.toString());
-			jasperReportUtil.createPdf(filename, parameters,reportFile.getPath());			
+			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+			InputStream input = new ByteArrayInputStream(bytes);
+			this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
+			log.info("Ticket de servicio generado {}...", filename);
 		} catch (Exception ex) {
-			ex.fillInStackTrace();
 			log.error("Problema general...", ex);
 			message = String.format("No se pudo imprimir el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
@@ -454,10 +481,10 @@ public class AltaConstanciaServicioBean implements Serializable {
 	}
 	
 	public void reload() throws IOException {
-	    ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-	    ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 	}
-	
+
 	public String getUnidadcobro() {
 		return unidadcobro;
 	}
@@ -681,5 +708,13 @@ public class AltaConstanciaServicioBean implements Serializable {
 	public void setServicio(ConstanciaServicioDetalle servicio) {
 		this.servicio = servicio;
 	}
+
+        public StreamedContent getFile() {
+            return file;
+        }
+
+        public void setFile(StreamedContent file) {
+            this.file = file;
+        }
 
 }

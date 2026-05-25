@@ -8,6 +8,8 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,13 +35,13 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cliente")
 @NamedQueries({
-    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c ORDER BY c.cteNombre"),
+    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c ORDER BY c.nombre"),
     @NamedQuery(name = "Cliente.findByCteCve",  query = "SELECT c FROM Cliente c WHERE c.cteCve = :cteCve"),
-    @NamedQuery(name = "Cliente.findByCteNombre",  query = "SELECT c FROM Cliente c WHERE c.cteNombre = :cteNombre"),
+    @NamedQuery(name = "Cliente.findByCteNombre",  query = "SELECT c FROM Cliente c WHERE c.nombre = :cteNombre"),
     @NamedQuery(name = "Cliente.findByCteRfc",  query = "SELECT c FROM Cliente c  WHERE c.cteRfc = :cteRfc"),
     @NamedQuery(name = "Cliente.findByNumeroCte",  query = "SELECT c FROM Cliente c  WHERE c.numeroCte = :numeroCte"),
     @NamedQuery(name = "Cliente.findByCteMail",  query = "SELECT c FROM Cliente c WHERE c.cteMail = :cteMail"),
-    @NamedQuery(name = "Cliente.findByHabilitado",  query = "SELECT c FROM Cliente c  WHERE c.habilitado = :habilitado ORDER BY c.cteNombre"),
+    @NamedQuery(name = "Cliente.findByHabilitado",  query = "SELECT c FROM Cliente c  WHERE c.habilitado = :habilitado ORDER BY c.nombre"),
     @NamedQuery(name = "Cliente.findByCodUnico",  query = "SELECT c FROM Cliente c WHERE c.codUnico = :codUnico")})
 public class Cliente implements Serializable {
 
@@ -53,7 +55,12 @@ public class Cliente implements Serializable {
     
     @Size(max = 150)
     @Column(name = "CTE_NOMBRE")
-    private String cteNombre;
+    private String nombre;
+
+    @Size(max=150)
+    @Column(name = "nb_alias")
+    private String alias;
+    
     
     @Size(max = 20)
     @Column(name = "CTE_RFC")
@@ -108,35 +115,26 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaServicios> constanciaServiciosList;
     
-    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
-    private List<Factura> facturaList;
-    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ProductoPorCliente> productoPorClienteList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ClienteDomicilios> clienteDomiciliosList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<DetalleFacturacion> detalleFacturacionList;
     
-    @OneToMany(mappedBy = "cteCve", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "cteCve", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Aviso> avisoList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
-    private List<CuotaMensualServicio> cuotaMensualServicioList;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     private List<PrecioServicio> precioServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true)
     private List<ClienteContacto> clienteContactoList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
     private List<ConstanciaDeServicio> constanciaDeServicioList;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
-    private List<ConstanciaDeDeposito> constanciaDeDepositoList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clienteCve", fetch = FetchType.LAZY)
     private List<ConstanciaSalida> constanciaSalidaList;
@@ -153,13 +151,40 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "serieConstanciaPK.cliente", orphanRemoval = true)
     private List<SerieConstancia> serieConstanciaList;
     
-    public Cliente() {
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "cliente", fetch = FetchType.LAZY)
+    private List<Salida> salidaList;
+    
+    @Override
+    public int hashCode() {
+        if(this.cteCve == null)
+        	return System.identityHashCode(this);
+        return Objects.hash(this.cteCve);
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Cliente)) {
+            return false;
+        }
+        Cliente other = (Cliente) object;
+        if ((this.cteCve == null && other.cteCve != null) || (this.cteCve != null && !this.cteCve.equals(other.cteCve))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Cliente[ cteCve=" + cteCve + " ]";
+    }
+    
+    public Cliente() {
+    }
+    
     public Cliente(Integer cteCve) {
         this.cteCve = cteCve;
     }
-
+    
     public Cliente(Integer cteCve, String numeroCte, boolean habilitado) {
         this.cteCve = cteCve;
         this.numeroCte = numeroCte;
@@ -167,61 +192,79 @@ public class Cliente implements Serializable {
     }
     
     public void add(ClienteContacto clienteContacto) {
-    	if(this.clienteContactoList == null)
-    		this.clienteContactoList = new ArrayList<ClienteContacto>();
+        if(this.clienteContactoList == null)
+        this.clienteContactoList = new ArrayList<ClienteContacto>();
     	clienteContacto.setIdCliente(this);
     	this.clienteContactoList.add(clienteContacto);
     }
     
     public void remove(ClienteContacto clienteContacto) {
-    	if(this.clienteContactoList == null)
-    		return;
+        if(this.clienteContactoList == null)
+        return;
     	clienteContacto.setIdCliente(null);
     	this.clienteContactoList.remove(clienteContacto);
     }
     
     public void remove(CandadoSalida candadoSalida) {
-    	candadoSalida.setCliente(null);
+        candadoSalida.setCliente(null);
     	this.candadoSalida = null;
     }
-
+    
 	public Integer getCteCve() {
         return cteCve;
     }
-
+    
     public void setCteCve(Integer cteCve) {
         this.cteCve = cteCve;
     }
-
-    public String getCteNombre() {
-        return cteNombre;
+    
+    public String getNombre() {
+        return nombre;
+    }
+    
+    public void setNombre(String cteNombre) {
+    	if(cteNombre != null)
+    		cteNombre = cteNombre.trim();
+        this.nombre = cteNombre;
+    }
+    
+    public String getAlias() {
+        return alias;
     }
 
-    public void setCteNombre(String cteNombre) {
-        this.cteNombre = cteNombre;
+    public void setAlias(String alias) {
+    	if(alias != null)
+    		alias = alias.trim();
+        this.alias = alias;
     }
-
+    
     public String getCteRfc() {
         return cteRfc;
     }
-
+    
     public void setCteRfc(String cteRfc) {
+    	if(cteRfc != null)
+    		cteRfc = cteRfc.trim();
         this.cteRfc = cteRfc;
     }
-
+    
     public String getNumeroCte() {
         return numeroCte;
     }
-
+    
     public void setNumeroCte(String numeroCte) {
+    	if(numeroCte != null)
+    		numeroCte = numeroCte.trim();
         this.numeroCte = numeroCte;
     }
-
+    
     public String getCteMail() {
         return cteMail;
     }
 
     public void setCteMail(String cteMail) {
+    	if(cteMail != null)
+    		cteMail = cteMail.trim();
         this.cteMail = cteMail;
     }
 
@@ -238,6 +281,8 @@ public class Cliente implements Serializable {
     }
 
     public void setCodUnico(String codUnico) {
+    	if(codUnico != null)
+    		codUnico = codUnico.trim();
         this.codUnico = codUnico;
     }
 
@@ -249,14 +294,6 @@ public class Cliente implements Serializable {
         this.constanciaServiciosList = constanciaServiciosList;
     }
 
-    public List<Factura> getFacturaList() {
-        return facturaList;
-    }
-
-    public void setFacturaList(List<Factura> facturaList) {
-        this.facturaList = facturaList;
-    }
-
     public List<ProductoPorCliente> getProductoPorClienteList() {
         return productoPorClienteList;
     }
@@ -264,7 +301,7 @@ public class Cliente implements Serializable {
     public void setProductoPorClienteList(List<ProductoPorCliente> productoPorClienteList) {
         this.productoPorClienteList = productoPorClienteList;
     }
-
+    
     public List<ClienteDomicilios> getClienteDomiciliosList() {
         return clienteDomiciliosList;
     }
@@ -287,14 +324,6 @@ public class Cliente implements Serializable {
 
     public void setAvisoList(List<Aviso> avisoList) {
         this.avisoList = avisoList;
-    }
-
-    public List<CuotaMensualServicio> getCuotaMensualServicioList() {
-        return cuotaMensualServicioList;
-    }
-
-    public void setCuotaMensualServicioList(List<CuotaMensualServicio> cuotaMensualServicioList) {
-        this.cuotaMensualServicioList = cuotaMensualServicioList;
     }
 
     public List<PrecioServicio> getPrecioServicioList() {
@@ -321,14 +350,6 @@ public class Cliente implements Serializable {
         this.constanciaDeServicioList = constanciaDeServicioList;
     }
 
-    public List<ConstanciaDeDeposito> getConstanciaDeDepositoList() {
-        return constanciaDeDepositoList;
-    }
-
-    public void setConstanciaDeDepositoList(List<ConstanciaDeDeposito> constanciaDeDepositoList) {
-        this.constanciaDeDepositoList = constanciaDeDepositoList;
-    }
-
     public List<ConstanciaSalida> getConstanciaSalidaList() {
         return constanciaSalidaList;
     }
@@ -351,32 +372,6 @@ public class Cliente implements Serializable {
 
     public void setConstanciaTraspasoList(List<ConstanciaTraspaso> constanciaTraspasoList) {
         this.constanciaTraspasoList = constanciaTraspasoList;
-    }
-
-
-	@Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (cteCve != null ? cteCve.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Cliente)) {
-            return false;
-        }
-        Cliente other = (Cliente) object;
-        if ((this.cteCve == null && other.cteCve != null) || (this.cteCve != null && !this.cteCve.equals(other.cteCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Cliente[ cteCve=" + cteCve + " ]";
     }
 
 	public String getRegimenCapital() {
@@ -463,6 +458,12 @@ public class Cliente implements Serializable {
 		this.serieConstanciaList.add(serie);
 	}
 
-	
+        public List<Salida> getSalidaList() {
+            return salidaList;
+        }
+
+        public void setSalidaList(List<Salida> salidaList) {
+            this.salidaList = salidaList;
+        }
     
 }

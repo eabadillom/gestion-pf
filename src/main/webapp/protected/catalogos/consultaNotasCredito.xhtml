@@ -9,186 +9,186 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:growl id="messages" showDetail="true" />
-			<div class="p-grid ui-fluid p-col-12">
-				<div class="p-col-6 p-md-6">
-					<p:outputLabel value="Cliente:"/>
+			<ui:include src="/protected/common/status-info.xhtml" />
+			<div class="p-grid ui-fluid">
+				<div class="p-col-12 p-md-6">
+					<p:outputLabel value="Cliente"/>
 					<p:selectOneMenu id="cliente" autoWidth="false" converter="entityConverter" value="#{consultaNotasCreditoBean.clienteSelect}" filter="true" filterMatchMode="contains">
 						<f:selectItem itemLabel="---Seleccione---" noSelectionOption="true" />
-						<f:selectItems value="#{consultaNotasCreditoBean.listaCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"/>
+						<f:selectItems value="#{consultaNotasCreditoBean.listaCliente}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}"/>
 					</p:selectOneMenu>
 				</div>
-				<div class="p-col-3 p-md-3">
-					<p:outputLabel value="Fecha Inicio:" styleClass="p-mr-2 p-ml-3" />
-					<p:datePicker id="fechaInicio" value="#{consultaNotasCreditoBean.fechaInicio}" showIcon="true">
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+				<div class="p-col-6 p-md-2">
+					<p:outputLabel value="Del" />
+					<p:datePicker id="fechaInicio" value="#{consultaNotasCreditoBean.fechaInicio}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						<p:ajax process="@this" />
 					</p:datePicker>
 				</div>
-				<div class="p-col-3 p-md-3">
-					<p:outputLabel value="Fecha Fin:" styleClass="p-mr-2 p-ml-3"/>
-					<p:datePicker id="fechaFin" value="#{consultaNotasCreditoBean.fechaFin}" showIcon="true">
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+				<div class="p-col-6 p-md-2">
+					<p:outputLabel value="al" />
+					<p:datePicker id="fechaFin" value="#{consultaNotasCreditoBean.fechaFin}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						<p:ajax process="@this" />
 					</p:datePicker>
 				</div>
-			</div>
-			<div class="p-grid ui-fluid p-col-12">
-				<div class="p-col-2 p-md-2">
-					<p:commandButton value="Consultar" styleClass="p-ml-4" actionListener="#{consultaNotasCreditoBean.consultarNotaCreditoCte}" process="@this" />
+				<div class="p-col-12 p-md-2">
+					<div>
+						<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+					</div>
+					<p:commandButton value="Consultar" actionListener="#{consultaNotasCreditoBean.consultarNotaCreditoCte}" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 				</div>
 			</div>
+			<p:spacer height="1rem"></p:spacer>
 			<p:dataTable id="dt-notaCredito" widgetVar="dtNotaCredito" value="#{consultaNotasCreditoBean.listaNotaCredito}" var="notaCredito" paginator="true" paginatorPosition="bottom" rows="10" >
 				<p:column headerText="Nota" width="3rem" style="text-align: center;">			
 					<h:outputText value="#{notaCredito.numero}" />
 				</p:column>
 				
-				<p:column headerText="Fecha" width="6rem" style="text-align: center;">
+				<p:column headerText="Fecha" width="5rem" style="text-align: center;">
 					<h:outputText value="#{notaCredito.fecha}">
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="Subtotal" width="6rem" style="text-align: right;">
+				<p:column headerText="Subtotal" width="5rem" style="text-align: right;">
 					<h:outputText value="#{notaCredito.subtotal}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="IVA" width="6rem" style="text-align: right;">
+				<p:column headerText="IVA" width="5rem" style="text-align: right;">
 					<h:outputText value="#{notaCredito.iva}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="Total" width="6rem" style="text-align: right;">
+				<p:column headerText="Total" width="5rem" style="text-align: right;">
 					<h:outputText value="#{notaCredito.total}">
 						<f:convertNumber pattern="$#0.00" />
 					</h:outputText>
 				</p:column>
 				
-				<p:column headerText="Cajero" style="text-align: center;">
-					<h:outputText value="#{notaCredito.cajero}" />
+				<p:column headerText="Cliente" style="text-align: center;">
+					<h:outputText value="#{notaCredito.cliente}" />
 				</p:column>
 				<p:column width="2rem" style="text-align: center;">
-					<p:commandButton icon="pi pi-bars" oncomplete="PF('dlg-General').show()" update="form:dlg-notaCredito" process="@this" >
+					<p:commandButton icon="pi pi-bars" process="@this" update="form:dlg-notaCredito" action="#{consultaNotasCreditoBean.cargaInfoNota(notaCredito)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlg-General').show();">
 						<f:setPropertyActionListener value="#{notaCredito}" target="#{consultaNotasCreditoBean.notaCreditoSelect}"></f:setPropertyActionListener>
 					</p:commandButton>
 				</p:column>
 				
-				<p:column width="2rem" style="text-align: center;">
-					<p:commandButton icon="pi pi-money-bill" oncomplete="PF('dlg-factura').show()" update="form:dlg-facturaNota" process="@this" action="#{consultaNotasCreditoBean.cargaInfoNota(notaCredito)}"> 
-						<f:setPropertyActionListener value="#{notaCredito}" target="#{consultaNotasCreditoBean.notaCreditoSelect}"></f:setPropertyActionListener>
-					</p:commandButton>
-				</p:column>
 				<p:column width="2rem" style="text-align: center;">
 					<p:commandButton icon="pi pi-times" class="ui-button-danger" process="@this" oncomplete="PF('cancelaNotaCredito').show();" action="#{consultaNotasCreditoBean.cargaInfoNota(notaCredito)}" disabled="#{notaCredito.status.id == 2}">
 						<f:setPropertyActionListener value="#{notaCredito}" target="#{consultaNotasCreditoBean.notaCreditoSelect}"></f:setPropertyActionListener>
 					</p:commandButton>
 				</p:column>
 			</p:dataTable>			
-			<p:dialog id="dlg-notaCredito" widgetVar="dlg-General" header="Informacion General" responsive="true" resizable="true">
-				<p:outputPanel >
-					<p:outputPanel id="notaCredito" class="ui-fluid" rendered="#{consultaNotasCreditoBean.notaCreditoSelect != null}">
-						<div class="p-grid">
-							<div class="p-col-2 p-md-2">
-								<p:outputLabel value="Folio:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.numero}" readonly="true"/>
+			<p:dialog id="dlg-notaCredito" widgetVar="dlg-General" header="Informacion General" responsive="true" resizable="true" position="center top">
+				<p:tabView id="tv-nota-credito">
+					<p:tab title="Información general">
+						<p:outputPanel id="notaCredito" class="ui-fluid" rendered="#{consultaNotasCreditoBean.notaCreditoSelect != null}">
+							<div class="p-grid">
+								<div class="p-col-2 p-md-2">
+									<p:outputLabel value="Folio:" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.numero}" readonly="true"/>
+								</div>
+								<div class="p-col-6 p-md-6">
+									<p:outputLabel value="Cliente:" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.cliente}" readonly="true"/>
+								</div>
+								<div class="p-col-4 p-md-4">
+									<p:outputLabel value="RFC:" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.rfc}" readonly="true"/>
+								</div>
+								<div class="p-col-4 p-md-4">
+									<p:outputLabel value="Fecha"/>
+									<p:datePicker value="#{consultaNotasCreditoBean.notaCreditoSelect.fecha}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+									</p:datePicker>
+								</div>
+								<div class="p-col-8 p-md-8">
+									<p:outputLabel value="Domicilio:" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.domicilio}" readonly="true"/>
+								</div>
+								<div class="p-col-4 p-md-4">
+									<p:outputLabel value="Subtotal:"/>
+									<p:inputNumber value="#{consultaNotasCreditoBean.notaCreditoSelect.subtotal}" readonly="true" symbol="$ " symbolPosition="p" decimalPlaces="2" thousandSeparator="," inputStyle="text-align: right"/>
+								</div>
+								<div class="p-col-4 p-md-4">
+									<p:outputLabel value="IVA:" />
+									<p:inputNumber value="#{consultaNotasCreditoBean.notaCreditoSelect.iva}" readonly="true" symbol="$ " symbolPosition="p" decimalPlaces="2" thousandSeparator="," inputStyle="text-align: right"/>
+								</div>
+								<div class="p-col-4 p-md-4">
+									<p:outputLabel value="Total:" />
+									<p:inputNumber value="#{consultaNotasCreditoBean.notaCreditoSelect.total}" readonly="true" symbol="$ " symbolPosition="p" decimalPlaces="2" thousandSeparator="," inputStyle="text-align: right"/>
+								</div>
+								<div class="p-col-6 p-md-6">
+									<p:outputLabel value="Servicios:" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.servicios}" >
+										<p:ajax process="@this" />
+									</p:inputText>
+								</div>
+								<div class="p-col-3 p-md-3">
+									<p:outputLabel value="Constancia:" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.constancia}" >
+										<p:ajax process="@this" />
+									</p:inputText>
+								</div>
+								<div class="p-col-3 p-md-3">
+									<p:outputLabel  value="Periodo:" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.periodo}" >
+										<p:ajax process="@this" />
+									</p:inputText>
+								</div>
+								<div class="p-col-12 p-md-12">
+									<p:outputLabel value="Observaciones" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.observaciones}">
+										<p:ajax process="@this" />
+									</p:inputText>
+								</div>
+								<div class="p-col-12 p-md-12">
+									<p:outputLabel value="Cajero" />
+									<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.cajero}" >
+										<p:ajax process="@this" />
+									</p:inputText>
+								</div>
 							</div>
-							<div class="p-col-6 p-md-6">
-								<p:outputLabel value="Cliente:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.cliente}" readonly="true"/>
-							</div>
-							<div class="p-col-4 p-md-4">
-								<p:outputLabel value="RFC:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.rfc}" readonly="true"/>
-							</div>
-							<div class="p-col-4 p-md-4">
-								<p:outputLabel value="Fecha"/>
-								<p:datePicker value="#{consultaNotasCreditoBean.notaCreditoSelect.fecha}" showIcon="true">
-									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-								</p:datePicker>
-							</div>
-							<div class="p-col-8 p-md-8">
-								<p:outputLabel value="Domicilio:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.domicilio}" readonly="true"/>
-							</div>
-							<div class="p-col-4 p-md-4">
-								<p:outputLabel value="SubTotal:"/>
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.subtotal}" readonly="true"/>
-							</div>
-							<div class="p-col-4 p-md-4">
-								<p:outputLabel value="IVA:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.iva}" readonly="true"/>
-							</div>
-							<div class="p-col-4 p-md-4">
-								<p:outputLabel value="Total:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.total}" readonly="true"/>
-							</div>
-							<div class="p-col-6 p-md-6">
-								<p:outputLabel value="Servicios:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.servicios}"/>
-							</div>
-							<div class="p-col-3 p-md-3">
-								<p:outputLabel value="Constancia:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.constancia}"/>
-							</div>
-							<div class="p-col-3 p-md-3">
-								<p:outputLabel  value="Periodo:" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.periodo}"/>
-							</div>
-							<div class="p-col-12 p-md-12">
-								<p:outputLabel value="Observaciones" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.observaciones}"/>
-							</div>
-							<div class="p-col-12 p-md-12">
-								<p:outputLabel value="Cajero" />
-								<p:inputText value="#{consultaNotasCreditoBean.notaCreditoSelect.cajero}"/>
-							</div>
-						</div>
-					</p:outputPanel>
-				</p:outputPanel>
-				<f:facet name="footer">
-					<p:commandButton icon="pi pi-save" value="Guardar" onclick="PF('dlg-General').hide()" process="@this notaCredito" action="#{consultaNotasCreditoBean.actualizar}" disabled="#{consultaNotasCreditoBean.notaCreditoSelect.status.id == 2}"/>
-				</f:facet>
-											
-			</p:dialog>
+						</p:outputPanel>
+					</p:tab>
+					<p:tab title="Facturas">
+						<p:outputPanel rendered="#{consultaNotasCreditoBean.notaCreditoSelect != null}">
 			
-			<p:dialog id="dlg-facturaNota" widgetVar="dlg-factura" header="Facturas asociadas a la nota de crédito" style="max-width:80em !important;">
-				<p:outputPanel id="factura" class="ui-fluid">
-					<p:outputPanel rendered="#{consultaNotasCreditoBean.notaCreditoSelect != null}">
-				
-						<p:dataTable id="dt-factura" value="#{consultaNotasCreditoBean.notaCreditoSelect.notaFacturaList}" var="npf" rowKey="#{npf.notaPorFacturaPK.factura.id}" rows="5">
-							<p:column headerText="Número">
-								<h:outputText value="#{npf.notaPorFacturaPK.factura.nomSerie}-#{npf.notaPorFacturaPK.factura.numero}" />
-							</p:column>
-							
-							<p:column headerText="Fecha">
-								<h:outputText value="#{npf.notaPorFacturaPK.factura.fecha}" />
-							</p:column>
-							
-							<p:column headerText="Subtotal factura">
-								<h:outputText value="#{npf.notaPorFacturaPK.factura.subtotal}" />
-							</p:column>
-							
-							<p:column headerText="IVA factura">
-								<h:outputText value="#{npf.notaPorFacturaPK.factura.iva}" />
-							</p:column>
-							
-							<p:column headerText="Total factura">
-								<h:outputText value="#{npf.notaPorFacturaPK.factura.total}" />
-							</p:column>
-							<p:column headerText="Importe nota">
-								<h:outputText value="#{npf.cantidad}">
-									
-								</h:outputText>
-							</p:column>
-						</p:dataTable>
-											
-					</p:outputPanel>
-				</p:outputPanel>
+							<p:dataTable id="dt-factura" value="#{consultaNotasCreditoBean.notaCreditoSelect.notaFacturaList}" var="npf" rowKey="#{npf.notaPorFacturaPK.factura.id}" rows="5">
+								<p:column headerText="Número">
+									<h:outputText value="#{npf.notaPorFacturaPK.factura.nomSerie}-#{npf.notaPorFacturaPK.factura.numero}" />
+								</p:column>
+								
+								<p:column headerText="Fecha">
+									<h:outputText value="#{npf.notaPorFacturaPK.factura.fecha}" />
+								</p:column>
+								
+								<p:column headerText="Subtotal factura">
+									<h:outputText value="#{npf.notaPorFacturaPK.factura.subtotal}" />
+								</p:column>
+								
+								<p:column headerText="IVA factura">
+									<h:outputText value="#{npf.notaPorFacturaPK.factura.iva}" />
+								</p:column>
+								
+								<p:column headerText="Total factura">
+									<h:outputText value="#{npf.notaPorFacturaPK.factura.total}" />
+								</p:column>
+								<p:column headerText="Importe nota">
+									<h:outputText value="#{npf.cantidad}">
+										
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+												
+						</p:outputPanel>
+					</p:tab>
+				</p:tabView>
 				<f:facet name="footer">
-					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlg-factura').hide()" process="@this" />
+					<p:commandButton icon="pi pi-save" value="Guardar" process="@this" actionListener="#{consultaNotasCreditoBean.actualizar()}" disabled="#{consultaNotasCreditoBean.notaCreditoSelect.status.id == 2}"/>
+					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlg-General').hide();" styleClass="ui-button-secondary"/>
 				</f:facet>
 			</p:dialog>
 			

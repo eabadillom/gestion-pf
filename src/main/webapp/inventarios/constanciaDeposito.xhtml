@@ -4,9 +4,14 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui"
 	template="/WEB-INF/template.xhtml">
-	<ui:define name="title">Constancia de Deposito</ui:define>
+	<ui:define name="title">Entrada</ui:define>
 	<ui:define name="content">
-		<h:form id="form">
+		<h:outputStylesheet>
+			.ui-datatable-header{
+				background-color: #d4d4d4 !important;
+			}
+		</h:outputStylesheet>
+		<h:form id="form" enctype="multipart/form-data">
 			<p:growl id="messages" showDetail="true" life="2000"/>
 			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
 				<div align="center">
@@ -18,301 +23,407 @@
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 		    </p:dialog>
-			<p:panel header="DATOS GENERALES">
-				<div class="p-grid ui-fluid p-col-12">
-					<div class="p-col-6 p-md-6">
-						<p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{constanciaDeDepositoBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains" onchange="PF('statusInfoDialog').show();">
-							<f:selectItem itemLabel="Seleccione un cliente" itemValue="" noSelectionOption="true"/>
-							<f:selectItems value="#{constanciaDeDepositoBean.listadoCliente}" var="cliente" itemLabel="#{cliente.cteNombre}" itemValue="#{cliente}"></f:selectItems>
-							<p:ajax listener="#{constanciaDeDepositoBean.cargaInfoCliente()}" update="claveProducto aviso precioServicio congelacion conservacion refrigeracion maniobras" oncomplete="PF('statusInfoDialog').hide();"/>		
+		    <p:panel header="DATOS GENERALES">
+				<p:outputPanel id="pnl-datos-generales" styleClass="p-grid ui-fluid p-col-12">
+					<div class="p-col-12 p-md-6">
+						<p:selectOneMenu autoWidth="false"  value="#{entradaBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Seleccione un cliente" noSelectionOption="true"/>
+							<f:selectItems value="#{entradaBean.listadoCliente}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias.concat(' - ').concat(cliente.nombre) }" itemValue="#{cliente}"></f:selectItems>
+							<p:ajax event="change" process="@this" listener="#{entradaBean.cargaInfoCliente()}" update="form:seleccion-mercancia form:pnl-datos-generales form:dlg-add-producto form:seleccion-servicio" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>		
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-2 p-md-2">
-						<p:selectOneMenu id="aviso" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.avisoSelect}" onchange="PF('statusInfoDialog').show();">
-							<f:selectItem itemLabel="Seleccione un aviso" itemValue="" noSelectionOption="true"/>
-							<f:selectItems value="#{constanciaDeDepositoBean.avisoPorCliente}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.categoriaCve.categoriaDs}-#{aviso.avisoVigencia}" itemValue="#{aviso}"/>
-							<p:ajax listener="#{constanciaDeDepositoBean.renderConstanciaDeDeposito()}" oncomplete="PF('statusInfoDialog').hide();" />
+					<div class="p-col-12 p-md-2">
+						<p:selectOneMenu autoWidth="false" converter="entityConverter" value="#{entradaBean.aviso}">
+							<f:selectItem itemLabel="Seleccione un aviso" noSelectionOption="true" />
+							<f:selectItems value="#{entradaBean.avisos}" var="aviso" itemLabel="#{aviso.avisoCve}-#{aviso.categoriaCve.categoriaDs}-#{aviso.avisoVigencia}" />
+							<p:ajax event="change" process="@this" listener="#{entradaBean.loadAviso()}" update="form:pnl-datos-generales form:seleccion-mercancia form:seleccion-servicio" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-2 p-md-2">
-						<p:selectOneMenu id="planta" autoWidth="false" value="#{constanciaDeDepositoBean.plantaSelect}" converter="entityConverter">
-							<f:selectItem itemLabel="Seleccione una planta" itemValue="" noSelectionOption="true"/>
-							<f:selectItems value="#{constanciaDeDepositoBean.listadoPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
-							<p:ajax listener="#{constanciaDeDepositoBean.filtraCamaras()}" update="camara" />	
+					<div class="p-col-12 p-md-2">
+						<p:selectOneMenu id="planta" autoWidth="false" value="#{entradaBean.plantaSelect}" converter="entityConverter">
+							<f:selectItem itemLabel="Seleccione una planta" noSelectionOption="true"/>
+							<f:selectItems value="#{entradaBean.listadoPlanta}" var="planta" itemLabel="#{planta.plantaDs}" itemValue="#{planta}"/>
+							<p:ajax event="change" process="@this" listener="#{entradaBean.filtraCamaras()}" update="form:pnl-datos-generales" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 						</p:selectOneMenu>	
 					</div>
-					<div class="p-col-2 p-md-2">
-						<p:selectOneMenu id="camara" autoWidth="false" value="#{constanciaDeDepositoBean.camaraSelect}" converter="entityConverter">
-							<f:selectItem itemLabel="Seleccione una camara" itemValue="" noSelectionOption="true"/>
-							<f:selectItems value="#{constanciaDeDepositoBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />	
-							<p:ajax listener="#{constanciaDeDepositoBean.filtrarPosicion()}" update="camara" ></p:ajax>		
+					<div class="p-col-12 p-md-2">
+						<p:selectOneMenu id="camara" autoWidth="false" value="#{entradaBean.camaraSelect}" converter="entityConverter">
+							<f:selectItem itemLabel="Seleccione una camara" noSelectionOption="true"/>
+							<f:selectItems value="#{entradaBean.camaraPorPlanta}" var="camara" itemLabel="#{camara.camaraDs}" itemValue="#{camara}" />
+							<p:ajax event="change" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />	
 						</p:selectOneMenu>
 					</div>
-					<div class="p-col-2 p-md-2">
-						<p:datePicker id="fechaIngreso" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha de Ingreso" value="#{constanciaDeDepositoBean.fechaIngreso}" maxdate="#{constanciaDeDepositoBean.maxDate}" disabled="#{constanciaDeDepositoBean.restricted}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
-							<p:ajax update="@this" process="@this"/>
+					<div class="p-col-12 p-md-2">
+						<p:datePicker id="fechaIngreso" showIcon="true" placeholder="Fecha de Ingreso" value="#{entradaBean.fechaIngreso}" maxdate="#{entradaBean.maxDate}" disabled="#{entradaBean.restricted}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+							<p:ajax event="change" process="@this"/>
 						</p:datePicker>
 					</div>
-					<div class="p-col-2 p-md-2">
-						<p:inputText id="numeroC" widgetVar="numeroC" placeholder="No Asignado" disabled="true" value="#{constanciaDeDepositoBean.noConstanciaSelect}" required="true" requiredMessage="ingresa folio"/>
+					<div class="p-col-12 p-md-2">
+						<p:inputText id="numeroC" widgetVar="numeroC" placeholder="No Asignado" readonly="true" value="#{entradaBean.folioCliente}" required="true" requiredMessage="ingresa folio"/>
 					</div>
-					<div class="p-col-2 p-md-2">
-						<p:commandButton id="cmdCambiarFolio" value="Cambiar Folio" icon="pi pi-pencil" style="margin-left: .5rem" styleClass="edit-button" oncomplete="PF('NoCambiarDialog').show()" rendered="#{not constanciaDeDepositoBean.restricted}"/>
+					<div class="p-col-12 p-md-2">
+						<p:commandButton id="cmdCambiarFolio" value="Folio" icon="pi pi-pencil" styleClass="edit-button" oncomplete="PF('NoCambiarDialog').show()" rendered="#{not entradaBean.restricted}"/>
 					</div>
-				</div>
-			</p:panel>
+				</p:outputPanel>
+		    </p:panel>
 			<div style="padding-top: 2rem;">
-				<p:panel id="seleccion-mercancia" header="SELECCIONE LA MERCANCIA">
+				<p:panel id="seleccion-mercancia" header="CONFIGURE SU TARIMA">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-12 p-md-12">
+						<div class="p-col-12 p-md-6">
 							<p:outputLabel value="Producto"/>
-							<p:selectOneMenu id="claveProducto" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.productoCve.productoCve}" filter="true" filterMatchMode="contains">
+							<p:selectOneMenu id="claveProducto" value="#{entradaBean.partida.unidadDeProductoCve.productoCve}" converter="entityConverter" filter="true" filterMatchMode="contains" autoWidth="false">
 								<f:selectItem itemLabel="Selecciona Producto" noSelectionOption="true"/>
-								<f:selectItems value="#{constanciaDeDepositoBean.productoC}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto.productoCve}"/>
-								<p:ajax process="@this"></p:ajax>
+								<f:selectItems value="#{entradaBean.productos}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto}"/>
 							</p:selectOneMenu>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Cantidad"/>
-							<p:inputNumber id="cantidad" value="#{constanciaDeDepositoBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="empty" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" symbol="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" symbolPosition="s">
-								<p:ajax process="@this" update="@this"></p:ajax>
+							<p:inputNumber id="cantidad" value="#{entradaBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="always" placeholder="Cantidad" title="Cantidad" decimalPlaces="0">
+								
 							</p:inputNumber>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:outputLabel value="Unidad de manejo"/>
-							<p:selectOneMenu autoWidth="false" value="#{constanciaDeDepositoBean.partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoCve}" filter="true" filterMatchMode="contains">
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Unidad"/>
+							<p:selectOneMenu autoWidth="false" value="#{entradaBean.partida.unidadDeProductoCve.unidadDeManejoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
-								<f:selectItems value="#{constanciaDeDepositoBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad.unidadDeManejoCve}" />
-								<p:ajax process="@this" update=":form:cantidad"></p:ajax>
+								<f:selectItems value="#{entradaBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
 							</p:selectOneMenu>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Peso (kg)" />
-							<p:inputNumber id="pesoTotal" value="#{constanciaDeDepositoBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" modifyValueOnWheel="true" title="Peso (kg)" symbol="kg" symbolPosition="s">
-								<p:ajax process="@this"></p:ajax>
+							<p:inputNumber id="pesoTotal" value="#{entradaBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" title="Peso (kg)" symbol=" kg" symbolPosition="s">
 							</p:inputNumber>
 						</div>
-						<!-- <div class="p-col-2 p-md-2">
-							<p:outputLabel value="Ubicación" />
-							<p:selectOneMenu id="posiciones" autoWidth="false" value="#{constanciaDeDepositoBean.posicionCamaraSelect}" converter="entityConverter">
-								<f:selectItem itemLabel="Selecciona Ubicacion" itemValue="" noSelectionOption="true"></f:selectItem>
-								<f:selectItems value="#{constanciaDeDepositoBean.posiciones}" var="posicion" itemLabel="#{posicion.descPosicion}" itemValue="#{posicion}"/>
-								<p:ajax process="@this"></p:ajax>
-							</p:selectOneMenu>
-						</div> -->
-						<!-- <div class="p-col-2 p-md-2">
-							<p:outputLabel value="Valor de la mercancía"/>
-							<p:inputNumber value="#{constanciaDeDepositoBean.partida.valorMercancia}" placeholder="Valor($) Mercancia">
-								<p:ajax process="@this"></p:ajax>
-							</p:inputNumber>
-						</div> -->
-						<!-- <div class="p-col-2 p-md-2">
-							<p:outputLabel value="m&#178; por camara"/>
-							<p:inputNumber value="#{constanciaDeDepositoBean.partida.rendimiento}" placeholder="m&#178; por camara">
-								<p:ajax process="@this"></p:ajax>
-							</p:inputNumber>
-						</div> -->
 					</div>
 					<div class="p-grid ui-fluid p-col-12">
-					    <div class="p-col-2 p-md-2">
-							<p:inputText id="txtCodigo" maxlength="13" value="#{constanciaDeDepositoBean.detalle.dtpCodigo}" disabled="#{not constanciaDeDepositoBean.showCodigo}" placeholder="Codigo" title="Codigo">
-								<p:ajax process="@this"></p:ajax>
+					    <div class="p-col-12 p-md-2">
+					    	<p:outputLabel value="Código" />
+							<p:inputText id="txtCodigo" maxlength="13" value="#{entradaBean.partida.detallePartidaList.get(0).dtpCodigo}" disabled="#{not entradaBean.showCodigo}" placeholder="Codigo" title="Codigo">
 							</p:inputText>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:inputText id="txtPedimento" maxlength="13" value="#{constanciaDeDepositoBean.detalle.dtpPedimento}" disabled="#{not constanciaDeDepositoBean.showPedimento}" placeholder="Pedimento" title="Pedimento">
-								<p:ajax process="@this"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Pedimento" />
+							<p:inputText id="txtPedimento" maxlength="13" value="#{entradaBean.partida.detallePartidaList.get(0).dtpPedimento}" disabled="#{not entradaBean.showPedimento}" placeholder="Pedimento" title="Pedimento">
 							</p:inputText>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:inputText id="txtSAP" maxlength="20" value="#{constanciaDeDepositoBean.detalle.dtpSAP}" disabled="#{not constanciaDeDepositoBean.showSAP}" placeholder="Contenedor" title="Contenedor">
-								<p:ajax process="@this"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Contenedor" />
+							<p:inputText id="txtSAP" maxlength="20" value="#{entradaBean.partida.detallePartidaList.get(0).dtpSAP}" disabled="#{not entradaBean.showSAP}" placeholder="Contenedor" title="Contenedor">
 							</p:inputText>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:inputText id="txtLote" maxlength="20" value="#{constanciaDeDepositoBean.detalle.dtpLote}" disabled="#{not constanciaDeDepositoBean.showLote}" placeholder="Lote" title="Lote">
-								<p:ajax process="@this"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Lote" />
+							<p:inputText id="txtLote" maxlength="20" value="#{entradaBean.partida.detallePartidaList.get(0).dtpLote}" disabled="#{not entradaBean.showLote}" placeholder="Lote" title="Lote">
 							</p:inputText>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:datePicker id="fechaCaducidad" showIcon="true" value="#{constanciaDeDepositoBean.detalle.dtpCaducidad}" disabled="#{not constanciaDeDepositoBean.showCaducidad}" placeholder="Caducidad" title="Caducidad" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6">
-								<p:ajax process="@this"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Caducidad" />
+							<p:datePicker id="fechaCaducidad" showIcon="true" value="#{entradaBean.partida.detallePartidaList.get(0).dtpCaducidad}" disabled="#{not entradaBean.showCaducidad}" placeholder="Caducidad" title="Caducidad" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6">
 							</p:datePicker>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:inputText id="txtOtro" maxlength="12" value="#{constanciaDeDepositoBean.detalle.dtpMP}" disabled="#{not constanciaDeDepositoBean.showOtro}" placeholder="Otro" title="Otro">
-								<p:ajax process="@this"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:outputLabel value="Otro" />
+							<p:inputText id="txtOtro" maxlength="12" value="#{entradaBean.partida.detallePartidaList.get(0).dtpMP}" disabled="#{not entradaBean.showOtro}" placeholder="Otro" title="Otro">
 							</p:inputText>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:commandButton id="cmd-agregar-producto" value="Agregar tarimas" styleClass="edit-button" icon="pi pi-plus" process="@this" update="form:dt-partidas" oncomplete="PF('noTarimasDlg').show()" rendered="#{not constanciaDeDepositoBean.saved}"/>
+						<div class="p-col-12 p-md-6">
+							<p:commandButton id="cmd-agregar-producto" value="Agregar tarimas" styleClass="edit-button" icon="pi pi-plus" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('noTarimasDlg').show();" rendered="#{not entradaBean.saved}"/>
+						</div>
+						<div class="p-col-12 p-md-6">
+							<p:commandButton id="cmd-reiniciar-producto" value="Reiniciar" styleClass="edit-button" icon="pi pi-replay" process="@this" update="form:seleccion-mercancia" rendered="#{not entradaBean.saved}" actionListener="#{entradaBean.resetPartida}"/>
 						</div>
 					</div>
 				</p:panel>
 			</div>
 			<div style="padding-top: 2rem;">
-				<p:panel header="SUS PRODUCTOS">
-					<p:dataTable id="dt-partidas" widgetVar="dtPartida" value="#{constanciaDeDepositoBean.listadoPartida}" var="partida" paginator="true"
-								  rowSelectMode="add" rows="10" rowKey="#{partida.pesoTotal}" reflow="true" selection="#{constanciaDeDepositoBean.selectedPartidas}" tableStyle="table-layout: auto;"
-								  editable="true" editMode="cell">
-								  
-								   <p:ajax event="cellEdit" listener="#{constanciaDeDepositoBean.partidaEditada}" update=":form:messages"/>
-				
-						<p:column exportable="false" width="2rem">
-							<p:rowToggler />
-						</p:column>
-						<p:column headerText="Producto">
-							<h:outputText value="#{partida.unidadDeProductoCve.productoCve.productoDs}"/>
-						</p:column>
-						<p:column headerText="Camara">
-							<h:outputText value="#{partida.camaraCve.camaraAbrev}"/>
-						</p:column>
-						<p:column headerText="Peso (kg)">
-							
-							<p:cellEditor>
-			                    <f:facet name="output">
-			                        <h:outputText value="#{partida.pesoTotal}"/>
-			                    </f:facet>
-			                    <f:facet name="input">
-			                        <p:inputText id="pesoEditado" value="#{partida.pesoTotal}" style="width:100%"/>
-			                    </f:facet>
-			                </p:cellEditor>
-							
-							
-						</p:column>
-						<p:column headerText="Cantidad">
-							<p:cellEditor>
-			                    <f:facet name="output">
-			                        <h:outputText value="#{partida.cantidadTotal}"/>
-			                    </f:facet>
-			                    <f:facet name="input">
-			                        <p:inputText id="cantidadEditado" value="#{partida.cantidadTotal}" style="width:100%"/>
-			                    </f:facet>
-			                </p:cellEditor>
-						</p:column>
-						<p:column headerText="Unidad">
-							<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}"/>
-						</p:column>
-						
-						<!-- <p:column headerText="Valor($)">
-							<h:outputText value="#{partida.valorMercancia}"/>
-						</p:column> -->
-						<p:column headerText="Tarimas">
-							<h:outputText value="#{partida.noTarimas}"/>
-						</p:column>
-						<p:rowExpansion>
-							<div class="orders-subtable">
-								<p:dataTable id="dtDetallePartida" value="#{partida.detallePartidaList}" var="detallePartida" reflow="true">
-									<p:column headerText="Codigo">
-										<h:outputText value="#{detallePartida.dtpCodigo}" />
-									</p:column>
-									<p:column headerText="Pedimento">
-										<h:outputText value="#{detallePartida.dtpPedimento}" />
-									</p:column>
-									<p:column headerText="Contenedor">
-										<h:outputText value="#{detallePartida.dtpSAP}" />
-									</p:column>
-									<p:column headerText="Lote">
-										<h:outputText value="#{detallePartida.dtpLote}" />
-									</p:column>
-									<p:column headerText="Caducidad">
-										<h:outputText value="#{detallePartida.dtpCaducidad}"> 
-											<f:convertDateTime pattern="dd/MM/yyyy" />
-										</h:outputText>
-									</p:column>
-									<p:column headerText="Otro">
-										<h:outputText value="#{detallePartida.dtpMP}" />
-									</p:column>
-								</p:dataTable>
+				<p:dataList id="dt-tarimas" widgetVar="dtTarima" value="#{entradaBean.tarimas}" var="tarima" emptyMessage="No se han agregado tarimas" type="definition">
+					<f:facet name="header">
+						<p:outputLabel value="TARIMAS (#{entradaBean.tarimas.size()})"/>
+					</f:facet>
+					<div style="padding-bottom: 1rem;">
+						<p:dataTable widgetVar="dtPartidas" value="#{tarima.partidas}" var="partida" rowKey="#{partida.partidaCve}" emptyMessage="Debe agregar productos a esta tarima">
+							<f:facet name="header">
+								<div align="center">
+									<span style="padding-left: 1rem; padding-right: 1rem;">
+										<p:commandButton icon="pi pi-plus" value="Agregar producto" actionListener="#{entradaBean.newPartida()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgAddProducto').show();" process="@this" update="form:seleccion-mercancia form:dlg-add-producto">
+											<f:setPropertyActionListener value="#{tarima}" target="#{entradaBean.tarima}"></f:setPropertyActionListener>
+										</p:commandButton>
+									</span>
+									<span style="padding-left: 1rem; padding-right: 1rem;">
+										<p:outputLabel value="TARIMA #{tarima.nombre}"></p:outputLabel>
+									</span>	
+									<span style="padding-left: 1rem; padding-right: 1rem;">
+										<p:commandButton icon="pi pi-trash" value="Eliminar tarima" styleClass="ui-button-danger" action="#{entradaBean.deleteTarima(tarima)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+											<p:confirm header="Eliminar tarima" message="¿Está seguro que quiere eliminar la tarima?" icon="pi pi-exclamation-triangle" />
+										</p:commandButton>
+									</span>
+								</div>
+							</f:facet>
+							<p:column width="2rem">
+								<p:commandButton icon="pi pi-chevron-right" process="@this" actionListener="#{entradaBean.cargaDetalle(partida)}" update="form:det-partida" styleClass="ui-button-flat" oncomplete="PF('detPartida').show();">
+									<f:setPropertyActionListener value="#{partida}" target="#{entradaBean.partida}"/>
+								</p:commandButton>
+							</p:column>
+							<p:column width="2rem">
+								<p:commandButton icon="pi pi-clone" process="@this" actionListener="#{entradaBean.clonarPartida(partida)}" update="form:dt-tarimas" styleClass="ui-button-flat">
+									<f:setPropertyActionListener value="#{partida}" target="#{entradaBean.partida}" />
+								</p:commandButton>
+							</p:column>
+							<p:column headerText="Producto">
+								<p:outputLabel value="#{partida.unidadDeProductoCve.productoCve.productoDs}"></p:outputLabel>
+							</p:column>
+							<p:column headerText="Cantidad" width="5rem" style="text-align: right;">
+								<p:inputNumber value="#{partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="always" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" decimalPlaces="0">
+									<p:ajax process="@this" update="form:dt-tarimas"/>
+								</p:inputNumber>
+							</p:column>
+							<p:column headerText="Unidad" width="5rem" style="text-align: right;">
+								<h:outputText value="#{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}"/>
+							</p:column>
+							<p:column headerText="Peso (kg)" width="5rem" style="text-align: right;">
+								<p:inputNumber value="#{partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" modifyValueOnWheel="true" title="Peso (kg)" symbol=" kg" symbolPosition="s">
+									<p:ajax process="@this" update="form:dt-tarimas"/>
+								</p:inputNumber>
+							</p:column>
+							<p:column width="2rem">
+								<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" action="#{entradaBean.deleteSelectedPartidas}" rendered="#{not entradaBean.saved}" update="form:dt-tarimas">
+								    <f:setPropertyActionListener value="#{partida}" target="#{entradaBean.selectedPartida}" />
+								</p:commandButton>
+							</p:column>
+							<p:columnGroup type="footer">
+								<p:column colspan="2">
+								</p:column>
+								<p:column>
+									<f:facet name="footer">
+										<p:outputLabel value="#{tarima.partidas.size()} producto(s)">
+										</p:outputLabel>
+									</f:facet>
+								</p:column>
+								<p:column style="text-align: right;">
+									<f:facet name="footer">
+										<p:outputLabel value="#{tarima.partidas.stream().map(item -> item.cantidadTotal).sum()}">
+											<f:convertNumber type="number"/>
+										</p:outputLabel>
+									</f:facet>
+								</p:column>
+								<p:column style="text-align: right;">
+									<f:facet name="footer">
+										<p:outputLabel value="Unidades"></p:outputLabel>
+									</f:facet>
+								</p:column>
+								<p:column style="text-align: right;">
+									<f:facet name="footer">
+										<p:outputLabel value="#{tarima.partidas.stream().map(item -> item.pesoTotal).sum()}">
+											<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2"/>
+										</p:outputLabel>
+									</f:facet>
+								</p:column>
+								<p:column>
+								</p:column>
+							</p:columnGroup>
+						</p:dataTable>
+					</div>
+					<f:facet name="footer">
+						<div class="p-grid ui-fluid p-col-12">
+							<div class="p-col-3 p-md-3">
+								<p:outputLabel value="TOTALES:">
+								</p:outputLabel>
 							</div>
-						</p:rowExpansion>
-						<p:column exportable="false" style="text-align:center">
-							<p:commandButton class="ui-button-danger" icon="pi pi-times" action="#{constanciaDeDepositoBean.deleteSelectedPartidas}" rendered="#{not constanciaDeDepositoBean.saved}">
-							    <f:setPropertyActionListener value="#{partida}" target="#{constanciaDeDepositoBean.selectedPartida}" />
-							</p:commandButton>
-						</p:column>
-						
-						<p:columnGroup type="footer" >
-                <p:row>
-                    <p:column colspan="3" style="text-align:left"  />
-                    <p:column>
-                        <f:facet name="footer">
-						<div align="left">
-							Total de tarimas:
-							<p:outputLabel value="#{constanciaDeDepositoBean.totalTarimas}" id="totalTarimas"/>
+							<div class="p-col-3 p-md-3">
+								<p:outputLabel value="#{entradaBean.tarimas.size()} Tarimas">
+									<f:convertNumber type="number" />
+								</p:outputLabel>
+							</div>
+							<div class="p-col-3 p-md-3">
+								<p:outputLabel value="#{entradaBean.listadoPartida.stream().map(item -> item.cantidadTotal).sum()} unidades">
+									<f:convertNumber type="number" />
+								</p:outputLabel>
+							</div>
+							<div class="p-col-3 p-md-3">
+								<p:outputLabel value="#{entradaBean.listadoPartida.stream().map(item -> item.pesoTotal).sum()} kg">
+									<f:convertNumber type="number" />
+								</p:outputLabel>
+							</div>
 						</div>
 					</f:facet>
-                    </p:column>
-                    
-                    <p:column>
-                        <f:facet name="footer">
-						<div align="left">
-							Total de kilos:
-							<p:outputLabel value="#{constanciaDeDepositoBean.totalKilos}" id="totalKilos"/>
-						</div>
-					</f:facet>
-                    </p:column>
-                    
-                    <p:column>
-                        <f:facet name="footer">
-						<div align="left">
-							Total de cajas:
-							<p:outputLabel value="#{constanciaDeDepositoBean.totalCajas}" id="totalCajas"/>
-						</div>
-					</f:facet>
-                    </p:column>
-                    <p:column colspan="2" style="text-align:left"  />
-                    </p:row>
-            </p:columnGroup>
-            
-            
-						
-					</p:dataTable>
-				</p:panel>
+				</p:dataList>
 			</div>
+			<p:dialog widgetVar="detPartida" modal="true" closable="true" closeOnEscape="true" responsive="true" width="100%" header="Tarima #{entradaBean.partida.tarima.nombre} - #{entradaBean.partida.unidadDeProductoCve.productoCve.productoDs}">
+				<p:ajax event="close" listener="#{entradaBean.quitaDetalle}" process="@this" update="form:dlg-add-producto" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+				<p:outputPanel id="det-partida" class="p-grid ui-fluid p-col-12">
+					<div class="p-col">
+						<div>
+							<p:outputLabel value="Código"/>
+						</div>
+						<div>
+							<p:inputText value="#{entradaBean.detalle.dtpCodigo}" disabled="#{not entradaBean.aviso.avisoCodigo}">
+								<p:ajax process="@this"/>
+							</p:inputText>
+						</div>
+					</div>
+					<div class="p-col">
+						<div>
+							<p:outputLabel value="Pedimento"/>
+						</div>
+						<div>
+							<p:inputText value="#{entradaBean.detalle.dtpPedimento}" disabled="#{not entradaBean.aviso.avisoPedimento}">
+								<p:ajax process="@this"/>
+							</p:inputText>
+						</div>
+					</div>
+					<div class="p-col">
+						<div>
+							<p:outputLabel value="Contenedor"/>
+						</div>
+						<div>
+							<p:inputText value="#{entradaBean.detalle.dtpSAP}" disabled="#{not entradaBean.aviso.avisoSap}">
+								<p:ajax process="@this"/>
+							</p:inputText>
+						</div>
+					</div>
+					<div class="p-col">
+						<div>
+							<p:outputLabel value="Lote"/>
+						</div>
+						<div>
+							<p:inputText value="#{entradaBean.detalle.dtpLote}" disabled="#{not entradaBean.aviso.avisoLote}">
+								<p:ajax process="@this"/>
+							</p:inputText>
+						</div>
+					</div>
+					<div class="p-col">
+						<div>
+							<p:outputLabel value="Caducidad"/>
+						</div>
+						<div>
+							<p:datePicker value="#{entradaBean.detalle.dtpCaducidad}" placeholder="caducidad (dd/mm/yyyy)" locale="es" format="dd/MM/YYYY" timeZone="GMT-6" showIcon="true" disabled="#{not entradaBean.aviso.avisoCaducidad}">
+								<p:ajax process="@this" />
+							</p:datePicker>
+						</div>
+					</div>
+					<div class="p-col">
+						<div>
+							<p:outputLabel value="Otro"/>
+						</div>
+						<div>
+							<p:inputText value="#{entradaBean.detalle.dtpMP}" disabled="#{not entradaBean.aviso.avisoOtro}">
+								<p:ajax process="@this"/>
+							</p:inputText>
+						</div>
+					</div>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton icon="pi pi-times" value="Cerrar" process="@this" actionListener="#{entradaBean.quitaDetalle}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('detPartida').hide();" update="form:dlg-add-producto">
+					</p:commandButton>
+				</f:facet>
+			</p:dialog >
+			<p:dialog widgetVar="dlgAddProducto" header="Agregar producto a la tarima #{entradaBean.tarima.nombre}" showEffect="hide" modal="true" width="100%" focus="sel-producto" closeOnEscape="true">
+				<p:outputPanel id="dlg-add-producto" styleClass="p-grid ui-fluid p-col-12">
+					<div class="p-col-12 p-md-6">
+						<p:outputLabel value="Producto"/>
+						<p:selectOneMenu id="sel-producto" value="#{entradaBean.partida.unidadDeProductoCve.productoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Selecciona Producto" noSelectionOption="true"/>
+							<f:selectItems value="#{entradaBean.productos}" var="producto" itemLabel="#{producto.numeroProd} - #{producto.productoDs}" itemValue="#{producto}"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Cantidad"/>
+						<p:inputNumber value="#{entradaBean.partida.cantidadTotal}" minValue="0" maxValue="100000" emptyValue="empty" placeholder="Cantidad" modifyValueOnWheel="true" title="Cantidad" decimalPlaces="0">
+						</p:inputNumber>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Unidad"/>
+						<p:selectOneMenu autoWidth="false" value="#{entradaBean.partida.unidadDeProductoCve.unidadDeManejoCve}" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Selecciona unidad" itemValue="" noSelectionOption="true" />
+							<f:selectItems value="#{entradaBean.listadoUnidadDeManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="Peso"/>
+						<p:inputNumber value="#{entradaBean.partida.pesoTotal}" placeholder="Peso (kg)" minValue="0" maxValue="1000000" emptyValue="empty" modifyValueOnWheel="true" title="Peso (kg)" symbol=" kg" symbolPosition="s">
+						</p:inputNumber>
+					</div>
+					<div class="p-col-12 p-md-3">
+						<p:outputLabel value="Código" />
+						<p:inputText maxlength="13" value="#{entradaBean.partida.detallePartidaList.get(0).dtpCodigo}" disabled="#{not entradaBean.showCodigo}" placeholder="Codigo" title="Codigo">
+						</p:inputText>
+					</div>
+					<div class="p-col-12 p-md-3">
+						<p:outputLabel value="Pedimento" />
+						<p:inputText maxlength="13" value="#{entradaBean.partida.detallePartidaList.get(0).dtpPedimento}" disabled="#{not entradaBean.showPedimento}" placeholder="Pedimento" title="Pedimento">
+						</p:inputText>
+					</div>
+					<div class="p-col-12 p-md-3">
+						<p:outputLabel value="Contenedor" />
+						<p:inputText maxlength="20" value="#{entradaBean.partida.detallePartidaList.get(0).dtpSAP}" disabled="#{not entradaBean.showSAP}" placeholder="Contenedor" title="Contenedor">
+						</p:inputText>
+					</div>
+					<div class="p-col-12 p-md-3">
+						<p:outputLabel value="Lote" />
+						<p:inputText maxlength="20" value="#{entradaBean.partida.detallePartidaList.get(0).dtpLote}" disabled="#{not entradaBean.showLote}" placeholder="Lote" title="Lote">
+						</p:inputText>
+					</div>
+					<div class="p-col-12 p-md-3">
+						<p:outputLabel value="Caducidad" />
+						<p:datePicker showIcon="true" value="#{entradaBean.partida.detallePartidaList.get(0).dtpCaducidad}" disabled="#{not entradaBean.showCaducidad}" placeholder="Caducidad" title="Caducidad" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6">
+						</p:datePicker>
+					</div>
+					<div class="p-col-12 p-md-3">
+						<p:outputLabel value="Otro" />
+						<p:inputText maxlength="12" value="#{entradaBean.partida.detallePartidaList.get(0).dtpMP}" disabled="#{not entradaBean.showOtro}" placeholder="Otro" title="Otro">
+						</p:inputText>
+					</div>
+				</p:outputPanel>
+				<f:facet name="footer">
+        			<p:commandButton value="Agregar" icon="pi pi-check" process="@this form:dlg-add-producto" actionListener="#{entradaBean.addPartida}" update="form:dt-tarimas form:seleccion-mercancia" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+					<p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('dlgAddProducto').hide();" styleClass="ui-button-secondary"/>
+				</f:facet>
+				<p:focus for="form:sel-producto"></p:focus>
+			</p:dialog>
+			
+			
+			
 			<div style="padding-top: 2rem;">
-				<p:panel id="seleccion-producto" header="PARA LOS SERVICIOS DE">
+				<p:panel id="seleccion-servicio" header="PARA LOS SERVICIOS DE">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-2 p-md-2">
-							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{constanciaDeDepositoBean.isCongelacion}">
-								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:selectBooleanCheckbox id="congelacion" itemLabel="Congelacion" value="#{entradaBean.isCongelacion}">
+								<p:ajax process="@this" listener="#{entradaBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{constanciaDeDepositoBean.isConservacion}">
-								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:selectBooleanCheckbox id="conservacion" itemLabel="Conservacion" value="#{entradaBean.isConservacion}">
+								<p:ajax process="@this" listener="#{entradaBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{constanciaDeDepositoBean.isRefrigeracion}">
-								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:selectBooleanCheckbox id="refrigeracion" itemLabel="Refrigeracion" value="#{entradaBean.isRefrigeracion}">
+								<p:ajax process="@this" listener="#{entradaBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{constanciaDeDepositoBean.isManiobras}">
-								<p:ajax process="@this" listener="#{constanciaDeDepositoBean.logServiciosBasicos}"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:selectBooleanCheckbox id="maniobras" itemLabel="Maniobras" value="#{entradaBean.isManiobras}">
+								<p:ajax process="@this" listener="#{entradaBean.logServiciosBasicos}"></p:ajax>
 							</p:selectBooleanCheckbox>
 						</div>
 					</div>
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-6 p-md-6">
-							<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{constanciaDeDepositoBean.precioServicioSelect}" filter="true" filterMatchMode="contains">
+						<div class="p-col-12 p-md-6">
+							<p:selectOneMenu id="precioServicio" autoWidth="false" converter="entityConverter" value="#{entradaBean.precioServicioSelect}" filter="true" filterMatchMode="contains">
 								<f:selectItem itemLabel="Selecciona un Servicio" itemValue="" noSelectionOption="true" />
-								<f:selectItems value="#{constanciaDeDepositoBean.listaServicioUnidad}" var="precioServicio" itemLabel="#{precioServicio.servicio.servicioDs} (Cobro por #{precioServicio.unidad.unidadDeManejoDs})" itemValue="#{precioServicio}" />	
-								<p:ajax process="@this"></p:ajax>
+								<f:selectItems value="#{entradaBean.listaServicioUnidad}" var="precioServicio" itemLabel="#{precioServicio.servicio.servicioDs} (Cobro por #{precioServicio.unidad.unidadDeManejoDs})" itemValue="#{precioServicio}" />	
 							</p:selectOneMenu>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:spinner id="cantidadServicio" min="1" value="#{constanciaDeDepositoBean.cantidadServicio}" placeholder="Cantidad">
-								<p:ajax process="@this"></p:ajax>
+						<div class="p-col-12 p-md-2">
+							<p:spinner id="cantidadServicio" min="1" value="#{entradaBean.cantidadServicio}" placeholder="Cantidad">
 							</p:spinner>
 						</div>
-						<div class="p-col-2 p-md-2">
-							<p:commandButton id="cmd-agregar-servicio" value="Agregar" styleClass="edit-button" actionListener="#{constanciaDeDepositoBean.saveConstanciaDepositoDetalle()}" style="margin-right: .5rem" icon="pi pi-plus" update="form:dt-constanciaDD" rendered="#{not constanciaDeDepositoBean.saved}"/>
+						<div class="p-col-12 p-md-2">
+							<p:commandButton id="cmd-agregar-servicio" icon="pi pi-plus" value="Agregar" process="@this cantidadServicio precioServicio" actionListener="#{entradaBean.agregaServicio()}" update="dt-constanciaDD precioServicio cantidadServicio" styleClass="edit-button" rendered="#{not entradaBean.saved}"/>
 						</div>
 					</div>
-					<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" value="#{constanciaDeDepositoBean.listadoConstanciaDepositoDetalle}"
-								rowSelectMode="add"	rowKey="#{constanciaDD}" var="constanciaDD" reflow="true" selection="#{constanciaDeDepositoBean.selectedConstanciaDD}" tableStyle="table-layout: auto;">
+					<p:dataTable id="dt-constanciaDD" widgetVar="dtConstanciaDD" value="#{entradaBean.listadoConstanciaDepositoDetalle}"
+								rowSelectMode="add"	rowKey="#{constanciaDD}" var="constanciaDD" reflow="true" selection="#{entradaBean.selectedConstanciaDD}" tableStyle="table-layout: auto;">
 	
 						<p:column headerText="Servicio">
 							<h:outputText value="#{constanciaDD.servicioCve.servicioDs}" />
@@ -321,8 +432,7 @@
 							<h:outputText value="#{constanciaDD.servicioCantidad}"/>
 						</p:column>
 						<p:column exportable="false" style="text-align:center">
-						    <p:commandButton class="ui-button-danger" icon="pi pi-times" actionListener="#{constanciaDeDepositoBean.deleteConstanciaDD()}" rendered="#{not constanciaDeDepositoBean.saved}">
-						      
+						    <p:commandButton class="ui-button-danger" icon="pi pi-times" actionListener="#{entradaBean.deleteConstanciaDD()}" rendered="#{not entradaBean.saved}">
 						    </p:commandButton>
 						</p:column>
 					</p:dataTable>
@@ -331,21 +441,21 @@
 			<div style="padding-top: 2rem;">
 				<p:panel id="datos-adicionales" header="DATOS ADICIONALES">
 					<div class="p-grid ui-fluid p-col-12">
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-3">
 							<p:outputLabel value="Temp. mercancía (°C)"/>
-							<p:spinner stepFactor=".01" value="#{constanciaDeDepositoBean.temperatura}" >
+							<p:spinner stepFactor=".01" value="#{entradaBean.temperatura}" >
 								<p:ajax process="@this" />
 							</p:spinner>
 						</div>
-						<div class="p-col-4 p-md-4">
+						<div class="p-col-12 p-md-4">
 							<p:outputLabel value="Nombre transportista"/>
-							<p:inputText value="#{constanciaDeDepositoBean.nombreTransportista}" maxlength="100" >
+							<p:inputText value="#{entradaBean.nombreTransportista}" maxlength="100" >
 								<p:ajax process="@this"></p:ajax>
 							</p:inputText>
 						</div>
-						<div class="p-col-2 p-md-2">
+						<div class="p-col-12 p-md-3">
 							<p:outputLabel value="Placas vehiculo"/>
-							<p:inputText value="#{constanciaDeDepositoBean.placas}" maxlength="10">
+							<p:inputText value="#{entradaBean.placas}" maxlength="10">
 								<p:ajax process="@this"></p:ajax>
 							</p:inputText>
 						</div>
@@ -353,7 +463,7 @@
 					<div class="p-grid ui-fluid p-col-12">
 						<div class="p-col-12 p-md-12">
 							<p:outputLabel value="Observaciones" />
-							<p:inputTextarea value="#{constanciaDeDepositoBean.observacion}" autoResize="true" maxlength="200">
+							<p:inputTextarea value="#{entradaBean.observacion}" autoResize="true" maxlength="200">
 								<p:ajax process="@this"></p:ajax>
 							</p:inputTextarea>
 						</div>
@@ -361,49 +471,71 @@
 				</p:panel>
 			</div>
 			<div style="padding-top: 2rem;">
-				<p:panel>
-					<div align="center">
-						<p:splitButton value="Guardar" styleClass="edit-button" actionListener="#{constanciaDeDepositoBean.saveConstanciaDeDeposito()}" icon="pi pi-save" process="@this numeroC" onclick="PF('statusSaveDialog').show();" oncomplete="PF('statusSaveDialog').hide();" >
-				            <p:menuitem value="Imprimir" actionListener="#{constanciaDeDepositoBean.imprimir()}" icon="pi pi-file-pdf" ajax="false" process="@this"/>
-				        </p:splitButton>								
-				        <p:commandButton value="Nueva constancia" styleClass="edit-button" actionListener="#{constanciaDeDepositoBean.reload()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-producto datos-adicionales dt-constanciaDD dt-partidas"/>
-					</div>
-				</p:panel>
+				<p:panelGrid columns="3" style="margin: 0 auto !important;">
+					<p:commandButton id="cmdGuardar" value="Guardar" styleClass="edit-button" actionListener="#{entradaBean.saveConstanciaDeDeposito()}" icon="pi pi-save" process="@this" onclick="PF('statusSaveDialog').show();" oncomplete="PF('statusSaveDialog').hide();" disabled="#{entradaBean.constanciaDeDeposito.folio ne null}" update="cmdGuardar cmdImprimir cmdNueva"/>
+					<p:commandButton id="cmdImprimir" value="Imprimir" process="numeroC" actionListener="#{entradaBean.jasper}" icon="pi pi-file-pdf" disabled="#{entradaBean.constanciaDeDeposito.folio eq null}" styleClass="edit-button" ajax="false">
+						<p:fileDownload value="#{entradaBean.file}" />
+					</p:commandButton>
+			        <p:commandButton id="cmdNueva" value="Nueva constancia" styleClass="edit-button" actionListener="#{entradaBean.reload()}" style="margin-right: .5rem" icon="pi pi-refresh" update="seleccion-mercancia seleccion-servicio datos-adicionales dt-constanciaDD dt-tarimas" disabled="#{entradaBean.constanciaDeDeposito.folio eq null}"/>
+				</p:panelGrid>
 			</div>
 			<p:dialog header="Folio" showEffect="hide" modal="true" widgetVar="NoCambiarDialog" responsive="true" style="text-align:center">
 				<p:outputPanel id="NoConstancia">
-					<p:outputPanel rendered="#{empty constanciaDeDepostioBean.noConstanciaSelect}" >
+					<p:outputPanel rendered="#{empty entradaBean.folioCliente}" >
 						<div>
-							<p:inputText value="#{constanciaDeDepositoBean.noConstanciaSelect}">
+							<p:inputText value="#{entradaBean.folioCliente}">
 								<p:ajax event="blur" update="numeroC"/> 
 							</p:inputText>
 						</div>		
 					</p:outputPanel>
 				</p:outputPanel>
 				<f:facet name="footer">
-						<p:commandButton value="Validar" actionListener="#{constanciaDeDepositoBean.validar()}" oncomplete="PF('NoCambiarDialog').hide()" update="@this" process="NoConstancia @this"/>
+						<p:commandButton value="Validar" actionListener="#{entradaBean.validar()}" oncomplete="PF('NoCambiarDialog').hide()" process="NoConstancia @this"/>
 						<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('NoCambiarDialog').hide()" class="ui-button-secondary"/>
 				</f:facet>													
 			</p:dialog>
-			<p:dialog header="¿Cuantas tarimas desea ingresar?" showEffect="hide" modal="true" widgetVar="noTarimasDlg" responsive="true" style="text-align:center">
-				<p:outputPanel id="NoTarimas">
-					<div>
-						<p:inputNumber id="numTarimas" value="#{constanciaDeDepositoBean.numTarimas}" placeholder="No. Tarimas" minValue="0.00" maxValue="1000000" decimalPlaces="2" decimalSeparator="." emptyValue="empty" modifyValueOnWheel="true" title="Tarimas">
-							<p:ajax process="@this"/>
-						</p:inputNumber>
-					</div>		
-				</p:outputPanel>
-				<f:facet name="footer">
-						<p:selectBooleanCheckbox id="id-validaCarga" itemLabel="Carga Completa" value="#{constanciaDeDepositoBean.validaCarga}" >
-						<p:ajax update="@this"  />
-						</p:selectBooleanCheckbox>
-						<p:commandButton value="Validar" actionListener="#{constanciaDeDepositoBean.addPartida()}" oncomplete="PF('noTarimasDlg').hide()" update="form:dt-partidas form:camara @this" process="NoConstancia @this"/>
-						<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('noTarimasDlg').hide()" class="ui-button-secondary"/>
-				</f:facet>
+			<p:dialog id="NoTarimas" header="Configuración de la tarima" showEffect="hide" modal="true" widgetVar="noTarimasDlg" responsive="true" closeOnEscape="true">
+				<p:ajax event="close" listener="#{entradaBean.quitaDetalle }" />
+				<p:tabView id="tvTarimas" dynamic="true" effect="drop">
+					<p:tab title="Tarima completa">
+						<p:outputPanel class="ui-fluid">
+							<div class="p-field">¿Cuantas tarimas se agregarán?</div>
+							<div class="p-field">
+								<p:inputNumber id="numTarimas" widgetVar="numTarimas" value="#{entradaBean.numTarimas}" placeholder="No. Tarimas" minValue="0" maxValue="1000000" decimalPlaces="0" decimalSeparator="." emptyValue="empty" modifyValueOnWheel="true" title="Tarimas">
+								</p:inputNumber>
+							</div>
+							<div class="p-field">
+								<p:commandButton value="Agregar" icon="pi pi-check" process="form:seleccion-mercancia form:NoTarimas @this" actionListener="#{entradaBean.addTarima()}" update="form:dt-tarimas form:seleccion-mercancia form:NoTarimas" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+							</div>
+							<div class="p-field">
+								<p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('noTarimasDlg').hide();" class="ui-button-secondary"/>
+							</div>
+						</p:outputPanel>
+					</p:tab>
+					<p:tab title="Agregar a tarima">
+						<p:outputPanel class="ui-fluid">
+							<div class="p-field">¿A que tarima pertenece el producto?</div>
+							<div class="p-field">
+								<p:selectOneMenu value="#{entradaBean.tarima}" converter="entityConverter">
+									<f:selectItem itemLabel="--SELECCIONE TARIMA--" noSelectionOption="true"/>
+									<f:selectItems value="#{entradaBean.tarimas}" var="tarima" itemLabel="#{tarima.nombre}" itemValue="#{tarima}"/>
+									<p:ajax process="@this" />
+								</p:selectOneMenu>
+							</div>
+							<div class="p-field">
+								<p:commandButton value="Agregar" icon="pi pi-plus" process="form:tvTarimas" actionListener="#{entradaBean.addPartida()}" update="form:camara form:dt-tarimas form:seleccion-mercancia" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+							</div>
+							<div class="p-field">
+								<p:commandButton value="Cancelar" icon="pi pi-times" process="@this" oncomplete="PF('noTarimasDlg').hide()" class="ui-button-secondary"/>
+							</div>
+						</p:outputPanel>
+					</p:tab>
+				</p:tabView>
+				<p:focus for="form:tvTarimas:numTarimas"/>
 			</p:dialog>
-			<p:confirmDialog widgetVar="deleteConstanciaDialog" showEffect="fade" width="400" message="Desea eliminar la constancia?" header="Eliminar" severity="warn">
-				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{constanciaDeDepositoBean.deleteConstanciaDD}" process="@this" oncomplete="PF('deleteConstanciaDialog').hide()"/>
-				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteConstanciaDialog').hide()" />
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="400" responsive="true">
+				<p:commandButton icon="pi pi-check" value="Sí" styleClass="ui-confirmdialog-yes"/>
+				<p:commandButton icon="pi pi-times" value="No" styleClass="ui-confirmdialog-no"/>
 			</p:confirmDialog>
 		</h:form>
 	</ui:define>

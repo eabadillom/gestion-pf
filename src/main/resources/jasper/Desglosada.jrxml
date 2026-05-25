@@ -4,7 +4,7 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="359"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="629"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GestionProduccionMySQL.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL_Gestion_local.jrdax"/>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA[$P{imagen}]]></defaultValueExpression>
 	</parameter>
@@ -95,7 +95,7 @@ FROM (
 		AND (factura.cliente = $P{idCliente} OR $P{idCliente} IS NULL)
 		AND (factura.emi_rfc = $P{emisorRFC} or $P{emisorRFC} IS NULL)
 ) t
-ORDER BY emi_nombre, nombre_cliente, numero_cliente, nom_serie, numero]]>
+ORDER BY emi_nombre, nombre_cliente, numero_cliente, fecha_pago, nom_serie, numero]]>
 	</queryString>
 	<field name="emi_rfc" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="emi_rfc"/>

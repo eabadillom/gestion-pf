@@ -6,6 +6,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -41,9 +42,11 @@ public class ProductoPorCliente implements Serializable {
     @Basic(optional = false)
     @Column(name = "PROD_X_CTE_CVE")
     private Integer prodXCteCve;
+    
     @JoinColumn(name = "CTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente cteCve;
+    
     @JoinColumn(name = "PRODUCTO_CVE", referencedColumnName = "PRODUCTO_CVE")
     @ManyToOne(optional = false)
     private Producto productoCve;
@@ -86,9 +89,9 @@ public class ProductoPorCliente implements Serializable {
 
 	@Override
     public int hashCode() {
-        int hash = 0;
-        hash += (prodXCteCve != null ? prodXCteCve.hashCode() : 0);
-        return hash;
+		if(this.prodXCteCve == null)
+			return System.identityHashCode(this);
+		return Objects.hash(this.prodXCteCve);
     }
 
     @Override

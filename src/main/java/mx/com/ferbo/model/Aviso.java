@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,10 +29,6 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "aviso")
 @NamedQueries({
@@ -55,107 +53,130 @@ import javax.validation.constraints.Size;
 public class Aviso implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "aviso_cve")
     private Integer avisoCve;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_po")
     private boolean avisoPo;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_codigo")
     private boolean avisoCodigo;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_pedimento")
     private boolean avisoPedimento;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_sap")
     private boolean avisoSap;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_lote")
     private boolean avisoLote;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_caducidad")
     private boolean avisoCaducidad;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_tarima")
     private boolean avisoTarima;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_otro")
     private boolean avisoOtro;
-    
+
     @Size(max = 50)
     @Column(name = "aviso_temp")
     private String avisoTemp;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_fecha")
     @Temporal(TemporalType.DATE)
     private Date avisoFecha;
-    
+
     @Size(max = 255)
     @Column(name = "aviso_observaciones")
     private String avisoObservaciones;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_vigencia")
     private int avisoVigencia;
-    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
-    // consider using these annotations to enforce field validation
+
     @Column(name = "aviso_val_seg")
+    @Basic(optional = true)
     private BigDecimal avisoValSeg;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "aviso_plazo")
     private int avisoPlazo;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 1)
     @Column(name = "aviso_tp_facturacion")
     private String avisoTpFacturacion;
-    
+
     @JoinColumn(name = "cte_cve", referencedColumnName = "CTE_CVE")
     @ManyToOne
     private Cliente cteCve;
-    
+
     @JoinColumn(name = "planta_cve", referencedColumnName = "PLANTA_CVE")
     @ManyToOne
+    @Basic(optional = true)
     private Planta plantaCve;
-    
-    @JoinColumn(name = "categoria_cve", referencedColumnName = "categoria_cve")
+
     @ManyToOne
+    @JoinColumn(name = "categoria_cve", referencedColumnName = "categoria_cve")
+    @Basic(optional = true)
     private Categoria categoriaCve;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve")
-    private List<CuotaMensualServicio> cuotaMensualServicioList;
-    
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE}, mappedBy = "avisoCve", orphanRemoval = true)
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "avisoCve", orphanRemoval = true)
     private List<PrecioServicio> precioServicioList;
     
-    @OneToMany(mappedBy = "avisoCve")
-    private List<ConstanciaDeDeposito> constanciaDeDepositoList;
+    @Override
+    public int hashCode() {
+    	if(this.avisoCve == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.avisoCve);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+    	if (this == o)
+    		return true;
+    	if (!(o instanceof Aviso))
+    		return false;
+    	Aviso other = (Aviso) o;
+    	
+    	if (this.avisoCve != null && other.avisoCve != null) {
+    		return Objects.equals(this.avisoCve, other.avisoCve);
+    	} else {
+    		return this == other;
+    	}
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.Aviso[ avisoCve=" + avisoCve + " ]";
+    }
 
     public Aviso() {
     }
@@ -197,15 +218,15 @@ public class Aviso implements Serializable {
         this.avisoPo = avisoPo;
     }
 
-	public boolean getAvisoCodigo() {
-		return avisoCodigo;
-	}
+    public boolean getAvisoCodigo() {
+        return avisoCodigo;
+    }
 
-	public void setAvisoCodigo(boolean avisoCodigo) {
-		this.avisoCodigo = avisoCodigo;
-	}
+    public void setAvisoCodigo(boolean avisoCodigo) {
+        this.avisoCodigo = avisoCodigo;
+    }
 
-	public boolean getAvisoPedimento() {
+    public boolean getAvisoPedimento() {
         return avisoPedimento;
     }
 
@@ -333,14 +354,6 @@ public class Aviso implements Serializable {
         this.categoriaCve = categoriaCve;
     }
 
-    public List<CuotaMensualServicio> getCuotaMensualServicioList() {
-        return cuotaMensualServicioList;
-    }
-
-    public void setCuotaMensualServicioList(List<CuotaMensualServicio> cuotaMensualServicioList) {
-        this.cuotaMensualServicioList = cuotaMensualServicioList;
-    }
-
     public List<PrecioServicio> getPrecioServicioList() {
         return precioServicioList;
     }
@@ -349,52 +362,17 @@ public class Aviso implements Serializable {
         this.precioServicioList = precioServicioList;
     }
 
-    public List<ConstanciaDeDeposito> getConstanciaDeDepositoList() {
-        return constanciaDeDepositoList;
-    }
-
-    public void setConstanciaDeDepositoList(List<ConstanciaDeDeposito> constanciaDeDepositoList) {
-        this.constanciaDeDepositoList = constanciaDeDepositoList;
-    }
-    
     public void add(PrecioServicio ps) {
-    	precioServicioList.add(ps);
-    	ps.setAvisoCve(this);
-    	ps.setCliente(this.cteCve);
+        precioServicioList.add(ps);
+        ps.setAvisoCve(this);
+        ps.setCliente(this.cteCve);
     }
-    
+
     public void remove(PrecioServicio ps) {
-    	precioServicioList.remove(ps);
-    	ps.setAvisoCve(null);
-    	ps.setCliente(null);
-    	ps.setServicio(null);
-    	ps.setUnidad(null);
+        precioServicioList.remove(ps);
+        ps.setAvisoCve(null);
+        ps.setCliente(null);
+        ps.setServicio(null);
+        ps.setUnidad(null);
     }
-    
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (avisoCve != null ? avisoCve.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Aviso)) {
-            return false;
-        }
-        Aviso other = (Aviso) object;
-        if ((this.avisoCve == null && other.avisoCve != null)
-                || (this.avisoCve != null && !this.avisoCve.equals(other.avisoCve))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.Aviso[ avisoCve=" + avisoCve + " ]";
-    }
-
 }

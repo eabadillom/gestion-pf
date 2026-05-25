@@ -13,10 +13,9 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Camara;
 import mx.com.ferbo.model.Posicion;
 import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.JPAEntity;
 
-public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer> {
-	EntityManager entity = JPAEntity.getEntity().createEntityManager();
+public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer>{
+	EntityManager entity = EntityManagerUtil.getEntityManager();
 	private static Logger log = LogManager.getLogger(PosicionCamaraDAO.class);
 
 	@SuppressWarnings("unchecked")
@@ -27,10 +26,10 @@ public class PosicionCamaraDAO extends IBaseDAO<Posicion, Integer> {
 			em = EntityManagerUtil.getEntityManager();
 			Query sql = entity.createNamedQuery("Posicion.findAll", Posicion.class);
 			posiciones = sql.getResultList();
-			System.out.println(posiciones + "*****************************************************");
-		} catch (Exception e) {
-			log.error("Error al obtener informacion", e);
-		} finally {
+			log.debug(posiciones + "*****************************************************");
+		}catch(Exception e) {
+			log.error("Error al obtener informacion",e);
+		}finally {
 			EntityManagerUtil.close(em);
 		}
 		return posiciones;

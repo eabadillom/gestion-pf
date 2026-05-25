@@ -33,8 +33,9 @@ import org.primefaces.PrimeFaces;
 
 import com.ferbo.facturama.tools.FacturamaException;
 
+import mx.com.ferbo.business.FacturacionConstanciasBL;
 import mx.com.ferbo.business.FacturamaBL;
-import mx.com.ferbo.dao.AsentamientoHumandoDAO;
+import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ClienteDomiciliosDAO;
@@ -98,6 +99,8 @@ public class FacturacionConstanciasBean implements Serializable{
 	private static final long serialVersionUID = -1785488265380235016L;
 	
 	private static Logger log = LogManager.getLogger(FacturacionConstanciasBean.class);
+	
+	private FacturacionConstanciasBL facturaEntradasBO = null;
 	
 	private Cliente clienteSelect;
 	private Domicilios domicilioSelect;
@@ -176,6 +179,8 @@ public class FacturacionConstanciasBean implements Serializable{
     
 	
 	public FacturacionConstanciasBean() {
+		
+		facturaEntradasBO = new FacturacionConstanciasBL();
 		clienteDAO = new ClienteDAO();
 		clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		plantaDAO = new PlantaDAO();
@@ -261,9 +266,9 @@ public class FacturacionConstanciasBean implements Serializable{
 		metodoPagoSelect = new MetodoPago();
 		MPagoSelect = new MetodoPago();
 		if((clienteSelect!=null)&&(plantaSelect!=null)) {
-			facturacionEntradas();
-			facturacionServicios();
-			facturacionVigencias();
+			this.facturacionEntradas();
+			this.facturacionServicios();
+			this.facturacionVigencias();
 		}
 		
 		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios","form:medioPago");
@@ -295,7 +300,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.avisoCliente();
 		
 		//carga de constancias si existe un cambio de cliente
-		cargarConstancias();
+		this.cargarConstancias();
 		
 		//PrimeFaces.current().ajax().update("form:medioPago","form:metodoPago");
 	}
@@ -342,7 +347,6 @@ public class FacturacionConstanciasBean implements Serializable{
 		this.serieFacturaSelect = this.plantaSelect.getSerieFacturaDefault();
 		
 		log.info("Planta seleccionada: {}", this.plantaSelect);
-		log.info("Emisor seleccionado: {}", this.emisor);
 		log.info("Serie factura seleccionada: {}", this.serieFacturaSelect);
 		
 		//Carga de constancias si existe cambio en planta 
@@ -361,7 +365,6 @@ public class FacturacionConstanciasBean implements Serializable{
 			this.listaSerieFactura = serieFacturaDAO.buscarPorEmisor(this.emisor, true);
 			
 			log.info("Planta seleccionada: {}", this.plantaSelect);
-			log.info("Emisor seleccionado: {}", this.emisor);
 			log.info("Serie factura seleccionada: {}", this.serieFacturaSelect);
 			
 			mensaje = "Debe seleccionar una serie";
@@ -394,19 +397,29 @@ public class FacturacionConstanciasBean implements Serializable{
 			return;
 		}
 		
+		if(clienteSelect.getCteCve() == null)
+			return;
+		
 		if(plantaSelect == null) {
 			return;
 		}
 		
+		if(plantaSelect.getPlantaCve() == null)
+			return;
+		
 		this.facturacionEntradas();
-		procesarEntradas();
-		this.facturacionVigencias();
-		procesarVigencias();
+		this.procesarEntradas();
+		this.facturarVigencias();
 		this.facturacionServicios();
-		procesarServicios();
+		this.procesarServicios();
 		
 		PrimeFaces.current().ajax().update("form:dt-constanciasE","form:dt-vigencias","form:dt-servicios");
 		
+	}
+	
+	public void facturarVigencias() {
+		this.facturacionVigencias();
+		this.procesarVigencias();
 	}
 	
 	public void calcula(ServicioConstancia sc) {
@@ -529,6 +542,8 @@ public class FacturacionConstanciasBean implements Serializable{
 			Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
 			String tipoFacturacion = aviso.getAvisoTpFacturacion();
 			cf.setServicioConstanciaList(new ArrayList<>());
+			
+			log.info("Inventario de Entrada: {}", cdd.getFolioCliente());
 
 			for (ConstanciaDepositoDetalle cs : cdd.getConstanciaDepositoDetalleList()) {
 
@@ -560,7 +575,7 @@ public class FacturacionConstanciasBean implements Serializable{
 				case 3:
 				case 4:
 
-					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
+					cantidad = this.facturaEntradasBO.getCantidad(cdd.getPartidaList(), tipoFacturacion);
 
 					importe = cantidad.multiply(precioServicio.getPrecio());
 					sc.setCosto(importe.setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -642,28 +657,32 @@ public class FacturacionConstanciasBean implements Serializable{
 		Integer id = 0;
 		BigDecimal importe = new BigDecimal(0);
 		
+		List<ConstanciaFactura> listaVigenciasFiltrada = new ArrayList<ConstanciaFactura>();
+		
 		for(ConstanciaFactura cf :listaVigencias) {
 			
 		
 		
-		ConstanciaDeDeposito cdd = cf.getFolio();
-		Aviso aviso = cdd.getAvisoCve();
-		Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
-		String tipoFacturacion = aviso.getAvisoTpFacturacion();
-		cf.setServicioConstanciaList(new ArrayList<>());
-		
-		for (ConstanciaDepositoDetalle cs : cdd.getConstanciaDepositoDetalleList()) {
+			ConstanciaDeDeposito cdd = cf.getFolio();
+			Aviso aviso = cdd.getAvisoCve();
+			Camara camara = cdd.getPartidaList().get(0).getCamaraCve();
+			String tipoFacturacion = aviso.getAvisoTpFacturacion();
+			cf.setServicioConstanciaList(new ArrayList<>());
 			
-			Servicio servicio = cs.getServicioCve();
-			TipoCobro tipoCobro = servicio.getCobro();
-			ServicioConstancia sc = new ServicioConstancia();
-			
-			BigDecimal cantidad = null;
-			
-			List<PrecioServicio> listaPrecioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
-					clienteSelect.getCteCve(), servicio.getServicioCve());
-			
-			if(!listaPrecioServicio.isEmpty()) {
+			for (ConstanciaDepositoDetalle cs : cdd.getConstanciaDepositoDetalleList()) {
+				
+				Servicio servicio = cs.getServicioCve();
+				TipoCobro tipoCobro = servicio.getCobro();
+				ServicioConstancia sc = new ServicioConstancia();
+				
+				BigDecimal cantidad = null;
+				
+				List<PrecioServicio> listaPrecioServicio = precioServicioDAO.busquedaServicio(cdd.getAvisoCve().getAvisoCve(),
+						clienteSelect.getCteCve(), servicio.getServicioCve());
+				
+				if(listaPrecioServicio.isEmpty())
+					continue;
+				
 				PrecioServicio precioServicio = listaPrecioServicio.get(0);
 				
 				switch (tipoCobro.getId()) {
@@ -674,7 +693,7 @@ public class FacturacionConstanciasBean implements Serializable{
 					break;
 				case 4:
 					
-					cantidad = getCantidadPartidas(cdd.getPartidaList(), tipoFacturacion);
+					cantidad = this.facturaEntradasBO.getCantidad(cdd.getPartidaList(), tipoFacturacion);
 					importe = cantidad.multiply(precioServicio.getPrecio()).setScale(2, BigDecimal.ROUND_HALF_UP);
 					log.debug("El tipo de cobro es 3 o 4 y su importe es: " + importe);
 					sc.setCosto(importe);
@@ -716,21 +735,38 @@ public class FacturacionConstanciasBean implements Serializable{
 					cf.getServicioConstanciaList().add(sc);					
 					id++;
 				}
+				
 			}
+			
+			cf.setFactura(factura);
+			cf.setPlantaCve(plantaSelect.getPlantaCve());
+			cf.setPlantaDs(plantaSelect.getPlantaDs());
+			cf.setPlantaAbrev(plantaSelect.getPlantaAbrev());
+			cf.setCamaraCve(camara.getCamaraCve());
+			cf.setCamaraDs(camara.getCamaraDs());
+			cf.setCamaraAbrev(camara.getCamaraAbrev());
+			
+			cdd.setConstanciaFacturaList(new ArrayList<>());
+			cdd.getConstanciaFacturaList().addAll(listaEntradas);
+			cdd.getConstanciaFacturaList().addAll(listaVigencias);
+			
+			BigDecimal totalConstancia = cf.getServicioConstanciaList().stream()
+				.map(ServicioConstancia::getCosto)
+				.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+				;
+			
+			log.info("Constancia {} - Total por cobrar: {}", cdd.getFolioCliente(), totalConstancia);
+			
+			if(totalConstancia.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0) {
+				log.info("Eliminando constancia {} debido a que no hay servicios por facturar.", cdd.getFolioCliente());
+				continue;
+			}
+			
+			listaVigenciasFiltrada.add(cf);
 		}
 		
-		cf.setFactura(factura);
-		cf.setPlantaCve(plantaSelect.getPlantaCve());
-		cf.setPlantaDs(plantaSelect.getPlantaDs());
-		cf.setPlantaAbrev(plantaSelect.getPlantaAbrev());
-		cf.setCamaraCve(camara.getCamaraCve());
-		cf.setCamaraDs(camara.getCamaraDs());
-		cf.setCamaraAbrev(camara.getCamaraAbrev());
-		
-		cdd.setConstanciaFacturaList(new ArrayList<>());
-		cdd.getConstanciaFacturaList().addAll(listaEntradas);
-		cdd.getConstanciaFacturaList().addAll(listaVigencias);
-		}
+		this.listaVigencias.clear();
+		this.listaVigencias.addAll(listaVigenciasFiltrada);
 		
 		PrimeFaces.current().ajax().update("form:dt-serviciosVigencia");
 	}
@@ -749,8 +785,9 @@ public class FacturacionConstanciasBean implements Serializable{
 			
 			cdd.setConstanciaFacturaList(new ArrayList<>());
 			cdd.getConstanciaFacturaList().addAll(selectedVigencias);
-			
 		}
+		log.info("Vigencias seleccionadas: {}", selectedVigencias.size());
+		log.info("Subtotal vigencias: {}", subTotalVigencias);
 		sumaGeneral();
 	}
 	
@@ -828,6 +865,40 @@ public class FacturacionConstanciasBean implements Serializable{
 	public BigDecimal getCantidadPartidas(List<Partida> listaPartidas, String tipoFacturacion) {
 
 		BigDecimal cantidad = new BigDecimal(0).setScale(3, BigDecimal.ROUND_HALF_UP);
+		List<Partida> tmpPartidas = null;
+		
+		if(tipoFacturacion.equals("T")) {
+			BigDecimal fraccionTarimas = null;
+			
+			//Primero se verifica si hay partidas asociadas a una tarima y se realiza el conteo de tarimas.
+			log.info("Contando partidas por tarima...");
+			tmpPartidas = listaPartidas.stream()
+					.filter(p -> p.getTarima() != null)
+					.collect(Collectors.toList())
+					;
+			
+			log.info("Contando tarimas a partir del atrubuto no_tarima.");
+			cantidad = listaPartidas.stream()
+					.filter(p -> p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) >= 0 )
+					.map(item -> item.getNoTarimas())
+					.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+					;
+			
+			fraccionTarimas = listaPartidas.stream()
+					.filter(p -> p.getNoTarimas().compareTo(BigDecimal.ONE.setScale(3, BigDecimal.ROUND_HALF_UP)) < 0 )
+					.map(item -> item.getNoTarimas())
+					.reduce(BigDecimal.ZERO.setScale(3, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+					;
+			fraccionTarimas = fraccionTarimas.setScale(0, BigDecimal.ROUND_CEILING);
+			cantidad = cantidad.add(fraccionTarimas);
+			
+		} else {
+			cantidad = listaPartidas.stream()
+					.map(item -> item.getPesoTotal())
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+					;
+		}
+		log.info("Cantidad: {} {}", cantidad, tipoFacturacion);
 
 		for (Partida p : listaPartidas) {
 
@@ -840,6 +911,8 @@ public class FacturacionConstanciasBean implements Serializable{
 			}
 
 		}
+		
+		log.info("Cantidad: {} {}", cantidad, tipoFacturacion);
 
 		return cantidad;
 	}
@@ -919,6 +992,7 @@ public class FacturacionConstanciasBean implements Serializable{
 
 		if (!(listaPrecioSTemp.isEmpty())) { // modificado por error de retornar objeto precioServicio en null
 			Optional<PrecioServicio> precioServicioMax = listaPrecioSTemp.stream()
+					.filter(ps -> ps.getAvisoCve() != null)
 					.max((i, j) -> i.getAvisoCve().getAvisoCve().compareTo(j.getAvisoCve().getAvisoCve()));
 			precioServicio = precioServicioMax.get();// colocar condicional, si y solo si precioServicioMax != null
 		}
@@ -996,7 +1070,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setCliente(clienteSelect);
 		factura.setMoneda(moneda);
 		factura.setRfc(clienteSelect.getCteRfc());
-		factura.setNombreCliente(clienteSelect.getCteNombre());
+		factura.setNombreCliente(clienteSelect.getNombre());
 		factura.setFecha(fechaCorte);
 		if(observaciones == null)
 			factura.setObservacion("");
@@ -1005,21 +1079,20 @@ public class FacturacionConstanciasBean implements Serializable{
 		factura.setSubtotal(null);//duda*
 		factura.setIva(null);//duda*
 		factura.setTotal(null);//duda*
-		factura.setPais(domicilioSelect.getPaisCved().getPaisDesc());
-		factura.setEstado(domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadoDesc());
-		factura.setMunicipio(domicilioSelect.getCiudades().getMunicipios().getMunicipioDs());
-		factura.setCiudad(domicilioSelect.getCiudades().getCiudadDs());
+		factura.setPais(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisDesc());
+		factura.setEstado(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadoDesc());
+		factura.setMunicipio(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipioDs());
+		factura.setCiudad(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadDs());
 		
-		AsentamientoHumandoDAO asentamientoDAO = new AsentamientoHumandoDAO();
+		AsentamientoHumanoDAO asentamientoDAO = new AsentamientoHumanoDAO();
 		
-		AsentamientoHumano asentamiento = asentamientoDAO.buscarPorAsentamiento(domicilioSelect.getPaisCved().getPaisCve(),
-				domicilioSelect.getCiudades().getMunicipios().getEstados().getEstadosPK().getEstadoCve(),
-				domicilioSelect.getCiudades().getMunicipios().getMunicipiosPK().getMunicipioCve(),
-				domicilioSelect.getCiudades().getCiudadesPK().getCiudadCve(),
-				domicilioSelect.getDomicilioColonia());
-		
+		AsentamientoHumano asentamiento = asentamientoDAO.buscarPorAsentamiento(domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve(),
+				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve(),
+				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve(),
+				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve(),
+				domicilioSelect.getAsentamiento().getAsentamientoHumanoPK().getAsentamientoCve());
 		factura.setColonia(asentamiento.getAsentamientoDs());
-		factura.setCp(domicilioSelect.getDomicilioCp());
+		factura.setCp(domicilioSelect.getAsentamiento().getCp());
 		factura.setCalle(domicilioSelect.getDomicilioCalle());
 		factura.setNumExt(domicilioSelect.getDomicilioNumExt());
 		factura.setNumInt(domicilioSelect.getDomicilioNumInt());
@@ -1045,7 +1118,7 @@ public class FacturacionConstanciasBean implements Serializable{
 			medioPagoSelect = medioP;
 		}
 		fmp.setMpId(medioP);
-		fmp.setFactura(factura);
+//		fmp.setFactura(factura);
 		fmp.setFmpPorcentaje(100);
 		fmp.setMpDescripcion(medioP.getMpDescripcion());
 		fmp.setFmpReferencia(referencia);
@@ -1092,7 +1165,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		PrimeFaces.current().ajax().update("form:metodoPago");
 	}
 	
-	public void saveFactura() throws InventarioException {
+	public synchronized void saveFactura() throws InventarioException {
 		FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
@@ -1101,7 +1174,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		List<Factura> buscaFacturasList = null;
 		SerieFactura serieTmp = null;
 		List<SerieFactura> listaSerieFacturaBkp = null;
-		String resultado = null;
+		SerieFactura serieFacturaSelect = null;
+		String folio = null;
 		
 		try {
 			listaSerieFacturaBkp = new ArrayList<SerieFactura>();
@@ -1140,8 +1214,11 @@ public class FacturacionConstanciasBean implements Serializable{
 			if(BigDecimal.ZERO.compareTo(subTotalGeneral) == 0)
 				throw new InventarioException("Debe registrar un importe mayor a cero.");
 			
+			serieFacturaSelect = serieFacturaDAO.buscarPorId(this.serieFacturaSelect.getId())
+					.orElseThrow(() -> new InventarioException("Serie factura no encontrada."));
+			folio = String.format("%s-%d", serieFacturaSelect.getNomSerie(), (serieFacturaSelect.getNumeroActual() + 1));
 			log.info("Emisor: {}", this.emisor);
-			log.info("Serie-número: {}-{}", this.serieFacturaSelect.getNomSerie(), (this.serieFacturaSelect.getNumeroActual() + 1));
+			log.info("Serie-número: {}", folio);
 			
 			serieTmp = serieFacturaDAO.findById(serieFacturaSelect.getId());
 			buscaFacturasList = facturaDAO.buscarActivasPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
@@ -1152,20 +1229,18 @@ public class FacturacionConstanciasBean implements Serializable{
 			factura.setEmisorNombre(this.emisor.getNb_emisor());
 			factura.setEmisorRFC(this.emisor.getNb_rfc());
 			factura.setEmisorCdRegimen(this.emisor.getCd_regimen().getCd_regimen());
+			factura.setLugarExpedicion(this.emisor.getCodigoPostal());
 			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
 			factura.setNomSerie(this.serieFacturaSelect.getNomSerie());
-			resultado = facturaDAO.guardar(factura);
+			facturaDAO.save(factura);
 			
-			if(resultado != null && "".equalsIgnoreCase(resultado.trim()))
-				throw new InventarioException("Ocurrió un problema al guardar la factura.");
-			
-			this.serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
-			serieFacturaDAO.update(this.serieFacturaSelect);
+			serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
+			this.serieFacturaDAO.actualizar(serieFacturaSelect);
 			
 			this.listaSerieFactura = listaSerieFacturaBkp;
 			this.serieFacturaSelect = serieTmp;
 			
-			mensaje = String.format("La factura %s-%s se guardo correctamente", this.serieFacturaSelect.getNomSerie(), this.serieFacturaSelect.getNumeroActual());
+			mensaje = String.format("La factura %s se guardo correctamente", folio);
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(InventarioException ex) {
 			log.error("Problema para guardar la factura...", ex);
@@ -1241,13 +1316,12 @@ public class FacturacionConstanciasBean implements Serializable{
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El timbrado se generó correctamente";
 		} catch (FacturamaException e) {
+			log.error("Problema para timbrar la factura...", e);
 			severity = FacesMessage.SEVERITY_ERROR;
 			message = e.getMessage();
-			e.printStackTrace();
 		}catch (Exception ex) {
-			//log.error("Problema para obtener los servicios del cliente.", ex);
-			ex.printStackTrace();
-			message = "Problema con la información de servicios.";
+			log.error("Problema para timbrar la factura...", ex);
+			message = "Problema para timbrar la factura.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			if(severity == null)
@@ -1261,7 +1335,7 @@ public class FacturacionConstanciasBean implements Serializable{
 		
 	}
 	
-public String paginaFactura() {
+	public String paginaFactura() {
 	
 		session.removeAttribute("plantaSelect");
 		session.removeAttribute("cliente");

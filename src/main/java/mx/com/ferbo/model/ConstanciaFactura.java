@@ -92,13 +92,14 @@ public class ConstanciaFactura implements Serializable {
     @Column(name = "camara_abrev")
     private String camaraAbrev;
     
-    @JoinColumn(name = "factura", referencedColumnName = "id")
     @ManyToOne
+    @JoinColumn(name = "factura", referencedColumnName = "id")
     private Factura factura;
-    @OneToMany(mappedBy = "constancia", cascade = CascadeType.ALL)//Modificado 1 junio
+    
+    @OneToMany(cascade = {CascadeType.PERSIST}, mappedBy = "constancia")
     private List<ServicioConstancia> servicioConstanciaList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "constanciaFactura")
+    @OneToMany(cascade = {CascadeType.PERSIST}, mappedBy = "constanciaFactura")
     private List<ProductoConstancia> productoConstanciaList;
 
     public ConstanciaFactura() {

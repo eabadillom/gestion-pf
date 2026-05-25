@@ -6,14 +6,14 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -43,8 +43,6 @@ public class TipoFacturacion implements Serializable {
     @Size(max = 75)
     @Column(name = "DESCRIPCION")
     private String descripcion;
-//    @OneToMany(mappedBy = "tipoFacturacion")
-//    private List<Factura> facturaList;
 
     public TipoFacturacion() {
     }
@@ -77,19 +75,12 @@ public class TipoFacturacion implements Serializable {
         this.descripcion = descripcion;
     }
 
-//    public List<Factura> getFacturaList() {
-//        return facturaList;
-//    }
-//
-//    public void setFacturaList(List<Factura> facturaList) {
-//        this.facturaList = facturaList;
-//    }
-
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+        
+        return Objects.hash(this.id);
     }
 
     @Override

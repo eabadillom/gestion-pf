@@ -7,10 +7,9 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,7 +17,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -58,9 +56,6 @@ public class MedioPago implements Serializable {
 	@NotNull
 	@Column(name = "mp_req_referencia")
 	private boolean mpReqReferencia;
-	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "mpId")
-    private List<FacturaMedioPago> facturaMedioPagoList;
 	
 	@Column(name="mp_forma_pago")
 	@Size(min = 1, max = 5)
@@ -111,14 +106,6 @@ public class MedioPago implements Serializable {
 		this.mpReqReferencia = mpReqReferencia;
 	}
 	
-	public List<FacturaMedioPago> getFacturaMedioPagoList() {
-        return facturaMedioPagoList;
-    }
-
-    public void setFacturaMedioPagoList(List<FacturaMedioPago> facturaMedioPagoList) {
-        this.facturaMedioPagoList = facturaMedioPagoList;
-    }
-    
     public String getFormaPago() {
 		return formaPago;
 	}
@@ -145,9 +132,9 @@ public class MedioPago implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int hash = 0;
-		hash += (mpId != null ? mpId.hashCode() : 0);
-		return hash;
+		if(this.mpId == null)
+			return System.identityHashCode(this);
+		return Objects.hash(this.mpId);
 	}
 
 	@Override

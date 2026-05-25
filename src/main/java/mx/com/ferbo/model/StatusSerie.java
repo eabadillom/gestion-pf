@@ -6,9 +6,8 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +15,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,7 +27,6 @@ import javax.validation.constraints.Size;
 @Table(name = "status_serie")
 @NamedQueries({
     @NamedQuery(name = "StatusSerie.findAll", query = "SELECT s FROM StatusSerie s"),
-//    @NamedQuery(name = "StatusSerie.find", query = "SELECT s FROM StatusSerie s WHERE s.id != 3"),
     @NamedQuery(name = "StatusSerie.findById", query = "SELECT s FROM StatusSerie s WHERE s.id = :id"),
     @NamedQuery(name = "StatusSerie.findByDescripcion", query = "SELECT s FROM StatusSerie s WHERE s.descripcion = :descripcion")})
 public class StatusSerie implements Serializable {
@@ -40,15 +37,12 @@ public class StatusSerie implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "descripcion")
     private String descripcion;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "statusSerie")
-    private List<SerieFactura> serieFacturaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "statusSerie")
-    private List<SerieNota> serieNotaList;
 
     public StatusSerie() {
     }
@@ -76,22 +70,6 @@ public class StatusSerie implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public List<SerieFactura> getSerieFacturaList() {
-        return serieFacturaList;
-    }
-
-    public void setSerieFacturaList(List<SerieFactura> serieFacturaList) {
-        this.serieFacturaList = serieFacturaList;
-    }
-
-    public List<SerieNota> getSerieNotaList() {
-        return serieNotaList;
-    }
-
-    public void setSerieNotaList(List<SerieNota> serieNotaList) {
-        this.serieNotaList = serieNotaList;
     }
 
     @Override

@@ -13,7 +13,7 @@ import mx.com.ferbo.model.Factura;
 
 public class ChequesDevueltosDAO {
 	
-	EntityManager entity = JPAEntity.getEntity().createEntityManager();
+	EntityManager entity = EntityManagerUtil.getEntityManager();
 	
 	@SuppressWarnings("unchecked")
 	public List<ChequeDevuelto> findAll(){

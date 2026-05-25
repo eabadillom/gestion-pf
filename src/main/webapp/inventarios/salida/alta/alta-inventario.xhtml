@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+			<p:dataTable id="dt-inventario" widgetVar="dt-inventario" value="#{altaConstanciaSalidaBean.listaInventario}"
+						var="inventario" reflow="true" rows="15"
+						emptyMessage="No se encontró información con el criterio solicitado" filteredValue="#{altaConstanciaSalidaBean.filteredInventario}"
+						rowKey="#{inventario.constanciaDeDeposito.folio}" paginator="true" paginatorPosition="bottom"  >
+				<f:facet name="header">
+					<div class="products-table-header">
+						<span style="font-weight: bold">INVENTARIO</span>
+					</div>
+				</f:facet>
+				<p:column width="1rem">
+					<p:rowToggler/>
+				</p:column>
+				<p:column filterBy="#{inventario.folioCliente}" width="5rem" filterMatchMode="contains">
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('dt-inventario').filter()" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Folio" itemValue="#{null}" noSelectionOption="true"/>
+                   			<f:selectItems value="#{altaConstanciaSalidaBean.listaEntradas}" />
+                   			<p:ajax process="@this" />
+						</p:selectOneMenu>
+					</f:facet>
+					<h:outputText value="#{inventario.folioCliente}" />
+				</p:column>
+				<p:column filterBy="#{inventario.fechaIngreso}" width="5rem" filterMatchMode="exact">
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('dt-inventario').filter()" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Ingreso" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{altaConstanciaSalidaBean.listaIngresos}" var="fhSalida" itemLabel="#{altaConstanciaSalidaBean.formatDate(fhSalida)}">
+							</f:selectItems>
+							<p:ajax process="@this" />
+						</p:selectOneMenu>
+					</f:facet>
+					<h:outputText value="#{inventario.fechaIngreso}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column filterBy="#{inventario.producto.productoDs}" filterable="true" filterMatchMode="contains">
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('dt-inventario').filter();" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="-Producto-" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{altaConstanciaSalidaBean.listaProductos}"></f:selectItems>
+							<p:ajax process="@this" />
+						</p:selectOneMenu>
+					</f:facet>
+					<h:outputText value="#{inventario.producto.numeroProd} - #{inventario.producto.productoDs}"/>
+				</p:column>
+				<p:column headerText="Cantidad" width="4rem" style="text-align: right;">
+					<h:outputText value="#{inventario.cantidad}" />
+				</p:column>
+				<p:column headerText="Unidad" width="5rem" style="text-align: right;">
+					<h:outputText  value="#{inventario.unidadManejo.unidadDeManejoDs}"/>
+				</p:column>
+				<p:column headerText="Peso (kg)" width="5rem" style="text-align: right;">
+					<h:outputText value="#{inventario.peso}" />
+				</p:column>
+				<p:column filterBy="#{inventario.tarima}" filterable="true" filterMatchMode="contains" width="4rem" style="text-align: center;">
+					<!-- <h:outputText value="#{inventario.numeroTarimas}"/> -->
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('dt-inventario').filter();" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="-Tarima-" itemValue="#{null}" noSelectionOption="true"></f:selectItem>
+							<f:selectItems value="#{altaConstanciaSalidaBean.listaTarimas}"></f:selectItems>
+							<p:ajax process="@this" />
+						</p:selectOneMenu>
+					</f:facet>
+					<h:outputText value="#{inventario.tarima}" />
+				</p:column>
+				<p:rowExpansion>
+					<div class="p-grid ui-fluid p-col-12">
+						<div class="p-col">
+							<p:outputLabel value="Código"></p:outputLabel>
+							<p:inputText value="#{inventario.codigo}" disabled="true" placeholder="--">
+							</p:inputText>
+						</div>
+						<div class="p-col">
+							<p:outputLabel value="Caducidad">
+								<p:inputText value="#{inventario.caducidad}" disabled="true" placeholder="--">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:inputText>
+							</p:outputLabel>
+						</div>
+						<div class="p-col">
+							<p:outputLabel value="Contenedor">
+								<p:inputText value="#{inventario.sap}" disabled="true" placeholder="--"/>
+							</p:outputLabel>
+						</div>
+						<div class="p-col">
+							<p:outputLabel value="Lote">
+								<p:inputText value="#{inventario.lote}" disabled="true" placeholder="--"/>
+							</p:outputLabel>
+						</div>
+						<div class="p-col">
+							<p:outputLabel value="Pedimento">
+								<p:inputText value="#{inventario.pedimento}" disabled="true" placeholder="--"/>
+							</p:outputLabel>
+						</div>
+					</div>
+				</p:rowExpansion>
+				<p:column width="2rem">
+					<p:commandButton icon="pi pi-plus" styleClass="edit-button ui-button-primary"
+						process="@this"
+						actionListener="#{altaConstanciaSalidaBean.newDetalleSalida(inventario)}"
+						onstart="PF('statusInfoDialog').show();"
+						oncomplete="PF('statusInfoDialog').hide();PF('dg-cantidad-producto').show();"
+						update="form:pnl-cantidad-producto">
+						<f:setPropertyActionListener value="#{inventario}" target="#{altaConstanciaSalidaBean.inventarioSelected}"></f:setPropertyActionListener>
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+
+</ui:composition>

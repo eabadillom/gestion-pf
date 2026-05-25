@@ -1,7 +1,5 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -246,6 +244,23 @@ public class PlantaDAO extends IBaseDAO<Planta, Integer>{
 			EntityManagerUtil.close(em);
 		}
 		return listado;
+	}
+	
+	public List<Planta> cargarCamaras() {
+		List<Planta> modelList = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			modelList = em.createNamedQuery("Planta.findAll", Planta.class).getResultList();
+			for(Planta planta : modelList) {
+				planta.getCamaraList().forEach(item -> log.debug("Camara: {}", item.getCamaraCve()));
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de cámaras...", ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return modelList;
 	}
 
 	@Override

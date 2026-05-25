@@ -1,0 +1,22 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+	<p:dialog header="Fotografía" widgetVar="dialogFotografia" modal="true" draggable="false" cache="false" dynamic="true" onHide="liberarCamara();PF('camera').detach();">
+	
+		<h:inputHidden id="realHeight" value="#{consultarConstanciaSalidaBean.realHeight}"/>
+		<h:inputHidden id="realWidth" value="#{consultarConstanciaSalidaBean.realWidth}"/>
+		<p:remoteCommand name="enviarInfoImagen" action="#{consultarConstanciaSalidaBean.recibirInfoImagen}" process="@this form:realHeight form:realWidth" update="form:camera"/>
+		
+		<p:photoCam id="camera" widgetVar="camera" listener="#{consultarConstanciaSalidaBean.capturar}"
+			update="form:datosGenerales:fotoPreview" device="environment" format="jpeg"
+			jpegQuality="90" onCameraError="onError(event)" photoHeight="#{consultarConstanciaSalidaBean.realHeight}" photoWidth="#{consultarConstanciaSalidaBean.realWidth}"/>
+		
+		<f:facet name="footer">
+			<p:commandButton value="Guardar"  icon="pi pi-check" onclick="capturarConOrientacion()" type="button" styleClass="ui-button-primary"/>
+			<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('camera').detach();PF('dialogFotografia').hide()" type="button" styleClass="ui-button-secondary"></p:commandButton>
+		</f:facet>
+	</p:dialog>
+</ui:composition>

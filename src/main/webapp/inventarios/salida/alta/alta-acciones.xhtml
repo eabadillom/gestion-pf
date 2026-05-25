@@ -1,0 +1,19 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton id="cmdGuardar" value="Guardar" process="@this" actionListener="#{altaConstanciaSalidaBean.saveConstanciaSalida()}" icon="pi pi-save" disabled="#{altaConstanciaSalidaBean.saved}" update="form:cmdGuardar form:cmdImprimir form:cmdNueva"></p:commandButton>
+					<p:spacer style="width: 0.5rem;"/>
+					<p:commandButton id="cmdImprimir" value="Imprimir" icon="pi pi-file-pdf" process="@this" actionListener="#{altaConstanciaSalidaBean.imprimirTicket()}" ajax="false" styleClass="edit-button" disabled="#{altaConstanciaSalidaBean .saved == false}">
+						<p:fileDownload value="#{altaConstanciaSalidaBean.file}" />
+					</p:commandButton>
+					<p:spacer style="width: 0.5rem;"/>
+					<p:commandButton id="cmdNueva" value="Nueva constancia" icon="pi pi-refresh" process="@this" actionListener="#{altaConstanciaSalidaBean.nuevoRegistro()}" update="@form" styleClass="edit-button" disabled="#{altaConstanciaSalidaBean.saved == false}"></p:commandButton>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+</ui:composition>

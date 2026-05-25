@@ -4,12 +4,14 @@ package mx.com.ferbo.controller;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -149,6 +151,8 @@ public class KardexBean implements Serializable {
 	private Integer cantidadTotal;
 	private BigDecimal pesoTotal;
 	private boolean pintaTraspaso;
+        private String nombreProducto;
+        private ConstanciaDeDeposito constanciaProductoSelected;
 	
 	private ConstanciaDeDeposito entrada;
 	
@@ -180,6 +184,7 @@ public class KardexBean implements Serializable {
 		listContanciaTraspaso = new ArrayList<>();
 		listTraspasoPartida = new ArrayList<>();
 		pintaTraspaso = false;
+                this.nombreProducto = "";
 	}
 
 	public void buscaDatos() {
@@ -223,8 +228,43 @@ public class KardexBean implements Serializable {
 		
 	}
 	
+	public List<DetalleConstanciaSalida> getDetalleConstanciaSalidaList(Partida partida) {
+		if(partida == null || partida.getDetalleConstanciaSalidaList() == null)
+			return new ArrayList<DetalleConstanciaSalida>();
+		return partida.getDetalleConstanciaSalidaList().stream()
+				.filter(d -> d.getConstanciaCve().getStatus().getId() == 1)
+				.collect(Collectors.toList())
+				;
+	}
+	
 	public void getSaldo(Partida partida) {
 		log.info("Obteniendo información de partida... {}", partida);
+	}
+	
+	public Integer saldoCantidadParcial(Partida partida) {
+		Integer cantidad = 0;
+		if(partida == null || partida.getDetalleConstanciaSalidaList() == null)
+			return 0;
+		
+		cantidad = partida.getCantidadTotal() - partida.getDetalleConstanciaSalidaList().stream()
+				.filter(d -> d.getConstanciaCve().getStatus().getId() == 1)
+				.mapToInt(DetalleConstanciaSalida::getCantidad)
+				.sum();
+		
+		return cantidad;
+	}
+	
+	public BigDecimal saldoPesoParcial(Partida partida) {
+		BigDecimal peso = BigDecimal.ZERO.setScale(3, RoundingMode.HALF_UP);
+		if(partida == null || partida.getDetalleConstanciaSalidaList() == null)
+			return BigDecimal.ZERO.setScale(3, RoundingMode.HALF_UP);
+		
+		peso = partida.getPesoTotal().subtract(partida.getDetalleConstanciaSalidaList().stream()
+				.filter(d -> d.getConstanciaCve().getStatus().getId() == 1)
+				.map(DetalleConstanciaSalida::getPeso)
+				.reduce(BigDecimal.ZERO.setScale(3, RoundingMode.HALF_UP), BigDecimal::add));
+		
+		return peso;
 	}
 
 	private void imprimeConstancia(ConstanciaDeDeposito constancia) {
@@ -247,6 +287,17 @@ public class KardexBean implements Serializable {
 			}
 		}
 		
+	}
+        
+	public void buscaDatosProducto() {
+		this.listConstanciaDepositoFiltered = constanciaDeDepositoDAO.buscarPorProducto(nombreProducto);
+	}
+    
+	public void cargarFolioEncontrado(ConstanciaDeDeposito constancia) {
+		this.constanciaProductoSelected = constancia;
+		log.info("Folio: {}", this.constanciaProductoSelected.getFolioCliente());
+		this.folioClienteSelected = this.constanciaProductoSelected.getFolioCliente();
+		this.buscaDatos();
 	}
 	
 	public void exportToPDF() {
@@ -679,8 +730,20 @@ public class KardexBean implements Serializable {
 		this.scKardexExcel = scKardexExcel;
 	}
 
-	
+        public String getNombreProducto() {
+            return nombreProducto;
+        }
 
-	
+        public void setNombreProducto(String nombreProducto) {
+            this.nombreProducto = nombreProducto;
+        }
 
+        public ConstanciaDeDeposito getConstanciaProductoSelected() {
+            return constanciaProductoSelected;
+        }
+
+        public void setConstanciaProductoSelected(ConstanciaDeDeposito constanciaProductoSelected) {
+            this.constanciaProductoSelected = constanciaProductoSelected;
+        }
+        
 }
