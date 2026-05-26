@@ -27,16 +27,15 @@
 				</div>
 				<div class="menu">
 					<po:menu widgetVar="OmegaMenuWidget">
+						<p:menuitem id="frb_orden_retiro" value="Ordenes de retiro" icon="pi pi-fw pi-sign-in" outcome="/inventarios/ordenSalidas/principal" badge="#{sideBarBean.numeroSalidas}" rendered="#{(sideBarBean.usuario.perfil eq 1 or sideBarBean.usuario.perfil eq 4) and (sideBarBean.numeroSalidas ne null)}"/>
 						<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
 							<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/entrada/alta/principal" />
 								<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/entrada/consultar/principal"/>
-								<p:menuitem id="frb_inventarios_sm144" value="Orden de Entrada" icon="pi pi-fw pi-sign-in" outcome="/inventarios/ordenEntrada" />
 							</p:submenu>
 							<p:submenu id="frb_inventarios_sm3" label="Salidas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm110" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/salida/alta/principal" />
-								<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/salida/consultar/principal" />
-								<p:menuitem id="frb_inventarios_sm13" value="Ordenes de salida" icon="pi pi-fw pi-sign-in" outcome="/inventarios/OrdenSalida" badge="#{sideBarBean.numeroSalidas}" />
+								<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/salida/consultar/principal"/>
 							</p:submenu>
 							<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
 								<p:menuitem id="frb_inventariossm31" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/traspasos/alta/principal" />
@@ -120,7 +119,7 @@
 						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
 						<p:menuitem value="Ajustes" outcome="/protected/settings/ajustes" icon="pi pi-cog" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
-                                                <p:menuitem value="Salir" icon="pi pi-sign-out" actionListener="#{sideBarBean.logout}"/>
+						<p:menuitem value="Salir" icon="pi pi-sign-out" url="#{request.contextPath}/logout" ajax="false" />
 					</po:menu>
 				</div>
 			</div>

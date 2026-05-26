@@ -37,7 +37,6 @@ import mx.com.ferbo.dao.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.AvisoDAO;
 import mx.com.ferbo.dao.ClaveUnidadDAO;
 import mx.com.ferbo.dao.ClienteDAO;
-import mx.com.ferbo.dao.n.ClienteDomiciliosDAO;
 import mx.com.ferbo.dao.ConceptoDAO;
 import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.FacturaDAO;
@@ -51,6 +50,7 @@ import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoCobroDAO;
 import mx.com.ferbo.dao.TipoFacturacionDAO;
 import mx.com.ferbo.dao.UnidadDeManejoDAO;
+import mx.com.ferbo.dao.n.ClienteDomiciliosDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.ClaveUnidad;
@@ -137,7 +137,6 @@ public class FacturaServiciosBean implements Serializable {
 	private ClaveUnidad claveUnidad;
 
 	private ClienteDAO clienteDAO;
-	private ClienteDomiciliosDAO clienteDomicilioDAO;
 	private PlantaDAO plantaDAO;
 	private AvisoDAO avisoDAO;
 	private MetodoPagoDAO metodoPagoDAO;
@@ -201,7 +200,6 @@ public class FacturaServiciosBean implements Serializable {
 		medioPagoSelect = null;
 		
 		clienteDAO = new ClienteDAO();
-		clienteDomicilioDAO = new ClienteDomiciliosDAO();
 		plantaDAO = new PlantaDAO();
 		avisoDAO = new AvisoDAO();
 		metodoPagoDAO = new MetodoPagoDAO();
@@ -379,15 +377,12 @@ public class FacturaServiciosBean implements Serializable {
 				.collect(Collectors.toList());
 			else
 				this.alServicios = preciosServicio.stream()
-				.filter(ps -> ps.getAvisoCve() != null)
-				.filter(ps -> ps.getAvisoCve().getAvisoCve() == this.aviso.getAvisoCve())
-				.collect(Collectors.toList());
-			
+						.filter(ps -> (ps.getAvisoCve() != null))
+						.filter(ps -> ps.getAvisoCve().getAvisoCve().equals(this.aviso.getAvisoCve()))
+						.collect(Collectors.toList());
 		} catch(Exception ex) {
 			log.error("Problema para seleccionar los servicios del aviso...", ex);
 		}
-		
-			
 	}
 	
 	public void agregarServicio() {
@@ -598,6 +593,7 @@ public class FacturaServiciosBean implements Serializable {
 		Cliente cliente = null;
 		List<Factura> buscaFacturasList = null;
 		List<SerieFactura> listaSerieFacturaBkp = null;
+		SerieFactura serieFactura = null;
 				
 		try {
 			listaSerieFacturaBkp = new ArrayList<SerieFactura>();
@@ -617,18 +613,19 @@ public class FacturaServiciosBean implements Serializable {
 			
 			// Datos receptor
 			cliente = clienteDAO.buscarPorId(clienteSelect.getCteCve(), true);
-			
-			buscaFacturasList = facturaDAO.buscarActivasPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
+			serieFactura = serieFacturaDAO.buscarPorId(this.serieFacturaSelect.getId())
+					.orElseThrow(() -> new InventarioException("Serie factura no encontrada."));
+			buscaFacturasList = facturaDAO.buscarActivasPorSerieNumero(serieFactura.getNomSerie(), String.valueOf(serieFactura.getNumeroActual() + 1));
 			
 			if(buscaFacturasList.size() > 0)
 				throw new InventarioException("La factura ya se encuentra registrada.");
 			
-			int serie = (serieFacturaSelect.getNumeroActual()+1);
-			serieFacturaSelect.setNumeroActual(serie);
+			int serie = (serieFactura.getNumeroActual()+1);
+			serieFactura.setNumeroActual(serie);
 			
 			factura.setId(idFactura);
 			factura.setCliente(cliente);
-			factura.setNumero(String.valueOf(serieFacturaSelect.getNumeroActual()));
+			factura.setNumero(String.valueOf(serieFactura.getNumeroActual()));
 			factura.setMoneda(this.moneda);
 			factura.setRfc(cliente.getCteRfc());
 			factura.setNombreCliente(cliente.getNombre());
@@ -681,7 +678,7 @@ public class FacturaServiciosBean implements Serializable {
 			factura.setPlanta(plantaSelect);// sucursal
 			factura.setPlazo(this.plazoSelect);
 			factura.setRetencion(BigDecimal.ZERO);
-			factura.setNomSerie(serieFacturaSelect.getNomSerie());
+			factura.setNomSerie(serieFactura.getNomSerie());
 			MetodoPago metodoP = this.metodoPagoSelect;
 			factura.setMetodoPago(metodoP.getCdMetodoPago());
 			factura.setTipoPersona(cliente.getTipoPersona());
@@ -701,12 +698,12 @@ public class FacturaServiciosBean implements Serializable {
 			
 			facturaDAO.save(factura);
 			
-			serieFacturaDAO.actualizar(serieFacturaSelect);
+			serieFacturaDAO.actualizar(serieFactura);
 			
 			listaSerieFactura.clear();
-			listaSerieFactura.add(serieFacturaSelect);
-			serieFacturaSelect = listaSerieFactura.get(0);
-			
+			listaSerieFactura.add(serieFactura);
+			serieFactura = listaSerieFactura.get(0);
+			serieFacturaSelect = serieFactura;
 			listaSerieFactura = listaSerieFacturaBkp;
 			
 			severity = FacesMessage.SEVERITY_INFO;

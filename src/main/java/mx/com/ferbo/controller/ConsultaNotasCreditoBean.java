@@ -3,10 +3,8 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -40,7 +38,7 @@ import mx.com.ferbo.util.InventarioException;
 @Named
 @ViewScoped
 
-public class ConsultaNotasCreditoBean implements Serializable{
+public class ConsultaNotasCreditoBean implements Serializable {
 	
 	private static final long serialVersionUID = -626048119540963939L;
 	private static Logger log = LogManager.getLogger(ConsultaNotasCreditoBean.class);
@@ -128,12 +126,27 @@ public class ConsultaNotasCreditoBean implements Serializable{
 	}
 	
 	public void actualizar() {
-		Calendar now = Calendar.getInstance();
-		TimeZone timeZone = now.getTimeZone();
-		log.debug("TimeZone: {}, {}", timeZone.getDisplayName(), timeZone.getID());
-		log.debug("Fecha nota credito: {}", this.notaCreditoSelect.getFecha());
-		notaCreditoDAO.actualizar(notaCreditoSelect);
-		this.consultarNotaCreditoCte();
+		String mensaje = null;
+		Severity severity = null;
+		String titulo = "Nota de crédito actualizada";
+		try {
+			log.debug("Fecha nota credito: {}", this.notaCreditoSelect.getFecha());
+			notaCreditoDAO.actualizar(notaCreditoSelect);
+			this.consultarNotaCreditoCte();
+			PrimeFaces.current().executeScript("PF('dlg-General').hide()");
+			mensaje = String.format("Nota %s OK", this.notaCreditoSelect.getNumero());
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch (InventarioException ex) {
+			log.error("Problema para actualizar la nota de crédito.", ex);
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			mensaje = "Ocurrió un problema para cancelar la nota de crédito.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, titulo, mensaje));
+			PrimeFaces.current().ajax().update("form:messages");
+		}
 	}
 	
 	public void cancelar() {
@@ -143,8 +156,6 @@ public class ConsultaNotasCreditoBean implements Serializable{
 		
 		List<NotaPorFactura> npfList = null;
 		CancelaNotaCredito cancela = null;
-		String resultado = null;
-		
 		BigDecimal saldo = null;
 		
 		try {
@@ -167,9 +178,7 @@ public class ConsultaNotasCreditoBean implements Serializable{
 			cancela.setNota(notaCreditoSelect);
 			cancela.setDescripcion(motivoCancelacion);
 			this.notaCreditoSelect.getCancelaNotaCreditoList().add(cancela);
-			
-			resultado = notaCreditoDAO.actualizar(notaCreditoSelect);
-			log.debug("Resultado de la actualización de la nota de credito: {}", resultado);
+			this.notaCreditoDAO.actualizar(notaCreditoSelect);
 			
 			this.motivoCancelacion = null;
 			
@@ -207,7 +216,7 @@ public class ConsultaNotasCreditoBean implements Serializable{
 		} catch (Exception e) {
 			message = "Ocurrió un problema para cancelar la nota de crédito.";
 			severity = FacesMessage.SEVERITY_ERROR;
-		}finally {
+		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,titulo, message));
 		}
 	}

@@ -1174,6 +1174,8 @@ public class FacturacionConstanciasBean implements Serializable{
 		List<Factura> buscaFacturasList = null;
 		SerieFactura serieTmp = null;
 		List<SerieFactura> listaSerieFacturaBkp = null;
+		SerieFactura serieFacturaSelect = null;
+		String folio = null;
 		
 		try {
 			listaSerieFacturaBkp = new ArrayList<SerieFactura>();
@@ -1212,8 +1214,11 @@ public class FacturacionConstanciasBean implements Serializable{
 			if(BigDecimal.ZERO.compareTo(subTotalGeneral) == 0)
 				throw new InventarioException("Debe registrar un importe mayor a cero.");
 			
+			serieFacturaSelect = serieFacturaDAO.buscarPorId(this.serieFacturaSelect.getId())
+					.orElseThrow(() -> new InventarioException("Serie factura no encontrada."));
+			folio = String.format("%s-%d", serieFacturaSelect.getNomSerie(), (serieFacturaSelect.getNumeroActual() + 1));
 			log.info("Emisor: {}", this.emisor);
-			log.info("Serie-número: {}-{}", this.serieFacturaSelect.getNomSerie(), (this.serieFacturaSelect.getNumeroActual() + 1));
+			log.info("Serie-número: {}", folio);
 			
 			serieTmp = serieFacturaDAO.findById(serieFacturaSelect.getId());
 			buscaFacturasList = facturaDAO.buscarActivasPorSerieNumero(serieFacturaSelect.getNomSerie(), String.valueOf(serieFacturaSelect.getNumeroActual() + 1));
@@ -1229,13 +1234,13 @@ public class FacturacionConstanciasBean implements Serializable{
 			factura.setNomSerie(this.serieFacturaSelect.getNomSerie());
 			facturaDAO.save(factura);
 			
-			this.serieFacturaSelect.setNumeroActual(this.serieFacturaSelect.getNumeroActual() + 1);
-			this.serieFacturaDAO.actualizar(this.serieFacturaSelect);
+			serieFacturaSelect.setNumeroActual(serieFacturaSelect.getNumeroActual() + 1);
+			this.serieFacturaDAO.actualizar(serieFacturaSelect);
 			
 			this.listaSerieFactura = listaSerieFacturaBkp;
 			this.serieFacturaSelect = serieTmp;
 			
-			mensaje = String.format("La factura %s-%s se guardo correctamente", this.serieFacturaSelect.getNomSerie(), this.serieFacturaSelect.getNumeroActual() + 1);
+			mensaje = String.format("La factura %s se guardo correctamente", folio);
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(InventarioException ex) {
 			log.error("Problema para guardar la factura...", ex);

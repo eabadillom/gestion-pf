@@ -181,7 +181,7 @@
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
-			<version>8.2.0</version>
+			<version>8.4.0</version>
 		</dependency>
 
 		<!-- https://mavenlibs.com/maven/dependency/org.webjars/font-awesome -->
@@ -209,7 +209,7 @@
 		<dependency>
 			<groupId>com.ferbo</groupId>
 			<artifactId>gestion-mail</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>0.0.5-RELEASE</version>
 		</dependency>
 	</dependencies>
 

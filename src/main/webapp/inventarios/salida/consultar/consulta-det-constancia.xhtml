@@ -3,43 +3,41 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <p:dialog id="constanciaSalida" header="Constancia de Salida: #{consultarConstanciaSalidaBean.constanciaSelect.numero}" widgetVar="dlgDetalles" modal="true" hideEffect="fade" style="max-width:80em !important;">
+    <p:dialog id="constanciaSalida" header="Constancia de Salida: #{consultarConstanciaSalidaBean.constanciaSelect.numero}" widgetVar="dlgDetalles" modal="true" hideEffect="fade" style="max-width:80em !important;" position="center top">
         <p:tabView id="datosGenerales" dynamic="true" cache="false">
             <p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
-            <p:tab id="tabGeneral" title="Datos Generales">
-                <p:outputPanel id="detalleCS" class="ui-fluid">
+            <p:tab id="tabGeneral" title="General">
+                <p:outputPanel id="detalleCS" class="p-grid ui-fluid">
                     <p:outputPanel rendered="#{consultarConstanciaSalidaBean.constanciaSelect != null}">
                         <div class="p-grid p-col-12">
-                            <div class="p-md-3 p-lg-3">
+                            <div class="p-col-6 p-md-3">
                                 <p:outputLabel for="@next" value="Fecha:" />
                                 <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.fecha}" readonly="true" >
                                     <f:convertDateTime pattern="dd/MM/yyyy" />
                                 </p:inputText>
                             </div>
-                            <div class="p-md-3 p-lg-3">
+                            <div class="p-col-6 p-md-3">
                                 <p:outputLabel value="Folio" />
                                 <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.numero}" readonly="true" />
                             </div>
-                            <div class="p-md-6 p-lg-6">
+                            <div class="p-col-6 p-md-6">
                                 <p:outputLabel value="Cliente"/>
                                 <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.clienteCve.nombre}" readonly="true" />
                             </div>
-                        </div>
-                        <div class="p-grid p-col-12">
-                            <div class="p-md-6 p-lg-6">
+                            <div class="p-col-6 p-md-6">
                                 <p:outputLabel value="Transportista" />
                                 <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.nombreTransportista}" readonly="true" />
                             </div>
-                            <div class="p-md-3 p-lg-3">
+                            <div class="p-col-6 p-md-6">
                                 <p:outputLabel value="Placas transporte" />
                                 <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.placasTransporte}" readonly="true" />
                             </div>
-                        </div>
-                        <div class="p-grid p-col-12">
-                            <div class="p-md-12 p-lg-12">
+                            <div class="p-col-12 p-md-12">
                                 <p:outputLabel value="Observaciones: " />
                                 <p:inputText value="#{consultarConstanciaSalidaBean.constanciaSelect.observaciones}" readonly="true" />
                             </div>
+                        </div>
+                        <div class="p-grid p-col-12">
                         </div>
                     </p:outputPanel>
                 </p:outputPanel>
@@ -101,6 +99,32 @@
                     </span>
                 </div>
             </p:tab>
+            <p:tab id="tabEvidencia" title="Enviar mail">
+            	<p:outputPanel class="p-grid ui-fluid">
+            		<div class="p-col-12 p-md-12">
+						<h:panelGroup id="fotoPreview">
+							<p:graphicImage library="ferbo" name="images/no-image.png" rendered="#{empty consultarConstanciaSalidaBean.imagenBase64}"/>
+							<h:graphicImage id="imgPreview"
+								value="#{consultarConstanciaSalidaBean.imagenBase64}"
+								style="max-width:80%; height:auto;"
+							/>
+							
+						</h:panelGroup>
+            		</div>
+            		<div class="p-col-12 p-md-12">
+            			<h:outputText id="mensajeStatus" value="#{consultarConstanciaSalidaBean.mensaje}"/>
+            		</div>
+            		<div class="p-col-6 p-md-3">
+            			<p:commandButton value="Capturar" icon="pi pi-camera" process="@this" immediate="true" onclick="iniciarCamara();" oncomplete="PF('dialogFotografia').show();">
+						</p:commandButton>
+					</div>
+					<div class="p-col-6 p-md-3">
+						<p:commandButton value="Enviar" icon="pi pi-send" process="@this" immediate="true" actionListener="#{consultarConstanciaSalidaBean.enviar}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+						</p:commandButton>
+            		</div>
+            	</p:outputPanel>
+            </p:tab>
+            
         </p:tabView>
     </p:dialog>
 </ui:composition>
