@@ -212,6 +212,14 @@
             <p:commandButton id="cmdImprimir" value="Imprimir" actionListener="#{consultarConstanciaDeDepositoBean.imprimir}" styleClass="ui-button-outlined" icon="pi pi-file-pdf" update="cmdGuardar cmdImprimir" ajax="false">
                 <p:fileDownload value="#{consultarConstanciaDeDepositoBean.file}" />
             </p:commandButton>
+            <p:menuButton value="Kardex" buttonStyleClass="ui-button-outlined" >
+                <p:menuitem value="PDF" actionListener="#{consultarConstanciaDeDepositoBean.obtenerPdfKardex}" icon="pi pi-file-pdf" ajax="false" >
+                    <p:fileDownload value="#{consultarConstanciaDeDepositoBean.kardexPdf}" />
+                </p:menuitem>
+                <p:menuitem value="Excel" actionListener="#{consultarConstanciaDeDepositoBean.obtenerExcelKardex}" icon="pi pi-file-excel" ajax="false" >
+                    <p:fileDownload value="#{consultarConstanciaDeDepositoBean.kardexExcel}" />
+                </p:menuitem>
+            </p:menuButton>
             <p:commandButton value="Cerrar" icon="pi pi-times" process="@this" update="form:constanciaD" oncomplete="PF('infoDatos').hide();" styleClass="ui-button-secondary"></p:commandButton>
         </f:facet>
     </p:dialog>
