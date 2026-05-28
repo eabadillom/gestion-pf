@@ -42,6 +42,7 @@ import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.model.NotaPorFacturaPK;
 import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.Parametro;
+import mx.com.ferbo.model.SerieFactura;
 import mx.com.ferbo.model.SerieNota;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.StatusNotaCredito;
@@ -52,7 +53,6 @@ import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
-
 public class AltaNotasCredito implements Serializable{
 	
 	private static final long serialVersionUID = -626048119540963939L;
@@ -147,6 +147,10 @@ public class AltaNotasCredito implements Serializable{
 		this.listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		//TODO timbrado CFDI para las notas de crédito. Se prepara parámetro para indicar planta (razón social) a la que pertenece la serie.
 		this.listaSerieNota = serieNotaDAO.buscarActivas(null);
+		
+		this.listaSerieNota.stream().forEach(item -> log.info("Serie Nota --> {}", item));
+		
+		
 		this.tipoPagoNotaCredito = tipoPagoDAO.buscarPorId(TipoPago.TIPO_PAGO_NOTA_CREDITO);
 		
 		
@@ -172,6 +176,10 @@ public class AltaNotasCredito implements Serializable{
 		this.fechaInicio = new Date();
 		this.fechaFin = new Date();
 		this.pIVA = parametroDAO.buscarPorNombre("IVA");
+	}
+	
+	public void verSerie() {
+		log.info("Serie --> {}", this.serieNotaSelect);
 	}
 	
 	public void filtroFactura() {
@@ -244,8 +252,6 @@ public class AltaNotasCredito implements Serializable{
 	}
 	
 	public void agregaFactura() {
-		log.debug("Factura seleccionada: {}", this.facturaSelect);
-		
 		if(facturaSelect == null)
 			return;
 		
@@ -259,7 +265,7 @@ public class AltaNotasCredito implements Serializable{
 		for(Pago p : facturaSelect.getPagoList()) {
 			saldoSelected = saldoSelected.subtract(p.getMonto());
 		}
-		log.debug("Saldo: {}", saldoSelected);
+		this.cantidad = null;
 	}
 	
 	public void facturasSeleccionadas() { 
@@ -302,7 +308,12 @@ public class AltaNotasCredito implements Serializable{
 		StatusFactura statusF = null;
 		String domicilio = null;
 		
+		SerieNota serieNotaSelect = null;
+		
 		try {
+			if(this.notaCredito.getId() != null)
+				throw new InventarioException("La nota de crédito ya está registrada.");
+			
 			domicilioCliente(clienteSelect);
 			
 			asentamientoCliente = asentamientoHumanoDAO.buscarPorAsentamiento(
@@ -315,6 +326,8 @@ public class AltaNotasCredito implements Serializable{
                         log.info("Info asentamiento: {}", asentamientoCliente.toString());
 			domicilio = domicilioSelect.getDomicilioCalle() + " " + domicilioSelect.getDomicilioNumExt() + " " + domicilioSelect.getDomicilioNumInt() + " " + asentamientoCliente.getAsentamientoDs();
 			
+			serieNotaSelect = serieNotaDAO.buscarPorId(this.serieNotaSelect.getId())
+					.orElseThrow(() -> new InventarioException("Serie no encontrada."));
 			
 			notaCredito.setNumero(String.valueOf(serieNotaSelect.getNumeroActual() + 1));
 			notaCredito.setIdcliente(clienteSelect.getCteCve());
@@ -399,13 +412,10 @@ public class AltaNotasCredito implements Serializable{
 			}
 			
 			serieNotaSelect.setNumeroActual(serieNotaSelect.getNumeroActual()+1);
-			serieNotaDAO.update(serieNotaSelect);
-			
+			serieNotaDAO.actualizar(serieNotaSelect);
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "Nota agregada correctamente";
-			
-			
 		} catch(Exception e) {
 			log.error("Ocurrió un problema al guardar la nota de crédito...", e);
 			mensaje = "Ocurrió un problema al guardar la nota de crédito.";
@@ -415,7 +425,6 @@ public class AltaNotasCredito implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update(":form:messages");
 		}
-			
 	}
 	
 	public void reload() throws IOException {

@@ -2,20 +2,26 @@ package mx.com.ferbo.dao;
 
 import java.util.List;
 
+import javax.persistence.CacheRetrieveMode;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.SerieFactura;
 import mx.com.ferbo.model.StatusSerie;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.InventarioException;
 
-public class SerieFacturaDAO {
+public class SerieFacturaDAO extends BaseDAO<SerieFactura, Integer> {
 	private static Logger log = LogManager.getLogger(SerieFacturaDAO.class);
+	
+	public SerieFacturaDAO() {
+		super(SerieFactura.class);
+	}
 
 	public List<SerieFactura> findAll() {
 		EntityManager entity = null;
@@ -23,7 +29,9 @@ public class SerieFacturaDAO {
 
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			list = entity.createNamedQuery("SerieFactura.findAll", SerieFactura.class).getResultList();
+			list = entity.createNamedQuery("SerieFactura.findAll", SerieFactura.class)
+					.setHint("javax.persistence.cache.retrieveMode", CacheRetrieveMode.BYPASS)
+					.getResultList();
 		} catch (Exception e) {
 			log.error("Error al obtener informacion", e);
 		} finally {
@@ -200,8 +208,9 @@ public class SerieFacturaDAO {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			modelList = em.createNamedQuery("SerieFactura.findByEmisor", SerieFactura.class)
+					.setHint("javax.persistence.cache.retrieveMode", CacheRetrieveMode.BYPASS)
 					.setParameter("idEmisor", idEmisoresCFDIS.getCd_emisor()).getResultList();
-
+			
 			if (isFullInfo == false)
 				return modelList;
 

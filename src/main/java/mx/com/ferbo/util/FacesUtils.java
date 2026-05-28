@@ -13,6 +13,7 @@ public final class FacesUtils
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, msg));
     }
     
+    //TODO Se reubicara este metodo en paquete de validaciones 
     public static void requireNonNull(Object obj, String mensaje) throws InventarioException {
         if (obj == null) {
             throw new InventarioException(mensaje);

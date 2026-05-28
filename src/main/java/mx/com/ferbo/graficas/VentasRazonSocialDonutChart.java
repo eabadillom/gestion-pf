@@ -38,8 +38,9 @@ public class VentasRazonSocialDonutChart implements Serializable
         Date fechaFin = new Date();
         Date fechaInicio = DateUtil.getFirstDayOfMonth(fechaFin);
         ReportesVentasDAO reportesVentasDAO = new ReportesVentasDAO();
+        log.info("Iniciando reporte de ventas por razon social.");
         List<FacturacionGeneral> listaVentaRazonSocial = reportesVentasDAO.ventaPorRazonSocial(fechaInicio, fechaFin);
-
+        log.info("Terminado reporte de ventas por razon social.");
         return construirGrafica(listaVentaRazonSocial);
     }
 

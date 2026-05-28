@@ -5,6 +5,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.SerieConstancia;
+import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
@@ -53,12 +55,11 @@ public class PlantaDAO extends BaseDAO <Planta, Integer> {
     
     public Planta findById(Integer idPlanta)
     {
-        Planta model = null;
+    	Planta model = null;
         EntityManager em = null;
         
         try {
             em = super.getEntityManager();
-            
             model = em.createNamedQuery("Planta.findByPlantaCve", Planta.class)
                 .setParameter("plantaCve", idPlanta)
                 .getSingleResult();
@@ -69,11 +70,30 @@ public class PlantaDAO extends BaseDAO <Planta, Integer> {
             
         } catch(Exception ex) {
             log.error("Problema para obtener la planta: ", ex);
+        }
+        
+        return model;
+    }
+
+    public Planta buscarPorNombre(String plantaDs) throws DAOException {
+        Planta model = null;
+        EntityManager em = null;
+        
+        try {
+            em = super.getEntityManager();
+            model = em.createNamedQuery("Planta.findByPlantaDs", Planta.class)
+                .setParameter("plantaDs", plantaDs)
+                .getSingleResult();
+        } catch (NoResultException ex) {
+            log.info("No se encontró la planta con la descripción: {}", plantaDs);
+            return null;
+        } catch (Exception ex) {
+            log.warn("Problema para obtener la planta con la descripción: {}", ex.getMessage());
+            throw new DAOException("Hubo un problema al buscar la planta");
         } finally {
             super.close(em);
         }
         
         return model;
     }
-    
 }

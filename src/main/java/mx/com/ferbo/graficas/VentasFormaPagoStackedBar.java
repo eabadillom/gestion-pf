@@ -72,6 +72,7 @@ public class VentasFormaPagoStackedBar implements Serializable
 
     public static BarChartModel build() 
     {
+    	log.info("Iniciando reporte de ventas forma de pago...");
         ReporteVentaUtil reporteVentaUtil = new ReporteVentaUtil();
         BarChartModel chartModel = new BarChartModel();
         ChartData data = new ChartData();
@@ -98,7 +99,8 @@ public class VentasFormaPagoStackedBar implements Serializable
         chartModel.setData(data);
         chartModel.setOptions(generarOpciones());
         chartModel.setExtender(CHART_EXTENDER);
-
+        
+        log.info("Terminado reporte de ventas forma de pago.");
         return chartModel;
     }
 

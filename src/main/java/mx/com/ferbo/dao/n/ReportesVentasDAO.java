@@ -69,11 +69,11 @@ public class ReportesVentasDAO extends BaseDAO<Factura, Integer>
                     "		INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ'\n" +
                     "		WHERE v.fecha BETWEEN :fechaini AND :fechaFin \n" +
                     "		GROUP BY fecha\n" +
-                    "		UNION\n" +
-                    "		SELECT 0 AS total_facturas, 0 AS total_ventas, SUM(ie.importe) AS Total_egresos, 0 AS ventas_totales\n" +
-                    "		FROM importe_egreso ie\n" +
-                    "		WHERE ie.fecha BETWEEN :fechaini AND :fechaFin\n" +
-                    "		GROUP BY fecha \n" +
+//                    "		UNION\n" +
+//                    "		SELECT 0 AS total_facturas, 0 AS total_ventas, SUM(ie.importe) AS Total_egresos, 0 AS ventas_totales\n" +
+//                    "		FROM importe_egreso ie\n" +
+//                    "		WHERE ie.fecha BETWEEN :fechaini AND :fechaFin\n" +
+//                    "		GROUP BY fecha \n" +
                     "	) combined \n" +
                     ")a";
 
@@ -234,11 +234,11 @@ public class ReportesVentasDAO extends BaseDAO<Factura, Integer>
                     "FROM (\n" +
                     "	SELECT DATE_FORMAT(combined.fecha, '%Y-%m') AS fecha, SUM(combined.total_pagos + combined.efectivo) AS pagos\n" +
                     "	FROM (\n" +
-                    "	    SELECT ie.fecha, 0 AS total_pagos, 0 AS efectivo\n" +
-                    "	    FROM importe_egreso ie\n" +
-                    "	    WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
-                    "	    GROUP BY ie.fecha\n" +
-                    "	    UNION ALL\n" +
+//                    "	    SELECT ie.fecha, 0 AS total_pagos, 0 AS efectivo\n" +
+//                    "	    FROM importe_egreso ie\n" +
+//                    "	    WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+//                    "	    GROUP BY ie.fecha\n" +
+//                    "	    UNION ALL\n" +
                     "	    SELECT MAX(f.fecha) AS fecha, COALESCE(SUM(p.monto), 0) AS total_pagos, 0 AS efectivo\n" +
                     "	    FROM factura f\n" +
                     "		LEFT JOIN pago p ON f.id = p.factura\n" +
@@ -412,12 +412,12 @@ public class ReportesVentasDAO extends BaseDAO<Factura, Integer>
                     "        GROUP BY emisor\n" +
                     "    )c\n" +
                     "    GROUP BY emisor\n" +
-                    "    UNION\n" +
-                    "    SELECT 0 AS total, e.nb_emisor AS emisor, SUM(ie.importe) AS egreso\n" +
-                    "    FROM importe_egreso ie\n" +
-                    "    INNER JOIN emisor e ON ie.cd_emisor = e.cd_emisor\n" +
-                    "    WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
-                    "    GROUP BY emisor\n" +
+                    //"    UNION\n" +
+                    //"    SELECT 0 AS total, e.nb_emisor AS emisor, SUM(ie.importe) AS egreso\n" +
+                    //"    FROM importe_egreso ie\n" +
+                    //"    INNER JOIN emisor e ON ie.cd_emisor = e.cd_emisor\n" +
+                    //"    WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    //"    GROUP BY emisor\n" +
                     ")d\n" +
                     "GROUP BY emisor";
 

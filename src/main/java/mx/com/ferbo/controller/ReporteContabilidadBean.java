@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
@@ -52,22 +51,16 @@ public class ReporteContabilidadBean implements Serializable {
 	public ReporteContabilidadBean() {
 		fecha = new Date();
 		listaClientes = new ArrayList<Cliente>();
-	}
-	@SuppressWarnings("unchecked")
-	@PostConstruct
-	public void init() {
+		this.fecha_ini = new Date();
+		this.fecha_fin = new Date();
 		faceContext = FacesContext.getCurrentInstance();
-        request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
+		request = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+		this.usuario = (Usuario) request.getSession(true).getAttribute("usuario");
 		this.listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		this.clienteSelect = new Cliente();
 		Date today = new Date();
 		this.maxDate = new Date(today.getTime() );
-		this.fecha_ini = new Date();
-		this.fecha_fin = new Date();
 	}
-	
-
 	
 	public void exportarPdf() {
 		String   message = null;

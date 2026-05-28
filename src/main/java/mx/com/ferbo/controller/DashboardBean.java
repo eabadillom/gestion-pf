@@ -8,9 +8,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -49,15 +53,9 @@ public class DashboardBean implements Serializable
     private static final long serialVersionUID = -6551673633472266325L;
     private static Logger log = LogManager.getLogger(DashboardBean.class);
     
-    @Inject
     private PlantaDAO plantaDAO;
-    
-    @Inject
     private ReportesVentasDAO reportesVentasDAO;
     
-    @Inject
-    private OcupacionPlantasBL ocupacionPlantasBL;
-
     private DonutChartModel donutModel;
     private DonutChartModel posicionesCamara;
     private BarChartModel stackedGroupBarModel;
@@ -85,8 +83,8 @@ public class DashboardBean implements Serializable
     private List<FacturacionGeneral> listaVentaPagos;
     
     private Planta plantaSelect;
-    private List<Planta> listaPlanta;
-    private Map<String, Map<String, BigDecimal>> reporte;
+    private List<Planta> listaPlanta = new ArrayList<Planta>();
+    private Map<String, Map<String, BigDecimal>> reporte =  new HashMap<String, Map<String,BigDecimal>>();
     
     private FacesContext context;
     private HttpServletRequest request;
@@ -94,6 +92,8 @@ public class DashboardBean implements Serializable
 
     public DashboardBean() 
     {
+    	plantaDAO = new PlantaDAO();
+    	reportesVentasDAO = new ReportesVentasDAO();
         listaImporteUtilidad = new ArrayList<>();
         listaVentasGlobales = new ArrayList<>();
         totalFacturacion = null;
@@ -104,53 +104,64 @@ public class DashboardBean implements Serializable
         listaVentaRazonSocial = new ArrayList<>();
         listaGananciaRazonSocial = new ArrayList<>();
         listaVentaPagos = new ArrayList<>();
+        this.process();
     }
-
-    @PostConstruct
-    public void init() 
-    {
-        this.context = FacesContext.getCurrentInstance();
+    
+    public void process() {
+    	this.context = FacesContext.getCurrentInstance();
         this.request = (HttpServletRequest) context.getExternalContext().getRequest();
         this.usuario = (Usuario) request.getSession(false).getAttribute("usuario");
         log.info("Usuario {} ha ingresado al dashboard", this.usuario.getUsuario());
         
         this.plantaSelect = new Planta();
+        OcupacionPlantasBL ocupacion = null;
         
         try {
             fechaPrueba = new Date();
             mesActual = new Date();
-
-            stackedGroupBarModel = UtilidadPorMesMensualStackedBar.construirGrafica();
-            ventaGlobales();
-            ventasPorMes();
-            ventaRazonSocial();
-            gananciaPorRazonSocial();
-            donutModel = VentasRazonSocialDonutChart.construirModeloVentasRazonSocial();
-            
-            if ((this.usuario.getPerfil() != 1) && (this.usuario.getPerfil() != 4)) {
-                listaPlanta = plantaDAO.buscarTodos(false);
-                reporte = ocupacionPlantasBL.reporteTodasPlantas(listaPlanta, fechaPrueba);
-            } else {
-                this.plantaSelect = this.plantaDAO.findById(this.usuario.getIdPlanta());
-                reporte = ocupacionPlantasBL.reportePorPlanta(plantaSelect, fechaPrueba);
+            switch(this.usuario.getPerfil()) {
+            case 2:
+            case 3:
+            	listaPlanta.addAll(plantaDAO.buscarTodos(false)) ;
+            	
+            	stackedGroupBarModel = UtilidadPorMesMensualStackedBar.construirGrafica();
+            	ventaGlobales();
+            	ventasPorMes();
+            	ventaRazonSocial();
+            	gananciaPorRazonSocial();
+            	donutModel = VentasRazonSocialDonutChart.construirModeloVentasRazonSocial();
+            	VentaDia();
+            	smVentasFormaPago = VentasFormaPagoStackedBar.build();
+            	this.reporte = new OcupacionPlantasBL().reporteTodasPlantas(listaPlanta, fechaPrueba);
+            	break;
+        	default:
+        		this.plantaSelect = this.plantaDAO.findById(this.usuario.getIdPlanta());
+        		listaPlanta.add(this.plantaSelect);
+        		this.reporte = new OcupacionPlantasBL().reportePorPlanta(plantaSelect, fechaPrueba);
             }
             
-            VentaDia();
-            smVentasFormaPago = VentasFormaPagoStackedBar.build();
-
             Date today = new Date();
             maxDate = new Date(today.getTime());
-        } catch (ParseException e) {
+        } catch (Exception e) {
             log.error("Error general: {}", e);
+        } finally {
+        	PrimeFaces.current().ajax().update("form");
         }
+    }
+
+    @PostConstruct
+    public void init() 
+    {
+        
     }
 
     public void ventaRazonSocial() 
     {
         Date fechaFin = new Date();
         Date fechaInicio = DateUtil.getFirstDayOfMonth(fechaFin);
-
+        log.info("Iniciando reporte de ventas por razon social...");
         listaVentaRazonSocial = reportesVentasDAO.ventaPorRazonSocial(fechaInicio, fechaFin);
+        log.info("Terminado reporte de ventas por razon social.");
 
         PrimeFaces.current().ajax().update("form:dt-ventaRS");
     }
@@ -159,9 +170,9 @@ public class DashboardBean implements Serializable
     {
         Date fechaFin = new Date();
         Date fechainicio = DateUtil.getFirstDayOfMonth(fechaFin);
-
+        log.info("Iniciando reporte de ganancia por razon social...");
         listaGananciaRazonSocial = reportesVentasDAO.gananciaPorRazonSocial(fechainicio, fechaFin);
-
+        log.info("Terminado reporte de ganancia por razon social.");
         PrimeFaces.current().ajax().update("form:dt-gananciaRS");
     }
 
@@ -170,6 +181,7 @@ public class DashboardBean implements Serializable
     {
         Date iniMes;
         iniMes = DateUtil.getFirstDayOfMonth(fechaPrueba);
+        log.info("Iniciando reporte de ventas globales...");
         listaVentasGlobales = reportesVentasDAO.ventasGanancias(iniMes, fechaPrueba);
         try {
             for (VentasGlobales vg : listaVentasGlobales) {
@@ -177,6 +189,7 @@ public class DashboardBean implements Serializable
                 ventasGlobales.setGanancias(vg.getGanancias());
                 ventasGlobales.setPorcentajeGanancias(vg.getPorcentajeGanancias().setScale(2, RoundingMode.DOWN));
             }
+            log.info("Terminado reporte de ventas globales.");
         } catch (Exception e) {// ??????????????????????
             /*
 			 * if(ventasGlobales.getVentasTotales() == null) {
@@ -197,12 +210,13 @@ public class DashboardBean implements Serializable
         DateUtil.setAnio(fechaActual, DateUtil.getAnio(mesActual));
         mesActual = fechaActual;
         DateUtil.getLastDayOfMonth(mesActual);
+        log.info("Iniciando reporte de ventas del dia...");
         listaVentaDia = reportesVentasDAO.obtenerVentaDia(mesActual);// venta del dia
 
         if (!listaVentaDia.isEmpty()) {
             listaVentaDia.get(0).setPorcentaje(new BigDecimal(0));
         }
-
+        log.info("Terminado reporte de ventas del dia.");
         PrimeFaces.current().ajax().update("form:dt-ventas");
     }
 
@@ -263,7 +277,9 @@ public class DashboardBean implements Serializable
         DateUtil.setDia(iniMes, 01);
         DateUtil.setMes(iniMes, 0);
         // System.out.println("Ventas realizadas por mes");
+        log.info("Iniciando reporte de ventas por mes...");
         listaImporteGlobal = reportesVentasDAO.ventasPorMesAnual(iniMes, fechaPrueba);
+        log.info("Terinado reporte de ventas por mes.");
     }
 
     public void readerList() 

@@ -239,18 +239,22 @@
                 </p:outputPanel>
                 
                 <f:facet name="footer">
-                    <p:commandButton value="Cerrar" oncomplete="PF('dlg-grafica').hide()" />
+                    <p:commandButton value="Cerrar" styleClass="ui-button-secondary" oncomplete="PF('dlg-grafica').hide()" />
                 </f:facet>
             </p:dialog>
 			
         	<p:spacer style="height: 2rem;"/>
 			
+			<ui:remove>
 			<p:panel header="Estado de resultados" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 				<p:barChart model="#{dashboardBean.stackedGroupBarModel}"/>
 			</p:panel>
+			</ui:remove>
         	
         	<p:spacer style="height: 2rem;"/>
         	
+        	
+        	<ui:remove>
         	<div class="p-grid ui-fluid">
             	<div class="p-col-12 p-md-9">
             		<p:panel header="Ventas por mes" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
@@ -324,6 +328,8 @@
 		            </p:panel>
             	</div>
             </div>
+            </ui:remove>
+            
             
             <p:spacer style="height: 2rem;"/>
             
@@ -370,6 +376,8 @@
             
             <p:spacer style="height: 2rem;"/>
             
+            
+            <ui:remove>
             <p:panel header="Ventas por mes" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
                     <p:dataTable id="dt-ventasMes" widgetVar="dtVM" var="ventasM"
                                  value="#{dashboardBean.listaImporteGlobal}" reflow="true"
@@ -388,9 +396,11 @@
                         </p:column>
                     </p:dataTable>
             </p:panel>
+            </ui:remove>
             
             <p:spacer style="height: 2rem;"/>
             
+            <ui:remove>
             <div class="p-grid ui-fluid">
             	<div class="p-col-12 p-md-6">
             		<p:panel header="Ventas del mes por razón social" toggleable="true" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
@@ -451,9 +461,11 @@
             		</p:panel>
             	</div>
             </div>
+            </ui:remove>
             
             <p:spacer style="height: 2rem;"/>
             
+            <ui:remove>
             <div class="p-grid ui-fluid">
             	<div class="p-col-12 p-md-6">
             		<p:panel header="Ventas" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
@@ -466,6 +478,7 @@
             		</p:panel>
             	</div>
             </div>
+            </ui:remove>
         </h:form>
     </ui:define>
 

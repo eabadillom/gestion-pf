@@ -14,7 +14,7 @@ public class NotaPorFacturaPK implements Serializable, Cloneable{
 	private static final long serialVersionUID = 1L;
 	
 	@JoinColumn(name = "NOTA")
-    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
+    @ManyToOne(optional = false)
 	private NotaCredito nota;
 	
 	@JoinColumn(name = "FACTURA")

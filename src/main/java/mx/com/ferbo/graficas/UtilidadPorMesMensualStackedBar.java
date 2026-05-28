@@ -73,6 +73,7 @@ public class UtilidadPorMesMensualStackedBar implements Serializable
     {
         BarChartModel model = new BarChartModel();
         ChartData data = new ChartData();
+        log.info("Iniciando reporte de utilidad por mes...");
         List<ImporteUtilidad> utilidadMesAnual = obtenerUtilidadPorMesAnual();
 
         // Configuración dinámica de datasets
@@ -107,7 +108,7 @@ public class UtilidadPorMesMensualStackedBar implements Serializable
         model.setData(data);
         model.setOptions(crearOpciones());
         model.setExtender(CHART_EXTENDER);
-
+        log.info("Terminado el reporte de utilidad por mes.");
         return model;
     }
 

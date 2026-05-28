@@ -193,12 +193,12 @@ public class ReportesVentasDAO extends IBaseDAO<Factura, Integer>
                     "	SELECT DATE_FORMAT(combined.fecha, '%Y-%m') AS fecha, SUM(combined.total_pagos) AS pagos, SUM(combined.total_egresos) AS egresos, \n" +
                     "		SUM(combined.total_pagos - combined.total_egresos) AS utilidad_perdida, SUM(combined.efectivo) AS izq \n" +
                     "	FROM (\n" +
-                    "		SELECT ie.fecha, COALESCE(SUM(ie.importe), 0) AS total_egresos, 0 AS total_pagos, 0 AS efectivo\n" +
-                    "	    FROM emisor e \n" +
-                    "	    LEFT JOIN importe_egreso ie ON e.cd_emisor = ie.cd_emisor \n" +
-                    "		WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
-                    "	    GROUP BY ie.fecha \n" +
-                    "	    UNION\n" +
+                    //"		SELECT ie.fecha, COALESCE(SUM(ie.importe), 0) AS total_egresos, 0 AS total_pagos, 0 AS efectivo\n" +
+                    //"	    FROM emisor e \n" +
+                    //"	    LEFT JOIN importe_egreso ie ON e.cd_emisor = ie.cd_emisor \n" +
+                    //"		WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    //"	    GROUP BY ie.fecha \n" +
+                    //"	    UNION\n" +
                     "	    SELECT MAX(f.fecha) AS fecha, 0 AS total_egresos, COALESCE(SUM(p.monto), 0) AS total_pagos, 0 as efectivo\n" +
                     "	    FROM factura f \n" +
                     "	    LEFT JOIN pago p ON f.id = p.factura  \n" +
