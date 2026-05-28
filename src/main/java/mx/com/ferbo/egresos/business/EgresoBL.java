@@ -14,10 +14,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.exception.ValidationException;
-import com.ferbo.tools.validation.Notification;
 import com.ferbo.tools.validation.ObjectValidator;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
-import com.ferbo.tools.validation.TextValidator;
 
 import mx.com.ferbo.egresos.dao.EgresoDAO;
 import mx.com.ferbo.egresos.model.CancelaEgreso;
@@ -170,7 +168,7 @@ public class EgresoBL {
 
     }
 
-    public boolean verificarStatusParaCancelar(Egreso egreso, StatusEgreso status) {
+    public boolean validarEgresoCancelado(Egreso egreso, StatusEgreso status) {
         if (egreso.getId() != null && "CAN".equalsIgnoreCase(status.getClave())) {
             if (!"CAN".equalsIgnoreCase(egreso.getStatus().getClave())) {
                 return true;

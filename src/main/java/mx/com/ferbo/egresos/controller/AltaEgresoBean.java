@@ -175,7 +175,7 @@ public class AltaEgresoBean implements Serializable {
     }
 
     public void abrirDialogoOProcesar() {
-        Boolean procesar = egresoBL.verificarStatusParaCancelar(egresoSelected, statusEgresoSelected);
+        Boolean procesar = egresoBL.validarEgresoCancelado(egresoSelected, statusEgresoSelected);
 
         if (procesar) {
             cancelaEgresoSelected = cancelaEgresoBL.nuevoOExistente(null);
@@ -197,7 +197,7 @@ public class AltaEgresoBean implements Serializable {
                 egresoBL.validarEgresoNuevo(egresoSelected);
             }
             egresoBL.validarEgresoProcesado(egresoSelected, statusEgresoSelected);
-            if (egresoBL.verificarStatusParaCancelar(egresoSelected, statusEgresoSelected)) {
+            if (egresoBL.validarEgresoCancelado(egresoSelected, statusEgresoSelected)) {
                 cancelaEgresoBL.concatenarSiHayMotivoCancelacion(cancelaEgresoSelected, inicioLeyenda);
                 cancelaEgresoBL.asignarEgreso(cancelaEgresoSelected, egresoSelected);
                 cancelaEgresoBL.guardarOActualizarCancelaEgreso(cancelaEgresoSelected);
