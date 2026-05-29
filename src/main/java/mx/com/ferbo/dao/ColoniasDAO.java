@@ -8,7 +8,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class ColoniasDAO extends IBaseDAO<AsentamientoHumano, Integer>{
+public class ColoniasDAO extends IBaseDAO<AsentamientoHumano, Integer> {
 
 	@Override
 	public AsentamientoHumano buscarPorId(Integer id) {

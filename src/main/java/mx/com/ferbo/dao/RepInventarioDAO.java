@@ -19,19 +19,16 @@ public class RepInventarioDAO extends IBaseDAO<RepInventario, Integer>{
 
 	@Override
 	public RepInventario buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<RepInventario> buscarTodos() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<RepInventario> buscarPorCriterios(RepInventario e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -171,25 +168,21 @@ public class RepInventarioDAO extends IBaseDAO<RepInventario, Integer>{
 
 	@Override
 	public String actualizar(RepInventario e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String guardar(RepInventario e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminar(RepInventario e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<RepInventario> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -15,16 +15,16 @@ import mx.com.ferbo.ui.OcupacionCamara;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class RepOcupacionCamaraDAO {
-	
+
 	private static Logger log = LogManager.getLogger(RepOcupacionCamaraDAO.class);
-	
+
 	@SuppressWarnings("unchecked")
 	public List<OcupacionCamara> ocupacionCamara(Date fecha, Integer idCliente, Integer idPlanta){
 		
 		EntityManager em = null;		
 		List<OcupacionCamara> listaOcupacionCamara = null;
 		String sql = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			
@@ -90,10 +90,9 @@ public class RepOcupacionCamaraDAO {
 					.setParameter("idPlanta", idPlanta);
 			
 			List<Object[]> listaObjetos = query.getResultList();
-						
-			
-			for(Object[] o: listaObjetos) {
-				
+
+			for (Object[] o : listaObjetos) {
+
 				OcupacionCamara oc = new OcupacionCamara();
 				int id = 0;
 				

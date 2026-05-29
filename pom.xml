@@ -211,6 +211,12 @@
 			<artifactId>gestion-mail</artifactId>
 			<version>0.0.5-RELEASE</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.ferbo</groupId>
+  			<artifactId>ferbo-tools</artifactId>
+    		<version>0.1.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -496,6 +502,11 @@
 							<webXml>${project.build.directory}/web.xml</webXml>
 						</configuration>
 					</plugin>
+                                        <!--<plugin>
+                                            <groupId>org.apache.maven.plugins</groupId>
+                                            <artifactId>maven-resources-plugin</artifactId>
+                                            <version>3.1.0</version>
+                                        </plugin>-->
 				</plugins>
 			</build>
 		</profile>

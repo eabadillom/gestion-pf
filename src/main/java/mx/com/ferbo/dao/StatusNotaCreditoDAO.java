@@ -18,16 +18,16 @@ public class StatusNotaCreditoDAO extends IBaseDAO<StatusNotaCredito, Integer> {
 	public StatusNotaCredito buscarPorId(Integer id) {
 		StatusNotaCredito status = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			status = em.find(StatusNotaCredito.class, id);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para consultar el status de nota de crédito: {}", ex, id);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return status;
 	}
 

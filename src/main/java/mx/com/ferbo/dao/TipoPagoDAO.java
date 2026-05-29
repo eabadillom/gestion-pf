@@ -13,6 +13,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoPagoDAO extends IBaseDAO<TipoPago, Integer> {
 	private static Logger log = LogManager.getLogger(TipoPagoDAO.class);
+
 	@Override
 	public TipoPago buscarPorId(Integer id) {
 		TipoPago tp = null;
@@ -20,10 +21,10 @@ public class TipoPagoDAO extends IBaseDAO<TipoPago, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			tp = em.find(TipoPago.class, id);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			log.error("Problema al buscar tipo pago...", e);
-			
-		}finally {
+
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return tp;
@@ -39,7 +40,6 @@ public class TipoPagoDAO extends IBaseDAO<TipoPago, Integer> {
 
 	@Override
 	public List<TipoPago> buscarPorCriterios(TipoPago tipoPago) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -94,5 +94,4 @@ public class TipoPagoDAO extends IBaseDAO<TipoPago, Integer> {
 		return null;
 	}
 
-	
 }

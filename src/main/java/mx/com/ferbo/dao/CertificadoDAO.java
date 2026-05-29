@@ -1,39 +1,33 @@
 package mx.com.ferbo.dao;
 
-import java.util.Date;
-import java.util.List;
-
 import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
+
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.AsentamientoHumano;
-import mx.com.ferbo.model.TipoAsentamiento;
+import mx.com.ferbo.model.Certificado;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+public class CertificadoDAO extends IBaseDAO<Certificado, Integer> {
 
-import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Certificado;
-import mx.com.ferbo.model.EmisoresCFDIS;
+	@SuppressWarnings("unchecked")
+	public List<Certificado> findAll() {
+		EntityManager entity = getEntityManager();
+		List<Certificado> certi = null;
+		Query sql = entity.createNamedQuery("Certificado.findAll", Certificado.class);
+		certi = sql.getResultList();
+		return certi;
+	}
 
-public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
-
-		@SuppressWarnings("unchecked")
-		public List<Certificado> findAll(){
-			EntityManager entity = getEntityManager();
-			List<Certificado> certi = null;
-			Query sql = entity.createNamedQuery("Certificado.findAll", Certificado.class);
-			certi = sql.getResultList();
-			return certi;
-		}
 	@Override
 	public Certificado buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public Certificado buscarporFecha() {
 		EntityManager entity = getEntityManager();
 		Certificado dtCertificado = null;
@@ -43,9 +37,10 @@ public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
 	}
 
 	public List<Certificado> buscarporcdEmisor(Integer emisor) {
-		List<Certificado> listaCertificado= null; 
+		List<Certificado> listaCertificado = null;
 		EntityManager entity = getEntityManager();
-		Query sql = entity.createNamedQuery("Certificado.findByemisor",Certificado.class).setParameter("emisor", emisor);
+		Query sql = entity.createNamedQuery("Certificado.findByemisor", Certificado.class).setParameter("emisor",
+				emisor);
 		listaCertificado = sql.getResultList();
 		return listaCertificado;
 	}
@@ -70,7 +65,7 @@ public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
 			em.merge(c);
 			em.getTransaction().commit();
 			em.close();
-		} catch (Exception e){
+		} catch (Exception e) {
 			System.out.println("Error al guardar datos" + e.getMessage());
 			return "ERROR";
 		}
@@ -85,7 +80,7 @@ public class CertificadoDAO extends IBaseDAO<Certificado, Integer>{
 			em.persist(e);
 			em.getTransaction().commit();
 			em.close();
-		} catch (Exception ex){
+		} catch (Exception ex) {
 			System.out.println("Error al guardar datos" + ex.getMessage());
 			return "ERROR";
 		}
