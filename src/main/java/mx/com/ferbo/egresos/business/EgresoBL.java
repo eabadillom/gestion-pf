@@ -14,10 +14,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.exception.ValidationException;
-import com.ferbo.tools.validation.Notification;
 import com.ferbo.tools.validation.ObjectValidator;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
-import com.ferbo.tools.validation.TextValidator;
 
 import mx.com.ferbo.egresos.dao.EgresoDAO;
 import mx.com.ferbo.egresos.model.CancelaEgreso;
@@ -69,10 +67,12 @@ public class EgresoBL {
         ObjectValidator.notNull(egreso, "El egreso");
         ObjectValidator.notNull(status, "El status");
 
-        egreso.setStatus(status);
+        if (!status.getClave().equalsIgnoreCase(egreso.getStatus().getClave())) {
+           egreso.setStatus(status);
+        }
     }
 
-      public void asignarCancelacionEgreso(CancelaEgreso cancelar, Egreso egreso) {
+    public void asignarCancelacionEgreso(CancelaEgreso cancelar, Egreso egreso) {
 
         ObjectValidator.notNull(egreso, "El egreso");
         ObjectValidator.notNull(cancelar, "El motivo cancelación");
@@ -128,34 +128,32 @@ public class EgresoBL {
                 .validateObject()
                 .texto("concepto", Egreso::getConcepto)
                 .validateNested("categoria", Egreso::getCategoria, cat -> cat.validateObject()
-                        .texto("nombre", CategoriaEgreso::getNombre))
+                .texto("nombre", CategoriaEgreso::getNombre))
                 .validateNested("emisor", Egreso::getEmisor, emi -> emi.validateObject()
-                        .texto("nombre", EmisoresCFDIS::getNb_emisor))
+                .texto("nombre", EmisoresCFDIS::getNb_emisor))
                 .validateNested("forma pago", Egreso::getFormaPago, fpago -> fpago.validateObject()
-                        .texto("nombre", MedioPago::getFormaPago))
+                .texto("nombre", MedioPago::getFormaPago))
                 .validateNested("metodo pago", Egreso::getMetodoPago, mpago -> mpago.validateObject()
-                        .texto("nombre", MetodoPago::getNbMetodoPago))
+                .texto("nombre", MetodoPago::getNbMetodoPago))
                 .validateOrThrow();
 
         ObjectValidator.notNull(egreso.getFecha(), "fecha de pago");
     }
 
-    public void validarEgresoProcesado(Egreso egreso) {
+    public void validarEgresoProcesado(Egreso egreso, StatusEgreso status) {
 
-        if ("PRO".equalsIgnoreCase(egreso.getStatus().getClave())) {
-
-            Notification notification = new Notification();
+        if ("PRO".equalsIgnoreCase(egreso.getStatus().getClave()) || "PRO".equalsIgnoreCase(status.getClave())) {
 
             BigDecimal total = egreso.getMonto();
 
-            TextValidator textValidator = new TextValidator(150);
+            String referencia = egreso.getReferencia();
 
-            try {
-                textValidator.validate(egreso.getReferencia(), notification);
-            } catch (ValidationException ex) {
-                log.warn("Hubo una error en la referenficía, solamente se cambia el mensaje para el usuario.");
-                throw new ValidationException(
-                        "El egreso cambio a status 'Procesado' por lo tanto debe tener un una referencía.");
+            if (referencia == null || "".equalsIgnoreCase(referencia)) {
+                throw new ValidationException("El egreso cambio a status 'Procesado' por lo tanto debe tener una referencía.");
+            }
+
+            if (referencia.length() > 150) {
+                throw new ValidationException("La referencía sobrepasa el limiete de 150 caracteres.");
             }
 
             if (total == null) {
@@ -170,9 +168,9 @@ public class EgresoBL {
 
     }
 
-    public boolean verificarStatusParaCancelar(Egreso egreso) {
-        if (egreso.getId() != null) {
-            if ("CAN".equalsIgnoreCase(egreso.getStatus().getClave())) {
+    public boolean validarEgresoCancelado(Egreso egreso, StatusEgreso status) {
+        if (egreso.getId() != null && "CAN".equalsIgnoreCase(status.getClave())) {
+            if (!"CAN".equalsIgnoreCase(egreso.getStatus().getClave())) {
                 return true;
             }
         }

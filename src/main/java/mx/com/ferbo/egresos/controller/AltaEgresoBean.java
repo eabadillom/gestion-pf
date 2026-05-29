@@ -159,7 +159,6 @@ public class AltaEgresoBean implements Serializable {
                 maquinaStatusEgreso.valiarCambioStatus(lstStatusEgresos, egresoSelected.getStatus(),
                         statusEgresoSelected);
             }
-            egresoBL.asignarStatusEgreso(egresoSelected, statusEgresoSelected);
             log.info("{} finalizo el proceso de {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha cambiado correctamente el status a: " + statusEgresoSelected.getNombre());
@@ -176,7 +175,7 @@ public class AltaEgresoBean implements Serializable {
     }
 
     public void abrirDialogoOProcesar() {
-        Boolean procesar = egresoBL.verificarStatusParaCancelar(egresoSelected);
+        Boolean procesar = egresoBL.validarEgresoCancelado(egresoSelected, statusEgresoSelected);
 
         if (procesar) {
             cancelaEgresoSelected = cancelaEgresoBL.nuevoOExistente(null);
@@ -194,15 +193,19 @@ public class AltaEgresoBean implements Serializable {
             titulo = (egresoSelected.getId() == null) ? "guardar el egreso" : "actualizar el egreso";
 
             log.info("{} inicia el proceso para {}.", inicioLeyenda, titulo);
-            egresoBL.validarEgresoNuevo(egresoSelected);
-            egresoBL.validarEgresoProcesado(egresoSelected);
-            if (egresoBL.verificarStatusParaCancelar(egresoSelected)) {
+            if (egresoSelected.getId() == null) {
+                egresoBL.validarEgresoNuevo(egresoSelected);
+            }
+            egresoBL.validarEgresoProcesado(egresoSelected, statusEgresoSelected);
+            if (egresoBL.validarEgresoCancelado(egresoSelected, statusEgresoSelected)) {
                 cancelaEgresoBL.concatenarSiHayMotivoCancelacion(cancelaEgresoSelected, inicioLeyenda);
                 cancelaEgresoBL.asignarEgreso(cancelaEgresoSelected, egresoSelected);
                 cancelaEgresoBL.guardarOActualizarCancelaEgreso(cancelaEgresoSelected);
                 egresoBL.asignarCancelacionEgreso(cancelaEgresoSelected, egresoSelected);
             }
+            egresoBL.asignarStatusEgreso(egresoSelected, statusEgresoSelected);
             egresoBL.crearOActualizarEgreso(egresoSelected, inicioLeyenda);
+            egresoSelected = egresoBL.nuevoOExistente(egresoSelected.getId());
             log.info("{} finaliza proceso para {}.", inicioLeyenda, titulo);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
                     "Se ha completado el proceso de " + titulo + ".");
