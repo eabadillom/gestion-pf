@@ -13,40 +13,46 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+/**
+ *
+ * @author alberto
+ */
 @Entity
 @Table(name = "tipo_egreso")
-@NamedQueries({ @NamedQuery(name = "TipoEgreso.findByAll", query = "SELECT t FROM TipoEgreso t"),
-		@NamedQuery(name = "TipoEgreso.findById", query = "SELECT t FROM TipoEgreso t WHERE t.idTipoEgreso = :idTipoEgreso"),
-		@NamedQuery(name = "TipoEgreso.findByNombre", query = "SELECT t FROM TipoEgreso t WHERE t.nombreTipoEgreso = :nombreTipoEgreso") })
+@NamedQueries({ 
+    @NamedQuery(name = "TipoEgreso.findByAll", query = "SELECT t FROM TipoEgreso t"),
+    @NamedQuery(name = "TipoEgreso.findById", query = "SELECT t FROM TipoEgreso t WHERE t.idTipoEgreso = :idTipoEgreso"),
+    @NamedQuery(name = "TipoEgreso.findByNombre", query = "SELECT t FROM TipoEgreso t WHERE t.nombreTipoEgreso = :nombreTipoEgreso") 
+})
+public class TipoEgreso implements Serializable
+{
+    private static final long serialVersionUID = 1L;
+    
+    @Id
+    @Basic(optional = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_tipo_egreso")
 
-public class TipoEgreso implements Serializable {
+    private Integer idTipoEgreso;
 
-	private static final long serialVersionUID = 1L;
-	@Id
-	@Basic(optional = false)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_tipo_egreso")
+    @Column(name = "nombre_tipo_egreso")
+    @NotNull
+    private String nombreTipoEgreso;
 
-	private Integer idTipoEgreso;
+    public Integer getIdTipoEgreso() {
+        return idTipoEgreso;
+    }
 
-	@Column(name = "nombre_tipo_egreso")
-	@NotNull
-	private String nombreTipoEgreso;
+    public void setIdTipoEgreso(Integer idTipoEgreso) {
+        this.idTipoEgreso = idTipoEgreso;
+    }
 
-	public Integer getIdTipoEgreso() {
-		return idTipoEgreso;
-	}
+    public String getNombreTipoEgreso() {
+        return nombreTipoEgreso;
+    }
 
-	public void setIdTipoEgreso(Integer idTipoEgreso) {
-		this.idTipoEgreso = idTipoEgreso;
-	}
-
-	public String getNombreTipoEgreso() {
-		return nombreTipoEgreso;
-	}
-
-	public void setNombreTipoEgreso(String nombreTipoEgreso) {
-		this.nombreTipoEgreso = nombreTipoEgreso;
-	}
+    public void setNombreTipoEgreso(String nombreTipoEgreso) {
+        this.nombreTipoEgreso = nombreTipoEgreso;
+    }
 
 }

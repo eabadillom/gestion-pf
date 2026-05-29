@@ -15,505 +15,521 @@ import mx.com.ferbo.model.VentasGlobales;
 import mx.com.ferbo.ui.ImporteUtilidad;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> {
+public class ReportesVentasDAO extends IBaseDAO<Factura, Integer> 
+{
+    private static Logger log = LogManager.getLogger(ReportesVentasDAO.class);
 
-	@Override
-	public Factura buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Factura buscarPorId(Integer id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public List<Factura> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<Factura> buscarTodos() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public List<Factura> buscarPorCriterios(Factura e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<Factura> buscarPorCriterios(Factura e) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public String actualizar(Factura e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String actualizar(Factura e) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public String guardar(Factura e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String guardar(Factura e) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public String eliminar(Factura e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String eliminar(Factura e) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public String eliminarListado(List<Factura> listado) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String eliminarListado(List<Factura> listado) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@SuppressWarnings("unchecked")
-	public List<VentasGlobales> ventasGanancias(Date fechaIni, Date fechaFin) {
-		List<VentasGlobales> listaVentas = null;
-		EntityManager em = null;
-		String sql = null;
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			
-                        listaVentas = new ArrayList<>();
+    @SuppressWarnings("unchecked")
+    public List<VentasGlobales> ventasGanancias(Date fechaIni, Date fechaFin) 
+    {
+        List<VentasGlobales> listaVentas = null;
+        EntityManager em = null;
+        String sql = null;
+        try {
+            em = EntityManagerUtil.getEntityManager();
 
-			sql = "select COALESCE(a.ventas_totales, 0) ,\n" + 
-					"COALESCE((a.ventas_totales - a.egresos),0) as ganancias,\n" + 
-					"COALESCE(((a.ventas_totales - a.egresos) / a.ventas_totales),0) as porcentaje_ganancia\n" + 
-					"from(\n" + 
-					"select SUM(combined.total_facturas), SUM(combined.total_ventas), sum(combined.total_facturas +  combined.total_ventas ) as ventas_totales, sum(combined.Total_egresos) as egresos\n" + 
-					"from (\n" + 
-					"select sum(f.total) as total_facturas,0 as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n" + 
-					"from factura f  where f.fecha BETWEEN :fechaini and :fechaFin and status in (1,3,4)\n" + 
-					"group by fecha    UNION\n" + 
-					"select 0 as total_facturas,sum(v.total) as total_ventas , 0 as Total_egresos, 0 as ventas_totales\n" + 
-					"from venta v\n" + 
-					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ'\n" + 
-					"where v.fecha BETWEEN :fechaini AND :fechaFin\n" + 
-					"group by fecha\n" + 
-					"UNION\n"  
-//					+ "select 0 as total_facturas, 0 as total_ventas , sum(ie.importe) as Total_egresos, 0 as ventas_totales\n" + 
-//					"from importe_egreso ie  where ie.fecha BETWEEN :fechaini AND :fechaFin\n" + 
-//					"group by fecha     "
-					+ ")combined   )a ;\n"
-					;
+            listaVentas = new ArrayList<>();
 
-			Query query = em.createNativeQuery(sql)
-					.setParameter("fechaini", DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD))
-					.setParameter("fechaFin", DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+            sql = "SELECT\n" +
+                    "	COALESCE(a.ventas_totales, 0) ,\n" +
+                    "	COALESCE((a.ventas_totales - a.egresos), 0) AS ganancias,\n" +
+                    "	COALESCE(((a.ventas_totales - a.egresos) / a.ventas_totales), 0) AS porcentaje_ganancia\n" +
+                    "FROM\n" +
+                    "(\n" +
+                    "	SELECT SUM(combined.total_facturas), SUM(combined.total_ventas),\n" +
+                    "		SUM(combined.total_facturas + combined.total_ventas ) AS ventas_totales, SUM(combined.Total_egresos ) AS egresos\n" +
+                    "	FROM\n" +
+                    "	(\n" +
+                    "		SELECT SUM(f.total) AS total_facturas, 0 AS total_ventas, 0 AS Total_egresos, 0 AS ventas_totales\n" +
+                    "		FROM factura f\n" +
+                    "		WHERE f.fecha BETWEEN :fechaini AND :fechaFin AND status IN (1, 3, 4)\n" +
+                    "		GROUP BY fecha\n" +
+                    "		UNION\n" +
+                    "		SELECT 0 AS total_facturas, SUM(v.total) AS total_ventas, 0 AS Total_egresos, 0 AS ventas_totales\n" +
+                    "		FROM venta v\n" +
+                    "		INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ'\n" +
+                    "		WHERE v.fecha BETWEEN :fechaini AND :fechaFin \n" +
+                    "		GROUP BY fecha\n" +
+                    "		UNION\n" +
+                    "		SELECT 0 AS total_facturas, 0 AS total_ventas, SUM(ie.importe) AS Total_egresos, 0 AS ventas_totales\n" +
+                    "		FROM importe_egreso ie\n" +
+                    "		WHERE ie.fecha BETWEEN :fechaini AND :fechaFin\n" +
+                    "		GROUP BY fecha \n" +
+                    "	) combined \n" +
+                    ")a";
 
-			List<Object[]> listaObjetos = query.getResultList();
+            Query query = em.createNativeQuery(sql)
+                    .setParameter("fechaini", DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD))
+                    .setParameter("fechaFin", DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
 
-			int id = 0;
-			for (Object[] o : listaObjetos) {
-				VentasGlobales vg = new VentasGlobales();
-				vg.setVentasTotales((BigDecimal) o[id++]);
-				vg.setGanancias((BigDecimal) o[id++]);
-				vg.setPorcentajeGanancias((BigDecimal) o[id++]);
-				listaVentas.add(vg);
-			}
-			return listaVentas;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		} finally {
-                    EntityManagerUtil.close(em);
-                }
+            List<Object[]> listaObjetos = query.getResultList();
 
-	}
+            int id = 0;
+            for (Object[] o : listaObjetos) {
+                VentasGlobales vg = new VentasGlobales();
+                vg.setVentasTotales((BigDecimal) o[id++]);
+                vg.setGanancias((BigDecimal) o[id++]);
+                vg.setPorcentajeGanancias((BigDecimal) o[id++]);
+                listaVentas.add(vg);
+            }
+            return listaVentas;
+        } catch (Exception e) {
+            log.error("Error al consultar ventas por ganancias: {}", e);
+            return null;
+        } finally {
+            EntityManagerUtil.close(em);
+        }
 
-	@SuppressWarnings("unchecked")
-	public List<FacturacionGeneral> desgloseFacturacion(Date fechaIni, Date fechaFin) {
-		List<FacturacionGeneral> listaFacturacion = null;
-		EntityManager em = null;
-		String sql = null;
-		try {
-			em = EntityManagerUtil.getEntityManager();
-			
-			listaFacturacion = new ArrayList<>();
+    }
 
-			sql = "select combined.fecha, sum(combined.total_facturas),SUM(combined.total_efectivo_por_dia) from\n"
-					+ "(\n" + "\n" + "\n"
-					+ "select fecha , SUM(f.total) as total_facturas,null as  total_efectivo_por_dia\n"
-					+ "from factura f\n" + "where f.fecha BETWEEN :fechaIni AND :fechaFin and status in (1,3,4)\n"
-					+ "\n" + "group by fecha\n" + "\n" + "union\n" + "\n"
-					+ "select fecha,null as total_facturas, sum(v.total) as total_efectivo_por_dia\n"
-					+ "from venta v\n" 
-					+"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " 
-					+ "where v.fecha BETWEEN :fechaIni AND :fechaFin \n" 
-					+ "group by fecha \n" 
-					+ ")combined \n" + "group by combined.fecha \n" + "order by combined.fecha DESC \n" + "\n" + "\n";
+    @SuppressWarnings("unchecked")
+    public List<FacturacionGeneral> desgloseFacturacion(Date fechaIni, Date fechaFin) 
+    {
+        List<FacturacionGeneral> listaFacturacion = null;
+        EntityManager em = null;
+        String sql = null;
+        try {
+            em = EntityManagerUtil.getEntityManager();
 
-			Query query = em.createNativeQuery(sql)
-					.setParameter("fechaIni", DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD))
-					.setParameter("fechaFin", DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+            listaFacturacion = new ArrayList<>();
 
-			List<Object[]> listaObjetos = query.getResultList();
+            sql = "SELECT combined.fecha, SUM(combined.total_facturas), SUM(combined.total_efectivo_por_dia) \n" +
+                    "FROM (\n" +
+                    "    SELECT fecha, SUM(f.total) AS total_facturas, NULL AS total_efectivo_por_dia\n" +
+                    "    FROM factura f WHERE f.fecha BETWEEN :fechaIni AND :fechaFin AND status IN (1,3,4)\n" +
+                    "    GROUP BY fecha \n" +
+                    "	UNION\n" +
+                    "    SELECT fecha, NULL AS total_facturas, SUM(v.total) AS total_efectivo_por_dia\n" +
+                    "    FROM venta v\n" +
+                    "    INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ'\n" +
+                    "    WHERE v.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    "    GROUP BY fecha\n" +
+                    "    )combined \n" +
+                    "GROUP BY combined.fecha \n" +
+                    "ORDER BY combined.fecha DESC";
 
-			for (Object[] o : listaObjetos) {
-				FacturacionGeneral fg = new FacturacionGeneral();
-				int id = 0;
-				fg.setFecha((Date) o[id++]);
-				fg.setTotal_facturacion((BigDecimal) o[id++]);
-				fg.setTotal_por_efectivo((BigDecimal) o[id++]);
-				listaFacturacion.add(fg);
-			}
-			return listaFacturacion;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		} finally {
-                    EntityManagerUtil.close(em);
-                }
+            Query query = em.createNativeQuery(sql)
+                    .setParameter("fechaIni", DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD))
+                    .setParameter("fechaFin", DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
 
-	}
+            List<Object[]> listaObjetos = query.getResultList();
 
-	@SuppressWarnings("unchecked")
-	public List<ImporteUtilidad> UtilidadPorMesAnual(String fechaIni, String fechaFin) {
-		List<ImporteUtilidad> lista = null;
-		EntityManager entity = null;
-		String sql = null;
+            for (Object[] o : listaObjetos) {
+                FacturacionGeneral fg = new FacturacionGeneral();
+                int id = 0;
+                fg.setFecha((Date) o[id++]);
+                fg.setTotal_facturacion((BigDecimal) o[id++]);
+                fg.setTotal_por_efectivo((BigDecimal) o[id++]);
+                listaFacturacion.add(fg);
+            }
+            return listaFacturacion;
+        } catch (Exception e) {
+            log.error("Error al consultar el desgloce de facturacion: {}", e);
+            return null;
+        } finally {
+            EntityManagerUtil.close(em);
+        }
+    }
 
-		try {
-			entity = EntityManagerUtil.getEntityManager();
+    @SuppressWarnings("unchecked")
+    public List<ImporteUtilidad> UtilidadPorMesAnual(String fechaIni, String fechaFin) 
+    {
+        List<ImporteUtilidad> lista = null;
+        EntityManager entity = null;
+        String sql = null;
 
-			lista = new ArrayList<>();
+        try {
+            entity = EntityManagerUtil.getEntityManager();
 
-			sql = "SELECT DATE_FORMAT(combined.fecha, '%Y-%m') AS fecha,\n" + "SUM(combined.total_pagos) AS pagos,\n"
-					+ "SUM(combined.total_egresos) AS egresos,\n"
-					+ "SUM(combined.total_pagos - combined.total_egresos) AS utilidad_perdida,\n"
-					+ "Sum(combined.efectivo) as izq\n" + "FROM (\n"
-					+ "SELECT ie.fecha,  COALESCE(SUM(ie.importe), 0) AS total_egresos,  0 AS total_pagos , 0 as efectivo\n"
-					+ "FROM  emisor e\n" + "LEFT JOIN importe_egreso ie ON e.cd_emisor = ie.cd_emisor\n"
-					+ "AND DATE_FORMAT(ie.fecha, '%Y-%m') BETWEEN  DATE_FORMAT(:fechaIni, '%Y-%m') and DATE_FORMAT(:fechaFin, '%Y-%m')\n"
-					+ "GROUP BY  ie.fecha\n" + "\n" + "UNION\n" + "\n" + "SELECT\n"
-					+ "MAX(p.fecha) AS fecha, 0 AS total_egresos, COALESCE(SUM(p.monto), 0) AS total_pagos , 0 as efectivo\n"
-					+ "FROM  factura f\n" + "LEFT JOIN pago p ON f.id = p.factura\n" + "and status in (1,3,4)\n"
-					+ "AND DATE_FORMAT(f.fecha, '%Y-%m') BETWEEN  DATE_FORMAT(:fechaIni, '%Y-%m') and DATE_FORMAT(:fechaFin, '%Y-%m')\n"
-					+ "GROUP BY  f.fecha\n" + "\n" + "UNION\n" + "\n"
-					+ "SELECT v.fecha,0 as total_egresos, 0 as total_pagos,sum(total) as efectivo\n" + "FROM venta v\n "
-					+"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " 
-					+ "GROUP BY  v.fecha\n" + ") AS combined\n" + "where fecha  is not null\n" + "GROUP BY\n"
-					+ "DATE_FORMAT(combined.fecha, '%Y-%m')\n" + "ORDER BY  fecha;\n";
+            lista = new ArrayList<>();
 
-			Query query = entity.createNativeQuery(sql).setParameter("fechaIni", fechaIni).setParameter("fechaFin",
-					fechaFin);
+            sql = "SELECT resultados.fecha, SUM(resultados.pagos), SUM(resultados.egresos), SUM(resultados.utilidad_perdida), SUM(resultados.izq)\n" +
+                    "FROM(\n" +
+                    "	SELECT DATE_FORMAT(combined.fecha, '%Y-%m') AS fecha, SUM(combined.total_pagos) AS pagos, SUM(combined.total_egresos) AS egresos, \n" +
+                    "		SUM(combined.total_pagos - combined.total_egresos) AS utilidad_perdida, SUM(combined.efectivo) AS izq \n" +
+                    "	FROM (\n" +
+                    //"		SELECT ie.fecha, COALESCE(SUM(ie.importe), 0) AS total_egresos, 0 AS total_pagos, 0 AS efectivo\n" +
+                    //"	    FROM emisor e \n" +
+                    //"	    LEFT JOIN importe_egreso ie ON e.cd_emisor = ie.cd_emisor \n" +
+                    //"		WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    //"	    GROUP BY ie.fecha \n" +
+                    //"	    UNION\n" +
+                    "	    SELECT MAX(f.fecha) AS fecha, 0 AS total_egresos, COALESCE(SUM(p.monto), 0) AS total_pagos, 0 as efectivo\n" +
+                    "	    FROM factura f \n" +
+                    "	    LEFT JOIN pago p ON f.id = p.factura  \n" +
+                    "		WHERE f.fecha BETWEEN :fechaIni AND :fechaFin AND status in (1,3,4)\n" +
+                    "	    GROUP BY f.fecha \n" +
+                    "	    UNION\n" +
+                    "	    SELECT v.fecha, 0 AS total_egresos, 0 AS total_pagos, sum(v.total) AS efectivo \n" +
+                    "	    FROM venta v\n" +
+                    "	    INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ' \n" +
+                    "	    WHERE v.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    "	    GROUP BY v.fecha\n" +
+                    "	    ) AS combined \n" +
+                    "	WHERE fecha IS NOT NULL\n" +
+                    "	GROUP BY combined.fecha \n" +
+                    "	ORDER BY fecha\n" +
+                    ") AS resultados\n" +
+                    "GROUP BY resultados.fecha \n" +
+                    "ORDER BY resultados.fecha";
 
-			List<Object[]> listaObjetos = query.getResultList();
+            Query query = entity.createNativeQuery(sql).setParameter("fechaIni", fechaIni).setParameter("fechaFin",
+                    fechaFin);
 
-			for (Object[] o : listaObjetos) {
-				ImporteUtilidad u = new ImporteUtilidad();
-				int id = 0;
-				String fh = ((String) o[id++]);
-				Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);
-				u.setFecha(f);
-				u.setPagos((BigDecimal) o[id++]);
-				u.setEgresos((BigDecimal) o[id++]);
-				u.setUtilidadPerdida((BigDecimal) o[id++]);
-				u.setIzq((BigDecimal) o[id++]);
-				lista.add(u);
-			}
+            List<Object[]> listaObjetos = query.getResultList();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally{
-                    EntityManagerUtil.close(entity);
-                }
-		return lista;
-	}   
-  
-	@SuppressWarnings("unchecked")
-	public List<FacturacionGeneral> ventasPorMesAnual(Date fechaini, Date fechafin) {
-		List<FacturacionGeneral> lista = null;
-		EntityManager entity = null;
-		String sql = null;
-    
-		try {
-			entity = EntityManagerUtil.getEntityManager();
+            for (Object[] o : listaObjetos) {
+                ImporteUtilidad u = new ImporteUtilidad();
+                int id = 0;
+                String fh = ((String) o[id++]);
+                Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);
+                u.setFecha(f);
+                u.setPagos((BigDecimal) o[id++]);
+                u.setEgresos((BigDecimal) o[id++]);
+                u.setUtilidadPerdida((BigDecimal) o[id++]);
+                u.setIzq((BigDecimal) o[id++]);
+                lista.add(u);
+            }
 
-			lista = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error al consultar la utilidad por mes: {}", e);
+        } finally {
+            EntityManagerUtil.close(entity);
+        }
+        return lista;
+    }
 
-			sql = "SELECT DATE_FORMAT(combined.fecha, '%Y-%m') AS fecha,\n" + 
-					"SUM(combined.total_pagos + combined.efectivo) AS pagos \n" + 
-					"FROM (\n" + 
-					"SELECT ie.fecha,  0 AS total_pagos , 0 as efectivo \n" + 
-					"FROM  importe_egreso ie \n" + 
-					"WHERE DATE_FORMAT(ie.fecha, '%Y-%m') BETWEEN  DATE_FORMAT(:fechaIni, '%Y-%m') and DATE_FORMAT(:fechaFin, '%Y-%m')\n" + 
-					"GROUP BY  ie.fecha\n" + 
-					"\n" + 
-					"UNION\n" + 
-					"\n" + 
-					"SELECT\n" + 
-					"MAX(p.fecha) AS fecha, COALESCE(SUM(p.monto), 0) AS total_pagos , 0 as efectivo\n" + 
-					"FROM  factura f\n" + 
-					"LEFT JOIN pago p ON f.id = p.factura\n" + 
-					"and status in (1,3,4)\n" + 
-					"AND DATE_FORMAT(f.fecha, '%Y-%m') BETWEEN  DATE_FORMAT(:fechaIni, '%Y-%m') and DATE_FORMAT(:fechaFin, '%Y-%m')\n" + 
-					"GROUP BY  f.fecha\n" + 
-					"\n" + 
-					"UNION\n" + 
-					"\n" + 
-					"SELECT v.fecha ,0 AS total_pagos, sum(total) as efectivo\n" + 
-					"FROM venta v\n" + 
-					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " +
-					"GROUP BY  v.fecha\n" + 
-					"\n" + 
-					") AS combined\n" + 
-					"where fecha  is not null\n" + 
-					"GROUP BY\n" + 
-					"DATE_FORMAT(combined.fecha, '%Y-%m')\n" + 
-					"ORDER BY  fecha;\n";
+    @SuppressWarnings("unchecked")
+    public List<FacturacionGeneral> ventasPorMesAnual(Date fechaini, Date fechafin) 
+    {
+        List<FacturacionGeneral> lista = null;
+        EntityManager entity = null;
+        String sql = null;
 
-			Query query = entity.createNativeQuery(sql)
-					.setParameter("fechaIni",DateUtil.getString(fechaini, DateUtil.FORMATO_YYYY_MM_DD))
-					.setParameter("fechaFin", DateUtil.getString(fechafin, DateUtil.FORMATO_YYYY_MM_DD));
+        try {
+            entity = EntityManagerUtil.getEntityManager();
 
-			List<Object[]> listaObjetos = query.getResultList();
+            lista = new ArrayList<>();
 
-			for (Object[] o : listaObjetos) {
-				FacturacionGeneral fg = new FacturacionGeneral();
-				int id = 0;
-				String fh = ((String) o[id++]);
-				Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);
-				fg.setFecha(f);
-				fg.setPagosPorMes((BigDecimal) o[id++]);
-				lista.add(fg);
-			}
+            sql = "SELECT fecha, SUM(pagos) AS pagos\n" +
+                    "FROM (\n" +
+                    "	SELECT DATE_FORMAT(combined.fecha, '%Y-%m') AS fecha, SUM(combined.total_pagos + combined.efectivo) AS pagos\n" +
+                    "	FROM (\n" +
+                    "	    SELECT ie.fecha, 0 AS total_pagos, 0 AS efectivo\n" +
+                    "	    FROM importe_egreso ie\n" +
+                    "	    WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    "	    GROUP BY ie.fecha\n" +
+                    "	    UNION ALL\n" +
+                    "	    SELECT MAX(f.fecha) AS fecha, COALESCE(SUM(p.monto), 0) AS total_pagos, 0 AS efectivo\n" +
+                    "	    FROM factura f\n" +
+                    "		LEFT JOIN pago p ON f.id = p.factura\n" +
+                    "	    WHERE f.fecha BETWEEN :fechaIni AND :fechaFin AND status IN (1,3,4)\n" +
+                    "	    GROUP BY  f.fecha\n" +
+                    "	    UNION ALL\n" +
+                    "	    SELECT v.fecha ,0 AS total_pagos, sum(total) AS efectivo\n" +
+                    "	    FROM venta v\n" +
+                    "	    INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ'\n" +
+                    "	    WHERE v.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    "	    GROUP BY v.fecha\n" +
+                    "	) AS combined\n" +
+                    "	WHERE fecha IS NOT NULL\n" +
+                    "	GROUP BY combined.fecha\n" +
+                    "	ORDER BY fecha\n" +
+                    ") AS resultados\n" +
+                    "GROUP BY resultados.fecha\n" +
+                    "ORDER BY resultados.fecha";
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			EntityManagerUtil.close(entity);
-		}
-		return lista;
-	}
+            Query query = entity.createNativeQuery(sql)
+                    .setParameter("fechaIni", DateUtil.getString(fechaini, DateUtil.FORMATO_YYYY_MM_DD))
+                    .setParameter("fechaFin", DateUtil.getString(fechafin, DateUtil.FORMATO_YYYY_MM_DD));
 
-	@SuppressWarnings("unchecked")
-	public List<FacturacionGeneral> obtenerVentaDia(Date fechaIni) {
+            List<Object[]> listaObjetos = query.getResultList();
 
-		List<FacturacionGeneral> lista = null;
-		EntityManager entity = null;
-		String sql = null;
+            for (Object[] o : listaObjetos) {
+                FacturacionGeneral fg = new FacturacionGeneral();
+                int id = 0;
+                String fh = ((String) o[id++]);
+                Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);
+                fg.setFecha(f);
+                fg.setPagosPorMes((BigDecimal) o[id++]);
+                lista.add(fg);
+            }
 
-		try {
-			entity = EntityManagerUtil.getEntityManager();
+        } catch (Exception e) {
+            log.error("Error al consultar ventas por mes anual", e);
+        } finally {
+            EntityManagerUtil.close(entity);
+        }
+        return lista;
+    }
 
-			lista = new ArrayList<>();
+    @SuppressWarnings("unchecked")
+    public List<FacturacionGeneral> obtenerVentaDia(Date fechaIni) 
+    {
+        List<FacturacionGeneral> lista = null;
+        EntityManager entity = null;
+        String sql = null;
 
-			sql = "select combined.fecha,sum(combined.total_facturas),sum(combined.total_efectivo_por_dia)\n" + 
-					"from  (\n" + 
-					"select fecha , SUM(f.total) as total_facturas, null as total_efectivo_por_dia\n" + 
-					"from factura f  where f.fecha = :fechaIni and status in (1,3,4)  group by fecha\n" + 
-					"union\n" + 
-					"select fecha ,null as total_facturas, SUM(v.total) as total_efectivo_por_dia\n" + 
-					"from venta v\n" + 
-					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " +
-					"where v.fecha = :fechaIni  group by fecha    )combined\n" + 
-					"group by combined.fecha  order by combined.fecha;\n";
+        try {
+            entity = EntityManagerUtil.getEntityManager();
 
-			Query query = entity.createNativeQuery(sql).setParameter("fechaIni",
-					DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD));
+            lista = new ArrayList<>();
 
-			List<Object[]> listaObjetos = query.getResultList();
+            sql = "SELECT combined.fecha, SUM(combined.total_facturas) AS total_facturas, SUM(combined.total_efectivo_por_dia) AS total_efectivo_por_dia\n" +
+                    "FROM (\n" +
+                    "    SELECT fecha , SUM(f.total) AS total_facturas, NULL AS total_efectivo_por_dia\n" +
+                    "    FROM factura f \n" +
+                    "    WHERE f.fecha = :fechaIni AND status IN (1,3,4)  \n" +
+                    "    GROUP BY fecha\n" +
+                    "    UNION\n" +
+                    "    SELECT fecha, NULL AS total_facturas, SUM(v.total) AS total_efectivo_por_dia\n" +
+                    "    FROM venta v\n" +
+                    "    INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ'\n" +
+                    "	WHERE v.fecha = :fechaIni\n" +
+                    "	GROUP BY fecha    \n" +
+                    ")combined\n" +
+                    "GROUP BY combined.fecha  \n" +
+                    "ORDER BY combined.fecha";
 
-			for (Object[] o : listaObjetos) {
-				FacturacionGeneral fg = new FacturacionGeneral();
-				int id = 0;
+            Query query = entity.createNativeQuery(sql).setParameter("fechaIni",
+                    DateUtil.getString(fechaIni, DateUtil.FORMATO_YYYY_MM_DD));
 
-				fg.setFecha((Date) o[id++]);
-				fg.setTotal_facturacion((BigDecimal) o[id++]);
-				fg.setTotal_por_efectivo((BigDecimal) o[id++]);
-				lista.add(fg);
-			}
+            List<Object[]> listaObjetos = query.getResultList();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			EntityManagerUtil.close(entity);
-		}
-		return lista;
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	public List<FacturacionGeneral> ventaPorRazonSocial(Date fechaInicio, Date fechaFin ){
-		
-		List<FacturacionGeneral> list = new ArrayList<>();
-		EntityManager em = null;
-		String sql = null;
-		Query query = null;
-		
-		try {
-			
-			em = EntityManagerUtil.getEntityManager();
-			
-			sql = "select SUM(c.total) as total, c.emisor as emisor from(\n" + 
-					"select sum(f.total) as total, f.emi_nombre as emisor\n" + 
-					"from factura f\n" + 
-					"where f.fecha between :fechaini and :fechafin and f.status in (1,3,4)\n" + 
-					"group by emisor\n" + 
-					"\n" + 
-					"union\n" + 
-					"\n" + 
-					"select sum(v.total) as total, e.nb_emisor as emisor\n" + 
-					"from venta v\n" + 
-					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " + 
-					"inner join emisor e on e.cd_emisor = v.id_emisor \n" + 
-					"where v.fecha between :fechaini and :fechafin \n" + 
-					"GROUP by emisor \n " + 
-					")c \n" + 
-					"GROUP BY emisor \n ";
-			
-			query = em.createNativeQuery(sql)
-						.setParameter("fechaini",DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
-						.setParameter("fechafin",DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
-			
-			List<Object[]> listaObjetos = query.getResultList();
-			
-			for (Object[] o : listaObjetos) {
-				FacturacionGeneral fg = new FacturacionGeneral();
-				int id = 0;
+            for (Object[] o : listaObjetos) {
+                FacturacionGeneral fg = new FacturacionGeneral();
+                int id = 0;
 
-				fg.setTotal_facturacion((BigDecimal) o[id++]);				
-				fg.setRazonSocial((String) o[id++]);
-				list.add(fg);
-			}
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}finally {
-			EntityManagerUtil.close(em);
-		}
-				
-		return list;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<FacturacionGeneral> gananciaPorRazonSocial(Date fechaInicio, Date fechaFin ){
-		
-		List<FacturacionGeneral> list = new ArrayList<>();
-		EntityManager em = null;
-		String sql = null;
-		Query query = null;
-		
-		try {
-			
-			em = EntityManagerUtil.getEntityManager();
-			
-			sql = "select sum(d.total - d.egreso) as ganancia, d.emisor as emisor from(\n" + 
-					"select SUM(c.total) as total, c.emisor as emisor, 0 as egreso from(\n" + 
-					"select sum(f.total) as total, f.emi_nombre as emisor\n" + 
-					"from factura f\n" + 
-					"where f.fecha between :fechaini and :fechafin and f.status in (1,3,4)\n" + 
-					"group by emisor\n" + 
-					"\n" + 
-					"union\n" + 
-					"\n" + 
-					"select sum(v.total), e.nb_emisor as emisor\n" + 
-					"from venta v\n" + 
-					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n "  + 
-					"inner join emisor e on e.cd_emisor = v.id_emisor\n" + 
-					"where v.fecha between :fechaini and :fechafin\n" + 
-					"GROUP by emisor\n" + 
-					"\n" + 
-					")c\n" + 
-					"GROUP BY emisor\n" + 
-					"\n" + 
-					"\n" + 
-					"union\n" + 
-					"\n" + 
-					"select 0 as total , e.nb_emisor as emisor,sum(ie.importe) as egreso\n" + 
-					"from importe_egreso ie\n" + 
-					"inner join emisor e on ie.cd_emisor = e.cd_emisor\n" + 
-					"where ie.fecha between :fechaini and :fechafin\n" + 
-					"group by emisor\n" + 
-					"\n" + 
-					")d\n" + 
-					"group by emisor\n";
-			
-			query = em.createNativeQuery(sql)
-						.setParameter("fechaini",DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
-						.setParameter("fechafin",DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
-			
-			List<Object[]> listaObjetos = query.getResultList();
-			
-			for (Object[] o : listaObjetos) {
-				FacturacionGeneral fg = new FacturacionGeneral();
-				int id = 0;
+                fg.setFecha((Date) o[id++]);
+                fg.setTotal_facturacion((BigDecimal) o[id++]);
+                fg.setTotal_por_efectivo((BigDecimal) o[id++]);
+                lista.add(fg);
+            }
 
-				fg.setTotal_facturacion((BigDecimal) o[id++]);				
-				fg.setRazonSocial((String) o[id++]);
-				list.add(fg);
-			}
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}finally {
-			EntityManagerUtil.close(em);
-		}
-				
-		return list;
-	}
-	
-	
-@SuppressWarnings("unchecked")
-public List<FacturacionGeneral> ventaPorFormaPago(Date fechaInicio, Date fechaFin ){
-		
-		List<FacturacionGeneral> list = new ArrayList<>();
-		EntityManager em = null;
-		String sql = null;
-		Query query = null;
-		
-		try {
-			
-			em = EntityManagerUtil.getEntityManager();
-			
-			sql = "select date_format(c.fecha,'%Y-%m') as mes, sum(c.monto), c.tipo as tipo  from(\n" + 
-					"SELECT p.fecha as fecha,sum(p.monto) as monto, tp.nombre as tipo from factura f\n" + 
-					"inner join pago p on p.factura = f.id\n" + 
-					"inner join tipo_pago tp on tp.id = p.tipo\n" + 
-					"where p.fecha BETWEEN :fechaini and :fechafin\n" + 
-					"group by p.tipo, p.fecha\n" + 
-					"union\n" + 
-					"select v.fecha as fecha, v.total as monto, 'Efectivo' as tipo\n" + 
-					"from venta v\n" + 
-					"inner join parametro p on p.valor = 'true' and p.nombre = 'SWIZQ' \n " + 
-					"where v.fecha between :fechaini and :fechafin \n " + 
-					")c \n" + 
-					"Group by mes, tipo \n" + 
-					"order by mes\n";
-			
-			query = em.createNativeQuery(sql)
-						.setParameter("fechaini",DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
-						.setParameter("fechafin",DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
-			
-			List<Object[]> listaObjetos = query.getResultList();
-			
-			for (Object[] o : listaObjetos) {
-				FacturacionGeneral fg = new FacturacionGeneral();
-				int id = 0;
+        } catch (Exception e) {
+            log.error("Error al consultar venta por dia", e);
+        } finally {
+            EntityManagerUtil.close(entity);
+        }
+        return lista;
+    }
 
-				String fh = ((String) o[id++]);
-				Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);
-				fg.setFecha(f);
-				fg.setPagosPorMes((BigDecimal) o[id++]);				
-				fg.setTipoPago((String) o[id++]);
-				list.add(fg);
-			}
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}finally {
-			EntityManagerUtil.close(em);
-		}
-				
-		return list;
-	}
-	
-	
-	
-	
-	
-	
-	
+    @SuppressWarnings("unchecked")
+    public List<FacturacionGeneral> ventaPorRazonSocial(Date fechaInicio, Date fechaFin) 
+    {
+        List<FacturacionGeneral> list = new ArrayList<>();
+        EntityManager em = null;
+        String sql = null;
+        Query query = null;
+
+        try {
+
+            em = EntityManagerUtil.getEntityManager();
+
+            sql = "SELECT SUM(c.total) AS total, c.emisor AS emisor \n" +
+                    "FROM (\n" +
+                    "    SELECT sum(f.total) AS total, f.emi_nombre AS emisor\n" +
+                    "    FROM factura f\n" +
+                    "    WHERE f.fecha BETWEEN :fechaIni AND :fechaFin AND f.status in (1,3,4)\n" +
+                    "    GROUP BY emisor\n" +
+                    "    UNION\n" +
+                    "    SELECT sum(v.total) AS total, e.nb_emisor AS emisor\n" +
+                    "    FROM venta v\n" +
+                    "    INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ'\n" +
+                    "    INNER JOIN emisor e ON e.cd_emisor = v.id_emisor\n" +
+                    "    WHERE v.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    "    GROUP by emisor\n" +
+                    ")c\n" +
+                    "GROUP BY emisor";
+
+            query = em.createNativeQuery(sql)
+                    .setParameter("fechaIni", DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
+                    .setParameter("fechaFin", DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+
+            List<Object[]> listaObjetos = query.getResultList();
+
+            for (Object[] o : listaObjetos) {
+                FacturacionGeneral fg = new FacturacionGeneral();
+                int id = 0;
+
+                fg.setTotal_facturacion((BigDecimal) o[id++]);
+                fg.setRazonSocial((String) o[id++]);
+                list.add(fg);
+            }
+
+        } catch (Exception e) {
+            log.error("Error al consultar venta por dia: {}", e);
+            return null;
+        } finally {
+            EntityManagerUtil.close(em);
+        }
+
+        return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<FacturacionGeneral> gananciaPorRazonSocial(Date fechaInicio, Date fechaFin) 
+    {
+        List<FacturacionGeneral> list = new ArrayList<>();
+        EntityManager em = null;
+        String sql = null;
+        Query query = null;
+
+        try {
+
+            em = EntityManagerUtil.getEntityManager();
+
+            sql = "SELECT SUM(d.total - d.egreso) AS ganancia, d.emisor AS emisor \n" +
+                    "FROM (\n" +
+                    "    SELECT SUM(c.total) AS total, c.emisor AS emisor, 0 AS egreso \n" +
+                    "    FROM(\n" +
+                    "        SELECT SUM(f.total) AS total, f.emi_nombre  AS emisor\n" +
+                    "        FROM factura f\n" +
+                    "        WHERE f.fecha BETWEEN :fechaIni AND :fechaFin AND f.status IN (1,3,4)\n" +
+                    "        GROUP BY emisor\n" +
+                    "        UNION\n" +
+                    "        SELECT SUM(v.total), e.nb_emisor AS emisor\n" +
+                    "        FROM venta v\n" +
+                    "        INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ'\n" +
+                    "        INNER JOIN emisor e ON e.cd_emisor = v.id_emisor\n" +
+                    "        WHERE v.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    "        GROUP BY emisor\n" +
+                    "    )c\n" +
+                    "    GROUP BY emisor\n" +
+                    "    UNION\n" +
+                    "    SELECT 0 AS total, e.nb_emisor AS emisor, SUM(ie.importe) AS egreso\n" +
+                    "    FROM importe_egreso ie\n" +
+                    "    INNER JOIN emisor e ON ie.cd_emisor = e.cd_emisor\n" +
+                    "    WHERE ie.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    "    GROUP BY emisor\n" +
+                    ")d\n" +
+                    "GROUP BY emisor";
+
+            query = em.createNativeQuery(sql)
+                    .setParameter("fechaIni", DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
+                    .setParameter("fechaFin", DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+
+            List<Object[]> listaObjetos = query.getResultList();
+
+            for (Object[] o : listaObjetos) {
+                FacturacionGeneral fg = new FacturacionGeneral();
+                int id = 0;
+
+                fg.setTotal_facturacion((BigDecimal) o[id++]);
+                fg.setRazonSocial((String) o[id++]);
+                list.add(fg);
+            }
+
+        } catch (Exception e) {
+            log.error("Error al consultar ganancia por razon social: {}", e);
+            return null;
+        } finally {
+            EntityManagerUtil.close(em);
+        }
+
+        return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<FacturacionGeneral> ventaPorFormaPago(Date fechaInicio, Date fechaFin) 
+    {
+        List<FacturacionGeneral> list = new ArrayList<>();
+        EntityManager em = null;
+        String sql = null;
+        Query query = null;
+
+        try {
+
+            em = EntityManagerUtil.getEntityManager();
+
+            sql = "SELECT DATE_FORMAT(c.fecha,'%Y-%m') AS mes, SUM(c.monto), c.tipo AS tipo \n" +
+                    "FROM(\n" +
+                    "    SELECT p.fecha AS fecha, SUM(p.monto) AS monto, tp.nombre AS tipo \n" +
+                    "    FROM factura f\n" +
+                    "    INNER JOIN pago p ON p.factura = f.id\n" +
+                    "    INNER JOIN tipo_pago tp ON tp.id = p.tipo\n" +
+                    "    WHERE p.fecha BETWEEN :fechaIni AND :fechaFin\n" +
+                    "	GROUP BY p.tipo, p.fecha\n" +
+                    "    UNION\n" +
+                    "    SELECT v.fecha AS fecha, v.total AS monto, 'Efectivo' AS tipo\n" +
+                    "    FROM venta v\n" +
+                    "    INNER JOIN parametro p ON p.valor = 'true' AND p.nombre = 'SWIZQ' \n" +
+                    "    WHERE v.fecha BETWEEN :fechaIni AND :fechaFin \n" +
+                    ")c \n" +
+                    "GROUP BY mes, tipo \n" +
+                    "ORDER BY mes";
+
+            query = em.createNativeQuery(sql)
+                    .setParameter("fechaIni", DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD))
+                    .setParameter("fechaFin", DateUtil.getString(fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+
+            List<Object[]> listaObjetos = query.getResultList();
+
+            for (Object[] o : listaObjetos) {
+                FacturacionGeneral fg = new FacturacionGeneral();
+                int id = 0;
+
+                String fh = ((String) o[id++]);
+                Date f = DateUtil.getDate(fh, DateUtil.FORMATO_YYYY_MM);
+                fg.setFecha(f);
+                fg.setPagosPorMes((BigDecimal) o[id++]);
+                fg.setTipoPago((String) o[id++]);
+                list.add(fg);
+            }
+
+        } catch (Exception e) {
+            log.error("Error al consultar venta por forma de pago: {}", e);
+            return null;
+        } finally {
+            EntityManagerUtil.close(em);
+        }
+
+        return list;
+    }
 
 }

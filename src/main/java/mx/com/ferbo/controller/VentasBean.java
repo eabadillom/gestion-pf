@@ -24,153 +24,155 @@ import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Parametro;
 import mx.com.ferbo.model.Ventas;
 import mx.com.ferbo.util.FormatUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+/**
+ *
+ * @author alberto
+ */
 @Named
 @ViewScoped
-public class VentasBean implements Serializable {
+public class VentasBean implements Serializable 
+{
+    private static Logger log = LogManager.getLogger(VentasBean.class);
+    private static final long serialVersionUID = -1785488265380235016L;
 
-	private static final long serialVersionUID = -1785488265380235016L;
+    private VentaDAO ventaDAO;
+    private List<Ventas> listVenta;
+    private Ventas venta;
 
-	private VentaDAO ventaDAO;
-	private List<Ventas> listVenta;
-	private Ventas venta;
+    private ClienteDAO clienteDAO;
+    private List<Cliente> listCliente;
+    private EmisoresCFDISDAO emisorDAO;
+    private List<EmisoresCFDIS> listEmisores;
 
-	private ClienteDAO clienteDAO;
-	private List<Cliente> listCliente;
-	private EmisoresCFDISDAO emisorDAO;
-	private List<EmisoresCFDIS> listEmisores;
-	
-	private BigDecimal total;
-	private String montoLetra;
-	private boolean ieps;
-	
-	
-	public VentasBean() {
-		
-		clienteDAO = new ClienteDAO();
-		listCliente = new ArrayList<>();
-		
-		emisorDAO = new EmisoresCFDISDAO();
-		listEmisores = new ArrayList<>();
-		total = new BigDecimal(0);
-		ventaDAO = new VentaDAO();
-		listVenta = new ArrayList<>();
-		venta = new Ventas();
+    private BigDecimal total;
+    private String montoLetra;
+    private boolean ieps;
 
-	}
+    public VentasBean() 
+    {
+        clienteDAO = new ClienteDAO();
+        listCliente = new ArrayList<>();
 
-	@PostConstruct
-	public void init() {
+        emisorDAO = new EmisoresCFDISDAO();
+        listEmisores = new ArrayList<>();
+        total = new BigDecimal(0);
+        ventaDAO = new VentaDAO();
+        listVenta = new ArrayList<>();
+        venta = new Ventas();
+    }
 
-		listCliente = clienteDAO.findall();
-		listEmisores = emisorDAO.findall(false);
-		listVenta = ventaDAO.buscarTodos();
-	}
-	
-	public void save() {
-		
-		FacesMessage message = null;
-		Severity severity = null;
-		String mensaje = null;	
-		FormatUtil formato = new FormatUtil();
-		
-		
-		try {			
+    @PostConstruct
+    public void init() 
+    {
+        listCliente = clienteDAO.findall();
+        listEmisores = emisorDAO.findall(false);
+        actualizarListas();
+    }
 
-			//porcentajeSubtotalIva = venta.getSubtotal().multiply(new BigDecimal(p.getValor()));
-			//porcentajeSubtotalieps = venta.getSubtotal().multiply((venta.getIeps()));
-			
-			//total = porcentajeSubtotalIva.add(porcentajeSubtotalieps).add(venta.getSubtotal());
-			venta.setFecha(new Date());
-			//venta.setIva(porcentajeSubtotalIva);
-			//venta.setIeps(porcentajeSubtotalieps);
-			//venta.setTotal(total);
-			venta.setMontoLetra(formato.getMontoConLetra(venta.getTotal().doubleValue()));
-			
-			if(ventaDAO.guardar(venta)==null) {
-				
-				mensaje = "Se guardo con exito"; 
-				severity = FacesMessage.SEVERITY_INFO;		
+    public void save() 
+    {
+        FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        FormatUtil formato = new FormatUtil();
+        log.info("Iniciando el guardado de una venta");
 
-			}else {
-				
-				mensaje = "Error al guardar registro"; 
-				severity = FacesMessage.SEVERITY_ERROR;
-				
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally {
-			
-			message = new FacesMessage(severity, "Registro venta", mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":form:messages",":form:total");
-		}
-		
-	}
-	
-	public void newVenta() {
-		venta = new Ventas();
-		
-		PrimeFaces.current().ajax().update("form:frm-agregaVenta");		
-	}
-	
+        try {
 
-	public List<Ventas> getListVenta() {
-		return listVenta;
-	}
+            //porcentajeSubtotalIva = venta.getSubtotal().multiply(new BigDecimal(p.getValor()));
+            //porcentajeSubtotalieps = venta.getSubtotal().multiply((venta.getIeps()));
+            //total = porcentajeSubtotalIva.add(porcentajeSubtotalieps).add(venta.getSubtotal());
+            venta.setFecha(new Date());
+            //venta.setIva(porcentajeSubtotalIva);
+            //venta.setIeps(porcentajeSubtotalieps);
+            //venta.setTotal(total);
+            venta.setMontoLetra(formato.getMontoConLetra(venta.getTotal().doubleValue()));
 
-	public void setListVenta(List<Ventas> listVenta) {
-		this.listVenta = listVenta;
-	}
+            if (ventaDAO.guardar(venta) == null) {
+                mensaje = "Se guardo con exito";
+                severity = FacesMessage.SEVERITY_INFO;
+            } else {
+                mensaje = "Error al guardar registro";
+                severity = FacesMessage.SEVERITY_ERROR;
+            }
+        } catch (Exception e) {
+            log.error("Error: ", e);
+        } finally {
+            actualizarListas();
+            message = new FacesMessage(severity, "Registro venta", mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update(":form:messages", ":form:total");
+        }
+    }
+    
+    public void actualizarListas()
+    {
+        listVenta = ventaDAO.buscarTodos();
+    }
 
-	public List<Cliente> getListCliente() {
-		return listCliente;
-	}
+    public void newVenta() 
+    {
+        venta = new Ventas();
+        PrimeFaces.current().ajax().update("form:frm-agregaVenta");
+    }
 
-	public void setListCliente(List<Cliente> listCliente) {
-		this.listCliente = listCliente;
-	}
+    public List<Ventas> getListVenta() {
+        return listVenta;
+    }
 
-	public List<EmisoresCFDIS> getListEmisores() {
-		return listEmisores;
-	}
+    public void setListVenta(List<Ventas> listVenta) {
+        this.listVenta = listVenta;
+    }
 
-	public void setListEmisores(List<EmisoresCFDIS> listEmisores) {
-		this.listEmisores = listEmisores;
-	}
+    public List<Cliente> getListCliente() {
+        return listCliente;
+    }
 
-	public Ventas getVenta() {
-		return venta;
-	}
+    public void setListCliente(List<Cliente> listCliente) {
+        this.listCliente = listCliente;
+    }
 
-	public void setVenta(Ventas venta) {
-		this.venta = venta;
-	}
+    public List<EmisoresCFDIS> getListEmisores() {
+        return listEmisores;
+    }
 
-	public String getMontoLetra() {
-		return montoLetra;
-	}
+    public void setListEmisores(List<EmisoresCFDIS> listEmisores) {
+        this.listEmisores = listEmisores;
+    }
 
-	public void setMontoLetra(String montoLetra) {
-		this.montoLetra = montoLetra;
-	}
+    public Ventas getVenta() {
+        return venta;
+    }
 
-	public BigDecimal getTotal() {
-		return total;
-	}
+    public void setVenta(Ventas venta) {
+        this.venta = venta;
+    }
 
-	public void setTotal(BigDecimal total) {
-		this.total = total;
-	}
+    public String getMontoLetra() {
+        return montoLetra;
+    }
 
-	public boolean isIeps() {
-		return ieps;
-	}
+    public void setMontoLetra(String montoLetra) {
+        this.montoLetra = montoLetra;
+    }
 
-	public void setIeps(boolean ieps) {
-		this.ieps = ieps;
-	}
+    public BigDecimal getTotal() {
+        return total;
+    }
 
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public boolean isIeps() {
+        return ieps;
+    }
+
+    public void setIeps(boolean ieps) {
+        this.ieps = ieps;
+    }
+    
 }
