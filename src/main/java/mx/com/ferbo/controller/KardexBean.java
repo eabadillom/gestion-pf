@@ -1,7 +1,10 @@
 
 package mx.com.ferbo.controller;
 
+import com.ferbo.gestion.reports.jasper.KardexJR;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -53,6 +56,7 @@ import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.KardexTotalsBean;
 import mx.com.ferbo.util.conexion;
+import org.primefaces.model.DefaultStreamedContent;
 
 @Named
 @ViewScoped
@@ -156,6 +160,7 @@ public class KardexBean implements Serializable {
 	
 	private ConstanciaDeDeposito entrada;
 	
+        private KardexJR kardexJR;
 	private StreamedContent scKardexPDF = null;
 	private StreamedContent scKardexExcel = null;
 
@@ -301,38 +306,21 @@ public class KardexBean implements Serializable {
 	}
 	
 	public void exportToPDF() {
-		String jasperPath = null;
 		String filename = null;
-		String images = null;
+		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
-		File reportFile = null;
-		File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
-		parameters = new HashMap<String, Object>();
 		
 		try {
-			jasperPath = "/jasper/kardex.jrxml";
 			images = "/images/logoF.png";
-			
-			URL resource = getClass().getResource(jasperPath);
-			URL resourceimg = getClass().getResource(images);
-			String file = resource.getFile();
-			String img = resourceimg.getFile();
-			
-			reportFile = new File(file);
-			imgfile = new File(img);
-			log.info(reportFile.getPath());
 			filename = String.format("kardex_%s.pdf", this.entrada.getFolioCliente());
 			
 			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("folio", this.entrada.getFolioCliente() );
-			parameters.put("imagen", imgfile.getPath());
-			log.info("Parametros: " + parameters.toString());
-			scKardexPDF = jasperReportUtil.getPdf(filename, parameters, reportFile.getPath());
+                        this.kardexJR = new KardexJR(connection, images);
+                        byte[] bytes = this.kardexJR.getPDF(this.entrada.getFolioCliente());
+                        InputStream input = new ByteArrayInputStream(bytes);
+			scKardexPDF = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
 			log.info("Kardex exportado.");
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
@@ -346,38 +334,20 @@ public class KardexBean implements Serializable {
 	}
 	
 	public void exportToExcel() {
-		String jasperPath = null;
 		String filename = null;
-		String images = null;
+		String images = "/images/logoF.png";
 		String message = null;
 		Severity severity = null;
-		File reportFile = null;
-		File imgfile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
 		Connection connection = null;
-		parameters = new HashMap<String, Object>();
 		
 		try {
-			jasperPath = "/jasper/kardex.jrxml";
-			images = "/images/logoF.png";
-			
-			URL resource = getClass().getResource(jasperPath);
-			URL resourceimg = getClass().getResource(images);
-			String file = resource.getFile();
-			String img = resourceimg.getFile();
-			
-			reportFile = new File(file);
-			imgfile = new File(img);
-			log.info(reportFile.getPath());
 			filename = String.format("kardex_%s.xlsx", this.entrada.getFolioCliente());
 			
-			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("folio", this.entrada.getFolioCliente() );
-			parameters.put("imagen", imgfile.getPath());
-			log.info("Parametros: " + parameters.toString());
-			scKardexExcel = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
+                        connection = EntityManagerUtil.getConnection();
+                        this.kardexJR = new KardexJR(connection, images);
+                        byte[] bytes = this.kardexJR.getXLSX(this.entrada.getFolioCliente());
+                        InputStream input = new ByteArrayInputStream(bytes);
+			scKardexExcel = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").name(filename).stream(() -> input).build();
 			log.info("Kardex exportado.");
 		} catch (Exception ex) {
 			log.error("Problema general...", ex);
