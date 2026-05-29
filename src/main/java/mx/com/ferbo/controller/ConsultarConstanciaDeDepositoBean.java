@@ -58,6 +58,9 @@ import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
+import com.ferbo.gestion.reports.jasper.KardexJR;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 @Named
 @ViewScoped
@@ -126,7 +129,10 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	private List<Tarima> tarimas = null;
 	private Integer idTarima = null;
 	
+        private KardexJR kardexJR;
 	private StreamedContent file;
+        private StreamedContent kardexPdf;
+        private StreamedContent kardexExcel;
 
 	// Objetos de ConstanciaDeposito
         @Inject
@@ -660,6 +666,64 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 			EntityManagerUtil.close(conn);
 		}
 	}
+        
+        public void obtenerPdfKardex(){
+            String filename = null;
+            String images = "/images/logo.jpeg";
+            String message = null;
+            Severity severity = null;
+            Connection conn = null;
+            try {
+                if(this.selectConstanciaDD.getFolio() == null)
+                    throw new InventarioException("La constancia de depósito no está registrada.");
+                
+                filename = String.format("Kardex_%s.pdf", this.selectConstanciaDD.getFolioCliente());
+                conn = EntityManagerUtil.getConnection();
+                
+                this.kardexJR = new KardexJR(conn, images);
+                byte[] bytes = this.kardexJR.getPDF(this.selectConstanciaDD.getFolioCliente());
+                InputStream input = new ByteArrayInputStream(bytes);
+                this.kardexPdf = DefaultStreamedContent.builder().contentType("application/pdf").name(filename).stream(() -> input).build();
+                log.info("Generado {}...", filename);
+            } catch (Exception ex) {
+                log.error("Problema general...", ex);
+                message = String.format("No se pudo imprimir el folio %s", this.selectConstanciaDD.getFolioCliente());
+                severity = FacesMessage.SEVERITY_INFO;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+                PrimeFaces.current().ajax().update("form:messages");
+            } finally {
+                EntityManagerUtil.close(conn);
+            }
+        }
+        
+        public void obtenerExcelKardex(){
+            String filename = null;
+            String images = "/images/logo.jpeg";
+            String message = null;
+            Severity severity = null;
+            Connection conn = null;
+            try {
+                if(this.selectConstanciaDD.getFolio() == null)
+                    throw new InventarioException("La constancia de depósito no está registrada.");
+                
+                filename = String.format("Kardex_%s.xlsx", this.selectConstanciaDD.getFolioCliente());
+                conn = EntityManagerUtil.getConnection();
+                
+                this.kardexJR = new KardexJR(conn, images);
+                byte[] bytes = this.kardexJR.getXLSX(this.selectConstanciaDD.getFolioCliente());
+                InputStream input = new ByteArrayInputStream(bytes);
+                this.kardexExcel = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").name(filename).stream(() -> input).build();
+                log.info("Generado {}...", filename);
+            } catch (Exception ex) {
+                log.error("Problema general...", ex);
+                message = String.format("No se pudo imprimir el folio %s", this.selectConstanciaDD.getFolioCliente());
+                severity = FacesMessage.SEVERITY_INFO;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+                PrimeFaces.current().ajax().update("form:messages");
+            } finally {
+                EntityManagerUtil.close(conn);
+            }
+        }
 
 	public Date getFechaInicial() {
 		return fechaInicial;
@@ -868,6 +932,22 @@ public class ConsultarConstanciaDeDepositoBean implements Serializable{
 	public void setFile(StreamedContent file) {
 		this.file = file;
 	}
+
+        public StreamedContent getKardexPdf() {
+            return kardexPdf;
+        }
+
+        public void setKardexPdf(StreamedContent kardexPdf) {
+            this.kardexPdf = kardexPdf;
+        }
+
+        public StreamedContent getKardexExcel() {
+            return kardexExcel;
+        }
+
+        public void setKardexExcel(StreamedContent kardexExcel) {
+            this.kardexExcel = kardexExcel;
+        }
 
 	public Tarima getTarima() {
 		return tarima;
