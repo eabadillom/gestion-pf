@@ -16,7 +16,7 @@
                 <p:inputNumber id="txtCantidadSrv" value="#{ordenSalidaBean.cantidadServicio}" placeholder="Cantidad" minValue="1" decimalPlaces="0"/>
             </div>
             <div class="p-col-3 p-md-3">
-                <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" action="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="form:dt-servicios form:selServicio form:txtCantidadSrv"/>
+                <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-info p-mr-2 p-mb-2" actionListener="#{ordenSalidaBean.agregaServicios}" process="selServicio txtCantidadSrv @this" update="form:dt-servicios form:selServicio form:txtCantidadSrv"/>
             </div>
         </div>
     </p:panel>

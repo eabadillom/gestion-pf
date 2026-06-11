@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.n;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -86,7 +87,7 @@ public class SaldosBL
         throw new InventarioException("El cliente no tiene  permitida la salida de mercancia porque presenta un adeudo. Favor de contactar al área de cobranza.");
     }
     
-    public void validarSalidaMercancia(Cliente cliente, Date fecha, Integer cantidadTotal) throws InventarioException
+    public void validarSalidaMercancia(Cliente cliente, Date fecha) throws InventarioException
     {
         CandadoSalida candadoSalida = candadoBL.obtenerCandadoSalidaPorCliente(cliente);
         Saldo saldo = obtenerSaldoPorCliente(cliente, fecha);
@@ -94,9 +95,9 @@ public class SaldosBL
         
         BigDecimal saldoTotal = (saldo == null ? new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP) : saldo.getSaldo());
         
-        if(cantidadInventario.compareTo(new BigDecimal(cantidadTotal).setScale(2, BigDecimal.ROUND_HALF_UP)) <= 0
+        if(cantidadInventario.compareTo(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)) <= 0
             && candadoSalida.isSalidaTotal() == false && saldoTotal.compareTo(BigDecimal.ZERO) > 0)
-            throw new InventarioException("El cliente no puede sacar toda su mercancía hasta liquidar sus adeudos.");
+            throw new InventarioException("El cliente tiene adeudos vencidos. Favor de contactar con el área de facturación.");
     }
     
     public Saldo obtenerSaldoPorCliente(Cliente cliente, Date fecha)

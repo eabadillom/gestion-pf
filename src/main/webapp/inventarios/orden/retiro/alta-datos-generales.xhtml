@@ -7,10 +7,10 @@
     <p:panel id="pnl-datos-generales" header="Información de la solicitud">
         <div class="p-grid ui-fluid p-col-12">
             <div class="p-col-12 p-md-4">
-                <p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.clienteSelect}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
+                <p:selectOneMenu id="cliente-som" autoWidth="false"  value="#{ordenSalidaBean.constancia.clienteCve}"  converter="entityConverter" onchange="PF('statusInfoDialog').show();" filter="true" filterMatchMode="contains">
                     <f:selectItem itemLabel="--CLIENTE--" noSelectionOption="true"/>
                     <f:selectItems value="#{ordenSalidaBean.listaClientes}" var="cliente" itemLabel="#{cliente.alias eq null or cliente.alias eq '' ? cliente.nombre : cliente.alias}" itemValue="#{cliente}" />
-                    <p:ajax listener="#{ordenSalidaBean.filtrarCliente}" process="@this" update="form:pnl-datos-generales form:selServicio" oncomplete="PF('statusInfoDialog').hide();"/>
+                    <p:ajax process="@this" listener="#{ordenSalidaBean.filtrarCliente}" update="form:pnl-datos-generales form:selServicio" oncomplete="PF('statusInfoDialog').hide();"/>
                 </p:selectOneMenu>
             </div>
             <div class="p-col-6 p-md-4">
