@@ -1,7 +1,13 @@
 package mx.com.ferbo.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 /**
  *
@@ -29,6 +35,18 @@ public final class FacesUtils
 
     public static String normalizar(String valor) {
         return valor == null ? "" : valor.trim().toLowerCase();
+    }
+    
+    public static StreamedContent toPDF(byte[] bytes, String fileName) {
+    	StreamedContent file;
+    	InputStream input = new ByteArrayInputStream(bytes);
+
+		file = DefaultStreamedContent.builder()
+				.contentType("application/pdf")
+				.name(fileName)
+				.stream(() -> input).build();
+		
+		return file;
     }
     
 }
