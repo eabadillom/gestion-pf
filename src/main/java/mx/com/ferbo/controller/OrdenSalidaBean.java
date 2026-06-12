@@ -97,6 +97,7 @@ public class OrdenSalidaBean implements Serializable {
 	@Inject private SideBarBean sideBar;
 	@Inject private PlantaBL plantaBO;
 	@Inject private SalidasBL salidaBO;
+	@Inject	private ConstanciaSalidaBL constanciaBO;
 	
 	private ConstanciaSalida constancia;
 	private List<Cliente> listaClientes;
@@ -185,12 +186,7 @@ public class OrdenSalidaBean implements Serializable {
 			this.tpMovimientoSalida = this.partidaBO.buscarTMPorId(2);
 			
 			byte bytes[] = {};
-			this.file = DefaultStreamedContent.builder()
-					.contentType("application/pdf")
-					.contentLength(bytes.length)
-					.name("factura.pdf")
-					.stream(() -> new ByteArrayInputStream(bytes) )
-					.build();
+			this.file = FacesUtils.toPDF(bytes, "TicketSalida.pdf");
 			
 			this.ordenSalida = ordenSalidaBO.create();
 			this.constancia = constanciaSalidaBO.create();
@@ -539,49 +535,58 @@ public class OrdenSalidaBean implements Serializable {
 	
 	public void imprimirTicketSalida() {
 		
-		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-		String filename = String.format("ticketSalida-%s.pdf", this.folioSalida);
-		String logo = "/images/logoF.png";
-		
-		File reportFile = new File(jasperPath);
-		File imgFile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		Connection connection = null;
-		parameters = new HashMap<String, Object>();
-		
 		try {
-			if(!this.isSalidaSaved)
-				throw new InventarioException("Debe guardar la salida.");
-			
-			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
-			URL logoUrl = getClass().getResource(logo); 
-			String file = resource.getFile();//retorna la ubicacion del archivo
-			String logoPath = logoUrl.getFile();
-			reportFile = new File(file);//crea un archivo
-			imgFile = new File(logoPath);
-			log.info(reportFile.getPath());
-			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("NUMERO", this.folioSalida);
-			parameters.put("LogoPath", imgFile.getPath());
-			log.info("Parametros: {}", parameters);
-			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
-			InputStream input = new ByteArrayInputStream(bytes);
-			this.file = DefaultStreamedContent.builder()
-					.contentType("application/pdf")
-					.name(filename)
-					.stream(() -> input )
-					.build();
-			log.info("Orden de salida generada {}...", filename);
-		} catch (Exception e) {
-			log.error("Problema para para imrprimir el folio...", e);
-			FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Error en impresion", String.format("No se pudo imprimir el folio %s", ordenSalida.getFolioSalida()));
-			PrimeFaces.current().ajax().update("form:messages");
-		}finally {
-			conexion.close((Connection) connection);
+			String filename = String.format("Salida-%s.pdf", this.constancia.getNumero());
+			byte[] bytes = constanciaBO.exportToPDF(this.constancia.getNumero())
+					.orElseThrow(() -> new InventarioException("Problema para generar el ticket de salida"));
+			this.file = FacesUtils.toPDF(bytes, filename);
+		} catch(Exception ex) {
+			log.error("Problema para generar el ticket de la constancia de salida...", ex);
 		}
+		
+//		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
+//		String filename = String.format("ticketSalida-%s.pdf", this.folioSalida);
+//		String logo = "/images/logoF.png";
+//		
+//		File reportFile = new File(jasperPath);
+//		File imgFile = null;
+//		JasperReportUtil jasperReportUtil = new JasperReportUtil();
+//		
+//		Map<String, Object> parameters = new HashMap<String, Object>();
+//		Connection connection = null;
+//		parameters = new HashMap<String, Object>();
+//		
+//		try {
+//			if(!this.isSalidaSaved)
+//				throw new InventarioException("Debe guardar la salida.");
+//			
+//			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
+//			URL logoUrl = getClass().getResource(logo); 
+//			String file = resource.getFile();//retorna la ubicacion del archivo
+//			String logoPath = logoUrl.getFile();
+//			reportFile = new File(file);//crea un archivo
+//			imgFile = new File(logoPath);
+//			log.info(reportFile.getPath());
+//			connection = EntityManagerUtil.getConnection();
+//			parameters.put("REPORT_CONNECTION", connection);
+//			parameters.put("NUMERO", this.folioSalida);
+//			parameters.put("LogoPath", imgFile.getPath());
+//			log.info("Parametros: {}", parameters);
+//			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+//			InputStream input = new ByteArrayInputStream(bytes);
+//			this.file = DefaultStreamedContent.builder()
+//					.contentType("application/pdf")
+//					.name(filename)
+//					.stream(() -> input )
+//					.build();
+//			log.info("Orden de salida generada {}...", filename);
+//		} catch (Exception e) {
+//			log.error("Problema para para imrprimir el folio...", e);
+//			FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Error en impresion", String.format("No se pudo imprimir el folio %s", ordenSalida.getFolioSalida()));
+//			PrimeFaces.current().ajax().update("form:messages");
+//		}finally {
+//			conexion.close((Connection) connection);
+//		}
 
 	}
 	
