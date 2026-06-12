@@ -541,7 +541,7 @@ public class OrdenSalidaBean implements Serializable {
 		
 		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
 		String filename = String.format("ticketSalida-%s.pdf", this.folioSalida);
-		String images = "/images/logoF.png";
+		String logo = "/images/logoF.png";
 		
 		File reportFile = new File(jasperPath);
 		File imgFile = null;
@@ -556,16 +556,17 @@ public class OrdenSalidaBean implements Serializable {
 				throw new InventarioException("Debe guardar la salida.");
 			
 			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
-			URL resourceimg = getClass().getResource(images); 
+			URL logoUrl = getClass().getResource(logo); 
 			String file = resource.getFile();//retorna la ubicacion del archivo
-			String img = resourceimg.getFile();
+			String logoPath = logoUrl.getFile();
 			reportFile = new File(file);//crea un archivo
-			imgFile = new File(img);
+			imgFile = new File(logoPath);
 			log.info(reportFile.getPath());
 			connection = EntityManagerUtil.getConnection();
 			parameters.put("REPORT_CONNECTION", connection);
 			parameters.put("NUMERO", this.folioSalida);
 			parameters.put("LogoPath", imgFile.getPath());
+			log.info("Parametros: {}", parameters);
 			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
 			InputStream input = new ByteArrayInputStream(bytes);
 			this.file = DefaultStreamedContent.builder()
