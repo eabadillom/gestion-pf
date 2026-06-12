@@ -27,7 +27,7 @@
 				</div>
 				<div class="menu">
 					<po:menu widgetVar="OmegaMenuWidget">
-						<p:menuitem id="frb_orden_retiro" value="Ordenes de retiro" icon="pi pi-fw pi-sign-in" outcome="/inventarios/ordenSalidas/principal" badge="#{sideBarBean.numeroSalidas}" rendered="#{(sideBarBean.usuario.perfil eq 1 or sideBarBean.usuario.perfil eq 4) and (sideBarBean.numeroSalidas ne null)}"/>
+						<p:menuitem id="frb_orden_retiro" value="Ordenes de retiro" icon="pi pi-fw pi-sign-in" outcome="/inventarios/orden/retiro/principal" badge="#{sideBarBean.numeroSalidas}" rendered="#{(sideBarBean.usuario.perfil eq 1 or sideBarBean.usuario.perfil eq 4) and (sideBarBean.numeroSalidas ne null)}"/>
 						<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
 							<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/entrada/alta/principal" />

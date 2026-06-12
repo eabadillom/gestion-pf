@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -33,10 +34,6 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
 {
     private static Logger log = LogManager.getLogger(SalidaDAO.class);
 
-    public SalidaDAO(Class<Salida> modelClass) {
-        super(modelClass);
-    }
-    
     public SalidaDAO(){
         super(Salida.class);
     }
@@ -111,6 +108,12 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
         return modelList;
     }
     
+    /**Método innecesario. La búsqueda por ID ya está implementada en la clase BaseDAO.
+     * @param idSalida
+     * @return
+     * @throws DAOException
+     */
+    @Deprecated
     public Salida findById(Integer idSalida) throws DAOException {
         Salida model = null;
         EntityManager em = null;
@@ -130,7 +133,8 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
         return model;
     }
     
-    public Salida findByFolioSalida(String folioSalida) throws DAOException {
+    public Optional<Salida> buscar(String folioSalida) {
+    	Optional<Salida> response = null;
         Salida model = null;
         EntityManager em = null;
         
@@ -140,22 +144,29 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
                 .setParameter("folioSalida", folioSalida)
                 .getSingleResult();
             
-            for(SalidaDetalle detalle : model.getListSalidaDetalle())
-                log.debug(detalle.toString());
+            for(SalidaDetalle detalle : model.getListSalidaDetalle()) {
+            	log.debug("Planta: {}", detalle.getPartida().getCamaraCve().getPlantaCve());
+            	log.debug("Entrada: {}", detalle.getPartida().getFolio().getFolioCliente());
+            	log.debug("Producto: {}", detalle.getPartida().getUnidadDeProductoCve().getProductoCve().getProductoCve());
+            	log.debug("Unidad: {}", detalle.getPartida().getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoCve());
+            	detalle.getPartida().getDetallePartidaList().forEach(dp -> log.debug("Detalle partida: {}", dp.getDetallePartidaPK().getDetPartCve()));
+            }
             
-            for(ServiciosSalida servicios: model.getListServiciosSalida())
-                log.debug(servicios.toString());
+            for(ServiciosSalida servicio : model.getListServiciosSalida())
+                log.debug("Servicio: {}", servicio.getIdSrvSalida());
             
-            log.debug(model.getStatus().toString());
+            log.debug("Status: {}", model.getStatus().getClave());
+            
+            response = Optional.of(model);
             
         } catch (Exception ex) {
             log.error("Problema en la consulta de la salida por el folio...", ex);
-            throw new DAOException("Problema al obtener la salida");
+            response = Optional.empty();
         } finally {
-            super.close(em);
+            this.close(em);
         }
         
-        return model;
+        return response;
     }
     
     public List<OrdenDeSalidas> buscarInventarioSalida(String clave, String folioSalida, Date fecha) {

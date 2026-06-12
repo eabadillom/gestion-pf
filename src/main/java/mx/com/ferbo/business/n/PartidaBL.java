@@ -2,9 +2,11 @@ package mx.com.ferbo.business.n;
 
 import java.util.List;
 import java.util.Optional;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import mx.com.ferbo.dao.n.DetallePartidaDAO;
 import mx.com.ferbo.dao.n.PartidaDAO;
 import mx.com.ferbo.dao.n.TipoMovimientoDAO;
@@ -13,8 +15,6 @@ import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.TipoMovimiento;
 import mx.com.ferbo.ui.OrdenDeSalidas;
 import mx.com.ferbo.util.InventarioException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -24,8 +24,6 @@ import org.apache.logging.log4j.Logger;
 @RequestScoped
 public class PartidaBL 
 {
-    private static Logger log = LogManager.getLogger(PartidaBL.class);
-    
     @Inject
     private PartidaDAO partidaDAO;
     
@@ -79,7 +77,7 @@ public class PartidaBL
         detallePartidaDAO.actualizar(detallePartida);
     }
     
-    /*Tipo Movimiento*/
+    //TODO Debería estar en una clase TipoMovimientoBL
     public TipoMovimiento buscarTMPorId(Integer idTipoMovimiento) throws InventarioException {
         if(idTipoMovimiento == null)
             throw new InventarioException("El tipo de movimiento no puede ser vacía");

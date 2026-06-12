@@ -668,7 +668,7 @@ public class DateUtil {
 			log.error("Problema para obtener el vencimiento...", ex);
 		}
 	}
-        
+        @Deprecated
         public static Date[] obtenerRango(Date fechaSeleccionada) 
         {
             ZoneId ZONE = ZoneId.of("Etc/GMT+6");
@@ -693,10 +693,12 @@ public class DateUtil {
             return new Date[]{inicioDate, finDate};
         }
         
+        //EL METODO addDays PUEDE HACER LO MISMO.
         /*
         * Inicializa una fecha inicio una semana
         * atras (7 dias) con una fecha final
         */
+        @Deprecated
         public static Date moverFechaSemanaAtras(Date fechaFin) {
             if (fechaFin == null) {
                 throw new IllegalArgumentException("La fecha fin no puede ser nula");
