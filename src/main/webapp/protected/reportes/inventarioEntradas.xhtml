@@ -4,134 +4,126 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
-
     <ui:define name="title">Reporte de Entradas</ui:define>
     <ui:define name="content">
         <h:form id="form">
-        	<p:dialog modal="true" widgetVar="statusDialog" header="Generando reporte..." draggable="false" closable="false" resizable="false">
-				<div align="center">
-		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
-				</div>
-		    </p:dialog>
-            <div class="p-grid crud-demo">
-                <div class="p-col-12">
-                    <div class="card">
-						<p:growl id="messages" showDetail="true" />
-						<p:fieldset>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:datePicker id="min" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteEntradasBean.fecha_ini}"  maxdate="#{reporteEntradasBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
-									<p:ajax process="@this" />
-								</p:datePicker>
-								<p:outputLabel for="min" value="Fecha inicial"/>
-							</span>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:datePicker id="max" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteEntradasBean.fecha_fin}"  maxdate="#{reporteEntradasBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
-									<p:ajax process="@this" />
-								</p:datePicker>
-								<p:outputLabel for="max" value="Fecha final"/>
-							</span>
-						</p:fieldset>
-						<p:fieldset>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:selectOneMenu id="Cliente" value="#{reporteEntradasBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
-									<f:selectItem itemLabel="Todos los clientes" itemValue=""  />
-									<f:selectItems value="#{reporteEntradasBean.listaClientes}" var="cliente"  itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}"/>
-										<p:ajax process ="@this" />
-								</p:selectOneMenu>
-								<p:outputLabel for="Cliente" value="Cliente" />
-							</span>
-							<span class="ui-float-label ui-input-icon-left"> 
-								<p:selectOneMenu id="so-planta" value="#{reporteEntradasBean.plantaSelect}" converter="entityConverter" autoWidth="true">
-									<f:selectItem itemLabel="Todas las plantas" itemValue="" />
-									<f:selectItems value="#{reporteEntradasBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
-									<p:ajax process="@this" listener="#{reporteEntradasBean.filtradoCamara()}" update="form:so-camara"/>
-								</p:selectOneMenu>
-								<p:outputLabel  for="so-planta" value="Planta" />
-							</span>
-							<span class="ui-float-label ui-input-icon-left"> 
-								<p:selectOneMenu id="so-camara" value="#{reporteEntradasBean.camaraSelect}" converter="entityConverter" autoWidth="true">
-									<f:selectItem itemLabel="Todas las camaras" itemValue="" />
-									<f:selectItems value="#{reporteEntradasBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}"  itemValue="#{c}"/>
-									<p:ajax process ="@this" />
-								</p:selectOneMenu>
-								<p:outputLabel for="so-camara" value="Camara " />
-							</span>
-						</p:fieldset>
-						<p:fieldset styleClass="p-mt-2">
-							<p:toolbar>
-								<p:toolbarGroup>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".pdf" actionListener="#{reporteEntradasBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
-									</div>
-									<div class="col-2">
-										<p:divider layout="vertical">
-											<b>OR</b>
-										</p:divider>
-									</div>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".xlsx"  actionListener="#{reporteEntradasBean.exportarExcel}" action="#{reporteEntradasBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary"/>  
-									</div>
-									<div class="col-2">
-										<p:divider layout="vertical">
-											<b>OR</b>
-										</p:divider>
-									</div>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value="Consultar" actionListener="#{reporteEntradasBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
-									</div>
-								</p:toolbarGroup>
-							</p:toolbar>
-						</p:fieldset>
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="min" value="Del"/>
+                        <p:datePicker id="min" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteEntradasBean.fechaIni}"  maxdate="#{reporteEntradasBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                            <p:ajax process="@this" />
+                        </p:datePicker>
+                    </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="max" value="al"/>
+                        <p:datePicker id="max" showIcon="true" styleClass="p-mr-4 p-mb-2" value="#{reporteEntradasBean.fechaFin}"  maxdate="#{reporteEntradasBean.maxDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                            <p:ajax process="@this" />
+                        </p:datePicker>
                     </div>
                 </div>
-            </div>
-            <p:dataTable id="dt-reporte" widgetVar="dtReporte" value="#{reporteEntradasBean.reporte}" var="r" rowKey="#{r.folioCliente}">
-            	<p:column width="1rem">
-            		<p:rowToggler/>
-            	</p:column>
-            	<p:column headerText="Folio" width="3rem">
-            		<h:outputText value="#{r.folioCliente}" />
-            	</p:column>
-            	<p:column headerText="Ingreso" width="6rem">
-            		<h:outputText value="#{r.fechaIngreso}" />
-            	</p:column>
-            	<p:column headerText="Producto" width="auto">
-            		<h:outputText value="#{r.productoDescripcion}" />
-            	</p:column>
-            	<p:column headerText="Cantidad" width="4rem">
-            		<h:outputText value="#{r.cantidadTotal}" />
-            	</p:column>
-            	<p:column headerText="Unidad" width="5rem">
-            		<h:outputText value="#{r.unidadManejoDescripcion}" />
-            	</p:column>
-            	<p:column headerText="Peso [kg]" width="4rem">
-					<h:outputText value="#{r.pesoTotal}" />
-            	</p:column>
-            	<p:rowExpansion>
-            		<div class="p-grid ui-fluid">
-            			<div class="p-field p-col-2 p-md-2">
-							<p:outputLabel for="@next" value="Codigo" />
-							<p:inputText value="#{r.dtpCodigo}" readonly="true"/>
-						</div>
-	            		<div class="p-field p-col-2 p-md-2">
-	            			<p:outputLabel for="@next" value="Caducidad" />
-	            			<p:inputText value="#{r.dtpCaducidad}" readonly="true"/>
-	            		</div>
-						<div class="p-field p-col-2 p-md-2">
-							<p:outputLabel for="@next" value="Lote" />
-							<p:inputText value="#{r.dtpLote}" readonly="true"/>
-						</div>
-						<div class="p-field p-col-2 p-md-2">
-							<p:outputLabel for="@next" value="Contenedor" />
-							<p:inputText value="#{r.dtpSap}" readonly="true"/>
-						</div>
-						<div class="p-field p-col-2 p-md-2">
-							<p:outputLabel for="@next" value="Tarimas" />
-							<p:inputText value="#{r.dtpTarimas}" readonly="true"/>
-						</div>
-            		</div>
-            	</p:rowExpansion>
-            </p:dataTable>
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel value="Cliente" />
+                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="startsWith" label="#{reporteEntradasBean.clientesSeleccionadosLabel}" 
+                            updateLabel="false" panelStyle="width: 37rem" scrollHeight="250" multiple="false" 
+                            value="#{reporteEntradasBean.listClienteSelect}" >
+                            <p:ajax event="change" update="@this" /> <f:selectItems value="#{reporteInventarioBean.listaClientes}" 
+                                var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}" />
+                        </p:selectCheckboxMenu>
+                    </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel  for="so-planta" value="Planta" />
+                        <p:selectOneMenu id="so-planta" value="#{reporteEntradasBean.plantaSelect}" converter="entityConverter" autoWidth="true">
+                            <f:selectItem itemLabel="Todas las plantas" itemValue="" />
+                            <f:selectItems value="#{reporteEntradasBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
+                            <p:ajax process="@this" listener="#{reporteEntradasBean.filtradoCamara()}" update="form:so-camara"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="so-camara" value="Camara " />
+                        <p:selectOneMenu id="so-camara" value="#{reporteEntradasBean.camaraSelect}" converter="entityConverter" autoWidth="true">
+                            <f:selectItem itemLabel="Todas las camaras" itemValue="" />
+                            <f:selectItems value="#{reporteEntradasBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}"  itemValue="#{c}"/>
+                            <p:ajax process ="@this" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="p-grid ui-fluid p-col-12">
+                    <div class="p-col-12 p-md-2">
+                        <p:commandButton value="PDF" icon="pi pi-file-pdf" actionListener="#{reporteEntradasBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+                            <p:fileDownload value="#{reporteEntradasBean.file}" />
+                        </p:commandButton> 
+                    </div>
+                    <div class="p-col-12 p-md-2">
+                        <p:commandButton value="Excel" icon="pi pi-file-excel" actionListener="#{reporteEntradasBean.exportarExcel}" action="#{reporteEntradasBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+                            <p:fileDownload value="#{reporteEntradasBean.file}" />
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-12 p-md-2">
+                        <p:commandButton value="Consultar" icon="pi pi-search" actionListener="#{reporteEntradasBean.generaReporte}" process="@this" 
+                            styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.listClienteSelect == null and reporteEntradasBean.plantaSelect == null}" 
+                            onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" update="form:pnl-entradas form:dt-reporte" />
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                    </div>
+                </div>
+            </p:panel>
+            
+            <p:spacer style="height: 2rem;"/>
+
+            <p:panel id="pnl-entradas" header="ENTRADAS" >
+                <p:dataTable id="dt-reporte" widgetVar="dtReporte" value="#{reporteEntradasBean.reporte}" var="r" rowKey="#{r.folioCliente}" >
+                    <p:column width="1rem">
+                        <p:rowToggler/>
+                    </p:column>
+                    <p:column headerText="Folio" width="3rem">
+                        <h:outputText value="#{r.folioCliente}" />
+                    </p:column>
+                    <p:column headerText="Ingreso" width="6rem">
+                        <h:outputText value="#{r.fechaIngreso}" />
+                    </p:column>
+                    <p:column headerText="Producto" width="auto">
+                        <h:outputText value="#{r.productoDescripcion}" />
+                    </p:column>
+                    <p:column headerText="Cantidad" width="4rem">
+                        <h:outputText value="#{r.cantidadTotal}" />
+                    </p:column>
+                    <p:column headerText="Unidad" width="5rem">
+                        <h:outputText value="#{r.unidadManejoDescripcion}" />
+                    </p:column>
+                    <p:column headerText="Peso [kg]" width="4rem">
+                        <h:outputText value="#{r.pesoTotal}" />
+                    </p:column>
+                    <p:rowExpansion>
+                        <div class="p-grid ui-fluid">
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Codigo" />
+                                <p:inputText value="#{r.dtpCodigo}" readonly="true"/>
+                            </div>
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Caducidad" />
+                                <p:inputText value="#{r.dtpCaducidad}" readonly="true"/>
+                            </div>
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Lote" />
+                                <p:inputText value="#{r.dtpLote}" readonly="true"/>
+                            </div>
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Contenedor" />
+                                <p:inputText value="#{r.dtpSap}" readonly="true"/>
+                            </div>
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Tarimas" />
+                                <p:inputText value="#{r.dtpTarimas}" readonly="true"/>
+                            </div>
+                        </div>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </p:panel>
         </h:form>
     </ui:define>
 </ui:composition>
