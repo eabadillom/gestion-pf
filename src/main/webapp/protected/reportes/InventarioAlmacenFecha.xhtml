@@ -18,7 +18,7 @@
                     </div>
                     <div class="p-col-12 p-md-4">
                         <p:outputLabel value="Cliente" />
-                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="startsWith" label="#{reporteAlmacenFechaBean.clientesSeleccionadosLabel}" 
+                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="contains" label="#{reporteAlmacenFechaBean.clientesSeleccionadosLabel}" 
                             updateLabel="false" panelStyle="width: 46rem" scrollHeight="250" multiple="false" 
                             value="#{reporteAlmacenFechaBean.listClienteSelect}" >
                             <p:ajax event="change" update="@this" /> <f:selectItems value="#{reporteAlmacenFechaBean.listaClientes}" 

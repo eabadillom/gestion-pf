@@ -12,7 +12,7 @@
                 <div class="p-grid ui-fluid">
                     <div class="p-col-12 p-md-5">
                         <p:outputLabel value="Cliente" />
-                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="startsWith" label="#{reporteInventarioOcupacionCamaraBean.clientesSeleccionadosLabel}" 
+                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="contains" label="#{reporteInventarioOcupacionCamaraBean.clientesSeleccionadosLabel}" 
                             updateLabel="false" panelStyle="width: 46rem" scrollHeight="250" multiple="false" 
                             value="#{reporteInventarioOcupacionCamaraBean.listClienteSelect}" >
                             <p:ajax event="change" update="@this" /> <f:selectItems value="#{reporteInventarioOcupacionCamaraBean.listaClientes}" 

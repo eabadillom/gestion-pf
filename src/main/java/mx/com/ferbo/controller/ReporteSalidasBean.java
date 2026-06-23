@@ -96,7 +96,7 @@ public class ReporteSalidasBean implements Serializable
         plantaSelect = new Planta();
         camaraSelect = new Camara();
 
-        listClienteSelect = new ArrayList();
+        listClienteSelect = new ArrayList<Cliente>();
         listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 
         if ((usuario.getPerfil() == 1) || (usuario.getPerfil() == 4)) {
@@ -130,7 +130,7 @@ public class ReporteSalidasBean implements Serializable
         try {
             List<Integer> listClientes = null;
             if (this.listClienteSelect != null || !this.listClienteSelect.isEmpty()) {
-                listClientes = new ArrayList();
+                listClientes = new ArrayList<Integer>();
                 for (Cliente cliente : listClienteSelect) {
                     listClientes.add(cliente.getCteCve());
                 }
@@ -180,7 +180,7 @@ public class ReporteSalidasBean implements Serializable
         try {
             List<Integer> listClientes = null;
             if (this.listClienteSelect != null || !this.listClienteSelect.isEmpty()) {
-                listClientes = new ArrayList();
+                listClientes = new ArrayList<Integer>();
                 for (Cliente cliente : listClienteSelect) {
                     listClientes.add(cliente.getCteCve());
                 }
@@ -233,7 +233,7 @@ public class ReporteSalidasBean implements Serializable
                 throw new InventarioException("Debe seleccionar un cliente.");
             }
 
-            listClientes = new ArrayList();
+            listClientes = new ArrayList<Integer>();
             for (Cliente cliente : listClienteSelect) {
                 listClientes.add(cliente.getCteCve());
             }
