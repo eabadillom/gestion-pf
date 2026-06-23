@@ -12,6 +12,7 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.almacen.PlantaBL;
 import mx.com.ferbo.dao.n.ClienteDAO;
 import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
@@ -163,7 +164,7 @@ public class ClienteBL {
             }
             Cliente clienteBuscado = obtenerPorCodigoUnico(cliente.getCodUnico());
             fiscalBL.validarCodigoUnico(cliente, clienteBuscado);
-            List<Planta> plantas = plantaBL.obtenerPlantas(Boolean.TRUE);
+            List<Planta> plantas = plantaBL.buscarTodos(Boolean.TRUE);
             asignarCandadoSalida(plantas, cliente);
             clienteDAO.guardar(cliente);
             status = "agregado";

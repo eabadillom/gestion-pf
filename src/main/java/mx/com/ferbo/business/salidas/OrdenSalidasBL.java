@@ -2,127 +2,62 @@ package mx.com.ferbo.business.salidas;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import mx.com.ferbo.business.n.PartidaBL;
-import mx.com.ferbo.business.n.ProductoBL;
-import mx.com.ferbo.business.n.UnidadManejoBL;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.business.almacen.StatusConstanciaSalidaBL;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.ConstanciaSalida;
 import mx.com.ferbo.model.ConstanciaSalidaServicios;
 import mx.com.ferbo.model.ConstanciaSalidaServiciosPK;
 import mx.com.ferbo.model.ConstanciaServicioDetalle;
-import mx.com.ferbo.model.Partida;
 import mx.com.ferbo.model.PartidaServicio;
 import mx.com.ferbo.model.Producto;
 import mx.com.ferbo.model.Salida;
+import mx.com.ferbo.model.SalidaDetalle;
 import mx.com.ferbo.model.ServiciosSalida;
+import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.UnidadDeManejo;
-import mx.com.ferbo.ui.OrdenDeSalidas;
-import mx.com.ferbo.ui.SalidaUI;
+import mx.com.ferbo.ui.SalidaDetalleUI;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.InventarioException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-/**
- *
- * @author alberto
- */
 @Named
 @RequestScoped
 public class OrdenSalidasBL 
 {
     private static Logger log = LogManager.getLogger(OrdenSalidasBL.class);
+    @Inject private StatusConstanciaSalidaBL statusBO;
     
-    @Inject
-    private PartidaBL partidaBL;
-    
-    @Inject
-    private ProductoBL productoBL;
-
-    @Inject
-    private UnidadManejoBL unidadDeManejoBL;
-    
-    public Salida build() {
+    public Salida create() {
     	Salida salida = new Salida();
-    	//TODO agregar otros atributos y objetos dependientes de "Salida"
+    	salida.setListSalidaDetalle(new ArrayList<SalidaDetalle>());
+    	salida.setListServiciosSalida(new ArrayList<ServiciosSalida>());
     	return salida;
     }
     
-    public List<SalidaUI> procesarOrdenesSalida(List<OrdenDeSalidas> listOrdenDeSalidas) throws InventarioException
-    {
-        List<SalidaUI> listSalidasUI = new ArrayList<SalidaUI>();
-        
-        for (OrdenDeSalidas orden : listOrdenDeSalidas) {
-            Partida partida = partidaBL.obtenerPartidaPorSalida(orden);
-            BigDecimal pesoCalculado = calcularPeso(partida, orden);
-            SalidaUI salidaUI = construirSalidaUI(orden, partida, pesoCalculado);
-            listSalidasUI.add(salidaUI);
-        }
-        
-        return listSalidasUI;
-    }
-    
-    private BigDecimal calcularPeso(Partida partida, OrdenDeSalidas orden) 
-    {
-        BigDecimal cantidadInicial = new BigDecimal(partida.getCantidadTotal());
-        BigDecimal pesoInicial = partida.getPesoTotal();
-        BigDecimal pesoPorUnidad = pesoInicial.divide(cantidadInicial, 3, BigDecimal.ROUND_HALF_UP);
-        BigDecimal cantidadOrden = new BigDecimal(orden.getCantidad());
-
-        return pesoPorUnidad.multiply(cantidadOrden);
-    }
-    
-    private SalidaUI construirSalidaUI(OrdenDeSalidas orden, Partida partida, BigDecimal pesoCalculado) 
-    {
-        SalidaUI preUI = new SalidaUI(
-                orden.getFolioSalida(),
-                orden.getStatus(),
-                orden.getFechaSalida(),
-                orden.getHoraSalida(),
-                orden.getPartidaCve(),
-                orden.getCantidad(),
-                orden.getPeso(),
-                orden.getCodigo(),
-                orden.getLote(),
-                orden.getFechaCaducidad(),
-                orden.getSAP(),
-                orden.getPedimento(),
-                orden.getTemperatura(),
-                orden.getUnidadManejo(),
-                orden.getCodigoProducto(),
-                orden.getNombreProducto(),
-                partida.getCamaraCve().getPlantaCve().getPlantaAbrev(),
-                partida.getCamaraCve().getCamaraAbrev(),
-                orden.getFolioOrdenSalida(),
-                orden.getProductoClave(),
-                orden.getUnidadManejoCve()
-        );
-
-        preUI.setSalidaSelected(false);
-        preUI.setPeso(pesoCalculado);
-        preUI.setFolioEntrada(partida.getFolio().getFolioCliente());
-
-        return preUI;
-    }
-    
-    public List<PartidaServicio> addPartidasServicios(List<SalidaUI> listSalidaUI, ConstanciaDeServicio cds) throws InventarioException {
+    public List<PartidaServicio> addPartidasServicios(List<SalidaDetalleUI> detalles, ConstanciaDeServicio cds) throws InventarioException {
         List<PartidaServicio> listPartidaServicio = new ArrayList<>();
         
-        for (SalidaUI orden : listSalidaUI) {
-            Producto pr = productoBL.buscarProductoPorId(orden.getProductoClave());
-            UnidadDeManejo udm = unidadDeManejoBL.obtenerUDMPorId(orden.getUnidadManejoCve());
-            Integer cantidad = orden.getCantidad();
+        for (SalidaDetalleUI detalle : detalles) {
+            Producto pr = detalle.getPartida().getUnidadDeProductoCve().getProductoCve();
+            UnidadDeManejo udm = detalle.getPartida().getUnidadDeProductoCve().getUnidadDeManejoCve();
+            Integer cantidad = detalle.getCantidad();
             BigDecimal Cantidad = new BigDecimal(cantidad);
-            BigDecimal pso = orden.getPeso();
+            BigDecimal pso = detalle.getPesoAprox();
             BigDecimal psoPorProducto = pso.divide(Cantidad, 3, BigDecimal.ROUND_HALF_UP);
-            BigDecimal cantidadOrdenSalida = new BigDecimal(orden.getCantidad());
+            BigDecimal cantidadOrdenSalida = new BigDecimal(detalle.getCantidad());
 
             PartidaServicio ps = new PartidaServicio();
             ps.setCantidadDeCobro(psoPorProducto.multiply(cantidadOrdenSalida));
-            ps.setCantidadTotal(orden.getCantidad());
+            ps.setCantidadTotal(detalle.getCantidad());
             ps.setFolio(cds);
             ps.setProductoCve(pr);
             ps.setUnidadDeCobro(udm);
@@ -174,4 +109,38 @@ public class OrdenSalidasBL
         return listaConstanciaSrv;
     }
     
+    public ConstanciaSalida toConstanciaSalida(Salida salida)
+	throws InventarioException {
+    	ConstanciaSalida constancia = null;
+    	StatusConstanciaSalida statusConstancia = statusBO.nueva();
+    	Date fecha = new Date();
+    	DateUtil.setTime(fecha, 0, 0, 0, 0);
+    	constancia = new ConstanciaSalida.Builder()
+		.fecha(fecha)
+		.placasTransporte(salida.getPlacasTransporte())
+		.nombreTransportista(salida.getNombreTransportista())
+		.cliente(salida.getCliente())
+		.nombreCliente(salida.getCliente().getNombre())
+		.status(statusConstancia)
+		.observaciones(String.format("Orden salida: %s - %s", salida.getFolioSalida(), salida.getObservaciones()))
+		.build();
+    	
+    	//TODO Implementar logica de List<DetalleConstanciaSalida>
+    	
+    	//TODO Implementar logica de List<ConstanciaSalidaServicio>
+    	
+    	return constancia;
+    }
+    
 }
+
+
+
+
+
+
+
+
+
+
+

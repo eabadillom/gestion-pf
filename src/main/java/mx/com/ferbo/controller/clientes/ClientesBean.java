@@ -37,6 +37,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.business.almacen.PlantaBL;
 import mx.com.ferbo.business.n.AvisoBL;
 import mx.com.ferbo.business.n.CategoriaBL;
 import mx.com.ferbo.business.n.ClienteBL;
@@ -44,7 +45,6 @@ import mx.com.ferbo.business.n.ClienteContactoBL;
 import mx.com.ferbo.business.n.DomiciliosBL;
 import mx.com.ferbo.business.n.FiscalBL;
 import mx.com.ferbo.business.n.MedioContactoBL;
-import mx.com.ferbo.business.n.PlantaBL;
 import mx.com.ferbo.business.n.PrecioServicioBL;
 import mx.com.ferbo.business.n.SeguridadBL;
 import mx.com.ferbo.business.n.ServicioBL;
@@ -200,7 +200,7 @@ public class ClientesBean implements Serializable {
             this.lstTipoTelefono = medioContactoBL.obtenerTiposTelefono();
             this.lstServicio = servicioBL.obtenerServicios();
             this.lstUnidadManejo = unidadManejoBL.obtenerUnidadesManejo();
-            this.lstPlanta = plantaBL.obtenerPlantas(Boolean.FALSE);
+            this.lstPlanta = plantaBL.buscarTodos(Boolean.FALSE);
             this.lstCategoria = categoriaBL.obtenerCategorias();
             this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
             this.lstUsoCfdi = fiscalBL.obtenerCfdis();

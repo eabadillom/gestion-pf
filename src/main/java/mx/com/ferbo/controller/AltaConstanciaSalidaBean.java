@@ -1,22 +1,15 @@
 
 package mx.com.ferbo.controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URL;
-import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -25,15 +18,16 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import mx.com.ferbo.business.constancias.ConstanciaSalidaBL;
 import mx.com.ferbo.dao.CandadoSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaServicioDAO;
@@ -73,10 +67,8 @@ import mx.com.ferbo.model.StatusConstanciaSalida;
 import mx.com.ferbo.model.TipoMovimiento;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.util.JasperReportUtil;
-import mx.com.ferbo.util.conexion;
 
 @Named
 @ViewScoped
@@ -85,6 +77,9 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	private static final long serialVersionUID = -1785488265380235016L;
 	
 	private static Logger log = LogManager.getLogger(AltaConstanciaSalidaBean.class);
+	
+	@Inject
+	private ConstanciaSalidaBL constanciaBO;
 	
 	private List<Cliente> listadoClientes;
 	private Cliente clienteSelect;
@@ -1014,47 +1009,13 @@ public class AltaConstanciaSalidaBean implements Serializable{
 	}
 	
 	public void imprimirTicket() {
-		
-		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-		String filename = String.format("Salida-%s.pdf", this.numFolio);
-		String images = "/images/logoF.png";
-		String message = null;
-		Severity severity = null;
-		ConstanciaSalida constancia = null;
-		File reportFile = new File(jasperPath);
-		File imgFile = null;
-		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		Connection connection = null;
-		parameters = new HashMap<String, Object>();
 		try {
-			
-			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
-			URL resourceimg = getClass().getResource(images); 
-			String file = resource.getFile();//retorna la ubicacion del archivo
-			String img = resourceimg.getFile();
-			reportFile = new File(file);//crea un archivo
-			imgFile = new File(img);
-			constancia = new ConstanciaSalida();
-			constancia.setNumero(this.numFolio);
-			numFolio = String.valueOf(getNumFolio());
-			connection = EntityManagerUtil.getConnection();
-			parameters.put("REPORT_CONNECTION", connection);
-			parameters.put("NUMERO", numFolio);
-			parameters.put("LogoPath", imgFile.getPath());
-			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
-			InputStream input = new ByteArrayInputStream(bytes);
-			this.file = DefaultStreamedContent.builder().contentType("application/pdf").name(filename)
-					.stream(() -> input).build();
-			log.info("Ticket salida generado {}...", filename);
-		} catch (Exception e) {
-			log.error("Ocurrió un problema al imprimir el ticket de la constancia de salida...", e);
-			message = String.format("No se pudo imprimir el folio %s", this.numFolio);
-			severity = FacesMessage.SEVERITY_INFO;
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
-			PrimeFaces.current().ajax().update("form:messages");
-		}finally {
-			conexion.close((Connection) connection);
+			String filename = String.format("Salida-%s.pdf", this.numFolio);
+			byte[] bytes = constanciaBO.exportToPDF(this.numFolio)
+					.orElseThrow(() -> new InventarioException("Problema para generar el ticket de salida"));
+			this.file = FacesUtils.toPDF(bytes, filename);
+		} catch(Exception ex) {
+			log.error("Problema para generar el ticket de la constancia de salida...", ex);
 		}
 	}
 

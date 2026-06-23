@@ -134,7 +134,7 @@ public class SideBarBean implements Serializable {
 	}
 	
 	public String redirectOrdenesSalida() {
-            return "/inventarios/ordenSalidas/principal?faces-redirect=true";
+            return "/inventarios/orden/retiro/principal?faces-redirect=true";
         }
 	
 	public String redirectOrdenEntrada() {

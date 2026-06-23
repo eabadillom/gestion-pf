@@ -18,9 +18,11 @@ import mx.com.ferbo.dao.n.StatusSalidaDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Salida;
+import mx.com.ferbo.model.SalidaDetalle;
 import mx.com.ferbo.model.ServiciosSalida;
 import mx.com.ferbo.model.StatusSalida;
 import mx.com.ferbo.ui.OrdenDeSalidas;
+import mx.com.ferbo.ui.SalidaDetalleUI;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
@@ -57,6 +59,11 @@ public class SalidasBL
     
     public StatusSalida obtenerStatusAceptado() throws DAOException {
         return statusSalidaDAO.findByClave(TP_ACEPTADO);
+    }
+    
+    public Salida buscar(String folioSalida) throws InventarioException {
+        return salidasDAO.buscar(folioSalida)
+        		.orElseThrow(() -> new InventarioException("Folio no encontrado."));
     }
     
     public List<Cliente> getListaClientesPendientes(Planta planta) {
@@ -107,8 +114,26 @@ public class SalidasBL
         actualizar(salida);
     }
     
+    public List<SalidaDetalleUI> toUI (List<SalidaDetalle> listaDetalles) {
+    	List<SalidaDetalleUI> detalles = new ArrayList<SalidaDetalleUI>();
+    	
+    	for(SalidaDetalle d : listaDetalles) {
+    		SalidaDetalleUI dUI = new SalidaDetalleUI();
+    		dUI.setIdSalidaDetalle(d.getIdSalidaDetalle());
+    		dUI.setSalida(d.getSalida());
+    		dUI.setPartida(d.getPartida());
+    		dUI.setCantidad(d.getCantidad());
+    		dUI.setPesoAprox(d.getPesoAprox());
+    		
+    		detalles.add(dUI);
+    	}
+    	
+    	return detalles;
+    }
+    
+    @Deprecated
     public List<OrdenDeSalidas> obtenerInventario(String folioSalida, Date fecha){
-        List<OrdenDeSalidas> listOrdenSalidas = new ArrayList();
+        List<OrdenDeSalidas> listOrdenSalidas = new ArrayList<OrdenDeSalidas>();
         StatusSalida stSalida = null;
         
         try{
@@ -125,10 +150,6 @@ public class SalidasBL
         }
         
         return listOrdenSalidas;
-    }
-    
-    public Salida obtenerSalidaPorFolio(String folioSalida) throws DAOException {
-        return salidasDAO.findByFolioSalida(folioSalida);
     }
     
     public Integer totalSalidasPorCliente(String clave, Date fechaSalida, Integer idPlanta){
