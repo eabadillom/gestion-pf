@@ -27,7 +27,6 @@ public class RepOcupacionCamaraDAO {
 		
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
 			
 			
 			listaOcupacionCamara = new ArrayList<OcupacionCamara>();
@@ -100,6 +99,7 @@ public class RepOcupacionCamaraDAO {
 				
 				oc.setCte_nombre((String) o[id++]);
 				oc.setPlanta_ds((String) o[id++]);
+                                oc.setPlanta_abrev((String) o[id++]);
 				oc.setTarima((BigDecimal)o[id++]);//setear al objeto total posiciones y posiciones disponibles
 				
 				listaOcupacionCamara.add(oc);
@@ -110,7 +110,7 @@ public class RepOcupacionCamaraDAO {
 		} catch (Exception e) {
 			log.info("Error al obtener Ocupacion de Camaras " + e.getMessage());
 		}finally {
-			em.close();
+			EntityManagerUtil.close(em);
 		}
 		
 		
