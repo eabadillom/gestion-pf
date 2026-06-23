@@ -32,7 +32,7 @@ public class RepOcupacionCamaraDAO extends BaseDAO <OcupacionCamara, Integer>
         super(OcupacionCamara.class);
     }
     
-    public List<OcupacionCamara> ocupacionCamara(Date fecha, Integer idCliente, Integer idPlanta){
+    public List<OcupacionCamara> ocupacionCamara(Date fecha, List<Integer> idsClientes, Integer idPlanta){
         List<OcupacionCamara> listaOcupacionCamara = null;
         EntityManager em = null;
         String sql = null;
@@ -71,8 +71,8 @@ public class RepOcupacionCamaraDAO extends BaseDAO <OcupacionCamara, Integer>
                 "    WHERE cdd.status = 1\n" +
                 "      AND cdd.FECHA_INGRESO <= :fecha\n" +
                 "      AND (:idPlanta IS NULL OR plt.PLANTA_CVE = :idPlanta)\n" +
-                "      AND (:idCliente IS NULL OR cdd.cte_cve = :idCliente)\n" +
                 "      AND (p.CANTIDAD_TOTAL - COALESCE(s.cantidad, 0)) > 0\n" +
+                "      {FILTRO_CLIENTES}\n" +
                 "),\n" +
                 "t1 AS (\n" +
                 "    SELECT i.cliente, i.planta, CEILING((i.peso / i.peso_total) * i.no_tarimas) AS tarimas\n" +
@@ -94,10 +94,19 @@ public class RepOcupacionCamaraDAO extends BaseDAO <OcupacionCamara, Integer>
                 "GROUP BY o.cliente, o.planta\n" +
                 "ORDER BY o.cliente, o.planta";
             
+            if (idsClientes != null && !idsClientes.isEmpty()) {
+                sql = sql.replace("{FILTRO_CLIENTES}", "AND cdd.cte_cve IN (:idsClientes)\n");
+            } else {
+                sql = sql.replace("{FILTRO_CLIENTES}", ""); 
+            }
+            
             Query query = em.createNativeQuery(sql)
                 .setParameter("fecha", fecha)
-                .setParameter("idCliente", idCliente)
                 .setParameter("idPlanta", idPlanta);
+            
+            if (idsClientes != null && !idsClientes.isEmpty()) {
+                query.setParameter("idsClientes", idsClientes);
+            }
             
             List<Object[]> listaObjetos = query.getResultList();
             
