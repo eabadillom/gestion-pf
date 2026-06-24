@@ -3,7 +3,6 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -12,15 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
@@ -107,14 +102,13 @@ public class DashboardBean implements Serializable
         this.process();
     }
     
-    public void process() {
+    public synchronized void process() {
     	this.context = FacesContext.getCurrentInstance();
         this.request = (HttpServletRequest) context.getExternalContext().getRequest();
         this.usuario = (Usuario) request.getSession(false).getAttribute("usuario");
         log.info("Usuario {} ha ingresado al dashboard", this.usuario.getUsuario());
         
         this.plantaSelect = new Planta();
-        OcupacionPlantasBL ocupacion = null;
         
         try {
             fechaPrueba = new Date();

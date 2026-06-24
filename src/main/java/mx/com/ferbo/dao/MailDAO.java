@@ -8,23 +8,20 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class MailDAO extends IBaseDAO<Mail, Integer>{
+public class MailDAO extends IBaseDAO<Mail, Integer> {
 
 	@Override
 	public Mail buscarPorId(Integer id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<Mail> buscarTodos() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<Mail> buscarPorCriterios(Mail e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -58,13 +55,11 @@ public class MailDAO extends IBaseDAO<Mail, Integer>{
 
 	@Override
 	public String eliminar(Mail e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<Mail> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

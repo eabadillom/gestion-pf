@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Ocupación de Camaras</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-12 p-md-5">
+                        <p:outputLabel value="Cliente" />
+                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="contains" label="#{reporteInventarioOcupacionCamaraBean.clientesSeleccionadosLabel}" 
+                            updateLabel="false" panelStyle="width: 46rem" scrollHeight="250" multiple="false" 
+                            value="#{reporteInventarioOcupacionCamaraBean.listClienteSelect}" >
+                            <p:ajax event="change" update="@this" /> <f:selectItems value="#{reporteInventarioOcupacionCamaraBean.listaClientes}" 
+                                var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}" />
+                        </p:selectCheckboxMenu>
+                    </div>
+                    <div class="p-col-12 p-md-5">
+                        <p:outputLabel  for="so-planta" value="Planta" />
+                        <p:selectOneMenu id="so-planta" value="#{reporteInventarioOcupacionCamaraBean.plantaSelect}" converter="entityConverter" style="width:100%" >
+                            <f:selectItem itemLabel="Todas las plantas" itemValue="" />
+                            <f:selectItems value="#{reporteInventarioOcupacionCamaraBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="p-grid ui-fluid p-col-12">
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton value="PDF" icon="pi pi-file-pdf" actionListener="#{reporteInventarioOcupacionCamaraBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                            <p:fileDownload value="#{reporteInventarioOcupacionCamaraBean.file}" />
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton value="Excel" icon="pi pi-file-excel" actionListener="#{reporteInventarioOcupacionCamaraBean.exportarExcel}" action="#{reporteInventarioOcupacionCamaraBean.sleep()}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                            <p:fileDownload value="#{reporteInventarioOcupacionCamaraBean.file}" />
+                        </p:commandButton> 
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton value="Consultar" icon="pi pi-search" styleClass="ui-button-raised ui-button-secondary" actionListener="#{reporteInventarioOcupacionCamaraBean.ocupacionCamara()}" />
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                    </div>
+                </div>
+            </p:panel>
+            
+            <p:spacer style="height: 2rem;"/>
+
+            <p:panel id="pnl-ocupacion-camaras" header="OCUPACIÓN DE CÁMARAS" >
+                <p:dataTable id="dt-OcupacionCamara" value="#{reporteInventarioOcupacionCamaraBean.listaOcupacionCamara}" var="ocupacion" 
+                    paginator="true" paginatorPosition="bottom" rows="10" rowHover="true" stripedRows="true" sortBy="#{ocupacion.cte_nombre}"
+                    showGridlines="true" emptyMessage="No se encontraron registros" >
+                    <p:headerRow field="cte_nombre">
+                        <p:column colspan="2" style="background: #f8f9fa; border-top: 2px solid #dcdcdc; padding: 8px 12px;" >
+                            <div class="p-d-flex p-jc-between p-ai-center">
+                                <h:outputText value="#{ocupacion.cte_nombre}" style="font-weight: bold; font-size: 15px; color: #495057;" />
+                                <p:commandButton icon="pi pi-chart-pie" styleClass="p-button-rounded p-button-text" oncomplete="PF('dlg-grafica').show()" update="form:grafica-panel" 
+                                    action="#{reporteInventarioOcupacionCamaraBean.createPieModel(ocupacion.cte_nombre)}"/>
+                            </div>
+                        </p:column>
+                    </p:headerRow>
+                    <p:column headerText="Planta" style="width:70%" >
+                        <h:outputText value="#{ocupacion.planta_ds}" />
+                    </p:column>
+                    <p:column headerText="Posiciones Ocupadas" style="text-align:center;width:30%" >
+                        <h:outputText value="#{ocupacion.tarima}" />
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+            <p:dialog widgetVar="dlg-grafica" modal="true" responsive="true" showEffect="fade" 
+                closable="true" resizable="false" style="width: 80vw; max-width: 900px; max-height: 720px;" position="top" dynamic="true" >
+                <p:outputPanel id="grafica-panel" class="ui-fluid">
+                    <p:pieChart model="#{reporteInventarioOcupacionCamaraBean.pieModel}" style="width:100%; height: 250px;"
+                        rendered="#{not empty reporteInventarioOcupacionCamaraBean.pieModel}" />
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="Cerrar" oncomplete="PF('dlg-grafica').hide()" />
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

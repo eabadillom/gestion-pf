@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Antiguedad de Saldo</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-12 p-md-5">
+                        <p:outputLabel for="fechaCorte" value="Fecha de Corte" />
+                        <p:datePicker id="fechaCorte" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                            <p:ajax process="@this" />
+                        </p:datePicker>
+                    </div>
+                </div>
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-12 p-md-5">
+                        <p:outputLabel for="so-cliente" value="Cliente" />
+                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="contains" label="#{reporteFacturacionAntiguedadSaldosBean.clientesSeleccionadosLabel}" 
+                            updateLabel="false" panelStyle="width: 46rem" scrollHeight="250" multiple="false" 
+                            value="#{reporteFacturacionAntiguedadSaldosBean.listClientesSelect}" >
+                            <p:ajax event="change" update="@this" /> <f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.listaClientes}" 
+                                var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}" />
+                        </p:selectCheckboxMenu>
+                    </div>
+                    <div class="p-col-12 p-md-5">
+                        <p:outputLabel for="so-emisor" value="Emisor" />
+                        <p:selectOneMenu id="so-emisor" value="#{reporteFacturacionAntiguedadSaldosBean.emisorSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="Todos los emisores" itemValue="" />
+                            <f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.emisorList}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"/>
+                            <p:ajax process="@this" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+            </p:panel>
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <p:panel id="pnl-filtros-descarga" header="TIPOS DE REPORTE" >
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-12 p-md-12">
+                        <p:selectOneRadio id="tipoReporte" value="#{reporteFacturacionAntiguedadSaldosBean.tipoReporte}">
+                            <f:selectItem itemLabel="Saldos Generales (Concentrado)" itemValue="Condensado" />
+                            <f:selectItem itemLabel="Detalle de Movimientos (Desglosado)" itemValue="Desglosado" />
+                        </p:selectOneRadio>
+                    </div>
+                </div>
+            </p:panel>
+            
+            <p:spacer style="height: 2rem;"/>
+            
+            <p:panel id="pnl-formatos-descarga" header="FORMATOS DE DESCARGA" >
+                <div class="p-grid ui-fluid p-col-12">
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton value="PDF" icon="pi pi-file-pdf" actionListener="#{reporteFacturacionAntiguedadSaldosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                            <p:fileDownload value="#{reporteFacturacionAntiguedadSaldosBean.file}" />
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton value="Excel" icon="pi pi-file-excel" actionListener="#{reporteFacturacionAntiguedadSaldosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                            <p:fileDownload value="#{reporteFacturacionAntiguedadSaldosBean.file}" />
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                    </div>
+                </div>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

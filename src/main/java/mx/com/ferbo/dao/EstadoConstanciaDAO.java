@@ -16,17 +16,16 @@ public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
 		EstadoConstancia bean = null;
 		EntityManager em = null;
 		Query query = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("EstadoConstancia.findByEdoCve", EstadoConstancia.class)
-					.setParameter("edoCve", id)
-					;
+			query = em.createNamedQuery("EstadoConstancia.findByEdoCve", EstadoConstancia.class).setParameter("edoCve",
+					id);
 			bean = (EstadoConstancia) query.getSingleResult();
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			if(em != null)
+			if (em != null)
 				em.close();
 		}
 		return bean;
@@ -38,8 +37,7 @@ public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
 		List<EstadoConstancia> alEstados = null;
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			alEstados = entity.createNamedQuery("EstadoConstancia.findAll", EstadoConstancia.class)
-					.getResultList();
+			alEstados = entity.createNamedQuery("EstadoConstancia.findAll", EstadoConstancia.class).getResultList();
 		} finally {
 			EntityManagerUtil.close(entity);
 		}
@@ -48,31 +46,26 @@ public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
 
 	@Override
 	public List<EstadoConstancia> buscarPorCriterios(EstadoConstancia e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String actualizar(EstadoConstancia e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String guardar(EstadoConstancia e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminar(EstadoConstancia e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<EstadoConstancia> listado) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -14,7 +14,7 @@ import mx.com.ferbo.model.MedioCnt;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
-	
+
 	private static Logger log = LogManager.getLogger(ClienteContactoDAO.class);
 
 	@Override
@@ -22,45 +22,43 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 		ClienteContacto clienteContacto = null;
 		EntityManager em = null;
 		Query query = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class)
-					.setParameter("id", id);
+			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class).setParameter("id", id);
 			clienteContacto = (ClienteContacto) query.getSingleResult();
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return clienteContacto;
 	}
-	
+
 	public ClienteContacto buscarPorId(Integer id, boolean isAllInfo) {
 		ClienteContacto clienteContacto = null;
 		EntityManager em = null;
 		Query query = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class)
-					.setParameter("id", id);
+			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class).setParameter("id", id);
 			clienteContacto = (ClienteContacto) query.getSingleResult();
-			
-			if(isAllInfo == false)
+
+			if (isAllInfo == false)
 				return clienteContacto;
-			
-			for(MedioCnt medioContacto : clienteContacto.getIdContacto().getMedioCntList()) {
-				log.debug("Tipo mail: " + medioContacto.getIdMail().getTpMail().getTpMail() );
+
+			for (MedioCnt medioContacto : clienteContacto.getIdContacto().getMedioCntList()) {
+				log.debug("Tipo mail: " + medioContacto.getIdMail().getTpMail().getTpMail());
 				log.debug("Tipo Telefono: " + medioContacto.getIdTelefono().getTpTelefono().getTpTelefono());
 			}
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return clienteContacto;
 	}
 
@@ -74,7 +72,7 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 
 	@Override
 	public List<ClienteContacto> buscarPorCriterios(ClienteContacto e) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -117,25 +115,23 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			
-			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class)
-					.setParameter("id", clienteContacto.getId());
+
+			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class).setParameter("id",
+					clienteContacto.getId());
 			tmpObj = (ClienteContacto) query.getSingleResult();
 			em.remove(tmpObj);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
-	
-	
 
 	@Override
 	public String eliminarListado(List<ClienteContacto> listado) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

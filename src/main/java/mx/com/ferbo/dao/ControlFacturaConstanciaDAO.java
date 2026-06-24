@@ -28,20 +28,20 @@ public class ControlFacturaConstanciaDAO extends IBaseDAO<ControlFacturaConstanc
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public List<ControlFacturaConstanciaDS> buscarPorConstancia(Integer folio) {
 		EntityManager entity = null;
 		List<ControlFacturaConstanciaDS> alFacturasConstancias = null;
-		
+
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			alFacturasConstancias = entity.createNamedQuery("ControlFacturaConstanciaDS.findByConstancia", ControlFacturaConstanciaDS.class)
-			.setParameter("constancia", folio)
-			.getResultList();
+			alFacturasConstancias = entity
+					.createNamedQuery("ControlFacturaConstanciaDS.findByConstancia", ControlFacturaConstanciaDS.class)
+					.setParameter("constancia", folio).getResultList();
 		} finally {
 			entity.close();
 		}
-		
+
 		return alFacturasConstancias;
 	}
 
@@ -68,6 +68,5 @@ public class ControlFacturaConstanciaDAO extends IBaseDAO<ControlFacturaConstanc
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
 
 }

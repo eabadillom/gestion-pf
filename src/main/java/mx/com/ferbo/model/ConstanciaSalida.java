@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -27,11 +23,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.annotation.Generated;
+import java.util.Collections;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
+
+
 @Entity
 @Table(name = "constancia_salida")
 @NamedQueries({
@@ -111,6 +107,47 @@ public class ConstanciaSalida implements Serializable {
     @JoinColumn(name = "CLIENTE_CVE", referencedColumnName = "CTE_CVE")
     @ManyToOne(optional = false)
     private Cliente clienteCve;
+    
+	@Generated("SparkTools")
+	private ConstanciaSalida(Builder builder) {
+		this.id = builder.id;
+		this.fecha = builder.fecha;
+		this.numero = builder.numero;
+		this.nombreCte = builder.nombreCte;
+		this.status = builder.status;
+		this.observaciones = builder.observaciones;
+		this.nombreTransportista = builder.nombreTransportista;
+		this.placasTransporte = builder.placasTransporte;
+		this.statusTermo = builder.statusTermo;
+		this.temperaturaTransporte = builder.temperaturaTransporte;
+		this.detalleConstanciaSalidaList = builder.detalleConstanciaSalidaList;
+		this.constanciaSalidaServiciosList = builder.constanciaSalidaServiciosList;
+		this.clienteCve = builder.clienteCve;
+	}
+    
+    @Override
+    public int hashCode() {
+        if(this.id == null)
+        	return System.identityHashCode(this);
+        return Objects.hashCode(this.id);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof ConstanciaSalida)) {
+            return false;
+        }
+        ConstanciaSalida other = (ConstanciaSalida) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "mx.com.ferbo.model.ConstanciaSalida[ id=" + id + " ]";
+    }
 
     public ConstanciaSalida() {
     }
@@ -213,31 +250,6 @@ public class ConstanciaSalida implements Serializable {
         this.clienteCve = clienteCve;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ConstanciaSalida)) {
-            return false;
-        }
-        ConstanciaSalida other = (ConstanciaSalida) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "mx.com.ferbo.model.ConstanciaSalida[ id=" + id + " ]";
-    }
-
     public Boolean getStatusTermo() {
         return statusTermo;
     }
@@ -253,5 +265,99 @@ public class ConstanciaSalida implements Serializable {
     public void setTemperaturaTransporte(BigDecimal temperaturaTransporte) {
         this.temperaturaTransporte = temperaturaTransporte;
     }
+
+	@Generated("SparkTools")
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	@Generated("SparkTools")
+	public static final class Builder {
+		private Integer id;
+		private Date fecha;
+		private String numero;
+		private String nombreCte;
+		private StatusConstanciaSalida status;
+		private String observaciones;
+		private String nombreTransportista;
+		private String placasTransporte;
+		private Boolean statusTermo;
+		private BigDecimal temperaturaTransporte;
+		private List<DetalleConstanciaSalida> detalleConstanciaSalidaList = Collections.emptyList();
+		private List<ConstanciaSalidaServicios> constanciaSalidaServiciosList = Collections.emptyList();
+		private Cliente clienteCve;
+
+		public Builder() {
+		}
+
+		public Builder Id(Integer id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder fecha(Date fecha) {
+			this.fecha = fecha;
+			return this;
+		}
+
+		public Builder numero(String numero) {
+			this.numero = numero;
+			return this;
+		}
+
+		public Builder nombreCliente(String nombreCliente) {
+			this.nombreCte = nombreCliente;
+			return this;
+		}
+
+		public Builder status(StatusConstanciaSalida status) {
+			this.status = status;
+			return this;
+		}
+
+		public Builder observaciones(String observaciones) {
+			this.observaciones = observaciones;
+			return this;
+		}
+
+		public Builder nombreTransportista(String nombreTransportista) {
+			this.nombreTransportista = nombreTransportista;
+			return this;
+		}
+
+		public Builder placasTransporte(String placasTransporte) {
+			this.placasTransporte = placasTransporte;
+			return this;
+		}
+
+		public Builder statusTermo(Boolean statusTermo) {
+			this.statusTermo = statusTermo;
+			return this;
+		}
+
+		public Builder temperaturaTransporte(BigDecimal temperaturaTransporte) {
+			this.temperaturaTransporte = temperaturaTransporte;
+			return this;
+		}
+
+		public Builder detalleConstanciaSalidaList(List<DetalleConstanciaSalida> detalleConstanciaSalidaList) {
+			this.detalleConstanciaSalidaList = detalleConstanciaSalidaList;
+			return this;
+		}
+
+		public Builder constanciaSalidaServiciosList(List<ConstanciaSalidaServicios> constanciaSalidaServiciosList) {
+			this.constanciaSalidaServiciosList = constanciaSalidaServiciosList;
+			return this;
+		}
+
+		public Builder cliente(Cliente cliente) {
+			this.clienteCve = cliente;
+			return this;
+		}
+
+		public ConstanciaSalida build() {
+			return new ConstanciaSalida(this);
+		}
+	}
 
 }

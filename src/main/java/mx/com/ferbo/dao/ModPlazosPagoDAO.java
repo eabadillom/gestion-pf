@@ -39,7 +39,7 @@ public class ModPlazosPagoDAO {
 		}
 		return null;
 	};
-	
+
 	public String updatePlazo(Factura factura, int plazo) {
 		String result = null;
 		EntityManager entity = null;
@@ -48,10 +48,7 @@ public class ModPlazosPagoDAO {
 			entity = EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
 			rows = entity.createNativeQuery("UPDATE factura SET plazo = :plazo WHERE factura.id = :idFactura")
-				.setParameter("plazo", plazo)
-				.setParameter("idFactura", factura.getId())
-				.executeUpdate()
-				;
+					.setParameter("plazo", plazo).setParameter("idFactura", factura.getId()).executeUpdate();
 			log.info("Registros afectados: ({})", rows);
 			entity.getTransaction().commit();
 		} catch (Exception e) {

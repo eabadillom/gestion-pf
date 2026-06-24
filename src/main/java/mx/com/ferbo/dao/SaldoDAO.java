@@ -16,13 +16,13 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class SaldoDAO {
 	private static Logger log = LogManager.getLogger(SaldoDAO.class);
-	
+
 	public Saldo getSaldo(Cliente cliente, Date fecha, String emisorRFC) {
 		Saldo saldo = null;
 		Object[] obj = null;
 		EntityManager em = null;
 		Query query = null;
-		
+
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			query = em.createNativeQuery("WITH cartera (id,numero_cliente, cliente, nom_serie, numero, nombre_cliente, fecha, subtotal, iva, total, saldo, status, nombre_status, emi_rfc, emi_nombre,plazo, dias) AS\n"
@@ -219,11 +219,11 @@ public class SaldoDAO {
 					;
 			
 			obj = (Object[]) query.getSingleResult();
-			
-			int idx = 0 ;
+
+			int idx = 0;
 			saldo = new Saldo();
-			
-			saldo.setNumeroCliente( (String) obj[idx++]  );
+
+			saldo.setNumeroCliente((String) obj[idx++]);
 			saldo.setNombreCliente((String) obj[idx++]);
 //			saldo.setEmisorRFC((String) obj[idx++]);
 //			saldo.setEmisorNombre((String) obj[idx++]);
@@ -234,15 +234,15 @@ public class SaldoDAO {
 			saldo.setAtraso30dias((BigDecimal) obj[idx++]);
 			saldo.setAtraso60dias((BigDecimal) obj[idx++]);
 			saldo.setAtrasoMayor60dias((BigDecimal) obj[idx++]);
-			
-		} catch(NoResultException ex) {
+
+		} catch (NoResultException ex) {
 			log.warn("Saldo no encontrado para el cliente id: {}", cliente.getCteCve());
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el saldo...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
-		
+
 		return saldo;
 	}
 
