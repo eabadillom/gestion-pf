@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" 
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <p:toolbar>
+        <p:toolbarGroup styleClass="ui-fluid">
+            <div class="p-grid">
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="periodo" value="Periodo:" style="width:100%"/>
+                    <p:datePicker id="periodo"
+                                  value="#{bitacoraBean.rangoFechas}"
+                                  selectionMode="range"
+                                  pattern="dd/MM/yyyy"
+                                  showIcon="true"
+                                  style="width:100%">
+                        <p:ajax process="@this" event="change" />
+                    </p:datePicker>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="nombrePantalla" value="Documento:" style="width:100%"/>
+                    <p:selectOneMenu
+                        id="nombrePantalla"
+                        value="#{bitacoraBean.filtros.nombrePantalla}"
+                        converter="entityConverter"
+                        style="width:100%">
+
+                        <f:selectItem itemLabel="Seleccione un documento" itemValue="#{null}"/>
+
+                        <f:selectItems
+                            value="#{bitacoraBean.nombrePantallas}"
+                            var="np"
+                            itemLabel="#{np}"
+                            itemValue="#{np}"/>
+
+                        <p:ajax process="@this" event="change" />
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="tipoPantalla" value="Tipo operación:" style="width:100%"/>
+                    <p:selectOneMenu
+                        id="tipoPantalla"
+                        value="#{bitacoraBean.filtros.tipoPantalla}"
+                        converter="entityConverter"
+                        style="width:100%">
+
+                        <f:selectItem itemLabel="Seleccione una operación" itemValue="#{null}"/>
+
+                        <f:selectItems
+                            value="#{bitacoraBean.tipoPantallas}"
+                            var="tp"
+                            itemLabel="#{tp}"
+                            itemValue="#{tp}"/>
+
+                        <p:ajax process="@this" event="change" />
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="usuario" value="Usuarios:" style="width:100%"/>
+                    <div class="p-grid">
+                        <div class="p-col-12 p-md-4">
+                            <p:selectBooleanButton id="stUsuarios" value="#{bitacoraBean.usuariosActivos}"
+                                                   onLabel="Activos"
+                                                   offLabel="Inactivos"
+                                                   onIcon="fa fa-solid fa-user"
+                                                   offIcon="fa fa-solid fa-user-slash" 
+                                                   styleClass="#{bitacoraBean.usuariosActivos ? 'ui-button-primary' : 'ui-button-outlined ui-button-secondary'}">
+                                <p:ajax process="@this" listener="#{bitacoraBean.obtenerUsuariosActivosOInactivos()}" update="usuario stUsuarios"/>
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="p-col-12 p-md-8">
+                            <p:selectOneMenu
+                                id="usuario"
+                                value="#{bitacoraBean.filtros.idUsuario}"
+                                converter="entityConverter"
+                                style="width:80%">
+
+                                <f:selectItem itemLabel="Seleccione un usuario" itemValue="#{null}"/>
+
+                                <f:selectItems
+                                    value="#{bitacoraBean.usuarios}"
+                                    var="user"
+                                    itemLabel="#{user.nombre} #{user.apellido1} #{user.apellido2}"
+                                    itemValue="#{user.id}"/>
+
+                                <p:ajax process="@this" event="change" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-col-12 p-md-8"></div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:commandButton id="cmd-pdf" value="PDF" icon="pi pi-file-pdf" styleClass="mr-2 mb-2 ui-button-secondary" actionListener="#{bitacoraBean.imprimirBitacora('PDF')}" ajax="false" disabled="#{bitacoraBean.grupos.size() == 0}">
+                        <p:fileDownload value="#{bitacoraBean.bitacora}"></p:fileDownload>
+                    </p:commandButton>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:commandButton id="cmd-excel" value="Excel" icon="pi pi-file-excel" styleClass="mr-2 mb-2 ui-button-secondary" actionListener="#{bitacoraBean.imprimirBitacora('XLSX')}" ajax="false" disabled="#{bitacoraBean.grupos.size() == 0}">
+                        <p:fileDownload value="#{bitacoraBean.bitacora}"></p:fileDownload>
+                    </p:commandButton>
+                </div>
+                
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="consultar" style="width:100%"/>
+                    <p:commandButton  id="consultar" value="Consultar" 
+                                      icon="pi pi-search"
+                                      process="@this" actionListener="#{bitacoraBean.filtrarGrupos()}"
+                                      styleClass="ui-button-secondary"
+                                      onstart="PF('statusInfoDialog').show()" 
+                                      oncomplete="PF('statusInfoDialog').hide()"
+                                      update="form:dtBitacora cmd-pdf cmd-excel"/>
+                </div>
+            </div>
+        </p:toolbarGroup>
+    </p:toolbar>
+</ui:composition>

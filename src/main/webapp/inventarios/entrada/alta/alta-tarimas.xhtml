@@ -66,12 +66,12 @@
                                                         </div>
                                                         <div class="p-col-12 p-md-2">
                                                                 <p:inputNumber value="#{partida.cantidadTotal}" minValue="0" maxValue="100000" placeholder="Cantidad" decimalPlaces="0" inputStyle="text-align: right;" symbol=" #{partida.unidadDeProductoCve.unidadDeManejoCve.unidadDeManejoDs}" symbolPosition="s">
-                                                                        <p:ajax event="blur" process="@this" update="form:tabViewPartidas:dl-tarimas" />
+                                                                    <p:ajax event="change" delay="1000" process="@this" listener="#{ingresoBean.modificacionPropiedadBitacora(null, partida, null, 'carga por tarima', 'cantidad')}" update="form:tabViewPartidas:dl-tarimas" />
                                                                 </p:inputNumber>
                                                         </div>
                                                         <div class="p-col-12 p-md-2">
                                                                 <p:inputNumber value="#{partida.pesoTotal}" minValue="0" maxValue="10000000" placeholder="Peso (kg)" decimalPlaces="3" inputStyle="text-align: right;" symbol=" kg" symbolPosition="s">
-                                                                        <p:ajax event="blur" process="@this" update="form:tabViewPartidas:dl-tarimas" />
+                                                                    <p:ajax event="change" delay="1000" process="@this" listener="#{ingresoBean.modificacionPropiedadBitacora(null, partida, null, 'carga por tarima', 'peso')}" update="form:tabViewPartidas:dl-tarimas" />
                                                                 </p:inputNumber>
                                                         </div>
                                                         <div class="p-col-12 p-md-2">
