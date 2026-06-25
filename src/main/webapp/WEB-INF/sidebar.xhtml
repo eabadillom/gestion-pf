@@ -27,7 +27,7 @@
 				</div>
 				<div class="menu">
 					<po:menu widgetVar="OmegaMenuWidget">
-						<p:menuitem id="frb_orden_retiro" value="Ordenes de retiro" icon="pi pi-fw pi-sign-in" outcome="/inventarios/ordenSalidas/principal" badge="#{sideBarBean.numeroSalidas}" rendered="#{(sideBarBean.usuario.perfil eq 1 or sideBarBean.usuario.perfil eq 4) and (sideBarBean.numeroSalidas ne null)}"/>
+						<p:menuitem id="frb_orden_retiro" value="Ordenes de retiro" icon="pi pi-fw pi-sign-in" outcome="/inventarios/orden/retiro/principal" badge="#{sideBarBean.numeroSalidas}" rendered="#{(sideBarBean.usuario.perfil eq 1 or sideBarBean.usuario.perfil eq 4) and (sideBarBean.numeroSalidas ne null)}"/>
 						<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
 							<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/entrada/alta/principal" />
@@ -85,9 +85,10 @@
 							<p:menuitem id="frb_facturacion_ingresos_actualizar" value="Consultar" icon="pi pi-fw pi-search" outcome="/protected/catalogos/ingAct" />
 						</p:submenu>
 						<ui:remove>
-                                                <p:submenu id="frb_facturacion_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
-							<p:menuitem id="facturacion_egresos" value="Alta/Consulta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos" />
-						</p:submenu>
+							<p:submenu id="frb_facturacion_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+								<p:menuitem id="facturacion_egresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos/alta/principal" />
+								<p:menuitem id="facturacion_egresos_consulta" value="Consulta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos/consulta/principal" />
+							</p:submenu>
 						</ui:remove>
 						<p:submenu label="Notas de Credito" icon="pi pi-file-o" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />
@@ -95,20 +96,20 @@
 						</p:submenu>
 						<p:submenu id="frb_reportes" label="Reportes" icon="pi pi-fw pi-file-o">
 							<p:submenu id="frb_inventario_reporte" label="Inventarios" icon="pi pi-fw pi-table">
-								<p:menuitem value="Entradas" icon="pi pi-file" outcome="/protected/reportes/inventarioEntradas" />
-								<p:menuitem value="Salidas" icon="pi pi-file" outcome="/protected/reportes/inventarioSalidas" />
-								<p:menuitem value="Entrada vs Salidas" icon="pi pi-file" outcome="/protected/reportes/InventarioEntradaySalida" />
+								<p:menuitem value="Entradas" icon="pi pi-file" outcome="/protected/reportes/inventario/entradas" />
+								<p:menuitem value="Salidas" icon="pi pi-file" outcome="/protected/reportes/inventario/salidas" />
+								<ui:remove><p:menuitem value="Entrada vs Salidas" icon="pi pi-file" outcome="/protected/reportes/InventarioEntradaySalida" /></ui:remove>
 								<p:menuitem value="Traspasos" icon="pi pi-file" outcome="/protected/reportes/InventarioTraspasos" />
 								<p:menuitem value="Servicios" icon="pi pi-file" outcome="/protected/reportes/InventarioServicios" />
-								<p:menuitem value="Almacen" icon="pi pi-file" outcome="/protected/reportes/inventarioAlmacen" />
-								<p:menuitem value="Almacen Fecha" icon="pi pi-file" outcome="/protected/reportes/InventarioAlmacenFecha" />
-								<p:menuitem value="Ocupacion Camaras" icon="pi pi-file" outcome="/protected/reportes/InventarioOcupacionCamara" />
+								<p:menuitem value="Almacen" icon="pi pi-file" outcome="/protected/reportes/inventario/almacen" />
+								<p:menuitem value="Almacen Fecha" icon="pi pi-file" outcome="/protected/reportes/inventario/almacen-fecha" />
+								<p:menuitem value="Ocupacion Camaras" icon="pi pi-file" outcome="/protected/reportes/inventario/ocupacion-camara" />
 							</p:submenu>
 							<p:submenu id="frb_inventario_reporteFact" label="Facturacion" icon="pi pi-fw pi-table" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 								<p:menuitem value="Facturas" icon="pi pi-file" outcome="/protected/reportes/Facturas" />
 								<p:menuitem value="Facturas por Mes" icon="pi pi-file" outcome="/protected/reportes/FacturasPorMes" />
 								<p:menuitem value="Facturas por Plantas" icon="pi pi-file" outcome="/protected/reportes/FacturasPorPlantas" />
-								<p:menuitem value="Antiguedad de Saldos" icon="pi pi-file" outcome="/protected/reportes/FacturasAntiguedadSaldos" />
+								<p:menuitem value="Antiguedad de Saldos" icon="pi pi-file" outcome="/protected/reportes/AntiguedadSaldos" />
 								<p:menuitem value="Cartera Clientes" icon="pi pi-file" outcome="/protected/reportes/CarteraCliente" />
 							</p:submenu>
 							<p:menuitem value="Contabilidad" icon="pi pi-file" outcome="/protected/reportes/Contabilidad" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}"/>

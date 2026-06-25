@@ -29,10 +29,10 @@ public class DateUtil {
 	public static final String FORMATO_YYYY_MM_DD          = "yyyy-MM-dd";
 	public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss.SSS";
 	public static final String FORMATO_DD_MM_YYYY_FULL     = "dd MMMM yyyy";
-        public static final String FORMATO_FECHA_CADENA        = "dd 'de' MMMM 'de' yyyy";
-        public static final String FORMATO_ISO_8601            = "yyyy-MM-dd'T'HH:mm:ss";
-        public static final String FORMATO_YYYY_MM          = "yyyy-MM";
-        
+	public static final String FORMATO_FECHA_CADENA        = "dd 'de' MMMM 'de' yyyy";
+	public static final String FORMATO_ISO_8601            = "yyyy-MM-dd'T'HH:mm:ss";
+	public static final String FORMATO_YYYY_MM          = "yyyy-MM";
+
 	public static final int ENERO      = Calendar.JANUARY;
 	public static final int FEBRERO    = Calendar.FEBRUARY;
 	public static final int MARZO      = Calendar.MARCH;
@@ -668,7 +668,7 @@ public class DateUtil {
 			log.error("Problema para obtener el vencimiento...", ex);
 		}
 	}
-        
+        @Deprecated
         public static Date[] obtenerRango(Date fechaSeleccionada) 
         {
             ZoneId ZONE = ZoneId.of("Etc/GMT+6");
@@ -693,10 +693,12 @@ public class DateUtil {
             return new Date[]{inicioDate, finDate};
         }
         
+        //EL METODO addDays PUEDE HACER LO MISMO.
         /*
         * Inicializa una fecha inicio una semana
         * atras (7 dias) con una fecha final
         */
+        @Deprecated
         public static Date moverFechaSemanaAtras(Date fechaFin) {
             if (fechaFin == null) {
                 throw new IllegalArgumentException("La fecha fin no puede ser nula");

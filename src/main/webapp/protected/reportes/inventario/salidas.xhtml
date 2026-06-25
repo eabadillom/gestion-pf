@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Salidas</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-12 p-md-4">
+                        <p:outputLabel for="ol-fechaIni" value="Del" />
+                        <p:datePicker id="ol-fechaIni" showIcon="true" value="#{reporteSalidasBean.fechaIni}" maxdate="#{reporteSalidasBean.maxDate}" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
+                            <p:ajax process="@this" />
+                        </p:datePicker>
+                    </div>
+                    <div class="p-col-12 p-md-4">
+                        <p:outputLabel for="ol-fechafin" value="al" />
+                        <p:datePicker id="ol-fechafin" showIcon="true" value="#{reporteSalidasBean.fechaFin}" maxdate="#{reporteSalidasBean.maxDate}" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
+                            <p:ajax process="@this" />
+                        </p:datePicker>
+                    </div>
+                </div>
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-12 p-md-4">
+                        <p:outputLabel value="Cliente" />
+                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="contains" label="#{reporteSalidasBean.clientesSeleccionadosLabel}" 
+                            updateLabel="false" panelStyle="width: 37rem" scrollHeight="250" multiple="false" 
+                            value="#{reporteSalidasBean.listClienteSelect}" >
+                            <p:ajax event="change" update="@this" /> <f:selectItems value="#{reporteSalidasBean.listaClientes}" 
+                                var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}" />
+                        </p:selectCheckboxMenu>
+                    </div>
+                    <div class="p-col-12 p-md-4">
+                        <p:outputLabel for="so-planta" value="Planta" />
+                        <p:selectOneMenu id="so-planta" value="#{reporteSalidasBean.plantaSelect}" converter="entityConverter" autoWidth="false">
+                            <f:selectItem itemLabel="Todas las plantas" itemValue="" />
+                            <f:selectItems value="#{reporteSalidasBean.listaPlanta}" var="p" itemLabel="#{p.plantaDs}" itemValue="#{p}" />
+                            <p:ajax listener="#{reporteSalidasBean.filtradoCamara()}" process=" @this" update=":form:so-camara" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-12 p-md-4">
+                        <p:outputLabel for="so-camara" value="Camara " />
+                        <p:selectOneMenu id="so-camara" value="#{reporteSalidasBean.camaraSelect}" converter="entityConverter" autoWidth="false">
+                            <f:selectItem itemLabel="Todas las camaras" itemValue="" />
+                            <f:selectItems value="#{reporteSalidasBean.listaCamara}" var="c" itemLabel="#{c.camaraDs}" itemValue="#{c}" />
+                            <p:ajax process="@this" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="p-grid ui-fluid p-col-12">
+                    <div class="p-col-12 p-md-2">
+                        <p:commandButton icon="pi pi-file-pdf" value="PDF" actionListener="#{reporteSalidasBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+                            <p:fileDownload value="#{reporteSalidasBean.file}" />
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-12 p-md-2">
+                        <p:commandButton icon="pi pi-file-excel" value="Excel" actionListener="#{reporteSalidasBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary">
+                            <p:fileDownload value="#{reporteSalidasBean.file}" />
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-12 p-md-2">
+                        <p:commandButton icon="pi pi-search" value="Consultar" actionListener="#{reporteSalidasBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteSalidasBean.listClienteSelect == null and reporteSalidasBean.plantaSelect == null}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                    </div>
+                </div>
+            </p:panel>
+            
+            <p:spacer style="height: 2rem;"/>
+
+            <p:panel id="pnl-salidas" header="SALIDAS" >
+                <p:dataTable id="dt-reporte" widgetVar="dtReporte" value="#{reporteSalidasBean.reporte}" var="r" rowKey="#{r.folioCliente}" emptyMessage="No se encontraron resultados">
+                    <p:column width="1rem">
+                        <p:rowToggler/>
+                    </p:column>
+                    <p:column headerText="Producto">
+                        <h:outputText value="#{r.producto}"/>
+                    </p:column>
+                    <p:column headerText="Salida" style="text-align: center" width="5rem">
+                        <h:outputText value="#{r.numero}"/>
+                    </p:column>
+                    <p:column headerText="Fecha" width="6rem" style="text-align: center;">
+                        <h:outputText value="#{r.fecha}">
+                            <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Cantidad" style="text-align: right;" width="5rem">
+                        <h:outputText value="#{r.cantidad}"/>
+                    </p:column>
+                    <p:column headerText="Peso [kg]" style="text-align: right;" width="5rem">
+                        <h:outputText value="#{r.peso}"/>
+                    </p:column>
+                    <p:rowExpansion>
+                        <div class="p-grid ui-fluid">
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Entrada" />
+                                <p:inputText value="#{r.folioCliente}" readonly="true" style="text-align: center;"/>
+                            </div>
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Fecha" />
+                                <p:inputText value="#{r.fechaIngreso}" readonly="true" style="text-align: center;">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                                </p:inputText>
+                            </div>
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Cantidad" />
+                                <p:inputText value="#{r.cantidadTotal}" readonly="true" style="text-align: center;"/>
+                            </div>
+                            <div class="p-field p-col-2 p-md-2">
+                                <p:outputLabel for="@next" value="Peso [kg]" />
+                                <p:inputText value="#{r.pesoTotal}" readonly="true" style="text-align: center;"/>
+                            </div>
+                        </div>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

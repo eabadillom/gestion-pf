@@ -20,10 +20,10 @@
 	</properties>
 
 	<dependencies>
-                <dependency>
+        <dependency>
 			<groupId>com.ferbo</groupId>
 			<artifactId>gestion-reports</artifactId>
-			<version>1.3.1-RELEASE</version>
+			<version>1.4.0-RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>javax</groupId>
@@ -215,6 +215,12 @@
 			<groupId>com.ferbo</groupId>
 			<artifactId>gestion-mail</artifactId>
 			<version>0.0.5-RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ferbo</groupId>
+  			<artifactId>ferbo-tools</artifactId>
+    		<version>0.1.1-RELEASE</version>
 		</dependency>
 	</dependencies>
 
@@ -501,6 +507,11 @@
 							<webXml>${project.build.directory}/web.xml</webXml>
 						</configuration>
 					</plugin>
+                                        <!--<plugin>
+                                            <groupId>org.apache.maven.plugins</groupId>
+                                            <artifactId>maven-resources-plugin</artifactId>
+                                            <version>3.1.0</version>
+                                        </plugin>-->
 				</plugins>
 			</build>
 		</profile>

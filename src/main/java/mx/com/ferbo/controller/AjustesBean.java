@@ -39,5 +39,4 @@ public class AjustesBean implements Serializable
             e.getMessage();
         }
     }
-    
 }

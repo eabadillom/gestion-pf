@@ -51,6 +51,11 @@ public class ReporteFacturacionPorMesBean implements Serializable {
    
 	
 	public ReporteFacturacionPorMesBean() {
+		Date today = new Date();
+		maxDate = new Date(today.getTime() );
+		this.fecha_ini = new Date();
+		this.fecha_fin = new Date();
+		
 		fecha = new Date();
 		listaClientes = new ArrayList<Cliente>();
 	}
@@ -63,10 +68,7 @@ public class ReporteFacturacionPorMesBean implements Serializable {
 		
 		listaClientes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
 		clienteSelect = new Cliente();
-		Date today = new Date();
-		maxDate = new Date(today.getTime() );
-		this.fecha_ini = new Date();
-		this.fecha_fin = new Date();
+		
 	}
 	
 

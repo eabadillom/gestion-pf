@@ -1,6 +1,5 @@
 package mx.com.ferbo.dao;
 
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -14,7 +13,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 	Logger log = LogManager.getLogger(ServicioDAO.class);
-	
+
 	@Override
 	public Servicio buscarPorId(Integer id) {
 		Servicio servicio = null;
@@ -22,13 +21,14 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			servicio = em.find(Servicio.class, id);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log.error("Problema para obtener el servicio: " + id, ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return servicio;
 	}
+
 	@Override
 	public List<Servicio> buscarTodos() {
 		EntityManager em = null;
@@ -36,9 +36,9 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("Servicio.findAll", Servicio.class).getResultList();
-		}catch(Exception e) {
-			log.error("Problemas para obtener informacion",e);
-		}finally {
+		} catch (Exception e) {
+			log.error("Problemas para obtener informacion", e);
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return listado;
@@ -48,6 +48,7 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 	public List<Servicio> buscarPorCriterios(Servicio e) {
 		return null;
 	}
+
 	@Override
 	public String actualizar(Servicio servicio) {
 		try {
@@ -73,9 +74,9 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 			em.persist(servicio);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			log.error("Error al obtener informacion",e);
+			log.error("Error al obtener informacion", e);
 			return "ERROR";
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -112,6 +113,5 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 		}
 		return null;
 	}
-
 
 }

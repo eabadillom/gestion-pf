@@ -35,7 +35,6 @@ import mx.com.ferbo.dao.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.RepEstadoCuentaDAO;
 import mx.com.ferbo.model.ConstanciaDeServicio;
 import mx.com.ferbo.model.EmisoresCFDIS;
-import mx.com.ferbo.ui.OcupacionCamara;
 import mx.com.ferbo.ui.RepEstadoCuenta;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;

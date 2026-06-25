@@ -1,0 +1,102 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <p:dataTable id="dt-salidas" widgetVar="dtsalidas" value="#{ordenSalidaBean.listaDetalles}"
+    	var="salidas" paginator="false" rowSelectMode="add" reflow="true" size="small"
+    	rowKey="#{salidas.idSalidaDetalle}">
+        <f:facet name="header">
+            <p:outputLabel value="Productos solicitados" />
+        </f:facet>
+        <p:column width="1.5rem">
+        	<div align="center">
+	            <p:selectBooleanCheckbox value="#{salidas.selected}">
+					<p:ajax process="@this" listener="#{ordenSalidaBean.validarProducto(salidas)}" update="form:dt-salidas"/>
+				</p:selectBooleanCheckbox>
+        	</div>
+        </p:column>
+        <p:column width="1rem">
+            <p:rowToggler />
+        </p:column>
+        <p:column headerText="Ingreso" width="6rem" style="text-align: center;">
+            <h:outputText value="#{salidas.partida.folio.folioCliente}" />
+        </p:column>
+        <p:column headerText="Camara" width="4rem" style="text-align: center;">
+            <h:outputText value="#{salidas.partida.camaraCve.camaraAbrev}"/>
+        </p:column>
+        <p:column headerText="Producto" width="auto">
+            <h:outputText value="#{salidas.partida.unidadDeProductoCve.productoCve.productoDs}"/>
+            <f:facet name="footer">
+                <h:outputText value="Total:"/>
+            </f:facet>
+        </p:column>
+        <p:column headerText="Cantidad" width="5rem" style="text-align: right;">
+            <h:outputText value="#{salidas.cantidad}"/>
+            <f:facet name="footer">
+                <h:outputText value="#{ordenSalidaBean.totalCajas}"/>
+            </f:facet>
+        </p:column>
+        <p:column headerText="Peso (kg)" width="6rem" style="text-align: right;">
+            <h:outputText value="#{salidas.pesoAprox}"/>
+            <f:facet name="footer">
+                <h:outputText value="#{ordenSalidaBean.pesoTotal}"/>
+            </f:facet>
+        </p:column>
+        <p:column headerText="Temp." width="6rem" style="text-align: right;">
+        	<p:inputNumber value="#{salidas.temperatura}" symbol=" °C" symbolPosition="s" decimalPlaces="2" inputStyle="text-align: right; width: 100%; box-sizing: border-box;" style="width: 100%; box-sizing: border-box;">
+        		<p:ajax process="@this" listener="#{ordenSalidaBean.validarTemperatura(salidas)}" />
+        	</p:inputNumber>
+        </p:column>
+        <p:rowExpansion>
+            <div class="orders-subtable">
+                <p:dataTable id="dtDetallesSalida" widgetVar="wv-detalleSalida" var="detalleSalidas" value="#{ordenSalidaBean.detallePartida(salidas.partida)}" reflow="true" rowKey="#{ordenSalidaBean.salida.folioSalida}" size="small">
+                	<p:column headerText="Código">
+                        <h:outputText value="#{detalleSalidas.dtpCodigo}" />
+                    </p:column>
+                    <p:column headerText="Lote">
+                        <h:outputText value="#{detalleSalidas.dtpLote}" />
+                    </p:column>
+                    <p:column headerText="Caducidad">
+                        <h:outputText value="#{detalleSalidas.dtpCaducidad}" />
+                    </p:column>
+                    <p:column headerText="PO">
+                        <h:outputText value="#{detalleSalidas.dtpPO}" />
+                    </p:column>
+                    <p:column headerText="MP">
+                        <h:outputText value="#{detalleSalidas.dtpMP}" />
+                    </p:column>
+                    <p:column headerText="Pedimento">
+                        <h:outputText value="#{detalleSalidas.dtpPedimento}" />
+                    </p:column>
+                    <p:column headerText="Contenedor">
+                        <h:outputText value="#{detalleSalidas.dtpSAP}" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </p:rowExpansion>
+        <p:columnGroup type="footer">
+			<p:row>
+				<p:column colspan="4" footerText=""/>
+				<p:column colspan="2" style="text-align:right;">
+					<f:facet name="footer">
+						<p:outputLabel value="#{ordenSalidaBean.totalCajas} unidades">
+							<f:convertNumber type="number" maxFractionDigits="0" />
+						</p:outputLabel>
+					</f:facet>
+				</p:column>
+				<p:column style="text-align:right;">
+					<f:facet name="footer">
+						<p:outputLabel value="#{ordenSalidaBean.pesoTotal} kg">
+							<f:convertNumber type="number" maxFractionDigits="3" minFractionDigits="3" />
+						</p:outputLabel>
+					</f:facet>
+				</p:column>
+				<p:column>
+				</p:column>
+			</p:row>
+		</p:columnGroup>
+    </p:dataTable>
+</ui:composition>

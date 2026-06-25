@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -122,5 +123,4 @@ public class SalidaDetalle implements Serializable
     public String toString() {
         return "SalidaDetalle[" + "idSalidaDetalle=" + idSalidaDetalle + ", cantidad=" + cantidad + ", pesoAprox=" + pesoAprox + ']';
     }
-    
 }

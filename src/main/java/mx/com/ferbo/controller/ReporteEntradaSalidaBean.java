@@ -1,7 +1,9 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
@@ -25,10 +27,13 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
 import net.sf.jasperreports.engine.JRException;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 @Named
 @ViewScoped
@@ -48,6 +53,8 @@ public class ReporteEntradaSalidaBean implements Serializable {
   
 	private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
+    private Usuario usuario;
+    private StreamedContent file;
 
 	public ReporteEntradaSalidaBean() {
 		fecha = new Date();
@@ -59,13 +66,15 @@ public class ReporteEntradaSalidaBean implements Serializable {
 	public void init() {
 		faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
+        usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
+        
 		clienteSelect = new Cliente();
 //		listaClientes = clienteDAO.buscarHabilitados(true);
 		listaClientes = (List<Cliente>) httpServletRequest.getSession(false).getAttribute("clientesActivosList");
 		Date today = new Date();
 
 		maxDate = new Date(today.getTime() );
-		
+		log.info("El usuario {} esta ingresando a reporte de entradas y salidas", usuario.getUsuario());
 	}
 	
 	
@@ -108,8 +117,14 @@ public class ReporteEntradaSalidaBean implements Serializable {
 				parameters.put("fechaFin", fecha_fin);
 				parameters.put("imagen", imgfile.getPath());
 				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createPdf(filename, parameters, reportFile.getPath());
 				
+                                byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
+				InputStream input = new ByteArrayInputStream(bytes);
+                                this.file = DefaultStreamedContent.builder().contentType("application/pdf")
+                                    .name(filename)
+                                    .stream(() -> input)
+                                    .build();
+                                log.info("El usuario {} descargo el reporte de inventario de entradas y salidas {}", this.usuario.getUsuario(), filename);
 			} catch (Exception ex) {
 				log.error("Problema general...", ex);
 				message = String.format("No se pudo imprimir el reporte");
@@ -161,7 +176,14 @@ public class ReporteEntradaSalidaBean implements Serializable {
 				parameters.put("fechaFin", fecha_fin);
 				parameters.put("imagen", imgfile.getPath());
 				log.info("Parametros: " + parameters.toString());
-				jasperReportUtil.createXlsx(filename, parameters, reportFile.getPath());
+				
+                                byte[] bytes = jasperReportUtil.createXLSX(parameters, reportFile.getPath());
+                                InputStream input = new ByteArrayInputStream(bytes);
+                                this.file = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel")
+                                    .name(filename)
+                                    .stream(() -> input)
+                                    .build();
+                                log.info("El usuario {} descargo el reporte de inventario de traspasos {}", this.usuario.getUsuario(), filename);
 			} catch (Exception ex) {
 				log.error("Problema general...", ex);
 				message = String.format("No se pudo imprimir el reporte");
@@ -178,39 +200,57 @@ public class ReporteEntradaSalidaBean implements Serializable {
 	public Date getFecha() {
 		return fecha;
 	}
+        
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
-	public Cliente getClienteSelect() {
+	
+        public Cliente getClienteSelect() {
 		return clienteSelect;
 	}
-	public void setClienteSelect(Cliente clienteSelect) {
+	
+        public void setClienteSelect(Cliente clienteSelect) {
 		this.clienteSelect = clienteSelect;
 	}
-	public List<Cliente> getListaClientes() {
+	
+        public List<Cliente> getListaClientes() {
 		return listaClientes;
 	}
-	public void setListaClientes(List<Cliente> listaClientes) {
+	
+        public void setListaClientes(List<Cliente> listaClientes) {
 		this.listaClientes = listaClientes;
 	}
-	public Date getFecha_ini() {
+	
+        public Date getFecha_ini() {
 		return fecha_ini;
 	}
-	public void setFecha_ini(Date fecha_ini) {
+	
+        public void setFecha_ini(Date fecha_ini) {
 		this.fecha_ini = fecha_ini;
 	}
-	public Date getFecha_fin() {
+	
+        public Date getFecha_fin() {
 		return fecha_fin;
 	}
-	public void setFecha_fin(Date fecha_fin) {
+	
+        public void setFecha_fin(Date fecha_fin) {
 		this.fecha_fin = fecha_fin;
 	}
-	public Date getMaxDate() {
+	
+        public Date getMaxDate() {
 		return maxDate;
 	}
-	public void setMaxDate(Date maxDate) {
+	
+        public void setMaxDate(Date maxDate) {
 		this.maxDate = maxDate;
 	}
 
+        public StreamedContent getFile() {
+            return file;
+        }
+
+        public void setFile(StreamedContent file) {
+            this.file = file;
+        }
 
 }

@@ -29,156 +29,207 @@ public class RepInventario {
 	private BigDecimal baseCargo = null;
 	private BigDecimal resultado = null;
 	private String posicionCodigo = null;
+
 	public Integer getFolio() {
 		return folio;
 	}
+
 	public void setFolio(Integer folio) {
 		this.folio = folio;
 	}
+
 	public String getNombreCliente() {
 		return nombreCliente;
 	}
+
 	public void setNombreCliente(String nombreCliente) {
 		this.nombreCliente = nombreCliente;
 	}
+
 	public String getNumeroCliente() {
 		return numeroCliente;
 	}
+
 	public void setNumeroCliente(String numeroCliente) {
 		this.numeroCliente = numeroCliente;
 	}
+
 	public String getFolioCliente() {
 		return folioCliente;
 	}
+
 	public void setFolioCliente(String folioCliente) {
 		this.folioCliente = folioCliente;
 	}
+
 	public Date getIngreso() {
 		return ingreso;
 	}
+
 	public void setIngreso(Date ingreso) {
 		this.ingreso = ingreso;
 	}
+
 	public Integer getIdPartida() {
 		return idPartida;
 	}
+
 	public void setIdPartida(Integer idPartida) {
 		this.idPartida = idPartida;
 	}
+
 	public BigDecimal getCantidad() {
 		return cantidad;
 	}
+
 	public void setCantidad(BigDecimal cantidad) {
 		this.cantidad = cantidad;
 	}
+
 	public String getUnidadCobro() {
 		return unidadCobro;
 	}
+
 	public void setUnidadCobro(String unidadCobro) {
 		this.unidadCobro = unidadCobro;
 	}
+
 	public BigDecimal getTarima() {
 		return tarima;
 	}
+
 	public void setTarima(BigDecimal tarima) {
 		this.tarima = tarima;
 	}
+
 	public BigDecimal getPeso() {
 		return peso;
 	}
+
 	public void setPeso(BigDecimal peso) {
 		this.peso = peso;
 	}
+
 	public Integer getIdProducto() {
 		return idProducto;
 	}
+
 	public void setIdProducto(Integer idProducto) {
 		this.idProducto = idProducto;
 	}
+
 	public String getProductoDescripcion() {
 		return productoDescripcion;
 	}
+
 	public void setProductoDescripcion(String productoDescripcion) {
 		this.productoDescripcion = productoDescripcion;
 	}
+
 	public Date getCaducidad() {
 		return caducidad;
 	}
+
 	public void setCaducidad(Date caducidad) {
 		this.caducidad = caducidad;
 	}
+
 	public String getCodigo() {
 		return codigo;
 	}
+
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
 	}
+
 	public String getSap() {
 		return sap;
 	}
+
 	public void setSap(String sap) {
 		this.sap = sap;
 	}
+
 	public String getPo() {
 		return po;
 	}
+
 	public void setPo(String po) {
 		this.po = po;
 	}
+
 	public Integer getIdCamara() {
 		return idCamara;
 	}
+
 	public void setIdCamara(Integer idCamara) {
 		this.idCamara = idCamara;
 	}
+
 	public String getCamaraDescripcion() {
 		return camaraDescripcion;
 	}
+
 	public void setCamaraDescripcion(String camaraDescripcion) {
 		this.camaraDescripcion = camaraDescripcion;
 	}
+
 	public Integer getIdPlanta() {
 		return idPlanta;
 	}
+
 	public void setIdPlanta(Integer idPlanta) {
 		this.idPlanta = idPlanta;
 	}
+
 	public String getPlantaDescripcion() {
 		return plantaDescripcion;
 	}
+
 	public void setPlantaDescripcion(String plantaDescripcion) {
 		this.plantaDescripcion = plantaDescripcion;
 	}
+
 	public String getLote() {
 		return lote;
 	}
+
 	public void setLote(String lote) {
 		this.lote = lote;
 	}
+
 	public BigDecimal getValor() {
 		return valor;
 	}
+
 	public void setValor(BigDecimal valor) {
 		this.valor = valor;
 	}
+
 	public BigDecimal getBaseCargo() {
 		return baseCargo;
 	}
+
 	public void setBaseCargo(BigDecimal baseCargo) {
 		this.baseCargo = baseCargo;
 	}
+
 	public BigDecimal getResultado() {
 		return resultado;
 	}
+
 	public void setResultado(BigDecimal resultado) {
 		this.resultado = resultado;
 	}
+
 	public String getPosicionCodigo() {
 		return posicionCodigo;
 	}
+
 	public void setPosicionCodigo(String posicionCodigo) {
 		this.posicionCodigo = posicionCodigo;
 	}
+
 	@Override
 	public String toString() {
 		return "{\"folio\":\"" + folio + "\", \"nombreCliente\":\"" + nombreCliente + "\", \"numeroCliente\":\""

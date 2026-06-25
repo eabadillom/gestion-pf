@@ -29,12 +29,15 @@ import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.pagos.businesslogic.FormaPagoBL;
+import mx.com.ferbo.pagos.businesslogic.MetodoPagoBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.business.almacen.PlantaBL;
 import mx.com.ferbo.business.n.AvisoBL;
 import mx.com.ferbo.business.n.CategoriaBL;
 import mx.com.ferbo.business.n.ClienteBL;
@@ -42,9 +45,6 @@ import mx.com.ferbo.business.n.ClienteContactoBL;
 import mx.com.ferbo.business.n.DomiciliosBL;
 import mx.com.ferbo.business.n.FiscalBL;
 import mx.com.ferbo.business.n.MedioContactoBL;
-import mx.com.ferbo.business.n.MedioPagoBL;
-import mx.com.ferbo.business.n.MetodoPagoBL;
-import mx.com.ferbo.business.n.PlantaBL;
 import mx.com.ferbo.business.n.PrecioServicioBL;
 import mx.com.ferbo.business.n.SeguridadBL;
 import mx.com.ferbo.business.n.ServicioBL;
@@ -158,7 +158,7 @@ public class ClientesBean implements Serializable {
     private PlantaBL plantaBL;
 
     @Inject
-    private MedioPagoBL medioPagoBL;
+    private FormaPagoBL medioPagoBL;
 
     @Inject
     private MetodoPagoBL metodoPagoBL;
@@ -200,7 +200,7 @@ public class ClientesBean implements Serializable {
             this.lstTipoTelefono = medioContactoBL.obtenerTiposTelefono();
             this.lstServicio = servicioBL.obtenerServicios();
             this.lstUnidadManejo = unidadManejoBL.obtenerUnidadesManejo();
-            this.lstPlanta = plantaBL.obtenerPlantas(Boolean.FALSE);
+            this.lstPlanta = plantaBL.buscarTodos(Boolean.FALSE);
             this.lstCategoria = categoriaBL.obtenerCategorias();
             this.lstRegimenFiscal = fiscalBL.obtenerRegimenesFiscales();
             this.lstUsoCfdi = fiscalBL.obtenerCfdis();

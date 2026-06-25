@@ -22,7 +22,7 @@ public class SerieNotaDAO extends BaseDAO<SerieNota, Integer> {
 
 	private static Logger log = LogManager.getLogger(PosicionCamaraDAO.class);
 
-	public List<SerieNota> findAll() {		
+	public List<SerieNota> findAll() {
 		EntityManager entity = null;
 		List<SerieNota> list = null;
 		try {
@@ -73,7 +73,7 @@ public class SerieNotaDAO extends BaseDAO<SerieNota, Integer> {
 		} finally {
 			EntityManagerUtil.close(entity);
 		}
-		
+
 		return lista;
 	}
 }
