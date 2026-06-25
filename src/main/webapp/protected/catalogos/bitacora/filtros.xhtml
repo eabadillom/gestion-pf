@@ -68,9 +68,9 @@
                                                    offLabel="Inactivos"
                                                    onIcon="fa fa-solid fa-user"
                                                    offIcon="fa fa-solid fa-user-slash" 
-                                             styleClass="#{bitacoraBean.usuariosActivos ? 'ui-button-success' : 'ui-button-outlined ui-button-secondary'}">
+                                                   styleClass="#{bitacoraBean.usuariosActivos ? 'ui-button-primary' : 'ui-button-outlined ui-button-secondary'}">
                                 <p:ajax process="@this" listener="#{bitacoraBean.obtenerUsuariosActivosOInactivos()}" update="usuario stUsuarios"/>
-                                </p:selectBooleanButton>
+                            </p:selectBooleanButton>
                         </div>
                         <div class="p-col-12 p-md-8">
                             <p:selectOneMenu
@@ -93,14 +93,29 @@
                     </div>
                 </div>
                 
+                <div class="p-col-12 p-md-8"></div>
+
                 <div class="p-col-12 p-md-4">
-                    <p:outputLabel for="buscar" style="width:100%"/>
-                     <p:commandButton  id="buscar" value="Buscar" 
-                             icon="pi pi-search"
-                             process="@this" actionListener="#{bitacoraBean.filtrarGrupos()}"
-                             onstart="PF('statusInfoDialog').show()" 
-                             oncomplete="PF('statusInfoDialog').hide()"
-                             update="form:dtBitacora"/>
+                    <p:commandButton id="cmd-pdf" value="PDF" icon="pi pi-file-pdf" styleClass="mr-2 mb-2 ui-button-secondary" actionListener="#{bitacoraBean.imprimirBitacora('PDF')}" ajax="false" disabled="#{bitacoraBean.grupos.size() == 0}">
+                        <p:fileDownload value="#{bitacoraBean.bitacora}"></p:fileDownload>
+                    </p:commandButton>
+                </div>
+
+                <div class="p-col-12 p-md-4">
+                    <p:commandButton id="cmd-excel" value="Excel" icon="pi pi-file-excel" styleClass="mr-2 mb-2 ui-button-secondary" actionListener="#{bitacoraBean.imprimirBitacora('XLSX')}" ajax="false" disabled="#{bitacoraBean.grupos.size() == 0}">
+                        <p:fileDownload value="#{bitacoraBean.bitacora}"></p:fileDownload>
+                    </p:commandButton>
+                </div>
+                
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="consultar" style="width:100%"/>
+                    <p:commandButton  id="consultar" value="Consultar" 
+                                      icon="pi pi-search"
+                                      process="@this" actionListener="#{bitacoraBean.filtrarGrupos()}"
+                                      styleClass="ui-button-secondary"
+                                      onstart="PF('statusInfoDialog').show()" 
+                                      oncomplete="PF('statusInfoDialog').hide()"
+                                      update="form:dtBitacora cmd-pdf cmd-excel"/>
                 </div>
             </div>
         </p:toolbarGroup>

@@ -15,7 +15,9 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.StreamedContent;
 
+import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.util.date.DateFormatter;
 
@@ -28,6 +30,7 @@ import mx.com.ferbo.bitacora.model.FiltroBitacora;
 import mx.com.ferbo.business.UsuarioBL;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.FacesUtils;
+import mx.com.ferbo.utils.ToolException;
 
 @Named
 @ViewScoped
@@ -59,8 +62,10 @@ public class BitacoraBean implements Serializable {
     private List<Usuario> usuarios;
 
     private Boolean usuariosActivos = Boolean.TRUE;
-    
+
     private BitacoraDTO grupoSelected;
+
+    private StreamedContent bitacora;
 
     public BitacoraBean() {
         LocalDate hoy = LocalDate.now();
@@ -128,6 +133,32 @@ public class BitacoraBean implements Serializable {
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, title, message);
         } catch (SystemException ex) {
             log.warn("Error: {}", ex.getMessage(), ex);
+        } finally {
+            actualizarMensajes();
+        }
+    }
+
+    public void imprimirBitacora(String extension) {
+        try {
+            String inicioFecha = DateFormatter.format(filtros.getInicio(), "dd-MM-yyyy");
+            String finFecha = DateFormatter.format(filtros.getFin(), "dd-MM-yyyy");
+            String filename = String.format("Bitacora" + inicioFecha + "al" + finFecha);
+            byte[] bytes = bitacoraBL.exportToFile(filtros, extension)
+                    .orElseThrow(() -> new ToolException("Hubo un problema para generar el PDF de la bitácora"));
+                    
+            bitacora = FacesUtils.crearStreamedContentDesdeBytes(bytes, filename, extension);
+        } catch (ToolException ex) {
+            log.warn("{}", ex.getMessage(), ex);
+            message = ex.getMessage();
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, title, message);
+        } catch (BusinessException ex) {
+            log.warn("{}", ex.getMessage(), ex);
+            message = ex.getMessage();
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, title, message);
+        } catch (Exception ex) {
+            log.error("Error al generar PDF de bitácora. {}", ex.getMessage(), ex);
+            message = "Error al generar PDF de la bitácora. \nContacte con el administrador del sistema";
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, title, message);
         } finally {
             actualizarMensajes();
         }
@@ -224,6 +255,14 @@ public class BitacoraBean implements Serializable {
 
     public void setGrupoSelected(BitacoraDTO grupoSelected) {
         this.grupoSelected = grupoSelected;
+    }
+
+    public StreamedContent getBitacora() {
+        return bitacora;
+    }
+
+    public void setBitacora(StreamedContent bitacora) {
+        this.bitacora = bitacora;
     }
 
 }
