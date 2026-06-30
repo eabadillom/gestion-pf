@@ -1,8 +1,6 @@
 package mx.com.ferbo.egresos.dao.catalogos;
 
 import java.util.List;
-import java.util.Optional;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;

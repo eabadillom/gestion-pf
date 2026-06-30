@@ -20,7 +20,7 @@
                     required="true" style="width:100%"
                     disabled="#{not empty altaEgresoBean.egresoSelected.id}">
 
-                    <f:selectItem itemLabel="--- Emisores ---"/>
+                    <f:selectItem itemLabel="--- Emisores ---" itemValue="#{null}"/>
 
                     <f:selectItems
                         value="#{altaEgresoBean.lstEmisoresCfdi}"
@@ -42,7 +42,7 @@
                     required="true" style="width:100%"
                     disabled="#{not empty altaEgresoBean.egresoSelected.id}">
 
-                    <f:selectItem itemLabel="--- Categorías ---"/>
+                    <f:selectItem itemLabel="--- Categorías ---" itemValue="#{null}" />
 
                     <f:selectItems
                         value="#{altaEgresoBean.lstCategoriasEgreso}"
@@ -88,7 +88,7 @@
                     required="true" style="width:100%"
                     disabled="#{not empty altaEgresoBean.egresoSelected.id}">
 
-                    <f:selectItem itemLabel="--- Métodos de pago ---"/>
+                    <f:selectItem itemLabel="--- Métodos de pago ---" itemValue="#{null}"/>
 
                     <f:selectItems
                         value="#{altaEgresoBean.lstMetodosPago}"
@@ -111,7 +111,7 @@
                     required="true" style="width:100%"
                     disabled="#{not empty altaEgresoBean.egresoSelected.id}">
 
-                    <f:selectItem itemLabel="--- Formas de pago ---"/>
+                    <f:selectItem itemLabel="--- Formas de pago ---" itemValue="#{null}"/>
 
                     <f:selectItems
                         value="#{altaEgresoBean.lstFormasPago}"
@@ -185,8 +185,7 @@
                     required="true" style="width:100%">
 
                     <f:selectItem itemLabel="--- Status de egreso ---"
-                                  itemValue="#{null}"
-                                  noSelectionOption="true"/>
+                                  itemValue="#{null}"/>
 
                     <f:selectItems
                         value="#{altaEgresoBean.lstStatusEgresos}"
@@ -194,7 +193,7 @@
                         itemLabel="#{s.nombre}"
                         itemValue="#{s}"/>
 
-                    <p:ajax process="@this" event="change" listener="#{altaEgresoBean.cambiarStatusEgreso}"/>
+                    <p:ajax process="@this"/>
                 </p:selectOneMenu>
             </div>
 
@@ -205,7 +204,7 @@
         <div class="field" style="display:flex; justify-content:flex-end; gap:10px;">
             <p:commandButton value="#{(altaEgresoBean.egresoSelected.id == null) ? 'Guardar' : 'Actualizar'}" 
                              icon="pi pi-check"
-                             actionListener="#{altaEgresoBean.abrirDialogoOProcesar()}"
+                             actionListener="#{altaEgresoBean.procesarEgreso()}"
                              process="@this" 
                              onstart="PF('statusInfoDialog').show()" 
                              oncomplete="PF('statusInfoDialog').hide()"/>
