@@ -25,8 +25,6 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
 
     private static final Logger log = LogManager.getLogger(EgresoDAO.class);
 
-    private EntityManager em;
-
     public EgresoDAO() {
         super(Egreso.class);
     }
@@ -34,6 +32,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     @Override
     public Optional<Egreso> buscarPorId(Long id) {
         Optional<Egreso> e = null;
+        EntityManager em = null;
         Egreso egreso;
         try {
             em = getEntityManager();
@@ -54,6 +53,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarTodos() throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.findAll", Egreso.class).getResultList();
@@ -66,6 +66,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarPorRangoFecha(LocalDateTime inicio, LocalDateTime fin) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.findByFechaBetween", Egreso.class).setParameter("inicio", inicio)
@@ -80,6 +81,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarPorCategoria(CategoriaEgreso categoria) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.findByCategoria", Egreso.class).setParameter("categoria", categoria)
@@ -94,6 +96,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarPorStatus(StatusEgreso status) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.findByStatus", Egreso.class).setParameter("status", status)
@@ -108,6 +111,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarPorConcepto(String concepto) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.searchByConcepto", Egreso.class).setParameter("concepto", concepto)
@@ -122,6 +126,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarPorEmisor(EmisoresCFDIS emisor) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.searchByEmisor", Egreso.class).setParameter("emisor", emisor)
@@ -138,6 +143,8 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     public List<Egreso> buscarPorFiltros(LocalDateTime inicio, LocalDateTime fin, CategoriaEgreso categoria,
             StatusEgreso status,
             String concepto, EmisoresCFDIS emisor) throws SystemException {
+
+        EntityManager em = null;
         List<Egreso> lst = null;
         try {
             em = getEntityManager();
@@ -168,6 +175,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public Egreso guardarYObtener(Egreso egreso) {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
