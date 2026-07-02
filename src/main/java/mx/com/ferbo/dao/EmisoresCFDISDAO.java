@@ -128,15 +128,17 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer> {
 
 	@Override
 	public String actualizar(EmisoresCFDIS emi) {
-		try {
-			EntityManager ent = getEntityManager();
+		EntityManager ent = null;
+                try {
+			ent = getEntityManager();
 			ent.getTransaction().begin();
 			ent.merge(emi);
 			ent.getTransaction().commit();
-			ent.close();
-		}catch(Exception e){
+		} catch(Exception e){
 			log.error("Problema para actualizar el emisor...", e);
 			return "Failed!" + e.getMessage();
+		} finally {
+			EntityManagerUtil.close(ent);
 		}
 		return null;
 	}
@@ -172,9 +174,10 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer> {
 			ent.remove(ent.merge(emi));
 			ent.getTransaction().commit();
 		} catch (Exception e) {
+                        log.error("Problema al eliminar el emisor cfdi... ", e);
 			return "Failed!" + e.getMessage();
 		} finally {
-			ent.close();
+			EntityManagerUtil.close(ent);
 		}
 
 		return null;
@@ -193,7 +196,7 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer> {
 			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("Error" + e.getMessage());
+			log.error("Problema al eliminar el listado de emisores cfdi... ", e);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -220,9 +223,9 @@ public class EmisoresCFDISDAO extends IBaseDAO<EmisoresCFDIS, Integer> {
 			}
 			
 		} catch(Exception ex) {
-			
+			log.error("problema al obtener el listado de emisores cfdi... ", ex);
 		} finally {
-			
+			EntityManagerUtil.close(em);
 		}
 		
 		return modelList;

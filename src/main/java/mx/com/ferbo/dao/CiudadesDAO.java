@@ -1,7 +1,5 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -208,9 +206,9 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 			.setParameter("ciudadCve", ciudades.getCiudadesPK().getCiudadCve()).executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema al eliminar una ciudad...", e);
 			return "ERROR";
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -223,17 +221,36 @@ public class CiudadesDAO extends IBaseDAO<Ciudades, Integer> {
 	}
 
 	public List<Ciudades> buscaPorId(Integer id) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Ciudades.findByCiudadCve", Ciudades.class).setParameter("ciudadCve", id)
+            List<Ciudades> listCiudades = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		listCiudades = em.createNamedQuery("Ciudades.findByCiudadCve", Ciudades.class).setParameter("ciudadCve", id)
 				.getResultList();
+            } catch (Exception e) {
+                log.error("Problema al obtener la lista de ciudades...", e);
+            } finally {
+                    EntityManagerUtil.close(em);
+            }
+            return listCiudades;
 	}
 	
 	public List<Ciudades> buscaPorAsentamiento(AsentamientoHumano as){
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Ciudades.findByTodo", Ciudades.class)
+            List<Ciudades> listCiudades = null;
+            EntityManager em = null;
+            try {    
+                em = EntityManagerUtil.getEntityManager();
+		listCiudades = em.createNamedQuery("Ciudades.findByTodo", Ciudades.class)
 				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
 				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
 				.setParameter("ciudadCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getCiudadCve())
 				.getResultList();
+            } catch (Exception e) {
+                log.error("Problema al obtener la lista de ciudades...", e);
+            } finally {
+                    EntityManagerUtil.close(em);
+            }
+            return listCiudades;
 	}
+        
 }

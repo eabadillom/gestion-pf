@@ -487,7 +487,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			}
 
 		} catch (Exception ex) {
-
+                        log.error("Problema al buscar al cliente por productos o servicios...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -508,7 +508,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 		} catch(Exception ex) {
 			log.warn("Problema para obtener el cliente por codigo unico: {}", ex.getMessage());
 		} finally {
-			this.close(em);
+			EntityManagerUtil.close(em);
 		}
 		
 		return model;

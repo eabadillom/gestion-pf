@@ -8,8 +8,11 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ControlFacturaConstanciaDS;
 import mx.com.ferbo.model.ControlFacturaConstanciaDsPK;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ControlFacturaConstanciaDAO extends IBaseDAO<ControlFacturaConstanciaDS, ControlFacturaConstanciaDsPK> {
+        private static Logger log = LogManager.getLogger(ControlFacturaConstanciaDAO.class);
 
 	@Override
 	public ControlFacturaConstanciaDS buscarPorId(ControlFacturaConstanciaDsPK id) {
@@ -38,8 +41,10 @@ public class ControlFacturaConstanciaDAO extends IBaseDAO<ControlFacturaConstanc
 			alFacturasConstancias = entity
 					.createNamedQuery("ControlFacturaConstanciaDS.findByConstancia", ControlFacturaConstanciaDS.class)
 					.setParameter("constancia", folio).getResultList();
-		} finally {
-			entity.close();
+		} catch (Exception e) {
+                        log.error("Problema al buscar la lista de control factura constancia ds...", e);
+                } finally {
+			EntityManagerUtil.close(entity);
 		}
 
 		return alFacturasConstancias;
