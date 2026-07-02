@@ -19,8 +19,6 @@ import mx.com.ferbo.commons.dao.BaseDAO;
 @ApplicationScoped
 public class BitacoraDAO extends BaseDAO<EventoBitacora, Long> {
 
-    private EntityManager em;
-
     private static final Logger log = LogManager.getLogger(BitacoraDAO.class);
 
     public BitacoraDAO() {
@@ -30,6 +28,7 @@ public class BitacoraDAO extends BaseDAO<EventoBitacora, Long> {
     @SuppressWarnings("unchecked")
     public List<Object[]> buscarGruposPorFiltros(FiltroBitacora filtros) {
 
+        EntityManager em = null;
         List<Object[]> resultados;
 
         try {
@@ -60,6 +59,7 @@ public class BitacoraDAO extends BaseDAO<EventoBitacora, Long> {
     }
 
     public List<EventoBitacora> buscarPorFiltros(FiltroBitacora filtros) {
+        EntityManager em = null;
         List<EventoBitacora> eventos;
         try {
             em = getEntityManager();
