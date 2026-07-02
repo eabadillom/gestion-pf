@@ -26,14 +26,14 @@ public class UsoCfdiDAO extends IBaseDAO<UsoCfdi, String> {
 		EntityManager em = null;
 
 		try {
-			em = this.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 
 			modelList = em.createNamedQuery("UsoCfdi.findAll", this.modelClass)
 				.getResultList();
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de usos de CFDI...", ex);
 		} finally {
-			this.close(em);
+			EntityManagerUtil.close(em);
 		}
 
 		return modelList;

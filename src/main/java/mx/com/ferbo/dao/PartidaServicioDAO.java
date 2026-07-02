@@ -54,12 +54,16 @@ public class PartidaServicioDAO extends IBaseDAO<PartidaServicio, Integer> {
 
 	// @SuppressWarnings("unchecked")
 	public List<PartidaServicio> buscarPorFolio(Integer folio) {
+		EntityManager em = null;
 		List<PartidaServicio> alPartidas = null;
 		try {
+			em = EntityManagerUtil.getEntityManager();
 			alPartidas = em.createNamedQuery("PartidaServicio.findByFolio", PartidaServicio.class)
 					.setParameter("folio", folio).getResultList();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 
 		return alPartidas;

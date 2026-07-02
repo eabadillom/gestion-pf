@@ -18,9 +18,17 @@ public class PaisDAO extends IBaseDAO<Pais, Integer> {
 
 	@Override
 	public List<Pais> buscarTodos() {
-		List<Pais> listado;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Pais.findAll", Pais.class).getResultList();
+		EntityManager em = null;
+		List<Pais> listado = null;
+
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("Pais.findAll", Pais.class).getResultList();
+		} catch (Exception ex) {
+			System.out.println("Error: " + ex.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 
