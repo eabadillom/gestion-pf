@@ -20,8 +20,6 @@ public class EmisorCfdiDAO extends BaseDAO<EmisoresCFDIS, Integer> {
 
     private static final Logger log = LogManager.getLogger(EmisorCfdiDAO.class);
 
-    private EntityManager em;
-
     public EmisorCfdiDAO() {
         super(EmisoresCFDIS.class);
     }
@@ -31,6 +29,7 @@ public class EmisorCfdiDAO extends BaseDAO<EmisoresCFDIS, Integer> {
     }
 
     public List<EmisoresCFDIS> obtenerTodos() throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("EmisoresCFDIS.findAll", EmisoresCFDIS.class).getResultList();
