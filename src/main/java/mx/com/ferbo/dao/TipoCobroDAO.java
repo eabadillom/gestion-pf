@@ -33,8 +33,16 @@ public class TipoCobroDAO extends IBaseDAO<TipoCobro, Integer> {
 	@Override
 	public List<TipoCobro> buscarTodos() {
 		List<TipoCobro> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("TipoCobro.findAll", TipoCobro.class).getResultList();
+		EntityManager em = null;
+		try {
+			em =  EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("TipoCobro.findAll", TipoCobro.class).getResultList();
+		} catch (Exception ex) {
+			System.err.println("Error: " + ex.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
 		return listado;
 	}
 

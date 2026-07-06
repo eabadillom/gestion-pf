@@ -9,31 +9,31 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Tarima;
+import mx.com.ferbo.util.EntityManagerUtil;
 
-public class TarimaDAO extends IBaseDAO<Tarima, Integer>{
-	
+public class TarimaDAO extends IBaseDAO<Tarima, Integer> {
+
 	private static Logger log = LogManager.getLogger(TarimaDAO.class);
-	
+
 	public TarimaDAO() {
 		this.modelClass = Tarima.class;
 	}
-	
+
 	public List<Tarima> buscarPorFolio(Integer folio) {
 		List<Tarima> tarimas = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = this.getEntityManager();
 			tarimas = em.createNamedQuery("Tarima.findByFolio", modelClass)
-			.setParameter("folio", folio)
-			.getResultList()
-			;
-		} catch(Exception ex) {
+					.setParameter("folio", folio)
+					.getResultList();
+		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de tarimas por folio...", ex);
 		} finally {
-			this.close(em);
+			EntityManagerUtil.close(em);
 		}
-		
+
 		return tarimas;
 	}
 
@@ -51,7 +51,5 @@ public class TarimaDAO extends IBaseDAO<Tarima, Integer>{
 	public String eliminarListado(List<Tarima> listado) {
 		throw new UnsupportedOperationException();
 	}
-
-	
 
 }

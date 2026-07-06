@@ -99,7 +99,7 @@ public class SerieConstanciaDAO extends IBaseDAO<SerieConstancia, SerieConstanci
 					idCliente, tipoSerie, idPlanta, ex);
 			optional = Optional.empty();
 		} finally {
-			this.close(em);
+			EntityManagerUtil.close(em);
 		}
 		
 		return optional;

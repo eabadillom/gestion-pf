@@ -57,47 +57,50 @@ public class PartidasAfectadasDAO extends IBaseDAO<PartidasAfectadas, Integer>{
 	}
 
 	@Override
-	public String actualizar(PartidasAfectadas p) 
-        {
+	public String actualizar(PartidasAfectadas p) {
+        EntityManager entity = null;
             try {
-                EntityManager entity = getEntityManager();
+                entity = getEntityManager();
                 entity.getTransaction().begin();
                 entity.merge(p);
                 entity.getTransaction().commit();
-                entity.close();
                 System.out.println(p);
             }catch(Exception e){
                 return "Failed!" + e.getMessage();
+            } finally {
+                EntityManagerUtil.close(entity);
             }
             return null;
 	}
 
 	@Override
-	public String guardar(PartidasAfectadas p) 
-        {
+	public String guardar(PartidasAfectadas p) {
+        EntityManager entity = null;
             try {
-                EntityManager entity= getEntityManager();
+                entity = getEntityManager();
                 entity.getTransaction().begin();
                 entity.persist(p);
                 entity.getTransaction().commit();
-                entity.close();
             }catch(Exception e){
                 return "Failed!! " + e.getMessage();
-            } 
+            } finally {
+                EntityManagerUtil.close(entity);
+            }
             return null;
 	}
 
 	@Override
-	public String eliminar(PartidasAfectadas p) 
-        {
+	public String eliminar(PartidasAfectadas p) {
+            EntityManager entity = null;
             try {
-                EntityManager entity = getEntityManager();
+                entity = getEntityManager();
                 entity.getTransaction().begin();
                 entity.remove(entity.merge(p));
                 entity.getTransaction().commit();
-                entity.close();
             }catch(Exception e){
                 return "Failed" + e.getMessage();
+            } finally {
+                EntityManagerUtil.close(entity);
             }
             return null;
 	}

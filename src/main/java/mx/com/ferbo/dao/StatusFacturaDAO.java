@@ -33,8 +33,18 @@ public class StatusFacturaDAO extends IBaseDAO<StatusFactura, Integer> {
 
 	@Override
 	public List<StatusFactura> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("StatusFactura.findAll", StatusFactura.class).getResultList();
+		EntityManager em = null;
+		List<StatusFactura> lst = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lst = em.createNamedQuery("StatusFactura.findAll", StatusFactura.class).getResultList();
+			return lst;
+		} catch (Exception ex) {
+			log.error("Hubo un error al momento de buscar todos los status de facturas: {}.", ex.getMessage(), ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return lst;
 	}
 
 	@Override

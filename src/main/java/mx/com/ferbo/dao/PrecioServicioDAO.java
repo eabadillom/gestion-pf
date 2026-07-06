@@ -32,11 +32,14 @@ public class PrecioServicioDAO extends IBaseDAO<PrecioServicio, Integer> {
 	@Override
 	public List<PrecioServicio> buscarTodos() {
 		List<PrecioServicio> listado = new ArrayList<>();
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			listado = em.createNamedQuery("PrecioServicio.findAll", PrecioServicio.class).getResultList();
 		} catch (Exception e) {
 			log.error("Problema para buscar a todos los clientes...", e);
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return listado;
 	}
