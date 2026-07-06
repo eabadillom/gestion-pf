@@ -7,9 +7,12 @@ import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.CuotaMinima;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CuotaMinimaDAO extends IBaseDAO<CuotaMinima, Integer> {
-
+        private static Logger log = LogManager.getLogger(CuotaMinimaDAO.class);
+        
 	@Override
 	public CuotaMinima buscarPorId(Integer id) {
 		return null;
@@ -17,10 +20,17 @@ public class CuotaMinimaDAO extends IBaseDAO<CuotaMinima, Integer> {
 
 	@Override
 	public List<CuotaMinima> buscarTodos() {
-		List<CuotaMinima> listado;
-		EntityManager em = EntityManagerUtil.getEntityManager();
+            List<CuotaMinima> listado = null;
+            EntityManager em = null;
+            try {    
+                em = EntityManagerUtil.getEntityManager();
 		listado = em.createNamedQuery("CuotaMinima.findAll", CuotaMinima.class).getResultList();
-		return listado;
+            } catch (Exception e) {
+                log.error("Problema al buscar la lista de detalle de constancia de salida...", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 
 	@Override
@@ -33,8 +43,9 @@ public class CuotaMinimaDAO extends IBaseDAO<CuotaMinima, Integer> {
 
 	@Override
 	public String actualizar(CuotaMinima e) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery("UPDATE cuota_minima SET cuota_value = :cuotaValue WHERE (cte_cve = :cteCve)")
 					.setParameter("cuotaValue", e.getCuotaValue()).setParameter("cteCve", e.getCliente().getCteCve())
@@ -42,16 +53,19 @@ public class CuotaMinimaDAO extends IBaseDAO<CuotaMinima, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception ex) {
-			System.out.println("ERROR" + ex.getMessage());
+			log.error("Error al actualizar la cuota minima... ", ex);
 			return "ERROR";
-		}
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 		return null;
 	}
 
 	@Override
 	public String guardar(CuotaMinima e) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			int cuotaId = this.buscarTodos().size() - 1;
 			em.createNativeQuery(
@@ -61,26 +75,31 @@ public class CuotaMinimaDAO extends IBaseDAO<CuotaMinima, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception ex) {
-			System.out.println("ERROR" + ex.getMessage());
+			log.error("Error al guardar la cuota minima...", ex);
 			return "ERROR";
-		}
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 
 		return null;
 	}
 
 	@Override
 	public String eliminar(CuotaMinima e) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery("DELETE FROM cuota_minima WHERE (cte_cve = :cteCve)")
 					.setParameter("cteCve", e.getCliente().getCteCve()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception ex) {
-			System.out.println("ERROR" + ex.getMessage());
+			log.error("Error al eliminar una cuota minima... ", ex);
 			return "ERROR";
-		}
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 		return null;
 	}
 
@@ -90,15 +109,34 @@ public class CuotaMinimaDAO extends IBaseDAO<CuotaMinima, Integer> {
 	}
 
 	private List<CuotaMinima> buscarPorCliente(CuotaMinima c) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("CuotaMinima.findByCteCve", CuotaMinima.class)
-				.setParameter("cteCve", c.getCliente().getCteCve()).getResultList();
+	    List<CuotaMinima> listCuotaMinima = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		listCuotaMinima = em.createNamedQuery("CuotaMinima.findByCteCve", CuotaMinima.class)
+                    .setParameter("cteCve", c.getCliente().getCteCve())
+                    .getResultList();
+            } catch (Exception ex) {
+                log.error("Error al obtener la lista de cuota minima... ", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listCuotaMinima;
 	}
 
 	public int cuentaRegistros(CuotaMinima e) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		em.getTransaction().begin();
-		return em.createNativeQuery("Select count(cuota_id) cuota_minima").executeUpdate();
+	    Integer totalCuotaMinima = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		Number result = (Number) em.createNativeQuery("SELECT count(cuota_id) FROM cuota_minima").getSingleResult();
+                totalCuotaMinima = result.intValue();
+            } catch (Exception ex) {
+                log.error("Error al obtener el total de cuota minima... ", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return totalCuotaMinima;
 	}
 
 }

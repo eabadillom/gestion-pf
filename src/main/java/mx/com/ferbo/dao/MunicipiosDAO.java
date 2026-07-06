@@ -129,9 +129,9 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
                                     .getResultList();
 				 return listado;
 			 } 
-		}catch(Exception e) {
+		} catch(Exception e) {
 			log.error("Problemas para obtener informacion",e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);	
 		}
 		 return listado;
@@ -139,50 +139,57 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 
 	@Override
 	public String actualizar(Municipios municipios) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			em.merge(municipios);
-			em.getTransaction().commit();
-			em.close();
-		} catch (Exception e) {
-			System.out.println("ERROR guardando Municipio" + e.getMessage());
-			return "ERROR";
-		}
-		return null;
+	    EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                em.getTransaction().begin();
+                em.merge(municipios);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                log.error("ERROR guardando un Municipio... ", e.getMessage());
+                return "ERROR";
+            } finally {
+                EntityManagerUtil.close(em);	
+            }
+            return null;
 	}
 
 	@Override
 	public String guardar(Municipios municipios) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			em.persist(municipios);
-			em.getTransaction().commit();
-			em.close();
-		} catch (Exception e) {
-			System.out.println("ERROR guardando Municipio" + e.getMessage());
-			return "ERROR";
-		}
-		return null;
+	    EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                em.getTransaction().begin();
+                em.persist(municipios);
+                em.getTransaction().commit();
+                em.close();
+            } catch (Exception e) {
+                log.error("ERROR guardando un Municipio" + e.getMessage());
+                return "ERROR";
+            } finally {
+                EntityManagerUtil.close(em);	
+            }
+            return null;
 	}
 
 	@Override
 	public String eliminar(Municipios municipios) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			em.createQuery("DELETE FROM Municipios m WHERE m.municipiosPK.estados.estadosPK.pais.paisCve =:paisCve and m.municipiosPK.estados.estadosPK.estadoCve =:estadoCve and m.municipiosPK.municipioCve =:municipioCve")
+            EntityManager em = null;
+                try {
+                    em = EntityManagerUtil.getEntityManager();
+                    em.getTransaction().begin();
+                    em.createQuery("DELETE FROM Municipios m WHERE m.municipiosPK.estados.estadosPK.pais.paisCve =:paisCve and m.municipiosPK.estados.estadosPK.estadoCve =:estadoCve and m.municipiosPK.municipioCve =:municipioCve")
 			.setParameter("paisCve", municipios.getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
 			.setParameter("estadoCve", municipios.getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
 			.setParameter("municipioCve", municipios.getMunicipiosPK().getMunicipioCve())
                         .executeUpdate();
-			em.getTransaction().commit();
-			em.close();
+                    em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return "ERROR";
-		}
+                    log.error("Error al eliminar un municipio" + e.getMessage());
+                    return "ERROR";
+		} finally {
+                    EntityManagerUtil.close(em);	
+                }
 		return null;
 	}
 
@@ -193,33 +200,36 @@ public class MunicipiosDAO extends IBaseDAO<Municipios, Integer> {
 	}
 
 	public List<Municipios> buscaPorId(Integer id) {
-		EntityManager em = null;
+		List<Municipios> listMunicipios = null;
+                EntityManager em = null;
 		try {
-		 em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Municipios.findByMunicipioCve", Municipios.class)
-				.setParameter("municipioCve", id).getResultList();
+                    em = EntityManagerUtil.getEntityManager();
+                    listMunicipios = em.createNamedQuery("Municipios.findByMunicipioCve", Municipios.class)
+                        .setParameter("municipioCve", id)
+                        .getResultList();
 		}catch(Exception e) {
 			log.error("Problemas para obtener informacion",e);
 		}finally {
 			EntityManagerUtil.close(em);
 		}
-		return null;
+		return listMunicipios;
 	}
 	
 	public List<Municipios> buscaPorAsentamiento(AsentamientoHumano as) {
-		EntityManager em = null;
+		List<Municipios> listMunicipios = null;
+                EntityManager em = null;
 		try {
-		em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Municipios.findByTodo", Municipios.class)
-				.setParameter("municipioCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
-				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
-				.setParameter("paisCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
-				.getResultList();
-		}catch(Exception e ) {
+                    em = EntityManagerUtil.getEntityManager();
+                    listMunicipios = em.createNamedQuery("Municipios.findByTodo", Municipios.class)
+                        .setParameter("municipioCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getMunicipioCve())
+                        .setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+                        .setParameter("paisCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+                        .getResultList();
+		} catch(Exception e ) {
 			log.error("Problemas para obtener informacion",e);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(em);
 		}
-		return null;
+		return listMunicipios;
 	}
 }
