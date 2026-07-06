@@ -94,6 +94,17 @@
                 </div>
                 
                 <div class="p-col-12 p-md-8"></div>
+                
+                <div class="p-col-12 p-md-4">
+                    <p:outputLabel for="consultar" style="width:100%"/>
+                    <p:commandButton  id="consultar" value="Consultar" 
+                                      icon="pi pi-search"
+                                      process="@this" actionListener="#{bitacoraBean.filtrarGrupos()}"
+                                      styleClass="ui-button-secondary"
+                                      onstart="PF('statusInfoDialog').show()" 
+                                      oncomplete="PF('statusInfoDialog').hide()"
+                                      update="form:dtBitacora cmd-pdf cmd-excel"/>
+                </div>
 
                 <div class="p-col-12 p-md-4">
                     <p:commandButton id="cmd-pdf" value="PDF" icon="pi pi-file-pdf" styleClass="mr-2 mb-2 ui-button-secondary" actionListener="#{bitacoraBean.imprimirBitacora('PDF')}" ajax="false" disabled="#{bitacoraBean.grupos.size() == 0}">
@@ -107,16 +118,7 @@
                     </p:commandButton>
                 </div>
                 
-                <div class="p-col-12 p-md-4">
-                    <p:outputLabel for="consultar" style="width:100%"/>
-                    <p:commandButton  id="consultar" value="Consultar" 
-                                      icon="pi pi-search"
-                                      process="@this" actionListener="#{bitacoraBean.filtrarGrupos()}"
-                                      styleClass="ui-button-secondary"
-                                      onstart="PF('statusInfoDialog').show()" 
-                                      oncomplete="PF('statusInfoDialog').hide()"
-                                      update="form:dtBitacora cmd-pdf cmd-excel"/>
-                </div>
+                
             </div>
         </p:toolbarGroup>
     </p:toolbar>

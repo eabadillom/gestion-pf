@@ -24,7 +24,6 @@ import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.util.date.DateFormatter;
 import com.ferbo.tools.validation.ObjectValidator;
 
-import antlr.Tool;
 import mx.com.ferbo.bitacora.dao.BitacoraDAO;
 import mx.com.ferbo.bitacora.dto.BitacoraDTO;
 import mx.com.ferbo.bitacora.enums.NombrePantalla;
