@@ -262,7 +262,7 @@ public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer>
 			em.persist(asentamientoHumano);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Asentamiento Humano" + e.getMessage());
+			log.error("Problema guardando Asentamiento Humano... ", e);
 			return "ERROR";
 		}finally {
 			EntityManagerUtil.close(em);
@@ -288,7 +288,7 @@ public class AsentamientoHumanoDAO extends IBaseDAO<AsentamientoHumano, Integer>
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema al eliminar el asentamiento humano...", e);
 			return "ERROR";
 		}finally{
 			EntityManagerUtil.close(em);

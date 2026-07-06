@@ -29,13 +29,11 @@ public class ConstanciaServicioDAO extends BaseDAO<ConstanciaDeServicio, Integer
 
         try {
             em = super.getEntityManager();
-            em.getTransaction().begin();
             alConstancias = em.createNamedQuery("ConstanciaDeServicio.findByFolioCliente", ConstanciaDeServicio.class)
                     .setParameter("folioCliente", folioCliente)
                     .getResultList();
-
-            em.getTransaction().commit();
         } catch (Exception ex) {
+            log.error("Problema al obtener el listado de constancia de servicios...", ex);
             super.rollback(em);
         } finally {
             super.close(em);

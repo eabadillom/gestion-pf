@@ -17,8 +17,6 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer> {
 	private static Logger log = LogManager.getLogger(ConstanciaTraspasoDAO.class);
 
-	public EntityManager em = null;
-
 	@Override
 	public ConstanciaTraspaso buscarPorId(Integer id) {
 		EntityManager em = null;
@@ -78,7 +76,7 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 			lista = em.createNamedQuery("ConstanciaTraspaso.findByNumero", ConstanciaTraspaso.class)
 					.setParameter("numero", numero).getResultList();
 		} catch (Exception ex) {
-			log.error("Problema para obtener la lista de constancias de traspaso Numero: " + numero, ex);
+			log.error("Problema para obtener la lista de constancias de traspaso con el identificador {}... ", numero, ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -126,7 +124,7 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 			em.getTransaction().commit();
 
 		} catch (Exception e) {
-			log.error("Problema para actualizar la constancia de traspaso: " + constancia, e);
+			log.error("Problema para actualizar la constancia de traspaso... ", e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -145,7 +143,7 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 			em.persist(constancia);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			log.error("Problema para guardar la constancia de traspaso: " + constancia, e);
+			log.error("Problema para guardar la constancia de traspaso... ", e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -167,14 +165,6 @@ public class ConstanciaTraspasoDAO extends IBaseDAO<ConstanciaTraspaso, Integer>
 	@Override
 	public List<ConstanciaTraspaso> buscarPorCriterios(ConstanciaTraspaso e) {
 		return null;
-	}
-
-	public EntityManager getEm() {
-		return em;
-	}
-
-	public void setEm(EntityManager em) {
-		this.em = em;
 	}
 
 }

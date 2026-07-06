@@ -10,9 +10,12 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
-
+        private static Logger log = LogManager.getLogger(ContactoDAO.class);
+        
 	@Override
 	public Contacto buscarPorId(Integer id) {
 
@@ -37,9 +40,8 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 			em.getTransaction().begin();
 			em.merge(contacto);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al actualizar el contacto...", e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -60,9 +62,8 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 			em.getTransaction().begin();
 			em.remove(em.merge(contacto));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al eliminar el contacto... " + e.getMessage());
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -79,8 +80,9 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 		ClienteContactoDAO clienteContactoDAO = new ClienteContactoDAO();
 		ClienteContacto clienteContacto = new ClienteContacto();
 		String error = null;
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(contacto);
 			em.getTransaction().commit();
@@ -91,11 +93,11 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 			clienteContacto.setStHabilitado(true);
 			clienteContacto.setStUsuario("A");
 			error = clienteContactoDAO.guardar(clienteContacto) == null ? null : "ERROR";
-
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al guardar el contacto... ", e);
 			error = "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return error;
 	}

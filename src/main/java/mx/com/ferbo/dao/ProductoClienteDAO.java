@@ -94,6 +94,8 @@ public class ProductoClienteDAO extends IBaseDAO<ProductoPorCliente, Integer> {
 			alProductos = em.createNamedQuery("ProductoPorCliente.findByCteCve", ProductoPorCliente.class)
 					.setParameter("cteCve", idCliente)
 					.getResultList();
+		} catch(Exception ex) {
+			log.error("Error al momento de obtener al cliente con id: {}. {}", idCliente, ex.getMessage(), ex);
 		} finally {
 			if (entityManagerInternal) {
 				EntityManagerUtil.close(em);

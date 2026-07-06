@@ -16,22 +16,27 @@ import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class NotaCreditoDAO extends BaseDAO<NotaCredito, Integer> {
-	public NotaCreditoDAO() {
+	private static Logger log = LogManager.getLogger(NotaCreditoDAO.class);
+    
+        public NotaCreditoDAO() {
 		super(NotaCredito.class);
 	}
-	
-	private static Logger log = LogManager.getLogger(NotaCreditoDAO.class);
-
-	EntityManager entity = EntityManagerUtil.getEntityManager();
-	EntityManager em = null;
 
 	@SuppressWarnings("unchecked")
 	public List<NotaCredito> findAll() {
-		List<NotaCredito> notaCredito;
-		Query sql = entity.createNamedQuery("NotaCredito.findAll", NotaCredito.class);
+            List<NotaCredito> notaCredito = null;
+            EntityManager entity = null;
+	    try {
+                entity = EntityManagerUtil.getEntityManager();
+                Query sql = entity.createNamedQuery("NotaCredito.findAll", NotaCredito.class);
 		notaCredito = sql.getResultList();
 		System.out.println(notaCredito + "*****************************************************");
-		return notaCredito;
+            } catch (Exception ex) {
+                log.error("Problema para consultar las notas de crédito...", ex);
+            } finally {
+                EntityManagerUtil.close(entity);
+            }
+            return notaCredito;
 	}
 	
 	public List<NotaCredito> buscarPor(Date fechaInicio, Date fechaFin, Integer idCliente) {

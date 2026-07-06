@@ -34,9 +34,16 @@ public class TipoMailDAO extends IBaseDAO<TipoMail, Integer> {
 
 	@Override
 	public List<TipoMail> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
 		List<TipoMail> listado = null;
-		listado = em.createNamedQuery("TipoMail.findAll", TipoMail.class).getResultList();
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("TipoMail.findAll", TipoMail.class).getResultList();
+		} catch (Exception ex) {
+			System.err.println("Error: " + ex.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 

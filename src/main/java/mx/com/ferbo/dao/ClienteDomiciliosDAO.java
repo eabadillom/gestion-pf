@@ -25,10 +25,18 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 
 	@Override
 	public List<ClienteDomicilios> buscarTodos() {
-		List<ClienteDomicilios> listado;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("ClienteDomicilios.findAll", ClienteDomicilios.class).getResultList();
-		return listado;
+            List<ClienteDomicilios> listado = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		listado = em.createNamedQuery("ClienteDomicilios.findAll", ClienteDomicilios.class)
+                    .getResultList();
+            } catch (Exception ex) {
+                log.error("Problema para obtener el listado de domicilios por cliente...", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 
 	@Override
@@ -47,7 +55,7 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 		} catch (Exception ex) {
 			log.error("Problema para obtener el listado de domicilios por cliente...", ex);
 		} finally {
-
+                    EntityManagerUtil.close(em);
 		}
 
 		return lista;
@@ -81,9 +89,9 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 
 	@Override
 	public String actualizar(ClienteDomicilios clienteDomicilio) {
-		
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery(
 					"UPDATE cliente_domicilios SET CTE_CVE = :cteCve, domicilio_tipo_cve = :domicilioTipoCve WHERE (id = :id)")
@@ -93,43 +101,46 @@ public class ClienteDomiciliosDAO extends IBaseDAO<ClienteDomicilios, Integer> {
 					.setParameter("domCve", clienteDomicilio.getDomicilios().getDomCve())
 					.setParameter("id", clienteDomicilio.getId()).executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema al actualizar el domicilio del cliente... ", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(ClienteDomicilios clienteDomicilio) {
-		
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(clienteDomicilio);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema al guardar el domicilio del cliente...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(ClienteDomicilios clienteDom) {
-		
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery("DELETE FROM cliente_domicilios WHERE (id = :id)")
 					.setParameter("id", clienteDom.getId()).executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

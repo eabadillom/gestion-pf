@@ -12,7 +12,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.UnidadDeProducto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
+public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer> {
 	private static Logger log = LogManager.getLogger(UnidadDeProducto.class);
 
 	@Override
@@ -28,24 +28,24 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			if (em != null)
-				em.close();
+			EntityManagerUtil.close(em);
 		}
 		return bean;
 	}
-	
+
 	public List<UnidadDeProducto> buscarPorCliente(Integer idCliente) {
 		List<UnidadDeProducto> modelList = null;
 		EntityManager em = null;
-		
+
 		try {
 			em = this.getEntityManager();
-		} catch(Exception ex) {
+			modelList = em.createNamedQuery("UnidadDeProducto.findByCliente", UnidadDeProducto.class)
+					.setParameter("idCLiente", idCliente).getResultList();
+		} catch (Exception ex) {
 			log.error("Problema para obtener la lista de Unidades de producto por cliente...", ex);
 		} finally {
-			this.close(em);
+			EntityManagerUtil.close(em);
 		}
-		
 		return modelList;
 	}
 
@@ -82,34 +82,34 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			if (em != null)
-				em.close();
+			EntityManagerUtil.close(em);
 		}
 		return bean;
 	}
 
 	@Override
 	public String actualizar(UnidadDeProducto unidadDeProducto) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(unidadDeProducto);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			System.err.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
-
 		return null;
 	}
 
 	@Override
 	public String guardar(UnidadDeProducto unidadDeProducto) {
 		EntityManager em = null;
-		
+
 		try {
-			em = this.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(unidadDeProducto);
 			em.getTransaction().commit();
@@ -117,9 +117,9 @@ public class UnidadDeProductoDAO extends IBaseDAO<UnidadDeProducto, Integer>{
 			log.error("Al guardar la unidad de producto...", e);
 			return "ERROR";
 		} finally {
-			this.close(em);
+			EntityManagerUtil.close(em);
 		}
-		
+
 		return null;
 	}
 

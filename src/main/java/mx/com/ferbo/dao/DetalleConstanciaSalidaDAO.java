@@ -23,13 +23,19 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 
 	@Override
 	public List<DetalleConstanciaSalida> buscarTodos() {
+            List<DetalleConstanciaSalida> listado = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
 
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		List<DetalleConstanciaSalida> listado = null;
-
-		listado = em.createNamedQuery("DetalleConstanciaSalida.findAll", DetalleConstanciaSalida.class).getResultList();
-
-		return listado;
+		listado = em.createNamedQuery("DetalleConstanciaSalida.findAll", DetalleConstanciaSalida.class)
+                    .getResultList();
+            } catch (Exception e) {
+                log.error("Problema al buscar la lista de detalle de constancia de salida...", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 
 	@Override
@@ -38,19 +44,25 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 	}
 
 	public List<DetalleConstanciaSalida> buscarPorPartidaCve(Partida partida) {
-
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		List<DetalleConstanciaSalida> lista = null;
-		lista = em.createNamedQuery("DetalleConstanciaSalida.findByPartidaCve", DetalleConstanciaSalida.class)
+            List<DetalleConstanciaSalida> lista = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                lista = em.createNamedQuery("DetalleConstanciaSalida.findByPartidaCve", DetalleConstanciaSalida.class)
 				.setParameter("partidaCve", partida.getPartidaCve()).getResultList();
-
-		return lista;
+            } catch (Exception e) {
+                log.error("Problema al buscar la lista de detalle de constancia de salida...", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return lista;
 	}
 
 	public List<DetalleConstanciaSalida> buscarPorPartidaCve(Partida partida, boolean isFullInfo) {
-
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		List<DetalleConstanciaSalida> lista = null;
+            List<DetalleConstanciaSalida> lista = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
 		lista = em.createNamedQuery("DetalleConstanciaSalida.findByPartidaCve", DetalleConstanciaSalida.class)
 				.setParameter("partidaCve", partida.getPartidaCve()).getResultList();
 		if (isFullInfo == false)
@@ -59,8 +71,12 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 		for (DetalleConstanciaSalida dcs : lista) {
 			log.debug("PartidaCve: {}", dcs.getPartidaCve().getPartidaCve());
 		}
-
-		return lista;
+            } catch (Exception e) {
+                log.error("Problema al buscar la lista de detalle de constancia de salida...", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return lista;
 	}
 
 	@Override
@@ -70,16 +86,19 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 
 	@Override
 	public String guardar(DetalleConstanciaSalida detalleConstanciaSalida) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(detalleConstanciaSalida);
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			log.error("Error al guardar el detalle de constancia salida...", e);
 			return "ERROR";
-		}
+		} finally {
+                    EntityManagerUtil.close(em);
+                }
 		return null;
 	}
 
@@ -94,11 +113,21 @@ public class DetalleConstanciaSalidaDAO extends IBaseDAO<DetalleConstanciaSalida
 	}
 
 	public List<DetalleConstanciaSalida> buscarPorParams(Partida p, ConstanciaDeDeposito cDepSel) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("DetalleConstanciaSalida.findByParams", DetalleConstanciaSalida.class)
-				.setParameter("partidaCve", p.getPartidaCve().intValue())
-				.setParameter("folioEntrada", cDepSel.getFolioCliente())
-				.setParameter("producto", p.getUnidadDeProductoCve().getProductoCve().getProductoDs()).getResultList();
+            List<DetalleConstanciaSalida> lista = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		lista = em.createNamedQuery("DetalleConstanciaSalida.findByParams", DetalleConstanciaSalida.class)
+                    .setParameter("partidaCve", p.getPartidaCve().intValue())
+                    .setParameter("folioEntrada", cDepSel.getFolioCliente())
+                    .setParameter("producto", p.getUnidadDeProductoCve().getProductoCve().getProductoDs())
+                    .getResultList();
+            } catch (Exception e) {
+                log.error("Problema al eliminar la lista de detalle de constancia de salida...", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return lista;
 	}
 
 }

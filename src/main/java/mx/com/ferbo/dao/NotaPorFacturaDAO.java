@@ -7,8 +7,11 @@ import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.NotaPorFactura;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class NotaPorFacturaDAO extends IBaseDAO<NotaPorFactura, Integer> {
+        private static Logger log = LogManager.getLogger(NotaPorFacturaDAO.class);
 
 	@Override
 	public NotaPorFactura buscarPorId(Integer id) {
@@ -27,34 +30,35 @@ public class NotaPorFacturaDAO extends IBaseDAO<NotaPorFactura, Integer> {
 
 	@Override
 	public String actualizar(NotaPorFactura nota) {
-		try {
-
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(nota);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("Error: " + e.getMessage());
-		}
+			log.error("Error al actualizar la nota por factura... " + e.getMessage());
+		} finally {
+                    EntityManagerUtil.close(em);
+                }
 
 		return null;
 	}
 
 	@Override
 	public String guardar(NotaPorFactura nota) {
-
+                EntityManager em = null;
 		try {
-
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(nota);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage());
+			log.error("Error al guardar una nota por factura... " + e.getMessage());
 			return "ERROR";
-		}
+		} finally {
+                    EntityManagerUtil.close(em);
+                }
 
 		return null;
 	}

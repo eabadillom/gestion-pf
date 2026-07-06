@@ -18,9 +18,16 @@ public class TipoTelefonoDAO extends IBaseDAO<TipoTelefono, Integer> {
 
 	@Override
 	public List<TipoTelefono> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
 		List<TipoTelefono> listado = null;
-		listado = em.createNamedQuery("TipoTelefono.findAll", TipoTelefono.class).getResultList();
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("TipoTelefono.findAll", TipoTelefono.class).getResultList();
+		} catch (Exception ex) {
+			System.err.println("Error al buscar todos los tipos de telefóno: " + ex.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 

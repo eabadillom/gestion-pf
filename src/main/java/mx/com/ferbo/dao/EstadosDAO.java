@@ -1,7 +1,5 @@
 package mx.com.ferbo.dao;
 
-import static mx.com.ferbo.util.EntityManagerUtil.getEntityManager;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -25,11 +23,18 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	
 	@SuppressWarnings("unchecked")
 	public List<Estados> findall() {
-		EntityManager entity = getEntityManager();
+		EntityManager entity = null;
 		List<Estados> estados = null;
-		Query sql = entity.createNamedQuery("Estados.findAll", Estados.class);
-		estados = sql.getResultList();
-		entity.close();
+		try {
+                    entity = EntityManagerUtil.getEntityManager();
+                
+                    Query sql = entity.createNamedQuery("Estados.findAll", Estados.class);
+                    estados = sql.getResultList();
+		} catch (Exception ex) {
+			log.error("Problema al buscar el Estado", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
+		}
 		return estados;
 	}
 	@Override
@@ -48,7 +53,7 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 			
 		} catch (Exception ex) {
 			log.error("Problema al buscar el Estado", ex);
-		}finally {
+		} finally {
 			EntityManagerUtil.close(entity);
 		}
 		
@@ -76,67 +81,92 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 
 	@Override
 	public List<Estados> buscarTodos() {
-		List<Estados> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
+            List<Estados> listado = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
 		listado = em.createNamedQuery("Estados.findAll", Estados.class).getResultList();
-		return listado;
+            } catch(Exception ex) {
+                log.warn("Problema para obtener la información del Estado...", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 
 	public List<Estados> buscarPorCriteriosEstados(Estados e) {
-		List<Estados> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("Estados.findByPaisCve", Estados.class).setParameter("paisCve", e.getEstadosPK().getPais().getPaisCve()).getResultList();
-		return listado;
+            List<Estados> listado = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		listado = em.createNamedQuery("Estados.findByPaisCve", Estados.class)
+                    .setParameter("paisCve", e.getEstadosPK().getPais().getPaisCve())
+                    .getResultList();
+            } catch(Exception ex) {
+                log.warn("Problema para obtener la información del Estado...", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 	
 	@Override
 	public List<Estados> buscarPorCriterios(Estados e) {
 		// TODO Auto-generated method stub
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		if (e.getEstadosPK().getPais().getPaisCve() != null) {
-			TypedQuery<Estados> consEstados = em.createNamedQuery("Estados.findByPaisCve", Estados.class);
-			consEstados.setParameter("paisCve", e.getEstadosPK().getPais().getPaisCve());
-			List<Estados> listado = consEstados.getResultList();
-			return listado;
-		} else {
-			return null;
-		} 
+            List<Estados> listEstados = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                TypedQuery<Estados> consEstados = em.createNamedQuery("Estados.findByPaisCve", Estados.class);
+                consEstados.setParameter("paisCve", e.getEstadosPK().getPais().getPaisCve());
+                listEstados = consEstados.getResultList();
+                } catch(Exception ex) {
+                log.warn("Problema para obtener la información del Estado...", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listEstados;
 	}
 
 	@Override
 	public String actualizar(Estados estados) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(estados);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR actualizando Estado" + e.getMessage());
-			return "ERROR";
+                    log.error("ERROR actualizando Estado", e);
+                    return "ERROR";
+		} finally {
+                    EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(Estados estados) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(estados);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Estado" + e.getMessage());
+			log.error("ERROR guardando Estado", e);
 			return "ERROR";
+		} finally {
+                    EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(Estados estados) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createQuery("DELETE FROM Estados e WHERE e.estadosPK.pais.paisCve =:paisCve and e.estadosPK.estadoCve =:estadoCve")
 			.setParameter("paisCve", estados.getEstadosPK().getPais().getPaisCve())
@@ -144,8 +174,10 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al eliminar un estado", e);
 			return "ERROR";
+		} finally {
+                    EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -157,17 +189,36 @@ public class EstadosDAO extends IBaseDAO<Estados, Integer>{
 	}
 
 	public List<Estados> buscaPorId(Integer id) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Estados.findByEstadoCve", Estados.class)
-				.setParameter("estadoCve", id).getResultList();
+            List<Estados> listEstados = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		listEstados = em.createNamedQuery("Estados.findByEstadoCve", Estados.class)
+                    .setParameter("estadoCve", id)
+                    .getResultList();
+            } catch (Exception e) {
+                log.error("Error al obneter la lista de estados", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listEstados;
 	}
 	
 	public List<Estados> buscaPorAsentamiento(AsentamientoHumano as) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Estados.findByCriterios", Estados.class)
-				.setParameter("paisCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
-				.setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
-                                .getResultList();
+	    List<Estados> listEstados = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		listEstados = em.createNamedQuery("Estados.findByCriterios", Estados.class)
+                    .setParameter("paisCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisCve())
+                    .setParameter("estadoCve", as.getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getEstadoCve())
+                    .getResultList();
+            } catch (Exception e) {
+                log.error("Error al obtener la lista de estados", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listEstados;
 	}
 	
 	public List<Estados> buscarPorPais(Paises pais) {

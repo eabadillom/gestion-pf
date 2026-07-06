@@ -7,8 +7,11 @@ import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ColoniasDAO extends IBaseDAO<AsentamientoHumano, Integer> {
+        private static Logger log = LogManager.getLogger(ColoniasDAO.class);
 
 	@Override
 	public AsentamientoHumano buscarPorId(Integer id) {
@@ -18,10 +21,17 @@ public class ColoniasDAO extends IBaseDAO<AsentamientoHumano, Integer> {
 
 	@Override
 	public List<AsentamientoHumano> buscarTodos() {
-		List<AsentamientoHumano> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
+            List<AsentamientoHumano> listado = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
 		listado = em.createNamedQuery("AsentamientoHumano.findAll", AsentamientoHumano.class).getResultList();
-		return listado;
+            } catch (Exception e) {
+                log.error("Problema al eliminar la colonia...", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 
 	@Override
