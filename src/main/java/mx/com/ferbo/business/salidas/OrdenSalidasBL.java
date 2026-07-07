@@ -122,7 +122,7 @@ public class OrdenSalidasBL
 		.cliente(salida.getCliente())
 		.nombreCliente(salida.getCliente().getNombre())
 		.status(statusConstancia)
-		.observaciones(String.format("Orden salida: %s - %s", salida.getFolioSalida(), salida.getObservaciones()))
+		.observaciones(String.format("Orden salida: %s - ", salida.getFolioSalida()))
 		.build();
     	
     	//TODO Implementar logica de List<DetalleConstanciaSalida>
