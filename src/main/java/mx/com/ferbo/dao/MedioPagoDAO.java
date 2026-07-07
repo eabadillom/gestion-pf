@@ -25,32 +25,49 @@ public class MedioPagoDAO extends IBaseDAO<MedioPago, Integer> {
 		try {
 			mp = new MedioPago();
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("MedioPago.findByMpId", MedioPago.class).setParameter("mpId", id);
+			query = em.createNamedQuery("MedioPago.findByMpId", MedioPago.class)
+                            .setParameter("mpId", id);
 
 			mp = (MedioPago) query.getSingleResult();
 
 		} catch (Exception e) {
 			log.info("Error al buscar medio Pago por id", e.getMessage());
 		} finally {
-			em.close();
+			EntityManagerUtil.close(em);
 		}
 
 		return mp;
 	}
 
 	public MedioPago buscarPorFormaPago(String formaPago) {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		MedioPago mp = entity.createNamedQuery("MedioPago.findBympformaPago", MedioPago.class)
-				.setParameter("mpformaPago", formaPago).getSingleResult();
-		return mp;
+            EntityManager entity = null;
+            MedioPago mp = null;
+            try {
+                entity = EntityManagerUtil.getEntityManager();
+                mp = entity.createNamedQuery("MedioPago.findBympformaPago", MedioPago.class)
+                    .setParameter("mpformaPago", formaPago)
+                    .getSingleResult();
+            } catch (Exception ex) {
+                log.error("Problema para leer el catálogo de medios de pago...", ex);
+            } finally {
+                    EntityManagerUtil.close(entity);
+            }
+            return mp;
 	}
 
 	@Override
 	public List<MedioPago> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		List<MedioPago> lista = null;
-		lista = em.createNamedQuery("MedioPago.findAll", MedioPago.class).getResultList();
-		return lista;
+            EntityManager em = null;
+            List<MedioPago> lista = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                lista = em.createNamedQuery("MedioPago.findAll", MedioPago.class).getResultList();
+            } catch (Exception ex) {
+                log.error("Problema para leer el catálogo de medios de pago...", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }    
+            return lista;
 	}
 
 	@Override

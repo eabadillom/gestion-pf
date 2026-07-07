@@ -19,9 +19,16 @@ public class TiposDomicilioDAO extends IBaseDAO<TiposDomicilio, Integer> {
 
 	@Override
 	public List<TiposDomicilio> buscarTodos() {
-		List<TiposDomicilio> listado;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("TiposDomicilio.findAll", TiposDomicilio.class).getResultList();
+		List<TiposDomicilio> listado = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("TiposDomicilio.findAll", TiposDomicilio.class).getResultList();
+		} catch (Exception ex) {
+			System.err.println("Error: " + ex.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 

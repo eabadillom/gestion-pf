@@ -50,6 +50,8 @@ public class IngresoProductoDAO extends IBaseDAO<IngresoProducto, Integer> {
 
 		} catch (Exception e) {
 			log.info("Error al encontrar Ingresos Productos por idIngreso" + e.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 
 		return listaIngresoProducto;

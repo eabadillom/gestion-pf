@@ -23,8 +23,6 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 	private static Logger log = LogManager.getLogger(ConstanciaDeDepositoDAO.class);
 
-	public EntityManager em = null;
-
 	@Override
 	public ConstanciaDeDeposito buscarPorId(Integer id) {
 		
@@ -314,14 +312,6 @@ public class ConstanciaDeDepositoDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		return null;
 	}
 
-	public EntityManager getEm() {
-		return em;
-	}
-
-	public void setEm(EntityManager em) {
-		this.em = em;
-	}
-        
     public List<ConstanciaDeDeposito> buscarPorProducto(String nombreProducto) {
 		EntityManager em = null;
 		List<ConstanciaDeDeposito> constancias = null;

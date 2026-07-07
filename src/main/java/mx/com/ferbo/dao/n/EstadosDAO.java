@@ -101,15 +101,21 @@ public class EstadosDAO extends BaseDAO<Estados, Integer>
 
     public List<Estados> buscarPorCriterios(Estados e) {
         // TODO Auto-generated method stub
-        EntityManager em = EntityManagerUtil.getEntityManager();
-        if (e.getEstadosPK().getPais().getPaisCve() != null) {
+        List<Estados> listado = null;
+        EntityManager em = null;
+        try{
+            em = EntityManagerUtil.getEntityManager();
             TypedQuery<Estados> consEstados = em.createNamedQuery("Estados.findByPaisCve", Estados.class);
             consEstados.setParameter("paisCve", e.getEstadosPK().getPais().getPaisCve());
-            List<Estados> listado = consEstados.getResultList();
+            listado = consEstados.getResultList();
             return listado;
-        } else {
-            return null;
+        } catch (Exception ex) {
+            log.warn("Problema para obtener la información del Estado...", ex);
+        } finally {
+            EntityManagerUtil.close(em);
         }
+        
+        return listado;
     }
 
     public List<Estados> buscaPorId(Integer id) {

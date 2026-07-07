@@ -30,28 +30,34 @@ public class TelefonoDAO extends IBaseDAO<Telefono, Integer> {
 
 	@Override
 	public String actualizar(Telefono telefono) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(telefono);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			System.err.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(Telefono telefono) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(telefono);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			System.err.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

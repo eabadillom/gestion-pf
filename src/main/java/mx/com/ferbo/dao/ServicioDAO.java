@@ -51,15 +51,17 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 
 	@Override
 	public String actualizar(Servicio servicio) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(servicio);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -84,32 +86,36 @@ public class ServicioDAO extends IBaseDAO<Servicio, Integer> {
 
 	@Override
 	public String eliminar(Servicio servicio) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(servicio));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<Servicio> listado) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			for (Servicio servicio : listado) {
 				em.remove(em.merge(servicio));
 			}
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

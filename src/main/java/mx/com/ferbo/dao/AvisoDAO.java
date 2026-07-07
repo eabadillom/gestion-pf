@@ -134,7 +134,7 @@ public class AvisoDAO extends IBaseDAO<Aviso, Integer> {
 			em.merge(aviso);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema al actualizar el aviso...", e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -163,7 +163,7 @@ public class AvisoDAO extends IBaseDAO<Aviso, Integer> {
 					.setParameter("avisoTpFacturacion", e.getAvisoTpFacturacion()).executeUpdate();
 			em.getTransaction().commit();
 		} catch (Exception ex) {
-			System.out.println("ERROR" + ex.getMessage());
+			log.error("Problema al guardar el aviso...", ex);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -182,7 +182,7 @@ public class AvisoDAO extends IBaseDAO<Aviso, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception ex) {
-			System.out.println("ERROR" + ex.getMessage());
+			log.error("Problema al eliminar el aviso...", ex);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);

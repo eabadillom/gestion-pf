@@ -16,19 +16,34 @@ public class ClaveUnidadDAO extends IBaseDAO<ClaveUnidad,String>{
 
 	@Override
 	public ClaveUnidad buscarPorId(String cdUnidad) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("ClaveUnidad.findByCdUnidad", ClaveUnidad.class).
-				setParameter("cdUnidad", cdUnidad).getSingleResult();		
+            ClaveUnidad claveUnidad = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		claveUnidad = em.createNamedQuery("ClaveUnidad.findByCdUnidad", ClaveUnidad.class).
+				setParameter("cdUnidad", cdUnidad).getSingleResult();
+            } catch(Exception ex) {
+                    log.error("Problema para obtener los conceptos...", ex);
+            } finally {
+                    EntityManagerUtil.close(em);
+            }
+            return claveUnidad;
 	}
 
 	@Override
 	public List<ClaveUnidad> buscarTodos() {
-		
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		List<ClaveUnidad> lista = null; 
+            List<ClaveUnidad> lista = null;
+            EntityManager em = null;
+            try {
+		em = EntityManagerUtil.getEntityManager();
+		 
 		lista = em.createNamedQuery("ClaveUnidad.findAll", ClaveUnidad.class).getResultList();
-		
-		return lista;
+	    } catch(Exception ex) {
+                log.error("Problema para obtener los conceptos...", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return lista;
 	}
 	
 	public List<ClaveUnidad> buscarPorClaveNombre(String clave, String nombre) {
@@ -74,68 +89,72 @@ public class ClaveUnidadDAO extends IBaseDAO<ClaveUnidad,String>{
 
 	@Override
 	public String actualizar(ClaveUnidad claveUnidad) {
-		
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(claveUnidad);
 			em.getTransaction().commit();
-			em.close();
-		}catch(Exception e){
-			System.out.print("ERROR..." + e.getMessage());
+		} catch(Exception e){
+			log.error("Problema al actualizar los conceptos...", e);
 			return "ERROR";
-		}
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 		return null;
 	}
 
 	@Override
 	public String guardar(ClaveUnidad claveUnidad) {
-		
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(claveUnidad);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.print("ERROR..." + e.getMessage());
+			log.error("Problema al guardar los conceptos...", e);
 			return "ERROR";
-		}
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 		
 		return null;
 	}
 
 	@Override
 	public String eliminar(ClaveUnidad claveUnidad) {
-		
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(claveUnidad));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.print("ERROR..." + e.getMessage());
+			log.error("Problema al eliminar los conceptos...", e);
 			return "ERROR";
-		}
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 		
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<ClaveUnidad> listado) {
-		
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			for(ClaveUnidad claveUnidad:listado){
 				em.remove(em.merge(claveUnidad));
 			}
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.print("ERROR..." + e.getMessage());
-		}
+			log.error("Problema al eliminar el listado de conceptos...", e);
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 		
 		return null;
 	}
