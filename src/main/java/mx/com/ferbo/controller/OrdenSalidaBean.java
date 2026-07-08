@@ -416,15 +416,19 @@ public class OrdenSalidaBean implements Serializable {
 			if(observaciones == null || observaciones.equals(""))
 				throw new InventarioException("Debe indicar las observaciones");
 			
+			log.info("Elementos confirmados: {}", this.listaDetallesSelected.size());
+			if(this.listaDetallesSelected.size() <= 0)
+				throw new InventarioException("Debe confirmar al menos un producto");
+			
 			for(SalidaDetalleUI detalle : this.listaDetallesSelected) {
 				if(detalle.getTemperatura() == null)
 					throw new InventarioException("Debe indicar la temperatura de salida de sus productos.");
 			}
-			
 			dcsList = this.constancia.getDetalleConstanciaSalidaList();
 			
 			this.constancia = ordenSalidaBO.toConstanciaSalida(ordenSalida);
 			this.constancia.setNumero(this.folioSalida);
+			this.constancia.setObservaciones(this.constancia.getObservaciones().concat(this.observaciones));
 			
 			for (SalidaDetalleUI detalle : this.listaDetallesSelected) {
 				

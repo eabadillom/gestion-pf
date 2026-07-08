@@ -116,22 +116,23 @@ public class CandadoSalidaDAO extends IBaseDAO<CandadoSalida, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<CandadoSalida> findAll() {
-            List<CandadoSalida> list = null;
-            EntityManager entity = null;
-            try {
-                entity = EntityManagerUtil.getEntityManager();
-		Query sql = entity.createNamedQuery("CandadoSalida.findAll", CandadoSalida.class);
-		list = sql.getResultList();
+		List<CandadoSalida> list = null;
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("CandadoSalida.findAll", CandadoSalida.class);
+			list = sql.getResultList();
 
-		for (CandadoSalida c : list) {
-			log.debug(c.toString());
+			for (CandadoSalida c : list) {
+				log.debug(c.toString());
+				log.debug("idCliente: {}", c.getCliente().getCteCve());
+			}
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de candado de salida...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
-            } catch (Exception ex) {
-                log.error("Problema para obtener el listado de candado de salida...", ex);
-            } finally {
-                EntityManagerUtil.close(entity);
-            }
-            return list;
+		return list;
 	}
 
 	public String save(CandadoSalida candado) {
