@@ -7,35 +7,48 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:growl id="messages" showDetail="true" />
-			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
-				<div align="center">
-		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
-				</div>
-		    </p:dialog>
-			<p:toolbar>
-				<p:toolbarGroup>
-					<p:outputLabel for="startDateSelected" value="Fecha Inicio" />
-					<p:datePicker id="startDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.startDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
-						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" process="@this"/>
-					</p:datePicker>
-					<p:outputLabel for="endDateSelected" value="Fecha Fin" />
-					<p:datePicker id="endDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.endDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
-						<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this"/>
-					</p:datePicker>
-					
-					<p:divider></p:divider>
-					<span class="ui-float-label ui-input-icon-left">
-						<p:outputLabel for="soClientes" value="Clientes" />
-						<p:selectOneMenu id="soClientes" converter="entityConverter" value="#{ingresosActualizacionBean.cteSelect}" filter="true" filterMatchMode="contains">
-							<f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" />
-							<f:selectItems value="#{ingresosActualizacionBean.listaCtes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
-							<p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" />
-						</p:selectOneMenu>
-					</span>
-					<p:commandButton id="buscarPago" actionListener="#{ingresosActualizacionBean.filtraPagos()}" icon="pi pi-search" disabled="#{ingresosActualizacionBean.endDate eq null}" process="@this soClientes  startDateSelected endDateSelected" styleClass="edit-button ui-button-primary" value="Buscar" update="form:dt-pagos" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
-				</p:toolbarGroup>
-			</p:toolbar>
+			<!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+                    <ui:include src="/protected/common/status-info.xhtml" />
+                        <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
+                            <div class="p-grid ui-fluid">
+                                <div class="p-col-12 p-md-5">
+                                    <p:outputLabel for="startDateSelected" value="Fecha Inicio" />
+                                    <p:datePicker id="startDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.startDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                                        <p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" process="@this"/>
+                                    </p:datePicker>
+                                </div>
+                                <div class="p-col-12 p-md-5">
+                                    <p:outputLabel for="endDateSelected" value="Fecha Fin" />
+                                    <p:datePicker id="endDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.endDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                                        <p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this"/>
+                                    </p:datePicker>
+                                </div>
+                            </div>
+                            <div class="p-grid ui-fluid">
+                                <div class="p-col-12 p-md-5">
+                                    <p:outputLabel for="soClientes" value="Clientes" />
+                                    <p:selectOneMenu id="soClientes" converter="entityConverter" value="#{ingresosActualizacionBean.cteSelect}" filter="true" filterMatchMode="contains">
+                                        <f:selectItem itemLabel="--SELECCIONE UN CLIENTE--" />
+                                        <f:selectItems value="#{ingresosActualizacionBean.listaCtes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
+                                        <p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" />
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-12 p-md-5">
+                                    <p:outputLabel for="tipoMetodoPago" value="Metodo de Pago"/>
+                                    <p:selectOneMenu id="tipoMetodoPago" value="#{ingresosActualizacionBean.tipoMetodoPago}">
+                                        <f:selectItem itemLabel="--SELECCIONE UN METODO DE PAGO--" itemValue=""/>
+                                        <f:selectItem itemLabel="Pago en Una sola Exhibición (PUE)" itemValue="PUE"/>
+                                        <f:selectItem itemLabel="Pago en Parcialidades o Diferido (PPD)" itemValue="PPD"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-12 p-md-5">
+                                    <p:commandButton id="buscarPago" actionListener="#{ingresosActualizacionBean.filtraPagos()}" icon="pi pi-search" 
+                                        disabled="#{ingresosActualizacionBean.endDate eq null}" process="@this soClientes tipoMetodoPago startDateSelected endDateSelected" 
+                                        styleClass="edit-button ui-button-primary" value="Consultar" update="form:dt-pagos" onclick="PF('statusInfoDialog').show();" 
+                                        oncomplete="PF('statusInfoDialog').hide();" />
+                                </div>
+                            </div>
+                        </p:panel>
 			<div style="padding-top: 2rem;">
 				<p:dataTable id="dt-pagos" widgetVar="dtPagos" var="pPago"
 					value="#{ingresosActualizacionBean.listaPago}" reflow="true"
@@ -43,7 +56,7 @@
 					 rowKey="#{pPago.id}"
 					paginator="true" rows="10" rowSelectMode="add"
 					paginatorPosition="bottom" lazy="true">
-					<p:column headerText="Factura" width="5rem" style="text-align: center;">
+                                        <p:column headerText="Factura" width="5rem" style="text-align: center;">
 						<h:outputText
 							value="#{pPago.factura.nomSerie.concat('-').concat(pPago.factura.numero)}" />
 					</p:column>
@@ -61,18 +74,19 @@
 					<p:column headerText="Cliente" width="auto" style="text-align: left;">
 						<h:outputText value="#{pPago.factura.nombreCliente}" />
 					</p:column>
+                                        <p:column headerText="Parcialidad" width="auto" style="text-align: left;" >
+                                                <h:outputText value="#{not empty pPago.parcialidad and pPago.parcialidad ne 0 ? pPago.parcialidad : '-'}" />
+					</p:column>
 					<p:column headerText="Importe" width="6rem" style="text-align: right;">
 						<h:outputText value="#{pPago.monto}">
 							<f:convertNumber pattern="¤#,##0.00" currencySymbol="$" />
 						</h:outputText>
 					</p:column>
 					<p:column width="2rem">
-						<p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button ui-button-primary" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('informacionPagoDialogAct').show()" update="form:dt-pagos form:panel-actualizaPago" disabled="#{pPago.tipo.id == 5}" actionListener="#{ingresosActualizacionBean.cargaInfoPago}">
-							<f:setPropertyActionListener value="#{pPago}" target="#{ingresosActualizacionBean.pagoSelected}"/>
-						</p:commandButton>
+						<p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button ui-button-primary" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('informacionPagoDialogAct').show()" update="form:panel-actualizaPago" disabled="#{pPago.tipo.id == 5}" actionListener="#{ingresosActualizacionBean.cargaInfoPago(pPago)}" />
 					</p:column>
 					<p:column width="2rem">
-						<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('informacionPagoDialogActDelete').show()" disabled="#{pPago.tipo.id == 5}">
+						<p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('informacionPagoDialogActDelete').show()" disabled="#{pPago.tipo.id == 5}">
 							<f:setPropertyActionListener value="#{pPago}" target="#{ingresosActualizacionBean.pagoSelected}" />
 						</p:commandButton>
 					</p:column>
@@ -86,7 +100,7 @@
 					</f:facet>
 				</p:dataTable>
 			</div>
-			<p:dialog header="Actualizar Pago" showEffect="fade" modal="true" widgetVar="informacionPagoDialogAct" responsive="true">
+			<p:dialog header="Actualizar Pago" showEffect="fade" modal="true" widgetVar="informacionPagoDialogAct" responsive="true" cache="false">
 				<p:outputPanel id="panel-actualizaPago" class="ui-fluid">
 					<div class="p-grid p-col-12">
 						<div class="p-md-12 p-lg-12">
@@ -126,6 +140,12 @@
 								
 							</p:inputText>
 						</div>
+                                                <ui:fragment rendered="#{ingresosActualizacionBean.pagoSelected.factura.metodoPago eq ingresosActualizacionBean.PAGO_EN_PARCIALIDADES}">
+                                                    <div class="p-md-3 p-lg-3">
+                                                        <p:outputLabel for="@next" value="Parcialidad" styleClass="ml-4" />
+                                                        <p:inputNumber id="soParcialidad" widgetVar="parcialidad-new" value="#{ingresosActualizacionBean.pagoSelected.parcialidad}" decimalPlaces="0" thousandSeparator="" />
+                                                    </div>
+                                                </ui:fragment>
 						<div class="p-md-3 p-lg-3">
 							<p:outputLabel for="@next" value="Importe de pago" />
 							<p:inputNumber value="#{ingresosActualizacionBean.pagoSelected.monto}" symbol="$" decimalPlaces="2"/>
@@ -141,10 +161,19 @@
 						
 						update="panel-actualizaPago dt-pagos"
 						process="@this panel-actualizaPago" />
-					<p:commandButton value="Cancelar" icon="pi pi-times"
+                                        
+                                        <p:commandButton id="actualizarParcialidad" value="Calcular Parcialidad" icon="pi pi-refresh" 
+                                                actionListener="#{ingresosActualizacionBean.calcularParcialidad()}" 
+                                                process="@this panel-actualizaPago"
+                                                update="form:panel-actualizaPago form:soParcialidad" />
+                                        
+					<p:commandButton value="Cancelar" icon="pi pi-times" process="@this"
 						onclick="PF('informacionPagoDialogAct').hide()"
-						update="panel-actualizaPago dt-pagos"
-						class="ui-button-secondary" resetValues="true" />
+						update="panel-actualizaPago soParcialidad dt-pagos" 
+						class="ui-button-secondary" resetValues="true" 
+                                                actionListener="#{ingresosActualizacionBean.limpiarDialogo()}" >
+                                            <p:resetInput target="panel-actualizaPago" />
+                                        </p:commandButton>
 				</f:facet>
 			</p:dialog>
 			<p:confirmDialog widgetVar="informacionPagoDialogActDelete"

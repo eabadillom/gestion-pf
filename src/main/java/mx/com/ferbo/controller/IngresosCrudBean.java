@@ -42,6 +42,8 @@ public class IngresosCrudBean implements Serializable {
 
 	private static final long serialVersionUID = -626048119540963939L;
 	private static Logger log = LogManager.getLogger(IngresosCrudBean.class);
+        
+        private String PAGO_EN_PARCIALIDADES = "PPD";
 
 	private Integer idCte;
 	private BigDecimal totalSaldo;
@@ -87,6 +89,7 @@ public class IngresosCrudBean implements Serializable {
 	private ParametroDAO parametroDAO;
 	private BigDecimal iva;
 	private String montoLetra;
+        private Integer parcialidad;
 	
 	private FacesContext faceContext;
 	private HttpServletRequest httpServletRequest;
@@ -180,9 +183,18 @@ public class IngresosCrudBean implements Serializable {
 		List<Pago> listaPagos = new ArrayList<>();
 		listaPagos = pagofactDAO.buscarPorFactura(facturaSelect.getId());
 		BigDecimal sumaTotal = new BigDecimal(0);
-		for(Pago p: listaPagos) {
+                Integer numParcialidad = 0;
+                boolean esPPD = false;
+                if(facturaSelect.getMetodoPago().equals(PAGO_EN_PARCIALIDADES)) {
+                    esPPD = true;
+                }
+                for(Pago p: listaPagos) {
 			sumaTotal = sumaTotal.add(p.getMonto());
+                        if(p.getParcialidad() != null && esPPD){
+                            numParcialidad += 1;
+                        }
 		}
+                parcialidad = numParcialidad + 1;
 		log.debug("Suma total de pagos: {}", sumaTotal);
 		BigDecimal totalFactura = facturaSelect.getTotal();
 		restaTotal = totalFactura.subtract(sumaTotal); 
@@ -197,7 +209,7 @@ public class IngresosCrudBean implements Serializable {
 		PagoUI pagoUI = null;
 		
 		try {
-			log.debug("Factura: {}", this.facturaSelect);
+                        log.debug("Factura: {}", this.facturaSelect);
 			log.debug(this.pagoSelected);
 			pg = new Pago();
 			
@@ -209,7 +221,14 @@ public class IngresosCrudBean implements Serializable {
 			pg.setTipo(tipoPago);
 			pg.setReferencia(referencia);
 			pg.setFecha(fecha);
-			
+                        
+                        /*if(facturaSelect.getMetodoPago().equalsIgnoreCase(PAGO_EN_PARCIALIDADES)) {
+                            pg.setParcialidad(parcialidad);
+                        } else {
+                            pg.setParcialidad(null);
+                        }*/
+                        pg.setParcialidad(PAGO_EN_PARCIALIDADES.equalsIgnoreCase(facturaSelect.getMetodoPago()) ? parcialidad : null);
+                        
 			pagoUI = new PagoUI();
 			pagoUI.setPago(pg);
 
@@ -251,7 +270,9 @@ public class IngresosCrudBean implements Serializable {
 			cantidadApagar = null;
 			
 			log.debug("Lista pago: {}", this.listaPago);
-		
+                        log.info("Se termina de agregar el pago");
+                        message = "Pago agregado";
+			severity = FacesMessage.SEVERITY_INFO;
 		} catch(InventarioException ex){
 			message = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -348,6 +369,11 @@ public class IngresosCrudBean implements Serializable {
 			cteSelect = null;
 			pagoParcial = false;
 			porCobrar = false;
+                        subtotalGlobal = null;
+                        ivaGlobal = null;
+                        totalGlobal = null;
+                        montoLetra = null;
+                        parcialidad = null;
 			
 			severity = FacesMessage.SEVERITY_INFO;
 			message = "El pago se genero correctamente";
@@ -608,6 +634,20 @@ public class IngresosCrudBean implements Serializable {
 		this.montoLetra = montoLetra;
 	}
 
+        public Integer getParcialidad() {
+            return parcialidad;
+        }
 
+        public void setParcialidad(Integer parcialidad) {
+            this.parcialidad = parcialidad;
+        }
+
+        public String getPAGO_EN_PARCIALIDADES() {
+            return PAGO_EN_PARCIALIDADES;
+        }
+
+        public void setPAGO_EN_PARCIALIDADES(String PAGO_EN_PARCIALIDADES) {
+            this.PAGO_EN_PARCIALIDADES = PAGO_EN_PARCIALIDADES;
+        }
 
 }

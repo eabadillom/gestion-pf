@@ -106,6 +106,12 @@
 						<p:outputLabel for="@next" value="Cantidad a pagar" styleClass="ml-4" />
 						<p:inputNumber widgetVar="cantidad-new" id="cantidad-new" value="#{ingresosCrudBean.cantidadApagar}" symbol="$" decimalPlaces="2"/>
 					</div>
+                                        <ui:fragment rendered="#{not empty ingresosCrudBean.facturaSelect and ingresosCrudBean.facturaSelect.metodoPago eq ingresosCrudBean.PAGO_EN_PARCIALIDADES}">
+                                            <div class="p-field p-col-3 p-md-3" >
+                                                <p:outputLabel for="@next" value="Parcialidad" styleClass="ml-4" />
+                                                <p:inputNumber widgetVar="parcialidad-new" id="parcialidad-new" value="#{ingresosCrudBean.parcialidad}" decimalPlaces="0" thousandSeparator="" />
+                                            </div>
+                                        </ui:fragment>
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton icon="pi pi-check" value="Añadir" actionListener="#{ingresosCrudBean.agregaPagoFactura()}" process="pnlCliente @this" update="pnlCliente detallesFacturacion" oncomplete="PF('dialogFacturaConfirmacion').hide()" />
@@ -114,27 +120,6 @@
 			</p:dialog>
 			<div style="padding-top: 2rem;">
 				<p:dataTable id="detallesFacturacion" var="detFactura" value ="#{ingresosCrudBean.listaPago}">
-					<div style="text-align: right;">
-						<p:outputLabel value="Bueno por ">
-						</p:outputLabel>
-						<p:outputLabel id="subTotal" value="#{altaNotasCredito.sumaSubtotal}">
-							<f:convertNumber pattern="$#0.00" />
-						</p:outputLabel>
-					</div>
-					<div style="text-align: right;">
-						<p:outputLabel value="I.V.A. ">
-						</p:outputLabel>
-						<p:outputLabel id="iva" value="#{altaNotasCredito.ivaSubtotal}">
-							<f:convertNumber pattern="$#0.00" />
-						</p:outputLabel>
-					</div>			
-					<div style="text-align: right;">
-						<p:outputLabel value="A Pagar ">
-						</p:outputLabel>
-						<p:outputLabel id="total" value="#{altaNotasCredito.totalCantidad}">
-							<f:convertNumber pattern="$#0.00" />
-						</p:outputLabel>
-					</div>}" reflow="true" rowKey="#{ingresosCrudBean.facturaSelect}" scrollable="true" scrollHeight="9em" scrollRows="4" lazy="true">
 					<p:column headerText="Factura" width="8em">
 						<h:outputText value="#{detFactura.pago.factura.nomSerie}-#{detFactura.pago.factura.numero}"/>
 					</p:column>

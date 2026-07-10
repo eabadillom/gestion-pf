@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -29,36 +30,36 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "Pago.findByMonto", query = "SELECT p FROM Pago p WHERE p.monto = :monto"),
         @NamedQuery(name = "Pago.findByFecha", query = "SELECT p FROM Pago p WHERE p.fecha = :fecha"),
         @NamedQuery(name = "Pago.findByReferencia", query = "SELECT p FROM Pago p WHERE p.referencia = :referencia"),
-        @NamedQuery(name = "Pago.findByCheque", query = "SELECT p FROM Pago p WHERE p.cheque = :cheque"),
-        @NamedQuery(name = "Pago.findByChequeDevuelto", query = "SELECT p FROM Pago p WHERE p.chequeDevuelto = :chequeDevuelto"),
         @NamedQuery(name = "Pago.findByFacturaId", query = "SELECT p FROM Pago p WHERE p.factura.id = :facturaId"),
-        @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)") })
-public class Pago implements Serializable {
+        @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)"),
+        @NamedQuery(name = "Pago.findByFacturaFechas", query = "SELECT p FROM Pago p WHERE (p.factura.id = :idFactura OR :idFactura IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate) AND p.factura.metodoPago = :metodoPago ORDER BY p.fecha ASC"),
+        @NamedQuery(name = "Pago.findByParametros", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate) AND p.factura.metodoPago = :metodoPago")
+})
+public class Pago implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "monto")
     private BigDecimal monto;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date fecha;
+    
     @Size(max = 20)
     @Column(name = "referencia")
     private String referencia;
     //El campo cheque se va a mostrar como "referencia" en la pantalla de usuario.
-    @Size(max = 10)
-    @Column(name = "cheque")
-    private String cheque; 
-    @Column(name = "cheque_devuelto")
-    private Boolean chequeDevuelto;
     
     @Basic(optional = true)
     @JoinColumn(name = "banco", referencedColumnName = "id")
@@ -72,6 +73,14 @@ public class Pago implements Serializable {
     @JoinColumn(name = "tipo", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private TipoPago tipo;
+    
+    @JoinColumn(name = "cd_comp_pago", referencedColumnName = "cd_comp_pago")
+    @ManyToOne(optional = true)
+    private ComplementoPago complementoPago;
+    
+    @Basic(optional = true)
+    @Column(name = "nu_parcialidad")
+    private Integer parcialidad;
 
     public Pago() {
     }
@@ -118,22 +127,6 @@ public class Pago implements Serializable {
         this.referencia = referencia;
     }
 
-    public String getCheque() {
-        return cheque;
-    }
-
-    public void setCheque(String cheque) {
-        this.cheque = cheque;
-    }
-
-    public Boolean getChequeDevuelto() {
-        return chequeDevuelto;
-    }
-
-    public void setChequeDevuelto(Boolean chequeDevuelto) {
-        this.chequeDevuelto = chequeDevuelto;
-    }
-
     public Bancos getBanco() {
         return banco;
     }
@@ -158,24 +151,63 @@ public class Pago implements Serializable {
         this.tipo = tipo;
     }
 
+    public ComplementoPago getComplementoPago() {
+        return complementoPago;
+    }
+
+    public void setComplementoPago(ComplementoPago complementoPago) {
+        this.complementoPago = complementoPago;
+    }
+
+    public Integer getParcialidad() {
+        return parcialidad;
+    }
+
+    public void setParcialidad(Integer parcialidad) {
+        this.parcialidad = parcialidad;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+        if (this.id == null) {
+            return System.identityHashCode(this);
+        }
+        return Objects.hash(this.id);
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Pago)) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null) {
             return false;
         }
-        Pago other = (Pago) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if (getClass() != object.getClass()) {
             return false;
         }
-        return true;
+        final Pago other = (Pago) object;
+        if(this.id == null || other.id == null)
+            return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+       
+        return Objects.equals(this.id, other.id);
+    }
+    
+    @Override
+    public Pago clone() throws CloneNotSupportedException {
+        Pago pago = null;
+        
+        pago = new Pago();
+        pago.setId(this.id == null ? null : new Integer(this.id));
+        pago.setMonto(this.monto);
+        pago.setFecha(this.fecha);
+        pago.setReferencia(this.referencia);
+        pago.setFactura(this.factura == null ? null : this.factura);
+        pago.setTipo(this.tipo);
+        pago.setComplementoPago(this.complementoPago == null ? null : this.complementoPago);
+        pago.setParcialidad(this.parcialidad == null ? null : this.parcialidad);
+        
+        return pago;
     }
 
     @Override
