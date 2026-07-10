@@ -22,8 +22,6 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 
 	private static Logger log = LogManager.getLogger(FacturacionServiciosDAO.class);
 
-	public EntityManager em = null;
-
 	@Override
 	public ConstanciaFacturaDs buscarPorId(Integer id) {
 		return null;
@@ -134,14 +132,6 @@ public class FacturacionServiciosDAO extends IBaseDAO<ConstanciaFacturaDs, Integ
 	@Override
 	public String eliminarListado(List<ConstanciaFacturaDs> listado) {
 		return null;
-	}
-
-	public EntityManager getEm() {
-		return em;
-	}
-
-	public void setEm(EntityManager em) {
-		this.em = em;
 	}
 
 }

@@ -17,13 +17,7 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Integer> {
 	private static Logger log = LogManager.getLogger(ConstanciaServicioDAO.class);
 
-	public EntityManager em = null;
-
 	public ConstanciaServicioDAO() {
-	}
-
-	public ConstanciaServicioDAO(EntityManager em) {
-		this.em = em;
 	}
 
 	@Override
@@ -90,7 +84,7 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 
 			em.getTransaction().commit();
 		} catch (Exception ex) {
-			EntityManagerUtil.rollback(em);
+			log.error("Problema obtener la consulta de constancias de servicio...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -164,7 +158,7 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 			em.getTransaction().commit();
 		} catch (Exception ex) {
 			EntityManagerUtil.rollback(em);
-			ex.printStackTrace();
+                        log.error("Problema al guardar la constancia de servicio...", ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -180,12 +174,5 @@ public class ConstanciaServicioDAO extends IBaseDAO<ConstanciaDeServicio, Intege
 	public String eliminarListado(List<ConstanciaDeServicio> listado) {
 		return null;
 	}
-
-	public EntityManager getEntityManager() {
-		return em;
-	}
-
-	public void setEntityManager(EntityManager em) {
-		this.em = em;
-	}
+        
 }

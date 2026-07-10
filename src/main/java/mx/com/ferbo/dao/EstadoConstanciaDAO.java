@@ -8,9 +8,12 @@ import javax.persistence.Query;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.EstadoConstancia;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
-
+        private static Logger log = LogManager.getLogger(EstadoConstanciaDAO.class);
+        
 	@Override
 	public EstadoConstancia buscarPorId(Integer id) {
 		EstadoConstancia bean = null;
@@ -19,14 +22,13 @@ public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
 
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("EstadoConstancia.findByEdoCve", EstadoConstancia.class).setParameter("edoCve",
-					id);
+			query = em.createNamedQuery("EstadoConstancia.findByEdoCve", EstadoConstancia.class)
+                            .setParameter("edoCve",id);
 			bean = (EstadoConstancia) query.getSingleResult();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("Error al obtener el estado constancia", ex);
 		} finally {
-			if (em != null)
-				em.close();
+			EntityManagerUtil.close(em);
 		}
 		return bean;
 	}
@@ -37,7 +39,10 @@ public class EstadoConstanciaDAO extends IBaseDAO<EstadoConstancia, Integer> {
 		List<EstadoConstancia> alEstados = null;
 		try {
 			entity = EntityManagerUtil.getEntityManager();
-			alEstados = entity.createNamedQuery("EstadoConstancia.findAll", EstadoConstancia.class).getResultList();
+			alEstados = entity.createNamedQuery("EstadoConstancia.findAll", EstadoConstancia.class)
+                            .getResultList();
+		} catch (Exception ex) {
+			log.error("Error al obtener el listado de estado de constancias...", ex);
 		} finally {
 			EntityManagerUtil.close(entity);
 		}

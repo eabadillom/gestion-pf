@@ -28,7 +28,7 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 			query = em.createNamedQuery("ClienteContacto.findById", ClienteContacto.class).setParameter("id", id);
 			clienteContacto = (ClienteContacto) query.getSingleResult();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("Problema al buscar el contacto del cliente por el identificador {}... ", id, ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -54,7 +54,7 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 				log.debug("Tipo Telefono: " + medioContacto.getIdTelefono().getTpTelefono().getTpTelefono());
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("Problema al buscar el contacto del cliente por el identificador...",ex);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -64,10 +64,17 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 
 	@Override
 	public List<ClienteContacto> buscarTodos() {
-		List<ClienteContacto> listado;
-		EntityManager em = EntityManagerUtil.getEntityManager();
+            List<ClienteContacto> listado = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
 		listado = em.createNamedQuery("ClienteContacto.findAll", ClienteContacto.class).getResultList();
-		return listado;
+            } catch (Exception ex) {
+                log.error("Problema al buscar el listado del contacto del cliente...",ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 
 	@Override
@@ -78,32 +85,36 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 
 	@Override
 	public String actualizar(ClienteContacto clienteContacto) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 //			em.merge(clienteContacto.getIdContacto());
 			em.merge(clienteContacto);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema al actualizar el contacto del cliente... ", e);
 			return "ERROR";
-		}
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 		return null;
 	}
 
 	@Override
 	public String guardar(ClienteContacto clienteContacto) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(clienteContacto);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Problema al guardar el cliente contacto... ", e);
 			return "ERROR";
-		}
+		} finally {
+                        EntityManagerUtil.close(em);
+                }
 		return null;
 	}
 
@@ -122,7 +133,7 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 			em.remove(tmpObj);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Problema al eliminar el contacto del cliente... ", e);
 		} finally {
 			EntityManagerUtil.close(em);
 		}

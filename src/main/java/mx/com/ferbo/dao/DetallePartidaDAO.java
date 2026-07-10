@@ -61,7 +61,6 @@ public class DetallePartidaDAO extends IBaseDAO<DetallePartida, Integer> {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			log.error("Problema para guardar en Detalle Partida...", e);
-			System.out.println("ERROR" + e.getCause());
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);

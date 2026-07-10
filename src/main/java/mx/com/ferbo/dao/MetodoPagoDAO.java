@@ -22,19 +22,33 @@ public class MetodoPagoDAO extends IBaseDAO<MetodoPago, String> {
 	}
 
 	public MetodoPago buscarPorMetodoPago(String metodoPago) {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		MetodoPago metodoP = entity.createNamedQuery("MetodoPago.findByCdMetodoPago", MetodoPago.class)
+            EntityManager entity = null;
+            MetodoPago metodoP = null;
+            try {
+                entity = EntityManagerUtil.getEntityManager();
+		metodoP = entity.createNamedQuery("MetodoPago.findByCdMetodoPago", MetodoPago.class)
 				.setParameter("cdMetodoPago", metodoPago).getSingleResult();
-		return metodoP;
+            } catch (Exception ex) {
+                log.error("Problema para obtener información del catálogo metodo_pago", ex);
+            } finally {
+                EntityManagerUtil.close(entity);
+            }
+            return metodoP;
 	}
 
 	@Override
 	public List<MetodoPago> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		List<MetodoPago> lista = null;
+            EntityManager em = null;
+            List<MetodoPago> lista = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
 		lista = em.createNamedQuery("MetodoPago.findAll", MetodoPago.class).getResultList();
-
-		return lista;
+            } catch (Exception ex) {
+                log.error("Problema para obtener información del catálogo metodo_pago", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return lista;
 	}
 
 	@SuppressWarnings("unchecked")

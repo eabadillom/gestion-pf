@@ -28,7 +28,7 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		return p;
 	}
 
-	@Override
+	@Override 
 	public Pago buscarPorId(Integer id) {
 		EntityManager em = null;
 		Pago pago = null;
@@ -45,6 +45,7 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		return pago;
 	}
 
+	
 	public Pago buscarPorId(Integer id, boolean isFullInfo) {
 		EntityManager em = null;
 		Pago pago = null;
@@ -70,6 +71,7 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		return pago;
 	}
 
+	
 	public List<Pago> buscarPorFactura(Integer id) {
 		List<Pago> lista = null;
 		EntityManager em = null;
@@ -98,14 +100,14 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		return null;
 	}
 
-	@Override
+	@Override 
 	public String actualizar(Pago pago) {
 		EntityManager em = null;
 
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-//			em.merge(pago);
+			// em.merge(pago);
 			em.createNativeQuery(
 					"UPDATE pago SET factura = :idFactura, tipo = :idTipo, monto= :monto, fecha = :fecha, banco = :idBanco, referencia = :referencia, nu_parcialidad = :parcialidad WHERE id = :idPago")
 					.setParameter("idFactura", pago.getFactura().getId()).setParameter("idTipo", pago.getTipo().getId())
@@ -124,25 +126,29 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		return null;
 	}
 
-	@Override
+	@Override 
 	public String guardar(Pago e) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(e);
 			em.getTransaction().commit();
 		} catch (Exception ex) {
 			System.out.println("ERROR" + ex.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 
 	}
 
-	@Override
+	@Override 
 	public String eliminar(Pago e) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createQuery("DELETE FROM Pago as p where p.id = :id").setParameter("id", e.getId()).executeUpdate();
 			em.getTransaction().commit();
@@ -150,6 +156,8 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		} catch (Exception ex) {
 			System.out.println("ERROR" + ex.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 
@@ -161,18 +169,34 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 	}
 
 	public List<Pago> buscaPorFactura(Factura f) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Pago.findByFacturaId", Pago.class).setParameter("facturaId", f.getId())
-				.getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			return em.createNamedQuery("Pago.findByFacturaId", Pago.class).setParameter("facturaId", f.getId())
+					.getResultList();
+		} catch (Exception ex) {
+			System.out.println("ERROR" + ex.getMessage());
+			return null;
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 	}
 
 	public List<Pago> buscaPorClienteFechas(Cliente c, Date startDate, Date endDate, String metodoPago) {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Pago.findByParametros", Pago.class)
-				.setParameter("cteCve", (c == null ? null : c.getCteCve())).setParameter("startDate", startDate)
-				.setParameter("endDate", endDate)
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			return em.createNamedQuery("Pago.findByParametros", Pago.class)
+                                .setParameter("cteCve", (c == null ? null : c.getCteCve())).setParameter("startDate", startDate)
+                                .setParameter("endDate", endDate)
                                 .setParameter("metodoPago", metodoPago)
                                 .getResultList();
+		} catch (Exception ex) {
+			System.out.println("ERROR" + ex.getMessage());
+			return null;
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 	}
         
         public List<Pago> buscaPorFacturaFechas(Factura f, Date startDate, Date endDate, String metodoPago) throws DAOException {

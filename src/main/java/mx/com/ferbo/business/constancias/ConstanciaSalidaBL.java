@@ -89,6 +89,8 @@ public class ConstanciaSalidaBL {
 		} catch(Exception ex) {
 			log.error("Problema para generar el ticket de la constancia de salida...", ex);
 			response = Optional.empty();
+		} finally {
+			EntityManagerUtil.close(conn);
 		}
 		
 		return response;
