@@ -54,11 +54,11 @@
 			</p:dataList>
 			<p:dialog header="Candado de salida" widgetVar="dg-modifica" modal="true" showEffect="fade" responsive="true">
 				<p:outputPanel id="frm-modifica" class="p-grid ui-fluid">
-					<div class="p-col-12 p-md-12 p-field">
+					<div class="p-col-12 p-md-8 p-field">
 						<p:outputLabel for="@next" value="Cliente" />
 						<p:inputText value="#{candadoSalidaBean.cliente.nombre}" disabled="true" />
 					</div>
-					<div class="p-col-12 p-md-12 p-field">
+					<div class="p-col-12 p-md-4 p-field">
 						<p:outputLabel value="Ordenes de retiro pendientes"/>
 						<p:inputNumber value="#{candadoSalidaBean.ordenesSalida.size()}" disabled="true" />
 					</div>
