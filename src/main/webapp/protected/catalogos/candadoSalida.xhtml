@@ -3,59 +3,83 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+	<f:metadata>
+        <f:event type="preRenderView" listener="#{candadoSalidaBean.precarga()}" />
+    </f:metadata>
 	<ui:define name="title">Candado Salida</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
-			<p:growl id="messages" showDetail="true" />
-			<div class="p-col-12">
-				<div class="card">
-					<p:dataTable id="dtCandado" widgetVar="dtCandado" var="cliente" value="#{candadoSalidaBean.clientes}" reflow="true" paginator="true" rows="10" paginatorPosition="bottom">
-						<p:column headerText="Núm." width="3rem" style="text-alignment: center;">
-							<h:outputText value="#{cliente.cteCve}" />
-						</p:column>
-						<p:column headerText="Nombre" filterBy="#{cliente.nombre}" filterMatchMode="contains">
-							<h:outputText value="#{cliente.nombre}" />
-						</p:column>
-						<p:column headerText="Permitir Salida" width="10rem" style="text-alignment: center;">
-							<h:outputText value="#{cliente.candadoSalida.habilitado ? 'Si' : 'No'}" />
-						</p:column>
-						<p:column headerText="No. Salidas Permitidas" width="10rem" style="text-alignment: center;">
-							<h:outputText value="#{cliente.candadoSalida.numSalidas}" />
-						</p:column>
-						<p:column class="p-text-center" width="3rem" style="text-alignment: center;">
-							<p:commandButton icon="pi pi-pencil" styleClass="ui-button-info" update="form:frm-modifica" process="@this" oncomplete="PF('dg-modifica').show()">
-								<f:setPropertyActionListener value="#{cliente}" target="#{candadoSalidaBean.cliente}" />
-							</p:commandButton>
-						</p:column>
-					</p:dataTable>
+			<ui:include src="/protected/common/status-info.xhtml"></ui:include>
+			<span class="ui-input-icon-left">
+		        <i class="pi pi-search" />
+				<p:inputText value="#{candadoSalidaBean.query}" placeholder="Buscar">
+					<p:ajax event="keyup" delay="400" process="@this" listener="#{candadoSalidaBean.buscar()}" update="dtCandado"/>
+				</p:inputText>
+		    </span>
+		    <p:spacer style="height: 1rem;"/>
+			<p:dataList id="dtCandado" widgetVar="dtCandado" value="#{candadoSalidaBean.busquedaClientes}" var="cliente" type="definition" paginator="true" paginatorPosition="bottom" rows="20" emptyMessage="No se encontraron clientes." >
+				<f:facet name="header">
+					<div class="p-grid ui-fluid">
+						<div class="p-col-12 p-md-7">
+							<p:outputLabel value="Cliente" />
+						</div>
+						<div class="p-col-4 p-md-2">
+							<p:outputLabel value="Habilitado" />
+						</div>
+						<div class="p-col-4 p-md-2">
+							<p:outputLabel value="Salidas" />
+						</div>
+						<div class="p-col-4 p-md-1">
+							<p:outputLabel value="" />
+						</div>
+					</div>
+				</f:facet>
+				<div class="p-grid ui-fluid">
+					<div class="p-col-12 p-md-7" style="text-align: center;">
+						<h:outputText value="#{cliente.nombre}" />
+					</div>
+					<div class="p-col-4 p-md-2" style="text-align: center;">
+						<h:outputText value="#{cliente.candadoSalida.habilitado ? 'Si' : 'No'}" />
+					</div>
+					<div class="p-col-4 p-md-2" style="text-align: center;">
+						<h:outputText value="#{cliente.candadoSalida.numSalidas}" />
+					</div>
+					<div class="p-col-4 p-md-1" style="text-align: center;">
+						<p:commandButton icon="pi pi-pencil" process="@this" actionListener="#{candadoSalidaBean.cargar(cliente)}" update="form:frm-modifica" oncomplete="PF('dg-modifica').show()">
+							<f:setPropertyActionListener value="#{cliente}" target="#{candadoSalidaBean.cliente}" />
+						</p:commandButton>
+					</div>
 				</div>
-			</div>
-			<p:dialog header="Modificar Candado Salida" widgetVar="dg-modifica"
-				modal="true" showEffect="fade" responsive="true">
-				<p:outputPanel id="frm-modifica" class="ui-fluid">
-					<div class="p-field">
-						<p:outputLabel for="@next" value="Nombre Cliente:" />
-						<p:inputText value="#{candadoSalidaBean.cliente.nombre}" required="true" disabled="true" />
+				<p:divider />
+			</p:dataList>
+			<p:dialog header="Candado de salida" widgetVar="dg-modifica" modal="true" showEffect="fade" responsive="true">
+				<p:outputPanel id="frm-modifica" class="p-grid ui-fluid">
+					<div class="p-col-12 p-md-12 p-field">
+						<p:outputLabel for="@next" value="Cliente" />
+						<p:inputText value="#{candadoSalidaBean.cliente.nombre}" disabled="true" />
 					</div>
-					<div class="p-field">
+					<div class="p-col-12 p-md-12 p-field">
+						<p:outputLabel value="Ordenes de retiro pendientes"/>
+						<p:inputNumber value="#{candadoSalidaBean.ordenesSalida.size()}" disabled="true" />
+					</div>
+					<div class="p-col-12 p-md-4 p-field">
 						<p:outputLabel for="@next" value="Permitir Salida (1 dia, con saldo vencido):" />
-						<p:selectBooleanCheckbox value="#{candadoSalidaBean.cliente.candadoSalida.habilitado}" />
+						<p:selectBooleanButton value="#{candadoSalidaBean.cliente.candadoSalida.habilitado}" onLabel="Permitir salida (1 día, con saldo vencido)" onIcon="pi pi-check" offLabel="Permitir salida (1 día, con saldo vencido)" offIcon="pi pi-times"/>
 					</div>
-					<div class="p-field">
-						<p:outputLabel for="@next" value="Numero Salidas Permitidas:" />
-						<p:inputNumber value="#{candadoSalidaBean.cliente.candadoSalida.numSalidas}" required="true" decimalPlaces="0" />
+					<div class="p-col-12 p-md-4 p-field">
+						<p:outputLabel for="@next" value="Salidas permitidas" />
+						<p:spinner value="#{candadoSalidaBean.cliente.candadoSalida.numSalidas}" min="0" decimalPlaces="0" buttons="horizontal"></p:spinner>
 					</div>
-					<div class="p-field">
+					<div class="p-col-12 p-md-4 p-field">
 						<p:outputLabel for="@next" value="Permitir salida del total de la mercancía:"/>
-						<p:selectBooleanCheckbox value="#{candadoSalidaBean.cliente.candadoSalida.salidaTotal}"/>
+						<p:selectBooleanButton value="#{candadoSalidaBean.cliente.candadoSalida.salidaTotal}" onLabel="Permitir salida total de la mercancía" onIcon="pi pi-times" offLabel="Permitir salida total de la mercancía" offIcon="pi pi-times" />
 					</div>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{candadoSalidaBean.update()}" process="frm-modifica @this" update="frm-modifica" />
+					<p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{candadoSalidaBean.update()}" process="frm-modifica @this" update="frm-modifica" />
 					<p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" oncomplete="PF('dg-modifica').hide()" />
 				</f:facet>
 			</p:dialog>
-
 		</h:form>
 	</ui:define>
 

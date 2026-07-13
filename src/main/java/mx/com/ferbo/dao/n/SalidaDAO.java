@@ -18,9 +18,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Salida;
 import mx.com.ferbo.model.SalidaDetalle;
 import mx.com.ferbo.model.ServiciosSalida;
+import mx.com.ferbo.model.StatusSalida;
 import mx.com.ferbo.ui.OrdenDeSalidas;
 import mx.com.ferbo.util.DAOException;
 
@@ -299,5 +301,27 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
         
         return total;
     }
+
+	public List<Salida> buscarPorStatus(Cliente cliente, Date fecha, StatusSalida status) {
+		List<Salida> modelList;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			modelList = em.createQuery("SELECT s FROM Salida s WHERE s.fechaSalida >= :fecha AND (s.cliente = :cliente OR :cliente IS NULL) AND s.status = :status", this.modelClass)
+					.setParameter("cliente", cliente)
+					.setParameter("fecha", fecha)
+					.setParameter("status", status)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de ordenes de retiro...", ex);
+			modelList = new ArrayList<Salida>();
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
     
 }
