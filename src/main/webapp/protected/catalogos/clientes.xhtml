@@ -1,13 +1,13 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:jsf="http://xmlns.jcp.org/jsf">
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:jsf="http://xmlns.jcp.org/jsf">
     <ui:define name="title">Clientes</ui:define>
 
     <ui:define name="content">
         <h:form id="form">
             <p:growl id="messages" showDetail="true" />
             <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false"
-                closable="false" resizable="false">
+                      closable="false" resizable="false">
                 <div align="center">
                     <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
                 </div>
@@ -15,26 +15,46 @@
             <p:toolbar styleClass="p-mb-4">
                 <p:toolbarGroup>
                     <p:commandButton value="Nuevo Cliente" icon="pi pi-plus" styleClass="ui-button-raised"
-                        style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}" process="@this"
-                        update="form:dialogCliente form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente"
-                        onstart="PF('statusInfoDialog').show();"
-                        oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();">
+                                     style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}" process="@this"
+                                     update="form:dialogCliente form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente"
+                                     onstart="PF('statusInfoDialog').show();"
+                                     oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();">
                     </p:commandButton>
                     <p:outputLabel value="Habilitados:" style="margin-right:8px" />
                     <p:inputSwitch value="#{clientesBean.estatusClientes}">
-                        <p:ajax process="@this" update="dtClientes" />
+                        <p:ajax process="@this" update="dtClientes" listener="#{clientesBean.filtrarListaClientes('sin filtro')}"/>
                     </p:inputSwitch>
                 </p:toolbarGroup>
             </p:toolbar>
+            <p:toolbar styleClass="p-mb-4">
+                <p:toolbarGroup>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <p:inputText id="filtro" value="#{clientesBean.filtro}" placeholder="Buscar por nombre o alias">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                        <p:commandButton id="busquedaFiltro" icon="pi pi-search" 
+                                         styleClass="ui ui-primary"
+                                         value="Buscar"
+                                         process="@this"
+                                         actionListener="#{clientesBean.filtrarListaClientes('con filtro')}" 
+                                         update="dtClientes"/>
+                        <p:commandButton id="limpiarFiltros" icon="pi pi-refresh"
+                                         styleClass="ui ui-primary"
+                                         value="Limpiar" 
+                                         process="@this"
+                                         actionListener="#{clientesBean.limpiarListaFiltrada()}"
+                                         update="dtClientes"/>
+                    </div>
+                </p:toolbarGroup>
+            </p:toolbar>
             <div style="padding-top: 1rem;">
-                <p:dataTable id="dtClientes" widgetVar="dtClientes" value="#{clientesBean.filtrarPorEstatus()}" var="cliente"
-                    rowKey="#{cliente.cteCve}" reflow="true" paginator="true" rows="10" rowSelectMode="add"
-                    paginatorPosition="bottom">
-                    <p:column headerText="Nombre" sortBy="#{cliente.nombre}" filterBy="#{cliente.nombre}"
-                        filterMatchMode="contains">
+                <p:dataTable id="dtClientes" widgetVar="dtClientes" value="#{clientesBean.lstClientesFiltrada}" var="cliente"
+                             rowKey="#{cliente.cteCve}" paginator="true" rows="10" 
+                             paginatorPosition="bottom">
+                    <p:column headerText="Nombre" sortBy="#{cliente.nombre}">
                         <h:outputText value="#{cliente.nombre}" />
                     </p:column>
-                    <p:column headerText="Alias" sortBy="#{cliente.alias}" filterBy="#{cliente.alias}">
+                    <p:column headerText="Alias" sortBy="#{cliente.alias}">
                         <h:outputText value="#{cliente.alias}" />
                     </p:column>
                     <p:column headerText="RFC" width="7rem" style="text-align: center;">
@@ -42,18 +62,18 @@
                     </p:column>
                     <p:column width="2rem" style="text-align: center;">
                         <p:commandButton icon="pi pi-pencil" styleClass="edit-button"
-                            onstart="PF('statusInfoDialog').show();"
-                            oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();" process="@this"
-                            update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoCliente(cliente)}"
-                            resetValues="form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente" />
+                                         onstart="PF('statusInfoDialog').show();"
+                                         oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();" process="@this"
+                                         update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoCliente(cliente.cteCve)}"
+                                         resetValues="form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente" />
                     </p:column>
                 </p:dataTable>
             </div>
 
 
             <p:dialog id="dialogCliente" header="Información del cliente" widgetVar="dialogCliente" showEffect="fade"
-                modal="true" responsive="true" position="center top" width="100%">
-                <p:tabView id="tabView" class="ui-fluid" dynamic="true" effect="drop">
+                      modal="true" responsive="true" position="center top" width="100%" dynamic="true" cache="false">
+                <p:tabView id="tabView" class="ui-fluid" dynamic="true" effect="drop" cache="false">
                     <p:tab title="Fiscal">
                         <ui:include src="infoclientes/fiscalTab.xhtml" />
                     </p:tab>
@@ -75,18 +95,18 @@
                 </p:tabView>
                 <f:facet name="footer">
                     <p:commandButton value="#{(clientesBean.clienteSelected.cteCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" process="@this"
-                        actionListener="#{clientesBean.guardarOActualizarCliente()}" update="dtClientes"
-                        onstart="PF('statusInfoDialog').show();"
-                        oncomplete="PF('statusInfoDialog').hide();"/>
+                                     actionListener="#{clientesBean.guardarOActualizarCliente()}" update="dtClientes"
+                                     onstart="PF('statusInfoDialog').show();"
+                                     oncomplete="PF('statusInfoDialog').hide();"/>
                     <p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('dialogCliente').hide()"
-                        immediate="true" class="ui-button-secondary" resetValues="true" />
+                                     immediate="true" class="ui-button-secondary" resetValues="true"/>
                 </f:facet>
             </p:dialog>
 
             <ui:include src="infoclientes/dlgDomiciliosTab.xhtml" />
 
             <p:dialog id="dialogClonar" header="Copiar información del cliente" widgetVar="dialogClonar"
-                showEffect="fade" modal="true" responsive="true">
+                      showEffect="fade" modal="true" responsive="true">
                 <p:outputPanel>
                     <h:outputLabel value="Seleccione el cliente" />
                     <p:selectOneMenu id="selClonarCliente" value="#{clientesBean.clonarCliente}">
@@ -96,17 +116,17 @@
             </p:dialog>
 
             <p:confirmDialog widgetVar="deleteClienteDialog" showEffect="fade" width="400"
-                message="Desea eliminar el cliente?" header="Eliminar" severity="warn">
-                <p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.filtrarPorEstatus()}"
-                    oncomplete="PF('deleteClienteDialog').hide()" />
+                             message="Desea eliminar el cliente?" header="Eliminar" severity="warn">
+                <p:commandButton value="Sí" icon="pi pi-check" process="@this" actionListener="#{clientesBean.filtrarListaClientes('sin filtro')}"
+                                 oncomplete="PF('deleteClienteDialog').hide()" />
                 <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
-                    onclick="PF('deleteClienteDialog').hide()" />
+                                 onclick="PF('deleteClienteDialog').hide()" />
             </p:confirmDialog>
 
             <p:confirmDialog global="true" showEffect="fade" width="400" header="Eliminar">
                 <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
-                    icon="pi pi-times" />
+                                 icon="pi pi-times" />
             </p:confirmDialog>
 
             <style>
