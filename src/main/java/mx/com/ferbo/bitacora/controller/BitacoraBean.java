@@ -112,7 +112,7 @@ public class BitacoraBean implements Serializable {
         }
     }
 
-    public void obternerDatellerGrupo(BitacoraDTO grupo) {
+    public void detalleGrupo(BitacoraDTO grupo) {
         try {
             grupoSelected = grupo;
             eventos = bitacoraBL.obtenerPorFiltros(grupo);
@@ -129,10 +129,10 @@ public class BitacoraBean implements Serializable {
         String estado = (usuariosActivos) ? "A" : "B";
         try {
             this.usuarios = UsuarioBL.obtenerUsuariosPorStatus(estado);
-            message = "Los usuarios se cargaron con exito";
+            this.message = "Los usuarios se cargaron con exito";
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, title, message);
         } catch (SystemException ex) {
-            log.warn("Error: {}", ex.getMessage(), ex);
+            log.warn("Error...}", ex);
         } finally {
             actualizarMensajes();
         }
@@ -140,13 +140,21 @@ public class BitacoraBean implements Serializable {
 
     public void imprimirBitacora(String extension) {
         try {
-            String inicioFecha = DateFormatter.format(filtros.getInicio(), "dd-MM-yyyy");
-            String finFecha = DateFormatter.format(filtros.getFin(), "dd-MM-yyyy");
+            String inicioFecha = DateFormatter.format(this.filtros.getInicio(), "dd-MM-yyyy");
+            String finFecha = DateFormatter.format(this.filtros.getFin(), "dd-MM-yyyy");
             String filename = String.format("Bitacora" + inicioFecha + "al" + finFecha);
-            byte[] bytes = bitacoraBL.exportToFile(filtros, extension)
+            byte[] bytes = this.bitacoraBL.exportToFile(this.filtros, extension)
                     .orElseThrow(() -> new ToolException("Hubo un problema para generar el PDF de la bitácora"));
-                    
-            bitacora = FacesUtils.crearStreamedContentDesdeBytes(bytes, filename, extension);
+            if("pdf".equalsIgnoreCase(extension)) {
+            	this.bitacora = FacesUtils.toPDF(bytes, filename);
+            	return;
+            }
+            
+            if("xlsx".equalsIgnoreCase(extension)) {
+            	this.bitacora = FacesUtils.toXLSX(bytes, filename);
+            	return;
+            }
+            
         } catch (ToolException ex) {
             log.warn("{}", ex.getMessage(), ex);
             message = ex.getMessage();
@@ -162,10 +170,6 @@ public class BitacoraBean implements Serializable {
         } finally {
             actualizarMensajes();
         }
-    }
-
-    public String getSoloFecha(Date fecha) {
-        return DateFormatter.format(fecha, "dd/MM/yyyy");
     }
 
     public String nombreCompleto(BitacoraDTO bitacoraDTO) {

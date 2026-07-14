@@ -7,28 +7,30 @@
     <p:dataTable id="dtBitacora" widgetVar="dtBitacora" value="#{bitacoraBean.grupos}" var="grupo"
                  rowKey="#{grupo.idUsuario}" reflow="true" paginator="true" rows="10" rowSelectMode="add"
                  paginatorPosition="bottom" lazy="false">
-        <p:column headerText="Folio">
-            <p:outputLabel value="#{grupo.documento}"/>
-        </p:column>
-        <p:column headerText="Documento">
-            <p:outputLabel value="#{grupo.nombrePantalla}"/>
-        </p:column>
-        <p:column headerText="Tipo operación">
-            <p:outputLabel value="#{grupo.tipoPantalla}"/>
+        <p:column headerText="Fecha" width="6rem" style="text-align: center;">
+        	<p:outputLabel value="#{grupo.momento}">
+	        	<f:convertDateTime locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" ></f:convertDateTime>
+        	</p:outputLabel>
         </p:column>
         <p:column headerText="Empleado">
             <p:outputLabel value="#{bitacoraBean.nombreCompleto(grupo)}"/>
         </p:column>
-        <p:column headerText="Día">
-            <h:outputText value="#{bitacoraBean.getSoloFecha(grupo.momento)}"/>
+        <p:column headerText="Folio">
+            <p:outputLabel value="#{grupo.documento}"/>
         </p:column>
-        <p:column>
-            <p:commandButton  id="detalle" value="Operaciones" 
+        <p:column headerText="Tipo operación" width="10rem">
+            <p:outputLabel value="#{grupo.tipoPantalla}"/>
+        </p:column>
+        <p:column headerText="Documento">
+            <p:outputLabel value="#{grupo.nombrePantalla}"/>
+        </p:column>
+        <p:column width="2rem">
+            <p:commandButton id="detalle" 
                              icon="pi pi-bars"
                              process="@this"
                              onstart="PF('statusInfoDialog').show()" 
                              oncomplete="PF('statusInfoDialog').hide(); PF('dlgEventos').show()"
-                             actionListener="#{bitacoraBean.obternerDatellerGrupo(grupo)}"
+                             actionListener="#{bitacoraBean.detalleGrupo(grupo)}"
                              update="form:dlgEventos"/>
         </p:column>
 
