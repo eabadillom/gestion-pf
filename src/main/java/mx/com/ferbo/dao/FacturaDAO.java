@@ -32,19 +32,36 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Factura> findall() {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		List<Factura> fact = null;
-		Query sql = entity.createNamedQuery("Factura.findAll", Factura.class);
-		fact = sql.getResultList();
-		return fact;
+	    List<Factura> listFacturas = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		Query sql = em.createNamedQuery("Factura.findAll", Factura.class);
+		listFacturas = sql.getResultList();
+            } catch(Exception ex) {
+                log.error("Problema para obtener la información de la lista de facturas... ", ex);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+
+            return listFacturas;
 	}
 	
 	
 	@Override
 	public Factura buscarPorId(Integer id) {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		Factura fact = entity.find(Factura.class, id);
-		return fact;
+	    Factura factura = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		factura = em.find(Factura.class, id);
+            } catch(Exception ex) {
+                log.error("Problema para obtener la información de la factura id:{}", ex, id);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+
+            return factura;
 	}
 	
 	public Factura buscarPorId(Integer id, boolean isFullInfo) {
@@ -124,14 +141,37 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 	}
 	
 	public List<Factura> buscarPorCliente (Cliente cte){
-	EntityManager entity = EntityManagerUtil.getEntityManager();
-	return entity.createNamedQuery("Factura.findByCliente", Factura.class).getResultList();
+            List<Factura> listFacturas = null;
+            EntityManager em = null;
+		
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                listFacturas = em.createNamedQuery("Factura.findByCliente", Factura.class)
+                    .getResultList();
+            } catch(Exception ex) {
+                    log.error("Problema para obtener la información de la lista de facturas... ", ex);
+            } finally {
+                    EntityManagerUtil.close(em);
+            }
+            return listFacturas;
 	}
 	
 	public List<Factura> buscarPorCteStatus(StatusFactura sf, Cliente cte){
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		return entity.createNamedQuery("Factura.findByClienteStatusFactura", Factura.class)
-		.setParameter("clienteCve", cte.getCteCve()).setParameter("status", sf.getId()).getResultList();
+            List<Factura> listFacturas = null;
+            EntityManager em = null;
+		
+            try {
+                EntityManager entity = EntityManagerUtil.getEntityManager();
+		listFacturas = entity.createNamedQuery("Factura.findByClienteStatusFactura", Factura.class)
+                    .setParameter("clienteCve", cte.getCteCve())
+                    .setParameter("status", sf.getId())
+                    .getResultList();
+            } catch(Exception ex) {
+                    log.error("Problema para obtener la información de la lista de facturas... ", ex);
+            } finally {
+                    EntityManagerUtil.close(em);
+            }
+            return listFacturas;
 	}
 	
 	public List<Factura> buscarPorCteStatusClientePeriodo(StatusFactura sf, Cliente cte, Date fechaInicio, Date fechaFin){
@@ -156,16 +196,33 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 
 	@Override
 	public List<Factura> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		return em.createNamedQuery("Factura.findAll", Factura.class).getResultList();
+	    List<Factura> listFacturas = null;
+            EntityManager entity = null;
+            try {
+                EntityManager em = EntityManagerUtil.getEntityManager();
+		listFacturas = em.createNamedQuery("Factura.findAll", Factura.class)
+                        .getResultList();
+            } catch(Exception ex) {
+                log.error("Problema para obtener las facturas solicitadas...", ex);
+            } finally {
+                EntityManagerUtil.close(entity);
+            }
+            return listFacturas;
 	}
 
 	@Override
 	public List<Factura> buscarPorCriterios(Factura f) {
-		List<Factura> listaFac = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
+            List<Factura> listaFac = null;
+            EntityManager entity = null;
+            try {
+                EntityManager em = EntityManagerUtil.getEntityManager();
 		listaFac = em.createNamedQuery("Factura.findById", Factura.class).setParameter("id", f.getId()).getResultList();
-		return listaFac;
+            } catch(Exception ex) {
+                log.error("Problema para obtener las facturas solicitadas...", ex);
+            } finally {
+                EntityManagerUtil.close(entity);
+            }
+            return listaFac;
 	}
 
 	@Override
@@ -234,7 +291,7 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 		} catch (Exception e) {
 			log.error("Problema al guardar la factura...", e);
 			return "ERROR";
-		}finally{
+		} finally{
 			EntityManagerUtil.close(em);
 		}
 		return null;
@@ -253,23 +310,26 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 	}
 
 	public String actualizaStatus(Factura f) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery("UPDATE factura SET status =:status WHERE id =:id")
 					.setParameter("status", f.getStatus()).setParameter("id", f.getId()).executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al actualizar la factura...", e);
 			return "ERROR";
+		} finally{
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 	
 	public String actualizarUuid(Factura f) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery("UPDATE factura SET uuid = :uuid "
 					+ "WHERE id = :id")
@@ -277,8 +337,10 @@ public class FacturaDAO extends IBaseDAO<Factura, Integer> {
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al actualizar la factura...", e);
 			return "ERROR";
+		} finally{
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

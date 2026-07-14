@@ -20,10 +20,18 @@ public class EntidadPostalDAO extends IBaseDAO<EntidadPostal, Integer> {
 
 	@Override
 	public List<EntidadPostal> buscarTodos() {
-		List<EntidadPostal> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("EntidadPostal.findAll", EntidadPostal.class).getResultList();
-		return listado;
+            List<EntidadPostal> listado = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+		listado = em.createNamedQuery("EntidadPostal.findAll", EntidadPostal.class)
+                    .getResultList();
+            } catch (Exception e) {
+                    Log.error("Problema al actualizar entidad postal", e);
+            } finally {
+                    EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 
 	@Override
@@ -51,32 +59,36 @@ public class EntidadPostalDAO extends IBaseDAO<EntidadPostal, Integer> {
 
 	@Override
 	public String guardar(EntidadPostal entidadPostal) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(entidadPostal);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR guardando Entidad Postal" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(EntidadPostal entidadPostal) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(entidadPostal));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
-		return null;
+		return null;    
 	}
 
 	@Override

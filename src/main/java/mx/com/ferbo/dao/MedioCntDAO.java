@@ -103,7 +103,7 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 			em.remove(medio);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al eliminar el medio de contacto...", e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -131,7 +131,7 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 			em.persist(medio);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al guardar el medio de contacto", e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);

@@ -69,7 +69,7 @@ public class CandadoSalidaDAO extends IBaseDAO<CandadoSalida, Integer> {
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			e = em.merge(e);
+			em.merge(e);
 			em.getTransaction().commit();
 		} catch (Exception ex) {
 			log.error("Problema para actualizar el candado de salida...", ex);
@@ -116,17 +116,24 @@ public class CandadoSalidaDAO extends IBaseDAO<CandadoSalida, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<CandadoSalida> findAll() {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
 		List<CandadoSalida> list = null;
-		Query sql = entity.createNamedQuery("CandadoSalida.findAll", CandadoSalida.class);
-		list = sql.getResultList();
+		EntityManager entity = null;
+		try {
+			entity = EntityManagerUtil.getEntityManager();
+			Query sql = entity.createNamedQuery("CandadoSalida.findAll", CandadoSalida.class);
+			list = sql.getResultList();
 
-		for (CandadoSalida c : list) {
-			log.debug(c.toString());
+			for (CandadoSalida c : list) {
+				log.debug(c.toString());
+				log.debug("idCliente: {}", c.getCliente().getCteCve());
+			}
+		} catch (Exception ex) {
+			log.error("Problema para obtener el listado de candado de salida...", ex);
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
-
 		return list;
-	};
+	}
 
 	public String save(CandadoSalida candado) {
 
@@ -139,6 +146,7 @@ public class CandadoSalidaDAO extends IBaseDAO<CandadoSalida, Integer> {
 			em.getTransaction().commit();
 
 		} catch (Exception e) {
+                        log.error("Problema para guardar el candado de salida...", e);
 			return "Error" + e.getMessage();
 		} finally {
 			EntityManagerUtil.close(em);
@@ -148,14 +156,17 @@ public class CandadoSalidaDAO extends IBaseDAO<CandadoSalida, Integer> {
 	}
 
 	public String update(CandadoSalida cS) {
-		try {
-			EntityManager entity = EntityManagerUtil.getEntityManager();
+		EntityManager entity = null;
+                try {
+			entity = EntityManagerUtil.getEntityManager();
 			entity.getTransaction().begin();
 			entity.merge(cS);
 			entity.getTransaction().commit();
-			entity.close();
 		} catch (Exception e) {
+                        log.error("Problema para actualizar el candado salida...", e);
 			return "Failed!! " + e.getMessage();
+		} finally {
+			EntityManagerUtil.close(entity);
 		}
 		return null;
 	}

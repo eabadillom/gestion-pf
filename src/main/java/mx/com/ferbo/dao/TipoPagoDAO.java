@@ -33,8 +33,15 @@ public class TipoPagoDAO extends IBaseDAO<TipoPago, Integer> {
 	@Override
 	public List<TipoPago> buscarTodos() {
 		List<TipoPago> listado = null;
-		EntityManager em = EntityManagerUtil.getEntityManager();
-		listado = em.createNamedQuery("TipoPago.findAll", TipoPago.class).getResultList();
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			listado = em.createNamedQuery("TipoPago.findAll", TipoPago.class).getResultList();
+		} catch (Exception ex) {
+			log.error("Problema al buscar todos: {}", ex.getMessage(), ex);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return listado;
 	}
 
@@ -45,45 +52,51 @@ public class TipoPagoDAO extends IBaseDAO<TipoPago, Integer> {
 
 	@Override
 	public String actualizar(TipoPago tipoPago) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(tipoPago);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR actualizando Banco" + e.getMessage());
+			System.err.println("ERROR actualizando Banco" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String guardar(TipoPago tipoPago) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(tipoPago);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR guardando Banco" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(TipoPago tipoPago) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(em.merge(tipoPago));
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

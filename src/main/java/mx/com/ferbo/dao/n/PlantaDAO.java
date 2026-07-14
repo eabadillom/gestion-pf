@@ -70,6 +70,8 @@ public class PlantaDAO extends BaseDAO <Planta, Integer> {
             
         } catch(Exception ex) {
             log.error("Problema para obtener la planta: ", ex);
+        } finally {
+            super.close(em);
         }
         
         return model;

@@ -20,7 +20,7 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
+        <dependency>
 			<groupId>com.ferbo</groupId>
 			<artifactId>gestion-reports</artifactId>
 			<version>1.5.0-RELEASE</version>
@@ -220,7 +220,7 @@
 		<dependency>
 			<groupId>com.ferbo</groupId>
   			<artifactId>ferbo-tools</artifactId>
-    		<version>0.1.1-SNAPSHOT</version>
+    		<version>0.1.1-RELEASE</version>
 		</dependency>
 	</dependencies>
 

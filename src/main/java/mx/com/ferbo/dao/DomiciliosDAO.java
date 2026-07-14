@@ -4,13 +4,14 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.jfree.util.Log;
-
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
+        private static Logger log = LogManager.getLogger(DomiciliosDAO.class);
 
 	@Override
 	public Domicilios buscarPorId(Integer id) {
@@ -19,10 +20,17 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 
 	@Override
 	public List<Domicilios> buscarTodos() {
-		List<Domicilios> listado;
-		EntityManager em = EntityManagerUtil.getEntityManager();
+            List<Domicilios> listado = null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
 		listado = em.createNamedQuery("Domicilios.findAll", Domicilios.class).getResultList();
-		return listado;
+            } catch (Exception e) {
+                log.error("Problema al encontrar domicilio", e);
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listado;
 	}
 
 	@Override
@@ -45,7 +53,7 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
                             .getSingleResult();
 			
 		} catch (Exception e) {
-			Log.error("Problema al encontrar domicilio", e);
+			log.error("Problema al encontrar domicilio", e);
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -55,8 +63,9 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 
 	@Override
 	public String actualizar(Domicilios dom) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery(
 					"update domicilios set asentamiento_cve = :asentamientoCve, ciudad_cve = :ciudadCve, estado_cve = :estadoCve, municipio_cve = :municipioCve, pais_cve = :paisCve,"
@@ -76,10 +85,11 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 					.setParameter("domicilioTipoCve", dom.getDomicilioTipoCve().getDomicilioTipoCve())
 					.setParameter("domCve", dom.getDomCve()).executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al actualizar el domicilio...", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
@@ -94,7 +104,7 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 			em.getTransaction().commit();
 
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.info("Error al guardar el domicilio...", e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -104,16 +114,19 @@ public class DomiciliosDAO extends IBaseDAO<Domicilios, Integer> {
 
 	@Override
 	public String eliminar(Domicilios dom) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
+                try {
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.createNativeQuery("DELETE FROM domicilios WHERE (dom_cve = :domCve)")
-					.setParameter("domCve", dom.getDomCve()).executeUpdate();
+                            .setParameter("domCve", dom.getDomCve())
+                            .executeUpdate();
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("Error al eliminar el domicilio", e);
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}

@@ -260,10 +260,12 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 
 	@Deprecated
 	public List<Inventario> buscarPorCliente(Cliente cliente, Planta planta) {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		List<ConstanciaDeDeposito> constancia = new ArrayList<>();
-		List<Inventario> listaInventario = new ArrayList<>();
-		constancia = entity.createNamedQuery("ConstanciaDeDeposito.findByCteCveAndPlanta", ConstanciaDeDeposito.class)
+            EntityManager entity = null;
+            List<ConstanciaDeDeposito> constancia = new ArrayList<>();
+            List<Inventario> listaInventario = new ArrayList<>();
+	    try {
+                entity = EntityManagerUtil.getEntityManager();
+                constancia = entity.createNamedQuery("ConstanciaDeDeposito.findByCteCveAndPlanta", ConstanciaDeDeposito.class)
 				.setParameter("cteCve", cliente.getCteCve()).setParameter("plantaCve", planta.getPlantaCve())
 				.getResultList();
 		// System.out.println(constancia);//imprimo para verificar
@@ -318,8 +320,12 @@ public class InventarioDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 			inventario.setConstanciaDeDeposito(c);
 			listaInventario.add(inventario);
 		}
-		entity.close();
-		return listaInventario;
+            } catch (Exception ex) {
+                log.error("Problema para obtener el listado de inventario...", ex);
+            } finally {
+                EntityManagerUtil.close(entity);
+            }
+            return listaInventario;
 	}
 
 	@Override

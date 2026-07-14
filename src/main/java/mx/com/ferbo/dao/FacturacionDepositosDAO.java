@@ -21,8 +21,6 @@ import mx.com.ferbo.util.EntityManagerUtil;
 public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Integer> {
 	private static Logger log = LogManager.getLogger(FacturacionDepositosDAO.class);
 
-	EntityManager em = null;
-
 	@Override
 	public ConstanciaDeDeposito buscarPorId(Integer id) {
 		return null;
@@ -82,7 +80,6 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 
 			Query query = em.createNativeQuery(sql, ConstanciaDeDeposito.class).setParameter("cteCve", idCliente)
 					.setParameter("plantaCve", idPlanta);
-			;
 
 			listaConstancias = query.getResultList();
 
@@ -116,8 +113,7 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 		} catch (Exception ex) {
 			log.error("Problema para obtener la lista de entradas no facturadas...", ex);
 		} finally {
-			if (em != null)
-				em.close();
+                    EntityManagerUtil.close(em);
 		}
 
 		return listaConstanciaFactura;
@@ -146,14 +142,6 @@ public class FacturacionDepositosDAO extends IBaseDAO<ConstanciaDeDeposito, Inte
 	@Override
 	public String eliminarListado(List<ConstanciaDeDeposito> listado) {
 		return null;
-	}
-
-	public EntityManager getEm() {
-		return em;
-	}
-
-	public void setEm(EntityManager em) {
-		this.em = em;
 	}
 
 }

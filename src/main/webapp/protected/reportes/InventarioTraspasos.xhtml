@@ -1,100 +1,91 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
-	<ui:define name="title">Traspasos</ui:define>
-	<ui:define name="content">
-		<h:form id="form">
-			<p:dialog modal="true" widgetVar="statusDialog" header="Generando Reporte..." draggable="false" closable="false" resizable="false">
-				<div align="center">
-		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
-				</div>
-		    </p:dialog>
-			<div class="p-grid crud-demo">
-				<div class="p-col-12">
-					<div class="card">
-						<p:growl id="messages" showDetail="true" />
-						<p:fieldset>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:datePicker id="ol-fechaIni" showIcon="true" value="#{reporteInventarioTraspasosBean.fecha_ini}" maxdate="#{reporteInventarioTraspasosBean.maxDate}">
-									<p:ajax process="@this" />
-									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-								</p:datePicker>
-								<p:outputLabel for="ol-fechaIni" value="Fecha de inicio" />
-							</span>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:datePicker id="ol-fechafin" showIcon="true" value="#{reporteInventarioTraspasosBean.fecha_fin}" maxdate="#{reporteInventarioTraspasosBean.maxDate}">
-									<p:ajax process="@this" />
-									<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-								</p:datePicker>
-								<p:outputLabel for="ol-fechafin" value="Fecha final" />
-							</span>
-						</p:fieldset>
-						<p:fieldset>
-							<span class="ui-float-label ui-input-icon-left">
-								<p:selectOneMenu id="Cliente" value="#{reporteInventarioTraspasosBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
-									<f:selectItem itemLabel="Todos los clientes	" noSelectionOption="true" />
-									<f:selectItems value="#{reporteInventarioTraspasosBean.listaClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
-									<p:ajax process="@this" />
-								</p:selectOneMenu>
-								<p:outputLabel for="Cliente" value="Cliente" />
-							</span>
-						</p:fieldset>
-						<p:fieldset styleClass="p-mt-2">
-							<p:toolbar>
-								<p:toolbarGroup>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".pdf" actionListener="#{reporteInventarioTraspasosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" />
-									</div>
-									<div class="col-2">
-										<p:divider layout="vertical">
-										</p:divider>
-									</div>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value=".xlsx" actionListener="#{reporteInventarioTraspasosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" />
-									</div>
-									<div class="col-2">
-										<p:divider layout="vertical">
-											<b>OR</b>
-										</p:divider>
-									</div>
-									<div class="col-5 flex align-items-center justify-content-center">
-										<p:commandButton value="Consultar" actionListener="#{reporteInventarioTraspasosBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteEntradasBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
-									</div>
-								</p:toolbarGroup>
-							</p:toolbar>
-						</p:fieldset>
-					</div>
-				</div>
-			</div>
-			<p:dataTable id="dt-reporte" widgetVar="dtReporte" value="#{reporteInventarioTraspasosBean.reporte}" var="r" rowKey="#{r.numeroCliente}">
-            	<p:column headerText="Traspaso" style="text-align: center" width="5rem">
-            		<h:outputText value="#{r.numero}"></h:outputText>
-            	</p:column>
-            	<p:column headerText="Fecha" width="6rem" style="text-align: center;">
-            		<h:outputText value="#{r.fecha}">
-            			<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-            		</h:outputText>
-            	</p:column>
-            	<p:column headerText="Entrada" style="text-align: center" width="5rem">
-            		<h:outputText value="#{r.constancia}" />
-            	</p:column>
-            	<p:column headerText="Producto">
-            		<h:outputText value="#{r.productoDescripcion}" />
-            	</p:column>
-            	<p:column headerText="Origen">
-            		<h:outputText value="#{r.origen}" />
-            	</p:column>
-            	<p:column headerText="Destino">
-            		<h:outputText value="#{r.destino}" />
-            	</p:column>
-            	<p:column headerText="Peso [kg]" style="text-align: right;" width="5rem">
-            		<h:outputText value="#{r.cantidad}" >
-            			<f:convertNumber pattern="#0.00" />
-            		</h:outputText>
-            	</p:column>
-			</p:dataTable>
-		</h:form>
-	</ui:define>
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Traspasos</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <!-- Controles comunes: Notificaciones, Dialogo "STATUS" y Dialogo Confirmar (Global) -->
+            <ui:include src="/protected/common/status-info.xhtml" />
+            <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-12 p-md-5">
+                        <p:outputLabel for="ol-fechaIni" value="Del" />
+                        <p:datePicker id="ol-fechaIni" showIcon="true" value="#{reporteInventarioTraspasosBean.fecha_ini}" maxdate="#{reporteInventarioTraspasosBean.maxDate}">
+                            <p:ajax process="@this" />
+                            <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                        </p:datePicker>
+                    </div>
+                    <div class="p-col-12 p-md-5">
+                        <p:outputLabel for="ol-fechafin" value="al" />
+                        <p:datePicker id="ol-fechafin" showIcon="true" value="#{reporteInventarioTraspasosBean.fecha_fin}" maxdate="#{reporteInventarioTraspasosBean.maxDate}">
+                            <p:ajax process="@this" />
+                            <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                        </p:datePicker>
+                    </div>
+                </div>
+                <div class="p-grid ui-fluid">
+                    <div class="p-col-12 p-md-5">
+                        <p:outputLabel for="Cliente" value="Cliente" />
+                        <p:selectOneMenu id="Cliente" value="#{reporteInventarioTraspasosBean.clienteSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="Todos los clientes	" noSelectionOption="true" />
+                            <f:selectItems value="#{reporteInventarioTraspasosBean.listaClientes}" var="cliente" itemLabel="#{cliente.nombre}#{cliente.alias == null ? '' : ' ('.concat(cliente.alias).concat(')')}" itemValue="#{cliente}" />
+                            <p:ajax process="@this" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="p-grid ui-fluid p-col-12">
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton value="PDF" icon="pi pi-file-pdf" actionListener="#{reporteInventarioTraspasosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                            <p:fileDownload value="#{reporteInventarioTraspasosBean.file}" />
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton value="Excel" icon="pi pi-file-excel" actionListener="#{reporteInventarioTraspasosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                            <p:fileDownload value="#{reporteInventarioTraspasosBean.file}" />
+                        </p:commandButton>
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:commandButton value="Consultar" icon="pi pi-search" actionListener="#{reporteInventarioTraspasosBean.generaReporte}" process="@this" styleClass="ui-button-raised ui-button-secondary" disabled="#{reporteInventarioTraspasosBean.clienteSelect == null and reporteEntradasBean.plantaSelect == null}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+                    </div>
+                    <div class="p-col-12 p-md-3">
+                        <p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                    </div>
+                </div>
+            </p:panel>
+
+            <p:spacer style="height: 2rem;"/>
+
+            <p:panel id="pnl-traspasos" header="TRASPASOS" >
+                <p:dataTable id="dt-reporte" widgetVar="dtReporte" value="#{reporteInventarioTraspasosBean.reporte}" var="r" rowKey="#{r.numeroCliente}">
+                    <p:column headerText="Traspaso" style="text-align: center" width="5rem">
+                        <h:outputText value="#{r.numero}"></h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha" width="6rem" style="text-align: center;">
+                        <h:outputText value="#{r.fecha}">
+                            <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Entrada" style="text-align: center" width="5rem">
+                        <h:outputText value="#{r.constancia}" />
+                    </p:column>
+                    <p:column headerText="Producto">
+                        <h:outputText value="#{r.productoDescripcion}" />
+                    </p:column>
+                    <p:column headerText="Origen">
+                        <h:outputText value="#{r.origen}" />
+                    </p:column>
+                    <p:column headerText="Destino">
+                        <h:outputText value="#{r.destino}" />
+                    </p:column>
+                    <p:column headerText="Peso [kg]" style="text-align: right;" width="5rem">
+                        <h:outputText value="#{r.cantidad}" >
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
 </ui:composition>

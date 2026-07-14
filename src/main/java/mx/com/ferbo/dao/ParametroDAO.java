@@ -18,20 +18,33 @@ public class ParametroDAO extends IBaseDAO<Parametro, Integer> {
 
 	public Parametro buscarPorNombre(String nombre) {
 
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
 		Parametro parametro = null;
-		parametro = em.createNamedQuery("Parametro.findByNombre", Parametro.class).setParameter("nombre", nombre)
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			parametro = em.createNamedQuery("Parametro.findByNombre", Parametro.class).setParameter("nombre", nombre)
 				.getSingleResult();
+		} catch (Exception ex) {
+			System.out.println("Error: " + ex.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 
 		return parametro;
 	}
 
 	@Override
 	public List<Parametro> buscarTodos() {
-		EntityManager em = EntityManagerUtil.getEntityManager();
+		EntityManager em = null;
 		List<Parametro> lista = new ArrayList<>();
-		lista = em.createNamedQuery("Parametro.findAll", Parametro.class).getResultList();
-
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			lista = em.createNamedQuery("Parametro.findAll", Parametro.class).getResultList();
+		} catch (Exception ex) {
+			System.out.println("Error:" + ex.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
+		}
 		return lista;
 	}
 
@@ -42,16 +55,17 @@ public class ParametroDAO extends IBaseDAO<Parametro, Integer> {
 
 	@Override
 	public String actualizar(Parametro parametro) {
-
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.merge(parametro);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e2) {
 			System.out.println("ERROR..." + e2.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 
 		return null;
@@ -59,48 +73,53 @@ public class ParametroDAO extends IBaseDAO<Parametro, Integer> {
 
 	@Override
 	public String guardar(Parametro parametro) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.persist(parametro);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.print("ERROR..." + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminar(Parametro parametro) {
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			em.remove(parametro);
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.print("ERROR..." + e.getMessage());
 			return "ERROR";
+		} finally {
+			em.close();
 		}
 		return null;
 	}
 
 	@Override
 	public String eliminarListado(List<Parametro> listado) {
-
+		EntityManager em = null;
 		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
 			for (Parametro para : listado) {
 				em.remove(em.merge(para));
 			}
 			em.getTransaction().commit();
-			em.close();
 		} catch (Exception e) {
 			System.out.print("ERROR..." + e.getMessage());
 			return "ERROR";
+		} finally {
+			EntityManagerUtil.close(em);
 		}
 
 		return null;

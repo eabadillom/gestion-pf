@@ -9,16 +9,22 @@ import mx.com.ferbo.model.TipoFacturacion;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class TipoFacturacionDAO extends IBaseDAO<TipoFacturacion, Integer> {
-	{
-
-	}
 
 	@Override
 	public TipoFacturacion buscarPorId(Integer id) {
-		EntityManager entity = EntityManagerUtil.getEntityManager();
-		TipoFacturacion TP = entity.createNamedQuery("TipoFacturacion.findById", TipoFacturacion.class)
-				.setParameter("id", id).getSingleResult();
-		return TP;
+		EntityManager em = null;
+		TipoFacturacion tipoFacturacion = null;
+
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			tipoFacturacion = em.createNamedQuery("TipoFacturacion.findById", TipoFacturacion.class)
+					.setParameter("id", id).getSingleResult();
+		} catch (Exception ex) {
+			System.err.println("Error: " + ex.getMessage());
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		return tipoFacturacion;
 	}
 
 	@Override

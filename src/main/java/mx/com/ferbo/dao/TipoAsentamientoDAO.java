@@ -79,7 +79,7 @@ public class TipoAsentamientoDAO extends IBaseDAO<TipoAsentamiento, Integer> {
 			em.merge(tipoAsentamiento);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR actualizando Tipo de Asentamiento" + e.getMessage());
+			log.error("ERROR actualizando Tipo de Asentamiento: {}", e.getMessage(), e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -96,7 +96,7 @@ public class TipoAsentamientoDAO extends IBaseDAO<TipoAsentamiento, Integer> {
 			em.persist(tipoAsentamiento);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR guardando Tipo de Asentamiento" + e.getMessage());
+			log.error("ERROR guardando Tipo de Asentamiento: {}", e.getMessage(), e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);
@@ -113,7 +113,7 @@ public class TipoAsentamientoDAO extends IBaseDAO<TipoAsentamiento, Integer> {
 			em.remove(em.merge(tipoAsentamiento));
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			log.error("ERROR: {}", e.getMessage(), e);
 			return "ERROR";
 		} finally {
 			EntityManagerUtil.close(em);

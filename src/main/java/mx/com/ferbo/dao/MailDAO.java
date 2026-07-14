@@ -7,8 +7,11 @@ import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Mail;
 import mx.com.ferbo.util.EntityManagerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MailDAO extends IBaseDAO<Mail, Integer> {
+        private static Logger log = LogManager.getLogger(MailDAO.class);
 
 	@Override
 	public Mail buscarPorId(Integer id) {
@@ -27,30 +30,36 @@ public class MailDAO extends IBaseDAO<Mail, Integer> {
 
 	@Override
 	public String actualizar(Mail mail) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			em.merge(mail);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return "ERROR";
-		}
-		return null;
+	    EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                em.getTransaction().begin();
+                em.merge(mail);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                log.error("Error al guardar el mail", e);
+                return "ERROR";
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return null;
 	}
 
 	@Override
 	public String guardar(Mail mail) {
-		try {
-			EntityManager em = EntityManagerUtil.getEntityManager();
-			em.getTransaction().begin();
-			em.persist(mail);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
-			return "ERROR";
-		}
-		return null;
+            EntityManager em = null;
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                em.getTransaction().begin();
+                em.persist(mail);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                log.error("Error al actualizar el mail", e);
+                return "ERROR";
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return null;
 	}
 
 	@Override
