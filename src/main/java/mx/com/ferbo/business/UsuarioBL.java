@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jboss.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.ferbo.tools.exception.SystemException;
 
@@ -16,7 +17,7 @@ import mx.com.ferbo.util.InventarioException;
 
 public class UsuarioBL {
 
-	private static Logger log = Logger.getLogger(UsuarioBL.class);
+	private static Logger log = LogManager.getLogger(UsuarioBL.class);
 	private static UsuarioDAO dao = new UsuarioDAO();
 	
 	public static synchronized List<Planta> buscarPlantasAutorizadas(Usuario usuario)
