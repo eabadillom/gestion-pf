@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jfree.util.Log;
+import org.jboss.logging.Logger;
 
 import com.ferbo.tools.exception.SystemException;
 
@@ -16,6 +16,7 @@ import mx.com.ferbo.util.InventarioException;
 
 public class UsuarioBL {
 
+	private static Logger log = Logger.getLogger(UsuarioBL.class);
 	private static UsuarioDAO dao = new UsuarioDAO();
 	
 	public static synchronized List<Planta> buscarPlantasAutorizadas(Usuario usuario)
@@ -74,11 +75,11 @@ public class UsuarioBL {
 		return optional;
 	}
 
-	public static synchronized List<Usuario> obtenerUsuariosPorStatus(String status) {
+	public static synchronized List<Usuario> buscarPorStatus(String status) {
 		try {
 			return dao.buscarPorStatus(status);
 		} catch (SystemException ex) {
-			Log.warn("Error: {}", ex);
+			log.warn("Error: {}", ex);
 			throw ex;
 		}
 	}
