@@ -128,7 +128,7 @@ public class BitacoraBean implements Serializable {
     public void obtenerUsuariosActivosOInactivos() {
         String estado = (usuariosActivos) ? "A" : "B";
         try {
-            this.usuarios = UsuarioBL.obtenerUsuariosPorStatus(estado);
+            this.usuarios = UsuarioBL.buscarPorStatus(estado);
             this.message = "Los usuarios se cargaron con exito";
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, title, message);
         } catch (SystemException ex) {
