@@ -47,7 +47,20 @@ public final class FacesUtils {
 
         return file;
     }
+    
+    public static StreamedContent toXLSX(byte[] bytes, String fileName) {
+    	StreamedContent file;
+        InputStream input = new ByteArrayInputStream(bytes);
 
+        file = DefaultStreamedContent.builder()
+                .contentType("application/vnd.ms-excel")
+                .name(fileName)
+                .stream(() -> input).build();
+
+        return file;
+    }
+
+    @Deprecated
     public static StreamedContent crearStreamedContentDesdeBytes(
             byte[] bytes, String nombreArchivo, String extension) {
 
@@ -58,7 +71,7 @@ public final class FacesUtils {
         }
 
         return DefaultStreamedContent.builder()
-                .contentType(extension)
+                .contentType(extension) //Implementación incorrecta del atributo contentType
                 .name(nombreArchivo)
                 .stream(() -> new ByteArrayInputStream(bytes))
                 .build();
