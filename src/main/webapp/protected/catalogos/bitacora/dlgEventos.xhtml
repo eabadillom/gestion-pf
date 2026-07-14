@@ -4,13 +4,15 @@
                 xmlns:p="http://primefaces.org/ui" 
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <p:dialog id="dlgEventos" widgetVar="dlgEventos"
-              header="Eventos Sucedidos"
+              header="Eventos"
               showEffect="fade"
               modal="true" responsive="true" position="center top" width="100%">
         <p:panel header="#{bitacoraBean.nombreCompleto(bitacoraBean.grupoSelected)}" styleClass="ui-fluid">
             <div class="p-grid">
                 <div class="p-col-12 p-md-4">
-                    <p:outputLabel value="#{bitacoraBean.getSoloFecha(bitacoraBean.grupoSelected.momento)}"/>
+                	<p:outputLabel value="#{bitacoraBean.grupoSelected.momento}">
+                		<f:convertDateTime locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" />
+                	</p:outputLabel>
                 </div>
                 <div class="p-col-12 p-md-4">
                     <p:outputLabel value="#{bitacoraBean.grupoSelected.documento}"/>
@@ -19,21 +21,17 @@
                     <p:outputLabel value="#{bitacoraBean.grupoSelected.tipoPantalla} DE "/>
                     <p:outputLabel value="#{bitacoraBean.grupoSelected.nombrePantalla}"/>
                 </div>
-
-                <div class="p-col-12 p-md-12">
-                    <p:dataTable id="dtEventos" widgetVar="dlgEventos" value="#{bitacoraBean.eventos}" var="evento"
-                                 rowKey="#{evento.id}" reflow="true" paginator="true" rows="7" rowSelectMode="add"
-                                 paginatorPosition="bottom" lazy="false">
-                        <p:column headerText="Hora">
-                            <p:outputLabel value="#{evento.hora}"/>
-                        </p:column>
-                        <p:column headerText="Descripcion">
-                            <p:outputLabel value="#{evento.descripcion}"/>
-                        </p:column>
-                    </p:dataTable>
-                </div>
-
             </div> 
         </p:panel>
+        <p:dataTable id="dtEventos" widgetVar="dlgEventos" value="#{bitacoraBean.eventos}" var="evento"
+                     rowKey="#{evento.id}" reflow="true" paginator="true" rows="7" rowSelectMode="add"
+                     paginatorPosition="bottom" lazy="false">
+            <p:column headerText="Hora" width="6rem">
+                <p:outputLabel value="#{evento.hora}"/>
+            </p:column>
+            <p:column headerText="Descripcion">
+                <p:outputLabel value="#{evento.descripcion}"/>
+            </p:column>
+        </p:dataTable>
     </p:dialog>
 </ui:composition>

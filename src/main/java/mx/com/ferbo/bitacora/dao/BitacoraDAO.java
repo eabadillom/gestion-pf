@@ -72,7 +72,7 @@ public class BitacoraDAO extends BaseDAO<EventoBitacora, Long> {
                     .setParameter("documento", filtros.getDocumento())
                     .getResultList();
             for (EventoBitacora evento : eventos) {
-                log.info("Usuario del evento: {}", evento.getUsuario());
+                log.debug("Usuario del evento: {}", evento.getUsuario());
             }
             return eventos;
         } catch (Exception ex) {
