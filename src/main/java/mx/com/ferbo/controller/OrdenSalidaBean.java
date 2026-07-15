@@ -137,6 +137,7 @@ public class OrdenSalidaBean implements Serializable {
 
 	private Integer totalCajas;
 	private BigDecimal pesoTotal = BigDecimal.ZERO;
+	private List<String> sinConfirmar;
 
 	private FacesContext context;
 	private HttpServletRequest request;
@@ -162,6 +163,7 @@ public class OrdenSalidaBean implements Serializable {
 		
 		this.archivosList = new ArrayList<Adjunto>();
         this.tamanioTotal = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.sinConfirmar = new ArrayList<String>();
 	}
 	
 	@PostConstruct
@@ -391,6 +393,29 @@ public class OrdenSalidaBean implements Serializable {
 			PrimeFaces.current().executeScript("PF('dialogCarga').show();");
 	}
 	
+	public void productosSinConfirmar() {
+		String producto = null;
+		this.sinConfirmar.clear();
+		for(SalidaDetalleUI detalle : listaDetalles) {
+			
+			if(listaDetallesSelected.contains(detalle) ) {
+				continue;
+			}
+			producto = String.format("%s - %d %s - %s kg",
+					detalle.getPartida().getUnidadDeProductoCve().getProductoCve().getProductoDs(),
+					detalle.getCantidad(),
+					detalle.getPartida().getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoDs(),
+					detalle.getPesoAprox()
+					);
+			
+			this.sinConfirmar.add(producto);
+		}
+		log.info("Productos sin confirmar: {}", this.sinConfirmar.size());
+		
+		PrimeFaces.current().ajax().update("form:confirm-guardar");
+		
+	}
+	
 	public synchronized void guardar() {
 		DetallePartida detPAnterior = null;
 		DetallePartida detPNuevo= null;
@@ -547,51 +572,6 @@ public class OrdenSalidaBean implements Serializable {
 		} catch(Exception ex) {
 			log.error("Problema para generar el ticket de la constancia de salida...", ex);
 		}
-		
-//		String jasperPath = "/jasper/ConstanciaSalida.jrxml";
-//		String filename = String.format("ticketSalida-%s.pdf", this.folioSalida);
-//		String logo = "/images/logoF.png";
-//		
-//		File reportFile = new File(jasperPath);
-//		File imgFile = null;
-//		JasperReportUtil jasperReportUtil = new JasperReportUtil();
-//		
-//		Map<String, Object> parameters = new HashMap<String, Object>();
-//		Connection connection = null;
-//		parameters = new HashMap<String, Object>();
-//		
-//		try {
-//			if(!this.isSalidaSaved)
-//				throw new InventarioException("Debe guardar la salida.");
-//			
-//			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
-//			URL logoUrl = getClass().getResource(logo); 
-//			String file = resource.getFile();//retorna la ubicacion del archivo
-//			String logoPath = logoUrl.getFile();
-//			reportFile = new File(file);//crea un archivo
-//			imgFile = new File(logoPath);
-//			log.info(reportFile.getPath());
-//			connection = EntityManagerUtil.getConnection();
-//			parameters.put("REPORT_CONNECTION", connection);
-//			parameters.put("NUMERO", this.folioSalida);
-//			parameters.put("LogoPath", imgFile.getPath());
-//			log.info("Parametros: {}", parameters);
-//			byte[] bytes = jasperReportUtil.createPDF(parameters, reportFile.getPath());
-//			InputStream input = new ByteArrayInputStream(bytes);
-//			this.file = DefaultStreamedContent.builder()
-//					.contentType("application/pdf")
-//					.name(filename)
-//					.stream(() -> input )
-//					.build();
-//			log.info("Orden de salida generada {}...", filename);
-//		} catch (Exception e) {
-//			log.error("Problema para para imrprimir el folio...", e);
-//			FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Error en impresion", String.format("No se pudo imprimir el folio %s", ordenSalida.getFolioSalida()));
-//			PrimeFaces.current().ajax().update("form:messages");
-//		}finally {
-//			conexion.close((Connection) connection);
-//		}
-
 	}
 	
 	public void imprimirTicketServicios() throws Exception{
@@ -990,5 +970,13 @@ public class OrdenSalidaBean implements Serializable {
 
 	public void setListaDetalles(List<SalidaDetalleUI> listaDetalles) {
 		this.listaDetalles = listaDetalles;
+	}
+
+	public List<String> getSinConfirmar() {
+		return sinConfirmar;
+	}
+
+	public void setSinConfirmar(List<String> sinConfirmar) {
+		this.sinConfirmar = sinConfirmar;
 	}
 }
