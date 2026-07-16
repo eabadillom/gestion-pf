@@ -248,7 +248,7 @@
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
                              actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="dtAvisos form:tabView:dtPreciosServicios"
-                             process="@this form:tabView:pnlAviso" oncomplete="PF('dialogAviso').hide()"/>
+                             process="@this form:tabView:pnlAviso" onstart="PF('statusInfoDialog').show" oncomplete="PF('statusInfoDialog').hide();"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogAviso').hide()"
                              class="ui-button-secondary"
                              resetValues="true" immediate="true" />

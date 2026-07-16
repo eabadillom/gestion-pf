@@ -128,6 +128,7 @@ public class ClientesBean implements Serializable {
     private PrecioServicioBL precioServicioBL;
 
     private PrecioServicio precioServicioSelected;
+    private PrecioServicio precioServicioTemporal;
     private List<PrecioServicio> lstPrecioServicios;
     private Servicio servicioSelected;
     private List<Servicio> lstServicio;
@@ -245,9 +246,9 @@ public class ClientesBean implements Serializable {
             log.warn("Error de regla de negocio: {}", ex.getMessage(), ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (SystemException ex) {
-            log.warn("Error de systema: {}", ex.getMessage(), ex);
+            log.warn("Error de sistema: {}", ex.getMessage(), ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
-        }catch (InventarioException ex) {
+        } catch (InventarioException ex) {
             log.warn("Error");
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (Exception e) {
@@ -298,7 +299,7 @@ public class ClientesBean implements Serializable {
             log.warn("Error de regla de negocio: {}", ex.getMessage(), ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (SystemException ex) {
-            log.warn("Error de systema: {}", ex.getMessage(), ex);
+            log.warn("Error de sistema: {}", ex.getMessage(), ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (InventarioException ex) {
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
@@ -356,13 +357,14 @@ public class ClientesBean implements Serializable {
     }
 
     public void actualizarPrecioDesdeAviso(PrecioServicio precioServicio) {
-        precioServicioBL.agregarOActualizar(clienteSelected, precioServicio, "actualizado", true);
+        precioServicioBL.agregarOActualizar(clienteSelected, precioServicio);
     }
 
     public void operarAvisos(String operacion) {
         log.info("El usuario {} ha comenzado a realizar operaciones con los avisos del cliente {}",
                 usuario.getUsuario(), clienteSelected.getNombre());
         String mensaje = null;
+        String titulo = "Aviso";
         try {
             switch (operacion) {
                 case "agregaraviso":
@@ -384,7 +386,8 @@ public class ClientesBean implements Serializable {
                     break;
 
                 case "eliminarservicio":
-                    precioServicioBL.eliminarDeAviso(lstDisponiblesParaAviso, lstConAviso, clienteSelected, precioAvisoSelected);
+                    precioServicioBL.eliminarDeAviso(lstDisponiblesParaAviso, lstConAviso, clienteSelected,
+                            precioAvisoSelected);
                     mensaje = "Servicio de aviso eliminado exitosamente";
                     break;
 
@@ -392,12 +395,23 @@ public class ClientesBean implements Serializable {
                     throw new InventarioException("Operación sobre avisos no válida");
             }
             log.info("El usuario {} ha relalizado {}", usuario.getUsuario(), mensaje);
-            // FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Aviso", mensaje);
+             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo, mensaje);
+        } catch (ValidationException ex) {
+            log.warn("Error de validación de datos: {}", ex.getMessage(), ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
+        } catch (BusinessException ex) {
+            log.warn("Error de regla de negocio: {}", ex.getMessage(), ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
+        } catch (SystemException ex) {
+            log.warn("Error de sistema: {}", ex.getMessage(), ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (InventarioException ex) {
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, "Aviso", ex.getMessage());
+            log.warn("Error de inventario: {}", ex.getMessage(), ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, ex.getMessage());
         } catch (Exception ex) {
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Aviso",
-                    "Contacte con el admistrador del sistema.");
+            log.warn("Error de desconocido: {}", ex.getMessage(), ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo,
+                    "Error desconocido. Contacte con el admistrador del sistema.");
         } finally {
             PrimeFaces.current().ajax().update("form:messages");
         }
@@ -459,7 +473,23 @@ public class ClientesBean implements Serializable {
     public void nuevoPrecioServicio() {
         log.info("El usuario {} ha comenzado a crear un nuevo precio servicio para el cliente {}", usuario.getUsuario(),
                 clienteSelected.getNombre());
-        precioServicioSelected = precioServicioBL.nuevoPrecioServicio();
+        precioServicioTemporal = precioServicioBL.nuevoPrecioServicio();
+    }
+
+    public void editarPrecioServicio(PrecioServicio original) {
+
+        precioServicioSelected = original;
+        precioServicioTemporal = precioServicioBL.clonar(original);
+
+    }
+
+    private void procesarPrecioServicio() {
+        precioServicioBL.validarEstructura(precioServicioTemporal);
+        precioServicioBL.validarUnicidad(lstPrecioServicios, precioServicioTemporal);
+        precioServicioBL.copiarValores(precioServicioTemporal, precioServicioSelected);
+        precioServicioBL.agregarOActualizar(clienteSelected, precioServicioSelected);
+        precioServicioSelected = null;
+        precioServicioSelected = new PrecioServicio();
     }
 
     public void operarServicios(String operacion) {
@@ -471,16 +501,17 @@ public class ClientesBean implements Serializable {
             switch (operacion) {
                 case "agregarprecioservicio":
                     verificarAgregadoOActualizado(precioServicioSelected.getId());
-                    precioServicioBL.agregarOActualizar(clienteSelected, precioServicioSelected, agregadoOActualizado, false);
+                    procesarPrecioServicio();
                     mensaje = "Servicio " + agregadoOActualizado + " exitosamente";
                     break;
                 case "eliminarprecioservicio":
-                    precioServicioBL.eliminar(clienteSelected, this.precioServicioSelected);
+                    precioServicioBL.eliminar(clienteSelected, precioServicioSelected);
                     mensaje = "Servicio eliminado exitosamente";
                     break;
             }
             recargarPreciosDeServicios();
             log.info("El usuario {} ha realizado {}", usuario.getUsuario(), mensaje);
+            PrimeFaces.current().ajax().update("form:tabView:dtPreciosServicios");
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Servicio", mensaje);
         } catch (ValidationException ex) {
             log.warn("Error de validación de datos: {}", ex.getMessage(), ex);
@@ -500,7 +531,7 @@ public class ClientesBean implements Serializable {
         }
     }
 
-    public void recargarPreciosDeServicios() {
+    private void recargarPreciosDeServicios() {
         lstPrecioServicios.clear();
 
         List<PrecioServicio> actualizada = precioServicioBL.filtrarPorAvisoOSinAviso(clienteSelected, null);
@@ -996,6 +1027,14 @@ public class ClientesBean implements Serializable {
 
     public void setPrecioServicioSelected(PrecioServicio precioServicioSelected) {
         this.precioServicioSelected = precioServicioSelected;
+    }
+
+    public PrecioServicio getPrecioServicioTemporal() {
+        return precioServicioTemporal;
+    }
+
+    public void setPrecioServicioTemporal(PrecioServicio precioServicioTemporal) {
+        this.precioServicioTemporal = precioServicioTemporal;
     }
 
     public List<PrecioServicio> getLstPrecioServicios() {

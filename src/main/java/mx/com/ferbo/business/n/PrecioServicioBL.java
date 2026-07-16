@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -48,7 +47,9 @@ public class PrecioServicioBL {
         return precioServicio;
     }
 
-    private void validarPrevioServicio(PrecioServicio precioServicio) {
+    public void validarEstructura(PrecioServicio precioServicio) {
+
+        log.info("Inicia proceso que verifica la estructura del precio de servicio");
 
         if (precioServicio.getId() == null) {
             if (precioServicio.getServicio().getServicioCve() == null) {
@@ -60,56 +61,123 @@ public class PrecioServicioBL {
             }
         }
 
-        if (precioServicio.getPrecio() == null || precioServicio.getPrecio().compareTo(BigDecimal.ZERO) <= 0){
+        if (precioServicio.getPrecio() == null || precioServicio.getPrecio().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("El precio del servicio tiene que ser mayor a cero");
         }
 
     }
 
-     public boolean sonPreciosEquivalentes(PrecioServicio actual,
-            PrecioServicio nuevo,
-            boolean compararAviso) {
+    public boolean sonPreciosEquivalentes(PrecioServicio actual,
+            PrecioServicio nuevo) {
 
-        if (actual == null || nuevo == null) {
-            return false;
+        boolean resultado = true;
+
+        resultado = sonPreciosEquivalentesSinConsiderarAviso(actual, nuevo);
+
+        Integer idAvisoActual = (actual.getAvisoCve() == null)
+                ? null
+                : actual.getAvisoCve().getAvisoCve();
+
+        Integer idAvisoNuevo = (nuevo.getAvisoCve() == null)
+                ? null
+                : nuevo.getAvisoCve().getAvisoCve();
+
+        if (!Objects.equals(idAvisoActual, idAvisoNuevo)) {
+            resultado = false;
+            return resultado;
         }
 
-        boolean mismoServicio = Objects.equals(actual.getServicio(), nuevo.getServicio());
-        boolean mismaUnidad = Objects.equals(actual.getUnidad(), nuevo.getUnidad());
-
-        if (!mismoServicio || !mismaUnidad) {
-            return false;
-        }
-
-        if (compararAviso) {
-            return Objects.equals(actual.getAvisoCve(), nuevo.getAvisoCve());
-        }
-
-        return true;
+        return resultado;
     }
 
-    public void agregarOActualizar(Cliente cliente, PrecioServicio precioServicio, String tipoOperacion, boolean compararAviso)
+    public boolean sonPreciosEquivalentesSinConsiderarAviso(PrecioServicio actual,
+            PrecioServicio nuevo) {
+        boolean resultado = true;
+
+        Integer idServicioActual = actual.getServicio().getServicioCve();
+        Integer idServicioNuevo = nuevo.getServicio().getServicioCve();
+
+        if (idServicioActual.compareTo(idServicioNuevo) != 0) {
+            resultado = false;
+            return resultado;
+        }
+
+        Integer idUnidadManejoActual = actual.getUnidad().getUnidadDeManejoCve();
+        Integer idUnidadManejoNuevo = nuevo.getUnidad().getUnidadDeManejoCve();
+
+        if (idUnidadManejoActual.compareTo(idUnidadManejoNuevo) != 0) {
+            resultado = false;
+            return resultado;
+        }
+
+        return resultado;
+    }
+
+    public long contarCuantoHayEquivalentes(List<PrecioServicio> lista, PrecioServicio precioServicio) {
+
+        log.info("Inicia proceso para contar cuantas veces puede existir el precio servicio");
+
+        long total = 0;
+
+        for (int i = 0; i < lista.size(); i++) {
+            if (sonPreciosEquivalentes(lista.get(i), precioServicio)) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    public void validarUnicidad(List<PrecioServicio> lista, PrecioServicio precioServicio) {
+
+        log.info("Inicia proceso para verificar unicidad del precio de servicio");
+
+        long cantidad = contarCuantoHayEquivalentes(lista, precioServicio);
+
+        if (cantidad >= 1) {
+            throw new BusinessException(
+                    "Existe más de un precio servicio con las mismas características");
+        }
+
+    }
+
+    public int buscarIndicePrecioServicio(List<PrecioServicio> lista,
+            PrecioServicio precioServicio) {
+
+        log.info("Inicia proceso para obtener la posición del precio de servicio");
+
+        int index = -1;
+
+        for (int i = 0; i < lista.size(); i++) {
+            boolean sonEquivalentes = false;
+            sonEquivalentes = sonPreciosEquivalentes(lista.get(i), precioServicio);
+            if (sonEquivalentes) {
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    public PrecioServicio clonar(PrecioServicio original) {
+        PrecioServicio clon = new PrecioServicio();
+
+        copiarValores(original, clon);
+
+        return clon;
+    }
+
+    public void copiarValores(PrecioServicio origen, PrecioServicio destino) {
+        destino.setServicio(origen.getServicio());
+        destino.setUnidad(origen.getUnidad());
+        destino.setPrecio(origen.getPrecio());
+        destino.setAvisoCve(origen.getAvisoCve());
+    }
+
+    public void agregarOActualizar(Cliente cliente, PrecioServicio precioServicio)
             throws ValidationException {
 
-        if (cliente == null) {
-            throw new ValidationException("El cliente no puede ser vacío");
-        }
-
         log.info("Inicia proceso de actualización o agregado del precio de servicio del cliente", cliente.getNombre());
-        
-        validarPrevioServicio(precioServicio);
 
-
-        final List<PrecioServicio> lista = cliente.getPrecioServicioList();
-
-        int index = IntStream.range(0, lista.size())
-                .filter(i -> sonPreciosEquivalentes(lista.get(i), precioServicio, compararAviso))
-                .findFirst()
-                .orElse(-1);
-
-        if (index >= 0 && "agregado".equalsIgnoreCase(tipoOperacion)) {
-            throw new BusinessException("El precio servicio que se intenta agregar ya existe, favor de verificar");
-        }
+        int index = buscarIndicePrecioServicio(cliente.getPrecioServicioList(), precioServicio);
 
         if (index >= 0) {
             cliente.getPrecioServicioList().set(index, precioServicio);
@@ -121,18 +189,19 @@ public class PrecioServicioBL {
         }
     }
 
-    public boolean verificarParaDisponiblesParaAviso(List<PrecioServicio> sinAviso, PrecioServicio precioServicio) {
-        boolean resultado = false; 
-        for (PrecioServicio ps : sinAviso) {
-            resultado = sonPreciosEquivalentes(ps, precioServicio, false);
-            if (resultado) {
-                break;
-            }
+    private void quitarDeLista(List<PrecioServicio> lista, PrecioServicio precioServicio) {
+
+        if (precioServicio.getId() != null) {
+            lista.remove(precioServicio);
+        } else {
+
+            int index = buscarIndicePrecioServicio(lista, precioServicio);
+            lista.remove(index);
         }
-        return resultado;
     }
 
-    public void eliminar(Cliente cliente, PrecioServicio precioServicio) throws InventarioException {
+    public void eliminar(Cliente cliente, PrecioServicio precioServicio)
+            throws InventarioException {
         log.info("Inicia el proceso de eliminacion del precio de servicio del cliente");
 
         if (cliente == null) {
@@ -143,7 +212,7 @@ public class PrecioServicioBL {
             throw new BusinessException("El precio de servicio no puede ser vacío");
         }
 
-        cliente.getPrecioServicioList().remove(precioServicio);
+        quitarDeLista(cliente.getPrecioServicioList(), precioServicio);
 
         precioServicio.setCliente(null);
 
@@ -159,7 +228,7 @@ public class PrecioServicioBL {
         for (PrecioServicio sinAviso : preciosSinAviso) {
 
             boolean existe = preciosConAviso.stream()
-                    .anyMatch(ps -> sonPreciosEquivalentes(sinAviso, ps, false));
+                    .anyMatch(ps -> sonPreciosEquivalentesSinConsiderarAviso(sinAviso, ps));
 
             if (!existe) {
                 disponibles.add(sinAviso);
@@ -179,9 +248,7 @@ public class PrecioServicioBL {
 
     public List<PrecioServicio> filtrarPorAvisoOSinAviso(Cliente cliente, Aviso aviso) {
 
-        if (cliente == null) {
-            throw new ValidationException("El cliente no puede ser vacío");
-        }
+        log.info("Inicia proceso para filtrar la lista " + ((aviso == null) ? "sin aviso" : "con aviso"));
 
         if (cliente.getPrecioServicioList() == null || cliente.getPrecioServicioList().isEmpty()) {
             return new ArrayList<>();
@@ -199,22 +266,22 @@ public class PrecioServicioBL {
             PrecioServicio origen,
             Aviso aviso) {
 
-        PrecioServicio copia = new PrecioServicio();
-        copia.setUnidad(origen.getUnidad());
-        copia.setServicio(origen.getServicio());
-        copia.setPrecio(origen.getPrecio());
+        PrecioServicio copia = clonar(origen);
         copia.setAvisoCve(aviso);
 
         return copia;
     }
 
-    public void asociarAAviso(List<PrecioServicio> disponiblesParaAviso, List<PrecioServicio> porAgregarAAviso, List<PrecioServicio> conAviso, Cliente cliente,
+    public void asociarAAviso(List<PrecioServicio> disponiblesParaAviso, List<PrecioServicio> porAgregarAAviso,
+            List<PrecioServicio> conAviso, Cliente cliente,
             Aviso aviso) {
+
+        log.info("Inicia proceo que asocia al aviso los precio servicios seleccionados");
 
         for (PrecioServicio origen : porAgregarAAviso) {
             PrecioServicio copiaConAviso = crearParaAviso(origen, aviso);
-            agregarOActualizar(cliente, copiaConAviso, "agregado",true);
-            disponiblesParaAviso.remove(origen);
+            agregarOActualizar(cliente, copiaConAviso);
+            quitarDeLista(disponiblesParaAviso, origen);
             conAviso.add(copiaConAviso);
         }
         porAgregarAAviso.clear();
@@ -222,8 +289,17 @@ public class PrecioServicioBL {
 
     }
 
-    public void eliminarDeAviso(List<PrecioServicio> disponiblesParaAviso, List<PrecioServicio> conAviso, Cliente cliente, PrecioServicio precioServicio)
-            throws InventarioException, ValidationException, BusinessException{
+    public boolean verificarParaDisponiblesParaAviso(List<PrecioServicio> sinAviso, PrecioServicio precioServicio) {
+
+        log.info("Inicia proceso para verificar si el precio servicio aun esta en la lista original");
+
+        return sinAviso.stream()
+                .anyMatch(ps -> sonPreciosEquivalentes(ps, precioServicio));
+    }
+
+    public void eliminarDeAviso(List<PrecioServicio> disponiblesParaAviso, List<PrecioServicio> conAviso,
+            Cliente cliente, PrecioServicio precioServicio)
+            throws InventarioException, ValidationException, BusinessException {
 
         if (cliente == null) {
             throw new ValidationException("El cliente no puede ser vacío");
@@ -233,9 +309,9 @@ public class PrecioServicioBL {
             throw new BusinessException("El precio de servicio no puede ser vacío");
         }
 
-        precioServicio.setAvisoCve(null);
-
         eliminar(cliente, precioServicio);
+
+        precioServicio.setAvisoCve(null);
 
         List<PrecioServicio> sinAviso = filtrarPorAvisoOSinAviso(cliente, null);
 
@@ -243,7 +319,8 @@ public class PrecioServicioBL {
             disponiblesParaAviso.add(precioServicio);
         }
 
-        conAviso.remove(precioServicio);
+        quitarDeLista(conAviso, precioServicio);
 
     }
+
 }

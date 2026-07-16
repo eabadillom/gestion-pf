@@ -37,8 +37,7 @@
         </p:column>
         <p:column width="2rem" style="text-align: center;">
             <p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button" oncomplete="PF('dlgPrecioServicio').show()"
-                             update="form:tabView:dlgPrecioServicio form:tabView:dlgPrecioServicio">
-                <f:setPropertyActionListener value="#{pServicio}" target="#{clientesBean.precioServicioSelected}" />
+                             update="form:tabView:dlgPrecioServicio form:tabView:dlgPrecioServicio" action="#{clientesBean.editarPrecioServicio(pServicio)}">
             </p:commandButton>
         </p:column>
         <p:column width="2rem" style="text-align: center;">
@@ -57,9 +56,9 @@
                 </div>
                  <div class="p-col-12 p-md-12">
                     <p:outputLabel for="servicio" value="Servicio"/>
-                    <p:selectOneMenu id="servicio" value="#{clientesBean.precioServicioSelected.servicio}" filter="true" filterMatchMode="contains"
+                    <p:selectOneMenu id="servicio" value="#{clientesBean.precioServicioTemporal.servicio}" filter="true" filterMatchMode="contains"
                                      converter="entityConverter" required="true" requiredMessage="Seleccione servicio" 
-                                     disabled="#{clientesBean.precioServicioSelected.id ne null}" style="width:100%">
+                                     disabled="#{clientesBean.precioServicioTemporal.id ne null}" style="width:100%">
                         <f:selectItem itemLabel="--Selecciona--" itemValue="#{null}" />
                         <f:selectItems value="#{clientesBean.lstServicio}" var="serv" itemLabel="#{serv.servicioDs}" itemValue="#{serv}"/>
                         <p:ajax process="@this" event="change"/>
@@ -67,9 +66,9 @@
                 </div>
                  <div class="p-col-12 p-md-12">
                     <p:outputLabel for="unidad" value="Unidad"/>
-                    <p:selectOneMenu id="unidad" value="#{clientesBean.precioServicioSelected.unidad}" filter="true" filterMatchMode="contains"
+                    <p:selectOneMenu id="unidad" value="#{clientesBean.precioServicioTemporal.unidad}" filter="true" filterMatchMode="contains"
                                      converter="entityConverter" required="true" requiredMessage="Seleccione unidad"
-                                     disabled="#{clientesBean.precioServicioSelected.id ne null}" style="width:100%">
+                                     disabled="#{clientesBean.precioServicioTemporal.id ne null}" style="width:100%">
                         <f:selectItem itemLabel="--Selecciona--" itemValue="#{null}"/>
                         <f:selectItems value="#{clientesBean.lstUnidadManejo}" var="unidad" itemLabel="#{unidad.unidadDeManejoDs}" itemValue="#{unidad}" />
                         <p:ajax process="@this" event="change" />
@@ -77,8 +76,8 @@
                 </div>
                  <div class="p-col-12 p-md-12">
                     <p:outputLabel for="precio" value="Precio"/>
-                    <p:inputNumber id="precio" value="#{clientesBean.precioServicioSelected.precio}" emptyValue="null" symbol="$ " symbolPosition="p" thousandSeparator="," inputStyle="text-align: right"
-                                   minValue="0" required="true" requiredMessage="Campo requerido" disabled="#{clientesBean.precioServicioSelected.avisoCve.avisoCve ne null}" style="width:100%">
+                    <p:inputNumber id="precio" value="#{clientesBean.precioServicioTemporal.precio}" emptyValue="null" symbol="$ " symbolPosition="p" thousandSeparator="," inputStyle="text-align: right"
+                                   minValue="0" required="true" requiredMessage="Campo requerido" style="width:100%">
                         <p:ajax process="@this"/>
                     </p:inputNumber>
                 </div>
@@ -86,7 +85,7 @@
 
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.precioServicioSelected.id != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check" actionListener="#{clientesBean.operarServicios('agregarprecioservicio')}"
-                             update="dtPreciosServicios" process="@this" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" resetValues="true"/>
+                             process="@this" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide()" resetValues="true"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dlgPrecioServicio').hide()" class="ui-button-secondary" immediate="true"/>
         </f:facet>
     </p:dialog>

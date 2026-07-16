@@ -16,9 +16,9 @@
                 <p:toolbarGroup>
                     <p:commandButton value="Nuevo Cliente" icon="pi pi-plus" styleClass="ui-button-raised"
                                      style="margin-right: .5rem" actionListener="#{clientesBean.nuevoCliente()}" process="@this"
-                                     update="form:dialogCliente form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente"
+                                     update="form:dlgCliente form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente"
                                      onstart="PF('statusInfoDialog').show();"
-                                     oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();">
+                                     oncomplete="PF('statusInfoDialog').hide(); PF('dlgCliente').show();">
                     </p:commandButton>
                     <p:outputLabel value="Habilitados:" style="margin-right:8px" />
                     <p:inputSwitch value="#{clientesBean.estatusClientes}">
@@ -63,15 +63,15 @@
                     <p:column width="2rem" style="text-align: center;">
                         <p:commandButton icon="pi pi-pencil" styleClass="edit-button"
                                          onstart="PF('statusInfoDialog').show();"
-                                         oncomplete="PF('statusInfoDialog').hide(); PF('dialogCliente').show();" process="@this"
-                                         update="form:dialogCliente" actionListener="#{clientesBean.cargarInfoCliente(cliente.cteCve)}"
+                                         oncomplete="PF('statusInfoDialog').hide(); PF('dlgCliente').show();" process="@this"
+                                         update="form:dlgCliente" actionListener="#{clientesBean.cargarInfoCliente(cliente.cteCve)}"
                                          resetValues="form:tabView:soClienteTipoDom form:tabView:dt-domiciliosCliente" />
                     </p:column>
                 </p:dataTable>
             </div>
 
 
-            <p:dialog id="dialogCliente" header="Información del cliente" widgetVar="dialogCliente" showEffect="fade"
+            <p:dialog id="dlgCliente" header="Información del cliente" widgetVar="dlgCliente" showEffect="fade"
                       modal="true" responsive="true" position="center top" width="100%" dynamic="true" cache="false">
                 <p:tabView id="tabView" class="ui-fluid" dynamic="true" effect="drop" cache="false">
                     <p:tab title="Fiscal">
@@ -98,7 +98,7 @@
                                      actionListener="#{clientesBean.guardarOActualizarCliente()}" update="dtClientes"
                                      onstart="PF('statusInfoDialog').show();"
                                      oncomplete="PF('statusInfoDialog').hide();"/>
-                    <p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('dialogCliente').hide()"
+                    <p:commandButton value="Cerrar" icon="pi pi-times" oncomplete="PF('dlgCliente').hide()"
                                      immediate="true" class="ui-button-secondary" resetValues="true"/>
                 </f:facet>
             </p:dialog>
