@@ -9,13 +9,13 @@
 					<div class="p-col-12 p-md-2">
 						<p:outputLabel value="Placas" />
 						<p:inputText value="#{altaConstanciaSalidaBean.placas}" placeholder="Placas transporte" maxlength="10" oninput="this.value = this.value.toUpperCase()">
-							<p:ajax process="@this" />
+                                                    <p:ajax process="@this" event="change" listener="#{altaConstanciaSalidaBean.agregarDatoGeneralABitacora('placas')}" />
 						</p:inputText>
 					</div>
 					<div class="p-col-12 p-md-4">
 						<p:outputLabel value="Transportista" />
 						<p:inputText value="#{altaConstanciaSalidaBean.nombreTransportista}" placeholder="Nombre transportista" maxlength="100" oninput="this.value = this.value.toUpperCase()">
-							<p:ajax process="@this" />
+                                                    <p:ajax process="@this" event="change" listener="#{altaConstanciaSalidaBean.agregarDatoGeneralABitacora('nombre transportista')}"/>
 						</p:inputText>
 					</div>
 					<div class="p-col-12 p-md-3">
@@ -27,12 +27,12 @@
 					<div class="p-col-12 p-md-3">
 						<p:outputLabel id="labelTempTransporte" value="Temp. Transporte"/>
 						<p:inputNumber id="inputTempTransporte" value="#{altaConstanciaSalidaBean.temperaturaTransporte}" disabled="#{not altaConstanciaSalidaBean.statusTermo}" emptyValue="empty" title="Temp. (°C)" symbol=" °C" symbolPosition="s" decimalPlaces="2" minValue="-50.00" maxValue="50.00">
-							<p:ajax process="@this"></p:ajax>
+                                                    <p:ajax process="@this" event="change" listener="#{altaConstanciaSalidaBean.agregarDatoGeneralABitacora('temperatura transporte')}"></p:ajax>
 						</p:inputNumber>
 					</div>
 					<div class="p-col-12 p-md-12">
 						<p:inputText autoResize="true" value="#{altaConstanciaSalidaBean.observaciones}" placeholder="Observaciones" maxlength="200" oninput="this.value = this.value.toUpperCase()">
-							<p:ajax process="@this"></p:ajax>
+                                                    <p:ajax process="@this" event="change" listener="#{altaConstanciaSalidaBean.agregarDatoGeneralABitacora('observaciones')}"></p:ajax>
 						</p:inputText>
 					</div>
 				</div>

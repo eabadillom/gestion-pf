@@ -109,7 +109,7 @@
 								<p:menuitem value="Facturas" icon="pi pi-file" outcome="/protected/reportes/Facturas" />
 								<p:menuitem value="Facturas por Mes" icon="pi pi-file" outcome="/protected/reportes/FacturasPorMes" />
 								<p:menuitem value="Facturas por Plantas" icon="pi pi-file" outcome="/protected/reportes/FacturasPorPlantas" />
-								<p:menuitem value="Antiguedad de Saldos" icon="pi pi-file" outcome="/protected/reportes/AntiguedadSaldos" />
+								<p:menuitem value="Antigüedad de saldos" icon="pi pi-file" outcome="/protected/reportes/facturacion/antiguedad-saldos" />
 								<p:menuitem value="Cartera Clientes" icon="pi pi-file" outcome="/protected/reportes/CarteraCliente" />
 							</p:submenu>
 							<p:menuitem value="Contabilidad" icon="pi pi-file" outcome="/protected/reportes/Contabilidad" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}"/>
@@ -127,6 +127,7 @@
 								<p:menuitem value="Estado de resultados" icon="pi pi-file" outcome="/protected/reportes/EstadoResultados" />			
 							</p:submenu>
 						</p:submenu>
+                                                <p:menuitem value="Bitácora" outcome="/protected/catalogos/bitacora/principal" icon="pi pi-fw pi-book" rendered="#{(sideBarBean.usuario.perfil == 3)}"/>
 						<p:menuitem value="Usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>

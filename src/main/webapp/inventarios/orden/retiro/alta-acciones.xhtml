@@ -9,7 +9,7 @@
     		
     	</div>
     	<div class="p-col-12 p-md-2">
-    		<p:commandButton value="Guardar" process="@this" icon="pi pi-save" onclick="PF('confirmGuardar').show();" update="pnl-acciones" disabled="#{ordenSalidaBean.folioSelected eq null}"/>
+    		<p:commandButton value="Guardar" process="@this" icon="pi pi-save" actionListener="#{ordenSalidaBean.productosSinConfirmar()}" oncomplete="PF('confirmGuardar').show();" update="pnl-acciones" disabled="#{ordenSalidaBean.folioSelected eq null}"/>
     	</div>
     	<div class="p-col-12 p-md-2">
     		<p:commandButton id="btnTicketSalida" value="Ticket Salida" icon="pi pi-print" actionListener="#{ordenSalidaBean.imprimirTicketSalida}" ajax="false" styleClass="ui-button-outlined" disabled="#{ordenSalidaBean.constancia.id eq null}">
