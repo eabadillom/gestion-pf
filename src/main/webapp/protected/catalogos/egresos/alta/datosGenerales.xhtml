@@ -135,6 +135,7 @@
                               style="width:100%"
                               disabled="#{not empty altaEgresoBean.egresoSelected.id}">
                     <p:ajax event="dateSelect" process="@this"/>
+                    <p:ajax event="change" process="@this"/>
                 </p:datePicker>
             </div>
 
