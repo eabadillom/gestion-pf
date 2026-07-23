@@ -3,6 +3,7 @@ package mx.com.ferbo.business.n;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
@@ -11,6 +12,8 @@ import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.ferbo.tools.exception.BusinessException;
 
 import mx.com.ferbo.business.almacen.PlantaBL;
 import mx.com.ferbo.dao.n.ClienteDAO;
@@ -45,7 +48,7 @@ public class ClienteBL {
     private PlantaBL plantaBL;
 
     public List<Cliente> obtenerTodos() {
-        
+
         log.info("Inicia el proceso para obtener todos los clientes");
         List<Cliente> lista = clienteDAO.buscarTodos();
 
@@ -57,13 +60,13 @@ public class ClienteBL {
         return lista;
     }
 
-    public Cliente obtenerTodoCliente(Cliente cliente, Boolean isFullInfo) throws InventarioException {
+    public Cliente obtenerTodoCliente(Integer idCliente, Boolean isFullInfo) throws InventarioException {
 
         try {
-            log.info("Inicia proceso para extraer la información minima del cliente {}", cliente.getNombre());
-            return clienteDAO.obtenerPorId(cliente.getCteCve(), isFullInfo);
+            log.info("Inicia proceso para extraer la información minima del cliente con id: {}", idCliente);
+            return clienteDAO.obtenerPorId(idCliente, isFullInfo);
         } catch (DAOException ex) {
-            log.info("Error al obtener la información del cliente", ex);
+            log.info("Error al obtener la información del cliente con id: {}", idCliente, ex.getMessage(), ex);
             throw new InventarioException("Hubo un problema al obtener la información del cliente");
         }
 
@@ -81,6 +84,18 @@ public class ClienteBL {
 
     }
 
+    public List<Cliente> fitrarPorNombreOAlias(List<Cliente> clientes, Boolean status, String filtro) {
+        String filtroFormateado = filtro.trim().toUpperCase();
+        List<Cliente> clientesFiltrados = clientes.stream()
+                .filter(c -> status.equals(c.getHabilitado()) &&
+                        (c.getNombre().trim().toUpperCase().contains(filtroFormateado)
+                                || (c.getAlias() == null ? "" : c.getAlias().trim().toUpperCase())
+                                        .contains(filtroFormateado)))
+                .collect(Collectors.toList());
+
+        return clientesFiltrados;
+    }
+
     public Cliente nuevoCliente() {
         log.info("Inicia proceso para crear un nuevo cliente");
         Cliente cliente = new Cliente();
@@ -94,13 +109,13 @@ public class ClienteBL {
         cliente.setAvisoList(new ArrayList<>());
         cliente.setClienteDomiciliosList(new ArrayList<>());
         cliente.setPrecioServicioList(new ArrayList<>());
-        
+
         log.info("Finaliaza proceso para crear un nuevo cliente");
         return cliente;
     }
 
     public void asignarCandadoSalida(List<Planta> plantas, Cliente cliente) {
-        
+
         log.info("Inicia proceso para asignar candado de salida al cliente: {}", cliente.getNombre());
         CandadoSalida candadoSalida = new CandadoSalida();
         candadoSalida.setHabilitado(true);
@@ -154,27 +169,24 @@ public class ClienteBL {
         log.info("Finaliza proceso para asignar candado de salida al cliente: {}", cliente.getNombre());
     }
 
-    public String guardarOActualizar(Cliente cliente) throws InventarioException {
+    public Cliente guardarOActualizar(Cliente cliente) throws InventarioException, BusinessException {
 
-        log.info("Inicia proceso para guardar o actualizar al cliente:_{}", cliente.getNombre());
-        String status = null;
+        log.info("Inicia proceso para guardar o actualizar al cliente: {}", cliente.getNombre());
         if (cliente.getCteCve() == null) {
             if ("m".equalsIgnoreCase(cliente.getTipoPersona())) {
                 fiscalBL.validarRegimenCapital(cliente);
             }
+            log.info("Se busca al cliente por su código unico");
             Cliente clienteBuscado = obtenerPorCodigoUnico(cliente.getCodUnico());
+            log.info("Se valida al cliente por su código unico");
             fiscalBL.validarCodigoUnico(cliente, clienteBuscado);
             List<Planta> plantas = plantaBL.buscarTodos(Boolean.TRUE);
+            log.info("Se asigna el candado de salida al cliente");
             asignarCandadoSalida(plantas, cliente);
-            clienteDAO.guardar(cliente);
-            status = "agregado";
-            log.info("El cliente {} se agrego satisfactoriamente", cliente.getNombre());
+            return clienteDAO.guardarYObtener(cliente);
         } else {
-            clienteDAO.actualizar(cliente);
-            status = "actualizado";
-            log.info("El cliente {} se actualizo satisfactoriamente", cliente.getNombre());
+            return clienteDAO.actualizarYObtener(cliente);
         }
-        return "Cliente " + status + " exitosamente";
     }
 
     public List<Cliente> filtrarPorEstatus(List<Cliente> original, Boolean estado) {
