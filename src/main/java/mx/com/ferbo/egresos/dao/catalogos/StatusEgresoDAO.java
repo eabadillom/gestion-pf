@@ -19,13 +19,12 @@ public class StatusEgresoDAO extends BaseDAO<StatusEgreso, Long> {
 
     private final static Logger log = LogManager.getLogger(StatusEgresoDAO.class);
 
-    private EntityManager em;
-
     public StatusEgresoDAO() {
         super(StatusEgreso.class);
     }
 
     public StatusEgreso buscarPorClave(String clave) throws SystemException {
+        EntityManager em = null ;
         try {
             em = getEntityManager();
             return em.createNamedQuery("StatusEgreso.findByClave", StatusEgreso.class).setParameter("clave", clave)
@@ -40,6 +39,7 @@ public class StatusEgresoDAO extends BaseDAO<StatusEgreso, Long> {
     }
 
     public List<StatusEgreso> buscarActivosOInactivos(Boolean activo) throws SystemException {
+        EntityManager em = null ;
         try {
             em = getEntityManager();
             return em.createNamedQuery("StatusEgreso.findActivosOInactivos", StatusEgreso.class)
