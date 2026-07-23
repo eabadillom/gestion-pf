@@ -49,7 +49,7 @@
             </p:toolbar>
             <div style="padding-top: 1rem;">
                 <p:dataTable id="dtClientes" widgetVar="dtClientes" value="#{clientesBean.lstClientesFiltrada}" var="cliente"
-                             rowKey="#{cliente.cteCve}" paginator="true" rows="10" 
+                             rowKey="#{cliente.cteCve}" paginator="true" rows="10" size="small"
                              paginatorPosition="bottom">
                     <p:column headerText="Nombre" sortBy="#{cliente.nombre}">
                         <h:outputText value="#{cliente.nombre}" />
@@ -57,7 +57,7 @@
                     <p:column headerText="Alias" sortBy="#{cliente.alias}">
                         <h:outputText value="#{cliente.alias}" />
                     </p:column>
-                    <p:column headerText="RFC" width="7rem" style="text-align: center;">
+                    <p:column headerText="RFC" width="10rem" style="text-align: center;">
                         <h:outputText value="#{cliente.cteRfc}" />
                     </p:column>
                     <p:column width="2rem" style="text-align: center;">
