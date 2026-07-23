@@ -34,21 +34,28 @@ import org.primefaces.model.StreamedContent;
 import com.ferbo.facturama.business.CfdiBL;
 import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
+import com.ferbo.tools.exception.ValidationException;
+import javax.inject.Inject;
 
 import mx.com.ferbo.business.FacturamaBL;
 import mx.com.ferbo.dao.FacturaMedioPagoDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
 import mx.com.ferbo.dao.MetodoPagoDAO;
+import mx.com.ferbo.dao.RegimenFiscalDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.UsoCfdiDAO;
+import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
 import mx.com.ferbo.dao.n.FacturaDAO;
+import mx.com.ferbo.model.AsentamientoHumano;
 import mx.com.ferbo.model.CancelaFactura;
 import mx.com.ferbo.model.Cfdi;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.Domicilios;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.FacturaMedioPago;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.RegimenFiscal;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
@@ -82,6 +89,7 @@ public class FacMantenimentoBean implements Serializable {
 	private CancelaFactura cancelaFactura = null;
 	private MetodoPagoDAO metodoPagoDAO;
 	private MedioPagoDAO medioPagoDAO;
+	private RegimenFiscalDAO regimenFiscalDAO;
 	private UsoCfdiDAO   usoCfdiDAO;
 
 	private String cdMetodoPagoSelected;
@@ -97,6 +105,15 @@ public class FacMantenimentoBean implements Serializable {
 	private StreamedContent file;
 	private Usuario usuario;
 	private FacturaDAO facturaDAO;
+        
+        @Inject
+        private AsentamientoHumanoDAO asentamientoHumanoDAO;
+        
+        private Domicilios domicilioSelected;
+        
+        private RegimenFiscal regimenFiscalEmisor;
+        
+        private RegimenFiscal regimenFiscalReceptor;
 
 	public FacMantenimentoBean() {
 		seleccion = new Factura();
@@ -112,6 +129,8 @@ public class FacMantenimentoBean implements Serializable {
 		de = new Date();
 		fechaModificada = new Date();
 		hasta = new Date();
+                domicilioSelected = new Domicilios();
+		regimenFiscalDAO = new RegimenFiscalDAO();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -183,7 +202,9 @@ public class FacMantenimentoBean implements Serializable {
 		}
 	}
 	
-	public void datosCliente() {
+	public void datosCliente(Factura factura) {
+            
+                seleccion = facturaDAO.buscarPorId(factura.getId(), true);
 		
 		consultarPagos();
 		
@@ -191,6 +212,15 @@ public class FacMantenimentoBean implements Serializable {
 		this.idMedioPagoSelected = fact.getFacturaMedioPagoList().get(0).getMpId().getMpId();
 		this.cdMetodoPagoSelected = this.seleccion.getMetodoPago();
 		this.usoCFDI = usoCfdiDAO.buscarPorId(seleccion.getCdUsoCfdi());
+		regimenFiscalEmisor = regimenFiscalDAO.buscarPorId(seleccion.getEmisorCdRegimen());
+		regimenFiscalReceptor = regimenFiscalDAO.buscarPorId(seleccion.getCdRegimen());
+	}
+
+	public void limpiarFacturaSeleccionada() {
+		seleccion = null;
+		seleccion = new Factura();
+		domicilioSelected = null;
+		domicilioSelected = new Domicilios();
 	}
 
 	public void cancelaFactura() {
@@ -413,6 +443,33 @@ public class FacMantenimentoBean implements Serializable {
 		}
 		
 	}
+        
+    public List<AsentamientoHumano> sugerenciasCodigoPostal(String consulta) {
+        List<AsentamientoHumano> lstSugerenciasCP = asentamientoHumanoDAO.buscaPorCP(consulta);
+        return lstSugerenciasCP;
+    }
+        
+    public void asignarDomicilio() {
+        try {
+            if (domicilioSelected == null) {
+                throw new ValidationException("El domicilio seleccionado no puede ser vacío");
+            }
+                
+            if (domicilioSelected.getAsentamiento() == null) {
+                throw new ValidationException("El asentamiento seleccionado no puede ser vacío");
+            }
+			seleccion.setCp(domicilioSelected.getAsentamiento().getCp());
+			seleccion.setColonia(domicilioSelected.getAsentamiento().getAsentamientoDs());
+			seleccion.setCiudad(domicilioSelected.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadDs());
+			seleccion.setMunicipio(domicilioSelected.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipioDs());
+			seleccion.setEstado(domicilioSelected.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadoDesc());
+			seleccion.setPais(domicilioSelected.getAsentamiento().getAsentamientoHumanoPK().getCiudades().getCiudadesPK().getMunicipios().getMunicipiosPK().getEstados().getEstadosPK().getPais().getPaisDesc());
+        } catch (ValidationException ex) {
+				log.warn("Error de validación de datos: {}", ex.getMessage(), ex);
+	} catch(Exception ex) {
+				log.error("Error desconocido: {}", ex.getMessage(), ex);
+        } 
+    }
 
 	public void setFolioFactura(Factura factura) {
 		this.folio = String.format("%s-%s", factura.getNomSerie(), factura.getNumero());
@@ -563,4 +620,29 @@ public class FacMantenimentoBean implements Serializable {
 		this.usoCFDI = usoCFDI;
 	}
 
+        public Domicilios getDomicilioSelected() {
+                return domicilioSelected;
+        }
+
+        public void setDomicilioSelected(Domicilios domicilioSelected) {
+                this.domicilioSelected = domicilioSelected;
+        }
+
+		public RegimenFiscal getRegimenFiscalEmisor() {
+			return regimenFiscalEmisor;
+		}
+
+		public void setRegimenFiscalEmisor(RegimenFiscal regimenFiscalEmisor) {
+			this.regimenFiscalEmisor = regimenFiscalEmisor;
+		}
+
+		public RegimenFiscal getRegimenFiscalReceptor() {
+			return regimenFiscalReceptor;
+		}
+
+		public void setRegimenFiscalReceptor(RegimenFiscal regimenFiscalReceptor) {
+			this.regimenFiscalReceptor = regimenFiscalReceptor;
+		}
+
+      
 }
