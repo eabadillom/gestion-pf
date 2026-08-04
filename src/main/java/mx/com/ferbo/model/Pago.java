@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -33,9 +34,9 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "Pago.findByFacturaId", query = "SELECT p FROM Pago p WHERE p.factura.id = :facturaId"),
         @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)"),
         @NamedQuery(name = "Pago.findByFacturaFechas", query = "SELECT p FROM Pago p WHERE (p.factura.id = :idFactura OR :idFactura IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate) AND p.factura.metodoPago = :metodoPago ORDER BY p.fecha ASC"),
-        @NamedQuery(name = "Pago.findByParametros", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate) AND p.factura.metodoPago = :metodoPago")
+        @NamedQuery(name = "Pago.findByParametros", query = "SELECT p FROM Pago p WHERE (p.factura.emisorRFC = :rfcEmisor OR :rfcEmisor IS NULL) AND (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.factura.metodoPago = :metodoPago) AND (p.fecha BETWEEN :startDate AND :endDate)")
 })
-public class Pago implements Serializable, Cloneable {
+public class Pago implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
@@ -55,6 +56,10 @@ public class Pago implements Serializable, Cloneable {
     @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date fecha;
+    
+    @Basic(optional = true)
+    @Column(name = "tm_hora")
+    private LocalTime hora;
     
     @Size(max = 20)
     @Column(name = "referencia")
@@ -117,6 +122,14 @@ public class Pago implements Serializable, Cloneable {
 
     public void setFecha(Date fecha) {
         this.fecha = fecha;
+    }
+
+    public LocalTime getHora() {
+        return hora;
+    }
+
+    public void setHora(LocalTime hora) {
+        this.hora = hora;
     }
 
     public String getReferencia() {
@@ -191,23 +204,6 @@ public class Pago implements Serializable, Cloneable {
             return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
        
         return Objects.equals(this.id, other.id);
-    }
-    
-    @Override
-    public Pago clone() throws CloneNotSupportedException {
-        Pago pago = null;
-        
-        pago = new Pago();
-        pago.setId(this.id == null ? null : new Integer(this.id));
-        pago.setMonto(this.monto);
-        pago.setFecha(this.fecha);
-        pago.setReferencia(this.referencia);
-        pago.setFactura(this.factura == null ? null : this.factura);
-        pago.setTipo(this.tipo);
-        pago.setComplementoPago(this.complementoPago == null ? null : this.complementoPago);
-        pago.setParcialidad(this.parcialidad == null ? null : this.parcialidad);
-        
-        return pago;
     }
 
     @Override

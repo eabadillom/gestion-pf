@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -20,9 +22,9 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "SerieComplementoPago.findAll", query = "SELECT scp FROM SerieComplementoPago scp"),
     @NamedQuery(name = "SerieComplementoPago.findById", query = "SELECT scp FROM SerieComplementoPago scp WHERE scp.id = :id"),
-    @NamedQuery(name = "SerieComplementoPago.findByEmisor", query = "SELECT scp FROM SerieComplementoPago scp WHERE scp.emisor = :emisor")
+    @NamedQuery(name = "SerieComplementoPago.findByEmisor", query = "SELECT scp FROM SerieComplementoPago scp WHERE scp.emisor.cd_emisor = :emisor")
 })
-public class SerieComplementoPago implements Serializable 
+public class SerieComplementoPago implements Serializable, Cloneable 
 {
     private static final long serialVersionUID = 1L;
     
@@ -44,10 +46,9 @@ public class SerieComplementoPago implements Serializable
     @Column(name = "nu_numero")
     private String numero;
     
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "cd_emisor")
-    private Integer emisor;
+    @JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
+    @ManyToOne(optional = true)
+    private EmisoresCFDIS emisor;
 
     public SerieComplementoPago() {
     }
@@ -76,11 +77,11 @@ public class SerieComplementoPago implements Serializable
         this.numero = numero;
     }
 
-    public Integer getEmisor() {
+    public EmisoresCFDIS getEmisor() {
         return emisor;
     }
 
-    public void setEmisor(Integer emisor) {
+    public void setEmisor(EmisoresCFDIS emisor) {
         this.emisor = emisor;
     }
 
@@ -108,10 +109,21 @@ public class SerieComplementoPago implements Serializable
        
         return Objects.equals(this.id, other.id);
     }
+    
+    public SerieComplementoPago clone() throws CloneNotSupportedException {
+        SerieComplementoPago serieComplementoPago = new SerieComplementoPago();
+        
+        serieComplementoPago.setId(this.id == null ? null : new Integer(this.id));
+        serieComplementoPago.setSerie(this.serie);
+        serieComplementoPago.setNumero(this.numero);
+        serieComplementoPago.setEmisor(this.emisor);
+        
+        return serieComplementoPago;
+    }
 
     @Override
     public String toString() {
-        return "SerieComplementoPago[" + "id=" + id + ", serie=" + serie + ", numero=" + numero + ", emisor=" + emisor + ']';
+        return "SerieComplementoPago[" + "id=" + id + ", serie=" + serie + ", numero=" + numero + ']';
     }
     
 }

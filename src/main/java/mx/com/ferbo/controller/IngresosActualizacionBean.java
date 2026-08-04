@@ -11,6 +11,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,18 +19,26 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.business.complemento.ComplementoBL;
+import mx.com.ferbo.business.ComplementoPagoBL;
 import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.PagoDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoPagoDAO;
+import mx.com.ferbo.dao.n.ClienteDAO;
+import mx.com.ferbo.dao.n.EmisoresCFDISDAO;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.ComplementoPago;
+import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
+import mx.com.ferbo.model.SerieComplementoPago;
 import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
 
 @Named
@@ -40,6 +49,13 @@ public class IngresosActualizacionBean implements Serializable{
 	private static final long serialVersionUID = -626048119540963939L;
 	private static Logger log = LogManager.getLogger(IngresosActualizacionBean.class);
         
+        @Inject
+        private ClienteDAO clienteDAO;
+        
+        @Inject
+        private EmisoresCFDISDAO emisoresDAO;
+        
+        private ComplementoBL complementoBL;
         private String PAGO_EN_PARCIALIDADES = "PPD";
 	
 	private Date startDate;
@@ -58,14 +74,19 @@ public class IngresosActualizacionBean implements Serializable{
 	private List<Pago> listaPago;
         private List<Pago> listaPagosSeleccionados;
 	private List<Cliente> listaCtes;
+        private List<EmisoresCFDIS> listEmisores;
 	private List<TipoPago> listatipoPago;
 	private List<Bancos> listaBancos;
 	
 	private Pago pagoSelected;
 	private Cliente cteSelect;
+        private EmisoresCFDIS emisoresSelected;
+        private ComplementoPago complementoPago;
+        private SerieComplementoPago serieComplementoPago;
 	
 	private BigDecimal totalPagos;
         private String tipoMetodoPago;
+        private boolean habilitarTimbrado = false;
 	
         private Usuario usuario;
 	private FacesContext context;
@@ -76,6 +97,7 @@ public class IngresosActualizacionBean implements Serializable{
 		listaCtes = new ArrayList<Cliente>();
 		pagoSelected = new Pago();
 		cteSelect = new Cliente();
+                complementoBL = new ComplementoBL();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -92,8 +114,10 @@ public class IngresosActualizacionBean implements Serializable{
 		facturaDAO = new FacturaDAO();
 		
 		listaCtes = (List<Cliente>) request.getSession(false).getAttribute("clientesActivosList");
-		listaBancos = bancoDAO.buscarTodos();
+		listEmisores = emisoresDAO.buscarTodos();
+                listaBancos = bancoDAO.buscarTodos();
 		listatipoPago = tipoPagoDAO.buscarTodos();
+                listaPagosSeleccionados = new ArrayList();
 		this.startDate = new Date();
 		this.endDate = new Date();
 		
@@ -106,8 +130,12 @@ public class IngresosActualizacionBean implements Serializable{
                 String messages = null;
 		Severity severity = null;
                 try {
+                    if(emisoresSelected == null){
+                        throw new InventarioException("Debe seleccionar un emisor.");
+                    }
+                    
                     if(tipoMetodoPago.isEmpty() || tipoMetodoPago == null){
-                        throw new InventarioException("Debe seleccionar uno de los dos métodos de pago.");
+                        throw new InventarioException("Debe seleccionar el método de pago.");
                     }
                     consultaListaPagos();
                     this.totalPagos = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -117,6 +145,10 @@ public class IngresosActualizacionBean implements Serializable{
                             this.totalPagos = this.totalPagos.add(pago.getMonto());
                     }
                     
+                    /*Obtener la serie del complemento de pago*/
+                    this.serieComplementoPago = complementoBL.obtenerSeriePorEmisor(emisoresSelected.getCd_emisor());
+                    
+                    log.info("Se ha filtrado la lista de pagos");
                     severity = FacesMessage.SEVERITY_INFO;
                     messages = "La consulta se realizó correctamente.";
                 } catch(InventarioException ex){	
@@ -133,8 +165,8 @@ public class IngresosActualizacionBean implements Serializable{
                 }
 	}
         
-        public void consultaListaPagos() {
-            listaPago = pagoDAO.buscaPorClienteFechas(cteSelect, startDate, endDate, tipoMetodoPago);
+        public void consultaListaPagos() throws DAOException {
+            listaPago = pagoDAO.buscaPorParametros(emisoresSelected, cteSelect, startDate, endDate, tipoMetodoPago);
         }
         
         public void cargaInfoPago(Pago pPago) {
@@ -142,7 +174,6 @@ public class IngresosActualizacionBean implements Serializable{
             Severity severity = null;
             try {
                 pagoSelected = pPago;
-                log.info("Pago: {}", pagoSelected);
                 severity = FacesMessage.SEVERITY_INFO;
                 messages = "Se seleccionó correctamente el pago";
             } catch (Exception ex) {
@@ -157,8 +188,7 @@ public class IngresosActualizacionBean implements Serializable{
         
         public void limpiarDialogo() {
             pagoSelected = new Pago();
-            consultaListaPagos();
-            log.info("Desvinculando pago del dialogo: {}", pagoSelected);
+            //consultaListaPagos();
             PrimeFaces.current().ajax().update("form:messages", "panel-actualizaPago", "soParcialidad", "dt-pagos");
         }
         
@@ -179,7 +209,6 @@ public class IngresosActualizacionBean implements Serializable{
                     }
                 }
                 
-                log.info("Parcialidad {} del pago {}", pagoSelected.getParcialidad(), pagoSelected.getId());
                 severity = FacesMessage.SEVERITY_INFO;
                 messages = "Se actualizo correctamente la parcialidad.";
             } catch(InventarioException ex){	
@@ -192,7 +221,7 @@ public class IngresosActualizacionBean implements Serializable{
                 messages = "Error al consultar la lista de pagos";
             } finally {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Ingresos", messages));
-                PrimeFaces.current().ajax().update("form:messages", "panel-actualizaPago", "soParcialidad");
+                PrimeFaces.current().ajax().update("form:messages", "form:panel-actualizaPago", "form:soParcialidad");
             }
         }
 	
@@ -208,9 +237,9 @@ public class IngresosActualizacionBean implements Serializable{
 		
 		try {
 			log.debug("Pago: {}", pagoSelected);
-			
-			respuesta = pagoDAO.actualizar(pagoSelected);
-			if(respuesta != null) {
+                        
+                        respuesta = pagoDAO.actualizar(pagoSelected);
+                        if(respuesta != null) {
 				throw new InventarioException("Ocurrió un problema al actualizar el pago.");
 			}
 			
@@ -235,10 +264,10 @@ public class IngresosActualizacionBean implements Serializable{
 			
 			facturaDAO.actualizaStatus(factura);
 			
-			listaPago = pagoDAO.buscaPorClienteFechas(cteSelect, startDate, endDate, tipoMetodoPago);
+			consultaListaPagos();
 			
 			severity = FacesMessage.SEVERITY_INFO;
-			messages = "El pago se actualizó correctamente.";
+			messages = "Se actualizó correctamente.";
 			
 		} catch(InventarioException ex){	
 			log.error("Ocurrió un problema al actualizar el pago...", ex);
@@ -250,8 +279,8 @@ public class IngresosActualizacionBean implements Serializable{
 			messages = "Error al actualizar pago";
 		}
 		
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Actualización", messages));
-		PrimeFaces.current().ajax().update("form:messages", "dt-pagos");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Pago", messages));
+		PrimeFaces.current().ajax().update("form:messages", "dt-pagos", "pnlComplementoPago", "dtComplementoPago");
 	}
 	
 	public void deletePago() {
@@ -305,7 +334,7 @@ public class IngresosActualizacionBean implements Serializable{
 			
 			filtraPagos();
 			
-			mensaje = "El pago fue eliminado correctamente";
+			mensaje = "Se eliminado correctamente";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(InventarioException ex) {
 			log.error("Ocurrió un problema al eliminar el pago...", ex);
@@ -316,10 +345,126 @@ public class IngresosActualizacionBean implements Serializable{
 			mensaje = "Ocurrio un problema al eliminar el pago.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Eliminar pago", mensaje));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Pago", mensaje));
 			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
+        
+        public void agregarPagoComplemento(Pago pPago) {
+            String message = null;
+            Severity severity = null;
+            try {
+                if(pPago == null) {
+                    throw new InventarioException("El pago no se seleccionó correctamente.");
+                }
+                
+                boolean existe = listaPagosSeleccionados.stream()
+                    .anyMatch(p -> p.getId().equals(pPago.getId()));
+                
+                if (existe) {
+                    throw new InventarioException("El pago ya se encuentra registrado.");
+                }
+                
+                log.info("Agregando pago {} a la lista de complemento de pago.", pPago.getId());
+                listaPagosSeleccionados.add(pPago);
+                listaPago.remove(pPago);
+                
+                message = "Pago agregado";
+                severity = FacesMessage.SEVERITY_INFO;
+            } catch(InventarioException ex){
+                message = ex.getMessage();
+                severity = FacesMessage.SEVERITY_WARN;
+            } catch(Exception ex) {
+                log.error("Problema para recuperar agregar el pago.", ex);
+                message = "Ocurrió un problema para agregar el pago.";
+                severity = FacesMessage.SEVERITY_ERROR;
+            }finally {
+                if(severity != null && message != null)
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Ingresos", message));
+                PrimeFaces.current().ajax().update("form:messages", "form:pnlComplementoPago", "form:dtComplementoPago");
+            }
+        }
+        
+        public void eliminarPagoComplemento(Pago pPago) {
+            String message = null;
+            Severity severity = null;
+            try {
+                if(pPago == null) {
+                    throw new InventarioException("El pago no se elimino correctamente.");
+                }
+                
+                log.info("Eliminando el pago {} de la lista de complemento de pago.", pPago.getId());
+                listaPagosSeleccionados.remove(pPago);
+                listaPago.add(pPago);
+                
+                message = "Pago eliminado";
+                severity = FacesMessage.SEVERITY_INFO;
+            } catch(InventarioException ex){
+                message = ex.getMessage();
+                severity = FacesMessage.SEVERITY_WARN;
+            } catch(Exception ex) {
+                log.error("Problema para eliminar el pago.", ex);
+                message = "Ocurrió un problema para eliminar el pago.";
+                severity = FacesMessage.SEVERITY_ERROR;
+            }finally {
+                if(severity != null && message != null)
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Ingresos", message));
+                PrimeFaces.current().ajax().update("form:messages", "form:pnlComplementoPago", "form:dtComplementoPago");
+            }
+        }
+        
+        public boolean deshabilitarPagos(Pago pPago) {
+            boolean respuesta = false;
+            
+            if (!PAGO_EN_PARCIALIDADES.equals(pPago.getFactura().getMetodoPago()) || pPago.getFactura().getStatus().getId() != 4) {
+                respuesta = true;
+            }
+            
+            return respuesta;
+        }
+        
+        public void guardarComplementoPago() {
+            String mensaje = null;
+            Severity severity = null;
+            try { 
+                if(listaPagosSeleccionados.isEmpty() || listaPagosSeleccionados == null) {
+                    log.error("Debe seleccionar por lo menos un pago");
+                    throw new InventarioException("Debe seleccionar al menos un pago.");
+                }
+                
+                if(cteSelect.getCteCve() == null) {
+                    throw new InventarioException("Debe seleccionar un cliente para el complemento de pago.");
+                }
+                
+                complementoBL.guardarComplemento(serieComplementoPago);
+                
+                complementoPago = complementoBL.obtenerPorFolioSerie(serieComplementoPago.getNumero(), serieComplementoPago.getSerie());
+                
+                for(Pago pago : listaPagosSeleccionados) {
+                    pago.setComplementoPago(complementoPago);
+                    pagoDAO.actualizar(pago);
+                    log.info("Pago actualizado....");
+                }
+                
+                habilitarTimbrado = true;
+                complementoBL.actualizarSerieComplemento(serieComplementoPago);
+                
+                mensaje = String.format("El complemento de pago %s-%s se ha guardado correctamente", serieComplementoPago.getSerie(), serieComplementoPago.getNumero());
+                severity = FacesMessage.SEVERITY_INFO;
+                log.info(mensaje);
+            } catch(InventarioException ex) {
+                log.error("Ocurrió un problema para generar el complemento de pago...", ex);
+                mensaje = ex.getMessage();
+                severity = FacesMessage.SEVERITY_WARN;
+            } catch (Exception ex) {
+                log.error("Ocurrió un problema para generar el complemento de pago...", ex);
+                mensaje = "Ocurrió un problema para generar el complemento de pago.";
+                severity = FacesMessage.SEVERITY_ERROR;
+            } finally {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Complemento de pago", mensaje));
+                PrimeFaces.current().ajax().update("form:messages");
+            }
+        }
         
         public void generarComplemento() {
             String mensaje = null;
@@ -330,21 +475,39 @@ public class IngresosActualizacionBean implements Serializable{
                     throw new InventarioException("Debe seleccionar al menos un pago.");
                 }
                 
+                if(cteSelect.getCteCve() == null) {
+                    throw new InventarioException("Debe seleccionar un cliente para el complemento de pago.");
+                }
+                
                 Integer idCliente = listaPagosSeleccionados.get(0).getFactura().getCliente().getCteCve();
+                int contarPagos = 0;
                 
                 for (Pago pago : listaPagosSeleccionados) {
+                    /*if(pago.getFactura().getCfdi() == null) {
+                        throw new InventarioException("Todavía no se ha emitido la factura del pago");
+                    }*/
+                    /*if(pago.getComplementoPago() != null || pago.getComplementoPago().getUuid() != null) {
+                        log.info("La factura con id: {} ya se encuentra timbrada (id Facturama {}).", pago.getFactura().getId(), pago.getComplementoPago().getPac());
+                        throw new InventarioException("El complemento de pago ya se encuentra facturado");
+                    }*/
+                    
                     if (!PAGO_EN_PARCIALIDADES.equals(pago.getFactura().getMetodoPago())) {
-                        throw new InventarioException("Solo se pueden generar complementos para pagos PPD.");
+                        throw new InventarioException("Solo se pueden generar complementos para pagos con método de pago 'PPD'.");
                     }
                     
                     if (!idCliente.equals(pago.getFactura().getCliente().getCteCve())){
-                        throw new InventarioException("Todos los pagos seleccionados deben pertenecer al mismo cliente.");
+                        throw new InventarioException("Los pagos deben ser del mismo cliente");
                     }
+                    contarPagos += 1;
+                    log.info("{} - pago: {}", contarPagos, pago.toString());
                 }
                 
-                /*Hacer el complemento de pago*/
+                /*Enviar peticion a facturama*/
+                ComplementoPagoBL complementoPagoBL = new ComplementoPagoBL(listaPagosSeleccionados, cteSelect.getCteCve(), emisoresSelected.getCd_emisor(), usuario);
+                complementoPagoBL.timbrar();
+                //complementoPagoBL.sendMail();
                 
-                mensaje = "El complemento de pago se ha hecho correctamente";
+                mensaje = "El timbrado se ha hecho correctamente";
                 severity = FacesMessage.SEVERITY_INFO;
             } catch(InventarioException ex) {
                 log.error("Ocurrió un problema para generar el complemento de pago...", ex);
@@ -355,28 +518,9 @@ public class IngresosActualizacionBean implements Serializable{
                 mensaje = "Ocurrió un problema para generar el complemento de pago.";
                 severity = FacesMessage.SEVERITY_ERROR;
             } finally {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Eliminar pago", mensaje));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Complemento de pago", mensaje));
                 PrimeFaces.current().ajax().update("form:messages");
             }
-        }
-        
-        public boolean permitirActualizarParcialidad(){
-            boolean respuesta = false;
-            
-            if(this.pagoSelected == null) {
-                return false;
-            }
-            
-            if(this.pagoSelected.getFactura() == null) {
-                return false;
-            }
-        
-            if(PAGO_EN_PARCIALIDADES.equals(this.pagoSelected.getFactura().getMetodoPago()) && this.pagoSelected.getParcialidad() == null) {
-                respuesta = true;
-            }
-            
-            log.info("Permite actualizar: {}", respuesta);
-            return respuesta;
         }
 	
 	public Date getStartDate() {
@@ -427,6 +571,22 @@ public class IngresosActualizacionBean implements Serializable{
 		this.listaCtes = listaCtes;
 	}
 
+        public List<EmisoresCFDIS> getListEmisores() {
+            return listEmisores;
+        }
+
+        public void setListEmisores(List<EmisoresCFDIS> listEmisores) {
+            this.listEmisores = listEmisores;
+        }
+
+        public EmisoresCFDIS getEmisoresSelected() {
+            return emisoresSelected;
+        }
+
+        public void setEmisoresSelected(EmisoresCFDIS emisoresSelected) {
+            this.emisoresSelected = emisoresSelected;
+        }
+
 	public List<TipoPago> getListatipoPago() {
 		return listatipoPago;
 	}
@@ -474,6 +634,29 @@ public class IngresosActualizacionBean implements Serializable{
         public void setListaPagosSeleccionados(List<Pago> listaPagosSeleccionados) {
             this.listaPagosSeleccionados = listaPagosSeleccionados;
         }
-	
+
+        public ComplementoPago getComplementoPago() {
+            return complementoPago;
+        }
+
+        public void setComplementoPago(ComplementoPago complementoPago) {
+            this.complementoPago = complementoPago;
+        }
+
+        public SerieComplementoPago getSerieComplementoPago() {
+            return serieComplementoPago;
+        }
+
+        public void setSerieComplementoPago(SerieComplementoPago serieComplementoPago) {
+            this.serieComplementoPago = serieComplementoPago;
+        }
+
+        public boolean isHabilitarTimbrado() {
+            return habilitarTimbrado;
+        }
+
+        public void setHabilitarTimbrado(boolean habilitarTimbrado) {
+            this.habilitarTimbrado = habilitarTimbrado;
+        }
 	
 }

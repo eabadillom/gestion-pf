@@ -21,6 +21,25 @@ public class ComplementoPagoDAO extends BaseDAO<ComplementoPago, Integer>
         super(ComplementoPago.class);
     }
     
+    public ComplementoPago buscarPorFolioSerie(String numero, String serie) throws DAOException {
+        ComplementoPago complementoPago = null;
+        EntityManager em = null;
+        try {
+            em = super.getEntityManager();
+            complementoPago = em.createNamedQuery("ComplementoPago.findByFolioSerie", ComplementoPago.class)
+                .setParameter("numero", numero)
+                .setParameter("serie", serie)
+                .getSingleResult();
+        } catch (Exception ex) {
+            log.error("Problema al obtener la lista de complementos de pago...", ex);
+            throw new DAOException("Problema al obtener los complementos de pagos");
+        } finally {
+            super.close(em);
+        }
+        
+        return complementoPago;
+    }
+    
     public List<ComplementoPago> buscarPorPeriodoRegistro(Date inicio, Date fin) throws DAOException
     {
         List<ComplementoPago> listComplementoPago = null;

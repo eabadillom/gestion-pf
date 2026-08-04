@@ -28,6 +28,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "ComplementoPago.findById", query = "SELECT cp FROM ComplementoPago cp WHERE cp.id = :id"),
     @NamedQuery(name = "ComplementoPago.findByRegistro", query = "SELECT cp FROM ComplementoPago cp WHERE cp.registro BETWEEN :inicio AND :fin"),
     @NamedQuery(name = "ComplementoPago.findByTimbrado", query = "SELECT cp FROM ComplementoPago cp WHERE cp.timbrado BETWEEN :inicio AND :fin"),
+    @NamedQuery(name = "ComplementoPago.findByFolioSerie", query = "SELECT cp FROM ComplementoPago cp WHERE cp.numero = :numero AND cp.serie = :serie"),
     @NamedQuery(name = "ComplementoPago.findByUUID", query = "SELECT cp FROM ComplementoPago cp WHERE cp.uuid = :uuid")
 })
 public class ComplementoPago implements Serializable
@@ -46,8 +47,6 @@ public class ComplementoPago implements Serializable
     @Temporal(TemporalType.DATE)
     private Date registro;
     
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "fh_timbrado")
     @Temporal(TemporalType.DATE)
     private Date timbrado;
@@ -65,7 +64,6 @@ public class ComplementoPago implements Serializable
     private String pac;
     
     @Column(name = "cd_uuid")
-    @Basic(optional = false)
     @Size(max = 36)
     private String uuid;
     
