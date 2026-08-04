@@ -25,8 +25,6 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
 
     private static final Logger log = LogManager.getLogger(EgresoDAO.class);
 
-    private EntityManager em;
-
     public EgresoDAO() {
         super(Egreso.class);
     }
@@ -34,6 +32,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     @Override
     public Optional<Egreso> buscarPorId(Long id) {
         Optional<Egreso> e = null;
+        EntityManager em = null;
         Egreso egreso;
         try {
             em = getEntityManager();
@@ -54,6 +53,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarTodos() throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.findAll", Egreso.class).getResultList();
@@ -66,6 +66,7 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarPorRangoFecha(LocalDateTime inicio, LocalDateTime fin) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.findByFechaBetween", Egreso.class).setParameter("inicio", inicio)
@@ -80,51 +81,60 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     }
 
     public List<Egreso> buscarPorCategoria(CategoriaEgreso categoria) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.findByCategoria", Egreso.class).setParameter("categoria", categoria)
                     .getResultList();
         } catch (Exception ex) {
             log.error("Error al momento de buscar los egresos con la categoría: {}. {}", categoria.getNombre(), ex);
-            throw new SystemException("Hubo un problema al momento de buscar los egresos con la categoría " + categoria.getNombre() + ".");
+            throw new SystemException("Hubo un problema al momento de buscar los egresos con la categoría "
+                    + categoria.getNombre() + ".");
         } finally {
             close(em);
         }
     }
 
     public List<Egreso> buscarPorStatus(StatusEgreso status) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.findByStatus", Egreso.class).setParameter("status", status)
                     .getResultList();
         } catch (Exception ex) {
             log.error("Error al momento de buscar los egresos con el status: {}. {}", status.getNombre(), ex);
-            throw new SystemException("Hubo un problema al momento de buscar los egresos con el status " + status.getNombre() + ".");
+            throw new SystemException(
+                    "Hubo un problema al momento de buscar los egresos con el status " + status.getNombre() + ".");
         } finally {
             close(em);
         }
     }
 
     public List<Egreso> buscarPorConcepto(String concepto) throws SystemException {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("Egreso.searchByConcepto", Egreso.class).setParameter("concepto", concepto)
                     .getResultList();
         } catch (Exception ex) {
             log.error("Error al momento de buscar los egresos con el concepto: {}. {}", concepto, ex);
-            throw new SystemException("Hubo un problema al momento de buscar los egresos con el concepto " + concepto + ".");
+            throw new SystemException(
+                    "Hubo un problema al momento de buscar los egresos con el concepto " + concepto + ".");
         } finally {
             close(em);
         }
     }
 
     public List<Egreso> buscarPorEmisor(EmisoresCFDIS emisor) throws SystemException {
+        EntityManager em = null;
         try {
-             em = getEntityManager();
-             return em.createNamedQuery("Egreso.searchByEmisor", Egreso.class).setParameter("emisor", emisor).getResultList();
+            em = getEntityManager();
+            return em.createNamedQuery("Egreso.searchByEmisor", Egreso.class).setParameter("emisor", emisor)
+                    .getResultList();
         } catch (Exception ex) {
             log.error("Error al momento de buscar los egresos con el emisor: {}. {}", emisor.getNb_emisor(), ex);
-            throw new SystemException("Hubo un problema al momento de buscar los egresos con el emisor " + emisor.getNb_emisor() + ".");
+            throw new SystemException(
+                    "Hubo un problema al momento de buscar los egresos con el emisor " + emisor.getNb_emisor() + ".");
         } finally {
             close(em);
         }
@@ -133,6 +143,8 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
     public List<Egreso> buscarPorFiltros(LocalDateTime inicio, LocalDateTime fin, CategoriaEgreso categoria,
             StatusEgreso status,
             String concepto, EmisoresCFDIS emisor) throws SystemException {
+
+        EntityManager em = null;
         List<Egreso> lst = null;
         try {
             em = getEntityManager();
@@ -162,4 +174,40 @@ public class EgresoDAO extends BaseDAO<Egreso, Long> {
         }
     }
 
+    public Egreso guardarYObtener(Egreso egreso) {
+        EntityManager em = null;
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            em.persist(egreso);
+            em.flush(); 
+            em.refresh(egreso);
+            em.getTransaction().commit();
+            return egreso;
+        } catch (Exception ex) {
+            log.error("Error al guardar el egreso: {}", ex.getMessage(), ex);
+            rollback(em);
+            throw new SystemException("Hubo un problema al momento de guardar el egreso");
+        } finally {
+            close(em);
+        }
+    }
+
+    public Egreso actualizarYObtener(Egreso egreso) throws SystemException {
+        EntityManager em = null;
+
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            Egreso actualizado = em.merge(egreso);
+            em.getTransaction().commit();
+            return actualizado;
+        } catch (Exception ex) {
+            log.error("Error al actualizar el egreso: {}", ex.getMessage(), ex);
+            rollback(em);
+            throw new SystemException("Hubo un problema al momento de actualizar el egreso");
+        } finally {
+            close(em);
+        }
+    }
 }

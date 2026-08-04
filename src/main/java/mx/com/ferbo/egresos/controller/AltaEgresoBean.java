@@ -17,11 +17,11 @@ import org.primefaces.PrimeFaces;
 
 import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
+import java.io.IOException;
 
 import mx.com.ferbo.egresos.business.CancelaEgresoBL;
 import mx.com.ferbo.egresos.business.EgresoBL;
 import mx.com.ferbo.egresos.business.catalogos.CategoriaEgresoBL;
-import mx.com.ferbo.egresos.business.catalogos.MaquinaStatusEgreso;
 import mx.com.ferbo.egresos.business.catalogos.StatusEgresoBL;
 import mx.com.ferbo.egresos.model.CancelaEgreso;
 import mx.com.ferbo.egresos.model.Egreso;
@@ -61,9 +61,6 @@ public class AltaEgresoBean implements Serializable {
 
     @Inject
     private EmisorCdfiBL emisorCfdiBL;
-
-    @Inject
-    private MaquinaStatusEgreso maquinaStatusEgreso;
 
     @Inject
     private CancelaEgresoBL cancelaEgresoBL;
@@ -146,77 +143,71 @@ public class AltaEgresoBean implements Serializable {
         PrimeFaces.current().ajax().update("form:messages");
     }
 
-    private void actualizarFormulario() {
-        PrimeFaces.current().ajax().update("form");
+    private void actualizarFormulario() throws IOException {
+        FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .redirect("principal.xhtml?id=" + egresoSelected.getId());
     }
 
-    public void cambiarStatusEgreso() {
-        titulo = "cambiar status egreso";
-        try {
-            log.info("{} inicio el proceso de {}.", inicioLeyenda, titulo);
-            egresoBL.varificarStatusPrimeraVez(statusEgresoSelected, egresoSelected);
-            if (egresoSelected.getId() != null) {
-                maquinaStatusEgreso.valiarCambioStatus(lstStatusEgresos, egresoSelected.getStatus(),
-                        statusEgresoSelected);
-            }
-            log.info("{} finalizo el proceso de {}.", inicioLeyenda, titulo);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
-                    "Se ha cambiado correctamente el status a: " + statusEgresoSelected.getNombre());
-        } catch (SystemException | BusinessException ex) {
-            log.warn("Error al momento de cambiar de status en el egreso. {}", ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
-        } catch (Exception ex) {
-            log.warn("Error al momento de {}. {}", titulo, ex);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
-                    "Error desconocido. Contacte con el administrador de sistemas.");
-        } finally {
-            actualizarMensajes();
-        }
+    private void abrirDialogoCancelacion() {
+        cancelaEgresoSelected = cancelaEgresoBL.nuevoOExistente(null);
+        PrimeFaces.current().ajax().update("form:dlgMotiCance");
+        PrimeFaces.current().executeScript("PF('dlgMotiCance').show();");
     }
 
-    public void abrirDialogoOProcesar() {
-        Boolean procesar = egresoBL.validarEgresoCancelado(egresoSelected, statusEgresoSelected);
-
-        if (procesar) {
-            cancelaEgresoSelected = cancelaEgresoBL.nuevoOExistente(null);
-            PrimeFaces.current().ajax().update("form:dlgMotiCance");
-            PrimeFaces.current().executeScript("PF('dlgMotiCance').show();");
-        } else {
-            procesarEgreso("no");
-        }
-
-    }
-
-    public void procesarEgreso(String cancelar) {
+    public void procesarEgreso() {
         boolean exito = false;
+        titulo = "Procesar egreso";
         try {
-            titulo = (egresoSelected.getId() == null) ? "guardar el egreso" : "actualizar el egreso";
-
-            log.info("{} inicia el proceso para {}.", inicioLeyenda, titulo);
-            if (egresoSelected.getId() == null) {
+            egresoBL.validarEgresoYStatus(egresoSelected, statusEgresoSelected);
+            egresoBL.validarStatusExistenteONuevo(egresoSelected, statusEgresoSelected);
+            if (egresoBL.egresoEstaPersistido(egresoSelected)) {
                 egresoBL.validarEgresoNuevo(egresoSelected);
             }
-            egresoBL.validarEgresoProcesado(egresoSelected, statusEgresoSelected);
-            if (egresoBL.validarEgresoCancelado(egresoSelected, statusEgresoSelected)) {
-                cancelaEgresoBL.concatenarSiHayMotivoCancelacion(cancelaEgresoSelected, inicioLeyenda);
-                cancelaEgresoBL.asignarEgreso(cancelaEgresoSelected, egresoSelected);
-                cancelaEgresoBL.guardarOActualizarCancelaEgreso(cancelaEgresoSelected);
-                egresoBL.asignarCancelacionEgreso(cancelaEgresoSelected, egresoSelected);
+            if (egresoBL.isCancelado(statusEgresoSelected)) {
+                abrirDialogoCancelacion();
+            } else {
+                egresoBL.asigarStatusEgreso(egresoSelected, statusEgresoSelected);
+                egresoSelected = egresoBL.crearOActualizarEgreso(egresoSelected, inicioLeyenda);
+                FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
+                        "El egreso se proceso exitosamente");
+                exito = true;
+                actualizarFormulario();
             }
-            egresoBL.asignarStatusEgreso(egresoSelected, statusEgresoSelected);
-            egresoBL.crearOActualizarEgreso(egresoSelected, inicioLeyenda);
-            egresoSelected = egresoBL.nuevoOExistente(egresoSelected.getId());
-            log.info("{} finaliza proceso para {}.", inicioLeyenda, titulo);
-            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
-                    "Se ha completado el proceso de " + titulo + ".");
-            actualizarFormulario();
-            exito = true;
         } catch (SystemException | BusinessException ex) {
-            log.warn("Error al momento de {}. {}", titulo.toUpperCase(), ex);
+            log.warn("Error al momento de {}. {}", titulo.toUpperCase(), ex.getMessage(), ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
             exito = false;
         } catch (Exception ex) {
-            log.warn("Error al momento de {}. {}", titulo, ex);
+            log.warn("Error al momento de {}. {}", titulo, ex.getMessage(), ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
+                    "Error desconocido. Contacte con el administrador de sistemas.");
+            exito = false;
+        } finally {
+            actualizarMensajes();
+            PrimeFaces.current().ajax().addCallbackParam("exito", exito);
+        }
+    }
+
+    public void procesarEgresoConCancelacion() {
+        boolean exito = false;
+        try {
+            titulo = "Procesar egreso con cancelación";
+            cancelaEgresoBL.concatenarSiHayMotivoCancelacion(cancelaEgresoSelected, inicioLeyenda);
+            cancelaEgresoBL.asignarEgreso(cancelaEgresoSelected, egresoSelected);
+            cancelaEgresoBL.guardarOActualizarCancelaEgreso(cancelaEgresoSelected);
+            egresoBL.asigarStatusEgreso(egresoSelected, statusEgresoSelected);
+            egresoBL.crearOActualizarEgreso(egresoSelected, inicioLeyenda);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo.toUpperCase(),
+                    "El egreso se proceso exitosamente");
+            exito = true;
+            actualizarFormulario();
+        } catch (SystemException | BusinessException ex) {
+            log.warn("Error al momento de {}. {}", titulo.toUpperCase(), ex.getMessage(), ex);
+            FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo.toUpperCase(), ex.getMessage());
+            exito = false;
+        } catch (Exception ex) {
+            log.warn("Error al momento de {}. {}", titulo, ex.getMessage(), ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, titulo.toUpperCase(),
                     "Error desconocido. Contacte con el administrador de sistemas.");
             exito = false;
