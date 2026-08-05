@@ -41,7 +41,7 @@
             <p:commandButton id="btnGuardarConCance"
                              value="Guardar"
                              icon="pi pi-save"
-                             actionListener="#{altaEgresoBean.procesarEgreso('si')}"
+                             actionListener="#{altaEgresoBean.procesarEgresoConCancelacion()}"
                              process="@this"
                              onstart="PF('statusInfoDialog').show()"
                              oncomplete="if(args.exito){

@@ -1,8 +1,6 @@
 package mx.com.ferbo.egresos.dao.catalogos;
 
 import java.util.List;
-import java.util.Optional;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -21,13 +19,12 @@ public class CategoriaEgresoDAO extends BaseDAO<CategoriaEgreso, Long> {
 
     private final static Logger log = LogManager.getLogger(CategoriaEgresoDAO.class);
 
-    private EntityManager em;
-
     public CategoriaEgresoDAO() {
         super(CategoriaEgreso.class);
     }
 
     public CategoriaEgreso buscarPorClave(String clave) {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("CategoriaEgreso.findByClave", CategoriaEgreso.class)
@@ -42,6 +39,7 @@ public class CategoriaEgresoDAO extends BaseDAO<CategoriaEgreso, Long> {
     }
 
     public List<CategoriaEgreso> buscarActivosOInactivos(Boolean activo) {
+        EntityManager em = null;
         try {
             em = getEntityManager();
             return em.createNamedQuery("CategoriaEgreso.findActivosOInactivos", CategoriaEgreso.class)

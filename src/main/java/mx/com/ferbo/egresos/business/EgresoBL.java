@@ -12,20 +12,19 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.exception.ValidationException;
 import com.ferbo.tools.validation.ObjectValidator;
 import com.ferbo.tools.validation.ObjectValidatorBuilder;
 
 import mx.com.ferbo.egresos.dao.EgresoDAO;
-import mx.com.ferbo.egresos.model.CancelaEgreso;
 import mx.com.ferbo.egresos.model.Egreso;
 import mx.com.ferbo.egresos.model.calogos.CategoriaEgreso;
 import mx.com.ferbo.egresos.model.calogos.StatusEgreso;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.MetodoPago;
-import mx.com.ferbo.util.InventarioException;
 
 @Named
 @RequestScoped
@@ -41,49 +40,33 @@ public class EgresoBL {
             return dao.buscarPorId(id).orElseThrow(
                     () -> new SystemException("El egreso con identificador: " + id + ",  no se ha encontrado."));
         } catch (SystemException ex) {
-            log.warn(ex);
+            log.warn("Error al momento de obtener el egreso: {}", ex.getMessage(), ex);
             return new Egreso();
         }
     }
 
-    public void crearOActualizarEgreso(Egreso egreso, String inicioLeyenda) {
+    public Egreso crearOActualizarEgreso(Egreso egreso, String inicioLeyenda) {
         String estado = "";
         try {
             Long id = egreso.getId();
             if (id == null) {
                 estado = "guardar";
-                dao.guardar(egreso);
+                return dao.guardarYObtener(egreso);
             } else {
                 estado = "actualizar";
-                dao.actualizar(egreso);
+                return dao.actualizarYObtener(egreso);
             }
-        } catch (InventarioException ex) {
-            log.warn(ex);
+        } catch (SystemException ex) {
+            log.warn("Error al momento de procesar el egreso: {}", ex.getMessage(), ex);
             throw new SystemException("Hubo un problema al momento de " + estado + " el egreso.");
         }
-    }
-
-    public void asignarStatusEgreso(Egreso egreso, StatusEgreso status) {
-        ObjectValidator.notNull(egreso, "El egreso");
-        ObjectValidator.notNull(status, "El status");
-
-        if (!status.getClave().equalsIgnoreCase(egreso.getStatus().getClave())) {
-           egreso.setStatus(status);
-        }
-    }
-
-    public void asignarCancelacionEgreso(CancelaEgreso cancelar, Egreso egreso) {
-
-        ObjectValidator.notNull(egreso, "El egreso");
-        ObjectValidator.notNull(cancelar, "El motivo cancelación");
-
-        egreso.setCancelaEgreso(cancelar);
     }
 
     public List<Egreso> listarTodos() {
         try {
             return dao.buscarTodos();
         } catch (SystemException ex) {
+            log.warn("Error de obtener todo el listado de egresos: {}", ex.getMessage(), ex);
             throw ex;
         }
     }
@@ -98,6 +81,7 @@ public class EgresoBL {
             LocalDateTime fin = finMes(mes);
             return dao.buscarPorFiltros(inicio, fin, categoria, status, concepto, emisor);
         } catch (SystemException ex) {
+            log.warn("Error de obtener todo el listado de egresos por filtros: {}", ex.getMessage(), ex);
             throw ex;
         }
     }
@@ -128,61 +112,121 @@ public class EgresoBL {
                 .validateObject()
                 .texto("concepto", Egreso::getConcepto)
                 .validateNested("categoria", Egreso::getCategoria, cat -> cat.validateObject()
-                .texto("nombre", CategoriaEgreso::getNombre))
+                        .texto("nombre", CategoriaEgreso::getNombre))
                 .validateNested("emisor", Egreso::getEmisor, emi -> emi.validateObject()
-                .texto("nombre", EmisoresCFDIS::getNb_emisor))
+                        .texto("nombre", EmisoresCFDIS::getNb_emisor))
                 .validateNested("forma pago", Egreso::getFormaPago, fpago -> fpago.validateObject()
-                .texto("nombre", MedioPago::getFormaPago))
+                        .texto("nombre", MedioPago::getFormaPago))
                 .validateNested("metodo pago", Egreso::getMetodoPago, mpago -> mpago.validateObject()
-                .texto("nombre", MetodoPago::getNbMetodoPago))
+                        .texto("nombre", MetodoPago::getNbMetodoPago))
                 .validateOrThrow();
 
         ObjectValidator.notNull(egreso.getFecha(), "fecha de pago");
     }
 
-    public void validarEgresoProcesado(Egreso egreso, StatusEgreso status) {
+    public void validarEgresoProcesado(Egreso egreso) {
 
-        if ("PRO".equalsIgnoreCase(egreso.getStatus().getClave()) || "PRO".equalsIgnoreCase(status.getClave())) {
+        BigDecimal total = egreso.getMonto();
 
-            BigDecimal total = egreso.getMonto();
+        String referencia = egreso.getReferencia();
 
-            String referencia = egreso.getReferencia();
+        if (referencia == null || "".equalsIgnoreCase(referencia)) {
+            throw new ValidationException(
+                    "El egreso cambio a status 'Procesado' por lo tanto debe tener una referencía.");
+        }
 
-            if (referencia == null || "".equalsIgnoreCase(referencia)) {
-                throw new ValidationException("El egreso cambio a status 'Procesado' por lo tanto debe tener una referencía.");
-            }
+        if (referencia.length() > 150) {
+            throw new ValidationException("La referencía sobrepasa el limiete de 150 caracteres.");
+        }
 
-            if (referencia.length() > 150) {
-                throw new ValidationException("La referencía sobrepasa el limiete de 150 caracteres.");
-            }
+        if (total == null) {
+            throw new ValidationException(
+                    "El egreso cambio a status 'Procesado' por lo tanto debe tener el monto pagado.");
+        }
 
-            if (total == null) {
-                throw new ValidationException(
-                        "El egreso cambio a status 'Procesado' por lo tanto debe tener el monto pagado.");
-            }
-
-            if (total.compareTo(BigDecimal.ZERO) < 0) {
-                throw new ValidationException("El monto del egreso no puede ser negativo.");
-            }
+        if (total.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ValidationException("El monto del egreso no puede ser negativo.");
         }
 
     }
 
-    public boolean validarEgresoCancelado(Egreso egreso, StatusEgreso status) {
-        if (egreso.getId() != null && "CAN".equalsIgnoreCase(status.getClave())) {
-            if (!"CAN".equalsIgnoreCase(egreso.getStatus().getClave())) {
-                return true;
-            }
-        }
-        return false;
+    public boolean egresoEstaPersistido(Egreso egreso) {
+        return (egreso.getId() == null); 
     }
 
-    public void varificarStatusPrimeraVez(StatusEgreso status, Egreso egreso) {
-        if (egreso.getId() == null) {
-            if ("CAN".equalsIgnoreCase(status.getClave())) {
-                throw new ValidationException("No se puede poner el egreso como cancelado, si aún no está guardado.");
-            }
+    public boolean isProcesado(Egreso egreso) {
+        return ("PRO".equalsIgnoreCase(egreso.getStatus().getClave()));
+    }
+
+    public boolean isCancelado(StatusEgreso statusEgreso) {
+        return ("CAN".equalsIgnoreCase(statusEgreso.getClave()));
+    }
+
+    private void validarStatusCancelado(String claveStatusEgreso) {
+        if ("PRO".equalsIgnoreCase(claveStatusEgreso)) {
+            throw new BusinessException("El egreso ya se encuentra procesado y por lo tanto no se puede cancelar");
         }
+    }
+
+    private void validarStatusProcesado(String claveStatusEgreso) {
+        if ("CAN".equalsIgnoreCase(claveStatusEgreso)) {
+            throw new BusinessException("El egreso ya se encuentra cancelado y por lo tanto no puede procesar");
+        }
+    }
+
+    private void validarStatusPendiente(String claveStatusEgreso) {
+        if ("PRO".equalsIgnoreCase(claveStatusEgreso) || "CAN".equalsIgnoreCase(claveStatusEgreso)){
+            throw new BusinessException("El egreso ya se encuentra con el estatus " + claveStatusEgreso + "por lo tanto ya no puede cambiar a pendiente");
+        }
+    }
+
+    private void validarStatusPrimeraVez(StatusEgreso status) {
+        String claveStatus = status.getClave();
+        if ("CAN".equalsIgnoreCase(claveStatus)) {
+            throw new BusinessException(
+                    "No se puede asignar el status de cancelado si el egreso aún no está registrado en el sistema");
+        }
+    }
+
+    private void validarStatusParaEgresoPersistido(Egreso egreso, StatusEgreso status) {
+        String claveStatus = status.getClave();
+        String claveStatusEgreso = egreso.getStatus().getClave();
+
+        switch (claveStatus) {
+            case "PRO":
+                validarStatusProcesado(claveStatusEgreso);
+                validarEgresoProcesado(egreso);
+                break;
+
+            case "CAN":
+                validarStatusCancelado(claveStatusEgreso);
+                break;
+
+            case "PEN":
+                validarStatusPendiente(claveStatusEgreso);
+                break;
+
+            default:
+                throw new BusinessException("El status de egreso aún no se encuentra en el sistema");
+        }
+    }
+
+    public void validarStatusExistenteONuevo(Egreso egreso, StatusEgreso status) {
+        if (egresoEstaPersistido(egreso)) {
+            validarStatusPrimeraVez(status);
+            egreso.setStatus(status);
+        } else {
+            validarStatusParaEgresoPersistido(egreso, status);
+        }
+    }
+
+    public void asigarStatusEgreso(Egreso egreso, StatusEgreso status) {
+        egreso.setStatus(status);
+    }
+
+    public void validarEgresoYStatus(Egreso egreso, StatusEgreso status) {
+        ObjectValidator.notNull(egreso, "egreso");
+        ObjectValidator.notNull(status.getId(), "status de egreso");
     }
 
     private LocalDateTime inicioMes(YearMonth mes) {

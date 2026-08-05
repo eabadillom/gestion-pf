@@ -16,7 +16,7 @@
     </div>
 
     <div class="orders-subtable">
-        <p:dataTable id="dtAvisos" widgetVar="dtAvisos" var="pAviso" 
+        <p:dataTable id="dtAvisos" widgetVar="dtAvisos" var="pAviso" size="small"
                      value="#{clientesBean.clienteSelected.avisoList}" reflow="true" 
                      rowKey="#{pAviso.avisoCve}" lazy="false"
                      paginator="true" rows="5" paginatorPosition="bottom">
@@ -73,31 +73,31 @@
                 <div class="p-grid">
                     <div class="p-field p-col-12 p-md-12">
                         <p:selectBooleanCheckbox id="aviso-po-m" itemLabel="P.O." value="#{clientesBean.avisoSelected.avisoPo}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                         <p:selectBooleanCheckbox id="aviso-ped-m" itemLabel="Pedimento" value="#{clientesBean.avisoSelected.avisoPedimento}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                         <p:selectBooleanCheckbox id="aviso-sap-m" itemLabel="Contenedor" value="#{clientesBean.avisoSelected.avisoSap}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                         <p:selectBooleanCheckbox id="aviso-lote-m" itemLabel="Lote" value="#{clientesBean.avisoSelected.avisoLote}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                         <p:selectBooleanCheckbox id="aviso-cad-m" itemLabel="Caducidad" value="#{clientesBean.avisoSelected.avisoCaducidad}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                         <p:selectBooleanCheckbox id="aviso-tarima-m" itemLabel="Tarima" value="#{clientesBean.avisoSelected.avisoTarima}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                         <p:selectBooleanCheckbox id="aviso-codigo-m" itemLabel="Código" value="#{clientesBean.avisoSelected.avisoCodigo}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                         <p:selectBooleanCheckbox id="aviso-otro-m" itemLabel="Otro" value="#{clientesBean.avisoSelected.avisoOtro}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectBooleanCheckbox>
                     </div>
-                    
+
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <p:outputLabel>Tipo facturación*</p:outputLabel>
                         <p:selectOneMenu id="soTpFacturacion-m"
@@ -108,12 +108,11 @@
                             <p:ajax process="@this" />
                         </p:selectOneMenu>
                     </div>
-                    
+
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <p:outputLabel>Vigencia en días*</p:outputLabel>
                         <p:inputNumber
                             value="#{clientesBean.avisoSelected.avisoVigencia}"
-                            decimal="false"
                             minValue="0"
                             maxValue="365">
                             <p:ajax process="@this"/>
@@ -124,23 +123,22 @@
                         <p:outputLabel>Plazo de pago en días*</p:outputLabel>
                         <p:inputNumber
                             value="#{clientesBean.avisoSelected.avisoPlazo}"
-                            decimal="false"
                             minValue="0"
                             maxValue="365">
                             <p:ajax process="@this"/>
                         </p:inputNumber>
                     </div>
-                    
+
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <p:outputLabel>Planta*</p:outputLabel>
                         <p:selectOneMenu id="soPlantaAct" converter="entityConverter" value="#{clientesBean.avisoSelected.plantaCve}">
                             <f:selectItem itemLabel="--Seleccione--" />
                             <f:selectItems value="#{clientesBean.lstPlanta}" var="planta"
                                            itemLabel="#{planta.plantaDs}" itemValue="#{planta}" />
-							<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectOneMenu>
                     </div>
-                    
+
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <p:outputLabel>Categoria*</p:outputLabel>
                         <p:selectOneMenu id="soCategoriaAct" converter="entityConverter"
@@ -148,10 +146,10 @@
                             <f:selectItem itemLabel="--Seleccione--" />
                             <f:selectItems value="#{clientesBean.lstCategoria}" var="categoria"
                                            itemLabel="#{categoria.categoriaDs}" itemValue="#{categoria}" />
-							<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:selectOneMenu>
                     </div>
-					
+
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <p:outputLabel>Valor del seguro</p:outputLabel>
                         <p:inputNumber
@@ -168,36 +166,37 @@
                             <p:ajax process="@this"/>
                         </p:inputNumber>
                     </div>
-                    
+
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <p:outputLabel> Temperatura</p:outputLabel>
                         <p:inputText disabled="false" value="#{clientesBean.avisoSelected.avisoTemp}">
-                        	<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:inputText>
                     </div>
-					
+
                     <div class="p-col-12 p-md-6 p-lg-4">
                         <p:outputLabel>Observaciones</p:outputLabel>
                         <p:inputText value="#{clientesBean.avisoSelected.avisoObservaciones}">
-							<p:ajax process="@this"/>
+                            <p:ajax process="@this"/>
                         </p:inputText>
                     </div>
-				</div>
-				
+                </div>
+
                 <p:panelGrid columns="2" layout="grid"
                              style="width:100%;"
                              columnClasses="ui-g-6 ui-md-6 ui-lg-6, ui-g-6 ui-md-6 ui-lg-6">
 
                     <p:panel header="Servicios disponibles">
                         <p:dataTable id="dtServiciosSinAviso"
-                                     value="#{clientesBean.lstPrecioServiciosDisponibles}"
+                                     value="#{clientesBean.lstDisponiblesParaAviso}"
                                      var="srv"
-                                     selection="#{clientesBean.seleccionadosParaAgregar}"
+                                     size="small"
+                                     selection="#{clientesBean.lstPorAgregarAAviso}"
                                      rowKey="#{srv.hashCode()}">
 
-                           
+
                             <p:column width="2rem" selectionMode="multiple"/>
-                            
+
                             <p:column headerText="Servicio">
                                 <h:outputText value="#{srv.servicio.servicioDs}" />
                             </p:column>
@@ -215,22 +214,28 @@
                     <p:panel header="Servicios con este aviso">
                         <p:dataTable id="dtServicioAviso" 
                                      widgetVar="dtServicioAviso" var="pServicioAviso"
-                                     value="#{clientesBean.avisoSelected.precioServicioList}"
+                                     value="#{clientesBean.lstConAviso}"
+                                     size="small"
                                      rowKey="#{pServicioAviso.id}" paginator="true"
                                      paginatorPosition="bottom">
 
                             <p:column headerText="Servicio">
                                 <h:outputText value="#{pServicioAviso.servicio.servicioDs}" />
                             </p:column>
-                            <p:column headerText="Precio">
-                                <p:inputText value="#{pServicioAviso.precio}">
-                                    <p:ajax process="@this"/>
-                                </p:inputText>
+                            <p:column headerText="Precio" width="8rem">
+                                <p:inputNumber
+                                    value="#{pServicioAviso.precio}"
+                                    decimalPlaces="2"
+                                    minValue="0"
+                                    thousandSeparator=","
+                                    symbol=" / #{pServicioAviso.unidad.unidadDeManejoDs}"
+                                    inputStyle="text-align: right;"
+                                    symbolPosition="s"
+                                    decimalSeparator=".">
+                                    <p:ajax process="@this" delay="1000" listener="#{clientesBean.actualizarPrecioDesdeAviso(pServicioAviso)}"/>
+                                </p:inputNumber>
                             </p:column>
-                            <p:column headerText="Unidad">
-                                <h:outputText value="#{pServicioAviso.unidad.unidadDeManejoDs}" />
-                            </p:column>
-                            <p:column width="5%" style="text-align: right !important;">
+                            <p:column width="2rem" style="text-align: right !important;">
                                 <p:commandButton class="ui-button-danger" icon="pi pi-trash" process="@this"
                                                  oncomplete="PF('deleteServicioDialog').show(); $('.ui-widget-overlay').remove();">
                                     <f:setPropertyActionListener value="#{pServicioAviso}" target="#{clientesBean.precioAvisoSelected}" />
@@ -245,7 +250,7 @@
         <f:facet name="footer">
             <p:commandButton value="#{(clientesBean.avisoSelected.avisoCve != null) ? 'Actualizar' : 'Agregar'}" icon="pi pi-check"
                              actionListener="#{clientesBean.operarAvisos('agregaraviso')}" update="dtAvisos form:tabView:dtPreciosServicios"
-                             process="@this form:tabView:pnlAviso" oncomplete="PF('dialogAviso').hide()"/>
+                             process="@this form:tabView:pnlAviso" onstart="PF('statusInfoDialog').show" oncomplete="PF('statusInfoDialog').hide();"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" oncomplete="PF('dialogAviso').hide()"
                              class="ui-button-secondary"
                              resetValues="true" immediate="true" />
