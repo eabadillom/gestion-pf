@@ -2,14 +2,10 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -39,7 +35,6 @@ import mx.com.ferbo.model.StatusFactura;
 import mx.com.ferbo.model.TipoPago;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.ui.PagoUI;
-import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.FormatUtil;
 import mx.com.ferbo.util.InventarioException;
 

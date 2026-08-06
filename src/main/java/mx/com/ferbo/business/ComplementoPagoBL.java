@@ -19,8 +19,6 @@ import com.ferbo.facturama.request.PaymentBindingModel;
 import com.ferbo.facturama.response.FileViewModel;
 import com.ferbo.facturama.tools.FacturamaException;
 import com.ferbo.mail.beans.Adjunto;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -50,7 +48,6 @@ public class ComplementoPagoBL
     public static final String CFDI_USE_PAGOS = "CP01";
     public static final String CURRENCY = "MXN";
     public static final String PAYMENT_METHOD = "PPD";
-    public static final String PAYMENT_FORM = "01";
     public static final String TAX_NAME = "IVA";
     public static final String TAX_OBJECT = "02";
     
@@ -66,9 +63,10 @@ public class ComplementoPagoBL
     private Integer idCliente;
     private Integer idEmisor;
     private Usuario usuario = null;
+    private String formaPago;
     private List<Pago> listPagos;
 
-    public ComplementoPagoBL(List<Pago> listPagos, Integer idCliente, Integer idEmisor, Usuario usuario) {
+    public ComplementoPagoBL(List<Pago> listPagos, Integer idCliente, Integer idEmisor, Usuario usuario, String formaPago) {
         clienteDAO = new ClienteDAO();
         emisoresDAO = new EmisoresCFDISDAO();
         complementoPagoDAO = new ComplementoPagoDAO();
@@ -77,6 +75,8 @@ public class ComplementoPagoBL
         this.idCliente = idCliente;
         this.idEmisor = idEmisor;
         this.usuario = usuario;
+        this.formaPago = formaPago;
+        log.info("Forma de pago del cliente {}: {}", idCliente, formaPago);
     }
     
     public void timbrar() throws InventarioException, DAOException, JsonProcessingException, FacturamaException {
@@ -129,7 +129,7 @@ public class ComplementoPagoBL
             DateUtil.setTime(fechaHora, pago.getHora().getHour(), pago.getHora().getMinute(), 0);
             log.info("Fecha de complemento de pago {}", fechaHora.toString());
             payment.setDate(fechaHora);
-            payment.setPaymentForm(PAYMENT_FORM);
+            payment.setPaymentForm(pago.getTipo().getNombre());
             payment.setAmount(pago.getMonto());
             payment.setCurrency(CURRENCY);
 
@@ -141,7 +141,7 @@ public class ComplementoPagoBL
             relatedDocument.setSerie(pago.getFactura().getNomSerie());
             relatedDocument.setFolio(pago.getFactura().getNumero());
             relatedDocument.setCurrency(CURRENCY);
-            relatedDocument.setPaymentMethod(PAYMENT_METHOD);
+            relatedDocument.setPaymentMethod(formaPago);
             relatedDocument.setPreviousBalanceAmount(saldosPago.getSaldoAnterior());
             relatedDocument.setAmountPaid(saldosPago.getMonto());
             relatedDocument.setImpSaldoInsoluto(saldosPago.getSaldoRestante());
@@ -167,12 +167,7 @@ public class ComplementoPagoBL
         complements.setPayments(listPayments);
         cfdi.setComplemento(complements);
         
-        Gson prettyGson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").setPrettyPrinting().create();
-        String jsonRequest = prettyGson.toJson(cfdi);
-        log.info("Json Complemento Pago");
-        log.info(jsonRequest);
-        
-        /*CfdiInfoModel registra = cfdiBL.registra(cfdi);
+        CfdiInfoModel registra = cfdiBL.registra(cfdi);
         
         String idPac             = registra.getId();
         String uuid              = registra.getComplement().getTaxStamp().getUuid();
@@ -180,15 +175,15 @@ public class ComplementoPagoBL
         String numCertificadoSAT = registra.getComplement().getTaxStamp().getSatCertNumber();
         
         complementoPago.setTimbrado(fecha);
-        complementoPago.setNumero(numCertificadoSAT);
         complementoPago.setPac(idPac);
         complementoPago.setUuid(uuid);
+        complementoPago.setCertificadoSAT(numCertificadoSAT);
         
-        complementoPagoDAO.actualizar(complementoPago);*/
+        complementoPagoDAO.actualizar(complementoPago);
     }
     
     public void sendMail() throws FacturamaException {
-        SendMailFacturaBL sendMailBO = null;
+        SendMailComplementoPagoBL sendMailBO = null;
         String sContent = null;
         byte[] content = null;
         
@@ -200,19 +195,19 @@ public class ComplementoPagoBL
             if(complementoPago == null)
                 throw new InventarioException("No se estableció un complemento de pago para envío por correo electrónico.");
             
-            FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", complementoPago.getUuid());
+            FileViewModel fileXML = cfdiBL.getFile("xml", "issuedLite", complementoPago.getPac());
             sContent = fileXML.getContent();
             content = Base64.getDecoder().decode(sContent);
-            adjunto = new Adjunto("Complemento_Pago_" + complementoPago.getSerie() + "-" + complementoPago.getNumero() + ".xml", Adjunto.TP_ARCHIVO_XML, content);
+            adjunto = new Adjunto("ComplementoPago_" + complementoPago.getSerie() + "-" + complementoPago.getNumero() + ".xml", Adjunto.TP_ARCHIVO_XML, content);
             alAdjuntos.add(adjunto);
 
-            FileViewModel filePDF = cfdiBL.getFile("pdf", "issuedLite", complementoPago.getUuid());
+            FileViewModel filePDF = cfdiBL.getFile("pdf", "issuedLite", complementoPago.getPac());
             sContent = filePDF.getContent();
             content = Base64.getDecoder().decode(sContent);
-            adjunto = new Adjunto("Complemento_Pago_" + complementoPago.getSerie()+ "-" + complementoPago.getNumero() + ".pdf", Adjunto.TP_ARCHIVO_PDF, content);
+            adjunto = new Adjunto("ComplementoPago_" + complementoPago.getSerie()+ "-" + complementoPago.getNumero() + ".pdf", Adjunto.TP_ARCHIVO_PDF, content);
             alAdjuntos.add(adjunto);
             
-            sendMailBO = new SendMailFacturaBL(idCliente);
+            sendMailBO = new SendMailComplementoPagoBL(idCliente);
             sendMailBO.setSerie(complementoPago.getSerie());
             sendMailBO.setFolio(complementoPago.getNumero());
             sendMailBO.setAlFiles(alAdjuntos);

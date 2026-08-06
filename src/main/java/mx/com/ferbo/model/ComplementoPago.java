@@ -67,6 +67,10 @@ public class ComplementoPago implements Serializable
     @Size(max = 36)
     private String uuid;
     
+    @Column(name = "nb_certificado_sat")
+    @Size(max = 20)
+    private String certificadoSAT;
+    
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "complementoPago")
     private List<Pago> listPagos;
 
@@ -144,6 +148,14 @@ public class ComplementoPago implements Serializable
         return Objects.hash(this.id);
     }
 
+    public String getCertificadoSAT() {
+        return certificadoSAT;
+    }
+
+    public void setCertificadoSAT(String certificadoSAT) {
+        this.certificadoSAT = certificadoSAT;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -164,7 +176,7 @@ public class ComplementoPago implements Serializable
 
     @Override
     public String toString() {
-        return "ComplementoPago[" + "id=" + id + ", registro=" + registro + ", timbrado=" + timbrado + ", serie=" + serie + ", numero=" + numero + ", pac=" + pac + ", uuid=" + uuid + ']';
+        return "ComplementoPago[" + "id=" + id + ", registro=" + registro + ", timbrado=" + timbrado + ", serie=" + serie + ", numero=" + numero + ", pac=" + pac + ", uuid=" + uuid + ", certificadoSAT=" + certificadoSAT + ']';
     }
     
 }

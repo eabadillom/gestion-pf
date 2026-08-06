@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -23,16 +25,18 @@ import mx.com.ferbo.business.complemento.ComplementoBL;
 import mx.com.ferbo.business.ComplementoPagoBL;
 import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.dao.FacturaDAO;
+import mx.com.ferbo.dao.MedioPagoDAO;
+import mx.com.ferbo.dao.MetodoPagoDAO;
 import mx.com.ferbo.dao.PagoDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoPagoDAO;
-import mx.com.ferbo.dao.n.ClienteDAO;
 import mx.com.ferbo.dao.n.EmisoresCFDISDAO;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ComplementoPago;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Factura;
+import mx.com.ferbo.model.MedioPago;
 import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.model.SerieComplementoPago;
 import mx.com.ferbo.model.StatusFactura;
@@ -50,9 +54,6 @@ public class IngresosActualizacionBean implements Serializable{
 	private static Logger log = LogManager.getLogger(IngresosActualizacionBean.class);
         
         @Inject
-        private ClienteDAO clienteDAO;
-        
-        @Inject
         private EmisoresCFDISDAO emisoresDAO;
         
         private ComplementoBL complementoBL;
@@ -64,12 +65,14 @@ public class IngresosActualizacionBean implements Serializable{
 	private PagoDAO pagoDAO;
 	private TipoPagoDAO tipoPagoDAO;
 	private BancoDAO bancoDAO;
+        private MedioPagoDAO medioPagoDAO;
 	private FacturaDAO facturaDAO;
 	private StatusFacturaDAO sfDAO;
 	private StatusFactura statusPorCobrar;
 	private StatusFactura statusPagada;
 	private StatusFactura statusPagoParcial;
-	
+        private MedioPago medioPagoSelect;
+	private MedioPago formaPagoCliente;
 	
 	private List<Pago> listaPago;
         private List<Pago> listaPagosSeleccionados;
@@ -77,6 +80,7 @@ public class IngresosActualizacionBean implements Serializable{
         private List<EmisoresCFDIS> listEmisores;
 	private List<TipoPago> listatipoPago;
 	private List<Bancos> listaBancos;
+        private List<MedioPago> listaMedioPago;
 	
 	private Pago pagoSelected;
 	private Cliente cteSelect;
@@ -95,6 +99,8 @@ public class IngresosActualizacionBean implements Serializable{
 	public IngresosActualizacionBean() {
 		listaPago = new ArrayList<Pago>();
 		listaCtes = new ArrayList<Cliente>();
+                listaMedioPago = new ArrayList<>();
+                medioPagoDAO = new MedioPagoDAO();
 		pagoSelected = new Pago();
 		cteSelect = new Cliente();
                 complementoBL = new ComplementoBL();
@@ -118,6 +124,7 @@ public class IngresosActualizacionBean implements Serializable{
                 listaBancos = bancoDAO.buscarTodos();
 		listatipoPago = tipoPagoDAO.buscarTodos();
                 listaPagosSeleccionados = new ArrayList();
+                listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
 		this.startDate = new Date();
 		this.endDate = new Date();
 		
@@ -143,6 +150,11 @@ public class IngresosActualizacionBean implements Serializable{
                             if(pago.getTipo().getId() == 5)
                                     continue;
                             this.totalPagos = this.totalPagos.add(pago.getMonto());
+                    }
+                    
+                    if(cteSelect != null){
+                        formaPagoCliente = medioPagoDAO.buscarPorFormaPago(cteSelect.getFormaPago());
+                        log.info("Forma de pago del cliente {}: {}", cteSelect.getNombre(), formaPagoCliente.getFormaPago());
                     }
                     
                     /*Obtener la serie del complemento de pago*/
@@ -238,6 +250,10 @@ public class IngresosActualizacionBean implements Serializable{
 		try {
 			log.debug("Pago: {}", pagoSelected);
                         
+                        if(pagoSelected.getComplementoPago().getUuid() != null) {
+                            throw new InventarioException("Ya no se puede modificar el pago, ya tiene asociado un complemento de pago.");
+                        }
+                        
                         respuesta = pagoDAO.actualizar(pagoSelected);
                         if(respuesta != null) {
 				throw new InventarioException("Ocurrió un problema al actualizar el pago.");
@@ -299,6 +315,10 @@ public class IngresosActualizacionBean implements Serializable{
 			
 			pago = pagoDAO.buscarPorId(this.pagoSelected.getId(), true);
 			idFactura = pago.getFactura().getId();
+                        
+                        if(pago.getComplementoPago().getUuid() != null) {
+                            throw new InventarioException("Ya no se puede eliminar el pago, ya está asociado con un complemento de pago.");
+                        }
 			
 			respuesta = pagoDAO.eliminar(pagoSelected);
 			
@@ -427,16 +447,17 @@ public class IngresosActualizacionBean implements Serializable{
             String mensaje = null;
             Severity severity = null;
             try { 
+                log.info("Forma de pago del cliente {}: {}", this.cteSelect.getNombre(), medioPagoSelect.getFormaPago() + "-" + medioPagoSelect.getMpDescripcion());
                 if(listaPagosSeleccionados.isEmpty() || listaPagosSeleccionados == null) {
                     log.error("Debe seleccionar por lo menos un pago");
                     throw new InventarioException("Debe seleccionar al menos un pago.");
                 }
                 
                 if(cteSelect.getCteCve() == null) {
-                    throw new InventarioException("Debe seleccionar un cliente para el complemento de pago.");
+                    throw new InventarioException("Debe seleccionar un cliente para generar el complemento de pago.");
                 }
                 
-                complementoBL.guardarComplemento(serieComplementoPago);
+                complementoBL.guardarComplementoPago(serieComplementoPago);
                 
                 complementoPago = complementoBL.obtenerPorFolioSerie(serieComplementoPago.getNumero(), serieComplementoPago.getSerie());
                 
@@ -480,16 +501,17 @@ public class IngresosActualizacionBean implements Serializable{
                 }
                 
                 Integer idCliente = listaPagosSeleccionados.get(0).getFactura().getCliente().getCteCve();
-                int contarPagos = 0;
+                //int contarPagos = 0;
                 
                 for (Pago pago : listaPagosSeleccionados) {
-                    /*if(pago.getFactura().getCfdi() == null) {
+                    if(pago.getFactura().getCfdi() == null) {
                         throw new InventarioException("Todavía no se ha emitido la factura del pago");
-                    }*/
-                    /*if(pago.getComplementoPago() != null || pago.getComplementoPago().getUuid() != null) {
-                        log.info("La factura con id: {} ya se encuentra timbrada (id Facturama {}).", pago.getFactura().getId(), pago.getComplementoPago().getPac());
-                        throw new InventarioException("El complemento de pago ya se encuentra facturado");
-                    }*/
+                    }
+                    
+                    if(pago.getComplementoPago() != null || pago.getComplementoPago().getUuid() != null) {
+                        log.info("El complemento de pago con id: {} ya se encuentra timbrada (id Facturama {}).", pago.getComplementoPago().getId(), pago.getComplementoPago().getCertificadoSAT());
+                        throw new InventarioException("El complemento de pago ya se encuentra timbrado");
+                    }
                     
                     if (!PAGO_EN_PARCIALIDADES.equals(pago.getFactura().getMetodoPago())) {
                         throw new InventarioException("Solo se pueden generar complementos para pagos con método de pago 'PPD'.");
@@ -498,14 +520,15 @@ public class IngresosActualizacionBean implements Serializable{
                     if (!idCliente.equals(pago.getFactura().getCliente().getCteCve())){
                         throw new InventarioException("Los pagos deben ser del mismo cliente");
                     }
-                    contarPagos += 1;
-                    log.info("{} - pago: {}", contarPagos, pago.toString());
+                    //contarPagos += 1;
+                    //log.info("{} - pago: {}", contarPagos, pago.toString());
                 }
                 
+                log.info("Cantidad de pagos a generar con el complemento de pago: {}", listaPagosSeleccionados.size());
                 /*Enviar peticion a facturama*/
-                ComplementoPagoBL complementoPagoBL = new ComplementoPagoBL(listaPagosSeleccionados, cteSelect.getCteCve(), emisoresSelected.getCd_emisor(), usuario);
+                ComplementoPagoBL complementoPagoBL = new ComplementoPagoBL(listaPagosSeleccionados, cteSelect.getCteCve(), emisoresSelected.getCd_emisor(), usuario, medioPagoSelect.getFormaPago());
                 complementoPagoBL.timbrar();
-                //complementoPagoBL.sendMail();
+                complementoPagoBL.sendMail();
                 
                 mensaje = "El timbrado se ha hecho correctamente";
                 severity = FacesMessage.SEVERITY_INFO;
@@ -522,6 +545,16 @@ public class IngresosActualizacionBean implements Serializable{
                 PrimeFaces.current().ajax().update("form:messages");
             }
         }
+        
+        public void  reset() {
+            ExternalContext ec = null;
+	    try {
+	    	ec = FacesContext.getCurrentInstance().getExternalContext();
+                ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+            } catch (IOException e) {
+                log.error("Problema para crear una nueva factura...",  e);
+            }
+	}
 	
 	public Date getStartDate() {
 		return startDate;
@@ -602,6 +635,30 @@ public class IngresosActualizacionBean implements Serializable{
 	public void setListaBancos(List<Bancos> listaBancos) {
 		this.listaBancos = listaBancos;
 	}
+
+        public MedioPago getMedioPagoSelect() {
+            return medioPagoSelect;
+        }
+
+        public void setMedioPagoSelect(MedioPago medioPagoSelect) {
+            this.medioPagoSelect = medioPagoSelect;
+        }
+
+        public MedioPago getFormaPagoCliente() {
+            return formaPagoCliente;
+        }
+
+        public void setFormaPagoCliente(MedioPago formaPagoCliente) {
+            this.formaPagoCliente = formaPagoCliente;
+        }
+
+        public List<MedioPago> getListaMedioPago() {
+            return listaMedioPago;
+        }
+
+        public void setListaMedioPago(List<MedioPago> listaMedioPago) {
+            this.listaMedioPago = listaMedioPago;
+        }
 
 	public BigDecimal getTotalPagos() {
 		return totalPagos;

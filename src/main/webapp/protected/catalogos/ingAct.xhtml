@@ -51,10 +51,20 @@
                                         <f:selectItem itemLabel="Pago en Parcialidades o Diferido (PPD)" itemValue="PPD"/>
                                     </p:selectOneMenu>
                                 </div>
+                                <div class="p-col-12 p-md-5">
+                                    <p:outputLabel value="Forma de pago (SAT)" />
+                                    <p:selectOneMenu id="medioPago" autoWidth="false" converter="entityConverter" value="#{ingresosActualizacionBean.medioPagoSelect}" required="true" requiredMessage="Ingresa una Forma de Pago">
+                                        <f:selectItem itemLabel="#{ingresosActualizacionBean.formaPagoCliente.formaPago} - #{ingresosActualizacionBean.formaPagoCliente.mpDescripcion}" itemValue="#{ingresosActualizacionBean.formaPagoCliente}" />
+                                        <f:selectItems value="#{ingresosActualizacionBean.listaMedioPago}" var="medioP" itemLabel="#{medioP.formaPago} - #{medioP.mpDescripcion}" itemValue="#{medioP}"/>
+                                        <p:ajax process="@this" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="p-grid ui-fluid">
                                 <div class="p-col-12 p-md-5" style="display:flex; align-items:flex-end;" >
                                     <p:commandButton id="buscarPago" actionListener="#{ingresosActualizacionBean.filtraPagos()}" icon="pi pi-search" 
                                         disabled="#{ingresosActualizacionBean.endDate eq null}" process="@this soClientes tipoMetodoPago startDateSelected endDateSelected" 
-                                        styleClass="edit-button ui-button-primary" value="Consultar" update="form:dt-pagos" onclick="PF('statusInfoDialog').show();" 
+                                        styleClass="edit-button ui-button-primary" value="Consultar" update="form:dt-pagos form:medioPago" onclick="PF('statusInfoDialog').show();" 
                                         oncomplete="PF('statusInfoDialog').hide();" />
                                 </div>
                             </div>
@@ -253,7 +263,7 @@
                                     <p:commandButton class="ui-button-danger" icon="pi pi-times" process="@this" onclick="PF('statusInfoDialog').show();" 
                                         oncomplete="PF('statusInfoDialog').hide();" actionListener="#{ingresosActualizacionBean.eliminarPagoComplemento(pagoComplemento)}" 
                                         update="form:dtComplementoPago form:dt-pagos"
-                                        disabled="#{ingresosActualizacionBean.habilitarTimbrado ne true}" />
+                                        disabled="#{ingresosActualizacionBean.habilitarTimbrado eq true}" />
                                 </p:column>
                             </p:dataTable>
                             <p:fieldset styleClass="p-mt-2">
@@ -273,6 +283,12 @@
                                                 actionListener="#{ingresosActualizacionBean.generarComplemento()}" 
                                                 onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" 
                                                 disabled="#{ingresosActualizacionBean.habilitarTimbrado ne true}" />
+                                        </div>
+                                        <div style="margin-top: 2rem;" align="center" class="col-2">
+                                            <p:divider layout="vertical"></p:divider>
+                                        </div>
+                                        <div style="margin-top: 2rem;" align="center" class="col-5 flex align-items-center justify-content-center">
+                                            <p:commandButton icon="pi pi-refresh" process="@this" actionListener="#{ingresosActualizacionBean.reset()}" title="NuevoComplemento" value="Nuevo Complemento" styleClass="ui-button-raised ui-button-secondary"/>
                                         </div>
                                     </p:toolbarGroup>
                                 </p:toolbar>
