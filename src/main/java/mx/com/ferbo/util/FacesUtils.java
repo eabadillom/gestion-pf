@@ -9,6 +9,8 @@ import javax.faces.context.FacesContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import mx.com.ferbo.utils.ToolException;
+
 /**
  *
  * @author alberto
@@ -60,9 +62,8 @@ public final class FacesUtils {
         return file;
     }
 
-    @Deprecated
     public static StreamedContent crearStreamedContentDesdeBytes(
-            byte[] bytes, String nombreArchivo, String extension) {
+            byte[] bytes, String nombreArchivo, String extension) throws ToolException {
 
         extension = extension.trim().toLowerCase();
 
@@ -70,10 +71,41 @@ public final class FacesUtils {
             nombreArchivo += "." + extension;
         }
 
+        String contentType = getContentType(extension);
+
+        InputStream input = new ByteArrayInputStream(bytes);
+
         return DefaultStreamedContent.builder()
-                .contentType(extension) //Implementación incorrecta del atributo contentType
+                .contentType(contentType) //Implementación incorrecta del atributo contentType
                 .name(nombreArchivo)
-                .stream(() -> new ByteArrayInputStream(bytes))
+                .stream(() -> input)
                 .build();
+    }
+
+    public static String getContentType(String extension) throws ToolException {
+
+        if (extension == null || "".equalsIgnoreCase(extension)) {
+            throw new ToolException("La extensión no puede ser vacía");
+        }
+
+        extension = extension.trim().toUpperCase();
+
+        String contentType = "";
+
+        switch  (extension) {
+            case "PDF":
+                contentType = "application/pdf";
+                break;
+        
+            case "XLSX": 
+                contentType = "application/vnd.ms-excel";
+                break;
+
+            default:
+                throw new ToolException("La extensión proporcionada no es compatible con el sistema");
+        }
+
+        return contentType;
+
     }
 }

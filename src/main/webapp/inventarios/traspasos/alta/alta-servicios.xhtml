@@ -42,7 +42,9 @@
     <div style="padding-top: 1rem;">
 	    <p:panel id="Descripcion" styleClass="p-grid ui-fluid">
 	        <div class="p-col-12 p-md-12">
-	            <p:inputText id="txtObservaciones" value="#{altaTraspasoBean.observaciones}" placeholder="OBSERVACIONES" style="width: 50rem;" oninput="this.value = this.value.toUpperCase()"/>
+                    <p:inputText id="txtObservaciones" value="#{altaTraspasoBean.observaciones}" placeholder="OBSERVACIONES" style="width: 50rem;" oninput="this.value = this.value.toUpperCase()">
+                        <p:ajax process="@this" event="change" listener="#{altaTraspasoBean.modificacionObservaciones()}"/>
+                    </p:inputText>
 	        </div>
 	    </p:panel>
     </div>
