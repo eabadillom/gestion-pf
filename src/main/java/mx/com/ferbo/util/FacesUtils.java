@@ -76,7 +76,7 @@ public final class FacesUtils {
         InputStream input = new ByteArrayInputStream(bytes);
 
         return DefaultStreamedContent.builder()
-                .contentType(contentType) //Implementación incorrecta del atributo contentType
+                .contentType(contentType)
                 .name(nombreArchivo)
                 .stream(() -> input)
                 .build();
