@@ -226,7 +226,7 @@
 		<dependency>
 			<groupId>com.ferbo.bitacora</groupId>
   			<artifactId>ferbo-bitacora</artifactId>
-    		<version>1.0-SNAPSHOT</version>
+    		<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
