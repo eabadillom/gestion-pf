@@ -66,8 +66,7 @@
 					<h:outputText value="#{(empty lista.uuid) ? '--' : 'SI'}"/>
 				</p:column>
 				<p:column width="2rem">
-					<p:commandButton icon="pi pi-bars" class="ui-button-info" process="@this" oncomplete="PF('dg-factura').show();" title="Ver información de la factura" action="#{facMantenimentoBean.datosCliente}" update="form:dgDescarga " >
-						<f:setPropertyActionListener value="#{lista}" target="#{facMantenimentoBean.seleccion}" />
+					<p:commandButton icon="pi pi-bars" class="ui-button-info" process="@this" oncomplete="PF('dg-factura').show();" title="Ver información de la factura" action="#{facMantenimentoBean.datosCliente(lista)}"  update="form:dgDescarga " >
 					</p:commandButton>
 				</p:column>
 				<p:column width="2rem">
@@ -117,10 +116,11 @@
 				</p:commandButton>
 			</div>
 			<p:dialog id="dgDescarga" header="Factura #{facMantenimentoBean.seleccion.nomSerie}-#{facMantenimentoBean.seleccion.numero}" widgetVar="dg-factura" modal="true" responsive="true" position="center top" width="100%" resizable="false" showEffect="fade" hideEffect="fade">
-				<p:outputPanel id="frm-Descarga" styleClass="ui-fluid">
+				<p:tabView id="tvDescarga" styleClass="ui-fluid" effect="drop">
+                                    <p:tab title="Emisor" id="tabEmi">
 					<div class="p-grid ui-fluid">
 						<div class="p-col-12 p-md-5">
-							<p:outputLabel value="Emisor" />
+							<p:outputLabel value="Nombre" />
 							<p:inputText value="#{facMantenimentoBean.seleccion.emisorNombre}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-12 p-md-3">
@@ -129,54 +129,94 @@
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Régimen fiscal" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.emisorCdRegimen}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+                                                        <p:inputText value="#{facMantenimentoBean.seleccion.emisorCdRegimen} - #{facMantenimentoBean.regimenFiscalEmisor.nb_regimen}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-12 p-md-2">
 							<p:outputLabel value="Lugar de expedición" />
 							<p:inputText value="#{facMantenimentoBean.seleccion.lugarExpedicion}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 					</div>
-					<p:separator />
+                                    </p:tab>
+			            
+                                    <p:tab title="Receptor" id="tabRecep">
 					<div class="p-grid ui-fluid">
 						<div class="p-col-12 p-md-4">
-							<p:outputLabel value="Receptor" />
+							<p:outputLabel value="Nombre" />
 							<p:inputText id="cliente" value="#{facMantenimentoBean.seleccion.nombreCliente}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
-						<div class="p-col-12 p-md-2">
+						<div class="p-col-12 p-md-4">
 							<p:outputLabel value="RFC" />
 							<p:inputText value="#{facMantenimentoBean.seleccion.rfc}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
-						<div class="p-col-12 p-md-2">
+						<div class="p-col-12 p-md-4">
 							<p:outputLabel value="Régimen fiscal" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.cdRegimen}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+                                                        <p:inputText value="#{facMantenimentoBean.seleccion.cdRegimen} - #{facMantenimentoBean.regimenFiscalReceptor.nb_regimen}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+						</div>
+                                            
+                                                <div class="p-col-12 p-md-4">
+                                                    
+                                                    <p:outputLabel for="@next">Código Postal</p:outputLabel>
+                                                        <p:autoComplete id="autocompleteAct"
+                                                                        value="#{facMantenimentoBean.domicilioSelected.asentamiento}"
+                                                                        completeMethod="#{facMantenimentoBean.sugerenciasCodigoPostal}" 
+                                                                        var="sugerencia"
+                                                                        itemLabel="#{sugerencia.cp}"
+                                                                        itemValue="#{sugerencia}" 
+                                                                        forceSelection="true"
+                                                                        minQueryLength="5"
+                                                                        maxlength="5"
+                                                                        placeholder="#{facMantenimentoBean.seleccion.cp}"
+                                                                        converter="entityConverter"
+                                                                        disabled="#{facMantenimentoBean.seleccion.uuid ne null}">
+                                                            <p:ajax process="@this" event="itemSelect" listener="#{facMantenimentoBean.asignarDomicilio}" update="pais estado municipio localidad colonia autocompleteAct"/>
+                                                        <p:column>
+                                                            <p:outputLabel value="#{sugerencia.cp}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <p:outputLabel value="#{sugerencia.asentamientoDs}"/>
+                                                        </p:column>
+                                                    </p:autoComplete>
+						</div>
+                                            
+                                                <div class="p-col-12 p-md-4">
+							<p:outputLabel value="País" />
+                                                        <p:inputText id="pais" value="#{facMantenimentoBean.seleccion.pais}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+						</div>
+                                                <div class="p-col-12 p-md-4">
+							<p:outputLabel value="Estado" />
+							<p:inputText id="estado" value="#{facMantenimentoBean.seleccion.estado}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
 						<div class="p-col-12 p-md-4">
-							<p:outputLabel value="Domicilio" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.calle} Num. ext. #{facMantenimentoBean.seleccion.numExt} Num. Int. #{facMantenimentoBean.seleccion.numInt}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
-						</div>
-						<div class="p-col-12 p-md-3">
-							<p:outputLabel value="Estado" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.estado}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
-						</div>
-						<div class="p-col-12 p-md-3">
 							<p:outputLabel value="Municipio" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.municipio}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+							<p:inputText id="municipio" value="#{facMantenimentoBean.seleccion.municipio}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
-						<div class="p-col-12 p-md-3">
+						<div class="p-col-12 p-md-4">
 							<p:outputLabel value="Localidad o Ciudad" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.ciudad}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+							<p:inputText id="localidad" value="#{facMantenimentoBean.seleccion.ciudad}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
-						<div class="p-col-12 p-md-3">
+                                            
+                                                <div class="p-col-12 p-md-4">
 							<p:outputLabel value="Colonia" />
-							<p:inputText value="#{facMantenimentoBean.seleccion.cp} - #{facMantenimentoBean.seleccion.colonia}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+                                                        <p:inputText id="colonia" value="#{facMantenimentoBean.seleccion.colonia}" readonly="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
+                                            
+						<div class="p-col-12 p-md-4">
+							<p:outputLabel value="Calle" />
+							<p:inputText value="#{facMantenimentoBean.seleccion.calle}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+						</div>
+                                                <div class="p-col-12 p-md-4">
+                                                        <p:outputLabel value="Num. ext." />
+                                                        <p:inputText value="#{facMantenimentoBean.seleccion.numExt}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+                                                </div>
+                                                <div class="p-col-12 p-md-4">
+                                                        <p:outputLabel value="Num. Int." />
+                                                        <p:inputText value="#{facMantenimentoBean.seleccion.numInt}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
+                                                </div>
 					</div>
-					<p:separator />
+                                    </p:tab>
+                                    
+                                    <p:tab title="Datos Generales" id="tabDaGe">
 					<div class="p-grid ui-fluid">
-						<div class="p-col-12 p-md-12">
-							<p:outputLabel>Observaciones</p:outputLabel>
-							<p:inputText value="#{facMantenimentoBean.seleccion.observacion}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}" />
-						</div>
 						<div class="p-col-12 p-md-3">
 							<p:outputLabel>Fecha emisión</p:outputLabel>
 							<p:datePicker value="#{facMantenimentoBean.seleccion.fecha}" monthNavigator="true" yearNavigator="true" showWeek="true" maxdate="#{facMantenimentoBean.actual}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" showIcon="true" disabled="#{facMantenimentoBean.seleccion.uuid ne null}">
@@ -227,14 +267,19 @@
 							<p:outputLabel>Importe con letra</p:outputLabel>
 							<p:inputText value="#{facMantenimentoBean.seleccion.montoLetra}" readonly="true" inputStyle="text-align: right" disabled="#{facMantenimentoBean.seleccion.uuid ne null}"/>
 						</div>
+                                                <div class="p-col-12 p-md-12">
+							<p:outputLabel>Observaciones</p:outputLabel>
+							<p:inputText value="#{facMantenimentoBean.seleccion.observacion}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}" />
+						</div>
 					</div>
-				</p:outputPanel>
+                                    </p:tab>
+                                </p:tabView>
 				<f:facet name="footer">
 					<p:commandButton icon="pi pi-save" value="Guardar" actionListener="#{facMantenimentoBean.updateFactura()}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}" update="form:dtSerieFac"/>
 					<p:commandButton value="Pre-factura" icon="pi pi-arrow-down" styleClass="ui-button-outlined" actionListener="#{facMantenimentoBean.jasper}" ajax="false">
 						<p:fileDownload value="#{facMantenimentoBean.file}" />
 					</p:commandButton>
-					<p:commandButton value="Cerrar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" onclick="PF('dg-factura').hide();" />
+                                        <p:commandButton value="Cerrar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" onclick="PF('dg-factura').hide();" action="#{facMantenimentoBean.limpiarFacturaSeleccionada()}" resetValues="true"/>
 				</f:facet>
 			</p:dialog>
 		</h:form>
