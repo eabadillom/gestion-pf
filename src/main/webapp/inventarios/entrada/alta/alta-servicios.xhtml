@@ -8,22 +8,22 @@
 				<div class="p-grid ui-fluid">
 					<div class="p-col-12 p-md-3">
 						<p:selectBooleanButton value="#{ingresoBean.isCongelacion}" onIcon="pi pi-check" onLabel="Congelación" offIcon="pi pi-times" offLabel="Congelación" disabled="#{not ingresoBean.capturar}">
-							<p:ajax event="change" process="@this"/>
+                                                    <p:ajax event="change" listener="#{ingresoBean.modificacionPropiedadBitacora(null, null, ingresoBean.isCongelacion, 'para los servicios de', 'congelación')}" process="@this"/>
 						</p:selectBooleanButton>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:selectBooleanButton value="#{ingresoBean.isConservacion}" onIcon="pi pi-check" onLabel="Conservación" offIcon="pi pi-times" offLabel="Conservación" disabled="#{not ingresoBean.capturar}">
-							<p:ajax event="change" process="@this"/>
+                                                    <p:ajax event="change" listener="#{ingresoBean.modificacionPropiedadBitacora(null, null, ingresoBean.isConservacion, 'para los servicios de', 'conservación')}" process="@this"/>
 						</p:selectBooleanButton>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:selectBooleanButton value="#{ingresoBean.isRefrigeracion}" onIcon="pi pi-check" onLabel="Refrigeración" offIcon="pi pi-times" offLabel="Refrigeración" disabled="#{not ingresoBean.capturar}">
-							<p:ajax event="change" process="@this"/>
+                                                    <p:ajax event="change" listener="#{ingresoBean.modificacionPropiedadBitacora(null, null, ingresoBean.isRefrigeracion, 'para los servicios de', 'refrigeración')}" process="@this"/>
 						</p:selectBooleanButton>
 					</div>
 					<div class="p-col-12 p-md-3">
 						<p:selectBooleanButton value="#{ingresoBean.isManiobras}" onIcon="pi pi-check" onLabel="Maniobras" offIcon="pi pi-times" offLabel="Maniobras" disabled="#{not ingresoBean.capturar}">
-							<p:ajax event="change" process="@this"/>
+                                                    <p:ajax event="change" listener="#{ingresoBean.modificacionPropiedadBitacora(null, null, ingresoBean.isManiobras, 'para los servicios de', 'maniobras')}" process="@this"/>
 						</p:selectBooleanButton>
 					</div>
 				</div>

@@ -66,6 +66,19 @@ public class SalidasBL
         		.orElseThrow(() -> new InventarioException("Folio no encontrado."));
     }
     
+    public List<Salida> buscarEnviadas(Cliente cliente) {
+    	List<Salida> salidas;
+    	
+    	try {
+    		salidas = salidasDAO.buscarPorStatus(cliente, new Date(), this.obtenerStatusEnviado());
+    		
+    	} catch(Exception ex) {
+    		salidas = new ArrayList<Salida>();
+    	}
+    	
+    	return salidas;
+    }
+    
     public List<Cliente> getListaClientesPendientes(Planta planta) {
     	List<Cliente> clientes = null;
     	StatusSalida statusEnviada;

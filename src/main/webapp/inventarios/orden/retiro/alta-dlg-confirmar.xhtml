@@ -4,8 +4,18 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <p:confirmDialog widgetVar="confirmGuardar" showEffect="fade" message="¿Está seguro que desea guardar la salida?" header="Guardar salida" severity="warn">
-        <p:commandButton value="Si" icon="pi pi-check" actionListener="#{ordenSalidaBean.guardar()}" process="@this" update="messages form:btnTicketSalida form:btnTicketServicio" onclick="PF('statusInfoDialog').show();" oncomplete="PF('confirmGuardar').hide();PF('statusInfoDialog').hide();"></p:commandButton>
-        <p:commandButton value="No" icon="pi pi-times" styleClass="ui-button-secondary" onclick="PF('confirmGuardar').hide();"></p:commandButton>
+    <p:confirmDialog id="confirm-guardar" widgetVar="confirmGuardar" showEffect="fade" header="Guardar salida" severity="warn">
+    	<f:facet name="message">
+    		<p:dataList value="#{ordenSalidaBean.sinConfirmar}" var="producto" rendered="#{ordenSalidaBean.sinConfirmar.size() > 0}" type="definition" paginator="true" paginatorPosition="bottom" rows="10">
+    			<f:facet name="header">
+    				<p:outputLabel value="#{ordenSalidaBean.sinConfirmar.size()} PRODUCTO#{ordenSalidaBean.sinConfirmar.size() > 1 ? 'S' : ''} SIN CONFIRMAR"></p:outputLabel>
+    			</f:facet>
+    			<p:outputLabel value="#{producto}"></p:outputLabel>
+    		</p:dataList>
+    		<p:spacer style="height: 2rem;" rendered="#{ordenSalidaBean.sinConfirmar.size() > 0}"/>
+	    	<p:outputLabel value="¿Está seguro que desea guardar la salida?"></p:outputLabel>
+    	</f:facet>
+        <p:commandButton value="Aceptar" icon="pi pi-check" actionListener="#{ordenSalidaBean.guardar()}" process="@this" update="messages form:btnTicketSalida form:btnTicketServicio" onclick="PF('statusInfoDialog').show();" oncomplete="PF('confirmGuardar').hide();PF('statusInfoDialog').hide();"></p:commandButton>
+        <p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-secondary" onclick="PF('confirmGuardar').hide();"></p:commandButton>
     </p:confirmDialog>
 </ui:composition>

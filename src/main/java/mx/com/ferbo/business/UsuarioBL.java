@@ -4,12 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.ferbo.tools.exception.SystemException;
+
 import mx.com.ferbo.dao.PlantaDAO;
+import mx.com.ferbo.dao.UsuarioDAO;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.InventarioException;
 
 public class UsuarioBL {
+
+	private static Logger log = LogManager.getLogger(UsuarioBL.class);
+	private static UsuarioDAO dao = new UsuarioDAO();
 	
 	public static synchronized List<Planta> buscarPlantasAutorizadas(Usuario usuario)
 	throws InventarioException {
@@ -65,5 +74,14 @@ public class UsuarioBL {
 		}
 		
 		return optional;
+	}
+
+	public static synchronized List<Usuario> buscarPorStatus(String status) {
+		try {
+			return dao.buscarPorStatus(status);
+		} catch (SystemException ex) {
+			log.warn("Error: {}", ex);
+			throw ex;
+		}
 	}
 }

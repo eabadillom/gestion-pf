@@ -3,7 +3,6 @@ package mx.com.ferbo.business.n;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 import javax.enterprise.context.RequestScoped;
@@ -19,7 +18,6 @@ import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Categoria;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Planta;
-import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
@@ -91,49 +89,6 @@ public class AvisoBL {
         log.info("Finaliza proceso para agregar o actualizar el aviso del cliente: " + cliente.getNombre());
     }
 
-    public void agregarServicioAviso(
-            Aviso aviso,
-            Cliente cliente,
-            List<PrecioServicio> serviciosDisponibles,
-            List<PrecioServicio> serviciosPorAgregar) throws InventarioException {
-
-        log.info("Inicia proceso para agregar el servicio son su precio al aviso");
-        FacesUtils.requireNonNull(aviso, "El aviso no puede ser vacío");
-        FacesUtils.requireNonNull(cliente, "El cliente no puede ser vacío");
-
-        if (serviciosPorAgregar == null || serviciosPorAgregar.isEmpty()) {
-            return;
-        }
-
-        for (PrecioServicio ps : serviciosPorAgregar) {
-
-            PrecioServicio nuevo = new PrecioServicio();
-            nuevo.setAvisoCve(aviso);
-            nuevo.setCliente(cliente);
-            nuevo.setPrecio(ps.getPrecio());
-            nuevo.setServicio(ps.getServicio());
-            nuevo.setUnidad(ps.getUnidad());
-
-            boolean existe = aviso.getPrecioServicioList().stream()
-                    .anyMatch(p -> p.getAvisoCve() != null
-                            && p.getAvisoCve().equals(aviso)
-                            && Objects.equals(p.getServicio(), ps.getServicio())
-                            && Objects.equals(p.getUnidad(), ps.getUnidad()));
-
-            if (existe) {
-                continue;
-            }
-
-            aviso.getPrecioServicioList().add(nuevo);
-            cliente.getPrecioServicioList().add(nuevo);
-
-            serviciosDisponibles.remove(ps);
-        }
-
-        serviciosPorAgregar.clear();
-        log.info("Finaliza proceso para agregar el servicio son su precio al aviso");
-    }
-
     public void eliminaAviso(Cliente cliente, Aviso aviso)
             throws InventarioException, DAOException {
 
@@ -159,22 +114,5 @@ public class AvisoBL {
         aviso.setCteCve(null);
 
         log.info("Finaliza porceso para eliminar el aviso del cliente: " + cliente.getNombre());
-    }
-
-    public void eliminarServicioAviso(Aviso aviso, PrecioServicio precioServicio,
-            List<PrecioServicio> serviciosDisponibles) throws InventarioException {
-
-        log.info("Inicia proceso para eliminar el servicio del aviso");
-
-        FacesUtils.requireNonNull(precioServicio, "El servicio a eliminar no puede ser vacío");
-
-        aviso.getPrecioServicioList().remove(precioServicio);
-        serviciosDisponibles.add(precioServicio);
-
-        precioServicio.setAvisoCve(null);
-        precioServicio.setCliente(null);
-
-        log.info("Finaliza proceso para eliminar el servicio del aviso");
-
     }
 }

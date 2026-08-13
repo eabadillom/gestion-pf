@@ -8,6 +8,8 @@ import javax.persistence.Query;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ferbo.tools.exception.SystemException;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.Perfil;
 import mx.com.ferbo.model.Planta;
@@ -201,6 +203,23 @@ public class UsuarioDAO extends IBaseDAO<Usuario, Integer> {
 		}
 
 		return usuarios;
+	}
+
+	public List<Usuario> buscarPorStatus(String status) {
+		List<Usuario> usuarios = null;
+		EntityManager em = null;
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			usuarios = em.createNamedQuery("Usuario.findByStUsuario", Usuario.class)
+					.setParameter("stUsuario", status)
+					.getResultList();
+			return usuarios;
+		} catch (Exception ex) {
+			log.error("Error al buscar los usuarios por el status {}. {}", status, ex);
+			throw new SystemException("Hubo un problema al nomento de obtener los usuarios por status");
+		} finally {
+			close(em);
+		}
 	}
 
 }

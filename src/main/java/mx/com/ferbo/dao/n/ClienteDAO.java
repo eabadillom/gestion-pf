@@ -10,6 +10,8 @@ import javax.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ferbo.tools.exception.SystemException;
+
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.Aviso;
 import mx.com.ferbo.model.Cliente;
@@ -192,5 +194,40 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
     	}
     	
     	return modelList;
+    }
+
+    public Cliente guardarYObtener(Cliente cliente) {
+        EntityManager em = null;
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            em.persist(cliente);
+            em.flush();
+            em.refresh(cliente);
+            em.getTransaction().commit();
+            return cliente;
+        } catch (Exception ex) {
+            log.error("Error al momento de guardar al cliente en la base de datos: {}", ex.getMessage(), ex);
+            throw new SystemException("Hubo un problema al momento de guardar al cliente dentro del sistema");
+        } finally {
+            close(em);
+        }
+    }
+
+    public Cliente actualizarYObtener(Cliente cliente) {
+        EntityManager em = null;
+
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            Cliente actualizado = em.merge(cliente);
+            em.getTransaction().commit();
+            return actualizado;
+        } catch (Exception ex) {
+            log.error("Error al momento de actualizar al cliente en la base de datos: {}", ex.getMessage(), ex);
+            throw new SystemException("Hubo un problema al momento de actualizar al cliente dentro del sistema");
+        } finally {
+            close(em);
+        }
     }
 }

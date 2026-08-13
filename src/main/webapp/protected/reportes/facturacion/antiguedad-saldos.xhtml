@@ -11,28 +11,26 @@
             <ui:include src="/protected/common/status-info.xhtml" />
             <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
                 <div class="p-grid ui-fluid">
-                    <div class="p-col-12 p-md-5">
+                    <div class="p-col-12 p-md-4">
                         <p:outputLabel for="fechaCorte" value="Fecha de Corte" />
-                        <p:datePicker id="fechaCorte" value="#{reporteFacturacionAntiguedadSaldosBean.fecha_ini}"  maxdate="#{reporteFacturacionAntiguedadSaldosBean.maxDate}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                        <p:datePicker id="fechaCorte" value="#{reporteAntiguedadSaldosBean.fecha}"  maxdate="#{reporteAntiguedadSaldosBean.maxDate}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                             <p:ajax process="@this" />
                         </p:datePicker>
                     </div>
-                </div>
-                <div class="p-grid ui-fluid">
-                    <div class="p-col-12 p-md-5">
+                    <div class="p-col-12 p-md-4">
                         <p:outputLabel for="so-cliente" value="Cliente" />
-                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="contains" label="#{reporteFacturacionAntiguedadSaldosBean.clientesSeleccionadosLabel}" 
+                        <p:selectCheckboxMenu id="so-cliente" dynamic="true" filter="true" filterMatchMode="contains" label="#{reporteAntiguedadSaldosBean.clientesSeleccionadosLabel}" 
                             updateLabel="false" panelStyle="width: 46rem" scrollHeight="250" multiple="false" 
-                            value="#{reporteFacturacionAntiguedadSaldosBean.listClientesSelect}" >
-                            <p:ajax event="change" update="@this" /> <f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.listaClientes}" 
+                            value="#{reporteAntiguedadSaldosBean.listClientesSelect}" >
+                            <p:ajax event="change" update="@this" /> <f:selectItems value="#{reporteAntiguedadSaldosBean.listaClientes}" 
                                 var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}" />
                         </p:selectCheckboxMenu>
                     </div>
-                    <div class="p-col-12 p-md-5">
+                    <div class="p-col-12 p-md-4">
                         <p:outputLabel for="so-emisor" value="Emisor" />
-                        <p:selectOneMenu id="so-emisor" value="#{reporteFacturacionAntiguedadSaldosBean.emisorSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
+                        <p:selectOneMenu id="so-emisor" value="#{reporteAntiguedadSaldosBean.emisorSelect}" converter="entityConverter" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="Todos los emisores" itemValue="" />
-                            <f:selectItems value="#{reporteFacturacionAntiguedadSaldosBean.emisorList}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"/>
+                            <f:selectItems value="#{reporteAntiguedadSaldosBean.emisorList}" var="emisor" itemLabel="#{emisor.nb_emisor}" itemValue="#{emisor}"/>
                             <p:ajax process="@this" />
                         </p:selectOneMenu>
                     </div>
@@ -44,7 +42,7 @@
             <p:panel id="pnl-filtros-descarga" header="TIPOS DE REPORTE" >
                 <div class="p-grid ui-fluid">
                     <div class="p-col-12 p-md-12">
-                        <p:selectOneRadio id="tipoReporte" value="#{reporteFacturacionAntiguedadSaldosBean.tipoReporte}">
+                        <p:selectOneRadio id="tipoReporte" value="#{reporteAntiguedadSaldosBean.tipoReporte}">
                             <f:selectItem itemLabel="Saldos Generales (Concentrado)" itemValue="Condensado" />
                             <f:selectItem itemLabel="Detalle de Movimientos (Desglosado)" itemValue="Desglosado" />
                         </p:selectOneRadio>
@@ -57,13 +55,13 @@
             <p:panel id="pnl-formatos-descarga" header="FORMATOS DE DESCARGA" >
                 <div class="p-grid ui-fluid p-col-12">
                     <div class="p-col-12 p-md-3">
-                        <p:commandButton value="PDF" icon="pi pi-file-pdf" actionListener="#{reporteFacturacionAntiguedadSaldosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
-                            <p:fileDownload value="#{reporteFacturacionAntiguedadSaldosBean.file}" />
+                        <p:commandButton value="PDF" icon="pi pi-file-pdf" actionListener="#{reporteAntiguedadSaldosBean.exportarPdf}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                            <p:fileDownload value="#{reporteAntiguedadSaldosBean.file}" />
                         </p:commandButton>
                     </div>
                     <div class="p-col-12 p-md-3">
-                        <p:commandButton value="Excel" icon="pi pi-file-excel" actionListener="#{reporteFacturacionAntiguedadSaldosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
-                            <p:fileDownload value="#{reporteFacturacionAntiguedadSaldosBean.file}" />
+                        <p:commandButton value="Excel" icon="pi pi-file-excel" actionListener="#{reporteAntiguedadSaldosBean.exportarExcel}" process="@this" ajax="false" styleClass="ui-button-raised ui-button-secondary" >
+                            <p:fileDownload value="#{reporteAntiguedadSaldosBean.file}" />
                         </p:commandButton>
                     </div>
                     <div class="p-col-12 p-md-3">

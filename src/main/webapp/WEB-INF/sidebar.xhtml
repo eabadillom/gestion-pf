@@ -85,12 +85,11 @@
 							<p:menuitem id="frb_facturacion_ingresos_actualizar" value="Consultar" icon="pi pi-fw pi-search" outcome="/protected/catalogos/ingAct" />
                                                         <p:menuitem id="frb_facturacion_ingresos_serie_complemento" value="Serie Complemento de Pago" icon="pi pi-book" outcome="/protected/catalogos/serieComplementos" />
 						</p:submenu>
-						<ui:remove>
-							<p:submenu id="frb_facturacion_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
-								<p:menuitem id="facturacion_egresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos/alta/principal" />
-								<p:menuitem id="facturacion_egresos_consulta" value="Consulta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos/consulta/principal" />
-							</p:submenu>
-						</ui:remove>
+						<p:submenu id="frb_facturacion_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
+							<p:menuitem id="facturacion_egresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos/alta/principal" />
+							<p:menuitem id="facturacion_egresos_consulta" value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/egresos/consulta/principal" />
+                            <p:menuitem id="facturacion_egresos_egresos" value="Categorías" icon="pi pi-fw pi-book" outcome="/protected/catalogos/egresos/catalogs/categoriaEgreso"/>
+						</p:submenu>
 						<p:submenu label="Notas de Credito" icon="pi pi-file-o" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/altaNotasCredito" />
 							<p:menuitem value="Consulta" icon="pi pi-fw pi-search" outcome="/protected/catalogos/consultaNotasCredito"></p:menuitem>
@@ -110,7 +109,7 @@
 								<p:menuitem value="Facturas" icon="pi pi-file" outcome="/protected/reportes/Facturas" />
 								<p:menuitem value="Facturas por Mes" icon="pi pi-file" outcome="/protected/reportes/FacturasPorMes" />
 								<p:menuitem value="Facturas por Plantas" icon="pi pi-file" outcome="/protected/reportes/FacturasPorPlantas" />
-								<p:menuitem value="Antiguedad de Saldos" icon="pi pi-file" outcome="/protected/reportes/AntiguedadSaldos" />
+								<p:menuitem value="Antigüedad de saldos" icon="pi pi-file" outcome="/protected/reportes/facturacion/antiguedad-saldos" />
 								<p:menuitem value="Cartera Clientes" icon="pi pi-file" outcome="/protected/reportes/CarteraCliente" />
 							</p:submenu>
 							<p:menuitem value="Contabilidad" icon="pi pi-file" outcome="/protected/reportes/Contabilidad" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}"/>
@@ -128,6 +127,7 @@
 								<p:menuitem value="Estado de resultados" icon="pi pi-file" outcome="/protected/reportes/EstadoResultados" />			
 							</p:submenu>
 						</p:submenu>
+                                                <p:menuitem value="Bitácora" outcome="/protected/catalogos/bitacora/principal" icon="pi pi-fw pi-book" rendered="#{(sideBarBean.usuario.perfil == 3)}"/>
 						<p:menuitem value="Usuarios" outcome="/protected/catalogos/MantenimientoUsuarios" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Test mail" outcome="/protected/catalogos/test-mail" icon="pi pi-fw pi-user-edit" rendered="#{(sideBarBean.usuario.perfil == 3)}" />
 						<p:menuitem value="Cambiar contraseña" outcome="/changePassword" icon="pi pi-sliders-v"/>
