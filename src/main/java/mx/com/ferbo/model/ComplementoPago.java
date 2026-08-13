@@ -59,6 +59,10 @@ public class ComplementoPago implements Serializable
     @Column(name = "nu_numero")
     private String numero;
     
+    @Column(name = "cd_forma_pago")
+    @Size(max = 20)
+    private String formaPago;
+    
     @Size(max = 25)
     @Column(name = "cd_pac")
     private String pac;
@@ -115,6 +119,14 @@ public class ComplementoPago implements Serializable
 
     public void setNumero(String numero) {
         this.numero = numero;
+    }
+
+    public String getFormaPago() {
+        return formaPago;
+    }
+
+    public void setFormaPago(String formaPago) {
+        this.formaPago = formaPago;
     }
 
     public String getPac() {

@@ -76,7 +76,6 @@ public class ComplementoPagoBL
         this.idEmisor = idEmisor;
         this.usuario = usuario;
         this.formaPago = formaPago;
-        log.info("Forma de pago del cliente {}: {}", idCliente, formaPago);
     }
     
     public void timbrar() throws InventarioException, DAOException, JsonProcessingException, FacturamaException {
@@ -127,9 +126,8 @@ public class ComplementoPagoBL
             PaymentBindingModel payment = new PaymentBindingModel();
             Date fechaHora = pago.getFecha();
             DateUtil.setTime(fechaHora, pago.getHora().getHour(), pago.getHora().getMinute(), 0);
-            log.info("Fecha de complemento de pago {}", fechaHora.toString());
             payment.setDate(fechaHora);
-            payment.setPaymentForm(pago.getTipo().getNombre());
+            payment.setPaymentForm(complementoPago.getFormaPago());
             payment.setAmount(pago.getMonto());
             payment.setCurrency(CURRENCY);
 

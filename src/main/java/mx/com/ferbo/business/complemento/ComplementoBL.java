@@ -77,11 +77,12 @@ public class ComplementoBL
         return complementoPagoDAO.buscarPorId(idComplementoPago).orElseThrow(() -> new InventarioException("Comlemento de pago no entrontrado."));
     }
     
-    public void guardarComplementoPago(SerieComplementoPago serieComplementoPago) throws InventarioException {
+    public void guardarComplementoPago(SerieComplementoPago serieComplementoPago, String formaPago) throws InventarioException {
         ComplementoPago complementoPago = new ComplementoPago();
         complementoPago.setRegistro(new Date());
         complementoPago.setSerie(serieComplementoPago.getSerie());
         complementoPago.setNumero(serieComplementoPago.getNumero());
+        complementoPago.setFormaPago(formaPago);
         complementoPagoDAO.guardar(complementoPago);
     }
     
