@@ -21,7 +21,7 @@
 
 
     <p:dataTable id="dtPreciosServicios" widgetVar="dtPreciosServicios" value="#{clientesBean.lstPrecioServicios}" rowKey="#{pServicio.id}"
-                 var="pServicio" paginator="true"
+                 var="pServicio" paginator="true" size="small"
                  rows="6" paginatorPosition="bottom">
 
         <p:column headerText="Servicio" sortBy="#{pServicio.servicio.servicioDs}">
@@ -47,7 +47,7 @@
         </p:column>
     </p:dataTable>
 
-    <p:dialog id="dlgPrecioServicio" header="#{(clientesBean.precioServicioSelected.id != null) ? 'Actualizar' : 'Agregar'} Precio Servicio" showEffect="fade" modal="false" widgetVar="dlgPrecioServicio" responsive="true" position="center center"
+    <p:dialog id="dlgPrecioServicio" header="#{(clientesBean.precioServicioSelected.id != null) ? 'Actualizar' : 'Agregar'} Servicio" showEffect="fade" modal="false" widgetVar="dlgPrecioServicio" responsive="true" position="center center"
               width="30rem" resizable="false" dynamic="true">
         <div class="p-grid">
                  <div class="p-col-12 p-md-12">
