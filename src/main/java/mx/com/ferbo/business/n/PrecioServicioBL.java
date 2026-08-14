@@ -131,6 +131,10 @@ public class PrecioServicioBL {
 
         log.info("Inicia proceso para verificar unicidad del precio de servicio");
 
+        if (precioServicio.getId() != null) {
+            return;
+        } 
+
         long cantidad = contarCuantoHayEquivalentes(lista, precioServicio);
 
         if (cantidad >= 1) {
@@ -161,6 +165,15 @@ public class PrecioServicioBL {
         PrecioServicio clon = new PrecioServicio();
 
         copiarValores(original, clon);
+
+        return clon;
+    }
+
+    public PrecioServicio clonarConId(PrecioServicio original) {
+
+        PrecioServicio clon = clonar(original);
+
+        clon.setId(original.getId());
 
         return clon;
     }
