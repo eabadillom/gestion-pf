@@ -29,14 +29,15 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import com.ferbo.bitacora.exception.BitacoraException;
+import com.ferbo.bitacora.model.Bitacora;
+import com.ferbo.bitacora.model.ContextoBitacora;
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.exception.ValidationException;
 
-import mx.com.ferbo.bitacora.business.BitacoraBL;
-import mx.com.ferbo.bitacora.enums.NombrePantalla;
-import mx.com.ferbo.bitacora.enums.TipoPantalla;
-import mx.com.ferbo.bitacora.model.EventoBitacora;
-import mx.com.ferbo.bitacora.model.ContextoBitacora;
+import mx.com.ferbo.bitacoraimp.business.BitacoraBLImp;
+import mx.com.ferbo.bitacoraimp.enums.NombrePantalla;
+import mx.com.ferbo.bitacoraimp.enums.TipoPantalla;
 import mx.com.ferbo.business.ClienteBL;
 import mx.com.ferbo.business.EntradaBL;
 import mx.com.ferbo.business.UsuarioBL;
@@ -122,13 +123,13 @@ public class IngresoBean implements Serializable {
 	private String idSesion = "";
 	private String descripcionEvento = "";
 
-	private EventoBitacora bitacoraEvento;
-	private List<EventoBitacora> eventos;
+	private Bitacora bitacoraEvento;
+	private List<Bitacora> eventos;
 	private ContextoBitacora contextBitacora;
 	private String documento = "";
 
 	@Inject
-	private BitacoraBL bitacoraBL;
+	private BitacoraBLImp bitacoraBL;
 
 	@SuppressWarnings("unchecked")
 	public IngresoBean() {
@@ -174,8 +175,12 @@ public class IngresoBean implements Serializable {
 
 			eventos = new ArrayList<>();
 			idSesion = session.getId();
-			contextBitacora = ContextoBitacora.of(idSesion, usuario, NombrePantalla.CONSTANCIA_DE_DEPOSITO,
-					TipoPantalla.ALTA);
+			String nombreUsuario = usuario.getNombre() + " " + usuario.getApellido1() + " " + usuario.getApellido2();
+			Integer idUsuario = usuario.getId();
+			contextBitacora = ContextoBitacora.of(idSesion, idUsuario, nombreUsuario, NombrePantalla.CONSTANCIA_DE_DEPOSITO.toString(),
+					TipoPantalla.ALTA.toString());
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Ocurrió un problema al iniciar el módulo de registro de constancias de depósito...", ex);
 		}
@@ -242,13 +247,11 @@ public class IngresoBean implements Serializable {
 			severity = FacesMessage.SEVERITY_INFO;
 			log.info("Creación de constancia de depósito terminada, procediendo con captura de productos.");
 		} catch (InventarioException ex) {
-			log.warn(ex.getMessage());
+			log.warn("Error: {}", ex.getMessage(), ex);
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_WARN;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}",ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema con la creación de la constancia de depósito...", ex);
 			mensaje = "Ocurrió un problema con la creación de la constancia de depósito. Avise a su administrador de sistemas.";
@@ -287,7 +290,7 @@ public class IngresoBean implements Serializable {
 
 			this.partida = EntradaBL.crearPartida(this.camara);
 
-			bitacoraEvento = EventoBitacora.of(contextBitacora)
+			bitacoraEvento = Bitacora.of(contextBitacora)
 					.documento(documento)
 					.descripcion(descripcionEvento)
 					.build();
@@ -303,11 +306,9 @@ public class IngresoBean implements Serializable {
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-			log.warn(ex.getMessage());
+			log.warn("Error: {}",ex.getMessage(), ex);
 		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_ERROR;
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema para generar las tarimas...", ex);
 			mensaje = "Ocurrió un problema al generar la(s) tarima(s).";
@@ -334,7 +335,7 @@ public class IngresoBean implements Serializable {
 
 			descripcionEvento = "Eliminó la tarima " + nameTarima;
 
-			bitacoraEvento = EventoBitacora.of(contextBitacora)
+			bitacoraEvento = Bitacora.of(contextBitacora)
 					.documento(documento)
 					.descripcion(descripcionEvento)
 					.build();
@@ -344,13 +345,11 @@ public class IngresoBean implements Serializable {
 			mensaje = "Tarima eliminada";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
-			log.warn(ex.getMessage());
+			log.warn("Error: {}", ex.getMessage(), ex);
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_WARN;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema para eliminar la tarima...");
 			mensaje = "Ocurrió un problema al eliminar la tarima.";
@@ -378,7 +377,7 @@ public class IngresoBean implements Serializable {
 			mensaje = "Se termino de configurar la partida con carga completa";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
-			log.warn(ex.getMessage());
+			log.warn("Error: {}", ex.getMessage(), ex);
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception ex) {
@@ -406,7 +405,7 @@ public class IngresoBean implements Serializable {
 			mensaje = "Se termino de editar una partida con carga completa";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
-			log.warn(ex.getMessage());
+			log.warn("Error: {}", ex.getMessage(), ex);
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception ex) {
@@ -434,7 +433,7 @@ public class IngresoBean implements Serializable {
 			mensaje = "Se termino de eliminar una partida con carga completa";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch (InventarioException ex) {
-			log.warn(ex.getMessage());
+			log.warn("Error: {}", ex.getMessage(), ex);
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 		} catch (Exception ex) {
@@ -488,14 +487,14 @@ public class IngresoBean implements Serializable {
 					+ partida.getUnidadDeProductoCve().getUnidadDeManejoCve().getUnidadDeManejoDs()
 					+ " y un peso total de " + partida.getPesoTotal() + " kg";
 			log.info("Producto agregado a la tarima.");
-			bitacoraEvento = EventoBitacora.of(contextBitacora)
+			bitacoraEvento = Bitacora.of(contextBitacora)
 					.documento(documento)
 					.descripcion(descripcionEvento)
 					.build();
 			eventos.add(bitacoraEvento);
 			this.partida = EntradaBL.crearPartida(camara);
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			log.error("Problema para agregar la partida a la tarima...", ex);
 		}
@@ -519,7 +518,7 @@ public class IngresoBean implements Serializable {
 			descripcionEvento = "Eliminó el producto " + nombreProducto
 					+ " con " + cantidadTotal + " " + unidadProducto
 					+ " y " + pesoTotal + " Kg de la tarima " + nombreTarima;
-			bitacoraEvento = EventoBitacora.of(contextBitacora)
+			bitacoraEvento = Bitacora.of(contextBitacora)
 					.documento(documento)
 					.descripcion(descripcionEvento)
 					.build();
@@ -528,7 +527,7 @@ public class IngresoBean implements Serializable {
 		} catch (InventarioException e) {
 			log.error("Problema para eliminar la partida...", e);
 		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema para eliminar la partida...", ex);
 		}
@@ -659,7 +658,7 @@ public class IngresoBean implements Serializable {
 			descripcionEvento = "Agregó el servicio "
 					+ servicio.getServicio().getServicioNombre() + " para " + cantidadServicio + " "
 					+ servicio.getUnidad().getUnidadDeManejoDs();
-			bitacoraEvento = EventoBitacora.of(contextBitacora)
+			bitacoraEvento = Bitacora.of(contextBitacora)
 					.documento(documento)
 					.descripcion(descripcionEvento)
 					.build();
@@ -674,11 +673,8 @@ public class IngresoBean implements Serializable {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages");
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_WARN;
-			PrimeFaces.current().ajax().update("form:messages");
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema para agregar el servicio...", ex);
 			mensaje = ex.getMessage();
@@ -697,14 +693,14 @@ public class IngresoBean implements Serializable {
 			descripcionEvento = "Eliminó el servicio "
 					+ constanciaServicio.getServicioCve().getServicioDs() + " de la entrada";
 			EntradaBL.eliminarServicio(entrada, constanciaServicio);
-			bitacoraEvento = EventoBitacora.of(contextBitacora)
+			bitacoraEvento = Bitacora.of(contextBitacora)
 					.documento(documento)
 					.descripcion(descripcionEvento)
 					.build();
 			eventos.add(bitacoraEvento);
 			log.info("Servicio eliminado.");
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema para eliminar el servicio...", ex);
 		}
@@ -751,7 +747,7 @@ public class IngresoBean implements Serializable {
 
 			descripcionEvento = "Guardó la constancia de deposito";
 
-			bitacoraEvento = EventoBitacora.of(contextBitacora)
+			bitacoraEvento = Bitacora.of(contextBitacora)
 					.documento(documento)
 					.descripcion(descripcionEvento)
 					.build();
@@ -767,10 +763,8 @@ public class IngresoBean implements Serializable {
 			log.warn(ex.getMessage());
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
-		} catch (SystemException ex) {
-			log.warn(ex);
-			mensaje = ex.getMessage();
-			severity = FacesMessage.SEVERITY_WARN;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema para eliminar la tarima...");
 			mensaje = "Ocurrió un problema al eliminar la tarima.";
@@ -841,14 +835,14 @@ public class IngresoBean implements Serializable {
 					throw new ValidationException("La sección pasada por parametro, no existe");
 			}
 
-			bitacoraEvento = EventoBitacora.of(contextBitacora)
+			bitacoraEvento = Bitacora.of(contextBitacora)
 					.documento(documento)
 					.descripcion(descripcionEvento)
 					.build();
 
 			eventos.add(bitacoraEvento);
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		}
 	}
 
