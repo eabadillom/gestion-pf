@@ -271,6 +271,17 @@
 							<p:outputLabel>Observaciones</p:outputLabel>
 							<p:inputText value="#{facMantenimentoBean.seleccion.observacion}" disabled="#{facMantenimentoBean.seleccion.uuid ne null}" />
 						</div>
+						 <div class="p-col-12 p-md-2">
+                    <p:commandButton id="cmd-pdf" value="PDF" icon="pi pi-file-pdf" styleClass="mr-2 mb-2 ui-button-secondary" actionListener="#{facMantenimentoBean.descargarFacturaTimbrada('PDF')}" ajax="false" disabled="#{facMantenimentoBean.seleccion.uuid eq null}">
+                        <p:fileDownload value="#{facMantenimentoBean.factura}"></p:fileDownload>
+                    </p:commandButton>
+                </div>
+
+                <div class="p-col-12 p-md-2">
+                    <p:commandButton id="cmd-xml" value="XML" icon="pi pi-file" styleClass="mr-2 mb-2 ui-button-secondary" actionListener="#{facMantenimentoBean.descargarFacturaTimbrada('XML')}" ajax="false" disabled="#{facMantenimentoBean.seleccion.uuid eq null}">
+                        <p:fileDownload value="#{facMantenimentoBean.factura}"></p:fileDownload>
+                    </p:commandButton>
+                </div>
 					</div>
                                     </p:tab>
                                 </p:tabView>
