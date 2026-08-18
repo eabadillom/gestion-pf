@@ -25,11 +25,15 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.bitacoraimp.business.BitacoraBLImp;
+import mx.com.ferbo.bitacoraimp.enums.NombrePantalla;
+import mx.com.ferbo.bitacoraimp.enums.TipoPantalla;
 import mx.com.ferbo.dao.CamaraDAO;
 import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.ConstanciaTraspasoDAO;
@@ -72,6 +76,10 @@ import mx.com.ferbo.util.conexion;
 import net.sf.jasperreports.engine.JRException;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+
+import com.ferbo.bitacora.exception.BitacoraException;
+import com.ferbo.bitacora.model.Bitacora;
+import com.ferbo.bitacora.model.ContextoBitacora;
 
 @Named
 @ViewScoped
@@ -144,7 +152,18 @@ public class AltaTraspasoBean implements Serializable {
 	private boolean isSaved = false;
 	private boolean habilitareporte = false;
         
-        private StreamedContent file;
+    private StreamedContent file;
+	
+	private String idSesion = "";
+	private String descripcionEvento = "";
+
+	@Inject
+	private BitacoraBLImp bitacoraBL;
+
+	private Bitacora eventoBitacora;
+	private List<Bitacora> eventos;
+	private ContextoBitacora contextBitacora;
+	private String documento = "";
 
 	public AltaTraspasoBean() {
 		log.debug("Entrando al constructor del controller...");
@@ -201,6 +220,21 @@ public class AltaTraspasoBean implements Serializable {
 			listadoPlantas = plantaDAO.findall(false);
 		}
 		plantaSelect = listadoPlantas.get(0);
+
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
+				.getExternalContext()
+				.getSession(false);
+
+		eventos = new ArrayList<>();
+		idSesion = session.getId();
+		Integer idUsuario = usuario.getId();
+		String nombreUsuario = usuario.getNombre() + " " + usuario.getApellido1() + " " + usuario.getApellido2();
+		try {
+			contextBitacora = ContextoBitacora.of(idSesion, idUsuario, nombreUsuario, NombrePantalla.CONSTANCIA_DE_TRASPASO.toString(),
+				TipoPantalla.ALTA.toString());
+		} catch (BitacoraException ex) {
+			log.error("{}: {}", ex.getCode(), ex.getMessage(), ex);
+		}
 
 	}
 
@@ -279,8 +313,16 @@ public class AltaTraspasoBean implements Serializable {
 				log.debug(ps.getServicio().getServicioDs());
 				log.debug(ps.getUnidad().getUnidadDeManejoDs());
 			}
+
+			documento = numero;
+			descripcionEvento = "Creó la constancia de traspaso";
+			log.info(descripcionEvento);
+			bitacoraBL.agregarORemplazarSiExiste(eventos, contextBitacora, descripcionEvento, documento);
 			message = "Agregue los servicios requeridos.";
+
 			severity = FacesMessage.SEVERITY_INFO;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
 			message = ex.getMessage();
@@ -367,9 +409,30 @@ public class AltaTraspasoBean implements Serializable {
 				throw new InventarioException("El producto ya se encuentra en la lista de traspaso.");
 			}
 
+			descripcionEvento = "Añadió " + selectedInventario.getCantidad() + " " + selectedInventario.getUnidadManejo().getUnidadDeManejoDs() 
+				+ " ("+ selectedInventario.getPeso() +" kg) de " + selectedInventario.getProducto().getProductoDs() 
+				+ " (" + selectedInventario.getFolioCliente() + ") desde la posición " 
+				+ ((selectedInventario.getPosicion() == null) ? "sin definir" : selectedInventario.getPosicion().getDescPosicion()) + " de " 
+				+ selectedInventario.getCamara().getCamaraDs() + " (" + selectedInventario.getPlanta().getPlantaDs() + ") hacia la posición " 
+				+ ((selectedInventario.getPosicionDestino() == null) ? "sin definir" : selectedInventario.getPosicionDestino().getDescPosicion())+ " de " 
+				+ selectedInventario.getCamaraDestino().getCamaraDs() 
+				+ " (" + selectedInventario.getPlantaDestino().getPlantaDs() + ")";
+			
+					
+			log.info(descripcionEvento);
+
+			eventoBitacora = Bitacora.of(contextBitacora)
+									 .descripcion(descripcionEvento)
+									 .documento(documento)
+									 .build();
+
+			eventos.add(eventoBitacora);
+
 			destino.add(selectedInventario);
 			PrimeFaces.current().executeScript("PF('dialogCliente').hide()");
 			
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -419,9 +482,24 @@ public class AltaTraspasoBean implements Serializable {
 			servicio.setServicio(precioServicio.getServicio().getServicioDs());
 			servicio.setPrecio(precioServicio.getPrecio());
 			servicio.setSubtotal(this.cantidadServicio.multiply(precioServicio.getPrecio()));
+                        
+            descripcionEvento = "Añadio el servicio " + precioServicio.getServicio().getServicioDs() + " para " 
+								+ cantidadServicio + " " + precioServicio.getUnidad().getUnidadDeManejoDs();
+            
+			log.info(descripcionEvento);
+
+			eventoBitacora = Bitacora.of(contextBitacora)
+									 .descripcion(descripcionEvento)
+									 .documento(documento)
+									 .build();
+
+			eventos.add(eventoBitacora);
+			
 			alServiciosDetalle.add(servicio);
 			message = "Servicio agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los servicios...", ex);
 			message = ex.getMessage();
@@ -526,9 +604,23 @@ public class AltaTraspasoBean implements Serializable {
 
 			this.isSaved = true;
 			this.habilitareporte = true;
+                        descripcionEvento = "Guardo la constancia de traspaso correctamente";
+                        log.info(descripcionEvento);
+			eventoBitacora = Bitacora.of(contextBitacora)
+									 .descripcion(descripcionEvento)
+									 .documento(documento)
+									 .build();
+
+			eventos.add(eventoBitacora);
+
+			bitacoraBL.registrarEnBitacora(eventos);
+            
+			bitacoraBL.limpiarEventos(eventos);
 			message = String.format("Constancia guardada correctamente con el folio %s", this.numero);
 			severity = FacesMessage.SEVERITY_INFO;
 
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -621,10 +713,54 @@ public class AltaTraspasoBean implements Serializable {
 
 	public void deleteServicio(TraspasoServicio servicio) {
 		this.alServiciosDetalle.remove(servicio);
+                descripcionEvento = "Elimino " + servicio.getServicio() + " con cantidad de " + servicio.getCantidad(); 
+		log.info(descripcionEvento);
+
+		try {
+
+			eventoBitacora = Bitacora.of(contextBitacora)
+									 .descripcion(descripcionEvento)
+									 .documento(documento)
+									 .build();
+
+			eventos.add(eventoBitacora);
+
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
+		} 
 	}
 
 	public void deletePartida(InventarioDetalle partida) {
 		this.destino.remove(partida);
+        descripcionEvento = "Eliminó " + partida.getCantidad() + " " + partida.getUnidadManejo().getUnidadDeManejoDs() 
+							+ " de " + partida.getProducto().getProductoDs() + " de la constancia de traspaso";
+		log.info(descripcionEvento);
+
+		try {
+
+			eventoBitacora = Bitacora.of(contextBitacora)
+									 .descripcion(descripcionEvento)
+									 .documento(documento)
+									 .build();
+
+			eventos.add(eventoBitacora);
+			
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
+		} 
+
+	}
+
+	public void modificacionObservaciones() {
+		descripcionEvento = "Modifico las observaciones a: " + observaciones;
+		log.info(descripcionEvento);
+
+		eventoBitacora = Bitacora.of(contextBitacora)
+									 .descripcion(descripcionEvento)
+									 .documento(documento)
+									 .build();
+
+		eventos.add(eventoBitacora);
 	}
 
 	public Cliente getSelCliente() {

@@ -20,7 +20,7 @@
 		<class>mx.com.ferbo.model.Cheque</class>
 		<class>mx.com.ferbo.model.Perfil</class>
 		<class>mx.com.ferbo.model.ServicioFactura</class>
-		<class>mx.com.ferbo.model.Bitacora</class>
+		<class>com.ferbo.bitacora.model.Bitacora</class>
 		<class>mx.com.ferbo.model.SerieFactura</class>
 		<class>mx.com.ferbo.model.UdCobro</class>
 		<class>mx.com.ferbo.model.Aviso</class>
