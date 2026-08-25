@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+        <p:panel id="pnl-datos-generales" header="Datos generales">
+            <div class="p-grid ui-fluid">
+                
+                <div class="p-col-6 p-md-2">
+                    <p:outputLabel for="clientes" value="Cliente:" style="width:100%"/>
+                    <p:selectOneMenu
+                        id="clientes"
+                        value="#{consultaOrdenSalidaBean.clienteSelected}"
+                        converter="entityConverter"
+                        filter="true"
+                        filterMatchMode="contains"
+                        style="width:100%">
+
+                        <f:selectItem itemLabel="Seleccione un cliente" itemValue="#{null}"/>
+                        
+                        <f:selectItems
+                            value="#{consultaOrdenSalidaBean.lstClientes}"
+                            var="cliente"
+                            itemLabel="#{cliente.nombre}"
+                            itemValue="#{cliente}"/>
+
+                        <p:ajax process="@this" event="change" />
+                        
+                    </p:selectOneMenu>
+                </div>
+                
+                <div class="p-col-6 p-md-2">
+                    <p:outputLabel for="fechaInicio" value="Del" />
+                    <p:datePicker id="fechaInicio" showIcon="true" required="true" value="#{consultaOrdenSalidaBean.fechaInicio}"
+                                  pattern="dd/MM/yyyy" locale="es" >
+                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                    </p:datePicker>
+                </div>
+                <div class="p-col-6 p-md-2">
+                    <p:outputLabel for="fechaFin" value="al" />
+                    <p:datePicker id="fechaFin" showIcon="true" required="true" value="#{consultaOrdenSalidaBean.fechaFin}"
+                                  pattern="dd/MM/yyyy" locale="es" >
+                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                    </p:datePicker>
+                </div>
+                <div class="p-col-4 p-md-2">
+                    <p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                    <p:commandButton value="Buscar" icon="pi pi-search" process="@this"
+                                     actionListener="#{consultaOrdenSalidaBean.consultarSalidas()}" update="dt-salidas"
+                        onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+                </div>
+            </div>
+        </p:panel>
+</ui:composition>
