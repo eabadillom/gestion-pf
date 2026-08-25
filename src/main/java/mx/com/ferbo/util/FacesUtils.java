@@ -11,6 +11,7 @@ import org.primefaces.model.StreamedContent;
 
 import com.ferbo.tools.exception.ToolException;
 
+
 /**
  *
  * @author alberto
@@ -62,7 +63,7 @@ public final class FacesUtils {
         return file;
     }
 
-     public static StreamedContent crearStreamedContentDesdeBytes(
+    public static StreamedContent crearStreamedContentDesdeBytes(
             byte[] bytes, String nombreArchivo, String extension) throws ToolException {
 
         extension = extension.trim().toLowerCase();

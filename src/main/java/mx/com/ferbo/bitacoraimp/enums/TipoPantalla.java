@@ -1,4 +1,4 @@
-package mx.com.ferbo.bitacora.enums;
+package mx.com.ferbo.bitacoraimp.enums;
 
 public enum TipoPantalla {
 
