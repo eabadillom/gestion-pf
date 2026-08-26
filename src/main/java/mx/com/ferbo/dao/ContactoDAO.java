@@ -87,10 +87,10 @@ public class ContactoDAO extends IBaseDAO<Contacto, Integer> {
 			em.persist(contacto);
 			em.getTransaction().commit();
 
-			clienteContacto.setIdCliente(cliente);
-			clienteContacto.setIdContacto(contacto);
+			clienteContacto.setCliente(cliente);
+			clienteContacto.setContacto(contacto);
 			clienteContacto.setFhAlta(new Date());
-			clienteContacto.setStHabilitado(true);
+			clienteContacto.setHabilitado(true);
 			clienteContacto.setStUsuario("A");
 			error = clienteContactoDAO.guardar(clienteContacto) == null ? null : "ERROR";
 		} catch (Exception e) {

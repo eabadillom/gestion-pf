@@ -20,7 +20,7 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.utils.IOUtil;
 
@@ -97,7 +97,7 @@ public class SendMailTicketSalida {
 		cliente = clienteDAO.buscarPorId(idCliente, true);  	
     	List<ClienteContacto> clienteContactoList = cliente.getClienteContactoList();
     	for(ClienteContacto cteContacto : clienteContactoList) {
-    		Contacto contacto = cteContacto.getIdContacto();
+    		Contacto contacto = cteContacto.getContacto();
     		
     		if(cteContacto.getRecibeInventario() == false) {
     			continue;
@@ -107,11 +107,11 @@ public class SendMailTicketSalida {
 	}
 	
 	private void processMail(Contacto contacto) {
-		List<MedioCnt> medioCntList = contacto.getMedioCntList();
-		for(MedioCnt medioCnt : medioCntList) {
-			Mail mail = medioCnt.getIdMail();
-			String nombreBuzon = String.format("%s, %s, %s", contacto.getNbNombre(), contacto.getNbApellido1(), contacto.getNbApellido2());
-            Correo correo = new Correo(mail.getNbMail(), nombreBuzon);
+		List<MedioContacto> medioCntList = contacto.getMediosContacto();
+		for(MedioContacto medioCnt : medioCntList) {
+			Mail mail = medioCnt.getMail();
+			String nombreBuzon = String.format("%s, %s, %s", contacto.getNombre(), contacto.getApellido1(), contacto.getApellido2());
+            Correo correo = new Correo(mail.getDescripcion(), nombreBuzon);
             alTo.add(correo);
 		}
 	}

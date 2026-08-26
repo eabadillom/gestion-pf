@@ -31,7 +31,7 @@
 		<class>mx.com.ferbo.model.Telefono</class>
 		<class>mx.com.ferbo.model.Paises</class>
 		<class>mx.com.ferbo.model.TipoTelefono</class>
-		<class>mx.com.ferbo.model.MedioCnt</class>
+		<class>mx.com.ferbo.model.MedioContacto</class>
 		<class>mx.com.ferbo.model.Municipios</class>
 		<class>mx.com.ferbo.model.LogSeguridad</class>
 		<class>mx.com.ferbo.model.ProductoConstancia</class>

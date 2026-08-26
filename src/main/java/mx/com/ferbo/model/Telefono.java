@@ -6,7 +6,6 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -17,100 +16,47 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "telefono")
-@NamedQueries({
-        @NamedQuery(name = "Telefono.findAll", query = "SELECT t FROM Telefono t"),
-        @NamedQuery(name = "Telefono.findByIdTelefono", query = "SELECT t FROM Telefono t WHERE t.idTelefono = :idTelefono"),
-        @NamedQuery(name = "Telefono.findByNbTelefono", query = "SELECT t FROM Telefono t WHERE t.nbTelefono = :nbTelefono"),
-        @NamedQuery(name = "Telefono.findByStPrincipal", query = "SELECT t FROM Telefono t WHERE t.stPrincipal = :stPrincipal") })
+@NamedQuery(name = "Telefono.findAll", query = "SELECT t FROM Telefono t")
+@NamedQuery(name = "Telefono.findByIdTelefono", query = "SELECT t FROM Telefono t WHERE t.id = :idTelefono")
+@NamedQuery(name = "Telefono.findByNbTelefono", query = "SELECT t FROM Telefono t WHERE t.descripcion = :nbTelefono")
+@NamedQuery(name = "Telefono.findByStPrincipal", query = "SELECT t FROM Telefono t WHERE t.principal = :stPrincipal")
 public class Telefono implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_telefono")
-    private Integer idTelefono;
+    private Integer id;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 16)
     @Column(name = "nb_telefono")
-    private String nbTelefono;
+    private String descripcion;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "st_principal")
-    private boolean stPrincipal;
+    private boolean principal;
+    
     @JoinColumn(name = "tp_telefono", referencedColumnName = "tp_telefono")
     @ManyToOne(optional = false)
-    private TipoTelefono tpTelefono;
-    @OneToMany(mappedBy = "idTelefono")
-    private List<MedioCnt> medioCntList;
-
-    public Telefono() {
-    }
-
-    public Telefono(Integer idTelefono) {
-        this.idTelefono = idTelefono;
-    }
-
-    public Telefono(Integer idTelefono, String nbTelefono, boolean stPrincipal) {
-        this.idTelefono = idTelefono;
-        this.nbTelefono = nbTelefono;
-        this.stPrincipal = stPrincipal;
-    }
-
-    public Integer getIdTelefono() {
-        return idTelefono;
-    }
-
-    public void setIdTelefono(Integer idTelefono) {
-        this.idTelefono = idTelefono;
-    }
-
-    public String getNbTelefono() {
-        return nbTelefono;
-    }
-
-    public void setNbTelefono(String nbTelefono) {
-        this.nbTelefono = nbTelefono;
-    }
-
-    public boolean getStPrincipal() {
-        return stPrincipal;
-    }
-
-    public void setStPrincipal(boolean stPrincipal) {
-        this.stPrincipal = stPrincipal;
-    }
-
-    public TipoTelefono getTpTelefono() {
-        return tpTelefono;
-    }
-
-    public void setTpTelefono(TipoTelefono tpTelefono) {
-        this.tpTelefono = tpTelefono;
-    }
-
-    public List<MedioCnt> getMedioCntList() {
-        return medioCntList;
-    }
-
-    public void setMedioCntList(List<MedioCnt> medioCntList) {
-        this.medioCntList = medioCntList;
-    }
-
+    private TipoTelefono tipoTelefono;
+    
+//    @OneToMany(mappedBy = "telefono")
+//    private List<MedioContacto> mediosContacto;
+//    @OneToOne(optional = true)
+//    private MedioContacto medioContacto;
+    
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -119,8 +65,8 @@ public class Telefono implements Serializable {
             return false;
         Telefono that = (Telefono) o;
 
-        if (this.idTelefono != null && that.idTelefono != null) {
-            return Objects.equals(this.idTelefono, that.idTelefono);
+        if (this.id != null && that.id != null) {
+            return Objects.equals(this.id, that.id);
         } else {
             return this == that;
         }
@@ -128,12 +74,73 @@ public class Telefono implements Serializable {
 
     @Override
     public int hashCode() {
-        return (idTelefono != null) ? idTelefono.hashCode() : System.identityHashCode(this);
+        return (id != null) ? id.hashCode() : System.identityHashCode(this);
     }
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.Telefono[ idTelefono=" + idTelefono + " ]";
+        return "mx.com.ferbo.model.Telefono[ idTelefono=" + id + " ]";
     }
+
+    public Telefono() {
+    }
+
+    public Telefono(Integer idTelefono) {
+        this.id = idTelefono;
+    }
+
+    public Telefono(Integer id, String descripcion, boolean principal) {
+        this.id = id;
+        this.descripcion = descripcion;
+        this.principal = principal;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public boolean getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(boolean principal) {
+        this.principal = principal;
+    }
+
+    public TipoTelefono getTipoTelefono() {
+        return tipoTelefono;
+    }
+
+    public void setTipoTelefono(TipoTelefono tipoTelefono) {
+        this.tipoTelefono = tipoTelefono;
+    }
+
+//    public List<MedioContacto> getMediosContacto() {
+//        return mediosContacto;
+//    }
+//
+//    public void setMedioContacto(List<MedioContacto> mediosContacto) {
+//        this.mediosContacto = mediosContacto;
+//    }
+    
+//	public MedioContacto getMedioContacto() {
+//		return medioContacto;
+//	}
+//
+//	public void setMedioContacto(MedioContacto medioContacto) {
+//		this.medioContacto = medioContacto;
+//	}
 
 }

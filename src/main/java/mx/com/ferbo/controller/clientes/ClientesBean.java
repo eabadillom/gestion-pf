@@ -4,44 +4,26 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
-
-import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.exception.ValidationException;
 
-import mx.com.ferbo.model.Aviso;
-import mx.com.ferbo.model.Categoria;
-import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.Planta;
-import mx.com.ferbo.model.PrecioServicio;
-import mx.com.ferbo.util.InventarioException;
-import mx.com.ferbo.model.MedioPago;
-import mx.com.ferbo.model.MetodoPago;
-import mx.com.ferbo.model.RegimenFiscal;
-import mx.com.ferbo.model.UsoCfdi;
-import mx.com.ferbo.model.Usuario;
-import mx.com.ferbo.pagos.businesslogic.FormaPagoBL;
-import mx.com.ferbo.pagos.businesslogic.MetodoPagoBL;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import mx.com.ferbo.model.Servicio;
-import mx.com.ferbo.model.UnidadDeManejo;
 import mx.com.ferbo.business.almacen.PlantaBL;
+import mx.com.ferbo.business.clientes.ContactoBL;
 import mx.com.ferbo.business.n.AvisoBL;
 import mx.com.ferbo.business.n.CategoriaBL;
 import mx.com.ferbo.business.n.ClienteBL;
@@ -56,15 +38,31 @@ import mx.com.ferbo.business.n.UnidadManejoBL;
 import mx.com.ferbo.controller.SideBarBean;
 import mx.com.ferbo.dao.n.AsentamientoHumanoDAO;
 import mx.com.ferbo.model.AsentamientoHumano;
+import mx.com.ferbo.model.Aviso;
+import mx.com.ferbo.model.Categoria;
+import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Domicilios;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
+import mx.com.ferbo.model.MedioPago;
+import mx.com.ferbo.model.MetodoPago;
+import mx.com.ferbo.model.Planta;
+import mx.com.ferbo.model.PrecioServicio;
+import mx.com.ferbo.model.RegimenFiscal;
+import mx.com.ferbo.model.Servicio;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.model.TipoTelefono;
 import mx.com.ferbo.model.TiposDomicilio;
+import mx.com.ferbo.model.UnidadDeManejo;
+import mx.com.ferbo.model.UsoCfdi;
+import mx.com.ferbo.model.Usuario;
+import mx.com.ferbo.pagos.businesslogic.FormaPagoBL;
+import mx.com.ferbo.pagos.businesslogic.MetodoPagoBL;
+import mx.com.ferbo.ui.ContactoUI;
 import mx.com.ferbo.util.FacesUtils;
+import mx.com.ferbo.util.InventarioException;
 
 @Named
 @ViewScoped
@@ -103,12 +101,14 @@ public class ClientesBean implements Serializable {
 
     // Objetos para contactos
     @Inject
-    ClienteContactoBL contactoBL;
+    ClienteContactoBL clienteContactoBL;
+    @Inject
+    ContactoBL contactoBL;
 
     private ClienteContacto clienteContactoSelected;
     private Contacto contactoSelected;
     private Boolean editandoContacto;
-    private MedioCnt medioCntSelected;
+    private MedioContacto medioCntSelected;
     private List<TipoMail> lstTipoMail;
     private List<TipoTelefono> lstTipoTelefono;
 
@@ -544,16 +544,22 @@ public class ClientesBean implements Serializable {
     }
 
     // Metodos exclusivos para contactos
+    public List<Contacto> buscarContactos(String query) {
+    	List<Contacto> listaContactos = null;
+    	
+    	return listaContactos;
+    }
+    
     public void nuevoClienteContacto() {
         log.info("El usuario {} ha creado un nuevo contacto para el cliente {}", usuario.getUsuario(),
                 clienteSelected.getNombre());
-        this.clienteContactoSelected = contactoBL.nuevoClienteContacto();
+        this.clienteContactoSelected = clienteContactoBL.nuevoClienteContacto();
     }
 
     public void nuevoMedioContacto() {
         log.info("El usuario {} ha creado un nuevo medio de contacto para el contacto {} {}", usuario.getUsuario(),
-                clienteContactoSelected.getIdContacto().getNbNombre(),
-                clienteContactoSelected.getIdContacto().getNbApellido1());
+                clienteContactoSelected.getContacto().getNombre(),
+                clienteContactoSelected.getContacto().getApellido1());
         this.medioCntSelected = medioContactoBL.nuevoMedio();
     }
 
@@ -567,23 +573,23 @@ public class ClientesBean implements Serializable {
 
                 case "agregarcontacto":
                     verificarAgregadoOActualizado(clienteContactoSelected.getId());
-                    contactoBL.agregarOActualizarContacto(this.clienteSelected, this.clienteContactoSelected);
+                    clienteContactoBL.agregarOActualizarContacto(this.clienteSelected, this.clienteContactoSelected);
                     mensaje = "Contacto " + agregadoOActualizado + " exitosamente";
                     break;
 
                 case "agregarmedio":
-                    verificarAgregadoOActualizado(medioCntSelected.getIdMedio());
-                    contactoBL.agregarOActualizarMedioContacto(this.clienteContactoSelected, this.medioCntSelected);
+                    verificarAgregadoOActualizado(medioCntSelected.getId());
+                    clienteContactoBL.agregarOActualizarMedioContacto(this.clienteContactoSelected, this.medioCntSelected);
                     mensaje = "Medio de contacto " + agregadoOActualizado + " exitosamente";
                     break;
 
                 case "eliminarmedio":
-                    contactoBL.eliminarMedioContacto(this.clienteContactoSelected, this.medioCntSelected);
+                    clienteContactoBL.eliminarMedioContacto(this.clienteContactoSelected, this.medioCntSelected);
                     mensaje = "Medio de contacto eliminado exitosamente";
                     break;
 
                 case "eliminarcontacto":
-                    contactoBL.eliminarContacto(this.clienteSelected, this.clienteContactoSelected);
+                    clienteContactoBL.eliminarContacto(this.clienteSelected, this.clienteContactoSelected);
                     mensaje = "Contacto eliminado exitosamente";
                     break;
 
@@ -607,6 +613,28 @@ public class ClientesBean implements Serializable {
         } finally {
             PrimeFaces.current().ajax().update("form:messages");
         }
+    }
+    
+    public List<ContactoUI> sugerenciaContactos(String query) {
+    	List<Contacto> contactos;
+    	List<ContactoUI> dtoList = new ArrayList<ContactoUI>();
+    	try {
+    		contactos = contactoBL.buscar(query);
+    		contactos.stream().forEach(c ->  {
+    			ContactoUI dto = new ContactoUI(c);
+    			dto.setCadena(String.format("%s %s %s", c.getNombre(), c.getApellido1(), c.getApellido2()));
+    			dtoList.add(dto);
+    			});
+    		
+    	} catch(InventarioException ex) {
+    		log.warn("Problema para encontrar resultados con {}", query);
+    	}
+    	
+    	return dtoList;
+    }
+    
+    public void asignarContacto() {
+    	this.clienteContactoSelected.setContacto(this.contactoSelected);
     }
 
     public void seleccionarMedioContacto() {
@@ -1000,11 +1028,11 @@ public class ClientesBean implements Serializable {
         this.editandoContacto = editandoContacto;
     }
 
-    public MedioCnt getMedioCntSelected() {
+    public MedioContacto getMedioCntSelected() {
         return medioCntSelected;
     }
 
-    public void setMedioCntSelected(MedioCnt medioCntSelected) {
+    public void setMedioCntSelected(MedioContacto medioCntSelected) {
         this.medioCntSelected = medioCntSelected;
     }
 

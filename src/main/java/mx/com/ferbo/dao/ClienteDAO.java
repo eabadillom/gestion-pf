@@ -14,7 +14,7 @@ import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.ProductoPorCliente;
 import mx.com.ferbo.model.SerieConstancia;
@@ -84,20 +84,20 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			
 			for(ClienteContacto clienteContacto : clienteContactoList) {
 				
-				Contacto contacto = clienteContacto.getIdContacto();
+				Contacto contacto = clienteContacto.getContacto();
 
-				List<MedioCnt> medioCntList = contacto.getMedioCntList();
+				List<MedioContacto> medioCntList = contacto.getMediosContacto();
 
-				for (MedioCnt medioContacto : medioCntList) {
+				for (MedioContacto medioContacto : medioCntList) {
 
-					Mail idMail = medioContacto.getIdMail();
-					Telefono idTelefono = medioContacto.getIdTelefono();
+					Mail idMail = medioContacto.getMail();
+					Telefono idTelefono = medioContacto.getTelefono();
 
 					if (idMail != null)
-						idMail.getTpMail().getNbTipo();
+						idMail.getTipoMail().getNbTipo();
 
 					if (idTelefono != null)
-						idTelefono.getTpTelefono().getNbTelefono();
+						idTelefono.getTipoTelefono().getNombre();
 
 				}
 			}
@@ -159,19 +159,19 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 
 				for (ClienteContacto clienteContacto : clienteContactoList) {
 
-					Contacto contacto = clienteContacto.getIdContacto();
-					List<MedioCnt> medioCntList = contacto.getMedioCntList();
+					Contacto contacto = clienteContacto.getContacto();
+					List<MedioContacto> medioCntList = contacto.getMediosContacto();
 
-					for (MedioCnt medioContacto : medioCntList) {
+					for (MedioContacto medioContacto : medioCntList) {
 
-						Mail idMail = medioContacto.getIdMail();
-						Telefono idTelefono = medioContacto.getIdTelefono();
+						Mail idMail = medioContacto.getMail();
+						Telefono idTelefono = medioContacto.getTelefono();
 
 						if (idMail != null)
-							log.debug(idMail.getTpMail().getNbTipo());
+							log.debug(idMail.getTipoMail().getNbTipo());
 
 						if (idTelefono != null)
-							log.debug(idTelefono.getTpTelefono().getNbTelefono());
+							log.debug(idTelefono.getTipoTelefono().getNombre());
 					}
 				}
 
@@ -241,19 +241,19 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 
 				for (ClienteContacto clienteContacto : clienteContactoList) {
 
-					Contacto contacto = clienteContacto.getIdContacto();
-					List<MedioCnt> medioCntList = contacto.getMedioCntList();
+					Contacto contacto = clienteContacto.getContacto();
+					List<MedioContacto> medioCntList = contacto.getMediosContacto();
 
-					for (MedioCnt medioContacto : medioCntList) {
+					for (MedioContacto medioContacto : medioCntList) {
 
-						Mail idMail = medioContacto.getIdMail();
-						Telefono idTelefono = medioContacto.getIdTelefono();
+						Mail idMail = medioContacto.getMail();
+						Telefono idTelefono = medioContacto.getTelefono();
 
 						if (idMail != null)
-							log.debug(idMail.getTpMail().getNbTipo());
+							log.debug(idMail.getTipoMail().getNbTipo());
 
 						if (idTelefono != null)
-							log.debug(idTelefono.getTpTelefono().getNbTelefono());
+							log.debug(idTelefono.getTipoTelefono().getNombre());
 					}
 				}
 			}
@@ -356,19 +356,19 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 			em.getTransaction().begin();
 
 			for (ClienteContacto ct : cliente.getClienteContactoList()) {
-				for (MedioCnt medio : ct.getIdContacto().getMedioCntList()) {
+				for (MedioContacto medio : ct.getContacto().getMediosContacto()) {
 //					em.remove(em.merge(medio));
 					em.createQuery("DELETE MedioCnt m WHERE m.idMedio =:idMedio")
-							.setParameter("idMedio", medio.getIdMedio()).executeUpdate();
-					if (medio.getIdTelefono() != null) {
+							.setParameter("idMedio", medio.getId()).executeUpdate();
+					if (medio.getTelefono() != null) {
 //						em.remove(em.merge(medio.getIdTelefono()));
 						em.createQuery("DELETE FROM Telefono t WHERE t.idTelefono = :idTel")
-								.setParameter("idTel", medio.getIdTelefono().getIdTelefono()).executeUpdate();
+								.setParameter("idTel", medio.getTelefono().getId()).executeUpdate();
 					}
-					if (medio.getIdMail() != null) {
+					if (medio.getMail() != null) {
 //						em.remove(em.merge(medio.getIdMail()));
 						em.createQuery("DELETE FROM Mail m WHERE m.idMail = :idMail")
-								.setParameter("idMail", medio.getIdMail().getIdMail()).executeUpdate();
+								.setParameter("idMail", medio.getMail().getIdMail()).executeUpdate();
 					}
 				}
 //				em.remove(em.merge(ct));
@@ -376,7 +376,7 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 				em.createQuery("DELETE FROM ClienteContacto ct WHERE ct.id = :clienteCon")
 						.setParameter("clienteCon", ct.getId()).executeUpdate();
 				em.createQuery("DELETE FROM Contacto con WHERE con.idContacto = :idCon")
-						.setParameter("idCon", ct.getIdContacto().getIdContacto()).executeUpdate();
+						.setParameter("idCon", ct.getContacto().getId()).executeUpdate();
 			}
 //			em.remove(em.merge(cliente));
 			em.createQuery("DELETE FROM Cliente cte WHERE cte.cteCve = :idCliente")
@@ -425,14 +425,14 @@ public class ClienteDAO extends IBaseDAO<Cliente, Integer> {
 
 			for (ClienteContacto ct : clienteContactoList) {
 				@SuppressWarnings("unused")
-				Contacto contacto = ct.getIdContacto();
-				List<MedioCnt> medioCntList = ct.getIdContacto().getMedioCntList();
+				Contacto contacto = ct.getContacto();
+				List<MedioContacto> medioCntList = ct.getContacto().getMediosContacto();
 
-				for (MedioCnt medio : medioCntList) {
+				for (MedioContacto medio : medioCntList) {
 					@SuppressWarnings("unused")
-					Telefono telefono = medio.getIdTelefono();
+					Telefono telefono = medio.getTelefono();
 					@SuppressWarnings("unused")
-					Mail mail = medio.getIdMail();
+					Mail mail = medio.getMail();
 				}
 			}
 			em.createQuery("DELETE FROM Cliente cte WHERE cte.cteCve = :idCliente")

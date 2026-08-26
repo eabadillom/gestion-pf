@@ -19,7 +19,7 @@ import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.ClienteDomicilios;
 import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.Mail;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.PrecioServicio;
 import mx.com.ferbo.model.StatusSalida;
@@ -91,21 +91,21 @@ public class ClienteDAO extends BaseDAO<Cliente, Integer> {
                 if (!clienteContactoList.isEmpty()) {
                     for (ClienteContacto clienteContacto : clienteContactoList) {
 
-                        Contacto contacto = clienteContacto.getIdContacto();
+                        Contacto contacto = clienteContacto.getContacto();
 
-                        List<MedioCnt> medioCntList = contacto.getMedioCntList();
+                        List<MedioContacto> medioCntList = contacto.getMediosContacto();
 
-                        for (MedioCnt medioContacto : medioCntList) {
+                        for (MedioContacto medioContacto : medioCntList) {
 
-                            Mail idMail = medioContacto.getIdMail();
-                            Telefono idTelefono = medioContacto.getIdTelefono();
+                            Mail mail = medioContacto.getMail();
+                            Telefono idTelefono = medioContacto.getTelefono();
 
-                            if (idMail != null) {
-                                idMail.getTpMail().getNbTipo();
+                            if (mail != null) {
+                                mail.getTipoMail().getNbTipo();
                             }
 
                             if (idTelefono != null) {
-                                idTelefono.getTpTelefono().getNbTelefono();
+                                idTelefono.getTipoTelefono().getNombre();
                             }
 
                         }

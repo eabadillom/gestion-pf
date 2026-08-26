@@ -6,6 +6,8 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,8 +26,8 @@ import javax.validation.constraints.Size;
 @Table(name = "tipo_telefono")
 @NamedQueries({
     @NamedQuery(name = "TipoTelefono.findAll", query = "SELECT t FROM TipoTelefono t"),
-    @NamedQuery(name = "TipoTelefono.findByTpTelefono", query = "SELECT t FROM TipoTelefono t WHERE t.tpTelefono = :tpTelefono"),
-    @NamedQuery(name = "TipoTelefono.findByNbTelefono", query = "SELECT t FROM TipoTelefono t WHERE t.nbTelefono = :nbTelefono")})
+    @NamedQuery(name = "TipoTelefono.findByTpTelefono", query = "SELECT t FROM TipoTelefono t WHERE t.clave = :tpTelefono"),
+    @NamedQuery(name = "TipoTelefono.findByNbTelefono", query = "SELECT t FROM TipoTelefono t WHERE t.nombre = :nbTelefono")})
 public class TipoTelefono implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,56 +35,27 @@ public class TipoTelefono implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "tp_telefono")
-    private Short tpTelefono;
+    private Short clave;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "nb_telefono")
-    private String nbTelefono;
-
-    public TipoTelefono() {
-    }
-
-    public TipoTelefono(Short tpTelefono) {
-        this.tpTelefono = tpTelefono;
-    }
-
-    public TipoTelefono(Short tpTelefono, String nbTelefono) {
-        this.tpTelefono = tpTelefono;
-        this.nbTelefono = nbTelefono;
-    }
-
-    public Short getTpTelefono() {
-        return tpTelefono;
-    }
-
-    public void setTpTelefono(Short tpTelefono) {
-        this.tpTelefono = tpTelefono;
-    }
-
-    public String getNbTelefono() {
-        return nbTelefono;
-    }
-
-    public void setNbTelefono(String nbTelefono) {
-        this.nbTelefono = nbTelefono;
-    }
-
+    private String nombre;
+    
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (tpTelefono != null ? tpTelefono.hashCode() : 0);
-        return hash;
+    	if(this.clave == null)
+    		return System.identityHashCode(this);
+    	return Objects.hash(this.clave);
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof TipoTelefono)) {
             return false;
         }
         TipoTelefono other = (TipoTelefono) object;
-        if ((this.tpTelefono == null && other.tpTelefono != null) || (this.tpTelefono != null && !this.tpTelefono.equals(other.tpTelefono))) {
+        if ((this.clave == null && other.clave != null) || (this.clave != null && !this.clave.equals(other.clave))) {
             return false;
         }
         return true;
@@ -90,7 +63,34 @@ public class TipoTelefono implements Serializable {
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.TipoTelefono[ tpTelefono=" + tpTelefono + " ]";
+        return "mx.com.ferbo.model.TipoTelefono[ tpTelefono=" + clave + " ]";
     }
-    
+
+    public TipoTelefono() {
+    }
+
+    public TipoTelefono(Short clave) {
+        this.clave = clave;
+    }
+
+    public TipoTelefono(Short clave, String nombre) {
+        this.clave = clave;
+        this.nombre = nombre;
+    }
+
+    public Short getClave() {
+        return clave;
+    }
+
+    public void setClave(Short clave) {
+        this.clave = clave;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 }

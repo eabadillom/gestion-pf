@@ -6,11 +6,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,24 +16,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 @Entity
 @Table(name = "mail")
-@NamedQueries({
-        @NamedQuery(name = "Mail.findAll", query = "SELECT m FROM Mail m"),
-        @NamedQuery(name = "Mail.findByIdMail", query = "SELECT m FROM Mail m WHERE m.idMail = :idMail"),
-        @NamedQuery(name = "Mail.findByNbMail", query = "SELECT m FROM Mail m WHERE m.nbMail = :nbMail"),
-        @NamedQuery(name = "Mail.findByStPrincipal", query = "SELECT m FROM Mail m WHERE m.stPrincipal = :stPrincipal") })
+@NamedQuery(name = "Mail.findAll", query = "SELECT m FROM Mail m")
+@NamedQuery(name = "Mail.findByIdMail", query = "SELECT m FROM Mail m WHERE m.id = :idMail")
+@NamedQuery(name = "Mail.findByNbMail", query = "SELECT m FROM Mail m WHERE m.descripcion = :nbMail")
+@NamedQuery(name = "Mail.findByStPrincipal", query = "SELECT m FROM Mail m WHERE m.principal = :stPrincipal")
 public class Mail implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -44,79 +36,28 @@ public class Mail implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_mail")
-    private Integer idMail;
+    private Integer id;
 
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "nb_mail")
-    private String nbMail;
+    private String descripcion;
 
     @Basic(optional = false)
     @NotNull
     @Column(name = "st_principal")
-    private boolean stPrincipal;
+    private boolean principal;
 
     @JoinColumn(name = "tp_mail", referencedColumnName = "tp_mail")
     @ManyToOne(optional = false)
-    private TipoMail tpMail;
+    private TipoMail tipoMail;
 
-    @OneToMany(mappedBy = "idMail", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MedioCnt> medioCntList;
-
-    public Mail() {
-    }
-
-    public Mail(Integer idMail) {
-        this.idMail = idMail;
-    }
-
-    public Mail(Integer idMail, String nbMail, boolean stPrincipal) {
-        this.idMail = idMail;
-        this.nbMail = nbMail;
-        this.stPrincipal = stPrincipal;
-    }
-
-    public Integer getIdMail() {
-        return idMail;
-    }
-
-    public void setIdMail(Integer idMail) {
-        this.idMail = idMail;
-    }
-
-    public String getNbMail() {
-        return nbMail;
-    }
-
-    public void setNbMail(String nbMail) {
-        this.nbMail = nbMail;
-    }
-
-    public boolean getStPrincipal() {
-        return stPrincipal;
-    }
-
-    public void setStPrincipal(boolean stPrincipal) {
-        this.stPrincipal = stPrincipal;
-    }
-
-    public TipoMail getTpMail() {
-        return tpMail;
-    }
-
-    public void setTpMail(TipoMail tpMail) {
-        this.tpMail = tpMail;
-    }
-
-    public List<MedioCnt> getMedioCntList() {
-        return medioCntList;
-    }
-
-    public void setMedioCntList(List<MedioCnt> medioCntList) {
-        this.medioCntList = medioCntList;
-    }
-
+    //@OneToOne(mappedBy = "mail", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<MedioContacto> mediosContacto;
+//    @OneToOne(optional = true)
+//    private MedioContacto medioContacto;
+    
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -125,8 +66,8 @@ public class Mail implements Serializable {
             return false;
         Mail that = (Mail) o;
 
-        if (this.idMail != null && that.idMail != null) {
-            return Objects.equals(this.idMail, that.idMail);
+        if (this.id != null && that.id != null) {
+            return Objects.equals(this.id, that.id);
         } else {
             return this == that;
         }
@@ -134,12 +75,72 @@ public class Mail implements Serializable {
 
     @Override
     public int hashCode() {
-        return (idMail != null) ? idMail.hashCode() : System.identityHashCode(this);
+        return (id != null) ? id.hashCode() : System.identityHashCode(this);
     }
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.Mail[ idMail=" + idMail + " ]";
+        return "mx.com.ferbo.model.Mail[ idMail=" + id + " ]";
     }
 
+    public Mail() {
+    }
+
+    public Mail(Integer id) {
+        this.id = id;
+    }
+
+    public Mail(Integer id, String descripcion, boolean principal) {
+        this.id = id;
+        this.descripcion = descripcion;
+        this.principal = principal;
+    }
+
+    public Integer getIdMail() {
+        return id;
+    }
+
+    public void setIdMail(Integer idMail) {
+        this.id = idMail;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public boolean getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(boolean principal) {
+        this.principal = principal;
+    }
+
+    public TipoMail getTipoMail() {
+        return tipoMail;
+    }
+
+    public void setTipoMail(TipoMail tipoMail) {
+        this.tipoMail = tipoMail;
+    }
+
+//	public MedioContacto getMedioContacto() {
+//		return medioContacto;
+//	}
+
+//	public void setMedioContacto(MedioContacto medioContacto) {
+//		this.medioContacto = medioContacto;
+//	}
+
+//    public List<MedioContacto> getMedioCntList() {
+//        return mediosContacto;
+//    }
+//
+//    public void setMedioCntList(List<MedioContacto> medioCntList) {
+//        this.mediosContacto = medioCntList;
+//    }
 }

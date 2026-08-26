@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.dao.n.TipoMailDAO;
 import mx.com.ferbo.dao.n.TipoTelefonoDAO;
 import mx.com.ferbo.model.Mail;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
 import mx.com.ferbo.model.Telefono;
 import mx.com.ferbo.model.TipoMail;
 import mx.com.ferbo.model.TipoTelefono;
@@ -51,24 +51,24 @@ public class MedioContactoBL {
         }
     }
 
-    public MedioCnt nuevoMedio() {
+    public MedioContacto nuevoMedio() {
         log.info("Inicia proceso para crear un nuevo medio de contacto");
-        MedioCnt medio = new MedioCnt();
+        MedioContacto medio = new MedioContacto();
         return medio;
     }
 
-    public void seleccionarMedioContacto(MedioCnt medioCnt) throws InventarioException {
+    public void seleccionarMedioContacto(MedioContacto medioCnt) throws InventarioException {
 
         log.info("Inicia proceso para seleccionar un medio de contaco");
-        switch (medioCnt.getTpMedio()) {
+        switch (medioCnt.getTipoMedio()) {
 
             case "m":
-                medioCnt.setIdMail(new Mail());
+                medioCnt.setMail(new Mail());
                 log.info("Se selecciono email como medio de contacto");
                 break;
 
             case "t":
-                medioCnt.setIdTelefono(new Telefono());
+                medioCnt.setTelefono(new Telefono());
                 log.info("Se selecciono telefono como medio de contacto");
                 break;
 

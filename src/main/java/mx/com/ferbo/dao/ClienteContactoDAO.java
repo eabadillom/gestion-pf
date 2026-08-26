@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.model.ClienteContacto;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
@@ -49,9 +49,9 @@ public class ClienteContactoDAO extends IBaseDAO<ClienteContacto, Integer> {
 			if (isAllInfo == false)
 				return clienteContacto;
 
-			for (MedioCnt medioContacto : clienteContacto.getIdContacto().getMedioCntList()) {
-				log.debug("Tipo mail: " + medioContacto.getIdMail().getTpMail().getTpMail());
-				log.debug("Tipo Telefono: " + medioContacto.getIdTelefono().getTpTelefono().getTpTelefono());
+			for (MedioContacto medioContacto : clienteContacto.getContacto().getMediosContacto()) {
+				log.debug("Tipo mail: " + medioContacto.getMail().getTipoMail().getTpMail());
+				log.debug("Tipo Telefono: " + medioContacto.getTelefono().getTipoTelefono().getClave());
 			}
 		} catch (Exception ex) {
 			log.error("Problema al buscar el contacto del cliente por el identificador...",ex);

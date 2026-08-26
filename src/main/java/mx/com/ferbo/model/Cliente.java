@@ -130,7 +130,7 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", orphanRemoval = true)
     private List<PrecioServicio> precioServicioList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente", orphanRemoval = true)
     private List<ClienteContacto> clienteContactoList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cteCve", fetch = FetchType.LAZY)
@@ -194,14 +194,14 @@ public class Cliente implements Serializable {
     public void add(ClienteContacto clienteContacto) {
         if(this.clienteContactoList == null)
         this.clienteContactoList = new ArrayList<ClienteContacto>();
-    	clienteContacto.setIdCliente(this);
+    	clienteContacto.setCliente(this);
     	this.clienteContactoList.add(clienteContacto);
     }
     
     public void remove(ClienteContacto clienteContacto) {
         if(this.clienteContactoList == null)
         return;
-    	clienteContacto.setIdCliente(null);
+    	clienteContacto.setCliente(null);
     	this.clienteContactoList.remove(clienteContacto);
     }
     

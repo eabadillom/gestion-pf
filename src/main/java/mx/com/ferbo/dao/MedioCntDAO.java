@@ -9,23 +9,23 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
 import mx.com.ferbo.util.EntityManagerUtil;
 
-public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
+public class MedioCntDAO extends IBaseDAO<MedioContacto, Integer> {
 	private static Logger log = LogManager.getLogger(MedioCntDAO.class);
 
 	@Override
-	public MedioCnt buscarPorId(Integer id) {
-		MedioCnt medioContacto = null;
+	public MedioContacto buscarPorId(Integer id) {
+		MedioContacto medioContacto = null;
 		EntityManager em = null;
 		Query query = null;
 
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			query = em.createNamedQuery("MedioCnt.findByIdMedio", MedioCnt.class).setParameter("idMedio", id);
+			query = em.createNamedQuery("MedioCnt.findByIdMedio", MedioContacto.class).setParameter("idMedio", id);
 
-			medioContacto = (MedioCnt) query.getSingleResult();
+			medioContacto = (MedioContacto) query.getSingleResult();
 		} finally {
 			EntityManagerUtil.close(em);
 		}
@@ -34,21 +34,21 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 	}
 
 	@Override
-	public List<MedioCnt> buscarTodos() {
+	public List<MedioContacto> buscarTodos() {
 		return null;
 
 	}
 
 	@Override
-	public List<MedioCnt> buscarPorCriterios(MedioCnt e) {
+	public List<MedioContacto> buscarPorCriterios(MedioContacto e) {
 
 		EntityManager em = null;
-		List<MedioCnt> lista = null;
+		List<MedioContacto> lista = null;
 
 		try {
 			em = EntityManagerUtil.getEntityManager();
-			lista = em.createNamedQuery("MedioCnt.findByIdContacto", MedioCnt.class)
-					.setParameter("idContacto", e.getIdContacto().getIdContacto()).getResultList();
+			lista = em.createNamedQuery("MedioCnt.findByIdContacto", MedioContacto.class)
+					.setParameter("idContacto", e.getContacto().getId()).getResultList();
 		} catch (Exception e2) {
 			log.error("Problema al encontrar registros", e2);
 		} finally {
@@ -59,7 +59,7 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 	}
 
 	@Override
-	public String actualizar(MedioCnt medio) {
+	public String actualizar(MedioContacto medio) {
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
@@ -76,7 +76,7 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 	}
 
 	@Override
-	public String guardar(MedioCnt medio) {
+	public String guardar(MedioContacto medio) {
 		EntityManager em = null;
 
 		try {
@@ -95,7 +95,7 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 	}
 
 	@Override
-	public String eliminar(MedioCnt medio) {
+	public String eliminar(MedioContacto medio) {
 		EntityManager em = EntityManagerUtil.getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -112,21 +112,21 @@ public class MedioCntDAO extends IBaseDAO<MedioCnt, Integer> {
 	}
 
 	@Override
-	public String eliminarListado(List<MedioCnt> listado) {
+	public String eliminarListado(List<MedioContacto> listado) {
 		return null;
 	}
 
-	public String guardaMedioCnt(MedioCnt medio) {
+	public String guardaMedioCnt(MedioContacto medio) {
 		EntityManager em = null;
 		try {
 			em = EntityManagerUtil.getEntityManager();
 			em.getTransaction().begin();
-			if (medio.getTpMedio().equalsIgnoreCase("m")) {
-				em.persist(medio.getIdMail());
-				medio.setIdTelefono(null);
+			if (medio.getTipoMedio().equalsIgnoreCase("m")) {
+				em.persist(medio.getMail());
+				medio.setTelefono(null);
 			} else {
-				em.persist(medio.getIdTelefono());
-				medio.setIdMail(null);
+				em.persist(medio.getTelefono());
+				medio.setMail(null);
 			}
 			em.persist(medio);
 			em.getTransaction().commit();

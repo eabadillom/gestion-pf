@@ -16,7 +16,7 @@ import mx.com.ferbo.dao.n.MedioCntDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
@@ -37,8 +37,8 @@ public class ClienteContactoBL {
     public ClienteContacto nuevoContacto() {
         ClienteContacto clienteContacto = new ClienteContacto();
         Contacto contacto = new Contacto();
-        contacto.setMedioCntList(new ArrayList<>());
-        clienteContacto.setIdContacto(contacto);
+        contacto.setMediosContacto(new ArrayList<>());
+        clienteContacto.setContacto(contacto);
         clienteContacto.setFhAlta(new Date());
         return clienteContacto;
     }
@@ -60,10 +60,10 @@ public class ClienteContactoBL {
         log.info("Inicia proceso para crear nuevo contacto");
         ClienteContacto clienteContacto = new ClienteContacto();
         Contacto contacto = new Contacto();
-        contacto.setMedioCntList(new ArrayList<>());
-        clienteContacto.setIdContacto(contacto);
+        contacto.setMediosContacto(new ArrayList<>());
+        clienteContacto.setContacto(contacto);
         clienteContacto.setFhAlta(new Date());
-        clienteContacto.setStHabilitado(true);
+        clienteContacto.setHabilitado(true);
         clienteContacto.setStUsuario("A");
         return clienteContacto;
     }
@@ -91,56 +91,56 @@ public class ClienteContactoBL {
             clienteContactos.set(index, clienteContacto);
             log.info("Se ha actualizado exitosamente el contacto del cliente: {}", cliente.getNombre());
         } else {
-            clienteContacto.setIdCliente(cliente);
+            clienteContacto.setCliente(cliente);
             clienteContactos.add(clienteContacto);
             log.info("Se ha agregado exitosamente el contacto del cliente: {}", cliente.getNombre());
         }
     }
 
-    public void agregarOActualizarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt)
+    public void agregarOActualizarMedioContacto(ClienteContacto clienteContacto, MedioContacto medioCnt)
             throws InventarioException {
 
-        log.info("Inicia el proceso para agregar o actualizar el medio de contacto para el contacto: {} {}", clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
+        log.info("Inicia el proceso para agregar o actualizar el medio de contacto para el contacto: {} {}", clienteContacto.getContacto().getNombre(), clienteContacto.getContacto().getApellido1() );
         FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede ser vacío.");
         FacesUtils.requireNonNullWithReturn(medioCnt, "El medio de contacto no puede ser vacío.");
 
-        List<MedioCnt> medioCnts = clienteContacto.getIdContacto().getMedioCntList();
+        List<MedioContacto> medioCnts = clienteContacto.getContacto().getMediosContacto();
         if (medioCnts == null || medioCnts.isEmpty()) {
             medioCnts = new ArrayList<>();
-            clienteContacto.getIdContacto().setMedioCntList(medioCnts);
+            clienteContacto.getContacto().setMediosContacto(medioCnts);
         }
 
-        final List<MedioCnt> lista = medioCnts;
+        final List<MedioContacto> lista = medioCnts;
 
         int index = IntStream.range(0, lista.size()).filter(i -> lista.get(i).equals(medioCnt)).findFirst().orElse(-1);
 
         if (index >= 0) {
             medioCnts.set(index, medioCnt);
-            log.info("Se ha actualizado el medio de contacto para el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
+            log.info("Se ha actualizado el medio de contacto para el contacto: {} {}",  clienteContacto.getContacto().getNombre(), clienteContacto.getContacto().getApellido1() );
         } else {
-            medioCnt.setIdContacto(clienteContacto.getIdContacto());
+            medioCnt.setContacto(clienteContacto.getContacto());
             medioCnts.add(medioCnt);
-            log.info("Se ha agregado el medio de contacto para el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
+            log.info("Se ha agregado el medio de contacto para el contacto: {} {}",  clienteContacto.getContacto().getNombre(), clienteContacto.getContacto().getApellido1() );
         }
     }
 
-    public void eliminarMedioContacto(ClienteContacto clienteContacto, MedioCnt medioCnt) throws InventarioException {
-        log.info("Inicia el proceso de eliminar el medio de contacto del el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
+    public void eliminarMedioContacto(ClienteContacto clienteContacto, MedioContacto medioCnt) throws InventarioException {
+        log.info("Inicia el proceso de eliminar el medio de contacto del el contacto: {} {}",  clienteContacto.getContacto().getNombre(), clienteContacto.getContacto().getApellido1() );
         FacesUtils.requireNonNullWithReturn(clienteContacto, "El contacto del cliente no puede estar vacío.");
         FacesUtils.requireNonNullWithReturn(medioCnt, "Debe proporcionar un medio de contacto para eliminar.");
 
-        clienteContacto.getIdContacto().getMedioCntList().remove(medioCnt);
+        clienteContacto.getContacto().getMediosContacto().remove(medioCnt);
         
-        medioCnt.setIdContacto(null);
-        medioCnt.setIdMail(null);
-        medioCnt.setIdTelefono(null);
+        medioCnt.setContacto(null);
+        medioCnt.setMail(null);
+        medioCnt.setTelefono(null);
 
-        log.info("Finaliza el proceso de eliminar el medio de contacto del el contacto: {} {}",  clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1() );
+        log.info("Finaliza el proceso de eliminar el medio de contacto del el contacto: {} {}",  clienteContacto.getContacto().getNombre(), clienteContacto.getContacto().getApellido1() );
     }
 
     public void eliminarContacto(Cliente cliente, ClienteContacto clienteContacto) throws InventarioException {
         
-        log.info("Inicia el proceso de eliminar al contacto {} {} del cliente {}", clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1(), cliente.getNombre());
+        log.info("Inicia el proceso de eliminar al contacto {} {} del cliente {}", clienteContacto.getContacto().getNombre(), clienteContacto.getContacto().getApellido1(), cliente.getNombre());
         FacesUtils.requireNonNullWithReturn(cliente, "El cliente no puede estar vacío.");
         FacesUtils.requireNonNullWithReturn(clienteContacto, "Debe proporcionar un ClienteContacto para eliminar.");
 
@@ -148,7 +148,7 @@ public class ClienteContactoBL {
             cliente.getClienteContactoList().remove(clienteContacto);
         } else {
 
-            List<MedioCnt> medioCnts = clienteContacto.getIdContacto().getMedioCntList();
+            List<MedioContacto> medioCnts = clienteContacto.getContacto().getMediosContacto();
 
             if (!medioCnts.isEmpty()) {
                 do {
@@ -158,10 +158,10 @@ public class ClienteContactoBL {
 
             cliente.getClienteContactoList().remove(clienteContacto);
 
-            log.info("Finaliza el proceso de eliminar al contacto {} {} del cliente {}", clienteContacto.getIdContacto().getNbNombre(), clienteContacto.getIdContacto().getNbApellido1(), cliente.getNombre());
+            log.info("Finaliza el proceso de eliminar al contacto {} {} del cliente {}", clienteContacto.getContacto().getNombre(), clienteContacto.getContacto().getApellido1(), cliente.getNombre());
 
-            clienteContacto.setIdContacto(null);
-            clienteContacto.setIdCliente(null);
+            clienteContacto.setContacto(null);
+            clienteContacto.setCliente(null);
             
 
         }

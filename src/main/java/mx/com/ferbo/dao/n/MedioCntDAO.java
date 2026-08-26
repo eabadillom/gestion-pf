@@ -12,35 +12,35 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.ClienteContacto;
-import mx.com.ferbo.model.MedioCnt;
+import mx.com.ferbo.model.MedioContacto;
 import mx.com.ferbo.util.DAOException;
 
 @Named
 @ApplicationScoped
-public class MedioCntDAO extends BaseDAO<MedioCnt, Integer>{
+public class MedioCntDAO extends BaseDAO<MedioContacto, Integer>{
 
 	private static Logger log = LogManager.getLogger(MedioCntDAO.class);
 
     public MedioCntDAO(){
-        super(MedioCnt.class);
+        super(MedioContacto.class);
     }
 
-    public List<MedioCnt> buscarPorIdContacto(ClienteContacto clienteContacto) throws DAOException {
+    public List<MedioContacto> buscarPorIdContacto(ClienteContacto clienteContacto) throws DAOException {
 
-		Integer idContacto = clienteContacto.getIdContacto().getIdContacto();
+		Integer idContacto = clienteContacto.getContacto().getId();
 
-		List<MedioCnt> mediosContacto = null;
+		List<MedioContacto> mediosContacto = null;
 		EntityManager em = null;
 		
 		try {
 			em = super.getEntityManager();
-			mediosContacto = em.createNamedQuery("MedioCnt.findByIdContacto", MedioCnt.class)
+			mediosContacto = em.createNamedQuery("MedioCnt.findByIdContacto", MedioContacto.class)
 					.setParameter("idContacto", idContacto).
                     getResultList();
 			
 		} catch (Exception ex) {
-			log.error("Error al obtener los medios de contacto del contacto: " + clienteContacto.getIdContacto().getNbNombre(), ex);
-			throw new DAOException("Ocurrio un error al obtener los medios de contacto del contacto: " + clienteContacto.getIdContacto().getNbNombre(), ex);
+			log.error("Error al obtener los medios de contacto del contacto: " + clienteContacto.getContacto().getNombre(), ex);
+			throw new DAOException("Ocurrio un error al obtener los medios de contacto del contacto: " + clienteContacto.getContacto().getNombre(), ex);
 		} finally {
 			super.close(em);
 		}
