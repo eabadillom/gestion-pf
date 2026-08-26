@@ -293,17 +293,24 @@ public class OrdenSalidaBean implements Serializable {
 		}
 	}
 
-	public void validarProducto(SalidaDetalleUI salida) {
+	public synchronized void validarProducto(SalidaDetalleUI salida) {
 		try {
 			if(salida.getSelected())
 				log.info("Partida: {} - CONFIRMADO", salida.getPartida().getPartidaCve());
 			else
 				log.info("Partida: {} - SIN CONFIRMAR", salida.getPartida().getPartidaCve());
                     
-			if(salida.getSelected())
-				this.listaDetallesSelected.add(salida);
-			else
+			if(salida.getSelected()) {
+				if(this.listaDetallesSelected.contains(salida)) {
+					log.warn("listaDetallesSelected ya contiene la salida: {}", salida);
+				}else {
+					log.info("Agregando salida: {}", salida);
+					this.listaDetallesSelected.add(salida);
+				}
+			} else {
+				log.info("Eliminando salida: {}", salida);
 				this.listaDetallesSelected.remove(salida);
+			}
 			
 			this.totalCajas = this.listaDetallesSelected.stream()
 					.mapToInt(SalidaDetalleUI::getCantidad)
