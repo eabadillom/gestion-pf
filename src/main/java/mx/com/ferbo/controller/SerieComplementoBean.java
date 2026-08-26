@@ -11,8 +11,10 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import mx.com.ferbo.dao.n.EmisoresCFDISDAO;
 import mx.com.ferbo.dao.n.SerieComplementoPagoDAO;
+import mx.com.ferbo.dao.n.StatusSerieComplementoDAO;
 import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.SerieComplementoPago;
+import mx.com.ferbo.model.StatusSerieComplemento;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.InventarioException;
@@ -33,7 +35,11 @@ public class SerieComplementoBean implements Serializable
     @Inject
     private EmisoresCFDISDAO emisorDAO;
     
+    @Inject
+    private StatusSerieComplementoDAO statusSerieCompDAO;
+    
     private List<SerieComplementoPago> listSerieComplemento;
+    private List<StatusSerieComplemento> listStatusSerieComp;
     private List<EmisoresCFDIS> listEmisores;
 
     private Usuario usuario;
@@ -41,7 +47,11 @@ public class SerieComplementoBean implements Serializable
     private HttpServletRequest httpServletRequest;
     
     private SerieComplementoPago serieComplementoSelected;
+    private StatusSerieComplemento statusSerieComplemento;
     private EmisoresCFDIS emisorSelected;
+    
+    private String serie = null;
+    private String numero = null; 
     
     @PostConstruct
     public void init() {
@@ -49,7 +59,8 @@ public class SerieComplementoBean implements Serializable
             faceContext = FacesContext.getCurrentInstance();
             httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
             usuario = (Usuario) httpServletRequest.getSession(false).getAttribute("usuario");
-
+            
+            listStatusSerieComp = statusSerieCompDAO.buscarTodos();
             listEmisores = emisorDAO.buscarTodos(true);
             consultarComplementoPago();
             log.info("El usuario {} entra a Ingresos / Series de Complementos de Pagos...", this.usuario.getUsuario());
@@ -66,6 +77,9 @@ public class SerieComplementoBean implements Serializable
         log.info("Inicializando complemento de pago...");
         serieComplementoSelected = new SerieComplementoPago();
         serieComplementoSelected.setEmisor((emisorSelected == null) ? null : emisorSelected);
+        serie = null;
+        numero = null;
+        statusSerieComplemento = null;
     }
     
     public void filtrarSeriesComplementos() {
@@ -76,17 +90,17 @@ public class SerieComplementoBean implements Serializable
         try {
             consultarComplementoPago(); 
             
-            log.info("El usuario {} a filtrado los complementos de pago...", this.usuario.getUsuario());
-            mensaje = "La información se guardó correctamente.";
-            severity = FacesMessage.SEVERITY_INFO;
+            log.info("El usuario {} a filtrado las serie complementos de pago...", this.usuario.getUsuario());
         } catch (Exception ex) {
             log.error("Problema para consultar la lista de serie complementos de pago...", ex);
-            mensaje = "Ocurrió un problema al guardar la información.";
+            mensaje = "Ocurrió un problema al obtener la serie de complemento de pago.";
             severity = FacesMessage.SEVERITY_ERROR;
         } finally {
-            message = new FacesMessage(severity, titulo, mensaje);
-            FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().ajax().update("form:messages");
+            if(mensaje != null) {
+                message = new FacesMessage(severity, titulo, mensaje);
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                PrimeFaces.current().ajax().update("form:messages");
+            }
         }
     }
     
@@ -96,62 +110,137 @@ public class SerieComplementoBean implements Serializable
         String mensaje = null;
         String titulo = "Serie complemento de pago";
         try {
-            if(serieComplementoSelected == null)
-                throw new InventarioException("Ocurrió un problema al guardar la información.");
+            log.info("El usuario {} a entrado a guardar una serie complemento de pago...", this.usuario.getUsuario());
             
-            if(serieComplementoSelected.getId() == null) {
-                serieComplementoDAO.guardar(serieComplementoSelected);
-                log.info("El usuario {} a guardado un complemento de pago...", this.usuario.getUsuario());
-                mensaje = "La información se guardó correctamente.";
-            } else {
-                serieComplementoDAO.actualizar(serieComplementoSelected);
-                log.info("El usuario {} a actualizado un complemento de pago...", this.usuario.getUsuario());
-                mensaje = "La información se actualizo correctamente.";
+            if(emisorSelected == null) {
+                throw new InventarioException("Debe seleccionar a un emisor.");
             }
             
-            consultarComplementoPago();
+            if(serie == null) {
+                throw new InventarioException("Debe agregar una serie");
+            }
+            
+            if(numero == null) {
+                throw new InventarioException("Debe agregar un numero");
+            }
+            
+            if(statusSerieComplemento == null) {
+                throw new InventarioException("Debe seleccionar una status");
+            }
+            
+            serieComplementoSelected = new SerieComplementoPago();
+            serieComplementoSelected.setEmisor(emisorSelected);
+            serieComplementoSelected.setSerie(serie);
+            serieComplementoSelected.setNumero(numero);
+            serieComplementoSelected.setStatusSerie(statusSerieComplemento);
+            
+            serieComplementoDAO.guardar(serieComplementoSelected);
+            log.info("El usuario {} a guardado una serie complemento de pago...", this.usuario.getUsuario());
+            mensaje = "Se guardó correctamente.";
+            
             severity = FacesMessage.SEVERITY_INFO;
+            serie = null;
+            numero = null;
+            emisorSelected = null;
+            statusSerieComplemento = null;
+            serieComplementoSelected = null;
+            consultarComplementoPago();
         } catch (InventarioException ex) {
+            log.info("Error al guardar la información de la serie complemento de pago", ex);
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_WARN;
+            FacesContext.getCurrentInstance().validationFailed();
         } catch (Exception ex) {
             log.error("Problema para guardar la información de la serie complemento de pago...", ex);
             mensaje = "Ocurrió un problema al guardar la información.";
             severity = FacesMessage.SEVERITY_ERROR;
+            FacesContext.getCurrentInstance().validationFailed();
         } finally {
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().ajax().update("form:messages");
+            PrimeFaces.current().ajax().update("form:messages", "form:dtSerieComplementos");
         }
     }
     
-    public void eliminar() {
+    public void actualizar() {
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Serie complemento de pago";
         try {
-            if(serieComplementoSelected == null)
-                throw new InventarioException("Ocurrió un problema al guardar la información.");
+            log.info("El usuario {} a entrado a actualizar una serie complemento de pago...", this.usuario.getUsuario());
             
-            serieComplementoDAO.eliminar(serieComplementoSelected);
+            if(emisorSelected == null) {
+                throw new InventarioException("Debe agregar un emisor.");
+            }
             
-            consultarComplementoPago();
-            log.info("El usuario {} a eliminado un complemento de pago...", this.usuario.getUsuario());
-            mensaje = "La información se elimino correctamente.";
+            if(serie == null) {
+                throw new InventarioException("Debe agregar una serie");
+            }
+            
+            if(numero == null) {
+                throw new InventarioException("Debe agregar un numero");
+            }
+            
+            if(statusSerieComplemento == null) {
+                throw new InventarioException("Debe seleccionar una status");
+            }
+            
+            serieComplementoSelected.setEmisor(emisorSelected);
+            serieComplementoSelected.setSerie(serie);
+            serieComplementoSelected.setNumero(numero);
+            serieComplementoSelected.setStatusSerie(statusSerieComplemento);
+            
+            serieComplementoDAO.actualizar(serieComplementoSelected);
+            log.info("El usuario {} a actualizado una serie complemento de pago...", this.usuario.getUsuario());
+            mensaje = "Se actualizo correctamente.";
+            
             severity = FacesMessage.SEVERITY_INFO;
+            serie = null;
+            numero = null;
+            emisorSelected = null;
+            statusSerieComplemento = null;
+            serieComplementoSelected = null;
+            consultarComplementoPago();
         } catch (InventarioException ex) {
+            log.info("Error al actualizar la información de la serie complemento de pago", ex);
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_WARN;
+            FacesContext.getCurrentInstance().validationFailed();
         } catch (Exception ex) {
             log.error("Problema para actualizar la información de la serie complemento de pago...", ex);
-            mensaje = "Ocurrió un problema al guardar la información.";
+            mensaje = "Ocurrió un problema al actualizar la información.";
             severity = FacesMessage.SEVERITY_ERROR;
+            FacesContext.getCurrentInstance().validationFailed();
         } finally {
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().ajax().update("form:messages");
+            PrimeFaces.current().ajax().update("form:messages", "form:dtSerieComplementos");
         }
+    }
+    
+    public void actualizarComplemento(SerieComplementoPago serieCompPago) {
+        try {
+            this.serieComplementoSelected = serieCompPago;
+            log.info("Serie complemento de pago seleccionado: {}", serieComplementoSelected.toString());
+            
+            this.serie = serieComplementoSelected.getSerie();
+            this.numero = serieComplementoSelected.getNumero();
+            this.emisorSelected = serieComplementoSelected.getEmisor();
+            this.statusSerieComplemento = serieComplementoSelected.getStatusSerie();
+        } catch (Exception ex) {
+            log.error("Problema para obtener la información de la serie de complemento de pago...", ex);
+        } finally {
+            PrimeFaces.current().ajax().update("form:messages", "form:panelActualizarComplemento");
+        }
+    }
+    
+    public void cerrarDialogo() {
+        serie = null;
+        numero = null;
+        emisorSelected = null;
+        statusSerieComplemento = null;
+        serieComplementoSelected = null;
     }
 
     public List<SerieComplementoPago> getListSerieComplemento() {
@@ -160,6 +249,14 @@ public class SerieComplementoBean implements Serializable
 
     public void setListSerieComplemento(List<SerieComplementoPago> listSerieComplemento) {
         this.listSerieComplemento = listSerieComplemento;
+    }
+
+    public List<StatusSerieComplemento> getListStatusSerieComp() {
+        return listStatusSerieComp;
+    }
+
+    public void setListStatusSerieComp(List<StatusSerieComplemento> listStatusSerieComp) {
+        this.listStatusSerieComp = listStatusSerieComp;
     }
 
     public List<EmisoresCFDIS> getListEmisores() {
@@ -178,12 +275,36 @@ public class SerieComplementoBean implements Serializable
         this.serieComplementoSelected = serieComplementoSelected;
     }
 
+    public StatusSerieComplemento getStatusSerieComplemento() {
+        return statusSerieComplemento;
+    }
+
+    public void setStatusSerieComplemento(StatusSerieComplemento statusSerieComplemento) {
+        this.statusSerieComplemento = statusSerieComplemento;
+    }
+
     public EmisoresCFDIS getEmisorSelected() {
         return emisorSelected;
     }
 
     public void setEmisorSelected(EmisoresCFDIS emisorSelected) {
         this.emisorSelected = emisorSelected;
+    }
+
+    public String getSerie() {
+        return serie;
+    }
+
+    public void setSerie(String serie) {
+        this.serie = serie;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
     }
     
 }

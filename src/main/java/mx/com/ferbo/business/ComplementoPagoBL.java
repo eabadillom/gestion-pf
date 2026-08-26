@@ -134,7 +134,7 @@ public class ComplementoPagoBL
             DatosPago saldosPago = complementoPagoBL.obtenerSaldos(pago);
             RelatedDocument relatedDocument = new RelatedDocument();
             relatedDocument.setTaxObject(TAX_OBJECT);
-            relatedDocument.setUuid((pago.getFactura().getCfdi() != null) ? pago.getFactura().getCfdi().getUuid() : "ABC" ); //Modificar aqui antes de subir
+            relatedDocument.setUuid(pago.getFactura().getCfdi().getUuid());
             relatedDocument.setPartialityNumber(pago.getParcialidad());
             relatedDocument.setSerie(pago.getFactura().getNomSerie());
             relatedDocument.setFolio(pago.getFactura().getNumero());

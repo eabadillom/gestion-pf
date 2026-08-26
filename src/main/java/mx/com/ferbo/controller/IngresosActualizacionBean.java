@@ -80,7 +80,8 @@ public class IngresosActualizacionBean implements Serializable{
 	private List<TipoPago> listatipoPago;
 	private List<Bancos> listaBancos;
         private List<MedioPago> listaMedioPago;
-	
+	private List<SerieComplementoPago> listSerieComplemento;
+        
 	private Pago pagoSelected;
 	private Cliente cteSelect;
         private EmisoresCFDIS emisoresSelected;
@@ -157,7 +158,9 @@ public class IngresosActualizacionBean implements Serializable{
                     }
                     
                     /*Obtener la serie del complemento de pago*/
-                    this.serieComplementoPago = complementoBL.obtenerSeriePorEmisor(emisoresSelected.getCd_emisor());
+                    this.listSerieComplemento = complementoBL.obtenerSerieComplemento(emisoresSelected.getCd_emisor());
+                    this.listaPagosSeleccionados.clear();
+                    this.serieComplementoPago = this.listSerieComplemento.get(0);
                     
                     log.info("Se ha filtrado la lista de pagos");
                     severity = FacesMessage.SEVERITY_INFO;
@@ -373,6 +376,10 @@ public class IngresosActualizacionBean implements Serializable{
             String message = null;
             Severity severity = null;
             try {
+                if(serieComplementoPago == null) {
+                    throw new InventarioException("Debe seleccionar un folio para el complemento de pago.");
+                }
+                
                 if(pPago == null) {
                     throw new InventarioException("El pago no se seleccionó correctamente.");
                 }
@@ -435,7 +442,7 @@ public class IngresosActualizacionBean implements Serializable{
         public boolean deshabilitarPagos(Pago pPago) {
             boolean respuesta = false;
             
-            if (!PAGO_EN_PARCIALIDADES.equals(pPago.getFactura().getMetodoPago()) || pPago.getComplementoPago() != null) {
+            if (!PAGO_EN_PARCIALIDADES.equals(pPago.getFactura().getMetodoPago()) || (pPago.getComplementoPago() != null && pPago.getComplementoPago().getUuid() != null)) {
                 respuesta = true;
             }
             
@@ -687,6 +694,14 @@ public class IngresosActualizacionBean implements Serializable{
 
         public void setListaPagosSeleccionados(List<Pago> listaPagosSeleccionados) {
             this.listaPagosSeleccionados = listaPagosSeleccionados;
+        }
+
+        public List<SerieComplementoPago> getListSerieComplemento() {
+            return listSerieComplemento;
+        }
+
+        public void setListSerieComplemento(List<SerieComplementoPago> listSerieComplemento) {
+            this.listSerieComplemento = listSerieComplemento;
         }
 
         public ComplementoPago getComplementoPago() {

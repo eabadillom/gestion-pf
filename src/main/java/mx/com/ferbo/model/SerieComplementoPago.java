@@ -49,6 +49,10 @@ public class SerieComplementoPago implements Serializable, Cloneable
     @JoinColumn(name = "cd_emisor", referencedColumnName = "cd_emisor")
     @ManyToOne(optional = true)
     private EmisoresCFDIS emisor;
+    
+    @JoinColumn(name = "cd_status", referencedColumnName = "cd_status_serie")
+    @ManyToOne(optional = true)
+    private StatusSerieComplemento statusSerie;
 
     public SerieComplementoPago() {
     }
@@ -85,6 +89,14 @@ public class SerieComplementoPago implements Serializable, Cloneable
         this.emisor = emisor;
     }
 
+    public StatusSerieComplemento getStatusSerie() {
+        return statusSerie;
+    }
+
+    public void setStatusSerie(StatusSerieComplemento statusSerie) {
+        this.statusSerie = statusSerie;
+    }
+
     @Override
     public int hashCode() {
         if(this.id == null)
@@ -117,6 +129,7 @@ public class SerieComplementoPago implements Serializable, Cloneable
         serieComplementoPago.setSerie(this.serie);
         serieComplementoPago.setNumero(this.numero);
         serieComplementoPago.setEmisor(this.emisor);
+        serieComplementoPago.setStatusSerie(this.statusSerie);
         
         return serieComplementoPago;
     }

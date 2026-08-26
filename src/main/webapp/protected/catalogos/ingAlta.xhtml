@@ -134,7 +134,7 @@
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Añadir" icon="pi pi-check" actionListener="#{ingresosCrudBean.agregaPagoFactura()}" process="pnlCliente @this" update="pnlCliente detallesFacturacion" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide(); if(args.success) {PF('dialogFacturaConfirmacion').hide();}" />
-					<p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogFacturaConfirmacion').hide();" class="ui-button-secondary" />
+					<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogFacturaConfirmacion').hide();" class="ui-button-secondary" />
 				</f:facet>
 			</p:dialog>
 			<div style="padding-top: 2rem;">
