@@ -372,7 +372,7 @@ public class IngresosActualizacionBean implements Serializable{
 		}
 	}
         
-        public void agregarPagoComplemento(Pago pPago) {
+        public synchronized void agregarPagoComplemento(Pago pPago) {
             String message = null;
             Severity severity = null;
             try {
@@ -411,12 +411,16 @@ public class IngresosActualizacionBean implements Serializable{
             }
         }
         
-        public void eliminarPagoComplemento(Pago pPago) {
+        public synchronized void eliminarPagoComplemento(Pago pPago) {
             String message = null;
             Severity severity = null;
             try {
                 if(pPago == null) {
                     throw new InventarioException("El pago no se elimino correctamente.");
+                }
+                
+                if(!listaPagosSeleccionados.contains(pPago)) {
+                    throw new InventarioException("El pago ya no se encuentra registrado.");
                 }
                 
                 log.info("Eliminando el pago {} de la lista de complemento de pago.", pPago.getId());
@@ -449,7 +453,7 @@ public class IngresosActualizacionBean implements Serializable{
             return respuesta;
         }
         
-        public void guardarComplementoPago() {
+        public synchronized void guardarComplementoPago() {
             String mensaje = null;
             Severity severity = null;
             try { 
@@ -493,7 +497,7 @@ public class IngresosActualizacionBean implements Serializable{
             }
         }
         
-        public void generarComplemento() {
+        public synchronized void generarComplemento() {
             String mensaje = null;
             Severity severity = null;
             try {

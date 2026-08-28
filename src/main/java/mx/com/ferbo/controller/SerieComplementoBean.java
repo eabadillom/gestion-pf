@@ -104,7 +104,7 @@ public class SerieComplementoBean implements Serializable
         }
     }
     
-    public void guardar() {
+    public synchronized void guardar() {
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
@@ -126,6 +126,12 @@ public class SerieComplementoBean implements Serializable
             
             if(statusSerieComplemento == null) {
                 throw new InventarioException("Debe seleccionar una status");
+            }
+            
+            for(SerieComplementoPago serieComp: listSerieComplemento){
+                if(serieComp.getNumero().equals(numero) && serieComp.getSerie().equals(serie)) {
+                    throw new InventarioException("Ya se encuentra registrado el complemento de pago");
+                }
             }
             
             serieComplementoSelected = new SerieComplementoPago();
@@ -162,7 +168,7 @@ public class SerieComplementoBean implements Serializable
         }
     }
     
-    public void actualizar() {
+    public synchronized void actualizar() {
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;

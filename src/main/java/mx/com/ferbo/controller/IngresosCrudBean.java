@@ -238,7 +238,7 @@ public class IngresosCrudBean implements Serializable {
 		restaTotal = totalFactura.subtract(sumaTotal);
 	}
 	
-	public void agregaPagoFactura() {
+	public synchronized void agregaPagoFactura() {
 		String title = "Pago";
                 String message = null;
 		Severity severity = null;
@@ -269,6 +269,12 @@ public class IngresosCrudBean implements Serializable {
                         pg.setFecha(fecha);
                         pg.setHora(hora);
                         pg.setParcialidad(PAGO_EN_PARCIALIDADES.equalsIgnoreCase(facturaSelect.getMetodoPago()) ? parcialidad : null);
+                        
+                        for(PagoUI pago :listaPago) {
+                            if(pago.getPago().equals((pg))) {
+                                throw new InventarioException("El pago ya se encuentra registrado");
+                            }
+                        }
                         
 			pagoUI = new PagoUI();
 			pagoUI.setPago(pg);
@@ -334,7 +340,7 @@ public class IngresosCrudBean implements Serializable {
 		}
 	}
 	
-	public void eliminaPagoFactura(PagoUI pagoUI) {
+	public synchronized void eliminaPagoFactura(PagoUI pagoUI) {
 		String title = "Pago";
                 String message = null;
 		Severity severity = null;
@@ -354,6 +360,10 @@ public class IngresosCrudBean implements Serializable {
 			factura = pago.getFactura();
 			factura.getPagoList().remove(pago);
 			
+                        if(!listaPago.contains(pagoUI)) {
+                            throw new InventarioException("El pago ya no se encuentra registrado.");
+                        }
+                        
 			listaPago.remove(pagoUI);
 			
 			totalGlobal = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -411,7 +421,7 @@ public class IngresosCrudBean implements Serializable {
 		}
 	}
 	
-	public void savePago() {
+	public synchronized void savePago() {
                 String title = "Guardar";
                 String message = null;
 		Severity severity = null;

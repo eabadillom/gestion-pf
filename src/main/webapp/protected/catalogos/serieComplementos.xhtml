@@ -134,7 +134,7 @@
                 <f:facet name="footer">
                     <p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{serieComplementoBean.actualizar()}" 
                         update="dtSerieComplementos" process="@this" onstart="PF('statusInfoDialog').show();"
-                        oncomplete="PF('statusInfoDialog').hide(); if (!args.validationFailed) {PF('dlgActualizarComplemento').hide();}" 
+                        oncomplete="PF('statusInfoDialog').hide(); if (!args.validationFailed) {PF('dlgActualizarComplemento').hide();}"
                         disabled="#{serieComplementoBean.serieComplementoSelected.statusSerie.id eq 2}" />
                     <p:commandButton value="Cerrar" icon="pi pi-times" class="ui-button-secondary" 
                         oncomplete="PF('dlgActualizarComplemento').hide();" 
