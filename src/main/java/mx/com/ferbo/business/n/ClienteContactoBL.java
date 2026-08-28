@@ -1,18 +1,18 @@
 package mx.com.ferbo.business.n;
 
-import javax.inject.Named;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.ClienteContactoDAO;
-import mx.com.ferbo.dao.n.MedioCntDAO;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.ClienteContacto;
 import mx.com.ferbo.model.Contacto;

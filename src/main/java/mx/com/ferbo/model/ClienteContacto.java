@@ -57,7 +57,7 @@ public class ClienteContacto implements Serializable {
     private Cliente cliente;
 
     @JoinColumn(name = "id_contacto", referencedColumnName = "id_contacto")
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     private Contacto contacto;
 
     @Column(name = "st_facturacion")

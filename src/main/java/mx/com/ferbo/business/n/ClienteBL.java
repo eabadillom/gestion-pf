@@ -3,7 +3,6 @@ package mx.com.ferbo.business.n;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
@@ -17,8 +16,10 @@ import com.ferbo.tools.exception.BusinessException;
 
 import mx.com.ferbo.business.almacen.PlantaBL;
 import mx.com.ferbo.dao.n.ClienteDAO;
+import mx.com.ferbo.dao.n.ContactoDAO;
 import mx.com.ferbo.model.CandadoSalida;
 import mx.com.ferbo.model.Cliente;
+import mx.com.ferbo.model.Contacto;
 import mx.com.ferbo.model.MetodoPago;
 import mx.com.ferbo.model.Planta;
 import mx.com.ferbo.model.RegimenFiscal;
@@ -183,6 +184,18 @@ public class ClienteBL {
             List<Planta> plantas = plantaBL.buscarTodos(Boolean.TRUE);
             log.info("Se asigna el candado de salida al cliente");
             asignarCandadoSalida(plantas, cliente);
+            List<Contacto> contactosNuevos = cliente.getClienteContactoList().stream()
+            		.filter(cc -> cc.getContacto() != null && cc.getContacto().getId() == null)
+            		.map(cc -> cc.getContacto())
+            		.collect(Collectors.toList());
+            ContactoDAO contactoDAO = new ContactoDAO();
+            contactosNuevos.stream().forEach(contacto -> {
+            	try {
+					contactoDAO.guardar(contacto);
+				} catch (InventarioException ex) {
+					log.error("Problema para guardar el contacto...", ex);
+				}
+            });
             return clienteDAO.guardarYObtener(cliente);
         } else {
             return clienteDAO.actualizarYObtener(cliente);

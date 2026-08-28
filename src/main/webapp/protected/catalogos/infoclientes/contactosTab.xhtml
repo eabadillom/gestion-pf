@@ -54,7 +54,7 @@
             	<div class="p-grid p-fluid">
             		<div class="p-col-12 p-md-12">
             			<p:autoComplete id="acContacto" value="#{clientesBean.contactoSelected}" completeMethod="#{clientesBean.sugerenciaContactos}" var="contacto"
-            				itemLabel="#{contacto.cadena}" itemValue="#{contacto}" forceSelection="true" minQueryLength="2" converter="entityConverter" scrollHeight="250"
+            				itemLabel="#{contacto.cadena}" itemValue="#{contacto}" forceSelection="true" minQueryLength="3" converter="entityConverter" scrollHeight="250"
             				placeholder="Buscar en el catálogo de contactos...">
             				<p:ajax process="@this" event="itemSelect" listener="#{clientesBean.asignarContacto}" update="form:tabView:pnlContacto"/>
             				<p:column>

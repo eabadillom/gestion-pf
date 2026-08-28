@@ -634,7 +634,11 @@ public class ClientesBean implements Serializable {
     }
     
     public void asignarContacto() {
-    	this.clienteContactoSelected.setContacto(this.contactoSelected);
+    	try {
+    		this.clienteContactoSelected.setContacto(contactoBL.cargar(this.contactoSelected));
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la información del contacto...", ex);
+    	}
     }
 
     public void seleccionarMedioContacto() {

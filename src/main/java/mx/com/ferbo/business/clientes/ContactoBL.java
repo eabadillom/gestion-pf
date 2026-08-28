@@ -31,4 +31,11 @@ public class ContactoBL {
 		
 		return this.contactoDAO.buscar(query);
 	}
+	
+	public Contacto cargar(Contacto contacto)
+	throws InventarioException {
+		Contacto resultado = null;
+		resultado = contactoDAO.cargar(contacto).orElseThrow(() -> new InventarioException("Contacto no encontrado.")) ;
+		return resultado;
+	}
 }
