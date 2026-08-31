@@ -10,7 +10,7 @@
             <ui:include src="/protected/common/status-info.xhtml" />
             <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
                 <div class="p-grid ui-fluid">
-                    <div class="p-col-12 p-md-5">
+                    <div class="p-col-12 p-md-6">
                         <p:outputLabel for="soClientes" value="Receptor" />
                         <p:selectOneMenu id="soClientes" autoWidth="false" value="#{ingresosCrudBean.idCte}" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="SELECCIONE UN CLIENTE" itemValue="" noSelectionOption="true" />
@@ -30,7 +30,7 @@
                 </div>
             </p:panel>
             <div style="padding-top: 2rem;">
-                <p:dataTable id="dt-Factura" var="fact" value="#{ingresosCrudBean.listaFactura}" reflow="true" rowKey="#{fact.id}"
+                <p:dataTable id="dt-Factura" var="fact" value="#{ingresosCrudBean.listaFactura}" reflow="true" rowKey="#{fact.id}" size="small"
                              paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" selectionMode="single" filterBy="#{fact.status.nombre}">     
                     <p:column headerText="Factura" width="5rem" style="text-align: center;">
                         <h:outputText value="#{fact.nomSerie}-#{fact.numero}" />
@@ -48,7 +48,7 @@
                     </p:column>
                     <p:column headerText="Total" width="6rem" style="text-align: right;">
                         <h:outputText value="#{fact.total}">
-                            <f:convertNumber pattern="¤#,##0.00" currencySymbol="$" />
+                            <f:convertNumber pattern="¤ #,##0.00" currencySymbol="$" />
                         </h:outputText>
                     </p:column>
                     <p:column style="text-align: center;">
@@ -61,76 +61,67 @@
                     </p:column>
                 </p:dataTable>
             </div>
-            <p:dialog id="dlgConfirmacion" header="Confirmar detalles" showEffect="fade" modal="true" widgetVar="dialogFacturaConfirmacion" responsive="true">
+            <p:dialog id="dlgConfirmacion" header="Pagar" showEffect="fade" modal="true" widgetVar="dialogFacturaConfirmacion" responsive="true" fitViewport="true" style="width: 90vw; max-width: 45rem;">
                 <p:outputPanel id="pnlCliente" class="p-grid ui-fluid p-col-12" rendered="#{ingresosCrudBean.facturaSelect != null}">
-                    <div class="p-grid p-col-12">
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Factura" styleClass="ml-4" />
-                            <p:inputText widgetVar="factura-new" id="factura-new" value="#{ingresosCrudBean.facturaSelect.nomSerie}-#{ingresosCrudBean.facturaSelect.numero}" readonly="true" />
-                        </div>
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Fecha de pago" styleClass="ml-4" />
-                            <p:datePicker id="fecha" showIcon="true" styleClass="p-mr-4 p-mb-2" placeholder="Fecha" value="#{ingresosCrudBean.fecha}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
-                                <p:ajax process="@this" />
-                            </p:datePicker>
-                        </div>
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Hora de pago" styleClass="ml-4" />
-                            <p:datePicker id="hora" value="#{ingresosCrudBean.hora}" timeOnly="true" pattern="HH:mm" hourFormat="24" 
-                                          readonlyInput="false" placeholder="HH:mm" >
-                                <p:ajax process="@this" />
-                            </p:datePicker>
-                        </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="Factura" />
+                        <p:inputText widgetVar="factura-new" id="factura-new" value="#{ingresosCrudBean.facturaSelect.nomSerie}-#{ingresosCrudBean.facturaSelect.numero}" readonly="true" />
                     </div>
-                    <div class="p-grid p-col-12">
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Total factura" styleClass="ml-4" />
-                            <p:inputText widgetVar="monto-new" id="monto-new" value="#{ingresosCrudBean.facturaSelect.total}" readonly="true">
-                                <f:convertNumber pattern="¤#,##0.00" currencySymbol="$" />
-                            </p:inputText>
-                        </div>
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Debe" styleClass="ml-4" />
-                            <p:inputText widgetVar="saldo-new" id="saldo-new" value="#{ingresosCrudBean.saldoAnterior}" readonly="true">
-                                <f:convertNumber pattern="¤#,##0.00" currencySymbol="$" />
-                            </p:inputText>
-                        </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="Total factura" />
+                        <p:inputNumber widgetVar="monto-new" id="monto-new" value="#{ingresosCrudBean.facturaSelect.total}" readonly="true" decimalPlaces="2" symbol="$ " symbolPosition="p" inputStyle="text-align: right;">
+                        </p:inputNumber>
+                        
                     </div>
-                    <div class="p-field p-col-12 p-md-12">
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="Debe" />
+                        <p:inputNumber widgetVar="saldo-new" id="saldo-new" value="#{ingresosCrudBean.saldoAnterior}" readonly="true" decimalPlaces="2" symbol="$ " symbolPosition="p" inputStyle="text-align: right;">
+                        </p:inputNumber>
+                    </div>
+                    <div class="p-col-12 p-md-12">
+                    	<p:separator />
                         <b>Datos adicionales</b>
                     </div>
-                    <div class="p-grid p-col-12">
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Banco" />
-                            <p:selectOneMenu id="Bco" autoWidth="true" value="#{ingresosCrudBean.bancoCve}">
-                                <f:selectItem itemLabel="" itemValue="" />
-                                <f:selectItems value="#{ingresosCrudBean.listaBancos}" var="banco" itemLabel="#{banco.nombre}" itemValue="#{banco.id}" />
-                            </p:selectOneMenu>
-                        </div>
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Forma de pago" />
-                            <p:selectOneMenu id="tipoPago" autoWidth="true" value="#{ingresosCrudBean.tipoP}">
-                                <f:selectItem itemLabel="" itemValue="" />
-                                <f:selectItems value="#{ingresosCrudBean.listatipoPago}" var="tipoP" itemLabel="#{tipoP.nombre}" itemValue="#{tipoP.id}" />
-                            </p:selectOneMenu>
-                        </div>
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Referencia" styleClass="ml-4" />
-                            <p:inputText widgetVar="referencia-new" id="referencia-new" value="#{ingresosCrudBean.referencia}" />
-                        </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="Fecha de pago"/>
+                        <p:datePicker id="fecha" showIcon="true" placeholder="Fecha" value="#{ingresosCrudBean.fecha}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                            <p:ajax process="@this" />
+                        </p:datePicker>
                     </div>
-                    <div class="p-grid p-col-12">
-                        <div class="p-field p-col-3 p-md-3">
-                            <p:outputLabel for="@next" value="Cantidad a pagar" styleClass="ml-4" />
-                            <p:inputNumber widgetVar="cantidad-new" id="cantidad-new" value="#{ingresosCrudBean.cantidadApagar}" symbol="$" decimalPlaces="2"/>
-                        </div>
-                        <ui:fragment rendered="#{not empty ingresosCrudBean.facturaSelect and ingresosCrudBean.facturaSelect.metodoPago eq ingresosCrudBean.PAGO_EN_PARCIALIDADES}">
-                            <div class="p-field p-col-3 p-md-3" >
-                                <p:outputLabel for="@next" value="Parcialidad" styleClass="ml-4" />
-                                <p:inputNumber widgetVar="parcialidad-new" id="parcialidad-new" value="#{ingresosCrudBean.parcialidad}" decimalPlaces="0" thousandSeparator="" />
-                            </div>
-                        </ui:fragment>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="Hora de pago" />
+                        <p:datePicker id="hora" value="#{ingresosCrudBean.hora}" timeOnly="true" pattern="HH:mm" hourFormat="24" readonlyInput="false" placeholder="hh:mm (p.e. 23:59)" >
+                            <p:ajax process="@this" />
+                        </p:datePicker>
                     </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="Banco" />
+                        <p:selectOneMenu id="Bco" autoWidth="true" value="#{ingresosCrudBean.bancoCve}">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItems value="#{ingresosCrudBean.listaBancos}" var="banco" itemLabel="#{banco.nombre}" itemValue="#{banco.id}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="Forma de pago" />
+                        <p:selectOneMenu id="tipoPago" autoWidth="false" value="#{ingresosCrudBean.tipoP}">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItems value="#{ingresosCrudBean.listatipoPago}" var="tipoP" itemLabel="#{tipoP.nombre}" itemValue="#{tipoP.id}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="Referencia"/>
+                        <p:inputText widgetVar="referencia-new" id="referencia-new" value="#{ingresosCrudBean.referencia}" />
+                    </div>
+                    <div class="p-col-4 p-md-4">
+                        <p:outputLabel for="@next" value="A pagar" />
+                        <p:inputNumber widgetVar="cantidad-new" id="cantidad-new" value="#{ingresosCrudBean.cantidadApagar}" symbol="$ " decimalPlaces="2" inputStyle="text-align: right;"/>
+                    </div>
+                    <ui:fragment rendered="#{not empty ingresosCrudBean.facturaSelect and ingresosCrudBean.facturaSelect.metodoPago eq ingresosCrudBean.PAGO_EN_PARCIALIDADES}">
+                        <div class="p-col-4 p-md-4" >
+                            <p:outputLabel for="@next" value="Parcialidad" />
+                            <p:inputNumber widgetVar="parcialidad-new" id="parcialidad-new" value="#{ingresosCrudBean.parcialidad}" decimalPlaces="0" thousandSeparator="" />
+                        </div>
+                    </ui:fragment>
                 </p:outputPanel>
                 <f:facet name="footer">
                     <p:commandButton value="Añadir" icon="pi pi-check" actionListener="#{ingresosCrudBean.agregaPagoFactura()}" process="pnlCliente @this" update="pnlCliente detallesFacturacion" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide(); if(args.success) {PF('dialogFacturaConfirmacion').hide();}" />
@@ -144,7 +135,7 @@
                     </p:column>
                     <p:column headerText="Fecha de Pago" style="text-align: center;">
                         <h:outputText value="#{detFactura.pago.fecha}" >
-                            <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                            <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="Hora de Pago" style="text-align: center;">
@@ -152,17 +143,17 @@
                     </p:column>
                     <p:column headerText="Total factura" style="text-align: right;">
                         <h:outputText value="#{detFactura.pago.factura.total}">
-                            <f:convertNumber pattern="¤#,##0.00" currencySymbol="$" />
+                            <f:convertNumber pattern="¤ #,##0.00" currencySymbol="$" />
                         </h:outputText>
                     </p:column>
                     <p:column headerText="Saldo anterior" style="text-align: right;">
                         <h:outputText value="#{detFactura.saldoAnterior}">
-                            <f:convertNumber pattern="¤#,##0.00" currencySymbol="$" />
+                            <f:convertNumber pattern="¤ #,##0.00" currencySymbol="$" />
                         </h:outputText>
                     </p:column>
                     <p:column headerText="A pagar" style="text-align: right;">
                         <h:outputText value="#{detFactura.pago.monto}" style="font-weight: bold;">
-                            <f:convertNumber pattern="¤#,##0.00" currencySymbol="$" />
+                            <f:convertNumber pattern="¤ #,##0.00" currencySymbol="$" />
                         </h:outputText>
                     </p:column>
                     <p:column headerText="Parcialidad" style="text-align: right;">
@@ -170,7 +161,7 @@
                     </p:column>
                     <p:column headerText="Saldo pendiente" style="text-align: right;">
                         <h:outputText value="#{detFactura.saldo}">
-                            <f:convertNumber pattern="¤#,##0.00" currencySymbol="$" />
+                            <f:convertNumber pattern="¤ #,##0.00" currencySymbol="$" />
                         </h:outputText>
                     </p:column>
                     <p:column width="2rem">
