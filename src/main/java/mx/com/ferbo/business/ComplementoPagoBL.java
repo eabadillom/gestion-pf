@@ -117,12 +117,12 @@ public class ComplementoPagoBL
         cfdi.setReceiver(receptor);
         
         Complement complements = new Complement();
-        List<PaymentBindingModel> listPayments = new ArrayList();
+        List<PaymentBindingModel> listPayments = new ArrayList<PaymentBindingModel>();
         List<RelatedDocument> listRelatedDocuments;
         List<Tax> listTaxes;
         for(Pago pago : this.listPagos) {
-            listRelatedDocuments = new ArrayList();
-            listTaxes = new ArrayList();
+            listRelatedDocuments = new ArrayList<RelatedDocument>();
+            listTaxes = new ArrayList<Tax>();
             PaymentBindingModel payment = new PaymentBindingModel();
             Date fechaHora = pago.getFecha();
             DateUtil.setTime(fechaHora, pago.getHora().getHour(), pago.getHora().getMinute(), 0);
