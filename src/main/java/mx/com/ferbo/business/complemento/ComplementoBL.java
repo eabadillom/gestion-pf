@@ -29,7 +29,7 @@ public class ComplementoBL
 
     public ComplementoBL() {
         this.pagoDAO = new PagoDAO();
-        complementoPagoDAO = new ComplementoPagoDAO();
+        this.complementoPagoDAO = new ComplementoPagoDAO();
         this.serieComplementoPagoDAO = new SerieComplementoPagoDAO();
     }
     
@@ -96,6 +96,13 @@ public class ComplementoBL
             throw new InventarioException("Debe seleccionar un emisor para el complemento de pago.");
 
         return serieComplementoPagoDAO.buscarPorEmisor(idEmisor);
+    }
+    
+    public List<SerieComplementoPago> obtenerSerieComplemento (Integer idEmisor) throws InventarioException, DAOException {
+        if(idEmisor == null)
+            throw new InventarioException("Debe seleccionar un emisor para el complemento de pago.");
+        
+        return serieComplementoPagoDAO.buscarSeriesPorEmisor(idEmisor);
     }
 
     public void actualizarSerieComplemento(SerieComplementoPago serieComplemento) throws InventarioException, CloneNotSupportedException {
