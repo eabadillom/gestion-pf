@@ -32,26 +32,31 @@
             <div style="padding-top: 2rem;">
                 <p:dataTable id="dt-Factura" var="fact" value="#{ingresosCrudBean.listaFactura}" reflow="true" rowKey="#{fact.id}" size="small"
                              paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" selectionMode="single" filterBy="#{fact.status.nombre}">     
-                    <p:column headerText="Factura" width="5rem" style="text-align: center;">
+                    <p:column headerText="Factura" width="6rem" style="text-align: center;">
                         <h:outputText value="#{fact.nomSerie}-#{fact.numero}" />
                     </p:column>
-                    <p:column headerText="Moneda" width="5rem" style="text-align: center;">
-                        <h:outputText value="#{fact.moneda}" />
-                    </p:column>
+                    <ui:remove>
+	                    <p:column headerText="Moneda" width="5rem" style="text-align: center;">
+	                        <h:outputText value="#{fact.moneda}" />
+	                    </p:column>
+                    </ui:remove>
                     <p:column headerText="Fecha" width="6rem" style="text-align: center;">
                         <h:outputText value="#{fact.fecha}">
                             <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Status" style="text-align: center;">
+                    <p:column headerText="Emisor" style="text-align: center;">
+                    	<h:outputText value="#{fact.emisorNombre}"/>
+                    </p:column>
+                    <p:column headerText="Status" width="10rem" style="text-align: center;">
                         <h:outputText value="#{fact.status.nombre}"/>
                     </p:column>
-                    <p:column headerText="Total" width="6rem" style="text-align: right;">
+                    <p:column headerText="Total" width="8rem" style="text-align: right;">
                         <h:outputText value="#{fact.total}">
                             <f:convertNumber pattern="¤ #,##0.00" currencySymbol="$" />
                         </h:outputText>
                     </p:column>
-                    <p:column style="text-align: center;">
+                    <p:column style="text-align: center;" width="10rem">
                         <p:commandButton icon="pi pi-plus" value="Agregar Pago" align="left" action="#{ingresosCrudBean.calculoFactura}" 
                                          update="form:pnlCliente :form:factura-new :form:monto-new :form:saldo-new :form:fecha :form:Bco :form:tipoPago :form:referencia-new :form:cantidad-new" 
                                          resetValues="true" styleClass="ui-button-raised" process="@this"
