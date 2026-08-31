@@ -1,5 +1,10 @@
 package mx.com.ferbo.controller;
 
+import com.ferbo.bitacora.exception.BitacoraException;
+import com.ferbo.bitacora.model.Bitacora;
+import com.ferbo.bitacora.model.ContextoBitacora;
+import com.ferbo.tools.exception.ValidationException;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +28,15 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import mx.com.ferbo.bitacoraimp.business.BitacoraBLImp;
+import mx.com.ferbo.bitacoraimp.enums.NombrePantalla;
+import mx.com.ferbo.bitacoraimp.enums.TipoPantalla;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -108,6 +119,17 @@ public class AltaConstanciaServicioBean implements Serializable {
 	private HttpServletRequest httpServletRequest;
         
         private StreamedContent file;
+	
+	private String idSesion = "";
+	private String descripcionEvento = "";
+
+	@Inject
+	private BitacoraBLImp bitacoraBL;
+
+	private Bitacora eventoBitacora;
+	private List<Bitacora> eventos;
+	private ContextoBitacora contextBitacora;
+	private String documento = "";
 
 	public AltaConstanciaServicioBean() {
 		clientes = new ArrayList<Cliente>();
@@ -149,6 +171,21 @@ public class AltaConstanciaServicioBean implements Serializable {
 		
 		partida = new PartidaServicio();
 		servicio = new ConstanciaServicioDetalle();
+                HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
+				.getExternalContext()
+				.getSession(false);
+
+		eventos = new ArrayList<>();
+		idSesion = session.getId();
+		Integer idUsuario = usuario.getId();
+		String nombreUsuario = usuario.getNombre() + " " + usuario.getApellido1() + " " + usuario.getApellido2();
+		try {
+			contextBitacora = ContextoBitacora.of(idSesion, idUsuario, nombreUsuario, NombrePantalla.CONSTANCIA_DE_SERVICIO.toString(),
+				TipoPantalla.ALTA.toString());
+		} catch (BitacoraException ex) {
+			log.error("{}: {}", ex.getCode(), ex.getMessage(), ex);
+		}
+
 	}
 
 	public void filtrarCliente() {
@@ -201,6 +238,13 @@ public class AltaConstanciaServicioBean implements Serializable {
 			}
 			message = "Agregue sus productos y servicios.";
 			severity = FacesMessage.SEVERITY_INFO;
+                        documento = folio;
+						
+            descripcionEvento = "Creó la constancia de servicio";
+			log.info(descripcionEvento);
+			bitacoraBL.agregarORemplazarSiExiste(eventos, contextBitacora, descripcionEvento, documento);
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (Exception ex) {
 			log.error("Problema para recuperar los datos del cliente.", ex);
 			message = ex.getMessage();
@@ -307,10 +351,25 @@ public class AltaConstanciaServicioBean implements Serializable {
 			alPartidas.add(partida);
 			log.info("Id Producto: " + this.partida.getProductoCve().getProductoDs());
 			
+                        descripcionEvento = "Agregó mercancía " + partida.getProductoCve().getProductoDs() + " con cantidad " 
+                                            + partida.getCantidadTotal() + " de " + partida.getUnidadDeManejoCve().getUnidadDeManejoDs() 
+                                            + " con un peso total de " + partida.getCantidadDeCobro() + "Kg";
+                        
+                        log.info(descripcionEvento);
+                        
+                        eventoBitacora = Bitacora.of(contextBitacora)
+                                .descripcion(descripcionEvento)
+                                .documento(documento)
+                                .build();
+                        
+                        eventos.add(eventoBitacora);
+                        
 			this.partida = new PartidaServicio();
 			
 			message = "Producto agregado";
 			severity = FacesMessage.SEVERITY_INFO;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -344,11 +403,25 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 			alServiciosDetalle.add(servicio);
 			log.info("Servicio agregado: {}", this.servicio.getServicioCve().getServicioDs());
+                        
+                        descripcionEvento = "Agregó el servicio " + servicio.getServicioCve().getServicioDs() + " para una cantidad de " 
+                                            + servicio.getServicioCantidad() + " unidades";
 
+                        log.info(descripcionEvento);
+                        
+                        eventoBitacora = Bitacora.of(contextBitacora)
+                                .descripcion(descripcionEvento)
+                                .documento(documento)
+                                .build();
+                        
+                        eventos.add(eventoBitacora);
+                        
 			this.servicio = new ConstanciaServicioDetalle();
 
 			message = "Producto agregado correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -418,7 +491,23 @@ public class AltaConstanciaServicioBean implements Serializable {
 			this.habilitareporte = true;
 			message = String.format("Constancia guardada correctamente con el folio %s", this.folio);
 			severity = FacesMessage.SEVERITY_INFO;
+
+			descripcionEvento = "Guardo la constancia de servicio correctamente";
+                        log.info(descripcionEvento);
+
+			eventoBitacora = Bitacora.of(contextBitacora)
+									 .descripcion(descripcionEvento)
+									 .documento(documento)
+									 .build();
+
+			eventos.add(eventoBitacora);
+
+			bitacoraBL.registrarEnBitacora(eventos);
+            
+			bitacoraBL.limpiarEventos(eventos);
 			
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			log.error("Problema para obtener la información de los productos...", ex);
 			message = ex.getMessage();
@@ -495,11 +584,79 @@ public class AltaConstanciaServicioBean implements Serializable {
 
 	public void deletePartida(PartidaServicio partida) {
 		this.alPartidas.remove(partida);
+                descripcionEvento = "Elimino mercancía " + partida.getProductoCve().getProductoDs() + " con cantidad " 
+                                            + partida.getCantidadTotal() + " de " + partida.getUnidadDeManejoCve().getUnidadDeManejoDs() 
+                                            + " con un peso total de " + partida.getCantidadDeCobro() + "Kg";
+                        
+                        log.info(descripcionEvento);
+            try {
+				eventoBitacora = Bitacora.of(contextBitacora)
+                                .descripcion(descripcionEvento)
+                                .documento(documento)
+                                .build();
+                        
+                        eventos.add(eventoBitacora);
+			} catch (BitacoraException ex) {
+				log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
+			}          
+                        
 	}
 
 	public void deleteServicio(ConstanciaServicioDetalle servicio) {
 		this.alServiciosDetalle.remove(servicio);
+                
+                descripcionEvento = "Eliminó el servicio " + servicio.getServicioCve().getServicioDs() + " para una cantidad de " 
+                                            + servicio.getServicioCantidad() + " unidades";
+
+                log.info(descripcionEvento);
+
+				try {
+					eventoBitacora = Bitacora.of(contextBitacora)
+                            .descripcion(descripcionEvento)
+                            .documento(documento)
+                            .build();
+                        
+                eventos.add(eventoBitacora);
+				} catch (BitacoraException ex) {
+					log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
+				}
+    
 	}
+        
+        public void modificacionDatosGenerales(String campo) {
+            campo = campo.trim().toUpperCase();
+            
+            descripcionEvento = "Modicicó el campo " + campo + " a: " ;
+            
+            switch(campo) {
+                case "VALOR DECLARADO":
+                    descripcionEvento += valorDeclarado;
+                    break;
+                
+                case "NOMBRE DEL TRANSPORTISTA":
+					descripcionEvento += nombreTransportista;
+                    break;
+                    
+                case "PLACAS DEL TRANSPORTE":
+                    descripcionEvento += placasVehiculo;
+                    break;
+                
+                case "OBSERVACIONES":
+					descripcionEvento += observaciones;
+                    break;
+                    
+                default:
+                    throw new ValidationException("El campo recibido no existe");
+            }
+			log.info(descripcionEvento);
+                        
+            eventoBitacora = Bitacora.of(contextBitacora)
+                            .descripcion(descripcionEvento)
+                            .documento(documento)
+                            .build();
+                        
+            eventos.add(eventoBitacora);
+        }
 
 	public Cliente getSelCliente() {
 		return selCliente;

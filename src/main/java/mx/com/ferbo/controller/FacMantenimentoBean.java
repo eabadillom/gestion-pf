@@ -61,6 +61,7 @@ import mx.com.ferbo.model.UsoCfdi;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.CfdiUtils;
 import mx.com.ferbo.util.EntityManagerUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.InventarioException;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.conexion;
@@ -114,6 +115,8 @@ public class FacMantenimentoBean implements Serializable {
         private RegimenFiscal regimenFiscalEmisor;
         
         private RegimenFiscal regimenFiscalReceptor;
+	
+	private StreamedContent factura;
 
 	public FacMantenimentoBean() {
 		seleccion = new Factura();
@@ -471,6 +474,35 @@ public class FacMantenimentoBean implements Serializable {
         } 
     }
 
+	public void descargarFacturaTimbrada(String extension) {
+
+		FacturamaBL facturamaBL = new FacturamaBL(seleccion.getId(), this.usuario);
+
+		byte[] contenido = null;
+                
+                String mensaje;
+                String titulo = "Descarga Factura";
+		
+		try {
+			contenido = facturamaBL.getFileBytesDeFacturama(extension, seleccion);
+			String nombreFactura = "Factura_" + seleccion.getNomSerie() + "-" + seleccion.getNumero();
+			factura = FacesUtils.crearStreamedContentDesdeBytes(contenido, nombreFactura, extension);
+                        mensaje = "La factura se descargo exitosamente";
+                         FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, titulo, mensaje);
+		} catch (FacturamaException ex) {
+			log.warn("Error de facturama: {}", ex.getMessage(), ex);
+                        mensaje = "Hubo un problema para generar la factura";
+                        FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, mensaje);
+		} catch (InventarioException ex) {
+                        log.warn("Error de inventario: {}", ex.getMessage(), ex);
+                        mensaje = ex.getMessage();
+                         FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, titulo, mensaje);
+		} finally {
+                    PrimeFaces.current().ajax().update("form:messages");
+		}
+
+	}
+
 	public void setFolioFactura(Factura factura) {
 		this.folio = String.format("%s-%s", factura.getNomSerie(), factura.getNumero());
 		log.info("Preparando vista previa de la factura (Folio: {})", this.folio);
@@ -644,5 +676,11 @@ public class FacMantenimentoBean implements Serializable {
 			this.regimenFiscalReceptor = regimenFiscalReceptor;
 		}
 
-      
+		public StreamedContent getFactura() {
+			return factura;
+		}
+
+		public void setFactura(StreamedContent factura) {
+			this.factura = factura;
+		}
 }

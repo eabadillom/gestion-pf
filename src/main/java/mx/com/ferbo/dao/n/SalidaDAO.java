@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao.n;
 
+import com.ferbo.tools.exception.SystemException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
@@ -323,5 +324,35 @@ public class SalidaDAO extends BaseDAO<Salida, Integer>
 		
 		return modelList;
 	}
+     
+    public List<Salida> buscarPorClientePeriodo(Integer idCliente, Date fechaInicio, Date fechaFin) {
+    
+        EntityManager em = null;
+        List<Salida> lista = null;
+
+        try {
+            em = getEntityManager();
+            lista = em.createNamedQuery("Salida.findByClienteYPeriodo", Salida.class)
+                    .setParameter("idCliente", idCliente)
+                    .setParameter("fechaInicio", fechaInicio)
+                    .setParameter("fechaFin", fechaFin)
+                    .getResultList();
+            for (Salida auxSalida : lista) {
+                log.debug(auxSalida.getListSalidaDetalle());
+                for (SalidaDetalle auxSalidaDetalle : auxSalida.getListSalidaDetalle()) {
+                    log.debug(auxSalidaDetalle.getPartida());
+                    log.debug(auxSalidaDetalle.getPartida().getUnidadDeProductoCve());
+                    log.debug(auxSalidaDetalle.getPartida().getUnidadDeProductoCve().getUnidadDeManejoCve());
+                    log.debug(auxSalidaDetalle.getPartida().getUnidadDeProductoCve().getProductoCve());
+                }
+            }
+            return lista;
+        } catch (Exception ex) {
+            throw new SystemException("Hubo un problema al buscar las ordenes de salida con los filtros seleccionados");
+        } finally {
+            close(em);
+        }
+            
+    }
     
 }

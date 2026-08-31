@@ -28,14 +28,15 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.StreamedContent;
 
+import com.ferbo.bitacora.exception.BitacoraException;
+import com.ferbo.bitacora.model.Bitacora;
+import com.ferbo.bitacora.model.ContextoBitacora;
 import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.ValidationException;
 
-import mx.com.ferbo.bitacora.business.BitacoraBL;
-import mx.com.ferbo.bitacora.enums.NombrePantalla;
-import mx.com.ferbo.bitacora.enums.TipoPantalla;
-import mx.com.ferbo.bitacora.model.ContextoBitacora;
-import mx.com.ferbo.bitacora.model.EventoBitacora;
+import mx.com.ferbo.bitacoraimp.business.BitacoraBLImp;
+import mx.com.ferbo.bitacoraimp.enums.NombrePantalla;
+import mx.com.ferbo.bitacoraimp.enums.TipoPantalla;
 import mx.com.ferbo.business.constancias.ConstanciaSalidaBL;
 import mx.com.ferbo.dao.CandadoSalidaDAO;
 import mx.com.ferbo.dao.ConstanciaSalidaDAO;
@@ -182,10 +183,10 @@ public class AltaConstanciaSalidaBean implements Serializable {
 	private String descripcionEvento = "";
 
 	@Inject
-	private BitacoraBL bitacoraBL;
+	private BitacoraBLImp bitacoraBL;
 
-	private EventoBitacora eventoBitacora;
-	private List<EventoBitacora> eventos;
+	private Bitacora eventoBitacora;
+	private List<Bitacora> eventos;
 	private ContextoBitacora contextBitacora;
 	private String documento = "";
 
@@ -265,8 +266,15 @@ public class AltaConstanciaSalidaBean implements Serializable {
 
 		eventos = new ArrayList<>();
 		idSesion = session.getId();
-		contextBitacora = ContextoBitacora.of(idSesion, usuario, NombrePantalla.CONSTANCIA_DE_SALIDA,
-				TipoPantalla.ALTA);
+		Integer idUsuario = usuario.getId();
+		String nombreUsuario = usuario.getNombre() + " " + usuario.getApellido1() + " " + usuario.getApellido2();
+		try {
+			contextBitacora = ContextoBitacora.of(idSesion, idUsuario, nombreUsuario, NombrePantalla.CONSTANCIA_DE_SALIDA.toString(),
+				TipoPantalla.ALTA.toString());
+		} catch (BitacoraException ex) {
+			log.error("{}: {}", ex.getCode(), ex.getMessage(), ex);
+		}
+		
 	}
 
 	@PostConstruct
@@ -490,10 +498,8 @@ public class AltaConstanciaSalidaBean implements Serializable {
 
 			bitacoraBL.agregarORemplazarSiExiste(eventos, contextBitacora, descripcionEvento, documento);
 
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -553,7 +559,7 @@ public class AltaConstanciaSalidaBean implements Serializable {
 					+ constanciaSalidaServicios.getNumCantidad() + " "
 					+ servicioClienteSelect.getUnidad().getUnidadDeManejoDs();
 
-			eventoBitacora = EventoBitacora.of(contextBitacora)
+			eventoBitacora = Bitacora.of(contextBitacora)
 					.descripcion(descripcionEvento)
 					.documento(documento)
 					.build();
@@ -562,10 +568,8 @@ public class AltaConstanciaSalidaBean implements Serializable {
 			this.servicioClienteSelect = null;
 			this.cantidadServicio = null;
 
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -741,7 +745,7 @@ public class AltaConstanciaSalidaBean implements Serializable {
 					+ " kg y una temperatura de " + detalleSalida.getTemperatura() + "°C, proveniente de la entrada "
 					+ detalleSalida.getFolioEntrada();
 
-			eventoBitacora = EventoBitacora.of(contextBitacora)
+			eventoBitacora = Bitacora.of(contextBitacora)
 					.descripcion(descripcionEvento)
 					.documento(documento)
 					.build();
@@ -761,10 +765,8 @@ public class AltaConstanciaSalidaBean implements Serializable {
 
 			listaInventario.remove(inventarioSelected);
 
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -854,15 +856,13 @@ public class AltaConstanciaSalidaBean implements Serializable {
 					+ detalleSalida.getTemperatura() + " °C, proveniente de la entrada "
 					+ detalleSalida.getFolioEntrada();
 
-			eventoBitacora = EventoBitacora.of(contextBitacora)
+			eventoBitacora = Bitacora.of(contextBitacora)
 					.descripcion(descripcionEvento)
 					.documento(documento)
 					.build();
 			eventos.add(eventoBitacora);
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -894,7 +894,7 @@ public class AltaConstanciaSalidaBean implements Serializable {
 					+ csServicio.getConstanciaSalidaServiciosPK().getServicioCve().getServicioNombre()
 					+ " con cantidad " + csServicio.getNumCantidad();
 
-			eventoBitacora = EventoBitacora.of(contextBitacora)
+			eventoBitacora = Bitacora.of(contextBitacora)
 					.descripcion(descripcionEvento)
 					.documento(documento)
 					.build();
@@ -903,9 +903,7 @@ public class AltaConstanciaSalidaBean implements Serializable {
 
 			this.listadoConstanciaSalidaServicios.remove(csServicio);
 		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_ERROR;
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -955,14 +953,14 @@ public class AltaConstanciaSalidaBean implements Serializable {
 					throw new BusinessException("El dato general recibido no es válido");
 			}
 
-			eventoBitacora = EventoBitacora.of(contextBitacora)
+			eventoBitacora = Bitacora.of(contextBitacora)
 					.descripcion(descripcionEvento)
 					.documento(documento)
 					.build();
 
 			eventos.add(eventoBitacora);
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		}
 	}
 
@@ -1146,7 +1144,7 @@ public class AltaConstanciaSalidaBean implements Serializable {
 
 			descripcionEvento = "Guardó la constancía de salida";
 
-			eventoBitacora = EventoBitacora.of(contextBitacora)
+			eventoBitacora = Bitacora.of(contextBitacora)
 					.descripcion(descripcionEvento)
 					.documento(documento)
 					.build();
@@ -1157,10 +1155,8 @@ public class AltaConstanciaSalidaBean implements Serializable {
 
 			mensaje = "La constancia de salida se guardó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
-		} catch (ValidationException ex) {
-			log.warn(ex.getMessage());
-			mensaje = "Ocurrió un error en la bitacora.\n Contacte con el administrador del sistema";
-			severity = FacesMessage.SEVERITY_ERROR;
+		} catch (BitacoraException ex) {
+			log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
 		} catch (InventarioException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;

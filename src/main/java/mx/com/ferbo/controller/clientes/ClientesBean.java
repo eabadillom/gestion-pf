@@ -479,7 +479,11 @@ public class ClientesBean implements Serializable {
     public void editarPrecioServicio(PrecioServicio original) {
 
         precioServicioSelected = original;
-        precioServicioTemporal = precioServicioBL.clonar(original);
+        if (original.getId() == null) {
+            precioServicioTemporal = precioServicioBL.clonar(original);
+        } else {
+            precioServicioTemporal = precioServicioBL.clonarConId(original);
+        }
 
     }
 

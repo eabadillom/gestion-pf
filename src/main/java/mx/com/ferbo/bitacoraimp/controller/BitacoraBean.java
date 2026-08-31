@@ -1,4 +1,4 @@
-package mx.com.ferbo.bitacora.controller;
+package mx.com.ferbo.bitacoraimp.controller;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -17,16 +17,17 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.StreamedContent;
 
+import com.ferbo.bitacora.dto.BitacoraDTO;
+import com.ferbo.bitacora.exception.BitacoraException;
+import com.ferbo.bitacora.model.Bitacora;
+import com.ferbo.bitacora.model.FiltroBitacora;
 import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.SystemException;
 import com.ferbo.tools.util.date.DateFormatter;
 
-import mx.com.ferbo.bitacora.business.BitacoraBL;
-import mx.com.ferbo.bitacora.dto.BitacoraDTO;
-import mx.com.ferbo.bitacora.enums.NombrePantalla;
-import mx.com.ferbo.bitacora.enums.TipoPantalla;
-import mx.com.ferbo.bitacora.model.EventoBitacora;
-import mx.com.ferbo.bitacora.model.FiltroBitacora;
+import mx.com.ferbo.bitacoraimp.business.BitacoraBLImp;
+import mx.com.ferbo.bitacoraimp.enums.NombrePantalla;
+import mx.com.ferbo.bitacoraimp.enums.TipoPantalla;
 import mx.com.ferbo.business.UsuarioBL;
 import mx.com.ferbo.model.Usuario;
 import mx.com.ferbo.util.FacesUtils;
@@ -40,7 +41,7 @@ public class BitacoraBean implements Serializable {
 
     private static final Logger log = LogManager.getLogger(BitacoraBean.class);
 
-    private List<EventoBitacora> eventos;
+    private List<Bitacora> eventos;
 
     private List<BitacoraDTO> grupos;
 
@@ -57,7 +58,7 @@ public class BitacoraBean implements Serializable {
     private List<LocalDate> rangoFechas;
 
     @Inject
-    private BitacoraBL bitacoraBL;
+    private BitacoraBLImp bitacoraBL;
 
     private List<Usuario> usuarios;
 
@@ -89,7 +90,7 @@ public class BitacoraBean implements Serializable {
             obtenerUsuariosActivosOInactivos();
             grupoSelected.setMomento(new Date());
             log.info("Finaliza proceso para cargar bitacora del dia de hoy");
-        } catch (SystemException ex) {
+        } catch (BitacoraException ex) {
             log.warn("Hubo un problema al carga la bitacora del dia de hoy. {}", ex.getMessage(), ex);
         }
     }
@@ -103,8 +104,8 @@ public class BitacoraBean implements Serializable {
             grupos = bitacoraBL.obtenerGruposPorFiltros(filtros);
             message = "La bitacora se filtro exitosamente";
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, title, message);
-        } catch (SystemException ex) {
-            log.warn("Error: {}", ex.getMessage(), ex);
+        } catch (BitacoraException ex) {
+            log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
             message = ex.getMessage();
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, title, message);
         } finally {
@@ -118,8 +119,8 @@ public class BitacoraBean implements Serializable {
             eventos = bitacoraBL.obtenerPorFiltros(grupo);
             message = "La bitacora se filtro exitosamente";
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, title, message);
-        } catch (SystemException ex) {
-            log.warn("Error: {}", ex.getMessage(), ex);
+        } catch (BitacoraException ex) {
+            log.warn("{}: {}", ex.getCode(), ex.getMessage(), ex);
         } finally {
             actualizarMensajes();
         }
@@ -132,7 +133,7 @@ public class BitacoraBean implements Serializable {
             this.message = "Los usuarios se cargaron con exito";
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, title, message);
         } catch (SystemException ex) {
-            log.warn("Error...}", ex);
+            log.warn("Error: {}", ex.getMessage(), ex);
         } finally {
             actualizarMensajes();
         }
@@ -144,16 +145,19 @@ public class BitacoraBean implements Serializable {
             String finFecha = DateFormatter.format(this.filtros.getFin(), "dd-MM-yyyy");
             String filename = String.format("Bitacora" + inicioFecha + "al" + finFecha);
             byte[] bytes = this.bitacoraBL.exportToFile(this.filtros, extension)
-                    .orElseThrow(() -> new ToolException("Hubo un problema para generar el PDF de la bitácora"));
-            if("pdf".equalsIgnoreCase(extension)) {
+                    .orElseThrow(() -> new ToolException("Hubo un problema para generar el archivo de la bitácora"));
+            /*if("pdf".equalsIgnoreCase(extension)) {
             	this.bitacora = FacesUtils.toPDF(bytes, filename);
             	return;
             }
             
             if("xlsx".equalsIgnoreCase(extension)) {
-            	this.bitacora = FacesUtils.toXLSX(bytes, filename);
+            	//this.bitacora = FacesUtils.toXLSX(bytes, filename);
+                bitacora = FacesUtils.crearStreamedContentDesdeBytes(bytes, filename, extension);
             	return;
-            }
+            }*/
+
+            bitacora = FacesUtils.crearStreamedContentDesdeBytes(bytes, filename, extension);
             
         } catch (ToolException ex) {
             log.warn("{}", ex.getMessage(), ex);
@@ -164,7 +168,7 @@ public class BitacoraBean implements Serializable {
             message = ex.getMessage();
             FacesUtils.addMessage(FacesMessage.SEVERITY_WARN, title, message);
         } catch (Exception ex) {
-            log.error("Error al generar PDF de bitácora. {}", ex.getMessage(), ex);
+            log.error("Error al generar el archivo de la bitácora. {}", ex.getMessage(), ex);
             message = "Error al generar PDF de la bitácora. \nContacte con el administrador del sistema";
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, title, message);
         } finally {
@@ -173,8 +177,7 @@ public class BitacoraBean implements Serializable {
     }
 
     public String nombreCompleto(BitacoraDTO bitacoraDTO) {
-        return bitacoraDTO.getNombreUsuario() + " " + bitacoraDTO.getApellido1Usuario() + " "
-                + bitacoraDTO.getApellido2Usuario();
+        return bitacoraDTO.getUsuario();
     }
 
     private void actualizarMensajes() {
@@ -189,19 +192,19 @@ public class BitacoraBean implements Serializable {
         this.rangoFechas = rangoFechas;
     }
 
-    public List<EventoBitacora> getEventos() {
+    public List<Bitacora> getEventos() {
         return eventos;
     }
 
-    public void setEventos(List<EventoBitacora> eventos) {
+    public void setEventos(List<Bitacora> eventos) {
         this.eventos = eventos;
     }
 
-    public List<NombrePantalla> getNombrePantallas() {
+    public List<String> getNombrePantallas() {
         return bitacoraBL.nombresPantallaEnumToList();
     }
 
-    public List<TipoPantalla> getTipoPantallas() {
+    public List<String> getTipoPantallas() {
         return bitacoraBL.tiposPantallaEnumToList();
     }
 

@@ -267,6 +267,31 @@ public class FacturamaBL {
         }
 	}
 	
-	
+	public byte[] getFileBytesDeFacturama(String extension, Factura factura) throws InventarioException, FacturamaException {
+
+		String sContent = null;
+        byte[] content = null;
+
+		if (factura == null) {
+			throw new InventarioException("No se estableció una factura");
+		}
+
+		if (factura.getUuid() == null || "".equalsIgnoreCase(factura.getUuid())) {
+			throw new InventarioException("La factura no tiene un UUID");
+		}
+
+		if (extension == null || "".equalsIgnoreCase(extension)) {
+			throw new InventarioException("La extensión no puede ser vacía");
+		}
+
+		extension = extension.trim().toLowerCase();
+
+		FileViewModel file = cfdiBL.getFile(extension, "issuedLite", factura.getUuid());
+                sContent = file.getContent();
+                content = Base64.getDecoder().decode(sContent);
+
+		return content;
+        	
+	}
 
 }
