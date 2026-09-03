@@ -27,8 +27,8 @@
 				</div>
 				<div class="menu">
 					<po:menu widgetVar="OmegaMenuWidget">
-						<p:menuitem id="frb_orden_retiro" value="Ordenes de retiro" icon="pi pi-fw pi-sign-in" outcome="/inventarios/orden/retiro/principal" badge="#{sideBarBean.numeroSalidas}" rendered="#{(sideBarBean.usuario.perfil eq 1 or sideBarBean.usuario.perfil eq 4) and (sideBarBean.numeroSalidas ne null)}"/>
-						<p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
+						<p:menuitem id="frb_orden_retiro" value="Ordenes de retiro" icon="pi pi-fw pi-sign-out" outcome="/inventarios/orden/retiro/principal" badge="#{sideBarBean.numeroSalidas}" rendered="#{(sideBarBean.usuario.perfil eq 1 or sideBarBean.usuario.perfil eq 4) and (sideBarBean.numeroSalidas ne null)}"/>
+                        <p:submenu id="frb_inventarios" label="Inventarios" icon="pi pi-fw pi-building">
 							<p:submenu id="frb_inventarios_sm1" label="Entradas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm111" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/entrada/alta/principal" />
 								<p:menuitem id="frb_inventarios_sm123" value="Consultar"	icon="pi pi-fw pi-search" outcome="/inventarios/entrada/consultar/principal"/>
@@ -36,6 +36,7 @@
 							<p:submenu id="frb_inventarios_sm3" label="Salidas" icon="pi pi-fw pi-plus">
 								<p:menuitem id="frb_inventarios_sm110" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/salida/alta/principal" />
 								<p:menuitem id="frb_inventarios_sm120" value="Consultar" icon="pi pi-fw pi-search" outcome="/inventarios/salida/consultar/principal"/>
+								<p:menuitem id="frb_consulta_orden_retiro" value="Ordenes de retiro" icon="pi pi-fw pi-search" outcome="/inventarios/orden/consulta/principal" rendered="#{sideBarBean.usuario.perfil eq 2 or sideBarBean.usuario.perfil eq 3}"/>
 							</p:submenu>
 							<p:submenu id="frb_inventariossm3" label="Traspasos" icon="pi pi-copy">
 								<p:menuitem id="frb_inventariossm31" value="Alta" icon="pi pi-fw pi-check" outcome="/inventarios/traspasos/alta/principal" />
@@ -83,6 +84,7 @@
 						<p:submenu id="frb_facturacion_ingresos" label="Ingresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem id="frb_facturacion_ingresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/ingAlta" />
 							<p:menuitem id="frb_facturacion_ingresos_actualizar" value="Consultar" icon="pi pi-fw pi-search" outcome="/protected/catalogos/ingAct" />
+                                                        <p:menuitem id="frb_facturacion_ingresos_serie_complemento" value="Serie Complemento de Pago" icon="pi pi-book" outcome="/protected/catalogos/serieComplementos" />
 						</p:submenu>
 						<p:submenu id="frb_facturacion_egresos" label="Egresos" icon="pi pi-fw pi-money-bill" rendered="#{(sideBarBean.usuario.perfil != 1) and (sideBarBean.usuario.perfil != 4)}">
 							<p:menuitem id="facturacion_egresos_alta" value="Alta" icon="pi pi-fw pi-plus" outcome="/protected/catalogos/egresos/alta/principal" />

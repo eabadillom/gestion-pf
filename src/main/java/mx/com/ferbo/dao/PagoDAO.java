@@ -10,9 +10,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
+import mx.com.ferbo.util.DAOException;
 import mx.com.ferbo.util.EntityManagerUtil;
 
 public class PagoDAO extends IBaseDAO<Pago, Integer> {
@@ -108,11 +108,17 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 			em.getTransaction().begin();
 			// em.merge(pago);
 			em.createNativeQuery(
-					"UPDATE pago SET factura = :idFactura, tipo = :idTipo, monto= :monto, fecha = :fecha, banco = :idBanco, referencia = :referencia WHERE id = :idPago")
-					.setParameter("idFactura", pago.getFactura().getId()).setParameter("idTipo", pago.getTipo().getId())
-					.setParameter("monto", pago.getMonto()).setParameter("fecha", pago.getFecha())
-					.setParameter("idBanco", pago.getBanco().getId()).setParameter("referencia", pago.getReferencia())
-					.setParameter("idPago", pago.getId()).executeUpdate();
+					"UPDATE pago SET factura = :idFactura, tipo = :idTipo, cd_comp_pago = :complementoPago, monto= :monto, fecha = :fecha, tm_hora =:hora, banco = :idBanco, referencia = :referencia, nu_parcialidad = :parcialidad WHERE id = :idPago")
+					.setParameter("idFactura", pago.getFactura().getId())
+                                        .setParameter("idTipo", pago.getTipo().getId())
+					.setParameter("complementoPago", (pago.getComplementoPago() != null) ? pago.getComplementoPago().getId() : null)
+                                        .setParameter("monto", pago.getMonto())
+                                        .setParameter("fecha", pago.getFecha())
+                                        .setParameter("hora", pago.getHora())
+					.setParameter("idBanco", pago.getBanco().getId())
+                                        .setParameter("referencia", pago.getReferencia())
+					.setParameter("idPago", pago.getId())
+                                        .setParameter("parcialidad", pago.getParcialidad()).executeUpdate();
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception ex) {
@@ -180,19 +186,50 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		}
 	}
 
-	public List<Pago> buscaPorClienteFechas(Cliente c, Date startDate, Date endDate) {
-		EntityManager em = null;
+	public List<Pago> buscaPor(String rfcEmisor, Integer idCliente, Date periodoInicio, Date periodoFin, String metodoPago) throws DAOException {
+		List<Pago> listPagos = null;
+        EntityManager em = null;
+        String query = null;
+        
 		try {
+			query = "SELECT p FROM Pago p INNER JOIN FETCH p.factura f  WHERE (p.factura.emisorRFC = :rfcEmisor OR :rfcEmisor IS NULL) AND (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.factura.metodoPago = :metodoPago OR :metodoPago IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)";
 			em = EntityManagerUtil.getEntityManager();
-			return em.createNamedQuery("Pago.findByClienteFechas", Pago.class)
-					.setParameter("cteCve", (c == null ? null : c.getCteCve())).setParameter("startDate", startDate)
-					.setParameter("endDate", endDate).getResultList();
+			listPagos = em.createQuery(query, Pago.class)
+			        .setParameter("rfcEmisor", rfcEmisor)
+			        .setParameter("cteCve", idCliente)
+			        .setParameter("startDate", periodoInicio)
+			        .setParameter("endDate", periodoFin)
+			        .setParameter("metodoPago", metodoPago)
+			        .getResultList();
+			listPagos.stream().forEach(p -> log.debug("Metodo pago: {}", p.getFactura().getMetodoPago()));
 		} catch (Exception ex) {
-			System.out.println("ERROR" + ex.getMessage());
-			return null;
+			log.error("Error al consultar la lista de pagos...", ex);
+			throw new DAOException("Error al obtener la lista de pagos");
 		} finally {
 			EntityManagerUtil.close(em);
 		}
+                return listPagos;
 	}
+        
+        public List<Pago> buscaPorFacturaFechas(Factura f, Date startDate, Date endDate, String metodoPago) throws DAOException {
+            List<Pago> listPagos = null;
+            EntityManager em = null;
+
+            try {
+                em = EntityManagerUtil.getEntityManager();
+                listPagos = em.createNamedQuery("Pago.findByFacturaFechas", Pago.class)
+                    .setParameter("idFactura", (f == null ? null : f.getId()))
+                    .setParameter("startDate", startDate)
+                    .setParameter("endDate", endDate)
+                    .setParameter("metodoPago", metodoPago)
+                    .getResultList();
+            } catch (Exception ex) {
+                log.error("Error al obtener la lista de pagos" + ex.getMessage());
+                throw new DAOException("No se obtuvieron los pagos de la factura ");
+            } finally {
+                EntityManagerUtil.close(em);
+            }
+            return listPagos;
+        }
 
 }
