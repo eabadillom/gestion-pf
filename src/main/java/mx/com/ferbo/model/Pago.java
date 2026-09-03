@@ -33,8 +33,7 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "Pago.findByReferencia", query = "SELECT p FROM Pago p WHERE p.referencia = :referencia"),
         @NamedQuery(name = "Pago.findByFacturaId", query = "SELECT p FROM Pago p WHERE p.factura.id = :facturaId"),
         @NamedQuery(name = "Pago.findByClienteFechas", query = "SELECT p FROM Pago p WHERE (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)"),
-        @NamedQuery(name = "Pago.findByFacturaFechas", query = "SELECT p FROM Pago p WHERE (p.factura.id = :idFactura OR :idFactura IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate) AND p.factura.metodoPago = :metodoPago ORDER BY p.fecha ASC"),
-        @NamedQuery(name = "Pago.findByParametros", query = "SELECT p FROM Pago p WHERE (p.factura.emisorRFC = :rfcEmisor OR :rfcEmisor IS NULL) AND (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.factura.metodoPago = :metodoPago) AND (p.fecha BETWEEN :startDate AND :endDate)")
+        @NamedQuery(name = "Pago.findByFacturaFechas", query = "SELECT p FROM Pago p WHERE (p.factura.id = :idFactura OR :idFactura IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate) AND p.factura.metodoPago = :metodoPago ORDER BY p.fecha ASC")
 })
 public class Pago implements Serializable {
 

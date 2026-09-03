@@ -70,17 +70,17 @@
                 <p:outputPanel id="pnlCliente" class="p-grid ui-fluid p-col-12" rendered="#{ingresosCrudBean.facturaSelect != null}">
                     <div class="p-col-4 p-md-4">
                         <p:outputLabel for="@next" value="Factura" />
-                        <p:inputText widgetVar="factura-new" id="factura-new" value="#{ingresosCrudBean.facturaSelect.nomSerie}-#{ingresosCrudBean.facturaSelect.numero}" readonly="true" />
+                        <p:inputText widgetVar="factura-new" id="factura-new" value="#{ingresosCrudBean.facturaSelect.nomSerie}-#{ingresosCrudBean.facturaSelect.numero}" disabled="true" />
                     </div>
                     <div class="p-col-4 p-md-4">
                         <p:outputLabel for="@next" value="Total factura" />
-                        <p:inputNumber widgetVar="monto-new" id="monto-new" value="#{ingresosCrudBean.facturaSelect.total}" readonly="true" decimalPlaces="2" symbol="$ " symbolPosition="p" inputStyle="text-align: right;">
+                        <p:inputNumber widgetVar="monto-new" id="monto-new" value="#{ingresosCrudBean.facturaSelect.total}" disabled="true" decimalPlaces="2" symbol="$ " symbolPosition="p" inputStyle="text-align: right;">
                         </p:inputNumber>
                         
                     </div>
                     <div class="p-col-4 p-md-4">
                         <p:outputLabel for="@next" value="Debe" />
-                        <p:inputNumber widgetVar="saldo-new" id="saldo-new" value="#{ingresosCrudBean.saldoAnterior}" readonly="true" decimalPlaces="2" symbol="$ " symbolPosition="p" inputStyle="text-align: right;">
+                        <p:inputNumber widgetVar="saldo-new" id="saldo-new" value="#{ingresosCrudBean.saldoAnterior}" disabled="true" decimalPlaces="2" symbol="$ " symbolPosition="p" inputStyle="text-align: right;">
                         </p:inputNumber>
                     </div>
                     <div class="p-col-12 p-md-12">
