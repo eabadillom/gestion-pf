@@ -193,7 +193,7 @@ public class IngresosCrudBean implements Serializable {
     public void calculoFactura() {
         log.debug("Factura: {}", facturaSelect);
         List<Pago> listaPagos = pagofactDAO.buscarPorFactura(facturaSelect.getId());
-
+        
         BigDecimal saldoAnt = facturaSelect.getTotal();
         BigDecimal totalFactura = facturaSelect.getTotal();
         BigDecimal sumaTotal = BigDecimal.ZERO;
@@ -236,6 +236,8 @@ public class IngresosCrudBean implements Serializable {
         log.debug("Suma total de pagos: {}", sumaTotal);
         saldoAnterior = saldoAnt;
         restaTotal = totalFactura.subtract(sumaTotal);
+        
+        this.hora = LocalTime.of(0, 0, 0);
     }
 
     public synchronized void agregaPagoFactura() {

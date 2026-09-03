@@ -10,8 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.model.Cliente;
-import mx.com.ferbo.model.EmisoresCFDIS;
 import mx.com.ferbo.model.Factura;
 import mx.com.ferbo.model.Pago;
 import mx.com.ferbo.util.DAOException;
@@ -188,18 +186,22 @@ public class PagoDAO extends IBaseDAO<Pago, Integer> {
 		}
 	}
 
-	public List<Pago> buscaPorParametros(EmisoresCFDIS e, Cliente c, Date startDate, Date endDate, String metodoPago) throws DAOException {
+	public List<Pago> buscaPor(String rfcEmisor, Integer idCliente, Date periodoInicio, Date periodoFin, String metodoPago) throws DAOException {
 		List<Pago> listPagos = null;
-                EntityManager em = null;
+        EntityManager em = null;
+        String query = null;
+        
 		try {
+			query = "SELECT p FROM Pago p INNER JOIN FETCH p.factura f  WHERE (p.factura.emisorRFC = :rfcEmisor OR :rfcEmisor IS NULL) AND (p.factura.cliente.cteCve = :cteCve OR :cteCve IS NULL) AND (p.factura.metodoPago = :metodoPago OR :metodoPago IS NULL) AND (p.fecha BETWEEN :startDate AND :endDate)";
 			em = EntityManagerUtil.getEntityManager();
-			listPagos = em.createNamedQuery("Pago.findByParametros", Pago.class)
-                                .setParameter("rfcEmisor", (e == null ? null : e.getNb_rfc()))
-                                .setParameter("cteCve", (c == null ? null : c.getCteCve()))
-                                .setParameter("startDate", startDate)
-                                .setParameter("endDate", endDate)
-                                .setParameter("metodoPago", metodoPago)
-                                .getResultList();
+			listPagos = em.createQuery(query, Pago.class)
+			        .setParameter("rfcEmisor", rfcEmisor)
+			        .setParameter("cteCve", idCliente)
+			        .setParameter("startDate", periodoInicio)
+			        .setParameter("endDate", periodoFin)
+			        .setParameter("metodoPago", metodoPago)
+			        .getResultList();
+			listPagos.stream().forEach(p -> log.debug("Metodo pago: {}", p.getFactura().getMetodoPago()));
 		} catch (Exception ex) {
 			log.error("Error al consultar la lista de pagos...", ex);
 			throw new DAOException("Error al obtener la lista de pagos");

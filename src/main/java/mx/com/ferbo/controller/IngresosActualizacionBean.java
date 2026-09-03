@@ -3,9 +3,11 @@ package mx.com.ferbo.controller;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -21,8 +23,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.business.complemento.ComplementoBL;
 import mx.com.ferbo.business.ComplementoPagoBL;
+import mx.com.ferbo.business.complemento.ComplementoBL;
 import mx.com.ferbo.dao.BancoDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.MedioPagoDAO;
@@ -88,11 +90,14 @@ public class IngresosActualizacionBean implements Serializable {
 
     private BigDecimal totalPagos;
     private String tipoMetodoPago;
+    private Boolean habilitarComplemento;
     private boolean habilitarTimbrado = false;
 
     private Usuario usuario;
     private FacesContext context;
     private HttpServletRequest request;
+    
+    private NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("es", "MX"));
 
     public IngresosActualizacionBean() {
         listaPago = new ArrayList<Pago>();
@@ -102,6 +107,8 @@ public class IngresosActualizacionBean implements Serializable {
         pagoSelected = new Pago();
         cteSelect = new Cliente();
         complementoBL = new ComplementoBL();
+        this.habilitarComplemento = Boolean.FALSE;
+        this.tipoMetodoPago = null;
     }
 
     @SuppressWarnings("unchecked")
@@ -121,7 +128,7 @@ public class IngresosActualizacionBean implements Serializable {
         listEmisores = emisoresDAO.buscarTodos();
         listaBancos = bancoDAO.buscarTodos();
         listatipoPago = tipoPagoDAO.buscarTodos();
-        listaPagosSeleccionados = new ArrayList();
+        listaPagosSeleccionados = new ArrayList<Pago>();
         listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
         this.startDate = new Date();
         this.endDate = new Date();
@@ -134,47 +141,59 @@ public class IngresosActualizacionBean implements Serializable {
     public void filtraPagos() {
         String messages = null;
         Severity severity = null;
+        String title = null;
         try {
-            if (emisoresSelected == null) {
-                throw new InventarioException("Debe seleccionar un emisor.");
-            }
-
-            if (tipoMetodoPago.isEmpty() || tipoMetodoPago == null) {
-                throw new InventarioException("Debe seleccionar el método de pago.");
-            }
             consultaListaPagos();
             this.totalPagos = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
-            for (Pago pago : listaPago) {
-                if (pago.getTipo().getId() == 5) {
-                    continue;
-                }
-                this.totalPagos = this.totalPagos.add(pago.getMonto());
+            this.totalPagos = listaPago.stream()
+            		.filter(p -> p.getTipo().getId() != 5)
+            		.map(Pago::getMonto)
+            		.reduce(BigDecimal.ZERO, BigDecimal::add)
+            		;
+            
+            if(this.emisoresSelected != null) {
+            	/*Obtener la serie del complemento de pago*/
+            	this.listSerieComplemento = complementoBL.obtenerSerieComplemento(emisoresSelected.getCd_emisor());
+            	this.listaPagosSeleccionados.clear();
+            	if(this.listSerieComplemento == null || this.listSerieComplemento.size() == 0)
+            		throw new InventarioException("Debe registrar una Serie de Complemento de pago para este emisor.");
+            	this.serieComplementoPago = this.listSerieComplemento.get(0);
             }
-
-            /*Obtener la serie del complemento de pago*/
-            this.listSerieComplemento = complementoBL.obtenerSerieComplemento(emisoresSelected.getCd_emisor());
-            this.listaPagosSeleccionados.clear();
-            this.serieComplementoPago = this.listSerieComplemento.get(0);
-
+            
+            if(this.emisoresSelected != null && this.cteSelect != null && this.tipoMetodoPago != null) {
+            	this.habilitarComplemento = Boolean.TRUE;
+            	log.info("Habilitar el registro de complementos de pago.");
+            } else {
+            	this.habilitarComplemento = Boolean.FALSE;
+            	log.info("Deshabilitar el registro de complementos de pago.");
+            }
+            
             log.info("Se ha filtrado la lista de pagos");
             severity = FacesMessage.SEVERITY_INFO;
+            title = "Completado";
             messages = "La consulta se realizó correctamente.";
         } catch (InventarioException ex) {
             log.error("Ocurrió un problema al consultar la lista de pagos...", ex);
             severity = FacesMessage.SEVERITY_WARN;
+            title = "Atención";
             messages = ex.getMessage();
         } catch (Exception ex) {
             log.error("Ocurrió un problema al consultar la lista de pagos...", ex);
             severity = FacesMessage.SEVERITY_ERROR;
             messages = "Error al consultar la lista de pagos";
+            title = "Error";
         } finally {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Ingresos", messages));
-            PrimeFaces.current().ajax().update("form:messages");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, messages));
+            PrimeFaces.current().ajax().update("form:messages", "form:pnlComplementoPago");
         }
     }
 
     public void consultaListaPagos() throws DAOException {
-        listaPago = pagoDAO.buscaPorParametros(emisoresSelected, cteSelect, startDate, endDate, tipoMetodoPago);
+    	String rfcEmisor = this.emisoresSelected == null ? null : this.emisoresSelected.getNb_rfc();
+    	Integer idCliente = this.cteSelect == null ? null : this.cteSelect.getCteCve();
+    	String metodoPago = (this.tipoMetodoPago == null || "".equalsIgnoreCase(this.tipoMetodoPago.trim()) ? null : this.tipoMetodoPago);
+    	
+        this.listaPago = this.pagoDAO.buscaPor(rfcEmisor, idCliente, this.startDate, this.endDate, metodoPago);
     }
 
     public void cargaInfoPago(Pago pPago) {
@@ -495,6 +514,16 @@ public class IngresosActualizacionBean implements Serializable {
             PrimeFaces.current().ajax().update("form:messages");
         }
     }
+    
+    public String totalPagos() {
+    	BigDecimal total = listaPago.stream().filter(p -> p.getTipo().getId() != 5).map(Pago::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
+    	return formatter.format(total);
+    }
+    
+    public String totalComplemento() {
+    	BigDecimal total = listaPagosSeleccionados.stream().map(Pago::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
+    	return formatter.format(total);
+    }
 
     public synchronized void generarComplemento() {
         String mensaje = null;
@@ -722,5 +751,13 @@ public class IngresosActualizacionBean implements Serializable {
     public void setHabilitarTimbrado(boolean habilitarTimbrado) {
         this.habilitarTimbrado = habilitarTimbrado;
     }
+
+	public Boolean getHabilitarComplemento() {
+		return habilitarComplemento;
+	}
+
+	public void setHabilitarComplemento(Boolean habilitarComplemento) {
+		this.habilitarComplemento = habilitarComplemento;
+	}
 
 }

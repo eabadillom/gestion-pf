@@ -56,7 +56,8 @@
                     <div class="p-col-12 p-md-5" style="display:flex; align-items:flex-end;" >
                         <p:commandButton id="buscarPago" actionListener="#{ingresosActualizacionBean.filtraPagos()}" icon="pi pi-search" 
                                          disabled="#{ingresosActualizacionBean.endDate eq null}" process="@this soClientes tipoMetodoPago startDateSelected endDateSelected" 
-                                         styleClass="edit-button ui-button-primary" value="Consultar" update="form:dt-pagos form:medioPago form:panelComplemento form:dtComplementoPago form:toolbarComplemento" 
+                                         styleClass="edit-button ui-button-primary" value="Consultar"
+                                         update="form:dt-pagos form:medioPago form:panelComplemento form:dtComplementoPago form:toolbarComplemento form:pnlComplementoPago" 
                                          onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
                     </div>
                 </div>
@@ -73,34 +74,38 @@
                 <f:facet name="header">
                     <p:outputLabel value="INGRESOS" />
                 </f:facet>
-                <p:column headerText="Factura" width="5rem" style="text-align: center;">
-                    <h:outputText
-                        value="#{pPago.factura.nomSerie.concat('-').concat(pPago.factura.numero)}" />
+                <p:column headerText="Fecha de pago" width="5rem" style="text-align: center;">
+                    <h:outputText value="#{pPago.fecha}">
+                        <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Factura" width="6rem" style="text-align: center;">
+                    <h:outputText value="#{pPago.factura.nomSerie.concat('-').concat(pPago.factura.numero)}" />
+                </p:column>
+                <p:column headerText="Status" width="5rem" style="text-align: center;">
+                     <h:outputText value="#{pPago.factura.status.nombre}" />
+                 </p:column>
+                <p:column headerText="Tipo" width="10rem" style="text-align: center;">
+                	<h:outputText value="#{pPago.tipo.nombre}" />
                 </p:column>
                 <p:column headerText="Cliente" width="auto" style="text-align: left;">
                     <h:outputText value="#{pPago.factura.nombreCliente}" />
                 </p:column>
                 <ui:remove>
-                 <p:column headerText="Status" width="5rem" style="text-align: center;">
-                     <h:outputText value="#{pPago.factura.status.nombre}" />
-                 </p:column>
+	                <p:column headerText="Hora" width="3rem" style="text-align: center;">
+	                    <h:outputText value="#{not empty pPago.hora ? pPago.hora : '-'}" />
+	                </p:column>
                 </ui:remove>
-                <p:column headerText="Fecha" width="5rem" style="text-align: center;">
-                    <h:outputText value="#{pPago.fecha}">
-                        <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
-                    </h:outputText>
-                </p:column>
-                <p:column headerText="Hora" width="3rem" style="text-align: center;">
-                    <h:outputText value="#{not empty pPago.hora ? pPago.hora : '-'}" />
-                </p:column>
                 <ui:remove>
-                 <p:column headerText="Tipo de Pago" >
-                     <h:outputText value="#{pPago.tipo.nombre}" />
-                 </p:column>
+	                 <p:column headerText="Tipo de Pago" >
+	                     <h:outputText value="#{pPago.tipo.nombre}" />
+	                 </p:column>
                 </ui:remove>
-                <p:column headerText="Parcialidad" width="5rem" style="text-align: center;" >
-                    <h:outputText value="#{not empty pPago.parcialidad and pPago.parcialidad ne 0 ? pPago.parcialidad : '-'}" />
-                </p:column>
+                <ui:remove>
+	                <p:column headerText="Parcialidad" width="5rem" style="text-align: center;" >
+	                    <h:outputText value="#{not empty pPago.parcialidad and pPago.parcialidad ne 0 ? pPago.parcialidad : '-'}" />
+	                </p:column>
+                </ui:remove>
                 <p:column headerText="Importe" width="10rem" style="text-align: right;">
                     <h:outputText value="#{pPago.monto}">
                         <f:convertNumber pattern="¤ #,##0.00" currencySymbol="$ " />
@@ -110,7 +115,8 @@
                     <p:commandButton icon="pi pi-pencil" process="@this" styleClass="edit-button ui-button-primary" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('informacionPagoDialogAct').show()" update="form:panel-actualizaPago" disabled="#{pPago.tipo.id == 5}" actionListener="#{ingresosActualizacionBean.cargaInfoPago(pPago)}" />
                 </p:column>
                 <p:column width="2rem">
-                    <p:commandButton icon="pi pi-plus-circle" process="@this" styleClass="ui-button-success" 
+                    <p:commandButton icon="pi pi-plus-circle" process="@this" styleClass="ui-button-success"
+                    				rendered="#{ingresosActualizacionBean.habilitarComplemento and pPago.tipo.id ne 5}"
                                      onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" 
                                      update="form:dtComplementoPago form:pnlComplementoPago form:dt-pagos form:panelComplemento" 
                                      disabled="#{ingresosActualizacionBean.deshabilitarPagos(pPago)}" 
@@ -121,14 +127,14 @@
                         <f:setPropertyActionListener value="#{pPago}" target="#{ingresosActualizacionBean.pagoSelected}" />
                     </p:commandButton>
                 </p:column>
-                <f:facet name="footer">
-                    <div align="right">
-                        Total de pagos:
-                        <h:outputText value="#{ingresosActualizacionBean.listaPago.stream().filter(p -> p.tipo.id != 5).map(item -> item.monto).sum()}">
-                            <f:convertNumber pattern="$ #,###,##0.00" />
-                        </h:outputText>
-                    </div>
-                </f:facet>
+                <p:columnGroup type="footer">
+					<p:row>
+                    	<p:column colspan="4" />
+                    	<p:column colspan="2" footerText="Total: #{ingresosActualizacionBean.totalPagos()}" style="text-align: right;">
+                    	</p:column>
+                    	<p:column colspan="3"/>
+					</p:row>
+				</p:columnGroup>
             </p:dataTable>
             <p:dialog id="dlgInformacionPago" header="Actualizar Pago" showEffect="fade" modal="true" widgetVar="informacionPagoDialogAct" responsive="true" cache="false">
                 <p:outputPanel id="panel-actualizaPago" class="ui-fluid">
@@ -226,10 +232,18 @@
 
             <p:spacer style="height: 2rem;"/>
 
-            <p:panel id="pnlComplementoPago" header="COMPLEMENTOS DE PAGO" >
-                <p:outputPanel id="panelComplemento" class="ui-fluid">
+            <p:panel id="pnlComplementoPago" header="COMPLEMENTOS DE PAGO">
+                <p:outputPanel id="panelComplemento" class="ui-fluid" rendered="#{ingresosActualizacionBean.habilitarComplemento}">
                     <div class="p-grid p-col-12">
-                        <div class="p-col-12 p-md-5">
+                        <div class="p-col-6 p-md-3">
+                            <p:outputLabel value="Folio (Complemento)" />
+                            <p:selectOneMenu id="serieComPago" autoWidth="false" converter="entityConverter" value="#{ingresosActualizacionBean.serieComplementoPago}" >
+                                <f:selectItem noSelectionOption="true" itemLabel="--SELECCIONE SERIE-NÚMERO--" />
+                                <f:selectItems value="#{ingresosActualizacionBean.listSerieComplemento}" var="serieComp" itemLabel="#{serieComp.serie} - #{serieComp.numero}" itemValue="#{medioP}"/>
+                                <p:ajax process="@this" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="p-col-6 p-md-4">
                             <p:outputLabel value="Forma de pago (SAT)" />
                             <p:selectOneMenu id="medioPago" autoWidth="false" converter="entityConverter" value="#{ingresosActualizacionBean.medioPagoSelect}" required="true" requiredMessage="Ingresa una Forma de Pago" filter="true" filterMatchMode="contains">
                                 <f:selectItem noSelectionOption="true" itemLabel="--SELECCIONE UNA FORMA DE PAGO--" />
@@ -237,33 +251,27 @@
                                 <p:ajax process="@this" />
                             </p:selectOneMenu>
                         </div>
-                        <div class="p-col-12 p-md-5">
-                            <p:outputLabel value="Serie-número (Complemento)" />
-                            <p:selectOneMenu id="serieComPago" autoWidth="false" converter="entityConverter" value="#{ingresosActualizacionBean.serieComplementoPago}" >
-                                <f:selectItem noSelectionOption="true" itemLabel="--SELECCIONE SERIE-NÚMERO--" />
-                                <f:selectItems value="#{ingresosActualizacionBean.listSerieComplemento}" var="serieComp" itemLabel="#{serieComp.serie} - #{serieComp.numero}" itemValue="#{medioP}"/>
-                                <p:ajax process="@this" />
-                            </p:selectOneMenu>
-                        </div>
                     </div>
                 </p:outputPanel>
                 <p:dataTable id="dtComplementoPago" widgetVar="dtComplementoPago" var="pagoComplemento"
                              value="#{ingresosActualizacionBean.listaPagosSeleccionados}" reflow="true"
-                             styleClass="pagos-table" selectionMode="single" size="small"
+                             styleClass="pagos-table" selectionMode="single" size="small" rendered="#{ingresosActualizacionBean.habilitarComplemento}"
                              rowKey="#{pagoComplemento.id}" lazy="true">
                     <f:facet name="header">
                         Pagos
                     </f:facet>
-                    <p:column headerText="Serie-Folio" width="6rem" style="text-align: center;">
-                        <h:outputText value="#{ingresosActualizacionBean.serieComplementoPago.serie}-#{ingresosActualizacionBean.serieComplementoPago.numero}" />
-                    </p:column>
-                    <p:column headerText="Factura" width="5rem" style="text-align: center;">
-                        <h:outputText value="#{pagoComplemento.factura.nomSerie.concat('-').concat(pagoComplemento.factura.numero)}" />
-                    </p:column>
-                    <p:column headerText="Fecha" width="5rem" style="text-align: center;">
+                    <ui:remove>
+	                    <p:column headerText="Serie-Folio" width="6rem" style="text-align: center;">
+	                        <h:outputText value="#{ingresosActualizacionBean.serieComplementoPago.serie}-#{ingresosActualizacionBean.serieComplementoPago.numero}" />
+	                    </p:column>
+                    </ui:remove>
+                    <p:column headerText="Fecha de pago" width="5rem" style="text-align: center;">
                         <h:outputText value="#{pagoComplemento.fecha}">
                             <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
                         </h:outputText>
+                    </p:column>
+                    <p:column headerText="Factura" width="5rem" style="text-align: center;">
+                        <h:outputText value="#{pagoComplemento.factura.nomSerie.concat('-').concat(pagoComplemento.factura.numero)}" />
                     </p:column>
                     <p:column headerText="Cliente" width="auto" style="text-align: left;">
                         <h:outputText value="#{pagoComplemento.factura.nombreCliente}" />
@@ -282,9 +290,17 @@
                                          update="form:dtComplementoPago form:dt-pagos"
                                          disabled="#{ingresosActualizacionBean.habilitarTimbrado eq true}" />
                     </p:column>
+                    <p:columnGroup type="footer">
+						<p:row>
+	                    	<p:column colspan="3" />
+	                    	<p:column colspan="2" footerText="Total: #{ingresosActualizacionBean.totalComplemento()}" style="text-align: right;">
+	                    	</p:column>
+	                    	<p:column />
+						</p:row>
+					</p:columnGroup>
                 </p:dataTable>
                 <p:spacer style="height: 2rem;"></p:spacer>
-                <p:toolbar id="toolbarComplemento" >
+                <p:toolbar id="toolbarComplemento" rendered="#{ingresosActualizacionBean.habilitarComplemento}">
                     <p:toolbarGroup>
                         <div align="center" class="col-5 flex align-items-center justify-content-center">
                             <p:commandButton icon="pi pi-save" value="Guardar" process="@this" update="form:pnlComplementoPago form:toolbarComplemento" 
