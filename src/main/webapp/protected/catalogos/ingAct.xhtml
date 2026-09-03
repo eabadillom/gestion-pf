@@ -136,7 +136,7 @@
 					</p:row>
 				</p:columnGroup>
             </p:dataTable>
-            <p:dialog id="dlgInformacionPago" header="Actualizar Pago" showEffect="fade" modal="true" widgetVar="informacionPagoDialogAct" responsive="true" cache="false">
+            <p:dialog id="dlgInformacionPago" header="Actualizar Pago" showEffect="fade" modal="true" widgetVar="informacionPagoDialogAct" responsive="true" cache="false" fitViewport="true" style="width: 90vw; max-width: 60rem;">
                 <p:outputPanel id="panel-actualizaPago" class="ui-fluid">
                     <div class="p-grid p-col-12">
                         <div class="p-md-12 p-lg-12">
@@ -160,7 +160,7 @@
                         </div>
                         <div class="p-md-3 p-lg-3">
                             <p:outputLabel>Tipo de Pago</p:outputLabel>
-                            <p:selectOneMenu id="soTipoPago" converter="entityConverter"
+                            <p:selectOneMenu id="soTipoPago" converter="entityConverter" autoWidth="false"
                                              value="#{ingresosActualizacionBean.pagoSelected.tipo}" filter="true"
                                              filterMatchMode="contains">
                                 <f:selectItem itemLabel="--Seleccione--" />
@@ -232,7 +232,7 @@
 
             <p:spacer style="height: 2rem;"/>
 
-            <p:panel id="pnlComplementoPago" header="COMPLEMENTOS DE PAGO">
+            <p:panel id="pnlComplementoPago" header="COMPLEMENTO DE PAGO">
                 <p:outputPanel id="panelComplemento" class="ui-fluid" rendered="#{ingresosActualizacionBean.habilitarComplemento}">
                     <div class="p-grid p-col-12">
                         <div class="p-col-6 p-md-3">
