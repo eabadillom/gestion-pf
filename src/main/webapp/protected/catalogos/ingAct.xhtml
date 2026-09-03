@@ -74,6 +74,9 @@
                 <f:facet name="header">
                     <p:outputLabel value="INGRESOS" />
                 </f:facet>
+                <p:column width="1rem">
+                	<h:outputText rendered="#{pPago.complementoPago ne null}" styleClass="fa fas fa-award" title="Complemento de pago" />
+                </p:column>
                 <p:column headerText="Fecha de pago" width="5rem" style="text-align: center;">
                     <h:outputText value="#{pPago.fecha}">
                         <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
@@ -129,7 +132,7 @@
                 </p:column>
                 <p:columnGroup type="footer">
 					<p:row>
-                    	<p:column colspan="4" />
+                    	<p:column colspan="5" />
                     	<p:column colspan="2" footerText="Total: #{ingresosActualizacionBean.totalPagos()}" style="text-align: right;">
                     	</p:column>
                     	<p:column colspan="3"/>

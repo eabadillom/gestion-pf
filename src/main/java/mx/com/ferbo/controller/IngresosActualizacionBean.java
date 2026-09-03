@@ -193,7 +193,7 @@ public class IngresosActualizacionBean implements Serializable {
     	Integer idCliente = this.cteSelect == null ? null : this.cteSelect.getCteCve();
     	String metodoPago = (this.tipoMetodoPago == null || "".equalsIgnoreCase(this.tipoMetodoPago.trim()) ? null : this.tipoMetodoPago);
     	
-        this.listaPago = this.pagoDAO.buscaPor(rfcEmisor, idCliente, this.startDate, this.endDate, metodoPago);
+        this.listaPago = this.pagoDAO.buscar(rfcEmisor, idCliente, this.startDate, this.endDate, metodoPago);
     }
 
     public void cargaInfoPago(Pago pPago) {
@@ -385,6 +385,7 @@ public class IngresosActualizacionBean implements Serializable {
     }
 
     public synchronized void agregarPagoComplemento(Pago pPago) {
+    	String title = null;
         String message = null;
         Severity severity = null;
         try {
@@ -395,6 +396,9 @@ public class IngresosActualizacionBean implements Serializable {
             if (pPago == null) {
                 throw new InventarioException("El pago no se seleccionó correctamente.");
             }
+            
+            if(pPago.getComplementoPago() != null)
+            	throw new InventarioException("El pago ya está asociado a otro complemento.");
 
             boolean existe = listaPagosSeleccionados.stream()
                     .anyMatch(p -> p.getId().equals(pPago.getId()));
@@ -407,18 +411,21 @@ public class IngresosActualizacionBean implements Serializable {
             listaPagosSeleccionados.add(pPago);
             listaPago.remove(pPago);
 
+            title = "Correcto";
             message = "Pago agregado";
             severity = FacesMessage.SEVERITY_INFO;
         } catch (InventarioException ex) {
+        	title = "Atención";
             message = ex.getMessage();
             severity = FacesMessage.SEVERITY_WARN;
         } catch (Exception ex) {
             log.error("Problema para recuperar agregar el pago.", ex);
+            title = "Error";
             message = "Ocurrió un problema para agregar el pago.";
             severity = FacesMessage.SEVERITY_ERROR;
         } finally {
             if (severity != null && message != null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Ingresos", message));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
             }
             PrimeFaces.current().ajax().update("form:messages", "form:pnlComplementoPago", "form:dtComplementoPago");
         }
