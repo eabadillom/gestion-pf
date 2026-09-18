@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+	<ui:define name="title">Consulta de complementos de pago</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<ui:include src="/protected/common/status-info.xhtml" />
+			<ui:include src="/protected/common/locale-es_MX.xhtml" />
+			<p:panel>
+				<div class="p-grid ui-fluid">
+					<div class="p-col-6 p-md-3">
+						<p:outputLabel value="Del" />
+						<p:datePicker value="#{consultaCPD.fechaInicio}" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" showIcon="true" placeholder="dd/mm/yyyy">
+							<p:ajax process="@this" />
+						</p:datePicker>
+					</div>
+					<div class="p-col-6 p-md-3">
+						<p:outputLabel value="al" />
+						<p:datePicker value="#{consultaCPD.fechaFin}" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" showIcon="true" placeholder="dd/mm/yyyy">
+							<p:ajax process="@this" />
+						</p:datePicker>
+					</div>
+					<div class="p-col-12 p-md-4">
+						<p:outputLabel value="Cliente" />
+						<p:selectOneMenu value="#{consultaCPD.cliente}" autoWidth="false" converter="entityConverter">
+							<f:selectItem noSelectionOption="true" itemLabel="--TODOS LOS CLIENTES--" />
+							<f:selectItems value="#{consultaCPD.clientes}" var="cliente" itemLabel="#{cliente.nombre}" itemValue="#{cliente}"></f:selectItems>
+							<p:ajax process="@this" update="form:dt-complementos" />
+						</p:selectOneMenu>
+					</div>
+					<div class="p-col-12 p-md-2">
+						<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+						<p:commandButton value="Buscar" icon="pi pi-search" process="@this" actionListener="#{consultaCPD.buscarComplementos()}" update="form:dt-complementos" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:commandButton>
+					</div>
+				</div>
+			</p:panel>
+			<p:spacer style="height: 1rem;"></p:spacer>
+			<p:dataTable id="dt-complementos" value="#{consultaCPD.complementos}" var="complemento" size="small" emptyMessage="No se encontraron complementos de pago">
+				<p:column headerText="Folio" width="8rem" style="text-align: center;">
+					<p:outputLabel value="#{complemento.serie}-#{complemento.numero}" />
+				</p:column>
+				<p:column headerText="Fecha registro" width="6rem" style="text-align: center;">
+					<p:outputLabel value="#{complemento.registro}">
+						<f:convertDateTime locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" />
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Emisor">
+					<p:outputLabel value="#{complemento.emisor.nb_emisor}" />
+				</p:column>
+				<p:column headerText="Receptor">
+					<p:outputLabel value="#{complemento.receptor.nombre}" />
+				</p:column>
+				<p:column width="2rem">
+					<p:commandButton icon="pi pi-bars" process="@this" actionListener="#{consultaCPD.cargaInfo(complemento)}" update="form:pnl-complemento" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide(); PF('dlgComplemento').show();">
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			<p:dialog widgetVar="dlgComplemento" header="Complemento de pago">
+				<p:outputPanel id="pnl-complemento" styleClass="ui-fluid p-grid p-col-12" >
+					<div class="p-col-6 p-md-2">
+						<div>
+							<p:outputLabel value="Serie (complemento)"></p:outputLabel>
+						</div>
+						<div>
+							<p:outputLabel value="#{consultaCPD.complemento.serie}-#{consultaCPD.complemento.numero}"></p:outputLabel>
+						</div>
+					</div>
+					<div class="p-col-6 p-md-5">
+						<div>
+							<p:outputLabel value="Emisor"></p:outputLabel>
+						</div>
+						<div>
+							<p:outputLabel value="#{consultaCPD.complemento.emisor.nb_emisor}"></p:outputLabel>
+						</div>
+					</div>
+					<div class="p-col-6 p-md-5">
+						<div>
+							<p:outputLabel value="Receptor"></p:outputLabel>
+						</div>
+						<div>
+							<p:outputLabel value="#{consultaCPD.complemento.receptor.nombre}"></p:outputLabel>
+						</div>
+					</div>
+					<p:dataTable value="#{consultaCPD.complemento.listPagos}" var="pago">
+						<p:column headerText="Factura">
+							<p:outputLabel value="#{pago.factura.nomSerie} - #{pago.factura.numero}"></p:outputLabel>
+						</p:column>
+						<p:column headerText="Importe">
+							<p:outputLabel value="#{pago.monto}"></p:outputLabel>
+						</p:column>
+						<p:column headerText="Parcialidad">
+							<p:outputLabel value="#{pago.parcialidad}"></p:outputLabel>
+						</p:column>
+						<p:column headerText="Fecha de pago">
+							<p:outputLabel value="#{pago.fecha}">
+								<f:convertDateTime locale="es_MX" pattern="dd / MMM / yyyy" timeZone="GMT-6"></f:convertDateTime>
+							</p:outputLabel>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+				
+			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

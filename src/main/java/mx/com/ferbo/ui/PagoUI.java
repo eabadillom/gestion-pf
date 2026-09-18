@@ -9,6 +9,8 @@ public class PagoUI {
 	
 	private BigDecimal saldo = null;
 	private BigDecimal saldoAnterior = null;
+	private BigDecimal subtotal = null;
+	private BigDecimal iva = null;
 	private Pago pago = null;
 	
 	public BigDecimal getSaldo() {
@@ -48,5 +50,17 @@ public class PagoUI {
 		PagoUI other = (PagoUI) obj;
 		return Objects.equals(pago, other.pago) && Objects.equals(saldo, other.saldo)
 				&& Objects.equals(saldoAnterior, other.saldoAnterior);
+	}
+	public BigDecimal getSubtotal() {
+		return subtotal;
+	}
+	public void setSubtotal(BigDecimal subtotal) {
+		this.subtotal = subtotal;
+	}
+	public BigDecimal getIva() {
+		return iva;
+	}
+	public void setIva(BigDecimal iva) {
+		this.iva = iva;
 	}
 }

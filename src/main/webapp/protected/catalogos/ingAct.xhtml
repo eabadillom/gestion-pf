@@ -12,13 +12,13 @@
             <p:panel id="pnl-datos-generales" header="DATOS GENERALES" >
                 <div class="p-grid ui-fluid">
                     <div class="p-col-12 p-md-5">
-                        <p:outputLabel for="startDateSelected" value="Desde" />
+                        <p:outputLabel for="startDateSelected" value="Del" />
                         <p:datePicker id="startDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.startDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                             <p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected" process="@this"/>
                         </p:datePicker>
                     </div>
                     <div class="p-col-12 p-md-5">
-                        <p:outputLabel for="endDateSelected" value="Hasta" />
+                        <p:outputLabel for="endDateSelected" value="Al" />
                         <p:datePicker id="endDateSelected" for="@previous" showIcon="true" value="#{ingresosActualizacionBean.endDate}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                             <p:ajax update="form:dt-pagos form:endDateSelected form:startDateSelected form:buscarPago" process="@this"/>
                         </p:datePicker>

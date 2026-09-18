@@ -2,10 +2,13 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -19,13 +22,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import com.ferbo.tools.value.money.Tax;
+
 import mx.com.ferbo.dao.BancoDAO;
-import mx.com.ferbo.dao.ClienteDAO;
 import mx.com.ferbo.dao.FacturaDAO;
 import mx.com.ferbo.dao.PagoDAO;
 import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.StatusFacturaDAO;
 import mx.com.ferbo.dao.TipoPagoDAO;
+import mx.com.ferbo.dao.n.ClienteDAO;
 import mx.com.ferbo.model.Bancos;
 import mx.com.ferbo.model.Cliente;
 import mx.com.ferbo.model.Factura;
@@ -90,13 +95,15 @@ public class IngresosCrudBean implements Serializable {
     private StatusFacturaDAO statusFacturaDAO;
     private Parametro pIVA;
     private ParametroDAO parametroDAO;
-    private BigDecimal iva;
+//    private BigDecimal iva;
     private String montoLetra;
     private Integer parcialidad;
 
     private Usuario usuario;
     private FacesContext faceContext;
     private HttpServletRequest httpServletRequest;
+    
+    private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("es", "MX"));
 
     public IngresosCrudBean() {
         cteDAO = new ClienteDAO();
@@ -135,7 +142,8 @@ public class IngresosCrudBean implements Serializable {
         sfpagoParcial = statusFacturaDAO.buscarPorId(4);
         sfporCobrar = statusFacturaDAO.buscarPorId(1);
         pIVA = parametroDAO.buscarPorNombre("IVA");
-        iva = new BigDecimal(pIVA.getValor()).setScale(2, BigDecimal.ROUND_HALF_UP);
+        
+//        iva = new BigDecimal(pIVA.getValor()).setScale(2, BigDecimal.ROUND_HALF_UP);
         log.info("El usuario {} entra a Alta de Ingresos.", this.usuario.getUsuario());
     }
 
@@ -146,61 +154,54 @@ public class IngresosCrudBean implements Serializable {
 
         try {
             log.info("Entrando a filtrar cliente {}", this.idCte);
-            this.cteSelect = cteDAO.buscarPorId(idCte);
-            if (this.cteSelect == null) {
+            this.cteSelect = cteDAO.buscarPorId(this.idCte).orElseThrow(() -> new InventarioException("No se encontró el cliente seleccionado."));
+            if (this.cteSelect == null)
                 throw new InventarioException("Seleccione un cliente.");
-            } else {
-                message = "Cliente seleccionado";
-            }
 
             this.listaFactura.clear();
 
-            if (pagoParcial == true) {
+            if (this.pagoParcial == true) {
                 StatusFactura sfpagoParcial = new StatusFactura();
                 sfpagoParcial.setId(4);
-                listaFactura.addAll(facturaDAO.buscarPorCteStatus(sfpagoParcial, cteSelect));
-                message = "Pago Parcial";
-                severity = FacesMessage.SEVERITY_INFO;
+                this.listaFactura.addAll(this.facturaDAO.buscarPorCteStatus(sfpagoParcial, this.cteSelect));
             }
-            if (porCobrar == true) {
+            
+            if (this.porCobrar == true) {
                 StatusFactura sfporCobrar = new StatusFactura();
                 sfporCobrar.setId(1);
-                listaFactura.addAll(facturaDAO.buscarPorCteStatus(sfporCobrar, cteSelect));
-                message = "Por Cobrar.";
-                severity = FacesMessage.SEVERITY_INFO;
-            }
-
-            if (listaFactura.size() > 0) {
-                message = "Seleccione la factura que desea pagar.";
-                severity = FacesMessage.SEVERITY_INFO;
+                this.listaFactura.addAll(this.facturaDAO.buscarPorCteStatus(sfporCobrar, this.cteSelect));
             }
 
             log.info("El usuario {} ha filtrado las facturas.", this.usuario.getUsuario());
             severity = FacesMessage.SEVERITY_INFO;
         } catch (InventarioException ex) {
+        	log.warn("{}", ex.getMessage());
+        	title = "Aviso";
             message = ex.getMessage();
             severity = FacesMessage.SEVERITY_WARN;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
         } catch (Exception ex) {
             log.error("Problema para recuperar los datos del cliente.", ex);
+            title = "Error";
             message = "Ocurrió un problema para consultar las facturas del cliente.";
             severity = FacesMessage.SEVERITY_ERROR;
-        } finally {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
+        } finally {
             PrimeFaces.current().ajax().update("form:messages", "form:dt-Factura");
         }
     }
 
     public void calculoFactura() {
-        log.debug("Factura: {}", facturaSelect);
-        List<Pago> listaPagos = pagofactDAO.buscarPorFactura(facturaSelect.getId());
+        log.debug("Factura: {}", this.facturaSelect);
+        List<Pago> listaPagos = this.pagofactDAO.buscarPorFactura(this.facturaSelect.getId());
         
-        BigDecimal saldoAnt = facturaSelect.getTotal();
-        BigDecimal totalFactura = facturaSelect.getTotal();
+        BigDecimal saldoAnt = this.facturaSelect.getTotal();
+        BigDecimal totalFactura = this.facturaSelect.getTotal();
         BigDecimal sumaTotal = BigDecimal.ZERO;
 
         Integer parcialidadBD = 0;
         Integer parcialidadUI = 0;
-        boolean esPPD = PAGO_EN_PARCIALIDADES.equals(facturaSelect.getMetodoPago());
+        boolean esPPD = PAGO_EN_PARCIALIDADES.equals(this.facturaSelect.getMetodoPago());
 
         if (esPPD) {
             parcialidadBD = listaPagos.stream()
@@ -209,17 +210,17 @@ public class IngresosCrudBean implements Serializable {
                     .max()
                     .orElse(0);
 
-            parcialidadUI = listaPago.stream()
+            parcialidadUI = this.listaPago.stream()
                     .filter(p -> p.getPago() != null)
-                    .filter(p -> p.getPago().getFactura().equals(facturaSelect))
+                    .filter(p -> p.getPago().getFactura().equals(this.facturaSelect))
                     .filter(p -> p.getPago().getParcialidad() != null)
                     .mapToInt(p -> p.getPago().getParcialidad())
                     .max()
                     .orElse(0);
 
-            parcialidad = Math.max(parcialidadBD, parcialidadUI) + 1;
+            this.parcialidad = Math.max(parcialidadBD, parcialidadUI) + 1;
         } else {
-            parcialidad = null;
+            this.parcialidad = null;
         }
 
         for (Pago p : listaPagos) {
@@ -227,17 +228,45 @@ public class IngresosCrudBean implements Serializable {
             saldoAnt = saldoAnt.subtract(p.getMonto());
         }
 
-        for (PagoUI p : listaPago) {
+        for (PagoUI p : this.listaPago) {
             if (p.getPago().getFactura().equals(facturaSelect)) {
                 saldoAnt = saldoAnt.subtract(p.getPago().getMonto());
             }
         }
 
         log.debug("Suma total de pagos: {}", sumaTotal);
-        saldoAnterior = saldoAnt;
-        restaTotal = totalFactura.subtract(sumaTotal);
+        this.saldoAnterior = saldoAnt;
+        this.restaTotal = totalFactura.subtract(sumaTotal);
+        this.fecha = new Date();
+        this.tipoP = null;
+        this.bancoCve = null;
+        this.referencia = null;
+        this.cantidadApagar = null;
         
         this.hora = LocalTime.of(0, 0, 0);
+    }
+    
+    public List<Factura> facturacionPendiente() {
+    	List<Factura> facturas;
+    	
+    	if(this.listaPago == null || this.listaPago.size() <= 0)
+    		return this.listaFactura;
+    	
+    	facturas = this.listaPago.stream()
+    			.map(p -> p.getPago().getFactura())
+    			.collect(Collectors.toList());
+    	
+    	return this.listaFactura.stream()
+    			.filter(f -> facturas.contains(f) == false)
+    			.collect(Collectors.toList());
+    }
+    
+    public List<TipoPago> tiposDePago() {
+    	List<TipoPago> tiposDePago = this.listatipoPago.stream()
+    			.filter(tp -> tp.getId() != 5)
+    			.collect(Collectors.toList());
+    	
+    	return tiposDePago;
     }
 
     public synchronized void agregaPagoFactura() {
@@ -247,6 +276,7 @@ public class IngresosCrudBean implements Serializable {
         BigDecimal saldo = BigDecimal.ZERO;
         Pago pg = null;
         PagoUI pagoUI = null;
+        Tax iva;
 
         try {
             log.debug("Factura: {}", this.facturaSelect);
@@ -311,8 +341,9 @@ public class IngresosCrudBean implements Serializable {
             for (PagoUI p : listaPago) {
                 totalGlobal = totalGlobal.add(p.getPago().getMonto());
             }
-            subtotalGlobal = totalGlobal.divide(new BigDecimal(1).setScale(2, BigDecimal.ROUND_HALF_UP).add(iva), BigDecimal.ROUND_HALF_UP);
-            ivaGlobal = subtotalGlobal.multiply(iva).setScale(2, BigDecimal.ROUND_HALF_UP);
+            iva = Tax.ofPercentage(this.facturaSelect.getPorcentajeIva());
+            subtotalGlobal = totalGlobal.divide(new BigDecimal(1).setScale(2, BigDecimal.ROUND_HALF_UP).add(iva.getRate()), BigDecimal.ROUND_HALF_UP);
+            ivaGlobal = subtotalGlobal.multiply(iva.getRate()).setScale(2, BigDecimal.ROUND_HALF_UP);
 
             FormatUtil formato = new FormatUtil();
 
@@ -356,6 +387,7 @@ public class IngresosCrudBean implements Serializable {
         Pago pago = null;
         Factura factura = null;
         BigDecimal saldoAnterior = BigDecimal.ZERO;
+        Tax iva;
 
         try {
 
@@ -404,8 +436,9 @@ public class IngresosCrudBean implements Serializable {
                     parcialidad++;
                 }
             }
-            subtotalGlobal = totalGlobal.divide(new BigDecimal(1).setScale(2, BigDecimal.ROUND_HALF_UP).add(iva), BigDecimal.ROUND_HALF_UP);
-            ivaGlobal = subtotalGlobal.multiply(iva).setScale(2, BigDecimal.ROUND_HALF_UP);
+            iva = Tax.ofPercentage(factura.getPorcentajeIva());
+            subtotalGlobal = totalGlobal.divide(new BigDecimal(1).setScale(2, BigDecimal.ROUND_HALF_UP).add(iva.getRate()), BigDecimal.ROUND_HALF_UP);
+            ivaGlobal = subtotalGlobal.multiply(iva.getRate()).setScale(2, BigDecimal.ROUND_HALF_UP);
 
             FormatUtil formato = new FormatUtil();
 
@@ -485,6 +518,12 @@ public class IngresosCrudBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
             PrimeFaces.current().ajax().update("form:messages", "form:dt-ingAlta", "form:dt-Factura", "form:detallesFacturacion", "form:Cliente", "form:statusPagoParcial", "form:statusPorCobrar");
         }
+    }
+    
+    public synchronized String format(BigDecimal valor) {
+    	if(valor == null)
+    		return "";
+    	return currencyFormat.format(valor);
     }
 
     public Integer getIdCte() {

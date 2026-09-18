@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -40,6 +42,14 @@ public class ComplementoPago implements Serializable
     @Basic(optional = false)
     @Column(name = "cd_comp_pago")
     private Integer id;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "cd_emisor")
+    private EmisoresCFDIS emisor;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_cliente")
+    private Cliente receptor;
     
     @Basic(optional = false)
     @NotNull
@@ -190,5 +200,21 @@ public class ComplementoPago implements Serializable
     public String toString() {
         return "ComplementoPago[" + "id=" + id + ", registro=" + registro + ", timbrado=" + timbrado + ", serie=" + serie + ", numero=" + numero + ", pac=" + pac + ", uuid=" + uuid + ", certificadoSAT=" + certificadoSAT + ']';
     }
+
+	public EmisoresCFDIS getEmisor() {
+		return emisor;
+	}
+
+	public void setEmisor(EmisoresCFDIS emisor) {
+		this.emisor = emisor;
+	}
+
+	public Cliente getReceptor() {
+		return receptor;
+	}
+
+	public void setReceptor(Cliente receptor) {
+		this.receptor = receptor;
+	}
     
 }

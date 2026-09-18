@@ -109,6 +109,9 @@ public class IngresosActualizacionBean implements Serializable {
         complementoBL = new ComplementoBL();
         this.habilitarComplemento = Boolean.FALSE;
         this.tipoMetodoPago = null;
+        
+        this.startDate = new Date();
+        this.endDate = new Date();
     }
 
     @SuppressWarnings("unchecked")
@@ -130,8 +133,6 @@ public class IngresosActualizacionBean implements Serializable {
         listatipoPago = tipoPagoDAO.buscarTodos();
         listaPagosSeleccionados = new ArrayList<Pago>();
         listaMedioPago = medioPagoDAO.buscarVigentes(new Date());
-        this.startDate = new Date();
-        this.endDate = new Date();
 
         statusPorCobrar = sfDAO.buscarPorId(StatusFactura.STATUS_POR_COBRAR);
         statusPagada = sfDAO.buscarPorId(StatusFactura.STATUS_PAGADA);
@@ -491,10 +492,17 @@ public class IngresosActualizacionBean implements Serializable {
             if (cteSelect.getCteCve() == null) {
                 throw new InventarioException("Debe seleccionar un cliente para generar el complemento de pago.");
             }
+            
+            ComplementoPago complementoPago = new ComplementoPago();
+    		complementoPago.setRegistro(new Date());
+    		complementoPago.setSerie(serieComplementoPago.getSerie());
+    		complementoPago.setNumero(serieComplementoPago.getNumero());
+    		complementoPago.setFormaPago(medioPagoSelect.getFormaPago());
+    		complementoPago.setEmisor(emisoresSelected);
+    		complementoPago.setReceptor(cteSelect);
+            complementoBL.guardarComplementoPago(complementoPago);
 
-            complementoBL.guardarComplementoPago(serieComplementoPago, medioPagoSelect.getFormaPago());
-
-            complementoPago = complementoBL.obtenerPorFolioSerie(serieComplementoPago.getNumero(), serieComplementoPago.getSerie());
+            this.complementoPago = complementoBL.obtenerPorFolioSerie(serieComplementoPago.getNumero(), serieComplementoPago.getSerie());
 
             for (Pago pago : listaPagosSeleccionados) {
                 pago.setComplementoPago(complementoPago);
