@@ -36,6 +36,11 @@ public class ComplementoBL {
 		this.serieComplementoPagoDAO = new SerieComplementoPagoDAO();
 	}
 	
+	public void actualizar(ComplementoPago pago)
+	throws InventarioException {
+		this.complementoPagoDAO.actualizar(pago);
+	}
+	
 	public ComplementoPago crear() {
 		ComplementoPago complemento = new ComplementoPago();
 		

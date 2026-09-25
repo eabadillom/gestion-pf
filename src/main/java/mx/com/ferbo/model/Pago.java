@@ -83,20 +83,15 @@ public class Pago implements Serializable {
     private ComplementoPago complementoPago;
     
     @Basic(optional = true)
+    @Column(name = "cd_forma_pago")
+    private String formaPago;
+    
+    @Basic(optional = true)
     @Column(name = "nu_parcialidad")
+    @Size(max = 5)
     private Integer parcialidad;
 
     public Pago() {
-    }
-
-    public Pago(Integer id) {
-        this.id = id;
-    }
-
-    public Pago(Integer id, BigDecimal monto, Date fecha) {
-        this.id = id;
-        this.monto = monto;
-        this.fecha = fecha;
     }
 
     public Integer getId() {
@@ -209,5 +204,13 @@ public class Pago implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.Pago[ id=" + id + " ]";
     }
+
+	public String getFormaPago() {
+		return formaPago;
+	}
+
+	public void setFormaPago(String formaPago) {
+		this.formaPago = formaPago;
+	}
 
 }

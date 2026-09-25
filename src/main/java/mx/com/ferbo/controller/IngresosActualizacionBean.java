@@ -197,11 +197,11 @@ public class IngresosActualizacionBean implements Serializable {
         this.listaPago = this.pagoDAO.buscar(rfcEmisor, idCliente, this.startDate, this.endDate, metodoPago);
     }
 
-    public void cargaInfoPago(Pago pPago) {
+    public void cargaInfoPago(Pago pago) {
         String messages = null;
         Severity severity = null;
         try {
-            pagoSelected = pPago;
+            pagoSelected = pago;
             severity = FacesMessage.SEVERITY_INFO;
             messages = "Se seleccionó correctamente el pago";
         } catch (Exception ex) {
@@ -384,8 +384,12 @@ public class IngresosActualizacionBean implements Serializable {
             PrimeFaces.current().ajax().update("form:messages");
         }
     }
+    
+    public synchronized void seleccionarPagoComplemento(Pago pago) {
+    	this.pagoSelected = pago;
+    }
 
-    public synchronized void agregarPagoComplemento(Pago pPago) {
+    public synchronized void agregarPagoComplemento() {
     	String title = null;
         String message = null;
         Severity severity = null;
@@ -394,27 +398,29 @@ public class IngresosActualizacionBean implements Serializable {
                 throw new InventarioException("Debe seleccionar un folio para el complemento de pago.");
             }
 
-            if (pPago == null) {
+            if (pagoSelected == null) {
                 throw new InventarioException("El pago no se seleccionó correctamente.");
             }
             
-            if(pPago.getComplementoPago() != null)
+            if(pagoSelected.getComplementoPago() != null)
             	throw new InventarioException("El pago ya está asociado a otro complemento.");
 
             boolean existe = listaPagosSeleccionados.stream()
-                    .anyMatch(p -> p.getId().equals(pPago.getId()));
+                    .anyMatch(p -> p.getId().equals(pagoSelected.getId()));
 
             if (existe) {
                 throw new InventarioException("El pago ya se encuentra registrado.");
             }
 
-            log.info("Agregando pago {} a la lista de complemento de pago.", pPago.getId());
-            listaPagosSeleccionados.add(pPago);
-            listaPago.remove(pPago);
+            log.info("Agregando pago {} a la lista de complemento de pago.", pagoSelected.getId());
+            listaPagosSeleccionados.add(pagoSelected);
+            listaPago.remove(pagoSelected);
 
-            title = "Correcto";
-            message = "Pago agregado";
+            title = "Pago agregado al complemento";
+            message = "Forma de pago " + pagoSelected.getFormaPago();
             severity = FacesMessage.SEVERITY_INFO;
+            
+            PrimeFaces.current().executeScript("PF('dlgFormaPago').hide()");
         } catch (InventarioException ex) {
         	title = "Atención";
             message = ex.getMessage();
@@ -425,9 +431,7 @@ public class IngresosActualizacionBean implements Serializable {
             message = "Ocurrió un problema para agregar el pago.";
             severity = FacesMessage.SEVERITY_ERROR;
         } finally {
-            if (severity != null && message != null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
-            }
+        	FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, title, message));
             PrimeFaces.current().ajax().update("form:messages", "form:pnlComplementoPago", "form:dtComplementoPago");
         }
     }
